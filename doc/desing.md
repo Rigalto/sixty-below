@@ -200,14 +200,17 @@ Une table particulière permet de mémoriser les éléments de configuration qui
 
 ### 6.1 Gestion Mémoire (Garbage Collection)
 
-  * **Object Pooling :** Obligatoire pour les entités fréquentes (Projectiles, Particules, Ennemis). Interdiction d'instancier des objets (`new Class`) dans la boucle de rendu (`render`).
-  * **Pre-allocation :** Les tableaux et buffers sont pré-alloués autant que possible.
+  * **Singleton :** Une seule création des instances pour la majorité des classes. Ces classes vont souvent gérer des 'Array' (ou des Map) d'objets.
+  * **Object Pooling :** A implémenter uniquement si les performances ne sont pas respectées. A priori, il y a peu de création/suppression d'objets. A monitorer.
+  * **Pre-allocation :** Les tableaux et buffers sont pré-alloués autant que possible. Par exemple, l'ensemble des tuiles du monde est chargé en mémoire au lancement d'une partie dans un `Array` qui n'est plus modifié par la suite.
 
 ### 6.2 Rendu
 
-  * **Culling :** Ne dessiner que ce qui est visible à l'écran + une marge (buffer).
+  * **Culling :** Ne dessiner que ce qui est visible à l'écran + une marge (buffer). Dans la pratique, l'écran visible est de 4 chunks de haut et 3 de large. On générera donc uniquement les images pour un rectangle de 5*4 chunks.
+  * **Conversion chunk vers image** : La conversion d'un chunk en image à afficher est effectuée dans une micro-tâche (budget **MicroTasks** au lieu de budget **Render**). On peut donc être amené à afficher une ancienne version du chunk pendant une à quelques frames. Ce délai est acceptable.
+  * **Framing** : on utilisera la technique de Bitmasking (méthode **4-connectivity**) pour ajuster l'image affichée pour une tuile en fonction de ses voisins. Les tuiles ont des bords en partie transparents, qui seront remplis par la couleur dominante de la tuile adjacente. Cela permet la visualisation d'une diffusion d'une matière dans une autre.
   * **OffscreenCanvas :** Étude de l'utilisation d'un Worker dédié au rendu si le thread principal sature.
-  * **Sprite Batching :** Regrouper les appels de dessin pour limiter les context switchs GPU/CPU.
+  * **Sprite Batching :** Regrouper les appels de dessin pour limiter les context switchs GPU/CPU. Analyser la pertinence de ce point pour une utilisation Canvas uniquement.
 
 -----
 
@@ -215,37 +218,33 @@ Une table particulière permet de mémoriser les éléments de configuration qui
 
 ### 7.1 Structure des fichiers (Draft)
 
+Contrairement à l'usage, plusieurs classes sont regroupées dans un même fichier source. Le but est d'améliorer le temps de chargement de l'application.
+
 ```
 /sixty-below
-├── /public          # Assets statiques (images, sons)
+├── /public             # Assets statiques (images, sons)
 ├── /src
-│   ├── /core        # Moteur (Loop, Events, ECS base)
-│   ├── /modules
-│   │   ├── /world   # Génération, Chunks, Physics
-│   │   ├── /combat  # Tour par tour, Pathfinding, Spells
-│   │   └── /render  # Canvas managers, Sprites
-│   ├── /data        # IndexedDB managers, Schemas
-│   └── /utils       # Math, Helpers, Constants
-├── /tests           # Tests unitaires critiques
+│   ├── core.mjs        # Moteur (Loop, Events, ECS base)
+│   ├── world.mjs       # Chunks, Physics
+│   ├── action.mjs      # Mining, Foraging, Digging, Logging...
+│   ├── combat.mjs      # Tour par tour, Pathfinding, Spells
+│   │── render.mjs      # Canvas managers, Sprites
+│   ├── database.mjs    # IndexedDB managers, Schemas
+│   ├── constant.mjs    # Constants, Tile definition, Item definition
+│   ├── generate.mjs       # World Generation
+│   └── /utils          # Math, Helpers
+├── /tests              # Tests unitaires critiques
 ├── index.html
 └── package.json
 ```
 
+__To Do__ : comment utiliser GitHub pour lancer l'application ?
+
 ### 7.2 Tooling
 
-  * **Bundler :** Vite.js (HMR rapide, Build optimisé).
-  * **Linter :** ESLint + Prettier.
-  * **CI/CD :** GitHub Action pour déploiement sur la branche `gh-pages` à chaque push sur `main`.
+  * **Bundler :** Aucun
+  * **Linter :** Respect de la convnetion 'Format' de Google :
+      * pas de point virgule à la fin des instructions
+  * **CI/CD :** GitHub Action pour déploiement sur la branche `gh-pages` à chaque push sur `main`. A m'expliquer.
+  * **Tests unitaires :** Outil à écrire - Politique à déterminer. Moking à prévoir. 
 
------
-
-## 8\. Journal des Décisions (Architecture Decision Records - ADR)
-
-  * *2025-11-20* : Choix du nom "Sixty-Below".
-  * *2025-11-20* : Validation du mode "Serverless" avec IndexedDB.
-
------
-
-### Prochaine étape pour l'IA :
-
-Une fois ce fichier en place, nous attaquerons le **Chapitre 7 (Organisation détaillée)** pour initialiser le repo avec `Vite`, ou le **Chapitre 2 (Architecture)** pour coder la boucle principale.
