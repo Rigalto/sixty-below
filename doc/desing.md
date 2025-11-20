@@ -78,7 +78,7 @@ Pour découpler les composants de l'application, un module de gestion d'événem
   * Ecoute d'un événement (`eventBus.on(idEvent, fonction)`)
   * Appel direct des fonctions lorsque l'événement est déclenché (si le traitement dépasse 0.1 millisecondes, cette fonction est en charge de créer une micro-tâche)
 
-### 2.6 Maitien d'un temps absolu
+### 2.7 Maitien d'un temps absolu
 
 Le jeu se déroule dans un monde qui a son propre calendrier. Il est nécessaire que la date courante dans le monde soit indépendante de la date réelle de l'exécution de l'application.
   * Au lancement du jeu, la date est initialisée à 0.
@@ -161,12 +161,24 @@ __TO DO__ : déterminer si le contenu des tuiles est stocké sur un ou deux octe
 ### 5.1 Base de Données Locale
 
   * Technologie : **IndexedDB**.
-  * Wrapper : Utilisation de `idb` (bibliothèque légère de Jake Archibald) pour les Promesses.
+  * Wrapper : Codage d'une classe dédiée.
+  * Sérialisation : Inutile, la base de données le fait en interne (attention à certaines contraintes de performance)
 
-### 5.2 Stratégie de Sauvegarde
+### 5.2 Sauvegarde synchrone
 
-  * Auto-save sur événement (changement de chunk, fin de combat).
-  * Sérialisation : Les entités et chunks doivent avoir des méthodes `toJSON()` et `fromJSON()` performantes.
+Pour ne pas avoir de création ou de disparition d'items et assurer la sauvegarde consistante de l'état du monde, une classe est dédiée à la gestion de la basse de données locale.
+  * Point d'entrée permettant de signaler qu'un élément a été modifié et doit être sauvegardé de façon synchrone (paramètres : objectStore, opération (update/create ou delete), record)
+  * Point d'entrée permettant de signaler qu'au moins une des tuiles du monde a été modifié (paramètre : le chunk de la tuile modifiée)
+  * Sauvegarde effectuée deux secondes après le premier signalement d'une modification (utilisation deu TaskManager)
+  * Utilisatoin d'une session pour rollback en cas de problème lors de la sauvegarde
+  * Conception interne : attention aux problèmes de performance avec les tableaux compacts.
+
+### 5.2 Item de configuration
+
+Une table particulière permet de mémoriser les éléments de configuration qui ne sont pas directement reliés au monde et ses objets :
+  * Lecture d'un éléments de configuration (paramètre : identifiant (Strong) de l'élément de configuration / Retour : valeur de l'élément de configuration)
+  * Ecriture d'un éléments de configuration (paramètre : identifiant (Strong) de l'élément de configuration, valeur de l'élément de configuration)
+  * Utilisée pour la position du joueur, l'heure du monde (timestamp)...
 
 -----
 
