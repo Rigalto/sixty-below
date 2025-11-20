@@ -221,24 +221,83 @@ Une table particulière permet de mémoriser les éléments de configuration qui
 Contrairement à l'usage, plusieurs classes sont regroupées dans un même fichier source. Le but est d'améliorer le temps de chargement de l'application.
 
 ```
+L'architecture privilégie le regroupement par domaine fonctionnel (Functional Cohesion) pour limiter le nombre de requêtes HTTP (module loading) sans bundler.
+
 /sixty-below
-├── /public             # Assets statiques (images, sons)
+├── /assets
+│   ├── /sprites             # Tilesets, Charsets (PNG)
+│   ├── /sounds              # SFX, Ambiances (MP3/OGG)
+│   └── /data                # Tiles, Items, Recipes, Chests, Tables de loot, Actions de combat
 ├── /src
-│   ├── core.mjs        # Moteur (Loop, Events, ECS base)
-│   ├── world.mjs       # Chunks, Physics
-│   ├── action.mjs      # Mining, Foraging, Digging, Logging...
-│   ├── combat.mjs      # Tour par tour, Pathfinding, Spells
-│   │── render.mjs      # Canvas managers, Sprites
-│   ├── database.mjs    # IndexedDB managers, Schemas
-│   ├── constant.mjs    # Constants, Tile definition, Item definition
-│   ├── generate.mjs       # World Generation
-│   └── /utils          # Math, Helpers
-├── /tests              # Tests unitaires critiques
-├── index.html
-└── package.json
+│   ├── core.mjs             # LE CERVEAU
+│   │                        # - GameLoop (Update/Render/MicroTask budgets)
+│   │                        # - InputManager (Keyboard/Mouse listeners)
+│   │                        # - EventBus (Pub/Sub)
+│   │                        # - TimeManager (Temps réel vs Temps monde)
+│   │                        # - MicroTaskManager
+│   │                        # - TaskScheduler
+│   │
+│   ├── world.mjs            # LA PHYSIQUE & L'ESPACE
+│   │                        # - ChunkManager (Grid storage)
+│   │                        # - PhysicsSystem (AABB Collisions, Gravity, Velocity)
+│   │                        # - LiquidSimulator
+│   │
+│   ├── action.mjs           # LES INTERACTIONS
+│   │                        # - PlayerManager (Déplacement, animation des actions, équipement, caractéristiques)
+│   │                        # - ActionManager (Mining, Cutting, Fishing, Foraging)
+│   │                        # - FurnitureManager (Placememnt/suppression Furniture/Crafting Station)
+│   │                        # - BuffManager (Placememnt/suppression Furniture/Crafting Station)
+│   │                        # - Interaction logique (ex: ouvrir un coffre, remplir une bouteille d'eau)
+│   │
+│   ├── buff.mjs             # LES MODIFICATEURS (STATUS EFFECTS)
+│   │                        # - BuffManager (Container par entité (joueur, monstre, plante...) et par état (exploration / combat)
+│   │                        # - Definitions (Static, Timed, Periodic, Aura)
+│   │                        # - StatModifiers (Calcul des bonus/malus)
+│   │                        # - BuffDisplay (Dans un Canvas en overlay - Affichage configurable)
+│   │                        # - Implentation de type middleware
+│   │
+│   ├── combat.mjs           # LE TACTIQUE
+│   │                        # - ArenaCreator (Création procédurale du terrain - forme, murs et trous)
+│   │                        # - TurnManager (Initiative, tours)
+│   │                        # - GridPathfinder (A* pour le combat)
+│   │                        # - SpellSystem (Portée, DamageCalculator)
+│   │                        # - CombatAI (définition des behaviors possibles, chaque monstre utilisera un ou plusieurs behaviors)
+│   │
+│   ├── ui.mjs               # LES INTERFACES PANEL/DOM (LOGIQUE)
+│   │                        # - UIManager (State machine des fenêtres)
+│   │                        # - InventorySystem (Slots, Stacking, Drag&Drop logic)
+│   │                        # - CraftSystem (Recettes, validation)
+│   │                        # - HelpSystem (aide en ligne, Encyclopédie)
+│   │                        # - PreferenceSystem (configuration UI, clavier, souris...)
+│   │
+│   ├── render.mjs           # LES YEUX
+│   │                        # - Renderer (Canvas Context management)
+│   │                        # - Camera (Viewport, Culling, Zoom)
+│   │                        # - SpriteManager (Animations, Batching virtuel)
+│   │                        # - Layering (Background, World, Entity, UI)
+│   │                        # - Overlays (Environnement, Hotbar, buffs)
+│   │
+│   ├── database.mjs         # LA MÉMOIRE
+│   │                        # - IDBWrapper (IndexedDB abstraction)
+│   │                        # - SaveManager (Serializer/Deserializer)
+│   │
+│   ├── generate.mjs         # LE CRÉATEUR (Chargé dynamiquement)
+│   │                        # - ProcGen (Perlin, Automates)
+│   │
+│   ├── constant.mjs         # LES RÉFÉRENCES
+│   │                        # - Constantes globales (Taille tuile, FPS)
+│   │                        # - Enums (State, Biome, ItemType)
+│   │
+│   └── utils.mjs            # LA BOÎTE À OUTILS
+│                            # - Math helpers, Random custom
+│
+├── /tests                   # Tests unitaires critiques
+├── index.html               # Point d'entrée (ES Module Loader)
+└── package.json             # Pour ESLint/Tests uniquement
 ```
 
 __To Do__ : comment utiliser GitHub pour lancer l'application ?
+__To Do__ : comment implémenter l'aide en ligne et l'encyclopédie (le plus possible automatique, mais avec un peu de lore)
 
 ### 7.2 Tooling
 
