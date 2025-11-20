@@ -50,8 +50,8 @@ Priorité au **Data-Oriented Design** pour la performance.
 
 Le jeu bascule entre trois états majeurs qui changent les inputs et l'interface :
 
-  * `STATE_EXPLORATION` : Moteur physique actif, Inputs temps réel.
-  * `STATE_INFORMATION` : Moteur physique figé, affichage de panels d'information (inventaire, carte, équipement, boutique, aide en ligne...)
+  * `STATE_EXPLORATION` : Moteur physique actif, Inputs temps réel, Hot Bar.
+  * `STATE_INFORMATION` : Moteur physique figé, affichage de panels d'information (inventaire, craft, carte, équipement, boutique, aide en ligne...)
   * `STATE_COMBAT` : Moteur physique figé, Inputs tour par tour, HUD tactique.
 
 ### 2.4 Gestion des Micro-tâches (MicroTasker)
@@ -97,18 +97,41 @@ __TO DO__ : trouver des termes corrects pour les deux références 'temps-réel'
 ### 3.1 Structure du Monde
 
   * **Grille de Tuiles (Tilemap) :** Le monde est une grille 2D.
-  * **Chunk System :** Le monde est divisé en `Chunks` (ex: 32x32 tuiles) pour le chargement/déchargement dynamique.
-  * **Stockage des Tuiles :** Utilisation de `TypedArrays` (ex: `Uint16Array`) pour stocker les ID des blocs en mémoire (Optimisation RAM).
+  * **Taille du Monde (fixe) :** Le monde fait 2048 tuiles de large et 768 tuiles de haut.
+  * **Taille d'une tuile (fixe) :** Chaque tuile fait 16 pixels de haut et 16 pixels de large.
+  * **Stockage des Tuiles :** Toutes les tuiles du monde sont présentes en mémoire. Cela représente une taille de 1.5Mbytes ou 3Mbytes, parfaitement acceptable pour les navigateurs et ordinateurs modernes.
+  * **Chunk System :** Le monde est divisé en `Chunks` de 16x16 tuiles, pour le chargement/déchargement dynamique. Donc le monde fait 128 chunks en largeur et 48 en hauteur. Il comporte donc 6144 chunks, chacun étant un enregistrement en base de données.
+  * **Taille fixe :** les dimensions du monde, des chunks et des tuiles sont fixes. Il est donc **interdit** d'utiliser des constantes et on codera en dur les **masks** et opérations **bitwise** permettant d'accéder et d'identifier rapidement aux données
+  *  **Echelle :** La dimension d'une tuile correspond à 50 centimètres pour le personnage. Le monde fait donc un kilomètre de large et 350 mètre de profond.
+
+__TO DO__ : définir un terme pour le joueur (personnage derrière le clavier) et le personnage dans le monde. Utiliser ensuite ce terme partout.
+__TO DO__ : déterminer si le contenu des tuiles est stocké sur un ou deux octets. Un octet suffit largement pour coder les différents types de briques. Ajouter un deuxième octet permettrait d'ajouter des informations supplémentaires sans devoir utiliser une indirection (tuile bloquée ou non, minable ou non, solide, liquide ou gazeuse, etc.). Trois choix d'implémentation (au moins) sont à analyser : Tuiles codées sur un octet et indirection pour obtenir les informations supplémentaires / Tuiles codées sur deux octets pour éviter les indirections mais sauvegarde également de ces informations en base de données / Deux tableaux, un pour la nature des tuiles et l'autre pour les informations complémentaitres, même index pour accéder aux deux tableaux mais seul le premier est sauvegardé en base de données.
 
 ### 3.2 Génération Procédurale
 
-  * Utilisation de **Web Workers** pour ne pas geler l'interface pendant la génération.
-  * Algorithmes : Bruit de Perlin/Simplex pour le relief, Automates Cellulaires pour les cavernes.
+  * Génération non temps réel : on gèle l'interface pendant la génération (état `STATE_INFORMATION`).
+  * Découpage en zones verticales pour 3 **biomes** (forêt, désert et jungle) plus la mer à gauche et à droite.
+  * Découpage en zones horizontales  (4 **Layers**) pour gérer la difficulté (surface, underworld, caverns...).
+  * Bruit de Perlin/Simplex pour rendre plus naturelles les frontières entre les zones rectangulaires.
+  * Algorithme de creusement pour les tunnels et cavernes.
+  * Gestion des fluides pour remplissage des lacs (water), des ruches (honey), des mares de sève dans la jungle (sap).
+  * Algorithme pour ajouter les coffres, les minerais, la flore, les éléments de décor, d'autres éléments minables.
+  * Algorithme pour éviter les trous isolés ou les tuiles isolées (nettoyage final).
+  * Le bas du monde est rempli de lave 'Lava' (pour éviter une limite verticale arbitraire) de 1 à 3 case de haut (Perlin Noise).
+  * Cible temps d'exécution : **10 secondes**
+  * Uilisation d'une **World Key** qui permet de regénérer le même monde à partir de la même clé (clé stockée en base de données et affichée).
 
 ### 3.3 Physique (Exploration)
 
+  * Déplacement du joueur par flèches directionnelles et touches ZQSD
+  * Caméra centrée sur le joeuur
+  * Zoom possible sur le monde
   * Collision AABB (Axis-Aligned Bounding Box) simple.
   * Pas de moteur physique lourd (Matter.js), implémentation custom légère spécifique aux jeux de tuiles.
+  * S'applique uniquement au personnage et aux monstres (pas de projectiles, ni d'effets spéciaux hormis l'animation des sprites)
+  * Algorithme de gestion des fluides par 'LiquidBody' pour Water, Honey et Sap (paramétrable en fonction de la viscosité)
+  * Algorithme de gestion des fluides pour le sable (automate cellulaire)
+  * AI simplifiée pour le déplacement des monstres (ignore le joueur, suit le joueur, évite le joueur, aime/déteste ses semblables, chasseur/proies
 
 -----
 
@@ -117,13 +140,19 @@ __TO DO__ : trouver des termes corrects pour les deux références 'temps-réel'
 ### 4.1 Déclenchement
 
   * La rencontre d'un ennemi gèle le `World System` et instancie le `Tactical System`.
+  * Certains énemis attaquent automatiquement le joueur (AI simplifiée, buffs/debuffs).
+  * Le joueur peut toujours attaquer un monstre en cliquant dessus.
   * La zone de combat se dessine directement sur le terrain actuel (overlay de grille).
 
 ### 4.2 Mécaniques
 
-  * **Initiative :** Ordre de jeu déterminé au début.
-  * **Grille :** Pathfinding (A\* ou Dijkstra) contraint par les obstacles du terrain généré (ex: on ne peut pas marcher dans un mur, on peut sauter un trou).
+  * **Initiative :** Ordre de jeu déterminé au début (caractéristique du joueur (modifiable) et des monstres (fixe)).
+  * **Génération automatique :** Génération automatique du terrain (forme, présence de trous et de mur) en fonction de la zone (biome + layer
+  * **Grille :** Pathfinding (A\* ou Dijkstra) contraint par les obstacles du terrain généré (on ne peut pas marcher dans un mur ni sauter un trou).
+  * **Ligne de vue** : bloquée par les joueurs et les murs, non bloquée par les trous
   * **Ressources :** PA (Points d'Action) et PM (Points de Mouvement).
+  * **Challenges :** sous-buts permettant de diversifier les combats (cf Dofus)
+  * **Evolutivité :** possibilité d'ajout de mécaniques spéciales (Boss)
 
 -----
 
