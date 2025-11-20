@@ -90,6 +90,19 @@ Le jeu se déroule dans un monde qui a son propre calendrier. Il est nécessaire
 
 __TO DO__ : trouver des termes corrects pour les deux références 'temps-réel' et 'du monde', termes à utiliser dans la documenation et le programme.
 
+
+### 2.7 Directive d'implémentation pour les Singletons
+
+La plupart des classes sont implémentées sous la forme d'un **singleton** :
+
+```javascript
+class GrassSystem {
+...
+}
+export const grassSystem = new GrassSystem()
+```
+
+
 -----
 
 ## 3\. Système "World" (Exploration)
