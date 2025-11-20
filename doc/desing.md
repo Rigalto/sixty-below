@@ -22,7 +22,7 @@
   * **Performance :** 60 FPS constants. Budget frame \< 16ms.
   * **Stack :** JavaScript Moderne (ESNext). Pas de framework de jeu lourd (Phaser/Unity). Bibliothèques légères autorisées comme sources d'inspiration.
   * **Rendu :** Canvas API (2D context).
-  * **Architecture :** Client-Side Only. Base de Données Locale.
+  * **Architecture :** Client-Side Only. Base de Données Locale. La majorité des classes sont implémentées comme des singletons (pas d'injection, seulement une importation)
   * **Hébergement :** Doit tourner nativement depuis un repository GitHub (GitHub Pages).
 
 -----
@@ -110,6 +110,7 @@ __TO DO__ : déterminer si le contenu des tuiles est stocké sur un ou deux octe
 ### 3.2 Génération Procédurale
 
   * Génération non temps réel : on gèle l'interface pendant la génération (état `STATE_INFORMATION`).
+  * Importation dynamique du module générant le monde (il est très peu souvent utilisé)
   * Découpage en zones verticales pour 3 **biomes** (forêt, désert et jungle) plus la mer à gauche et à droite.
   * Découpage en zones horizontales  (4 **Layers**) pour gérer la difficulté (surface, underworld, caverns...).
   * Bruit de Perlin/Simplex pour rendre plus naturelles les frontières entre les zones rectangulaires.
