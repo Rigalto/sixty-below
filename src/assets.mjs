@@ -11,19 +11,19 @@ export const IMAGE_FILES = [
   // TILES //
   // ////////
   // Tuiles de copper / iron / silver / gold / cobalt / platine
-  '/assets/rpg/ore_16_16.png',
+  'assets/sprites/ore_16_16.png',
   // Tuiles de contour / dirt / stone / clay / mud / sand / humus / silt / ash / web / slush
-  '/assets/rpg/substrat_16_16.png',
+  'assets/sprites/substrat_16_16.png',
   // Tuiles de granite / marble / meteorite / obsidian / hellstone / sandstone / hive
-  '/assets/rpg/rock_16_16.png',
+  'assets/sprites/rock_16_16.png',
   // Tuiles de topaz / rubis / emerald / sapphir
-  '/assets/rpg/gem_16_16.png',
+  'assets/sprites/gem_16_16.png',
   // Tuiles de grass / jungle grass / mushroom grass / ash grass
-  '/assets/rpg/grass_16_16.png',
+  'assets/sprites/grass_16_16.png',
   // Tuiles de wood wall / background wall
-  '/assets/rpg/wall_16_16.png',
+  'assets/sprites/wall_16_16.png',
   // sea / water / honey / lava
-  '/assets/rpg/liquid_16_16.png',
+  'assets/sprites/liquid_16_16.png',
   // ITEMS //
   // ////////
   // Items des blocs de minage
@@ -31,61 +31,61 @@ export const IMAGE_FILES = [
   // dirt / stone / clay / mud / sand / humus / silt / ash
   // granite / marble / obsidian / hellstone / sandstone / hive
   // topaz / rubis / emerald / sapphir
-  '/assets/rpg/blocks_16_16.png',
+  'assets/sprites/blocks_16_16.png',
   // weapons / tools / walls / seeds / platforms / bags
   // misc
-  '/assets/rpg/tools_32_32.png',
+  'assets/sprites/tools_32_32.png',
   // accessory
-  '/assets/rpg/accessories_32_32.png',
+  'assets/sprites/accessories_32_32.png',
   // passive buffs
-  '/assets/rpg/passive_32_32.png',
+  'assets/sprites/passive_32_32.png',
   // furniture / crafting station
-  '/assets/rpg/furniture_32_32.png',
+  'assets/sprites/furniture_32_32.png',
   // potions / consumables
-  '/assets/rpg/potions_32_32.png',
+  'assets/sprites/potions_32_32.png',
   // crafting seul
-  '/assets/rpg/crafting_32_32.png',
+  'assets/sprites/crafting_32_32.png',
   // critters / bait
-  '/assets/rpg/critter_32_32.png',
+  'assets/sprites/critter_32_32.png',
   // food
-  '/assets/rpg/food_32_32.png',
+  'assets/sprites/food_32_32.png',
   // PLACED //
   // /////////
-  '/assets/rpg/fuws_16_16.png',
-  '/assets/rpg/placed_16_32.png',
-  '/assets/rpg/fuws_16_48.png',
-  '/assets/rpg/fuws_32_16.png',
-  '/assets/rpg/fuws_32_32.png',
-  '/assets/rpg/fuws_32_48.png',
-  '/assets/rpg/fuws_32_80.png',
-  '/assets/rpg/fuws_48_16.png',
-  '/assets/rpg/fuws_48_32.png',
-  '/assets/rpg/fuws_48_48.png',
-  '/assets/rpg/fuws_64_32.png',
-  '/assets/rpg/npc_26_46.png',
-  '/assets/rpg/heads_26_22.png',
-  '/assets/rpg/bodies_26_18.png',
-  '/assets/rpg/feet_26_12.png',
-  '/assets/rpg/oak_80_48.png',
-  '/assets/rpg/mahogany_80_48.png',
+  'assets/sprites/fuws_16_16.png',
+  'assets/sprites/placed_16_32.png',
+  'assets/sprites/fuws_16_48.png',
+  'assets/sprites/fuws_32_16.png',
+  'assets/sprites/fuws_32_32.png',
+  'assets/sprites/fuws_32_48.png',
+  'assets/sprites/fuws_32_80.png',
+  'assets/sprites/fuws_48_16.png',
+  'assets/sprites/fuws_48_32.png',
+  'assets/sprites/fuws_48_48.png',
+  'assets/sprites/fuws_64_32.png',
+  'assets/sprites/npc_26_46.png',
+  'assets/sprites/heads_26_22.png',
+  'assets/sprites/bodies_26_18.png',
+  'assets/sprites/feet_26_12.png',
+  'assets/sprites/oak_80_48.png',
+  'assets/sprites/mahogany_80_48.png',
   // IN HAND //
   // //////////
-  '/assets/rpg/s_42_42.png',
-  '/assets/rpg/w_42_42.png',
-  '/assets/rpg/w_62_62.png',
+  'assets/sprites/s_42_42.png',
+  'assets/sprites/w_42_42.png',
+  'assets/sprites/w_62_62.png',
   // IHM //
   // //////
-  '/assets/rpg/buff_32_32.png', // buffs et town signs
-  '/assets/rpg/moon_50_50.png',
-  '/assets/rpg/env_32_32.png',
-  '/assets/rpg/coins_16_16.png', // aussi un item
-  '/assets/rpg/ihm_32_32.png'
+  'assets/sprites/buff_32_32.png', // buffs et town signs
+  'assets/sprites/moon_50_50.png',
+  'assets/sprites/env_32_32.png',
+  'assets/sprites/coins_16_16.png', // aussi un item
+  'assets/sprites/ihm_32_32.png'
 ]
 
 export const SOUND_FILES = [
-  '/assets/sounds/mining_hit.mp3',
-  '/assets/sounds/mining_break.mp3',
-  '/assets/sounds/water_splash.mp3',
+  'assets/sounds/mining_hit.mp3',
+  'assets/sounds/mining_break.mp3',
+  'assets/sounds/water_splash.mp3',
   // ...
 ]
 
@@ -102,7 +102,7 @@ export const ATLAS_INDEX = {}
 export const SOUND_CACHE = {}
 
 /* =========================================
-   3. PARSING LOGIC (La nouveauté)
+   3. PARSING LOGIC
    ========================================= */
 
 /**
@@ -130,13 +130,13 @@ export const resolveAssetData = (codeStr) => {
   if (!codeStr) return null
 
   let atlasName, variant = 0, tx = 0, ty = 0
-  
-  // Cas 1: Variante simple "atlas+index"
+
+  // Cas 1: Variante simple "atlas+index", index=y, x déterminé dynamiquement (framing)
   if (codeStr.includes('+')) {
     const parts = codeStr.split('+')
     atlasName = parts[0]
     variant = parseInt(parts[1], 10)
-  } 
+  }
   // Cas 2: Coordonnées explicites "atlas-x-y"
   else if (codeStr.includes('-')) {
     const parts = codeStr.split('-')
@@ -187,19 +187,19 @@ export const resolveAssetData = (codeStr) => {
 
 export const loadAssets = async () => {
   console.time('Assets Loading')
-  
+
   // 4.1 Chargement Images
   const imgPromises = IMAGE_FILES.map((path, index) => {
     return new Promise((resolve) => {
       const img = new Image()
       img.src = path
-      
+
       // Extraction Nom & Métadonnées
       const filename = path.substring(path.lastIndexOf('/') + 1, path.lastIndexOf('.'))
       const meta = parseAtlasName(filename)
-      
+
       img.meta = { cellW: meta.w, cellH: meta.h }
-      
+
       // Indexation
       IMAGE_CACHE[index] = img
       ATLAS_INDEX[filename] = index
