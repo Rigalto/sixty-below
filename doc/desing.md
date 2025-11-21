@@ -159,10 +159,10 @@ __TO DO__ : déterminer si le contenu des tuiles est stocké sur un ou deux octe
 
 ### 4.2 Mécaniques
 
-  * **Initiative :** Ordre de jeu déterminé au début (caractéristique du joueur (modifiable) et des monstres (fixe)).
-  * **Grille :** Pathfinding (A\* ou Dijkstra) contraint par les obstacles du terrain généré (on ne peut pas marcher dans un mur ni sauter un trou).
-  * **Ligne de vue** : bloquée par les joueurs et les murs, non bloquée par les trous
+  * **Initiative :** Ordre de jeu déterminé par la caractéristique 'Initiative' (joueur (buffable), monstres) midifiable en combat.
   * **Ressources :** PA (Points d'Action) et PM (Points de Mouvement).
+  * **Grille :** Pathfinding (A\* ou Dijkstra) sur la grille locale, prenant en compte les obstacles du terrain généré (on ne peut pas marcher dans un mur ni sauter un trou).
+  * **Ligne de vue (LOS) :** B: Raycasting simple bloqué par murs/entités
   * **Challenges :** sous-buts permettant de diversifier les combats (cf Dofus)
   * **Evolutivité :** possibilité d'ajout de mécaniques spéciales (Boss)
 
@@ -172,136 +172,84 @@ __TO DO__ : déterminer si le contenu des tuiles est stocké sur un ou deux octe
 
 ### 5.1 Base de Données Locale
 
-  * Technologie : **IndexedDB**.
-  * Wrapper : Codage d'une classe dédiée.
-  * Sérialisation : Inutile, la base de données le fait en interne (attention à certaines contraintes de performance)
+  * **IndexedDB** native via wrapper custom.
+  * Pas de sérialisation JSON complexe : stockage direct des objets JS structurés.
 
 ### 5.2 Sauvegarde synchrone
 
-Pour ne pas avoir de création ou de disparition d'items et assurer la sauvegarde consistante de l'état du monde, une classe est dédiée à la gestion de la basse de données locale.
-  * Point d'entrée permettant de signaler qu'un élément a été modifié et doit être sauvegardé de façon synchrone (paramètres : objectStore, opération (update/create ou delete), record)
-  * Point d'entrée permettant de signaler qu'au moins une des tuiles du monde a été modifié (paramètre : le chunk de la tuile modifiée)
-  * Sauvegarde effectuée deux secondes après le premier signalement d'une modification (utilisation deu TaskManager)
-  * Utilisatoin d'une session pour rollback en cas de problème lors de la sauvegarde
-  * Conception interne : attention aux problèmes de performance avec les tableaux compacts.
-
-### 5.2 Item de configuration
-
-Une table particulière permet de mémoriser les éléments de configuration qui ne sont pas directement reliés au monde et ses objets :
-  * Lecture d'un éléments de configuration (paramètre : identifiant (Strong) de l'élément de configuration / Retour : valeur de l'élément de configuration)
-  * Ecriture d'un éléments de configuration (paramètre : identifiant (Strong) de l'élément de configuration, valeur de l'élément de configuration)
-  * Utilisée pour la position du joueur, l'heure du monde (timestamp)...
+* **Stratégie "Write-Behind" :** Les modifications sont signalées (Dirty Flag) et persitées après un délai (2 secondes) via le `TaskScheduler`.
+* **Session :** Gestion transactionnelle pour rollback en cas de crash pendant la sauvegarde.
+* **Configuration :** Table Key-Value pour la métadonnée (Position joueur, Heure monde, Paramètres).
+* **Détail d'implémentation :**
+    * La liste des chunks modifiés est mise à jour par le composant gérant les tuiles et fournie au composant `Database`.
+    * Les autres modifications sont signalées par une API (`database.change(objectStore, operation, record)`). Operation : DB_UPDATE_CREATE, DB_DELETE
+    * Lecture d'un éléments de configuration (`database.getItem(id) => value`)
+    * Ecriture d'un éléments de configuration (paramètre : identifiant (Strong) de l'élément de configuration, valeur de l'élément de configuration)
+    * Conception interne : attention aux problèmes de performance avec les tableaux compacts.
 
 -----
 
-## 6\. Stratégies d'Optimisation (Performance First)
+## 6\. Interface & Rendu (UI/UX)
 
-### 6.1 Gestion Mémoire (Garbage Collection)
+### 6.1 Stratégie "Layered Canvas"
 
-  * **Singleton :** Une seule création des instances pour la majorité des classes. Ces classes vont souvent gérer des 'Array' (ou des Map) d'objets.
-  * **Object Pooling :** A implémenter uniquement si les performances ne sont pas respectées. A priori, il y a peu de création/suppression d'objets. A monitorer.
-  * **Pre-allocation :** Les tableaux et buffers sont pré-alloués autant que possible. Par exemple, l'ensemble des tuiles du monde est chargé en mémoire au lancement d'une partie dans un `Array` qui n'est plus modifié par la suite.
+L'interface est divisée en couches HTML superposées pour optimiser les redraws.
+    * **Layer 0 (Game Canvas) :** Le monde, le joueur, la flore, la faune, les meubles. Redessiné à chaque requestAnimationFrame.
+    * **Layer 1 (Env Canvas) :** Date, Météo, Phases lunaires. Redessiné sur événement TIME_TICK.
+    * **Layer 2 (UI Canvas) :** Hotbar, Buffs actifs, Jauges. Redessiné sur événement (ex: INVENTORY_CHANGE, BUFF_TICK).
+    * **Layer 3 (DOM Panels) :** Inventaire complet, Craft, Aide. Éléments HTML standards (<div>) affichés/masqués. Interruptifs (Pause du jeu).
 
-### 6.2 Rendu
+### 6.2 Optimisations Graphiques
 
-  * **Culling :** Ne dessiner que ce qui est visible à l'écran + une marge (buffer). Dans la pratique, l'écran visible est de 4 chunks de haut et 3 de large. On générera donc uniquement les images pour un rectangle de 5*4 chunks.
-  * **Conversion chunk vers image** : La conversion d'un chunk en image à afficher est effectuée dans une micro-tâche (budget **MicroTasks** au lieu de budget **Render**). On peut donc être amené à afficher une ancienne version du chunk pendant une à quelques frames. Ce délai est acceptable.
-  * **Framing** : on utilisera la technique de Bitmasking (méthode **4-connectivity**) pour ajuster l'image affichée pour une tuile en fonction de ses voisins. Les tuiles ont des bords en partie transparents, qui seront remplis par la couleur dominante de la tuile adjacente. Cela permet la visualisation d'une diffusion d'une matière dans une autre.
-  * **OffscreenCanvas :** Étude de l'utilisation d'un Worker dédié au rendu si le thread principal sature.
-  * **Sprite Batching :** Regrouper les appels de dessin pour limiter les context switchs GPU/CPU. Analyser la pertinence de ce point pour une utilisation Canvas uniquement.
+* **Culling :** Rendu strict du viewport + buffer de 1 chunk.
+* **Framing (Auto-tiling) :** Bitmasking (4-connectivity) calculé à la volée ou au chargement pour les transitions de textures.
+* **Conversions :** Chunk -> Image via OffscreenCanvas (MicroTask) pour mettre en cache les chunks statiques. Mise à jour uniquement si modification (dirty flag)
 
 -----
 
 ## 7\. Organisation & Déploiement
 
-### 7.1 Structure des fichiers (Draft)
+### 7.1 Structure des fichiers (ES Modules)
 
-Contrairement à l'usage, plusieurs classes sont regroupées dans un même fichier source. Le but est d'améliorer le temps de chargement de l'application.
+L'architecture sépare la logique (UI Logic) du rendu pur (Render) et distingue les types d'interfaces.
 
 ```
-L'architecture privilégie le regroupement par domaine fonctionnel (Functional Cohesion) pour limiter le nombre de requêtes HTTP (module loading) sans bundler.
-
 /sixty-below
 ├── /assets
-│   ├── /sprites             # Tilesets, Charsets (PNG)
+│   ├── /sprites             # Tilesets, Charsets, Icons (PNG)
 │   ├── /sounds              # SFX, Ambiances (MP3/OGG)
 │   └── /data                # Tiles, Items, Recipes, Chests, Tables de loot, Actions de combat
 ├── /src
-│   ├── core.mjs             # LE CERVEAU
-│   │                        # - GameLoop (Update/Render/MicroTask budgets)
-│   │                        # - InputManager (Keyboard/Mouse listeners)
-│   │                        # - EventBus (Pub/Sub)
-│   │                        # - TimeManager (Temps réel vs Temps monde)
-│   │                        # - MicroTaskManager
-│   │                        # - TaskScheduler
-│   │
-│   ├── world.mjs            # LA PHYSIQUE & L'ESPACE
-│   │                        # - ChunkManager (Grid storage)
-│   │                        # - PhysicsSystem (AABB Collisions, Gravity, Velocity)
-│   │                        # - LiquidSimulator
-│   │
-│   ├── action.mjs           # LES INTERACTIONS
-│   │                        # - PlayerManager (Déplacement, animation des actions, équipement, caractéristiques)
-│   │                        # - ActionManager (Mining, Cutting, Fishing, Foraging)
-│   │                        # - FurnitureManager (Placememnt/suppression Furniture/Crafting Station)
-│   │                        # - BuffManager (Placememnt/suppression Furniture/Crafting Station)
-│   │                        # - Interaction logique (ex: ouvrir un coffre, remplir une bouteille d'eau)
-│   │
-│   ├── buff.mjs             # LES MODIFICATEURS (STATUS EFFECTS)
-│   │                        # - BuffManager (Container par entité (joueur, monstre, plante...) et par état (exploration / combat)
-│   │                        # - Definitions (Static, Timed, Periodic, Aura)
-│   │                        # - StatModifiers (Calcul des bonus/malus)
-│   │                        # - BuffDisplay (Dans un Canvas en overlay - Affichage configurable)
-│   │                        # - Implentation de type middleware
-│   │
-│   ├── combat.mjs           # LE TACTIQUE
-│   │                        # - ArenaCreator (Création procédurale du terrain - forme, murs et trous)
-│   │                        # - TurnManager (Initiative, tours)
-│   │                        # - GridPathfinder (A* pour le combat)
-│   │                        # - SpellSystem (Portée, DamageCalculator)
-│   │                        # - CombatAI (définition des behaviors possibles, chaque monstre utilisera un ou plusieurs behaviors)
-│   │
-│   ├── ui.mjs               # LES INTERFACES PANEL/DOM (LOGIQUE)
-│   │                        # - UIManager (State machine des fenêtres)
-│   │                        # - InventorySystem (Slots, Stacking, Drag&Drop logic)
-│   │                        # - CraftSystem (Recettes, validation)
-│   │                        # - HelpSystem (aide en ligne, Encyclopédie)
-│   │                        # - PreferenceSystem (configuration UI, clavier, souris...)
-│   │
-│   ├── render.mjs           # LES YEUX
-│   │                        # - Renderer (Canvas Context management)
-│   │                        # - Camera (Viewport, Culling, Zoom)
-│   │                        # - SpriteManager (Animations, Batching virtuel)
-│   │                        # - Layering (Background, World, Entity, UI)
-│   │                        # - Overlays (Environnement, Hotbar, buffs)
-│   │
-│   ├── database.mjs         # LA MÉMOIRE
-│   │                        # - IDBWrapper (IndexedDB abstraction)
-│   │                        # - SaveManager (Serializer/Deserializer)
-│   │
-│   ├── generate.mjs         # LE CRÉATEUR (Chargé dynamiquement)
-│   │                        # - ProcGen (Perlin, Automates)
-│   │
-│   ├── constant.mjs         # LES RÉFÉRENCES
-│   │                        # - Constantes globales (Taille tuile, FPS)
-│   │                        # - Enums (State, Biome, ItemType)
-│   │
-│   └── utils.mjs            # LA BOÎTE À OUTILS
-│                            # - Math helpers, Random custom
-│
-├── /tests                   # Tests unitaires critiques
-├── index.html               # Point d'entrée (ES Module Loader)
+│   ├── core.mjs             # SYSTEM : GameLoop (Update/Render/MicroTask), InputManager (Keyboard/Mouse listeners), MicroTasker, TaskScheduler, EventBus, TimeManager
+│   ├── world.mjs            # PHYSICS : ChunkManager (Grid storage), PhysicsSystem (AABB Collisions, Gravity, Velocity), LiquidSimulator
+│   ├── action.mjs           # GAMEPLAY : ActionManager (Mining, Cutting, Fishing, Foraging...)
+│   ├── player.mjs           # PLAYER : PlayerManager (Déplacement, animation des actions, équipement, caractéristiques), LifeManager
+│   ├── buff.mjs             # BUFFS/DEBUFFS : BuffManager, EffectDefinitions, StatModifiers (Middleware de calcul des bonus/malus), BuffDisplay (dans un Canvas en overlay)
+│   ├── housing.mjs          # HOUSING : FurnitureManager (Placememnt/suppression Furniture/Crafting Station), HousingManager, Buffs
+│   ├── combat.mjs           # TACTICAL : ArenaCreator (procédural - forme, murs et trous), TurnManager, Pathfinding (A* pour le combat), SpellSystem (Portée, DamageCalculator), CombatAI (CombatBehaviors combinables)
+│   ├── ui.mjs               # INTERFACE PANEL/DOM (LOGIQUE) :
+│   │                        # - Logic : InventorySystem (Slots, Stacking, Drag&Drop logic), CraftSystem (Recettes, validation)
+│   │                        # - DOM Managers : InventoryPanel, HelpPanel, PreferencePanel (configuration UI, clavier, souris...)
+│   │                        # - Canvas Managers : HotbarOverlay, EnvOverlay (Draw logic)
+│   ├── render.mjs           # GRAPHICS : MainRenderer (Canvas Context management), Camera (Viewport, Culling, Zoom), SpriteManager (Animations, Batching virtuel)
+│   ├── database.mjs         # STORAGE : IDBWrapper (IndexedDB abstraction), SaveManager
+│   ├── generate.mjs         # PROC-GEN : Algorithmes de génération (Dynamic Import)
+│   ├── constant.mjs         # CONFIG : Constantes, Enums (State, Biome, ItemType), Bitmasks
+│   └── utils.mjs            # TOOLS : Math, Helpers, Random custom
+├── /tests                   # Tests unitaires
+├── index.html               # Entry Point (ES Module Loader) + Canvas Layers + DOM Containers
 └── package.json             # Pour ESLint/Tests uniquement
 ```
 
-__To Do__ : comment utiliser GitHub pour lancer l'application ?
+### 7.2 Déploiement (GitHub Pages)
+* Hébergement statique direct depuis la branche main.
+* Pas de build step. Le navigateur charge les modules .mjs.
+* Contrôle Qualité : GitHub Action sur push pour exécuter les tests unitaires.
+
 __To Do__ : comment implémenter l'aide en ligne et l'encyclopédie (le plus possible automatique, mais avec un peu de lore)
 
 ### 7.2 Tooling
 
-  * **Bundler :** Aucun
-  * **Linter :** Respect de la convnetion 'Format' de Google :
+  * **Linter :** Respect de la convention 'Format' de Google :
       * pas de point virgule à la fin des instructions
-  * **CI/CD :** GitHub Action pour déploiement sur la branche `gh-pages` à chaque push sur `main`. A m'expliquer.
-  * **Tests unitaires :** Outil à écrire - Politique à déterminer. Moking à prévoir. 
 
