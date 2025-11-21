@@ -10,20 +10,22 @@
 
 ### 1.1 Concept
 
-**Sixty-Below** est une démonstration technique de jeu par navigateur mélangeant deux gameplays distincts :
+**Sixty-Below** est une démonstration technique de jeu par navigateur mélangeant plusieurs gameplays :
 
 1.  **Exploration (Temps réel) :** Vue de côté, minage, génération procédurale (Type: *Terraria*).
 2.  **Combat (Faune - Tour par tour) :** Grille tactique, points d'action/mouvement, stratégie (Type: *Dofus*).
-3.  **Récolte (Flore) :** Grille tactique, points d'action/mouvement, stratégie (Type: *Terraria*).
-3.  **Artisanat (ce qui ne se loote pas, se crafte) :** Grille tactique, points d'action/mouvement, stratégie (Type: *Dofus*).
+3.  **Récolte (Flore) :** Vue de côté, outils (hache, faucille, couteau...), eco-système, agriculture (Type: *Terraria*).
+4.  **Artisanat (ce qui ne se loote pas, se crafte) :** Grille tactique, points d'action/mouvement, stratégie (Type: *Dofus*).
+5.  **Housing (Shelter, Crafting Station) :** Vue de côté, outils (hache, faucille, couteau...), eco-système, agriculture (Type: *Terraria*).
 
 ### 1.2 Contraintes Techniques (Non-négociables)
 
-  * **Performance :** 60 FPS constants. Budget frame \< 16ms.
-  * **Stack :** JavaScript Moderne (ESNext). Pas de framework de jeu lourd (Phaser/Unity). Bibliothèques légères autorisées comme sources d'inspiration.
+  * **Performance :** 60 FPS constants. Budget frame = 12ms.
+  * **Stack :** Vanilla JavaScript Moderne (ESNext). Pas de framework (Phaser/Unity). Pas de Bundler (Webpack/Vite).
   * **Rendu :** Canvas API (2D context).
-  * **Architecture :** Client-Side Only. Base de Données Locale. La majorité des classes sont implémentées comme des singletons (pas d'injection, seulement une importation)
-  * **Hébergement :** Doit tourner nativement depuis un repository GitHub (GitHub Pages).
+  * **Architecture :** Client-Side Only. Base de Données Locale (IndexDB).
+  * **Hébergement :** "Serverless" via GitHub Pages.
+  * **Design Pattern :** Singletons pour la majorité des Managers. Composition préférentielle à l'héritage.
 
 -----
 
@@ -33,16 +35,25 @@
 
 Priorité au **Data-Oriented Design** pour la performance.
 
-  * Adoption d'une architecture de type **ECS (Entity Component System)** ou composition stricte pour éviter les chaînes d'héritage profondes de la POO classique.
-  * Séparation stricte : État (Data) vs Logique (Systems) vs Rendu (View).
+  * Adoption d'une architecture de type **ECS (Entity Component System)** pragmatique ou composition stricte pour éviter les chaînes d'héritage profondes de la POO classique.
+  * Séparation stricte : Data (State) / Logic (Systems) / View (Render).
 
-### 2.2 La Game Loop
+### 2.2 La Game Loop & Budgets Temps
 
-  * Utilisation de `requestAnimationFrame`.
+  * Utilisation de `requestAnimationFrame`. Pour garantir la fluidité, chaque frame (16.6ms) est budgetée :
   * Dans la boucle principale, détermination de trois budgets :
-      * **Update (Physic) :** physique déterministe, déplacemments (joueur, faune). Typiquement 3 millisecondes
-      * **Render (Draw) :** Affichage du fond (tuiles) puis des sprites (flore, faune, meubles). Typiquement 4 millisecondes
-      * **MicroTasks (Logic)** Tâches longues découpées en micro-tâches pouvant ainsi s'exécuter sur plusieurs frames. Typiquement 5 millisecondes
+      * **Update (Physic/Input) - Budget ~3ms :**
+          * Déplacement Joueur/Faune
+          * Physique déterministe
+          * Incrémentation du temps "Monde"
+      * **Render (World Draw) - Budget ~4ms :**
+          * Dessin du fond, des tuiles visibles (Culling) et des entités (Sprites : flore, faune, meubles).
+          * Concerne uniquement le canvas principal `#game-layer`.
+      * **MicroTasks (Logic) - Budget ~5ms**
+          * Exécution des tâches lourdes découpées (Pathfinding, Génération).
+          * Mise à jour des Overlays UI (Canvases secondaires) si nécessaire.
+      * **Navigateur (DOM) - Budget ~4ms**
+          * Gestion du DOM, E/S, affichage, Garbage Collector.
 
   __TO DO__ : définir où gérer les animations des sprites
 
@@ -50,58 +61,51 @@ Priorité au **Data-Oriented Design** pour la performance.
 
 Le jeu bascule entre trois états majeurs qui changent les inputs et l'interface :
 
-  * `STATE_EXPLORATION` : Moteur physique actif, Inputs temps réel, Hot Bar.
-  * `STATE_INFORMATION` : Moteur physique figé, affichage de panels d'information (inventaire, craft, carte, équipement, boutique, aide en ligne...)
+  * `STATE_EXPLORATION` : Moteur physique actif, Inputs temps réel
+  * `STATE_INFORMATION` : Moteur physique figé, affichage de panels d'information (inventaire, craft, carte, équipement, boutique, aide en ligne...), création du monde
   * `STATE_COMBAT` : Moteur physique figé, Inputs tour par tour, HUD tactique.
 
-### 2.4 Gestion des Micro-tâches (MicroTasker)
+  * 2.4 Gestion des Tâches (MicroTasker & Scheduler)
+MicroTasker : Exécute des tâches fractionnées dans le temps restant de la frame. Priorité et Capacité définies par tâche.
 
-Pour assurer le respect des 60FPS, toute tâche sera découpée en une ou plusieurs 'micro-tâches' :
-  * Exécutées dans le budget défini par 12 millliseondes (3+4+5) moins le temps réellement passé pour l'**Update** et le **Render**
-  * Définies avec une priorité et une capacité (temps d'exécution maximum 95% des occurences)
-  * Dans la phase **MicroTask**, on exécute le maximum de micro-tâches en respectant la priorité, la capacité et le temps restant
+TaskScheduler : Gère les tâches longues (ex: cuisson, craft long). Tableau trié par timestamp d'exécution, recherche dichotomique, suppression "lazy" (flag deleted).
 
-### 2.5 Gestion des Actions (TaskScheduler)
+### 2.4 Gestion desTâches (MicroTasker & Scheduler)
 
-Pour ne tester qu'une seule fin de délai par boucle, on organise toutes les tâches de longue durée (celles qui sont typiquement définies en secondes ou centièmes de seconde) dans un seul tableau.
-  * Le tableau est trié par ordre de timestamp d'exécution des tâches (de façon que la suppression d'une tâche supprime uniquement le dernier élément du tableau et non le premier)
-  * Les tâches dans le tableau sont triées.
-  * L'insertion dans le tableau est effectuée avec un algorithme dichthomique.
-  * La suppression d'une tâche est effectuée par la mise à jour d'un booléen (deleted), la suppression effective intervient losque la tâche aurait été exécutée.
-  * L'exécution d'une tâche du tableau est effectuée en créant une micro-tâche à partir des données stockées dans le tableau (fonction, paramètres, priorité, capacité).
+* **MicroTasker :** Exécute des tâches fractionnées dans le temps restant de la frame. Priorité et Capacité définies par tâche.
+* **TaskScheduler :** Gère les tâches longues (ex: minage, croissance de la flore). Tableau trié par timestamp d'exécution, insertion dichotomique, suppression "lazy" (flag `deleted`), exécution par création d'une micro-tâche.
 
-### 2.6 Découplage (EventBus)
+### 2.5 Découplage (EventBus)
 
-Pour découpler les composants de l'application, un module de gestion d'événements est mis en place :
+* **Système Pub/Sub** pour la communication entre modules sans dépendance cyclique.
+* Si un listener dépasse 0.1ms, il doit déléguer son travail au `MicroTasker`.
+* **Implémentation**
   * Evénement défini par un identifiant et des paramètres optionnels
-  * Emission d'un événement (`eventBus.submit()`)
+  * Publication d'un événement (`eventBus.submit()`)
   * Ecoute d'un événement (`eventBus.on(idEvent, fonction)`)
-  * Appel direct des fonctions lorsque l'événement est déclenché (si le traitement dépasse 0.1 millisecondes, cette fonction est en charge de créer une micro-tâche)
+  * Appel direct des fonctions lorsque l'événement est déclenché
 
-### 2.7 Maitien d'un temps absolu
+### 2.6 Le temps
 
-Le jeu se déroule dans un monde qui a son propre calendrier. Il est nécessaire que la date courante dans le monde soit indépendante de la date réelle de l'exécution de l'application.
-  * Au lancement du jeu, la date est initialisée à 0.
-  * La date est incrémentée dans le boucle (budget **Update**, état `STATE_EXPLORATION`)
-  * La date est sauvegardée en base de données
-  * Au lancement de l'application, la date est récupérée depuis la base de données
-  * La date est mémorisée en timestamp (en milliseconde) et convertie en datation locale (heure, jour, minute)
-  * Une seconde de temps réel correspond à une minute de temps du monde. Donc une minute de temps réel = 1 heure du monde. Donc 24 minutes de temps réel = 1 journée du monde.
+Distinction stricte entre :
+* **Temps Réel** : Date système.
+* **Temps Monde** : Stocké en Timestamp (ms). Ratio : 1 minute réelle = 1 heure monde (Cycle 24h monde = 24 min réelles).
 
-__TO DO__ : trouver des termes corrects pour les deux références 'temps-réel' et 'du monde', termes à utiliser dans la documenation et le programme.
-
+Détails d'implémentaton :
+  * **Initialisation :** A la création du monde, la date est initialisée à 0.
+  * **Incrémentation :** La date est incrémentée dans la Game Loop (budget **Update**, état `STATE_EXPLORATION`)
+  * **Persistence :** La date est sauvegardée en base de données et récupérée au lancement de l'application
 
 ### 2.7 Directive d'implémentation pour les Singletons
 
-La plupart des classes sont implémentées sous la forme d'un **singleton** :
+La plupart des managers sont implémentés sous la forme d'un **singleton** :
 
 ```javascript
-class GrassSystem {
+class GrassManager {
 ...
 }
-export const grassSystem = new GrassSystem()
+export const grassManager = new GrassManager()
 ```
-
 
 -----
 
@@ -109,12 +113,10 @@ export const grassSystem = new GrassSystem()
 
 ### 3.1 Structure du Monde
 
-  * **Grille de Tuiles (Tilemap) :** Le monde est une grille 2D.
-  * **Taille du Monde (fixe) :** Le monde fait 2048 tuiles de large et 768 tuiles de haut.
-  * **Taille d'une tuile (fixe) :** Chaque tuile fait 16 pixels de haut et 16 pixels de large.
-  * **Stockage des Tuiles :** Toutes les tuiles du monde sont présentes en mémoire. Cela représente une taille de 1.5Mbytes ou 3Mbytes, parfaitement acceptable pour les navigateurs et ordinateurs modernes.
-  * **Chunk System :** Le monde est divisé en `Chunks` de 16x16 tuiles, pour le chargement/déchargement dynamique. Donc le monde fait 128 chunks en largeur et 48 en hauteur. Il comporte donc 6144 chunks, chacun étant un enregistrement en base de données.
-  * **Taille fixe :** les dimensions du monde, des chunks et des tuiles sont fixes. Il est donc **interdit** d'utiliser des constantes et on codera en dur les **masks** et opérations **bitwise** permettant d'accéder et d'identifier rapidement aux données
+  * **Grille 2D de Tuiles (Tilemap) :** 2048 x 768 tuiles. Taille tuile : 16x16px. Tailles fixes non paramétrées.
+  * **Mémoire :** Totalité de la map chargée en TypedArray (Uint8Array ou Uint16Array). Pas de lazy loading depuis la DB pour la map active. Justification : taille de seulement 1.5Mbytes ou 3Mbytes.
+  * **Chunks :** Division logique en 16x16 tuiles (128x48 chunks) pour la gestion des redraws et des updates partiels (6144 chunks).
+  * **Bitmasks :** Utilisation de masques binaires pour coder les propriétés des tuiles (Solide, Liquide, Minable) afin d'éviter les objets JS lourds. Utilisation de masques et de décalages binaires pour effectuer les changements de coordonnées et le calcul des index (`index = (y << 11) & x`).
   *  **Echelle :** La dimension d'une tuile correspond à 50 centimètres pour le personnage. Le monde fait donc un kilomètre de large et 350 mètre de profond.
 
 __TO DO__ : définir un terme pour le joueur (personnage derrière le clavier) et le personnage dans le monde. Utiliser ensuite ce terme partout.
@@ -122,30 +124,27 @@ __TO DO__ : déterminer si le contenu des tuiles est stocké sur un ou deux octe
 
 ### 3.2 Génération Procédurale
 
-  * Génération non temps réel : on gèle l'interface pendant la génération (état `STATE_INFORMATION`).
-  * Importation dynamique du module générant le monde (il est très peu souvent utilisé)
-  * Découpage en zones verticales pour 3 **biomes** (forêt, désert et jungle) plus la mer à gauche et à droite.
-  * Découpage en zones horizontales  (4 **Layers**) pour gérer la difficulté (surface, underworld, caverns...).
-  * Bruit de Perlin/Simplex pour rendre plus naturelles les frontières entre les zones rectangulaires.
-  * Algorithme de creusement pour les tunnels et cavernes.
-  * Gestion des fluides pour remplissage des lacs (water), des ruches (honey), des mares de sève dans la jungle (sap).
-  * Algorithme pour ajouter les coffres, les minerais, la flore, les éléments de décor, d'autres éléments minables.
-  * Algorithme pour éviter les trous isolés ou les tuiles isolées (nettoyage final).
-  * Le bas du monde est rempli de lave 'Lava' (pour éviter une limite verticale arbitraire) de 1 à 3 case de haut (Perlin Noise).
-  * Cible temps d'exécution : **10 secondes**
-  * Uilisation d'une **World Key** qui permet de regénérer le même monde à partir de la même clé (clé stockée en base de données et affichée).
+  * **Effectuée hors temps réel :** état `STATE_INFORMATION`.
+  * **Mémoire :** Importation dynamique du module générant le monde
+  * **Biomes :** découpage vertical : Forêt, Désert, Jungle + Océans latéraux.
+  * **Layers :** découpage horizontal : Surface, Underworld, Caverns, Hell (Lava).
+  * **Fluides :** Lacs (Water), Ruches (Honey), Sève (Sap), Sable (Sand).
+  * **Détail d'implémentation :**
+      * **World Key :** Seed permettant la re-génération déterministe.
+      * **Temps d'exécution :** 10 secondes maximum
+      * **Lissage :** Bruit de Perlin/Simplex.
+      * **Creusement :** Algorithme dédiés pour les tunnels et cavernes.
+      * **Fluides :** creusement et remplissage initial.
+      * **Décors :** Algorithme d'ajout de coffres, minerais, flore...
+      * **Nettoyage :** Suppression  des trous ou tuiles isolés
 
 ### 3.3 Physique (Exploration)
 
-  * Déplacement du joueur par flèches directionnelles et touches ZQSD
-  * Caméra centrée sur le joeuur
-  * Zoom possible sur le monde
-  * Collision AABB (Axis-Aligned Bounding Box) simple.
-  * Pas de moteur physique lourd (Matter.js), implémentation custom légère spécifique aux jeux de tuiles.
-  * S'applique uniquement au personnage et aux monstres (pas de projectiles, ni d'effets spéciaux hormis l'animation des sprites)
-  * Algorithme de gestion des fluides par 'LiquidBody' pour Water, Honey et Sap (paramétrable en fonction de la viscosité)
-  * Algorithme de gestion des fluides pour le sable (automate cellulaire)
-  * AI simplifiée pour le déplacement des monstres (ignore le joueur, suit le joueur, évite le joueur, aime/déteste ses semblables, chasseur/proies
+  * **Déplacement du joueur :** par flèches directionnelles et touches ZQSD. Caméra centrée sur le joueur. Zoom possible sur le monde.
+  * **Collision :** AABB (Axis-Aligned Bounding Box) simple custom.
+  * **Liquides :** Algorithme custom pour Water, Honey et Sap (paramétrable en fonction de la viscosité) et Automates cellulaires (Cellular Automata) pour le sable.
+  * **AI :** Comportements simples (Suit, Fuit, Erre) sans Pathfinding complexe en temps réel.
+  * **Performance :** Pas de moteur physique lourd (Matter.js). Implémentation custom légère spécifique aux jeux de tuiles. Pas de projectiles, ni d'effets spéciaux hormis l'animation des sprites.
 
 -----
 
@@ -153,15 +152,14 @@ __TO DO__ : déterminer si le contenu des tuiles est stocké sur un ou deux octe
 
 ### 4.1 Déclenchement
 
-  * La rencontre d'un ennemi gèle le `World System` et instancie le `Tactical System`.
-  * Certains énemis attaquent automatiquement le joueur (AI simplifiée, buffs/debuffs).
-  * Le joueur peut toujours attaquer un monstre en cliquant dessus.
-  * La zone de combat se dessine directement sur le terrain actuel (overlay de grille).
+  * Passage en `STATE_COMBAT`.
+  * Overlay de grille dessiné par dessus le monde.
+  * Déclenchement par le joueur (click souris) ou par le monstre (AI simplifiée, buffs/debuffs).
+  * Génération automatique du terrain (forme, présence de trous et de murs) en fonction de la zone (biome + layer)
 
 ### 4.2 Mécaniques
 
   * **Initiative :** Ordre de jeu déterminé au début (caractéristique du joueur (modifiable) et des monstres (fixe)).
-  * **Génération automatique :** Génération automatique du terrain (forme, présence de trous et de mur) en fonction de la zone (biome + layer
   * **Grille :** Pathfinding (A\* ou Dijkstra) contraint par les obstacles du terrain généré (on ne peut pas marcher dans un mur ni sauter un trou).
   * **Ligne de vue** : bloquée par les joueurs et les murs, non bloquée par les trous
   * **Ressources :** PA (Points d'Action) et PM (Points de Mouvement).
