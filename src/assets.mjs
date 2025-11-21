@@ -8,11 +8,78 @@
    ========================================= */
 
 export const IMAGE_FILES = [
-  '/assets/sprites/ore_16_16.png',
-  '/assets/sprites/substrat_16_16.png',
-  '/assets/sprites/liquid_16_16.png',
-  '/assets/sprites/tools_32_32.png',
-  // ... le reste de votre liste ...
+  // TILES //
+  // ////////
+  // Tuiles de copper / iron / silver / gold / cobalt / platine
+  '/assets/rpg/ore_16_16.png',
+  // Tuiles de contour / dirt / stone / clay / mud / sand / humus / silt / ash / web / slush
+  '/assets/rpg/substrat_16_16.png',
+  // Tuiles de granite / marble / meteorite / obsidian / hellstone / sandstone / hive
+  '/assets/rpg/rock_16_16.png',
+  // Tuiles de topaz / rubis / emerald / sapphir
+  '/assets/rpg/gem_16_16.png',
+  // Tuiles de grass / jungle grass / mushroom grass / ash grass
+  '/assets/rpg/grass_16_16.png',
+  // Tuiles de wood wall / background wall
+  '/assets/rpg/wall_16_16.png',
+  // sea / water / honey / lava
+  '/assets/rpg/liquid_16_16.png',
+  // ITEMS //
+  // ////////
+  // Items des blocs de minage
+  // copper / iron / silver / gold / cobalt / platine / meteorite / slush
+  // dirt / stone / clay / mud / sand / humus / silt / ash
+  // granite / marble / obsidian / hellstone / sandstone / hive
+  // topaz / rubis / emerald / sapphir
+  '/assets/rpg/blocks_16_16.png',
+  // weapons / tools / walls / seeds / platforms / bags
+  // misc
+  '/assets/rpg/tools_32_32.png',
+  // accessory
+  '/assets/rpg/accessories_32_32.png',
+  // passive buffs
+  '/assets/rpg/passive_32_32.png',
+  // furniture / crafting station
+  '/assets/rpg/furniture_32_32.png',
+  // potions / consumables
+  '/assets/rpg/potions_32_32.png',
+  // crafting seul
+  '/assets/rpg/crafting_32_32.png',
+  // critters / bait
+  '/assets/rpg/critter_32_32.png',
+  // food
+  '/assets/rpg/food_32_32.png',
+  // PLACED //
+  // /////////
+  '/assets/rpg/fuws_16_16.png',
+  '/assets/rpg/placed_16_32.png',
+  '/assets/rpg/fuws_16_48.png',
+  '/assets/rpg/fuws_32_16.png',
+  '/assets/rpg/fuws_32_32.png',
+  '/assets/rpg/fuws_32_48.png',
+  '/assets/rpg/fuws_32_80.png',
+  '/assets/rpg/fuws_48_16.png',
+  '/assets/rpg/fuws_48_32.png',
+  '/assets/rpg/fuws_48_48.png',
+  '/assets/rpg/fuws_64_32.png',
+  '/assets/rpg/npc_26_46.png',
+  '/assets/rpg/heads_26_22.png',
+  '/assets/rpg/bodies_26_18.png',
+  '/assets/rpg/feet_26_12.png',
+  '/assets/rpg/oak_80_48.png',
+  '/assets/rpg/mahogany_80_48.png',
+  // IN HAND //
+  // //////////
+  '/assets/rpg/s_42_42.png',
+  '/assets/rpg/w_42_42.png',
+  '/assets/rpg/w_62_62.png',
+  // IHM //
+  // //////
+  '/assets/rpg/buff_32_32.png', // buffs et town signs
+  '/assets/rpg/moon_50_50.png',
+  '/assets/rpg/env_32_32.png',
+  '/assets/rpg/coins_16_16.png', // aussi un item
+  '/assets/rpg/ihm_32_32.png'
 ]
 
 export const SOUND_FILES = [
