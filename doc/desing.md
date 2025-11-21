@@ -96,7 +96,39 @@ Détails d'implémentaton :
   * **Incrémentation :** La date est incrémentée dans la Game Loop (budget **Update**, état `STATE_EXPLORATION`)
   * **Persistence :** La date est sauvegardée en base de données et récupérée au lancement de l'application
 
-### 2.7 Directive d'implémentation pour les Singletons
+
+### 2.7 Cycle de Vie et Initialisation (Anti-Circularité)
+
+#### 2.7.1 Architecture pyramidale
+
+#### 2.7.1 Hiérarchie des Modules (Dependency Layering)
+
+Pour garantir la stabilité du chargement, l'application respecte 4 niveaux de dépendance :
+* **Layer 0 (Roots) :** `constant.mjs`
+    * Contrainte : N'importe aucun fichier local.
+* **Layer 1 (Kernel) :** `utils.mjs`, `database.mjs`
+    * Contrainte : N'importent que la Layer 0.
+* **Layer 2 (Systems - Interdependent) :** `world.mjs`, `action.mjs`, `buff.mjs`, `combat.mjs`, `ui.mjs`, `render.mjs`...
+    * Comportement : Peuvent s'importer mutuellement.
+    * Sécurité : Utilisation obligatoire du pattern init() pour les interactions croisées.
+    * Exception : `generate.mjs` est isolé (importé dynamiquement ou statiquement sans dépendance retour).
+* **Layer 3 (Application) :** `core.mjs`
+    * Rôle : Point d'entrée. Importe les Layers 0, 1, 2. Orchestre l'initialisation séquentielle.
+
+#### 2.7.2 Cycle de Vie et Initialisation (Anti-Circularité)
+
+Pour permettre les références croisées dans la Layer 2 (ex: World a besoin de Combat, Combat a besoin de World) sans provoquer d'erreurs d'évaluation ESM, le cycle de vie est strict :
+* **Instantiation :** Au chargement du module, le Singleton est créé via `new Class()`. Le constructeur ne doit jamais accéder à une autre instance de la Layer 2.
+* **Initialisation :** Chaque Manager expose une méthode publique `init()`.
+
+Boot Sequence (dans core.mjs) :
+* **IMPORT :** Importe tous les modules.
+* **INIT :** Appelle `worldManager.init()`, `combatManager.init()`, `uiManager.init()`... L'ordre peut avoir de l'importance.
+* **RUN :** Lance la Game Loop.
+
+__Note__ : Après la création d'un nouveau monde, pour relancer le jeu, il faudra effectuer la phase `INIT` avant de lancer la phase `RUN`.
+
+#### 2.7.3 Directive d'implémentation pour les Singletons
 
 La plupart des managers sont implémentés sous la forme d'un **singleton** :
 
@@ -220,7 +252,10 @@ L'architecture sépare la logique (UI Logic) du rendu pur (Render) et distingue 
 │   ├── /sounds              # SFX, Ambiances (MP3/OGG)
 │   └── /data                # Tiles, Items, Recipes, Chests, Tables de loot, Actions de combat
 ├── /src
-│   ├── core.mjs             # SYSTEM : GameLoop (Update/Render/MicroTask), InputManager (Keyboard/Mouse listeners), MicroTasker, TaskScheduler, EventBus, TimeManager
+│   ├── constant.mjs         # CONFIG : Constantes, Enums (State, Biome, ItemType), Bitmasks
+│   ├── utils.mjs            # TOOLS : MicroTasker, TaskScheduler, EventBus, TimeManager, Math, Helpers, Random custom, 
+TimeManager
+│   ├── database.mjs         # STORAGE : IDBWrapper (IndexedDB abstraction), SaveManager
 │   ├── world.mjs            # PHYSICS : ChunkManager (Grid storage), PhysicsSystem (AABB Collisions, Gravity, Velocity), LiquidSimulator
 │   ├── action.mjs           # GAMEPLAY : ActionManager (Mining, Cutting, Fishing, Foraging...)
 │   ├── player.mjs           # PLAYER : PlayerManager (Déplacement, animation des actions, équipement, caractéristiques), LifeManager
@@ -232,10 +267,8 @@ L'architecture sépare la logique (UI Logic) du rendu pur (Render) et distingue 
 │   │                        # - DOM Managers : InventoryPanel, HelpPanel, PreferencePanel (configuration UI, clavier, souris...)
 │   │                        # - Canvas Managers : HotbarOverlay, EnvOverlay (Draw logic)
 │   ├── render.mjs           # GRAPHICS : MainRenderer (Canvas Context management), Camera (Viewport, Culling, Zoom), SpriteManager (Animations, Batching virtuel)
-│   ├── database.mjs         # STORAGE : IDBWrapper (IndexedDB abstraction), SaveManager
 │   ├── generate.mjs         # PROC-GEN : Algorithmes de génération (Dynamic Import)
-│   ├── constant.mjs         # CONFIG : Constantes, Enums (State, Biome, ItemType), Bitmasks
-│   └── utils.mjs            # TOOLS : Math, Helpers, Random custom
+│   └── core.mjs             # SYSTEM : GameLoop (Update/Render/MicroTask), InputManager (Keyboard/Mouse listeners)
 ├── /tests                   # Tests unitaires
 ├── index.html               # Entry Point (ES Module Loader) + Canvas Layers + DOM Containers
 └── package.json             # Pour ESLint/Tests uniquement
