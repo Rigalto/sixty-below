@@ -106,8 +106,9 @@ Détails d'implémentaton :
 Pour garantir la stabilité du chargement, l'application respecte 4 niveaux de dépendance :
 * **Layer 0 (Roots) :** `constant.mjs`
     * Contrainte : N'importe aucun fichier local.
-* **Layer 1 (Kernel) :** `utils.mjs`, `database.mjs`
+* **Layer 1 (Kernel) :** `utils.mjs`, `database.mjs`, `assets.mjs`
     * Contrainte : N'importent que la Layer 0.
+    * Rôle : Outils, Accès DB, Chargement & Parsing des ressources.
 * **Layer 2 (Systems - Interdependent) :** `world.mjs`, `action.mjs`, `buff.mjs`, `combat.mjs`, `ui.mjs`, `render.mjs`...
     * Comportement : Peuvent s'importer mutuellement.
     * Sécurité : Utilisation obligatoire du pattern init() pour les interactions croisées.
@@ -122,9 +123,11 @@ Pour permettre les références croisées dans la Layer 2 (ex: World a besoin de
 * **Initialisation :** Chaque Manager expose une méthode publique `init()`.
 
 Boot Sequence (dans core.mjs) :
-* **IMPORT :** Importe tous les modules.
-* **INIT :** Appelle `worldManager.init()`, `combatManager.init()`, `uiManager.init()`... L'ordre peut avoir de l'importance.
-* **RUN :** Lance la Game Loop.
+* **1. INSTANTIATION :** Création des Singletons (new Class). Importe tous les modules.
+* **2. LOAD ASSETS :** Appel de `assetsManager.load()`. Chargement de toutes les images et sons. Construction des index d'atlas.
+* **3. HYDRATION (Linkage) :** Une fois les assets chargés (synchrone), on parcourt `TILE_DB` et `ITEM_DB` (de `constant.mjs`) pour remplacer les chaînes de caractères (ex: "ore_16_16+1") par les données de rendu calculées par assets.mjs (Index image, sx, sy).
+* **4. INIT :** Appelle `worldManager.init()`, `combatManager.init()`, `uiManager.init()`... L'ordre peut avoir de l'importance.
+* **5. RUN :** Lance la Game Loop.
 
 __Note__ : Après la création d'un nouveau monde, pour relancer le jeu, il faudra effectuer la phase `INIT` avant de lancer la phase `RUN`.
 
@@ -234,6 +237,7 @@ L'interface est divisée en couches HTML superposées pour optimiser les redraws
 ### 6.2 Optimisations Graphiques
 
 * **Culling :** Rendu strict du viewport + buffer de 1 chunk.
+* **Asset Hydration (Zero-Cost Runtime) :** Les coordonnées de texture (sx, sy, sw, sh) et les index d'images sont calculés une seule fois au démarrage via `assets.mjs`. Le moteur de rendu accède à des entiers pré-calculés, jamais à des chaînes de caractères ou des calculs de grille pendant la frame.
 * **Framing (Auto-tiling) :** Bitmasking (4-connectivity) calculé à la volée ou au chargement pour les transitions de textures.
 * **Conversions :** Chunk -> Image via OffscreenCanvas (MicroTask) pour mettre en cache les chunks statiques. Mise à jour uniquement si modification (dirty flag)
 
@@ -253,8 +257,8 @@ L'architecture sépare la logique (UI Logic) du rendu pur (Render) et distingue 
 │   └── /data                # Tiles, Items, Recipes, Chests, Tables de loot, Actions de combat
 ├── /src
 │   ├── constant.mjs         # CONFIG : Constantes, Enums (State, Biome, ItemType), Bitmasks
-│   ├── utils.mjs            # TOOLS : MicroTasker, TaskScheduler, EventBus, TimeManager, Math, Helpers, Random custom, 
-TimeManager
+│   ├── assets.mjs           # RESOURCES : Loader (Images/Sons), Parser (Atlas Grid), Resolver (String -> UV Coords)
+│   ├── utils.mjs            # TOOLS : MicroTasker, TaskScheduler, EventBus, TimeManager, Math, Helpers, Random custom, TimeManager
 │   ├── database.mjs         # STORAGE : IDBWrapper (IndexedDB abstraction), SaveManager
 │   ├── world.mjs            # PHYSICS : ChunkManager (Grid storage), PhysicsSystem (AABB Collisions, Gravity, Velocity), LiquidSimulator
 │   ├── action.mjs           # GAMEPLAY : ActionManager (Mining, Cutting, Fishing, Foraging...)
