@@ -112,13 +112,13 @@ export const SOUND_CACHE = {}
 function parseAtlasName(filename) {
   const parts = filename.split('_')
   // Si le format est respecté: nom_w_h
-  if (parts.length >= 3) {
-    const h = parseInt(parts.pop(), 10)
-    const w = parseInt(parts.pop(), 10)
-    return { w, h }
+  if (parts.length === 3) {
+    const cellH = parseInt(parts.pop(), 10)
+    const cellW = parseInt(parts.pop(), 10)
+    return { cellW, cellH }
   }
   // Fallback
-  return { w: 16, h: 16 }
+  return { cellW: 16, cellH: 16 }
 }
 
 /**
@@ -129,55 +129,42 @@ function parseAtlasName(filename) {
 export const resolveAssetData = (codeStr) => {
   if (!codeStr) return null
 
-  let atlasName, variant = 0, tx = 0, ty = 0
+  let atlasName, row = 0, col = 0, isAutoTile = false
 
   // Cas 1: Variante simple "atlas+index", index=y, x déterminé dynamiquement (framing)
   if (codeStr.includes('+')) {
+// MODE AUTOTILE (Ligne fixe, Colonne dynamique)
+    // ex: "substrat_16_16+3" -> Ligne 3
     const parts = codeStr.split('+')
     atlasName = parts[0]
-    variant = parseInt(parts[1], 10)
+    row = parseInt(parts[1], 10)
+    col = 0 // Sera modifié par le bitmasking (0-15)
+    isAutoTile = true
   }
   // Cas 2: Coordonnées explicites "atlas-x-y"
   else if (codeStr.includes('-')) {
+    // MODE STATIC (Coordonnées fixes)
+    // ex: "liquid_16_16-1-0" -> Colonne 1, Ligne 0
     const parts = codeStr.split('-')
-    // Attention: votre format est "nom_w_h-x-y"
-    // on doit reconstituer le nom de l'atlas qui peut contenir des underscores
-    // Le plus simple est de prendre tout sauf les 2 derniers
-    ty = parseInt(parts.pop(), 10)
-    tx = parseInt(parts.pop(), 10)
-    atlasName = parts.join('-')
+    row = parseInt(parts.pop(), 10) // y
+    col = parseInt(parts.pop(), 10) // x
+    atlasName = parts.join('-') // marche même si le nom contient un tiret
   } else {
     return null
   }
 
   const imgIndex = ATLAS_INDEX[atlasName]
-  if (imgIndex === undefined) {
-    console.warn(`Asset resolve error: Atlas '${atlasName}' not found.`)
-    return null
-  }
+  if (imgIndex === undefined) return null
 
-  const imgObj = IMAGE_CACHE[imgIndex]
-  const { cellW, cellH } = imgObj.meta
-
-  // Calcul des coordonnées sources (sx, sy)
-  let sx, sy
-
-  if (codeStr.includes('+')) {
-    // Calcul automatique basé sur la largeur de l'image
-    const cols = Math.floor(imgObj.width / cellW)
-    sx = (variant % cols) * cellW
-    sy = Math.floor(variant / cols) * cellH
-  } else {
-    sx = tx * cellW // Si x était un index de colonne
-    sy = ty * cellH // Si y était un index de ligne
-    // Si tx/ty sont des pixels absolus, retirer la multiplication
-  }
+  const {cellH, cellW} = parseAtlasName(atlasName)
 
   return {
-    imgId: imgIndex, // L'entier ultra-rapide pour le renderer
-    sx, sy,
+    imgIndex: imgIndex, // L'entier ultra-rapide pour le renderer
+    sx: col * cellW, // Position X de base (0 pour autotile)
+    sy: row * cellH, // Position Y (Ligne du matériau)
     sw: cellW,
-    sh: cellH
+    sh: cellH,
+    isAutoTile: isAutoTile // Flag utile pour le Renderer (savoir s'il doit calculer et appliquer le mask)
   }
 }
 
@@ -194,36 +181,32 @@ export const loadAssets = async () => {
       const img = new Image()
       img.src = path
 
-      // Extraction Nom & Métadonnées
-      const filename = path.substring(path.lastIndexOf('/') + 1, path.lastIndexOf('.'))
-      const meta = parseAtlasName(filename)
-
-      img.meta = { cellW: meta.w, cellH: meta.h }
-
       // Indexation
+      const filename = path.substring(path.lastIndexOf('/') + 1, path.lastIndexOf('.'))
       IMAGE_CACHE[index] = img
       ATLAS_INDEX[filename] = index
 
       img.onload = () => resolve()
       img.onerror = () => {
-        console.error(`Failed: ${path}`)
+        console.error(`loadAssets - Image non chargée: ${path}`)
         resolve() // On ne bloque pas
       }
     })
   })
 
   // 4.2 Chargement Sons (Web Audio API)
-  const audioCtx = new (window.AudioContext || window.webkitAudioContext)()
-  const sndPromises = SOUND_FILES.map(path => {
-    return fetch(path)
-      .then(response => response.arrayBuffer())
-      .then(arrayBuffer => audioCtx.decodeAudioData(arrayBuffer))
-      .then(audioBuffer => {
-        const filename = path.substring(path.lastIndexOf('/') + 1, path.lastIndexOf('.'))
-        SOUND_CACHE[filename] = audioBuffer
-      })
-      .catch(e => console.error(`Sound error ${path}`, e))
-  })
+  const sndPromises = []
+  // const audioCtx = new (window.AudioContext || window.webkitAudioContext)()
+  // const sndPromises = SOUND_FILES.map(path => {
+  //   return fetch(path)
+  //     .then(response => response.arrayBuffer())
+  //     .then(arrayBuffer => audioCtx.decodeAudioData(arrayBuffer))
+  //     .then(audioBuffer => {
+  //       const filename = path.substring(path.lastIndexOf('/') + 1, path.lastIndexOf('.'))
+  //       SOUND_CACHE[filename] = audioBuffer
+  //     })
+  //     .catch(e => console.error(`Sound error ${path}`, e))
+  // })
 
   await Promise.all([...imgPromises, ...sndPromises])
   console.timeEnd('Assets Loading')
