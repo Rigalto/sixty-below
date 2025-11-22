@@ -123,3 +123,146 @@ export const PALETTE = {
   DEBUG_CHUNK: 'rgba(255, 0, 0, 0.3)',
   BACKGROUND: '#0d0d15' // Couleur de fond par défaut
 }
+
+
+
+/* =========================================
+   8. DEFINITION DES NOEUDS
+   ========================================= */
+
+   // const tileCode = NODES.CLAY.code
+   // const tileDesc = NODES.CLAY
+   // const tileDesc = NODES_LOOKUP[tileCode]
+
+   export const NODE_TYPE = {SPACE: 0x1, NATURAL: 0x2, TOPSOIL: 0x4, SUBSTRAT: 0x8, LIQUID: 0x10, ORE: 0x20, GEM: 0x40, ROCK: 0x80, WOOD: 0x100, WALL: 0x200, BWALL: 0x400, WEB: 0x800, STRONG: 0x1000, XXXX: 0x2000, CREATION: 0x4000}
+
+   export const NODES = {
+  // modifier 'isEmptyTileCode' si les codes changent
+  OUTSIDE: {code: 0, name: 'Out of World', type: NODE_TYPE.CREATION, color: '#000000'},
+  SKY: {code: 1, name: 'Sky', type: NODE_TYPE.SPACE, color: '#E6F3FF', star: 0, solid: false},
+  VOID: {code: 2, name: 'Void', type: NODE_TYPE.SPACE, color: '#300606', star: 0, solid: false},
+  INVISIBLE: {code: 3, name: 'Invisible', type: NODE_TYPE.SPACE, color: '#300606', star: 0, solid: true},
+  BASALT: {code: 4, name: 'Basalt', type: NODE_TYPE.STRONG, color: '#000000', star: 6, solid: true},
+
+  CLAY: {code: 5, name: 'Clay', type: NODE_TYPE.TOPSOIL, stype: 'block', star: 1, solid: true, color: '#af784d', image: 'substrat_16_16+3', speed: 1000, mining: [{item: 'bkclay', count: 1}]},
+  MUD: {code: 6, name: 'Mud', type: NODE_TYPE.TOPSOIL, stype: 'block', star: 1, solid: true, color: '#853a51', image: 'substrat_16_16+4', speed: 1000, mining: [{item: 'bkmud', count: 1}]},
+  SILT: {code: 7, name: 'Silt', type: NODE_TYPE.TOPSOIL, stype: 'block', star: 1, solid: true, color: '#4f5b6c', image: 'substrat_16_16+7', speed: 1000, mining: [{item: 'bksilt', count: 1}]},
+  ASH: {code: 8, name: 'Ash', type: NODE_TYPE.TOPSOIL, stype: 'block', star: 1, solid: true, color: '#1b283b', speed: 1000, image: 'substrat_16_16+8', mining: [{item: 'bkash', count: 1}]},
+
+  DIRT: {code: 9, name: 'Dirt', type: NODE_TYPE.SUBSTRAT, stype: 'block', star: 1, solid: true, color: '#835537', image: 'substrat_16_16+1', speed: 1000, mining: [{item: 'bkdirt', count: 1}, {item: 'worm', count: 0.15, lucky: 1.2, rainy: 1.7}]},
+  STONE: {code: 10, name: 'Stone', type: NODE_TYPE.SUBSTRAT, stype: 'block', star: 1, solid: true, color: '#a4937f', image: 'substrat_16_16+2', speed: 1000, mining: [{item: 'bkston', count: 1}]},
+  SAND: {code: 11, name: 'Sand', type: NODE_TYPE.SUBSTRAT, stype: 'block', star: 1, solid: true, color: '#fee267', image: 'substrat_16_16+5', speed: 500, mining: [{item: 'bksand', count: 1}], viscosity: 1000}, // 500
+  HUMUS: {code: 12, name: 'Humus', type: NODE_TYPE.SUBSTRAT, stype: 'block', star: 1, solid: true, color: '#036632', image: 'substrat_16_16+6', speed: 1000, mining: [{item: 'bkhumus', count: 1}]},
+  SLUSH: {code: 13, name: 'Slush', type: NODE_TYPE.SUBSTRAT, stype: 'block', star: 1, solid: true, color: '#641f97', image: 'substrat_16_16+10', speed: 600, mining: [{item: 'bkslush', count: 1}]},
+
+  GRASS: {code: 16, name: 'Regular Grass', type: NODE_TYPE.NATURAL, star: 1, solid: true, color: '#84de50', image: 'grass_16_16+0', speed: 500, mining: [{item: 'bkclay', count: 1}, {item: 'seedf', count: 0.2}, {item: 'worm', count: 0.02, rainy: 40}], foraging: [{item: 'seedf', count: 0.2, lucky: 1.5}, {item: 'worm', count: 0.05, lucky: 2, rainy: 10}, {item: 'slug', count: 0.04, lucky: 1.8, rainy: 10}, {item: 'goldworm', count: 0.01}]},
+  GRASSJUNGLE: {code: 17, name: 'Jungle Grass', type: NODE_TYPE.NATURAL, star: 2, solid: true, color: '#56ba27', image: 'grass_16_16+1', speed: 500, mining: [{item: 'bkmud', count: 1}, {item: 'seedj', count: 0.15}], foraging: [{item: 'seedj', count: 0.15, lucky: 1.5}, {item: 'slug', count: 0.05, lucky: 2, rainy: 10}]},
+  GRASSMUSHROOM: {code: 18, name: 'Mushroom Grass', type: NODE_TYPE.NATURAL, star: 3, solid: true, color: '#56ba27', image: 'grass_16_16+2', speed: 500, mining: [{item: 'bksilt', count: 1}, {item: 'seedm', count: 0.1, lucky: 1.5}], foraging: [{item: 'seedm', count: 0.1, lucky: 1.5}, {item: 'slug', count: 0.05, lucky: 2, rainy: 10}]},
+  GRASSASH: {code: 19, name: 'Ash Grass', type: NODE_TYPE.NATURAL, star: 4, solid: true, color: '#56ba27', image: 'grass_16_16+3', speed: 500, mining: [{item: 'bkash', count: 1}, {item: 'seeda', count: 0.05}], foraging: [{item: 'seeda', count: 0.06, lucky: 1.5}]},
+
+  GRANITE: {code: 20, name: 'Granite', type: NODE_TYPE.ROCK, star: 4, solid: true, color: '#1966cc', image: 'rock_16_16+0', speed: 1500, mining: [{item: 'granite', count: 1}]}, // UNDERWORLD
+  MARBLE: {code: 21, name: 'Marble', type: NODE_TYPE.ROCK, star: 4, solid: true, color: '#e6ddc4', image: 'rock_16_16+1', speed: 1500, mining: [{item: 'marble', count: 1}]}, // UNDERWORLD
+  METEORITE: {code: 22, name: 'Meteroite', type: NODE_TYPE.ROCK, stype: 'block', star: 5, solid: true, color: '#7d6f5f', image: 'rock_16_16+2', speed: 2000, mining: [{item: 'bkmtrt', count: 1}]}, // SURFACE
+  OBSIDIAN: {code: 23, name: 'Obsidian', type: NODE_TYPE.ROCK, star: 5, solid: true, color: '#73c882', image: 'rock_16_16+3', speed: 2000, mining: [{item: 'obsidian', count: 1}]}, // HELL
+  HELLSTONE: {code: 24, name: 'Hellstone', type: NODE_TYPE.ROCK, stype: 'block', star: 5, solid: true, color: '#cc0030', image: 'rock_16_16+4', speed: 2200, mining: [{item: 'hellstone', count: 1}]}, // HELL
+  SANDSTONE: {code: 14, name: 'Sandstone', type: NODE_TYPE.ROCK, stype: 'block', star: 1, solid: true, color: '#b87141', image: 'rock_16_16+5', speed: 1200, mining: [{item: 'sandstone', count: 1}]},
+  HIVE: {code: 15, name: 'Hive', type: NODE_TYPE.ROCK, stype: 'block', star: 1, solid: true, color: '#fd8431', image: 'rock_16_16+6', speed: 1200, mining: [{item: 'bkhive', count: 1}]},
+
+  COPPER: {code: 25, name: 'Copper Ore', type: NODE_TYPE.ORE, star: 1, solid: true, color: '#fe602f', image: 'ore_16_16+0', speed: 1000, mining: [{item: 'orcu', count: 1}]}, // GROUND
+  IRON: {code: 26, name: 'Iron Ore', type: NODE_TYPE.ORE, star: 1, solid: true, color: '#af784d', image: 'ore_16_16+1', speed: 1100, mining: [{item: 'orfe', count: 1}]}, // GROUND
+  SILVER: {code: 27, name: 'Silver Ore', type: NODE_TYPE.ORE, star: 2, solid: true, color: '#788696', image: 'ore_16_16+2', speed: 1200, mining: [{item: 'orag', count: 1}]}, // UNDERGROUND
+  GOLD: {code: 28, name: 'Gold Ore', type: NODE_TYPE.ORE, star: 2, solid: true, color: '#ffaa33', image: 'ore_16_16+3', speed: 1400, mining: [{item: 'orau', count: 1}]}, // UNDERGROUND
+  COBALT: {code: 29, name: 'Cobalt Ore', type: NODE_TYPE.ORE, star: 3, solid: true, color: '#2797ea', image: 'ore_16_16+4', speed: 1600, mining: [{item: 'orco', count: 1}]}, // UNDERWORLD
+  PLATINUM: {code: 30, name: 'Platinum Ore', type: NODE_TYPE.ORE, star: 4, solid: true, color: '#25874d', image: 'ore_16_16+5', speed: 1800, mining: [{item: 'orpt', count: 1}]}, // HELL - images de tungsten dans Terraria
+
+  TOPAZ: {code: 31, name: 'Topaz Deposit', type: NODE_TYPE.GEM, star: 1, solid: true, color: '#788696', image: 'gem_16_16+0', speed: 900, mining: [{item: 'topaz', count: 1}]}, // FOREST GROUND - UNDERGROUND
+  RUBY: {code: 32, name: 'Ruby Deposit', type: NODE_TYPE.GEM, star: 2, solid: true, color: '#788696', image: 'gem_16_16+1', speed: 900, mining: [{item: 'ruby', count: 1}]}, // DESERT UNDERGROUND
+  EMERALD: {code: 33, name: 'Emerald Deposit', type: NODE_TYPE.GEM, star: 3, solid: true, color: '#788696', image: 'gem_16_16+2', speed: 900, mining: [{item: 'emerald', count: 1}]}, // JUNGLE UNDERGROUND
+  SAPPHIRE: {code: 34, name: 'Sapphire Deposit', type: NODE_TYPE.GEM, star: 4, solid: true, color: '#788696', image: 'gem_16_16+3', speed: 1100, mining: [{item: 'sapphire', count: 1}]}, // CAVERN
+
+  WOODWALL: {code: 35, name: 'Wood Wall', type: NODE_TYPE.WALL, star: 1, solid: true, color: '#855959', image: 'wall_16_16+0', speed: 1200, hammering: [{item: 'woodwall', count: 1}]},
+  BRICKWALL: {code: 36, name: 'Brick Wall', type: NODE_TYPE.BWALL, star: 1, solid: false, color: '#788696', image: 'wall_16_16+1', speed: 1200, hammering: [{item: 'brickwall', count: 1}]},
+  STONEWALL: {code: 37, name: 'Stone Wall', type: NODE_TYPE.BWALL, star: 1, solid: false, color: '#788696', image: 'wall_16_16+2', speed: 1200, hammering: [{item: 'stonewall', count: 1}]},
+  SANDSTONEWALL: {code: 38, name: 'Sandstone Wall', type: NODE_TYPE.BWALL, star: 1, solid: false, color: '#788696', image: 'wall_16_16+3', speed: 1200, hammering: [{item: 'sandstonewall', count: 1}]},
+  COPPERWALL: {code: 39, name: 'Copper Wall', type: NODE_TYPE.BWALL, star: 2, solid: false, color: '#788696', image: 'wall_16_16+4', speed: 1400, hammering: [{item: 'copperwall', count: 1}]},
+  IRONWALL: {code: 40, name: 'Iron Wall', type: NODE_TYPE.BWALL, star: 2, solid: false, color: '#788696', image: 'wall_16_16+5', speed: 1400, hammering: [{item: 'ironwall', count: 1}]},
+  SILVERWALL: {code: 41, name: 'Silver Wall', type: NODE_TYPE.BWALL, star: 2, solid: false, color: '#788696', image: 'wall_16_16+6', speed: 1400, hammering: [{item: 'silverwall', count: 1}]},
+  GOLDWALL: {code: 42, name: 'Gold Wall', type: NODE_TYPE.BWALL, star: 2, solid: false, color: '#788696', image: 'wall_16_16+7', speed: 1400, hammering: [{item: 'goldwall', count: 1}]},
+  TOPAZWALL: {code: 43, name: 'Topaz Wall', type: NODE_TYPE.BWALL, star: 3, solid: false, color: '#788696', image: 'wall_16_16+8', speed: 1600, hammering: [{item: 'topazwall', count: 1}]},
+  RUBYWALL: {code: 44, name: 'Ruby Wall', type: NODE_TYPE.BWALL, star: 3, solid: false, color: '#788696', image: 'wall_16_16+9', speed: 1600, hammering: [{item: 'rubywall', count: 1}]},
+  EMERALDWALL: {code: 45, name: 'Emerald Wall', type: NODE_TYPE.BWALL, star: 3, solid: false, color: '#788696', image: 'wall_16_16+10', speed: 1600, hammering: [{item: 'emeraldwall', count: 1}]},
+  SAPPHIREWALL: {code: 46, name: 'Sapphire Wall', type: NODE_TYPE.BWALL, star: 3, solid: false, color: '#788696', image: 'wall_16_16+11', speed: 1600, hammering: [{item: 'sapphirewall', count: 1}]},
+  COBALTWALL: {code: 47, name: 'Cobalt Wall', type: NODE_TYPE.BWALL, star: 4, solid: false, color: '#788696', image: 'wall_16_16+12', speed: 1800, hammering: [{item: 'cobaltwall', count: 1}]},
+  PLATINUMWALL: {code: 48, name: 'Platinum Wall', type: NODE_TYPE.BWALL, star: 4, solid: false, color: '#788696', image: 'wall_16_16+13', speed: 1800, hammering: [{item: 'platinumwall', count: 1}]},
+  GRANITEWALL: {code: 49, name: 'Granite Wall', type: NODE_TYPE.BWALL, star: 4, solid: false, color: '#788696', image: 'wall_16_16+14', speed: 1800, hammering: [{item: 'granitewall', count: 1}]},
+  MARBLEWALL: {code: 50, name: 'Marble Wall', type: NODE_TYPE.BWALL, star: 4, solid: false, color: '#788696', image: 'wall_16_16+15', speed: 1800, hammering: [{item: 'marblewall', count: 1}]},
+
+  WEB: {code: 53, name: 'Cobweb', type: NODE_TYPE.WEB, star: 1, solid: false, color: '#788696', image: 'substrat_16_16+9', speed: 1900, mining: [{item: 'cobweb', count: 1}, {item: 'spideregg', count: '1-3-0.08'}, {monster: 'spider', rate: '25'}]},
+
+  BRICK: {code: 54, name: 'Brick', type: NODE_TYPE.WALL, star: 1, solid: true, color: '#A52A2A'}, // DUNGEON - à supprimer
+
+  // modifier 'isLiquidTileCode' si les codes changent
+  SEA: {code: 55, name: 'Sea', type: NODE_TYPE.LIQUID, stype: 'water', level: 16, star: 0, solid: false, color: '#2D5EBF', image: 'liquid_16_16-0-0', waveImage: 'liquid_16_16-4-0', viscosity: 200},
+  WATER: {code: 56, name: 'Water', type: NODE_TYPE.LIQUID, stype: 'water', level: 16, star: 0, solid: false, color: '#477BFF', image: 'liquid_16_16-1-0', viscosity: 200},
+  HONEY: {code: 57, name: 'Honey', type: NODE_TYPE.LIQUID, stype: 'honey', level: 16, star: 0, solid: false, color: '#FFC700', image: 'liquid_16_16-2-0', viscosity: 600},
+  LAVA: {code: 58, name: 'Lava', type: NODE_TYPE.LIQUID, stype: 'lava', level: 16, star: 0, solid: false, color: '#DC143C', image: 'liquid_16_16-3-0', viscosity: 800},
+  SAP: {code: 59, name: 'Sap', type: NODE_TYPE.LIQUID, solid: false, color: '#008000', viscosity: 500},
+
+  SHORE: {code: 60, name: 'Shore'},
+  // types utilisés de manière temporaire pendant la création du monde
+  HEART: {code: 61, name: 'Life Heart', type: NODE_TYPE.CREATION, color: '#FF19CD'}
+}
+
+/* =========================================
+   5. INITIALISATION AUTOMATIQUE
+   ========================================= */
+export const NODES_LOOKUP = [] // Array Lookup
+
+// const hexToRgb = (hex) => {
+//   if (!hex) return 'rgb(0,0,0)'
+//   let h = hex.startsWith('#') ? hex.slice(1) : hex
+//   const r = parseInt(h.slice(0, 2), 16)
+//   const g = parseInt(h.slice(2, 4), 16)
+//   const b = parseInt(h.slice(4, 6), 16)
+//   return `rgb(${r}, ${g}, ${b})`
+// }
+
+for (const key in NODES) {
+  const nodeDesc = NODES[key]
+  NODES_LOOKUP[nodeDesc.code] = nodeDesc
+  // Préparation pour hydratation (sera remplacé par assets.mjs)
+  nodeDesc.renderData = null
+  //  nodeDesc.rgbColor = hexToRgb(nodeDesc.color) // décommenter si utile
+}
+
+// CI-DESSOUS A SUPPRIMER
+
+  // 1. Calcul des Flags
+//   let flags = TILE_FLAG.NONE
+//   if (node.solid) flags |= TILE_FLAG.SOLID
+//   if (node.type === TILE_TYPE.LIQUID) flags |= TILE_FLAG.LIQUID
+//   if (node.type === TILE_TYPE.WALL || node.type === TILE_TYPE.BWALL) flags |= TILE_FLAG.WALL
+//   if (node.speed > 0) flags |= TILE_FLAG.MINABLE
+
+  // 2. Enrichissement de l'objet (Mutation)
+//   node.flags = flags
+//   node.rgbColor = hexToRgb(node.color) // TODO Vérifier si utile
+//   node.viscosity = node.viscosity || 0
+//   node.speed = node.speed || 0
+
+  // Préparation pour hydratation (sera remplacé par assets.mjs)
+//   node._imageRaw = node.image // utilité ?
+//   node._waveRaw = node.waveImage
+//   node.renderData = null
+//   node.waveRenderData = null
+
+  // 3. Stockage Référence
+//   NODES_LOOKUP[node.code] = node
+
+  // 4. Linkage Biomes
+//   if (node.biome !== undefined && BIOME.code[node.biome]) {
+//     const b = BIOME.code[node.biome]
+//     if (node.type === TILE_TYPE.TOPSOIL) b.ground = node.code
+//     else if (node.type === TILE_TYPE.GEM) b.gem = node.code
+//   }
+// }
