@@ -85,7 +85,7 @@ export const IMAGE_FILES = [
 export const SOUND_FILES = [
   'assets/sounds/mining_hit.mp3',
   'assets/sounds/mining_break.mp3',
-  'assets/sounds/water_splash.mp3',
+  'assets/sounds/water_splash.mp3'
   // ...
 ]
 
@@ -109,16 +109,16 @@ export const SOUND_CACHE = {}
  * Analyse le nom de l'atlas pour en déduire la grille.
  * Ex: "ore_16_16" -> cellW=16, cellH=16
  */
-function parseAtlasName(filename) {
+function parseAtlasName (filename) {
   const parts = filename.split('_')
   // Si le format est respecté: nom_w_h
   if (parts.length === 3) {
     const cellH = parseInt(parts.pop(), 10)
     const cellW = parseInt(parts.pop(), 10)
-    return { cellW, cellH }
+    return {cellW, cellH}
   }
   // Fallback
-  return { cellW: 16, cellH: 16 }
+  return {cellW: 16, cellH: 16}
 }
 
 /**
@@ -129,20 +129,22 @@ function parseAtlasName(filename) {
 export const resolveAssetData = (codeStr) => {
   if (!codeStr) return null
 
-  let atlasName, row = 0, col = 0, isAutoTile = false
+  let atlasName
+  let row = 0
+  let col = 0
+  let isAutoTile = false
 
-  // Cas 1: Variante simple "atlas+index", index=y, x déterminé dynamiquement (framing)
   if (codeStr.includes('+')) {
-// MODE AUTOTILE (Ligne fixe, Colonne dynamique)
+    // Cas 1: Variante simple "atlas+index", index=y, x déterminé dynamiquement (framing)
+    // MODE AUTOTILE (Ligne fixe, Colonne dynamique)
     // ex: "substrat_16_16+3" -> Ligne 3
     const parts = codeStr.split('+')
     atlasName = parts[0]
     row = parseInt(parts[1], 10)
     col = 0 // Sera modifié par le bitmasking (0-15)
     isAutoTile = true
-  }
-  // Cas 2: Coordonnées explicites "atlas-x-y"
-  else if (codeStr.includes('-')) {
+  } else if (codeStr.includes('-')) {
+    // Cas 2: Coordonnées explicites "atlas-x-y"
     // MODE STATIC (Coordonnées fixes)
     // ex: "liquid_16_16-1-0" -> Colonne 1, Ligne 0
     const parts = codeStr.split('-')
@@ -159,12 +161,12 @@ export const resolveAssetData = (codeStr) => {
   const {cellH, cellW} = parseAtlasName(atlasName)
 
   return {
-    imgIndex: imgIndex, // L'entier ultra-rapide pour le renderer
+    imgIndex, // L'entier ultra-rapide pour le renderer
     sx: col * cellW, // Position X de base (0 pour autotile)
     sy: row * cellH, // Position Y (Ligne du matériau)
     sw: cellW,
     sh: cellH,
-    isAutoTile: isAutoTile // Flag utile pour le Renderer (savoir s'il doit calculer et appliquer le mask)
+    isAutoTile // Flag utile pour le Renderer (savoir s'il doit calculer et appliquer le mask)
   }
 }
 
@@ -210,5 +212,5 @@ export const loadAssets = async () => {
 
   await Promise.all([...imgPromises, ...sndPromises])
   console.timeEnd('Assets Loading')
-  return { imageCount: IMAGE_CACHE.length, soundCount: Object.keys(SOUND_CACHE).length }
+  return {imageCount: IMAGE_CACHE.length, soundCount: Object.keys(SOUND_CACHE).length}
 }
