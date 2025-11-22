@@ -1,3 +1,5 @@
+import {SKY_COLORS, NODES} from './constant.mjs'
+
 class EventBus {
   constructor () {
     this.listeners = new Map() // Map<eventType, Set[callbacks]>
@@ -17,6 +19,7 @@ class EventBus {
   }
 
   emit (event, data) {
+    console.log('EventBus.emit >>>>>>>>>>>>>>>', event)
     const callbacks = this.listeners.get(event)
     if (!callbacks) return // Si aucun listener pour cet événement, on ne fait rien.
 
@@ -252,3 +255,374 @@ class MicroTasker {
 
 // Export du singleton
 export const microTasker = new MicroTasker()
+
+class TaskScheduler {
+  constructor () {
+    this.tasks = [] // Tableau trié des tâches
+    this.lastFrameTime = 0
+  }
+
+  // initialisation de l'heure absolue
+  initTime (time) { this.lastFrameTime = time }
+
+  // Ajoute une tâche à exécuter après un délai
+  enqueue (id, delay, fn, priority, capacityUnits, ...args) {
+    const task = {id, time: delay + this.lastFrameTime, fn, args, priority, capacityUnits, isRemoved: false}
+    return this.#addTask(task)
+  }
+
+  // Modifie le délai d'une tâche existante, en la créant systématiquement
+  // si on modifie uniquement le 'time' de la tâche existante, elle ne serait pas triée
+  requeue (id, delay, fn, priority, capacityUnits, ...args) {
+    this.dequeue(id) // Marque les anciennes comme 'isRemoved = true'
+    const task = {id, time: delay + this.lastFrameTime, fn, priority, capacityUnits, args, isRemoved: false}
+    return this.#addTask(task)
+  }
+
+  // Cherche une tâche unique par son ID (obligatoirement une string), la marque comme supprimée et la retourne.
+  // Renvoie la tâche si UNE SEULE a été trouvée et supprimée.
+  // Renvoie null si ZÉRO ou PLUS D'UNE tâche active a été trouvée (aucune suppression n'est alors effectuée).
+  #findAndRemoveTask (id) {
+    let foundTask = null
+    let count = 0
+
+    // 1. On parcourt la liste pour trouver toutes les correspondances actives
+    for (const task of this.tasks) {
+      if (!task.isRemoved && task.id === id) {
+        count++
+        foundTask = task // On mémorise la tâche trouvée
+      }
+    }
+
+    // 2. On applique la logique de sécurité
+    // Si on a trouvé 0 ou plus d'une tâche, on n'a pas de base de temps fiable.
+    // On abandonne et on ne supprime rien pour éviter les effets de bord inattendus.
+    if (count !== 1) return null
+
+    // 3. Si une seule tâche a été trouvée, on la marque comme supprimée et on la retourne.
+    foundTask.isRemoved = true
+    return foundTask
+  }
+
+  // Prolonge une tâche existante ou la crée si elle n'existe pas.
+  // Le délai est ajouté à l'heure d'expiration de la tâche existante.
+  extendTask (id, delay, fn, priority, capacityUnits, ...args) {
+    // 1. On essaie de trouver et supprimer la tâche existante en une seule opération.
+    const existingTask = this.#findAndRemoveTask(id)
+    // 2. On détermine le temps de base.
+    const baseTime = existingTask ? existingTask.time : this.lastFrameTime
+    // 3. On crée la nouvelle tâche avec l'heure d'expiration prolongée.
+    const task = {id, time: baseTime + delay, fn, priority, capacityUnits, args, isRemoved: false}
+    // 4. On ajoute la tâche à la file triée et on retourne son heure d'expiration.
+    return this.#addTask(task)
+  }
+
+  // Ajoute une tâche à exécuter à un temps absolu.
+  enqueueAbsolute (id, time, fn, priority, capacityUnits, ...args) {
+    const task = {id, time, fn, args, priority, capacityUnits, isRemoved: false}
+    return this.#addTask(task)
+  }
+
+  // ajoute la tâche uniquement si elle n'est pas déjà présente
+  // ne fait rien si elle est présnete
+  enqueueOnce (id, delay, fn, priority, capacityUnits, ...args) {
+    const old = this.tasks.find(task => !task.isRemoved && task.id === id)
+    if (old !== undefined) { return old.time }
+    const task = {id, time: delay + this.lastFrameTime, fn, priority, capacityUnits, args, isRemoved: false}
+    return this.#addTask(task)
+  }
+
+  // Ajoute une tâche après la dernière tâche correspondant à un identifiant ou une regex.
+  enqueueAfter (idOrRegex, newId, delay, fn, priority, capacityUnits, ...args) {
+    const lastMatchingTask = this.tasks.find(task => {
+      if (task.isRemoved) { return false }
+      if (typeof idOrRegex === 'string') {
+        return task.id === idOrRegex
+      } else if (idOrRegex instanceof RegExp) {
+        return idOrRegex.test(task.id)
+      }
+      return false
+    })
+    const baseTime = lastMatchingTask ? lastMatchingTask.time : this.lastFrameTime
+    const task = {id: newId, time: delay + baseTime, fn, priority, capacityUnits, args, isRemoved: false}
+    return this.#addTask(task)
+  }
+
+  // Ajoute une tâche à exécuter
+  #addTask (task) {
+    // if (typeof task.fn !== 'function') { debugger }
+    // Insérer la tâche dans le tableau trié via recherche dichotomique
+    let left = 0
+    let right = this.tasks.length
+    while (left < right) {
+      // const mid = Math.floor((left + right) / 2)
+      const mid = (left + right) >>> 1 // Bitwise shift est plus safe/rapide
+      if (this.tasks[mid].time < task.time) {
+        right = mid
+      } else {
+        left = mid + 1
+      }
+    }
+    this.tasks.splice(left, 0, task) // Insertion rapide
+    return task.time
+  }
+
+  // Supprime toutes les tâches correspondant à un identifiant ou une regex.
+  dequeue (idOrRegex) {
+    if (typeof idOrRegex === 'string') {
+      for (const task of this.tasks) {
+        if (task.id === idOrRegex) {
+          task.isRemoved = true // Marquer la tâche comme supprimée
+        }
+      }
+    } else if (idOrRegex instanceof RegExp) {
+      for (const task of this.tasks) {
+        if (idOrRegex.test(task.id)) {
+          task.isRemoved = true // Marquer la tâche comme supprimée
+        }
+      }
+    }
+  }
+
+  // Vérifie s'il existe une tâche correspondant à un identifiant ou une regex existe.
+  has (idOrRegex) {
+    if (typeof idOrRegex === 'string') {
+      return this.tasks.some(task => !task.isRemoved && task.id === idOrRegex)
+    } else if (idOrRegex instanceof RegExp) {
+      return this.tasks.some(task => !task.isRemoved && idOrRegex.test(task.id))
+    }
+  }
+
+  // renvoie la première action (celle qui sera lancée en premier
+  // Renvoie 'undefined' si aucune action ne correspond
+  findFirstTarget (idOrRegex) {
+    // Parcourt le tableau depuis la fin (plus ancien temps, première exécution) vers le début
+    for (let i = this.tasks.length - 1; i >= 0; i--) {
+      const task = this.tasks[i]
+      // Ignore les tâches marquées comme supprimées
+      if (task.isRemoved) { continue }
+
+      // Vérifie la correspondance de l'ID
+      let match = false
+      if (typeof idOrRegex === 'string') {
+        match = (task.id === idOrRegex)
+      } else if (idOrRegex instanceof RegExp) {
+        // Vérifie si task.id est une chaîne avant d'utiliser test()
+        match = idOrRegex.test(task.id)
+      }
+      // correspondance trouvée
+      if (match) { return task }
+    }
+    // Aucune tâche correspondante (et non supprimée) trouvée
+    return undefined
+  }
+
+  // Recherche une action avec un target et des paramètres spécifiques.
+  // Renvoie la tâche si elle est trouvée, 'undefined' sinon
+  findAction (idOrRegex, params) {
+    return this.tasks.find(task => {
+      if (task.isRemoved) { return false }
+      // Vérifie la correspondance de l'ID
+      let match = false
+      if (typeof idOrRegex === 'string') {
+        match = (task.id === idOrRegex)
+      } else if (idOrRegex instanceof RegExp) {
+        // Vérifie si task.id est une chaîne avant d'utiliser test()
+        match = idOrRegex.test(task.id)
+      }
+      // correspondance trouvée
+      if (!match) { return false } // identifiant ne correspond pas
+
+      if (params) {
+        for (let i = 0; i < params.length; i++) {
+          // Correction ici : task.args
+          if (params[i] !== undefined && task.args[i] !== params[i]) return false // Paramètre défini et différent
+        }
+      }
+
+      return true // Tous les paramètres correspondent
+    })
+  }
+
+  //* Retourne le nombre de tâches dans la table.
+  get queueSize () { return this.tasks.length }
+
+  // Vide la table des tâches
+  clear () { this.tasks.length = 0 }
+
+  // Boucle principale appelée à chaque frame.
+  update (currentTime) {
+    this.lastFrameTime = currentTime
+
+    // Vérifier et exécuter les tâches dont le délai est écoulé
+    while (this.tasks.length > 0 && this.tasks[this.tasks.length - 1].time <= currentTime) {
+      const task = this.tasks.pop() // La tâche la plus ancienne est en dernier
+      if (!task.isRemoved) { microTasker.enqueue(task.fn, task.priority, task.capacityUnits, ...task.args) }
+    }
+  }
+
+  // renvoie une chaîne de caractères listant les actions en attente
+  debug () {
+    return this.tasks.filter(a => !a.isRemoved).map(a => a.id).join(', ')
+  }
+
+  // Fonction pour afficher les statistiques collectées
+  debugStats () {
+    let output = '--- TaskScheduler - Task List ---\n'
+    const currentTime = this.lastFrameTime
+    for (const task of this.tasks) {
+      if (task.isRemoved) { continue }
+      output += `${task.id}:\n`
+      output += `  Due time: ${task.time.toFixed(1)} ms (Duration: ${(task.time - currentTime).toFixed(1)})\n`
+      output += `  Function: ${task.fn.name}\n`
+      output += `  Priority: ${task.priority}\n`
+      output += `  Capacity: ${task.capacityUnits} ¼ms\n`
+      output += '---------------------------------\n'
+    }
+    console.log(output)
+    return output // Retourne aussi la chaîne pour un usage éventuel
+  }
+}
+export const taskScheduler = new TaskScheduler()
+
+const GAME_TIME_RATIO = 60
+const MS_PER_DAY = 1440 * 60 * 1000
+
+class TimeManager {
+  #minute5Cache
+
+  constructor () {
+    // Source de vérité
+    this.gameTime = 0
+
+    // Propriétés Publiques (Cache)
+    // Initialisées à -1 pour forcer la mise à jour au premier tick
+    this.day = -1
+    this.hour = -1
+    this.minute = -1
+    this.timeSlot = -1
+    this.moonPhase = 0
+
+    // Cache interne pour trigger 5min
+    this.#minute5Cache = -1
+
+    // Environnement
+    this.weather = 0
+    this.nextWeather = 0
+    this.currentSkyColor = SKY_COLORS[35]
+  }
+
+  init (savedGameTime = 28800000, savedWeather = 0, savedNextWeather = 0) {
+    this.gameTime = savedGameTime
+    this.weather = savedWeather
+    this.nextWeather = savedNextWeather
+
+    // Reset pour forcer l'émission des événements
+    this.day = -1
+    this.hour = -1
+    this.#minute5Cache = -1
+
+    this.#recalculateAndEmit(true)
+  }
+
+  update (realDt) {
+    this.gameTime += realDt * GAME_TIME_RATIO
+    this.#recalculateAndEmit(false)
+    return this.gameTime
+  }
+
+  #recalculateAndEmit (isFirstLoop = false) {
+    // Calculs bruts à partir du timestamp unique
+    const totalMinutes = Math.floor(this.gameTime / 60000)
+    const day = Math.floor(this.gameTime / MS_PER_DAY)
+    const dayTimeMs = this.gameTime % MS_PER_DAY
+    const hour = Math.floor(dayTimeMs / 3600000)
+    const minute = Math.floor(dayTimeMs / 60000) % 60
+
+    // 1. CHECK MINUTE (Changement de base)
+    // On utilise minute local (0-59) pour l'UI, mais totalMinutes pour les events
+    if (isFirstLoop || minute !== this.minute) {
+      this.minute = minute
+
+      eventBus.emit('time/every-minute', {
+        minutes: totalMinutes,
+        dayTimeMinutes: Math.floor(dayTimeMs / 60000)
+      })
+
+      // 2. CHECK 5 MINUTES
+      const min5 = Math.floor(totalMinutes / 5)
+      if (isFirstLoop || min5 !== this.#minute5Cache) {
+        this.#minute5Cache = min5
+
+        this.#updateSkyColor(Math.floor(dayTimeMs / 60000))
+        eventBus.emit('time/every-5-minutes', {minutes: totalMinutes})
+
+        // 3. CHECK HEURE
+        if (isFirstLoop || hour !== this.hour) {
+          this.hour = hour
+          eventBus.emit('time/every-hour', {hour})
+
+          // 4. CHECK TIME SLOT (3H)
+          const tslot = Math.floor(hour / 3)
+          if (isFirstLoop || tslot !== this.timeSlot) {
+            this.timeSlot = tslot
+            eventBus.emit('time/every-3-hours', {tslot})
+          }
+
+          // 5. CHECK JOUR (A minuit, l'heure change aussi)
+          if (isFirstLoop || day !== this.day) {
+            this.day = day
+            this.moonPhase = day & 7 // Optimisation Bitwise (remplace % 8)
+            this.#handleNewDay(day)
+          }
+        }
+      }
+    }
+
+    // Cas spécial First Loop: on envoie un event global pour l'UI
+    if (isFirstLoop) {
+      eventBus.emit('time/first-loop', {
+        day: this.day,
+        hour: this.hour,
+        minute: this.minute,
+        tslot: this.timeSlot,
+        weather: this.weather,
+        nextWeather: this.nextWeather,
+        skyColor: this.currentSkyColor
+      })
+    }
+  }
+
+  #handleNewDay (day) {
+    this.weather = this.nextWeather
+    this.nextWeather = 0 // TODO: RNG
+
+    eventBus.emit('time/new-day', {
+      day,
+      weather: this.weather,
+      moonPhase: this.moonPhase
+    })
+  }
+
+  #updateSkyColor (dayMinutes) {
+    let colorIndex = 35
+
+    if (dayMinutes < 180 || dayMinutes > 1260) {
+      colorIndex = 0
+    } else if (dayMinutes < 360) {
+      colorIndex = Math.trunc((dayMinutes - 180) / 5)
+    } else if (dayMinutes > 1080) {
+      colorIndex = 36 - Math.trunc((dayMinutes - 1080) / 5)
+    }
+
+    const newColor = SKY_COLORS[colorIndex]
+
+    if (this.currentSkyColor !== newColor) {
+      this.currentSkyColor = newColor
+      if (NODES.SKY) NODES.SKY.color = newColor
+      eventBus.emit('time/sky-color-changed', newColor)
+    }
+  }
+}
+
+export const timeManager = new TimeManager()
