@@ -38,14 +38,14 @@ Priorité au **Data-Oriented Design** pour la performance.
   * Adoption d'une architecture de type **ECS (Entity Component System)** pragmatique ou composition stricte pour éviter les chaînes d'héritage profondes de la POO classique.
   * Séparation stricte : Data (State) / Logic (Systems) / View (Render).
 
-### 2.2 La Game Loop & Budgets Temps
+### 2.2 La Game Loop & Budgets Temps [`core.mjs :: GameCore`]
 
   * Utilisation de `requestAnimationFrame`. Pour garantir la fluidité, chaque frame (16.6ms) est budgetée :
-  * Dans la boucle principale, détermination de trois budgets :
+  * Dans la boucle principale, détermination de trois budgets [`constant.mjs :: TIME_BUDGET`] :
       * **Update (Physic/Input) - Budget ~3ms :**
           * Déplacement Joueur/Faune
           * Physique déterministe
-          * Incrémentation du temps "Monde"
+          * Incrémentation du temps "Monde" (plus météo, phase de la lune) [`utils.mjs :: TimeManager`]
       * **Render (World Draw) - Budget ~4ms :**
           * Dessin du fond, des tuiles visibles (Culling) et des entités (Sprites : flore, faune, meubles).
           * Concerne uniquement le canvas principal `#game-layer`.
@@ -66,40 +66,38 @@ Le jeu bascule entre trois états majeurs qui changent les inputs et l'interface
   * `STATE_COMBAT` : Moteur physique figé, Inputs tour par tour, HUD tactique.
 
   * 2.4 Gestion des Tâches (MicroTasker & Scheduler)
-MicroTasker : Exécute des tâches fractionnées dans le temps restant de la frame. Priorité et Capacité définies par tâche.
 
-TaskScheduler : Gère les tâches longues (ex: cuisson, craft long). Tableau trié par timestamp d'exécution, recherche dichotomique, suppression "lazy" (flag deleted).
+  * **MicroTasker** [`utils.mjs :: MicroTasker`] : Exécute des tâches fractionnées dans le temps restant de la frame. Priorité et Capacité définies par tâche.
+
+  * **TaskScheduler** [`utils.mjs :: TaskManager`] : Gère les tâches longues (ex: cuisson, craft long). Tableau trié par timestamp d'exécution, recherche dichotomique, suppression "lazy" (flag deleted).
 
 ### 2.4 Gestion desTâches (MicroTasker & Scheduler)
 
 * **MicroTasker :** Exécute des tâches fractionnées dans le temps restant de la frame. Priorité et Capacité définies par tâche.
 * **TaskScheduler :** Gère les tâches longues (ex: minage, croissance de la flore). Tableau trié par timestamp d'exécution, insertion dichotomique, suppression "lazy" (flag `deleted`), exécution par création d'une micro-tâche.
 
-### 2.5 Découplage (EventBus)
+### 2.5 Découplage [`utils.mjs :: EventBus`]
 
 * **Système Pub/Sub** pour la communication entre modules sans dépendance cyclique.
 * Si un listener dépasse 0.1ms, il doit déléguer son travail au `MicroTasker`.
 * **Implémentation**
   * Evénement défini par un identifiant et des paramètres optionnels
-  * Publication d'un événement (`eventBus.submit()`)
-  * Ecoute d'un événement (`eventBus.on(idEvent, fonction)`)
+  * Publication (`emit`) et Abonnement (`on`).
   * Appel direct des fonctions lorsque l'événement est déclenché
 
-### 2.6 Le temps
+### 2.6 Le temps [`utils.mjs :: TimeManager`]
 
 Distinction stricte entre :
-* **Temps Réel** : Date système.
-* **Temps Monde** : Stocké en Timestamp (ms). Ratio : 1 minute réelle = 1 heure monde (Cycle 24h monde = 24 min réelles).
+
+* **Temps Réel (Playtime) :** Nombre de ms écoulées moteur allumé (depuis la création du monde). Utilisé par le `TaskScheduler`.
+* **Temps Monde :** Calculé à partir du Playtime (Ratio 1000ms réelles = 1 min monde). Utilisé pour l'affichage et les cycles jour/nuit.
 
 Détails d'implémentaton :
-  * **Initialisation :** A la création du monde, la date est initialisée à 0.
+  * **Initialisation :** A la création du monde, la date est initialisée à : Jour 1 - 8h00.
   * **Incrémentation :** La date est incrémentée dans la Game Loop (budget **Update**, état `STATE_EXPLORATION`)
   * **Persistence :** La date est sauvegardée en base de données et récupérée au lancement de l'application
 
-
 ### 2.7 Cycle de Vie et Initialisation (Anti-Circularité)
-
-#### 2.7.1 Architecture pyramidale
 
 #### 2.7.1 Hiérarchie des Modules (Dependency Layering)
 
@@ -116,7 +114,7 @@ Pour garantir la stabilité du chargement, l'application respecte 4 niveaux de d
 * **Layer 3 (Application) :** `core.mjs`
     * Rôle : Point d'entrée. Importe les Layers 0, 1, 2. Orchestre l'initialisation séquentielle.
 
-#### 2.7.2 Cycle de Vie et Initialisation (Anti-Circularité)
+#### 2.7.2 Cycle de Vie  [`core.mjs :: GameCore`]
 
 Pour permettre les références croisées dans la Layer 2 (ex: World a besoin de Combat, Combat a besoin de World) sans provoquer d'erreurs d'évaluation ESM, le cycle de vie est strict :
 * **Instantiation :** Au chargement du module, le Singleton est créé via `new Class()`. Le constructeur ne doit jamais accéder à une autre instance de la Layer 2.
@@ -124,9 +122,9 @@ Pour permettre les références croisées dans la Layer 2 (ex: World a besoin de
 
 Boot Sequence (dans core.mjs) :
 * **1. INSTANTIATION :** Création des Singletons (new Class). Importe tous les modules.
-* **2. LOAD ASSETS :** Appel de `assetsManager.load()`. Chargement de toutes les images et sons. Construction des index d'atlas.
-* **3. HYDRATION (Linkage) :** Une fois les assets chargés (synchrone), on parcourt `TILE_DB` et `ITEM_DB` (de `constant.mjs`) pour remplacer les chaînes de caractères (ex: "ore_16_16+1") par les données de rendu calculées par assets.mjs (Index image, sx, sy).
-* **4. INIT :** Appelle `worldManager.init()`, `combatManager.init()`, `uiManager.init()`... L'ordre peut avoir de l'importance.
+* **2. LOAD ASSETS :** Appel de [`assets.mjs :: loadAssets`]. Chargement de toutes les images et sons. Construction des index d'atlas.
+* **3. HYDRATION (Linkage) :** Une fois les assets chargés (synchrone), on parcourt `TILE_DB` et `ITEM_DB` (de `constant.mjs`) pour remplacer les chaînes de caractères (ex: "ore_16_16+1") par les données de rendu calculées par assets.mjs (Index image, sx, sy). [`assets.mjs :: loadAssets`]
+* **4. INIT :** Appelle `eventBus.init()`, `microTasker.init()`, `taskManager.init()`, `worldManager.init()`, `combatManager.init()`, `uiManager.init()`... L'ordre peut avoir de l'importance.
 * **5. RUN :** Lance la Game Loop.
 
 __Note__ : Après la création d'un nouveau monde, pour relancer le jeu, il faudra effectuer la phase `INIT` avant de lancer la phase `RUN`.
@@ -229,10 +227,14 @@ __TO DO__ : déterminer si le contenu des tuiles est stocké sur un ou deux octe
 ### 6.1 Stratégie "Layered Canvas"
 
 L'interface est divisée en couches HTML superposées pour optimiser les redraws.
-    * **Layer 0 (Game Canvas) :** Le monde, le joueur, la flore, la faune, les meubles. Redessiné à chaque requestAnimationFrame.
-    * **Layer 1 (Env Canvas) :** Date, Météo, Phases lunaires. Redessiné sur événement TIME_TICK.
-    * **Layer 2 (UI Canvas) :** Hotbar, Buffs actifs, Jauges. Redessiné sur événement (ex: INVENTORY_CHANGE, BUFF_TICK).
-    * **Layer 3 (DOM Panels) :** Inventaire complet, Craft, Aide. Éléments HTML standards (<div>) affichés/masqués. Interruptifs (Pause du jeu).
+    * **Layer 0 (Game Canvas) :** Le monde, la flore, la faune, les meubles, le joueur. Redessiné à chaque requestAnimationFrame.
+        * Techniquement, deux canvas superposés. Le plus profond est juste un rectangle rempli avec la couleur du ciel. Devant le monde, avec les tuiles vides (SKY) transparentes.
+    * **Layer 1 (UI Canvas) :** Redessiné sur événement
+        * **Environment Overlay** [`ui.mjs :: EnvironmentOverlay`] : Affiche l'heure, la météo, la lune... Abonné aux événements du `TimeManager`.
+        * **Hotbar**
+        * **Buffs/Debuffs actifs**
+        * **Jauges** (Vie)
+    * **Layer 2 (DOM Panels) :** Inventaire complet, Craft, Aide. Éléments HTML standards (<div>) affichés/masqués. Interruptifs (Pause du jeu).
 
 ### 6.2 Optimisations Graphiques
 
@@ -269,7 +271,7 @@ L'architecture sépare la logique (UI Logic) du rendu pur (Render) et distingue 
 │   ├── ui.mjs               # INTERFACE PANEL/DOM (LOGIQUE) :
 │   │                        # - Logic : InventorySystem (Slots, Stacking, Drag&Drop logic), CraftSystem (Recettes, validation)
 │   │                        # - DOM Managers : InventoryPanel, HelpPanel, PreferencePanel (configuration UI, clavier, souris...)
-│   │                        # - Canvas Managers : HotbarOverlay, EnvOverlay (Draw logic)
+│   │                        # - Canvas Managers : HotbarOverlay, EnvironmentOverlay (Draw logic)
 │   ├── render.mjs           # GRAPHICS : MainRenderer (Canvas Context management), Camera (Viewport, Culling, Zoom), SpriteManager (Animations, Batching virtuel)
 │   ├── generate.mjs         # PROC-GEN : Algorithmes de génération (Dynamic Import)
 │   └── core.mjs             # SYSTEM : GameLoop (Update/Render/MicroTask), InputManager (Keyboard/Mouse listeners)
@@ -289,4 +291,3 @@ __To Do__ : comment implémenter l'aide en ligne et l'encyclopédie (le plus pos
 
   * **Linter :** Respect de la convention 'Format' de Google :
       * pas de point virgule à la fin des instructions
-
