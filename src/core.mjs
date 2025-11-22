@@ -1,8 +1,8 @@
-import { TIME_BUDGET, NODES_LOOKUP } from './constant.mjs'
-import { loadAssets, resolveAssetData } from './assets.mjs'
+import {TIME_BUDGET, NODES_LOOKUP} from './constant.mjs'
+import {loadAssets, resolveAssetData} from './assets.mjs'
 
 class GameCore {
-  constructor() {
+  constructor () {
     this.isBooted = false
     this.isRunning = false
 
@@ -18,7 +18,7 @@ class GameCore {
    * Initialisation technique. Charge les ressources et lie les données statiques.
    * À appeler une seule fois au chargement de la page.
    */
-  async boot() {
+  async boot () {
     if (this.isBooted) return
     console.time('Engine Boot')
 
@@ -27,8 +27,8 @@ class GameCore {
 
     // 2. Hydratation des bases de données statiques
     // On sépare les logiques pour la lisibilité
-    this._hydrateNodes()
-    this._hydrateItems()
+    this.#hydrateNodes()
+    this.#hydrateItems()
     // this._hydrateBuffs() ...
 
     this.isBooted = true
@@ -40,7 +40,7 @@ class GameCore {
    * Hydratation spécifique pour les Tuiles (NODES)
    * Transforme les strings 'image' en objets 'renderData' avec imgIndex
    */
-  _hydrateNodes() {
+  #hydrateNodes () {
     let count = 0
     for (const node of NODES_LOOKUP) {
       if (!node) continue
@@ -58,22 +58,21 @@ class GameCore {
   /**
    * Hydratation spécifique pour les Items
    */
-  _hydrateItems() {
+  #hydrateItems () {
     // TODO: Implémenter quand ITEMS_LOOKUP existera
     // La logique sera identique : parsing des icônes de l'item
-    console.log(`   🔹 Items hydratés : (TODO)`)
+    console.log('   🔹 Items hydratés : (TODO)')
   }
 
-
-/* =========================================
+  /* =========================================
      PHASE 2 : GAME SESSION (Repeatable)
      ========================================= */
 
   /**
    * Lance une partie (Nouveau monde ou Chargement).
    */
-  async startSession() {
-    if (!this.isBooted) throw new Error("Core not booted. Call boot() first.")
+  async startSession () {
+    if (!this.isBooted) throw new Error('Core not booted. Call boot() first.')
     if (this.isRunning) return
 
     console.log('🚀 Démarrage de la session...')
@@ -95,7 +94,7 @@ class GameCore {
      GAME LOOP
      ========================================= */
 
-  loop(timestamp) {
+  loop (timestamp) {
     if (!this.isRunning) return
     requestAnimationFrame((t) => this.loop(t))
 
@@ -108,8 +107,8 @@ class GameCore {
 
     const durationUpdate = performance.now() - timestamp
     if (durationUpdate > TIME_BUDGET.UPDATE) {
-        console.warn(`⚠️ Budget Update: ${durationUpdate.toFixed(2)}ms`)
-        // if (Math.random() < 0.01) console.warn(`⚠️ Budget Update: ${durationUpdate.toFixed(2)}ms`)
+      console.warn(`⚠️ Budget Update: ${durationUpdate.toFixed(2)}ms`)
+      // if (Math.random() < 0.01) console.warn(`⚠️ Budget Update: ${durationUpdate.toFixed(2)}ms`)
     }
 
     // 2. Render (Graphisme)
@@ -123,9 +122,8 @@ class GameCore {
 
     const durationRender = performance.now() - timestamp - durationUpdate
     if (durationRender > TIME_BUDGET.RENDER) {
-        console.warn(`⚠️ Budget Render: ${durationRender.toFixed(2)}ms`)
-        // if (Math.random() < 0.01) console.warn(`⚠️ Budget Render: ${durationRender.toFixed(2)}ms`)
-
+      console.warn(`⚠️ Budget Render: ${durationRender.toFixed(2)}ms`)
+      // if (Math.random() < 0.01) console.warn(`⚠️ Budget Render: ${durationRender.toFixed(2)}ms`)
     }
     // Temps écoulé total pour cette frame
     const timeUsed = durationUpdate + durationRender
@@ -133,8 +131,8 @@ class GameCore {
 
     // 3. MicroTasks (Optimisation)
     if (budgetMicrotask > 0) {
-        // microTasker.process(budgetMicrotask)
+      // microTasker.process(budgetMicrotask)
     }
   }
 }
-export const gameCore = new(GameCore)
+export const gameCore = new GameCore()
