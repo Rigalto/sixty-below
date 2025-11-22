@@ -1,5 +1,6 @@
 import {TIME_BUDGET, NODES_LOOKUP} from './constant.mjs'
 import {loadAssets, resolveAssetData} from './assets.mjs'
+import {timeManager, taskScheduler, microTasker} from './utils.mjs'
 
 class GameCore {
   constructor () {
@@ -7,6 +8,7 @@ class GameCore {
     this.isRunning = false
 
     this.budgetTotal = TIME_BUDGET.UPDATE + TIME_BUDGET.RENDER + TIME_BUDGET.MICROTASK
+    this.lastTime = 0
     // Ne rien faire de lourd ici
   }
 
@@ -80,14 +82,21 @@ class GameCore {
     // 1. Récupération des informations en base de données
     // await database.loadSession(...)
 
-    // 2. Initialisation des systèmes (Layer 2)
+    // 2. Initialisation des systèmes (Layer 1)
+
+    const startTimestamp = 480 * 1000 // sera récupéré depuis la base de données (c'est la valeur à la création du monde)
+    timeManager.init(startTimestamp)
+    // eventBus.init()
+    // microTasker.init()
+
+    // 3. Initialisation des systèmes (Layer 2)
     // C'est ici qu'on initialise les managers
     // await WorldManager.init(...)
 
-    // 2. Lancement de la boucle
+    // 4. Lancement de la boucle
     this.isRunning = true
     this.lastTime = performance.now()
-    // this.loop() // DEBUG
+    this.loop(this.lastTime)
   }
 
   /* =========================================
@@ -98,11 +107,22 @@ class GameCore {
     if (!this.isRunning) return
     requestAnimationFrame((t) => this.loop(t))
 
-    // Calcul du Delta Time
+    // ///////////// //
+    // BUDGET UPDATE //
+    // ///////////// //
+
+    // 1. DELTA TIME
     const dt = timestamp - this.lastTime
     this.lastTime = timestamp
 
-    // 1. Update (Logique)
+    // 2. UPDATE (SYSTEMS)
+    // 2.A. TimeManager (Source de vérité temporelle)
+    const gameTimestamp = timeManager.update(dt) // timestamp depuis création du monde
+
+    // 2.B. TaskScheduler (Vérifie si des tâches longues sont dues)
+    taskScheduler.update(gameTimestamp)
+
+    // 2.C. Suite
     // worldManager.update(dt)
 
     const durationUpdate = performance.now() - timestamp
@@ -111,7 +131,11 @@ class GameCore {
       // if (Math.random() < 0.01) console.warn(`⚠️ Budget Update: ${durationUpdate.toFixed(2)}ms`)
     }
 
-    // 2. Render (Graphisme)
+    // ///////////// //
+    // BUDGET RENDER //
+    // ///////////// //
+
+    // 3. Render (Graphisme)
     // canvas.clear()
     // backgroundManager.drawCanvas(canvas)
     // worldManager.drawCanvas(canvas)
@@ -125,13 +149,18 @@ class GameCore {
       console.warn(`⚠️ Budget Render: ${durationRender.toFixed(2)}ms`)
       // if (Math.random() < 0.01) console.warn(`⚠️ Budget Render: ${durationRender.toFixed(2)}ms`)
     }
+
+    // //////////////// //
+    // BUDGET MICROTASK //
+    // //////////////// //
+
     // Temps écoulé total pour cette frame
     const timeUsed = durationUpdate + durationRender
     const budgetMicrotask = this.budgetTotal - timeUsed
 
-    // 3. MicroTasks (Optimisation)
+    // 4. MicroTasks // 4. MICROTASKS (Consommation du reste)
     if (budgetMicrotask > 0) {
-      // microTasker.process(budgetMicrotask)
+      microTasker.update(budgetMicrotask)
     }
   }
 }

@@ -96,6 +96,8 @@ class MicroTasker {
 
   // Exécute des fonctions selon leur priorité et leur capacité
   update (budget) {
+    console.log('MicroTasker.update >>>>>>>>>>>>>>>', budget)
+
     if (this.taskQueue.length === 0) { return }
     this.budget = (budget * 4) | 0 // Réinitialise le budget pour chaque frame
     if (this.taskQueue.length > MAX_QUEUE_LENGTH) {
@@ -452,6 +454,8 @@ class TaskScheduler {
 
   // Boucle principale appelée à chaque frame.
   update (currentTime) {
+    console.log('TaskScheduler.update >>>>>>>>>>>>>>>', currentTime)
+
     this.lastFrameTime = currentTime
 
     // Vérifier et exécuter les tâches dont le délai est écoulé
@@ -485,25 +489,25 @@ class TaskScheduler {
 }
 export const taskScheduler = new TaskScheduler()
 
-const GAME_TIME_RATIO = 60
-const MS_PER_DAY = 1440 * 60 * 1000
+// Règle métier : 1000ms réelles (Playtime) = 1 minute dans le calendrier Monde
+const REAL_MS_PER_GAME_MINUTE = 1000
+const GAME_MINUTES_PER_DAY = 1440
 
 class TimeManager {
   #minute5Cache
 
   constructor () {
-    // Source de vérité
-    this.gameTime = 0
+    // REFERENCE UNIQUE : Temps réel écoulé en jeu (ms)
+    this.timestamp = 0
 
-    // Propriétés Publiques (Cache)
-    // Initialisées à -1 pour forcer la mise à jour au premier tick
+    // Cache Calendrier (dérivé du timestamp)
     this.day = -1
     this.hour = -1
     this.minute = -1
     this.timeSlot = -1
     this.moonPhase = 0
 
-    // Cache interne pour trigger 5min
+    // Interne
     this.#minute5Cache = -1
 
     // Environnement
@@ -512,12 +516,13 @@ class TimeManager {
     this.currentSkyColor = SKY_COLORS[35]
   }
 
-  init (savedGameTime = 28800000, savedWeather = 0, savedNextWeather = 0) {
-    this.gameTime = savedGameTime
+  init (savedTimestamp = 28800000, savedWeather = 0, savedNextWeather = 0) {
+    // savedTimestamp est le Playtime en ms (28 800 000 ms = 8h00 game time)
+    this.timestamp = savedTimestamp
     this.weather = savedWeather
     this.nextWeather = savedNextWeather
 
-    // Reset pour forcer l'émission des événements
+    // Reset cache
     this.day = -1
     this.hour = -1
     this.#minute5Cache = -1
@@ -526,36 +531,40 @@ class TimeManager {
   }
 
   update (realDt) {
-    this.gameTime += realDt * GAME_TIME_RATIO
+    // PAS DE RATIO ICI. 1ms réelle = 1ms de timestamp.
+    this.timestamp += realDt
+
     this.#recalculateAndEmit(false)
-    return this.gameTime
+
+    return this.timestamp
   }
 
   #recalculateAndEmit (isFirstLoop = false) {
-    // Calculs bruts à partir du timestamp unique
-    const totalMinutes = Math.floor(this.gameTime / 60000)
-    const day = Math.floor(this.gameTime / MS_PER_DAY)
-    const dayTimeMs = this.gameTime % MS_PER_DAY
-    const hour = Math.floor(dayTimeMs / 3600000)
-    const minute = Math.floor(dayTimeMs / 60000) % 60
+    // CONVERSION : C'est ici que la magie opère.
+    // On transforme le Playtime (ms) en Minutes Monde.
+    const totalGameMinutes = Math.floor(this.timestamp / REAL_MS_PER_GAME_MINUTE)
 
-    // 1. CHECK MINUTE (Changement de base)
-    // On utilise minute local (0-59) pour l'UI, mais totalMinutes pour les events
+    const day = Math.floor(totalGameMinutes / GAME_MINUTES_PER_DAY)
+    const dayTimeMinutes = totalGameMinutes % GAME_MINUTES_PER_DAY // 0 - 1439
+    const hour = Math.floor(dayTimeMinutes / 60)
+    const minute = dayTimeMinutes % 60
+
+    // 1. CHECK MINUTE (Base du calendrier)
     if (isFirstLoop || minute !== this.minute) {
       this.minute = minute
 
       eventBus.emit('time/every-minute', {
-        minutes: totalMinutes,
-        dayTimeMinutes: Math.floor(dayTimeMs / 60000)
+        minutes: totalGameMinutes,
+        dayTimeMinutes
       })
 
       // 2. CHECK 5 MINUTES
-      const min5 = Math.floor(totalMinutes / 5)
+      const min5 = Math.floor(totalGameMinutes / 5)
       if (isFirstLoop || min5 !== this.#minute5Cache) {
         this.#minute5Cache = min5
 
-        this.#updateSkyColor(Math.floor(dayTimeMs / 60000))
-        eventBus.emit('time/every-5-minutes', {minutes: totalMinutes})
+        this.#updateSkyColor(dayTimeMinutes)
+        eventBus.emit('time/every-5-minutes', {minutes: totalGameMinutes})
 
         // 3. CHECK HEURE
         if (isFirstLoop || hour !== this.hour) {
@@ -569,17 +578,16 @@ class TimeManager {
             eventBus.emit('time/every-3-hours', {tslot})
           }
 
-          // 5. CHECK JOUR (A minuit, l'heure change aussi)
+          // 5. CHECK JOUR
           if (isFirstLoop || day !== this.day) {
             this.day = day
-            this.moonPhase = day & 7 // Optimisation Bitwise (remplace % 8)
+            this.moonPhase = day & 7
             this.#handleNewDay(day)
           }
         }
       }
     }
 
-    // Cas spécial First Loop: on envoie un event global pour l'UI
     if (isFirstLoop) {
       eventBus.emit('time/first-loop', {
         day: this.day,
