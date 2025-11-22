@@ -1,1 +1,32 @@
+<!DOCTYPE html>
+<html lang="fr">
+<body>
+    <h1>Sixty-Below Checkpoint</h1>
+    <div id="out"></div>
+    <script type="module">
+        import { NODES_LOOKUP, NODES } from './src/constant.mjs'
+        import { loadAssets, resolveAssetData } from './src/assets.mjs'
 
+        // pré-chargement des assets
+        loadAssets()
+
+        // HYDRATATION
+        let count = 0
+        NODES_LOOKUP.forEach(node => {
+          if (node.image) {
+            node.renderData = resolveAssetData(node.image)
+            if (node.renderData) count++
+          }
+        })
+
+        console.log("--- RESULTAT FINAL ---")
+        console.log(`Objets hydratés : ${count}`)
+
+        // Vérification de la donnée Clay
+        console.log("Clay Node:", NODES.CLAY)
+        console.log("Clay DB Ref:", NODES_LOOKUP[5]) // Doit être le même objet
+
+        document.getElementById('out').innerText = `Succès. ${count} tuiles liées. Vérifiez la console.`
+    </script>
+</body>
+</html>
