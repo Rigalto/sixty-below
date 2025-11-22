@@ -1,7 +1,7 @@
 import { TIME_BUDGET, NODES_LOOKUP } from './constant.mjs'
 import { loadAssets, resolveAssetData } from './assets.mjs'
 
-export class GameCore {
+class GameCore {
   constructor() {
     this.isBooted = false
     this.isRunning = false
@@ -88,7 +88,7 @@ export class GameCore {
     // 2. Lancement de la boucle
     this.isRunning = true
     this.lastTime = performance.now()
-    this.loop()
+    // this.loop() // DEBUG
   }
 
   /* =========================================
@@ -137,3 +137,4 @@ export class GameCore {
     }
   }
 }
+export const gameCore = new(GameCore)
