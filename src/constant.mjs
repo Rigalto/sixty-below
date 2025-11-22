@@ -13,17 +13,17 @@ export const FRAME_DURATION = 1000 / FPS // ~16.66ms
 
 // Budgets temps en millisecondes (cf. Design 2.2)
 export const TIME_BUDGET = {
-  UPDATE: 3,     // Physique, Déplacement
-  RENDER: 4,     // Canvas Drawing
-  MICROTASK: 5,  // Pathfinding, Generation, UI Updates
-  DOM: 4         // Browser overhead (GC, Event Loop)
+  UPDATE: 3, // Physique, Déplacement
+  RENDER: 4, // Canvas Drawing
+  MICROTASK: 5, // Pathfinding, Generation, UI Updates
+  DOM: 4 // Browser overhead (GC, Event Loop)
 }
 
 // États du jeu (State Machine)
 export const GAME_STATE = {
   EXPLORATION: 'state_exploration', // Temps réel
-  COMBAT: 'state_combat',           // Tour par tour
-  INFORMATION: 'state_information'  // Pause / Menus
+  COMBAT: 'state_combat', // Tour par tour
+  INFORMATION: 'state_information' // Pause / Menus
 }
 
 /* =========================================
@@ -53,7 +53,7 @@ export const PIXEL_TO_METER = 0.03125 // 1px = 1/32m (donc 16px = 0.5m)
 // Exemple: y * 2048 devient y << WORLD_WIDTH_SHIFT
 
 export const WORLD_WIDTH_SHIFT = 11 // 2^11 = 2048
-export const CHUNK_SHIFT = 4        // 2^4 = 16
+export const CHUNK_SHIFT = 4 // 2^4 = 16
 
 // Masque pour obtenir la position locale dans un chunk (0-15)
 // Exemple: x % 16 devient x & CHUNK_MASK
@@ -67,11 +67,11 @@ export const CHUNK_MASK = 0b1111 // 15
 
 export const COLLISION_MASK = {
   NONE: 0,
-  SOLID: 1 << 0,       // 1: Bloque le mouvement
-  PLATFORM: 1 << 1,    // 2: Traversable par le bas
-  LIQUID: 1 << 2,      // 4: Ralentit, nage
-  DAMAGE: 1 << 3,      // 8: Lave, pics
-  SLOW: 1 << 4,        // 16: Ralentit (Toile d'araignée)
+  SOLID: 1 << 0, // 1: Bloque le mouvement
+  PLATFORM: 1 << 1, // 2: Traversable par le bas
+  LIQUID: 1 << 2, // 4: Ralentit, nage
+  DAMAGE: 1 << 3, // 8: Lave, pics
+  SLOW: 1 << 4 // 16: Ralentit (Toile d'araignée)
 }
 
 /* =========================================
@@ -84,6 +84,65 @@ export const GAME_MIN_PER_REAL_MS = 1 / REAL_MS_PER_GAME_MIN
 
 export const DAY_DURATION_GAME_MIN = 24 * 60 // 1440 minutes jeu
 
+export const MOON_PHASE_BLURRED = [0, 0, 2, 2, 4, 6, 6, 0]
+export const MOON_PHASES = [
+  {icon: 'moonfullmoon', name: 'Full Moon', shortcut: 'fm'},
+  {icon: 'moonwaninggibbous', name: 'Waning Gibbous', shortcut: 'wg'},
+  {icon: 'moonthirdquarter', name: 'Third Quarter', shortcut: 'tq'},
+  {icon: 'moonwaningcrescent', name: 'Waning Crescent', shortcut: 'wc'},
+  {icon: 'circle', name: 'New Moon', shortcut: 'nm'},
+  {icon: 'moonwaxingcrescent', name: 'Waxing Crescent', shortcut: 'xc'},
+  {icon: 'moonfirstquarter', name: 'First Quarter', shortcut: 'fq'},
+  {icon: 'moonwaxinggibbous', name: 'Waxing Gibbous', shortcut: 'xg'}
+]
+export const TIME_SLOT = ['Midnight', 'Dawn', 'Morning', 'Noon', 'Afternoon', 'Dusk', 'Evening', 'Night']
+export const WEATHER = [
+  {name: 'Sunny', weight: 10},
+  {name: 'Cloudy', weight: 20},
+  {name: 'Rainy', weight: 30},
+  {name: 'Windy', weight: 25},
+  {name: 'Stormy', weight: 15}
+]
+
+export const SKY_COLORS = [
+  '#300606', // Nuit
+  '#380715',
+  '#400824',
+  '#480933',
+  '#500A42',
+  '#580B51',
+  '#600C60',
+  '#680D6F',
+  '#700E7E',
+  '#780F8D',
+  '#80109C',
+  '#8811AB',
+  '#9012BA',
+  '#9813C9',
+  '#A014D8',
+  '#A815E7',
+  '#B016F6',
+  '#B817FF',
+  '#C026FF',
+  '#C835FF',
+  '#D044FF',
+  '#D853FF',
+  '#E062FF',
+  '#E871FF',
+  '#F080FF',
+  '#F88FFF',
+  '#FF9EFF',
+  '#FFADFF',
+  '#FFBCF7',
+  '#FFCBEF',
+  '#FFDAE7',
+  '#FFE9DF',
+  '#FFF8D7',
+  '#FFFFCF',
+  '#FFFFE7',
+  '#E6F3FF' // Jour
+]
+
 /* =========================================
    6. DATABASE CONFIG
    ========================================= */
@@ -92,14 +151,14 @@ export const DB_CONFIG = {
   NAME: 'SixtyBelowDB',
   VERSION: 1,
   STORES: {
-    WORLD: 'world_chunks',    // Stockage des Uint16Array
-    PLAYER: 'player_data',    // Position, Stats
-    CONFIG: 'game_config',    // Time, Seed
-    INVENTORY: 'inventory',   // Items, Gears, Chests
-    BUFF: 'buff',             // Buffs/Debuffs
-    PLANT: 'plant',           // Trees, Herbs, Mushrooms, Flowers, Corals
-    MONSTER: 'monster',       // Enemies, Criters, Bosses
-    FURNITURE: 'furniture'    // Furniture (Housing), Crafting Station
+    WORLD: 'world_chunks', // Stockage des Uint16Array
+    PLAYER: 'player_data', // Position, Stats
+    CONFIG: 'game_config', // Time, Seed
+    INVENTORY: 'inventory', // Items, Gears, Chests
+    BUFF: 'buff', // Buffs/Debuffs
+    PLANT: 'plant', // Trees, Herbs, Mushrooms, Flowers, Corals
+    MONSTER: 'monster', // Enemies, Criters, Bosses
+    FURNITURE: 'furniture' // Furniture (Housing), Crafting Station
   }
 }
 
@@ -108,10 +167,10 @@ export const DB_CONFIG = {
    ========================================= */
 
 export const UI_LAYERS = {
-  GAME: 'game-layer',   // Canvas 0
-  ENV: 'env-layer',     // Canvas 1
-  UI: 'ui-layer',       // Canvas 2
-  PANEL: 'modal-layer'  // DOM
+  GAME: 'game-layer', // Canvas 0
+  ENV: 'env-layer', // Canvas 1
+  UI: 'ui-layer', // Canvas 2
+  PANEL: 'modal-layer' // DOM
 }
 
 /* =========================================
@@ -124,19 +183,17 @@ export const PALETTE = {
   BACKGROUND: '#0d0d15' // Couleur de fond par défaut
 }
 
-
-
 /* =========================================
    8. DEFINITION DES NOEUDS
    ========================================= */
 
-   // const tileCode = NODES.CLAY.code
-   // const tileDesc = NODES.CLAY
-   // const tileDesc = NODES_LOOKUP[tileCode]
+// const tileCode = NODES.CLAY.code
+// const tileDesc = NODES.CLAY
+// const tileDesc = NODES_LOOKUP[tileCode]
 
-   export const NODE_TYPE = {SPACE: 0x1, NATURAL: 0x2, TOPSOIL: 0x4, SUBSTRAT: 0x8, LIQUID: 0x10, ORE: 0x20, GEM: 0x40, ROCK: 0x80, WOOD: 0x100, WALL: 0x200, BWALL: 0x400, WEB: 0x800, STRONG: 0x1000, XXXX: 0x2000, CREATION: 0x4000}
+export const NODE_TYPE = {SPACE: 0x1, NATURAL: 0x2, TOPSOIL: 0x4, SUBSTRAT: 0x8, LIQUID: 0x10, ORE: 0x20, GEM: 0x40, ROCK: 0x80, WOOD: 0x100, WALL: 0x200, BWALL: 0x400, WEB: 0x800, STRONG: 0x1000, XXXX: 0x2000, CREATION: 0x4000}
 
-   export const NODES = {
+export const NODES = {
   // modifier 'isEmptyTileCode' si les codes changent
   OUTSIDE: {code: 0, name: 'Out of World', type: NODE_TYPE.CREATION, color: '#000000'},
   SKY: {code: 1, name: 'Sky', type: NODE_TYPE.SPACE, color: '#E6F3FF', star: 0, solid: false},
@@ -237,29 +294,29 @@ for (const key in NODES) {
 
 // CI-DESSOUS A SUPPRIMER
 
-  // 1. Calcul des Flags
+// 1. Calcul des Flags
 //   let flags = TILE_FLAG.NONE
 //   if (node.solid) flags |= TILE_FLAG.SOLID
 //   if (node.type === TILE_TYPE.LIQUID) flags |= TILE_FLAG.LIQUID
 //   if (node.type === TILE_TYPE.WALL || node.type === TILE_TYPE.BWALL) flags |= TILE_FLAG.WALL
 //   if (node.speed > 0) flags |= TILE_FLAG.MINABLE
 
-  // 2. Enrichissement de l'objet (Mutation)
+// 2. Enrichissement de l'objet (Mutation)
 //   node.flags = flags
 //   node.rgbColor = hexToRgb(node.color) // TODO Vérifier si utile
 //   node.viscosity = node.viscosity || 0
 //   node.speed = node.speed || 0
 
-  // Préparation pour hydratation (sera remplacé par assets.mjs)
+// Préparation pour hydratation (sera remplacé par assets.mjs)
 //   node._imageRaw = node.image // utilité ?
 //   node._waveRaw = node.waveImage
 //   node.renderData = null
 //   node.waveRenderData = null
 
-  // 3. Stockage Référence
+// 3. Stockage Référence
 //   NODES_LOOKUP[node.code] = node
 
-  // 4. Linkage Biomes
+// 4. Linkage Biomes
 //   if (node.biome !== undefined && BIOME.code[node.biome]) {
 //     const b = BIOME.code[node.biome]
 //     if (node.type === TILE_TYPE.TOPSOIL) b.ground = node.code
