@@ -97,11 +97,11 @@ export const SKY_COLORS = [
 ]
 
 export const WEATHER_TYPE = [
-  {code: 0, name: 'Sunny', weight: 10},
-  {code: 1, name: 'Cloudy', weight: 20},
-  {code: 2, name: 'Rainy', weight: 30},
-  {code: 3, name: 'Windy', weight: 25},
-  {code: 4, name: 'Stormy', weight: 15}
+  {code: 0, name: 'Sunny', weight: 10, icon: '☀️'},
+  {code: 1, name: 'Cloudy', weight: 20, icon: '☁️'},
+  {code: 2, name: 'Rainy', weight: 30, icon: '🌧️'},
+  {code: 3, name: 'Windy', weight: 25, icon: '💨'},
+  {code: 4, name: 'Stormy', weight: 15, icon: '⛈️'}
 ]
 
 export const MOON_PHASE = [

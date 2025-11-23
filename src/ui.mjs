@@ -58,16 +58,16 @@ class EnvironmentOverlay {
     // 2. Injection du HTML Statique
     this.container.innerHTML = `
       <div style="display:flex; justify-content:space-between; align-items:baseline; border-bottom:1px solid #555; padding-bottom:4px; margin-bottom:4px; pointer-events:none;">
-        <span id="env-day" style="font-size:1.4em; font-weight:bold; letter-spacing:1px;">DAY 1</span>
+        <span id="env-day" style="font-size:1.4em; font-weight:bold; letter-spacing:1px;">DAY ?</span>
         <span id="env-time" style="font-size:1.4em; font-weight:bold; letter-spacing:1px;">--:--</span>
       </div>
 
-      <div style="display:flex; justify-content:space-between; align-items:center;">
+      <div style="display:flex; justify-content:space-between; align-items:center; font-size: 24px;">
         <div style="display:flex; gap:5px;">
-          <div id="env-weather-now" title="Weather" style="cursor:help;" pointer-events:auto;>[?]</div>
+          <div id="env-weather-now" title="Weather" style="cursor:help; pointer-events:auto;">[?]</div>
           <div id="env-weather-next" title="Forecast" style="display:none; pointer-events:auto;">[->?]</div>
         </div>
-        <div id="env-moon" title="Moon Phase" style="cursor:help; font-size: 24px; pointer-events:auto;">[M]</div>
+        <div id="env-moon" title="Moon Phase" style="cursor:help; pointer-events:auto;">[M]</div>
       </div>
 
       <div id="env-coords" style="font-size:0.8em; color:#888; font-family:monospace; margin-top:2px;">
@@ -142,19 +142,24 @@ class EnvironmentOverlay {
   #updateEnvironment ({weather, nextWeather, moonPhase}) {
     // 1. Weather Now
     if (this.lastState.weatherCode !== weather) {
-      const wInfo = WEATHER_TYPE[weather] || {name: 'Unknown'}
-      this.dom.weatherNow.textContent = `[${wInfo.name.substring(0, 3).toUpperCase()}]`
+      const wInfo = WEATHER_TYPE[weather] || {name: 'Unknown', icon: '?'}
+
+      // MODIFICATION : Usage direct de l'icône
+      this.dom.weatherNow.textContent = wInfo.icon
       this.dom.weatherNow.title = wInfo.name
+
       this.lastState.weatherCode = weather
     }
 
     // 2. Weather Next (Affiché seulement si artefact présent)
     // TODO: Vérifier buff 'weather_forecast'
-    const hasForecastBuff = false // Mettre à true pour tester
+    const hasForecastBuff = true // Test
     if (hasForecastBuff) {
-      const nwInfo = WEATHER_TYPE[nextWeather] || {name: '?'}
+      const nwInfo = WEATHER_TYPE[nextWeather] || {name: '?', icon: '?'}
       this.dom.weatherNext.style.display = 'block'
-      this.dom.weatherNext.textContent = `->[${nwInfo.name.substring(0, 3).toUpperCase()}]`
+
+      // MODIFICATION : Petite flèche + Icône
+      this.dom.weatherNext.textContent = `➞ ${nwInfo.icon}`
       this.dom.weatherNext.title = `Tomorrow: ${nwInfo.name}`
     } else {
       this.dom.weatherNext.style.display = 'none'
@@ -179,7 +184,7 @@ class EnvironmentOverlay {
       }
 
       this.dom.moon.textContent = phaseObj.icon
-      this.dom.moon.title = phaseObj.name + (!hasMoonBuff ? " (Approx)" : "")
+      this.dom.moon.title = phaseObj.name + (!hasMoonBuff ? ' (Approx)' : '')
 
       this.lastState.moonPhase = moonPhase
     }
@@ -201,81 +206,5 @@ class EnvironmentOverlay {
     }
   }
 }
-
-class EnvironmentOverlay_ {
-  constructor () {
-    this.container = null
-    this.state = {
-      day: 0,
-      hour: 0,
-      minute: 0, // Clock
-      weather: 0, // Daily
-      tslot: 0,
-      isDay: true // Phase
-    }
-    this.#initDOM()
-    this.#bindEvents()
-  }
-
-  #initDOM () {
-    this.container = document.createElement('div')
-    Object.assign(this.container.style, {
-      position: 'absolute',
-      top: '10px',
-      right: '10px',
-      padding: '8px 12px',
-      backgroundColor: 'rgba(0, 0, 0, 0.7)',
-      color: '#e6f0aa',
-      fontFamily: 'monospace',
-      fontSize: '14px',
-      borderRadius: '4px',
-      pointerEvents: 'none',
-      zIndex: '1000',
-      whiteSpace: 'pre'
-    })
-    document.body.appendChild(this.container)
-  }
-
-  #bindEvents () {
-    const update = (data) => this.updateState(data)
-
-    // Init global
-    eventBus.on('time/first-loop', update)
-
-    // 1. Flux Rapide (Clock) -> { day, hour, minute }
-    eventBus.on('time/clock', update)
-
-    // 2. Flux Lent (Météo) -> { weather, ... }
-    eventBus.on('time/daily', (data) => {
-      this.updateState({weather: data.weather})
-    })
-
-    // 3. Flux Moyen (Cycle) -> { tslot, isDay }
-    eventBus.on('time/timeslot', update)
-
-    // 4. Visuel pur
-    eventBus.on('time/sky-color-changed', (color) => {
-      this.container.style.borderLeft = `5px solid ${color}`
-    })
-  }
-
-  updateState (data) {
-    Object.assign(this.state, data)
-    this.render()
-  }
-
-  render () {
-    const {day, hour, minute, tslot, weather, isDay} = this.state
-
-    const d = day + 1
-    const h = String(hour).padStart(2, '0')
-    const m = String(minute).padStart(2, '0')
-    const wName = WEATHER_TYPE[weather]?.name || '?'
-    const cycleStatus = isDay ? 'SUN' : 'MOON' // Indicateur Jour/Nuit
-
-    this.container.innerText = `DAY ${d} | ${h}:${m} | ${cycleStatus} [Slot ${tslot}]\nWeather: ${wName}`
-  }
-}
-
 // Instanciation immédiate (Singleton autonome)
 export const environmentOverlay = new EnvironmentOverlay()
