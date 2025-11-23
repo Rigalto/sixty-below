@@ -1,6 +1,7 @@
 import {TIME_BUDGET, NODES_LOOKUP} from './constant.mjs'
 import {loadAssets, resolveAssetData} from './assets.mjs'
 import {timeManager, taskScheduler, microTasker} from './utils.mjs'
+import './ui.mjs'
 
 class GameCore {
   constructor () {

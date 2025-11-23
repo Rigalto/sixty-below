@@ -84,64 +84,39 @@ export const GAME_MIN_PER_REAL_MS = 1 / REAL_MS_PER_GAME_MIN
 
 export const DAY_DURATION_GAME_MIN = 24 * 60 // 1440 minutes jeu
 
-export const MOON_PHASE_BLURRED = [0, 0, 2, 2, 4, 6, 6, 0]
-export const MOON_PHASES = [
-  {icon: 'moonfullmoon', name: 'Full Moon', shortcut: 'fm'},
-  {icon: 'moonwaninggibbous', name: 'Waning Gibbous', shortcut: 'wg'},
-  {icon: 'moonthirdquarter', name: 'Third Quarter', shortcut: 'tq'},
-  {icon: 'moonwaningcrescent', name: 'Waning Crescent', shortcut: 'wc'},
-  {icon: 'circle', name: 'New Moon', shortcut: 'nm'},
-  {icon: 'moonwaxingcrescent', name: 'Waxing Crescent', shortcut: 'xc'},
-  {icon: 'moonfirstquarter', name: 'First Quarter', shortcut: 'fq'},
-  {icon: 'moonwaxinggibbous', name: 'Waxing Gibbous', shortcut: 'xg'}
-]
-export const TIME_SLOT = ['Midnight', 'Dawn', 'Morning', 'Noon', 'Afternoon', 'Dusk', 'Evening', 'Night']
-export const WEATHER = [
-  {name: 'Sunny', weight: 10},
-  {name: 'Cloudy', weight: 20},
-  {name: 'Rainy', weight: 30},
-  {name: 'Windy', weight: 25},
-  {name: 'Stormy', weight: 15}
-]
+/* =========================================
+   6. ENVIRONNEMENT (TIME & WEATHER)
+   ========================================= */
 
 export const SKY_COLORS = [
-  '#300606', // Nuit
-  '#380715',
-  '#400824',
-  '#480933',
-  '#500A42',
-  '#580B51',
-  '#600C60',
-  '#680D6F',
-  '#700E7E',
-  '#780F8D',
-  '#80109C',
-  '#8811AB',
-  '#9012BA',
-  '#9813C9',
-  '#A014D8',
-  '#A815E7',
-  '#B016F6',
-  '#B817FF',
-  '#C026FF',
-  '#C835FF',
-  '#D044FF',
-  '#D853FF',
-  '#E062FF',
-  '#E871FF',
-  '#F080FF',
-  '#F88FFF',
-  '#FF9EFF',
-  '#FFADFF',
-  '#FFBCF7',
-  '#FFCBEF',
-  '#FFDAE7',
-  '#FFE9DF',
-  '#FFF8D7',
-  '#FFFFCF',
-  '#FFFFE7',
-  '#E6F3FF' // Jour
+  '#300606', '#380715', '#400824', '#480933', '#500A42', '#580B51', '#600C60', '#680D6F',
+  '#700E7E', '#780F8D', '#80109C', '#8811AB', '#9012BA', '#9813C9', '#A014D8', '#A815E7',
+  '#B016F6', '#B817FF', '#C026FF', '#C835FF', '#D044FF', '#D853FF', '#E062FF', '#E871FF',
+  '#F080FF', '#F88FFF', '#FF9EFF', '#FFADFF', '#FFBCF7', '#FFCBEF', '#FFDAE7', '#FFE9DF',
+  '#FFF8D7', '#FFFFCF', '#FFFFE7', '#E6F3FF' // Jour (Index 35)
 ]
+
+export const WEATHER_TYPE = [
+  {code: 0, name: 'Sunny', weight: 10},
+  {code: 1, name: 'Cloudy', weight: 20},
+  {code: 2, name: 'Rainy', weight: 30},
+  {code: 3, name: 'Windy', weight: 25},
+  {code: 4, name: 'Stormy', weight: 15}
+]
+
+export const MOON_PHASE = [
+  {code: 0, name: 'Full Moon', icon: '🌕'},
+  {code: 1, name: 'Waning Gibbous', icon: '🌖'},
+  {code: 2, name: 'Third Quarter', icon: '🌗'},
+  {code: 3, name: 'Waning Crescent', icon: '🌘'},
+  {code: 4, name: 'New Moon', icon: '🌑'},
+  {code: 5, name: 'Waxing Crescent', icon: '🌒'},
+  {code: 6, name: 'First Quarter', icon: '🌓'},
+  {code: 7, name: 'Waxing Gibbous', icon: '🌔'}
+]
+
+// Index des tranches horaires (3h)
+export const TIME_SLOT = ['Midnight', 'Dawn', 'Morning', 'Noon', 'Afternoon', 'Dusk', 'Evening', 'Night']
 
 /* =========================================
    6. DATABASE CONFIG

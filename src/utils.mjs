@@ -96,8 +96,6 @@ class MicroTasker {
 
   // Exécute des fonctions selon leur priorité et leur capacité
   update (budget) {
-    console.log('MicroTasker.update >>>>>>>>>>>>>>>', budget)
-
     if (this.taskQueue.length === 0) { return }
     this.budget = (budget * 4) | 0 // Réinitialise le budget pour chaque frame
     if (this.taskQueue.length > MAX_QUEUE_LENGTH) {
@@ -454,8 +452,6 @@ class TaskScheduler {
 
   // Boucle principale appelée à chaque frame.
   update (currentTime) {
-    console.log('TaskScheduler.update >>>>>>>>>>>>>>>', currentTime)
-
     this.lastFrameTime = currentTime
 
     // Vérifier et exécuter les tâches dont le délai est écoulé
@@ -489,59 +485,81 @@ class TaskScheduler {
 }
 export const taskScheduler = new TaskScheduler()
 
-// Règle métier : 1000ms réelles (Playtime) = 1 minute dans le calendrier Monde
-const REAL_MS_PER_GAME_MINUTE = 1000
-const GAME_MINUTES_PER_DAY = 1440
+// Constantes de conversion
+const REAL_MS_PER_GAME_MINUTE = 1000 // 1000ms réelles = 1 minute dans le jeu
+const GAME_MINUTES_PER_DAY = 1440 // 24h * 60min
 
 class TimeManager {
+  // Déclaration des champs privés
   #minute5Cache
+  #isFirstLoop
 
   constructor () {
-    // REFERENCE UNIQUE : Temps réel écoulé en jeu (ms)
-    this.timestamp = 0
+    // Source de vérité : Temps réel écoulé en jeu (ms)
+    this.timestamp = 480000
 
-    // Cache Calendrier (dérivé du timestamp)
+    // Propriétés Publiques (Cache mis à jour par update)
     this.day = -1
-    this.hour = -1
-    this.minute = -1
     this.timeSlot = -1
-    this.moonPhase = 0
-
-    // Interne
+    this.hour = -1
     this.#minute5Cache = -1
+    this.minute = -1
 
     // Environnement
     this.weather = 0
     this.nextWeather = 0
-    this.currentSkyColor = SKY_COLORS[35]
+    this.true = SKY_COLORS[35] // Jour par défaut
+    this.isDay = false
+    this.moonPhase = 0
+
+    // État interne
+    this.#isFirstLoop = true
   }
 
-  init (savedTimestamp = 28800000, savedWeather = 0, savedNextWeather = 0) {
-    // savedTimestamp est le Playtime en ms (28 800 000 ms = 8h00 game time)
+  /**
+   * Initialisation des données (Phase 1).
+   * N'émet AUCUN événement.
+   * @param {number} savedTimestamp - Temps écoulé en ms (défaut jour 1 à 8h00 = 480 000 ms)
+   */
+  init (savedTimestamp = 480000, savedWeather = 0, savedNextWeather = 0) {
     this.timestamp = savedTimestamp
     this.weather = savedWeather
     this.nextWeather = savedNextWeather
+    this.currentSkyColor = SKY_COLORS[35] // Jour par défaut
+    this.isDay = false
 
-    // Reset cache
+    // Reset du cache pour forcer la détection de changement
     this.day = -1
+    this.timeSlot = -1
     this.hour = -1
     this.#minute5Cache = -1
+    this.minute = -1
 
-    this.#recalculateAndEmit(true)
+    // On arme le flag pour la première frame
+    this.#isFirstLoop = true
   }
 
-  update (realDt) {
-    // PAS DE RATIO ICI. 1ms réelle = 1ms de timestamp.
-    this.timestamp += realDt
+  /**
+   * Avance le temps (Phase 2 - Loop).
+   * @param {number} dt - Delta time réel en ms
+   * @returns {number} - Le timestamp jeu actuel (ms)
+   */
+  update (dt) {
+    // Incrément direct du temps réel
+    this.timestamp += dt
 
-    this.#recalculateAndEmit(false)
+    if (this.#isFirstLoop) {
+      this.#recalculateAndEmit(true)
+      this.#isFirstLoop = false
+    } else {
+      this.#recalculateAndEmit(false)
+    }
 
     return this.timestamp
   }
 
   #recalculateAndEmit (isFirstLoop = false) {
-    // CONVERSION : C'est ici que la magie opère.
-    // On transforme le Playtime (ms) en Minutes Monde.
+    // CONVERSION : Playtime (ms) -> Calendrier Monde
     const totalGameMinutes = Math.floor(this.timestamp / REAL_MS_PER_GAME_MINUTE)
 
     const day = Math.floor(totalGameMinutes / GAME_MINUTES_PER_DAY)
@@ -551,43 +569,60 @@ class TimeManager {
 
     // 1. CHECK MINUTE (Base du calendrier)
     if (isFirstLoop || minute !== this.minute) {
+      // Mise à jour des propriétés publiques
       this.minute = minute
 
-      eventBus.emit('time/every-minute', {
-        minutes: totalGameMinutes,
-        dayTimeMinutes
-      })
+      // Payload Clock
+      const clockData = {day, hour, minute}
+      eventBus.emit('time/clock', clockData)
 
       // 2. CHECK 5 MINUTES
       const min5 = Math.floor(totalGameMinutes / 5)
       if (isFirstLoop || min5 !== this.#minute5Cache) {
         this.#minute5Cache = min5
 
-        this.#updateSkyColor(dayTimeMinutes)
-        eventBus.emit('time/every-5-minutes', {minutes: totalGameMinutes})
+        this.#updateSkyColor(dayTimeMinutes, isFirstLoop)
+        eventBus.emit('time/every-5-minutes', clockData)
 
         // 3. CHECK HEURE
         if (isFirstLoop || hour !== this.hour) {
           this.hour = hour
-          eventBus.emit('time/every-hour', {hour})
+          this.isDay = (hour >= 6 && hour < 21)
+          eventBus.emit('time/every-hour', clockData)
 
           // 4. CHECK TIME SLOT (3H)
           const tslot = Math.floor(hour / 3)
           if (isFirstLoop || tslot !== this.timeSlot) {
             this.timeSlot = tslot
-            eventBus.emit('time/every-3-hours', {tslot})
+            eventBus.emit('time/timeslot', {tslot, isDay: this.isDay})
           }
 
-          // 5. CHECK JOUR
+          // 5. CHECK JOUR (Minuit)
           if (isFirstLoop || day !== this.day) {
             this.day = day
             this.moonPhase = day & 7
-            this.#handleNewDay(day)
+
+            // Gestion rotation météo (sauf au tout premier lancement pour respecter la save)
+            if (!isFirstLoop) {
+              this.weather = this.nextWeather
+              this.nextWeather = 0 // TODO: RNG
+            }
+
+            eventBus.emit('time/daily', {
+              day,
+              weather: this.weather,
+              nextWeather: this.nextWeather,
+              moonPhase: this.moonPhase
+            })
+
+            // Déclenche aussi l'event new-day spécifique pour compatibilité
+            // eventBus.emit('time/new-day', {day, weather: this.weather})
           }
         }
       }
     }
 
+    // Cas spécial First Loop : on envoie un snapshot complet pour init UI
     if (isFirstLoop) {
       eventBus.emit('time/first-loop', {
         day: this.day,
@@ -596,27 +631,18 @@ class TimeManager {
         tslot: this.timeSlot,
         weather: this.weather,
         nextWeather: this.nextWeather,
-        skyColor: this.currentSkyColor
+        skyColor: this.currentSkyColor,
+        moonPhase: this.moonPhase,
+        isDay: this.isDay
       })
     }
   }
 
-  #handleNewDay (day) {
-    this.weather = this.nextWeather
-    this.nextWeather = 0 // TODO: RNG
-
-    eventBus.emit('time/new-day', {
-      day,
-      weather: this.weather,
-      moonPhase: this.moonPhase
-    })
-  }
-
-  #updateSkyColor (dayMinutes) {
-    let colorIndex = 35
+  #updateSkyColor (dayMinutes, forceEmit) {
+    let colorIndex = 35 // Jour
 
     if (dayMinutes < 180 || dayMinutes > 1260) {
-      colorIndex = 0
+      colorIndex = 0 // Nuit
     } else if (dayMinutes < 360) {
       colorIndex = Math.trunc((dayMinutes - 180) / 5)
     } else if (dayMinutes > 1080) {
@@ -625,9 +651,12 @@ class TimeManager {
 
     const newColor = SKY_COLORS[colorIndex]
 
-    if (this.currentSkyColor !== newColor) {
+    if (forceEmit || this.currentSkyColor !== newColor) {
       this.currentSkyColor = newColor
-      if (NODES.SKY) NODES.SKY.color = newColor
+
+      // Mise à jour Data Layer 0 (Optimisation Rendu) On va faire différemment
+      // if (NODES.SKY) NODES.SKY.color = newColor
+
       eventBus.emit('time/sky-color-changed', newColor)
     }
   }
