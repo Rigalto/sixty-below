@@ -295,3 +295,30 @@ __To Do__ : comment implémenter l'aide en ligne et l'encyclopédie (le plus pos
 
   * **Linter :** Respect de la convention 'Format' de Google :
       * pas de point virgule à la fin des instructions
+
+## 8. Modules Métier (Layer 2) - Contrats d'interface
+
+Cette couche contient la logique spécifique du jeu. Les modules communiquent le plus possible via l'EventBus (Pattern Pub/Sub) pour garantir un couplage faible.
+
+### 8.1 Système d'Inventaire [`ui.mjs` / `inventory.mjs`]
+* **Responsabilité :** Gérer le stockage, les slots, l'équipement et les artefacts passifs.
+* **Cycle de vie des Buffs Statiques :**
+    * L'inventaire ne calcule pas les stats. Il se contente de scanner son contenu.
+    * À la fermeture de l'interface, il génère une liste d'IDs d'artefacts actifs (ex: `['sextant', 'gps']`).
+    * **Événement émis :** `inventory/static-buffs` avec la liste en payload.
+
+### 8.2 Système de Buffs [`buff.mjs`]
+* **Responsabilité :** Centraliser tous les bonus/malus (Temporaires, Passifs, d'Équipement).
+* **Buffs Statiques : Pattern "Re-emitter" :**
+    1.  S'abonne à `inventory/static-buffs`.
+    2.  Met à jour son état interne (quels artefacts sont présents).
+    3.  Émet des événements granulaires pour les consommateurs finaux (UI, Player).
+        * *Exemple :* Réception de `'gps'` -> Émission de `buff/coords` (boolean).
+        * *Exemple :* Réception de `'clock_lvl2'` -> Émission de `buff/precision` (valeur).
+* **Avantage :** L'UI ne sait pas qu'il faut un "Sextant" pour voir la météo, elle sait juste qu'elle a reçu le signal `buff/weather-forecast`. Cela permet de changer les règles de Game Design (ex: changer l'item requis) sans toucher à l'UI.
+
+### 8.3 Interface Environnement [`ui.mjs`]
+* **Abonnement :** Écoute les événements granulaires du `BuffManager` (`buff/moon`, `buff/weather`, `buff/coords`).
+* **Optimisation dynamique :**
+    * Pour les coordonnées (mise à jour fréquente), l'UI [`EnvironmentOverlay`] ne s'abonne à l'événement `player/move` **QUE** si le buff `buff/coords-display` est actif.
+    * Si le buff est perdu, l'UI se désabonne immédiatement de `player/move` pour économiser le CPU.
