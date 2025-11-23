@@ -47,6 +47,7 @@ class EnvironmentOverlay {
     style.fontFamily = 'Segoe UI, Roboto, monospace'
     style.fontSize = '14px'
     style.borderRadius = '6px'
+    style.pointerEvents = 'none'
     style.padding = '8px'
     style.boxShadow = '0 2px 10px rgba(0,0,0,0.5)'
     style.zIndex = '1000'
@@ -63,13 +64,13 @@ class EnvironmentOverlay {
 
       <div style="display:flex; justify-content:space-between; align-items:center;">
         <div style="display:flex; gap:5px;">
-          <div id="env-weather-now" title="Weather" style="cursor:help;">[?]</div>
-          <div id="env-weather-next" title="Forecast" style="opacity:0.5; display:none;">[->?]</div>
+          <div id="env-weather-now" title="Weather" style="cursor:help;" pointer-events:auto;>[?]</div>
+          <div id="env-weather-next" title="Forecast" style="display:none; pointer-events:auto;">[->?]</div>
         </div>
-        <div id="env-moon" title="Moon Phase" style="cursor:help; font-size: 24px;">[M]</div>
+        <div id="env-moon" title="Moon Phase" style="cursor:help; font-size: 24px; pointer-events:auto;">[M]</div>
       </div>
 
-      <div id="env-coords" style="font-size:0.8em; color:#888; font-family:monospace; margin-top:2px; pointer-events:none;">
+      <div id="env-coords" style="font-size:0.8em; color:#888; font-family:monospace; margin-top:2px;">
         POS: -- | --
       </div>
     `
