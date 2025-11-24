@@ -121,8 +121,13 @@ class GameCore {
      ========================================= */
 
   loop (timestamp) {
+    // timestamp = performance.now()
+
     if (!this.isRunning) return
     requestAnimationFrame((t) => this.loop(t))
+
+    // 0. Capture du temps réel de début d'exécution du JS pour mesure des temps d'exécution
+    const executionStart = performance.now()
 
     // ///////////// //
     // BUDGET UPDATE //
@@ -141,6 +146,7 @@ class GameCore {
     // 2. UPDATE (SYSTEMS)
     // 2.A. TimeManager (Source de vérité temporelle)
     const gameTimestamp = timeManager.update(dt) // timestamp depuis création du monde
+    console.log('>>>', gameTimestamp)
 
     // 2.B. TaskScheduler (Vérifie si des tâches longues sont dues)
     taskScheduler.update(gameTimestamp)
@@ -148,7 +154,7 @@ class GameCore {
     // 2.C. Suite
     // worldManager.update(dt)
 
-    const durationUpdate = performance.now() - timestamp
+    const durationUpdate = performance.now() - executionStart
     if (durationUpdate > TIME_BUDGET.UPDATE) {
       console.warn(`⚠️ Budget Update: ${durationUpdate.toFixed(2)}ms`)
       // if (Math.random() < 0.01) console.warn(`⚠️ Budget Update: ${durationUpdate.toFixed(2)}ms`)
@@ -167,7 +173,7 @@ class GameCore {
     // monsterManager.drawCanvas(canvas)
     // playerManager.drawCanvas(canvas)
 
-    const durationRender = performance.now() - timestamp - durationUpdate
+    const durationRender = performance.now() - executionStart - durationUpdate
     if (durationRender > TIME_BUDGET.RENDER) {
       console.warn(`⚠️ Budget Render: ${durationRender.toFixed(2)}ms`)
       // if (Math.random() < 0.01) console.warn(`⚠️ Budget Render: ${durationRender.toFixed(2)}ms`)
