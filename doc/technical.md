@@ -44,13 +44,13 @@ const tileDesc = NODES_LOOKUP[tileCode]
 
 ### Class EventBus (Singleton: eventBus)
 
-* `init(): void` - Vide tous les écouteurs
 * `on(event: string, callback: function): void`
 * `off(event: string, callback: function): void`
 * `emit(event: string, data: any): void`
 
 ### Class `MicroTasker` (Singleton: `microTasker`)
 
+* `init(): void` - Vide la file d'attente et les stats.
 * `initDebug(mapping: object): void`
 * `enqueue(fn: function, priority: int, capacityUnits: int, ...args: any): void`
 * `enqueueOnce(fn: function, priority: int, capacityUnits: int, ...args: any): void`
@@ -75,7 +75,7 @@ microTasker.enqueue(this.myMethod, priority, capacity, arg1, arg2)
 ```
 
 ### Class `TaskScheduler` (Singleton: `taskScheduler`)
-* `initTime(time: number): void`
+* `init(time: number): void`
 * `enqueue(id: string, delay: number, fn: function, priority: int, cap: int, ...args): number`
 * `requeue(id: string, delay: number, fn: function, priority: int, cap: int, ...args): number`
 * `extendTask(id: string, delay: number, fn: function, priority: int, cap: int, ...args): number`

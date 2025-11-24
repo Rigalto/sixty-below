@@ -9,11 +9,6 @@ class EventBus {
     this.listeners = new Map() // Map<eventType, Set[callbacks]>
   }
 
-  // Réinitialise le bus pour une nouvelle session (Nettoyage complet)
-  init () {
-    this.listeners.clear()
-  }
-
   on (event, callback) {
     if (!this.listeners.has(event)) this.listeners.set(event, new Set())
     this.listeners.get(event).add(callback)
@@ -85,6 +80,12 @@ class MicroTasker {
     this.taskStats = {}
     this.resetStats = this.resetStats.bind(this)
     this.MICROTASK_FN_NAME_TO_KEY = null
+  }
+
+  // Réinitialise le scheduler pour une nouvelle session
+  init () {
+    this.taskQueue.length = 0
+    this.taskStats = {}
   }
 
   initDebug (MICROTASK_FN_NAME_TO_KEY) { this.MICROTASK_FN_NAME_TO_KEY = MICROTASK_FN_NAME_TO_KEY }
@@ -305,7 +306,11 @@ class TaskScheduler {
   }
 
   // initialisation de l'heure absolue
-  initTime (time) { this.lastFrameTime = time }
+  init (time) {
+    this.lastFrameTime = time
+    this.tasks.length = 0
+    this.lastFrameTime = 0
+  }
 
   // Ajoute une tâche à exécuter après un délai
   enqueue (id, delay, fn, priority, capacityUnits, ...args) {

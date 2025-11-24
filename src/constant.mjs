@@ -247,7 +247,7 @@ export const NODES = {
 }
 
 /* =========================================
-   5. INITIALISATION AUTOMATIQUE
+   INITIALISATION AUTOMATIQUE
    ========================================= */
 export const NODES_LOOKUP = [] // Array Lookup
 
@@ -299,3 +299,18 @@ for (const key in NODES) {
 //     else if (node.type === TILE_TYPE.GEM) b.gem = node.code
 //   }
 // }
+
+/* =========================================
+   CAPACITES ET PRIORITES DES MICRO-TACHES
+   ========================================= */
+
+export const MICROTASK = {
+  WORLD_RENDERER_UPDATE: {priority: 52, capacity: 15, taskName: 'updateOneChunkPerFrame'}, // exemple #1
+  WORLD_RENDERER_ADD: {priority: 50, capacity: 15, taskName: 'addOneChunkPerFrame'} // exemple #1
+}
+
+export const MICROTASK_FN_NAME_TO_KEY = Object.keys(MICROTASK).reduce((acc, key) => {
+  // on crée l'entrée dans notre table de correspondance
+  acc[MICROTASK[key].taskName] = MICROTASK[key].capacity
+  return acc
+}, {})

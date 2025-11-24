@@ -1,4 +1,4 @@
-import {TIME_BUDGET, NODES_LOOKUP} from './constant.mjs'
+import {TIME_BUDGET, NODES_LOOKUP, MICROTASK_FN_NAME_TO_KEY} from './constant.mjs'
 import {loadAssets, resolveAssetData} from './assets.mjs'
 import {timeManager, taskScheduler, microTasker, eventBus, seededRNG} from './utils.mjs'
 import './ui.mjs'
@@ -99,11 +99,15 @@ class GameCore {
     // Init RNG en mode aléatoire (Math.random()) pour la session de jeu
     seededRNG.init()
 
+    // OBLIGATOIRE EN PREMIER POUR QUE LES MANAGERS PUISSENT TRAVAILLER
     const startTimestamp = 480 * 1000 // sera récupéré depuis la base de données (c'est la valeur à la création du monde)
-    timeManager.init(startTimestamp)
-    eventBus.init()
-    // microTasker.init()
+    microTasker.init()
+    microTasker.initDebug(MICROTASK_FN_NAME_TO_KEY)
+    taskScheduler.init(startTimestamp)
+    timeManager.init(startTimestamp) // TODO: startTimestamp, savedWeather , savedNextWeather
+
     // buffManager.init()
+
     eventBus.emit('buff/display-next-weather', true)
     eventBus.emit('buff/display-moon-detail', true)
     eventBus.emit('buff/display-time-precision', 3) // DEBUG => toutes les secondes
@@ -162,7 +166,6 @@ class GameCore {
     // 2. UPDATE (SYSTEMS)
     // 2.A. TimeManager (Source de vérité temporelle)
     const gameTimestamp = timeManager.update(dt) // timestamp depuis création du monde
-    console.log('>>>', gameTimestamp)
 
     // 2.B. TaskScheduler (Vérifie si des tâches longues sont dues)
     taskScheduler.update(gameTimestamp)
