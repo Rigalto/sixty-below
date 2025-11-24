@@ -1,4 +1,4 @@
-import {SKY_COLORS, NODES} from './constant.mjs'
+import {SKY_COLORS} from './constant.mjs'
 
 class EventBus {
   constructor () {
@@ -33,6 +33,33 @@ class EventBus {
         console.error(`EventBus:emit - Erreur dans un handler de l'événement '${event}' pour la fonction '${cb.name}':`, e)
       }
     }
+  }
+
+  // Affiche les statistiques des événements et des écouteurs
+  debugStats () {
+    let output = '--- EventBus - Listeners List ---\n'
+    const sortedEvents = Array.from(this.listeners.keys()).sort()
+
+    for (const event of sortedEvents) {
+      const callbacks = this.listeners.get(event)
+      if (!callbacks || callbacks.size === 0) { continue }
+
+      output += `${event}:\n`
+      output += `  Count: ${callbacks.size}\n`
+      output += '  Listeners:\n'
+
+      for (const cb of callbacks) {
+        // Nettoyer le nom de la fonction pour gérer le préfixe "bound " (fréquent sur les events)
+        let fnName = cb.name || '(anonymous)'
+        if (fnName.startsWith('bound ')) {
+          fnName = fnName.substring(6)
+        }
+        output += `    - ${fnName}\n`
+      }
+      output += '---------------------------------\n'
+    }
+    console.log(output)
+    return output
   }
 }
 export const eventBus = new EventBus()
