@@ -75,7 +75,7 @@ microTasker.enqueue(this.myMethod, priority, capacity, arg1, arg2)
 ```
 
 ### Class `TaskScheduler` (Singleton: `taskScheduler`)
-* `init(time: number): void`
+* `init(time: number): void` - Vide la file et initialise le temps de référence.
 * `enqueue(id: string, delay: number, fn: function, priority: int, cap: int, ...args): number`
 * `requeue(id: string, delay: number, fn: function, priority: int, cap: int, ...args): number`
 * `extendTask(id: string, delay: number, fn: function, priority: int, cap: int, ...args): number`
