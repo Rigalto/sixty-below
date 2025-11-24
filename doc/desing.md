@@ -120,6 +120,8 @@ Pour permettre les références croisées dans la Layer 2 (ex: World a besoin de
 * **Instantiation :** Au chargement du module, le Singleton est créé via `new Class()`. Le constructeur ne doit jamais accéder à une autre instance de la Layer 2.
 * **Initialisation :** Chaque Manager expose une méthode publique `init()`.
 
+__Note__ : la création du singleton n'est effectuée qu'une seule fois. La fonction `init` peut être appelée plusieurs fois. On veillera à placer dans le `constructor` ce qui est constant (ex: création du DOM pour un overlay) et dans `init` ce qui change suite à la création d'un nouveau monde (ex: initialisation des informations dans le DOM, valeurs mises en cache).
+
 Boot Sequence (dans core.mjs) :
 * **1. INSTANTIATION :** Création des Singletons (new Class). Importe tous les modules.
 * **2. LOAD ASSETS :** Appel de [`assets.mjs :: loadAssets`]. Chargement de toutes les images et sons. Construction des index d'atlas.

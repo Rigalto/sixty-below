@@ -588,6 +588,7 @@ class TimeManager {
         if (isFirstLoop || hour !== this.hour) {
           this.hour = hour
           this.isDay = (hour >= 6 && hour < 21)
+          clockData.isDay = this.isDay
           eventBus.emit('time/every-hour', clockData)
 
           // 4. CHECK TIME SLOT (3H)
@@ -614,9 +615,6 @@ class TimeManager {
               nextWeather: this.nextWeather,
               moonPhase: this.moonPhase
             })
-
-            // Déclenche aussi l'event new-day spécifique pour compatibilité
-            // eventBus.emit('time/new-day', {day, weather: this.weather})
           }
         }
       }

@@ -1,6 +1,6 @@
 import {TIME_BUDGET, NODES_LOOKUP} from './constant.mjs'
 import {loadAssets, resolveAssetData} from './assets.mjs'
-import {timeManager, taskScheduler, microTasker} from './utils.mjs'
+import {timeManager, taskScheduler, microTasker, eventBus} from './utils.mjs'
 import './ui.mjs'
 
 class GameCore {
@@ -89,6 +89,11 @@ class GameCore {
     timeManager.init(startTimestamp)
     // eventBus.init()
     // microTasker.init()
+    // buffManager.init()
+    eventBus.emit('buff/display-next-weather', true)
+    eventBus.emit('buff/display-moon-detail', true)
+    eventBus.emit('buff/display-time-precision', 3) // DEBUG => toutes les secondes
+    eventBus.emit('buff/display-coords', true)
 
     // 3. Initialisation des systèmes (Layer 2)
     // C'est ici qu'on initialise les managers

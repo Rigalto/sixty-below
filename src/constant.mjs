@@ -114,6 +114,7 @@ export const MOON_PHASE = [
   {code: 6, name: 'First Quarter', icon: '🌓'},
   {code: 7, name: 'Waxing Gibbous', icon: '🌔'}
 ]
+export const MOON_PHASE_BLURRED = [0, 0, 2, 2, 4, 6, 6, 0]
 
 // Index des tranches horaires (3h)
 export const TIME_SLOT = ['Midnight', 'Dawn', 'Morning', 'Noon', 'Afternoon', 'Dusk', 'Evening', 'Night']

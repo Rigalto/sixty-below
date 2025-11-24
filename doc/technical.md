@@ -131,3 +131,35 @@ taskScheduler.enqueueAfter(
 * `boot(): Promise<void> (Technical init)`
 * `startSession(): Promise<void> (Game start)`
 * `loop(timestamp): void`
+
+
+
+## EventBus Contracts (API)
+
+Cette section définit les événements officiels. Tout nouvel événement doit être enregistré ici avant implémentation.
+
+### Time & Environment (`TimeManager`)
+| Event Name | Payload Structure | Description |
+| :--- | :--- | :--- |
+| `time/clock` | `{ day, hour, minute }` | Émis chaque minute-jeu. |
+| `time/every-5-minutes` | `{ day, hour, minute }` | Émis toutes les 5 minutes-jeu. |
+| `time/every-hour` | `{ day, hour, minute, isDay }` | Émis à chaque changement d'heure. |
+| `time/timeslot` | `{ tslot, isDay }` | Émis toutes les 3h (changement de slot). |
+| `time/daily` | `{ day, weather, nextWeather, moonPhase }` | Émis à minuit (changement de jour). |
+| `time/first-loop` | `{ day, hour, minute, tslot, weather, nextWeather, skyColor, moonPhase, isDay }` | Émis une seule fois au démarrage du rendu. |
+| `time/sky-color-changed`| `string` (Hex Color) | Émis uniquement si la couleur change. |
+
+### Inventory (`InventoryManager`)
+*En prévision*
+| Event Name | Payload Structure | Description |
+| :--- | :--- | :--- |
+| `inventory/static-buffs`| `Array<string>` (List of buffs) | Émis à la fermeture de l'inventaire. |
+
+### Buffs (`BuffManager`)
+*En prévision*
+| Event Name | Payload Structure | Description |
+| :--- | :--- | :--- |
+| `buff/display-next-weather` | `boolean` | Active/Désactive la prévision météo. |
+| `buff/display-coords` | `boolean` | Active/Désactive l'affichage des coordonnées. |
+| `buff/display-time-precision` | `integer` | précision 0 => 1heure, 1 => 15 minutes, 2 => 5 minutes |
+| `buff/display-moon-detail` | `boolean` | affiche 4 (false) ou 8 (true) phases lunaires |
