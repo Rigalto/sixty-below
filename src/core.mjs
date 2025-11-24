@@ -11,6 +11,9 @@ class GameCore {
     this.budgetTotal = TIME_BUDGET.UPDATE + TIME_BUDGET.RENDER + TIME_BUDGET.MICROTASK
     this.lastTime = 0
     // Ne rien faire de lourd ici
+
+    // Flag pour le déclenchement debug (touche ²)
+    this.debugTrigger = false
   }
 
   /* =========================================
@@ -33,6 +36,14 @@ class GameCore {
     this.#hydrateNodes()
     this.#hydrateItems()
     // this._hydrateBuffs() ...
+
+    // Écouteur Debug (Touche ²)
+    window.addEventListener('keydown', (e) => {
+      // "²" sur clavier AZERTY. !e.repeat empêche l'auto-fire si maintenu.
+      if (e.key === '²' && !e.repeat) {
+        this.debugTrigger = true
+      }
+    })
 
     this.isBooted = true
     console.timeEnd('Engine Boot')
@@ -121,6 +132,12 @@ class GameCore {
     const dt = timestamp - this.lastTime
     this.lastTime = timestamp
 
+    // AExécution Debug synchronisée (consommation du flag)
+    if (this.debugTrigger) {
+      this.debugTrigger = false // Reset immédiat
+      this.#runDebugAction()
+    }
+
     // 2. UPDATE (SYSTEMS)
     // 2.A. TimeManager (Source de vérité temporelle)
     const gameTimestamp = timeManager.update(dt) // timestamp depuis création du monde
@@ -168,6 +185,17 @@ class GameCore {
     if (budgetMicrotask > 0) {
       microTasker.update(budgetMicrotask)
     }
+  }
+
+  /* =========================================
+     DEBUG
+     ========================================= */
+
+  #runDebugAction () {
+    console.log('GameCore.#runDebugAction')
+    eventBus.debugStats()
+    microTasker.debugStats()
+    taskScheduler.debugStats()
   }
 }
 export const gameCore = new GameCore()
