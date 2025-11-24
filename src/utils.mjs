@@ -19,7 +19,6 @@ class EventBus {
   }
 
   emit (event, data) {
-    console.log('EventBus.emit >>>>>>>>>>>>>>>', event)
     const callbacks = this.listeners.get(event)
     if (!callbacks) return // Si aucun listener pour cet événement, on ne fait rien.
 
