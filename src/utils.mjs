@@ -1,8 +1,17 @@
 import {SKY_COLORS} from './constant.mjs'
 
+/* ====================================================================================================
+   EVENT BUS
+   ==================================================================================================== */
+
 class EventBus {
   constructor () {
     this.listeners = new Map() // Map<eventType, Set[callbacks]>
+  }
+
+  // Réinitialise le bus pour une nouvelle session (Nettoyage complet)
+  init () {
+    this.listeners.clear()
   }
 
   on (event, callback) {
@@ -62,6 +71,10 @@ class EventBus {
   }
 }
 export const eventBus = new EventBus()
+
+/* ====================================================================================================
+   MICROTASKER
+   ==================================================================================================== */
 
 const MAX_QUEUE_LENGTH = 100 // Limite arbitraire
 // Le budget est en unités de 1/4ms, soit 5ms * 4 = 20 unités.
@@ -278,9 +291,12 @@ class MicroTasker {
     return output // Retourne aussi la chaîne pour un usage éventuel
   }
 }
-
 // Export du singleton
 export const microTasker = new MicroTasker()
+
+/* ====================================================================================================
+   TASK SCHEDULER
+   ==================================================================================================== */
 
 class TaskScheduler {
   constructor () {
@@ -511,6 +527,10 @@ class TaskScheduler {
 }
 export const taskScheduler = new TaskScheduler()
 
+/* ====================================================================================================
+   TIME MANAGER
+   ==================================================================================================== */
+
 // Constantes de conversion
 const REAL_MS_PER_GAME_MINUTE = 1000 // 1000ms réelles = 1 minute dans le jeu
 const GAME_MINUTES_PER_DAY = 1440 // 24h * 60min
@@ -687,3 +707,148 @@ class TimeManager {
 }
 
 export const timeManager = new TimeManager()
+
+/* ====================================================================================================
+   SEEDED RNG (Mulberry32)
+   ==================================================================================================== */
+
+class SeededRNG {
+  #seed
+  #useMathRandom
+
+  constructor () {
+    this.#seed = 1234
+    this.#useMathRandom = true // Par défaut, comportement aléatoire non déterministe
+  }
+
+  /**
+   * Initialise la graine.
+   * @param {string|number} [seed] - Si undefined, utilise Math.random()
+   */
+  init (seed) {
+    if (seed === undefined) {
+      this.#useMathRandom = true
+    } else {
+      this.#useMathRandom = false
+      // Hashage simple (cyrb53-like mix) pour transformer n'importe quelle clé en entier 32bit
+      let h = 0xdeadbeef
+      const str = String(seed)
+      for (let i = 0; i < str.length; i++) {
+        h = Math.imul(h ^ str.charCodeAt(i), 2654435761)
+      }
+      this.#seed = ((h ^ h >>> 16) >>> 0)
+    }
+  }
+
+  /**
+   * Cœur du générateur
+   * Retourne un float [0, 1[
+   */
+  #next () {
+    if (this.#useMathRandom) return Math.random()
+
+    // Algorithme Mulberry32
+    let t = (this.#seed += 0x6D2B79F5)
+    t = Math.imul(t ^ t >>> 15, t | 1)
+    t ^= t + Math.imul(t ^ t >>> 7, t | 61)
+    return ((t ^ t >>> 14) >>> 0) / 4294967296
+  }
+
+  // --- API COMPATIBLE (VOTRE LIBRAIRIE) ---
+
+  randomGet () { return this.#next() }
+
+  randomGetBool () { return this.#next() > 0.5 }
+
+  /**
+   * Entier polyvalent (Range, Array, Max, MinMax)
+   */
+  randomInteger (a, b) {
+    if (a === undefined) { return this.#next() > 0.5 ? 1 : 0 }
+
+    // Gestion Array: Retourne une VALEUR aléatoire du tableau
+    if (Array.isArray(a)) {
+      return a.length === 0 ? null : a[Math.floor(this.#next() * a.length)]
+    }
+
+    // Gestion Range (Duck typing pour éviter dependency 'Range')
+    if (a && typeof a === 'object' && 'min' in a && 'max' in a) {
+      return Math.floor(a.min + this.#next() * (a.max - a.min + 1))
+    }
+
+    // Gestion Max seul (0 à a)
+    if (b === undefined) { return Math.floor(this.#next() * (a + 1)) }
+
+    // Gestion MinMax (a à b)
+    return Math.floor(a + this.#next() * (b - a + 1))
+  }
+
+  randomReal (a, b) {
+    if (a === undefined) { return this.#next() }
+
+    if (Array.isArray(a)) {
+      return a.length === 0 ? null : a[Math.floor(this.#next() * a.length)]
+    }
+
+    if (a && typeof a === 'object' && 'min' in a && 'max' in a) {
+      return a.min + this.#next() * (a.max - a.min)
+    }
+
+    if (b === undefined) { return this.#next() * a }
+
+    return a + this.#next() * (b - a)
+  }
+
+  randomGetMax (max) { return Math.floor(this.#next() * (max + 1)) }
+
+  randomGetMinMax (min, max) { return Math.floor(min + this.#next() * (max - min + 1)) }
+
+  randomGetRealMax (max) { return this.#next() * max }
+
+  randomGetRealMinMax (min, max) { return min + this.#next() * (max - min) }
+
+  randomGetArrayValue (arr) {
+    return arr.length === 0 ? null : arr[Math.floor(this.#next() * arr.length)]
+  }
+
+  randomGetArrayIndex (arr) {
+    return arr.length === 0 ? null : Math.floor(this.#next() * arr.length)
+  }
+
+  randomGaussian (mean = 0, sd = 1) {
+    let u1 = 0
+    let u2 = 0
+    while (u1 === 0) u1 = this.#next()
+    while (u2 === 0) u2 = this.#next()
+    return mean + sd * Math.sqrt(-2.0 * Math.log(u1)) * Math.cos(2 * Math.PI * u2)
+  }
+
+  randomLinear () { return Math.sqrt(this.#next()) }
+
+  /**
+   * Retourne l'INDEX de l'élément choisi selon son poids.
+   * Attend des objets { weight: number } dans le tableau.
+   */
+  randomGetArrayWeighted (arr) {
+    const totalWeight = arr.reduce((acc, obj) => acc + (obj.weight === undefined ? 1 : parseFloat(obj.weight)), 0)
+
+    if (isNaN(totalWeight) || totalWeight <= 0) {
+      console.error('[SeededRNG] Poids invalide', arr)
+      return 0
+    }
+
+    const random = this.#next() * totalWeight
+    let currentWeight = 0
+
+    for (let i = 0; i < arr.length; i++) {
+      if (arr[i].weight <= 0) continue
+      currentWeight += (arr[i].weight || 1)
+      if (random < currentWeight) {
+        return i
+      }
+    }
+    return arr.length - 1 // Fallback sécurité
+  }
+}
+
+export const seededRNG = new SeededRNG()

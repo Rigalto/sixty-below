@@ -1,6 +1,6 @@
 import {TIME_BUDGET, NODES_LOOKUP} from './constant.mjs'
 import {loadAssets, resolveAssetData} from './assets.mjs'
-import {timeManager, taskScheduler, microTasker, eventBus} from './utils.mjs'
+import {timeManager, taskScheduler, microTasker, eventBus, seededRNG} from './utils.mjs'
 import './ui.mjs'
 
 class GameCore {
@@ -96,9 +96,12 @@ class GameCore {
 
     // 2. Initialisation des systèmes (Layer 1)
 
+    // Init RNG en mode aléatoire (Math.random()) pour la session de jeu
+    seededRNG.init()
+
     const startTimestamp = 480 * 1000 // sera récupéré depuis la base de données (c'est la valeur à la création du monde)
     timeManager.init(startTimestamp)
-    // eventBus.init()
+    eventBus.init()
     // microTasker.init()
     // buffManager.init()
     eventBus.emit('buff/display-next-weather', true)
@@ -126,16 +129,29 @@ class GameCore {
     if (!this.isRunning) return
     requestAnimationFrame((t) => this.loop(t))
 
-    // 0. Capture du temps réel de début d'exécution du JS pour mesure des temps d'exécution
-    const executionStart = performance.now()
-
     // ///////////// //
     // BUDGET UPDATE //
     // ///////////// //
 
     // 1. DELTA TIME
-    const dt = timestamp - this.lastTime
+
+    const executionStart = performance.now() // Capture du temps réel de début d'exécution du JS pour mesure des temps d'exécution
+    let dt = timestamp - this.lastTime
     this.lastTime = timestamp
+
+    // --- PROTECTION TEMPORELLE ---
+
+    if (dt > 1000) {
+      // Cas A : Retour de veille / Changement d'onglet / Debugger (> 1 seconde)
+      // On considère que le jeu était en PAUSE. On n'avance d'une frame.
+      console.log(`[GameCore] Gros saut temporel détecté (${dt.toFixed(0)}ms). Simulation ignorée.`)
+      dt = 16.66
+    } else if (dt > 65) {
+      // Cas B : Lag Machine (ex: Garbage Collector qui prend 40ms)
+      // On clampe pour éviter que la physique n'explose (Tunneling).
+      // 65ms correspond à ~15 FPS. En dessous, le jeu passera en "Slow Motion".
+      dt = 65
+    }
 
     // AExécution Debug synchronisée (consommation du flag)
     if (this.debugTrigger) {

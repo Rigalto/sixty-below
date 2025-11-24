@@ -44,6 +44,7 @@ const tileDesc = NODES_LOOKUP[tileCode]
 
 ### Class EventBus (Singleton: eventBus)
 
+* `init(): void` - Vide tous les écouteurs
 * `on(event: string, callback: function): void`
 * `off(event: string, callback: function): void`
 * `emit(event: string, data: any): void`
@@ -123,6 +124,21 @@ taskScheduler.enqueueAfter(
     lootData
 )
 ```
+
+### Class `SeededRNG` (Singleton: `seededRNG`)
+
+* `init(seed?: string|number): void`
+* `randomGet(): number`
+* `randomGetBool(): boolean`
+* `randomInteger(a?: any, b?: number): number|any` (Polyvalent: Range, Array, MinMax)
+* `randomReal(a?: any, b?: number): number`
+* `randomGetMax(max: number): number`
+* `randomGetMinMax(min: number, max: number): number`
+* `randomGetArrayValue(arr: Array): any`
+* `randomGetArrayIndex(arr: Array): int`
+* `randomGetArrayWeighted(arr: Array<{weight}>): int` (Retourne l'index)
+* `randomGaussian(mean?: number, sd?: number): number`
+* `randomLinear(): number`
 
 ## core.mjs (layer 3)
 
