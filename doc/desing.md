@@ -226,6 +226,23 @@ __TO DO__ : déterminer si le contenu des tuiles est stocké sur un ou deux octe
     * Ecriture d'un éléments de configuration (paramètre : identifiant (Strong) de l'élément de configuration, valeur de l'élément de configuration)
     * Conception interne : attention aux problèmes de performance avec les tableaux compacts.
 
+### 5.3 Gestion de l'État Global (GameState Pattern)
+
+Le `gamestate` est un stockage clé/valeur (K/V) utilisé pour persister les états dispersés des différents systèmes (Météo, Temps, Stats joueur, Flags divers, etc.).
+
+* **Principe "Memory First" :** La source de vérité est **toujours** la variable en mémoire vive (RAM) dans l'instance du Manager concerné. La base de données n'est qu'un miroir de persistance.
+* **Cycle de Vie (Session Start) [`core.mjs`] :**
+    * **1. Chargement Global :** Au début de `startSession`, l'application charge l'intégralité du `gamestate` en une seule requête via `database.getAllGameState()`.
+    * **Distribution (Injection) :** Les valeurs récupérées sont extraites et passées en arguments aux méthodes `.init()` des différents Managers (`timeManager.init(state.timestamp)`, `playerManager.init(state.pos)`...).
+* **Mise à jour (Runtime) :**
+    * Lorsqu'un Manager modifie une donnée d'état, il met à jour sa variable locale (immédiat).
+    * Il déclenche ensuite une sauvegarde asynchrone via `database.setGameState(key, value)` (ou `batchSetGameState`).
+    * **Règle stricte :** Le Manager n'attend pas (`await`) la fin de l'écriture pour continuer son traitement. C'est du "Fire and Forget".
+* **Lecture (Runtime) :**
+    * L'utilisation de `database.getGameStateValue(key)` est **déconseillée** pendant le jeu. Les Managers doivent utiliser leurs propres variables membres.
+* **Nettoyage :**
+    * Aucune suppression de clé n'est gérée manuellement. Le nettoyage se fait naturellement lors de la suppression complète des stores à la création d'un nouveau monde (`database.clearAllObjectStores`).
+
 -----
 
 ## 6\. Interface & Rendu (UI/UX)

@@ -1,6 +1,7 @@
 import {TIME_BUDGET, NODES_LOOKUP, MICROTASK_FN_NAME_TO_KEY} from './constant.mjs'
 import {loadAssets, resolveAssetData} from './assets.mjs'
 import {timeManager, taskScheduler, microTasker, eventBus, seededRNG} from './utils.mjs'
+import {database} from './database.mjs'
 import './ui.mjs'
 
 class GameCore {
@@ -91,8 +92,19 @@ class GameCore {
 
     console.log('🚀 Démarrage de la session...')
 
-    // 1. Récupération des informations en base de données
-    // await database.loadSession(...)
+    // 1. Chargement massif de l'état (1 seule requête DB)
+    // Retourne un objet : {timestamp: 480000, weather: 1, playerPosition: '100|82|1', ...}
+    // const state = await database.getAllGameState()
+    // DEBUG
+    const state = {
+      timestamp: 480 * 1000,
+      weather: 2,
+      nextWeather: 3
+    }
+
+    // 2. Dispatch aux systèmes (Injection de dépendance des données)
+    // Valeur par défaut (480000) gérée si state.timestamp est undefined (nouveau jeu)
+    timeManager.init(state.timestamp, state.weather, state.nextWeather)
 
     // 2. Initialisation des systèmes (Layer 1)
 
@@ -100,11 +112,10 @@ class GameCore {
     seededRNG.init()
 
     // OBLIGATOIRE EN PREMIER POUR QUE LES MANAGERS PUISSENT TRAVAILLER
-    const startTimestamp = 480 * 1000 // sera récupéré depuis la base de données (c'est la valeur à la création du monde)
     microTasker.init()
     microTasker.initDebug(MICROTASK_FN_NAME_TO_KEY)
-    taskScheduler.init(startTimestamp)
-    timeManager.init(startTimestamp) // TODO: startTimestamp, savedWeather , savedNextWeather
+    taskScheduler.init(state.timestamp)
+    timeManager.init(state.timestamp, state.weather, state.nextWeather)
 
     // buffManager.init()
 
