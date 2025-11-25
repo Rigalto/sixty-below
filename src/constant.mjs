@@ -126,6 +126,7 @@ export const TIME_SLOT = ['Midnight', 'Dawn', 'Morning', 'Noon', 'Afternoon', 'D
 export const DB_CONFIG = {
   NAME: 'SixtyBelowDB',
   VERSION: 1,
+  DEBUG: true,
   STORES: {
     WORLD: 'world_chunks', // Stockage des Uint16Array
     PLAYER: 'player_data', // Position, Stats
@@ -150,9 +151,10 @@ export const UI_LAYERS = {
 }
 
 /* =========================================
-   8. COLORS & PALETTES (Fallback)
+   COLORS & PALETTES (Fallback)
    ========================================= */
 
+// pas encore utilisé
 export const PALETTE = {
   DEBUG_GRID: 'rgba(255, 255, 255, 0.1)',
   DEBUG_CHUNK: 'rgba(255, 0, 0, 0.3)',
@@ -160,7 +162,7 @@ export const PALETTE = {
 }
 
 /* =========================================
-   8. DEFINITION DES NOEUDS
+   DEFINITION DES NOEUDS
    ========================================= */
 
 // const tileCode = NODES.CLAY.code

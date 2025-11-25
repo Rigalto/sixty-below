@@ -140,6 +140,29 @@ taskScheduler.enqueueAfter(
 * `randomGaussian(mean?: number, sd?: number): number`
 * `randomLinear(): number`
 
+### Class `Database` (Singleton: `database`)
+
+* `init(): Promise<void>`
+* `clearAllObjectStores(): Promise<void>`
+* `clearObjectStore(storeName: string): Promise<void>`
+* `hasObjetStore(storeName: string): boolean`
+* `countRecords(storeName: string): integer`
+* `getRecordByKey(store, key): Promise<any>`
+* `readAllFromObjectStore(storeName: string): Promise<Array>`
+* `openTransaction(storeNames: string | string[], mode?: string): IDBTransaction`
+* `addOrUpdateRecord (storeName, record, existingTransaction?): Promise<void>`
+* `addOrUpdateOrDeleteRecords(storeName: string, records: Array, transaction?: IDBTransaction): Promise<Array>`
+* `addMultipleRecords(storeName: string, records: Array): Promise<Array>`
+* `batchUpdate(updates: Array<{storeName, record?, delete?, records?}>): Promise<Array>`
+* `deleteRecord(storeName: string, key: any, transaction?: IDBTransaction): Promise<void>`
+* `deleteMultipleRecords(storeName: string, keys: Array): Promise<void>`
+* `getAllGameState(): Promise<any>` - Retourne un objet fusionné (Map clé/valeur)
+* `setGameState(key: string, value, transaction?): Promise`
+* `batchSetGameState(updates: Array): Promise<any>`- Format updates: `{key, value}`
+* `getGameStateValue(key: string): Promise<any>`
+* `backupDatabase(): Promise<void>` - Télécharge un JSON complet.
+* `restoreDatabase(file: File): Promise<void>` - Écrase et remplace la DB depuis un fichier.
+
 ## core.mjs (layer 3)
 
 ### Class GameCore (Singleton: gameCore)
