@@ -152,14 +152,24 @@ export const grassManager = new GrassManager()
 
 ### 3.1 Structure du Monde
 
-  * **Grille 2D de Tuiles (Tilemap) :** 2048 x 768 tuiles. Taille tuile : 16x16px. Tailles fixes non paramétrées.
-  * **Mémoire :** Totalité de la map chargée en TypedArray (Uint8Array ou Uint16Array). Pas de lazy loading depuis la DB pour la map active. Justification : taille de seulement 1.5Mbytes ou 3Mbytes.
-  * **Chunks :** Division logique en 16x16 tuiles (128x48 chunks) pour la gestion des redraws et des updates partiels (6144 chunks).
-  * **Bitmasks :** Utilisation de masques binaires pour coder les propriétés des tuiles (Solide, Liquide, Minable) afin d'éviter les objets JS lourds. Utilisation de masques et de décalages binaires pour effectuer les changements de coordonnées et le calcul des index (`index = (y << 11) & x`).
-  *  **Echelle :** La dimension d'une tuile correspond à 50 centimètres pour le personnage. Le monde fait donc un kilomètre de large et 350 mètre de profond.
-
-__TO DO__ : définir un terme pour le joueur (personnage derrière le clavier) et le personnage dans le monde. Utiliser ensuite ce terme partout.
-__TO DO__ : déterminer si le contenu des tuiles est stocké sur un ou deux octets. Un octet suffit largement pour coder les différents types de briques. Ajouter un deuxième octet permettrait d'ajouter des informations supplémentaires sans devoir utiliser une indirection (tuile bloquée ou non, minable ou non, solide, liquide ou gazeuse, etc.). Trois choix d'implémentation (au moins) sont à analyser : Tuiles codées sur un octet et indirection pour obtenir les informations supplémentaires / Tuiles codées sur deux octets pour éviter les indirections mais sauvegarde également de ces informations en base de données / Deux tableaux, un pour la nature des tuiles et l'autre pour les informations complémentaitres, même index pour accéder aux deux tableaux mais seul le premier est sauvegardé en base de données.
+  * **Grille 2D de Tuiles (Tilemap) :** 2048 (Largeur) x 768 (Hauteur) tuiles. Taille tuile : 16x16px. Tailles fixes non paramétrées.
+  * **Stockage Mémoire (Runtime) :**
+      * **Structure :** Un unique `Uint8Array` (Flat Array) stockant l'ID de la tuile (référence vers `NODES` via `NODES_LOOKUP`).
+      * **Adressage :** Index calculé par opérations binaires : `index = (y << 11) | x`.
+      * **Evolutin :** Si des données supplémentaires sont nécessaires (ex: Murs, Liquides, tuiles bloquées), elles feront l'objet d'uune conception spécifique.
+  * **Optimisation "Ghost Cells" (Padding) :**
+      * Les bords de la carte sont **interdits à la modification** (Immuables) pour supprimer les vérifications de limites (Bounds Checking) dans les boucles critiques.
+      * **Haut (y=0) :** SKY. Permet la détection de surface.
+      * **Bas (y=767) :** LAVA.
+      * **Latéral (x=0 et x=2047) :** Colonnes composées de SKY (haut), SEA (milieu) et BASALT (fond).
+  * **Echelle :** 1 tuile = 50cm. Monde = 1km de large x 380m de haut.
+  * **Classification des Entités (Grid vs Objects) :**
+      * **Tuiles (Grid-based) :** Tout élément structurel répétitif stocké dans le `Uint8Array`.
+          * Comprend : Terrain naturel (Terre, Pierre), Liquides, Vides (SKY, VOID), **Murs de fond** (Background Walls) et Murs de construction (Wood Walls).
+      * **Furniture (Object-based) :** Tout élément posé manuellement par le joueur, stocké dans un Store dédié (`furniture`).
+          * Comprend : Stations de craft, Coffres, Lits, Portes, Feux de camp...
+          * **Cas spécifiques :** Les **Plateformes** et les **Sources de lumière** (Torches, Lampes) sont traitées comme des Furniture (entités libres) et non des Tuiles, pour ne pas bloquer la physique ou l'éclairage de la grille.
+          * Gestion : Un item "Meuble" est dans l'inventaire (`inventory` store) tant qu'il n'est pas posé. Une fois posé, il passe dans le `furniture` store avec ses coordonnées.
 
 ### 3.2 Génération Procédurale
 
@@ -184,6 +194,21 @@ __TO DO__ : déterminer si le contenu des tuiles est stocké sur un ou deux octe
   * **Liquides :** Algorithme custom pour Water, Honey et Sap (paramétrable en fonction de la viscosité) et Automates cellulaires (Cellular Automata) pour le sable.
   * **AI :** Comportements simples (Suit, Fuit, Erre) sans Pathfinding complexe en temps réel.
   * **Performance :** Pas de moteur physique lourd (Matter.js). Implémentation custom légère spécifique aux jeux de tuiles. Pas de projectiles, ni d'effets spéciaux hormis l'animation des sprites.
+
+### 3.4 Simulation & Écosystème
+
+  * **Portée des mises à jour (Update Scope) :**
+      * **Faune (Mobs) :** Gestion stricte dans l'espace visible (Viewport) + Buffer de sécurité ("Active Area"). Les entités hors zone sont désactivées ou despawnées pour économiser le CPU. L'apparition (Spawning) est calculée juste en dehors de la vue pour paraître naturelle.
+      * **Liquides & Physique locale :** La simulation des fluides (eau, miel, sève, sable)
+
+  * **Flore (Global Simulation) :**
+      * La croissance des plantes (Arbres, Buissons, Fleurs) est **décorrélée des chunks**.
+      * Les données sont stockées dans le Store `plant` dédié (Liste clairsemée).
+      * La simulation est temporelle et globale (calcul mathématique basé sur le timestamp), ce qui permet à une forêt de pousser à l'autre bout du monde sans charger les chunks graphiques correspondants.
+
+  * **Régénération :**
+      * Certains matériaux critiques (Minerais rares, Ruches) possèdent des règles de régénération lente déclenchées par des timers globaux, générant des modifications de tuiles ponctuelles.
+      * La lente croissance des toiles d'araignées (tuile spécifique) est déclenchées par des timers globaux, générant des modifications de tuiles ponctuelles.
 
 -----
 
@@ -214,17 +239,21 @@ __TO DO__ : déterminer si le contenu des tuiles est stocké sur un ou deux octe
   * **IndexedDB** native via wrapper custom.
   * Pas de sérialisation JSON complexe : stockage direct des objets JS structurés.
 
-### 5.2 Sauvegarde synchrone
+### 5.2 Sauvegarde et Persistance
 
-* **Stratégie "Write-Behind" :** Les modifications sont signalées (Dirty Flag) et persitées après un délai (2 secondes) via le `TaskScheduler`.
-* **Session :** Gestion transactionnelle pour rollback en cas de crash pendant la sauvegarde.
-* **Configuration :** Table Key-Value pour la métadonnée (Position joueur, Heure monde, Paramètres).
-* **Détail d'implémentation :**
-    * La liste des chunks modifiés est mise à jour par le composant gérant les tuiles et fournie au composant `Database`.
-    * Les autres modifications sont signalées par une API (`database.change(objectStore, operation, record)`). Operation : DB_UPDATE_CREATE, DB_DELETE
-    * Lecture d'un éléments de configuration (`database.getItem(id) => value`)
-    * Ecriture d'un éléments de configuration (paramètre : identifiant (Strong) de l'élément de configuration, valeur de l'élément de configuration)
-    * Conception interne : attention aux problèmes de performance avec les tableaux compacts.
+* **Stratégie "Write-Behind" :**
+    * Les modifications en jeu ne déclenchent pas d'écriture immédiate en base.
+    * Les chunks modifiés sont marqués via un "Dirty Flag" (Set de coordonnées - `(chunk_y << 7) | chunk_x`).
+    * Périodicité : Le `TaskScheduler` déclenche la sauvegarde des chunks 'Dirty' toutes les 2 secondes.
+
+* **Dimensionnement du Transfer Pool (Elastic Pool) :**
+    * **Principe :** Le pool possède une taille initiale fixe (64 buffers) couvrant 99% des cas d'usage pour garantir le "Zero-GC".
+    * **Expansion d'Urgence :** Si le nombre de chunks modifiés dépasse la capacité du pool (Overflow), le système **doit** allouer de nouveaux buffers `Uint8Array` à la volée pour garantir l'intégrité des données.
+    * **Persistance de l'expansion :** Les nouveaux buffers créés sont ajoutés définitivement au pool. Le pool ne réduit jamais sa taille, s'adaptant ainsi dynamiquement aux pics de charge spécifiques du style de jeu du joueur.
+    * **Monitoring :** Toute extension du pool doit générer un avertissement (Error) dans la console pour permettre l'analyse et l'ajustement de la taille initiale dans les futures versions.
+
+* **Session Transactionnelle :**
+    * Une sauvegarde englobe les chunks modifiés ET les métadonnées critiques (Inventaire, Position) dans une même transaction pour garantir la cohérence en cas de crash. Elle s'effectue en utilisant `database.batchUpdate`.
 
 ### 5.3 Gestion de l'État Global (GameState Pattern)
 
