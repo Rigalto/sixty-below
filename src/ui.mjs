@@ -93,39 +93,25 @@ class EnvironmentOverlay {
   #bindEvents () {
     // Mise à jour atomique par type d'événement
 
-    // Clock -> Time & Day
-    // TODO: utiliser l'eventBus 'time/every-5-minutes'
-    eventBus.on('time/clock', this.#updateClock.bind(this))
+    // Clock -> Time & Day (mesure : 50µs, microtask inutile)
+    eventBus.on('time/clock', this.#updateClockEnvironment.bind(this)) // TODO: utiliser l'eventBus 'time/every-5-minutes'
 
-    // Daily -> Day, Weather & Moon
+    // Daily -> Day, Weather & Moon (mesure : 100µs, microtask inutile)
     eventBus.on('time/daily', this.#updateEnvironment.bind(this))
 
-    // Init Global -> Tout mettre à jour
-    eventBus.on('time/first-loop', (data) => {
-      this.#updateClock(data)
-      this.#updateEnvironment(data)
-      this.#updateSkyBorder(data.skyColor)
-    })
+    // Init Global -> Tout mettre à jour (estimation : 150µs, microtask inutile car acceptable lors de l'init)
+    eventBus.on('time/first-loop', this.#firstloopEnvironment.bind(this))
 
-    // Sky Color -> Juste la bordure (Debug visuel)
+    // Sky Color -> Juste la bordure (Debug visuel) - TODO: à supprimer
     eventBus.on('time/sky-color-changed', this.#updateSkyBorder.bind(this))
 
-    // Events de Buffs
-    eventBus.on('buff/display-time-precision', (lvl) => {
-      this.buffs.timePrecision = lvl
-    })
-    eventBus.on('buff/display-moon-detail', (active) => {
-      this.buffs.moonDetail = active
-      // On utilise la valeur en cache pour redessiner avec la nouvelle précision
-      if (this.lastState.moonPhase !== -1) {
-        this.#updateMoon(this.lastState.moonPhase)
-      }
-    })
-
-    eventBus.on('buff/display-next-weather', (active) => {
-      this.dom.weatherNext.style.display = active ? 'block' : 'none'
-    })
-
+    // Buff de précision d'affichage du temps (estimation : 10µs, microtask inutile)
+    eventBus.on('buff/display-time-precision', this.#toggleTimePrecision.bind(this))
+    // (estimation : 50µs, microtask inutile)
+    eventBus.on('buff/display-moon-detail', this.#toggleMoonDetail.bind(this))
+    // (estimation : 10µs, microtask inutile)
+    eventBus.on('buff/display-next-weather', this.#toggleNextWeather.bind(this))
+    // (estimation : 50µs, microtask inutile)
     eventBus.on('buff/display-coords', this.#toggleCoords.bind(this))
 
     // TODO: Future: player/move -> Coords
@@ -136,7 +122,14 @@ class EnvironmentOverlay {
      UPDATES ATOMIQUES (Performance)
      ========================================= */
 
-  #updateClock ({hour, minute}) {
+  #firstloopEnvironment (data) {
+    this.#updateClockEnvironment(data)
+    this.#updateEnvironment(data)
+    this.#updateSkyBorder(data.skyColor) // TODO: à supprimer
+  }
+
+  // temps d'exécution mesuré à 0.05 ms
+  #updateClockEnvironment ({hour, minute}) {
     // 2. Update Time (Fréquent)
     // Logique de "Fuzzy Time" (Simulée ici, à connecter aux Buffs plus tard)
     // TODO: Vérifier buff 'clock_precision'
@@ -206,6 +199,18 @@ class EnvironmentOverlay {
   #updateSkyBorder (color) {
     this.container.style.borderLeft = `5px solid ${color}`
   }
+
+  #toggleNextWeather (active) {
+    this.dom.weatherNext.style.display = active ? 'block' : 'none'
+  }
+
+  #toggleMoonDetail (active) {
+    this.buffs.moonDetail = active
+    // On utilise la valeur en cache pour redessiner avec la nouvelle précision
+    if (this.lastState.moonPhase !== -1) { this.#updateMoon(this.lastState.moonPhase) }
+  }
+
+  #toggleTimePrecision (lvl) { this.buffs.timePrecision = lvl }
 
   #toggleCoords (isActive) {
     if (this.buffs.coords === isActive) return // Pas de changement

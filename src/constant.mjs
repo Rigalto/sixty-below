@@ -127,16 +127,26 @@ export const DB_CONFIG = {
   NAME: 'SixtyBelowDB',
   VERSION: 1,
   DEBUG: true,
-  STORES: {
-    WORLD: 'world_chunks', // Stockage des Uint16Array
-    PLAYER: 'player_data', // Position, Stats
-    CONFIG: 'game_config', // Time, Seed
-    INVENTORY: 'inventory', // Items, Gears, Chests
-    BUFF: 'buff', // Buffs/Debuffs
-    PLANT: 'plant', // Trees, Herbs, Mushrooms, Flowers, Corals
-    MONSTER: 'monster', // Enemies, Criters, Bosses
-    FURNITURE: 'furniture' // Furniture (Housing), Crafting Station
-  }
+  STORES: [
+    'world_chunks', // Stockage des Uint16Array
+    'player_data', // Position, Stats
+    'game_config', // Time, Seed
+    'inventory', // Items, Gears, Chests
+    'buff', // Buffs/Debuffs
+    'plant', // Trees, Herbs, Mushrooms, Flowers, Corals
+    'monster', // Enemies, Criters, Bosses
+    'furniture' // Furniture (Housing), Crafting Station
+  ]
+  // STORES1: {
+  //   WORLD: 'world_chunks', // Stockage des Uint16Array
+  //   PLAYER: 'player_data', // Position, Stats
+  //   CONFIG: 'game_config', // Time, Seed
+  //   INVENTORY: 'inventory', // Items, Gears, Chests
+  //   BUFF: 'buff', // Buffs/Debuffs
+  //   PLANT: 'plant', // Trees, Herbs, Mushrooms, Flowers, Corals
+  //   MONSTER: 'monster', // Enemies, Criters, Bosses
+  //   FURNITURE: 'furniture' // Furniture (Housing), Crafting Station
+  // }
 }
 
 /* =========================================
@@ -307,8 +317,8 @@ for (const key in NODES) {
    ========================================= */
 
 export const MICROTASK = {
-  WORLD_RENDERER_UPDATE: {priority: 52, capacity: 15, taskName: 'updateOneChunkPerFrame'}, // exemple #1
-  WORLD_RENDERER_ADD: {priority: 50, capacity: 15, taskName: 'addOneChunkPerFrame'} // exemple #1
+  UI_ENV_UPDATE: {priority: 20, capacity: 2, taskName: 'updateClockInOverlay'}, // exemple #1
+  RENDER_DEBUG_OVERLAY: {priority: 10, capacity: 4, taskName: 'renderDebugOverlay'} // affichage des informations de débug (temps exéec et taille files)
 }
 
 export const MICROTASK_FN_NAME_TO_KEY = Object.keys(MICROTASK).reduce((acc, key) => {

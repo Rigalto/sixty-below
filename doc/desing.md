@@ -295,6 +295,7 @@ L'architecture sépare la logique (UI Logic) du rendu pur (Render) et distingue 
 │   │                        # - Logic : InventorySystem (Slots, Stacking, Drag&Drop logic), CraftSystem (Recettes, validation)
 │   │                        # - DOM Managers : InventoryPanel, HelpPanel, PreferencePanel (configuration UI, clavier, souris...)
 │   │                        # - Canvas Managers : HotbarOverlay, EnvironmentOverlay (Draw logic)
+│   ├── ui-debug.mjs         # INTERFACE PANEL/DOM uniquement dédiée au debug
 │   ├── render.mjs           # GRAPHICS : MainRenderer (Canvas Context management), Camera (Viewport, Culling, Zoom), SpriteManager (Animations, Batching virtuel)
 │   ├── generate.mjs         # PROC-GEN : Algorithmes de génération (Dynamic Import)
 │   └── core.mjs             # SYSTEM : GameLoop (Update/Render/MicroTask), InputManager (Keyboard/Mouse listeners)

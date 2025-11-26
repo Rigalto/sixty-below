@@ -66,11 +66,12 @@ const tileDesc = NODES_LOOKUP[tileCode]
 import {MICROTASK} from './constant.mjs'
 import {microTasker} from './utils.mjs'
 
-// 1. Récupération de la configuration depuis les constantes
+// 1. Récupération de la configuration depuis les constantes : **Obligatoire**
 const {priority, capacity} = MICROTASK.SYSTEM_ACTION_NAME
 
 // 2. Enregistrement de la tâche
 // capacity correspond à 'capacityUnits' (1 unit = 0.25ms)
+// fonctions anonymes interdites, this.myMethod doit avoir été bindée à this
 microTasker.enqueue(this.myMethod, priority, capacity, arg1, arg2)
 ```
 

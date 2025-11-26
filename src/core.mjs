@@ -3,6 +3,7 @@ import {loadAssets, resolveAssetData} from './assets.mjs'
 import {timeManager, taskScheduler, microTasker, eventBus, seededRNG} from './utils.mjs'
 import {database} from './database.mjs'
 import './ui.mjs'
+import './ui-debug.mjs'
 
 class GameCore {
   constructor () {
@@ -32,8 +33,10 @@ class GameCore {
     // 1. Chargement des Assets (Bloquant)
     await loadAssets()
 
-    // 2. Hydratation des bases de données statiques
-    // On sépare les logiques pour la lisibilité
+    // 2. Ouverture de la base de données IndexedDB
+    database.init()
+
+    // 2. Hydratation des données statiques
     this.#hydrateNodes()
     this.#hydrateItems()
     // this._hydrateBuffs() ...
@@ -221,6 +224,14 @@ class GameCore {
     if (budgetMicrotask > 0) {
       microTasker.update(budgetMicrotask)
     }
+
+    // //////////// //
+    // DEBUG SAMPLE //
+    // //////////// //
+
+    // On mesure le temps passé dans microTasker
+    const durationMicro = performance.now() - executionStart - timeUsed
+    eventBus.emit('debug/frame-sample', {updateTime: durationUpdate, renderTime: durationRender, microTime: durationMicro})
   }
 
   /* =========================================
