@@ -31,20 +31,19 @@ export const GAME_STATE = {
    ========================================= */
 
 // Dimensions fondamentales (cf. Design 3.1)
-export const TILE_SIZE = 16 // pixels
-export const CHUNK_SIZE = 16 // tuiles
+// export const TILE_SIZE = 16 // pixels
+// export const CHUNK_SIZE = 16 // tuiles
 
-// Dimensions du Monde (Fixe)
-export const WORLD_WIDTH = 2048 // tuiles
-export const WORLD_HEIGHT = 768 // tuiles
+// Dimensions du Monde (Fixes)
+export const WORLD_WIDTH = 1024 // tuiles
+export const WORLD_HEIGHT = 512 // tuiles
 
 // Dimensions du Monde en Chunks
-export const WORLD_WIDTH_CHUNKS = WORLD_WIDTH / CHUNK_SIZE // 128
-export const WORLD_HEIGHT_CHUNKS = WORLD_HEIGHT / CHUNK_SIZE // 48
-export const TOTAL_CHUNKS = WORLD_WIDTH_CHUNKS * WORLD_HEIGHT_CHUNKS // 6144
+// export const WORLD_WIDTH_CHUNKS = WORLD_WIDTH / CHUNK_SIZE // 128
+// export const WORLD_HEIGHT_CHUNKS = WORLD_HEIGHT / CHUNK_SIZE // 48
 
 // Échelle physique
-export const PIXEL_TO_METER = 0.03125 // 1px = 1/32m (donc 16px = 0.5m)
+// export const PIXEL_TO_METER = 0.03125 // 1px = 1/32m (donc 16px = 0.5m)
 
 /* =========================================
    3. BITWISE OPERATIONS & OPTIMIZATIONS
