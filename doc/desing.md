@@ -91,8 +91,7 @@ Distinction stricte entre :
 
 * **Temps Réel (Playtime) :** Nombre de ms écoulées moteur allumé (depuis la création du monde). Utilisé par le `TaskScheduler`.
 * **Temps Monde :** Calculé à partir du Playtime (Ratio 1000ms réelles = 1 min monde). Utilisé pour l'affichage et les cycles jour/nuit.
-
-Détails d'implémentaton :
+* **Détails d'implémentaton :**
   * **Initialisation :** A la création du monde, la date est initialisée à : Jour 1 - 8h00.
   * **Incrémentation :** La date est incrémentée dans la Game Loop (budget **Update**, état `STATE_EXPLORATION`)
   * **Persistence :** La date est sauvegardée en base de données et récupérée au lancement de l'application
@@ -107,10 +106,12 @@ Pour garantir la stabilité du chargement, l'application respecte 4 niveaux de d
 * **Layer 1 (Kernel) :** `utils.mjs`, `database.mjs`, `assets.mjs`
     * Contrainte : N'importent que la Layer 0.
     * Rôle : Outils, Accès DB, Chargement & Parsing des ressources.
+    * Précision Accès DB : `database.mjs` est un driver pur (Get/Set/Batch). Il ne connaît ni le `ChunkManager` ni le `Player`.
 * **Layer 2 (Systems - Interdependent) :** `world.mjs`, `action.mjs`, `buff.mjs`, `combat.mjs`, `ui.mjs`, `render.mjs`...
     * Comportement : Peuvent s'importer mutuellement.
     * Sécurité : Utilisation obligatoire du pattern init() pour les interactions croisées.
     * Exception : `generate.mjs` est isolé (importé dynamiquement ou statiquement sans dépendance retour).
+    * Persistance : `persistence.mjs` (`SaveManager`) importe le Driver (Layer 1 - `database.mjs`), mémorise la liste des enregistrements provenant des Managers de données (Layer 2) pour orchestrer la sauvegarde toutes les 2 secondes.
 * **Layer 3 (Application) :** `core.mjs`
     * Rôle : Point d'entrée. Importe les Layers 0, 1, 2. Orchestre l'initialisation séquentielle.
 
@@ -152,17 +153,21 @@ export const grassManager = new GrassManager()
 
 ### 3.1 Structure du Monde
 
-  * **Grille 2D de Tuiles (Tilemap) :** 2048 (Largeur) x 768 (Hauteur) tuiles. Taille tuile : 16x16px. Tailles fixes non paramétrées.
+  * **Grille 2D de Tuiles (Tilemap) :** 1024 (Largeur) x 512 (Hauteur) tuiles. Taille tuile : 16x16px. Tailles fixes non paramétrées.
+  * **Implémentation :**  [`world.mjs :: ChunkManager`] : Singleton maître de la donnée.
+      * Stockage : `Uint8Array` unique (1 octet par tuile).
+      * Optimisation : Utilisation stricte d'opérations bitwise (>> 4, & 15) pour les conversions de coordonnées.
+      * Dirty Flags : Maintient deux listes de chunks modifiés : `dirtyRenderChunks` (pour le Renderer) et `dirtySaveChunks` (pour la Persistence).
   * **Stockage Mémoire (Runtime) :**
       * **Structure :** Un unique `Uint8Array` (Flat Array) stockant l'ID de la tuile (référence vers `NODES` via `NODES_LOOKUP`).
-      * **Adressage :** Index calculé par opérations binaires : `index = (y << 11) | x`.
+      * **Adressage :** Index calculé par opérations binaires : `index = (y << 10) | x`. Cet index sera utilisé comme référence unique à une tuile (on utilise **jamais** une String `x_y`).
       * **Evolutin :** Si des données supplémentaires sont nécessaires (ex: Murs, Liquides, tuiles bloquées), elles feront l'objet d'uune conception spécifique.
   * **Optimisation "Ghost Cells" (Padding) :**
       * Les bords de la carte sont **interdits à la modification** (Immuables) pour supprimer les vérifications de limites (Bounds Checking) dans les boucles critiques.
       * **Haut (y=0) :** SKY. Permet la détection de surface.
-      * **Bas (y=767) :** LAVA.
-      * **Latéral (x=0 et x=2047) :** Colonnes composées de SKY (haut), SEA (milieu) et BASALT (fond).
-  * **Echelle :** 1 tuile = 50cm. Monde = 1km de large x 380m de haut.
+      * **Bas (y=511) :** LAVA.
+      * **Latéral (x=0 et x=1023) :** Colonnes composées de DEEPSKY (haut), DEEPSEA (milieu) et BASALT (fond).
+  * **Echelle :** 1 tuile = 50cm. Monde = 510 de large x 254m de haut.
   * **Classification des Entités (Grid vs Objects) :**
       * **Tuiles (Grid-based) :** Tout élément structurel répétitif stocké dans le `Uint8Array`.
           * Comprend : Terrain naturel (Terre, Pierre), Liquides, Vides (SKY, VOID), **Murs de fond** (Background Walls) et Murs de construction (Wood Walls).
@@ -170,6 +175,7 @@ export const grassManager = new GrassManager()
           * Comprend : Stations de craft, Coffres, Lits, Portes, Feux de camp...
           * **Cas spécifiques :** Les **Plateformes** et les **Sources de lumière** (Torches, Lampes) sont traitées comme des Furniture (entités libres) et non des Tuiles, pour ne pas bloquer la physique ou l'éclairage de la grille.
           * Gestion : Un item "Meuble" est dans l'inventaire (`inventory` store) tant qu'il n'est pas posé. Une fois posé, il passe dans le `furniture` store avec ses coordonnées.
+  * **Map :** pour le débug, on pourra afficher la totalité de la carte à l'échelle 1/16 en utilisant la couleur dominante (attribut `color` de `NODES`). Affichage par la touche 'M', Disparition par 'M' ou 'Escape'.
 
 ### 3.2 Génération Procédurale
 
@@ -255,6 +261,13 @@ export const grassManager = new GrassManager()
 * **Session Transactionnelle :**
     * Une sauvegarde englobe les chunks modifiés ET les métadonnées critiques (Inventaire, Position) dans une même transaction pour garantir la cohérence en cas de crash. Elle s'effectue en utilisant `database.batchUpdate`.
 
+ * **Orchestrateur [`persistence.mjs :: SaveManager`] :**
+    * Module de Layer 2 qui utilise le `TaskScheduler` (toutes les 2s).
+    * Interroge `ChunkManager` pour récupérer les deltas (Dirty Chunks), puis Formate les données brutes.
+    * Récupère les records à créer/modifier/supprimer, informations envoyées les managers de données (InventoryManager, PlayerManager, Flore, Faune, Meubles...). Du point de vue des managers de données : Fire & Forget.
+    * Appelle `database.mjs` (Layer 1) pour l'écriture physique (batchUpdate).
+    * Confirme la sauvegarde à `ChunkManager` pour qu'ils nettoient leurs Dirty Flags.
+
 ### 5.3 Gestion de l'État Global (GameState Pattern)
 
 Le `gamestate` est un stockage clé/valeur (K/V) utilisé pour persister les états dispersés des différents systèmes (Météo, Temps, Stats joueur, Flags divers, etc.).
@@ -271,6 +284,17 @@ Le `gamestate` est un stockage clé/valeur (K/V) utilisé pour persister les ét
     * L'utilisation de `database.getGameStateValue(key)` est **déconseillée** pendant le jeu. Les Managers doivent utiliser leurs propres variables membres.
 * **Nettoyage :**
     * Aucune suppression de clé n'est gérée manuellement. Le nettoyage se fait naturellement lors de la suppression complète des stores à la création d'un nouveau monde (`database.clearAllObjectStores`).
+
+### 5.4 Identifiants Logiques vs Physiques
+
+* **Problème :** La création d'entités en base de données (`IndexedDB`) est asynchrone et génère des clés primaires (Physical ID - attribut `key`) *a posteriori* (Fire & Forget). Cela empêche de lier des entités entre elles (ex: un Arbre et ses Champignons) lors de leur instanciation en mémoire si l'on doit attendre le retour de la base.
+* **Solution:** Utilisation d'un **Identifiant Logique (UID)** généré par l'application au moment de l'instanciation.
+    * Permet de créer des graphes d'objets complets en mémoire avant même que la sauvegarde ne soit lancée.
+    * L'UID est stocké dans le record et sert de référence pour les liens (parent/enfant/voisins).
+    * La clé physique (IndexedDB Key) reste utilisée pour l'indexation interne du moteur de stockage, mais n'est pas exposée à la logique métier pour les liaisons.
+* **Génération :** Algorithme à "Graine + Suffixe".
+    * Pour optimiser les E/S, la graine (Seed) n'est sauvegardée qu'une fois toutes les 26 générations.
+    * En cas de redémarrage, on saute systématiquement à la graine suivante pour garantir l'unicité, acceptant des "trous" dans la séquence d'IDs.
 
 -----
 
@@ -294,6 +318,19 @@ L'interface est divisée en couches HTML superposées pour optimiser les redraws
 * **Asset Hydration (Zero-Cost Runtime) :** Les coordonnées de texture (sx, sy, sw, sh) et les index d'images sont calculés une seule fois au démarrage via `assets.mjs`. Le moteur de rendu accède à des entiers pré-calculés, jamais à des chaînes de caractères ou des calculs de grille pendant la frame.
 * **Framing (Auto-tiling) :** Bitmasking (4-connectivity) calculé à la volée ou au chargement pour les transitions de textures.
 * **Conversions :** Chunk -> Image via OffscreenCanvas (MicroTask) pour mettre en cache les chunks statiques. Mise à jour uniquement si modification (dirty flag)
+* **Diffusion :** Pour rendre plus naturelle la transition entre deux tuiles, elles ont un bord de 2 pixels partiellement transparent. Les pixels transparents sont peints de la couleur dominante des tuiles adjacentes.
+
+### 6.2 Implémentation [`render.mjs :: WorldRenderer`] :**
+    * Ne stocke aucune donnée de jeu. Lit exclusivement le `ChunkManager`.
+    * Cache : Utilise un pool d'OffscreenCanvas (ou Canvas cachés) par chunk visible.
+    * Camera : Singleton responsable uniquement des mathématiques de projection (World <-> Screen), du Culling (Quels chunks sont visibles ?) et du zoom.
+
+### 6.3 Organisation spatiale
+
+* **Taille des Canvas :** Le monde est affiché dans un canvas de 4 chunks de large (1024 pixels) et 3 chunks de haut (768 pixels).
+* **Centrage :** Ces canvas sont centrés dans l'écran physique.
+* **Overlays de jeu :** Les overlays affichés pendant le jeu (pendant le temps réel) sont collés sur les bords de l'écran (avec un padding de 10px pour l'esthétique). Sur grand écran, ils n'empiètent pas sur l'affichage du monde.
+* **Overlays de jeu :** Les overlays qui interrompent le déroulement du jeu (inventaire, craft, aide, paramètres...) sont affichés centrés sur l'écran. Ils peuvent s'empiler les uns sur les autres.
 
 -----
 
@@ -313,9 +350,11 @@ L'architecture sépare la logique (UI Logic) du rendu pur (Render) et distingue 
 │   ├── constant.mjs         # CONFIG : Constantes, Enums (State, Biome, ItemType), Bitmasks
 │   ├── assets.mjs           # RESOURCES : Loader (Images/Sons), Parser (Atlas Grid), Resolver (String -> UV Coords)
 │   ├── utils.mjs            # TOOLS : MicroTasker, TaskScheduler, EventBus, TimeManager, Math, Helpers, Random custom, TimeManager
-│   ├── database.mjs         # STORAGE : IDBWrapper (IndexedDB abstraction), SaveManager
+│   ├── database.mjs         # DRIVER / STORAGE : IDBWrapper (Abstraction bas niveau IndexedDB). Aucune logique métier.
 │   ├── world.mjs            # PHYSICS : ChunkManager (Grid storage), PhysicsSystem (AABB Collisions, Gravity, Velocity), LiquidSimulator
-│   ├── action.mjs           # GAMEPLAY : ActionManager (Mining, Cutting, Fishing, Foraging...)
+│   ├── world.mjs            # DATA & PHYSICS : ChunkManager (Uint8Array Grid storage, Dirty Flags), PhysicsSystem (AABB Collisions, Gravity, Velocity), LiquidSimulator.
+│   ├── persistence.mjs      # ORCHESTRATOR : SaveManager. Coordonne la sauvegarde (Player/World/Flore/Faune -> Database).
+├── action.mjs           # GAMEPLAY : ActionManager (Mining, Cutting, Fishing, Foraging...)
 │   ├── player.mjs           # PLAYER : PlayerManager (Déplacement, animation des actions, équipement, caractéristiques), LifeManager
 │   ├── buff.mjs             # BUFFS/DEBUFFS : BuffManager, EffectDefinitions, StatModifiers (Middleware de calcul des bonus/malus), BuffDisplay (dans un Canvas en overlay)
 │   ├── housing.mjs          # HOUSING : FurnitureManager (Placememnt/suppression Furniture/Crafting Station), HousingManager, Buffs
@@ -325,7 +364,7 @@ L'architecture sépare la logique (UI Logic) du rendu pur (Render) et distingue 
 │   │                        # - DOM Managers : InventoryPanel, HelpPanel, PreferencePanel (configuration UI, clavier, souris...)
 │   │                        # - Canvas Managers : HotbarOverlay, EnvironmentOverlay (Draw logic)
 │   ├── ui-debug.mjs         # INTERFACE PANEL/DOM uniquement dédiée au debug
-│   ├── render.mjs           # GRAPHICS : MainRenderer (Canvas Context management), Camera (Viewport, Culling, Zoom), SpriteManager (Animations, Batching virtuel)
+│   ├── render.mjs           # GRAPHICS : WorldRenderer (OffscreenCanvas Cache), Camera (Maths & Culling), SpriteManager (Animations, Batching virtuel).
 │   ├── generate.mjs         # PROC-GEN : Algorithmes de génération (Dynamic Import)
 │   └── core.mjs             # SYSTEM : GameLoop (Update/Render/MicroTask), InputManager (Keyboard/Mouse listeners)
 ├── /tests                   # Tests unitaires

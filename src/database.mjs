@@ -516,3 +516,70 @@ class DataBase {
   }
 }
 export const database = new DataBase()
+
+/* ====================================================================================================
+   GENERATEUR IDENTIFIANTS UNIQUES
+   ==================================================================================================== */
+
+/**
+ * Générateur d'identifiants uniques (Logique).
+ * Pattern: Graine (Persistée) + Suffixe (Volatile).
+ * Optimisation: Sauvegarde en DB uniquement lors du changement de graine (tous les 26 IDs).
+ */
+class UniqueIdGenerator {
+  #currentSeed
+  #currentSuffix
+
+  /**
+   * Initialise le générateur au début de la session.
+   * @param {string} lastSavedSeed - La dernière graine connue en base de données.
+   */
+  init (lastSavedSeed) {
+    // Au démarrage, on ne sait pas où on s'est arrêté dans le suffixe (a-z).
+    // On incrémente donc forcément la graine pour éviter les collisions.
+    this.#generateNextSeed(lastSavedSeed || 'a')
+  }
+
+  /**
+   * Retourne un nouvel ID unique.
+   * @returns {string} ID unique (ex: "aba", "abb")
+   */
+  getUniqueId () {
+    // Rotation du suffixe
+    if (this.#currentSuffix === 'z') {
+      this.#generateNextSeed(this.#currentSeed)
+    } else {
+      const charCode = this.#currentSuffix.charCodeAt(0)
+      this.#currentSuffix = String.fromCharCode(charCode + 1)
+    }
+    return this.#currentSeed + this.#currentSuffix
+  }
+
+  /**
+   * Calcule la graine suivante (Base 26 : a -> z -> aa -> ab...).
+   * @param {string} seed
+   * @returns {string} Nouvelle graine
+   */
+  #generateNextSeed (seed) {
+    const chars = seed.split('')
+    let i = chars.length - 1
+
+    while (i >= 0) {
+      if (chars[i] === 'z') {
+        chars[i] = 'a'
+        i--
+      } else {
+        chars[i] = String.fromCharCode(chars[i].charCodeAt(0) + 1)
+        break
+      }
+    }
+
+    if (i < 0) { chars.unshift('a') } // Ajoute un 'a' au début si nécessaire
+
+    this.#currentSeed = chars.join('')
+    this.#currentSuffix = 'a'
+    database.setGameState('unique_id_seed', this.#currentSeed)
+  }
+}
+
+export const uniqueIdGenerator = new UniqueIdGenerator()

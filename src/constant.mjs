@@ -318,7 +318,7 @@ for (const key in NODES) {
 
 export const MICROTASK = {
   UI_ENV_UPDATE: {priority: 20, capacity: 2, taskName: 'updateClockInOverlay'}, // exemple #1
-  RENDER_DEBUG_OVERLAY: {priority: 10, capacity: 4, taskName: 'renderDebugOverlay'} // affichage des informations de débug (temps exéec et taille files)
+  RENDER_DEBUG_OVERLAY: {priority: 10, capacity: 2, taskName: 'renderDebugOverlay'} // affichage des informations de débug (temps exéec et taille files)
 }
 
 export const MICROTASK_FN_NAME_TO_KEY = Object.keys(MICROTASK).reduce((acc, key) => {

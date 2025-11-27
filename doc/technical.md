@@ -141,6 +141,8 @@ taskScheduler.enqueueAfter(
 * `randomGaussian(mean?: number, sd?: number): number`
 * `randomLinear(): number`
 
+## database.mjs (layer 1)
+
 ### Class `Database` (Singleton: `database`)
 
 * `init(): Promise<void>`
@@ -163,6 +165,12 @@ taskScheduler.enqueueAfter(
 * `getGameStateValue(key: string): Promise<any>`
 * `backupDatabase(): Promise<void>` - Télécharge un JSON complet.
 * `restoreDatabase(file: File): Promise<void>` - Écrase et remplace la DB depuis un fichier.
+
+### Class `UniqueIdGenerator` (Singleton: `uniqueIdGenerator`)
+
+Génère des IDs logiques alphabétiques uniques (ex: `aab`, `aac`).
+* `init(lastSavedSeed?: string): void` : À appeler au démarrage avec la valeur stockée en DB (sans paramètre avant la création d'un nouveau monde).
+* `getUniqueId(): string` : Retourne un ID unique
 
 ## core.mjs (layer 3)
 
