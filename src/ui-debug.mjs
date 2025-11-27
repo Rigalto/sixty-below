@@ -153,5 +153,106 @@ class RealtimeDebugOverlay {
     this.frameCount = 64
   }
 }
-
 export const realtimeDebugOverlay = new RealtimeDebugOverlay()
+
+/* ====================================================================================================
+   AFFICHE LA CARTE COMPLETE DU MONDE (1px = 1 tuile)
+   ==================================================================================================== */
+
+class WorldMapDebug {
+  constructor () {
+    this.canvas = null
+    this.ctx = null
+    this.imageDataForMap = null
+
+    // Cache de couleurs : Index ID -> {r, g, b}
+    // Évite le parsing Hex dans la boucle critique
+    this.colorCache = new Array(256).fill(null)
+
+    this.#initCanvas()
+    this.#initColorCache()
+    this.#bindEvents()
+  }
+
+  #initCanvas () {
+    this.canvas = document.createElement('canvas')
+    this.canvas.width = WORLD_WIDTH
+    this.canvas.height = WORLD_HEIGHT
+
+    // Centré à l'écran, bordure noire, masqué par défaut
+    Object.assign(this.canvas.style, {
+      position: 'fixed',
+      top: '50%',
+      left: '50%',
+      transform: 'translate(-50%, -50%)',
+      zIndex: '5000',
+      border: '4px solid #000',
+      backgroundColor: '#000',
+      display: 'none',
+      boxShadow: '0 0 20px rgba(0,0,0,0.5)',
+      imageRendering: 'pixelated'
+    })
+
+    document.body.appendChild(this.canvas)
+    this.ctx = this.canvas.getContext('2d', {alpha: false}) // Opaque pour perf
+  }
+
+  #initColorCache () {
+    // Pré-calcul des couleurs pour chaque Node ID
+    // On parcourt le tableau de lookup existant
+    for (let i = 0; i < NODES_LOOKUP.length; i++) {
+      const node = NODES_LOOKUP[i]
+      if (node && node.color) {
+        this.colorCache[i] = node.rgbColor
+      }
+    }
+  }
+
+  #bindEvents () {
+    eventBus.on('debug/map-display', this.drawMap.bind(this))
+    eventBus.on('debug/map-hide', this.hideMap.bind(this))
+  }
+
+  drawMap () {
+    const t1 = performance.now()
+
+    // Affichage
+    this.canvas.style.display = 'block'
+
+    // Création ou réutilisation ImageData
+    if (this.imageDataForMap === null) {
+      this.imageDataForMap = this.ctx.createImageData(WORLD_WIDTH, WORLD_HEIGHT)
+    }
+
+    const targetData = this.imageDataForMap.data
+
+    // Récupération des données brutes du ChunkManager (Flat Array)
+    const worldData = chunkManager.getRawData()
+    const len = worldData.length
+
+    // Boucle linéaire (Plus rapide que les boucles X/Y imbriquées)
+    // index i correspond exactement à la position du pixel dans imageData (divisé par 4)
+    for (let i = 0; i < len; i++) {
+      const tileCode = worldData[i]
+      const color = this.colorCache[tileCode]
+
+      // Position dans le buffer image (4 composantes par pixel)
+      const pos = i << 2
+
+      targetData[pos] = color.r
+      targetData[pos + 1] = color.g
+      targetData[pos + 2] = color.b
+      targetData[pos + 3] = 255 // Alpha opaque
+    }
+
+    this.ctx.putImageData(this.imageDataForMap, 0, 0)
+
+    const t2 = performance.now()
+    console.log('[WorldMapDebug] Draw:', (t2 - t1).toFixed(2), 'ms')
+  }
+
+  hideMap () {
+    this.canvas.style.display = 'none'
+  }
+}
+export const worldMapDebug = new WorldMapDebug()

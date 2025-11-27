@@ -262,21 +262,21 @@ export const NODES = {
    ========================================= */
 export const NODES_LOOKUP = [] // Array Lookup
 
-// const hexToRgb = (hex) => {
-//   if (!hex) return 'rgb(0,0,0)'
-//   let h = hex.startsWith('#') ? hex.slice(1) : hex
-//   const r = parseInt(h.slice(0, 2), 16)
-//   const g = parseInt(h.slice(2, 4), 16)
-//   const b = parseInt(h.slice(4, 6), 16)
-//   return `rgb(${r}, ${g}, ${b})`
-// }
+const hexToRgb = (hex) => {
+  if (!hex) return {r: 0, g: 0, b: 0, rgb: 'rgb(0,0,0)'}
+  const h = hex.startsWith('#') ? hex.slice(1) : hex
+  const r = parseInt(h.slice(0, 2), 16)
+  const g = parseInt(h.slice(2, 4), 16)
+  const b = parseInt(h.slice(4, 6), 16)
+  return {r, g, b, rgb: `rgb(${r}, ${g}, ${b})`}
+}
 
 for (const key in NODES) {
   const nodeDesc = NODES[key]
   NODES_LOOKUP[nodeDesc.code] = nodeDesc
   // Préparation pour hydratation (sera remplacé par assets.mjs)
   nodeDesc.renderData = null
-  //  nodeDesc.rgbColor = hexToRgb(nodeDesc.color) // décommenter si utile
+  nodeDesc.rgbColor = hexToRgb(nodeDesc.color)
 }
 
 // CI-DESSOUS A SUPPRIMER
