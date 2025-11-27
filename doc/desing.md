@@ -59,22 +59,39 @@ Priorité au **Data-Oriented Design** pour la performance.
 
 ### 2.3 Gestion des États (State Machine)
 
-Le jeu bascule entre trois états majeurs qui changent les inputs et l'interface :
+L'état du jeu définit quels sous-systèmes sont actifs (boucle principale et overlay temps réel / overlays qui bloquent le temps réel / génération d'un nouveau monde). L'``InputManager`` est l'autorité qui détient l'état courant (Pattern Input Authority).
 
-  * `STATE_EXPLORATION` : Moteur physique actif, Inputs temps réel
-  * `STATE_INFORMATION` : Moteur physique figé, affichage de panels d'information (inventaire, craft, carte, équipement, boutique, aide en ligne...), création du monde
-  * `STATE_COMBAT` : Moteur physique figé, Inputs tour par tour, HUD tactique.
+  * `STATE_EXPLORATION` (0) :
+      * Physique : Active (Mouvement fluide, Gravité).
+      * Rendu du monde : Rafraîchissement constant (60 FPS).
+      * MicroTasker et TaskScheduler : Actifs.
+      * Inputs : Polling
+          * Bitmask pour les touches clavier de mouvement
+          * Position souris
+          * click gauche / droit souris
+          * molette souris
+  * `STATE_INFORMATION` (1) :
+      * Déclencheur : Ouverture d'un overlay (Inventaire, Craft, Aide).
+      * Physique : Hard Stop (Figée). Le DeltaTime n'est plus calculé.
+      * Rendu du monde : Hard Stop (Figée).
+      * MicroTasker et TaskScheduler : Inactifs.
+      * Inputs : Routés vers l'overlay actif.
+      * Sortie du state : Fermeture du dernier overlay actif.
+  * `STATE_CREATION` (1) :
+      * Déclencheur : Demande de création, confirmée par introduction de la WorldKey.
+      * Overlay (Inventaire, Craft, Aide) : Fermés automatiquement.
+      * Boucle principale : Figée
+      * Inputs : aucun
+      * Sortie du state : quand le monde est créé et enregistré en base de données. Appel de startSession pour tout réinitialiser.
+  * `STATE_COMBAT` (2) :
+      * Identique au `STATE_INFORMATION`
+      * L'utilité de ce mode sera déterminée ultérieurement
 
-  * 2.4 Gestion des Tâches (MicroTasker & Scheduler)
+### 2.4 Gestion des Tâches (MicroTasker & Scheduler)
 
   * **MicroTasker** [`utils.mjs :: MicroTasker`] : Exécute des tâches fractionnées dans le temps restant de la frame. Priorité et Capacité définies par tâche.
 
   * **TaskScheduler** [`utils.mjs :: TaskManager`] : Gère les tâches longues (ex: cuisson, craft long). Tableau trié par timestamp d'exécution, recherche dichotomique, suppression "lazy" (flag deleted).
-
-### 2.4 Gestion desTâches (MicroTasker & Scheduler)
-
-* **MicroTasker :** Exécute des tâches fractionnées dans le temps restant de la frame. Priorité et Capacité définies par tâche.
-* **TaskScheduler :** Gère les tâches longues (ex: minage, croissance de la flore). Tableau trié par timestamp d'exécution, insertion dichotomique, suppression "lazy" (flag `deleted`), exécution par création d'une micro-tâche.
 
 ### 2.5 Découplage [`utils.mjs :: EventBus`]
 
@@ -146,6 +163,14 @@ class GrassManager {
 }
 export const grassManager = new GrassManager()
 ```
+
+### 2.8 Architecture des Inputs (Input Authority)
+
+  * Responsabilité Inversée : L'InputManager ne dépend pas du GameCore. C'est lui qui détermine l'état du jeu via une pile d'overlays (Stack). Exemple : Si la pile contient ['inventory'], l'état est INFORMATION.
+  * Séparation des Signaux :
+      * Continuous (Polling) : Pour le mouvement en Exploration. Le Core lit un Bitmask binaire (inputFlags) à chaque frame.
+      * Discrete (Events) : Pour les actions "One-Shot" (Ouvrir UI, Taper, Changer Slot). Transmis via l'EventBus.
+  * Routing Hiérarchique : Les inputs sont traités en cascade :  Combat > Creation > Aide > Craft > Inventory > Exploration.
 
 -----
 
@@ -220,10 +245,9 @@ export const grassManager = new GrassManager()
 
 ## 4\. Système "Tactical" (Combat)
 
-### 4.1 Déclenchement
-
-  * Passage en `STATE_COMBAT`.
-  * Overlay de grille dessiné par dessus le monde.
+### 4.1 Déclenchement & Rendu
+  * État : Passage irréversible en STATE_COMBAT jusqu'à la fin du combat, si cet état est maintenu.
+  * Rendu : Entièrement géré par le DOM, comme les autres overlays.
   * Déclenchement par le joueur (click souris) ou par le monstre (AI simplifiée, buffs/debuffs).
   * Génération automatique du terrain (forme, présence de trous et de murs) en fonction de la zone (biome + layer)
 
@@ -331,6 +355,20 @@ L'interface est divisée en couches HTML superposées pour optimiser les redraws
 * **Centrage :** Ces canvas sont centrés dans l'écran physique.
 * **Overlays de jeu :** Les overlays affichés pendant le jeu (pendant le temps réel) sont collés sur les bords de l'écran (avec un padding de 10px pour l'esthétique). Sur grand écran, ils n'empiètent pas sur l'affichage du monde.
 * **Overlays de jeu :** Les overlays qui interrompent le déroulement du jeu (inventaire, craft, aide, paramètres...) sont affichés centrés sur l'écran. Ils peuvent s'empiler les uns sur les autres.
+
+### 6.4 Hiérarchie Visuelle et Input (Z-Index Strategy)
+
+L'ordre d'affichage et de capture des clics est statique, défini par le CSS et respecté par l'InputManager.
+
+  * Game Layer (Z: 0) : Canvas du Monde (Personnage, Décors).
+  * HUD Layer (Z: 20) : Éléments DOM permanents (Hotbar, Jauge Vie, Environment, Debug).
+  * Info Panels (Z: 30 à 90) : Overlays bloquants
+    * 30 : Inventaire.
+    * 40 : Craft.
+    * 50 : Aide.
+  * Combat (Z: 100)
+  * Creation (Z: 110)
+  * System Layer (Z: 200) : Dialogues Modaux (Priorité absolue).
 
 -----
 
