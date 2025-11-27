@@ -3,8 +3,9 @@
  * @description UI Technique (Canvas Overlay pour Perf Monitoring).
  */
 
-import {MICROTASK} from './constant.mjs'
+import {MICROTASK, WORLD_WIDTH, WORLD_HEIGHT, NODES_LOOKUP} from './constant.mjs'
 import {eventBus, microTasker, taskScheduler} from './utils.mjs'
+import {chunkManager} from './world.mjs'
 
 const DEBUG_WIDTH = 200
 const DEBUG_HEIGHT = 110
