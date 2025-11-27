@@ -2,6 +2,7 @@ import {TIME_BUDGET, NODES_LOOKUP, MICROTASK_FN_NAME_TO_KEY} from './constant.mj
 import {loadAssets, resolveAssetData} from './assets.mjs'
 import {timeManager, taskScheduler, microTasker, eventBus, seededRNG} from './utils.mjs'
 import {database} from './database.mjs'
+import {chunkManager} from './world.mjs'
 import './ui.mjs'
 import './ui-debug.mjs'
 
@@ -16,6 +17,7 @@ class GameCore {
 
     // Flag pour le déclenchement debug (touche ²)
     this.debugTrigger = false
+    this.debugMap = false
   }
 
   /* =========================================
@@ -46,6 +48,9 @@ class GameCore {
       // "²" sur clavier AZERTY. !e.repeat empêche l'auto-fire si maintenu.
       if (e.key === '²' && !e.repeat) {
         this.debugTrigger = true
+      }
+      if (e.key === 'm' && !e.repeat) {
+        this.debugMap = true
       }
     })
 
@@ -120,8 +125,31 @@ class GameCore {
     taskScheduler.init(state.timestamp)
     timeManager.init(state.timestamp, state.weather, state.nextWeather)
 
-    // buffManager.init()
+    // chargement du monde - SIMULATION DE DONNÉES (MOCK)
+    const mockSavedChunks = []
+    const TEST_VALUES = [11, 16, 20] // Patterns alternés
+    const TOTAL_CHUNKS = 2048 // 64 * 32
+    const CHUNK_SIZE_BYTES = 256 // 16 * 16
 
+    for (let i = 0; i < TOTAL_CHUNKS; i++) {
+      // 1. Création du buffer de 256 octets
+      const chunkData = new Uint8Array(CHUNK_SIZE_BYTES)
+
+      // 2. Remplissage avec la valeur (Alternance 11 -> 16 -> 20)
+      chunkData.fill(TEST_VALUES[i % 3])
+
+      // 3. Construction de l'objet Record DB
+      mockSavedChunks.push({
+        key: `mock_chunk_${i}`, // Clé fictive
+        index: i, // Index logique indispensable
+        chunk: chunkData // Uint8Array
+      })
+    }
+    // Injection
+    chunkManager.init(mockSavedChunks)
+
+    // buffManager.init()
+    // Les quatre lignes ci-dessous simulent le traitement du buffManager
     eventBus.emit('buff/display-next-weather', true)
     eventBus.emit('buff/display-moon-detail', true)
     eventBus.emit('buff/display-time-precision', 3) // DEBUG => toutes les secondes
