@@ -197,11 +197,34 @@ Cette section définit les événements officiels. Tout nouvel événement doit 
 | `time/first-loop` | `{ day, hour, minute, tslot, weather, nextWeather, skyColor, moonPhase, isDay }` | Émis une seule fois au démarrage du rendu. |
 | `time/sky-color-changed`| `string` (Hex Color) | Émis uniquement si la couleur change. |
 
-### Inventory (`InventoryManager`)
+### Inventory (`InventoryManager`, `InventoryOverlay`)
 *En prévision*
 | Event Name | Payload Structure | Description |
 | :--- | :--- | :--- |
+| `inventory/open`| - | Demande d'ouverture du panel d'inventaire. |
+| `inventory/close`| - | Demande de fermeture du panel d'inventaire. |
 | `inventory/static-buffs`| `Array<string>` (List of buffs) | Émis à la fermeture de l'inventaire. |
+
+### Craft (`CraftOverlay`)
+*En prévision*
+| Event Name | Payload Structure | Description |
+| :--- | :--- | :--- |
+| `craft/open`| - | Demande d'ouverture du panel d'artisanat. |
+| `craft/close`| - | Demande de fermeture du panel d'inventaire. |
+
+### Help (`HelpOverlay`)
+*En prévision*
+| Event Name | Payload Structure | Description |
+| :--- | :--- | :--- |
+| `help/open`| - | Demande d'ouverture du panel d'artisanat. |
+| `help/close`| - | Demande de fermeture du panel d'inventaire. |
+
+### Combat (`CombatOverlay`)
+*En prévision*
+| Event Name | Payload Structure | Description |
+| :--- | :--- | :--- |
+| `combat/open`| - | Demande d'ouverture du panel d'artisanat. |
+| `combat/close`| - | Demande de fermeture du panel d'inventaire. |
 
 ### Buffs (`BuffManager`)
 *En prévision*
@@ -211,3 +234,11 @@ Cette section définit les événements officiels. Tout nouvel événement doit 
 | `buff/display-coords` | `boolean` | Active/Désactive l'affichage des coordonnées. |
 | `buff/display-time-precision` | `integer` | précision 0 => 1heure, 1 => 15 minutes, 2 => 5 minutes |
 | `buff/display-moon-detail` | `boolean` | affiche 4 (false) ou 8 (true) phases lunaires |
+
+### Debug (`CraftOverlay`)
+*En prévision*
+| Event Name | Payload Structure | Description |
+| :--- | :--- | :--- |
+| `map/open`| - | Demande d'ouverture de la carte au 1/16e. |
+| `map/close`| - | Demande de fermeture de la carte au 1/16e. |
+| `debug/frame-sample`| `{updateTime, renderTime, microTime}` | Temps exécution dans la loop pour les 3 budgets. |
