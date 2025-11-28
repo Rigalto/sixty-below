@@ -6,6 +6,29 @@ import {chunkManager} from './world.mjs'
 import './ui.mjs'
 import './ui-debug.mjs'
 
+const mockup = () => {
+  const debugDiv = document.createElement('div')
+  debugDiv.id = 'debug-mouse-coords' // ID pour le cibler plus tard
+
+  // Styles pour positionnement et visibilité
+  debugDiv.style.position = 'fixed'
+  debugDiv.style.top = '250px'
+  debugDiv.style.right = '10px' // Collé à droite avec une petite marge
+  debugDiv.style.backgroundColor = 'rgba(0, 0, 0, 0.7)' // Fond semi-transparent
+  debugDiv.style.color = '#00ff00' // Vert console classique
+  debugDiv.style.padding = '5px 10px'
+  debugDiv.style.fontFamily = 'monospace' // Chasse fixe pour éviter que le texte ne tremble
+  debugDiv.style.fontSize = '14px'
+  debugDiv.style.zIndex = '9999' // Au-dessus de tout
+  debugDiv.style.pointerEvents = 'none' // IMPORTANT : Les clics traversent cette div !
+
+  // Initialisation
+  debugDiv.textContent = 'Mouse: 0, 0'
+
+  // Ajout au DOM
+  document.body.appendChild(debugDiv)
+}
+
 class GameCore {
   constructor () {
     this.isBooted = false
@@ -18,6 +41,9 @@ class GameCore {
     // Flag pour le déclenchement debug (touche ²)
     this.debugTrigger = false
     this.debugMap = false
+    // DEBUG
+    mockup()
+    this.mockupDiv = document.getElementById('debug-mouse-coords')
   }
 
   /* =========================================
@@ -42,6 +68,9 @@ class GameCore {
     this.#hydrateNodes()
     this.#hydrateItems()
     // this._hydrateBuffs() ...
+
+    // 3. Liens avec le DOM
+    mouseManager.init('game-canvas')
 
     this.isBooted = true
     console.timeEnd('Engine Boot')
@@ -212,7 +241,7 @@ class GameCore {
     }
 
     // 2.D Affiche des informations concernant la tuile sous la souris
-    // const hoverPosition = mouseManager.mouseManager
+    // const hoverPosition = mouseManager.mouse
     // const tileCoords = camera.cavasToTiles(hoverPosition)
     // if (this.previousTileCoords !== tileCoords) {
     //   this.previousTileCoords = tileCoords
@@ -220,8 +249,15 @@ class GameCore {
     // }
 
     // 2.E Gestion du clic gauche la souris
+    const leftClick = mouseManager.consumeLeftClick()
 
     // 2.F Gestion du clic droit la souris
+    const rightClick = mouseManager.consumeRightClick()
+
+    // DEBUG
+    this.mockupDiv.textContent = `Mouse: ${mouseManager.mouse.x}, ${mouseManager.mouse.y} | L:${leftClick ? 1 : 0} R:${rightClick ? 1 : 0}`
+    if (leftClick) { console.log('leftClick', mouseManager.mouse) }
+    if (rightClick) { console.log('rightClick', mouseManager.mouse) }
 
     // 2.G. Suite
     // player.update(dt)
@@ -474,68 +510,97 @@ export const keyboardManager = new KeyboardManager()
    ==================================================================================================== */
 
 class MouseManager {
-  // Public State (Polling)
-  // Lu par les systèmes (Mining, Attack, Builder) dans la Game Loop
+  #canvas
 
   constructor () {
     // Lu par la Game Loop pour traiter le 'hover' de la souris
     // et transférer les clics aux autres managers (Mining, Attack, Builder)
-    this.mous = {x: 0, y: 0}
+    this.mouse = {x: null, y: null}
     this.left = false
     this.right = false
 
     // Liaison des méthodes pour conserver le contexte 'this'
     this.onMouseMove = this.onMouseMove.bind(this)
-    this.onMouseDown = this.onMouseDown.bind(this)
-    this.onMouseUp = this.onMouseUp.bind(this)
-
-    // Écouteurs globaux (Window)
-    // Les coordonnées sont relatives au viewport (clientX/Y).
-    // La conversion en coordonnées "Monde" se fera dans le Renderer ou via la Caméra.
-    window.addEventListener('mousemove', this.onMouseMove)
-    window.addEventListener('mousedown', this.onMouseDown)
-    window.addEventListener('mouseup', this.onMouseUp)
-
-    // Bloque le menu contextuel natif pour permettre l'utilisation du Clic Droit en jeu
-    window.addEventListener('contextmenu', e => e.preventDefault())
+    this.onClick = this.onClick.bind(this)
+    this.onContextMenu = this.onContextMenu.bind(this)
+    this.onMouseOut = this.onMouseOut.bind(this)
   }
 
   /**
-   * Mise à jour de la position
-   * @param {MouseEvent} e
+   * Initialisation DOM
+   * @param {string} canvasId
+   */
+  init (canvasId) {
+    this.#canvas = document.getElementById(canvasId)
+    if (!this.#canvas) {
+      console.error('MouseManager: Canvas not found', canvasId)
+      return
+    }
+
+    // Mapping strict selon demande :
+    // - MouseMove : Coordonnées locales
+    // - Click : Gestion Clic Gauche
+    // - ContextMenu : Gestion Clic Droit
+    // - MouseOut : Reset
+    this.#canvas.addEventListener('mousemove', this.onMouseMove)
+    this.#canvas.addEventListener('click', this.onClick)
+    this.#canvas.addEventListener('contextmenu', this.onContextMenu)
+    this.#canvas.addEventListener('mouseout', this.onMouseOut)
+  }
+
+  // "Read-and-Reset" Pattern pour les clics (indispensable car l'événement est instantané)
+  consumeLeftClick () {
+    if (!this.left) return false
+    this.left = false
+    return true
+  }
+
+  consumeRightClick () {
+    if (!this.right) return false
+    this.right = false
+    return true
+  }
+
+  /**
+   * Mise à jour position (Locales au Canvas)
    */
   onMouseMove (e) {
-    this.mouse.x = e.clientX
-    this.mouse.y = e.clientY
+    this.mouse.x = e.offsetX
+    this.mouse.y = e.offsetY
   }
 
   /**
-   * Activation des boutons
-   * @param {MouseEvent} e
+   * Sortie de zone
    */
-  onMouseDown (e) {
-    // button 0 = Clic Gauche
-    if (e.button === 0) {
-      this.left = true
-    }
-    // button 2 = Clic Droit
-    if (e.button === 2) {
-      this.right = true
-    }
+  onMouseOut (e) {
+    this.mouse.x = null
+    this.mouse.y = null
+    this.left = false
+    this.right = false
   }
 
   /**
-   * Désactivation des boutons
-   * @param {MouseEvent} e
+   * Gestion Clic Gauche
    */
-  onMouseUp (e) {
-    if (e.button === 0) {
-      this.left = false
-    }
-    if (e.button === 2) {
-      this.right = false
-    }
+  onClick (e) {
+    this.left = true
+    // Note: click ne se déclenche qu'au relâchement.
+    // Pour du minage continu, il faudra cliquer plusieurs fois.
   }
+
+  /**
+   * Gestion Clic Droit
+   */
+  onContextMenu (e) {
+    e.preventDefault() // Bloque le menu natif
+    this.right = true
+  }
+
+  // Voici la procédure pour désactiver les Gestes de bascule (Rocker Gestures) dans Vivaldi :
+  //   * Ouvrez les Réglages (Settings) de Vivaldi (Raccourci : Ctrl+F12).
+  //   * Allez dans la section Souris (Mouse) dans le menu de gauche.
+  //   * Cherchez la sous-section Gestes (Gestures).
+  //   * Décochez la case Autoriser les gestes de bascule (Allow Rocker Gestures).
 }
 
 export const mouseManager = new MouseManager()
