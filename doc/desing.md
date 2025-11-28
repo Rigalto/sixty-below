@@ -61,7 +61,7 @@ Priorité au **Data-Oriented Design** pour la performance.
 
 L'état du jeu définit quels sous-systèmes sont actifs (boucle principale et overlay temps réel / overlays qui bloquent le temps réel / génération d'un nouveau monde). L'``InputManager`` est l'autorité qui détient l'état courant (Pattern Input Authority).
 
-  * `STATE_EXPLORATION` (0) :
+  * `STATE.EXPLORATION` (0) :
       * Physique : Active (Mouvement fluide, Gravité).
       * Rendu du monde : Rafraîchissement constant (60 FPS).
       * MicroTasker et TaskScheduler : Actifs.
@@ -70,21 +70,21 @@ L'état du jeu définit quels sous-systèmes sont actifs (boucle principale et o
           * Position souris
           * click gauche / droit souris
           * molette souris
-  * `STATE_INFORMATION` (1) :
+  * `STATE.INFORMATION` (1) :
       * Déclencheur : Ouverture d'un overlay (Inventaire, Craft, Aide).
       * Physique : Hard Stop (Figée). Le DeltaTime n'est plus calculé.
       * Rendu du monde : Hard Stop (Figée).
       * MicroTasker et TaskScheduler : Inactifs.
       * Inputs : Routés vers l'overlay actif.
       * Sortie du state : Fermeture du dernier overlay actif.
-  * `STATE_CREATION` (1) :
+  * `STATE.CREATION` (2) :
       * Déclencheur : Demande de création, confirmée par introduction de la WorldKey.
       * Overlay (Inventaire, Craft, Aide) : Fermés automatiquement.
       * Boucle principale : Figée
       * Inputs : aucun
       * Sortie du state : quand le monde est créé et enregistré en base de données. Appel de startSession pour tout réinitialiser.
-  * `STATE_COMBAT` (2) :
-      * Identique au `STATE_INFORMATION`
+  * `STATE.COMBAT` (3) :
+      * Identique au `STATE.INFORMATION`
       * L'utilité de ce mode sera déterminée ultérieurement
 
 ### 2.4 Gestion des Tâches (MicroTasker & Scheduler)
@@ -110,7 +110,7 @@ Distinction stricte entre :
 * **Temps Monde :** Calculé à partir du Playtime (Ratio 1000ms réelles = 1 min monde). Utilisé pour l'affichage et les cycles jour/nuit.
 * **Détails d'implémentaton :**
   * **Initialisation :** A la création du monde, la date est initialisée à : Jour 1 - 8h00.
-  * **Incrémentation :** La date est incrémentée dans la Game Loop (budget **Update**, état `STATE_EXPLORATION`)
+  * **Incrémentation :** La date est incrémentée dans la Game Loop (budget **Update**, état `STATE.EXPLORATION`)
   * **Persistence :** La date est sauvegardée en base de données et récupérée au lancement de l'application
 
 ### 2.7 Cycle de Vie et Initialisation (Anti-Circularité)
@@ -204,7 +204,7 @@ export const grassManager = new GrassManager()
 
 ### 3.2 Génération Procédurale
 
-  * **Effectuée hors temps réel :** état `STATE_INFORMATION`.
+  * **Effectuée hors temps réel :** état `STATE.INFORMATION`.
   * **Mémoire :** Importation dynamique du module générant le monde
   * **Biomes :** découpage vertical : Forêt, Désert, Jungle + Océans latéraux.
   * **Layers :** découpage horizontal : Surface, Underworld, Caverns, Hell (Lava).
@@ -246,7 +246,7 @@ export const grassManager = new GrassManager()
 ## 4\. Système "Tactical" (Combat)
 
 ### 4.1 Déclenchement & Rendu
-  * État : Passage irréversible en STATE_COMBAT jusqu'à la fin du combat, si cet état est maintenu.
+  * État : Passage irréversible en STATE.COMBAT jusqu'à la fin du combat, si cet état est maintenu.
   * Rendu : Entièrement géré par le DOM, comme les autres overlays.
   * Déclenchement par le joueur (click souris) ou par le monstre (AI simplifiée, buffs/debuffs).
   * Génération automatique du terrain (forme, présence de trous et de murs) en fonction de la zone (biome + layer)

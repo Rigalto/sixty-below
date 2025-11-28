@@ -20,10 +20,20 @@ export const TIME_BUDGET = {
 }
 
 // États du jeu (State Machine)
-export const GAME_STATE = {
-  EXPLORATION: 'state_exploration', // Temps réel
-  COMBAT: 'state_combat', // Tour par tour
-  INFORMATION: 'state_information' // Pause / Menus
+export const STATE = {
+  EXPLORATION: 0, // Temps réel
+  INFORMATION: 1, // Pause / Menus
+  CREATION: 2, // Pause / Menus
+  COMBAT: 3 // Tour par tour - TODO: peut-être à intégrer dans INFORMATION
+}
+
+export const OVERLAYS = {
+  inventory: {state: STATE.INFORMATION, zIndex: 30},
+  craft: {state: STATE.INFORMATION, zIndex: 40},
+  help: {state: STATE.INFORMATION, zIndex: 50},
+  map: {state: STATE.INFORMATION, zIndex: 60},
+  combat: {state: STATE.COMBAT, zIndex: 100},
+  creation: {state: STATE.CREATION, zIndex: 110}
 }
 
 /* =========================================

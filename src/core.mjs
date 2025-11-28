@@ -1,4 +1,4 @@
-import {TIME_BUDGET, NODES_LOOKUP, MICROTASK_FN_NAME_TO_KEY} from './constant.mjs'
+import {TIME_BUDGET, NODES_LOOKUP, MICROTASK_FN_NAME_TO_KEY, STATE, OVERLAYS} from './constant.mjs'
 import {loadAssets, resolveAssetData} from './assets.mjs'
 import {timeManager, taskScheduler, microTasker, eventBus, seededRNG} from './utils.mjs'
 import {database} from './database.mjs'
@@ -36,23 +36,12 @@ class GameCore {
     await loadAssets()
 
     // 2. Ouverture de la base de données IndexedDB
-    database.init()
+    await database.init()
 
     // 2. Hydratation des données statiques
     this.#hydrateNodes()
     this.#hydrateItems()
     // this._hydrateBuffs() ...
-
-    // Écouteur Debug (Touche ²)
-    window.addEventListener('keydown', (e) => {
-      // "²" sur clavier AZERTY. !e.repeat empêche l'auto-fire si maintenu.
-      if (e.key === '²' && !e.repeat) {
-        this.debugTrigger = true
-      }
-      if (e.key === 'm' && !e.repeat) {
-        this.debugMap = true
-      }
-    })
 
     this.isBooted = true
     console.timeEnd('Engine Boot')
@@ -200,10 +189,7 @@ class GameCore {
     }
 
     // AExécution Debug synchronisée (consommation du flag)
-    if (this.debugTrigger) {
-      this.debugTrigger = false // Reset immédiat
-      this.#runDebugAction()
-    }
+    if (inputManager.consumeDebugTrigger()) { this.#runDebugAction() }
 
     // 2. UPDATE (SYSTEMS)
     // 2.A. TimeManager (Source de vérité temporelle)
@@ -274,3 +260,105 @@ class GameCore {
   }
 }
 export const gameCore = new GameCore()
+
+class InputManager {
+  #overlayStack
+
+  constructor () {
+    this.#overlayStack = []
+    this.state = STATE.EXPLORATION // il faut pouvoir passer en STATE;CREATION si la base de donnée est vide
+    this.debugTrigger = false // affiche dans la console les logs du MicroTasker, du TaskScheduler et de l'EventBus
+
+    this.onKeyDown = this.onKeyDown.bind(this)
+    // Passive: true n'est pas nécessaire ici car preventDefault n'est pas appelé systématiquement
+    // mais on reste sur du standard.
+    window.addEventListener('keydown', this.onKeyDown)
+  }
+
+  // "read-once" (lecture unique)
+  consumeDebugTrigger () {
+    const v = this.debugTrigger
+    this.debugTrigger = false
+    return v
+  }
+
+  #updateState () {
+    if (this.#overlayStack === 0) {
+      this.state = STATE.EXPLORATION
+    } else {
+      const topId = this.#overlayStack[this.#overlayStack.length - 1]
+      this.state = OVERLAYS[topId].state
+    }
+  }
+
+  /**
+   * Tente d'ouvrir ou fermer un overlay
+   * @param {string} id - L'identifiant défini dans OVERLAYS
+   */
+  #openOverlay (id) {
+    const def = OVERLAYS[id]
+    if (!def) {
+      console.error('InputManager: Unknown overlay', id)
+      return
+    }
+
+    const stackTop = this.#overlayStack[this.#overlayStack.length - 1]
+
+    // 1. Cas : L'overlay est DÉJÀ ouvert
+    if (this.#overlayStack.includes(id)) {
+      // Si c'est celui tout en haut, on le ferme (Comportement standard Toggle)
+      if (stackTop === id) { this.#closeOverlay() }
+      return
+    }
+
+    // 2. Cas : L'overlay est FERMÉ, on veut l'ouvrir
+    // On vérifie la priorité par rapport au sommet actuel
+    if (stackTop) {
+      const currentPriority = OVERLAYS[stackTop].priority
+      // INTERDICTION : On n'ouvre pas l'inventaire (30) si on est en Combat (100)
+      if (def.priority < currentPriority) return
+    }
+
+    // Accepté : On empile
+    this.#overlayStack.push(id)
+    this.#updateState()
+    // On notifie l'overlay pour qu'il s'affiche
+    eventBus.emit(`${id}/open`)
+  }
+
+  #closeOverlay () {
+    if (this.#overlayStack.length === 0) return // Rien à fermer
+
+    const id = this.#overlayStack.pop() // Retire le dernier
+    this.#updateState()
+    eventBus.emit(`${id}/close`)
+  }
+
+  /**
+   * Gestionnaire d'événement clavier (Discrete)
+   * @param {KeyboardEvent} e
+   */
+  onKeyDown (e) {
+    // Rejet immédiat des répétitions automatiques (appui long) pour les actions "One-Shot"
+    if (e.repeat) return
+
+    // Touche ² (AZERTY) ou ` (QWERTY) - Position physique haut-gauche
+    if (e.code === 'Backquote') { this.debugTrigger = true }
+
+    // Touche M (Map) - fonctionne en AZERTY et QWERTY
+    if (e.key === 'm' || e.key === 'M') {
+      eventBus.emit('debug/map-display')
+    }
+
+    if (e.key === 'i' || e.key === 'I') {
+      this.#openOverlay('inventory')
+    }
+    if (e.key === 'k' || e.key === 'K') {
+      this.#openOverlay('craft')
+    }
+    if (e.key === 'h' || e.key === 'H') {
+      this.#openOverlay('help')
+    }
+  }
+}
+export const inputManager = new InputManager()
