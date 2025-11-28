@@ -283,7 +283,7 @@ class InputManager {
   }
 
   #updateState () {
-    if (this.#overlayStack === 0) {
+    if (this.#overlayStack.length === 0) {
       this.state = STATE.EXPLORATION
     } else {
       const topId = this.#overlayStack[this.#overlayStack.length - 1]
@@ -347,7 +347,8 @@ class InputManager {
 
     // Touche M (Map) - fonctionne en AZERTY et QWERTY
     if (e.key === 'm' || e.key === 'M') {
-      eventBus.emit('debug/map-display')
+      // eventBus.emit('debug/map-display')/
+      this.#openOverlay('map')
     }
 
     if (e.key === 'i' || e.key === 'I') {
@@ -358,6 +359,15 @@ class InputManager {
     }
     if (e.key === 'h' || e.key === 'H') {
       this.#openOverlay('help')
+    }
+
+    // Touche Escape : ouvre l'inventaire ou ferme l'overlay visible
+    if (e.code === 'Escape') {
+      if (this.#overlayStack.length === 0) {
+        this.#openOverlay('inventory')
+      } else {
+        this.#closeOverlay()
+      }
     }
   }
 }

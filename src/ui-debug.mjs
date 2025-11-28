@@ -210,8 +210,8 @@ class WorldMapDebug {
   }
 
   #bindEvents () {
-    eventBus.on('debug/map-display', this.drawMap.bind(this))
-    eventBus.on('debug/map-hide', this.hideMap.bind(this))
+    eventBus.on('map/open', this.drawMap.bind(this))
+    eventBus.on('map/close', this.hideMap.bind(this))
   }
 
   drawMap () {
