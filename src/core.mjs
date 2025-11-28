@@ -104,6 +104,7 @@ class GameCore {
     timeManager.init(state.timestamp, state.weather, state.nextWeather)
 
     // 2. Initialisation des systèmes (Layer 1)
+    this.previousTileCoords = undefined
 
     // Init RNG en mode aléatoire (Math.random()) pour la session de jeu
     seededRNG.init()
@@ -164,6 +165,12 @@ class GameCore {
     if (!this.isRunning) return
     requestAnimationFrame((t) => this.loop(t))
 
+    // ///////////////// //
+    // EXPLORATION FIGEE //
+    // ///////////////// //
+
+    if (keyboardManager.state !== STATE.EXPLORATION) return
+
     // ///////////// //
     // BUDGET UPDATE //
     // ///////////// //
@@ -188,8 +195,8 @@ class GameCore {
       dt = 65
     }
 
-    // AExécution Debug synchronisée (consommation du flag)
-    if (inputManager.consumeDebugTrigger()) { this.#runDebugAction() }
+    // Exécution Debug synchronisée (consommation du flag)
+    if (keyboardManager.consumeDebugTrigger()) { this.#runDebugAction() }
 
     // 2. UPDATE (SYSTEMS)
     // 2.A. TimeManager (Source de vérité temporelle)
@@ -198,8 +205,28 @@ class GameCore {
     // 2.B. TaskScheduler (Vérifie si des tâches longues sont dues)
     taskScheduler.update(gameTimestamp)
 
-    // 2.C. Suite
-    // worldManager.update(dt)
+    // 2.C Mouvements du joueur (touches flèches et ZQSD)
+    if (keyboardManager.directions !== 0) {
+      // console.log('player.move(', keyboardManager.directions, ')')
+      // player.move(keyboardManager.directions)
+    }
+
+    // 2.D Affiche des informations concernant la tuile sous la souris
+    // const hoverPosition = mouseManager.mouseManager
+    // const tileCoords = camera.cavasToTiles(hoverPosition)
+    // if (this.previousTileCoords !== tileCoords) {
+    //   this.previousTileCoords = tileCoords
+    //   eventBus.emit('mouse/hover', tileCoords)
+    // }
+
+    // 2.E Gestion du clic gauche la souris
+
+    // 2.F Gestion du clic droit la souris
+
+    // 2.G. Suite
+    // player.update(dt)
+    // flore.update(dt)
+    // faune.update(dt)
 
     const durationUpdate = performance.now() - executionStart
     if (durationUpdate > TIME_BUDGET.UPDATE) {
@@ -261,18 +288,70 @@ class GameCore {
 }
 export const gameCore = new GameCore()
 
-class InputManager {
+/* ====================================================================================================
+   KEYBOARD INPUTS
+   ==================================================================================================== */
+
+const HOTBAR_MAP = {
+  Digit1: 0,
+  Numpad1: 0,
+  Digit2: 1,
+  Numpad2: 1,
+  Digit3: 2,
+  Numpad3: 2,
+  Digit4: 3,
+  Numpad4: 3,
+  Digit5: 4,
+  Numpad5: 4,
+  Digit6: 5,
+  Numpad6: 5,
+  Digit7: 6,
+  Numpad7: 6,
+  Digit8: 7,
+  Numpad8: 7,
+  Digit9: 8,
+  Numpad9: 8,
+  Digit0: 9,
+  Numpad0: 9
+}
+
+const MOVEMENT_MAP = {
+  ArrowUp: 1,
+  KeyW: 1, // Z (Azerty) / W (Qwerty)
+  ArrowDown: 2,
+  KeyS: 2, // S
+  ArrowLeft: 4,
+  KeyA: 4, // Q (Azerty) / A (Qwerty)
+  ArrowRight: 8,
+  KeyD: 8 // D
+}
+
+const OVERLAY_MAP = {
+  m: 'map',
+  M: 'map',
+  i: 'inventory',
+  I: 'inventory',
+  k: 'craft',
+  K: 'craft',
+  h: 'help',
+  H: 'help'
+}
+
+class KeyboardManager {
   #overlayStack
 
   constructor () {
     this.#overlayStack = []
     this.state = STATE.EXPLORATION // il faut pouvoir passer en STATE;CREATION si la base de donnée est vide
     this.debugTrigger = false // affiche dans la console les logs du MicroTasker, du TaskScheduler et de l'EventBus
+    this.directions = 0
 
     this.onKeyDown = this.onKeyDown.bind(this)
+    this.onKeyUp = this.onKeyUp.bind(this)
     // Passive: true n'est pas nécessaire ici car preventDefault n'est pas appelé systématiquement
     // mais on reste sur du standard.
     window.addEventListener('keydown', this.onKeyDown)
+    window.addEventListener('keyup', this.onKeyUp)
   }
 
   // "read-once" (lecture unique)
@@ -298,7 +377,7 @@ class InputManager {
   #openOverlay (id) {
     const def = OVERLAYS[id]
     if (!def) {
-      console.error('InputManager: Unknown overlay', id)
+      console.error('KeyboardManager: Unknown overlay', id)
       return
     }
 
@@ -342,23 +421,28 @@ class InputManager {
     // Rejet immédiat des répétitions automatiques (appui long) pour les actions "One-Shot"
     if (e.repeat) return
 
-    // Touche ² (AZERTY) ou ` (QWERTY) - Position physique haut-gauche
+    // 1. Mouvements (Polling)
+    const moveBit = MOVEMENT_MAP[e.code]
+    if (moveBit) {
+      this.directions |= moveBit
+      return
+    }
+
+    // 2. Hotbar (Selection Slot)
+    const slotIndex = HOTBAR_MAP[e.code]
+    if (slotIndex !== undefined) {
+      eventBus.emit('hotbar/select-slot', slotIndex)
+      return
+    }
+
+    // 1.5 Debug dans la console (Touche ² (AZERTY) ou ` (QWERTY))
     if (e.code === 'Backquote') { this.debugTrigger = true }
 
-    // Touche M (Map) - fonctionne en AZERTY et QWERTY
-    if (e.key === 'm' || e.key === 'M') {
-      // eventBus.emit('debug/map-display')/
-      this.#openOverlay('map')
-    }
-
-    if (e.key === 'i' || e.key === 'I') {
-      this.#openOverlay('inventory')
-    }
-    if (e.key === 'k' || e.key === 'K') {
-      this.#openOverlay('craft')
-    }
-    if (e.key === 'h' || e.key === 'H') {
-      this.#openOverlay('help')
+    // 1.5 Overlay
+    const overlay = OVERLAY_MAP[e.key]
+    if (overlay !== undefined) {
+      this.#openOverlay(overlay)
+      return
     }
 
     // Touche Escape : ouvre l'inventaire ou ferme l'overlay visible
@@ -370,5 +454,88 @@ class InputManager {
       }
     }
   }
+
+  /**
+   * KEY UP
+   * Indispensable pour arrêter le mouvement quand on relâche la touche
+   */
+  onKeyUp (e) {
+    const moveBit = MOVEMENT_MAP[e.code]
+    if (moveBit) {
+      // Bitwise AND avec l'inverse (NOT) du masque pour éteindre le bit
+      this.directions &= ~moveBit
+    }
+  }
 }
-export const inputManager = new InputManager()
+export const keyboardManager = new KeyboardManager()
+
+/* ====================================================================================================
+   MOUSE INPUTS
+   ==================================================================================================== */
+
+class MouseManager {
+  // Public State (Polling)
+  // Lu par les systèmes (Mining, Attack, Builder) dans la Game Loop
+
+  constructor () {
+    // Lu par la Game Loop pour traiter le 'hover' de la souris
+    // et transférer les clics aux autres managers (Mining, Attack, Builder)
+    this.mous = {x: 0, y: 0}
+    this.left = false
+    this.right = false
+
+    // Liaison des méthodes pour conserver le contexte 'this'
+    this.onMouseMove = this.onMouseMove.bind(this)
+    this.onMouseDown = this.onMouseDown.bind(this)
+    this.onMouseUp = this.onMouseUp.bind(this)
+
+    // Écouteurs globaux (Window)
+    // Les coordonnées sont relatives au viewport (clientX/Y).
+    // La conversion en coordonnées "Monde" se fera dans le Renderer ou via la Caméra.
+    window.addEventListener('mousemove', this.onMouseMove)
+    window.addEventListener('mousedown', this.onMouseDown)
+    window.addEventListener('mouseup', this.onMouseUp)
+
+    // Bloque le menu contextuel natif pour permettre l'utilisation du Clic Droit en jeu
+    window.addEventListener('contextmenu', e => e.preventDefault())
+  }
+
+  /**
+   * Mise à jour de la position
+   * @param {MouseEvent} e
+   */
+  onMouseMove (e) {
+    this.mouse.x = e.clientX
+    this.mouse.y = e.clientY
+  }
+
+  /**
+   * Activation des boutons
+   * @param {MouseEvent} e
+   */
+  onMouseDown (e) {
+    // button 0 = Clic Gauche
+    if (e.button === 0) {
+      this.left = true
+    }
+    // button 2 = Clic Droit
+    if (e.button === 2) {
+      this.right = true
+    }
+  }
+
+  /**
+   * Désactivation des boutons
+   * @param {MouseEvent} e
+   */
+  onMouseUp (e) {
+    if (e.button === 0) {
+      this.left = false
+    }
+    if (e.button === 2) {
+      this.right = false
+    }
+  }
+}
+
+export const mouseManager = new MouseManager()
