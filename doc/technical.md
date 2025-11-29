@@ -202,6 +202,11 @@ Cette section définit les événements officiels. Tout nouvel événement doit 
 | :--- | :--- | :--- |
 | `state/changed` | `{ state, oldState }` | Émis lorsque l'`InputManager` change l'état global du jeu (Exploration <-> Information/Combat). |
 
+### UI / Interface (Common)
+| Event Name | Payload Structure | Description |
+| :--- | :--- | :--- |
+| `overlay/close` | `string` (Overlay ID) | Demande générique de fermeture émise par le bouton 'X' d'un overlay. Traitée par `InputManager`. |
+
 ### Inventory (`InventoryManager`, `InventoryOverlay`)
 *En prévision*
 | Event Name | Payload Structure | Description |
