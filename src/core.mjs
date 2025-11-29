@@ -249,13 +249,19 @@ class GameCore {
     // }
 
     // 2.E Gestion du clic gauche la souris
-    const leftClick = mouseManager.consumeLeftClick()
+    const leftClick = mouseManager.consumeLeftClick() // "Read-and-Reset"
+    if (leftClick) {
+      //
+    }
 
     // 2.F Gestion du clic droit la souris
-    const rightClick = mouseManager.consumeRightClick()
+    const rightClick = mouseManager.consumeRightClick() // "Read-and-Reset"
+    if (rightClick) {
+      //
+    }
 
     // DEBUG
-    this.mockupDiv.textContent = `Mouse: ${mouseManager.mouse.x}, ${mouseManager.mouse.y} | L:${leftClick ? 1 : 0} R:${rightClick ? 1 : 0}`
+    this.mockupDiv.textContent = `Mouse: ${mouseManager.mouse.x}, ${mouseManager.mouse.y}`
     if (leftClick) { console.log('leftClick', mouseManager.mouse) }
     if (rightClick) { console.log('rightClick', mouseManager.mouse) }
 
@@ -398,11 +404,19 @@ class KeyboardManager {
   }
 
   #updateState () {
-    if (this.#overlayStack.length === 0) {
-      this.state = STATE.EXPLORATION
-    } else {
+    let newState = STATE.EXPLORATION
+
+    // Détermination du nouvel état théorique
+    if (this.#overlayStack.length > 0) {
       const topId = this.#overlayStack[this.#overlayStack.length - 1]
-      this.state = OVERLAYS[topId].state
+      newState = OVERLAYS[topId].state
+    }
+
+    // Application et émission UNIQUEMENT si changement réel
+    if (this.state !== newState) {
+      const oldState = this.state
+      this.state = newState
+      eventBus.emit('state/changed', {state: this.state, oldState})
     }
   }
 
@@ -521,9 +535,9 @@ class MouseManager {
 
     // Liaison des méthodes pour conserver le contexte 'this'
     this.onMouseMove = this.onMouseMove.bind(this)
+    this.onMouseOut = this.onMouseOut.bind(this)
     this.onClick = this.onClick.bind(this)
     this.onContextMenu = this.onContextMenu.bind(this)
-    this.onMouseOut = this.onMouseOut.bind(this)
   }
 
   /**
@@ -537,15 +551,15 @@ class MouseManager {
       return
     }
 
-    // Mapping strict selon demande :
-    // - MouseMove : Coordonnées locales
+    // Mapping :
+    // - MouseMove : Coordonnées locales au canvas
+    // - MouseOut : Reset Coordonnées
     // - Click : Gestion Clic Gauche
     // - ContextMenu : Gestion Clic Droit
-    // - MouseOut : Reset
     this.#canvas.addEventListener('mousemove', this.onMouseMove)
+    this.#canvas.addEventListener('mouseout', this.onMouseOut)
     this.#canvas.addEventListener('click', this.onClick)
     this.#canvas.addEventListener('contextmenu', this.onContextMenu)
-    this.#canvas.addEventListener('mouseout', this.onMouseOut)
   }
 
   // "Read-and-Reset" Pattern pour les clics (indispensable car l'événement est instantané)
