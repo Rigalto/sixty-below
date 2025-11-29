@@ -4,7 +4,11 @@
  */
 
 import {eventBus} from './utils.mjs'
-import {WEATHER_TYPE, MOON_PHASE, MOON_PHASE_BLURRED} from './constant.mjs'
+import {WEATHER_TYPE, MOON_PHASE, MOON_PHASE_BLURRED, STATE, OVERLAYS} from './constant.mjs'
+
+/* ====================================================================================================
+   AFFICHAGE DATE/HEURE METEO LUNE POSITION
+   ==================================================================================================== */
 
 class EnvironmentOverlay {
   #boundUpdateCoords = null // Référence pour on/off dynamique
@@ -50,14 +54,25 @@ class EnvironmentOverlay {
     this.container.id = 'env-overlay-root'
 
     // CSS "In-JS"
-    this.container.style.cssText = `
-    position: absolute; top: 10px; right: 10px; width: 160px;
-    background-color: rgba(20, 20, 25, 0.9); border: 1px solid #444;
-    color: #ffffff; font-family: Segoe UI, Roboto, monospace; font-size: 14px;
-    border-radius: 6px; pointer-events: none; padding: 8px;
-    box-shadow: 0 2px 10px rgba(0,0,0,0.5); z-index: 1000;
-    display: flex; flex-direction: column; gap: 6px;
-  `
+    Object.assign(this.container.style, {
+      position: 'absolute',
+      top: '10px',
+      right: '10px',
+      width: '160px',
+      backgroundColor: 'rgba(20, 20, 25, 0.9)',
+      border: '1px solid #444',
+      color: '#ffffff',
+      fontFamily: 'Segoe UI, Roboto, monospace',
+      fontSize: '14px',
+      borderRadius: '6px',
+      pointerEvents: 'none',
+      padding: '8px',
+      boxShadow: '0 2px 10px rgba(0,0,0,0.5)',
+      zIndex: OVERLAYS.hud.zIndex,
+      display: 'flex',
+      flexDirection: 'column',
+      gap: '6px'
+    })
 
     // 2. Injection du HTML Statique
     this.container.innerHTML = `
@@ -233,3 +248,44 @@ class EnvironmentOverlay {
 }
 // Instanciation immédiate (Singleton autonome)
 export const environmentOverlay = new EnvironmentOverlay()
+
+/* ====================================================================================================
+   AFFICHAGE VOILE SOMBRE
+   ==================================================================================================== */
+
+class ModalBlocker {
+  #element
+
+  constructor () {
+    this.#element = document.createElement('div')
+    this.#element.id = 'ui-modal-backdrop'
+
+    // Styles critiques (CSS-in-JS pour éviter une feuille de style externe)
+    Object.assign(this.#element.style, {
+      position: 'fixed',
+      top: '0',
+      left: '0',
+      width: '100vw',
+      height: '100vh',
+      backgroundColor: 'rgba(0, 0, 0, 0.6)', // Noir à 60% d'opacité
+      zIndex: OVERLAYS.backdrop.zIndex,
+      display: 'none'
+    })
+    document.body.appendChild(this.#element)
+
+    // Abonnement au changement d'état
+    eventBus.on('state/changed', this.onStateChanged.bind(this))
+  }
+
+  /**
+   * Réaction au changement d'état du jeu
+   * @param {object} payload - { state, oldState }
+   */
+  onStateChanged ({state}) {
+    // Si on est en EXPLORATION, le voile disparaît.
+    // Pour tout autre état (INFORMATION, COMBAT, CREATION), il apparaît.
+    this.#element.style.display = (state === STATE.EXPLORATION) ? 'none' : 'block'
+  }
+}
+
+export const modalBlocker = new ModalBlocker()

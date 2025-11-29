@@ -1,11 +1,10 @@
-/**
- * @file debug-ui.mjs
- * @description UI Technique (Canvas Overlay pour Perf Monitoring).
- */
-
-import {MICROTASK, WORLD_WIDTH, WORLD_HEIGHT, NODES_LOOKUP} from './constant.mjs'
+import {MICROTASK, WORLD_WIDTH, WORLD_HEIGHT, NODES_LOOKUP, OVERLAYS} from './constant.mjs'
 import {eventBus, microTasker, taskScheduler} from './utils.mjs'
 import {chunkManager} from './world.mjs'
+
+/* ====================================================================================================
+   PERFORMANCE MONITORING
+   ==================================================================================================== */
 
 const DEBUG_WIDTH = 200
 const DEBUG_HEIGHT = 110
@@ -46,7 +45,7 @@ class RealtimeDebugOverlay {
       bottom: '10px',
       right: '10px',
       pointerEvents: 'none',
-      zIndex: '2000', // Au-dessus de tout
+      zIndex: OVERLAYS.hud.zIndex, // Au-dessus de tout
       backgroundColor: 'rgba(0, 0, 0, 0.8)', // Fond semi-transparent
       borderRadius: '4px'
     })
@@ -186,7 +185,7 @@ class WorldMapDebug {
       top: '50%',
       left: '50%',
       transform: 'translate(-50%, -50%)',
-      zIndex: '5000',
+      zIndex: OVERLAYS.map.zIndex,
       border: '4px solid #000',
       backgroundColor: '#000',
       display: 'none',

@@ -28,6 +28,9 @@ export const STATE = {
 }
 
 export const OVERLAYS = {
+  canvas: {state: null, zIndex: 0},
+  hud: {state: null, zIndex: 10},
+  backdrop: {state: null, zIndex: 20},
   inventory: {state: STATE.INFORMATION, zIndex: 30},
   craft: {state: STATE.INFORMATION, zIndex: 40},
   help: {state: STATE.INFORMATION, zIndex: 50},

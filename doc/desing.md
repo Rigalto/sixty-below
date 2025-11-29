@@ -356,12 +356,13 @@ L'interface est divisée en couches HTML superposées pour optimiser les redraws
 * **Overlays de jeu :** Les overlays affichés pendant le jeu (pendant le temps réel) sont collés sur les bords de l'écran (avec un padding de 10px pour l'esthétique). Sur grand écran, ils n'empiètent pas sur l'affichage du monde.
 * **Overlays de jeu :** Les overlays qui interrompent le déroulement du jeu (inventaire, craft, aide, paramètres...) sont affichés centrés sur l'écran. Ils peuvent s'empiler les uns sur les autres.
 
-### 6.4 Hiérarchie Visuelle et Input (Z-Index Strategy)
+### 6.4 Hiérarchie Visuelle et Input (Z-Index Strategy) [`constant.mjs :: OVERLAYS`]
 
-L'ordre d'affichage et de capture des clics est statique, défini par le CSS et respecté par l'InputManager.
+L'ordre d'affichage et de capture des clics est statique, défini par le CSS et respecté par l'``InputManager``.
 
   * Game Layer (Z: 0) : Canvas du Monde (Personnage, Décors).
-  * HUD Layer (Z: 20) : Éléments DOM permanents (Hotbar, Jauge Vie, Environment, Debug).
+  * HUD Layer (Z: 10) : Éléments DOM permanents (Hotbar, Jauge Vie, Environment, Debug).
+  * Voile noir  (Z: 20) : Pour indiquer que le jeu est en pause
   * Info Panels (Z: 30 à 90) : Overlays bloquants
     * 30 : Inventaire.
     * 40 : Craft.
