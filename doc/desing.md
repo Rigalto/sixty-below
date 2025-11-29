@@ -399,9 +399,12 @@ L'architecture sépare la logique (UI Logic) du rendu pur (Render) et distingue 
 │   ├── housing.mjs          # HOUSING : FurnitureManager (Placememnt/suppression Furniture/Crafting Station), HousingManager, Buffs
 │   ├── combat.mjs           # TACTICAL : ArenaCreator (procédural - forme, murs et trous), TurnManager, Pathfinding (A* pour le combat), SpellSystem (Portée, DamageCalculator), CombatAI (CombatBehaviors combinables)
 │   ├── ui.mjs               # INTERFACE PANEL/DOM (LOGIQUE) :
-│   │                        # - Logic : InventorySystem (Slots, Stacking, Drag&Drop logic), CraftSystem (Recettes, validation)
-│   │                        # - DOM Managers : InventoryPanel, HelpPanel, PreferencePanel (configuration UI, clavier, souris...)
-│   │                        # - Canvas Managers : HotbarOverlay, EnvironmentOverlay (Draw logic)
+│   │                        # - DOM Managers : PreferencePanel (configuration UI, clavier, souris...)
+│   │                        # - HUD Managers : HotbarOverlay, EnvironmentOverlay (Draw logic)
+│   │                        # - Factories : Don't Repeat Yourself (DRY)
+│   ├── craft.mjs            # InventoryPanel, CraftSystem (SRecettes, validation)
+│   ├── inventory.mjs        # InventoryPanel, InventorySystem (Slots, Stacking, Drag&Drop logic)
+│   ├── help.mjs             # HelpPanel
 │   ├── ui-debug.mjs         # INTERFACE PANEL/DOM uniquement dédiée au debug
 │   ├── render.mjs           # GRAPHICS : WorldRenderer (OffscreenCanvas Cache), Camera (Maths & Culling), SpriteManager (Animations, Batching virtuel).
 │   ├── generate.mjs         # PROC-GEN : Algorithmes de génération (Dynamic Import)

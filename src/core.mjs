@@ -5,6 +5,9 @@ import {database} from './database.mjs'
 import {chunkManager} from './world.mjs'
 import './ui.mjs'
 import './ui-debug.mjs'
+import './inventory.mjs'
+import './craft.mjs'
+import './help.mjs'
 
 const mockup = () => {
   const debugDiv = document.createElement('div')

@@ -289,3 +289,63 @@ class ModalBlocker {
 }
 
 export const modalBlocker = new ModalBlocker()
+
+/* ====================================================================================================
+   FACTORIES (DON'T REPEAT YOURSELF)
+   ==================================================================================================== */
+/**
+
+ * Crée un header standardisé pour les overlays.
+ * @param {string} titleText - Le titre (avec icône)
+ * @returns {object} { header, closeBtn } - Retourne le conteneur et le bouton pour attacher les events.
+ */
+export function createOverlayHeader (titleText) {
+  // 1. Injection unique du style global pour le :hover (Idempotent)
+  if (!document.getElementById('ui-global-styles')) {
+    const style = document.createElement('style')
+    style.id = 'ui-global-styles'
+    style.textContent = '.ui-close-btn:hover { color: #ffffff !important; }'
+    document.head.appendChild(style)
+  }
+
+  // 2. Conteneur Header
+  const header = document.createElement('div')
+  Object.assign(header.style, {
+    height: '40px',
+    background: 'linear-gradient(90deg, #2c3e50 0%, #4a69bd 50%, #2c3e50 100%)',
+    borderBottom: '2px solid #1e272e',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center', // Titre centré
+    position: 'relative', // Référence pour le bouton absolu
+    padding: '0 10px',
+    fontSize: '16px',
+    fontWeight: 'bold',
+    textShadow: '1px 1px 2px black',
+    borderTopLeftRadius: '4px',
+    borderTopRightRadius: '4px',
+    color: '#ffffff',
+    userSelect: 'none'
+  })
+
+  // 3. Titre
+  const title = document.createElement('span')
+  title.textContent = titleText
+  header.appendChild(title)
+
+  // 4. Bouton Fermer
+  const closeBtn = document.createElement('span')
+  closeBtn.textContent = '✕'
+  closeBtn.className = 'ui-close-btn' // Hook CSS
+  Object.assign(closeBtn.style, {
+    cursor: 'pointer',
+    fontSize: '14px',
+    color: '#bdc3c7',
+    position: 'absolute',
+    right: '10px',
+    transition: 'color 0.2s'
+  })
+  header.appendChild(closeBtn)
+
+  return {header, closeBtn}
+}
