@@ -32,7 +32,7 @@ class CraftOverlay {
     })
 
     // 2. Création du Header via la Factory
-    const {header, closeBtn} = createOverlayHeader('⚒️ Artisanat [K]')
+    const {header, closeBtn} = createOverlayHeader('⚒️ Artisanat [K]', 'craft')
     this.#header = header
     this.closeBtn = closeBtn
 

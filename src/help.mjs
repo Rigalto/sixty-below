@@ -32,7 +32,7 @@ class HelpOverlay {
     })
 
     // 2. Création du Header via la Factory
-    const {header, closeBtn} = createOverlayHeader('📜 Aide [H]')
+    const {header, closeBtn} = createOverlayHeader('📜 Aide [H]' ,'help')
     this.#header = header
     this.closeBtn = closeBtn
 

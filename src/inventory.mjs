@@ -32,7 +32,7 @@ class InventoryOverlay {
     })
 
     // 2. Création du Header via la Factory
-    const {header, closeBtn} = createOverlayHeader('🎒 Inventaire [I]')
+    const {header, closeBtn} = createOverlayHeader('🎒 Inventaire [I]', 'inventory')
     this.#header = header
     this.closeBtn = closeBtn
 

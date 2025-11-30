@@ -299,7 +299,7 @@ export const modalBlocker = new ModalBlocker()
  * @param {string} titleText - Le titre (avec icône)
  * @returns {object} { header, closeBtn } - Retourne le conteneur et le bouton pour attacher les events.
  */
-export function createOverlayHeader (titleText) {
+export function createOverlayHeader (titleText, overlayId) {
   // 1. Injection unique du style global pour le :hover (Idempotent)
   if (!document.getElementById('ui-global-styles')) {
     const style = document.createElement('style')
@@ -344,6 +344,12 @@ export function createOverlayHeader (titleText) {
     position: 'absolute',
     right: '10px',
     transition: 'color 0.2s'
+  })
+  closeBtn.addEventListener('click', (e) => {
+    // On empêche la propagation (sécurité)
+    e.stopPropagation()
+    // On demande la fermeture à l'InputManager
+    eventBus.emit('overlay/close', overlayId)
   })
   header.appendChild(closeBtn)
 

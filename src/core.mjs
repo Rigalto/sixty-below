@@ -264,7 +264,7 @@ class GameCore {
     }
 
     // DEBUG
-    this.mockupDiv.textContent = `Mouse: ${mouseManager.mouse.x}, ${mouseManager.mouse.y}`
+    // this.mockupDiv.textContent = `Mouse: ${mouseManager.mouse.x}, ${mouseManager.mouse.y}`
     if (leftClick) { console.log('leftClick', mouseManager.mouse) }
     if (rightClick) { console.log('rightClick', mouseManager.mouse) }
 
@@ -397,6 +397,8 @@ class KeyboardManager {
     // mais on reste sur du standard.
     window.addEventListener('keydown', this.onKeyDown)
     window.addEventListener('keyup', this.onKeyUp)
+    // écoute les demandes de fermeture  et d'ouverture des overlays
+    eventBus.on('overlay/close', this.onCloseRequest.bind(this))
   }
 
   // "read-once" (lecture unique)
@@ -456,6 +458,8 @@ class KeyboardManager {
     this.#updateState()
     // On notifie l'overlay pour qu'il s'affiche
     eventBus.emit(`${id}/open`)
+              this.debugLog()
+
   }
 
   #closeOverlay () {
@@ -464,6 +468,12 @@ class KeyboardManager {
     const id = this.#overlayStack.pop() // Retire le dernier
     this.#updateState()
     eventBus.emit(`${id}/close`)
+          this.debugLog()
+  }
+
+  debugLog() {
+    const mockupDiv = document.getElementById('debug-mouse-coords')
+    mockupDiv.textContent = this.#overlayStack.join('\n')
   }
 
   /**
@@ -518,6 +528,12 @@ class KeyboardManager {
       // Bitwise AND avec l'inverse (NOT) du masque pour éteindre le bit
       this.directions &= ~moveBit
     }
+  }
+
+  onCloseRequest (overlyId) {
+    const stackTop = this.#overlayStack[this.#overlayStack.length - 1]
+    if (stackTop !== overlyId) return
+    this.#closeOverlay()
   }
 }
 export const keyboardManager = new KeyboardManager()
