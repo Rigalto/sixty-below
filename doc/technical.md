@@ -93,13 +93,15 @@ microTasker.enqueue(this.myMethod, priority, capacity, arg1, arg2)
 
 ### Usage Patterns (Standard)
 
+L'utilisation de `MICROTASK` est **obligatoire**.
+
 **1. Tâche différée simple** (Ex: Fin de cooldown)
 
 ```javascript
 import { MICROTASK } from './constant.mjs'
 import { taskScheduler } from './utils.mjs'
 
-const { priority, capacity } = MICROTASK.SPELL_COOLDOWN
+const {priority, capacity} = MICROTASK.SPELL_COOLDOWN
 // "fireball_cd" est l'ID unique. 500ms est le délai.
 taskScheduler.enqueue('fireball_cd', 500, this.resetCooldown, priority, capacity, 'fireball')
 ```

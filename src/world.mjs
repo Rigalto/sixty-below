@@ -115,7 +115,7 @@ class ChunkManager {
   /**
    * Prépare l'objet complet pour la sauvegarde (DTO).
    */
-  getChunkExportData (chunkIndex) {
+  getChunkSaveData (chunkIndex) {
     // Décodage aligné sur l'hydratation (>> 6)
     const cx = chunkIndex & 0x3F
     const cy = chunkIndex >> 6

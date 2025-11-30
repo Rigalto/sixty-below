@@ -329,7 +329,8 @@ for (const key in NODES) {
    ========================================= */
 
 export const MICROTASK = {
-  UI_ENV_UPDATE: {priority: 20, capacity: 2, taskName: 'updateClockInOverlay'}, // exemple #1
+  UI_ENV_UPDATE: {priority: 20, capacity: 2, taskName: 'updateClockInOverlay'}, // affiche l'overlay time/weather/Moon/Location
+  PROCESS_SAVE: {priority: 15, capacity: 12, taskName: 'processSave'}, // sauvegarde en database des chunks et autres records
   RENDER_DEBUG_OVERLAY: {priority: 10, capacity: 2, taskName: 'renderDebugOverlay'} // affichage des informations de débug (temps exéec et taille files)
 }
 
