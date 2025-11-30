@@ -448,9 +448,9 @@ class KeyboardManager {
     // 2. Cas : L'overlay est FERMÉ, on veut l'ouvrir
     // On vérifie la priorité par rapport au sommet actuel
     if (stackTop) {
-      const currentPriority = OVERLAYS[stackTop].priority
+      const currentZIndex = OVERLAYS[stackTop].zIndex
       // INTERDICTION : On n'ouvre pas l'inventaire (30) si on est en Combat (100)
-      if (def.priority < currentPriority) return
+      if (def.zIndex < currentZIndex) return
     }
 
     // Accepté : On empile
