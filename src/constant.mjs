@@ -51,6 +51,10 @@ export const OVERLAYS = {
 export const WORLD_WIDTH = 1024 // tuiles
 export const WORLD_HEIGHT = 512 // tuiles
 
+// Dimensions du Canvas (Fixes)
+export const CANVAS_WIDTH = 1024 // pixels
+export const CANVAS_HEIGHT = 768 // pixels
+
 // Dimensions du Monde en Chunks
 // export const WORLD_WIDTH_CHUNKS = WORLD_WIDTH / CHUNK_SIZE // 128
 // export const WORLD_HEIGHT_CHUNKS = WORLD_HEIGHT / CHUNK_SIZE // 48
@@ -141,8 +145,7 @@ export const DB_CONFIG = {
   DEBUG: true,
   STORES: [
     'world_chunks', // Stockage des Uint16Array
-    'player_data', // Position, Stats
-    'game_config', // Time, Seed
+    'gamestate', // Time, Seed, Player position
     'inventory', // Items, Gears, Chests
     'buff', // Buffs/Debuffs
     'plant', // Trees, Herbs, Mushrooms, Flowers, Corals

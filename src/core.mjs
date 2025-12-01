@@ -3,6 +3,8 @@ import {loadAssets, resolveAssetData} from './assets.mjs'
 import {timeManager, taskScheduler, microTasker, eventBus, seededRNG} from './utils.mjs'
 import {database} from './database.mjs'
 import {chunkManager} from './world.mjs'
+import {saveManager} from './persistence.mjs'
+import {camera} from './render.mjs'
 import './ui.mjs'
 import './ui-debug.mjs'
 import './inventory.mjs'
@@ -66,6 +68,7 @@ class GameCore {
 
     // 2. Ouverture de la base de données IndexedDB
     await database.init()
+    saveManager.init()
 
     // 2. Hydratation des données statiques
     this.#hydrateNodes()
@@ -128,7 +131,8 @@ class GameCore {
     const state = {
       timestamp: 480 * 1000,
       weather: 2,
-      nextWeather: 3
+      nextWeather: 3,
+      player: '8192|1280|1'
     }
 
     // 2. Dispatch aux systèmes (Injection de dépendance des données)
@@ -169,6 +173,10 @@ class GameCore {
     }
     // Injection
     chunkManager.init(mockSavedChunks)
+    let [playerX, playerY, playerOrientation] = state.player.split('|')
+    playerX = parseInt(playerX, 10)
+    playerY = parseInt(playerY, 10)
+    camera.init(playerX, playerY)
 
     // buffManager.init()
     // Les quatre lignes ci-dessous simulent le traitement du buffManager
