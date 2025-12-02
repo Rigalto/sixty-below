@@ -67,7 +67,7 @@ class EnvironmentOverlay {
       borderRadius: '6px',
       padding: '8px',
       boxShadow: '0 2px 10px rgba(0,0,0,0.5)',
-     display: 'flex',
+      display: 'flex',
       flexDirection: 'column',
       gap: '6px'
     })
@@ -121,9 +121,6 @@ class EnvironmentOverlay {
     // Init Global -> Tout mettre à jour (estimation : 150µs, microtask inutile car acceptable lors de l'init)
     eventBus.on('time/first-loop', this.#firstloopEnvironment.bind(this))
 
-    // Sky Color -> Juste la bordure (Debug visuel) - TODO: à supprimer
-    eventBus.on('time/sky-color-changed', this.#updateSkyBorder.bind(this))
-
     // Buff de précision d'affichage du temps (estimation : 10µs, microtask inutile)
     eventBus.on('buff/display-time-precision', this.#toggleTimePrecision.bind(this))
     // (estimation : 50µs, microtask inutile)
@@ -144,7 +141,6 @@ class EnvironmentOverlay {
   #firstloopEnvironment (data) {
     this.#updateClockEnvironment(data)
     this.#updateEnvironment(data)
-    this.#updateSkyBorder(data.skyColor) // TODO: à supprimer
   }
 
   // temps d'exécution mesuré à 0.05 ms
@@ -212,11 +208,6 @@ class EnvironmentOverlay {
 
     // Mise à jour du cache pour le prochain appel via buff
     this.lastState.moonPhase = moonPhase
-  }
-
-  // TODO: A supprimer - Debug uniquement
-  #updateSkyBorder (color) {
-    this.container.style.borderLeft = `5px solid ${color}`
   }
 
   #toggleNextWeather (active) {
