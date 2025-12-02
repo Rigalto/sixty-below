@@ -55,38 +55,36 @@ class EnvironmentOverlay {
 
     // CSS "In-JS"
     Object.assign(this.container.style, {
-      position: 'absolute',
-      top: '10px',
-      right: '10px',
-      width: '160px',
+      position: 'relative', // MODIFIÉ : Plus d'absolute, suit le flux normal
+      // top et right SUPPRIMÉS
+      width: '100%', // MODIFIÉ : Prend toute la largeur de la colonne
+      marginBottom: '10px', // AJOUT : Espace avec l'overlay suivant
       backgroundColor: 'rgba(20, 20, 25, 0.9)',
       border: '1px solid #444',
       color: '#ffffff',
       fontFamily: 'Segoe UI, Roboto, monospace',
       fontSize: '14px',
       borderRadius: '6px',
-      pointerEvents: 'none',
       padding: '8px',
       boxShadow: '0 2px 10px rgba(0,0,0,0.5)',
-      zIndex: OVERLAYS.hud.zIndex,
-      display: 'flex',
+     display: 'flex',
       flexDirection: 'column',
       gap: '6px'
     })
 
     // 2. Injection du HTML Statique
     this.container.innerHTML = `
-      <div style="display:flex; justify-content:space-between; align-items:baseline; border-bottom:1px solid #555; padding-bottom:4px; margin-bottom:4px; pointer-events:none;">
+      <div style="display:flex; justify-content:space-between; align-items:baseline; border-bottom:1px solid #555; padding-bottom:4px; margin-bottom:4px;">
         <span id="env-day" style="font-size:1.4em; font-weight:bold; letter-spacing:1px;">DAY ?</span>
         <span id="env-time" style="font-size:1.4em; font-weight:bold; letter-spacing:1px;">--:--</span>
       </div>
 
       <div style="display:flex; justify-content:space-between; align-items:center; font-size: 24px;">
         <div style="display:flex; gap:5px;">
-          <div id="env-weather-now" title="Weather" style="cursor:help; pointer-events:auto;">[?]</div>
-          <div id="env-weather-next" title="Forecast" style="display:none; pointer-events:auto;">[->?]</div>
+          <div id="env-weather-now" title="Weather" style="cursor:help;">[?]</div>
+          <div id="env-weather-next" title="Forecast" style="display:none;">[->?]</div>
         </div>
-        <div id="env-moon" title="Moon Phase" style="cursor:help; pointer-events:auto;">[M]</div>
+        <div id="env-moon" title="Moon Phase" style="cursor:help;">[M]</div>
       </div>
 
       <div id="env-coords" style="font-size:0.8em; color:#888; font-family:monospace; margin-top:2px;">
@@ -94,7 +92,13 @@ class EnvironmentOverlay {
       </div>
     `
 
-    document.body.appendChild(this.container)
+    const overlayPanel = document.getElementById('overlay-panel')
+    if (overlayPanel) {
+      overlayPanel.appendChild(this.container)
+    } else {
+      console.error('EnvironmentOverlay: #overlay-panel introuvable, fallback sur body')
+      document.body.appendChild(this.container)
+    }
 
     // 3. Mise en cache des références (Hydratation DOM)
     this.dom.day = document.getElementById('env-day')

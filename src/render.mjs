@@ -1,4 +1,4 @@
-import {WORLD_WIDTH, WORLD_HEIGHT, CANVAS_WIDTH, CANVAS_HEIGHT} from './constant.mjs'
+import {WORLD_WIDTH, WORLD_HEIGHT, CANVAS_WIDTH, CANVAS_HEIGHT, OVERLAYS} from './constant.mjs'
 import {eventBus} from './utils.mjs'
 
 if (WORLD_WIDTH !== 1024 || WORLD_HEIGHT !== 512 || CANVAS_WIDTH !== 1024 || CANVAS_HEIGHT !== 768) {
@@ -14,7 +14,7 @@ const VIEWPORT_HALF_H = VIEWPORT_HEIGHT >> 1
 // Taille d'un chunk en pixels (16 * 16 = 256)
 const CHUNK_PIXEL_SIZE = 256 // (>> 8)
 // Nombre de chunks sur la largeur du monde (1024 / 16)
-const WORLD_CHUNKS_X = 64 // (>> 8)
+const WORLD_CHUNKS_X = 64 // (>> 6)
 
 /**
  * Fonction utilitaire d'interpolation linéaire
@@ -134,15 +134,15 @@ class Camera {
 
     // 3. Détection de changement de Chunk
     // Coordonnée chunk du coin haut-gauche de la caméra
-    const cx = this.x >> 8 // * 256
-    const cy = this.y >> 8 // * 256
+    const cx = this.x >> 8 // / 256
+    const cy = this.y >> 8 // / 256
 
     // Index flat unique
     const chunkIndex = cx + (cy * WORLD_CHUNKS_X)
 
     if (this.currentChunkIndex !== chunkIndex) {
       this.currentChunkIndex = chunkIndex
-      this.#updateChunkLists(cx, cy)
+      this.#updateChunkLists()
     }
   }
 
@@ -150,7 +150,11 @@ class Camera {
    * Recalcule les listes de chunks (Display/Preload)
    * Optimisé pour ne pas générer de Garbage Collection
    */
-  #updateChunkLists (cx, cy) {
+  #updateChunkLists () {
+    // coordonnées (unité chunk) du chunk en haut à gauche
+    const cx = this.x >> 8
+    const cy = this.y >> 8
+
     // Vider les tableaux sans détruire les références
     this.displayChunks.length = 0
     this.preloadChunks.length = 0
@@ -261,8 +265,86 @@ export const camera = new Camera()
 
 // Placeholder pour le WorldRenderer (à implémenter ensuite)
 class WorldRenderer {
+  constructor () {
+    this.#createCanvas()
+    this.activeCanvasCache = new Map()
+    this.canvasPool = []
+    this.pendingRenderChunks = new Set()
+    this.pixelSize = 256
+  }
+
+  #createCanvas () {
+  // 1. création du canvas
+    this.canvas = document.createElement('canvas')
+    this.canvas.id = 'world-renderer'
+    this.canvas.width = 1024
+    this.canvas.height = 768
+
+    // 2. Style CSS et Positionnement
+    Object.assign(this.canvas.style, {
+      position: 'absolute',
+      top: '0',
+      left: '0',
+      zIndex: OVERLAYS.world.zIndex,
+      imageRendering: 'pixelated'
+    })
+
+    // 3. Configuration du Contexte 2D
+    // alpha: true car on doit voir le ciel (SkyRenderer) à travers les trous du décor
+    this.ctx = this.canvas.getContext('2d', {alpha: true})
+    this.ctx.imageSmoothingEnabled = false
+
+    // Ajout au DOM
+    const container = document.getElementById('canvas-container')
+    if (container) {
+      container.appendChild(this.canvas)
+    } else {
+      console.error("SkyRenderer: Impossible de trouver '#canvas-container'.")
+    }
+  }
+
   init () {
-    console.log('Renderer initialized')
+    // 1. Initialisation des conteneurs de données (Reset)
+    this.activeCanvasCache.clear()
+    this.canvasPool.length = 0
+    this.pendingRenderChunks.clear()
+    this.isRenderTaskScheduled = false // Flag du worker éteint
+
+    // 2. Pre-warming : Génération synchrone des images de départ
+    // On s'assure que le joueur voit quelque chose dès la première frame.
+    const initialChunks = camera.displayChunks
+
+    console.log(`[WorldRenderer] Pre-warming cache for ${initialChunks.length} chunks.`)
+
+    for (const chunkIndex of initialChunks) {
+      // Au démarrage, le pool est vide, on instancie directement
+      const canvas = new OffscreenCanvas(this.pixelSize, this.pixelSize)
+      // Appel direct (bloquant) de la fonction de dessin
+      this._drawChunkToCanvas(chunkIndex, canvas)
+      // On insère immédiatement dans le cache actif
+      this.activeCanvasCache.set(chunkIndex, canvas)
+    }
+
+    // 3. Pre-allocation : Remplissage du Pool
+    // On comble le vide pour atteindre les 72 canvas totaux nécessaires à la caméra.
+    // Ainsi, lors des déplacements futurs, on aura juste à piocher dans ce stock.
+    const needed = 72 - this.activeCanvasCache.size
+    if (needed > 0) {
+      console.log(`[WorldRenderer] Pre-allocating ${needed} silent canvases into pool.`)
+      for (let i = 0; i < needed; i++) {
+        this.canvasPool.push(new OffscreenCanvas(this.pixelSize, this.pixelSize))
+      }
+    }
+    console.log('[WorldRenderer] Initialized')
+  }
+
+  /**
+   * Fonction de dessin (Placeholder)
+   * Sera plus tard remplie par la logique de lecture des tuiles
+   */
+  _drawChunkToCanvas (chunkIndex, canvas) {
+    console.log(`[Render] Generating image for Chunk ${chunkIndex}`)
+    // TODO: Implémenter le parcours des tuiles et le drawImage
   }
 
   render () {
@@ -270,3 +352,70 @@ class WorldRenderer {
   }
 }
 export const worldRenderer = new WorldRenderer()
+
+/* ====================================================================================================
+   SKY RENDERER
+   ==================================================================================================== */
+
+class SkyRenderer {
+  #canvas
+  #ctx
+
+  /**
+   * Initialise le canvas du ciel et l'accroche au DOM.
+   */
+  constructor () {
+    // 1. Création du Canvas
+    this.#canvas = document.createElement('canvas')
+    this.#canvas.id = 'sky-renderer'
+
+    // Définition de la taille (Doit correspondre à la taille du Viewport définie dans le CSS ou le Renderer)
+    this.#canvas.width = 1024
+    this.#canvas.height = 768
+
+    // 2. Styles et Positionnement
+    Object.assign(this.#canvas.style, {
+      position: 'absolute', // Superposition
+      top: '0',
+      left: '0',
+      zIndex: OVERLAYS.sky.zIndex, // Positionnement vertical (sous le monde)
+      pointerEvents: 'none', // Le clic doit traverser vers le jeu
+      width: '1024px', // Taille CSS
+      height: '768px'
+    })
+
+    // 3. Optimisation : alpha: false
+    // On promet au navigateur que ce canvas est totalement opaque.
+    // Le GPU n'a pas à calculer de transparence avec l'arrière-plan de la page web.
+    this.#ctx = this.#canvas.getContext('2d', {alpha: false})
+
+    // 4. Ajout au DOM
+    const container = document.getElementById('canvas-container')
+    if (container) {
+      container.appendChild(this.#canvas)
+    } else {
+      console.error("SkyRenderer: Impossible de trouver '#canvas-container'.")
+    }
+
+    // 5. Initialisation par défaut (Bleu ciel en attendant l'event)
+    this.updateSkyColor('#87CEEB')
+
+    // 6. Abonnement à l'EventBus
+    // Dès que le TimeManager dit que la couleur change, on repeint tout.
+    this.updateSkyColor = this.updateSkyColor.bind(this)
+    eventBus.on('time/sky-color-changed', this.updateSkyColor)
+  }
+
+  /**
+   * Remplit le canvas avec une couleur unie.
+   * Opération très rapide.
+   * @param {string} color - Code Hex ou RGB (ex: '#1a1a2e')
+   */
+  updateSkyColor (color) {
+    this.#ctx.fillStyle = color
+    // On remplit tout le rectangle d'un coup
+    this.#ctx.fillRect(0, 0, this.#canvas.width, this.#canvas.height)
+  }
+}
+
+export const skyRenderer = new SkyRenderer()

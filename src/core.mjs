@@ -312,14 +312,13 @@ class GameCore {
     // BUDGET RENDER //
     // ///////////// //
 
-    // 3. Render (Graphisme)
-    // canvas.clear()
-    // backgroundManager.drawCanvas(canvas)
-    // worldManager.drawCanvas(canvas)
-    // plantManager.drawCanvas(canvas)
-    // furnitureManager.drawCanvas(canvas)
-    // monsterManager.drawCanvas(canvas)
-    // playerManager.drawCanvas(canvas)
+    // 3. Render (Pass-through Context)
+    // const ctx = worldRender.prepareFrame()
+    // plantManager.render(ctx)
+    // furnitureManager.render(ctx)
+    // monsterManager.render(ctx)
+    // playerManager.render(ctx)
+    // worldRender.finishFrame()
 
     const durationRender = performance.now() - executionStart - durationUpdate
     if (durationRender > TIME_BUDGET.RENDER) {

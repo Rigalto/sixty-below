@@ -41,16 +41,22 @@ class RealtimeDebugOverlay {
 
     // Style (Position bas-droite)
     Object.assign(this.canvas.style, {
-      position: 'absolute',
-      bottom: '10px',
-      right: '10px',
+      position: 'relative', // Suit le flux normal
+      marginBottom: '10px', // Espace avec l'élément suivant
+      flexShrink: '0', // Empêche le redimensionnement automatique flex
       pointerEvents: 'none',
       zIndex: OVERLAYS.hud.zIndex, // Au-dessus de tout
       backgroundColor: 'rgba(0, 0, 0, 0.8)', // Fond semi-transparent
       borderRadius: '4px'
     })
 
-    document.body.appendChild(this.canvas)
+    // Ancrage dans le panneau de droite
+    const overlayPanel = document.getElementById('overlay-panel')
+    if (overlayPanel) {
+      overlayPanel.appendChild(this.canvas)
+    } else {
+      document.body.appendChild(this.canvas)
+    }
     this.ctx = this.canvas.getContext('2d', {alpha: true}) // Alpha pour la transparence
 
     // Configuration texte statique

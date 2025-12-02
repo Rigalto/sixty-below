@@ -360,7 +360,8 @@ L'interface est divisée en couches HTML superposées pour optimiser les redraws
 
 L'ordre d'affichage et de capture des clics est statique, défini par le CSS et respecté par l'``InputManager``.
 
-  * Game Layer (Z: 0) : Canvas du Monde (Personnage, Décors).
+  * Sky Layer (Z: 0) : Canvas du ciel.
+  * Game Layer (Z: 5) : Canvas du Monde (Personnage, Décors).
   * HUD Layer (Z: 10) : Éléments DOM permanents (Hotbar, Jauge Vie, Environment, Debug).
   * Voile noir  (Z: 20) : Pour indiquer que le jeu est en pause
   * Info Panels (Z: 30 à 90) : Overlays bloquants

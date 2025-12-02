@@ -1,23 +1,107 @@
 <!DOCTYPE html>
 <html lang="fr">
+  <head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sixty-Below</title>
+  <style>
+    /* Reset basique */
+    body, html {
+      margin: 0;
+      padding: 0;
+      width: 100%;
+      height: 100%;
+      background-color: azure; /* Fond clair général */
+      color: #eeeeee;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      overflow: hidden; /* Pas de scroll sur la page principale */
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    /* Conteneur Flex pour aligner les 3 colonnes */
+    #layout-container {
+      display: flex;
+      flex-direction: row;
+      align-items: center;     /* Centre verticalement */
+      justify-content: center; /* Centre horizontalement */
+      height: 100vh;
+      width: 100vw;
+    }
+
+    /* 1. La Hotbar (Gauche) */
+    #hotbar {
+      width: 80px;            /* Largeur fixe pour les slots */
+      height: 768px;          /* Même hauteur que le jeu */
+      margin-right: 20px;     /* Espace demandé entre hotbar et canvas */
+      background-color: #1e1e1e;
+      border: 1px solid #333;
+      border-radius: 4px;
+      /* Flex pour centrer les futurs icônes */
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding-top: 10px;
+    }
+
+    /* 2. Le Conteneur de Jeu (Centre) */
+    /* C'est ici que le JS viendra injecter les <canvas> */
+    #canvas-container {
+      position: relative;     /* REFERENCE SPATIALE pour les canvas absolute */
+      width: 1024px;
+      height: 768px;
+      background-color: #000; /* Fond noir par défaut (derrière le ciel) */
+      flex-shrink: 0;         /* Empêche le jeu de s'écraser si fenêtre trop petite */
+    }
+
+    /* 3. Le Panneau d'Overlay / Debug (Droite) */
+    #overlay-panel {
+      flex-grow: 1;           /* Prend l'espace restant à droite */
+      height: 768px;          /* Même hauteur que le jeu */
+      max-width: 400px;       /* Limite pour pas que ça s'étale trop */
+      margin-left: 20px;      /* Espace esthétique */
+
+      /* Gestion de l'ascenseur demandée */
+      overflow-y: auto;
+
+      background-color: rgba(30, 30, 30, 0.5);
+      border-left: 1px solid #333;
+      padding: 10px;
+      box-sizing: border-box;
+    }
+
+    /* Style optionnel pour l'ascenseur (Scrollbar) pour faire "Pro" */
+    #overlay-panel::-webkit-scrollbar { width: 8px; }
+    #overlay-panel::-webkit-scrollbar-track { background: #111; }
+    #overlay-panel::-webkit-scrollbar-thumb { background: #444; border-radius: 4px; }
+  </style>
+</head>
 <body>
-    <h1>Sixty-Below Checkpoint</h1>
-    <div id="out"></div>
-    <canvas id="game-canvas" width="1024" height="768" style="border: 5px solid blue;"></canvas>
-    <script type="module">
-      import {gameCore} from './src/core.mjs'
+  <div id="layout-container">
+    <div id="hotbar">
+      </div>
+    <div id="canvas-container">
+      </div>
+    <div id="overlay-panel">
+      <h3>Debug Info</h3>
+      <div id="debug-content">
+        </div>
+    </div>
+  </div>
 
-      // 1. Démarrage technique (Loading Screen)
-      gameCore.boot().then(() => {
-        // Le moteur est prêt, on peut afficher le Menu Principal ici.
-        // Pour le dev, on lance directement une session :
-        document.getElementById('out').innerText = `Succès.`
-        gameCore.startSession()
-      }).catch(err => {
-          console.error("Erreur critique au démarrage :", err)
-          document.getElementById('out').innerHTML = `<h1 style="color:red">CRASH: ${err.message}</h1>`
-      })
+  <script type="module">
+    import {gameCore} from './src/core.mjs'
 
-    </script>
+    // 1. Démarrage technique (Loading Screen)
+    gameCore.boot().then(() => {
+      // Le moteur est prêt, on lance directement une session
+      gameCore.startSession()
+    }).catch(err => {
+        console.error("Erreur critique au démarrage :", err)
+        document.getElementById('out').innerHTML = `<h1 style="color:red">CRASH: ${err.message}</h1>`
+    })
+  </script>
 </body>
 </html>
