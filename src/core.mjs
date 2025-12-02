@@ -4,7 +4,7 @@ import {timeManager, taskScheduler, microTasker, eventBus, seededRNG} from './ut
 import {database} from './database.mjs'
 import {chunkManager} from './world.mjs'
 import {saveManager} from './persistence.mjs'
-import {camera} from './render.mjs'
+import {camera, worldRenderer} from './render.mjs'
 import './ui.mjs'
 import './ui-debug.mjs'
 import './inventory.mjs'
@@ -68,7 +68,6 @@ class GameCore {
 
     // 2. Ouverture de la base de données IndexedDB
     await database.init()
-    saveManager.init()
 
     // 2. Hydratation des données statiques
     this.#hydrateNodes()
@@ -173,10 +172,15 @@ class GameCore {
     }
     // Injection
     chunkManager.init(mockSavedChunks)
-    let [playerX, playerY, playerOrientation] = state.player.split('|')
-    playerX = parseInt(playerX, 10)
-    playerY = parseInt(playerY, 10)
-    camera.init(playerX, playerY)
+    const [playerX, playerY, playerDirection] = state.player.split('|')
+    this.playerX = parseInt(playerX, 10)
+    this.playerY = parseInt(playerY, 10)
+    this.playerDirection = playerDirection
+    camera.init(this.playerX, this.playerY)
+    // Puis initialisaton du rendering du monde
+    worldRenderer.init()
+    // Lancement de la sauvegarde périodique (toutes les deux secondes)
+    saveManager.init()
 
     // buffManager.init()
     // Les quatre lignes ci-dessous simulent le traitement du buffManager
@@ -250,6 +254,23 @@ class GameCore {
       // console.log('player.move(', keyboardManager.directions, ')')
       // player.move(keyboardManager.directions)
     }
+    // MOCK-UP va-et-vient du player
+    const speed = 5 // Pixels par frame
+
+    // Application du mouvement
+    this.playerX += speed * this.playerDirection
+
+    // Gestion des bornes et rebond
+    if (this.playerX >= 9700) {
+      this.playerX = 9700
+      this.playerDirection = -1 // Demi-tour gauche
+    } else if (this.playerX <= 6700) {
+      this.playerX = 6700
+      this.playerDirection = 1 // Demi-tour droite
+    }
+
+    // Mise à jour Caméra
+    camera.update(this.playerX, this.playerY)
 
     // 2.D Affiche des informations concernant la tuile sous la souris
     // const hoverPosition = mouseManager.mouse
@@ -466,8 +487,7 @@ class KeyboardManager {
     this.#updateState()
     // On notifie l'overlay pour qu'il s'affiche
     eventBus.emit(`${id}/open`)
-              this.debugLog()
-
+    this.debugLog()
   }
 
   #closeOverlay () {
@@ -476,10 +496,10 @@ class KeyboardManager {
     const id = this.#overlayStack.pop() // Retire le dernier
     this.#updateState()
     eventBus.emit(`${id}/close`)
-          this.debugLog()
+    this.debugLog()
   }
 
-  debugLog() {
+  debugLog () {
     const mockupDiv = document.getElementById('debug-mouse-coords')
     mockupDiv.textContent = this.#overlayStack.join('\n')
   }
