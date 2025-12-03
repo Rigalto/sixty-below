@@ -191,7 +191,9 @@ class GameCore {
 
     // 3. Initialisation des systèmes (Layer 2)
     // C'est ici qu'on initialise les managers
-    // await WorldManager.init(...)
+    // await FloraManager.init(...)
+    // await FaunaManager.init(...)
+    // await PlayerManager.init(...)
 
     // 4. Lancement de la boucle
     this.isRunning = true
@@ -313,13 +315,17 @@ class GameCore {
     // ///////////// //
 
     // 3. Render (Pass-through Context)
-    // const ctx = worldRender.prepareFrame()
+    const ctx = worldRenderer.render()
     // plantManager.render(ctx)
     // furnitureManager.render(ctx)
     // monsterManager.render(ctx)
     // playerManager.render(ctx)
-    // worldRender.finishFrame()
+    ctx.restore() // 'worldRenderer.render' a fait un ctx.save()
     // lightRenderer.render()
+
+    // 3.1 génère la liste des chunks dont il faut générer les images
+    // Les images seront générées par une micro-tâche
+    worldRenderer.update()
 
     const durationRender = performance.now() - executionStart - durationUpdate
     if (durationRender > TIME_BUDGET.RENDER) {

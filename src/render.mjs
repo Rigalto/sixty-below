@@ -1,5 +1,6 @@
-import {WORLD_WIDTH, WORLD_HEIGHT, CANVAS_WIDTH, CANVAS_HEIGHT, OVERLAYS} from './constant.mjs'
-import {eventBus} from './utils.mjs'
+import {WORLD_WIDTH, WORLD_HEIGHT, CANVAS_WIDTH, CANVAS_HEIGHT, OVERLAYS, NODES_LOOKUP, MICROTASK} from './constant.mjs'
+import {eventBus, microTasker} from './utils.mjs'
+import {chunkManager} from './world.mjs'
 
 if (WORLD_WIDTH !== 1024 || WORLD_HEIGHT !== 512 || CANVAS_WIDTH !== 1024 || CANVAS_HEIGHT !== 768) {
   console.error('render: Constantes de dimensions incorrectes')
@@ -38,7 +39,7 @@ class Camera {
 
     // Listes d'index de chunks
     this.displayChunks = [] // Chunks visibles à l'écran (Target Render) (5 * 4 chunks)
-    this.preloadChunks = [] // Chunks en bordure (Target Cache update) (7 * 6 - 5 * 4 chunks)
+    this.preloadChunks = new Set() // Chunks en bordure (Target Cache update) (7 * 6 chunks)
     this.unpurgeableChunks = [] // Chunks à garder en cache RAM (9 * 8 chunks)
 
     this.setZoom = this.setZoom.bind(this)
@@ -157,7 +158,7 @@ class Camera {
 
     // Vider les tableaux sans détruire les références
     this.displayChunks.length = 0
-    this.preloadChunks.length = 0
+    this.preloadChunks.clear()
     this.unpurgeableChunks.length = 0
 
     // Définition des rectangles (en coordonnées Chunk)
@@ -192,10 +193,7 @@ class Camera {
 
         // Si c'est dans la zone Preload mais PAS dans Display -> C'est un preload
         if (x >= preX0 && x <= preX1 && y >= preY0 && y <= preY1) {
-          // Astuce: includes sur un petit tableau (size < 20) est très rapide
-          if (!this.displayChunks.includes(idx)) {
-            this.preloadChunks.push(idx)
-          }
+          this.preloadChunks.add(idx)
         }
       }
     }
@@ -263,7 +261,6 @@ export const camera = new Camera()
    AFFICHAGE DES TUILES DU MONDE
    ==================================================================================================== */
 
-// Placeholder pour le WorldRenderer (à implémenter ensuite)
 class WorldRenderer {
   constructor () {
     this.#createCanvas()
@@ -271,6 +268,8 @@ class WorldRenderer {
     this.canvasPool = []
     this.pendingRenderChunks = new Set()
     this.pixelSize = 256
+
+    this.processRenderQueue = this.processRenderQueue.bind(this)
   }
 
   #createCanvas () {
@@ -320,7 +319,7 @@ class WorldRenderer {
       // Au démarrage, le pool est vide, on instancie directement
       const canvas = new OffscreenCanvas(this.pixelSize, this.pixelSize)
       // Appel direct (bloquant) de la fonction de dessin
-      this._drawChunkToCanvas(chunkIndex, canvas)
+      this.#drawChunkToCanvas(chunkIndex, canvas)
       // On insère immédiatement dans le cache actif
       this.activeCanvasCache.set(chunkIndex, canvas)
     }
@@ -342,13 +341,181 @@ class WorldRenderer {
    * Fonction de dessin (Placeholder)
    * Sera plus tard remplie par la logique de lecture des tuiles
    */
-  _drawChunkToCanvas (chunkIndex, canvas) {
+  #drawChunkToCanvas (chunkIndex, canvas) {
+    const ctx = canvas.getContext('2d')
+
+    // 1. Nettoyage impératif (le canvas peut venir du canvasPool et contenir une vieille image)
+    ctx.clearRect(0, 0, canvas.width, canvas.height)
+
+    // 2. Récupération des données locales du chunk (Uint8Array de 256 octets)
+    const chunkData = chunkManager.getChunkData(chunkIndex)
+
+    // 3. Boucle de rendu (16x16)
+    // chunkData est un tableau plat de 0 à 255 correspondant exactement à notre tile 16x16
+    for (let i = 0; i < 256; i++) {
+      // ID de la tuile
+      const tileId = chunkData[i]
+
+      // Coordonnées locales dans le chunk (Optimisation bitwise)
+      const x = i & 0xF // i % 16
+      const y = i >> 4 // i / 16
+
+      // Lookup des propriétés
+      const node = NODES_LOOKUP[tileId]
+
+      // 4. Dessin du carré de couleur
+      // TODO: Implémenter l'utilisation des textures
+      if (node) {
+        ctx.fillStyle = node.color
+        ctx.fillRect(x << 4, y << 4, 16, 16)
+      }
+    }
     console.log(`[Render] Generating image for Chunk ${chunkIndex}`)
-    // TODO: Implémenter le parcours des tuiles et le drawImage
   }
 
+  /**
+   * PHASE UPDATE (~1ms)
+   * Vérifie les besoins de la caméra et planifie le rendu si nécessaire.
+   */
+  update () {
+    // Note: La suppression des chunks lointains (GC) sera designée et codée plus tard
+
+    // 1. GESTION DES MODIFICATIONS (Dirty Chunks)
+    const dirtyChunks = chunkManager.consumeRenderDirtyChunks()
+    if (dirtyChunks) {
+      for (const idx of dirtyChunks) {
+        // Est-ce que ce chunk est dans la zone de Preload ?
+        const isDirty = camera.preloadChunks.has(idx)
+
+        if (isDirty) {
+          // Cas 1 : Il faut recalculer l'image de ce chunk
+          this.pendingRenderChunks.add(idx)
+        } else {
+          // Cas 2 : S'il y a une image en cache, elle est désormais invalide.
+          if (this.activeCanvasCache.has(idx)) {
+            // On la supprime pour ne pas garder une fausse image, et on recycle le canvas.
+            const canvas = this.activeCanvasCache.get(idx)
+            this.canvasPool.push(canvas)
+            this.activeCanvasCache.delete(idx)
+
+            // Si jamais il était en attente de rendu, on l'annule pour économiser le worker
+            this.pendingRenderChunks.delete(idx)
+          }
+        }
+      }
+    }
+
+    // 2. Missing Chunks - Preload
+    for (const idx of camera.preloadChunks) {
+      if (!this.activeCanvasCache.has(idx)) { this.pendingRenderChunks.add(idx) }
+    }
+
+    // 3. Allumage du Moteur (Si du travail existe et que le worker dort)
+    if (this.pendingRenderChunks.size > 0 && !this.isRenderTaskScheduled) {
+      this.isRenderTaskScheduled = true
+
+      const {priority, capacity} = MICROTASK.RENDER_CHUNK_QUEUE
+      // On lance la première tâche
+      microTasker.enqueue(this.processRenderQueue, priority, capacity)
+    }
+  }
+
+  /**
+   * PHASE MICROTASK (Worker)
+   * Génération d'une texture de chunk. S'auto-rappelle si travail restant.
+   */
+  processRenderQueue () {
+    // 1. Si plus rien à faire (ou annulé), on éteint le moteur
+    if (this.pendingRenderChunks.size === 0) {
+      this.isRenderTaskScheduled = false
+      return
+    }
+
+    // 2. Récupération de l'identifiant du chunk
+    // .values().next().value permet de prendre le premier élément d'un Set (ordre d'insertion)
+    const targetIndex = this.pendingRenderChunks.values().next().value
+
+    // 3. Retrait de la file d'attente
+    this.pendingRenderChunks.delete(targetIndex)
+
+    // 4. Gestion du Canvas (Récupération ou Allocation)
+    // 4.1 : Le chunk est déjà affiché (ex: Dirty Chunk suite à minage)
+    // On réutilise l'instance existante pour ne pas épuiser le pool.
+    let offscreen = this.activeCanvasCache.get(targetIndex)
+
+    // Cas B : Le chunk n'est pas encore en mémoire (ex: Déplacement caméra)
+    if (!offscreen) {
+      if (this.canvasPool.length > 0) {
+        // Recyclage depuis le pool
+        offscreen = this.canvasPool.pop()
+      } else {
+        // Création à neuf si pool vide
+        offscreen = new OffscreenCanvas(this.pixelSize, this.pixelSize)
+      }
+      // On l'enregistre immédiatement dans le cache actif
+      this.activeCanvasCache.set(targetIndex, offscreen)
+    }
+
+    // 5. GÉNÉRATION DE L'IMAGE
+    this.#drawChunkToCanvas(targetIndex, offscreen)
+
+    // 6. Re-planification (Chaining)
+    // Tant qu'il reste des chunks, on demande au MicroTasker de nous rappeler
+    if (this.pendingRenderChunks.size > 0) {
+      const {priority, capacity} = MICROTASK.RENDER_CHUNK_QUEUE
+      microTasker.enqueue(this.processRenderQueue, priority, capacity)
+    } else {
+      // Plus rien à faire, on éteint le flag
+      this.isRenderTaskScheduled = false
+    }
+  }
+
+  // Appelé par la loop
   render () {
-    // Sera appelé par la loop
+    const ctx = this.ctx
+
+    // 1. Nettoyage de la frame précédente
+    // On efface l'intégralité du viewport physique (1024x768)
+    ctx.clearRect(0, 0, this.canvas.width, this.canvas.height)
+
+    // 2. Mise en place de la Matrice (Caméra & Zoom)
+    // On sauvegarde l'état "neutre" (Screen Space) avant de transformer
+    ctx.save()
+
+    // A. Zoom (Scaling)
+    // Note : On applique le zoom avant la translation
+    if (camera.zoom !== 1) {
+      ctx.scale(camera.zoom, camera.zoom)
+    }
+
+    // B. Position (Translation)
+    // On déplace le monde à l'inverse de la position de la caméra.
+    // L'utilisation de "| 0" force l'arrondi à l'entier pour éviter le flou (sub-pixel rendering)
+    ctx.translate(-camera.x | 0, -camera.y | 0)
+
+    // 3. Rendu des Chunks du Sol (Layer 0)
+    // On itère uniquement sur la liste fournie par la caméra (Culling déjà fait)
+    const displayList = camera.displayChunks
+
+    for (const chunkIndex of displayList) {
+      // Récupération de l'image pré-calculée dans le cache
+      const cachedCanvas = this.activeCanvasCache.get(chunkIndex)
+
+      if (cachedCanvas) {
+        // Décodage : Index Flat -> Coordonnées Monde (Pixels)
+        const cx = (chunkIndex & 0x3F) << 8
+        const cy = (chunkIndex >> 6) << 8
+
+        // Dessin de l'OffscreenCanvas sur le MainCanvas
+        ctx.drawImage(cachedCanvas, cx, cy)
+      }
+    }
+
+    // 4. Passage de relais
+    // On retourne le contexte ALORS qu'il est encore transformé (Zoom/Translate actifs).
+    // Les managers suivants (Flora, Furniture, Fauna) dessineront par-dessus le sol
+    // en utilisant des coordonnées Monde, sans avoir à recalculer la caméra.
+    return ctx
   }
 }
 export const worldRenderer = new WorldRenderer()

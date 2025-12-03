@@ -278,7 +278,7 @@ export const NODES = {
   LAVA: {code: 58, name: 'Lava', type: NODE_TYPE.LIQUID, stype: 'lava', level: 16, star: 0, solid: false, color: '#DC143C', image: 'liquid_16_16-3-0', viscosity: 800},
   SAP: {code: 59, name: 'Sap', type: NODE_TYPE.LIQUID, solid: false, color: '#008000', viscosity: 500},
 
-  SHORE: {code: 60, name: 'Shore'},
+  SHORE: {code: 60, name: 'Shore', color: '#FFCC00'},
   // types utilisés de manière temporaire pendant la création du monde
   HEART: {code: 61, name: 'Life Heart', type: NODE_TYPE.CREATION, color: '#FF19CD'}
 }
@@ -302,6 +302,7 @@ for (const key in NODES) {
   NODES_LOOKUP[nodeDesc.code] = nodeDesc
   // Préparation pour hydratation (sera remplacé par assets.mjs)
   nodeDesc.renderData = null
+  if (nodeDesc.color === undefined) { console.error('Attribut "color" manquant pour', key) }
   nodeDesc.rgbColor = hexToRgb(nodeDesc.color)
 }
 
@@ -342,6 +343,7 @@ for (const key in NODES) {
    ========================================= */
 
 export const MICROTASK = {
+  RENDER_CHUNK_QUEUE: {priority: 30, capacity: 12, taskName: 'processRenderQueue'}, // génère les images des dirty chunks
   UI_ENV_UPDATE: {priority: 20, capacity: 2, taskName: 'updateClockInOverlay'}, // affiche l'overlay time/weather/Moon/Location
   PROCESS_SAVE: {priority: 15, capacity: 12, taskName: 'processSave'}, // sauvegarde en database des chunks et autres records
   RENDER_DEBUG_OVERLAY: {priority: 10, capacity: 2, taskName: 'renderDebugOverlay'} // affichage des informations de débug (temps exéec et taille files)

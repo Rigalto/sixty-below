@@ -113,6 +113,28 @@ class ChunkManager {
   }
 
   /**
+   * Renvoie les tuiles du chunk dont on donne l'index.
+   */
+  getChunkData (chunkIndex) {
+    // Décodage aligné sur l'hydratation (>> 6)
+    const cx = chunkIndex & 0x3F
+    const cy = chunkIndex >> 6
+
+    const buffer = new Uint8Array(256)
+
+    const startWorldX = cx << 4
+    const startWorldY = cy << 4
+    let rowOffset = (startWorldY << 10) | startWorldX
+
+    for (let y = 0; y < 16; y++) {
+      const worldRow = this.#data.subarray(rowOffset, rowOffset + 16)
+      buffer.set(worldRow, y << 4)
+      rowOffset += WORLD_WIDTH // 1024
+    }
+    return buffer
+  }
+
+  /**
    * Prépare l'objet complet pour la sauvegarde (DTO).
    */
   getChunkSaveData (chunkIndex) {
@@ -140,7 +162,7 @@ class ChunkManager {
    * Appelé par le Renderer.
    * @returns {Set<number>} Set d'IDs de chunks
    */
-  fetchRenderDirty () {
+  consumeRenderDirtyChunks () {
     if (this.#dirtyRenderChunks.size === 0) return null
     // On clone pour renvoyer et on clear l'original
     // Note: Pour optimiser le GC, on pourrait utiliser un double-buffer de Set
