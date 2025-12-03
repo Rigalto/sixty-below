@@ -417,5 +417,45 @@ class SkyRenderer {
     this.#ctx.fillRect(0, 0, this.#canvas.width, this.#canvas.height)
   }
 }
-
 export const skyRenderer = new SkyRenderer()
+
+/* ====================================================================================================
+   LIGHT RENDERER (TORCHES...)
+   ==================================================================================================== */
+
+class LightRenderer {
+  constructor () {
+    // 1. Création de l'élément Canvas
+    this.canvas = document.createElement('canvas')
+    this.canvas.id = 'light-renderer'
+    this.canvas.width = 1024
+    this.canvas.height = 768
+
+    // 2. Styles CSS et Positionnement
+    Object.assign(this.canvas.style, {
+      position: 'absolute',
+      top: '0',
+      left: '0',
+      zIndex: OVERLAYS.light.zIndex,
+      pointerEvents: 'none' // Les clics doivent traverser ce calque pour atteindre le jeu
+    })
+
+    // 3. Configuration du Contexte
+    // On garde les settings par défaut (alpha: true) pour la transparence
+    this.ctx = this.canvas.getContext('2d')
+
+    // 4. Ancrage dans le conteneur central
+    const container = document.getElementById('canvas-container')
+    if (container) {
+      container.appendChild(this.canvas)
+    } else {
+      console.error("[LightRenderer]: Impossible de trouver '#canvas-container'.")
+    }
+  }
+
+  // Placeholder pour la méthode de rendu principale
+  render () {
+    // À implémenter : Reset Noir -> Découpe Ciel -> Découpe Torches -> Coloration
+  }
+}
+export const lightRenderer = new LightRenderer()

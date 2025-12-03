@@ -32,6 +32,7 @@ const mockup = () => {
 
   // Ajout au DOM
   document.body.appendChild(debugDiv)
+  return debugDiv
 }
 
 class GameCore {
@@ -47,8 +48,7 @@ class GameCore {
     this.debugTrigger = false
     this.debugMap = false
     // DEBUG
-    mockup()
-    this.mockupDiv = document.getElementById('debug-mouse-coords')
+    this.mockupDiv = mockup()
   }
 
   /* =========================================
@@ -75,7 +75,7 @@ class GameCore {
     // this._hydrateBuffs() ...
 
     // 3. Liens avec le DOM
-    mouseManager.init('game-canvas')
+    mouseManager.init()
 
     this.isBooted = true
     console.timeEnd('Engine Boot')
@@ -293,7 +293,7 @@ class GameCore {
     }
 
     // DEBUG
-    // this.mockupDiv.textContent = `Mouse: ${mouseManager.mouse.x}, ${mouseManager.mouse.y}`
+    this.mockupDiv.textContent = `Mouse: ${mouseManager.mouse.x}, ${mouseManager.mouse.y}`
     if (leftClick) { console.log('leftClick', mouseManager.mouse) }
     if (rightClick) { console.log('rightClick', mouseManager.mouse) }
 
@@ -319,6 +319,7 @@ class GameCore {
     // monsterManager.render(ctx)
     // playerManager.render(ctx)
     // worldRender.finishFrame()
+    // lightRenderer.render()
 
     const durationRender = performance.now() - executionStart - durationUpdate
     if (durationRender > TIME_BUDGET.RENDER) {
@@ -590,10 +591,10 @@ class MouseManager {
    * Initialisation DOM
    * @param {string} canvasId
    */
-  init (canvasId) {
-    this.#canvas = document.getElementById(canvasId)
+  init () {
+    this.#canvas = document.getElementById('world-renderer')
     if (!this.#canvas) {
-      console.error('MouseManager: Canvas not found', canvasId)
+      console.error('MouseManager: Canvas world-renderer not found')
       return
     }
 
