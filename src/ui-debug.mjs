@@ -1,4 +1,4 @@
-import {MICROTASK, WORLD_WIDTH, WORLD_HEIGHT, NODES_LOOKUP, OVERLAYS} from './constant.mjs'
+import {MICROTASK, WORLD_WIDTH, WORLD_HEIGHT, NODES_LOOKUP, OVERLAYS, UI_LAYOUT} from './constant.mjs'
 import {eventBus, microTasker, taskScheduler} from './utils.mjs'
 import {chunkManager} from './world.mjs'
 
@@ -9,7 +9,7 @@ import {chunkManager} from './world.mjs'
 const DEBUG_WIDTH = 200
 const DEBUG_HEIGHT = 110
 
-class RealtimeDebugOverlay {
+class RealtimeDebugWidget {
   constructor () {
     this.canvas = null
     this.ctx = null
@@ -46,11 +46,13 @@ class RealtimeDebugOverlay {
       flexShrink: '0', // Empêche le redimensionnement automatique flex
       pointerEvents: 'none',
       backgroundColor: 'rgba(0, 0, 0, 0.8)', // Fond semi-transparent
-      borderRadius: '4px'
+      borderRadius: '4px',
+      order: UI_LAYOUT.DEBUG_REALTIME,
+      alignSelf: 'flex-start'
     })
 
     // Ancrage dans le panneau de droite
-    const overlayPanel = document.getElementById('overlay-panel')
+    const overlayPanel = document.getElementById('right-sidebar')
     if (overlayPanel) {
       overlayPanel.appendChild(this.canvas)
     } else {
@@ -158,7 +160,7 @@ class RealtimeDebugOverlay {
     this.frameCount = 64
   }
 }
-export const realtimeDebugOverlay = new RealtimeDebugOverlay()
+export const realtimeDebugWidget = new RealtimeDebugWidget()
 
 /* ====================================================================================================
    AFFICHE LA CARTE COMPLETE DU MONDE (1px = 1 tuile)

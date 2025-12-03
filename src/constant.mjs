@@ -46,7 +46,7 @@ export const UI_LAYOUT = {
   ENVIRONMENT: 20,
   LIFE: 30,
   BUFF: 40,
-  DEBUG_PERF: 90
+  DEBUG_REALTIME: 90
 }
 
 /* =========================================

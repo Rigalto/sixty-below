@@ -4,13 +4,13 @@
  */
 
 import {eventBus} from './utils.mjs'
-import {WEATHER_TYPE, MOON_PHASE, MOON_PHASE_BLURRED, STATE, OVERLAYS} from './constant.mjs'
+import {WEATHER_TYPE, MOON_PHASE, MOON_PHASE_BLURRED, STATE, OVERLAYS, UI_LAYOUT} from './constant.mjs'
 
 /* ====================================================================================================
    AFFICHAGE DATE/HEURE METEO LUNE POSITION
    ==================================================================================================== */
 
-class EnvironmentOverlay {
+class EnvironmentWidget {
   #boundUpdateCoords = null // Référence pour on/off dynamique
 
   constructor () {
@@ -58,6 +58,7 @@ class EnvironmentOverlay {
       position: 'relative', // MODIFIÉ : Plus d'absolute, suit le flux normal
       // top et right SUPPRIMÉS
       width: '100%', // MODIFIÉ : Prend toute la largeur de la colonne
+      order: UI_LAYOUT.ENVIRONMENT,
       marginBottom: '10px', // AJOUT : Espace avec l'overlay suivant
       backgroundColor: 'rgba(20, 20, 25, 0.9)',
       border: '1px solid #444',
@@ -92,11 +93,11 @@ class EnvironmentOverlay {
       </div>
     `
 
-    const overlayPanel = document.getElementById('overlay-panel')
+    const overlayPanel = document.getElementById('right-sidebar')
     if (overlayPanel) {
       overlayPanel.appendChild(this.container)
     } else {
-      console.error('EnvironmentOverlay: #overlay-panel introuvable, fallback sur body')
+      console.error('EnvironmentWidget: #right-sidebar introuvable, fallback sur body')
       document.body.appendChild(this.container)
     }
 
@@ -242,7 +243,7 @@ class EnvironmentOverlay {
   }
 }
 // Instanciation immédiate (Singleton autonome)
-export const environmentOverlay = new EnvironmentOverlay()
+export const environmentWidget = new EnvironmentWidget()
 
 /* ====================================================================================================
    AFFICHAGE VOILE SOMBRE

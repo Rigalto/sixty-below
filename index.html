@@ -57,15 +57,14 @@
     }
 
     /* 3. Le Panneau d'Overlay / Debug (Droite) */
-    #overlay-panel {
+    #right-sidebar {
       flex-grow: 1;           /* Prend l'espace restant à droite */
       height: 768px;          /* Même hauteur que le jeu */
       max-width: 400px;       /* Limite pour pas que ça s'étale trop */
       margin-left: 20px;      /* Espace esthétique */
-
-      /* Gestion de l'ascenseur demandée */
+      display: flex;
+      flex-direction: column;
       overflow-y: auto;
-
       background-color: rgba(30, 30, 30, 0.5);
       border-left: 1px solid #333;
       padding: 10px;
@@ -73,9 +72,9 @@
     }
 
     /* Style optionnel pour l'ascenseur (Scrollbar) pour faire "Pro" */
-    #overlay-panel::-webkit-scrollbar { width: 8px; }
-    #overlay-panel::-webkit-scrollbar-track { background: #111; }
-    #overlay-panel::-webkit-scrollbar-thumb { background: #444; border-radius: 4px; }
+    #right-sidebar::-webkit-scrollbar { width: 8px; }
+    #right-sidebar::-webkit-scrollbar-track { background: #111; }
+    #right-sidebar::-webkit-scrollbar-thumb { background: #444; border-radius: 4px; }
   </style>
 </head>
 <body>
@@ -84,10 +83,7 @@
       </div>
     <div id="canvas-container">
       </div>
-    <div id="overlay-panel">
-      <h3>Debug Info</h3>
-      <div id="debug-content">
-        </div>
+    <div id="right-sidebar">
     </div>
   </div>
 

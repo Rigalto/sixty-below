@@ -245,7 +245,7 @@ Cette section définit les événements officiels. Tout nouvel événement doit 
 | `buff/display-time-precision` | `integer` | précision 0 => 1heure, 1 => 15 minutes, 2 => 5 minutes |
 | `buff/display-moon-detail` | `boolean` | affiche 4 (false) ou 8 (true) phases lunaires |
 
-### Debug (`WorldMapDebug`, `RealtimeDebugOverlay`)
+### Debug (`WorldMapDebug`, `RealtimeDebugWidget`)
 | Event Name | Payload Structure | Description |
 | :--- | :--- | :--- |
 | `map/open`| - | Demande d'ouverture de la carte au 1/16e. |

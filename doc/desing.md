@@ -329,7 +329,7 @@ Le `gamestate` est un stockage clé/valeur (K/V) utilisé pour persister les ét
 * **3 zones : (découpage horizontal)**
     * **Gauche** : Hotbar (verticale)
     * **Centre** : Monde (empilmenent de <canvas>)
-    * **Droite** : Modules les uns sous les autres (Layout)
+    * **Droite** : Widgets les uns sous les autres (Layout)
         * **Boutons d'action** : Inventaire, Artisanat, Aide, Zoom, Sons, Nouveau Monde (Snapshot pour débug)
         * **Environement :** Jour / Heure / Météo / Phase de la Lune / Position
         * **Jauges :** Vie
@@ -375,7 +375,7 @@ La partie centrale de l'interface est divisée en balises <canvas> superposées 
     * Camera : récupère les informations de la Caméra (chunks à afficher, chunk dont il faut précharger les images)
 * **Camera :** Singleton responsable uniquement des mathématiques de projection (World <-> Screen), du Culling (Quels chunks sont visibles ?) et du zoom.
 * **ModalBlocker :** [`ui.mjs`] - Voile sombre
-* **EnvironmentOverlay :** [`ui.mjs`] - Date, météo, lune...
+* **EnvironmentWidget :** [`ui.mjs`] - Date, météo, lune...
 
 
 ### 6.5 Hiérarchie Visuelle et Input (Z-Index Strategy) [`constant.mjs :: OVERLAYS`]
@@ -424,7 +424,7 @@ L'architecture sépare la logique (UI Logic) du rendu pur (Render) et distingue 
 │   ├── combat.mjs           # TACTICAL : ArenaCreator (procédural - forme, murs et trous), TurnManager, Pathfinding (A* pour le combat), SpellSystem (Portée, DamageCalculator), CombatAI (CombatBehaviors combinables)
 │   ├── ui.mjs               # INTERFACE PANEL/DOM (LOGIQUE) :
 │   │                        # - DOM Managers : PreferencePanel (configuration UI, clavier, souris...)
-│   │                        # - HUD Managers : HotbarOverlay, EnvironmentOverlay (Draw logic)
+│   │                        # - HUD Managers : HotbarManager, EnvironmentWidget (Draw logic)
 │   │                        # - Factories : Don't Repeat Yourself (DRY)
 │   ├── craft.mjs            # InventoryPanel, CraftSystem (SRecettes, validation)
 │   ├── inventory.mjs        # InventoryPanel, InventorySystem (Slots, Stacking, Drag&Drop logic)
@@ -474,5 +474,5 @@ Cette couche contient la logique spécifique du jeu. Les modules communiquent le
 ### 8.3 Interface Environnement [`ui.mjs`]
 * **Abonnement :** Écoute les événements granulaires du `BuffManager` (`buff/moon`, `buff/weather`, `buff/coords`).
 * **Optimisation dynamique :**
-    * Pour les coordonnées (mise à jour fréquente), l'UI [`EnvironmentOverlay`] ne s'abonne à l'événement `player/move` **QUE** si le buff `buff/coords-display` est actif.
+    * Pour les coordonnées (mise à jour fréquente), l'UI [`EnvironmentWidget`] ne s'abonne à l'événement `player/move` **QUE** si le buff `buff/coords-display` est actif.
     * Si le buff est perdu, l'UI se désabonne immédiatement de `player/move` pour économiser le CPU.
