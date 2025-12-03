@@ -29,15 +29,24 @@ export const STATE = {
 
 export const OVERLAYS = {
   sky: {state: null, zIndex: 0},
-  world: {state: null, zIndex: 5},
-  hud: {state: null, zIndex: 10},
-  backdrop: {state: null, zIndex: 20},
-  inventory: {state: STATE.INFORMATION, zIndex: 30},
-  craft: {state: STATE.INFORMATION, zIndex: 40},
-  help: {state: STATE.INFORMATION, zIndex: 50},
-  map: {state: STATE.INFORMATION, zIndex: 60},
+  world: {state: null, zIndex: 10},
+  light: {state: null, zIndex: 20},
+  backdrop: {state: null, zIndex: 30},
+  inventory: {state: STATE.INFORMATION, zIndex: 40},
+  craft: {state: STATE.INFORMATION, zIndex: 50},
+  help: {state: STATE.INFORMATION, zIndex: 60},
+  map: {state: STATE.INFORMATION, zIndex: 70},
   combat: {state: STATE.COMBAT, zIndex: 100},
-  creation: {state: STATE.CREATION, zIndex: 110}
+  creation: {state: STATE.CREATION, zIndex: 110},
+  system: {state: null, zIndex: 200}
+}
+
+export const UI_LAYOUT = {
+  ACTIONS: 10,
+  ENVIRONMENT: 20,
+  LIFE: 30,
+  BUFF: 40,
+  DEBUG_PERF: 90
 }
 
 /* =========================================

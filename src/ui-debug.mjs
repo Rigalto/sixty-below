@@ -45,7 +45,6 @@ class RealtimeDebugOverlay {
       marginBottom: '10px', // Espace avec l'élément suivant
       flexShrink: '0', // Empêche le redimensionnement automatique flex
       pointerEvents: 'none',
-      zIndex: OVERLAYS.hud.zIndex, // Au-dessus de tout
       backgroundColor: 'rgba(0, 0, 0, 0.8)', // Fond semi-transparent
       borderRadius: '4px'
     })

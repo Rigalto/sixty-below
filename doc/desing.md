@@ -334,11 +334,13 @@ Le `gamestate` est un stockage clé/valeur (K/V) utilisé pour persister les ét
         * **Environement :** Jour / Heure / Météo / Phase de la Lune / Position
         * **Jauges :** Vie
         * **Buffs/Debuffs actifs**
+        * **Débug**
 * **Taille des Canvas :** Le monde est affiché dans un canvas de 4 chunks de large (1024 pixels) et 3 chunks de haut (768 pixels).
 * **Overlays : (empilement vertical)**
     * **Inventaire**
     * **Artisanat**
     * **Aide**
+    * **Carte**
 * **Overlays : (positionnement)**
     * Les overlays affichés pendant le jeu (pendant le temps réel) sont centrés sur l'écran physique.
     * Les overlays s'empilent les uns sur les autres, dans un ordre prédéterminé.
@@ -382,12 +384,13 @@ L'ordre d'affichage et de capture des clics est statique, défini par le CSS et 
 
   * Sky Layer (Z: 0) : Canvas du ciel.
   * Game Layer (Z: 10) : Canvas du Monde (Personnage, Décors).
-  * Voile noir (Z: 20) : Pour indiquer que le jeu est en pause.
-  * Eclairage (Z: 30) : Gestion des lumières.
+  * Eclairage (Z: 20) : Canvas pour les lumières.
+  * Voile noir (Z: 30) : Pour indiquer que le jeu est en pause.
   * Overlays (Z: 40 à 90) :
     * 40 : Inventaire.
     * 50 : Craft.
     * 60 : Aide.
+    * 70 : Carte.
   * Combat (Z: 100)
   * Creation (Z: 110)
   * System Layer (Z: 200) : Dialogues Modaux (Priorité absolue).

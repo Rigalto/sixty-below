@@ -24,7 +24,7 @@ const mockup = () => {
   debugDiv.style.padding = '5px 10px'
   debugDiv.style.fontFamily = 'monospace' // Chasse fixe pour éviter que le texte ne tremble
   debugDiv.style.fontSize = '14px'
-  debugDiv.style.zIndex = OVERLAYS.hud.zIndex
+  debugDiv.style.zIndex = OVERLAYS.system.zIndex
   debugDiv.style.pointerEvents = 'none' // IMPORTANT : Les clics traversent cette div !
 
   // Initialisation
