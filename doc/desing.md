@@ -365,7 +365,55 @@ La partie centrale de l'interface est divisée en balises <canvas> superposées 
 * **Diffusion :** Pour rendre plus naturelle la transition entre deux tuiles, elles ont un bord de 2 pixels partiellement transparent. Les pixels transparents sont peints de la couleur dominante des tuiles adjacentes.
 * **Empilement vertical :** L'affichage est effectué dans l'ordre suivant : tuiles, flore, meubles, faune, joueur. Pas de gestion d'une troisième dimension.
 
-### 6.4 Implémentation**
+### 6.4. Système d'Éclairage et d'Ombres (LightRenderer)
+
+* Shadow Mapping par Soustraction.
+
+#### 6.4.1. Architecture des Calques (Layering)
+
+Composition de trois canvas superposés via CSS (`z-index`), de bas en haut :
+
+* `SkyRenderer` : Affiche la couleur atmosphérique. Gère le cycle jour/nuit uniquement par sa couleur.
+* `WorldRenderer` : Affiche les tuiles et entités. Les tuiles `SKY` et `FOG` ne sont pas dessinées (transparence), laissant voir le SkyRenderer.
+* `LightRenderer` : Un calque recouvrant la totalité du canvas, gérant l'occlusion et les sources de lumière locales.
+
+#### 6.4.2. Stratégie de Rendu (Algorithme "Surface & Punch")
+
+Rendu en 4 passes successives utilisant les opérations de composition du Canvas API (`globalCompositeOperation`).
+
+* **Passe 1 :** L'Obscurité Totale (Reset)
+    * Action : Remplissage intégral du canvas.
+    * Couleur : Noir total.
+    * Mode : `source-over`.
+    * Résultat : Mnde invisible, couvert par le voile noir.
+
+* **Passe 2 :** La Découpe du Ciel (Optimisation SurfaceLine)
+   * Utilisationde la `surfaceLine` [`world.mjs :: SurfaceLineManager`] : pour chaque coordonnée X du monde, la coordonnée Y de la première tuile solide.
+   * Action : Tracé d'un polygone représentant toute la zone "Aérienne" visible à l'écran.
+   * Mode : `destination-out` (Gomme).
+   * Résultat : Toute la zone au-dessus du sol devient transparente, révélant le `SkyRenderer`.
+
+* **Passe 3 :** Les Trous de Lumière (Punch-holes)
+    * Entrée : Liste des objets émetteurs visibles fournie par le `FurnitureManager`.
+    * Action : Pour chaque source :
+        * Création d'un Gradient Radial (Blanc Opaque au centre -> Transparent en périphérie).
+        * Dessin d'un disque centré sur l'objet.
+        * Mode : `destination-out` (Gomme).
+    * Résultat : Le voile noir est gommé circulairement autour des torches, révélant le décor.
+
+* **Passe 4 :** La Coloration (Tinting)
+    * Action : Pour chaque source (identique Passe 3) :
+        * Création d'un Gradient Radial (Couleur de la source au centre -> Noir Transparent en périphérie).
+        * Dessin du disque.
+        * Mode : `lighter` (ou screen).
+        * Résultat : Une teinte colorée se superpose aux zones éclairées.
+
+#### 6.4.3. Optimisations
+Vectoriel vs Raster : L'usage du polygone pour le ciel remplace ~1000 appels de dessin de tuiles par 1 seul appel de dessin vectoriel, gain critique de performance.
+
+No-Draw Condition : Si la caméra est entièrement dans le ciel (tous les surfaceY > bas_écran), le LightRenderer est désactivé (Canvas clearRect uniquement).
+
+### 6.5 Implémentation**
 
 * **HotbarManager :**
 * **SkyRenderer :** [`render.mjs`] - canvas Layer 0
@@ -378,7 +426,7 @@ La partie centrale de l'interface est divisée en balises <canvas> superposées 
 * **EnvironmentWidget :** [`ui.mjs`] - Date, météo, lune...
 
 
-### 6.5 Hiérarchie Visuelle et Input (Z-Index Strategy) [`constant.mjs :: OVERLAYS`]
+### 6.6 Hiérarchie Visuelle et Input (Z-Index Strategy) [`constant.mjs :: OVERLAYS`]
 
 L'ordre d'affichage et de capture des clics est statique, défini par le CSS et respecté par l'``InputManager``.
 
