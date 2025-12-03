@@ -324,50 +324,70 @@ Le `gamestate` est un stockage clé/valeur (K/V) utilisé pour persister les ét
 
 ## 6\. Interface & Rendu (UI/UX)
 
-### 6.1 Stratégie "Layered Canvas"
+### 6.1 Organisation générale de l'écran
 
-L'interface est divisée en couches HTML superposées pour optimiser les redraws.
-    * **Layer 0 (Game Canvas) :** Le monde, la flore, la faune, les meubles, le joueur. Redessiné à chaque requestAnimationFrame.
-        * Techniquement, deux canvas superposés. Le plus profond est juste un rectangle rempli avec la couleur du ciel. Devant le monde, avec les tuiles vides (SKY) transparentes.
-    * **Layer 1 (UI Canvas) :** Redessiné sur événement
-        * **Environment Overlay** [`ui.mjs :: EnvironmentOverlay`] : Affiche l'heure, la météo, la lune... Abonné aux événements du `TimeManager`.
-        * **Hotbar**
+* **3 zones : (découpage horizontal)**
+    * **Gauche** : Hotbar (verticale)
+    * **Centre** : Monde (empilmenent de <canvas>)
+    * **Droite** : Modules les uns sous les autres (Layout)
+        * **Boutons d'action** : Inventaire, Artisanat, Aide, Zoom, Sons, Nouveau Monde (Snapshot pour débug)
+        * **Environement :** Jour / Heure / Météo / Phase de la Lune / Position
+        * **Jauges :** Vie
         * **Buffs/Debuffs actifs**
-        * **Jauges** (Vie)
-    * **Layer 2 (DOM Panels) :** Inventaire complet, Craft, Aide. Éléments HTML standards (<div>) affichés/masqués. Interruptifs (Pause du jeu).
+* **Taille des Canvas :** Le monde est affiché dans un canvas de 4 chunks de large (1024 pixels) et 3 chunks de haut (768 pixels).
+* **Overlays : (empilement vertical)**
+    * **Inventaire**
+    * **Artisanat**
+    * **Aide**
+* **Overlays : (positionnement)**
+    * Les overlays affichés pendant le jeu (pendant le temps réel) sont centrés sur l'écran physique.
+    * Les overlays s'empilent les uns sur les autres, dans un ordre prédéterminé.
+    * Dès qu'un overlay est affiché, un voile sombre s'interpose entre lui et les canvas du monde.
+    * Les overlays qui interrompent le déroulement du jeu.
 
-### 6.2 Optimisations Graphiques
+### 6.2 Stratégie "Layered Canvas"
+
+La partie centrale de l'interface est divisée en balises <canvas> superposées pour optimiser les redraws.
+    * **Layer 0 :** Le ciel dont la couleur change en fonction de l'heure (modification sur `eventBus`)
+    * **Layer 1 (Game Canvas) :** Le monde, la flore, la faune, les meubles, le joueur. Redessiné à chaque requestAnimationFrame.
+        * les tuiles vides (`SKY` et `FOG`) sont transparentes transparentes.
+    * **Layer 2 :** Voile sombre qui apparaît lorsqu'un DOM Panel est affiché (modification sur `eventBus`, changement de `State`)
+    * **Layer 3 (DOM Panels) :** Inventaire complet, Craft, Aide. Éléments HTML standards (<div>) affichés/masqués. Interruptifs (Pause du jeu).
+
+### 6.3 Optimisations Graphiques
 
 * **Culling :** Rendu strict du viewport + buffer de 1 chunk.
 * **Asset Hydration (Zero-Cost Runtime) :** Les coordonnées de texture (sx, sy, sw, sh) et les index d'images sont calculés une seule fois au démarrage via `assets.mjs`. Le moteur de rendu accède à des entiers pré-calculés, jamais à des chaînes de caractères ou des calculs de grille pendant la frame.
 * **Framing (Auto-tiling) :** Bitmasking (4-connectivity) calculé à la volée ou au chargement pour les transitions de textures.
 * **Conversions :** Chunk -> Image via OffscreenCanvas (MicroTask) pour mettre en cache les chunks statiques. Mise à jour uniquement si modification (dirty flag)
 * **Diffusion :** Pour rendre plus naturelle la transition entre deux tuiles, elles ont un bord de 2 pixels partiellement transparent. Les pixels transparents sont peints de la couleur dominante des tuiles adjacentes.
+* **Empilement vertical :** L'affichage est effectué dans l'ordre suivant : tuiles, flore, meubles, faune, joueur. Pas de gestion d'une troisième dimension.
 
-### 6.2 Implémentation [`render.mjs :: WorldRenderer`] :**
+### 6.4 Implémentation**
+
+* **HotbarManager :**
+* **SkyRenderer :** [`render.mjs`] - canvas Layer 0
+* **WorldRenderer :** [`render.mjs`]
     * Ne stocke aucune donnée de jeu. Lit exclusivement le `ChunkManager`.
     * Cache : Utilise un pool d'OffscreenCanvas (ou Canvas cachés) par chunk visible.
-    * Camera : Singleton responsable uniquement des mathématiques de projection (World <-> Screen), du Culling (Quels chunks sont visibles ?) et du zoom.
+    * Camera : récupère les informations de la Caméra (chunks à afficher, chunk dont il faut précharger les images)
+* **Camera :** Singleton responsable uniquement des mathématiques de projection (World <-> Screen), du Culling (Quels chunks sont visibles ?) et du zoom.
+* **ModalBlocker :** [`ui.mjs`] - Voile sombre
+* **EnvironmentOverlay :** [`ui.mjs`] - Date, météo, lune...
 
-### 6.3 Organisation spatiale
 
-* **Taille des Canvas :** Le monde est affiché dans un canvas de 4 chunks de large (1024 pixels) et 3 chunks de haut (768 pixels).
-* **Centrage :** Ces canvas sont centrés dans l'écran physique.
-* **Overlays de jeu :** Les overlays affichés pendant le jeu (pendant le temps réel) sont collés sur les bords de l'écran (avec un padding de 10px pour l'esthétique). Sur grand écran, ils n'empiètent pas sur l'affichage du monde.
-* **Overlays de jeu :** Les overlays qui interrompent le déroulement du jeu (inventaire, craft, aide, paramètres...) sont affichés centrés sur l'écran. Ils peuvent s'empiler les uns sur les autres.
-
-### 6.4 Hiérarchie Visuelle et Input (Z-Index Strategy) [`constant.mjs :: OVERLAYS`]
+### 6.5 Hiérarchie Visuelle et Input (Z-Index Strategy) [`constant.mjs :: OVERLAYS`]
 
 L'ordre d'affichage et de capture des clics est statique, défini par le CSS et respecté par l'``InputManager``.
 
   * Sky Layer (Z: 0) : Canvas du ciel.
-  * Game Layer (Z: 5) : Canvas du Monde (Personnage, Décors).
-  * HUD Layer (Z: 10) : Éléments DOM permanents (Hotbar, Jauge Vie, Environment, Debug).
-  * Voile noir  (Z: 20) : Pour indiquer que le jeu est en pause
-  * Info Panels (Z: 30 à 90) : Overlays bloquants
-    * 30 : Inventaire.
-    * 40 : Craft.
-    * 50 : Aide.
+  * Game Layer (Z: 10) : Canvas du Monde (Personnage, Décors).
+  * Voile noir (Z: 20) : Pour indiquer que le jeu est en pause.
+  * Eclairage (Z: 30) : Gestion des lumières.
+  * Overlays (Z: 40 à 90) :
+    * 40 : Inventaire.
+    * 50 : Craft.
+    * 60 : Aide.
   * Combat (Z: 100)
   * Creation (Z: 110)
   * System Layer (Z: 200) : Dialogues Modaux (Priorité absolue).
