@@ -5,7 +5,7 @@ import {database} from './database.mjs'
 import {chunkManager} from './world.mjs'
 import {saveManager} from './persistence.mjs'
 import {camera, worldRenderer} from './render.mjs'
-import './ui.mjs'
+import {creationDialogOverlay} from './ui.mjs'
 import './ui-debug.mjs'
 import './inventory.mjs'
 import './craft.mjs'
@@ -131,7 +131,8 @@ class GameCore {
       timestamp: 480 * 1000,
       weather: 2,
       nextWeather: 3,
-      player: '8192|1280|1'
+      player: '8192|1280|1',
+      worldkey: 4321
     }
 
     // 2. Dispatch aux systèmes (Injection de dépendance des données)
@@ -190,6 +191,7 @@ class GameCore {
     eventBus.emit('buff/display-coords', true)
 
     // 3. Initialisation des systèmes (Layer 2)
+    creationDialogOverlay.init(state.worldkey)
     // C'est ici qu'on initialise les managers
     // await FloraManager.init(...)
     // await FaunaManager.init(...)

@@ -328,15 +328,15 @@ class CreationDialogOverlay {
   }
 
   #onGenerateClick () {
-    this.currentSeed = parseInt(this.dom.seedInput.value.trim(), 10) || 1234
-    console.log(`[CreationDialog]: Request generation with seed [${this.currentSeed}]`)
+    const seed = parseInt(this.dom.seedInput.value.trim(), 10) || 1234
+    console.log(`[CreationDialog]: Request generation with seed [${seed}]`)
 
     // On émet l'événement qui sera intercepté par le Core/WorldManager pour lancer la génération
-    eventBus.emit('world/generate-start', {seed: this.currentSeed})
+    eventBus.emit('world/generate-start', {seed})
   }
 }
-
 export const creationDialogOverlay = new CreationDialogOverlay()
+
 /* ====================================================================================================
    AFFICHAGE DATE/HEURE METEO LUNE POSITION
    ==================================================================================================== */
