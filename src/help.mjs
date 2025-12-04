@@ -32,9 +32,8 @@ class HelpOverlay {
     })
 
     // 2. Création du Header via la Factory
-    const {header, closeBtn} = createOverlayHeader('📜 Aide [H]', 'help')
+    const header = createOverlayHeader('📜 Aide [H]', 'help')
     this.#header = header
-    this.closeBtn = closeBtn
 
     // 3. Zone de contenu (Vide pour l'instant, juste pour remplir)
     this.#content = document.createElement('div')

@@ -38,6 +38,7 @@ export const OVERLAYS = {
   map: {state: STATE.INFORMATION, zIndex: 70},
   combat: {state: STATE.COMBAT, zIndex: 100},
   creation: {state: STATE.CREATION, zIndex: 110},
+  dialog: {state: null, zIndex: 150},
   system: {state: null, zIndex: 200}
 }
 

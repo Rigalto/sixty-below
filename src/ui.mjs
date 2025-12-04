@@ -122,9 +122,7 @@ class MenuBarWidget {
   }
 
   #onNewWorldClick () {
-    // TODO: Implémenter la logique de confirmation et changement de State
-    console.log('Action: Request New World Generation')
-    // eventBus.emit('state/request-creation') // Future implementation
+    eventBus.emit('overlay/open-request', 'creation')
   }
 
   async #onSnapshotClick () {
@@ -162,6 +160,183 @@ class MenuBarWidget {
 
 export const menuBarWidget = new MenuBarWidget()
 
+/* ====================================================================================================
+   DIALOGUE DE LANCEMENT DE LA CREATION D'UN NOUVEAU MONDE
+   ==================================================================================================== */
+
+class CreationDialogOverlay {
+  constructor () {
+    this.container = null
+    this.dom = {
+      seedInput: null,
+      btnGenerate: null,
+      btnBackup: null,
+      btnRestore: null,
+      btnClose: null
+    }
+
+    this.open = this.open.bind(this)
+    this.close = this.close.bind(this)
+    this.#initDOM()
+    this.#bindEvents()
+
+    this.currentSeed = 1234
+  }
+
+  #initDOM () {
+    // 1. Conteneur Modal (Centré)
+    this.container = document.createElement('div')
+    this.container.id = 'creation-dialog'
+
+    Object.assign(this.container.style, {
+      position: 'absolute',
+      top: '50%',
+      left: '50%',
+      transform: 'translate(-50%, -50%)',
+      width: '400px',
+      backgroundColor: '#222',
+      border: '2px solid #555',
+      borderRadius: '8px',
+      padding: '0',
+      display: 'none',
+      flexDirection: 'column',
+      gap: '0',
+      zIndex: OVERLAYS.dialog.zIndex,
+      boxShadow: '0 10px 25px rgba(0,0,0,0.8)',
+      color: '#eee',
+      fontFamily: 'Segoe UI, sans-serif'
+    })
+
+    // 2. Header
+    this.container.appendChild(createOverlayHeader('🌱 World Management', 'creation'))
+
+    // 3. Wrapper de Contenu (pour préserver l'espacement interne)
+    const content = document.createElement('div')
+    Object.assign(content.style, {
+      padding: '20px',
+      display: 'flex',
+      flexDirection: 'column',
+      gap: '15px'
+    })
+    this.container.appendChild(content)
+
+    // 4. Zone Seed (Input Numérique)
+    const seedContainer = document.createElement('div')
+    Object.assign(seedContainer.style, {display: 'flex', flexDirection: 'column', gap: '5px'})
+
+    const seedLabel = document.createElement('label')
+    seedLabel.textContent = 'World Seed (1 - 99999):'
+    seedLabel.style.fontSize = '12px'
+    seedLabel.style.color = '#aaa'
+
+    const seedInput = document.createElement('input')
+    seedInput.type = 'number'
+    seedInput.min = '1'
+    seedInput.max = '99999'
+    seedInput.placeholder = 'Random'
+    Object.assign(seedInput.style, {
+      padding: '8px',
+      backgroundColor: '#111',
+      border: '1px solid #444',
+      color: '#fff',
+      borderRadius: '4px',
+      fontFamily: 'monospace'
+    })
+
+    seedInput.addEventListener('input', function() {
+      if (this.value < 1) this.value = 1
+      if (this.value > 99999) this.value = (this.value / 10) | 0
+    })
+
+    seedContainer.appendChild(seedLabel)
+    seedContainer.appendChild(seedInput)
+
+    // 4. Boutons d'action
+    const createBtn = (text, icon, isActive) => {
+      const btn = document.createElement('button')
+      // Layout icône + texte
+      btn.innerHTML = `<span style="margin-right:8px;">${icon}</span>${text}`
+
+      Object.assign(btn.style, {
+        padding: '10px',
+        backgroundColor: isActive ? '#388e3c' : '#333',
+        color: isActive ? '#fff' : '#888',
+        border: '1px solid ' + (isActive ? '#2e7d32' : '#444'),
+        borderRadius: '4px',
+        cursor: isActive ? 'pointer' : 'not-allowed',
+        textAlign: 'left',
+        fontSize: '14px',
+        fontWeight: 'bold',
+        transition: 'background-color 0.2s'
+      })
+
+      if (isActive) {
+        btn.onmouseenter = () => { btn.style.backgroundColor = '#4caf50' }
+        btn.onmouseleave = () => { btn.style.backgroundColor = '#388e3c' }
+      }
+
+      return btn
+    }
+
+    const btnGenerate = createBtn('GENERATE NEW WORLD', '🌱', true)
+    const btnBackup = createBtn('BACKUP WORLD (Coming Soon)', '💾', false)
+    const btnRestore = createBtn('RESTORE WORLD (Coming Soon)', '📥', false)
+
+    // Assemblage
+    content.appendChild(seedContainer)
+    content.appendChild(btnGenerate)
+    content.appendChild(btnBackup)
+    content.appendChild(btnRestore)
+
+    // Injection dans le body (car z-index élevé, sort du flux sidebar)
+    document.body.appendChild(this.container)
+
+    // Cache Refs
+    this.dom.seedInput = seedInput
+    this.dom.btnGenerate = btnGenerate
+    this.dom.btnBackup = btnBackup
+    this.dom.btnRestore = btnRestore
+  }
+
+  #bindEvents () {
+    // Actions UI
+    this.dom.btnGenerate.addEventListener('click', this.#onGenerateClick.bind(this))
+
+    // Écoute pour affichage/masquage
+    eventBus.on('creation/open', () => {
+      this.open()
+    })
+
+    eventBus.on('creation/close', () => {
+      this.close()
+    })
+
+    // Les boutons grisés ne font rien (pas d'event listener)
+  }
+
+  init (seed) { this.currentSeed = seed }
+
+  // --- Logic ---
+  open () {
+    this.container.style.display = 'flex'
+    this.dom.seedInput.value = this.currentSeed
+    this.dom.seedInput.focus()
+  }
+
+  close () {
+    this.container.style.display = 'none'
+  }
+
+  #onGenerateClick () {
+    this.currentSeed = parseInt(this.dom.seedInput.value.trim(), 10) || 1234
+    console.log(`[CreationDialog]: Request generation with seed [${this.currentSeed}]`)
+
+    // On émet l'événement qui sera intercepté par le Core/WorldManager pour lancer la génération
+    eventBus.emit('world/generate-start', {seed: this.currentSeed})
+  }
+}
+
+export const creationDialogOverlay = new CreationDialogOverlay()
 /* ====================================================================================================
    AFFICHAGE DATE/HEURE METEO LUNE POSITION
    ==================================================================================================== */
@@ -449,7 +624,7 @@ export const modalBlocker = new ModalBlocker()
 
  * Crée un header standardisé pour les overlays.
  * @param {string} titleText - Le titre (avec icône)
- * @returns {object} { header, closeBtn } - Retourne le conteneur et le bouton pour attacher les events.
+ * @returns {DOM Element} header } - Retourne le conteneur
  */
 export function createOverlayHeader (titleText, overlayId) {
   // 1. Injection unique du style global pour le :hover (Idempotent)
@@ -505,5 +680,5 @@ export function createOverlayHeader (titleText, overlayId) {
   })
   header.appendChild(closeBtn)
 
-  return {header, closeBtn}
+  return header
 }
