@@ -1,5 +1,5 @@
 import {WORLD_WIDTH, WORLD_HEIGHT, CANVAS_WIDTH, CANVAS_HEIGHT, OVERLAYS, NODES_LOOKUP, MICROTASK} from './constant.mjs'
-import {eventBus, microTasker} from './utils.mjs'
+import {eventBus, microTasker, taskScheduler} from './utils.mjs'
 import {chunkManager} from './world.mjs'
 
 if (WORLD_WIDTH !== 1024 || WORLD_HEIGHT !== 512 || CANVAS_WIDTH !== 1024 || CANVAS_HEIGHT !== 768) {
@@ -40,7 +40,7 @@ class Camera {
     // Listes d'index de chunks
     this.displayChunks = [] // Chunks visibles à l'écran (Target Render) (5 * 4 chunks)
     this.preloadChunks = new Set() // Chunks en bordure (Target Cache update) (7 * 6 chunks)
-    this.unpurgeableChunks = [] // Chunks à garder en cache RAM (9 * 8 chunks)
+    this.unpurgeableChunks = new Set() // Chunks à garder en cache RAM (9 * 8 chunks)
 
     this.setZoom = this.setZoom.bind(this)
     eventBus.on('render/set-zoom', this.setZoom)
@@ -159,7 +159,7 @@ class Camera {
     // Vider les tableaux sans détruire les références
     this.displayChunks.length = 0
     this.preloadChunks.clear()
-    this.unpurgeableChunks.length = 0
+    this.unpurgeableChunks.clear()
 
     // Définition des rectangles (en coordonnées Chunk)
     // Viewport visible (approx 4x3 chunks) -> On prend large pour le scrolling
@@ -189,7 +189,7 @@ class Camera {
       const rowOffset = y * WORLD_CHUNKS_X
       for (let x = keepX0; x <= keepX1; x++) {
         const idx = rowOffset + x
-        this.unpurgeableChunks.push(idx)
+        this.unpurgeableChunks.add(idx)
 
         // Si c'est dans la zone Preload mais PAS dans Display -> C'est un preload
         if (x >= preX0 && x <= preX1 && y >= preY0 && y <= preY1) {
@@ -270,6 +270,7 @@ class WorldRenderer {
     this.pixelSize = 256
 
     this.processRenderQueue = this.processRenderQueue.bind(this)
+    this.pruneCache = this.pruneCache.bind(this)
   }
 
   #createCanvas () {
@@ -334,6 +335,10 @@ class WorldRenderer {
         this.canvasPool.push(new OffscreenCanvas(this.pixelSize, this.pixelSize))
       }
     }
+
+    // 4. Lancement de la tâche périodique d'élagage
+    const {priority, capacity} = MICROTASK.PRUNE_CACHE
+    taskScheduler.enqueue('prune_cache', 12553, this.pruneCache, priority, capacity)
     console.log('[WorldRenderer] Initialized')
   }
 
@@ -374,7 +379,7 @@ class WorldRenderer {
   }
 
   /**
-   * PHASE UPDATE (~1ms)
+   * PHASE UPDATE
    * Vérifie les besoins de la caméra et planifie le rendu si nécessaire.
    */
   update () {
@@ -385,9 +390,9 @@ class WorldRenderer {
     if (dirtyChunks) {
       for (const idx of dirtyChunks) {
         // Est-ce que ce chunk est dans la zone de Preload ?
-        const isDirty = camera.preloadChunks.has(idx)
+        const preloadable = camera.preloadChunks.has(idx)
 
-        if (isDirty) {
+        if (preloadable) {
           // Cas 1 : Il faut recalculer l'image de ce chunk
           this.pendingRenderChunks.add(idx)
         } else {
@@ -468,6 +473,32 @@ class WorldRenderer {
       // Plus rien à faire, on éteint le flag
       this.isRenderTaskScheduled = false
     }
+  }
+
+  /**
+   * Tâche planifiée : Nettoyage du cache (Garbage Collection).
+   * Recycle les canvas des chunks qui ne sont plus dans la zone active.
+   */
+  pruneCache () {
+    let count = 0
+    for (const chunkIndex of this.activeCanvasCache.keys()) {
+      // Si le chunk n'est plus dans le Set global (Display + Preload)
+      if (!camera.unpurgeableChunks.has(chunkIndex)) {
+        count++
+        const canvas = this.activeCanvasCache.get(chunkIndex)
+
+        // 1. Recyclage : Retour au pool
+        this.canvasPool.push(canvas)
+
+        // 2. Suppression de la référence
+        this.activeCanvasCache.delete(chunkIndex)
+      }
+    }
+
+    // Re-planification (Boucle infinie temporelle)
+    const {priority, capacity} = MICROTASK.PRUNE_CACHE
+    taskScheduler.enqueue('prune_cache', 12553, this.pruneCache, priority, capacity)
+    if (count > 0) console.log('[WorldRenderer.pruneCache', count)
   }
 
   // Appelé par la loop

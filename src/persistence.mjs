@@ -84,7 +84,7 @@ class SaveManager {
     // --- A. Récupération des Chunks (Layer 2 -> Layer 2) ---
     // chunkManager doit exposer une méthode getDirtyChunksData() retournant
     // un tableau d'objets {storeName: 'world_chunks', record: {key, index, chunk}}
-    const dirtyChunks = chunkManager.fetchSaveDirty()
+    const dirtyChunks = chunkManager.consumeSaveDirty()
     if (dirtyChunks !== null) {
       for (const chunkIndex of dirtyChunks) {
         const record = chunkManager.getChunkSaveData(chunkIndex)

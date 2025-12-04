@@ -177,7 +177,7 @@ class ChunkManager {
    * Appelé par le SaveManager (Persistence).
    * @returns {Set<number>} Set d'IDs de chunks
    */
-  fetchSaveDirty () {
+  consumeSaveDirty () {
     if (this.#dirtySaveChunks.size === 0) return null
     const dirty = new Set(this.#dirtySaveChunks)
     this.#dirtySaveChunks.clear()

@@ -346,7 +346,8 @@ export const MICROTASK = {
   RENDER_CHUNK_QUEUE: {priority: 30, capacity: 12, taskName: 'processRenderQueue'}, // génère les images des dirty chunks
   UI_ENV_UPDATE: {priority: 20, capacity: 2, taskName: 'updateClockInOverlay'}, // affiche l'overlay time/weather/Moon/Location
   PROCESS_SAVE: {priority: 15, capacity: 12, taskName: 'processSave'}, // sauvegarde en database des chunks et autres records
-  RENDER_DEBUG_OVERLAY: {priority: 10, capacity: 2, taskName: 'renderDebugOverlay'} // affichage des informations de débug (temps exéec et taille files)
+  RENDER_DEBUG_OVERLAY: {priority: 10, capacity: 2, taskName: 'renderDebugOverlay'}, // affichage des informations de débug (temps exéec et taille files)
+  PRUNE_CACHE: {priority: 8, capacity: 2, taskName: 'pruneCache'} // supprime les images des chunks distants
 }
 
 export const MICROTASK_FN_NAME_TO_KEY = Object.keys(MICROTASK).reduce((acc, key) => {
