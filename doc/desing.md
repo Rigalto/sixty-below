@@ -416,12 +416,19 @@ No-Draw Condition : Si la caméra est entièrement dans le ciel (tous les surfac
 ### 6.5 Implémentation**
 
 * **HotbarManager :**
-* **SkyRenderer :** [`render.mjs`] - canvas Layer 0
-* **WorldRenderer :** [`render.mjs`]
+* **SkyRenderer :** [`render.mjs`] - canvas 'Sky Layer'
+* **WorldRenderer :** [`render.mjs`] - canvas 'Game Layer'
     * Ne stocke aucune donnée de jeu. Lit exclusivement le `ChunkManager`.
-    * Cache : Utilise un pool d'OffscreenCanvas (ou Canvas cachés) par chunk visible.
-    * Camera : récupère les informations de la Caméra (chunks à afficher, chunk dont il faut précharger les images)
-* **Camera :** Singleton responsable uniquement des mathématiques de projection (World <-> Screen), du Culling (Quels chunks sont visibles ?) et du zoom.
+    * Cache : Utilise un pool d'`OffscreenCanvas` (ou Canvas cachés) par chunk visible.
+    * Purge périodique des images des chunks trop éloignés (environ 12s)
+    * Camera : récupère les informations de la Caméra (les trois listes)
+    * Affichage  [Budget Render] : applique le décalage et le facteur de zoom au canvas, puis y affiche les chunks visibles
+    * Génération des images [Budget MicroTasks] : effectuées par des micro-tâches au niveau des chunks
+* **Camera :** [`render.mjs`] Singleton responsable uniquement des mathématiques de projection (World <-> Screen), du Culling (Quels chunks sont visibles ?) et du zoom.
+    * Fournit trois listes : chunks visibles, chunks dont les images sont prégénérées, chunks dont on garde les images en mémoire pendant la purge
+    * Fournit deux fonctions de conversion (unité = pixel) : `worldToCanvas` et `canvasToWorld`
+    * Zoom de 100% à 200%, paramétrable via eventBus (`'render/set-zoom'`)
+* **LightManager :** [`render.mjs`] - Lumières
 * **ModalBlocker :** [`ui.mjs`] - Voile sombre
 * **EnvironmentWidget :** [`ui.mjs`] - Date, météo, lune...
 
@@ -433,7 +440,7 @@ L'ordre d'affichage et de capture des clics est statique, défini par le CSS et 
   * Sky Layer (Z: 0) : Canvas du ciel.
   * Game Layer (Z: 10) : Canvas du Monde (Personnage, Décors).
   * Eclairage (Z: 20) : Canvas pour les lumières.
-  * Voile noir (Z: 30) : Pour indiquer que le jeu est en pause.
+  * Voile sombre (Z: 30) : Pour indiquer que le jeu est en pause.
   * Overlays (Z: 40 à 90) :
     * 40 : Inventaire.
     * 50 : Craft.
