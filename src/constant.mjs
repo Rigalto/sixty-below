@@ -42,7 +42,7 @@ export const OVERLAYS = {
 }
 
 export const UI_LAYOUT = {
-  ACTIONS: 10,
+  MENU_BAR: 10,
   ENVIRONMENT: 20,
   LIFE: 30,
   BUFF: 40,

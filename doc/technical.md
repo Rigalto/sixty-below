@@ -208,35 +208,36 @@ Cette section définit les événements officiels. Tout nouvel événement doit 
 | Event Name | Payload Structure | Description |
 | :--- | :--- | :--- |
 | `overlay/close` | `string` (Overlay ID) | Demande générique de fermeture émise par le bouton 'X' d'un overlay. Traitée par `InputManager`. |
+| `overlay/open-request`| `string` (Overlay ID) | Demande générique d'ouverture d'un overlay. Traitée par `InputManager`. |
 
 ### Inventory (`InventoryManager`, `InventoryOverlay`)
 *En prévision*
 | Event Name | Payload Structure | Description |
 | :--- | :--- | :--- |
-| `inventory/open`| - | Demande d'ouverture du panel d'inventaire. |
-| `inventory/close`| - | Demande de fermeture du panel d'inventaire. |
+| `inventory/open`| - | Affichage du panel d'inventaire. |
+| `inventory/close`| - | Disparition du panel d'inventaire. |
 | `inventory/static-buffs`| `Array<string>` (List of buffs) | Émis à la fermeture de l'inventaire. |
 
 ### Craft (`CraftOverlay`)
 *En prévision*
 | Event Name | Payload Structure | Description |
 | :--- | :--- | :--- |
-| `craft/open`| - | Demande d'ouverture du panel d'artisanat. |
-| `craft/close`| - | Demande de fermeture du panel d'inventaire. |
+| `craft/open`| - | Affichage du panel d'artisanat. |
+| `craft/close`| - | Disparition du panel d'artisanat. |
 
 ### Help (`HelpOverlay`)
 | Event Name | Payload Structure | Description |
 | :--- | :--- | :--- |
-| `help/open`| - | Demande d'ouverture du panel d'artisanat. |
-| `help/close`| - | Demande de fermeture du panel d'inventaire. |
+| `help/open`| - | Affichage du panel d'aide. |
+| `help/close`| - | Disparition du panel d'aide. |
 
 ### Combat (`CombatOverlay`)
 | Event Name | Payload Structure | Description |
 | :--- | :--- | :--- |
-| `combat/open`| - | Demande d'ouverture du panel d'artisanat. |
-| `combat/close`| - | Demande de fermeture du panel d'inventaire. |
+| `combat/open`| - | Affichage du panel de combat. |
+| `combat/close`| - | Disparition du panel de combat. |
 
-### Buffs (`BuffManager`)
+### Buffs Widget (`BuffManager`)
 *En prévision*
 | Event Name | Payload Structure | Description |
 | :--- | :--- | :--- |
@@ -248,6 +249,6 @@ Cette section définit les événements officiels. Tout nouvel événement doit 
 ### Debug (`WorldMapDebug`, `RealtimeDebugWidget`)
 | Event Name | Payload Structure | Description |
 | :--- | :--- | :--- |
-| `map/open`| - | Demande d'ouverture de la carte au 1/16e. |
-| `map/close`| - | Demande de fermeture de la carte au 1/16e. |
+| `map/open`| - | Affichage de la carte au 1/16e. |
+| `map/close`| - | Disparition de la carte au 1/16e. |
 | `debug/frame-sample`| `{updateTime, renderTime, microTime}` | Temps exécution dans la loop pour les 3 budgets. |

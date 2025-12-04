@@ -434,6 +434,7 @@ class KeyboardManager {
     window.addEventListener('keyup', this.onKeyUp)
     // écoute les demandes de fermeture  et d'ouverture des overlays
     eventBus.on('overlay/close', this.onCloseRequest.bind(this))
+    eventBus.on('overlay/open-request', this.onOverlayOpenRequest.bind(this))
   }
 
   // "read-once" (lecture unique)
@@ -568,6 +569,10 @@ class KeyboardManager {
     const stackTop = this.#overlayStack[this.#overlayStack.length - 1]
     if (stackTop !== overlyId) return
     this.#closeOverlay()
+  }
+
+  onOverlayOpenRequest (overlyId) {
+    if (overlyId) this.#openOverlay(overlyId)
   }
 }
 export const keyboardManager = new KeyboardManager()

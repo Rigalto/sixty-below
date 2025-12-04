@@ -7,6 +7,162 @@ import {eventBus} from './utils.mjs'
 import {WEATHER_TYPE, MOON_PHASE, MOON_PHASE_BLURRED, STATE, OVERLAYS, UI_LAYOUT} from './constant.mjs'
 
 /* ====================================================================================================
+   AFFICHAGE BOUTONS D'ACTION
+   ==================================================================================================== */
+
+class MenuBarWidget {
+  constructor () {
+    this.container = null
+    this.dom = {
+      btnInventory: null,
+      btnCraft: null,
+      btnHelp: null,
+      btnNewWorld: null,
+      btnSnapshot: null
+    }
+    this.#initDOM()
+    this.#bindEvents()
+  }
+
+  #initDOM () {
+    // 1. Conteneur Principal
+    this.container = document.createElement('div')
+    this.container.id = 'menu-bar-root'
+
+    Object.assign(this.container.style, {
+      position: 'relative',
+      width: '100%',
+      order: UI_LAYOUT.MENU_BAR,
+      marginBottom: '10px',
+      backgroundColor: 'rgba(20, 20, 25, 0.9)',
+      border: '1px solid #444',
+      borderRadius: '6px',
+      padding: '8px',
+      boxShadow: '0 2px 10px rgba(0,0,0,0.5)',
+      display: 'flex', // Flexbox
+      flexDirection: 'row', // MODIFIÉ : Une seule ligne horizontale
+      gap: '5px' // Espace uniforme entre les 5 boutons
+    })
+
+    // Helper pour créer les boutons (DRY)
+    const createBtn = (id, text, title, isMeta = false) => {
+      const btn = document.createElement('button')
+      btn.id = id
+      btn.textContent = text
+      btn.title = title
+      Object.assign(btn.style, {
+        flex: '1', // Chaque bouton prendra 20% de la largeur
+        backgroundColor: isMeta ? '#442222' : '#333',
+        color: '#ddd',
+        border: '1px solid #555',
+        borderRadius: '4px',
+        padding: '6px 0', // Un peu plus de padding pour les cibles tactiles/souris
+        cursor: 'pointer',
+        fontSize: '18px', // MODIFIÉ : Taille augmentée pour la lisibilité des icônes
+        lineHeight: '1.2',
+        fontFamily: '"Segoe UI Emoji", "Apple Color Emoji", sans-serif' // Assure le rendu des émojis
+      })
+
+      btn.onmouseenter = () => { btn.style.backgroundColor = isMeta ? '#663333' : '#555' }
+      btn.onmouseleave = () => { btn.style.backgroundColor = isMeta ? '#442222' : '#333' }
+      return btn
+    }
+
+    // Création des boutons
+    const btnInv = createBtn('btn-inv', '🎒', 'Open Inventory [I]')
+    const btnCraft = createBtn('btn-craft', '⚒️', 'Open Crafting [C]')
+    const btnHelp = createBtn('btn-help', '📜', 'Help [H]')
+
+    const btnNew = createBtn('btn-new', '🌱', 'Generate New World', true)
+    const btnSnap = createBtn('btn-snap', '🖼️', 'Debug: Copy Snapshot', true)
+
+    // Assemblage dans le conteneur
+    this.container.appendChild(btnInv)
+    this.container.appendChild(btnCraft)
+    this.container.appendChild(btnHelp)
+    this.container.appendChild(btnNew)
+    this.container.appendChild(btnSnap)
+
+    // Injection DOM
+    const overlayPanel = document.getElementById('right-sidebar')
+    if (overlayPanel) {
+      overlayPanel.appendChild(this.container)
+    } else {
+      console.warn('MenuBarWidget: #right-sidebar missing')
+    }
+
+    // Cache refs
+    this.dom.btnInventory = btnInv
+    this.dom.btnCraft = btnCraft
+    this.dom.btnHelp = btnHelp
+    this.dom.btnNewWorld = btnNew
+    this.dom.btnSnapshot = btnSnap
+  }
+
+  #bindEvents () {
+    this.dom.btnInventory.addEventListener('click', this.#onInventoryClick.bind(this))
+    this.dom.btnCraft.addEventListener('click', this.#onCraftClick.bind(this))
+    this.dom.btnHelp.addEventListener('click', this.#onHelpClick.bind(this))
+    this.dom.btnNewWorld.addEventListener('click', this.#onNewWorldClick.bind(this))
+    this.dom.btnSnapshot.addEventListener('click', this.#onSnapshotClick.bind(this))
+  }
+
+  // --- Handlers ---
+
+  #onInventoryClick () {
+    eventBus.emit('overlay/open-request', 'inventory')
+  }
+
+  #onCraftClick () {
+    eventBus.emit('overlay/open-request', 'craft')
+  }
+
+  #onHelpClick () {
+    eventBus.emit('overlay/open-request', 'help')
+  }
+
+  #onNewWorldClick () {
+    // TODO: Implémenter la logique de confirmation et changement de State
+    console.log('Action: Request New World Generation')
+    // eventBus.emit('state/request-creation') // Future implementation
+  }
+
+  async #onSnapshotClick () {
+    // Méthode Debug : Copie le canvas principal dans le presse-papier
+    try {
+      const canvas = document.getElementById('world-renderer')
+      if (!canvas) throw new Error('Game Canvas not found')
+
+      // Conversion Blob
+      const blob = await new Promise(resolve => canvas.toBlob(resolve))
+
+      // Clipboard API (Nécessite contexte sécurisé ou localhost)
+      if (!navigator.clipboard) {
+        throw new Error('Clipboard API unavailable')
+      }
+
+      await navigator.clipboard.write([
+        new ClipboardItem({'image/png': blob})
+      ])
+
+      console.log('Debug: Snapshot copied to clipboard!')
+
+      // Feedback visuel rapide (Flash bouton)
+      const originalColor = this.dom.btnSnapshot.style.backgroundColor
+      this.dom.btnSnapshot.style.backgroundColor = '#228822'
+      setTimeout(() => {
+        this.dom.btnSnapshot.style.backgroundColor = originalColor
+      }, 200)
+    } catch (e) {
+      console.error('Debug Snapshot Failed:', e)
+      alert('Snapshot failed (See console). Note: Requires HTTPS or Localhost.')
+    }
+  }
+}
+
+export const menuBarWidget = new MenuBarWidget()
+
+/* ====================================================================================================
    AFFICHAGE DATE/HEURE METEO LUNE POSITION
    ==================================================================================================== */
 
