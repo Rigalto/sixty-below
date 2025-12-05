@@ -5,6 +5,7 @@ import {database} from './database.mjs'
 import {chunkManager} from './world.mjs'
 import {saveManager} from './persistence.mjs'
 import {camera, worldRenderer} from './render.mjs'
+import {buffManager} from './buff.mjs'
 import {creationDialogOverlay} from './ui.mjs'
 import './ui-debug.mjs'
 import './inventory.mjs'
@@ -183,7 +184,7 @@ class GameCore {
     // Lancement de la sauvegarde périodique (toutes les deux secondes)
     saveManager.init()
 
-    // buffManager.init()
+    buffManager.init()
     // Les quatre lignes ci-dessous simulent le traitement du buffManager
     eventBus.emit('buff/display-next-weather', true)
     eventBus.emit('buff/display-moon-detail', true)
@@ -229,8 +230,10 @@ class GameCore {
     let dt = timestamp - this.lastTime
     this.lastTime = timestamp
 
-    // --- PROTECTION TEMPORELLE ---
+    // --- ACCELERATION DU TEMPS (Sleepng) ---
+    if (buffManager.getBuff('sleeping')) { dt = dt * 2 }
 
+    // --- PROTECTION TEMPORELLE ---
     if (dt > 1000) {
       // Cas A : Retour de veille / Changement d'onglet / Debugger (> 1 seconde)
       // On considère que le jeu était en PAUSE. On n'avance d'une frame.
@@ -259,10 +262,10 @@ class GameCore {
       // player.move(keyboardManager.directions)
     }
     // MOCK-UP va-et-vient du player
-    const speed = 5 // Pixels par frame
+    const speed = 0.3 // Pixels par ms
 
     // Application du mouvement
-    this.playerX += speed * this.playerDirection
+    this.playerX += speed * this.playerDirection * dt
 
     // Gestion des bornes et rebond
     if (this.playerX >= 9700) {
