@@ -90,9 +90,7 @@ class ChunkManager {
     }
   }
 
-  getTile (x, y) {
-    return this.#data[(y << 10) | x]
-  }
+  getTile (x, y) { return this.#data[(y << 10) | x] }
 
   setTile (x, y, code) {
     // if (x === 0 || x === 1023 || y === 0 || y === 511) return
@@ -111,6 +109,9 @@ class ChunkManager {
     this.#dirtyRenderChunks.add(chunkKey)
     this.#dirtySaveChunks.add(chunkKey)
   }
+
+  // version spécifique lors de la génération du monde
+  setGenTile (x, y, code) { this.#data[(y << 10) | x] = code }
 
   /**
    * Renvoie les tuiles du chunk dont on donne l'index.
