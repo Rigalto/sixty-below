@@ -177,6 +177,7 @@ class CreationDialogOverlay {
 
     this.open = this.open.bind(this)
     this.close = this.close.bind(this)
+    this.onGenerateClick = this.onGenerateClick.bind(this)
     this.#initDOM()
     this.#bindEvents()
 
@@ -300,7 +301,7 @@ class CreationDialogOverlay {
 
   #bindEvents () {
     // Actions UI
-    this.dom.btnGenerate.addEventListener('click', this.#onGenerateClick.bind(this))
+    this.dom.btnGenerate.addEventListener('click', this.onGenerateClick.bind(this))
 
     // Écoute pour affichage/masquage
     eventBus.on('creation/open', () => {
@@ -327,12 +328,16 @@ class CreationDialogOverlay {
     this.container.style.display = 'none'
   }
 
-  #onGenerateClick () {
+  async onGenerateClick () {
     const seed = parseInt(this.dom.seedInput.value.trim(), 10) || 1234
     console.log(`[CreationDialog]: Request generation with seed [${seed}]`)
 
-    // On émet l'événement qui sera intercepté par le Core/WorldManager pour lancer la génération
-    eventBus.emit('world/generate-start', {seed})
+    try {
+      const {worldGenerator} = await import('./generate.mjs')
+      await worldGenerator.generate(seed) // seed provient du payload de l'événement
+    } catch (error) {
+      console.error('[CreationDialogOverlay] Failed to load generator:', error)
+    }
   }
 }
 export const creationDialogOverlay = new CreationDialogOverlay()
