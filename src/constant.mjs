@@ -205,26 +205,48 @@ export const PALETTE = {
 // const tileDesc = NODES.CLAY
 // const tileDesc = NODES_LOOKUP[tileCode]
 
-export const NODE_TYPE = {SPACE: 0x1, NATURAL: 0x2, TOPSOIL: 0x4, SUBSTRAT: 0x8, LIQUID: 0x10, ORE: 0x20, GEM: 0x40, ROCK: 0x80, WOOD: 0x100, WALL: 0x200, BWALL: 0x400, WEB: 0x800, STRONG: 0x1000, XXXX: 0x2000, CREATION: 0x4000}
+export const NODE_TYPE = {GAZ: 0x1, LIQUID: 0x2, SOLID: 0x4, FIXED: 0x8, NATURAL: 0x10, TOPSOIL: 0x20, SUBSTRAT: 0x40, ORE: 0x80, GEM: 0x100, ROCK: 0x200, WOOD: 0x400, WALL: 0x800, BWALL: 0x1000, WEB: 0x2000}
 
 export const NODES = {
-  // modifier 'isEmptyTileCode' si les codes changent
-  OUTSIDE: {code: 0, name: 'Out of World', type: NODE_TYPE.CREATION, color: '#000000'},
-  SKY: {code: 1, name: 'Sky', type: NODE_TYPE.SPACE, color: '#E6F3FF', star: 0, solid: false},
-  VOID: {code: 2, name: 'Void', type: NODE_TYPE.SPACE, color: '#300606', star: 0, solid: false},
-  INVISIBLE: {code: 3, name: 'Invisible', type: NODE_TYPE.SPACE, color: '#300606', star: 0, solid: true},
-  BASALT: {code: 4, name: 'Basalt', type: NODE_TYPE.STRONG, color: '#000000', star: 6, solid: true},
+  // Les tuiles du périmètres, qui ne peuvent être modifiées
+  FOG: {code: 1, name: 'Fog', type: NODE_TYPE.STRONG | NODE_TYPE.GAZ, color: 'none', star: 6},
+  DEEPSEA: {code: 2, name: 'Deep Sea', type: NODE_TYPE.LIQUID | NODE_TYPE.STRONG, color: '#2D5EBF', star: 6, waveImage: 'liquid_16_16-4-0'},
+  BASALT: {code: 3, name: 'Basalt', type: NODE_TYPE.SOLID | NODE_TYPE.STRONG, color: '#000000', star: 6},
+  LAVA: {code: 4, name: 'Lava', type: NODE_TYPE.SOLID | NODE_TYPE.STRONG, color: '#DC143C', star: 6},
 
-  CLAY: {code: 5, name: 'Clay', type: NODE_TYPE.TOPSOIL, stype: 'block', star: 1, solid: true, color: '#af784d', image: 'substrat_16_16+3', speed: 1000, mining: [{item: 'bkclay', count: 1}]},
-  MUD: {code: 6, name: 'Mud', type: NODE_TYPE.TOPSOIL, stype: 'block', star: 1, solid: true, color: '#853a51', image: 'substrat_16_16+4', speed: 1000, mining: [{item: 'bkmud', count: 1}]},
-  SILT: {code: 7, name: 'Silt', type: NODE_TYPE.TOPSOIL, stype: 'block', star: 1, solid: true, color: '#4f5b6c', image: 'substrat_16_16+7', speed: 1000, mining: [{item: 'bksilt', count: 1}]},
-  ASH: {code: 8, name: 'Ash', type: NODE_TYPE.TOPSOIL, stype: 'block', star: 1, solid: true, color: '#1b283b', speed: 1000, image: 'substrat_16_16+8', mining: [{item: 'bkash', count: 1}]},
+  // les tuiles de gas
+  SKY: {code: 5, name: 'Sky', type: NODE_TYPE.GAZ, color: 'none', star: 0},
+  VOID: {code: 6, name: 'Void', type: NODE_TYPE.GAZ, color: '#300606', star: 0},
 
-  DIRT: {code: 9, name: 'Dirt', type: NODE_TYPE.SUBSTRAT, stype: 'block', star: 1, solid: true, color: '#835537', image: 'substrat_16_16+1', speed: 1000, mining: [{item: 'bkdirt', count: 1}, {item: 'worm', count: 0.15, lucky: 1.2, rainy: 1.7}]},
-  STONE: {code: 10, name: 'Stone', type: NODE_TYPE.SUBSTRAT, stype: 'block', star: 1, solid: true, color: '#a4937f', image: 'substrat_16_16+2', speed: 1000, mining: [{item: 'bkston', count: 1}]},
-  SAND: {code: 11, name: 'Sand', type: NODE_TYPE.SUBSTRAT, stype: 'block', star: 1, solid: true, color: '#fee267', image: 'substrat_16_16+5', speed: 500, mining: [{item: 'bksand', count: 1}], viscosity: 1000}, // 500
-  HUMUS: {code: 12, name: 'Humus', type: NODE_TYPE.SUBSTRAT, stype: 'block', star: 1, solid: true, color: '#036632', image: 'substrat_16_16+6', speed: 1000, mining: [{item: 'bkhumus', count: 1}]},
-  SLUSH: {code: 13, name: 'Slush', type: NODE_TYPE.SUBSTRAT, stype: 'block', star: 1, solid: true, color: '#641f97', image: 'substrat_16_16+10', speed: 600, mining: [{item: 'bkslush', count: 1}]},
+  // les tuiles liquides
+  SEA: {code: 7, name: 'Sea', type: NODE_TYPE.LIQUID, stype: 'water', star: 0, color: '#2D5EBF', waveImage: 'liquid_16_16-4-0', viscosity: 200},
+  WATER: {code: 8, name: 'Water', type: NODE_TYPE.LIQUID, stype: 'water', star: 0, color: '#477BFF', viscosity: 200},
+  HONEY: {code: 9, name: 'Honey', type: NODE_TYPE.LIQUID, stype: 'honey', star: 0, color: '#FFC700', viscosity: 600},
+  SAP: {code: 10, name: 'Sap', type: NODE_TYPE.LIQUID, stype: 'sap', star: 0, color: '#008000', viscosity: 400},
+
+  // les tuiles de substrat peu de plantes
+  CLAY: {code: 11, name: 'Clay', type: NODE_TYPE.SUBSTRAT, stype: 'block', star: 1, solid: true, color: '#af784d', image: 'substrat_16_16+3', speed: 1000, mining: [{item: 'bkclay', count: 1}]}, // Forêt
+  SANDSTONE: {code: 12, name: 'Sandstone', type: NODE_TYPE.SUBSTRAT, stype: 'block', star: 1, solid: true, color: '#b87141', image: 'rock_16_16+5', speed: 1200, mining: [{item: 'sandstone', count: 1}]}, // Désert
+  MUD: {code: 13, name: 'Mud', type: NODE_TYPE.SUBSTRAT, stype: 'block', star: 1, solid: true, color: '#853a51', image: 'substrat_16_16+4', speed: 1000, mining: [{item: 'bkmud', count: 1}]}, // Jungle
+  STONE: {code: 14, name: 'Stone', type: NODE_TYPE.SUBSTRAT, stype: 'block', star: 1, solid: true, color: '#a4937f', image: 'substrat_16_16+2', speed: 1000, mining: [{item: 'bkston', count: 1}]}, // Underground
+  SHALE: {code: 15, name: 'Shale', type: NODE_TYPE.SUBSTRAT, stype: 'block', star: 1, solid: true, color: '#1b283b', speed: 1000, image: 'substrat_16_16+8', mining: [{item: 'bkash', count: 1}]}, // Cavern Layer
+
+  // les tuiles de topsoil, propices aux plantes
+  DIRT: {code: 9, name: 'Dirt', type: NODE_TYPE.TOPSOIL, stype: 'block', star: 1, solid: true, color: '#835537', image: 'substrat_16_16+1', speed: 1000, mining: [{item: 'bkdirt', count: 1}, {item: 'worm', count: 0.15, lucky: 1.2, rainy: 1.7}]}, // Forêt
+  SAND: {code: 11, name: 'Sand', type: NODE_TYPE.TOPSOIL, stype: 'block', star: 1, solid: true, color: '#fee267', image: 'substrat_16_16+5', speed: 500, mining: [{item: 'bksand', count: 1}], viscosity: 500}, // désert
+  SILT: {code: 7, name: 'Silt', type: NODE_TYPE.TOPSOIL, stype: 'block', star: 1, solid: true, color: '#4f5b6c', image: 'substrat_16_16+7', speed: 1000, mining: [{item: 'bksilt', count: 1}]}, // Jungle
+  HUMUS: {code: 12, name: 'Humus', type: NODE_TYPE.TOPSOIL, stype: 'block', star: 1, solid: true, color: '#036632', image: 'substrat_16_16+6', speed: 1000, mining: [{item: 'bkhumus', count: 1}]}, // mushroom / fern / moss - Underground
+  ASH: {code: 15, name: 'Ash', type: NODE_TYPE.SUBSTRAT, stype: 'block', star: 1, solid: true, color: '#1b283b', speed: 1000, image: 'substrat_16_16+8', mining: [{item: 'bkash', count: 1}]}, // Cavern Layer
+
+  INVISIBLE: {code: 3, name: 'Invisible', type: NODE_TYPE.SOLID, color: '#300606', star: 0, solid: true},
+
+
+
+
+
+
+
+
 
   GRASS: {code: 16, name: 'Regular Grass', type: NODE_TYPE.NATURAL, star: 1, solid: true, color: '#84de50', image: 'grass_16_16+0', speed: 500, mining: [{item: 'bkclay', count: 1}, {item: 'seedf', count: 0.2}, {item: 'worm', count: 0.02, rainy: 40}], foraging: [{item: 'seedf', count: 0.2, lucky: 1.5}, {item: 'worm', count: 0.05, lucky: 2, rainy: 10}, {item: 'slug', count: 0.04, lucky: 1.8, rainy: 10}, {item: 'goldworm', count: 0.01}]},
   GRASSJUNGLE: {code: 17, name: 'Jungle Grass', type: NODE_TYPE.NATURAL, star: 2, solid: true, color: '#56ba27', image: 'grass_16_16+1', speed: 500, mining: [{item: 'bkmud', count: 1}, {item: 'seedj', count: 0.15}], foraging: [{item: 'seedj', count: 0.15, lucky: 1.5}, {item: 'slug', count: 0.05, lucky: 2, rainy: 10}]},
@@ -236,7 +258,6 @@ export const NODES = {
   METEORITE: {code: 22, name: 'Meteroite', type: NODE_TYPE.ROCK, stype: 'block', star: 5, solid: true, color: '#7d6f5f', image: 'rock_16_16+2', speed: 2000, mining: [{item: 'bkmtrt', count: 1}]}, // SURFACE
   OBSIDIAN: {code: 23, name: 'Obsidian', type: NODE_TYPE.ROCK, star: 5, solid: true, color: '#73c882', image: 'rock_16_16+3', speed: 2000, mining: [{item: 'obsidian', count: 1}]}, // HELL
   HELLSTONE: {code: 24, name: 'Hellstone', type: NODE_TYPE.ROCK, stype: 'block', star: 5, solid: true, color: '#cc0030', image: 'rock_16_16+4', speed: 2200, mining: [{item: 'hellstone', count: 1}]}, // HELL
-  SANDSTONE: {code: 14, name: 'Sandstone', type: NODE_TYPE.ROCK, stype: 'block', star: 1, solid: true, color: '#b87141', image: 'rock_16_16+5', speed: 1200, mining: [{item: 'sandstone', count: 1}]},
   HIVE: {code: 15, name: 'Hive', type: NODE_TYPE.ROCK, stype: 'block', star: 1, solid: true, color: '#fd8431', image: 'rock_16_16+6', speed: 1200, mining: [{item: 'bkhive', count: 1}]},
 
   COPPER: {code: 25, name: 'Copper Ore', type: NODE_TYPE.ORE, star: 1, solid: true, color: '#fe602f', image: 'ore_16_16+0', speed: 1000, mining: [{item: 'orcu', count: 1}]}, // GROUND
@@ -269,15 +290,6 @@ export const NODES = {
   MARBLEWALL: {code: 50, name: 'Marble Wall', type: NODE_TYPE.BWALL, star: 4, solid: false, color: '#788696', image: 'wall_16_16+15', speed: 1800, hammering: [{item: 'marblewall', count: 1}]},
 
   WEB: {code: 53, name: 'Cobweb', type: NODE_TYPE.WEB, star: 1, solid: false, color: '#788696', image: 'substrat_16_16+9', speed: 1900, mining: [{item: 'cobweb', count: 1}, {item: 'spideregg', count: '1-3-0.08'}, {monster: 'spider', rate: '25'}]},
-
-  BRICK: {code: 54, name: 'Brick', type: NODE_TYPE.WALL, star: 1, solid: true, color: '#A52A2A'}, // DUNGEON - à supprimer
-
-  // modifier 'isLiquidTileCode' si les codes changent
-  SEA: {code: 55, name: 'Sea', type: NODE_TYPE.LIQUID, stype: 'water', level: 16, star: 0, solid: false, color: '#2D5EBF', image: 'liquid_16_16-0-0', waveImage: 'liquid_16_16-4-0', viscosity: 200},
-  WATER: {code: 56, name: 'Water', type: NODE_TYPE.LIQUID, stype: 'water', level: 16, star: 0, solid: false, color: '#477BFF', image: 'liquid_16_16-1-0', viscosity: 200},
-  HONEY: {code: 57, name: 'Honey', type: NODE_TYPE.LIQUID, stype: 'honey', level: 16, star: 0, solid: false, color: '#FFC700', image: 'liquid_16_16-2-0', viscosity: 600},
-  LAVA: {code: 58, name: 'Lava', type: NODE_TYPE.LIQUID, stype: 'lava', level: 16, star: 0, solid: false, color: '#DC143C', image: 'liquid_16_16-3-0', viscosity: 800},
-  SAP: {code: 59, name: 'Sap', type: NODE_TYPE.LIQUID, solid: false, color: '#008000', viscosity: 500},
 
   SHORE: {code: 60, name: 'Shore', color: '#FFCC00'},
   // types utilisés de manière temporaire pendant la création du monde

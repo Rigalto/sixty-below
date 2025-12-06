@@ -531,3 +531,74 @@ Cette couche contient la logique spécifique du jeu. Les modules communiquent le
 * **Optimisation dynamique :**
     * Pour les coordonnées (mise à jour fréquente), l'UI [`EnvironmentWidget`] ne s'abonne à l'événement `player/move` **QUE** si le buff `buff/coords-display` est actif.
     * Si le buff est perdu, l'UI se désabonne immédiatement de `player/move` pour économiser le CPU.
+
+## 9. Le monde (composition / génération)
+
+Le monde est grossièrement divisé verticalement en quatre biomes et horizontalement en 4 couches (Layers).
+Le monde fait 1024 tuiles de large et 512 tuiles de haut. Ce qui correspond à 64 chunks de large et 32 chunks de haut.
+
+### 9.1 Biomes - Découpage horizontal
+
+* **Sea :** de chaque côté du monde. Sa largeur fait 2 chunks d'un côté et 3 chunks de l'autre côté (aléatoire).
+* **Forêt :** le biome le plus facile. Il y a une zone de Forêt au centre du monde, là où le joueur se trouve au départ.
+* **Désert :** le biome intermédiaire.
+* **Jungle :** le biome le plus difficile.
+
+Les biomes s'étalent sur 3 à 6 chunks. Leur taille et leur position est aléatoire.
+
+### 9.2 Les couches - Découpage vertical (Layers)
+
+* **Ciel (SKY) :** les trois chunks du haut, qui ne contiennent aucune tuile solide.
+* **Surface :** Le quatrième et cinquième chunk. Ligne de surface découpée. Présence de lac (oadis dans le désert).
+* **Sous-sol (Underground) :** Traversé par des couloirs horizontaux et des galeries obliques.
+* **Cavernes :** En plus des couloirs et galeries, de vastes zones dégagées offrent des mini-biotopes (Mushroom, Hive...)
+
+La surface de la mer se trouve en Y=56.
+
+### 9.3 Frontières
+
+Le monde est limité par des tuiles inamovibles sur son périmètre :
+* **Fog :** en haut et sur les deux côtés jusqu'à la tuile de Y=55 (analogue à du SKY).
+* **Deep Sea :** de chaque côtés, à partir de la tuile 56 jusqu'à la fin de l'underground  (analogue à de la SEA).
+* **Basalt :** de chaque côtés, sur toute la hauteur de la 'Cavern Layer' (roche infiniment dure).
+* **Lava :** La dernière rangée de tuiles et peut s'étendre jusqu'à trois tuiles de haut.
+
+### 9.4 Le Substrat
+
+Il s'agit des tuiles solides, relativement inertes, qui supporte le monde/ Il y en a cinq types :
+* **CLAY :** Majoritairement dans le biome Forêt, couche de surface
+* **SANDSTONE :** Majoritairement dans le biome désert, couche de surface
+* **MUD :** Majoritairement dans le biome Jungle, couche de surface
+* **STONE :** Majoritairement dans la couche 'Underground'
+* **SHALE :** Majoritairement dans la couche 'Caverns'
+
+### 9.5 Le Topsoil
+
+Il s'agit d'une couche peu épaisse propice au développement de la flore :
+* **DIRT :** dans le biome Forêt.
+* **SAND :** dans le biome désert.
+* **SILT :** dans le biome Jungle.
+* **HUMUS :** dans la couche 'Underground'
+* **ASH :** dans la couche 'Caverns'
+
+### 9.6 Diffusion
+
+Les limites entre les différents biomes et les différentrs couches n'est pas brutale. Leur aspect naturel est généré en utilisant :
+* **Perlin Noise :** permet d'obtenir une ondulation de la frontière, avec un aspect organique dû au bruit de Perlin.
+* **Diffusion :** simule des échanges de matières entre deux zones contiguës. Des taches de `substrat` et de `topsoil` d'une zone sont placés dans la zone limitrophe. La taille de ces taches diminuent avec la distance, de même que leur probabilité d'apparition.
+
+### 9.7 Les liquides
+
+* **SEA :** Eau dans le biome 'Sea' avec sa version bloquée 'DEEP SEA'.
+* **WATER :** Eau partout dans le monde.
+* **SAND :** Dans le désert, s'écoule en formant des tas.
+* **HONEY :** Dans le mini-biome Ruche (Hive).
+* **SAP :** Dans le mini-bionme [A définir].
+
+### 9.8 Les minerais
+
+### 9.9 Les gemmes
+
+### 9.10 Nettoyage final
+
+La dernière étape de la création du monde consiste en un
