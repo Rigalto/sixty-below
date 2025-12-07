@@ -595,9 +595,59 @@ Les limites entre les différents biomes et les différentrs couches n'est pas b
 * **HONEY :** Dans le mini-biome Ruche (Hive).
 * **SAP :** Dans le mini-bionme [A définir].
 
-### 9.8 Les minerais
+### 9.8 Les métaux
+
+#### 9.8.1 Minerais (Ores)
+
+Les métaux se trouvent dans le monde sous forme d'amas de minerais (tuiles reliées par leur côté). Ils s'extraient avec une pioche suffisamment solide.
+* **Copper Ore - Tier 1 :** Commun en surface, rare en 'Underground', très rare en 'Caverns'.
+* **Iron Ore - Tier 2 :** Rare en surface, commun en 'Underground', rare en 'Caverns'.
+* **Silver Ore - Tier 3 :** Absent en surface, rare en 'Underground', très rare en 'Caverns'.
+* **Gold Ore - Tier 3 :** Absent en surface, rare en 'Underground', très rare en 'Caverns'.
+* **Platinum Ore - Tier 4 :** Absent en surface, très rare en 'Underground' biome Forêt, commun en 'Caverns' biomes Forêt et Jungle.
+* **Cobalt Ore - Tier 4 :** Absent en surface, très rare en 'Underground' biome Desert, commun en 'Caverns' biomes Desert et Jungle.
+* **Titanum Ore - Tier 5 :** Absent en surface, absent en 'Underground', rare en 'Caverns'.
+* **Siderite Ore - Tier 5 :** Tombe rarement en surface sous la forme d'une météorite.
+
+#### 9.8.2 Lingots (Lingots)
+
+Les minerais sont transformés en lingot auprès d'une Crafting Station ('Furnace' pour tier 1-4 et '???' pour tier 5 et 6) :
+* **Copper - Tier 1 :** A partir des 'Copper Ores'.
+* **Iron - Tier 2 :** A partir des 'Iron Ores'.
+* **Silver  - Tier 3 :** A partir des 'Silver Ores'.
+* **Gold  - Tier 3 :** A partir des 'Gold Ores'.
+* **Platinum  - Tier 4 :** A partir des 'Platinum Ores'.
+* **Cobalt  - Tier 4 :** A partir des 'Cobalt Ores'.
+* **Titanum  - Tier 5 :** A partir des 'Titanum Ores'.
+* **Siderite  - Tier 5 :** A partir des 'Siderite Ores'.
+
+#### 9.8.3 Alliages (Alloys)
+
+Les alliages combinent des métaux auprès d'une Crafting Station ('Crucible' pour tier 1-4 et 'Smelter' pour tier 5 et 6) :
+* **Steel  - Tier 2 :** [armes] 'Iron' + 'Charcoal'.
+* **Bronze - Tier 2 :**  [armures] 'Copper' + 'Iron'.
+* **Brass - Tier 2 :** [accessoires] 'Copper' + 'Charcoal' (obtenu à partir de 'Oak Logs' près d'une Crafting Station 'Campfire').
+
+* **Pyrite - Tier 3 :**  [armes] 'Iron' + 'Gold'.
+* **Sterling - Tier 3 :**  [armures] 'Copper' + 'Silver'.
+* **Vermeil - Tier 3 :**  [accessoires] 'Silver' + 'Gold'.
+
+* **Magnite - Tier 4 :**  [armes] 'Iron' + 'Cobalt'.
+* **Plasteel - Tier 4 :**  [armures] 'Iron' + 'Platinum'.
+* **Celestium - Tier 4 :**  [accessoires] 'Platinum' + 'Cobalt'.
+
+* **Chromis - Tier 5 :**  [armes] 'Platinum' + 'Titanum'.
+* **Solarium - Tier 5 :**  [armures] 'Gold' + 'Siderite'.
+* **Nebulis - Tier 5 :**  [accessoires] 'Titanum' + 'Siderite'.
 
 ### 9.9 Les gemmes
+
+### 9.9 Les arbres
+
+* Oak => Oak Log => Charcoal (métalurgie)
+* Mahogany => Mahogany Log => ??? (stabilisateur de potion)
+* PalmTree => Fibre (armure, accessoire)
+
 
 ### 9.10 Nettoyage final
 
