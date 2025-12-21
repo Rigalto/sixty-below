@@ -652,6 +652,14 @@ Les alliages combinent des métaux auprès d'une Crafting Station ('Crucible' po
 
 ### 9.9 Les gemmes
 
+Les gemmes se trouvent dans des amas plus petits que les 'Ores'. Il y en a quatre :
+* **Ruby - Tier 2 :** Couche 'Underground', tous les biomes.
+* **Emerald - Tier 3 :** Couche 'Caverns', Forêt.
+* **Topas - Tier 4 :** Couche 'Caverns', Désert.
+* **Sapphire - Tier 5 :** Couche 'Caverns', Jungle.
+
+Elles sont abondamment utilisées dans les armes, les armures et les accessoires.
+
 ### 9.9 Les arbres
 
 * Oak => Oak Log => Coal (métalurgie)
