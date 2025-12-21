@@ -621,30 +621,40 @@ Les minerais sont transformés en lingot auprès d'une Crafting Station ('Furnac
 * **Titanum  - Tier 5 :** A partir des 'Titanum Ores'.
 * **Siderite  - Tier 5 :** A partir des 'Siderite Ores'.
 
+
 #### 9.8.3 Alliages (Alloys)
 
+Les alliages sont constitués de plusieurs métaux fondus entre eux dans des proportions très précises. Ils peuvent aussi incorporer d'autres éléments :
+* **Coal** : Obtenu à partir de 'Oak Logs' près d'une Crafting Station 'Campfire' ou en minant une 'Coal Vein'. Une 'Coal Vein' est un chemin vide d'une case de diamètre dont le toit est constitué par des tuiles de 'Coal'.
+* **Sand** : Obtenu en minant les tuiles de 'SAND' présentes principalement dans le désert et sur les plages. Fondu dans un 'Furnace', il donne du 'Glass' (tier-1) utilisé pour de nombreux récipients ('containers').
+* **Clay** : Obtenu en minant les tuiles de 'CLAY' présentes principalement en surface, dans la forêt. Fondu dans un 'Furnace', il donne du 'Glass' (tier-1) utilisé pour de nombreux récipients ('containers').
+
 Les alliages combinent des métaux auprès d'une Crafting Station ('Crucible' pour tier 1-4 et 'Smelter' pour tier 5 et 6) :
-* **Steel  - Tier 2 :** [armes] 'Iron' + 'Charcoal'.
+* **Steel  - Tier 2 :** [armes] 'Iron' + 'Coal'.
 * **Bronze - Tier 2 :**  [armures] 'Copper' + 'Iron'.
-* **Brass - Tier 2 :** [accessoires] 'Copper' + 'Charcoal' (obtenu à partir de 'Oak Logs' près d'une Crafting Station 'Campfire').
+* **Brass - Tier 2 :** [accessoires] 'Copper' + 'Coal'.
+* **Crystal - Tier 2 :** [récipients] 'Copper' + 'Sand'.
 
 * **Pyrite - Tier 3 :**  [armes] 'Iron' + 'Gold'.
 * **Sterling - Tier 3 :**  [armures] 'Copper' + 'Silver'.
 * **Vermeil - Tier 3 :**  [accessoires] 'Silver' + 'Gold'.
+* **Terracotta - Tier 3 :** [récipients] 'Iron' + 'Clay'.
 
 * **Magnite - Tier 4 :**  [armes] 'Iron' + 'Cobalt'.
 * **Plasteel - Tier 4 :**  [armures] 'Iron' + 'Platinum'.
 * **Celestium - Tier 4 :**  [accessoires] 'Platinum' + 'Cobalt'.
+* **Ceramic - Tier 4 :** [récipients] 'Sand' + 'Cobalt'.
 
 * **Chromis - Tier 5 :**  [armes] 'Platinum' + 'Titanum'.
 * **Solarium - Tier 5 :**  [armures] 'Gold' + 'Siderite'.
 * **Nebulis - Tier 5 :**  [accessoires] 'Titanum' + 'Siderite'.
+* **Silicate - Tier 5 :**  [récipients] 'Platinum' + 'Sand'.
 
 ### 9.9 Les gemmes
 
 ### 9.9 Les arbres
 
-* Oak => Oak Log => Charcoal (métalurgie)
+* Oak => Oak Log => Coal (métalurgie)
 * Mahogany => Mahogany Log => ??? (stabilisateur de potion)
 * PalmTree => Fibre (armure, accessoire)
 
