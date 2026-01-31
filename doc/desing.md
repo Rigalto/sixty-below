@@ -186,16 +186,16 @@ export const grassManager = new GrassManager()
   * **Stockage Mémoire (Runtime) :**
       * **Structure :** Un unique `Uint8Array` (Flat Array) stockant l'ID de la tuile (référence vers `NODES` via `NODES_LOOKUP`).
       * **Adressage :** Index calculé par opérations binaires : `index = (y << 10) | x`. Cet index sera utilisé comme référence unique à une tuile (on utilise **jamais** une String `x_y`).
-      * **Evolutin :** Si des données supplémentaires sont nécessaires (ex: Murs, Liquides, tuiles bloquées), elles feront l'objet d'uune conception spécifique.
+      * **Evolution :** Si des données supplémentaires sont nécessaires (ex: Murs, Liquides, tuiles bloquées), elles feront l'objet d'uune conception spécifique.
   * **Optimisation "Ghost Cells" (Padding) :**
       * Les bords de la carte sont **interdits à la modification** (Immuables) pour supprimer les vérifications de limites (Bounds Checking) dans les boucles critiques.
-      * **Haut (y=0) :** SKY. Permet la détection de surface.
+      * **Haut (y=0) :** DEEPSKY. Permet la détection de surface.
       * **Bas (y=511) :** LAVA.
       * **Latéral (x=0 et x=1023) :** Colonnes composées de DEEPSKY (haut), DEEPSEA (milieu) et BASALT (fond).
   * **Echelle :** 1 tuile = 50cm. Monde = 510 de large x 254m de haut.
   * **Classification des Entités (Grid vs Objects) :**
       * **Tuiles (Grid-based) :** Tout élément structurel répétitif stocké dans le `Uint8Array`.
-          * Comprend : Terrain naturel (Terre, Pierre), Liquides, Vides (SKY, VOID), **Murs de fond** (Background Walls) et Murs de construction (Wood Walls).
+          * Comprend : Terrain naturel (Terre, Pierre, Minerais, Gemme), Liquides, Vides (SKY, VOID), **Murs de fond** (Background Walls) et Murs de construction (Wood Walls).
       * **Furniture (Object-based) :** Tout élément posé manuellement par le joueur, stocké dans un Store dédié (`furniture`).
           * Comprend : Stations de craft, Coffres, Lits, Portes, Feux de camp...
           * **Cas spécifiques :** Les **Plateformes** et les **Sources de lumière** (Torches, Lampes) sont traitées comme des Furniture (entités libres) et non des Tuiles, pour ne pas bloquer la physique ou l'éclairage de la grille.
