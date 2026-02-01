@@ -720,10 +720,14 @@ export const timeManager = new TimeManager()
 class SeededRNG {
   #seed
   #useMathRandom
+  #perlinGradients
+  #perlinOctaves
 
   constructor () {
     this.#seed = 1234
     this.#useMathRandom = true // Par défaut, comportement aléatoire non déterministe
+    this.#perlinGradients = {}
+    this.#perlinOctaves = [{scale: 1, amplitude: 1}, {scale: 2, amplitude: 0.5}, {scale: 4, amplitude: 0.25}, {scale: 8, amplitude: 0.125}]
   }
 
   /**
@@ -854,6 +858,68 @@ class SeededRNG {
     }
     return arr.length - 1 // Fallback sécurité
   }
+
+  // /////////////////////////////
+  // générateur de bruit de Perlin
+  // /////////////////////////////
+
+  // https://dcabuzel.alwaysdata.net/#ele/not/table/4633/card
+
+  randomPerlinInit () { this.#perlinGradients = {} }
+
+  randomPerlinOctave (octaves) {
+    // par précaution, on effectue une copie des objets décrivant chaque octave
+    this.#perlinOctaves.length = 0
+    octaves.forEach(octave => this.#perlinOctaves.push({...octave}))
+  }
+
+  #perlinGrid (x, y, x0, y0) {
+    if (!this.#perlinGradients[[x, y]]) {
+      const a = this.#next() * 2 * Math.PI
+      const v = {x: Math.cos(a), y: Math.sin(a)}
+      this.#perlinGradients[[x, y]] = v
+    }
+    const {x: x1, y: y1} = this.#perlinGradients[[x, y]]
+    const dx = x0 - x
+    const dy = y0 - y
+    // console.log('>>>>>>', {dx, dy, x1, y1, rerurn: dx * x1 + dy * y1})
+    return dx * x1 + dy * y1
+  }
+
+  #perlinOctave (x, y, scale, amplitude) {
+    const scaledX = x * scale
+    const scaledY = y * scale
+
+    const {int: intX, fract: fractX} = intFract(scaledX)
+    const {int: intY, fract: fractY} = intFract(scaledY)
+
+    // interpolate
+    const tl = this.#perlinGrid(intX, intY, scaledX, scaledY)
+    const tr = this.#perlinGrid(intX + 1, intY, scaledX, scaledY)
+    const bl = this.#perlinGrid(intX, intY + 1, scaledX, scaledY)
+    const br = this.#perlinGrid(intX + 1, intY + 1, scaledX, scaledY)
+    const xt = cosineInterpolation(fractX, tl, tr)
+    const xb = cosineInterpolation(fractX, bl, br)
+    return amplitude * cosineInterpolation(fractY, xt, xb)
+  }
+
+  randomPerlin (x, y = 1) {
+    const noise = this.#perlinOctaves.reduce((acc, octave) => acc + this.#perlinOctave(x, y, octave.scale, octave.amplitude), 0) / 2 + 0.5
+    if (noise < 0) { return 0 }
+    if (noise > 1) { return 1 }
+    return noise
+  }
 }
 
 export const seededRNG = new SeededRNG()
+
+// retourne la partie entière et la partie fractionnaire
+export const intFract = (r) => {
+  const int = Math.floor(r)
+  return {int, fract: r - int}
+}
+
+export const cosineInterpolation = (x, a, b) => {
+  const f = (1 - Math.cos(x * Math.PI)) * 0.5
+  return a * (1 - f) + b * f
+}

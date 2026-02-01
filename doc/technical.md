@@ -132,7 +132,7 @@ taskScheduler.enqueueAfter(
 
 * `init(seed?: string|number): void`
 * `randomGet(): number`
-* `randomGetBool(): boolean`
+* `randomGetBool(): boolean` (Retourne true/false à 50%/50%)
 * `randomInteger(a?: any, b?: number): number|any` (Polyvalent: Range, Array, MinMax)
 * `randomReal(a?: any, b?: number): number`
 * `randomGetMax(max: number): number`
@@ -142,6 +142,13 @@ taskScheduler.enqueueAfter(
 * `randomGetArrayWeighted(arr: Array<{weight}>): int` (Retourne l'index)
 * `randomGaussian(mean?: number, sd?: number): number`
 * `randomLinear(): number`
+* `randomPerlinInit()` : Vide le cache des gradients de bruit.
+* `randomPerlinOctave(octaves)` : Définit les couches de bruit (ex: `[{scale: 1, amplitude: 1}]`).
+* `randomPerlin(x, y)` : Retourne une valeur de bruit cohérente entre 0 et 1.
+
+### Math Utils
+* `intFract(number)` : Retourne `{int, fract}`.
+* `cosineInterpolation(x, a, b)` : Interpolation non-linéaire entre a et b.
 
 ## database.mjs (layer 1)
 
