@@ -550,10 +550,10 @@ Les biomes s'étalent sur 3 à 6 chunks. Leur taille et leur position est aléat
 
 * **Ciel (SKY) :** les trois chunks du haut, qui ne contiennent aucune tuile solide.
 * **Surface :** Le quatrième et cinquième chunk. Ligne de surface découpée. Présence de lac (oadis dans le désert).
-* **Sous-sol (Underground) :** Traversé par des couloirs horizontaux et des galeries obliques.
+* **Sous-sol (Underground) :** Traversé par des couloirs horizontaux et des galeries obliques (19 à 21 chunks de haut).
 * **Cavernes :** En plus des couloirs et galeries, de vastes zones dégagées offrent des mini-biotopes (Mushroom, Hive...)
 
-La surface de la mer se trouve en Y=56.
+La surface de la mer se trouve en Y=56 tiles.
 
 ### 9.3 Frontières
 
