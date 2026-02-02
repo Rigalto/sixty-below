@@ -909,6 +909,12 @@ class SeededRNG {
     if (noise > 1) { return 1 }
     return noise
   }
+
+  randomPerlinScaled (x, y, period, amplitude) {
+    // (n * 2 - 1) transforme [0, 1] en [-1, 1]
+    const noise = this.randomPerlin(x / period, y) * 2 - 1
+    return noise * amplitude
+  }
 }
 
 export const seededRNG = new SeededRNG()

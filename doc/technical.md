@@ -145,6 +145,7 @@ taskScheduler.enqueueAfter(
 * `randomPerlinInit()` : Vide le cache des gradients de bruit.
 * `randomPerlinOctave(octaves)` : Définit les couches de bruit (ex: `[{scale: 1, amplitude: 1}]`).
 * `randomPerlin(x, y)` : Retourne une valeur de bruit cohérente entre 0 et 1.
+* `randomPerlinScaled(x, y, period, amplitude)` : Retourne une valeur de bruit entre -amplitude et +amplitude, avec une période de 'period' tuiles.
 
 ### Math Utils
 * `intFract(number)` : Retourne `{int, fract}`.
