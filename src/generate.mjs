@@ -19,7 +19,7 @@ class WorldGenerator {
     console.log('[WorldGenerator] - Biomes', biomes, (performance.now() - t0).toFixed(3), 'ms')
 
     // 2. Génération des zones
-    const {skySurface, surfaceUnder, underCaverns} = this.precomputeHorizontalBoundaries()
+    const {skySurface, surfaceUnder, underCaverns, hell} = this.precomputeHorizontalBoundaries()
 
     for (let x = 0; x < WORLD_WIDTH; x++) {
       for (let y = 0; y < WORLD_HEIGHT; y++) {
@@ -38,6 +38,7 @@ class WorldGenerator {
           if (y === skySurface[x]) code = NODES.HONEY.code
           if (y === surfaceUnder[x]) code = NODES.HONEY.code
           if (y === underCaverns[x]) code = NODES.HONEY.code
+          if (y >= hell[x]) code = NODES.LAVA.code
         }
         chunkManager.setGenTile(x, y, code)
       }
@@ -62,22 +63,25 @@ class WorldGenerator {
     const skySurface = new Int16Array(1024)
     const surfaceUnder = new Int16Array(1024)
     const underCaverns = new Int16Array(1024)
+    const hell = new Int16Array(1024)
 
     const skySurfaceY = 48
     const surfaceUnderY = 96
     const underCavernsY = 16 * (6 + seededRNG.randomGetMinMax(8, 10))
+    const HellY = 512
 
     for (let x = 0; x < 1024; x++) {
       // les valeurs de Y sont choisies éloignées pour ne pas corréler les lignes
       let noise = seededRNG.randomPerlinScaled(x, 2.8, 30, 15) + seededRNG.randomPerlinScaled(x, 2.8, 10, 5)
       skySurface[x] = skySurfaceY + noise // 3 chunks * 16
-      noise = seededRNG.randomPerlinScaled(x, 13.7, 50, 20)
+      noise = seededRNG.randomPerlinScaled(x, 13.7, 50, 20) + seededRNG.randomPerlinScaled(x, 13.7, 10, 5)
       surfaceUnder[x] = surfaceUnderY + noise // 6 chunks total (3 sky + 6 surface)
-      noise = seededRNG.randomPerlinScaled(x, 24.6, 45, 30)
+      noise = seededRNG.randomPerlinScaled(x, 24.6, 45, 30) + seededRNG.randomPerlinScaled(x, 24.6, 10, 5)
       underCaverns[x] = underCavernsY + noise // + ~20 chunks
+      hell[x] = HellY - 5 * seededRNG.randomPerlin(x / 60, 35.2)
     }
 
-    return {skySurface, surfaceUnder, underCaverns}
+    return {skySurface, surfaceUnder, underCaverns, hell}
   }
 
   async save (seed) {
