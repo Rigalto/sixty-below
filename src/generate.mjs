@@ -19,10 +19,26 @@ class WorldGenerator {
     console.log('[WorldGenerator] - Biomes', biomes, (performance.now() - t0).toFixed(3), 'ms')
 
     // 2. Génération des zones
+    const {skySurface, surfaceUnder, underCaverns} = this.precomputeHorizontalBoundaries()
+
     for (let x = 0; x < WORLD_WIDTH; x++) {
       for (let y = 0; y < WORLD_HEIGHT; y++) {
-        let code = NODES.SKY.code
-        if (y > 56) { code = NODES.SAND.code }
+        let code = 0
+        // 2.1 protection du périmètre (NODE_TYPE.STRONG)
+        if ((x === 0) || (x === 1023)) {
+          code = NODES.DEEPSEA.code
+          if (y < 56) code = NODES.FOG.code
+          if (y > 80) code = NODES.BASALT.code
+        }
+        if (y === 0) code = NODES.FOG.code
+        if (y === 511) code = NODES.LAVA.code
+
+        if (code === 0) {
+          code = NODES.SKY.code
+          if (y === skySurface[x]) code = NODES.HONEY.code
+          if (y === surfaceUnder[x]) code = NODES.HONEY.code
+          if (y === underCaverns[x]) code = NODES.HONEY.code
+        }
         chunkManager.setGenTile(x, y, code)
       }
     }
@@ -34,6 +50,34 @@ class WorldGenerator {
     seededRNG.init()
 
     console.log('[WorldGenerator] - Terminé en', (performance.now() - t0).toFixed(3), 'ms')
+  }
+
+  /**
+ * Calcule les lignes de démarcation horizontales avec du bruit
+ * @param {number} width Largeur du monde en tuiles
+ * @returns {Object} { skySurface, surfaceUnder, underCaverns }
+ */
+
+  precomputeHorizontalBoundaries () {
+    const skySurface = new Int16Array(1024)
+    const surfaceUnder = new Int16Array(1024)
+    const underCaverns = new Int16Array(1024)
+
+    const skySurfaceY = 48
+    const surfaceUnderY = 96
+    const underCavernsY = 16 * (6 + seededRNG.randomGetMinMax(8, 10))
+
+    for (let x = 0; x < 1024; x++) {
+      // les valeurs de Y sont choisies éloignées pour ne pas corréler les lignes
+      let noise = seededRNG.randomPerlinScaled(x, 2.8, 30, 15) + seededRNG.randomPerlinScaled(x, 2.8, 10, 5)
+      skySurface[x] = skySurfaceY + noise // 3 chunks * 16
+      noise = seededRNG.randomPerlinScaled(x, 13.7, 50, 20)
+      surfaceUnder[x] = surfaceUnderY + noise // 6 chunks total (3 sky + 6 surface)
+      noise = seededRNG.randomPerlinScaled(x, 24.6, 45, 30)
+      underCaverns[x] = underCavernsY + noise // + ~20 chunks
+    }
+
+    return {skySurface, surfaceUnder, underCaverns}
   }
 
   async save (seed) {
