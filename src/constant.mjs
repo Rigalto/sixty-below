@@ -155,8 +155,8 @@ export const DB_CONFIG = {
   VERSION: 1,
   DEBUG: true,
   STORES: [
-    'world_chunks', // Stockage des Uint16Array
-    'gamestate', // Time, Seed, Player position
+    'world_chunks', // Stockage des chunks (Uint8Array)
+    'gamestate', // Time, Seed, Player position...
     'inventory', // Items, Gears, Chests
     'buff', // Buffs/Debuffs
     'plant', // Trees, Herbs, Mushrooms, Flowers, Corals

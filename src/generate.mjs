@@ -1,6 +1,6 @@
 import {seededRNG} from './utils.mjs'
 import {database} from './database.mjs'
-import {WORLD_WIDTH, WORLD_HEIGHT, BIOME_TYPE, NODES} from './constant.mjs'
+import {WORLD_WIDTH, WORLD_HEIGHT, BIOME_TYPE, NODES, WEATHER_TYPE} from './constant.mjs'
 import {chunkManager} from './world.mjs'
 
 /* ====================================================================================================
@@ -8,7 +8,7 @@ import {chunkManager} from './world.mjs'
    ==================================================================================================== */
 
 class WorldGenerator {
-  generate (seed) {
+  async generate (seed) {
     const t0 = performance.now()
     console.log('[WorldGenerator] - Début avec la graine', seed)
     // 1. On passe le générateur de nombre aléatoire en mode déterminé par la clé
@@ -28,6 +28,7 @@ class WorldGenerator {
     }
 
     // N. Stochage du monde en base de données
+    await this.save(seed)
 
     // N + 1. On repasse le générateur de nombres aléatoires en mode aléatoire
     seededRNG.init()
@@ -35,59 +36,48 @@ class WorldGenerator {
     console.log('[WorldGenerator] - Terminé en', (performance.now() - t0).toFixed(3), 'ms')
   }
 
-  async save (key) {
-    const WEATHER = [
-      {name: 'Sunny', weight: 10},
-      {name: 'Cloudy', weight: 20},
-      {name: 'Rainy', weight: 30},
-      {name: 'Windy', weight: 25},
-      {name: 'Stormy', weight: 15}
-    ]
-
+  async save (seed) {
     const start = window.performance.now()
-    // sauvegarde des tuiles
-    await database.clearObjectStore('worldTiles')
-    for (let yc = 0; yc < GEOMETRY.WORLD_CHUNK_Y; yc++) {
-      const records = []
-      for (let xc = 0; xc < GEOMETRY.WORLD_CHUNK_X; xc++) {
-        const key = yc * GEOMETRY.WORLD_CHUNK_X + xc
-        const chunk = this.chunks[key]
-        records.push({key, chunk: chunk.chunk})
-      }
-      await database.addMultipleRecords('worldTiles', records)
-    }
-    // sauvegardes des spots de graines
-    await database.clearObjectStore('seeds')
-    await database.addMultipleRecords('seeds', this.seedSpots)
-    // sauvegardes des arbres
-    await database.clearObjectStore('trees')
-    await database.addMultipleRecords('trees', this.treeSpots)
+    // 1. Sauvegarde des tuiles
+    await database.clearObjectStore('world_chunks')
 
-    // reset des quêtes et succès
-    await database.clearObjectStore('quest')
-    await database.clearObjectStore('success')
+    const chunks = chunkManager.processWorldToChunks()
+    await database.addMultipleRecords('world_chunks', chunks)
+    // for (let yc = 0; yc < GEOMETRY.WORLD_CHUNK_Y; yc++) {
+    //   const records = []
+    //   for (let xc = 0; xc < GEOMETRY.WORLD_CHUNK_X; xc++) {
+    //     const key = yc * GEOMETRY.WORLD_CHUNK_X + xc
+    //     const chunk = this.chunks[key]
+    //     records.push({key, chunk: chunk.chunk})
+    //   await database.addMultipleRecords('world_chunks', records)
+    //   }
+    // }
+    // sauvegardes des spots de graines
+    // await database.clearObjectStore('seeds')
+    // await database.addMultipleRecords('seeds', this.seedSpots)
+    // sauvegardes des arbres
+    // await database.clearObjectStore('trees')
+    // await database.addMultipleRecords('trees', this.treeSpots)
+
+    const weather = seededRNG.randomGetArrayWeighted(WEATHER_TYPE)
+    const nextweather = seededRNG.randomGetArrayWeighted(WEATHER_TYPE)
 
     await database.clearObjectStore('gamestate')
     await database.batchSetGameState([
-      {key: 'playerx', value: this.spawn.x},
-      {key: 'playery', value: this.spawn.y},
-      {key: 'spawnx', value: this.spawn.x},
-      {key: 'spawny', value: this.spawn.y},
-      {key: 'worldsize', value: GEOMETRY.WORLD_SIZE},
-      {key: 'randomkey', value: key},
+      {key: 'player', value: '8192|1280|1'},
+      {key: 'spawn', value: '8192|1280'},
+      {key: 'randomkey', value: seed},
+      {key: 'uniqueidseed', value: 'a'},
+      {key: 'timestamp', value: 480 * 1000}, // Day 1 - 8:00
+      {key: 'weather', value: weather},
+      {key: 'nextweather', value: nextweather},
+
       {key: 'redhearts', value: 5},
       {key: 'goldhearts', value: 0},
       {key: 'daybloomseeds', value: ''},
       {key: 'moonglowseeds', value: ''},
-      {key: 'health', value: 100},
-      {key: 'day', value: GEOMETRY.FIRST_DAY},
-      {key: 'minutes', value: GEOMETRY.FIRST_MINUTES},
-      {key: 'timestamp', value: GEOMETRY.FIRST_MINUTES * 1000},
-      {key: 'weather', value: randomGetArrayWeigthed(WEATHER)},
-      {key: 'nextweather', value: randomGetArrayWeigthed(WEATHER)},
-      {key: 'uniqueidseed', value: 'a'},
-      {key: 'honeysurface', value: this.honeysurface.join('|')},
-      {key: 'townsign', value: '0'.repeat(NPC_PRORITY.length)}
+      {key: 'health', value: 100}
+      // {key: 'honeysurface', value: this.honeysurface.join('|')}
     ])
 
     // sauvegarde des meubles

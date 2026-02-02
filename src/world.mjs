@@ -160,7 +160,7 @@ class ChunkManager {
 
   /**
  * Convertit l'intégralité de la grille de données en un tableau de chunks
- * @returns {Array<{index: number, chunk: Uint8Array}>}
+ * @returns {Array<{key: number, chunk: Uint8Array}>}
  * Appelé uniquement à la fin de la génération d'un nouveau monde
  */
   processWorldToChunks () {
@@ -171,11 +171,10 @@ class ChunkManager {
 
     for (let i = 0; i < totalChunks; i++) {
       result.push({
-        index: i,
+        key: i,
         chunk: this.getChunkData(i)
       })
     }
-
     return result
   }
 
