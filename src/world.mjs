@@ -159,6 +159,27 @@ class ChunkManager {
   }
 
   /**
+ * Convertit l'intégralité de la grille de données en un tableau de chunks
+ * @returns {Array<{index: number, chunk: Uint8Array}>}
+ * Appelé uniquement à la fin de la génération d'un nouveau monde
+ */
+  processWorldToChunks () {
+    const chunksX = WORLD_WIDTH >> 4 // WORLD_WIDTH / 16
+    const chunksY = WORLD_HEIGHT >> 4 // WORLD_HEIGHT / 16
+    const totalChunks = chunksX * chunksY
+    const result = []
+
+    for (let i = 0; i < totalChunks; i++) {
+      result.push({
+        index: i,
+        chunk: this.getChunkData(i)
+      })
+    }
+
+    return result
+  }
+
+  /**
    * Récupère la liste des chunks à redessiner et vide la liste.
    * Appelé par le Renderer.
    * @returns {Set<number>} Set d'IDs de chunks
