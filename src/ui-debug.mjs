@@ -1,4 +1,4 @@
-import {MICROTASK, WORLD_WIDTH, WORLD_HEIGHT, NODES_LOOKUP, OVERLAYS, UI_LAYOUT} from './constant.mjs'
+import {MICROTASK, WORLD_WIDTH, WORLD_HEIGHT, NODES_LOOKUP, OVERLAYS, UI_LAYOUT, hexToRgb, SKY_COLORS} from './constant.mjs'
 import {eventBus, microTasker, taskScheduler} from './utils.mjs'
 import {chunkManager} from './world.mjs'
 
@@ -210,7 +210,7 @@ class WorldMapDebug {
     for (let i = 0; i < NODES_LOOKUP.length; i++) {
       const node = NODES_LOOKUP[i]
       if (node && node.color) {
-        this.colorCache[i] = node.rgbColor
+        this.colorCache[i] = node.color === 'none' ? hexToRgb(SKY_COLORS[35]) : node.rgbColor
       }
     }
   }
@@ -241,7 +241,12 @@ class WorldMapDebug {
     // index i correspond exactement à la position du pixel dans imageData (divisé par 4)
     for (let i = 0; i < len; i++) {
       const tileCode = worldData[i]
-      const color = this.colorCache[tileCode]
+      let color = this.colorCache[tileCode]
+      if (color === null) {
+        // continue
+        // console.error('WorldMapDebug.drawMap - Couleur incorrecte', tileCode, color)
+        color = hexToRgb('#ff0000')
+      }
 
       // Position dans le buffer image (4 composantes par pixel)
       const pos = i << 2

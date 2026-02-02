@@ -57,7 +57,7 @@ class ChunkManager {
    */
   #hydrateFromSave (savedChunks) {
     for (const record of savedChunks) {
-      const chunkIndex = record.index
+      const chunkIndex = record.key
 
       // 1. Mémorisation de la clé DB
       this.#dbKeys[chunkIndex] = record.key

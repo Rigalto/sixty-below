@@ -3,7 +3,8 @@
  * @description Layer 2 - Gestion de l'Interface Utilisateur (DOM & Canvas Overlays).
  */
 
-import {eventBus} from './utils.mjs'
+import {eventBus, seededRNG} from './utils.mjs'
+import {gameCore} from './core.mjs'
 import {WEATHER_TYPE, MOON_PHASE, MOON_PHASE_BLURRED, STATE, OVERLAYS, UI_LAYOUT} from './constant.mjs'
 
 /* ====================================================================================================
@@ -244,7 +245,7 @@ class CreationDialogOverlay {
       fontFamily: 'monospace'
     })
 
-    seedInput.addEventListener('input', function() {
+    seedInput.addEventListener('input', function () {
       if (this.value < 1) this.value = 1
       if (this.value > 99999) this.value = (this.value / 10) | 0
     })
@@ -329,12 +330,17 @@ class CreationDialogOverlay {
   }
 
   async onGenerateClick () {
-    const seed = parseInt(this.dom.seedInput.value.trim(), 10) || 1234
+    const seed = parseInt(this.dom.seedInput.value.trim(), 10) || seededRNG.randomGetMinMax(1, 99999)
     console.log(`[CreationDialog]: Request generation with seed [${seed}]`)
+    this.state = STATE.CREATION
 
     try {
+      gameCore.stopSession()
       const {worldGenerator} = await import('./generate.mjs')
-      await worldGenerator.generate(seed) // seed provient du payload de l'événement
+      await worldGenerator.generate(seed)
+      // this.state = STATE.CREATION
+      gameCore.startSession()
+      eventBus.emit('overlay/close', 'creation')
     } catch (error) {
       console.error('[CreationDialogOverlay] Failed to load generator:', error)
     }

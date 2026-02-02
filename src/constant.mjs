@@ -303,7 +303,7 @@ export const NODES = {
    ========================================= */
 export const NODES_LOOKUP = [] // Array Lookup
 
-const hexToRgb = (hex) => {
+export const hexToRgb = (hex) => {
   if (!hex) return {r: 0, g: 0, b: 0, rgb: 'rgb(0,0,0)'}
   const h = hex.startsWith('#') ? hex.slice(1) : hex
   const r = parseInt(h.slice(0, 2), 16)

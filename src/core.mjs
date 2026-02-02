@@ -126,15 +126,15 @@ class GameCore {
 
     // 1. Chargement massif de l'état (1 seule requête DB)
     // Retourne un objet : {timestamp: 480000, weather: 1, playerPosition: '100|82|1', ...}
-    // const state = await database.getAllGameState()
+    const state = await database.getAllGameState()
     // DEBUG
-    const state = {
-      timestamp: 480 * 1000,
-      weather: 2,
-      nextWeather: 3,
-      player: '8192|1280|1',
-      worldkey: 4321
-    }
+    // const state = {
+    //   timestamp: 480 * 1000,
+    //   weather: 2,
+    //   nextWeather: 3,
+    //   player: '8192|1280|1',
+    //   worldkey: 4321
+    // }
 
     // 2. Dispatch aux systèmes (Injection de dépendance des données)
     // Valeur par défaut (480000) gérée si state.timestamp est undefined (nouveau jeu)
@@ -152,28 +152,10 @@ class GameCore {
     taskScheduler.init(state.timestamp)
     timeManager.init(state.timestamp, state.weather, state.nextWeather)
 
-    // chargement du monde - SIMULATION DE DONNÉES (MOCK)
-    const mockSavedChunks = []
-    const TEST_VALUES = [11, 16, 20] // Patterns alternés
-    const TOTAL_CHUNKS = 2048 // 64 * 32
-    const CHUNK_SIZE_BYTES = 256 // 16 * 16
-
-    for (let i = 0; i < TOTAL_CHUNKS; i++) {
-      // 1. Création du buffer de 256 octets
-      const chunkData = new Uint8Array(CHUNK_SIZE_BYTES)
-
-      // 2. Remplissage avec la valeur (Alternance 11 -> 16 -> 20)
-      chunkData.fill(TEST_VALUES[i % 3])
-
-      // 3. Construction de l'objet Record DB
-      mockSavedChunks.push({
-        key: `mock_chunk_${i}`, // Clé fictive
-        index: i, // Index logique indispensable
-        chunk: chunkData // Uint8Array
-      })
-    }
-    // Injection
+    // Injection des tuiles
+    const mockSavedChunks = await database.readAllFromObjectStore('world_chunks')
     chunkManager.init(mockSavedChunks)
+
     const [playerX, playerY, playerDirection] = state.player.split('|')
     this.playerX = parseInt(playerX, 10)
     this.playerY = parseInt(playerY, 10)
@@ -203,6 +185,8 @@ class GameCore {
     this.lastTime = performance.now()
     this.loop(this.lastTime)
   }
+
+  stopSession () { this.isRunning = false }
 
   /* =========================================
      GAME LOOP
