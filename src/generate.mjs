@@ -15,8 +15,8 @@ class WorldGenerator {
     seededRNG.init(seed)
 
     // 2. Génération des biomes
-    const biomes = biomesdGenerator.generate()
-    console.log('[WorldGenerator] - Biomes', biomes, (performance.now() - t0).toFixed(3), 'ms')
+    const {biomes, biomesDescription} = biomesdGenerator.generate()
+    console.log('[WorldGenerator] - Biomes', biomes, biomesDescription, (performance.now() - t0).toFixed(3), 'ms')
 
     // 2. Génération des zones
     const {skySurface, surfaceUnder, underCaverns, hell} = this.precomputeHorizontalBoundaries()
@@ -182,8 +182,9 @@ class BiomesdGenerator {
     this.#applySegments(biomes, rightData, forestEnd)
 
     this.#ensureBiomeDiversity(biomes, leftSeaWidth, 64 - rightSeaWidth)
+    const biomesDescription = this.#convertBiomesToDesc(biomes)
 
-    return biomes
+    return {biomes, biomesDescription}
   }
 
   /**
@@ -296,6 +297,46 @@ class BiomesdGenerator {
         }
       }
     }
+  }
+
+  #convertBiomesToDesc (biomes) {
+    const config = []
+    if (biomes.length === 0) return config
+
+    // 1. Substitution des biomes SEA
+    const processedBiomes = [...biomes]
+
+    // SEA Gauche : prend le premier biome non-SEA à sa droite
+    const firstLandBiome = biomes.find(b => b !== BIOME_TYPE.SEA)
+    for (let i = 0; i < processedBiomes.length; i++) {
+      if (processedBiomes[i] === BIOME_TYPE.SEA) processedBiomes[i] = firstLandBiome
+      else break
+    }
+
+    // SEA Droite : prend le dernier biome non-SEA à sa gauche
+    const lastLandBiome = [...biomes].reverse().find(b => b !== BIOME_TYPE.SEA)
+    for (let i = processedBiomes.length - 1; i >= 0; i--) {
+      if (processedBiomes[i] === BIOME_TYPE.SEA) processedBiomes[i] = lastLandBiome
+      else break
+    }
+
+    // 2. Agrégation en zones
+    let currentZone = {
+      type: processedBiomes[0],
+      width: 16
+    }
+
+    for (let i = 1; i < processedBiomes.length; i++) {
+      const type = processedBiomes[i]
+      if (type === currentZone.type) {
+        currentZone.width += 16
+      } else {
+        config.push(currentZone)
+        currentZone = {type, width: 16}
+      }
+    }
+    config.push(currentZone) // Ajouter la dernière zone
+    return config
   }
 }
 export const biomesdGenerator = new BiomesdGenerator()
