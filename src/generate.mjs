@@ -1,6 +1,6 @@
 import {seededRNG} from './utils.mjs'
 import {database} from './database.mjs'
-import {WORLD_WIDTH, WORLD_HEIGHT, BIOME_TYPE, NODES, WEATHER_TYPE} from './constant.mjs'
+import {WORLD_WIDTH, WORLD_HEIGHT, SEA_LEVEL, BIOME_TYPE, NODES, WEATHER_TYPE} from './constant.mjs'
 import {chunkManager} from './world.mjs'
 
 /* ====================================================================================================
@@ -102,8 +102,8 @@ class BiomeNaturalizer {
         // 2.1 protection du périmètre (NODE_TYPE.STRONG)
         if ((x === 0) || (x === 1023)) {
           code = NODES.DEEPSEA.code
-          if (y < 56) code = NODES.FOG.code
-          if (y > 80) code = NODES.BASALT.code
+          if (y < SEA_LEVEL) code = NODES.FOG.code
+          if (y > surfaceUnder[x]) code = NODES.BASALT.code
         }
         if (y === 0) code = NODES.FOG.code
         if (y === 511) code = NODES.LAVA.code
@@ -115,14 +115,18 @@ class BiomeNaturalizer {
         chunkManager.setGenTile(x, y, code)
       }
     }
-    // this.applyWorldMigration(surfaceUnder, underCaverns, verticalBoundaries)
+
     // ajout de la mer
     const {leftCliff, rightCliff} = this.precomputeCliffs(leftSeaWidth, rightSeaWidth)
+    this.applySeaPostProcessing(leftCliff, rightCliff)
     for (let y = 0; y < WORLD_HEIGHT; y++) {
-      chunkManager.setGenTile(leftCliff[y], y, NODES.HONEY.code)
-      chunkManager.setGenTile(rightCliff[y], y, NODES.LAVA.code)
+      // chunkManager.setGenTile(leftCliff[y], y, NODES.HONEY.code)
+      // chunkManager.setGenTile(rightCliff[y], y, NODES.HONEY.code)
     }
+
+    this.applyWorldMigration(surfaceUnder, underCaverns, verticalBoundaries)
   }
+
   /**
  * Calcule les lignes de démarcation horizontales avec du bruit
  * @param {number} width Largeur du monde en tuiles
@@ -314,7 +318,7 @@ class BiomeNaturalizer {
 
     // RÈGLE DE ROBUSTESSE :
     // On ne migre pas si la tuile actuelle est du ciel ou de la mer ou une tuile de pourtour
-    if (currentCode >= NODES.BIOMEFORSUR.code) { // && (currentCode <= NODES.BIOMEJUNCAV.code)
+    if ((newCode >= NODES.BIOMEFORSUR.code) && (currentCode >= NODES.BIOMEFORSUR.code)) { // && (currentCode <= NODES.BIOMEJUNCAV.code)
       chunkManager.setGenTile(x, y, newCode)
     }
   }
@@ -326,7 +330,7 @@ class BiomeNaturalizer {
  * @return {Object} { leftCliff, rightCliff } (Int16Array)
  */
   precomputeCliffs (leftSeaWidth, rightSeaWidth) {
-  const leftCliff = new Int16Array(512)
+    const leftCliff = new Int16Array(512)
     const rightCliff = new Int16Array(512)
     const slopeStep = 0.36397 // 1 / tan(70°)
 
@@ -350,6 +354,36 @@ class BiomeNaturalizer {
       rightCliff[y] = xRightTarget + (deltaY * slopeStep) - noise
     }
     return {leftCliff, rightCliff}
+  }
+
+  /**
+ * Inonde les zones côtières en remplaçant les tuiles de surface
+ * @param {Int16Array} leftCliff, rightCliff
+ */
+  applySeaPostProcessing (leftCliff, rightCliff) {
+    const BIOMEFORSUR = NODES.BIOMEFORSUR.code
+    const BIOMEJUNSUR = NODES.BIOMEJUNSUR.code
+    const BIOMESKY = NODES.BIOMESKY.code
+    const BIOMESEA = NODES.BIOMESEA.code
+    const DEEPSEA = NODES.DEEPSEA.code
+
+    // 1. Mer Gauche
+    for (let y = 1; y < 280; y++) { // Environ le milieu de la zone under
+      // On s'arrête si la falaise sort de l'écran à gauche
+      if (leftCliff[y] < 0) continue
+
+      const endX = leftCliff[y]
+      for (let x = 1; x < endX; x++) {
+        const currentTile = chunkManager.getTile(x, y)
+
+        // On ne remplace que si c'est une tuile de biome "Surface"
+        // (En supposant que tes codes de surface sont identifiables)
+        if ((currentTile >= BIOMEFORSUR) && (currentTile <= BIOMEJUNSUR)) {
+          const newCode = (y < SEA_LEVEL) ? BIOMESKY : BIOMESEA
+          chunkManager.setGenTile(x, y, newCode)
+        }
+      }
+    }
   }
 }
 export const biomeNaturalizer = new BiomeNaturalizer()
