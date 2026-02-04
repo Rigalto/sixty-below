@@ -14,35 +14,13 @@ class WorldGenerator {
     // 1. On passe le générateur de nombre aléatoire en mode déterminé par la clé
     seededRNG.init(seed)
 
-    // 2. Génération des biomes
-    const {biomes, biomesDescription} = biomesdGenerator.generate()
-    console.log('[WorldGenerator] - Biomes', biomes, biomesDescription, (performance.now() - t0).toFixed(3), 'ms')
+    // 2. Génération des biomes (rectangles)
+    const {biomesDescription, leftSeaWidth, rightSeaWidth} = biomesdGenerator.generate()
+    console.log('[WorldGenerator::biomesDescription] - Biomes', biomesDescription, leftSeaWidth, rightSeaWidth, (performance.now() - t0).toFixed(3), 'ms')
 
-    // 2. Génération des zones
-    const {skySurface, surfaceUnder, underCaverns, hell} = this.precomputeHorizontalBoundaries()
-
-    for (let x = 0; x < WORLD_WIDTH; x++) {
-      for (let y = 0; y < WORLD_HEIGHT; y++) {
-        let code = 0
-        // 2.1 protection du périmètre (NODE_TYPE.STRONG)
-        if ((x === 0) || (x === 1023)) {
-          code = NODES.DEEPSEA.code
-          if (y < 56) code = NODES.FOG.code
-          if (y > 80) code = NODES.BASALT.code
-        }
-        if (y === 0) code = NODES.FOG.code
-        if (y === 511) code = NODES.LAVA.code
-
-        if (code === 0) {
-          code = NODES.SKY.code
-          if (y === skySurface[x]) code = NODES.HONEY.code
-          if (y === surfaceUnder[x]) code = NODES.HONEY.code
-          if (y === underCaverns[x]) code = NODES.HONEY.code
-          if (y >= hell[x]) code = NODES.LAVA.code
-        }
-        chunkManager.setGenTile(x, y, code)
-      }
-    }
+    // 3. Rafinement des biomes (Perlin + diffusion)
+    biomeNaturalizer.naturalize(biomesDescription, leftSeaWidth, rightSeaWidth)
+    console.log('[WorldGenerator::biomeNaturalizer] - Biomes', (performance.now() - t0).toFixed(3), 'ms')
 
     // N. Stochage du monde en base de données
     await this.save(seed)
@@ -51,37 +29,6 @@ class WorldGenerator {
     seededRNG.init()
 
     console.log('[WorldGenerator] - Terminé en', (performance.now() - t0).toFixed(3), 'ms')
-  }
-
-  /**
- * Calcule les lignes de démarcation horizontales avec du bruit
- * @param {number} width Largeur du monde en tuiles
- * @returns {Object} { skySurface, surfaceUnder, underCaverns }
- */
-
-  precomputeHorizontalBoundaries () {
-    const skySurface = new Int16Array(1024)
-    const surfaceUnder = new Int16Array(1024)
-    const underCaverns = new Int16Array(1024)
-    const hell = new Int16Array(1024)
-
-    const skySurfaceY = 48
-    const surfaceUnderY = 96
-    const underCavernsY = 16 * (6 + seededRNG.randomGetMinMax(8, 10))
-    const HellY = 512
-
-    for (let x = 0; x < 1024; x++) {
-      // les valeurs de Y sont choisies éloignées pour ne pas corréler les lignes
-      let noise = seededRNG.randomPerlinScaled(x, 2.8, 30, 15) + seededRNG.randomPerlinScaled(x, 2.8, 10, 5)
-      skySurface[x] = skySurfaceY + noise // 3 chunks * 16
-      noise = seededRNG.randomPerlinScaled(x, 13.7, 50, 20) + seededRNG.randomPerlinScaled(x, 13.7, 10, 5)
-      surfaceUnder[x] = surfaceUnderY + noise // 6 chunks total (3 sky + 6 surface)
-      noise = seededRNG.randomPerlinScaled(x, 24.6, 45, 30) + seededRNG.randomPerlinScaled(x, 24.6, 10, 5)
-      underCaverns[x] = underCavernsY + noise // + ~20 chunks
-      hell[x] = HellY - 5 * seededRNG.randomPerlin(x / 60, 35.2)
-    }
-
-    return {skySurface, surfaceUnder, underCaverns, hell}
   }
 
   async save (seed) {
@@ -143,6 +90,270 @@ class WorldGenerator {
 }
 export const worldGenerator = new WorldGenerator()
 
+class BiomeNaturalizer {
+  naturalize (biomesDescription, leftSeaWidth, rightSeaWidth) {
+    const {skySurface, surfaceUnder, underCaverns, hell} = this.precomputeHorizontalBoundaries()
+    const verticalBoundaries = this.precomputeVerticalBoundaries(biomesDescription)
+    console.log('[WorldGenerator] - verticalBoundaries', verticalBoundaries)
+
+    for (let x = 0; x < WORLD_WIDTH; x++) {
+      for (let y = 0; y < WORLD_HEIGHT; y++) {
+        let code = 0
+        // 2.1 protection du périmètre (NODE_TYPE.STRONG)
+        if ((x === 0) || (x === 1023)) {
+          code = NODES.DEEPSEA.code
+          if (y < 56) code = NODES.FOG.code
+          if (y > 80) code = NODES.BASALT.code
+        }
+        if (y === 0) code = NODES.FOG.code
+        if (y === 511) code = NODES.LAVA.code
+
+        if (code === 0) {
+          code = this.getBiome(x, y, skySurface, surfaceUnder, underCaverns, verticalBoundaries)
+          if (y >= hell[x]) code = NODES.LAVA.code
+        }
+        chunkManager.setGenTile(x, y, code)
+      }
+    }
+    // this.applyWorldMigration(surfaceUnder, underCaverns, verticalBoundaries)
+    // ajout de la mer
+    const {leftCliff, rightCliff} = this.precomputeCliffs(leftSeaWidth, rightSeaWidth)
+    for (let y = 0; y < WORLD_HEIGHT; y++) {
+      chunkManager.setGenTile(leftCliff[y], y, NODES.HONEY.code)
+      chunkManager.setGenTile(rightCliff[y], y, NODES.LAVA.code)
+    }
+  }
+  /**
+ * Calcule les lignes de démarcation horizontales avec du bruit
+ * @param {number} width Largeur du monde en tuiles
+ * @returns {Object} { skySurface, surfaceUnder, underCaverns }
+ */
+
+  precomputeHorizontalBoundaries () {
+    const skySurface = new Int16Array(1024)
+    const surfaceUnder = new Int16Array(1024)
+    const underCaverns = new Int16Array(1024)
+    const hell = new Int16Array(1024)
+
+    const skySurfaceY = 48
+    const surfaceUnderY = 96
+    const underCavernsY = 16 * (6 + seededRNG.randomGetMinMax(8, 10))
+    const HellY = 512
+
+    for (let x = 0; x < 1024; x++) {
+      // les valeurs de Y sont choisies éloignées pour ne pas corréler les lignes
+      let noise = seededRNG.randomPerlinScaled(x, 2.8, 30, 15) + seededRNG.randomPerlinScaled(x, 2.8, 10, 5)
+      skySurface[x] = skySurfaceY + noise // 3 chunks * 16
+      noise = seededRNG.randomPerlinScaled(x, 13.7, 50, 20) + seededRNG.randomPerlinScaled(x, 13.7, 10, 5)
+      surfaceUnder[x] = surfaceUnderY + noise // 6 chunks total (3 sky + 6 surface)
+      noise = seededRNG.randomPerlinScaled(x, 24.6, 45, 30) + seededRNG.randomPerlinScaled(x, 24.6, 10, 5)
+      underCaverns[x] = underCavernsY + noise // + ~20 chunks
+      hell[x] = HellY - 5 * seededRNG.randomPerlin(x / 60, 35.2)
+    }
+
+    return {skySurface, surfaceUnder, underCaverns, hell}
+  }
+
+  precomputeVerticalBoundaries (biomesDescription) {
+    const verticalBoundaries = []
+
+    let boundaryCenter = 0
+    for (let i = 0; i < biomesDescription.length; i++) {
+      const {biome, width} = biomesDescription[i]
+      boundaryCenter += width
+      const boundary = new Int16Array(512)
+      for (let y = 0; y < 512; y++) {
+        const noise = seededRNG.randomPerlinScaled(y, 100.2 + boundaryCenter, 30, 15) + seededRNG.randomPerlinScaled(y, 100.2 + boundaryCenter, 10, 5)
+        boundary[y] = boundaryCenter + noise
+      }
+      verticalBoundaries.push({biome, boundary})
+    }
+    return verticalBoundaries
+  }
+
+  getBiome (x, y, skySurface, surfaceUnder, underCaverns, verticalBoundaries) {
+    // 1. Détermination du biome
+    let biome = verticalBoundaries[verticalBoundaries.length - 1].biome
+    for (let i = 0; i < verticalBoundaries.length - 1; i++) {
+      if (x < verticalBoundaries[i].boundary[y]) {
+        biome = verticalBoundaries[i].biome
+        break // Sortie immédiate dès que la zone est trouvée
+      }
+    }
+    // 2. Détermination de la couche
+    let layer = 'caverns'
+    if (y < skySurface[x]) layer = 'sky'
+    else if (y < surfaceUnder[x]) layer = 'surface'
+    else if (y < underCaverns[x]) layer = 'under'
+
+    // conversion biome+layer => biomeLayer (valeurs de débug)
+    if (y < skySurface[x]) return NODES.BIOMESKY.code
+
+    if (layer === 'surface') {
+      if (biome === BIOME_TYPE.FOREST) return NODES.BIOMEFORSUR.code
+      if (biome === BIOME_TYPE.DESERT) return NODES.BIOMEDESSUR.code
+      if (biome === BIOME_TYPE.JUNGLE) return NODES.BIOMEJUNSUR.code
+    }
+    if (layer === 'under') {
+      if (biome === BIOME_TYPE.FOREST) return NODES.BIOMEFORUND.code
+      if (biome === BIOME_TYPE.DESERT) return NODES.BIOMEDESUND.code
+      if (biome === BIOME_TYPE.JUNGLE) return NODES.BIOMEJUNUND.code
+    }
+    if (biome === BIOME_TYPE.FOREST) return NODES.BIOMEFORCAV.code
+    if (biome === BIOME_TYPE.DESERT) return NODES.BIOMEDESCAV.code
+    if (biome === BIOME_TYPE.JUNGLE) return NODES.BIOMEJUNCAV.code
+    console.error('getBiome - biome/layer inconnu')
+    return NODES.LAVA.code
+  }
+
+  applyWorldMigration (surfaceUnder, underCaverns, verticalBoundaries) {
+    // 1. On récupère les données courantes en tant que source des diffusions
+    const source = chunkManager.getSnapshot()
+
+    // 2. Diffusions horizontales
+    this.applyHorizontalMigration(source, surfaceUnder)
+    this.applyHorizontalMigration(source, underCaverns)
+
+    // 3. Diffusions verticales
+    for (let i = 0; i < verticalBoundaries.length - 1; i++) {
+      this.applyVerticalMigration(source, verticalBoundaries[i].boundary)
+    }
+  }
+
+  /**
+ * Applique la diffusion (migration) pour les frontières verticales
+ * @param {Object} vBoundary L'objet {biome, boundary} calculé précédemment
+ */
+  applyVerticalMigration (source, vBoundary) {
+    const maxDistance = 20
+    const width = 1024
+
+    for (let y = 0; y < 512; y++) {
+      const borderX = vBoundary[y]
+
+      // On récupère les types de tuiles à gauche et à droite de la frontière
+      // pour savoir quoi "projeter"
+      // const codeLeft = worldData[(y << 10) | (borderX - 1)]
+      // const codeRight = worldData[(y << 10) | borderX]
+      const index = (y << 10) | borderX
+      const codeLeft = source[index - 1]
+      const codeRight = source[index]
+
+      // Migration vers la gauche (le code de droite s'infiltre à gauche)
+      for (let x = borderX - 1; x >= borderX - maxDistance; x--) {
+        if (x < 0) break
+        const dist = borderX - x
+        const prob = 0.4 * Math.exp(-dist * 0.15)
+        if (seededRNG.randomReal() < prob) {
+          this.safeSetTile(x, y, codeRight)
+        }
+      }
+
+      // Migration vers la droite (le code de gauche s'infiltre à droite)
+      for (let x = borderX; x < borderX + maxDistance; x++) {
+        if (x >= width) break
+        const dist = x - borderX
+        const prob = 0.4 * Math.exp(-dist * 0.15)
+        if (seededRNG.randomReal() < prob) {
+          this.safeSetTile(x, y, codeLeft)
+        }
+      }
+    }
+  }
+
+  /**
+ * Applique la diffusion (migration) pour les frontières horizontales (Layers)
+ * @param {Uint8Array} source Le snapshot gelé du monde
+ * @param {Int16Array} horizontalBorder Le tableau des altitudes de la frontière
+ */
+  applyHorizontalMigration (source, horizontalBorder) {
+    const maxDistance = 20
+    const width = 1024
+    const height = 512
+
+    for (let x = 0; x < width; x++) {
+      const borderY = horizontalBorder[x]
+
+      // On récupère les codes au-dessus et en-dessous de la frontière dans la source
+      // On s'assure que borderY n'est pas aux limites 0 ou height
+      if (borderY <= 0 || borderY >= height) continue
+
+      const index = (borderY << 10) | x
+      const codeAbove = source[index - 1024] // Tuile (x, y-1)
+      const codeBelow = source[index] // Tuile (x, y)
+
+      // Migration vers le haut (le code du bas s'infiltre en haut)
+      for (let y = borderY - 1; y >= borderY - maxDistance; y--) {
+        if (y < 0) break
+        const dist = borderY - y
+        const prob = 0.4 * Math.exp(-dist * 0.15)
+
+        if (seededRNG.randomReal() < prob) {
+          this.safeSetTile(x, y, codeBelow)
+        }
+      }
+
+      // Migration vers le bas (le code du haut s'infiltre en bas)
+      for (let y = borderY; y < borderY + maxDistance; y++) {
+        if (y >= height) break
+        const dist = y - borderY
+        const prob = 0.4 * Math.exp(-dist * 0.15)
+
+        if (seededRNG.randomReal() < prob) {
+          this.safeSetTile(x, y, codeAbove)
+        }
+      }
+    }
+  }
+
+  /**
+   * Vérifie que la tuile peut être écrasée par la migration
+   */
+  safeSetTile (x, y, newCode) {
+    const currentCode = chunkManager.getTile(x, y)
+
+    // RÈGLE DE ROBUSTESSE :
+    // On ne migre pas si la tuile actuelle est du ciel ou de la mer ou une tuile de pourtour
+    if (currentCode >= NODES.BIOMEFORSUR.code) { // && (currentCode <= NODES.BIOMEJUNCAV.code)
+      chunkManager.setGenTile(x, y, newCode)
+    }
+  }
+
+  /**
+ * Prépare les courbes des falaises latérales
+ * @param {number} leftSeaWidth Largeur théorique mer gauche (en tuiles)
+ * @param {number} rightSeaWidth Largeur théorique mer droite (en tuiles)
+ * @return {Object} { leftCliff, rightCliff } (Int16Array)
+ */
+  precomputeCliffs (leftSeaWidth, rightSeaWidth) {
+  const leftCliff = new Int16Array(512)
+    const rightCliff = new Int16Array(512)
+    const slopeStep = 0.36397 // 1 / tan(70°)
+
+    // Coordonnées cibles à Y = 70 (conversion chunks -> tuiles)
+    const xLeftTarget = leftSeaWidth << 4
+    const xRightTarget = 1024 - (rightSeaWidth << 4)
+
+    for (let y = 0; y < 512; y++) {
+      // Bruit haute fréquence pour l'aspect rocheux
+      const noise = seededRNG.randomPerlinScaled(y, 42.5, 20, 5)
+
+      // Décalage par rapport au pivot Y=70
+      const deltaY = y - 70
+
+      // Falaise gauche : la mer est à gauche, la terre à droite.
+      // En descendant (y > 70), la falaise avance vers la droite (x augmente).
+      leftCliff[y] = xLeftTarget - (deltaY * slopeStep) + noise
+
+      // Falaise droite : la mer est à droite, la terre à gauche.
+      // En descendant (y > 70), la falaise avance vers la gauche (x diminue).
+      rightCliff[y] = xRightTarget + (deltaY * slopeStep) - noise
+    }
+    return {leftCliff, rightCliff}
+  }
+}
+export const biomeNaturalizer = new BiomeNaturalizer()
+
 class BiomesdGenerator {
   generate () {
     const biomes = new Array(64).fill(BIOME_TYPE.SEA)
@@ -184,7 +395,7 @@ class BiomesdGenerator {
     this.#ensureBiomeDiversity(biomes, leftSeaWidth, 64 - rightSeaWidth)
     const biomesDescription = this.#convertBiomesToDesc(biomes)
 
-    return {biomes, biomesDescription}
+    return {biomes, biomesDescription, leftSeaWidth, rightSeaWidth}
   }
 
   /**
@@ -322,21 +533,21 @@ class BiomesdGenerator {
 
     // 2. Agrégation en zones
     let currentZone = {
-      type: processedBiomes[0],
+      biome: processedBiomes[0],
       width: 16
     }
 
     for (let i = 1; i < processedBiomes.length; i++) {
-      const type = processedBiomes[i]
-      if (type === currentZone.type) {
+      const biome = processedBiomes[i]
+      if (biome === currentZone.biome) {
         currentZone.width += 16
       } else {
         config.push(currentZone)
-        currentZone = {type, width: 16}
+        currentZone = {biome, width: 16}
       }
     }
     config.push(currentZone) // Ajouter la dernière zone
     return config
   }
 }
-export const biomesdGenerator = new BiomesdGenerator()
+const biomesdGenerator = new BiomesdGenerator()
