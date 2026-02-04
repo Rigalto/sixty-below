@@ -7,6 +7,8 @@ import {chunkManager} from './world.mjs'
    CREATION DU MONDE
    ==================================================================================================== */
 
+const SEA_MAX_DEPTH = 280 // tuiles
+
 class WorldGenerator {
   async generate (seed) {
     const t0 = performance.now()
@@ -330,28 +332,27 @@ class BiomeNaturalizer {
  * @return {Object} { leftCliff, rightCliff } (Int16Array)
  */
   precomputeCliffs (leftSeaWidth, rightSeaWidth) {
-    const leftCliff = new Int16Array(512)
-    const rightCliff = new Int16Array(512)
+    const leftCliff = new Int16Array(SEA_MAX_DEPTH)
+    const rightCliff = new Int16Array(SEA_MAX_DEPTH)
     const slopeStep = 0.36397 // 1 / tan(70°)
 
     // Coordonnées cibles à Y = 70 (conversion chunks -> tuiles)
     const xLeftTarget = leftSeaWidth << 4
     const xRightTarget = 1024 - (rightSeaWidth << 4)
 
-    for (let y = 0; y < 512; y++) {
+    for (let y = 0; y < SEA_MAX_DEPTH; y++) {
       // Bruit haute fréquence pour l'aspect rocheux
-      const noise = seededRNG.randomPerlinScaled(y, 42.5, 20, 5)
+      const leftNoise = seededRNG.randomPerlinScaled(y, 42.5, 18, 8)
+      const rightNoise = seededRNG.randomPerlinScaled(y, 252.8, 18, 8)
 
       // Décalage par rapport au pivot Y=70
       const deltaY = y - 70
 
       // Falaise gauche : la mer est à gauche, la terre à droite.
-      // En descendant (y > 70), la falaise avance vers la droite (x augmente).
-      leftCliff[y] = xLeftTarget - (deltaY * slopeStep) + noise
+      leftCliff[y] = xLeftTarget - (deltaY * slopeStep) + leftNoise
 
       // Falaise droite : la mer est à droite, la terre à gauche.
-      // En descendant (y > 70), la falaise avance vers la gauche (x diminue).
-      rightCliff[y] = xRightTarget + (deltaY * slopeStep) - noise
+      rightCliff[y] = xRightTarget + (deltaY * slopeStep) - rightNoise
     }
     return {leftCliff, rightCliff}
   }
@@ -365,10 +366,9 @@ class BiomeNaturalizer {
     const BIOMEJUNSUR = NODES.BIOMEJUNSUR.code
     const BIOMESKY = NODES.BIOMESKY.code
     const BIOMESEA = NODES.BIOMESEA.code
-    const DEEPSEA = NODES.DEEPSEA.code
 
     // 1. Mer Gauche
-    for (let y = 1; y < 280; y++) { // Environ le milieu de la zone under
+    for (let y = 1; y < SEA_MAX_DEPTH; y++) { // Environ le milieu de la zone under
       // On s'arrête si la falaise sort de l'écran à gauche
       if (leftCliff[y] < 0) continue
 
