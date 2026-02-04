@@ -209,9 +209,13 @@ class ChunkManager {
    * Accès direct au TypedArray pour la sauvegarde de masse ou l'initialisation.
    * @returns {Uint8Array}
    */
-  getRawData () {
-    return this.#data
-  }
+  getRawData () { return this.#data }
+
+  /**
+   * Renvoie un clone du TypedArray pour la génération du monde.
+   * @returns {Uint8Array}
+   */
+  getSnapshot () { return this.#data.slice() }
 }
 
 export const chunkManager = new ChunkManager()
