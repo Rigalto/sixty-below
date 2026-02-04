@@ -367,20 +367,33 @@ class BiomeNaturalizer {
     const BIOMESKY = NODES.BIOMESKY.code
     const BIOMESEA = NODES.BIOMESEA.code
 
-    // 1. Mer Gauche
     for (let y = 1; y < SEA_MAX_DEPTH; y++) { // Environ le milieu de la zone under
-      // On s'arrête si la falaise sort de l'écran à gauche
-      if (leftCliff[y] < 0) continue
+      const newCode = (y < SEA_LEVEL) ? BIOMESKY : BIOMESEA
+      // 2. Mer Gauche
+      // On vérifie si la falaise n'est pas sortie de l'écran à gauche (1023)
+      if (leftCliff[y] >= 1) {
+        const endX = leftCliff[y]
+        for (let x = 1; x < endX; x++) {
+          const currentTile = chunkManager.getTile(x, y)
 
-      const endX = leftCliff[y]
-      for (let x = 1; x < endX; x++) {
-        const currentTile = chunkManager.getTile(x, y)
+          // On ne remplace que si c'est une tuile de biome "Surface"
+          // (En supposant que tes codes de surface sont identifiables)
+          if ((currentTile >= BIOMEFORSUR) && (currentTile <= BIOMEJUNSUR)) {
+            chunkManager.setGenTile(x, y, newCode)
+          }
+        }
+      }
 
-        // On ne remplace que si c'est une tuile de biome "Surface"
-        // (En supposant que tes codes de surface sont identifiables)
-        if ((currentTile >= BIOMEFORSUR) && (currentTile <= BIOMEJUNSUR)) {
-          const newCode = (y < SEA_LEVEL) ? BIOMESKY : BIOMESEA
-          chunkManager.setGenTile(x, y, newCode)
+      // 2. Mer Droite
+      // On vérifie si la falaise n'est pas sortie de l'écran à droite (1023)
+      if (rightCliff[y] <= 1023) {
+        const startX = rightCliff[y]
+        // On part du bord droit (1022 car 1023 est le périmètre DEEPSEA)
+        for (let x = 1022; x > startX; x--) {
+          const currentTile = chunkManager.getTile(x, y)
+          if (currentTile >= BIOMEFORSUR && currentTile <= BIOMEJUNSUR) {
+            chunkManager.setGenTile(x, y, newCode)
+          }
         }
       }
     }
