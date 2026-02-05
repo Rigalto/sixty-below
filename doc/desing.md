@@ -539,12 +539,12 @@ Le monde fait 1024 tuiles de large et 512 tuiles de haut. Ce qui correspond à 6
 
 ### 9.1 Biomes - Découpage horizontal
 
-* **Sea :** de chaque côté du monde. Sa largeur fait 2 chunks d'un côté et 3 chunks de l'autre côté (aléatoire).
+* **Sea :** de chaque côté du monde. Sa largeur fait 3 chunks d'un côté et 4 chunks de l'autre côté (aléatoire).
 * **Forêt :** le biome le plus facile. Il y a une zone de Forêt au centre du monde, là où le joueur se trouve au départ.
 * **Désert :** le biome intermédiaire.
 * **Jungle :** le biome le plus difficile.
 
-Les biomes s'étalent sur 3 à 6 chunks. Leur taille et leur position est aléatoire.
+Les biomes s'étalent sur 3 à 6 chunks. Leur taille et leur position est aléatoire. Le biome central a une taille de 6 à 8 chunks.
 
 ### 9.2 Les couches - Découpage vertical (Layers)
 

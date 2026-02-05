@@ -17,7 +17,7 @@ class WorldGenerator {
     seededRNG.init(seed)
 
     // 2. Génération des biomes (rectangles)
-    const {biomesDescription, leftSeaWidth, rightSeaWidth} = biomesdGenerator.generate()
+    const {biomesDescription, leftSeaWidth, rightSeaWidth} = biomesGenerator.generate()
     console.log('[WorldGenerator::biomesDescription] - Biomes', biomesDescription, leftSeaWidth, rightSeaWidth, (performance.now() - t0).toFixed(3), 'ms')
 
     // 3. Rafinement des biomes (Perlin + diffusion)
@@ -401,21 +401,18 @@ class BiomeNaturalizer {
 }
 export const biomeNaturalizer = new BiomeNaturalizer()
 
-class BiomesdGenerator {
+class BiomesGenerator {
   generate () {
     const biomes = new Array(64).fill(BIOME_TYPE.SEA)
 
     // 1. Mers à auche et à droite
     const leftIsSmall = seededRNG.randomGetBool()
-    const leftSeaWidth = leftIsSmall ? 2 : 3
-    const rightSeaWidth = leftIsSmall ? 3 : 2
-
-    // Test FOREST (debug)
-    for (let i = leftSeaWidth; i < 64 - rightSeaWidth; i++) biomes[i] = 0
+    const leftSeaWidth = leftIsSmall ? 2 : 4
+    const rightSeaWidth = leftIsSmall ? 3 : 3
 
     // 2. Forêt centrale
-    // 2.1. Taille entre 6 et 10 chunks
-    const forestWidth = seededRNG.randomGetMinMax(6, 10)
+    // 2.1. Taille entre 6 et 8 chunks
+    const forestWidth = seededRNG.randomGetMinMax(6, 8)
     // 2.2. Calcul du centre théorique
     const halfForest = Math.floor(31.5 - forestWidth / 2)
     // 2.3. Application du décalage (50% de chance de décaler de 1 vers la droite si forestWidth est pair)
@@ -426,14 +423,14 @@ class BiomesdGenerator {
     for (let i = forestStart; i < forestEnd; i++) {
       biomes[i] = BIOME_TYPE.FOREST
     }
-    // console.log('[BiomesdGenerator.generateBiomes]', forestStart, forestEnd, forestWidth)
 
     // 3. Génération des segments latéraux
     const leftChunkCount = forestStart - leftSeaWidth
     const rightChunkCount = (64 - rightSeaWidth) - forestEnd
 
-    const leftData = this.#generateSideData(leftChunkCount)
-    const rightData = this.#generateSideData(rightChunkCount).reverse()
+    const leftData = this.#generateSideData(leftChunkCount).reverse()
+    const rightData = this.#generateSideData(rightChunkCount)
+
 
     // 4. Application et Post-traitement
     this.#applySegments(biomes, leftData, leftSeaWidth)
@@ -442,6 +439,7 @@ class BiomesdGenerator {
     this.#ensureBiomeDiversity(biomes, leftSeaWidth, 64 - rightSeaWidth)
     const biomesDescription = this.#convertBiomesToDesc(biomes)
 
+    console.log('>>>>>>>>>>>>>>>>>>>>', leftData, rightData, biomesDescription)
     return {biomes, biomesDescription, leftSeaWidth, rightSeaWidth}
   }
 
@@ -597,4 +595,4 @@ class BiomesdGenerator {
     return config
   }
 }
-const biomesdGenerator = new BiomesdGenerator()
+const biomesGenerator = new BiomesGenerator()
