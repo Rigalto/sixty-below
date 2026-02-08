@@ -403,44 +403,105 @@ export const biomeNaturalizer = new BiomeNaturalizer()
 
 class BiomesGenerator {
   generate () {
-    const biomes = new Array(64).fill(BIOME_TYPE.SEA)
-
-    // 1. Mers à auche et à droite
+    // 1. Détermination des Mers (Largeurs fixes)
     const leftIsSmall = seededRNG.randomGetBool()
-    const leftSeaWidth = leftIsSmall ? 2 : 4
-    const rightSeaWidth = leftIsSmall ? 3 : 3
+    const leftSeaWidthChunks = leftIsSmall ? 2 : 4
+    const rightSeaWidthChunks = leftIsSmall ? 3 : 3
 
-    // 2. Forêt centrale
-    // 2.1. Taille entre 6 et 8 chunks
+    // 2. Forêt Centrale (6 à 8 chunks)
     const forestWidth = seededRNG.randomGetMinMax(6, 8)
-    // 2.2. Calcul du centre théorique
-    const halfForest = Math.floor(31.5 - forestWidth / 2)
-    // 2.3. Application du décalage (50% de chance de décaler de 1 vers la droite si forestWidth est pair)
-    const offset = (forestWidth % 2 === 0 && seededRNG.randomGetBool() === 1) ? 1 : 0
-    const forestStart = halfForest + offset
-    const forestEnd = forestStart + forestWidth
-    // 2.4. Mémorisation
-    for (let i = forestStart; i < forestEnd; i++) {
-      biomes[i] = BIOME_TYPE.FOREST
+
+    // 3. Calcul de l'espace restant pour les biomes latéraux
+    // On divise le reste du monde (64 - forêt) en deux
+    const remainingTotal = 64 - forestWidth
+    let leftChunkCount, rightChunkCount
+    if (seededRNG.randomGetBool()) {
+      leftChunkCount = Math.floor(remainingTotal / 2)
+      rightChunkCount = remainingTotal - leftChunkCount
+    } else {
+      rightChunkCount = Math.floor(remainingTotal / 2)
+      leftChunkCount = remainingTotal - rightChunkCount
     }
 
-    // 3. Génération des segments latéraux
-    const leftChunkCount = forestStart - leftSeaWidth
-    const rightChunkCount = (64 - rightSeaWidth) - forestEnd
+    // 4. Génération des segments organiques (Desert / Jungle / Forest)
+    const leftSegments = this.#generateSideData(leftChunkCount).reverse()
+    const rightSegments = this.#generateSideData(rightChunkCount)
 
-    const leftData = this.#generateSideData(leftChunkCount).reverse()
-    const rightData = this.#generateSideData(rightChunkCount)
+    // 5. Assemblage initial (en chunks)
+    const all = [
+      ...leftSegments,
+      {width: forestWidth, type: BIOME_TYPE.FOREST},
+      ...rightSegments
+    ]
 
+    // 6. Sécurités
+    this.#ensureBiomeDiversity(all)
+    this.#ensureMinimumWidth(all)
 
-    // 4. Application et Post-traitement
-    this.#applySegments(biomes, leftData, leftSeaWidth)
-    this.#applySegments(biomes, rightData, forestEnd)
+    // 7. Conversion finale en tuiles (biomesDescription)
+    let currentOffset = 0
+    const biomesDescription = all.map(s => {
+      const widthInTiles = s.width * 16
+      const segment = {
+        biome: s.type,
+        width: widthInTiles,
+        offset: currentOffset
+      }
+      currentOffset += widthInTiles
+      return segment
+    })
+    if (currentOffset !== 1024) {
+      throw new Error(`[BiomesGenerator] Invalid world width: ${currentOffset} tiles instead of 1024`)
+    }
 
-    this.#ensureBiomeDiversity(biomes, leftSeaWidth, 64 - rightSeaWidth)
-    const biomesDescription = this.#convertBiomesToDesc(biomes)
+    // 8. Retour des informations à l'appelant
+    return {
+      biomesDescription,
+      leftSeaWidth: leftSeaWidthChunks,
+      rightSeaWidth: rightSeaWidthChunks
+    }
+  }
 
-    console.log('>>>>>>>>>>>>>>>>>>>>', leftData, rightData, biomesDescription)
-    return {biomes, biomesDescription, leftSeaWidth, rightSeaWidth}
+  #ensureBiomeDiversity (all) {
+    const requiredBiomes = [BIOME_TYPE.DESERT, BIOME_TYPE.JUNGLE, BIOME_TYPE.FOREST]
+
+    // 1. Chaque biome doit avoir au moins une zone
+    const counts = []
+    for (const b of requiredBiomes) { counts[b] = 0 }
+    for (const s of all) { counts[s.type]++ }
+
+    for (const type of requiredBiomes) {
+      if (counts[type] === 0) {
+        // 1.1. Trouver le type ayant le maximum d'occurrences
+        const maxType = requiredBiomes.reduce((maxIdx, currType) => {
+          return (counts[currType] > counts[maxIdx]) ? currType : maxIdx
+        }, requiredBiomes[0])
+        // 1. 2. On remplace la première occurrence du biome dominant
+        const target = all.find(s => s.type === maxType)
+        if (target) {
+          target.type = type
+          counts[maxType]--
+          counts[type]++
+        }
+      }
+    }
+  }
+
+  #ensureMinimumWidth (all) {
+    // Taille Minimum (Le don de chunk)
+    const MIN_W = 3
+    for (const s of all) {
+      if (s.width < MIN_W) {
+        const diff = MIN_W - s.width
+        // Sélection du segment le plus large du monde comme donneur
+        const donor = all.reduce((prev, curr) => (curr.width > prev.width) ? curr : prev)
+
+        if (donor && donor.width >= (MIN_W + diff)) {
+          donor.width -= diff
+          s.width += diff
+        }
+      }
+    }
   }
 
   /**
@@ -475,7 +536,6 @@ class BiomesGenerator {
     for (let i = 0; i < zoneCount; i++) {
       segments[i].width += offsets[i]
     }
-
     return segments
   }
 
@@ -522,77 +582,89 @@ class BiomesGenerator {
 
     return offsets
   }
-
-  /**
-   * Post-traitement : vérifie la présence de tous les biomes obligatoires.
-   */
-  #ensureBiomeDiversity (biomes, start, end) {
-    const required = [BIOME_TYPE.DESERT, BIOME_TYPE.JUNGLE, BIOME_TYPE.FOREST]
-    const counts = new Map()
-
-    // Comptage
-    for (let i = start; i < end; i++) {
-      counts.set(biomes[i], (counts.get(biomes[i]) || 0) + 1)
-    }
-
-    for (const type of required) {
-      if (!counts.has(type) || counts.get(type) === 0) {
-        // Trouver le biome le plus représenté pour le remplacer
-        let maxType = -1
-        let maxVal = -1
-        counts.forEach((val, key) => {
-          if (val > maxVal) { maxVal = val; maxType = key }
-        })
-
-        // Remplacement de la première occurrence trouvée du biome majoritaire
-        for (let i = start; i < end; i++) {
-          if (biomes[i] === maxType) {
-            biomes[i] = type
-            break
-          }
-        }
-      }
-    }
-  }
-
-  #convertBiomesToDesc (biomes) {
-    const config = []
-    if (biomes.length === 0) return config
-
-    // 1. Substitution des biomes SEA
-    const processedBiomes = [...biomes]
-
-    // SEA Gauche : prend le premier biome non-SEA à sa droite
-    const firstLandBiome = biomes.find(b => b !== BIOME_TYPE.SEA)
-    for (let i = 0; i < processedBiomes.length; i++) {
-      if (processedBiomes[i] === BIOME_TYPE.SEA) processedBiomes[i] = firstLandBiome
-      else break
-    }
-
-    // SEA Droite : prend le dernier biome non-SEA à sa gauche
-    const lastLandBiome = [...biomes].reverse().find(b => b !== BIOME_TYPE.SEA)
-    for (let i = processedBiomes.length - 1; i >= 0; i--) {
-      if (processedBiomes[i] === BIOME_TYPE.SEA) processedBiomes[i] = lastLandBiome
-      else break
-    }
-
-    // 2. Agrégation en zones
-    let currentZone = {
-      biome: processedBiomes[0],
-      width: 16
-    }
-
-    for (let i = 1; i < processedBiomes.length; i++) {
-      const biome = processedBiomes[i]
-      if (biome === currentZone.biome) {
-        currentZone.width += 16
-      } else {
-        config.push(currentZone)
-        currentZone = {biome, width: 16}
-      }
-    }
-    config.push(currentZone) // Ajouter la dernière zone
-    return config
-  }
 }
 const biomesGenerator = new BiomesGenerator()
+
+function runBiomesTest () {
+  const ITERATIONS = 10000
+  const REQUIRED_BIOMES = [BIOME_TYPE.DESERT, BIOME_TYPE.JUNGLE, BIOME_TYPE.FOREST]
+  const MIN_WIDTH_TILES = 3 * 16
+  const EXPECTED_TOTAL = 1024
+
+  const report = {
+    total: 0,
+    diversityErrors: 0,
+    widthErrors: 0,
+    consecutiveErrors: 0,
+    sumErrors: 0,
+    centerForestErrors: 0
+  }
+
+  console.log(`--- Démarrage du test : ${ITERATIONS} itérations ---`)
+
+  for (let i = 0; i < ITERATIONS; i++) {
+    const {biomesDescription} = biomesGenerator.generate()
+    report.total++
+
+    // 1. Vérification de la diversité
+    // const present = new Set(biomesDescription.map(b => b.biome))
+    // if (!REQUIRED_BIOMES.every(type => present.has(type))) report.diversityErrors++
+
+    const present = new Set(biomesDescription.map(b => b.biome))
+    const missing = REQUIRED_BIOMES.filter(type => !present.has(type))
+
+    if (missing.length > 0) {
+      report.diversityErrors++
+      console.warn(`[Iteration ${i}] Biome(s) manquant(s): ${missing.join(', ')}`, biomesDescription)
+      console.log('Structure all (chunks):', biomesDescription.map(z => `[Type:${z.biome} W:${z.width / 16}]`).join(' | '))
+    }
+
+    // 2. Vérification largeur, consécutifs et centre FOREST
+    let totalWidth = 0
+    let lastBiome = -1
+    let hasWidthError = false
+    let hasConsecutiveError = false
+
+    // Création d'un mini-map des tuiles pour vérifier les chunks 30/31
+    const tileMap = new Array(1024)
+    let cursor = 0
+
+    for (const zone of biomesDescription) {
+      if (zone.width < MIN_WIDTH_TILES) hasWidthError = true
+      if (zone.biome === lastBiome) hasConsecutiveError = true
+
+      // Remplissage de la map temporaire pour le check de position
+      for (let t = 0; t < zone.width; t++) {
+        tileMap[cursor + t] = zone.biome
+      }
+
+      totalWidth += zone.width
+      cursor += zone.width
+      lastBiome = zone.biome
+    }
+
+    if (hasWidthError) report.widthErrors++
+    if (hasConsecutiveError) report.consecutiveErrors++
+    if (totalWidth !== EXPECTED_TOTAL) report.sumErrors++
+
+    // 3. Vérification des chunks 30 et 31 (Centre théorique du monde)
+    // Index tuiles : Chunk 30 (480-495), Chunk 31 (496-511)
+    const isChunk30Forest = tileMap[480] === BIOME_TYPE.FOREST
+    const isChunk31Forest = tileMap[496] === BIOME_TYPE.FOREST
+
+    if (!isChunk30Forest || !isChunk31Forest) {
+      report.centerForestErrors++
+    }
+  }
+
+  console.table(report)
+
+  const hasErrors = Object.values(report).some((val, idx) => idx > 0 && val > 0)
+  if (hasErrors) {
+    console.error('❌ Test échoué : Des anomalies ont été détectées.')
+  } else {
+    console.log('✅ Test réussi : Les 100 générations sont conformes aux spécifications.')
+  }
+}
+
+// runBiomesTest()
