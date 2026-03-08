@@ -1,672 +1,321 @@
-# DESIGN DOC: Sixty-Below
+# DESIGN DOC — Sixty-Below
 
 > **AI CONTEXT INSTRUCTION:**
-> Ce document est la Source de Vérité pour le projet "Sixty-Below".
-> Toute génération de code ou proposition d'architecture doit strictement respecter les contraintes définies ci-dessous, en particulier la performance (60 FPS) et l'absence de Backend.
+> Ce document est la **Source de Vérité Gameplay** du projet "Sixty-Below".
+> Il décrit le *quoi* et le *pourquoi* : vision, mécaniques, monde, UI.
+> Pour le *comment* (architecture, API, budgets, algorithmes) → voir `TECHNICAL.md`.
+> Toute génération de code doit respecter les contraintes définies dans ces deux documents.
 
------
+---
 
-## 1\. Vision & Contraintes Globales
+## 1. Vision & Contraintes Globales
 
 ### 1.1 Concept
 
 **Sixty-Below** est une démonstration technique de jeu par navigateur mélangeant plusieurs gameplays :
 
-1.  **Exploration (Temps réel) :** Vue de côté, minage, génération procédurale (Type: *Terraria*).
-2.  **Combat (Faune - Tour par tour) :** Grille tactique, points d'action/mouvement, stratégie (Type: *Dofus*).
-3.  **Récolte (Flore) :** Vue de côté, outils (hache, faucille, couteau...), eco-système, agriculture (Type: *Terraria*).
-4.  **Artisanat (ce qui ne se loote pas, se crafte) :** Grille tactique, points d'action/mouvement, stratégie (Type: *Dofus*).
-5.  **Housing (Shelter, Crafting Station) :** Vue de côté, outils (hache, faucille, couteau...), eco-système, agriculture (Type: *Terraria*).
+1. **Exploration (Temps réel) :** Vue de côté, minage, génération procédurale (type *Terraria*).
+2. **Combat (Faune — Tour par tour) :** Grille tactique, points d'action/mouvement, stratégie (type *Dofus*).
+3. **Récolte (Flore) :** Vue de côté, outils (hache, faucille, couteau…), écosystème, agriculture.
+4. **Artisanat :** Ce qui ne se loote pas se crafte. Recettes, ingrédients, stations.
+5. **Housing :** Shelter (protection nocturne), Crafting Station, Entrepôt.
 
-### 1.2 Contraintes Techniques (Non-négociables)
+### 1.2 Contraintes Non-Négociables
 
-  * **Performance :** 60 FPS constants. Budget frame = 12ms.
-  * **Stack :** Vanilla JavaScript Moderne (ESNext). Pas de framework (Phaser/Unity). Pas de Bundler (Webpack/Vite).
-  * **Rendu :** Canvas API (2D context).
-  * **Architecture :** Client-Side Only. Base de Données Locale (IndexDB).
-  * **Hébergement :** "Serverless" via GitHub Pages.
-  * **Design Pattern :** Singletons pour la majorité des Managers. Composition préférentielle à l'héritage.
+* **Performance :** 60 FPS constants, navigateur uniquement.
+* **Stack :** Vanilla JavaScript (ESNext). Zéro framework (Phaser, Unity…). Zéro bundler (Webpack, Vite…).
+* **Architecture :** Client-Side Only. Persistance locale via IndexedDB.
+* **Hébergement :** Serverless via GitHub Pages.
+* **Patterns :** Singletons pour les Managers. Composition préférentielle à l'héritage.
 
------
+---
 
-## 2\. Architecture Technique & Core Engine
+## 2. Architecture Générale
 
 ### 2.1 Paradigme
 
-Priorité au **Data-Oriented Design** pour la performance.
+Priorité au **Data-Oriented Design**.
 
-  * Adoption d'une architecture de type **ECS (Entity Component System)** pragmatique ou composition stricte pour éviter les chaînes d'héritage profondes de la POO classique.
-  * Séparation stricte : Data (State) / Logic (Systems) / View (Render).
+* Architecture de type **ECS (Entity Component System)** pragmatique : composition stricte, pas de chaînes d'héritage.
+* Séparation stricte : **Data** (State) / **Logic** (Systems) / **View** (Render).
 
-### 2.2 La Game Loop & Budgets Temps [`core.mjs :: GameCore`]
+### 2.2 Couches Architecturales
 
-  * Utilisation de `requestAnimationFrame`. Pour garantir la fluidité, chaque frame (16.6ms) est budgetée :
-  * Dans la boucle principale, détermination de trois budgets [`constant.mjs :: TIME_BUDGET`] :
-      * **Update (Physic/Input) - Budget ~3ms :**
-          * Déplacement Joueur/Faune
-          * Physique déterministe
-          * Incrémentation du temps "Monde" (plus météo, phase de la lune) [`utils.mjs :: TimeManager`]
-      * **Render (World Draw) - Budget ~4ms :**
-          * Dessin du fond, des tuiles visibles (Culling) et des entités (Sprites : flore, faune, meubles).
-          * Concerne uniquement le canvas principal `#game-layer`.
-      * **MicroTasks (Logic) - Budget ~5ms**
-          * Exécution des tâches lourdes découpées (Pathfinding, Génération).
-          * Mise à jour des Overlays UI (Canvases secondaires) si nécessaire.
-      * **Navigateur (DOM) - Budget ~4ms**
-          * Gestion du DOM, E/S, affichage, Garbage Collector.
+```
+Layer 0 — constant.mjs       Zéro dépendance. Config, Enums, Bitmasks.
+Layer 1 — utils.mjs          Utilitaires purs : EventBus, MicroTasker,
+          database.mjs       TaskScheduler, TimeManager, seededRNG.
+Layer 2 — core.mjs           Kernel : GameLoop, InputManager, KeyboardManager.
+─────────────────────────────────────────────────────────────
+Layer 3 — assets.mjs         Ressources graphiques/sons.
+          persistence.mjs    Orchestration sauvegarde (connaît les stores métier).
+─────────────────────────────────────────────────────────────
+Layer 4+ — Modules Métier    world, render, player, combat, inventory…
+```
 
-  __TO DO__ : définir où gérer les animations des sprites
+**Règle absolue :** les dépendances ne vont que vers le bas. Un module de Layer N n'importe jamais un module de Layer N+.
 
 ### 2.3 Gestion des États (State Machine)
 
-L'état du jeu définit quels sous-systèmes sont actifs (boucle principale et overlay temps réel / overlays qui bloquent le temps réel / génération d'un nouveau monde). L'``InputManager`` est l'autorité qui détient l'état courant (Pattern Input Authority).
+L'`InputManager` (kernel) est l'autorité qui détient l'état courant via une **pile d'overlays**.
 
-  * `STATE.EXPLORATION` (0) :
-      * Physique : Active (Mouvement fluide, Gravité).
-      * Rendu du monde : Rafraîchissement constant (60 FPS).
-      * MicroTasker et TaskScheduler : Actifs.
-      * Inputs : Polling
-          * Bitmask pour les touches clavier de mouvement
-          * Position souris
-          * click gauche / droit souris
-          * molette souris
-  * `STATE.INFORMATION` (1) :
-      * Déclencheur : Ouverture d'un overlay (Inventaire, Craft, Aide).
-      * Physique : Hard Stop (Figée). Le DeltaTime n'est plus calculé.
-      * Rendu du monde : Hard Stop (Figée).
-      * MicroTasker et TaskScheduler : Inactifs.
-      * Inputs : Routés vers l'overlay actif.
-      * Sortie du state : Fermeture du dernier overlay actif.
-  * `STATE.CREATION` (2) :
-      * Déclencheur : Demande de création, confirmée par introduction de la WorldKey.
-      * Overlay (Inventaire, Craft, Aide) : Fermés automatiquement.
-      * Boucle principale : Figée
-      * Inputs : aucun
-      * Sortie du state : quand le monde est créé et enregistré en base de données. Appel de startSession pour tout réinitialiser.
-  * `STATE.COMBAT` (3) :
-      * Identique au `STATE.INFORMATION`
-      * L'utilité de ce mode sera déterminée ultérieurement
+| État | Déclencheur | Physique | Rendu | MicroTasker |
+|---|---|---|---|---|
+| `EXPLORATION` (0) | Défaut | Active | 60 FPS | Actif |
+| `INFORMATION` (1) | Overlay ouvert (Inventaire, Craft, Aide) | Hard Stop | Hard Stop | Inactif |
+| `CREATION` (2) | Création d'un nouveau monde confirmée | Figée | Figée | Inactif |
+| `COMBAT` (3) | Contact faune | Identique à INFORMATION | — | — |
 
-### 2.4 Gestion des Tâches (MicroTasker & Scheduler)
+**Routing des inputs :** Combat > Creation > Aide > Craft > Inventory > Exploration.
 
-  * **MicroTasker** [`utils.mjs :: MicroTasker`] : Exécute des tâches fractionnées dans le temps restant de la frame. Priorité et Capacité définies par tâche.
+**Signals d'input :**
+* *Continuous (Polling) :* Mouvement en Exploration → Bitmask binaire lu à chaque frame.
+* *Discrete (Events) :* Actions one-shot (Ouvrir UI, Taper, Changer Slot) → EventBus.
 
-  * **TaskScheduler** [`utils.mjs :: TaskManager`] : Gère les tâches longues (ex: cuisson, craft long). Tableau trié par timestamp d'exécution, recherche dichotomique, suppression "lazy" (flag deleted).
+### 2.4 Découplage (EventBus)
 
-### 2.5 Découplage [`utils.mjs :: EventBus`]
+* Communication inter-modules via **Pub/Sub** (`eventBus`), sans dépendance cyclique.
+* Règle : si un listener dépasse 0,1 ms de traitement, il délègue au `MicroTasker`.
 
-* **Système Pub/Sub** pour la communication entre modules sans dépendance cyclique.
-* Si un listener dépasse 0.1ms, il doit déléguer son travail au `MicroTasker`.
-* **Implémentation**
-  * Evénement défini par un identifiant et des paramètres optionnels
-  * Publication (`emit`) et Abonnement (`on`).
-  * Appel direct des fonctions lorsque l'événement est déclenché
+### 2.5 Le Temps
 
-### 2.6 Le temps [`utils.mjs :: TimeManager`]
+Deux temporalités strictement séparées :
 
-Distinction stricte entre :
+* **Temps Réel (Playtime) :** ms écoulées moteur allumé. Utilisé par le `TaskScheduler`.
+* **Temps Monde (World Time) :** Temps fictif in-game (cycle jour/nuit, météo, lune). Géré par le `TimeManager`.
 
-* **Temps Réel (Playtime) :** Nombre de ms écoulées moteur allumé (depuis la création du monde). Utilisé par le `TaskScheduler`.
-* **Temps Monde :** Calculé à partir du Playtime (Ratio 1000ms réelles = 1 min monde). Utilisé pour l'affichage et les cycles jour/nuit.
-* **Détails d'implémentaton :**
-  * **Initialisation :** A la création du monde, la date est initialisée à : Jour 1 - 8h00.
-  * **Incrémentation :** La date est incrémentée dans la Game Loop (budget **Update**, état `STATE.EXPLORATION`)
-  * **Persistence :** La date est sauvegardée en base de données et récupérée au lancement de l'application
+---
 
-### 2.7 Cycle de Vie et Initialisation (Anti-Circularité)
-
-#### 2.7.1 Hiérarchie des Modules (Dependency Layering)
-
-Pour garantir la stabilité du chargement, l'application respecte 4 niveaux de dépendance :
-* **Layer 0 (Roots) :** `constant.mjs`
-    * Contrainte : N'importe aucun fichier local.
-* **Layer 1 (Kernel) :** `utils.mjs`, `database.mjs`, `assets.mjs`
-    * Contrainte : N'importent que la Layer 0.
-    * Rôle : Outils, Accès DB, Chargement & Parsing des ressources.
-    * Précision Accès DB : `database.mjs` est un driver pur (Get/Set/Batch). Il ne connaît ni le `ChunkManager` ni le `Player`.
-* **Layer 2 (Systems - Interdependent) :** `world.mjs`, `action.mjs`, `buff.mjs`, `combat.mjs`, `ui.mjs`, `render.mjs`...
-    * Comportement : Peuvent s'importer mutuellement.
-    * Sécurité : Utilisation obligatoire du pattern init() pour les interactions croisées.
-    * Exception : `generate.mjs` est isolé (importé dynamiquement ou statiquement sans dépendance retour).
-    * Persistance : `persistence.mjs` (`SaveManager`) importe le Driver (Layer 1 - `database.mjs`), mémorise la liste des enregistrements provenant des Managers de données (Layer 2) pour orchestrer la sauvegarde toutes les 2 secondes.
-* **Layer 3 (Application) :** `core.mjs`
-    * Rôle : Point d'entrée. Importe les Layers 0, 1, 2. Orchestre l'initialisation séquentielle.
-
-#### 2.7.2 Cycle de Vie  [`core.mjs :: GameCore`]
-
-Pour permettre les références croisées dans la Layer 2 (ex: World a besoin de Combat, Combat a besoin de World) sans provoquer d'erreurs d'évaluation ESM, le cycle de vie est strict :
-* **Instantiation :** Au chargement du module, le Singleton est créé via `new Class()`. Le constructeur ne doit jamais accéder à une autre instance de la Layer 2.
-* **Initialisation :** Chaque Manager expose une méthode publique `init()`.
-
-__Note__ : la création du singleton n'est effectuée qu'une seule fois. La fonction `init` peut être appelée plusieurs fois. On veillera à placer dans le `constructor` ce qui est constant (ex: création du DOM pour un overlay) et dans `init` ce qui change suite à la création d'un nouveau monde (ex: initialisation des informations dans le DOM, valeurs mises en cache).
-
-Boot Sequence (dans core.mjs) :
-* **1. INSTANTIATION :** Création des Singletons (new Class). Importe tous les modules.
-* **2. LOAD ASSETS :** Appel de [`assets.mjs :: loadAssets`]. Chargement de toutes les images et sons. Construction des index d'atlas.
-* **3. HYDRATION (Linkage) :** Une fois les assets chargés (synchrone), on parcourt `TILE_DB` et `ITEM_DB` (de `constant.mjs`) pour remplacer les chaînes de caractères (ex: "ore_16_16+1") par les données de rendu calculées par assets.mjs (Index image, sx, sy). [`assets.mjs :: loadAssets`]
-* **4. INIT :** Appelle `eventBus.init()`, `microTasker.init()`, `taskManager.init()`, `ChunkManager.init()`, `combatManager.init()`, `uiManager.init()`... L'ordre peut avoir de l'importance.
-    * **Contrainte :** Configuration de l'état interne uniquement. Interdiction d'émettre des événements ou d'appeler d'autres managers (qui peuvent ne pas être prêts).
-* **5. RUN :** Lance la Game Loop.
-* **5.1 RUN - First Loop :** Première exécution de la boucle.
-    * Le `TimeManager` détecte la première frame et émet l'eventBus `time/first-loop`.
-    * Les systèmes réagissent pour initialiser leur logique croisée (Cross-System Logic).
-
-__Note__ : Après la création d'un nouveau monde, pour relancer le jeu, il faudra effectuer la phase `INIT` avant de lancer la phase `RUN`.
-
-#### 2.7.3 Directive d'implémentation pour les Singletons
-
-La plupart des managers sont implémentés sous la forme d'un **singleton** :
-
-```javascript
-class GrassManager {
-...
-}
-export const grassManager = new GrassManager()
-```
-
-### 2.8 Architecture des Inputs (Input Authority)
-
-  * Responsabilité Inversée : L'InputManager ne dépend pas du GameCore. C'est lui qui détermine l'état du jeu via une pile d'overlays (Stack). Exemple : Si la pile contient ['inventory'], l'état est INFORMATION.
-  * Séparation des Signaux :
-      * Continuous (Polling) : Pour le mouvement en Exploration. Le Core lit un Bitmask binaire (inputFlags) à chaque frame.
-      * Discrete (Events) : Pour les actions "One-Shot" (Ouvrir UI, Taper, Changer Slot). Transmis via l'EventBus.
-  * Routing Hiérarchique : Les inputs sont traités en cascade :  Combat > Creation > Aide > Craft > Inventory > Exploration.
-
------
-
-## 3\. Système "World" (Exploration)
+## 3. Système "World" (Exploration)
 
 ### 3.1 Structure du Monde
 
-  * **Grille 2D de Tuiles (Tilemap) :** 1024 (Largeur) x 512 (Hauteur) tuiles. Taille tuile : 16x16px. Tailles fixes non paramétrées.
-  * **Implémentation :**  [`world.mjs :: ChunkManager`] : Singleton maître de la donnée.
-      * Stockage : `Uint8Array` unique (1 octet par tuile).
-      * Optimisation : Utilisation stricte d'opérations bitwise (>> 4, & 15) pour les conversions de coordonnées.
-      * Dirty Flags : Maintient deux listes de chunks modifiés : `dirtyRenderChunks` (pour le Renderer) et `dirtySaveChunks` (pour la Persistence).
-  * **Stockage Mémoire (Runtime) :**
-      * **Structure :** Un unique `Uint8Array` (Flat Array) stockant l'ID de la tuile (référence vers `NODES` via `NODES_LOOKUP`).
-      * **Adressage :** Index calculé par opérations binaires : `index = (y << 10) | x`. Cet index sera utilisé comme référence unique à une tuile (on utilise **jamais** une String `x_y`).
-      * **Evolution :** Si des données supplémentaires sont nécessaires (ex: Murs, Liquides, tuiles bloquées), elles feront l'objet d'uune conception spécifique.
-  * **Optimisation "Ghost Cells" (Padding) :**
-      * Les bords de la carte sont **interdits à la modification** (Immuables) pour supprimer les vérifications de limites (Bounds Checking) dans les boucles critiques.
-      * **Haut (y=0) :** DEEPSKY. Permet la détection de surface.
-      * **Bas (y=511) :** LAVA.
-      * **Latéral (x=0 et x=1023) :** Colonnes composées de DEEPSKY (haut), DEEPSEA (milieu) et BASALT (fond).
-  * **Echelle :** 1 tuile = 50cm. Monde = 510 de large x 254m de haut.
-  * **Classification des Entités (Grid vs Objects) :**
-      * **Tuiles (Grid-based) :** Tout élément structurel répétitif stocké dans le `Uint8Array`.
-          * Comprend : Terrain naturel (Terre, Pierre, Minerais, Gemme), Liquides, Vides (SKY, VOID), **Murs de fond** (Background Walls) et Murs de construction (Wood Walls).
-      * **Furniture (Object-based) :** Tout élément posé manuellement par le joueur, stocké dans un Store dédié (`furniture`).
-          * Comprend : Stations de craft, Coffres, Lits, Portes, Feux de camp...
-          * **Cas spécifiques :** Les **Plateformes** et les **Sources de lumière** (Torches, Lampes) sont traitées comme des Furniture (entités libres) et non des Tuiles, pour ne pas bloquer la physique ou l'éclairage de la grille.
-          * Gestion : Un item "Meuble" est dans l'inventaire (`inventory` store) tant qu'il n'est pas posé. Une fois posé, il passe dans le `furniture` store avec ses coordonnées.
-  * **Map :** pour le débug, on pourra afficher la totalité de la carte à l'échelle 1/16 en utilisant la couleur dominante (attribut `color` de `NODES`). Affichage par la touche 'M', Disparition par 'M' ou 'Escape'.
+* **Grille 2D :** 1024 × 512 tuiles. Taille tuile : 16 × 16 px. Dimensions fixes, non paramétrables.
+* **Stockage Runtime :** `Uint8Array` unique (flat array). 1 octet par tuile = référence vers `NODES_LOOKUP`.
+* **Adressage :** `index = (y << 10) | x`. Jamais de clé string `"x_y"`.
+* **Optimisation "Ghost Cells" :** Les bords (x=0, x=1023, y=0, y=511) sont immuables → suppression du bounds checking dans les boucles critiques.
+* **Échelle :** 1 tuile = 50 cm. Monde ≈ 510 m de large × 254 m de haut.
+
+**Classification des entités :**
+
+* **Tuiles (Grid-based) :** Terrain naturel, liquides, vides (SKY, VOID), murs de fond et de construction. Stockés dans le `Uint8Array`.
+* **Furniture (Object-based) :** Éléments posés par le joueur (stations de craft, coffres, lits, portes, feux de camp…). Stockés dans le store `furniture` avec coordonnées.
+  * *Cas spécifiques :* Plateformes et sources de lumière (Torches, Lampes) sont des Furniture — pas des tuiles — pour ne pas perturber la physique ni l'éclairage.
+  * *Cycle de vie :* L'item est dans l'`inventory` store tant qu'il n'est pas posé. Une fois posé → `furniture` store.
+
+**Map de debug :** Touche `M` → affichage de la carte complète à l'échelle 1/16, couleur dominante des tuiles (`NODES.color`). Disparition par `M` ou `Escape`.
 
 ### 3.2 Génération Procédurale
 
-  * **Effectuée hors temps réel :** état `STATE.INFORMATION`.
-  * **Mémoire :** Importation dynamique du module générant le monde
-  * **Biomes :** découpage vertical : Forêt, Désert, Jungle + Océans latéraux.
-  * **Layers :** découpage horizontal : Surface, Underworld, Caverns, Hell (Lava).
-  * **Fluides :** Lacs (Water), Ruches (Honey), Sève (Sap), Sable (Sand).
-  * **Détail d'implémentation :**
-      * **World Key :** Seed permettant la re-génération déterministe.
-      * **Temps d'exécution :** 10 secondes maximum
-      * **Lissage :** Bruit de Perlin/Simplex.
-      * **Creusement :** Algorithme dédiés pour les tunnels et cavernes.
-      * **Fluides :** creusement et remplissage initial.
-      * **Décors :** Algorithme d'ajout de coffres, minerais, flore...
-      * **Nettoyage :** Suppression  des trous ou tuiles isolés
+* Effectuée **hors temps réel** (`STATE.CREATION`), en import dynamique (`generate.mjs`).
+* **World Key :** seed pour la re-génération déterministe.
+* **Temps maximum :** 10 secondes.
+* **Biomes (axe horizontal) :** Forêt (départ joueur, centre), Désert, Jungle + Océans latéraux.
+* **Layers (axe vertical) :** Surface, Underworld, Caverns, Hell (Lava).
+* **Fluides initiaux :** Lacs (Water), Ruches (Honey), Sève (Sap), Sable (Sand).
+* **Algorithmes :** Perlin/Simplex pour le lissage, algorithmes dédiés pour tunnels et cavernes, placement de coffres/minerais/flore, nettoyage des isolats.
 
-### 3.3 Physique (Exploration)
+### 3.3 Biomes — Découpage Horizontal
 
-  * **Déplacement du joueur :** par flèches directionnelles et touches ZQSD. Caméra centrée sur le joueur. Zoom possible sur le monde.
-  * **Collision :** AABB (Axis-Aligned Bounding Box) simple custom.
-  * **Liquides :** Algorithme custom pour Water, Honey et Sap (paramétrable en fonction de la viscosité) et Automates cellulaires (Cellular Automata) pour le sable.
-  * **AI :** Comportements simples (Suit, Fuit, Erre) sans Pathfinding complexe en temps réel.
-  * **Performance :** Pas de moteur physique lourd (Matter.js). Implémentation custom légère spécifique aux jeux de tuiles. Pas de projectiles, ni d'effets spéciaux hormis l'animation des sprites.
+| Biome | Position | Difficulté |
+|---|---|---|
+| Sea | Bords gauche (3 chunks) et droit (4 chunks, aléatoire) | — |
+| Forêt | Centre du monde — zone de départ | Facile |
+| Désert | Intermédiaire | Moyen |
+| Jungle | Extrémités | Difficile |
 
-### 3.4 Simulation & Écosystème
+### 3.4 Physique (Exploration)
 
-  * **Portée des mises à jour (Update Scope) :**
-      * **Faune (Mobs) :** Gestion stricte dans l'espace visible (Viewport) + Buffer de sécurité ("Active Area"). Les entités hors zone sont désactivées ou despawnées pour économiser le CPU. L'apparition (Spawning) est calculée juste en dehors de la vue pour paraître naturelle.
-      * **Liquides & Physique locale :** La simulation des fluides (eau, miel, sève, sable)
+* **Déplacement :** Flèches directionnelles + ZQSD. Caméra centrée joueur. Zoom possible.
+* **Collision :** AABB (Axis-Aligned Bounding Box) custom.
+* **Liquides :** Algorithme custom paramétrable (viscosité) pour Water, Honey, Sap. Automates cellulaires pour le sable.
+* **AI Faune :** Comportements simples (Suit, Fuit, Erre) sans pathfinding complexe en temps réel.
+* **Contrainte :** Pas de moteur physique externe (Matter.js…). Pas de projectiles ni d'effets spéciaux hormis les animations de sprites.
 
-  * **Flore (Global Simulation) :**
-      * La croissance des plantes (Arbres, Buissons, Fleurs) est **décorrélée des chunks**.
-      * Les données sont stockées dans le Store `plant` dédié (Liste clairsemée).
-      * La simulation est temporelle et globale (calcul mathématique basé sur le timestamp), ce qui permet à une forêt de pousser à l'autre bout du monde sans charger les chunks graphiques correspondants.
+### 3.5 Simulation & Écosystème
 
-  * **Régénération :**
-      * Certains matériaux critiques (Minerais rares, Ruches) possèdent des règles de régénération lente déclenchées par des timers globaux, générant des modifications de tuiles ponctuelles.
-      * La lente croissance des toiles d'araignées (tuile spécifique) est déclenchées par des timers globaux, générant des modifications de tuiles ponctuelles.
+* **Faune :** Active uniquement dans le Viewport + buffer de sécurité. Entités hors-zone désactivées ou despawnées. Spawning calculé juste hors-vue.
+* **Flore :** Croissance **décorrélée des chunks**. Données dans le store `plant` (liste clairsemée). Calcul temporel global (timestamp) → une forêt peut pousser hors-vue sans charger ses chunks.
+* **Régénération :** Minerais rares, ruches et toiles d'araignées se régénèrent via timers globaux générant des modifications de tuiles ponctuelles.
 
------
+---
 
-## 4\. Système "Tactical" (Combat)
+## 4. Système "Tactical" (Combat)
 
-### 4.1 Déclenchement & Rendu
-  * État : Passage irréversible en STATE.COMBAT jusqu'à la fin du combat, si cet état est maintenu.
-  * Rendu : Entièrement géré par le DOM, comme les autres overlays.
-  * Déclenchement par le joueur (click souris) ou par le monstre (AI simplifiée, buffs/debuffs).
-  * Génération automatique du terrain (forme, présence de trous et de murs) en fonction de la zone (biome + layer)
+### 4.1 Déclenchement & Contexte
+
+* Déclenchement : clic joueur sur faune, ou IA faune (comportement simple + buffs/debuffs).
+* Passage en `STATE.COMBAT` — irréversible jusqu'à la fin du combat.
+* Rendu : entièrement DOM (overlay, comme les autres panels).
+* Terrain : généré procéduralement en fonction du biome + layer (forme, trous, murs).
 
 ### 4.2 Mécaniques
 
-  * **Initiative :** Ordre de jeu déterminé par la caractéristique 'Initiative' (joueur (buffable), monstres) midifiable en combat.
-  * **Ressources :** PA (Points d'Action) et PM (Points de Mouvement).
-  * **Grille :** Pathfinding (A\* ou Dijkstra) sur la grille locale, prenant en compte les obstacles du terrain généré (on ne peut pas marcher dans un mur ni sauter un trou).
-  * **Ligne de vue (LOS) :** B: Raycasting simple bloqué par murs/entités
-  * **Challenges :** sous-buts permettant de diversifier les combats (cf Dofus)
-  * **Evolutivité :** possibilité d'ajout de mécaniques spéciales (Boss)
+* **Initiative :** Déterminée par la caractéristique `Initiative` (joueur buffable, monstres). Modifiable en cours de combat.
+* **Ressources :** PA (Points d'Action) et PM (Points de Mouvement).
+* **Grille :** Pathfinding A\* ou Dijkstra sur grille locale. Murs et trous bloquants.
+* **Ligne de vue (LOS) :** Raycasting simple, bloqué par murs et entités.
+* **Challenges :** Sous-buts en combat pour diversifier les parties (cf. *Dofus*).
+* **Évolutivité :** Possibilité d'ajout de mécaniques spéciales (Boss).
 
------
+---
 
-## 5\. Données & Persistance
+## 5. Données & Persistance
 
-### 5.1 Base de Données Locale
+### 5.1 Stockage Local
 
-  * **IndexedDB** native via wrapper custom.
-  * Pas de sérialisation JSON complexe : stockage direct des objets JS structurés.
+* **IndexedDB** native, via wrapper custom (`database.mjs`).
+* Pas de sérialisation JSON complexe : stockage direct d'objets JS structurés.
 
-### 5.2 Sauvegarde et Persistance
+### 5.2 Stratégie "Write-Behind"
 
-* **Stratégie "Write-Behind" :**
-    * Les modifications en jeu ne déclenchent pas d'écriture immédiate en base.
-    * Les chunks modifiés sont marqués via un "Dirty Flag" (Set de coordonnées - `(chunk_y << 7) | chunk_x`).
-    * Périodicité : Le `TaskScheduler` déclenche la sauvegarde des chunks 'Dirty' toutes les 2 secondes.
+* Les modifications en jeu ne déclenchent **pas** d'écriture immédiate.
+* Chunks modifiés → **Dirty Flag** (Set de coordonnées).
+* Le `TaskScheduler` déclenche la sauvegarde des chunks dirty **toutes les 2 secondes**.
+* Chaque sauvegarde englobe chunks + métadonnées critiques (Inventaire, Position) dans **une transaction unique** → cohérence en cas de crash.
 
-* **Dimensionnement du Transfer Pool (Elastic Pool) :**
-    * **Principe :** Le pool possède une taille initiale fixe (64 buffers) couvrant 99% des cas d'usage pour garantir le "Zero-GC".
-    * **Expansion d'Urgence :** Si le nombre de chunks modifiés dépasse la capacité du pool (Overflow), le système **doit** allouer de nouveaux buffers `Uint8Array` à la volée pour garantir l'intégrité des données.
-    * **Persistance de l'expansion :** Les nouveaux buffers créés sont ajoutés définitivement au pool. Le pool ne réduit jamais sa taille, s'adaptant ainsi dynamiquement aux pics de charge spécifiques du style de jeu du joueur.
-    * **Monitoring :** Toute extension du pool doit générer un avertissement (Error) dans la console pour permettre l'analyse et l'ajustement de la taille initiale dans les futures versions.
+### 5.3 Transfer Pool (Zero-GC)
 
-* **Session Transactionnelle :**
-    * Une sauvegarde englobe les chunks modifiés ET les métadonnées critiques (Inventaire, Position) dans une même transaction pour garantir la cohérence en cas de crash. Elle s'effectue en utilisant `database.batchUpdate`.
+* Pool de 64 buffers `Uint8Array` couvrant 99 % des cas.
+* En cas d'overflow : allocation à la volée + avertissement console + persistance du pool étendu.
 
- * **Orchestrateur [`persistence.mjs :: SaveManager`] :**
-    * Module de Layer 2 qui utilise le `TaskScheduler` (toutes les 2s).
-    * Interroge `ChunkManager` pour récupérer les deltas (Dirty Chunks), puis Formate les données brutes.
-    * Récupère les records à créer/modifier/supprimer, informations envoyées les managers de données (InventoryManager, PlayerManager, Flore, Faune, Meubles...). Du point de vue des managers de données : Fire & Forget.
-    * Appelle `database.mjs` (Layer 1) pour l'écriture physique (batchUpdate).
-    * Confirme la sauvegarde à `ChunkManager` pour qu'ils nettoient leurs Dirty Flags.
+### 5.4 GameState (K/V Global)
 
-### 5.3 Gestion de l'État Global (GameState Pattern)
+* Stockage clé/valeur pour les états dispersés (Météo, Temps, Position, Flags…).
+* **Memory First :** la variable en RAM du Manager est la source de vérité. La DB est un miroir.
+* Au démarrage de session : chargement complet du gamestate en **une seule requête**, puis injection dans chaque Manager via `.init()`.
+* En runtime : écriture "Fire & Forget" (`database.setGameState`). Jamais d'`await` bloquant.
 
-Le `gamestate` est un stockage clé/valeur (K/V) utilisé pour persister les états dispersés des différents systèmes (Météo, Temps, Stats joueur, Flags divers, etc.).
+### 5.5 Identifiants Logiques vs Physiques
 
-* **Principe "Memory First" :** La source de vérité est **toujours** la variable en mémoire vive (RAM) dans l'instance du Manager concerné. La base de données n'est qu'un miroir de persistance.
-* **Cycle de Vie (Session Start) [`core.mjs`] :**
-    * **1. Chargement Global :** Au début de `startSession`, l'application charge l'intégralité du `gamestate` en une seule requête via `database.getAllGameState()`.
-    * **Distribution (Injection) :** Les valeurs récupérées sont extraites et passées en arguments aux méthodes `.init()` des différents Managers (`timeManager.init(state.timestamp)`, `playerManager.init(state.pos)`...).
-* **Mise à jour (Runtime) :**
-    * Lorsqu'un Manager modifie une donnée d'état, il met à jour sa variable locale (immédiat).
-    * Il déclenche ensuite une sauvegarde asynchrone via `database.setGameState(key, value)` (ou `batchSetGameState`).
-    * **Règle stricte :** Le Manager n'attend pas (`await`) la fin de l'écriture pour continuer son traitement. C'est du "Fire and Forget".
-* **Lecture (Runtime) :**
-    * L'utilisation de `database.getGameStateValue(key)` est **déconseillée** pendant le jeu. Les Managers doivent utiliser leurs propres variables membres.
-* **Nettoyage :**
-    * Aucune suppression de clé n'est gérée manuellement. Le nettoyage se fait naturellement lors de la suppression complète des stores à la création d'un nouveau monde (`database.clearAllObjectStores`).
+* **Problème :** La clé primaire IndexedDB est générée *a posteriori* (async). On ne peut pas lier des entités entre elles au moment de leur création si l'on doit attendre la DB.
+* **Solution :** **UID logique** généré par l'application au moment de l'instanciation. Permet de construire des graphes d'objets en mémoire avant toute sauvegarde.
+* **Génération :** Algorithme "Graine + Suffixe". Sauvegarde de la graine toutes les 26 générations. Au redémarrage, saut à la graine suivante (unicité garantie, trous acceptés).
 
-### 5.4 Identifiants Logiques vs Physiques
+---
 
-* **Problème :** La création d'entités en base de données (`IndexedDB`) est asynchrone et génère des clés primaires (Physical ID - attribut `key`) *a posteriori* (Fire & Forget). Cela empêche de lier des entités entre elles (ex: un Arbre et ses Champignons) lors de leur instanciation en mémoire si l'on doit attendre le retour de la base.
-* **Solution:** Utilisation d'un **Identifiant Logique (UID)** généré par l'application au moment de l'instanciation.
-    * Permet de créer des graphes d'objets complets en mémoire avant même que la sauvegarde ne soit lancée.
-    * L'UID est stocké dans le record et sert de référence pour les liens (parent/enfant/voisins).
-    * La clé physique (IndexedDB Key) reste utilisée pour l'indexation interne du moteur de stockage, mais n'est pas exposée à la logique métier pour les liaisons.
-* **Génération :** Algorithme à "Graine + Suffixe".
-    * Pour optimiser les E/S, la graine (Seed) n'est sauvegardée qu'une fois toutes les 26 générations.
-    * En cas de redémarrage, on saute systématiquement à la graine suivante pour garantir l'unicité, acceptant des "trous" dans la séquence d'IDs.
+## 6. Interface & Rendu (UI/UX)
 
------
+### 6.1 Organisation de l'Écran
 
-## 6\. Interface & Rendu (UI/UX)
+Découpage horizontal en 3 zones :
 
-### 6.1 Organisation générale de l'écran
-
-* **3 zones : (découpage horizontal)**
-    * **Gauche** : Hotbar (verticale)
-    * **Centre** : Monde (empilmenent de <canvas>)
-    * **Droite** : Widgets les uns sous les autres (Layout)
-        * **Boutons d'action** : Inventaire, Artisanat, Aide, Zoom, Sons, Nouveau Monde (Snapshot pour débug)
-        * **Environement :** Jour / Heure / Météo / Phase de la Lune / Position
-        * **Jauges :** Vie
-        * **Buffs/Debuffs actifs**
-        * **Débug**
-* **Taille des Canvas :** Le monde est affiché dans un canvas de 4 chunks de large (1024 pixels) et 3 chunks de haut (768 pixels).
-* **Overlays : (empilement vertical)**
-    * **Inventaire**
-    * **Artisanat**
-    * **Aide**
-    * **Carte**
-* **Overlays : (positionnement)**
-    * Les overlays affichés pendant le jeu (pendant le temps réel) sont centrés sur l'écran physique.
-    * Les overlays s'empilent les uns sur les autres, dans un ordre prédéterminé.
-    * Dès qu'un overlay est affiché, un voile sombre s'interpose entre lui et les canvas du monde.
-    * Les overlays qui interrompent le déroulement du jeu.
+* **Gauche :** Hotbar (verticale).
+* **Centre :** Monde (empilement de `<canvas>`). Dimensions : 1024 × 768 px (4 chunks × 3 chunks).
+* **Droite :** Widgets empilés.
+  * Boutons d'action : Inventaire, Artisanat, Aide, Zoom, Sons, Nouveau Monde.
+  * Environnement : Jour / Heure / Météo / Phase de Lune / Position.
+  * Jauges : Vie.
+  * Buffs/Debuffs actifs.
+  * Debug.
 
 ### 6.2 Stratégie "Layered Canvas"
 
-La partie centrale de l'interface est divisée en balises <canvas> superposées pour optimiser les redraws.
-    * **Layer 0 :** Le ciel dont la couleur change en fonction de l'heure (modification sur `eventBus`)
-    * **Layer 1 (Game Canvas) :** Le monde, la flore, la faune, les meubles, le joueur. Redessiné à chaque requestAnimationFrame.
-        * les tuiles vides (`SKY` et `FOG`) sont transparentes transparentes.
-    * **Layer 2 :** Voile sombre qui apparaît lorsqu'un DOM Panel est affiché (modification sur `eventBus`, changement de `State`)
-    * **Layer 3 (DOM Panels) :** Inventaire complet, Craft, Aide. Éléments HTML standards (<div>) affichés/masqués. Interruptifs (Pause du jeu).
+La zone centrale est composée de `<canvas>` superposés (z-index CSS) :
 
-### 6.3 Optimisations Graphiques
+| Z-Index | Élément | Description |
+|---|---|---|
+| 0 | `SkyRenderer` | Couleur atmosphérique. Cycle jour/nuit. |
+| 10 | `WorldRenderer` | Tuiles, flore, faune, meubles, joueur. Les tuiles SKY/FOG sont transparentes. |
+| 20 | `LightRenderer` | Occlusion et sources de lumière locales. |
+| 30 | Voile sombre (`ModalBlocker`) | Apparaît dès qu'un overlay est actif. |
+| 40–70 | Overlays DOM | Inventaire (40), Craft (50), Aide (60), Carte (70). |
+| 100 | Combat | Overlay tactique. |
+| 110 | Creation | Overlay création de monde. |
+| 150 | Dialog | Modaux. |
+| 200 | System | Priorité absolue. |
 
-* **Culling :** Rendu strict du viewport + buffer de 1 chunk.
-* **Asset Hydration (Zero-Cost Runtime) :** Les coordonnées de texture (sx, sy, sw, sh) et les index d'images sont calculés une seule fois au démarrage via `assets.mjs`. Le moteur de rendu accède à des entiers pré-calculés, jamais à des chaînes de caractères ou des calculs de grille pendant la frame.
-* **Framing (Auto-tiling) :** Bitmasking (4-connectivity) calculé à la volée ou au chargement pour les transitions de textures.
-* **Conversions :** Chunk -> Image via OffscreenCanvas (MicroTask) pour mettre en cache les chunks statiques. Mise à jour uniquement si modification (dirty flag)
-* **Diffusion :** Pour rendre plus naturelle la transition entre deux tuiles, elles ont un bord de 2 pixels partiellement transparent. Les pixels transparents sont peints de la couleur dominante des tuiles adjacentes.
-* **Empilement vertical :** L'affichage est effectué dans l'ordre suivant : tuiles, flore, meubles, faune, joueur. Pas de gestion d'une troisième dimension.
+**Overlays :** centrés sur l'écran physique. S'empilent dans un ordre prédéterminé. Interruptifs (pause du jeu) si leur `state` est non-null.
 
-### 6.4. Système d'Éclairage et d'Ombres (LightRenderer)
+### 6.3 Système d'Éclairage (LightRenderer)
 
-* Shadow Mapping par Soustraction.
+* **Stratégie :** Shadow Mapping par Soustraction ("Surface & Punch").
+* Le `LightRenderer` couvre la totalité du canvas et opère en 4 passes (`globalCompositeOperation`).
+* Sources de lumière fournies par le `FurnitureManager` (Torches, Lampes).
+* Optimisation : si la caméra est entièrement dans le ciel → `LightRenderer` désactivé.
 
-#### 6.4.1. Architecture des Calques (Layering)
+*(Détail des 4 passes → `TECHNICAL.md §Éclairage`)*
 
-Composition de trois canvas superposés via CSS (`z-index`), de bas en haut :
+### 6.4 Ordre d'Affichage (Empilement Vertical)
 
-* `SkyRenderer` : Affiche la couleur atmosphérique. Gère le cycle jour/nuit uniquement par sa couleur.
-* `WorldRenderer` : Affiche les tuiles et entités. Les tuiles `SKY` et `FOG` ne sont pas dessinées (transparence), laissant voir le SkyRenderer.
-* `LightRenderer` : Un calque recouvrant la totalité du canvas, gérant l'occlusion et les sources de lumière locales.
+Tuiles → Flore → Meubles → Faune → Joueur. Pas de troisième dimension.
 
-#### 6.4.2. Stratégie de Rendu (Algorithme "Surface & Punch")
+---
 
-Rendu en 4 passes successives utilisant les opérations de composition du Canvas API (`globalCompositeOperation`).
+## 7. Modules Métier (Layer 4+)
 
-* **Passe 1 :** L'Obscurité Totale (Reset)
-    * Action : Remplissage intégral du canvas.
-    * Couleur : Noir total.
-    * Mode : `source-over`.
-    * Résultat : Mnde invisible, couvert par le voile noir.
+Les modules communiquent via l'`EventBus` (couplage faible).
 
-* **Passe 2 :** La Découpe du Ciel (Optimisation SurfaceLine)
-   * Utilisationde la `surfaceLine` [`world.mjs :: SurfaceLineManager`] : pour chaque coordonnée X du monde, la coordonnée Y de la première tuile solide.
-   * Action : Tracé d'un polygone représentant toute la zone "Aérienne" visible à l'écran.
-   * Mode : `destination-out` (Gomme).
-   * Résultat : Toute la zone au-dessus du sol devient transparente, révélant le `SkyRenderer`.
+### 7.1 Système d'Inventaire [`inventory.mjs`]
 
-* **Passe 3 :** Les Trous de Lumière (Punch-holes)
-    * Entrée : Liste des objets émetteurs visibles fournie par le `FurnitureManager`.
-    * Action : Pour chaque source :
-        * Création d'un Gradient Radial (Blanc Opaque au centre -> Transparent en périphérie).
-        * Dessin d'un disque centré sur l'objet.
-        * Mode : `destination-out` (Gomme).
-    * Résultat : Le voile noir est gommé circulairement autour des torches, révélant le décor.
+* Gère : stockage, slots, équipement, artefacts passifs.
+* À la fermeture de l'interface : scan du contenu → émission de `inventory/static-buffs` avec la liste des IDs d'artefacts actifs.
+* L'inventaire **ne calcule pas** les stats.
 
-* **Passe 4 :** La Coloration (Tinting)
-    * Action : Pour chaque source (identique Passe 3) :
-        * Création d'un Gradient Radial (Couleur de la source au centre -> Noir Transparent en périphérie).
-        * Dessin du disque.
-        * Mode : `lighter` (ou screen).
-        * Résultat : Une teinte colorée se superpose aux zones éclairées.
+### 7.2 Système de Buffs [`buff.mjs`]
 
-#### 6.4.3. Optimisations
-Vectoriel vs Raster : L'usage du polygone pour le ciel remplace ~1000 appels de dessin de tuiles par 1 seul appel de dessin vectoriel, gain critique de performance.
+* Centralise tous les bonus/malus (Temporaires, Passifs, Équipement).
+* Pattern **"Re-emitter"** sur `inventory/static-buffs` :
+  * Reçoit la liste d'artefacts → met à jour son état interne → émet des événements granulaires.
+  * *Ex :* `'gps'` reçu → émet `buff/coords` (boolean).
+  * *Ex :* `'clock_lvl2'` reçu → émet `buff/precision` (valeur).
+* **Avantage :** L'UI ignore quels items déclenchent quels buffs. Changer une règle de game design ne touche pas l'UI.
 
-No-Draw Condition : Si la caméra est entièrement dans le ciel (tous les surfaceY > bas_écran), le LightRenderer est désactivé (Canvas clearRect uniquement).
+### 7.3 Interface Environnement [`ui.mjs :: EnvironmentWidget`]
 
-### 6.5 Implémentation**
+* Écoute les événements granulaires du `BuffManager` (`buff/moon`, `buff/weather`, `buff/coords`).
+* **Abonnement dynamique :** le widget ne s'abonne à `player/move` (fréquent) **que si** le buff `buff/coords-display` est actif. Désabonnement immédiat si le buff est perdu.
 
-* **HotbarManager :**
-* **SkyRenderer :** [`render.mjs`] - canvas 'Sky Layer'
-* **WorldRenderer :** [`render.mjs`] - canvas 'Game Layer'
-    * Ne stocke aucune donnée de jeu. Lit exclusivement le `ChunkManager`.
-    * Cache : Utilise un pool d'`OffscreenCanvas` (ou Canvas cachés) par chunk visible.
-    * Purge périodique des images des chunks trop éloignés (environ 12s)
-    * Camera : récupère les informations de la Caméra (les trois listes)
-    * Affichage  [Budget Render] : applique le décalage et le facteur de zoom au canvas, puis y affiche les chunks visibles
-    * Génération des images [Budget MicroTasks] : effectuées par des micro-tâches au niveau des chunks
-* **Camera :** [`render.mjs`] Singleton responsable uniquement des mathématiques de projection (World <-> Screen), du Culling (Quels chunks sont visibles ?) et du zoom.
-    * Fournit trois listes : chunks visibles, chunks dont les images sont prégénérées, chunks dont on garde les images en mémoire pendant la purge
-    * Fournit deux fonctions de conversion (unité = pixel) : `worldToCanvas` et `canvasToWorld`
-    * Zoom de 100% à 200%, paramétrable via eventBus (`'render/set-zoom'`)
-* **LightManager :** [`render.mjs`] - Lumières
-* **ModalBlocker :** [`ui.mjs`] - Voile sombre
-* **EnvironmentWidget :** [`ui.mjs`] - Date, météo, lune...
+---
 
+## 8. Organisation du Projet
 
-### 6.6 Hiérarchie Visuelle et Input (Z-Index Strategy) [`constant.mjs :: OVERLAYS`]
-
-L'ordre d'affichage et de capture des clics est statique, défini par le CSS et respecté par l'``InputManager``.
-
-  * Sky Layer (Z: 0) : Canvas du ciel.
-  * Game Layer (Z: 10) : Canvas du Monde (Personnage, Décors).
-  * Eclairage (Z: 20) : Canvas pour les lumières.
-  * Voile sombre (Z: 30) : Pour indiquer que le jeu est en pause.
-  * Overlays (Z: 40 à 90) :
-    * 40 : Inventaire.
-    * 50 : Craft.
-    * 60 : Aide.
-    * 70 : Carte.
-  * Combat (Z: 100)
-  * Creation (Z: 110)
-  * System Layer (Z: 200) : Dialogues Modaux (Priorité absolue).
-
------
-
-## 7\. Organisation & Déploiement
-
-### 7.1 Structure des fichiers (ES Modules)
-
-L'architecture sépare la logique (UI Logic) du rendu pur (Render) et distingue les types d'interfaces.
+### 8.1 Structure des Fichiers
 
 ```
 /sixty-below
 ├── /assets
 │   ├── /sprites             # Tilesets, Charsets, Icons (PNG)
 │   ├── /sounds              # SFX, Ambiances (MP3/OGG)
-│   └── /data                # Tiles, Items, Recipes, Chests, Tables de loot, Actions de combat
+│   └── /data                # Tiles, Items, Recipes, Loot tables, Actions de combat
 ├── /src
-│   ├── constant.mjs         # CONFIG : Constantes, Enums (State, Biome, ItemType), Bitmasks
-│   ├── assets.mjs           # RESOURCES : Loader (Images/Sons), Parser (Atlas Grid), Resolver (String -> UV Coords)
-│   ├── utils.mjs            # TOOLS : MicroTasker, TaskScheduler, EventBus, TimeManager, Math, Helpers, Random custom, TimeManager
-│   ├── database.mjs         # DRIVER / STORAGE : IDBWrapper (Abstraction bas niveau IndexedDB). Aucune logique métier.
-│   ├── world.mjs            # PHYSICS : ChunkManager (Grid storage), PhysicsSystem (AABB Collisions, Gravity, Velocity), LiquidSimulator
-│   ├── world.mjs            # DATA & PHYSICS : ChunkManager (Uint8Array Grid storage, Dirty Flags), PhysicsSystem (AABB Collisions, Gravity, Velocity), LiquidSimulator.
-│   ├── persistence.mjs      # ORCHESTRATOR : SaveManager. Coordonne la sauvegarde (Player/World/Flore/Faune -> Database).
-├── action.mjs           # GAMEPLAY : ActionManager (Mining, Cutting, Fishing, Foraging...)
-│   ├── player.mjs           # PLAYER : PlayerManager (Déplacement, animation des actions, équipement, caractéristiques), LifeManager
-│   ├── buff.mjs             # BUFFS/DEBUFFS : BuffManager, EffectDefinitions, StatModifiers (Middleware de calcul des bonus/malus), BuffDisplay (dans un Canvas en overlay)
-│   ├── housing.mjs          # HOUSING : FurnitureManager (Placememnt/suppression Furniture/Crafting Station), HousingManager, Buffs
-│   ├── combat.mjs           # TACTICAL : ArenaCreator (procédural - forme, murs et trous), TurnManager, Pathfinding (A* pour le combat), SpellSystem (Portée, DamageCalculator), CombatAI (CombatBehaviors combinables)
-│   ├── ui.mjs               # INTERFACE PANEL/DOM (LOGIQUE) :
-│   │                        # - DOM Managers : PreferencePanel (configuration UI, clavier, souris...)
-│   │                        # - HUD Managers : HotbarManager, EnvironmentWidget (Draw logic)
-│   │                        # - Factories : Don't Repeat Yourself (DRY)
-│   ├── craft.mjs            # InventoryPanel, CraftSystem (SRecettes, validation)
-│   ├── inventory.mjs        # InventoryPanel, InventorySystem (Slots, Stacking, Drag&Drop logic)
-│   ├── help.mjs             # HelpPanel
-│   ├── ui-debug.mjs         # INTERFACE PANEL/DOM uniquement dédiée au debug
-│   ├── render.mjs           # GRAPHICS : WorldRenderer (OffscreenCanvas Cache), Camera (Maths & Culling), SpriteManager (Animations, Batching virtuel).
-│   ├── generate.mjs         # PROC-GEN : Algorithmes de génération (Dynamic Import)
-│   └── core.mjs             # SYSTEM : GameLoop (Update/Render/MicroTask), InputManager (Keyboard/Mouse listeners)
-├── /tests                   # Tests unitaires
-├── index.html               # Entry Point (ES Module Loader) + Canvas Layers + DOM Containers
-└── package.json             # Pour ESLint/Tests uniquement
+│   ├── constant.mjs         # Layer 0 : Config, Enums, Bitmasks
+│   ├── utils.mjs            # Layer 1 : EventBus, MicroTasker, TaskScheduler, TimeManager, seededRNG
+│   ├── database.mjs         # Layer 1 : IDBWrapper
+│   ├── core.mjs             # Layer 2 : GameLoop, InputManager, KeyboardManager
+│   ├── assets.mjs           # Layer 3 : Loader, Parser, Resolver
+│   ├── persistence.mjs      # Layer 3 : SaveManager
+│   ├── world.mjs            # Layer 4 : ChunkManager, PhysicsSystem, LiquidSimulator
+│   ├── render.mjs           # Layer 4 : WorldRenderer, Camera, SkyRenderer, LightRenderer
+│   ├── generate.mjs         # Layer 4 : Proc-Gen (Dynamic Import)
+│   ├── player.mjs           # Layer 4 : PlayerManager, LifeManager
+│   ├── action.mjs           # Layer 4 : ActionManager (Mining, Cutting, Fishing…)
+│   ├── buff.mjs             # Layer 4 : BuffManager, StatModifiers
+│   ├── housing.mjs          # Layer 4 : FurnitureManager, HousingManager
+│   ├── combat.mjs           # Layer 4 : ArenaCreator, TurnManager, SpellSystem, CombatAI
+│   ├── inventory.mjs        # Layer 4 : InventorySystem
+│   ├── craft.mjs            # Layer 4 : CraftSystem
+│   ├── ui.mjs               # Layer 4 : HUD, Panels, Factories
+│   ├── help.mjs             # Layer 4 : HelpPanel
+│   └── ui-debug.mjs         # Layer 4 : Debug UI
+├── /tests
+├── index.html               # Entry Point + Canvas Layers + DOM Containers
+└── package.json             # ESLint + Tests uniquement
 ```
 
-### 7.2 Déploiement (GitHub Pages)
-* Hébergement statique direct depuis la branche main.
-* Pas de build step. Le navigateur charge les modules .mjs.
-* Contrôle Qualité : GitHub Action sur push pour exécuter les tests unitaires.
+### 8.2 Déploiement
 
-__To Do__ : comment implémenter l'aide en ligne et l'encyclopédie (le plus possible automatique, mais avec un peu de lore)
+* GitHub Pages — hébergement statique, branche `main`.
+* Pas de build step. Le navigateur charge les modules `.mjs` nativement.
+* CI : GitHub Action sur push → exécution des tests unitaires.
 
-### 7.2 Tooling
+### 8.3 Tooling
 
-  * **Linter :** Respect de la convention 'Format' de Google :
-      * pas de point virgule à la fin des instructions
+* **Linter :** Google JavaScript Style Guide.
+  * Pas de point-virgule en fin d'instruction.
+  * Champs privés natifs (`#variable`).
+  * `Object.assign()` pour les styles CSS groupés.
 
-## 8. Modules Métier (Layer 2) - Contrats d'interface
+---
 
-Cette couche contient la logique spécifique du jeu. Les modules communiquent le plus possible via l'EventBus (Pattern Pub/Sub) pour garantir un couplage faible.
-
-### 8.1 Système d'Inventaire [`ui.mjs` / `inventory.mjs`]
-* **Responsabilité :** Gérer le stockage, les slots, l'équipement et les artefacts passifs.
-* **Cycle de vie des Buffs Statiques :**
-    * L'inventaire ne calcule pas les stats. Il se contente de scanner son contenu.
-    * À la fermeture de l'interface, il génère une liste d'IDs d'artefacts actifs (ex: `['sextant', 'gps']`).
-    * **Événement émis :** `inventory/static-buffs` avec la liste en payload.
-
-### 8.2 Système de Buffs [`buff.mjs`]
-* **Responsabilité :** Centraliser tous les bonus/malus (Temporaires, Passifs, d'Équipement).
-* **Buffs Statiques : Pattern "Re-emitter" :**
-    1.  S'abonne à `inventory/static-buffs`.
-    2.  Met à jour son état interne (quels artefacts sont présents).
-    3.  Émet des événements granulaires pour les consommateurs finaux (UI, Player).
-        * *Exemple :* Réception de `'gps'` -> Émission de `buff/coords` (boolean).
-        * *Exemple :* Réception de `'clock_lvl2'` -> Émission de `buff/precision` (valeur).
-* **Avantage :** L'UI ne sait pas qu'il faut un "Sextant" pour voir la météo, elle sait juste qu'elle a reçu le signal `buff/weather-forecast`. Cela permet de changer les règles de Game Design (ex: changer l'item requis) sans toucher à l'UI.
-
-### 8.3 Interface Environnement [`ui.mjs`]
-* **Abonnement :** Écoute les événements granulaires du `BuffManager` (`buff/moon`, `buff/weather`, `buff/coords`).
-* **Optimisation dynamique :**
-    * Pour les coordonnées (mise à jour fréquente), l'UI [`EnvironmentWidget`] ne s'abonne à l'événement `player/move` **QUE** si le buff `buff/coords-display` est actif.
-    * Si le buff est perdu, l'UI se désabonne immédiatement de `player/move` pour économiser le CPU.
-
-## 9. Le monde (composition / génération)
-
-Le monde est grossièrement divisé verticalement en quatre biomes et horizontalement en 4 couches (Layers).
-Le monde fait 1024 tuiles de large et 512 tuiles de haut. Ce qui correspond à 64 chunks de large et 32 chunks de haut.
-
-### 9.1 Biomes - Découpage horizontal
-
-* **Sea :** de chaque côté du monde. Sa largeur fait 3 chunks d'un côté et 4 chunks de l'autre côté (aléatoire).
-* **Forêt :** le biome le plus facile. Il y a une zone de Forêt au centre du monde, là où le joueur se trouve au départ.
-* **Désert :** le biome intermédiaire.
-* **Jungle :** le biome le plus difficile.
-
-Les biomes s'étalent sur 3 à 6 chunks. Leur taille et leur position est aléatoire. Le biome central a une taille de 6 à 8 chunks.
-
-### 9.2 Les couches - Découpage vertical (Layers)
-
-* **Ciel (SKY) :** les trois chunks du haut, qui ne contiennent aucune tuile solide.
-* **Surface :** Le quatrième, cinquième et sixième chunk. Ligne de surface découpée. Présence de lac (oadis dans le désert).
-* **Sous-sol (Underground) :** Traversé par des couloirs horizontaux et des galeries obliques (8 à 10 chunks de haut).
-* **Cavernes :** En plus des couloirs et galeries, de vastes zones dégagées offrent des mini-biotopes (Mushroom, Hive...)
-
-La surface de la mer se trouve en Y=56 tiles.
-
-### 9.3 Frontières
-
-Le monde est limité par des tuiles inamovibles sur son périmètre :
-* **Fog :** en haut et sur les deux côtés jusqu'à la tuile de Y=55 (analogue à du SKY).
-* **Deep Sea :** de chaque côtés, à partir de la tuile 56 jusqu'à la fin de l'underground  (analogue à de la SEA).
-* **Basalt :** de chaque côtés, sur toute la hauteur de la 'Cavern Layer' (roche infiniment dure).
-* **Lava :** La dernière rangée de tuiles et peut s'étendre jusqu'à trois tuiles de haut.
-
-### 9.4 Le Substrat
-
-Il s'agit des tuiles solides, relativement inertes, qui supporte le monde/ Il y en a cinq types :
-* **CLAY :** Majoritairement dans le biome Forêt, couche de surface
-* **SANDSTONE :** Majoritairement dans le biome désert, couche de surface
-* **MUD :** Majoritairement dans le biome Jungle, couche de surface
-* **STONE :** Majoritairement dans la couche 'Underground'
-* **SHALE :** Majoritairement dans la couche 'Caverns'
-
-### 9.5 Le Topsoil
-
-Il s'agit d'une couche peu épaisse propice au développement de la flore :
-* **DIRT :** dans le biome Forêt.
-* **SAND :** dans le biome désert.
-* **SILT :** dans le biome Jungle.
-* **HUMUS :** dans la couche 'Underground'
-* **ASH :** dans la couche 'Caverns'
-
-### 9.6 Diffusion
-
-Les limites entre les différents biomes et les différentrs couches n'est pas brutale. Leur aspect naturel est généré en utilisant :
-* **Perlin Noise :** permet d'obtenir une ondulation de la frontière, avec un aspect organique dû au bruit de Perlin.
-* **Diffusion :** simule des échanges de matières entre deux zones contiguës. Des taches de `substrat` et de `topsoil` d'une zone sont placés dans la zone limitrophe. La taille de ces taches diminuent avec la distance, de même que leur probabilité d'apparition.
-
-### 9.7 Les liquides
-
-* **SEA :** Eau dans le biome 'Sea' avec sa version bloquée 'DEEP SEA'.
-* **WATER :** Eau partout dans le monde.
-* **SAND :** Dans le désert, s'écoule en formant des tas.
-* **HONEY :** Dans le mini-biome Ruche (Hive).
-* **SAP :** Dans le mini-bionme [A définir].
-
-### 9.8 Les métaux
-
-#### 9.8.1 Minerais (Ores)
-
-Les métaux se trouvent dans le monde sous forme d'amas de minerais (tuiles reliées par leur côté). Ils s'extraient avec une pioche suffisamment solide.
-* **Copper Ore - Tier 1 :** Commun en surface, rare en 'Underground', très rare en 'Caverns'.
-* **Iron Ore - Tier 2 :** Rare en surface, commun en 'Underground', rare en 'Caverns'.
-* **Silver Ore - Tier 3 :** Absent en surface, rare en 'Underground', très rare en 'Caverns'.
-* **Gold Ore - Tier 3 :** Absent en surface, rare en 'Underground', très rare en 'Caverns'.
-* **Platinum Ore - Tier 4 :** Absent en surface, très rare en 'Underground' biome Forêt, commun en 'Caverns' biomes Forêt et Jungle.
-* **Cobalt Ore - Tier 4 :** Absent en surface, très rare en 'Underground' biome Desert, commun en 'Caverns' biomes Desert et Jungle.
-* **Titanum Ore - Tier 5 :** Absent en surface, absent en 'Underground', rare en 'Caverns'.
-* **Siderite Ore - Tier 5 :** Tombe rarement en surface sous la forme d'une météorite.
-
-#### 9.8.2 Lingots (Lingots)
-
-Les minerais sont transformés en lingot auprès d'une Crafting Station ('Furnace' pour tier 1-4 et '???' pour tier 5 et 6) :
-* **Copper - Tier 1 :** A partir des 'Copper Ores'.
-* **Iron - Tier 2 :** A partir des 'Iron Ores'.
-* **Silver  - Tier 3 :** A partir des 'Silver Ores'.
-* **Gold  - Tier 3 :** A partir des 'Gold Ores'.
-* **Platinum  - Tier 4 :** A partir des 'Platinum Ores'.
-* **Cobalt  - Tier 4 :** A partir des 'Cobalt Ores'.
-* **Titanum  - Tier 5 :** A partir des 'Titanum Ores'.
-* **Siderite  - Tier 5 :** A partir des 'Siderite Ores'.
-
-
-#### 9.8.3 Alliages (Alloys)
-
-Les alliages sont constitués de plusieurs métaux fondus entre eux dans des proportions très précises. Ils peuvent aussi incorporer d'autres éléments :
-* **Coal** : Obtenu à partir de 'Oak Logs' près d'une Crafting Station 'Campfire' ou en minant une 'Coal Vein'. Une 'Coal Vein' est un chemin vide d'une case de diamètre dont le toit est constitué par des tuiles de 'Coal'.
-* **Sand** : Obtenu en minant les tuiles de 'SAND' présentes principalement dans le désert et sur les plages. Fondu dans un 'Furnace', il donne du 'Glass' (tier-1) utilisé pour de nombreux récipients ('containers').
-* **Clay** : Obtenu en minant les tuiles de 'CLAY' présentes principalement en surface, dans la forêt. Fondu dans un 'Furnace', il donne du 'Glass' (tier-1) utilisé pour de nombreux récipients ('containers').
-
-Les alliages combinent des métaux auprès d'une Crafting Station ('Crucible' pour tier 1-4 et 'Smelter' pour tier 5 et 6) :
-* **Steel  - Tier 2 :** [armes] 'Iron' + 'Coal'.
-* **Bronze - Tier 2 :**  [armures] 'Copper' + 'Iron'.
-* **Brass - Tier 2 :** [accessoires] 'Copper' + 'Coal'.
-* **Crystal - Tier 2 :** [récipients] 'Copper' + 'Sand'.
-
-* **Pyrite - Tier 3 :**  [armes] 'Iron' + 'Gold'.
-* **Sterling - Tier 3 :**  [armures] 'Copper' + 'Silver'.
-* **Vermeil - Tier 3 :**  [accessoires] 'Silver' + 'Gold'.
-* **Terracotta - Tier 3 :** [récipients] 'Iron' + 'Clay'.
-
-* **Magnite - Tier 4 :**  [armes] 'Iron' + 'Cobalt'.
-* **Plasteel - Tier 4 :**  [armures] 'Iron' + 'Platinum'.
-* **Celestium - Tier 4 :**  [accessoires] 'Platinum' + 'Cobalt'.
-* **Ceramic - Tier 4 :** [récipients] 'Sand' + 'Cobalt'.
-
-* **Chromis - Tier 5 :**  [armes] 'Platinum' + 'Titanum'.
-* **Solarium - Tier 5 :**  [armures] 'Gold' + 'Siderite'.
-* **Nebulis - Tier 5 :**  [accessoires] 'Titanum' + 'Siderite'.
-* **Silicate - Tier 5 :**  [récipients] 'Platinum' + 'Sand'.
-
-### 9.9 Les gemmes
-
-Les gemmes se trouvent dans des amas plus petits que les 'Ores'. Il y en a quatre :
-* **Ruby - Tier 2 :** Couche 'Underground', tous les biomes.
-* **Emerald - Tier 3 :** Couche 'Caverns', Forêt.
-* **Topas - Tier 4 :** Couche 'Caverns', Désert.
-* **Sapphire - Tier 5 :** Couche 'Caverns', Jungle.
-
-Elles sont abondamment utilisées dans les armes, les armures et les accessoires.
-
-### 9.9 Les arbres
-
-* Oak => Oak Log => Coal (métalurgie)
-* Mahogany => Mahogany Log => ??? (stabilisateur de potion)
-* PalmTree => Fibre (armure, accessoire)
-
-
-### 9.10 Nettoyage final
-
-La dernière étape de la création du monde consiste en un
+*TODO : définir l'implémentation de l'aide en ligne et de l'encyclopédie (automatique + lore).*

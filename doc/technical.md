@@ -1,262 +1,379 @@
-# TECHNICAL REFERENCE
+# TECHNICAL REFERENCE — Sixty-Below
 
-Ce document liste les interfaces publiques (API) des modules implémentés. À fournir à l'IA pour qu'elle utilise correctement les fonctions existantes.
+> Ce document décrit le *comment* : architecture du kernel, budgets, algorithmes, API publique des modules.
+> Pour la vision, les mécaniques et le gameplay → voir `DESIGN.md`.
+> Ce document est la référence fournie à l'IA pour qu'elle utilise correctement les fonctions existantes
+> et respecte les contraintes de performance.
 
-## constant.mjs (layer 0)
+---
 
-* FPS, TILE_SIZE, CHUNK_SIZE, WORLD_WIDTH, WORLD_HEIGHT
-* NODES: Object { CLAY: {code...}, ... }
-* NODES_LOOKUP: Array[NodeObject]
-* TILE_TYPE, TILE_FLAG
+## 0. Contraintes de Performance (Critiques — Budget 16 ms)
 
-### Usage Patterns (Standard)
+* **Zéro allocation mémoire (GC) dans les boucles `update` et `render`.**
+* Opérations bitwise et TypedArrays en priorité.
+* Interdit dans les hot paths : `map`, `filter`, `forEach` → utiliser `for` ou `for…of`.
+* Interdit : chaînes de caractères comme clés dans les boucles critiques.
+* Tout listener EventBus dépassant **0,1 ms** doit déléguer au `MicroTasker`.
 
-**1. Récupérer l'ID numérique** (Pour écriture)
-*Utilisé pour définir une tuile dans la grille (TypedArray).*
+---
+
+## 1. Kernel
+
+Le Kernel est l'ensemble des modules sans dépendance métier. Il peut être testé en isolation totale.
+**Règle :** aucun module métier (Layer 4+) ne doit importer depuis le kernel en sens inverse.
+
+### 1.1 Couches du Kernel
+
+```
+Layer 0 — constant.mjs    Zéro dépendance. Chargé par tous les modules.
+Layer 1 — utils.mjs       Dépend de Layer 0 uniquement.
+           database.mjs   Dépend de Layer 0 uniquement.
+Layer 2 — core.mjs        Dépend de Layer 0 + Layer 1.
+```
+
+---
+
+## 2. `constant.mjs` (Layer 0)
+
+Aucune dépendance externe autorisée.
+
+### Exports
+
+| Constante | Type | Valeur | Description |
+|---|---|---|---|
+| `FPS` | number | 60 | Fréquence cible |
+| `FRAME_DURATION` | number | ~16,66 ms | Durée d'une frame |
+| `TIME_BUDGET` | object | — | Budgets par phase (voir ci-dessous) |
+| `STATE` | enum | 0–3 | États de la state machine |
+| `OVERLAYS` | object | — | Définition des calques (state + zIndex) |
+| `UI_LAYOUT` | object | — | Z-index des widgets HUD |
+| `WORLD_WIDTH` | number | 1024 | Largeur monde en tuiles |
+| `WORLD_HEIGHT` | number | 512 | Hauteur monde en tuiles |
+| `CANVAS_WIDTH` | number | 1024 | Largeur canvas en px |
+| `CANVAS_HEIGHT` | number | 768 | Hauteur canvas en px |
+| `SEA_LEVEL` | number | 56 | Niveau de la mer en tuiles |
+| `WORLD_WIDTH_SHIFT` | number | 11 | `2^11 = 1024` — shift pour index ligne |
+| `CHUNK_SHIFT` | number | 4 | `2^4 = 16` — shift pour coordonnées chunk |
+| `CHUNK_MASK` | number | `0b1111` | Masque position locale dans un chunk |
+| `NODES` | object | — | Définitions des tuiles par nom |
+| `NODES_LOOKUP` | Array | — | Lookup par code numérique |
+| `TILE_TYPE` | enum | — | Types de tuiles |
+| `TILE_FLAG` | bitmask | — | Flags (SOLID, LIQUID…) |
+| `MICROTASK` | object | — | Config priorité/capacité des microtâches |
+| `DB_CONFIG` | object | — | Config IndexedDB (NAME, VERSION, DEBUG) |
+
+### Budgets Temps [`TIME_BUDGET`]
+
+| Phase | Budget | Contenu |
+|---|---|---|
+| `UPDATE` | 3 ms | Physique, déplacement joueur/faune, TimeManager |
+| `RENDER` | 4 ms | Dessin tuiles visibles + entités (`#game-layer`) |
+| `MICROTASK` | 5 ms | Pathfinding, génération, updates UI secondaires |
+| `DOM` | 4 ms | Browser overhead (GC, Event Loop) |
+
+*Total moteur : 12 ms. Les 4 ms DOM sont gérées par le navigateur.*
+
+### Patterns d'Usage — `NODES` / `NODES_LOOKUP`
+
 ```javascript
+// 1. Écriture dans la grille (TypedArray) → code numérique
 import { NODES } from './constant.mjs'
 const tileCode = NODES.CLAY.code
-// usage: chunk.data[index] = tileCode
-```
+chunk.data[index] = tileCode
 
-**2. Récupérer l'objet complet par son Nom** (Pour UI / Logique) Utilisé quand on manipule le type de manière abstraite (ex: Inventaire).
-
-```javascript
-import { NODES } from './constant.mjs'
+// 2. Manipulation abstraite (Inventaire, UI) → objet complet par nom
 const tileDesc = NODES.CLAY
-```
 
-**3. Récupérer l'objet complet par son ID** (Pour Rendu / Physique) Utilisé dans les boucles critiques (Hot path) à partir d'une valeur lue dans la grille.
-
-```javascript
-import { NODES_LOOKUP } from './constant.mjs'
+// 3. Lecture dans une boucle critique (Hot Path) → lookup par code
+import { NODES_LOOKUP, TILE_FLAG } from './constant.mjs'
 const tileDesc = NODES_LOOKUP[tileCode]
-// usage: if (tileDesc.flags & TILE_FLAG.SOLID) .
+if (tileDesc.flags & TILE_FLAG.SOLID) { … }
 ```
 
-## assets.mjs (layer 1)
+---
 
-* loadAssets(): Promise<void>
-* resolveAssetData(codeStr): {imgId, sx, sy, sw, sh, isAutoTile}
-* IMAGE_FILES: Array[String]
+## 3. `utils.mjs` (Layer 1)
 
-## utils.mjs (layer 1)
+### Class `EventBus` (Singleton : `eventBus`)
 
-### Class EventBus (Singleton: eventBus)
+| Méthode | Signature | Description |
+|---|---|---|
+| `on` | `(event: string, cb: function): void` | Abonnement |
+| `off` | `(event: string, cb: function): void` | Désabonnement |
+| `emit` | `(event: string, data: any): void` | Publication |
 
-* `on(event: string, callback: function): void`
-* `off(event: string, callback: function): void`
-* `emit(event: string, data: any): void`
+**Règle :** appel direct des callbacks (pas de queue). Si le listener dépasse 0,1 ms → déléguer au `MicroTasker`.
 
-### Class `MicroTasker` (Singleton: `microTasker`)
+---
 
-* `init(): void` - Vide la file d'attente et les stats.
-* `initDebug(mapping: object): void`
-* `enqueue(fn: function, priority: int, capacityUnits: int, ...args: any): void`
-* `enqueueOnce(fn: function, priority: int, capacityUnits: int, ...args: any): void`
-* `clear(): void`
-* `queueSize`: number (getter)
-* `resetStats(): void`
-* `debugStats(): string`
-* `update(budgetMs: number): void` (appel uniquememnt par `gameCore`)
+### Class `MicroTasker` (Singleton : `microTasker`)
 
-#### Usage Pattern (Standard)
+Exécute des tâches fractionnées dans le temps résiduel de la frame.
 
+| Méthode/Getter | Signature | Description |
+|---|---|---|
+| `init` | `(): void` | Vide la file et les stats |
+| `initDebug` | `(mapping: object): void` | — |
+| `enqueue` | `(fn, priority, capacityUnits, ...args): void` | Enfile une tâche répétable |
+| `enqueueOnce` | `(fn, priority, capacityUnits, ...args): void` | Enfile une tâche unique |
+| `clear` | `(): void` | Vide la file |
+| `update` | `(budgetMs: number): void` | Appelé **uniquement** par `GameCore` |
+| `queueSize` | `number` (getter) | Taille de la file |
+| `resetStats` | `(): void` | — |
+| `debugStats` | `(): string` | — |
+
+**Pattern d'usage obligatoire :**
 ```javascript
-import {MICROTASK} from './constant.mjs'
-import {microTasker} from './utils.mjs'
+import { MICROTASK } from './constant.mjs'
+import { microTasker } from './utils.mjs'
 
-// 1. Récupération de la configuration depuis les constantes : **Obligatoire**
-const {priority, capacity} = MICROTASK.SYSTEM_ACTION_NAME
+// 1. Config depuis les constantes (obligatoire)
+const { priority, capacity } = MICROTASK.SYSTEM_ACTION_NAME
 
-// 2. Enregistrement de la tâche
-// capacity correspond à 'capacityUnits' (1 unit = 0.25ms)
-// fonctions anonymes interdites, this.myMethod doit avoir été bindée à this
+// 2. Enregistrement — les fonctions anonymes sont interdites
+//    this.myMethod doit être bindée à this au préalable
 microTasker.enqueue(this.myMethod, priority, capacity, arg1, arg2)
 ```
 
-### Class `TaskScheduler` (Singleton: `taskScheduler`)
-* `init(time: number): void` - Vide la file et initialise le temps de référence.
-* `enqueue(id: string, delay: number, fn: function, priority: int, cap: int, ...args): number`
-* `requeue(id: string, delay: number, fn: function, priority: int, cap: int, ...args): number`
-* `extendTask(id: string, delay: number, fn: function, priority: int, cap: int, ...args): number`
-* `enqueueAbsolute(id: string, time: number, fn: function, priority: int, cap: int, ...args): number`
-* `enqueueOnce(id: string, delay: number, fn: function, priority: int, cap: int, ...args): number`
-* `enqueueAfter(idOrRegex: string|RegExp, newId: string, delay: number, fn: function, priority: int, cap: int, ...args): number`
-* `dequeue(idOrRegex: string|RegExp): void`
-* `has(idOrRegex: string|RegExp): boolean`
-* `findFirstTarget(idOrRegex: string|RegExp): Task|undefined`
-* `findAction(idOrRegex: string|RegExp, params?: Array): Task|undefined`
-* `clear(): void`
-* `queueSize: number` (getter)
-* `update(currentTime: number): void` (appel uniquememnt par `gameCore`)
+*`capacity` : 1 unité = 0,25 ms de budget alloué.*
 
-### Usage Patterns (Standard)
+---
 
-L'utilisation de `MICROTASK` est **obligatoire**.
+### Class `TaskScheduler` (Singleton : `taskScheduler`)
 
-**1. Tâche différée simple** (Ex: Fin de cooldown)
+Gère les tâches longues inter-frames (ex : sauvegarde auto toutes les 2 s, craft long).
+Tableau trié par timestamp d'exécution, recherche dichotomique, suppression lazy (flag `deleted`).
 
+| Méthode | Signature | Description |
+|---|---|---|
+| `init` | `(time: number): void` | Vide la file, initialise le temps de référence |
+| `enqueue` | `(id, delayMs, fn, priority, capacity): void` | Planifie une tâche |
+| `update` | `(currentTime: number): void` | Appelé **uniquement** par `GameCore` |
+
+---
+
+### Class `TimeManager` (Singleton : `timeManager`)
+
+| Méthode | Signature | Description |
+|---|---|---|
+| `init` | `(timestamp, weather, nextWeather): void` | Initialise depuis le gamestate |
+| `update` | `(dt: number): void` | Avance le temps monde |
+
+Émet `time/sky-color-changed` quand la couleur du ciel doit changer.
+
+---
+
+### `seededRNG`
+
+Générateur pseudo-aléatoire déterministe. Utilisé pour la génération procédurale reproductible.
+
+| Méthode | Description |
+|---|---|
+| `randomPerlinScaled(x, seed, amplitude, frequency)` | Bruit de Perlin mis à l'échelle |
+
+---
+
+## 4. `database.mjs` (Layer 1)
+
+Wrapper IndexedDB bas niveau. **Aucune connaissance du domaine métier.**
+Proxy universel : toutes les opérations d'une session transitent par cette classe.
+
+### Class `DataBase` (Singleton : `database`)
+
+| Méthode | Signature | Description |
+|---|---|---|
+| `init` | `(): Promise<void>` | Ouverture DB + demande de persistance. Appelé par `GameCore.boot()`. |
+| `setGameState` | `(key, value, tx?): Promise` | Écrit un K/V dans `gamestate` |
+| `getGameStateValue` | `(key): Promise<any>` | Lit une valeur (déconseillé en runtime) |
+| `getAllGameState` | `(): Promise<object>` | Lit tout le gamestate → `{key: value, …}` |
+| `batchSetGameState` | `(updates: Array<{key,value}>): Promise` | Écriture multiple en une transaction |
+| `addOrUpdateRecord` | `(storeName, record, tx?): Promise` | Upsert générique |
+| `getRecordByKey` | `(storeName, key): Promise` | Lecture par clé primaire |
+| `readAllFromObjectStore` | `(storeName): Promise<Array>` | Lecture complète d'un store |
+| `addMultipleRecords` | `(storeName, items): Promise` | Insertion en masse |
+| `clearObjectStore` | `(storeName): Promise` | Vide un store |
+| `clearAllObjectStores` | `(): Promise` | Reset complet (nouveau monde) |
+| `openTransaction` | `(storeName, mode): IDBTransaction` | Transaction manuelle |
+| `batchUpdate` | `(operations): Promise` | Lot d'opérations mixtes en une transaction |
+| `backupDatabase` | `(): Promise` | Export JSON (debug) |
+| `restoreDatabase` | `(file): Promise` | Import JSON (debug) |
+
+---
+
+## 5. `core.mjs` (Layer 2)
+
+### Class `GameCore` (Singleton : `gameCore`)
+
+Point d'entrée unique du moteur.
+
+| Méthode | Signature | Description |
+|---|---|---|
+| `boot` | `(): Promise<void>` | Phase technique one-time : assets, DB, hydratation, DOM |
+| `startSession` | `(): Promise<void>` | Lance une partie (nouveau monde ou chargement) |
+| `consumeDebugTrigger` | `(): boolean` | Lecture unique du flag debug (touche `²`) |
+
+**Cycle de `boot()` :**
+1. `loadAssets()` (bloquant)
+2. `database.init()`
+3. Hydratation des données statiques (nodes, items)
+4. `mouseManager.init()`
+
+**Cycle de `startSession()` :**
+1. `database.getAllGameState()` → chargement en une requête
+2. Injection dans chaque Manager : `timeManager.init(…)`, `playerManager.init(…)`…
+3. Chargement des chunks
+4. Démarrage de la game loop
+
+---
+
+### Class `InputManager` / `KeyboardManager` (dans `core.mjs`)
+
+`KeyboardManager` est l'**autorité de l'état du jeu** via une pile d'overlays (`#overlayStack`).
+
+**Signals d'input :**
+* `directions` : bitmask lu en polling à chaque frame (mouvement).
+* `EventBus` : actions one-shot (overlay, slot, action…).
+
+**Routing hiérarchique :** Combat > Creation > Aide > Craft > Inventory > Exploration.
+
+**Ouverture/Fermeture d'overlay :**
+* Un overlay ne peut s'ouvrir que si son `zIndex` est ≥ celui du sommet de la pile.
+* Toggle : si l'overlay est déjà au sommet → fermeture.
+
+---
+
+## 6. `assets.mjs` (Layer 3)
+
+| Export | Signature | Description |
+|---|---|---|
+| `loadAssets` | `(): Promise<void>` | Charge toutes les images/sons |
+| `resolveAssetData` | `(codeStr): {imgId, sx, sy, sw, sh, isAutoTile}` | Résout une string image en UV pré-calculées |
+| `IMAGE_FILES` | `Array<string>` | Liste des fichiers image |
+
+**Zero-Cost Runtime :** les coordonnées de texture sont calculées **une seule fois** au boot via `resolveAssetData`. Le renderer accède à des entiers, jamais à des strings ni des calculs de grille pendant la frame.
+
+---
+
+## 7. `world.mjs` (Layer 4)
+
+### Class `ChunkManager` (Singleton : `chunkManager`)
+
+Maître unique de la donnée monde. Le renderer et la persistence **ne font que lire/consommer**.
+
+| Méthode | Signature | Description |
+|---|---|---|
+| `init` | `(savedChunks: Array): void` | Hydrate le buffer depuis la DB. Lève une erreur si count ≠ 2048. |
+| `getTile` | `(x, y): number` | Hot path. Pas de bounds checking (Ghost Cells). |
+| `setTile` | `(x, y, code): void` | Écriture avec dirty flags (render + save). |
+| `setGenTile` | `(x, y, code): void` | Écriture rapide sans dirty flags — **génération uniquement**. |
+| `getChunkData` | `(chunkIndex): Uint8Array` | Retourne une copie des 256 octets du chunk. |
+| `getChunkSaveData` | `(chunkIndex): {key, index, chunk}` | DTO pour la persistence. |
+| `consumeRenderDirtyChunks` | `(): Set<number> \| null` | Clone + vide la liste render dirty. Appelé par le Renderer. |
+| `consumeSaveDirty` | `(): Set<number> \| null` | Clone + vide la liste save dirty. Appelé par SaveManager. |
+| `processWorldToChunks` | `(): Array<{key, chunk}>` | Conversion complète monde → chunks. Fin de génération uniquement. |
+| `getRawData` | `(): Uint8Array` | Accès direct au buffer (init/génération). |
+
+**Adressage :**
 ```javascript
-import { MICROTASK } from './constant.mjs'
-import { taskScheduler } from './utils.mjs'
-
-const {priority, capacity} = MICROTASK.SPELL_COOLDOWN
-// "fireball_cd" est l'ID unique. 500ms est le délai.
-taskScheduler.enqueue('fireball_cd', 500, this.resetCooldown, priority, capacity, 'fireball')
+const index = (y << 10) | x          // Index mondial → tuile
+const chunkKey = (cy << 6) | cx      // Index chunk (64 chunks de large)
+const cx = chunkIndex & 0x3F         // Décodage X chunk
+const cy = chunkIndex >> 6           // Décodage Y chunk
 ```
 
-**2. Debounce / Extension** (Ex: Régénération de vie après dernier dégât) Si le joueur reprend des dégâts, on repousse le début de la régénération.
+---
 
-```javascript
-// Si une tâche "regen_start" existe, son délai est repoussé de 3000ms à partir de maintenant.
-// Sinon, elle est créée.
-const { priority, capacity } = MICROTASK.START_REGEN
-taskScheduler.extendTask('regen_start', 3000, this.startRegen, priority, capacity)
-```
+## 8. `render.mjs` (Layer 4)
 
-**3. Chaînage d'actions** (Ex: Animation de mort puis Drop de loot) Lance le drop 200ms APRÈS la fin de la tâche 'monster_death_anim'.
+### Class `Camera` (Singleton : `camera`)
 
-```javascript
-taskScheduler.enqueueAfter(
-    'monster_death_anim', // ID cible (ou Regex)
-    'monster_loot_drop',  // Nouvel ID
-    200,                  // Délai après la cible
-    this.dropLoot,
-    priority, capacity,
-    lootData
-)
-```
+Responsable uniquement des mathématiques de projection et du culling.
 
-### Class `SeededRNG` (Singleton: `seededRNG`)
+| Méthode/Propriété | Description |
+|---|---|
+| `worldToCanvas(wx, wy)` | Conversion pixel monde → pixel canvas |
+| `canvasToWorld(cx, cy)` | Conversion pixel canvas → pixel monde |
+| `displayChunks` | `Array` — chunks visibles (cible du render) |
+| `preloadChunks` | `Set` — chunks en bordure (cible du cache) |
+| `unpurgeableChunks` | `Set` — chunks à garder en RAM pendant la purge |
+| `setZoom` | Écoute `render/set-zoom` (EventBus). Zoom 100%–200%. |
+| `logicalWidth` / `logicalHeight` | Dimensions logiques = `VIEWPORT / zoom` |
 
-* `init(seed?: string|number): void`
-* `randomGet(): number`
-* `randomGetBool(): boolean` (Retourne true/false à 50%/50%)
-* `randomInteger(a?: any, b?: number): number|any` (Polyvalent: Range, Array, MinMax)
-* `randomReal(a?: any, b?: number): number`
-* `randomGetMax(max: number): number`
-* `randomGetMinMax(min: number, max: number): number`
-* `randomGetArrayValue(arr: Array): any`
-* `randomGetArrayIndex(arr: Array): int`
-* `randomGetArrayWeighted(arr: Array<{weight}>): int` (Retourne l'index)
-* `randomGaussian(mean?: number, sd?: number): number`
-* `randomLinear(): number`
-* `randomPerlinInit()` : Vide le cache des gradients de bruit.
-* `randomPerlinOctave(octaves)` : Définit les couches de bruit (ex: `[{scale: 1, amplitude: 1}]`).
-* `randomPerlin(x, y)` : Retourne une valeur de bruit cohérente entre 0 et 1.
-* `randomPerlinScaled(x, y, period, amplitude)` : Retourne une valeur de bruit entre -amplitude et +amplitude, avec une période de 'period' tuiles.
+---
 
-### Math Utils
-* `intFract(number)` : Retourne `{int, fract}`.
-* `cosineInterpolation(x, a, b)` : Interpolation non-linéaire entre a et b.
+### Class `WorldRenderer` (Singleton : `worldRenderer`)
 
-## database.mjs (layer 1)
+Ne stocke aucune donnée de jeu. Lit exclusivement `ChunkManager`.
 
-### Class `Database` (Singleton: `database`)
+* **Cache :** Pool d'`OffscreenCanvas` par chunk visible.
+* **Purge :** Suppression des images de chunks trop éloignés (~12 s).
+* **Budget Render :** Applique décalage + zoom, affiche les chunks visibles.
+* **Budget MicroTask :** Génération des images de chunk (micro-tâches).
 
-* `init(): Promise<void>`
-* `clearAllObjectStores(): Promise<void>`
-* `clearObjectStore(storeName: string): Promise<void>`
-* `hasObjetStore(storeName: string): boolean`
-* `countRecords(storeName: string): integer`
-* `getRecordByKey(store, key): Promise<any>`
-* `readAllFromObjectStore(storeName: string): Promise<Array>`
-* `openTransaction(storeNames: string | string[], mode?: string): IDBTransaction`
-* `addOrUpdateRecord (storeName, record, existingTransaction?): Promise<void>`
-* `addOrUpdateOrDeleteRecords(storeName: string, records: Array, transaction?: IDBTransaction): Promise<Array>`
-* `addMultipleRecords(storeName: string, records: Array): Promise<Array>`
-* `batchUpdate(updates: Array<{storeName, record?, delete?, records?}>): Promise<Array>`
-* `deleteRecord(storeName: string, key: any, transaction?: IDBTransaction): Promise<void>`
-* `deleteMultipleRecords(storeName: string, keys: Array): Promise<void>`
-* `getAllGameState(): Promise<any>` - Retourne un objet fusionné (Map clé/valeur)
-* `setGameState(key: string, value, transaction?): Promise`
-* `batchSetGameState(updates: Array): Promise<any>`- Format updates: `{key, value}`
-* `getGameStateValue(key: string): Promise<any>`
-* `backupDatabase(): Promise<void>` - Télécharge un JSON complet.
-* `restoreDatabase(file: File): Promise<void>` - Écrase et remplace la DB depuis un fichier.
+---
 
-### Class `UniqueIdGenerator` (Singleton: `uniqueIdGenerator`)
+### Class `SkyRenderer` (Singleton : `skyRenderer`)
 
-Génère des IDs logiques alphabétiques uniques (ex: `aab`, `aac`).
-* `init(lastSavedSeed?: string): void` : À appeler au démarrage avec la valeur stockée en DB (sans paramètre avant la création d'un nouveau monde).
-* `getUniqueId(): string` : Retourne un ID unique
+Canvas opaque (`alpha: false`). Écoute `time/sky-color-changed` → `fillRect` plein.
 
-## core.mjs (layer 3)
+| Méthode | Signature | Description |
+|---|---|---|
+| `updateSkyColor` | `(color: string): void` | Remplit le canvas avec la couleur hex/rgb |
 
-### Class GameCore (Singleton: gameCore)
+---
 
-* `boot(): Promise<void> (Technical init)`
-* `startSession(): Promise<void> (Game start)`
-* `loop(timestamp): void`
+### Class `LightRenderer` (Singleton : `lightRenderer`)
 
+#### Algorithme "Surface & Punch" — 4 passes
 
+| Passe | Mode | Action | Résultat |
+|---|---|---|---|
+| 1 — Reset | `source-over` | `fillRect` noir total | Monde invisible |
+| 2 — Découpe Ciel | `destination-out` | Polygone zone aérienne via `surfaceLine` | Zone au-dessus du sol transparente |
+| 3 — Punch-holes | `destination-out` | Gradient radial (blanc → transparent) par source lumineuse | Halos de lumière |
+| 4 — Coloration | `lighter` | Gradient radial (couleur source → noir transparent) par source | Teinte colorée sur les halos |
 
-## EventBus Contracts (API)
+**Sources lumineuses :** fournies par `FurnitureManager` (liste des objets visibles).
+**`surfaceLine` :** fournie par `world.mjs :: SurfaceLineManager` — pour chaque X du monde, Y de la première tuile solide.
 
-Cette section définit les événements officiels. Tout nouvel événement doit être enregistré ici avant implémentation.
+**Optimisation :** 1 polygone vectoriel pour le ciel remplace ~1000 appels de dessin de tuiles.
+**No-Draw Condition :** Si caméra entièrement dans le ciel → `clearRect` uniquement, LightRenderer inactif.
 
-### Time & Environment (`TimeManager`)
-| Event Name | Payload Structure | Description |
-| :--- | :--- | :--- |
-| `time/clock` | `{ day, hour, minute }` | Émis chaque minute-jeu. |
-| `time/every-5-minutes` | `{ day, hour, minute }` | Émis toutes les 5 minutes-jeu. |
-| `time/every-hour` | `{ day, hour, minute, isDay }` | Émis à chaque changement d'heure. |
-| `time/timeslot` | `{ tslot, isDay }` | Émis toutes les 3h (changement de slot). |
-| `time/daily` | `{ day, weather, nextWeather, moonPhase }` | Émis à minuit (changement de jour). |
-| `time/first-loop` | `{ day, hour, minute, tslot, weather, nextWeather, skyColor, moonPhase, isDay }` | Émis une seule fois au démarrage du rendu. |
-| `time/sky-color-changed`| `string` (Hex Color) | Émis uniquement si la couleur change. |
+---
 
-### Core / State (`InputManager`)
-| Event Name | Payload Structure | Description |
-| :--- | :--- | :--- |
-| `state/changed` | `{ state, oldState }` | Émis lorsque l'`InputManager` change l'état global du jeu (Exploration <-> Information/Combat). |
+## 9. `persistence.mjs` (Layer 3)
 
-### UI / Interface (Common)
-| Event Name | Payload Structure | Description |
-| :--- | :--- | :--- |
-| `overlay/close` | `string` (Overlay ID) | Demande générique de fermeture émise par le bouton 'X' d'un overlay. Traitée par `InputManager`. |
-| `overlay/open-request`| `string` (Overlay ID) | Demande générique d'ouverture d'un overlay. Traitée par `InputManager`. |
+### Class `SaveManager` (Singleton : `saveManager`)
 
-### Inventory (`InventoryManager`, `InventoryOverlay`)
-*En prévision*
-| Event Name | Payload Structure | Description |
-| :--- | :--- | :--- |
-| `inventory/open`| - | Affichage du panel d'inventaire. |
-| `inventory/close`| - | Disparition du panel d'inventaire. |
-| `inventory/static-buffs`| `Array<string>` (List of buffs) | Émis à la fermeture de l'inventaire. |
+Orchestrateur de sauvegarde. Connaît les object stores métier.
 
-### Craft (`CraftOverlay`)
-*En prévision*
-| Event Name | Payload Structure | Description |
-| :--- | :--- | :--- |
-| `craft/open`| - | Affichage du panel d'artisanat. |
-| `craft/close`| - | Disparition du panel d'artisanat. |
+| Méthode | Signature | Description |
+|---|---|---|
+| `init` | `(): void` | Planifie la première sauvegarde auto (2 s via `taskScheduler`) |
+| `queueStaticUpdate` | `(updates: Array\|Object): void` | Empile des updates (inventaire, player…). Dédoublonnage par ID. |
+| `processSave` | `(): void` | Exécuté par `TaskScheduler`. Collecte dirty chunks + updates statiques → `database.batchUpdate`. |
 
-### Help (`HelpOverlay`)
-| Event Name | Payload Structure | Description |
-| :--- | :--- | :--- |
-| `help/open`| - | Affichage du panel d'aide. |
-| `help/close`| - | Disparition du panel d'aide. |
+**Flux :**
+1. Interroge `chunkManager.consumeSaveDirty()`.
+2. Récupère les records des managers (InventoryManager, PlayerManager…) via `pendingStaticUpdates`.
+3. Appelle `database.batchUpdate()` en une transaction (cohérence crash).
+4. Fire & Forget — les managers n'attendent pas la confirmation.
 
-### Combat (`CombatOverlay`)
-| Event Name | Payload Structure | Description |
-| :--- | :--- | :--- |
-| `combat/open`| - | Affichage du panel de combat. |
-| `combat/close`| - | Disparition du panel de combat. |
+---
 
-### Buffs Widget (`BuffManager`)
-*En prévision*
-| Event Name | Payload Structure | Description |
-| :--- | :--- | :--- |
-| `buff/display-next-weather` | `boolean` | Active/Désactive la prévision météo. |
-| `buff/display-coords` | `boolean` | Active/Désactive l'affichage des coordonnées. |
-| `buff/display-time-precision` | `integer` | précision 0 => 1heure, 1 => 15 minutes, 2 => 5 minutes |
-| `buff/display-moon-detail` | `boolean` | affiche 4 (false) ou 8 (true) phases lunaires |
+## 10. `assets.mjs` — Auto-Tiling
 
-### Debug (`WorldMapDebug`, `RealtimeDebugWidget`)
-| Event Name | Payload Structure | Description |
-| :--- | :--- | :--- |
-| `map/open`| - | Affichage de la carte au 1/16e. |
-| `map/close`| - | Disparition de la carte au 1/16e. |
-| `debug/frame-sample`| `{updateTime, renderTime, microTime}` | Temps exécution dans la loop pour les 3 budgets. |
+**Framing :** Bitmasking 4-connectivity calculé à la volée ou au chargement pour les transitions de texture.
+**Diffusion :** Les tuiles ont un bord de 2 px partiellement transparent, peint de la couleur dominante des tuiles adjacentes (`NODES.color`).
+
+---
+
+## 11. Règles de Codage
+
+* Vanilla JS ESNext, modules natifs `.mjs`, pas de bundler.
+* Google JavaScript Style Guide — **pas de point-virgule**.
+* Champs privés natifs (`#variable`).
+* `Object.assign()` pour les styles CSS groupés.
+* `for` ou `for…of` dans les hot paths. Jamais de `map`/`filter`/`forEach`.
+* Singletons exportés en minuscule (`export const chunkManager = new ChunkManager()`).
+* Les fonctions passées à `MicroTasker` doivent être des méthodes bindées — pas de lambdas anonymes.

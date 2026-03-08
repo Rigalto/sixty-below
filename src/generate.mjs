@@ -668,3 +668,8 @@ function runBiomesTest () {
 }
 
 // runBiomesTest()
+
+Canon CLI-526 Cartouche BK Noire
+
+Canon CLI-526 C Ancienne Version
+Canon PGI-525 Cartouche BK Noire
