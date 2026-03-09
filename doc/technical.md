@@ -107,6 +107,8 @@ Un seul fichier centralise toutes les tables pour éviter les dépendances circu
 | `PLANTS`       | object | Index par id string.                                               |
 | `RECIPES`      | object | Index par id string.                                               |
 
+Note : les 'furnitures' sont des items possédant le type 'ITEM_TYPE.FURNITURE'.
+
 ### Conventions d'accès
 
 ```javascript
