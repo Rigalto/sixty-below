@@ -7,17 +7,20 @@ export const _results = []
 
 const _realLog = console.log
 const _realError = console.error
+const _realWarn = console.warn
 let _consoleCaptured = null // null = pas de capture active
 
 export function captureConsole () {
   _consoleCaptured = []
   console.log = (...args) => _consoleCaptured.push(args.join(' '))
   console.error = (...args) => _consoleCaptured.push(args.join(' '))
+  console.warn = (...args) => _consoleCaptured.push(args.join(' '))
 }
 
 export function releaseConsole () {
   console.log = _realLog
   console.error = _realError
+  console.warn = _realWarn
 
   const lines = _consoleCaptured ?? []
   _consoleCaptured = null
