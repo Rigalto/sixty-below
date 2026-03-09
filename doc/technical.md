@@ -155,13 +155,99 @@ Itère sur `NODES_LOOKUP` et `ITEMS`, modifie les objets en place
 
 ### Class `EventBus` (Singleton : `eventBus`)
 
-| Méthode | Signature                        | Description   |
-|---------|----------------------------------|---------------|
-| `on`    | `(event: string, cb: function): void` | Abonnement    |
-| `off`   | `(event: string, cb: function): void` | Désabonnement |
-| `emit`  | `(event: string, data: any): void`    | Publication   |
+| Méthode | Signature | Description |
+|---|---|---|
+| `on` | `(event: string, cb: function): void` | Abonnement |
+| `off` | `(event: string, cb: function): void` | Désabonnement. No-op si cb inconnue. |
+| `emit` | `(event: string, data: any): void` | Publication synchrone. Erreurs isolées par callback. |
+| `debugStats` | `(): string` | Liste tous les listeners actifs. Console + retour string. |
 
-**Règle :** appel direct des callbacks (pas de queue). Si le listener dépasse 0,1 ms → déléguer au `MicroTasker`.
+**Règles critiques :**
+- Appel direct et synchrone des callbacks (pas de queue).
+- Si le listener dépasse 0,1 ms → déléguer au `MicroTasker`.
+- **Interdit : lambdas anonymes** dans `on()` — impossible à `off()` par la suite.
+- Toujours binder le callback avant enregistrement : `this.myHandler = this.myHandler.bind(this)`.
+
+**Pattern d'usage standard :**
+```javascript
+// ✅ Correct — callback nommée et bindée
+this.onOpen = this.onOpen.bind(this)
+eventBus.on('inventory/open', this.onOpen)
+// Plus tard :
+eventBus.off('inventory/open', this.onOpen)
+
+// ❌ Incorrect — impossible à désabonner
+eventBus.on('inventory/open', () => { this.show() })
+```
+
+**Catalogue des événements (exhaustif) :**
+
+Cette section définit les événements officiels. Tout nouvel événement doit être enregistré ici avant implémentation.
+
+#### Time & Environment (`TimeManager`)
+| Event Name | Payload Structure | Description |
+| :--- | :--- | :--- |
+| `time/clock` | `{ day, hour, minute }` | Émis chaque minute-jeu. |
+| `time/every-5-minutes` | `{ day, hour, minute }` | Émis toutes les 5 minutes-jeu. |
+| `time/every-hour` | `{ day, hour, minute, isDay }` | Émis à chaque changement d'heure. |
+| `time/timeslot` | `{ tslot, isDay }` | Émis toutes les 3h (changement de slot). |
+| `time/daily` | `{ day, weather, nextWeather, moonPhase }` | Émis à minuit (changement de jour). |
+| `time/first-loop` | `{ day, hour, minute, tslot, weather, nextWeather, skyColor, moonPhase, isDay }` | Émis une seule fois au démarrage du rendu. |
+| `time/sky-color-changed`| `string` (Hex Color) | Émis uniquement si la couleur change. |
+
+#### Core / State (`InputManager`)
+| Event Name | Payload Structure | Description |
+| :--- | :--- | :--- |
+| `state/changed` | `{ state, oldState }` | Émis lorsque l'`InputManager` change l'état global du jeu (Exploration <-> Information/Combat). |
+
+#### UI / Interface (Common)
+| Event Name | Payload Structure | Description |
+| :--- | :--- | :--- |
+| `overlay/close` | `string` (Overlay ID) | Demande générique de fermeture émise par le bouton 'X' d'un overlay. Traitée par `InputManager`. |
+| `overlay/open-request`| `string` (Overlay ID) | Demande générique d'ouverture d'un overlay. Traitée par `InputManager`. |
+
+#### Inventory (`InventoryManager`, `InventoryOverlay`)
+*En prévision*
+| Event Name | Payload Structure | Description |
+| :--- | :--- | :--- |
+| `inventory/open`| - | Affichage du panel d'inventaire. |
+| `inventory/close`| - | Disparition du panel d'inventaire. |
+| `inventory/static-buffs`| `Array<string>` (List of buffs) | Émis à la fermeture de l'inventaire. |
+
+#### Craft (`CraftOverlay`)
+*En prévision*
+| Event Name | Payload Structure | Description |
+| :--- | :--- | :--- |
+| `craft/open`| - | Affichage du panel d'artisanat. |
+| `craft/close`| - | Disparition du panel d'artisanat. |
+
+#### Help (`HelpOverlay`)
+| Event Name | Payload Structure | Description |
+| :--- | :--- | :--- |
+| `help/open`| - | Affichage du panel d'aide. |
+| `help/close`| - | Disparition du panel d'aide. |
+
+#### Combat (`CombatOverlay`)
+| Event Name | Payload Structure | Description |
+| :--- | :--- | :--- |
+| `combat/open`| - | Affichage du panel de combat. |
+| `combat/close`| - | Disparition du panel de combat. |
+
+#### Buffs Widget (`BuffManager`)
+*En prévision*
+| Event Name | Payload Structure | Description |
+| :--- | :--- | :--- |
+| `buff/display-next-weather` | `boolean` | Active/Désactive la prévision météo. |
+| `buff/display-coords` | `boolean` | Active/Désactive l'affichage des coordonnées. |
+| `buff/display-time-precision` | `integer` | précision 0 => 1heure, 1 => 15 minutes, 2 => 5 minutes |
+| `buff/display-moon-detail` | `boolean` | affiche 4 (false) ou 8 (true) phases lunaires |
+
+#### Debug (`WorldMapDebug`, `RealtimeDebugWidget`)
+| Event Name | Payload Structure | Description |
+| :--- | :--- | :--- |
+| `map/open`| - | Affichage de la carte au 1/16e. |
+| `map/close`| - | Disparition de la carte au 1/16e. |
+| `debug/frame-sample`| `{updateTime, renderTime, microTime}` | Temps exécution dans la loop pour les 3 budgets. |
 
 ---
 

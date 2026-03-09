@@ -26,8 +26,10 @@ class EventBus {
     const callbacks = this.listeners.get(event)
     if (!callbacks) return // Si aucun listener pour cet événement, on ne fait rien.
 
+    // Copie défensive : isole l'itération des mutations (off() pendant emit())
+    const snapshot = [...callbacks] // ← allocation, mais hors hot path
     // On exécute chaque callback immédiatement et séquentiellement.
-    for (const cb of callbacks) {
+    for (const cb of snapshot) {
       try {
         // Appel direct et synchrone du handler.
         // Si le handler doit faire une tâche longue, c'est sa responsabilité de l'ajouter au MicroTasker.
@@ -41,6 +43,7 @@ class EventBus {
   // Affiche les statistiques des événements et des écouteurs
   debugStats () {
     let output = '--- EventBus - Listeners List ---\n'
+    // Crée un tableau temporaire. Pas critique vu l'usage (debug).
     const sortedEvents = Array.from(this.listeners.keys()).sort()
 
     for (const event of sortedEvents) {
