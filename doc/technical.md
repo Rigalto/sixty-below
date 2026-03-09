@@ -253,7 +253,15 @@ Cette section définit les événements officiels. Tout nouvel événement doit 
 
 ### Class `MicroTasker` (Singleton : `microTasker`)
 
-Exécute des tâches fractionnées dans le temps résiduel de la frame.
+**Contrat d'exécution :**
+Le `MicroTasker` exécute des tâches fractionnées dans le temps résiduel de la frame.
+Il maximise le nombre de tâches exécutées dans le temps résiduel
+de la frame, sans jamais dépasser le budget total de 16 ms.
+La priorité et la capacité sont des **hints de sélection** — ils influencent
+le choix des tâches candidates mais n'offrent aucune garantie d'ordre ni
+de délai d'exécution maximum.
+
+**API :**
 
 | Méthode/Getter  | Signature                                    | Description                        |
 |-----------------|----------------------------------------------|------------------------------------|
@@ -264,8 +272,20 @@ Exécute des tâches fractionnées dans le temps résiduel de la frame.
 | `clear`         | `(): void`                                   | Vide la file                       |
 | `update`        | `(budgetMs: number): void`                   | Appelé **uniquement** par `GameCore` |
 | `queueSize`     | `number` (getter)                            | Taille de la file                  |
-| `resetStats`    | `(): void`                                   | —                                  |
-| `debugStats`    | `(): string`                                 | —                                  |
+| `resetStats`    | `(): void`                                   | Retire toutes les occurrences de `fn` de la file |
+| `debugStats`    | `(): string`                                 | Retourne la file formatée (debug console) |
+
+**Comportements garantis :**
+- La tâche en tête de file (priorité la plus haute) est **toujours exécutée**,
+  même si le budget résiduel est nul.
+- pour les tâches suivantes, le scheduler sélectionne
+  la tâche la plus prioritaire **qui rentre dans le budget résiduel** — une tâche
+  de priorité plus basse mais de capacité plus faible peut donc passer avant
+  une tâche de priorité plus haute dont la capacité dépasse le budget restant.
+- `enqueueOnce` déduplique par **référence de fonction** (===).
+- `capacityUnits` invalide (null, undefined) est ramené à 20 (budget max).
+- `initDebug(mapping)` est optionnel. Si absent, `debugStats()` affiche `'?'`
+  pour la capacité de chaque tâche.
 
 **Pattern d'usage obligatoire :**
 ```javascript

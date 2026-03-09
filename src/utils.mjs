@@ -143,21 +143,19 @@ export class MicroTasker {
   // Exécute des fonctions selon leur priorité et leur capacité
   update (budget) {
     if (this.taskQueue.length === 0) { return }
-    this.budget = (budget * 4) | 0 // Réinitialise le budget pour chaque frame
+    const budgetUnits = (budget * 4) | 0 // Réinitialise le budget pour chaque frame
     if (this.taskQueue.length > MAX_QUEUE_LENGTH) {
       console.error(`MicroTasker.update File de tâches trop longue (${this.taskQueue.length} tâches).`)
     }
 
     const startTime = performance.now()
-    const deadline = startTime + this.budget / 4 // L'heure à ne pas dépasser
+    const deadline = startTime + budgetUnits / 4 // L'heure à ne pas dépasser
 
     // exécute la tâche la plus prioritaire (rapide avec pop())
     const highestPriorityTask = this.taskQueue.pop()
     this.#executeTask(highestPriorityTask)
 
     // s'il reste du budget et des micro-tâches, on tente d'en exécuter
-    // while (this.taskQueue.length > 0 && this.budget > 0) {
-
     while (this.taskQueue.length > 0 && performance.now() < deadline) {
       const remainingTimeMs = deadline - performance.now()
       const remainingBudgetUnits = Math.floor(remainingTimeMs * 4)
@@ -233,8 +231,8 @@ export class MicroTasker {
 
   // Fonction pour afficher les statistiques collectées (adaptée pour les bins dynamiques)
   debugStats () {
-    this.histogramBinSize = 0.5
-    this.histogramNumBins = 10
+    const HISTOGRAM_BIN_SIZE = 0.5
+    const HISTOGRAM_NUM_BINS = 10
 
     let output = '--- MicroTasker Execution Stats ---\n'
     const sortedNames = Object.keys(this.taskStats).sort()
@@ -255,22 +253,22 @@ export class MicroTasker {
       output += `  Max Duration: ${stats.maxDuration.toFixed(3)} ms\n`
 
       // --- Affichage de l'Histogramme ---
-      output += `  Histogram (Bin Size: ${this.histogramBinSize}ms):\n`
+      output += `  Histogram (Bin Size: ${HISTOGRAM_BIN_SIZE}ms):\n`
       const maxBinCount = Math.max(...stats.histogramBins) // Pour scaling
       const scaleFactor = maxBinCount > 50 ? 50 / maxBinCount : 1 // Example scaling
 
-      for (let i = 0; i < this.histogramNumBins; i++) {
-        const lowerBound = i * this.histogramBinSize
-        const upperBound = (i + 1) * this.histogramBinSize
+      for (let i = 0; i < HISTOGRAM_NUM_BINS; i++) {
+        const lowerBound = i * HISTOGRAM_BIN_SIZE
+        const upperBound = (i + 1) * HISTOGRAM_BIN_SIZE
         const label = `${lowerBound.toFixed(1)}-${upperBound.toFixed(1)}ms`.padEnd(10)
         const count = stats.histogramBins[i]
         const bar = '*'.repeat(Math.round(count * scaleFactor))
         output += `    ${label}: ${count.toString().padStart(5)} ${bar}\n`
       }
       // Affiche le dernier bin "> limite"
-      const lastBinLowerBound = this.histogramNumBins * this.histogramBinSize
+      const lastBinLowerBound = HISTOGRAM_NUM_BINS * HISTOGRAM_BIN_SIZE
       const lastLabel = `>${lastBinLowerBound.toFixed(1)}ms`.padEnd(10)
-      const lastCount = stats.histogramBins[this.histogramNumBins]
+      const lastCount = stats.histogramBins[HISTOGRAM_NUM_BINS]
       const lastBar = '*'.repeat(Math.round(lastCount * scaleFactor))
       output += `    ${lastLabel}: ${lastCount.toString().padStart(5)} ${lastBar}\n`
       // --- Fin Histogramme ---
