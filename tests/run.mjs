@@ -6,8 +6,8 @@
 import {_results} from './kernel.mjs'
 
 const REGISTRY = [
-  {name: 'EventBus', file: './test-eventbus.mjs'}
-  // {name: 'MicroTasker', file: './test-microtasker.mjs'},
+  {name: 'EventBus', file: './test-eventbus.mjs'},
+  {name: 'MicroTasker', file: './test-microtasker.mjs'}
 ]
 
 const target = process.argv[2] ?? null

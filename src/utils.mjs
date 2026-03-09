@@ -77,7 +77,7 @@ export const eventBus = new EventBus()
 const MAX_QUEUE_LENGTH = 100 // Limite arbitraire
 // Le budget est en unités de 1/4ms, soit 5ms * 4 = 20 unités.
 
-class MicroTasker {
+export class MicroTasker {
   constructor () {
     this.taskQueue = [] // Table des fonctions enregistrées, triées par priorité puis par capacité
     this.taskStats = {}
@@ -116,10 +116,13 @@ class MicroTasker {
 
   // insertion au bon endroit - tri : tâche la plus prioritaire en fin de tableau
   #addToTaskQueue (task) {
-    task.capacityUnits = Math.max(1, Math.min(task.capacityUnits, 20)) || 20
+    task.capacityUnits = Math.max(1, Math.min(task.capacityUnits ?? 20, 20))
     task.index = this.#calculateIndex(task.priority, task.capacityUnits)
-    this.taskQueue.push(task)
-    this.taskQueue.sort((a, b) => a.index - b.index)
+    // insertion positionnée
+    let i = this.taskQueue.length
+    while (i > 0 && this.taskQueue[i - 1].index > task.index) { i-- }
+    this.taskQueue.splice(i, 0, task)
+
     if (this.taskQueue.length > 20) {
       console.log('microTasker.#addToTaskQueue', this.debug())
     }
@@ -243,7 +246,7 @@ class MicroTasker {
       // 1. Nettoyer le nom de la tâche pour gérer le préfixe "bound "
       const cleanTaskName = taskName.startsWith('bound ') ? taskName.substring(6) : taskName
       // 2. Trouver la capacité correspondante
-      const currentCapacity = this.MICROTASK_FN_NAME_TO_KEY[cleanTaskName]
+      const currentCapacity = this.MICROTASK_FN_NAME_TO_KEY?.[cleanTaskName] ?? '?'
       // 3. Calculer la durée moyenne d'exécution
       const avgDuration = stats.totalDuration / stats.count
       output += `${taskName} (Cap: ${currentCapacity}):\n`
@@ -543,7 +546,7 @@ export const taskScheduler = new TaskScheduler()
 const REAL_MS_PER_GAME_MINUTE = 1000 // 1000ms réelles = 1 minute dans le jeu
 const GAME_MINUTES_PER_DAY = 1440 // 24h * 60min
 
-class TimeManager {
+export class TimeManager {
   // Déclaration des champs privés
   #minute5Cache
   #isFirstLoop
@@ -720,7 +723,7 @@ export const timeManager = new TimeManager()
    SEEDED RNG (Mulberry32)
    ==================================================================================================== */
 
-class SeededRNG {
+export class SeededRNG {
   #seed
   #useMathRandom
   #perlinGradients
