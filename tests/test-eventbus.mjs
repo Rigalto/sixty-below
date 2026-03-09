@@ -1,6 +1,8 @@
 // test-eventbus.mjs
 // Exécution : node C:\Users\dcabu\Documents\sixty-below\tests\test-eventbus.mjs
 
+import {EventBus} from '../src/utils.mjs'
+
 /* ====================================================================================================
    MICRO-FRAMEWORK DE TEST (Vanilla, zéro dépendance)
    ==================================================================================================== */
@@ -21,50 +23,6 @@ function assert (label, condition) {
 function describe (label, fn) {
   console.log(`\n📦 ${label}`)
   fn()
-}
-
-/* ====================================================================================================
-   CLASSE À TESTER (copiée pour isolation totale)
-   ==================================================================================================== */
-
-class EventBus {
-  constructor () {
-    this.listeners = new Map()
-  }
-
-  on (event, callback) {
-    if (!this.listeners.has(event)) this.listeners.set(event, new Set())
-    this.listeners.get(event).add(callback)
-  }
-
-  off (event, callback) {
-    const callbacks = this.listeners.get(event)
-    if (callbacks) {
-      callbacks.delete(callback)
-      if (callbacks.size === 0) { this.listeners.delete(event) }
-    }
-  }
-
-  emit (event, data) {
-    const callbacks = this.listeners.get(event)
-    if (!callbacks) return
-    for (const cb of callbacks) {
-      try { cb(data) } catch (e) {
-        console.error(`EventBus:emit error in '${event}' / '${cb.name}':`, e)
-      }
-    }
-  }
-
-  debugStats () {
-    let output = '--- EventBus - Listeners List ---\n'
-    const sortedEvents = Array.from(this.listeners.keys()).sort()
-    for (const event of sortedEvents) {
-      const callbacks = this.listeners.get(event)
-      if (!callbacks || callbacks.size === 0) { continue }
-      output += `${event}:\n  Count: ${callbacks.size}\n`
-    }
-    return output
-  }
 }
 
 /* ====================================================================================================
@@ -152,7 +110,7 @@ describe('debugStats()', () => {
   assert('debugStats() trie les événements alphabétiquement', output.indexOf('a-event') < output.indexOf('b-event'))
 })
 
-describe('🐛 Bug connu : off() pendant emit()', () => {
+describe('off() pendant emit()', () => {
   const bus = new EventBus()
   let cb2Called = false
 
@@ -165,8 +123,8 @@ describe('🐛 Bug connu : off() pendant emit()', () => {
 
   // Ce test ÉCHOUE avec l'implémentation actuelle → documente le bug
   assert(
-    '[BUG CONNU] cb2 supprimé par cb1 pendant emit → cb2 non appelé (Set mutation)',
-    cb2Called === false // Ce comportement est le bug — le assert passe pour documenter l'état actuel
+    'cb2 supprimé par cb1 pendant emit (Set mutation) → cb2 appelé',
+    cb2Called === true
   )
 })
 

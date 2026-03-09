@@ -4,7 +4,7 @@ import {SKY_COLORS} from './constant.mjs'
    EVENT BUS
    ==================================================================================================== */
 
-class EventBus {
+export class EventBus {
   constructor () {
     this.listeners = new Map() // Map<eventType, Set[callbacks]>
   }
