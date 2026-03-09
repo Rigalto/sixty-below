@@ -1,4 +1,5 @@
-import {TIME_BUDGET, NODES_LOOKUP, MICROTASK_FN_NAME_TO_KEY, STATE, OVERLAYS} from './constant.mjs'
+import {TIME_BUDGET, MICROTASK_FN_NAME_TO_KEY, STATE, OVERLAYS} from './constant.mjs'
+import {NODES_LOOKUP} from '../../assets/data/data.mjs'
 import {loadAssets, resolveAssetData} from './assets.mjs'
 import {timeManager, taskScheduler, microTasker, eventBus, seededRNG} from './utils.mjs'
 import {database} from './database.mjs'

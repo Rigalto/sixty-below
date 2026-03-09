@@ -1,4 +1,5 @@
-import {MICROTASK, WORLD_WIDTH, WORLD_HEIGHT, NODES_LOOKUP, OVERLAYS, UI_LAYOUT, hexToRgb, SKY_COLORS} from './constant.mjs'
+import {MICROTASK, WORLD_WIDTH, WORLD_HEIGHT, OVERLAYS, UI_LAYOUT, SKY_COLORS} from './constant.mjs'
+import {hexToRgb, NODES_LOOKUP} from '../../assets/data/data.mjs'
 import {eventBus, microTasker, taskScheduler} from './utils.mjs'
 import {chunkManager} from './world.mjs'
 

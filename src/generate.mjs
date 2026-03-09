@@ -1,6 +1,8 @@
 import {seededRNG} from './utils.mjs'
 import {database} from './database.mjs'
-import {WORLD_WIDTH, WORLD_HEIGHT, SEA_LEVEL, BIOME_TYPE, NODES, WEATHER_TYPE} from './constant.mjs'
+import {WORLD_WIDTH, WORLD_HEIGHT, SEA_LEVEL, BIOME_TYPE, WEATHER_TYPE} from './constant.mjs'
+import {NODES} from '../../assets/data/data.mjs'
+
 import {chunkManager} from './world.mjs'
 
 /* ====================================================================================================
@@ -668,8 +670,3 @@ function runBiomesTest () {
 }
 
 // runBiomesTest()
-
-Canon CLI-526 Cartouche BK Noire
-
-Canon CLI-526 C Ancienne Version
-Canon PGI-525 Cartouche BK Noire
