@@ -1,35 +1,8 @@
-// test-eventbus.mjs
-// Exécution : node C:\Users\dcabu\Documents\sixty-below\tests\test-eventbus.mjs
-
+// tests/test-eventbus.mjs
+import {describe, assert, captureConsole, releaseConsole} from './kernel.mjs'
 import {EventBus} from '../src/utils.mjs'
 
-/* ====================================================================================================
-   MICRO-FRAMEWORK DE TEST (Vanilla, zéro dépendance)
-   ==================================================================================================== */
-
-let passed = 0
-let failed = 0
-
-function assert (label, condition) {
-  if (condition) {
-    console.log(`  ✅ ${label}`)
-    passed++
-  } else {
-    console.error(`  ❌ ${label}`)
-    failed++
-  }
-}
-
-function describe (label, fn) {
-  console.log(`\n📦 ${label}`)
-  fn()
-}
-
-/* ====================================================================================================
-   SUITES DE TESTS
-   ==================================================================================================== */
-
-describe('on() — Abonnement', () => {
+describe('EventBus — on()', () => {
   const bus = new EventBus()
   const cb = () => {}
 
@@ -44,73 +17,74 @@ describe('on() — Abonnement', () => {
   assert('Deux callbacks différentes → size = 2', bus.listeners.get('test').size === 2)
 })
 
-describe('off() — Désabonnement', () => {
+describe('EventBus — off()', () => {
   const bus = new EventBus()
   const cb = () => {}
 
   bus.on('test', cb)
   bus.off('test', cb)
   assert('off() supprime le callback', !bus.listeners.get('test'))
+  assert('off() vide → clé supprimée du Map', !bus.listeners.has('test'))
 
-  // No-op
   bus.off('inexistant', cb)
   assert('off() sur event inexistant ne throw pas', true)
 
   bus.on('test', cb)
-  bus.off('test', () => {}) // mauvaise référence
+  bus.off('test', () => {})
   assert('off() avec mauvaise référence ne supprime rien', bus.listeners.get('test').size === 1)
 })
 
-describe('emit() — Publication', () => {
+describe('EventBus — emit()', () => {
   const bus = new EventBus()
   let received = null
-
   const cb = (data) => { received = data }
+
   bus.on('ping', cb)
   bus.emit('ping', {value: 42})
-  assert('emit() appelle le callback avec la data', received?.value === 42)
+  assert('emit() transmet la data au callback', received?.value === 42)
 
-  // Pas de listeners
   bus.emit('ghost')
   assert('emit() sur event sans listeners ne throw pas', true)
 
-  // Plusieurs listeners
   let count = 0
   bus.on('multi', () => count++)
   bus.on('multi', () => count++)
   bus.emit('multi')
   assert('emit() appelle tous les listeners', count === 2)
-
-  // Isolation des erreurs
-  const busErr = new EventBus()
-  let secondCalled = false
-  busErr.on('err', () => { throw new Error('boom') })
-  busErr.on('err', () => { secondCalled = true })
-  busErr.emit('err')
-  assert('emit() — une erreur dans cb1 n\'empêche pas cb2', secondCalled)
 })
 
-describe('Nettoyage automatique du Map', () => {
+describe('EventBus — isolation des erreurs', () => {
   const bus = new EventBus()
-  const cb = () => {}
+  let secondCalled = false
 
-  bus.on('clean', cb)
-  bus.off('clean', cb)
-  assert('Clé supprimée du Map quand Set vide', !bus.listeners.has('clean'))
+  bus.on('err', () => { throw new Error('boom') })
+  bus.on('err', () => { secondCalled = true })
+
+  captureConsole()
+  bus.emit('err')
+  const lines = releaseConsole()
+
+  assert('Une erreur dans cb1 n\'empêche pas cb2', secondCalled)
+  assert('L\'erreur est bien loggée dans console.error', lines.some(l => l.includes('boom')))
 })
 
-describe('debugStats()', () => {
+describe('EventBus — debugStats()', () => {
   const bus = new EventBus()
   bus.on('b-event', () => {})
   bus.on('a-event', () => {})
 
-  const output = bus.debugStats()
-  assert('debugStats() retourne une string', typeof output === 'string')
-  assert('debugStats() contient les événements enregistrés', output.includes('a-event') && output.includes('b-event'))
-  assert('debugStats() trie les événements alphabétiquement', output.indexOf('a-event') < output.indexOf('b-event'))
+  captureConsole()
+  const output = bus.debugStats() // console.log intercepté, rien affiché
+  const lines = releaseConsole() // console.log restauré, lignes récupérées
+
+  assert('Retourne une string', typeof output === 'string')
+  assert('Contient les événements enregistrés', output.includes('a-event') && output.includes('b-event'))
+  assert('Tri alphabétique', output.indexOf('a-event') < output.indexOf('b-event'))
+  assert('A bien écrit dans console.log', lines.length > 0)
+  assert('Log contient a-event', lines.some(l => l.includes('a-event')))
 })
 
-describe('off() pendant emit()', () => {
+describe('EventBus — off() pendant emit()', () => {
   const bus = new EventBus()
   let cb2Called = false
 
@@ -121,17 +95,5 @@ describe('off() pendant emit()', () => {
   bus.on('race', cb2)
   bus.emit('race')
 
-  // Ce test ÉCHOUE avec l'implémentation actuelle → documente le bug
-  assert(
-    'cb2 supprimé par cb1 pendant emit (Set mutation) → cb2 appelé',
-    cb2Called === true
-  )
+  assert('cb2 appelé même si supprimé pendant l\'itération', cb2Called)
 })
-
-/* ====================================================================================================
-   RAPPORT
-   ==================================================================================================== */
-
-console.log(`\n${'─'.repeat(40)}`)
-console.log(`Résultat : ${passed} ✅  ${failed} ❌  (${passed + failed} tests)`)
-if (failed > 0) process.exit(1)

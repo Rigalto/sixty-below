@@ -305,14 +305,26 @@ Les modules communiquent via l'`EventBus` (couplage faible).
 ├── index.html               # Entry Point + Canvas Layers + DOM Containers
 └── package.json             # ESLint + Tests uniquement
 ```
+### 8.2 Tests Unitaires
 
-### 8.2 Déploiement
+Les classes du Kernel (Layer 0–2) sont testées unitairement via un mini-framework
+Vanilla JS sans dépendance, situé dans `/tests`.
+
+- `tests/kernel.mjs` — framework de test (assert, describe, captureConsole)
+- `tests/run.mjs` — point d'entrée CLI
+- `tests/test-[classname].mjs` — un fichier par classe testée
+
+**Lancement :**
+- `node tests/run.mjs` → tous les tests, une ligne de résumé par suite
+- `node tests/run.mjs EventBus` → détail complet pour une classe
+
+### 8.3 Déploiement
 
 * GitHub Pages — hébergement statique, branche `main`.
 * Pas de build step. Le navigateur charge les modules `.mjs` nativement.
 * CI : GitHub Action sur push → exécution des tests unitaires.
 
-### 8.3 Tooling
+### 8.4 Tooling
 
 * **Linter :** Google JavaScript Style Guide.
   * Pas de point-virgule en fin d'instruction.

@@ -406,7 +406,54 @@ par les modules qui en ont besoin.
 
 ---
 
-## 8. `world.mjs` (Layer 4)
+## 8. Tests Unitaires (`/tests`)
+
+### Règles
+
+- Un fichier de test par classe : `tests/test-[classname].mjs`
+- Chaque fichier **exporte uniquement ses suites** via `describe()` — il ne s'exécute pas seul.
+- Chaque fichier importe la **classe réelle** depuis `src/` (jamais une copie locale).
+- Chaque `describe()` instancie sa **propre instance** de la classe testée — zéro état partagé entre suites.
+- Pour enregistrer une nouvelle classe : ajouter une entrée dans le tableau `REGISTRY` de `run.mjs`.
+
+### API du kernel (`tests/kernel.mjs`)
+
+| Export | Signature | Description |
+|---|---|---|
+| `describe` | `(label: string, fn: function): void` | Déclare une suite de tests |
+| `assert` | `(label: string, condition: boolean): void` | Assertion booléenne. Doit être appelé dans un `describe()`. |
+| `captureConsole` | `(): void` | Redirige `console.log` et `console.error` vers un buffer interne. |
+| `releaseConsole` | `(): string[]` | Restaure la console et retourne les lignes capturées. |
+| `_results` | `Array` | Résultats accumulés — lu par `run.mjs`, ne pas utiliser dans les tests. |
+
+### Pattern d'usage standard
+```javascript
+// tests/test-maclasse.mjs
+import { describe, assert, captureConsole, releaseConsole } from './kernel.mjs'
+import { MaClasse } from '../src/utils.mjs'
+
+// ─── Suite standard ───────────────────────────────────────────────────────────
+describe('MaClasse — méthode()', () => {
+  const obj = new MaClasse()          // instance isolée par suite
+  // ...
+  assert('description du test', condition)
+})
+
+// ─── Suite avec capture console ───────────────────────────────────────────────
+describe('MaClasse — logs', () => {
+  const obj = new MaClasse()
+
+  captureConsole()
+  obj.methodQuiLog()
+  const lines = releaseConsole()      // toujours dans la même suite, après l'appel
+
+  assert('Le log contient X', lines.some(l => l.includes('X')))
+})
+```
+
+---
+
+## 9. `world.mjs` (Layer 4)
 
 ### Class `ChunkManager` (Singleton : `chunkManager`)
 
@@ -435,7 +482,7 @@ const cy = chunkIndex >> 6           // Décodage Y chunk
 
 ---
 
-## 9. `render.mjs` (Layer 4)
+## 10. `render.mjs` (Layer 4)
 
 ### Class `Camera` (Singleton : `camera`)
 
@@ -494,7 +541,7 @@ Y de la première tuile solide.
 
 ---
 
-## 10. `persistence.mjs` (Layer 3)
+## 11. `persistence.mjs` (Layer 3)
 
 ### Class `SaveManager` (Singleton : `saveManager`)
 
@@ -514,7 +561,7 @@ Orchestrateur de sauvegarde. Connaît les object stores métier.
 
 ---
 
-## 11. `assets.mjs` — Auto-Tiling
+## 12. `assets.mjs` — Auto-Tiling
 
 **Framing :** Bitmasking 4-connectivity calculé à la volée ou au chargement pour les transitions de texture.
 **Diffusion :** Les tuiles ont un bord de 2 px partiellement transparent, peint de la couleur dominante
@@ -522,7 +569,7 @@ des tuiles adjacentes (`NODES.color`).
 
 ---
 
-## 12. Règles de Codage
+## 13. Règles de Codage
 
 * Vanilla JS ESNext, modules natifs `.mjs`, pas de bundler.
 * Google JavaScript Style Guide — **pas de point-virgule**.
