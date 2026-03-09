@@ -42,15 +42,18 @@ Priorité au **Data-Oriented Design**.
 ### 2.2 Couches Architecturales
 
 ```
-Layer 0 — constant.mjs       Zéro dépendance. Config, Enums, Bitmasks.
+Layer 0 — constant.mjs       Zéro dépendance. Config technique, Enums système, Bitmasks.
 Layer 1 — utils.mjs          Utilitaires purs : EventBus, MicroTasker,
           database.mjs       TaskScheduler, TimeManager, seededRNG.
 Layer 2 — core.mjs           Kernel : GameLoop, InputManager, KeyboardManager.
 ─────────────────────────────────────────────────────────────
 Layer 3 — assets.mjs         Ressources graphiques/sons.
           persistence.mjs    Orchestration sauvegarde (connaît les stores métier).
+          data/data.mjs      Données métier : tuiles, items, plantes, recettes. Zéro dépendance hors constant.mjs.
+          data/data-gen.mjs  Données génération (biomes, courbes, paramètres proc-gen)
 ─────────────────────────────────────────────────────────────
 Layer 4+ — Modules Métier    world, render, player, combat, inventory…
+          generate.mjs       Algorithmes de génération — importé dynamiquement - importe data-generate.mjs
 ```
 
 **Règle absolue :** les dépendances ne vont que vers le bas. Un module de Layer N n'importe jamais un module de Layer N+.

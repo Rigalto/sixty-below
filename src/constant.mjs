@@ -329,7 +329,7 @@ export const hexToRgb = (hex) => {
 for (const key in NODES) {
   const nodeDesc = NODES[key]
   NODES_LOOKUP[nodeDesc.code] = nodeDesc
-  // Préparation pour hydratation (sera remplacé par assets.mjs)
+  // Préparation pour hydratation (sera remplacé par assets.mjs::resolveAssetData)
   nodeDesc.renderData = null
   if (nodeDesc.color === undefined) { console.error('Attribut "color" manquant pour', key) }
   nodeDesc.rgbColor = hexToRgb(nodeDesc.color)

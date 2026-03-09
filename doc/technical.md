@@ -20,12 +20,12 @@
 ## 1. Kernel
 
 Le Kernel est l'ensemble des modules sans dépendance métier. Il peut être testé en isolation totale.
-**Règle :** aucun module métier (Layer 4+) ne doit importer depuis le kernel en sens inverse.
+**Règle :** aucun module métier (Layer 3+) ne doit importer depuis le kernel en sens inverse.
 
 ### 1.1 Couches du Kernel
 
 ```
-Layer 0 — constant.mjs    Zéro dépendance. Chargé par tous les modules.
+Layer 0 — constant.mjs    Zéro dépendance. Zéro métier. Config technique pure.
 Layer 1 — utils.mjs       Dépend de Layer 0 uniquement.
            database.mjs   Dépend de Layer 0 uniquement.
 Layer 2 — core.mjs        Dépend de Layer 0 + Layer 1.
@@ -35,72 +35,129 @@ Layer 2 — core.mjs        Dépend de Layer 0 + Layer 1.
 
 ## 2. `constant.mjs` (Layer 0)
 
-Aucune dépendance externe autorisée.
+Aucune dépendance externe autorisée. Aucune donnée métier.
 
 ### Exports
 
-| Constante | Type | Valeur | Description |
-|---|---|---|---|
-| `FPS` | number | 60 | Fréquence cible |
-| `FRAME_DURATION` | number | ~16,66 ms | Durée d'une frame |
-| `TIME_BUDGET` | object | — | Budgets par phase (voir ci-dessous) |
-| `STATE` | enum | 0–3 | États de la state machine |
-| `OVERLAYS` | object | — | Définition des calques (state + zIndex) |
-| `UI_LAYOUT` | object | — | Z-index des widgets HUD |
-| `WORLD_WIDTH` | number | 1024 | Largeur monde en tuiles |
-| `WORLD_HEIGHT` | number | 512 | Hauteur monde en tuiles |
-| `CANVAS_WIDTH` | number | 1024 | Largeur canvas en px |
-| `CANVAS_HEIGHT` | number | 768 | Hauteur canvas en px |
-| `SEA_LEVEL` | number | 56 | Niveau de la mer en tuiles |
-| `WORLD_WIDTH_SHIFT` | number | 11 | `2^11 = 1024` — shift pour index ligne |
-| `CHUNK_SHIFT` | number | 4 | `2^4 = 16` — shift pour coordonnées chunk |
-| `CHUNK_MASK` | number | `0b1111` | Masque position locale dans un chunk |
-| `NODES` | object | — | Définitions des tuiles par nom |
-| `NODES_LOOKUP` | Array | — | Lookup par code numérique |
-| `TILE_TYPE` | enum | — | Types de tuiles |
-| `TILE_FLAG` | bitmask | — | Flags (SOLID, LIQUID…) |
-| `MICROTASK` | object | — | Config priorité/capacité des microtâches |
-| `DB_CONFIG` | object | — | Config IndexedDB (NAME, VERSION, DEBUG) |
+| Constante          | Type    | Valeur    | Description                              |
+|--------------------|---------|-----------|------------------------------------------|
+| `FPS`              | number  | 60        | Fréquence cible                          |
+| `FRAME_DURATION`   | number  | ~16,66 ms | Durée d'une frame                        |
+| `TIME_BUDGET`      | object  | —         | Budgets par phase (voir ci-dessous)      |
+| `STATE`            | enum    | 0–3       | États de la state machine                |
+| `OVERLAYS`         | object  | —         | Définition des calques (state + zIndex)  |
+| `UI_LAYOUT`        | object  | —         | Z-index des widgets HUD                  |
+| `UI_LAYERS`        | object  | —         | IDs et z-index des canvas                |
+| `PALETTE`          | object  | —         | Couleurs de fallback                     |
+| `WORLD_WIDTH`      | number  | 1024      | Largeur monde en tuiles                  |
+| `WORLD_HEIGHT`     | number  | 512       | Hauteur monde en tuiles                  |
+| `CANVAS_WIDTH`     | number  | 1024      | Largeur canvas en px                     |
+| `CANVAS_HEIGHT`    | number  | 768       | Hauteur canvas en px                     |
+| `SEA_LEVEL`        | number  | 56        | Niveau de la mer en tuiles               |
+| `WORLD_WIDTH_SHIFT`| number  | 11        | `2^11 = 1024` — shift pour index ligne   |
+| `CHUNK_SHIFT`      | number  | 4         | `2^4 = 16` — shift pour coordonnées chunk|
+| `CHUNK_MASK`       | number  | `0b1111`  | Masque position locale dans un chunk     |
+| `MICROTASK`        | object  | —         | Config priorité/capacité des microtâches |
+| `DB_CONFIG`        | object  | —         | Config IndexedDB (NAME, VERSION, DEBUG)  |
 
 ### Budgets Temps [`TIME_BUDGET`]
 
-| Phase | Budget | Contenu |
-|---|---|---|
-| `UPDATE` | 3 ms | Physique, déplacement joueur/faune, TimeManager |
-| `RENDER` | 4 ms | Dessin tuiles visibles + entités (`#game-layer`) |
-| `MICROTASK` | 5 ms | Pathfinding, génération, updates UI secondaires |
-| `DOM` | 4 ms | Browser overhead (GC, Event Loop) |
+| Phase       | Budget | Contenu                                                       |
+|-------------|--------|---------------------------------------------------------------|
+| `UPDATE`    | 3 ms   | Physique, déplacement joueur/faune, TimeManager               |
+| `RENDER`    | 4 ms   | Dessin tuiles visibles + entités (`#game-layer`)              |
+| `MICROTASK` | 5 ms   | Pathfinding, génération, updates UI secondaires               |
+| `DOM`       | 4 ms   | Browser overhead (GC, Event Loop)                             |
 
 *Total moteur : 12 ms. Les 4 ms DOM sont gérées par le navigateur.*
 
-### Patterns d'Usage — `NODES` / `NODES_LOOKUP`
+---
+
+## 3. `assets/data/data.mjs`
+
+Données métier uniques. **Jamais importé par le kernel (Layer 0–2).**
+Importé par `assets.mjs` (Layer 3) et les modules métier (Layer 4+).
+
+Un seul fichier centralise toutes les tables pour éviter les dépendances circulaires
+(nodes ↔ items ↔ plants ↔ recipes ↔ mobs).
+
+### Garanties du module
+
+* Le corps du module s'exécute **une seule fois** (cache ESModule natif).
+* Chaque objet de chaque table est **unique en mémoire** — pas de duplication.
+* Les post-traitements **modifient les tables en place** (pas de copie intermédiaire).
+* Un `throw` bloquant au boot si la validation d'intégrité échoue.
+
+### Exports — Enums métier
+
+| Export       | Type    | Description             |
+|--------------|---------|-------------------------|
+| `NODE_TYPE`  | bitmask | Types de tuiles         |
+| `ITEM_TYPE`  | bitmask | Types d'items           |
+| `PLANT_TYPE` | bitmask | Types de plantes        |
+| `BIOME_TYPE` | enum    | Types de biomes         |
+
+### Exports — Tables
+
+| Export         | Type   | Description                                                        |
+|----------------|--------|--------------------------------------------------------------------|
+| `NODES`        | object | Index par nom symbolique. `NODES.CLAY` → objet node complet.       |
+| `NODES_LOOKUP` | Array  | Lookup par code numérique (hot path). `NODES_LOOKUP[14]` → node.  |
+| `ITEMS`        | object | Index par id string. `ITEMS.bkston` → objet item complet.         |
+| `PLANTS`       | object | Index par id string.                                               |
+| `RECIPES`      | object | Index par id string.                                               |
+
+### Conventions d'accès
 
 ```javascript
-// 1. Écriture dans la grille (TypedArray) → code numérique
-import { NODES } from './constant.mjs'
-const tileCode = NODES.CLAY.code
-chunk.data[index] = tileCode
+// NODES
+NODES.CLAY              // → objet node complet
+NODES.CLAY.code         // → 14  (numérique, usage TypedArray)
+NODES_LOOKUP[14]        // → objet node complet  (hot path render/physics)
 
-// 2. Manipulation abstraite (Inventaire, UI) → objet complet par nom
-const tileDesc = NODES.CLAY
+// ITEMS — la clé string est injectée comme propriété .code au boot
+ITEMS.bkston            // → objet item complet
+ITEMS.bkston.code       // → 'bkston'
 
-// 3. Lecture dans une boucle critique (Hot Path) → lookup par code
-import { NODES_LOOKUP, TILE_FLAG } from './constant.mjs'
-const tileDesc = NODES_LOOKUP[tileCode]
-if (tileDesc.flags & TILE_FLAG.SOLID) { … }
+// Références croisées (résolues au boot — strings remplacées par objets)
+NODES.CLAY.mining[0].item       // → ITEMS.bkclay   (objet direct)
+ITEMS.bkston.placesNode         // → NODES.STONE    (objet direct)
+PLANTS.oak.growsOn[0]           // → NODES.DIRT     (objet direct)
+PLANTS.oak.drops[0].item        // → ITEMS.oaklog   (objet direct)
+RECIPES.wooden_plank.result.item // → ITEMS.plank   (objet direct)
 ```
+
+### Post-traitements (top-level, ordre d'exécution)
+
+1. Injection de `code` dans chaque item (`ITEMS.worm.code === 'worm'`)
+2. Construction de `NODES_LOOKUP` par code numérique
+3. Résolution `NODES.mining[].item` : string → objet item
+4. Résolution `ITEMS.placesNode` : string → objet node
+5. Résolution `PLANTS.growsOn[]` : string → objet node
+6. Résolution `PLANTS.drops[].item` : string → objet item
+7. Résolution `RECIPES.ingredients[].item` et `result.item` : string → objet item
+8. **Validation d'intégrité** — `throw` bloquant si KO :
+   - Codes `NODES` uniques
+   - Aucune référence croisée non résolue (string résiduelle = erreur)
+
+### Hydratation des images
+
+**Absente de `data.mjs`** — dépend de `loadAssets()`.
+Effectuée par `core.mjs :: #hydrateNodes()` et `#hydrateItems()` après `loadAssets()`.
+Itère sur `NODES_LOOKUP` et `ITEMS`, modifie les objets en place
+(ajout de `renderData`, suppression de `image` pour libérer la mémoire).
 
 ---
 
-## 3. `utils.mjs` (Layer 1)
+## 4. `utils.mjs` (Layer 1)
 
 ### Class `EventBus` (Singleton : `eventBus`)
 
-| Méthode | Signature | Description |
-|---|---|---|
-| `on` | `(event: string, cb: function): void` | Abonnement |
-| `off` | `(event: string, cb: function): void` | Désabonnement |
-| `emit` | `(event: string, data: any): void` | Publication |
+| Méthode | Signature                        | Description   |
+|---------|----------------------------------|---------------|
+| `on`    | `(event: string, cb: function): void` | Abonnement    |
+| `off`   | `(event: string, cb: function): void` | Désabonnement |
+| `emit`  | `(event: string, data: any): void`    | Publication   |
 
 **Règle :** appel direct des callbacks (pas de queue). Si le listener dépasse 0,1 ms → déléguer au `MicroTasker`.
 
@@ -110,17 +167,17 @@ if (tileDesc.flags & TILE_FLAG.SOLID) { … }
 
 Exécute des tâches fractionnées dans le temps résiduel de la frame.
 
-| Méthode/Getter | Signature | Description |
-|---|---|---|
-| `init` | `(): void` | Vide la file et les stats |
-| `initDebug` | `(mapping: object): void` | — |
-| `enqueue` | `(fn, priority, capacityUnits, ...args): void` | Enfile une tâche répétable |
-| `enqueueOnce` | `(fn, priority, capacityUnits, ...args): void` | Enfile une tâche unique |
-| `clear` | `(): void` | Vide la file |
-| `update` | `(budgetMs: number): void` | Appelé **uniquement** par `GameCore` |
-| `queueSize` | `number` (getter) | Taille de la file |
-| `resetStats` | `(): void` | — |
-| `debugStats` | `(): string` | — |
+| Méthode/Getter  | Signature                                    | Description                        |
+|-----------------|----------------------------------------------|------------------------------------|
+| `init`          | `(): void`                                   | Vide la file et les stats          |
+| `initDebug`     | `(mapping: object): void`                    | —                                  |
+| `enqueue`       | `(fn, priority, capacityUnits, ...args): void` | Enfile une tâche répétable       |
+| `enqueueOnce`   | `(fn, priority, capacityUnits, ...args): void` | Enfile une tâche unique          |
+| `clear`         | `(): void`                                   | Vide la file                       |
+| `update`        | `(budgetMs: number): void`                   | Appelé **uniquement** par `GameCore` |
+| `queueSize`     | `number` (getter)                            | Taille de la file                  |
+| `resetStats`    | `(): void`                                   | —                                  |
+| `debugStats`    | `(): string`                                 | —                                  |
 
 **Pattern d'usage obligatoire :**
 ```javascript
@@ -144,20 +201,20 @@ microTasker.enqueue(this.myMethod, priority, capacity, arg1, arg2)
 Gère les tâches longues inter-frames (ex : sauvegarde auto toutes les 2 s, craft long).
 Tableau trié par timestamp d'exécution, recherche dichotomique, suppression lazy (flag `deleted`).
 
-| Méthode | Signature | Description |
-|---|---|---|
-| `init` | `(time: number): void` | Vide la file, initialise le temps de référence |
-| `enqueue` | `(id, delayMs, fn, priority, capacity): void` | Planifie une tâche |
-| `update` | `(currentTime: number): void` | Appelé **uniquement** par `GameCore` |
+| Méthode  | Signature                                      | Description                              |
+|----------|------------------------------------------------|------------------------------------------|
+| `init`   | `(time: number): void`                         | Vide la file, initialise le temps de référence |
+| `enqueue`| `(id, delayMs, fn, priority, capacity): void`  | Planifie une tâche                       |
+| `update` | `(currentTime: number): void`                  | Appelé **uniquement** par `GameCore`     |
 
 ---
 
 ### Class `TimeManager` (Singleton : `timeManager`)
 
-| Méthode | Signature | Description |
-|---|---|---|
-| `init` | `(timestamp, weather, nextWeather): void` | Initialise depuis le gamestate |
-| `update` | `(dt: number): void` | Avance le temps monde |
+| Méthode | Signature                                  | Description                    |
+|---------|--------------------------------------------|--------------------------------|
+| `init`  | `(timestamp, weather, nextWeather): void`  | Initialise depuis le gamestate |
+| `update`| `(dt: number): void`                       | Avance le temps monde          |
 
 Émet `time/sky-color-changed` quand la couleur du ciel doit changer.
 
@@ -167,56 +224,57 @@ Tableau trié par timestamp d'exécution, recherche dichotomique, suppression la
 
 Générateur pseudo-aléatoire déterministe. Utilisé pour la génération procédurale reproductible.
 
-| Méthode | Description |
-|---|---|
-| `randomPerlinScaled(x, seed, amplitude, frequency)` | Bruit de Perlin mis à l'échelle |
+| Méthode                                              | Description                    |
+|------------------------------------------------------|--------------------------------|
+| `randomPerlinScaled(x, seed, amplitude, frequency)`  | Bruit de Perlin mis à l'échelle |
 
 ---
 
-## 4. `database.mjs` (Layer 1)
+## 5. `database.mjs` (Layer 1)
 
 Wrapper IndexedDB bas niveau. **Aucune connaissance du domaine métier.**
 Proxy universel : toutes les opérations d'une session transitent par cette classe.
 
 ### Class `DataBase` (Singleton : `database`)
 
-| Méthode | Signature | Description |
-|---|---|---|
-| `init` | `(): Promise<void>` | Ouverture DB + demande de persistance. Appelé par `GameCore.boot()`. |
-| `setGameState` | `(key, value, tx?): Promise` | Écrit un K/V dans `gamestate` |
-| `getGameStateValue` | `(key): Promise<any>` | Lit une valeur (déconseillé en runtime) |
-| `getAllGameState` | `(): Promise<object>` | Lit tout le gamestate → `{key: value, …}` |
-| `batchSetGameState` | `(updates: Array<{key,value}>): Promise` | Écriture multiple en une transaction |
-| `addOrUpdateRecord` | `(storeName, record, tx?): Promise` | Upsert générique |
-| `getRecordByKey` | `(storeName, key): Promise` | Lecture par clé primaire |
-| `readAllFromObjectStore` | `(storeName): Promise<Array>` | Lecture complète d'un store |
-| `addMultipleRecords` | `(storeName, items): Promise` | Insertion en masse |
-| `clearObjectStore` | `(storeName): Promise` | Vide un store |
-| `clearAllObjectStores` | `(): Promise` | Reset complet (nouveau monde) |
-| `openTransaction` | `(storeName, mode): IDBTransaction` | Transaction manuelle |
-| `batchUpdate` | `(operations): Promise` | Lot d'opérations mixtes en une transaction |
-| `backupDatabase` | `(): Promise` | Export JSON (debug) |
-| `restoreDatabase` | `(file): Promise` | Import JSON (debug) |
+| Méthode                | Signature                              | Description                                                   |
+|------------------------|----------------------------------------|---------------------------------------------------------------|
+| `init`                 | `(): Promise<void>`                    | Ouverture DB + demande de persistance. Appelé par `GameCore.boot()`. |
+| `setGameState`         | `(key, value, tx?): Promise`           | Écrit un K/V dans `gamestate`                                 |
+| `getGameStateValue`    | `(key): Promise<any>`                  | Lit une valeur (déconseillé en runtime)                       |
+| `getAllGameState`       | `(): Promise<object>`                  | Lit tout le gamestate → `{key: value, …}`                    |
+| `batchSetGameState`    | `(updates: Array<{key,value}>): Promise` | Écriture multiple en une transaction                        |
+| `addOrUpdateRecord`    | `(storeName, record, tx?): Promise`    | Upsert générique                                              |
+| `getRecordByKey`       | `(storeName, key): Promise`            | Lecture par clé primaire                                      |
+| `readAllFromObjectStore` | `(storeName): Promise<Array>`        | Lecture complète d'un store                                   |
+| `addMultipleRecords`   | `(storeName, items): Promise`          | Insertion en masse                                            |
+| `clearObjectStore`     | `(storeName): Promise`                 | Vide un store                                                 |
+| `clearAllObjectStores` | `(): Promise`                          | Reset complet (nouveau monde)                                 |
+| `openTransaction`      | `(storeName, mode): IDBTransaction`    | Transaction manuelle                                          |
+| `batchUpdate`          | `(operations): Promise`                | Lot d'opérations mixtes en une transaction                    |
+| `backupDatabase`       | `(): Promise`                          | Export JSON (debug)                                           |
+| `restoreDatabase`      | `(file): Promise`                      | Import JSON (debug)                                           |
 
 ---
 
-## 5. `core.mjs` (Layer 2)
+## 6. `core.mjs` (Layer 2)
 
 ### Class `GameCore` (Singleton : `gameCore`)
 
 Point d'entrée unique du moteur.
 
-| Méthode | Signature | Description |
-|---|---|---|
-| `boot` | `(): Promise<void>` | Phase technique one-time : assets, DB, hydratation, DOM |
-| `startSession` | `(): Promise<void>` | Lance une partie (nouveau monde ou chargement) |
-| `consumeDebugTrigger` | `(): boolean` | Lecture unique du flag debug (touche `²`) |
+| Méthode              | Signature          | Description                                          |
+|----------------------|--------------------|------------------------------------------------------|
+| `boot`               | `(): Promise<void>` | Phase technique one-time : assets, DB, hydratation, DOM |
+| `startSession`       | `(): Promise<void>` | Lance une partie (nouveau monde ou chargement)       |
+| `consumeDebugTrigger`| `(): boolean`       | Lecture unique du flag debug (touche `²`)            |
 
 **Cycle de `boot()` :**
-1. `loadAssets()` (bloquant)
+1. `loadAssets()` (bloquant) — charge images et sons, importe `data.mjs` en parallèle
 2. `database.init()`
-3. Hydratation des données statiques (nodes, items)
-4. `mouseManager.init()`
+3. `#hydrateNodes()` — itère `NODES_LOOKUP`, remplace `image` par `renderData`
+4. `#hydrateItems()` — itère `ITEMS`, remplace `image` par `renderData`
+5. `mouseManager.init()`
 
 **Cycle de `startSession()` :**
 1. `database.getAllGameState()` → chargement en une requête
@@ -242,36 +300,42 @@ Point d'entrée unique du moteur.
 
 ---
 
-## 6. `assets.mjs` (Layer 3)
+## 7. `assets.mjs` (Layer 3)
 
-| Export | Signature | Description |
-|---|---|---|
-| `loadAssets` | `(): Promise<void>` | Charge toutes les images/sons |
-| `resolveAssetData` | `(codeStr): {imgId, sx, sy, sw, sh, isAutoTile}` | Résout une string image en UV pré-calculées |
-| `IMAGE_FILES` | `Array<string>` | Liste des fichiers image |
+| Export           | Signature                                           | Description                                       |
+|------------------|-----------------------------------------------------|---------------------------------------------------|
+| `loadAssets`     | `(): Promise<void>`                                 | Charge toutes les images/sons                     |
+| `resolveAssetData` | `(codeStr): {imgId, sx, sy, sw, sh, isAutoTile}` | Résout une string image en UV pré-calculées       |
+| `IMAGE_FILES`    | `Array<string>`                                     | Liste des fichiers image                          |
 
-**Zero-Cost Runtime :** les coordonnées de texture sont calculées **une seule fois** au boot via `resolveAssetData`. Le renderer accède à des entiers, jamais à des strings ni des calculs de grille pendant la frame.
+**Zero-Cost Runtime :** les coordonnées de texture sont calculées **une seule fois** au boot via
+`resolveAssetData`. Le renderer accède à des entiers, jamais à des strings ni des calculs de grille
+pendant la frame.
+
+**Relation avec `data.mjs` :** `assets.mjs` n'exporte pas les tables de données.
+Les tables (`NODES`, `ITEMS`…) sont importées directement depuis `assets/data/data.mjs`
+par les modules qui en ont besoin.
 
 ---
 
-## 7. `world.mjs` (Layer 4)
+## 8. `world.mjs` (Layer 4)
 
 ### Class `ChunkManager` (Singleton : `chunkManager`)
 
 Maître unique de la donnée monde. Le renderer et la persistence **ne font que lire/consommer**.
 
-| Méthode | Signature | Description |
-|---|---|---|
-| `init` | `(savedChunks: Array): void` | Hydrate le buffer depuis la DB. Lève une erreur si count ≠ 2048. |
-| `getTile` | `(x, y): number` | Hot path. Pas de bounds checking (Ghost Cells). |
-| `setTile` | `(x, y, code): void` | Écriture avec dirty flags (render + save). |
-| `setGenTile` | `(x, y, code): void` | Écriture rapide sans dirty flags — **génération uniquement**. |
-| `getChunkData` | `(chunkIndex): Uint8Array` | Retourne une copie des 256 octets du chunk. |
-| `getChunkSaveData` | `(chunkIndex): {key, index, chunk}` | DTO pour la persistence. |
-| `consumeRenderDirtyChunks` | `(): Set<number> \| null` | Clone + vide la liste render dirty. Appelé par le Renderer. |
-| `consumeSaveDirty` | `(): Set<number> \| null` | Clone + vide la liste save dirty. Appelé par SaveManager. |
-| `processWorldToChunks` | `(): Array<{key, chunk}>` | Conversion complète monde → chunks. Fin de génération uniquement. |
-| `getRawData` | `(): Uint8Array` | Accès direct au buffer (init/génération). |
+| Méthode                   | Signature                        | Description                                                        |
+|---------------------------|----------------------------------|--------------------------------------------------------------------|
+| `init`                    | `(savedChunks: Array): void`     | Hydrate le buffer depuis la DB. Lève une erreur si count ≠ 2048.  |
+| `getTile`                 | `(x, y): number`                 | Hot path. Pas de bounds checking (Ghost Cells).                    |
+| `setTile`                 | `(x, y, code): void`             | Écriture avec dirty flags (render + save).                         |
+| `setGenTile`              | `(x, y, code): void`             | Écriture rapide sans dirty flags — **génération uniquement**.      |
+| `getChunkData`            | `(chunkIndex): Uint8Array`       | Retourne une copie des 256 octets du chunk.                        |
+| `getChunkSaveData`        | `(chunkIndex): {key, index, chunk}` | DTO pour la persistence.                                        |
+| `consumeRenderDirtyChunks`| `(): Set<number> \| null`        | Clone + vide la liste render dirty. Appelé par le Renderer.        |
+| `consumeSaveDirty`        | `(): Set<number> \| null`        | Clone + vide la liste save dirty. Appelé par SaveManager.          |
+| `processWorldToChunks`    | `(): Array<{key, chunk}>`        | Conversion complète monde → chunks. Fin de génération uniquement.  |
+| `getRawData`              | `(): Uint8Array`                 | Accès direct au buffer (init/génération).                          |
 
 **Adressage :**
 ```javascript
@@ -283,21 +347,21 @@ const cy = chunkIndex >> 6           // Décodage Y chunk
 
 ---
 
-## 8. `render.mjs` (Layer 4)
+## 9. `render.mjs` (Layer 4)
 
 ### Class `Camera` (Singleton : `camera`)
 
 Responsable uniquement des mathématiques de projection et du culling.
 
-| Méthode/Propriété | Description |
-|---|---|
-| `worldToCanvas(wx, wy)` | Conversion pixel monde → pixel canvas |
-| `canvasToWorld(cx, cy)` | Conversion pixel canvas → pixel monde |
-| `displayChunks` | `Array` — chunks visibles (cible du render) |
-| `preloadChunks` | `Set` — chunks en bordure (cible du cache) |
-| `unpurgeableChunks` | `Set` — chunks à garder en RAM pendant la purge |
-| `setZoom` | Écoute `render/set-zoom` (EventBus). Zoom 100%–200%. |
-| `logicalWidth` / `logicalHeight` | Dimensions logiques = `VIEWPORT / zoom` |
+| Méthode/Propriété     | Description                                              |
+|-----------------------|----------------------------------------------------------|
+| `worldToCanvas(wx, wy)` | Conversion pixel monde → pixel canvas                 |
+| `canvasToWorld(cx, cy)` | Conversion pixel canvas → pixel monde                 |
+| `displayChunks`       | `Array` — chunks visibles (cible du render)              |
+| `preloadChunks`       | `Set` — chunks en bordure (cible du cache)               |
+| `unpurgeableChunks`   | `Set` — chunks à garder en RAM pendant la purge          |
+| `setZoom`             | Écoute `render/set-zoom` (EventBus). Zoom 100%–200%.     |
+| `logicalWidth` / `logicalHeight` | Dimensions logiques = `VIEWPORT / zoom`     |
 
 ---
 
@@ -316,8 +380,8 @@ Ne stocke aucune donnée de jeu. Lit exclusivement `ChunkManager`.
 
 Canvas opaque (`alpha: false`). Écoute `time/sky-color-changed` → `fillRect` plein.
 
-| Méthode | Signature | Description |
-|---|---|---|
+| Méthode          | Signature               | Description                            |
+|------------------|-------------------------|----------------------------------------|
 | `updateSkyColor` | `(color: string): void` | Remplit le canvas avec la couleur hex/rgb |
 
 ---
@@ -326,32 +390,33 @@ Canvas opaque (`alpha: false`). Écoute `time/sky-color-changed` → `fillRect` 
 
 #### Algorithme "Surface & Punch" — 4 passes
 
-| Passe | Mode | Action | Résultat |
-|---|---|---|---|
-| 1 — Reset | `source-over` | `fillRect` noir total | Monde invisible |
-| 2 — Découpe Ciel | `destination-out` | Polygone zone aérienne via `surfaceLine` | Zone au-dessus du sol transparente |
-| 3 — Punch-holes | `destination-out` | Gradient radial (blanc → transparent) par source lumineuse | Halos de lumière |
-| 4 — Coloration | `lighter` | Gradient radial (couleur source → noir transparent) par source | Teinte colorée sur les halos |
+| Passe              | Mode               | Action                                          | Résultat                         |
+|--------------------|--------------------|-------------------------------------------------|----------------------------------|
+| 1 — Reset          | `source-over`      | `fillRect` noir total                           | Monde invisible                  |
+| 2 — Découpe Ciel   | `destination-out`  | Polygone zone aérienne via `surfaceLine`        | Zone au-dessus du sol transparente |
+| 3 — Punch-holes    | `destination-out`  | Gradient radial (blanc → transparent) par source | Halos de lumière               |
+| 4 — Coloration     | `lighter`          | Gradient radial (couleur source → transparent)  | Teinte colorée sur les halos     |
 
 **Sources lumineuses :** fournies par `FurnitureManager` (liste des objets visibles).
-**`surfaceLine` :** fournie par `world.mjs :: SurfaceLineManager` — pour chaque X du monde, Y de la première tuile solide.
+**`surfaceLine` :** fournie par `world.mjs :: SurfaceLineManager` — pour chaque X du monde,
+Y de la première tuile solide.
 
 **Optimisation :** 1 polygone vectoriel pour le ciel remplace ~1000 appels de dessin de tuiles.
 **No-Draw Condition :** Si caméra entièrement dans le ciel → `clearRect` uniquement, LightRenderer inactif.
 
 ---
 
-## 9. `persistence.mjs` (Layer 3)
+## 10. `persistence.mjs` (Layer 3)
 
 ### Class `SaveManager` (Singleton : `saveManager`)
 
 Orchestrateur de sauvegarde. Connaît les object stores métier.
 
-| Méthode | Signature | Description |
-|---|---|---|
-| `init` | `(): void` | Planifie la première sauvegarde auto (2 s via `taskScheduler`) |
-| `queueStaticUpdate` | `(updates: Array\|Object): void` | Empile des updates (inventaire, player…). Dédoublonnage par ID. |
-| `processSave` | `(): void` | Exécuté par `TaskScheduler`. Collecte dirty chunks + updates statiques → `database.batchUpdate`. |
+| Méthode             | Signature                        | Description                                                         |
+|---------------------|----------------------------------|---------------------------------------------------------------------|
+| `init`              | `(): void`                       | Planifie la première sauvegarde auto (2 s via `taskScheduler`)      |
+| `queueStaticUpdate` | `(updates: Array\|Object): void` | Empile des updates (inventaire, player…). Dédoublonnage par ID.     |
+| `processSave`       | `(): void`                       | Exécuté par `TaskScheduler`. Collecte dirty chunks + updates statiques → `database.batchUpdate`. |
 
 **Flux :**
 1. Interroge `chunkManager.consumeSaveDirty()`.
@@ -361,14 +426,15 @@ Orchestrateur de sauvegarde. Connaît les object stores métier.
 
 ---
 
-## 10. `assets.mjs` — Auto-Tiling
+## 11. `assets.mjs` — Auto-Tiling
 
 **Framing :** Bitmasking 4-connectivity calculé à la volée ou au chargement pour les transitions de texture.
-**Diffusion :** Les tuiles ont un bord de 2 px partiellement transparent, peint de la couleur dominante des tuiles adjacentes (`NODES.color`).
+**Diffusion :** Les tuiles ont un bord de 2 px partiellement transparent, peint de la couleur dominante
+des tuiles adjacentes (`NODES.color`).
 
 ---
 
-## 11. Règles de Codage
+## 12. Règles de Codage
 
 * Vanilla JS ESNext, modules natifs `.mjs`, pas de bundler.
 * Google JavaScript Style Guide — **pas de point-virgule**.
