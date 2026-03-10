@@ -629,7 +629,55 @@ const cy = chunkIndex >> 6           // Décodage Y chunk
 
 ---
 
-## 10. `render.mjs` (Layer 4)
+## 10. `generate.mjs` (Layer 4)
+
+### Class `WorldBuffer` (Singleton : `worldBuffer`)
+
+Buffer temporaire actif **uniquement pendant la génération d'un nouveau monde**.
+N'existe jamais en mémoire pendant une session de jeu normale.
+
+Le buffer est un `Uint8Array` plat 1024 × 512. La valeur `0` est interdite pour
+un node valide — elle signifie "tuile non initialisée" et facilite la détection
+d'erreurs de génération dans les tests.
+
+| Méthode/Getter        | Signature                              | Description                                                     |
+|-----------------------|----------------------------------------|-----------------------------------------------------------------|
+| `init`                | `(): void`                             | Crée le buffer à zéro. Réinitialise s'il existait déjà.         |
+| `clear`               | `(): void`                             | Libère le buffer (`world = null`). Appelé par `WorldGenerator` après écriture en DB, ou par les tests après assertions. |
+| `world`               | `Uint8Array` (getter)                  | Accès direct au buffer brut — usage réservé aux algorithmes de génération en boucle serrée. |
+| `read`                | `(x, y): number`                       | Lecture par coordonnées.                                        |
+| `readAt`              | `(index): number`                      | Lecture par index précalculé.                                   |
+| `write`               | `(x, y, value): void`                  | Écriture par coordonnées.                                       |
+| `writeAt`             | `(index, value): void`                 | Écriture par index précalculé.                                  |
+| `processWorldToChunks`| `(): Array<{key: number, chunk: Uint8Array}>` | Convertit le buffer en 2048 chunks de 256 octets pour écriture en DB. |
+
+**Adressage :**
+```javascript
+const index = (y << 10) | x   // Coordonnées → index (identique à ChunkManager)
+```
+
+**Cycle de vie :**
+```javascript
+// Production
+worldBuffer.init()
+biomesGenerator.generate()   // utilise write() / writeAt()
+// ... autres algorithmes ...
+await database.addMultipleRecords('world_chunks', worldBuffer.processWorldToChunks())
+worldBuffer.clear()
+
+// Debug / Tests (pas d'écriture DB)
+worldBuffer.init()
+biomesGenerator.generate()
+assert('...', worldBuffer.read(x, y) === expectedValue)
+worldBuffer.clear()           // appelant responsable
+```
+
+**Pas de bounds checking** — cohérent avec les Ghost Cells de `ChunkManager`.
+Un accès hors-borne est un bug d'algorithme détecté par les tests.
+
+---
+
+## 11. `render.mjs` (Layer 4)
 
 ### Class `Camera` (Singleton : `camera`)
 
@@ -688,7 +736,7 @@ Y de la première tuile solide.
 
 ---
 
-## 11. `persistence.mjs` (Layer 3)
+## 12. `persistence.mjs` (Layer 3)
 
 ### Class `SaveManager` (Singleton : `saveManager`)
 
@@ -708,7 +756,7 @@ Orchestrateur de sauvegarde. Connaît les object stores métier.
 
 ---
 
-## 12. `assets.mjs` — Auto-Tiling
+## 13. `assets.mjs` — Auto-Tiling
 
 **Framing :** Bitmasking 4-connectivity calculé à la volée ou au chargement pour les transitions de texture.
 **Diffusion :** Les tuiles ont un bord de 2 px partiellement transparent, peint de la couleur dominante
@@ -716,7 +764,7 @@ des tuiles adjacentes (`NODES.color`).
 
 ---
 
-## 13. Règles de Codage
+## 14. Règles de Codage
 
 * Vanilla JS ESNext, modules natifs `.mjs`, pas de bundler.
 * Google JavaScript Style Guide — **pas de point-virgule**.

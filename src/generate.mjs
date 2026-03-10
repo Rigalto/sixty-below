@@ -1,9 +1,62 @@
 import {seededRNG} from './utils.mjs'
 import {database} from './database.mjs'
 import {WORLD_WIDTH, WORLD_HEIGHT, SEA_LEVEL, BIOME_TYPE, WEATHER_TYPE} from './constant.mjs'
-import {NODES} from '../../assets/data/data.mjs'
+import {NODES} from '../assets/data/data.mjs'
 
 import {chunkManager} from './world.mjs'
+
+/* ====================================================================================================
+   WORLD BUFFER (CREATION DU MONDE)
+   ==================================================================================================== */
+
+class WorldBuffer {
+  #data
+
+  constructor () {
+    this.#data = null
+  }
+
+  init () {
+    this.#data = new Uint8Array(WORLD_WIDTH * WORLD_HEIGHT)
+  }
+
+  get world () { return this.#data }
+
+  clear () { this.#data = null }
+
+  read (x, y) { return this.#data[(y << 10) | x] }
+
+  readAt (index) { return this.#data[index] }
+
+  write (x, y, value) { this.#data[(y << 10) | x] = value }
+
+  writeAt (index, value) { this.#data[index] = value }
+
+  processWorldToChunks () {
+    const chunksX = WORLD_WIDTH >> 4
+    const chunksY = WORLD_HEIGHT >> 4
+    const totalChunks = chunksX * chunksY
+    const result = []
+
+    for (let i = 0; i < totalChunks; i++) {
+      const cx = i & 0x3F
+      const cy = i >> 6
+      const buffer = new Uint8Array(256)
+      const startWorldX = cx << 4
+      const startWorldY = cy << 4
+      let rowOffset = (startWorldY << 10) | startWorldX
+
+      for (let y = 0; y < 16; y++) {
+        buffer.set(this.#data.subarray(rowOffset, rowOffset + 16), y << 4)
+        rowOffset += WORLD_WIDTH
+      }
+      result.push({key: i, chunk: buffer})
+    }
+    return result
+  }
+}
+
+export const worldBuffer = new WorldBuffer()
 
 /* ====================================================================================================
    CREATION DU MONDE

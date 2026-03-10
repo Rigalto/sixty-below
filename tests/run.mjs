@@ -10,7 +10,8 @@ const REGISTRY = [
   {name: 'MicroTasker', file: './test-microtasker.mjs'},
   {name: 'TaskScheduler', file: './test-taskscheduler.mjs'},
   {name: 'TimeManager', file: './test-timemanager.mjs'},
-  {name: 'SeededRNG', file: './test-seededrng.mjs'}
+  {name: 'SeededRNG', file: './test-seededrng.mjs'},
+  {name: 'WorldBuffer', file: './test-worldbuffer.mjs'}
 ]
 
 const target = process.argv[2] ?? null

@@ -53,7 +53,7 @@ Layer 3 — assets.mjs         Ressources graphiques/sons.
           data/data-gen.mjs  Données génération (biomes, courbes, paramètres proc-gen)
 ─────────────────────────────────────────────────────────────
 Layer 4+ — Modules Métier    world, render, player, combat, inventory…
-          generate.mjs       Algorithmes de génération — importé dynamiquement - importe data-generate.mjs
+          generate.mjs       Algorithmes de génération — importé dynamiquement - Dépend uniquement de utils.mjs, database.mjs, constant.mjs et data-generate.mjs
 ```
 
 **Règle absolue :** les dépendances ne vont que vers le bas. Un module de Layer N n'importe jamais un module de Layer N+.
@@ -291,6 +291,9 @@ Les modules communiquent via l'`EventBus` (couplage faible).
 │   ├── world.mjs            # Layer 4 : ChunkManager, PhysicsSystem, LiquidSimulator
 │   ├── render.mjs           # Layer 4 : WorldRenderer, Camera, SkyRenderer, LightRenderer
 │   ├── generate.mjs         # Layer 4 : Proc-Gen (Dynamic Import)
+│   │                        #   WorldBuffer : TypedArray 1024×512, API read/write (x,y) et (index)
+│   │                        #   Algorithmes : Biomes, Ores, Gems, Plants, Hives, Chests, CobWebs…
+│   │                        #   WorldGenerator : orchestration complète
 │   ├── player.mjs           # Layer 4 : PlayerManager, LifeManager
 │   ├── action.mjs           # Layer 4 : ActionManager (Mining, Cutting, Fishing…)
 │   ├── buff.mjs             # Layer 4 : BuffManager, StatModifiers
@@ -317,6 +320,17 @@ Vanilla JS sans dépendance, situé dans `/tests`.
 **Lancement :**
 - `node tests/run.mjs` → tous les tests, une ligne de résumé par suite
 - `node tests/run.mjs EventBus` → détail complet pour une classe
+
+**Tests de génération procédurale (`generate.mjs`) :**
+
+`WorldGenerator.generate()` accepte un paramètre `debug` (défaut : `false`).
+
+- `debug = false` (production) : écrit dans la base de données, ne retourne rien.
+- `debug = true` (test) : **n'écrit pas** dans la base de données, retourne le `WorldBuffer`
+  pour inspection. L'appelant est responsable de libérer la référence (`buffer = null`).
+
+Les algorithmes individuels (`BiomesGenerator`, `BiomeNaturalizer`...) peuvent être
+testés unitairement en instanciant directement un `WorldBuffer` sans passer par `WorldGenerator`.
 
 ### 8.3 Déploiement
 
