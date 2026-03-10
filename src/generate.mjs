@@ -3,8 +3,6 @@ import {database} from './database.mjs'
 import {WORLD_WIDTH, WORLD_HEIGHT, SEA_LEVEL, BIOME_TYPE, WEATHER_TYPE} from './constant.mjs'
 import {NODES} from '../assets/data/data.mjs'
 
-import {chunkManager} from './world.mjs'
-
 /* ====================================================================================================
    WORLD BUFFER (CREATION DU MONDE)
    ==================================================================================================== */
@@ -26,11 +24,19 @@ class WorldBuffer {
 
   clear () { this.#data = null }
 
-  read (x, y) { return this.#data[(y << 10) | x] }
+  read (x, y) {
+    // DEBUG — décommenter pour investiguer les accès invalides :
+    // if (!this.#data || x < 0 || x >= 1024 || y < 0 || y >= 512) { debugger }
+    return this.#data[(y << 10) | x]
+  }
 
   readAt (index) { return this.#data[index] }
 
-  write (x, y, value) { this.#data[(y << 10) | x] = value }
+  write (x, y, value) {
+    // DEBUG — décommenter pour investiguer les accès invalides :
+    // if (!this.#data || x < 0 || x >= 1024 || y < 0 || y >= 512) { debugger }
+    this.#data[(y << 10) | x] = value
+  }
 
   writeAt (index, value) { this.#data[index] = value }
 
@@ -67,9 +73,13 @@ export const worldBuffer = new WorldBuffer()
 const SEA_MAX_DEPTH = 280 // tuiles
 
 class WorldGenerator {
-  async generate (seed) {
+  async generate (seed, debug = false) {
     const t0 = performance.now()
     console.log('[WorldGenerator] - Début avec la graine', seed)
+
+    // 0. Initialisation du buffer de génération
+    worldBuffer.init()
+
     // 1. On passe le générateur de nombre aléatoire en mode déterminé par la clé
     seededRNG.init(seed)
 
@@ -82,12 +92,16 @@ class WorldGenerator {
     console.log('[WorldGenerator::biomeNaturalizer] - Biomes', (performance.now() - t0).toFixed(3), 'ms')
 
     // N. Stochage du monde en base de données
-    await this.save(seed)
+    if (!debug) {
+      await this.save(seed)
+      worldBuffer.clear()
+    }
 
     // N + 1. On repasse le générateur de nombres aléatoires en mode aléatoire
     seededRNG.init()
 
     console.log('[WorldGenerator] - Terminé en', (performance.now() - t0).toFixed(3), 'ms')
+    if (debug) { return worldBuffer } // appelant responsable du clear()
   }
 
   async save (seed) {
@@ -95,7 +109,7 @@ class WorldGenerator {
     // 1. Sauvegarde des tuiles
     await database.clearObjectStore('world_chunks')
 
-    const chunks = chunkManager.processWorldToChunks()
+    const chunks = worldBuffer.processWorldToChunks() // NEW
     await database.addMultipleRecords('world_chunks', chunks)
     // for (let yc = 0; yc < GEOMETRY.WORLD_CHUNK_Y; yc++) {
     //   const records = []
@@ -171,7 +185,7 @@ class BiomeNaturalizer {
           code = this.getBiome(x, y, skySurface, surfaceUnder, underCaverns, verticalBoundaries)
           if (y >= hell[x]) code = NODES.LAVA.code
         }
-        chunkManager.setGenTile(x, y, code)
+        worldBuffer.write(x, y, code) // NEW
       }
     }
 
@@ -179,8 +193,8 @@ class BiomeNaturalizer {
     const {leftCliff, rightCliff} = this.precomputeCliffs(leftSeaWidth, rightSeaWidth)
     this.applySeaPostProcessing(leftCliff, rightCliff)
     for (let y = 0; y < WORLD_HEIGHT; y++) {
-      // chunkManager.setGenTile(leftCliff[y], y, NODES.HONEY.code)
-      // chunkManager.setGenTile(rightCliff[y], y, NODES.HONEY.code)
+      // worldBuffer.write(leftCliff[y], y, NODES.HONEY.code)
+      // worldBuffer.write(rightCliff[y], y, NODES.HONEY.code)
     }
 
     this.applyWorldMigration(surfaceUnder, underCaverns, verticalBoundaries)
@@ -271,7 +285,7 @@ class BiomeNaturalizer {
 
   applyWorldMigration (surfaceUnder, underCaverns, verticalBoundaries) {
     // 1. On récupère les données courantes en tant que source des diffusions
-    const source = chunkManager.getSnapshot()
+    const source = worldBuffer.snapshot()
 
     // 2. Diffusions horizontales
     this.applyHorizontalMigration(source, surfaceUnder)
@@ -373,12 +387,12 @@ class BiomeNaturalizer {
    * Vérifie que la tuile peut être écrasée par la migration
    */
   safeSetTile (x, y, newCode) {
-    const currentCode = chunkManager.getTile(x, y)
+    const currentCode = worldBuffer.read(x, y)
 
     // RÈGLE DE ROBUSTESSE :
     // On ne migre pas si la tuile actuelle est du ciel ou de la mer ou une tuile de pourtour
     if ((newCode >= NODES.BIOMEFORSUR.code) && (currentCode >= NODES.BIOMEFORSUR.code)) { // && (currentCode <= NODES.BIOMEJUNCAV.code)
-      chunkManager.setGenTile(x, y, newCode)
+      worldBuffer.write(x, y, newCode)
     }
   }
 
@@ -431,12 +445,12 @@ class BiomeNaturalizer {
       if (leftCliff[y] >= 1) {
         const endX = leftCliff[y]
         for (let x = 1; x < endX; x++) {
-          const currentTile = chunkManager.getTile(x, y)
+          const currentTile = worldBuffer.read(x, y)
 
           // On ne remplace que si c'est une tuile de biome "Surface"
           // (En supposant que tes codes de surface sont identifiables)
           if ((currentTile >= BIOMEFORSUR) && (currentTile <= BIOMEJUNSUR)) {
-            chunkManager.setGenTile(x, y, newCode)
+            worldBuffer.write(x, y, newCode)
           }
         }
       }
@@ -447,9 +461,9 @@ class BiomeNaturalizer {
         const startX = rightCliff[y]
         // On part du bord droit (1022 car 1023 est le périmètre DEEPSEA)
         for (let x = 1022; x > startX; x--) {
-          const currentTile = chunkManager.getTile(x, y)
+          const currentTile = worldBuffer.read(x, y)
           if (currentTile >= BIOMEFORSUR && currentTile <= BIOMEJUNSUR) {
-            chunkManager.setGenTile(x, y, newCode)
+            worldBuffer.write(x, y, newCode)
           }
         }
       }
@@ -640,7 +654,7 @@ class BiomesGenerator {
     return offsets
   }
 }
-const biomesGenerator = new BiomesGenerator()
+export const biomesGenerator = new BiomesGenerator()
 
 function runBiomesTest () {
   const ITERATIONS = 10000
