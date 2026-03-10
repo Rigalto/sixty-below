@@ -838,11 +838,12 @@ export class SeededRNG {
    * Attend des objets { weight: number } dans le tableau.
    */
   randomGetArrayWeighted (arr) {
+    if (arr.length === 0) { return -1 }
     const totalWeight = arr.reduce((acc, obj) => acc + (obj.weight === undefined ? 1 : parseFloat(obj.weight)), 0)
 
     if (isNaN(totalWeight) || totalWeight <= 0) {
       console.error('[SeededRNG] Poids invalide', arr)
-      return 0
+      return -1
     }
 
     const random = this.#next() * totalWeight
