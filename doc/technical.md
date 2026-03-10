@@ -356,12 +356,59 @@ taskScheduler.extendTask('my_task_id', 2000, this.myMethod, priority, capacity)
 
 ### Class `TimeManager` (Singleton : `timeManager`)
 
-| Méthode | Signature                                  | Description                    |
-|---------|--------------------------------------------|--------------------------------|
-| `init`  | `(timestamp, weather, nextWeather): void`  | Initialise depuis le gamestate |
-| `update`| `(dt: number): void`                       | Avance le temps monde          |
+Gère le temps monde (cycle jour/nuit, météo, lune). Convertit le temps réel de jeu (ms)
+en calendrier fictif et émet des événements granulaires à chaque changement.
 
-Émet `time/sky-color-changed` quand la couleur du ciel doit changer.
+Deux phases obligatoires : `init()` (sans émission) puis `update()` à chaque frame.
+
+| Méthode/Propriété  | Signature                                              | Description                              |
+|--------------------|--------------------------------------------------------|------------------------------------------|
+| `init`             | `(timestamp?: number, weather?: number, nextWeather?: number): void` | Initialise depuis le gamestate. N'émet aucun événement. |
+| `update`           | `(dt: number): void`                                   | Avance le temps. Appelé **uniquement** par `GameCore`. |
+| `timestamp`        | `number`                                               | Temps réel écoulé en ms (source de vérité) |
+| `day`              | `number`                                               | Jour courant (0-based)                   |
+| `hour`             | `number`                                               | Heure courante (0–23)                    |
+| `minute`           | `number`                                               | Minute courante (0–59)                   |
+| `timeSlot`         | `number`                                               | Tranche de 3h courante (0–7)             |
+| `isDay`            | `boolean`                                              | `true` entre 06:00 et 20:59 inclus       |
+| `weather`          | `number`                                               | Météo courante                           |
+| `nextWeather`      | `number`                                               | Météo du prochain jour                   |
+| `moonPhase`        | `number`                                               | Phase lunaire (0–7) = `day & 7`          |
+| `currentSkyColor`  | `string`                                               | Couleur hex du ciel courant              |
+
+**Valeurs par défaut de `init()` :** `timestamp=480000` (Jour 0, 08:00), `weather=0`, `nextWeather=0`.
+
+**Conversions (REAL_MS_PER_GAME_MINUTE = 1000) :**
+
+| Durée jeu  | ms réelles  |
+|------------|-------------|
+| 1 minute   | 1 000       |
+| 1 heure    | 60 000      |
+| 3 heures   | 180 000     |
+| 1 jour     | 1 440 000   |
+
+**Événements émis par `update()` :**
+
+| Événement               | Payload                                                                 | Condition d'émission                        |
+|-------------------------|-------------------------------------------------------------------------|---------------------------------------------|
+| `time/clock`            | `{ day, hour, minute }`                                                 | À chaque changement de minute               |
+| `time/every-5-minutes`  | `{ day, hour, minute }`                                                 | À chaque tranche de 5 minutes               |
+| `time/every-hour`       | `{ day, hour, minute, isDay }`                                          | À chaque changement d'heure                 |
+| `time/timeslot`         | `{ tslot, isDay }`                                                      | À chaque tranche de 3h                      |
+| `time/daily`            | `{ day, weather, nextWeather, moonPhase }`                              | À chaque changement de jour (minuit)        |
+| `time/sky-color-changed`| `string` (hex)                                                          | Uniquement si la couleur change             |
+| `time/first-loop`       | `{ day, hour, minute, tslot, weather, nextWeather, skyColor, moonPhase, isDay }` | Une seule fois, à la première frame |
+
+**Contrat d'émission :**
+Les événements sont **imbriqués** : `time/daily` n'est émis que si `time/every-hour` l'est aussi,
+qui lui-même n'est émis que si `time/every-5-minutes` l'est, etc. Dans le fonctionnement
+normal (frame par frame), tous les seuils intermédiaires sont franchis naturellement.
+`time/first-loop` est toujours émis lors de la première frame, indépendamment des autres.
+
+**Rotation météo :**
+À chaque changement de jour, `weather` prend la valeur de `nextWeather`,
+et `nextWeather` est tiré aléatoirement selon les poids définis dans `WEATHER_TYPE`.
+Cette rotation n'a **pas lieu** lors du first-loop (pour respecter la sauvegarde).
 
 ---
 

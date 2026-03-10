@@ -1,4 +1,4 @@
-import {SKY_COLORS} from './constant.mjs'
+import {SKY_COLORS, WEATHER_TYPE} from './constant.mjs'
 
 /* ====================================================================================================
    EVENT BUS
@@ -563,7 +563,7 @@ export class TimeManager {
     // Environnement
     this.weather = 0
     this.nextWeather = 0
-    this.true = SKY_COLORS[35] // Jour par défaut
+    this.currentSkyColor = SKY_COLORS[35] // Jour par défaut
     this.isDay = false
     this.moonPhase = 0
 
@@ -602,18 +602,13 @@ export class TimeManager {
   update (dt) {
     // Incrément direct du temps réel
     this.timestamp += dt
-
-    if (this.#isFirstLoop) {
-      this.#recalculateAndEmit(true)
-      this.#isFirstLoop = false
-    } else {
-      this.#recalculateAndEmit(false)
-    }
-
-    return this.timestamp
+    this.#recalculateAndEmit()
+    this.#isFirstLoop = false
   }
 
-  #recalculateAndEmit (isFirstLoop = false) {
+  #recalculateAndEmit () {
+    const isFirstLoop = this.#isFirstLoop
+
     // CONVERSION : Playtime (ms) -> Calendrier Monde
     const totalGameMinutes = Math.floor(this.timestamp / REAL_MS_PER_GAME_MINUTE)
 
@@ -661,7 +656,7 @@ export class TimeManager {
             // Gestion rotation météo (sauf au tout premier lancement pour respecter la save)
             if (!isFirstLoop) {
               this.weather = this.nextWeather
-              this.nextWeather = 0 // TODO: RNG
+              this.nextWeather = WEATHER_TYPE[seededRNG.randomGetArrayWeighted(WEATHER_TYPE)].code
             }
 
             eventBus.emit('time/daily', {
