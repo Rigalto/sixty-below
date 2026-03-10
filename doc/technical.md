@@ -307,13 +307,50 @@ microTasker.enqueue(this.myMethod, priority, capacity, arg1, arg2)
 ### Class `TaskScheduler` (Singleton : `taskScheduler`)
 
 Gère les tâches longues inter-frames (ex : sauvegarde auto toutes les 2 s, craft long).
-Tableau trié par timestamp d'exécution, recherche dichotomique, suppression lazy (flag `deleted`).
+Les tâches sont triées par timestamp d'exécution (décroissant), ce qui permet un `pop()`
+sans décalage mémoire. La suppression est lazy (flag `isRemoved`).
 
-| Méthode  | Signature                                      | Description                              |
-|----------|------------------------------------------------|------------------------------------------|
-| `init`   | `(time: number): void`                         | Vide la file, initialise le temps de référence |
-| `enqueue`| `(id, delayMs, fn, priority, capacity): void`  | Planifie une tâche                       |
-| `update` | `(currentTime: number): void`                  | Appelé **uniquement** par `GameCore`     |
+| Méthode/Getter    | Signature                                                              | Description                                          |
+|-------------------|------------------------------------------------------------------------|------------------------------------------------------|
+| `init`            | `(time: number): void`                                                 | Vide la file, initialise `lastFrameTime`             |
+| `clear`           | `(): void`                                                             | Vide la file                                         |
+| `queueSize`       | `number` (getter)                                                      | Taille de la file (tâches actives + supprimées)      |
+| `enqueue`         | `(id, delayMs, fn, priority, capacity, ...args): number`               | Planifie une tâche dans `delayMs` ms                 |
+| `enqueueOnce`     | `(id, delayMs, fn, priority, capacity, ...args): number`               | Planifie uniquement si aucune tâche active avec cet `id` |
+| `enqueueAbsolute` | `(id, time, fn, priority, capacity, ...args): number`                  | Planifie à un timestamp absolu                       |
+| `enqueueAfter`    | `(idOrRegex, newId, delayMs, fn, priority, capacity, ...args): number` | Planifie `delayMs` ms après la tâche référencée      |
+| `requeue`         | `(id, delayMs, fn, priority, capacity, ...args): number`               | Replanifie depuis `lastFrameTime` (annule l'ancienne)|
+| `extendTask`      | `(id, delayMs, fn, priority, capacity, ...args): number`               | Prolonge depuis le time existant, ou crée si absente |
+| `dequeue`         | `(idOrRegex: string\|RegExp): void`                                    | Marque toutes les correspondances `isRemoved = true` |
+| `update`          | `(currentTime: number): void`                                          | Appelé **uniquement** par `GameCore`                 |
+| `debugStats`      | `(): string`                                                           | Liste les tâches actives avec leur échéance          |
+
+Toutes les méthodes retournant `number` renvoient le **timestamp absolu** de la tâche créée.
+
+**Contraintes :**
+- L'`id` est obligatoirement une `string`.
+- `dequeue` et `enqueueAfter` acceptent une `string` ou une `RegExp` pour cibler plusieurs tâches.
+- Les fonctions anonymes sont interdites (même règle que `MicroTasker`).
+
+**Contrat d'exécution :**
+À chaque frame, `update()` transfère au `MicroTasker` toutes les tâches dont
+l'échéance est atteinte. C'est le `MicroTasker` qui les exécute dans son budget résiduel —
+aucune garantie d'exécution dans la frame exacte de l'échéance.
+
+**Pattern d'usage obligatoire :**
+```javascript
+import { MICROTASK } from './constant.mjs'
+import { taskScheduler } from './utils.mjs'
+
+const { priority, capacity } = MICROTASK.SYSTEM_ACTION_NAME
+this.myMethod = this.myMethod.bind(this)
+
+// Délai relatif à lastFrameTime
+taskScheduler.enqueue('my_task_id', 2000, this.myMethod, priority, capacity)
+
+// Prolongation depuis l'échéance existante (ex : boucle de sauvegarde)
+taskScheduler.extendTask('my_task_id', 2000, this.myMethod, priority, capacity)
+```
 
 ---
 

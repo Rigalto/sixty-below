@@ -303,7 +303,7 @@ export const microTasker = new MicroTasker()
    TASK SCHEDULER
    ==================================================================================================== */
 
-class TaskScheduler {
+export class TaskScheduler {
   constructor () {
     this.tasks = [] // Tableau trié des tâches
     this.lastFrameTime = 0
@@ -313,7 +313,6 @@ class TaskScheduler {
   init (time) {
     this.lastFrameTime = time
     this.tasks.length = 0
-    this.lastFrameTime = 0
   }
 
   // Ajoute une tâche à exécuter après un délai
@@ -377,24 +376,25 @@ class TaskScheduler {
   // ajoute la tâche uniquement si elle n'est pas déjà présente
   // ne fait rien si elle est présnete
   enqueueOnce (id, delay, fn, priority, capacityUnits, ...args) {
-    const old = this.tasks.find(task => !task.isRemoved && task.id === id)
-    if (old !== undefined) { return old.time }
+    for (const task of this.tasks) {
+      if (!task.isRemoved && task.id === id) { return task.time }
+    }
+
     const task = {id, time: delay + this.lastFrameTime, fn, priority, capacityUnits, args, isRemoved: false}
     return this.#addTask(task)
   }
 
   // Ajoute une tâche après la dernière tâche correspondant à un identifiant ou une regex.
   enqueueAfter (idOrRegex, newId, delay, fn, priority, capacityUnits, ...args) {
-    const lastMatchingTask = this.tasks.find(task => {
-      if (task.isRemoved) { return false }
-      if (typeof idOrRegex === 'string') {
-        return task.id === idOrRegex
-      } else if (idOrRegex instanceof RegExp) {
-        return idOrRegex.test(task.id)
+    let baseTime = this.lastFrameTime
+    const isRegex = idOrRegex instanceof RegExp
+    for (const task of this.tasks) {
+      if (task.isRemoved) { continue }
+      if (isRegex ? idOrRegex.test(task.id) : task.id === idOrRegex) {
+        baseTime = task.time
+        break
       }
-      return false
-    })
-    const baseTime = lastMatchingTask ? lastMatchingTask.time : this.lastFrameTime
+    }
     const task = {id: newId, time: delay + baseTime, fn, priority, capacityUnits, args, isRemoved: false}
     return this.#addTask(task)
   }
