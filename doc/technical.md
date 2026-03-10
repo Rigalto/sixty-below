@@ -412,13 +412,56 @@ Cette rotation n'a **pas lieu** lors du first-loop (pour respecter la sauvegarde
 
 ---
 
-### `seededRNG`
+### Class `SeededRNG` (Singleton : `seededRNG`)
 
-Générateur pseudo-aléatoire déterministe. Utilisé pour la génération procédurale reproductible.
+Générateur pseudo-aléatoire Mulberry32. Deux modes : **déterministe** (graine fixe,
+reproductible) et **aléatoire** (`Math.random()`). Le mode aléatoire est le mode par
+défaut à la construction et après `init()` sans argument.
 
-| Méthode                                              | Description                    |
-|------------------------------------------------------|--------------------------------|
-| `randomPerlinScaled(x, seed, amplitude, frequency)`  | Bruit de Perlin mis à l'échelle |
+| Méthode | Signature | Retour | Description |
+|---|---|---|---|
+| `init` | `(seed?: string\|number): void` | — | Sans argument → mode aléatoire. Avec argument → mode déterministe. Réinitialiser avec la même graine rejoue la séquence à l'identique. |
+| `randomGet` | `(): number` | `[0, 1[` | Float brut |
+| `randomGetBool` | `(): boolean` | `true\|false` | Booléen aléatoire |
+| `randomGetMax` | `(max: number): number` | `[0, max]` | Entier |
+| `randomGetMinMax` | `(min: number, max: number): number` | `[min, max]` | Entier |
+| `randomGetRealMax` | `(max: number): number` | `[0, max[` | Float |
+| `randomGetRealMinMax` | `(min: number, max: number): number` | `[min, max[` | Float |
+| `randomGetArrayValue` | `(arr: Array): any\|null` | valeur ou `null` | Valeur aléatoire. `null` si tableau vide. |
+| `randomGetArrayIndex` | `(arr: Array): number\|null` | index ou `null` | Index aléatoire. `null` si tableau vide. |
+| `randomGetArrayWeighted` | `(arr: Array<{weight: number}>): number` | index ou `-1` | Index pondéré par `weight`. `-1` si tableau vide ou tous poids à `0`. |
+| `randomInteger` | `(a?, b?): number` | entier | Polyvalent : sans arg → `0\|1`, `(max)` → `[0,max]`, `(min,max)` → `[min,max]`, `(array)` → valeur, `(range)` → `[range.min, range.max]` |
+| `randomReal` | `(a?, b?): number` | float | Polyvalent : sans arg → `[0,1[`, `(max)` → `[0,max[`, `(min,max)` → `[min,max[`, `(array)` → valeur |
+| `randomGaussian` | `(mean?: number, sd?: number): number` | float | Distribution normale. Défauts : `mean=0, sd=1` |
+| `randomLinear` | `(): number` | `[0, 1[` | Distribution linéaire (biais vers 1) |
+| `randomPerlinInit` | `(): void` | — | Réinitialise le cache des gradients. Obligatoire avant un nouveau tirage Perlin. |
+| `randomPerlinOctave` | `(octaves: Array<{scale, amplitude}>): void` | — | Configure les octaves. Défaut : 4 octaves. |
+| `randomPerlin` | `(x: number, y?: number): number` | `[0, 1]` | Bruit de Perlin 1D ou 2D. |
+| `randomPerlinScaled` | `(x: number, y: number, period: number, amplitude: number): number` | `[-amplitude, amplitude]` | Perlin mis à l'échelle. |
+
+**Pattern d'usage (génération procédurale) :**
+```javascript
+// Mode déterministe — génération de monde reproductible
+seededRNG.init(worldSeed)
+seededRNG.randomPerlinInit()
+const height = seededRNG.randomPerlinScaled(x, 0, 100, 50)
+
+// Retour en mode aléatoire après la génération
+seededRNG.init()
+```
+
+**Règle critique :** `seededRNG` est un singleton à état global. Tout appel hors
+génération de monde doit se faire en mode aléatoire (`init()` sans argument).
+Ne jamais appeler `seededRNG` en mode déterministe depuis la game loop.
+
+---
+
+### Fonctions utilitaires exportées (`utils.mjs`)
+
+| Fonction | Signature | Retour | Description |
+|---|---|---|---|
+| `intFract` | `(r: number): {int, fract}` | `{int: number, fract: number}` | Partie entière (`Math.floor`) et fractionnaire. `fract` toujours `>= 0`. |
+| `cosineInterpolation` | `(x: number, a: number, b: number): number` | `[a, b]` | Interpolation cosinus. `x=0` → `a`, `x=1` → `b`, monotone sur `[0, 1]`. |
 
 ---
 
