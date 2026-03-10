@@ -213,3 +213,41 @@ describe('WorldBuffer — processWorldToChunks() : dernier chunk (2047) correspo
   assert('chunk[2047][255] = 88', chunks[2047].chunk[255] === 88)
   worldBuffer.clear()
 })
+
+// ─── snapshot ─────────────────────────────────────────────────────────────────
+
+describe('WorldBuffer — snapshot() : retourne un Uint8Array', () => {
+  worldBuffer.init()
+  const snap = worldBuffer.snapshot()
+  assert('snapshot est un Uint8Array', snap instanceof Uint8Array)
+  assert('snapshot a la même taille que le buffer', snap.length === 524288)
+  worldBuffer.clear()
+})
+
+describe('WorldBuffer — snapshot() : les valeurs sont identiques au moment du snapshot', () => {
+  worldBuffer.init()
+  worldBuffer.write(10, 10, 42)
+  worldBuffer.write(500, 200, 99)
+  const snap = worldBuffer.snapshot()
+  assert('snap(10,10) = 42', snap[(10 << 10) | 10] === 42)
+  assert('snap(500,200) = 99', snap[(200 << 10) | 500] === 99)
+  worldBuffer.clear()
+})
+
+describe('WorldBuffer — snapshot() : modification du snapshot n\'affecte pas le buffer', () => {
+  worldBuffer.init()
+  worldBuffer.write(50, 50, 77)
+  const snap = worldBuffer.snapshot()
+  snap[(50 << 10) | 50] = 255
+  assert('Le buffer original est inchangé', worldBuffer.read(50, 50) === 77)
+  worldBuffer.clear()
+})
+
+describe('WorldBuffer — snapshot() : modification du buffer n\'affecte pas le snapshot', () => {
+  worldBuffer.init()
+  worldBuffer.write(50, 50, 77)
+  const snap = worldBuffer.snapshot()
+  worldBuffer.write(50, 50, 255)
+  assert('Le snapshot est inchangé', snap[(50 << 10) | 50] === 77)
+  worldBuffer.clear()
+})

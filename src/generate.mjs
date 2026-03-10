@@ -22,6 +22,8 @@ class WorldBuffer {
 
   get world () { return this.#data }
 
+  snapshot () { return this.#data.slice() }
+
   clear () { this.#data = null }
 
   read (x, y) { return this.#data[(y << 10) | x] }

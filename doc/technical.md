@@ -645,6 +645,7 @@ d'erreurs de génération dans les tests.
 | `init`                | `(): void`                             | Crée le buffer à zéro. Réinitialise s'il existait déjà.         |
 | `clear`               | `(): void`                             | Libère le buffer (`world = null`). Appelé par `WorldGenerator` après écriture en DB, ou par les tests après assertions. |
 | `world`               | `Uint8Array` (getter)                  | Accès direct au buffer brut — usage réservé aux algorithmes de génération en boucle serrée. |
+| `snapshot`            | `(): Uint8Array`                        | Retourne une copie indépendante du buffer. Utilisée par les algorithmes de diffusion (lecture source / écriture destination). |
 | `read`                | `(x, y): number`                       | Lecture par coordonnées.                                        |
 | `readAt`              | `(index): number`                      | Lecture par index précalculé.                                   |
 | `write`               | `(x, y, value): void`                  | Écriture par coordonnées.                                       |
