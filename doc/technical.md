@@ -92,10 +92,10 @@ Un seul fichier centralise toutes les tables pour éviter les dépendances circu
 
 | Export       | Type    | Description             |
 |--------------|---------|-------------------------|
+| `BIOME_TYPE` | enum | Types de biomes (SEA, FOREST, DESERT, JUNGLE) |
 | `NODE_TYPE`  | bitmask | Types de tuiles         |
 | `ITEM_TYPE`  | bitmask | Types d'items           |
 | `PLANT_TYPE` | bitmask | Types de plantes        |
-| `BIOME_TYPE` | enum    | Types de biomes         |
 
 ### Exports — Tables
 
