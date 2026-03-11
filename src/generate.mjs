@@ -398,8 +398,8 @@ class BiomeNaturalizer {
 
   /**
  * Prépare les courbes des falaises latérales
- * @param {number} leftSeaWidth Largeur théorique mer gauche (en tuiles)
- * @param {number} rightSeaWidth Largeur théorique mer droite (en tuiles)
+ * @param {number} leftSeaWidth Largeur théorique mer gauche (en chunks)
+ * @param {number} rightSeaWidth Largeur théorique mer droite (en chunks)
  * @return {Object} { leftCliff, rightCliff } (Int16Array)
  */
   precomputeCliffs (leftSeaWidth, rightSeaWidth) {
@@ -440,7 +440,7 @@ class BiomeNaturalizer {
 
     for (let y = 1; y < SEA_MAX_DEPTH; y++) { // Environ le milieu de la zone under
       const newCode = (y < SEA_LEVEL) ? BIOMESKY : BIOMESEA
-      // 2. Mer Gauche
+      // 1. Mer Gauche
       // On vérifie si la falaise n'est pas sortie de l'écran à gauche (1023)
       if (leftCliff[y] >= 1) {
         const endX = leftCliff[y]
@@ -476,8 +476,8 @@ class BiomesGenerator {
   generate () {
     // 1. Détermination des Mers (Largeurs fixes)
     const leftIsSmall = seededRNG.randomGetBool()
-    const leftSeaWidthChunks = leftIsSmall ? 2 : 4
-    const rightSeaWidthChunks = leftIsSmall ? 3 : 3
+    const leftSeaWidthChunks = leftIsSmall ? 3 : 4
+    const rightSeaWidthChunks = leftIsSmall ? 4 : 3
 
     // 2. Forêt Centrale (6 à 8 chunks)
     const forestWidth = seededRNG.randomGetMinMax(6, 8)
@@ -589,7 +589,8 @@ class BiomesGenerator {
     let remaining = totalChunks
 
     for (let i = 0; i < zoneCount; i++) {
-      const width = (i === zoneCount - 1) ? remaining : Math.floor(totalChunks / zoneCount)
+      // const width = (i === zoneCount - 1) ? remaining : Math.floor(totalChunks / zoneCount)
+      const width = (i === zoneCount - 1) ? remaining : Math.floor(remaining / (zoneCount - i))
 
       // Tirage et alternance
       const rollIdx = seededRNG.randomGetMinMax(0, available.length - 1)
@@ -608,18 +609,6 @@ class BiomesGenerator {
       segments[i].width += offsets[i]
     }
     return segments
-  }
-
-  /**
-   * Copie les segments calculés dans le tableau principal.
-   */
-  #applySegments (targetArray, segments, startOffset) {
-    let cursor = startOffset
-    for (const seg of segments) {
-      for (let i = 0; i < seg.width; i++) {
-        targetArray[cursor++] = seg.type
-      }
-    }
   }
 
   /**

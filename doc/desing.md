@@ -108,7 +108,94 @@ Deux temporalités strictement séparées :
 
 **Map de debug :** Touche `M` → affichage de la carte complète à l'échelle 1/16, couleur dominante des tuiles (`NODES.color`). Disparition par `M` ou `Escape`.
 
-### 3.2 Génération Procédurale
+### 3.2 Biomes — Découpage Horizontal
+
+| Biome | Position | Difficulté |
+|---|---|---|
+| Sea | Bords - 50/50 entre (gauche=3 chunks, droite=4 chunks) et (gauche=4 chunks, droite=3 chunks) | — |
+| Forêt | Centre du monde — zone de départ + réparti | Facile |
+| Désert | Réparti | Moyen |
+| Jungle | Réparti | Difficile |
+
+### 3.3 Layers — Découpage Vertical
+
+| Layer | Position | Difficulté |
+|---|---|---|
+| Fog | Bord supérieur du monde | — |
+| Sky | Au-dessus du monde | — |
+| Surface | Haut du monde — zone de départ | Facile |
+| Underground | Centrale | Moyen |
+| Caverns | Bas du monde | Difficile |
+| Lava | Bord inférieur du monde | Difficile |
+
+### 3.4 Types de Tuiles (NODE_TYPE)
+
+Les types sont des bitmasks combinables :
+
+| Type | Rôle |
+|---|---|
+| `GAZ` | Traversable, pas de collision (ciel, vide) |
+| `LIQUID` | Fluide, ralentit le joueur (mer, eau, miel, sève) |
+| `SOLID` | Bloque le mouvement |
+| `ETERNAL` | Indestructible — tuiles de pourtour intégrées à la lore |
+| `NATURAL` | Topsoil en surface recouvert de végétation |
+| `TOPSOIL` | Terrain nourricier, propice aux plantes |
+| `SUBSTRAT` | Roche de base, peu propice aux plantes |
+| `ORE` | Minerai minable, présent en inclusion dans le substrat |
+| `GEM` | Gemme minable, présente en inclusion dans le substrat |
+| `ROCK` | Roche spéciale (caves exceptionnelles et enfer) |
+| `WALL` | Mur de côté des maisons, posable par le joueur |
+| `BWALL` | Mur de fond des maisons, posable par le joueur |
+| `WEB` | Toile d'araignée — ralentit, piège |
+
+### 3.5 Tuiles de Pourtour (ETERNAL)
+
+Indestructibles, intégrées à la lore. Ne jamais réutiliser leurs noms pour des tuiles ordinaires.
+
+| Tuile | Emplacement | Lore |
+|---|---|---|
+| `FOG` | Bord supérieur | Brouillard impénétrable |
+| `DEEPSEA` | Bords latéraux | Océan abyssal |
+| `BASALT` | Bords latéraux profonds | Roche primordiale |
+| `LAVA` | Bord inférieur | Magma originel |
+
+### 3.6 Tuiles par Biome et Couche
+
+Chaque combinaison biome/couche correspond à une tuile de substrat distincte avec ses propres propriétés (vitesse de minage, drops, végétation, pop de monstres).
+
+| Couche | FOREST | DESERT | JUNGLE |
+|---|---|---|---|
+| **natural** | `GRASS` | — | `GRASSJUNGLE` |
+| **topsoil** | `DIRT` | `SAND` | `SILT` |
+| **surface** | `CLAY` | `SANDSTONE` | `MUD` |
+| **underground** | `STONE` | `ASH` | `LIMESTONE` |
+| **caverns** | `HARDSTONE` | `HELLSTONE` | `SLATE` |
+
+Le désert n'a pas de tuile NATURAL, car sa végétation est éparse et non couvrante.
+
+Tuiles TOPSOIL transversales (présentes dans plusieurs biomes) :
+- `HUMUS` — sous-bois, grottes à champignons, grottes à fougères
+- `INVISIBLE` — utilisée derrière les portes fermées (furniture) pour simplifier la détection de collision
+
+Caves spéciales :
+- **Granite Cave** (Forêt - GRANITE)
+- **Marble Cave** (Desert - MARBLE)
+- **Obsidian Cave** (Jungle - OBSIDIAN)
+- **Météorite** (Tombe du ciel - METEORITE)
+- **Mushroom Cave** (Forest - HUMUS / GRASSMUSHROOM)
+- **Fern Cave** (Jungle - HUMUS / GRASSFERN)
+- **Hive** (Desert - HIVE / HONEY)
+
+Tuiles spéciales :
+- **SKY** : gaz, éclairé par le soleil
+- **VOID** : gaz, non éclairé par le soleil
+- **INVISIBLE** : gaz, utilisée derrière les portes fermées (furniture) pour simplifier la détection de collision
+- **SEA** : eau salée, sur les bords gauche et droit du monde
+- **WATER** : eau douce
+- **HONEY** : liquide créé dans les **Hive**
+- **SAP** : liquide créé dans la jungle
+
+### 3.7 Génération Procédurale
 
 * Effectuée **hors temps réel** (`STATE.CREATION`), en import dynamique (`generate.mjs`).
 * **World Key :** seed pour la re-génération déterministe.
@@ -116,18 +203,9 @@ Deux temporalités strictement séparées :
 * **Biomes (axe horizontal) :** Forêt (départ joueur, centre), Désert, Jungle + Océans latéraux.
 * **Layers (axe vertical) :** Surface, Underworld, Caverns, Hell (Lava).
 * **Fluides initiaux :** Lacs (Water), Ruches (Honey), Sève (Sap), Sable (Sand).
-* **Algorithmes :** Perlin/Simplex pour le lissage, algorithmes dédiés pour tunnels et cavernes, placement de coffres/minerais/flore, nettoyage des isolats.
+* **Algorithmes :** Perlin noise pour le lissage, algorithmes dédiés pour tunnels et cavernes, placement de coffres/minerais/flore, nettoyage des isolats.
 
-### 3.3 Biomes — Découpage Horizontal
-
-| Biome | Position | Difficulté |
-|---|---|---|
-| Sea | Bords gauche (3 chunks) et droit (4 chunks, aléatoire) | — |
-| Forêt | Centre du monde — zone de départ | Facile |
-| Désert | Intermédiaire | Moyen |
-| Jungle | Extrémités | Difficile |
-
-### 3.4 Physique (Exploration)
+### 3.8 Physique (Exploration)
 
 * **Déplacement :** Flèches directionnelles + ZQSD. Caméra centrée joueur. Zoom possible.
 * **Collision :** AABB (Axis-Aligned Bounding Box) custom.
@@ -135,7 +213,7 @@ Deux temporalités strictement séparées :
 * **AI Faune :** Comportements simples (Suit, Fuit, Erre) sans pathfinding complexe en temps réel.
 * **Contrainte :** Pas de moteur physique externe (Matter.js…). Pas de projectiles ni d'effets spéciaux hormis les animations de sprites.
 
-### 3.5 Simulation & Écosystème
+### 3.9 Simulation & Écosystème
 
 * **Faune :** Active uniquement dans le Viewport + buffer de sécurité. Entités hors-zone désactivées ou despawnées. Spawning calculé juste hors-vue.
 * **Flore :** Croissance **décorrélée des chunks**. Données dans le store `plant` (liste clairsemée). Calcul temporel global (timestamp) → une forêt peut pousser hors-vue sans charger ses chunks.
