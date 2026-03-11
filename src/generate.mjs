@@ -1,7 +1,6 @@
 import {seededRNG} from './utils.mjs'
 import {database} from './database.mjs'
-import {WORLD_WIDTH, WORLD_HEIGHT, SEA_LEVEL, BIOME_TYPE, WEATHER_TYPE} from './constant.mjs'
-import {NODES} from '../assets/data/data.mjs'
+import {NODES, WEATHER_TYPE, BIOME_TYPE, WORLD_WIDTH, WORLD_HEIGHT, SEA_LEVEL, BIOME_TILE_MAP} from '../assets/data/data-gen.mjs'
 
 /* ====================================================================================================
    WORLD BUFFER (CREATION DU MONDE)
@@ -163,7 +162,7 @@ class WorldGenerator {
 }
 export const worldGenerator = new WorldGenerator()
 
-class BiomeNaturalizer {
+export class BiomeNaturalizer {
   naturalize (biomesDescription, leftSeaWidth, rightSeaWidth) {
     const {skySurface, surfaceUnder, underCaverns, hell} = this.precomputeHorizontalBoundaries()
     const verticalBoundaries = this.precomputeVerticalBoundaries(biomesDescription)
@@ -281,6 +280,25 @@ class BiomeNaturalizer {
     if (biome === BIOME_TYPE.JUNGLE) return NODES.BIOMEJUNCAV.code
     console.error('getBiome - biome/layer inconnu')
     return NODES.LAVA.code
+  }
+
+  getSubstratCode (x, y, skySurface, surfaceUnder, underCaverns, verticalBoundaries) {
+  // 1. Détermination du biome
+    let biome = verticalBoundaries[verticalBoundaries.length - 1].biome
+    for (let i = 0; i < verticalBoundaries.length - 1; i++) {
+      if (x < verticalBoundaries[i].boundary[y]) {
+        biome = verticalBoundaries[i].biome
+        break
+      }
+    }
+    // 2. Détermination de la couche
+    let layer = 'caverns'
+    if (y < skySurface[x]) layer = 'sky'
+    else if (y < surfaceUnder[x]) layer = 'surface'
+    else if (y < underCaverns[x]) layer = 'under'
+
+    // 3. Résolution via table d'indirection
+    return BIOME_TILE_MAP[biome][layer]
   }
 
   applyWorldMigration (surfaceUnder, underCaverns, verticalBoundaries) {

@@ -6,10 +6,10 @@
  */
 
 import {NODES, NODES_LOOKUP, NODE_TYPE, BIOME_TYPE} from './data.mjs'
-import {WORLD_WIDTH, WORLD_HEIGHT, SEA_LEVEL} from '../../src/constant.mjs'
+import {WORLD_WIDTH, WORLD_HEIGHT, SEA_LEVEL, WEATHER_TYPE} from '../../src/constant.mjs'
 
 // Re-exports pour generate.mjs
-export {NODES, NODES_LOOKUP, NODE_TYPE, BIOME_TYPE, WORLD_WIDTH, WORLD_HEIGHT, SEA_LEVEL}
+export {NODES, NODES_LOOKUP, NODE_TYPE, BIOME_TYPE, WORLD_WIDTH, WORLD_HEIGHT, SEA_LEVEL, WEATHER_TYPE}
 
 // ── Table d'indirection biome × layer → code de tuile substrat ───────────────
 // Source de vérité : DESIGN.md

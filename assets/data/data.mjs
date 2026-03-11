@@ -12,6 +12,8 @@
    1. ENUMS MÉTIER
    ============================================================================ */
 
+export const BIOME_TYPE = {SEA: 1, FOREST: 2, DESERT: 3, JUNGLE: 4}
+
 export const NODE_TYPE = {GAZ: 0x1, LIQUID: 0x2, SOLID: 0x4, ETERNAL: 0x8, NATURAL: 0x10, TOPSOIL: 0x20, SUBSTRAT: 0x40, ORE: 0x80, GEM: 0x100, ROCK: 0x200, WOOD: 0x400, WALL: 0x800, BWALL: 0x1000, WEB: 0x2000}
 
 /* ============================================================================
@@ -63,9 +65,6 @@ export const NODES = {
   SLATE: {code: 28, name: 'Slate', type: NODE_TYPE.SUBSTRAT, stype: 'block', star: 3, solid: true, color: '#2a3a4a', image: 'substrat_16_16+0', speed: 1600, mining: [{item: 'bkslate', count: 1}]},
 
   // ----
-
-
-
 
   GRANITE: {code: 36, name: 'Granite', type: NODE_TYPE.ROCK, star: 4, solid: true, color: '#1966cc', image: 'rock_16_16+0', speed: 1500, mining: [{item: 'granite', count: 1}]}, // UNDERWORLD
   MARBLE: {code: 37, name: 'Marble', type: NODE_TYPE.ROCK, star: 4, solid: true, color: '#e6ddc4', image: 'rock_16_16+1', speed: 1500, mining: [{item: 'marble', count: 1}]}, // UNDERWORLD
