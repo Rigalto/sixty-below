@@ -207,8 +207,6 @@ export const PALETTE = {
 // const tileDesc = NODES.CLAY
 // const tileDesc = NODES_LOOKUP[tileCode]
 
-export const BIOME_TYPE = {SEA: 1, FOREST: 2, DESERT: 3, JUNGLE: 4}
-
 // CI-DESSOUS A SUPPRIMER
 
 // 1. Calcul des Flags
