@@ -6,9 +6,9 @@
 // seededRNG est initialisé avec une graine fixe pour la reproductibilité.
 
 import {describe, assert} from './kernel.mjs'
-import {BiomeNaturalizer, worldBuffer} from '../src/generate.mjs'
+import {BiomeNaturalizer, biomesGenerator, worldBuffer} from '../src/generate.mjs'
 import {seededRNG} from '../src/utils.mjs'
-import {NODES, BIOME_TYPE} from '../assets/data/data.mjs'
+import {NODES, NODES_LOOKUP, BIOME_TYPE} from '../assets/data/data.mjs'
 
 const SEED = 1234
 
@@ -500,5 +500,40 @@ describe('BiomeNaturalizer — applyWorldMigration() : les tuiles ETERNAL ne son
   n.applyWorldMigration(surfaceUnder, underCaverns, vb)
 
   assert('LAVA (ETERNAL) non migré', worldBuffer.read(512, 250) === NODES.LAVA.code)
+  worldBuffer.clear()
+})
+
+// ─── naturalize — présence de tous les substrats ──────────────────────────────
+
+describe('BiomeNaturalizer — naturalize() : tous les substrats présents dans le monde généré', () => {
+  seededRNG.init(SEED)
+  seededRNG.randomPerlinInit()
+  worldBuffer.init()
+  const n = new BiomeNaturalizer()
+
+  const {biomesDescription, leftSeaWidth, rightSeaWidth} = biomesGenerator.generate()
+  n.naturalize(biomesDescription, leftSeaWidth, rightSeaWidth)
+
+  const EXPECTED_SET = new Set([
+    NODES.SKY.code, NODES.VOID.code,
+    NODES.CLAY.code, NODES.SANDSTONE.code, NODES.MUD.code,
+    NODES.STONE.code, NODES.ASH.code, NODES.LIMESTONE.code,
+    NODES.HARDSTONE.code, NODES.HELLSTONE.code, NODES.SLATE.code
+  ])
+
+  const found = new Set()
+  const data = worldBuffer.world
+  for (let i = 0; i < data.length; i++) {
+    const code = data[i]
+    if (EXPECTED_SET.has(code)) {
+      found.add(code)
+      if (found.size === EXPECTED_SET.size) break // court-circuit correct
+    }
+  }
+
+  for (const code of EXPECTED_SET) {
+    assert(`code ${code} (${NODES_LOOKUP[code]?.name ?? '?'}) présent dans le monde`, found.has(code))
+  }
+
   worldBuffer.clear()
 })
