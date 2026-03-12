@@ -396,6 +396,16 @@ describe('BiomeNaturalizer — safeSetTile() : ne propage pas VOID', () => {
   worldBuffer.clear()
 })
 
+describe('BiomeNaturalizer — safeSetTile() : ne propage pas SKY', () => {
+  worldBuffer.init()
+  const n = new BiomeNaturalizer()
+
+  worldBuffer.write(10, 10, NODES.STONE.code)
+  n.safeSetTile(10, 10, NODES.SKY.code)
+  assert('STONE non remplacé par SKY', worldBuffer.read(10, 10) === NODES.STONE.code)
+  worldBuffer.clear()
+})
+
 // ─── applySeaPostProcessing ───────────────────────────────────────────────────
 
 describe('BiomeNaturalizer — applySeaPostProcessing() : tuiles terrain à gauche de leftCliff remplacées par SEA sous SEA_LEVEL', () => {

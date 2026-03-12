@@ -34,3 +34,8 @@ export const BIOME_TILE_MAP = {
     caverns: NODES.SLATE.code
   }
 }
+
+// taille maximale de la mer
+export const SEA_MAX_WIDTH = 90
+export const SEA_MAX_HEIGHT = 150
+export const SEA_MAX_JITTER = 10

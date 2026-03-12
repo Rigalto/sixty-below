@@ -1,6 +1,6 @@
 import {seededRNG} from './utils.mjs'
 import {database} from './database.mjs'
-import {NODES, NODES_LOOKUP, NODE_TYPE, WEATHER_TYPE, BIOME_TYPE, WORLD_WIDTH, WORLD_HEIGHT, SEA_LEVEL, BIOME_TILE_MAP} from '../assets/data/data-gen.mjs'
+import {NODES, NODES_LOOKUP, NODE_TYPE, WEATHER_TYPE, BIOME_TYPE, WORLD_WIDTH, WORLD_HEIGHT, SEA_LEVEL, BIOME_TILE_MAP, SEA_MAX_JITTER, SEA_MAX_WIDTH, SEA_MAX_HEIGHT} from '../assets/data/data-gen.mjs'
 
 /* ====================================================================================================
    WORLD BUFFER (CREATION DU MONDE)
@@ -89,6 +89,12 @@ class WorldGenerator {
     // 3. Rafinement des biomes (Perlin + diffusion)
     biomeNaturalizer.naturalize(biomesDescription, leftSeaWidth, rightSeaWidth)
     console.log('[WorldGenerator::biomeNaturalizer] - Biomes', (performance.now() - t0).toFixed(3), 'ms')
+
+    // N-1 Remplissage de la mer (gauche et droite)
+    liquidFiller.fillSea()
+    console.log('[WorldGenerator::liquidFiller] - Sea', (performance.now() - t0).toFixed(3), 'ms')
+
+    // 68824
 
     // N. Stochage du monde en base de données
     if (!debug) {
@@ -368,6 +374,8 @@ export class BiomeNaturalizer {
    */
   safeSetTile (x, y, newCode) {
     if (newCode === NODES.VOID.code) return // jamais propager VOID (SEA temporaire)
+    if (newCode === NODES.SKY.code) return // jamais propager SKY
+
     const currentType = NODES_LOOKUP[worldBuffer.read(x, y)]?.type ?? 0
     if (currentType & (NODE_TYPE.SUBSTRAT | NODE_TYPE.TOPSOIL | NODE_TYPE.NATURAL)) {
       worldBuffer.write(x, y, newCode)
@@ -413,7 +421,7 @@ export class BiomeNaturalizer {
   applySeaPostProcessing (leftCliff, rightCliff) {
     const SKY_CODE = NODES.SKY.code
     const SEA_CODE = NODES.VOID.code
-    const SURFACE_CODES = new Set([NODES.CLAY.code, NODES.SANDSTONE.code, NODES.MUD.code
+    const SURFACE_CODES = new Set([NODES.CLAY.code, NODES.SANDSTONE.code, NODES.MUD.code, NODES.SKY.code
     ])
 
     for (let y = 1; y < SEA_MAX_DEPTH; y++) { // Environ le milieu de la zone under
@@ -622,3 +630,81 @@ class BiomesGenerator {
   }
 }
 export const biomesGenerator = new BiomesGenerator()
+
+class LiquidFiller {
+  fillSea () {
+    const jitterLeft = seededRNG.randomGetMax(SEA_MAX_JITTER)
+    const jitterRight = seededRNG.randomGetMax(SEA_MAX_JITTER)
+    const jitterHeight = seededRNG.randomGetMax(SEA_MAX_JITTER)
+    const maxY = SEA_LEVEL + SEA_MAX_HEIGHT + jitterHeight
+
+    this.#fillOneSea(SEA_LEVEL << 10, true, SEA_MAX_WIDTH + jitterLeft, maxY)
+    this.#fillOneSea((SEA_LEVEL << 10) | 1023, false, SEA_MAX_WIDTH + jitterRight, maxY)
+  }
+
+  #fillOneSea (src, isLeft, maxWidth, maxY) {
+    const maxIndexTop = SEA_LEVEL * 1024 - 1
+    const xLimit = isLeft ? maxWidth : 1023 - maxWidth
+
+    const VOID_CODE = NODES.VOID.code
+    const SEA_CODE = NODES.SEA.code
+    const SANDSTONE_CODE = NODES.SANDSTONE.code
+
+    const visited = new Set()
+    const queue = []
+    let head = 0
+
+    const enqueue = (idx) => {
+      if (visited.has(idx)) return
+      visited.add(idx)
+      queue.push(idx)
+    }
+
+    visited.add(src)
+    queue.push(src)
+
+    while (head < queue.length) {
+      const idx = queue[head++]
+      const neighbors = [idx - 1, idx + 1, idx - 1024, idx + 1024]
+
+      for (let i = 0; i < 4; i++) {
+        const nIdx = neighbors[i]
+        if (visited.has(nIdx)) continue
+
+        // Limite haute
+        if (nIdx <= maxIndexTop) continue
+
+        const nx = nIdx & 0x3FF
+        const ny = nIdx >> 10
+
+        // Ghost cells
+        if (nx === 0 || nx === 1023 || ny === 0 || ny === 511) continue
+
+        // Limite basse
+        if (ny > maxY) continue
+
+        const tileCode = worldBuffer.readAt(nIdx)
+        if (tileCode !== VOID_CODE) continue
+
+        // Limite X — rebouchage éventuel
+        const atLimit = isLeft ? nx >= xLimit : nx <= xLimit
+        if (atLimit) {
+          const dir = nIdx - idx
+          const ahead1 = nIdx + dir
+          const ahead2 = ahead1 + dir
+          if (worldBuffer.readAt(ahead1) === VOID_CODE && worldBuffer.readAt(ahead2) === VOID_CODE) {
+            worldBuffer.writeAt(nIdx, SANDSTONE_CODE)
+            worldBuffer.writeAt(ahead1, SANDSTONE_CODE)
+            visited.add(nIdx)
+            continue
+          }
+        }
+
+        worldBuffer.writeAt(nIdx, SEA_CODE)
+        enqueue(nIdx)
+      }
+    }
+  }
+}
+
+export const liquidFiller = new LiquidFiller()
