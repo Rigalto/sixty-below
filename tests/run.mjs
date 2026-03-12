@@ -13,7 +13,8 @@ const REGISTRY = [
   {name: 'SeededRNG', file: './test-seededrng.mjs'},
   {name: 'WorldBuffer', file: './test-worldbuffer.mjs'},
   {name: 'BiomesGenerator', file: './test-biomesgenerator.mjs'},
-  {name: 'BiomeNaturalizer', file: './test-biomenaturalizer.mjs'}
+  {name: 'BiomeNaturalizer', file: './test-biomenaturalizer.mjs'},
+  {name: 'LiquidFiller', file: './test-liquidfiller.mjs'}
 ]
 
 const target = process.argv[2] ?? null
