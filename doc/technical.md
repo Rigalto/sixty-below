@@ -678,6 +678,20 @@ Un accès hors-borne est un bug d'algorithme détecté par les tests.
 
 ---
 
+### Class `ClusterGenerator` (Singleton : `clusterGenerator`)
+
+Calcule des clusters de tuiles de formes organiques (substrat, topsoil, ore, gem…).
+Sans effet de bord — n'écrit pas dans `worldBuffer`. Les clusters sont accumulés
+puis appliqués en une passe dédiée.
+
+| Méthode | Signature | Description |
+|---|---|---|
+| `randomWalkCluster` | `(x0, y0, size, code): Array<{x, y, index, code}>` | Cluster 4-connexe par diffusion aléatoire (drunk-walk agrégé). Retourne la liste des tuiles sans modifier le monde. `index = (y << 10) | x`, prêt pour `worldBuffer.writeAt`. Ghost cells exclues (marge de 2 tuiles). |
+
+**Algorithme :** frange maintenue en doublon `Set + Array` — déduplication O(1), tirage O(1) par swap-and-pop.
+
+---
+
 ### Autres classes de génération
 
 | Singleton            | Classe              | Rôle                                                                                      |

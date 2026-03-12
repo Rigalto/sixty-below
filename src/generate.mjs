@@ -708,3 +708,63 @@ class LiquidFiller {
 }
 
 export const liquidFiller = new LiquidFiller()
+
+class ClusterGenerator {
+  /**
+   * Génère un cluster organique par diffusion aléatoire (drunk-walk agrégé 4-connexe).
+   *
+   * @param {number} x0    - X de la tuile de départ
+   * @param {number} y0    - Y de la tuile de départ
+   * @param {number} size  - Nombre de tuiles cibles
+   * @param {number} code  - Code de node (ex: NODES.DIRT.code)
+   * @returns {Array<{x: number, y: number, index: number, code: number}>}
+   */
+  randomWalkCluster (x0, y0, size, code) {
+    const chosen = new Set()
+    const fringeSet = new Set()
+    const fringeArr = []
+
+    const seed = (y0 << 10) | x0
+    chosen.add(seed)
+    this.#pushNeighbors(x0, y0, chosen, fringeSet, fringeArr)
+
+    while (chosen.size < size && fringeArr.length > 0) {
+      const idx = seededRNG.randomGetMax(fringeArr.length - 1)
+      const key = fringeArr[idx]
+
+      fringeArr[idx] = fringeArr[fringeArr.length - 1]
+      fringeArr.pop()
+      fringeSet.delete(key)
+
+      chosen.add(key)
+      this.#pushNeighbors(key & 0x3FF, key >> 10, chosen, fringeSet, fringeArr)
+    }
+
+    const result = []
+    for (const key of chosen) {
+      result.push({x: key & 0x3FF, y: key >> 10, index: key, code})
+    }
+    return result
+  }
+
+  #pushNeighbors (x, y, chosen, fringeSet, fringeArr) {
+    if (y > 1) {
+      const k = ((y - 1) << 10) | x
+      if (!chosen.has(k) && !fringeSet.has(k)) { fringeSet.add(k); fringeArr.push(k) }
+    }
+    if (y < 510) {
+      const k = ((y + 1) << 10) | x
+      if (!chosen.has(k) && !fringeSet.has(k)) { fringeSet.add(k); fringeArr.push(k) }
+    }
+    if (x > 1) {
+      const k = (y << 10) | (x - 1)
+      if (!chosen.has(k) && !fringeSet.has(k)) { fringeSet.add(k); fringeArr.push(k) }
+    }
+    if (x < 1022) {
+      const k = (y << 10) | (x + 1)
+      if (!chosen.has(k) && !fringeSet.has(k)) { fringeSet.add(k); fringeArr.push(k) }
+    }
+  }
+}
+
+export const clusterGenerator = new ClusterGenerator()
