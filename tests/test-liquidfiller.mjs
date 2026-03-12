@@ -17,15 +17,14 @@ import {worldBuffer, liquidFiller} from '../src/generate.mjs'
 
 const SEED = 'liquidfiller-test'
 
-const SEA_LEVEL = 56   // même valeur que constant.mjs
-const W = 1024
+const SEA_LEVEL = 56 // même valeur que constant.mjs
 const H = 512
 
 const DEEPSEA = NODES.DEEPSEA.code
-const STONE   = NODES.STONE.code
-const VOID    = NODES.VOID.code
-const SEA     = NODES.SEA.code
-const SAND    = NODES.SANDSTONE.code
+const STONE = NODES.STONE.code
+const VOID = NODES.VOID.code
+const SEA = NODES.SEA.code
+const SAND = NODES.SANDSTONE.code
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
@@ -35,7 +34,7 @@ const initWorld = () => {
   const data = worldBuffer.world
   data.fill(STONE)
   for (let y = 0; y < H; y++) {
-    worldBuffer.write(0,    y, DEEPSEA)
+    worldBuffer.write(0, y, DEEPSEA)
     worldBuffer.write(1023, y, DEEPSEA)
   }
 }
@@ -198,8 +197,8 @@ describe('LiquidFiller  — fillSea — tunnel remontant : SEA ne dépasse pas S
   initWorld()
 
   // Tunnel en L : horizontal à SEA_LEVEL puis remonte au-dessus
-  digRect(1, SEA_LEVEL, 10, SEA_LEVEL + 3)       // segment horizontal
-  digRect(8, SEA_LEVEL - 10, 10, SEA_LEVEL - 1)  // segment vertical remontant
+  digRect(1, SEA_LEVEL, 10, SEA_LEVEL + 3) // segment horizontal
+  digRect(8, SEA_LEVEL - 10, 10, SEA_LEVEL - 1) // segment vertical remontant
 
   liquidFiller.fillSea()
 
