@@ -678,6 +678,17 @@ Un accès hors-borne est un bug d'algorithme détecté par les tests.
 
 ---
 
+### Autres classes de génération
+
+| Singleton            | Classe              | Rôle                                                                                      |
+|----------------------|---------------------|-------------------------------------------------------------------------------------------|
+| `worldGenerator`     | `WorldGenerator`    | Orchestre toutes les passes de génération dans l'ordre et sauvegarde en base de données.                                   |
+| `biomesGenerator`    | `BiomesGenerator`   | Disposition horizontale des biomes et largeurs des mers latérales.                        |
+| `biomeNaturalizer`   | `BiomeNaturalizer`  | Remplit le buffer avec les substrats par biome/couche. Prépare les zones côtières (VOID). |
+| `liquidFiller`       | `LiquidFiller`      | Flood-fill BFS des zones liquides et automate pour le SAND. |
+
+---
+
 ## 11. `render.mjs` (Layer 4)
 
 ### Class `Camera` (Singleton : `camera`)
