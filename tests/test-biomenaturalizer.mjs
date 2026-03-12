@@ -386,6 +386,16 @@ describe('BiomeNaturalizer — safeSetTile() : ne remplace pas une tuile non ini
   worldBuffer.clear()
 })
 
+describe('BiomeNaturalizer — safeSetTile() : ne propage pas VOID', () => {
+  worldBuffer.init()
+  const n = new BiomeNaturalizer()
+
+  worldBuffer.write(10, 10, NODES.STONE.code) // SUBSTRAT — normalement migrable
+  n.safeSetTile(10, 10, NODES.VOID.code)
+  assert('STONE non remplacé par VOID', worldBuffer.read(10, 10) === NODES.STONE.code)
+  worldBuffer.clear()
+})
+
 // ─── applySeaPostProcessing ───────────────────────────────────────────────────
 
 describe('BiomeNaturalizer — applySeaPostProcessing() : tuiles terrain à gauche de leftCliff remplacées par SEA sous SEA_LEVEL', () => {
@@ -403,7 +413,8 @@ describe('BiomeNaturalizer — applySeaPostProcessing() : tuiles terrain à gauc
   const rightCliff = new Int16Array(280).fill(900)
   n.applySeaPostProcessing(leftCliff, rightCliff)
 
-  assert('Tuile terrain sous SEA_LEVEL et à gauche de leftCliff → SEA', worldBuffer.read(testX, testY) === NODES.SEA.code)
+  assert('Tuile terrain sous SEA_LEVEL et à gauche de leftCliff → VOID', worldBuffer.read(testX, testY) === NODES.VOID.code)
+
   worldBuffer.clear()
 })
 

@@ -106,19 +106,6 @@ export const NODES = {
   SHORE: {code: 70, name: 'Shore', color: '#FFCC00'},
   // types utilisés de manière temporaire pendant la création du monde
   HEART: {code: 71, name: 'Life Heart', type: NODE_TYPE.CREATION, color: '#FF19CD'},
-
-  // utilisé provisoirement par la génération
-  BIOMESKY: {code: 101, name: 'B.Sky', type: 0, color: '#08ffff', star: 0},
-  BIOMESEA: {code: 102, name: 'B.Sea', type: 0, color: '#4040c0', star: 0},
-  BIOMEFORSUR: {code: 103, name: 'B.Forest.Surface', type: 0, color: '#80ff80', star: 0},
-  BIOMEDESSUR: {code: 104, name: 'B.Desert.Surface', type: 0, color: '#ffff80', star: 0},
-  BIOMEJUNSUR: {code: 105, name: 'B.Jungle.Surface', type: 0, color: '#ff80a0', star: 0},
-  BIOMEFORUND: {code: 106, name: 'B.Forest.Underground', type: 0, color: '#408040', star: 0},
-  BIOMEDESUND: {code: 107, name: 'B.Desert.Underground', type: 0, color: '#ffc000', star: 0},
-  BIOMEJUNUND: {code: 108, name: 'B.Jungle.Underground', type: 0, color: '#ff80ff', star: 0},
-  BIOMEFORCAV: {code: 109, name: 'B.Forest.Caverns', type: 0, color: '#206020', star: 0},
-  BIOMEDESCAV: {code: 110, name: 'B.Desert.Caverns', type: 0, color: '#ff8000', star: 0},
-  BIOMEJUNCAV: {code: 111, name: 'B.Jungle.Caverns', type: 0, color: '#8020a0', star: 0}
 }
 
 /** Lookup par code numérique — hot path render/physics */

@@ -1,6 +1,6 @@
 import {seededRNG} from './utils.mjs'
 import {database} from './database.mjs'
-import {NODES, WEATHER_TYPE, BIOME_TYPE, WORLD_WIDTH, WORLD_HEIGHT, SEA_LEVEL, BIOME_TILE_MAP} from '../assets/data/data-gen.mjs'
+import {NODES, NODES_LOOKUP, NODE_TYPE, WEATHER_TYPE, BIOME_TYPE, WORLD_WIDTH, WORLD_HEIGHT, SEA_LEVEL, BIOME_TILE_MAP} from '../assets/data/data-gen.mjs'
 
 /* ====================================================================================================
    WORLD BUFFER (CREATION DU MONDE)
@@ -181,7 +181,7 @@ export class BiomeNaturalizer {
         if (y === 511) code = NODES.LAVA.code
 
         if (code === 0) {
-          code = this.getBiome(x, y, skySurface, surfaceUnder, underCaverns, verticalBoundaries)
+          code = this.getSubstratCode(x, y, skySurface, surfaceUnder, underCaverns, verticalBoundaries)
           if (y >= hell[x]) code = NODES.LAVA.code
         }
         worldBuffer.write(x, y, code) // NEW
@@ -191,11 +191,8 @@ export class BiomeNaturalizer {
     // ajout de la mer
     const {leftCliff, rightCliff} = this.precomputeCliffs(leftSeaWidth, rightSeaWidth)
     this.applySeaPostProcessing(leftCliff, rightCliff)
-    for (let y = 0; y < WORLD_HEIGHT; y++) {
-      // worldBuffer.write(leftCliff[y], y, NODES.HONEY.code)
-      // worldBuffer.write(rightCliff[y], y, NODES.HONEY.code)
-    }
 
+    // ajout d'une migration des tuiles aux fromtières
     this.applyWorldMigration(surfaceUnder, underCaverns, verticalBoundaries)
   }
 
@@ -245,41 +242,6 @@ export class BiomeNaturalizer {
       verticalBoundaries.push({biome, boundary})
     }
     return verticalBoundaries
-  }
-
-  getBiome (x, y, skySurface, surfaceUnder, underCaverns, verticalBoundaries) {
-    // 1. Détermination du biome
-    let biome = verticalBoundaries[verticalBoundaries.length - 1].biome
-    for (let i = 0; i < verticalBoundaries.length - 1; i++) {
-      if (x < verticalBoundaries[i].boundary[y]) {
-        biome = verticalBoundaries[i].biome
-        break // Sortie immédiate dès que la zone est trouvée
-      }
-    }
-    // 2. Détermination de la couche
-    let layer = 'caverns'
-    if (y < skySurface[x]) layer = 'sky'
-    else if (y < surfaceUnder[x]) layer = 'surface'
-    else if (y < underCaverns[x]) layer = 'under'
-
-    // conversion biome+layer => biomeLayer (valeurs de débug)
-    if (y < skySurface[x]) return NODES.BIOMESKY.code
-
-    if (layer === 'surface') {
-      if (biome === BIOME_TYPE.FOREST) return NODES.BIOMEFORSUR.code
-      if (biome === BIOME_TYPE.DESERT) return NODES.BIOMEDESSUR.code
-      if (biome === BIOME_TYPE.JUNGLE) return NODES.BIOMEJUNSUR.code
-    }
-    if (layer === 'under') {
-      if (biome === BIOME_TYPE.FOREST) return NODES.BIOMEFORUND.code
-      if (biome === BIOME_TYPE.DESERT) return NODES.BIOMEDESUND.code
-      if (biome === BIOME_TYPE.JUNGLE) return NODES.BIOMEJUNUND.code
-    }
-    if (biome === BIOME_TYPE.FOREST) return NODES.BIOMEFORCAV.code
-    if (biome === BIOME_TYPE.DESERT) return NODES.BIOMEDESCAV.code
-    if (biome === BIOME_TYPE.JUNGLE) return NODES.BIOMEJUNCAV.code
-    console.error('getBiome - biome/layer inconnu')
-    return NODES.LAVA.code
   }
 
   getSubstratCode (x, y, skySurface, surfaceUnder, underCaverns, verticalBoundaries) {
@@ -405,11 +367,9 @@ export class BiomeNaturalizer {
    * Vérifie que la tuile peut être écrasée par la migration
    */
   safeSetTile (x, y, newCode) {
-    const currentCode = worldBuffer.read(x, y)
-
-    // RÈGLE DE ROBUSTESSE :
-    // On ne migre pas si la tuile actuelle est du ciel ou de la mer ou une tuile de pourtour
-    if ((newCode >= NODES.BIOMEFORSUR.code) && (currentCode >= NODES.BIOMEFORSUR.code)) { // && (currentCode <= NODES.BIOMEJUNCAV.code)
+    if (newCode === NODES.VOID.code) return // jamais propager VOID (SEA temporaire)
+    const currentType = NODES_LOOKUP[worldBuffer.read(x, y)]?.type ?? 0
+    if (currentType & (NODE_TYPE.SUBSTRAT | NODE_TYPE.TOPSOIL | NODE_TYPE.NATURAL)) {
       worldBuffer.write(x, y, newCode)
     }
   }
@@ -451,15 +411,15 @@ export class BiomeNaturalizer {
  * @param {Int16Array} leftCliff, rightCliff
  */
   applySeaPostProcessing (leftCliff, rightCliff) {
-    const BIOMEFORSUR = NODES.BIOMEFORSUR.code
-    const BIOMEJUNSUR = NODES.BIOMEJUNSUR.code
-    const BIOMESKY = NODES.BIOMESKY.code
-    const BIOMESEA = NODES.BIOMESEA.code
+    const SKY_CODE = NODES.SKY.code
+    const SEA_CODE = NODES.VOID.code
+    const SURFACE_CODES = new Set([NODES.CLAY.code, NODES.SANDSTONE.code, NODES.MUD.code
+    ])
 
     for (let y = 1; y < SEA_MAX_DEPTH; y++) { // Environ le milieu de la zone under
-      const newCode = (y < SEA_LEVEL) ? BIOMESKY : BIOMESEA
+      const newCode = (y < SEA_LEVEL) ? SKY_CODE : SEA_CODE
       // 1. Mer Gauche
-      // On vérifie si la falaise n'est pas sortie de l'écran à gauche (1023)
+      // On vérifie si la falaise n'est pas sortie de l'écran à gauche (1)
       if (leftCliff[y] >= 1) {
         const endX = leftCliff[y]
         for (let x = 1; x < endX; x++) {
@@ -467,7 +427,7 @@ export class BiomeNaturalizer {
 
           // On ne remplace que si c'est une tuile de biome "Surface"
           // (En supposant que tes codes de surface sont identifiables)
-          if ((currentTile >= BIOMEFORSUR) && (currentTile <= BIOMEJUNSUR)) {
+          if (SURFACE_CODES.has(currentTile)) {
             worldBuffer.write(x, y, newCode)
           }
         }
@@ -480,7 +440,7 @@ export class BiomeNaturalizer {
         // On part du bord droit (1022 car 1023 est le périmètre DEEPSEA)
         for (let x = 1022; x > startX; x--) {
           const currentTile = worldBuffer.read(x, y)
-          if (currentTile >= BIOMEFORSUR && currentTile <= BIOMEJUNSUR) {
+          if (SURFACE_CODES.has(currentTile)) {
             worldBuffer.write(x, y, newCode)
           }
         }
