@@ -795,6 +795,34 @@ class ClusterGenerator {
 
     return result
   }
+
+  /**
+   * Applique une liste de tuiles calculées par scatterClusters/randomWalkCluster
+   * dans le worldBuffer, en respectant les protections suivantes :
+   *   - Bounds checking strict (ghost cells comprises)
+   *   - Tuiles ETERNAL (FOG, DEEPSEA, BASALT, LAVA) jamais écrasées
+   *   - SKY et SEA jamais écrasés
+   *   - VOID est écrasé
+   *
+   * @param {Array<{x: number, y: number, index: number, code: number}>} tiles
+   */
+  applyTiles (tiles) {
+    const PROTECTED = new Set([
+      NODES.FOG.code,
+      NODES.DEEPSEA.code,
+      NODES.BASALT.code,
+      NODES.LAVA.code,
+      NODES.SKY.code,
+      NODES.SEA.code
+    ])
+
+    for (const tile of tiles) {
+      if (tile.x < 0 || tile.x >= WORLD_WIDTH) continue
+      if (tile.y < 0 || tile.y >= WORLD_HEIGHT) continue
+      if (PROTECTED.has(worldBuffer.readAt(tile.index))) continue
+      worldBuffer.write(tile.x, tile.y, tile.code)
+    }
+  }
 }
 
 export const clusterGenerator = new ClusterGenerator()

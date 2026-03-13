@@ -687,6 +687,8 @@ puis appliqués en une passe dédiée.
 | Méthode | Signature | Description |
 |---|---|---|
 | `randomWalkCluster` | `(x0, y0, size, code): Array<{x, y, index, code}>` | Cluster 4-connexe par diffusion aléatoire (drunk-walk agrégé). Retourne la liste des tuiles sans modifier le monde. `index = (y << 10) | x`, prêt pour `worldBuffer.writeAt`. Ghost cells exclues (marge de 2 tuiles). |
+| `scatterClusters` | `(x0, y0, x1, y1, percent, code, sizeMin?, sizeMax?): Array<{x, y, index, code}>` | Distribue `max(5, round(surface × percent))` clusters `randomWalkCluster` à des positions aléatoires dans le rectangle. `sizeMin` défaut 5, `sizeMax` défaut 8. Sans effet de bord. |
+| `applyTiles` | `(tiles: Array<{x, y, index, code}>): void` | Écrit les tuiles dans `worldBuffer` via `writeAt`. Ignore les tuiles hors bornes et protège `FOG`, `DEEPSEA`, `BASALT`, `LAVA`, `SKY`, `SEA` contre l'écrasement. `VOID` non protégé — à appeler avant le creusement. |
 
 **Algorithme :** frange maintenue en doublon `Set + Array` — déduplication O(1), tirage O(1) par swap-and-pop.
 
