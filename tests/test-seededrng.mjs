@@ -8,7 +8,7 @@
 //     1 000 pour Perlin)
 //   - intFract et cosineInterpolation testés en fin de fichier
 
-import {describe, assert} from './kernel.mjs'
+import {describe, assert, captureConsole, releaseConsole} from './kernel.mjs'
 import {SeededRNG, intFract, cosineInterpolation} from '../src/utils.mjs'
 
 const ITERATIONS = 10000
@@ -268,7 +268,9 @@ describe('SeededRNG — randomGetArrayWeighted() : retourne -1 si tableau vide',
 
 describe('SeededRNG — randomGetArrayWeighted() : retourne -1 si tous poids à 0', () => {
   const r = rng()
+  captureConsole()
   assert('-1 si tous poids à 0', r.randomGetArrayWeighted([{weight: 0}, {weight: 0}]) === -1)
+  releaseConsole()
 })
 
 describe('SeededRNG — randomGetArrayWeighted() : respecte les poids (élément dominant)', () => {

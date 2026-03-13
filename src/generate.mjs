@@ -1,6 +1,6 @@
 import {seededRNG} from './utils.mjs'
 import {database} from './database.mjs'
-import {NODES, NODES_LOOKUP, NODE_TYPE, WEATHER_TYPE, BIOME_TYPE, WORLD_WIDTH, WORLD_HEIGHT, SEA_LEVEL, BIOME_TILE_MAP, SEA_MAX_JITTER, SEA_MAX_WIDTH, SEA_MAX_HEIGHT, CLUSTER_SCATTER_MAP} from '../assets/data/data-gen.mjs'
+import {NODES, NODES_LOOKUP, NODE_TYPE, WEATHER_TYPE, BIOME_TYPE, WORLD_WIDTH, WORLD_HEIGHT, SEA_LEVEL, BIOME_TILE_MAP, SEA_MAX_JITTER, SEA_MAX_WIDTH, SEA_MAX_HEIGHT, CLUSTER_SCATTER_MAP, ORE_GEM_SCATTER_MAP} from '../assets/data/data-gen.mjs'
 
 /* ====================================================================================================
    WORLD BUFFER (CREATION DU MONDE)
@@ -61,6 +61,66 @@ class WorldBuffer {
     }
     return result
   }
+
+  /**
+   * Comptabilise toutes les tuiles du buffer par node, groupées par type.
+   * Usage diagnostic uniquement — appelée en fin de génération avant clear().
+   * Affiche les résultats dans la console via console.log.
+   */
+  logStats () {
+    const counts = new Map()
+    const data = this.#data
+
+    for (let i = 0; i < data.length; i++) {
+      const code = data[i]
+      counts.set(code, (counts.get(code) ?? 0) + 1)
+    }
+
+    const groups = {
+      ETERNAL: [],
+      GAZ: [],
+      LIQUID: [],
+      SUBSTRAT: [],
+      TOPSOIL: [],
+      NATURAL: [],
+      ORE: [],
+      GEM: [],
+      ROCK: [],
+      OTHER: []
+    }
+
+    for (const [code, count] of counts) {
+      const node = NODES_LOOKUP[code]
+      if (!node) continue
+      const t = node.type ?? 0
+      let group
+      if (t & NODE_TYPE.ETERNAL) group = groups.ETERNAL
+      else if (t & NODE_TYPE.ORE) group = groups.ORE
+      else if (t & NODE_TYPE.GEM) group = groups.GEM
+      else if (t & NODE_TYPE.ROCK) group = groups.ROCK
+      else if (t & NODE_TYPE.SUBSTRAT) group = groups.SUBSTRAT
+      else if (t & NODE_TYPE.TOPSOIL) group = groups.TOPSOIL
+      else if (t & NODE_TYPE.NATURAL) group = groups.NATURAL
+      else if (t & NODE_TYPE.LIQUID) group = groups.LIQUID
+      else if (t & NODE_TYPE.GAZ) group = groups.GAZ
+      else group = groups.OTHER
+      group.push({name: node.name, count, pct: (count / data.length * 100).toFixed(2)})
+    }
+
+    for (const group of Object.values(groups)) {
+      group.sort((a, b) => b.count - a.count)
+    }
+
+    const lines = []
+    for (const [label, group] of Object.entries(groups)) {
+      if (group.length === 0) continue
+      lines.push(`── ${label}`)
+      for (const {name, count, pct} of group) {
+        lines.push(`   ${name.padEnd(20)} ${String(count).padStart(8)}  (${pct}%)`)
+      }
+    }
+    console.log('[WorldBuffer::logStats]\n' + lines.join('\n'))
+  }
 }
 
 export const worldBuffer = new WorldBuffer()
@@ -94,11 +154,36 @@ class WorldGenerator {
     clusterGenerator.addSubstratClusters(biomesDescription, skySurface, surfaceUnder, underCaverns)
     console.log('[WorldGenerator::clusterGenerator] - Substrat clusters', (performance.now() - t0).toFixed(3), 'ms')
 
-    // N-1 Remplissage de la mer (gauche et droite)
+    // 5. Clusters ore/gem
+    clusterGenerator.addOreClusters(biomesDescription, skySurface, surfaceUnder, underCaverns)
+    console.log('[WorldGenerator::clusterGenerator] - Ore/Gem clusters', (performance.now() - t0).toFixed(3), 'ms')
+
+    // 6. Creusement (plus de creusement ensuite, ou alors très localisé) - TODO
+
+    // 6.1 Creusement des tunnels et cavernes - TODO
+
+    // 6.2 Creusement des mini-biomes avec peuplement - TODO
+
+    // 6.3 Creusement des mini-biomes avec peuplement différé - TODO
+
+    // 7. Traitement des surfaces végétales + désert - TODO
+
+    // N-7 Remplissage de la mer (gauche et droite) - TODO
     liquidFiller.fillSea()
     console.log('[WorldGenerator::liquidFiller] - Sea', (performance.now() - t0).toFixed(3), 'ms')
 
-    // 68824
+    // N-6 Ajout de la plage (Shore) et du fond de la mer - TODO
+
+    // N-5 Ajout des plantes et des coraux - TODO
+
+    // N-4 Peuplement des biomes qui sont à peuplement différé - TODO
+
+    // N-3. Ajout des coffres et objets spéciaux - TODO
+
+    // N-2. Nettoyage final (tuiles isolées) - TODO
+
+    // N-1 Affichage de statistiques)
+    worldBuffer.logStats()
 
     // N. Stochage du monde en base de données
     if (!debug) {
@@ -866,8 +951,6 @@ class ClusterGenerator {
       const yCaverns = WORLD_HEIGHT - 2
       const yCavernsMid = (yUnder + yCaverns) >> 1
 
-      console.log('<><><>', {ySkySurface, ySurface, yUnder, yCavernsMid, yCaverns})
-
       // surface
       this.#scatterLayer(x0, ySkySurface, x1, ySurface, map.surface, zone.biome, 'surface') // ← corrigé
       // under
@@ -890,6 +973,47 @@ class ClusterGenerator {
     for (const entry of entries) {
       const tiles = this.scatterClusters(x0, y0, x1, y1, entry.percent, entry.code)
       this.applyTiles(tiles)
+    }
+  }
+
+  /**
+   * Parcourt tous les rectangles biome × layer (under / caverns_top / caverns_bottom)
+   * et applique les clusters ore/gem définis dans ORE_GEM_SCATTER_MAP.
+   * Les ores écrasent le substrat — VOID/FOG/DEEPSEA/BASALT/LAVA seuls protégés.
+   * Pas de clusters en surface (ores absents de cette layer).
+   *
+   * @param {Array<{biome, width, offset}>} biomesDescription
+   * @param {Int16Array}                    surfaceUnder   - Frontière surface/under
+   * @param {Int16Array}                    underCaverns   - Frontière under/caverns
+   */
+  addOreClusters (biomesDescription, skySurface, surfaceUnder, underCaverns) {
+    for (const zone of biomesDescription) {
+      const map = ORE_GEM_SCATTER_MAP[zone.biome]
+      if (!map) continue
+
+      const x0 = zone.offset
+      const x1 = zone.offset + zone.width - 1
+
+      let sumSkySurface = 0
+      let sumSurface = 0
+      let sumUnder = 0
+      for (let x = x0; x <= x1; x++) {
+        sumSkySurface += skySurface[x]
+        sumSurface += surfaceUnder[x]
+        sumUnder += underCaverns[x]
+      }
+      const width = x1 - x0 + 1
+      const ySkySurface = Math.round(sumSkySurface / width) // ← ajout
+
+      const ySurface = Math.round(sumSurface / width)
+      const yUnder = Math.round(sumUnder / width)
+      const yCaverns = WORLD_HEIGHT - 1
+      const yCavernsMid = (yUnder + yCaverns) >> 1
+
+      this.#scatterLayer(x0, ySkySurface, x1, ySurface, map.surface, zone.biome, 'surface') // ← ajout
+      this.#scatterLayer(x0, ySurface, x1, yUnder, map.under, zone.biome, 'under')
+      this.#scatterLayer(x0, yUnder, x1, yCavernsMid, map.caverns_top, zone.biome, 'caverns_top')
+      this.#scatterLayer(x0, yCavernsMid, x1, yCaverns, map.caverns_bottom, zone.biome, 'caverns_bottom')
     }
   }
 }

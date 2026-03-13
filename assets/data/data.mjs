@@ -64,25 +64,27 @@ export const NODES = {
   LIMESTONE: {code: 27, name: 'Limestone', type: NODE_TYPE.SUBSTRAT, stype: 'block', star: 2, solid: true, color: '#c8c0a0', image: 'substrat_16_16+0', speed: 1400, mining: [{item: 'bklime', count: 1}]},
   SLATE: {code: 28, name: 'Slate', type: NODE_TYPE.SUBSTRAT, stype: 'block', star: 3, solid: true, color: '#2a3a4a', image: 'substrat_16_16+0', speed: 1600, mining: [{item: 'bkslate', count: 1}]},
 
+  // ── Ore (gisement de minerais) ────────────────────────
+  COPPER: {code: 29, name: 'Copper Ore', type: NODE_TYPE.ORE, star: 1, solid: true, color: '#fe602f', image: 'ore_16_16+0', speed: 1000, mining: [{item: 'orcu', count: 1}]},
+  IRON: {code: 30, name: 'Iron Ore', type: NODE_TYPE.ORE, star: 1, solid: true, color: '#af784d', image: 'ore_16_16+1', speed: 1100, mining: [{item: 'orfe', count: 1}]},
+  SILVER: {code: 31, name: 'Silver Ore', type: NODE_TYPE.ORE, star: 2, solid: true, color: '#788696', image: 'ore_16_16+2', speed: 1200, mining: [{item: 'orag', count: 1}]},
+  GOLD: {code: 32, name: 'Gold Ore', type: NODE_TYPE.ORE, star: 3, solid: true, color: '#ffaa33', image: 'ore_16_16+3', speed: 1400, mining: [{item: 'orau', count: 1}]},
+  COBALT: {code: 33, name: 'Cobalt Ore', type: NODE_TYPE.ORE, star: 4, solid: true, color: '#2797ea', image: 'ore_16_16+4', speed: 1600, mining: [{item: 'orco', count: 1}]},
+  PLATINUM: {code: 34, name: 'Platinum Ore', type: NODE_TYPE.ORE, star: 5, solid: true, color: '#25874d', image: 'ore_16_16+5', speed: 1800, mining: [{item: 'orpt', count: 1}]},
+
+  // ── Gem (gisement de pierres précieuses) ────────────────────────
+  TOPAZ: {code: 35, name: 'Topaz Deposit', type: NODE_TYPE.GEM, star: 2, solid: true, color: '#788696', image: 'gem_16_16+0', speed: 900, mining: [{item: 'topaz', count: 1}]},
+  RUBY: {code: 36, name: 'Ruby Deposit', type: NODE_TYPE.GEM, star: 3, solid: true, color: '#788696', image: 'gem_16_16+1', speed: 900, mining: [{item: 'ruby', count: 1}]},
+  EMERALD: {code: 37, name: 'Emerald Deposit', type: NODE_TYPE.GEM, star: 4, solid: true, color: '#788696', image: 'gem_16_16+2', speed: 900, mining: [{item: 'emerald', count: 1}]},
+  SAPPHIRE: {code: 38, name: 'Sapphire Deposit', type: NODE_TYPE.GEM, star: 5, solid: true, color: '#788696', image: 'gem_16_16+3', speed: 1100, mining: [{item: 'sapphire', count: 1}]},
+
   // ----
 
-  GRANITE: {code: 36, name: 'Granite', type: NODE_TYPE.ROCK, star: 4, solid: true, color: '#1966cc', image: 'rock_16_16+0', speed: 1500, mining: [{item: 'granite', count: 1}]}, // UNDERWORLD
-  MARBLE: {code: 37, name: 'Marble', type: NODE_TYPE.ROCK, star: 4, solid: true, color: '#e6ddc4', image: 'rock_16_16+1', speed: 1500, mining: [{item: 'marble', count: 1}]}, // UNDERWORLD
-  OBSIDIAN: {code: 38, name: 'Obsidian', type: NODE_TYPE.ROCK, star: 5, solid: true, color: '#73c882', image: 'rock_16_16+3', speed: 2000, mining: [{item: 'obsidian', count: 1}]}, // HELL
-  METEORITE: {code: 39, name: 'Meteroite', type: NODE_TYPE.ROCK, stype: 'block', star: 5, solid: true, color: '#7d6f5f', image: 'rock_16_16+2', speed: 2000, mining: [{item: 'bkmtrt', count: 1}]}, // SURFACE
-  HIVE: {code: 41, name: 'Hive', type: NODE_TYPE.ROCK, stype: 'block', star: 1, solid: true, color: '#fd8431', image: 'rock_16_16+6', speed: 1200, mining: [{item: 'bkhive', count: 1}]},
-
-  COPPER: {code: 42, name: 'Copper Ore', type: NODE_TYPE.ORE, star: 1, solid: true, color: '#fe602f', image: 'ore_16_16+0', speed: 1000, mining: [{item: 'orcu', count: 1}]}, // GROUND
-  IRON: {code: 43, name: 'Iron Ore', type: NODE_TYPE.ORE, star: 1, solid: true, color: '#af784d', image: 'ore_16_16+1', speed: 1100, mining: [{item: 'orfe', count: 1}]}, // GROUND
-  SILVER: {code: 44, name: 'Silver Ore', type: NODE_TYPE.ORE, star: 2, solid: true, color: '#788696', image: 'ore_16_16+2', speed: 1200, mining: [{item: 'orag', count: 1}]}, // UNDERGROUND
-  GOLD: {code: 45, name: 'Gold Ore', type: NODE_TYPE.ORE, star: 2, solid: true, color: '#ffaa33', image: 'ore_16_16+3', speed: 1400, mining: [{item: 'orau', count: 1}]}, // UNDERGROUND
-  COBALT: {code: 46, name: 'Cobalt Ore', type: NODE_TYPE.ORE, star: 3, solid: true, color: '#2797ea', image: 'ore_16_16+4', speed: 1600, mining: [{item: 'orco', count: 1}]}, // UNDERWORLD
-  PLATINUM: {code: 47, name: 'Platinum Ore', type: NODE_TYPE.ORE, star: 4, solid: true, color: '#25874d', image: 'ore_16_16+5', speed: 1800, mining: [{item: 'orpt', count: 1}]}, // HELL - images de tungsten dans Terraria
-
-  TOPAZ: {code: 48, name: 'Topaz Deposit', type: NODE_TYPE.GEM, star: 1, solid: true, color: '#788696', image: 'gem_16_16+0', speed: 900, mining: [{item: 'topaz', count: 1}]}, // FOREST GROUND - UNDERGROUND
-  RUBY: {code: 49, name: 'Ruby Deposit', type: NODE_TYPE.GEM, star: 2, solid: true, color: '#788696', image: 'gem_16_16+1', speed: 900, mining: [{item: 'ruby', count: 1}]}, // DESERT UNDERGROUND
-  EMERALD: {code: 50, name: 'Emerald Deposit', type: NODE_TYPE.GEM, star: 3, solid: true, color: '#788696', image: 'gem_16_16+2', speed: 900, mining: [{item: 'emerald', count: 1}]}, // JUNGLE UNDERGROUND
-  SAPPHIRE: {code: 51, name: 'Sapphire Deposit', type: NODE_TYPE.GEM, star: 4, solid: true, color: '#788696', image: 'gem_16_16+3', speed: 1100, mining: [{item: 'sapphire', count: 1}]}, // CAVERN
+  GRANITE: {code: 46, name: 'Granite', type: NODE_TYPE.ROCK, star: 4, solid: true, color: '#1966cc', image: 'rock_16_16+0', speed: 1500, mining: [{item: 'granite', count: 1}]}, // UNDERWORLD
+  MARBLE: {code: 47, name: 'Marble', type: NODE_TYPE.ROCK, star: 4, solid: true, color: '#e6ddc4', image: 'rock_16_16+1', speed: 1500, mining: [{item: 'marble', count: 1}]}, // UNDERWORLD
+  OBSIDIAN: {code: 48, name: 'Obsidian', type: NODE_TYPE.ROCK, star: 5, solid: true, color: '#73c882', image: 'rock_16_16+3', speed: 2000, mining: [{item: 'obsidian', count: 1}]}, // HELL
+  METEORITE: {code: 49, name: 'Meteroite', type: NODE_TYPE.ROCK, stype: 'block', star: 5, solid: true, color: '#7d6f5f', image: 'rock_16_16+2', speed: 2000, mining: [{item: 'bkmtrt', count: 1}]}, // SURFACE
+  HIVE: {code: 50, name: 'Hive', type: NODE_TYPE.ROCK, stype: 'block', star: 1, solid: true, color: '#fd8431', image: 'rock_16_16+6', speed: 1200, mining: [{item: 'bkhive', count: 1}]},
 
   WOODWALL: {code: 52, name: 'Wood Wall', type: NODE_TYPE.WALL, star: 1, solid: true, color: '#855959', image: 'wall_16_16+0', speed: 1200, hammering: [{item: 'woodwall', count: 1}]},
   BRICKWALL: {code: 53, name: 'Brick Wall', type: NODE_TYPE.BWALL, star: 1, solid: false, color: '#788696', image: 'wall_16_16+1', speed: 1200, hammering: [{item: 'brickwall', count: 1}]},

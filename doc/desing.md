@@ -195,7 +195,35 @@ Tuiles spéciales :
 - **HONEY** : liquide créé dans les **Hive**
 - **SAP** : liquide créé dans la jungle
 
-### 3.7 Génération Procédurale
+### 3.7 Minerais (Ore)
+
+Six minerais métalliques, classés par tier de difficulté (`star`). Les localisations
+sont indicatives — les densités et tailles de clusters exactes sont définies dans
+`ORE_GEM_SCATTER_MAP` (`data-gen.mjs`).
+
+| Minerai | Tier | Surface | Under | Cavern-top | Cavern-bottom | Biome pénalisé |
+|---|---|---|---|---|---|---|
+| `COPPER`   | ★☆☆☆☆ | moyenne | grande  | moyenne | faible  | — |
+| `IRON`     | ★☆☆☆☆ | —       | moyenne | moyenne | faible  | — |
+| `SILVER`   | ★★☆☆☆ | —       | petite  | moyenne | petite  | Forest (plus rare) |
+| `GOLD`     | ★★★☆☆ | —       | —       | moyenne | petite  | Desert (plus rare) |
+| `COBALT`   | ★★★★☆ | —       | —       | petite  | moyenne | Jungle (plus rare) |
+| `PLATINUM` | ★★★★★ | —       | —       | —       | moyenne | — |
+
+### 3.8 Gemmes (Gem)
+
+Quatre gemmes, chacune associée à un biome ou une profondeur. Les localisations
+sont indicatives — les densités exactes sont définies dans `ORE_GEM_SCATTER_MAP`
+(`data-gen.mjs`).
+
+| Gemme | Tier | Biome | Localisation indicative |
+|---|---|---|---|
+| `TOPAZ` | ★★☆☆☆ | Forest | Underground (rare) et Cavernes. |
+| `RUBY` | ★★★☆☆ | Desert | Cavernes. |
+| `EMERALD` | ★★★★☆ | Jungle | Cavernes. |
+| `SAPPHIRE` | ★★★★★ | Tous | Cavernes profondes uniquement. |
+
+### 3.9 Génération Procédurale
 
 * Effectuée **hors temps réel** (`STATE.CREATION`), en import dynamique (`generate.mjs`).
 * **World Key :** seed pour la re-génération déterministe.
@@ -205,7 +233,7 @@ Tuiles spéciales :
 * **Fluides initiaux :** Lacs (Water), Ruches (Honey), Sève (Sap), Sable (Sand).
 * **Algorithmes :** Perlin noise pour le lissage, algorithmes dédiés pour tunnels et cavernes, placement de coffres/minerais/flore, nettoyage des isolats.
 
-### 3.8 Physique (Exploration)
+### 3.10 Physique (Exploration)
 
 * **Déplacement :** Flèches directionnelles + ZQSD. Caméra centrée joueur. Zoom possible.
 * **Collision :** AABB (Axis-Aligned Bounding Box) custom.
@@ -213,7 +241,7 @@ Tuiles spéciales :
 * **AI Faune :** Comportements simples (Suit, Fuit, Erre) sans pathfinding complexe en temps réel.
 * **Contrainte :** Pas de moteur physique externe (Matter.js…). Pas de projectiles ni d'effets spéciaux hormis les animations de sprites.
 
-### 3.9 Simulation & Écosystème
+### 3.11 Simulation & Écosystème
 
 * **Faune :** Active uniquement dans le Viewport + buffer de sécurité. Entités hors-zone désactivées ou despawnées. Spawning calculé juste hors-vue.
 * **Flore :** Croissance **décorrélée des chunks**. Données dans le store `plant` (liste clairsemée). Calcul temporel global (timestamp) → une forêt peut pousser hors-vue sans charger ses chunks.
