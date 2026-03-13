@@ -39,3 +39,44 @@ export const BIOME_TILE_MAP = {
 export const SEA_MAX_WIDTH = 90
 export const SEA_MAX_HEIGHT = 150
 export const SEA_MAX_JITTER = 10
+
+export const CLUSTER_SCATTER_MAP = {
+  [BIOME_TYPE.FOREST]: {
+    surface: [{code: NODES.DIRT.code, percent: 0.02},
+      {code: NODES.STONE.code, percent: 0.002}],
+    under: [{code: NODES.STONE.code, percent: 0.02},
+      {code: NODES.DIRT.code, percent: 0.005}],
+    caverns_top: [{code: NODES.HARDSTONE.code, percent: 0.02},
+      {code: NODES.DIRT.code, percent: 0.01},
+      {code: NODES.HUMUS.code, percent: 0.002}],
+    caverns_bottom: [{code: NODES.HARDSTONE.code, percent: 0.02},
+      {code: NODES.HUMUS.code, percent: 0.002}]
+  },
+  [BIOME_TYPE.DESERT]: {
+    surface: [{code: NODES.SAND.code, percent: 0.01},
+      {code: NODES.SANDSTONE.code, percent: 0.01},
+      {code: NODES.STONE.code, percent: 0.002}],
+    under: [{code: NODES.ASH.code, percent: 0.02},
+      {code: NODES.DIRT.code, percent: 0.008},
+      {code: NODES.SANDSTONE.code, percent: 0.002}],
+    caverns_top: [{code: NODES.HELLSTONE.code, percent: 0.02},
+      {code: NODES.ASH.code, percent: 0.01},
+      {code: NODES.SAND.code, percent: 0.001}],
+    caverns_bottom: [{code: NODES.HELLSTONE.code, percent: 0.02},
+      {code: NODES.ASH.code, percent: 0.005},
+      {code: NODES.SAND.code, percent: 0.001}]
+  },
+  [BIOME_TYPE.JUNGLE]: {
+    surface: [{code: NODES.SILT.code, percent: 0.02},
+      {code: NODES.STONE.code, percent: 0.002}],
+    under: [{code: NODES.LIMESTONE.code, percent: 0.02},
+      {code: NODES.HUMUS.code, percent: 0.006},
+      {code: NODES.DIRT.code, percent: 0.001}],
+    caverns_top: [{code: NODES.SLATE.code, percent: 0.02},
+      {code: NODES.HUMUS.code, percent: 0.015},
+      {code: NODES.SILT.code, percent: 0.003}],
+    caverns_bottom: [{code: NODES.SLATE.code, percent: 0.02},
+      {code: NODES.HUMUS.code, percent: 0.02},
+      {code: NODES.SILT.code, percent: 0.003}]
+  }
+}

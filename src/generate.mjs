@@ -1,6 +1,6 @@
 import {seededRNG} from './utils.mjs'
 import {database} from './database.mjs'
-import {NODES, NODES_LOOKUP, NODE_TYPE, WEATHER_TYPE, BIOME_TYPE, WORLD_WIDTH, WORLD_HEIGHT, SEA_LEVEL, BIOME_TILE_MAP, SEA_MAX_JITTER, SEA_MAX_WIDTH, SEA_MAX_HEIGHT} from '../assets/data/data-gen.mjs'
+import {NODES, NODES_LOOKUP, NODE_TYPE, WEATHER_TYPE, BIOME_TYPE, WORLD_WIDTH, WORLD_HEIGHT, SEA_LEVEL, BIOME_TILE_MAP, SEA_MAX_JITTER, SEA_MAX_WIDTH, SEA_MAX_HEIGHT, CLUSTER_SCATTER_MAP} from '../assets/data/data-gen.mjs'
 
 /* ====================================================================================================
    WORLD BUFFER (CREATION DU MONDE)
@@ -87,8 +87,12 @@ class WorldGenerator {
     console.log('[WorldGenerator::biomesDescription] - Biomes', biomesDescription, leftSeaWidth, rightSeaWidth, (performance.now() - t0).toFixed(3), 'ms')
 
     // 3. Rafinement des biomes (Perlin + diffusion)
-    biomeNaturalizer.naturalize(biomesDescription, leftSeaWidth, rightSeaWidth)
+    const {skySurface, surfaceUnder, underCaverns} = biomeNaturalizer.naturalize(biomesDescription, leftSeaWidth, rightSeaWidth)
     console.log('[WorldGenerator::biomeNaturalizer] - Biomes', (performance.now() - t0).toFixed(3), 'ms')
+
+    // 4. Clusters de substrat
+    clusterGenerator.addSubstratClusters(biomesDescription, skySurface, surfaceUnder, underCaverns)
+    console.log('[WorldGenerator::clusterGenerator] - Substrat clusters', (performance.now() - t0).toFixed(3), 'ms')
 
     // N-1 Remplissage de la mer (gauche et droite)
     liquidFiller.fillSea()
@@ -172,7 +176,7 @@ export class BiomeNaturalizer {
   naturalize (biomesDescription, leftSeaWidth, rightSeaWidth) {
     const {skySurface, surfaceUnder, underCaverns, hell} = this.precomputeHorizontalBoundaries()
     const verticalBoundaries = this.precomputeVerticalBoundaries(biomesDescription)
-    console.log('[WorldGenerator] - verticalBoundaries', verticalBoundaries)
+    // console.log('[WorldGenerator] - verticalBoundaries', verticalBoundaries)
 
     for (let x = 0; x < WORLD_WIDTH; x++) {
       for (let y = 0; y < WORLD_HEIGHT; y++) {
@@ -200,6 +204,8 @@ export class BiomeNaturalizer {
 
     // ajout d'une migration des tuiles aux fromtières
     this.applyWorldMigration(surfaceUnder, underCaverns, verticalBoundaries)
+
+    return {skySurface, surfaceUnder, underCaverns}
   }
 
   /**
@@ -801,8 +807,8 @@ class ClusterGenerator {
    * dans le worldBuffer, en respectant les protections suivantes :
    *   - Bounds checking strict (ghost cells comprises)
    *   - Tuiles ETERNAL (FOG, DEEPSEA, BASALT, LAVA) jamais écrasées
-   *   - SKY et SEA jamais écrasés
-   *   - VOID est écrasé
+   *   - VOID protégé à la place de SEA (pas encore de mer à ce stade — creusement postérieur)
+   *   - SKY jamais écrasé
    *
    * @param {Array<{x: number, y: number, index: number, code: number}>} tiles
    */
@@ -813,7 +819,7 @@ class ClusterGenerator {
       NODES.BASALT.code,
       NODES.LAVA.code,
       NODES.SKY.code,
-      NODES.SEA.code
+      NODES.VOID.code
     ])
 
     for (const tile of tiles) {
@@ -821,6 +827,69 @@ class ClusterGenerator {
       if (tile.y < 0 || tile.y >= WORLD_HEIGHT) continue
       if (PROTECTED.has(worldBuffer.readAt(tile.index))) continue
       worldBuffer.write(tile.x, tile.y, tile.code)
+    }
+  }
+
+  /**
+   * Parcourt tous les rectangles biome × layer et applique les clusters
+   * de substrat définis dans CLUSTER_SCATTER_MAP.
+   * La layer caverns est découpée en deux moitiés verticales (top/bottom).
+   * Les frontières sont utilisées brutes — les débordements inter-zones
+   * renforcent le caractère naturel du résultat.
+   *
+   * @param {Array<{biome, width, offset}>}         biomesDescription   - Zones horizontales
+   * @param {Int16Array}                             skySurface          - Frontière sky/surface
+   * @param {Int16Array}                             surfaceUnder        - Frontière surface/under
+   * @param {Int16Array}                             underCaverns        - Frontière under/caverns
+   */
+  addSubstratClusters (biomesDescription, skySurface, surfaceUnder, underCaverns) {
+    for (const zone of biomesDescription) {
+      const map = CLUSTER_SCATTER_MAP[zone.biome]
+      if (!map) continue
+
+      const x0 = zone.offset
+      const x1 = zone.offset + zone.width - 1
+
+      // Y moyen de chaque frontière sur la largeur de la zone — approx. pour les rectangles
+      let sumSkySurface = 0
+      let sumSurface = 0
+      let sumUnder = 0
+      for (let x = x0; x <= x1; x++) {
+        sumSkySurface += skySurface[x] // ← ajout
+        sumSurface += surfaceUnder[x]
+        sumUnder += underCaverns[x]
+      }
+      const width = x1 - x0 + 1
+      const ySkySurface = Math.round(sumSkySurface / width) // ← ajout
+      const ySurface = Math.round(sumSurface / width)
+      const yUnder = Math.round(sumUnder / width)
+      const yCaverns = WORLD_HEIGHT - 2
+      const yCavernsMid = (yUnder + yCaverns) >> 1
+
+      console.log('<><><>', {ySkySurface, ySurface, yUnder, yCavernsMid, yCaverns})
+
+      // surface
+      this.#scatterLayer(x0, ySkySurface, x1, ySurface, map.surface, zone.biome, 'surface') // ← corrigé
+      // under
+      this.#scatterLayer(x0, ySurface, x1, yUnder, map.under, zone.biome, 'under')
+      // caverns_top
+      this.#scatterLayer(x0, yUnder, x1, yCavernsMid, map.caverns_top, zone.biome, 'caverns_top')
+      // caverns_bottom
+      this.#scatterLayer(x0, yCavernsMid, x1, yCaverns, map.caverns_bottom, zone.biome, 'caverns_bottom')
+    }
+  }
+
+  /**
+   * @param {number}   x0
+   * @param {number}   y0
+   * @param {number}   x1
+   * @param {number}   y1
+   * @param {Array<{code, percent}>} entries
+   */
+  #scatterLayer (x0, y0, x1, y1, entries, biome, layer) {
+    for (const entry of entries) {
+      const tiles = this.scatterClusters(x0, y0, x1, y1, entry.percent, entry.code)
+      this.applyTiles(tiles)
     }
   }
 }

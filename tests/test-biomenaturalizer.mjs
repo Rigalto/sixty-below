@@ -547,3 +547,46 @@ describe('BiomeNaturalizer — naturalize() : tous les substrats présents dans 
 
   worldBuffer.clear()
 })
+
+// ─── naturalize — valeur de retour ───────────────────────────────────────────
+
+describe('BiomeNaturalizer — naturalize() : retourne skySurface, surfaceUnder, underCaverns', () => {
+  seededRNG.init(SEED)
+  seededRNG.randomPerlinInit()
+  worldBuffer.init()
+  const n = new BiomeNaturalizer()
+
+  const {biomesDescription, leftSeaWidth, rightSeaWidth} = biomesGenerator.generate()
+  const result = n.naturalize(biomesDescription, leftSeaWidth, rightSeaWidth)
+
+  assert('retourne un objet', typeof result === 'object' && result !== null)
+  assert('skySurface est Int16Array', result.skySurface instanceof Int16Array)
+  assert('surfaceUnder est Int16Array', result.surfaceUnder instanceof Int16Array)
+  assert('underCaverns est Int16Array', result.underCaverns instanceof Int16Array)
+
+  worldBuffer.clear()
+})
+
+describe('BiomeNaturalizer — naturalize() : frontières retournées de taille 1024 et ordonnées', () => {
+  seededRNG.init(SEED)
+  seededRNG.randomPerlinInit()
+  worldBuffer.init()
+  const n = new BiomeNaturalizer()
+
+  const {biomesDescription, leftSeaWidth, rightSeaWidth} = biomesGenerator.generate()
+  const {skySurface, surfaceUnder, underCaverns} = n.naturalize(biomesDescription, leftSeaWidth, rightSeaWidth)
+
+  assert('skySurface.length === 1024', skySurface.length === 1024)
+  assert('surfaceUnder.length === 1024', surfaceUnder.length === 1024)
+  assert('underCaverns.length === 1024', underCaverns.length === 1024)
+
+  let ok = true
+  for (let x = 0; x < 1024; x++) {
+    if (skySurface[x] >= surfaceUnder[x] || surfaceUnder[x] >= underCaverns[x]) {
+      ok = false; break
+    }
+  }
+  assert('skySurface < surfaceUnder < underCaverns sur toutes les colonnes', ok)
+
+  worldBuffer.clear()
+})

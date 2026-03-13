@@ -280,9 +280,9 @@ describe('ClusterGenerator — applyTiles() : ne remplace pas SKY', () => {
   worldBuffer.clear()
 })
 
-describe('ClusterGenerator — applyTiles() : ne remplace pas SEA', () => {
+describe('ClusterGenerator — applyTiles() : ne remplace pas VOID', () => {
   worldBuffer.init()
-  worldBuffer.world.fill(NODES.SEA.code)
+  worldBuffer.world.fill(NODES.VOID.code)
 
   seededRNG.init(SEED)
   const tiles = clusterGenerator.scatterClusters(100, 100, 200, 200, 0.01, NODES.CLAY.code)
@@ -291,9 +291,9 @@ describe('ClusterGenerator — applyTiles() : ne remplace pas SEA', () => {
   let ok = true
   for (const tile of tiles) {
     if (tile.x < 0 || tile.x >= 1024 || tile.y < 0 || tile.y >= 512) continue
-    if (worldBuffer.read(tile.x, tile.y) !== NODES.SEA.code) { ok = false; break }
+    if (worldBuffer.read(tile.x, tile.y) !== NODES.VOID.code) { ok = false; break }
   }
-  assert('SEA jamais remplacé', ok)
+  assert('VOID jamais remplacé', ok)
   worldBuffer.clear()
 })
 
@@ -345,22 +345,5 @@ describe('ClusterGenerator — applyTiles() : ne remplace pas LAVA (ETERNAL)', (
     if (worldBuffer.read(tile.x, tile.y) !== NODES.LAVA.code) { ok = false; break }
   }
   assert('LAVA jamais remplacé', ok)
-  worldBuffer.clear()
-})
-
-describe('ClusterGenerator — applyTiles() : remplace VOID (creusement postérieur)', () => {
-  worldBuffer.init()
-  worldBuffer.world.fill(NODES.VOID.code)
-
-  seededRNG.init(SEED)
-  const tiles = clusterGenerator.scatterClusters(100, 100, 200, 200, 0.01, NODES.CLAY.code)
-  clusterGenerator.applyTiles(tiles)
-
-  let ok = false
-  for (const tile of tiles) {
-    if (tile.x < 0 || tile.x >= 1024 || tile.y < 0 || tile.y >= 512) continue
-    if (worldBuffer.read(tile.x, tile.y) === NODES.CLAY.code) { ok = true; break }
-  }
-  assert('VOID remplacé par CLAY', ok)
   worldBuffer.clear()
 })
