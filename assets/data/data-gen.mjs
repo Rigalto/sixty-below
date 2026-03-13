@@ -167,3 +167,6 @@ export const ORE_GEM_SCATTER_MAP = {
     ]
   }
 }
+
+export const SMALL_CAVERNS_COUNT = 100
+export const MEDIUM_CAVERNS_COUNT = 150

@@ -1,6 +1,6 @@
 import {seededRNG} from './utils.mjs'
 import {database} from './database.mjs'
-import {NODES, NODES_LOOKUP, NODE_TYPE, WEATHER_TYPE, BIOME_TYPE, WORLD_WIDTH, WORLD_HEIGHT, SEA_LEVEL, BIOME_TILE_MAP, SEA_MAX_JITTER, SEA_MAX_WIDTH, SEA_MAX_HEIGHT, CLUSTER_SCATTER_MAP, ORE_GEM_SCATTER_MAP} from '../assets/data/data-gen.mjs'
+import {NODES, NODES_LOOKUP, NODE_TYPE, WEATHER_TYPE, BIOME_TYPE, WORLD_WIDTH, WORLD_HEIGHT, SEA_LEVEL, BIOME_TILE_MAP, SEA_MAX_JITTER, SEA_MAX_WIDTH, SEA_MAX_HEIGHT, CLUSTER_SCATTER_MAP, ORE_GEM_SCATTER_MAP, SMALL_CAVERNS_COUNT, MEDIUM_CAVERNS_COUNT} from '../assets/data/data-gen.mjs'
 
 /* ====================================================================================================
    WORLD BUFFER (CREATION DU MONDE)
@@ -161,6 +161,7 @@ class WorldGenerator {
     // 6. Creusement (plus de creusement ensuite, ou alors très localisé) - TODO
 
     // 6.1 Creusement des tunnels et cavernes - TODO
+    worldCarver.addSmallCaverns()
 
     // 6.2 Creusement des mini-biomes avec peuplement - TODO
 
@@ -1019,3 +1020,174 @@ class ClusterGenerator {
 }
 
 export const clusterGenerator = new ClusterGenerator()
+
+class WorldCarver {
+/**
+ * Génère un cercle bruité dont les bords sont irréguliers (aspect naturel).
+ * Les tuiles isolées (≤ 1 voisin 4-connexe dans le résultat) sont éliminées
+ * pour garantir un contour compact sans pixel orphelin.
+ *
+ * @param {number} cx        - Centre X (tuiles)
+ * @param {number} cy        - Centre Y (tuiles)
+ * @param {number} radiusMin - Rayon minimum (bords les plus rentrés)
+ * @param {number} radiusMax - Rayon maximum (bords les plus sortis)
+ * @param {number} code      - Code de node à attribuer à chaque tuile
+ * @param {number} frequency - Fréquence spatiale du bruit (défaut : 0.3)
+ * @returns {Array<{x: number, y: number, index: number, code: number}>}
+ */
+  digNoisyCircle_ (cx, cy, radiusMin, radiusMax, code, frequency = 0.3) {
+    const radius = (radiusMin + radiusMax) >> 1
+    const spread = radiusMax - radiusMin
+    const period = 1 / frequency
+
+    // 1. Carré englobant — clampé aux ghost cells
+    const xMin = Math.max(2, cx - radiusMax)
+    const xMax = Math.min(WORLD_WIDTH - 3, cx + radiusMax)
+    const yMin = Math.max(2, cy - radiusMax)
+    const yMax = Math.min(WORLD_HEIGHT - 3, cy + radiusMax)
+
+    // 2. Candidats : toutes les tuiles dans le cercle bruité
+    const candidates = new Set()
+    for (let x = xMin; x <= xMax; x++) {
+      for (let y = yMin; y <= yMax; y++) {
+        const dx = x - cx
+        const dy = y - cy
+        // distance² pour éviter Math.hypot (sqrt) dans la boucle serrée
+        const dist2 = dx * dx + dy * dy
+        if (dist2 > radiusMax * radiusMax) continue // rejet rapide hors carré englobant réel
+
+        const dist = Math.sqrt(dist2)
+        const noise = seededRNG.randomPerlin(x / period, y / period) // [0, 1]
+        const threshold = radius + (noise * 2 - 1) * spread // [radius-spread, radius+spread]
+
+        if (dist <= threshold) {
+          candidates.add((y << 10) | x)
+        }
+      }
+    }
+
+    // 3. Filtrage compacité : on élimine les tuiles avec < 2 voisins 4-connexes dans candidates
+    const result = []
+    for (const idx of candidates) {
+      const x = idx & 0x3FF
+      const y = idx >> 10
+      let neighbors = 0
+      if (candidates.has(((y - 1) << 10) | x)) neighbors++
+      if (candidates.has(((y + 1) << 10) | x)) neighbors++
+      if (candidates.has((y << 10) | (x - 1))) neighbors++
+      if (candidates.has((y << 10) | (x + 1))) neighbors++
+      if (neighbors >= 2) result.push({x, y, index: idx, code})
+    }
+
+    return result
+  }
+
+  /**
+ * DEBUG — Quadrillage de cercles bruités sur tout le monde.
+ * Rayon aléatoire entre 6 et 10, espacés de 20 tuiles.
+ * Écrit VOID directement dans worldBuffer pour validation visuelle.
+ * À supprimer après validation.
+ */
+
+  digNoisyCircle (cx, cy, radiusMin, radiusMax, code, frequency = 0.3) {
+    const radius = (radiusMin + radiusMax) >> 1
+    const spread = radiusMax - radiusMin
+    const period = 1 / frequency
+
+    const xMin = Math.max(2, cx - radiusMax)
+    const xMax = Math.min(WORLD_WIDTH - 3, cx + radiusMax)
+    const yMin = Math.max(2, cy - radiusMax)
+    const yMax = Math.min(WORLD_HEIGHT - 3, cy + radiusMax)
+
+    const result = []
+    for (let x = xMin; x <= xMax; x++) {
+      for (let y = yMin; y <= yMax; y++) {
+        const dx = x - cx
+        const dy = y - cy
+        const dist2 = dx * dx + dy * dy
+        if (dist2 > radiusMax * radiusMax) continue
+
+        const dist = Math.sqrt(dist2)
+        const noise = seededRNG.randomPerlin(x / period, y / period)
+        const threshold = radius + (noise * 2 - 1) * spread
+
+        if (dist <= threshold) {
+          result.push({x, y, index: (y << 10) | x, code})
+        }
+      }
+    }
+    return result
+  }
+
+  /**
+ * Applique une liste de tuiles dans worldBuffer.
+ * Protège les tuiles ETERNAL (FOG, DEEPSEA, BASALT, LAVA), SKY et VOID.
+ *
+ * @param {Array<{x: number, y: number, index: number, code: number}>} tiles
+ */
+  applyTiles (tiles) {
+    const PROTECTED = new Set([
+      NODES.FOG.code,
+      NODES.DEEPSEA.code,
+      NODES.BASALT.code,
+      NODES.LAVA.code,
+      NODES.SKY.code,
+      NODES.VOID.code
+    ])
+
+    for (let i = 0; i < tiles.length; i++) {
+      const tile = tiles[i]
+      if (tile.x < 0 || tile.x >= WORLD_WIDTH) continue
+      if (tile.y < 0 || tile.y >= WORLD_HEIGHT) continue
+      if (PROTECTED.has(worldBuffer.readAt(tile.index))) continue
+      worldBuffer.writeAt(tile.index, tile.code)
+    }
+  }
+
+  /**
+ * Disperse des petites et moyennes cavernes aléatoirement dans tout le monde.
+ * 128 itérations (64 chunks × 32 / 16), chacune creuse une petite + une moyenne caverne.
+ */
+  addSmallCaverns () {
+    const code = NODES.VOID.code
+
+    // Petites cavernes
+    let tiles = []
+    for (let i = 0; i < SMALL_CAVERNS_COUNT; i++) {
+      const x = seededRNG.randomGetMinMax(2, WORLD_WIDTH - 3)
+      const y = seededRNG.randomGetMinMax(1, WORLD_HEIGHT - 3)
+
+      const t = this.digNoisyCircle(x, y, 3, 8, code)
+      for (let j = 0; j < t.length; j++) tiles.push(t[j])
+    }
+    this.applyTiles(tiles)
+
+    // Moyennes cavernes
+    tiles = []
+    for (let i = 0; i < MEDIUM_CAVERNS_COUNT; i++) {
+      const x = seededRNG.randomGetMinMax(2, WORLD_WIDTH - 3)
+      const y = seededRNG.randomGetMinMax(1, WORLD_HEIGHT - 3)
+      const t = this.digNoisyCircle(x, y, 4, 12, code)
+      for (let j = 0; j < t.length; j++) tiles.push(t[j])
+    }
+    this.applyTiles(tiles)
+  }
+
+  debugFillWithCircles () {
+    const code = NODES.VOID.code
+    const step = 32
+
+    for (let cy = step; cy < WORLD_HEIGHT - step; cy += step) {
+      for (let cx = step; cx < WORLD_WIDTH - step; cx += step) {
+        const radiusMin = seededRNG.randomGetMinMax(6, 8)
+        const radiusMax = radiusMin + seededRNG.randomGetMinMax(2, 4)
+        const tiles = this.digNoisyCircle(cx, cy, radiusMin, radiusMax, code)
+        for (let i = 0; i < tiles.length; i++) {
+          worldBuffer.write(tiles[i].x, tiles[i].y, code)
+        }
+      }
+    }
+  }
+}
+
+export const worldCarver = new WorldCarver()
