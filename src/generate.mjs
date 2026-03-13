@@ -765,6 +765,36 @@ class ClusterGenerator {
       if (!chosen.has(k) && !fringeSet.has(k)) { fringeSet.add(k); fringeArr.push(k) }
     }
   }
+
+  /**
+   * Distribue des clusters aléatoires dans un rectangle du monde.
+   * Le nombre de clusters est proportionnel à la surface du rectangle.
+   *
+   * @param {number} x0       - X gauche du rectangle (inclus)
+   * @param {number} y0       - Y haut du rectangle (inclus)
+   * @param {number} x1       - X droit du rectangle (inclus)
+   * @param {number} y1       - Y bas du rectangle (inclus)
+   * @param {number} percent  - Densité : fraction de la surface couverte en clusters
+   * @param {number} code     - Code de node à appliquer
+   * @param {number} sizeMin  - Taille minimale d'un cluster (défaut : 5)
+   * @param {number} sizeMax  - Taille maximale d'un cluster (défaut : 8)
+   * @returns {Array<{x: number, y: number, index: number, code: number}>}
+   */
+  scatterClusters (x0, y0, x1, y1, percent, code, sizeMin = 5, sizeMax = 8) {
+    const surface = (x1 - x0) * (y1 - y0)
+    const count = Math.max(5, Math.round(surface * percent))
+    const result = []
+
+    for (let i = 0; i < count; i++) {
+      const x = seededRNG.randomGetMinMax(x0, x1)
+      const y = seededRNG.randomGetMinMax(y0, y1)
+      const size = seededRNG.randomGetMinMax(sizeMin, sizeMax)
+      const cluster = this.randomWalkCluster(x, y, size, code)
+      for (const tile of cluster) { result.push(tile) }
+    }
+
+    return result
+  }
 }
 
 export const clusterGenerator = new ClusterGenerator()
