@@ -15,7 +15,7 @@
 
 import {describe, assert} from './kernel.mjs'
 import {biomesGenerator} from '../src/generate.mjs'
-import {BIOME_TYPE} from '../src/constant.mjs'
+import {BIOME_TYPE} from '../assets/data/data.mjs'
 import {seededRNG} from '../src/utils.mjs'
 
 const ITERATIONS = 10000
