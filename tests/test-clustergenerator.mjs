@@ -8,8 +8,9 @@
 //   - Robustesse (size=1, size non atteignable)
 
 import {describe, assert} from './kernel.mjs'
-import {clusterGenerator} from '../src/generate.mjs'
+import {clusterGenerator, worldBuffer} from '../src/generate.mjs'
 import {seededRNG} from '../src/utils.mjs'
+import {NODES} from '../assets/data/data.mjs'
 
 const SEED = 42
 const ITERATIONS = 200
@@ -182,4 +183,184 @@ describe('ClusterGenerator — randomWalkCluster() : deux appels successifs sans
     if (r1[i].index !== r2[i].index) { differs = true; break }
   }
   assert('Deux appels consécutifs consomment le RNG', differs)
+})
+
+// ─── scatterClusters ──────────────────────────────────────────────────────────
+
+describe('ClusterGenerator — scatterClusters() : retourne un Array', () => {
+  seededRNG.init(SEED)
+  const result = clusterGenerator.scatterClusters(100, 100, 200, 200, 0.01, 5)
+  assert('Résultat est un Array', Array.isArray(result))
+})
+
+describe('ClusterGenerator — scatterClusters() : chaque entrée a les champs x, y, index, code', () => {
+  seededRNG.init(SEED)
+  const result = clusterGenerator.scatterClusters(100, 100, 200, 200, 0.01, 5)
+  let ok = true
+  for (const entry of result) {
+    if (
+      typeof entry.x !== 'number' ||
+      typeof entry.y !== 'number' ||
+      typeof entry.index !== 'number' ||
+      typeof entry.code !== 'number'
+    ) { ok = false; break }
+  }
+  assert('Tous les champs sont des numbers', ok)
+})
+
+describe('ClusterGenerator — scatterClusters() : count minimum = 5', () => {
+  seededRNG.init(SEED)
+  // Rectangle minuscule → surface * percent < 5 → count forcé à 5
+  // sizeMin=1, sizeMax=1 → chaque cluster = 1 tuile → result.length = count exact
+  const result = clusterGenerator.scatterClusters(100, 100, 101, 101, 0.0001, 5, 1, 1)
+  assert('Au moins 5 tuiles produites', result.length >= 5)
+})
+
+describe('ClusterGenerator — scatterClusters() : code propagé à toutes les entrées', () => {
+  seededRNG.init(SEED)
+  const CODE = 21
+  const result = clusterGenerator.scatterClusters(100, 100, 200, 200, 0.01, CODE)
+  let ok = true
+  for (const entry of result) {
+    if (entry.code !== CODE) { ok = false; break }
+  }
+  assert('code identique sur toutes les tuiles', ok)
+})
+
+describe('ClusterGenerator — scatterClusters() : même graine → même résultat', () => {
+  seededRNG.init(SEED)
+  const r1 = clusterGenerator.scatterClusters(100, 100, 200, 200, 0.01, 5)
+
+  seededRNG.init(SEED)
+  const r2 = clusterGenerator.scatterClusters(100, 100, 200, 200, 0.01, 5)
+
+  let ok = r1.length === r2.length
+  if (ok) {
+    for (let i = 0; i < r1.length; i++) {
+      if (r1[i].index !== r2[i].index) { ok = false; break }
+    }
+  }
+  assert('Résultats identiques avec la même graine', ok)
+})
+
+// ─── applyTiles ───────────────────────────────────────────────────────────────
+
+describe('ClusterGenerator — applyTiles() : écrit les tuiles dans worldBuffer', () => {
+  worldBuffer.init()
+  // Remplissage avec STONE
+  const data = worldBuffer.world
+  data.fill(NODES.STONE.code)
+
+  seededRNG.init(SEED)
+  const tiles = clusterGenerator.scatterClusters(100, 100, 200, 200, 0.01, NODES.CLAY.code)
+  clusterGenerator.applyTiles(tiles)
+
+  let ok = false
+  for (const tile of tiles) {
+    if (worldBuffer.read(tile.x, tile.y) === NODES.CLAY.code) { ok = true; break }
+  }
+  assert('Au moins une tuile CLAY écrite dans le buffer', ok)
+  worldBuffer.clear()
+})
+
+describe('ClusterGenerator — applyTiles() : ne remplace pas SKY', () => {
+  worldBuffer.init()
+  worldBuffer.world.fill(NODES.SKY.code)
+
+  seededRNG.init(SEED)
+  const tiles = clusterGenerator.scatterClusters(100, 100, 200, 200, 0.01, NODES.CLAY.code)
+  clusterGenerator.applyTiles(tiles)
+
+  let ok = true
+  for (const tile of tiles) {
+    if (tile.x < 0 || tile.x >= 1024 || tile.y < 0 || tile.y >= 512) continue
+    if (worldBuffer.read(tile.x, tile.y) !== NODES.SKY.code) { ok = false; break }
+  }
+  assert('SKY jamais remplacé', ok)
+  worldBuffer.clear()
+})
+
+describe('ClusterGenerator — applyTiles() : ne remplace pas SEA', () => {
+  worldBuffer.init()
+  worldBuffer.world.fill(NODES.SEA.code)
+
+  seededRNG.init(SEED)
+  const tiles = clusterGenerator.scatterClusters(100, 100, 200, 200, 0.01, NODES.CLAY.code)
+  clusterGenerator.applyTiles(tiles)
+
+  let ok = true
+  for (const tile of tiles) {
+    if (tile.x < 0 || tile.x >= 1024 || tile.y < 0 || tile.y >= 512) continue
+    if (worldBuffer.read(tile.x, tile.y) !== NODES.SEA.code) { ok = false; break }
+  }
+  assert('SEA jamais remplacé', ok)
+  worldBuffer.clear()
+})
+
+describe('ClusterGenerator — applyTiles() : ne remplace pas DEEPSEA', () => {
+  worldBuffer.init()
+  worldBuffer.world.fill(NODES.DEEPSEA.code)
+
+  seededRNG.init(SEED)
+  const tiles = clusterGenerator.scatterClusters(100, 100, 200, 200, 0.01, NODES.CLAY.code)
+  clusterGenerator.applyTiles(tiles)
+
+  let ok = true
+  for (const tile of tiles) {
+    if (tile.x < 0 || tile.x >= 1024 || tile.y < 0 || tile.y >= 512) continue
+    if (worldBuffer.read(tile.x, tile.y) !== NODES.DEEPSEA.code) { ok = false; break }
+  }
+  assert('DEEPSEA jamais remplacé', ok)
+  worldBuffer.clear()
+})
+
+describe('ClusterGenerator — applyTiles() : ne remplace pas BASALT (ETERNAL)', () => {
+  worldBuffer.init()
+  worldBuffer.world.fill(NODES.BASALT.code)
+
+  seededRNG.init(SEED)
+  const tiles = clusterGenerator.scatterClusters(100, 100, 200, 200, 0.01, NODES.CLAY.code)
+  clusterGenerator.applyTiles(tiles)
+
+  let ok = true
+  for (const tile of tiles) {
+    if (tile.x < 0 || tile.x >= 1024 || tile.y < 0 || tile.y >= 512) continue
+    if (worldBuffer.read(tile.x, tile.y) !== NODES.BASALT.code) { ok = false; break }
+  }
+  assert('BASALT jamais remplacé', ok)
+  worldBuffer.clear()
+})
+
+describe('ClusterGenerator — applyTiles() : ne remplace pas LAVA (ETERNAL)', () => {
+  worldBuffer.init()
+  worldBuffer.world.fill(NODES.LAVA.code)
+
+  seededRNG.init(SEED)
+  const tiles = clusterGenerator.scatterClusters(100, 100, 200, 200, 0.01, NODES.CLAY.code)
+  clusterGenerator.applyTiles(tiles)
+
+  let ok = true
+  for (const tile of tiles) {
+    if (tile.x < 0 || tile.x >= 1024 || tile.y < 0 || tile.y >= 512) continue
+    if (worldBuffer.read(tile.x, tile.y) !== NODES.LAVA.code) { ok = false; break }
+  }
+  assert('LAVA jamais remplacé', ok)
+  worldBuffer.clear()
+})
+
+describe('ClusterGenerator — applyTiles() : remplace VOID (creusement postérieur)', () => {
+  worldBuffer.init()
+  worldBuffer.world.fill(NODES.VOID.code)
+
+  seededRNG.init(SEED)
+  const tiles = clusterGenerator.scatterClusters(100, 100, 200, 200, 0.01, NODES.CLAY.code)
+  clusterGenerator.applyTiles(tiles)
+
+  let ok = false
+  for (const tile of tiles) {
+    if (tile.x < 0 || tile.x >= 1024 || tile.y < 0 || tile.y >= 512) continue
+    if (worldBuffer.read(tile.x, tile.y) === NODES.CLAY.code) { ok = true; break }
+  }
+  assert('VOID remplacé par CLAY', ok)
+  worldBuffer.clear()
 })
