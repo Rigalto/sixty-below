@@ -161,7 +161,9 @@ class WorldGenerator {
     // 6. Creusement (plus de creusement ensuite, ou alors très localisé) - TODO
 
     // 6.1 Creusement des tunnels et cavernes - TODO
-    worldCarver.addSmallCaverns()
+    // worldCarver.addSmallCaverns()
+    worldCarver.debugTraceTunnel()
+    worldCarver.cleanupAfterCarving()
 
     // 6.2 Creusement des mini-biomes avec peuplement - TODO
 
@@ -1089,7 +1091,7 @@ class WorldCarver {
  * À supprimer après validation.
  */
 
-  digNoisyCircle (cx, cy, radiusMin, radiusMax, code, frequency = 0.3) {
+  digNoisyCircle (tiles, cx, cy, radiusMin, radiusMax, code, frequency = 0.3) {
     const radius = (radiusMin + radiusMax) >> 1
     const spread = radiusMax - radiusMin
     const period = 1 / frequency
@@ -1099,7 +1101,6 @@ class WorldCarver {
     const yMin = Math.max(2, cy - radiusMax)
     const yMax = Math.min(WORLD_HEIGHT - 3, cy + radiusMax)
 
-    const result = []
     for (let x = xMin; x <= xMax; x++) {
       for (let y = yMin; y <= yMax; y++) {
         const dx = x - cx
@@ -1112,11 +1113,10 @@ class WorldCarver {
         const threshold = radius + (noise * 2 - 1) * spread
 
         if (dist <= threshold) {
-          result.push({x, y, index: (y << 10) | x, code})
+          tiles.push({x, y, index: (y << 10) | x, code})
         }
       }
     }
-    return result
   }
 
   /**
@@ -1131,8 +1131,7 @@ class WorldCarver {
       NODES.DEEPSEA.code,
       NODES.BASALT.code,
       NODES.LAVA.code,
-      NODES.SKY.code,
-      NODES.VOID.code
+      NODES.SKY.code
     ])
 
     for (let i = 0; i < tiles.length; i++) {
@@ -1145,48 +1144,196 @@ class WorldCarver {
   }
 
   /**
+ * Calcule le chemin d'un tunnel comme suite de points avec rayon local.
+ * Ne creuse pas — l'appelant passe chaque point à digNoisyCircle.
+ *
+ * @param {number} x0         - X de départ (tuiles)
+ * @param {number} y0         - Y de départ (tuiles)
+ * @param {number} radiusMax  - Rayon maximum du tunnel
+ * @param {number} maxLength  - Longueur cible (sous-comptée à 0.8 — tunnel ~25% plus long)
+ * @param {number} angle      - Orientation initiale (degrés)
+ * @param {number} deltaAngle - Déviation maximale par pas (degrés)
+ * @returns {Array<{x, y, radiusMin, radiusMax}>}
+ */
+  pathTunnel (x0, y0, radiusMax, maxLength, angle, deltaAngle) {
+    let alpha = angle * Math.PI / 180
+    const dAlpha = deltaAngle * Math.PI / 180
+    let x = x0
+    let y = y0
+    let radius = seededRNG.randomGetMinMax(radiusMax >> 1, radiusMax)
+    const path = [{x, y, radiusMin: Math.floor(0.7 * radius), radiusMax: Math.ceil(1.4 * radius)}]
+    let length = 0
+
+    while (length < maxLength) {
+      alpha += seededRNG.randomReal(-dAlpha, dAlpha)
+      const dx = Math.ceil(radius * Math.sin(alpha))
+      const dy = Math.ceil(radius * Math.cos(alpha))
+      length += 0.8 * Math.hypot(dx, dy)
+      x = x + dx
+      y = y - dy
+      radius = seededRNG.randomGetMinMax(radiusMax >> 1, radiusMax)
+      path.push({x, y, radiusMin: Math.floor(0.7 * radius), radiusMax: Math.ceil(1.4 * radius)})
+    }
+
+    return path
+  }
+
+  /**
  * Disperse des petites et moyennes cavernes aléatoirement dans tout le monde.
  * 128 itérations (64 chunks × 32 / 16), chacune creuse une petite + une moyenne caverne.
  */
   addSmallCaverns () {
     const code = NODES.VOID.code
 
-    // Petites cavernes
-    let tiles = []
+    const smallTiles = []
     for (let i = 0; i < SMALL_CAVERNS_COUNT; i++) {
       const x = seededRNG.randomGetMinMax(2, WORLD_WIDTH - 3)
       const y = seededRNG.randomGetMinMax(1, WORLD_HEIGHT - 3)
-
-      const t = this.digNoisyCircle(x, y, 3, 8, code)
-      for (let j = 0; j < t.length; j++) tiles.push(t[j])
+      this.digNoisyCircle(smallTiles, x, y, 3, 8, code)
     }
-    this.applyTiles(tiles)
+    this.applyTiles(smallTiles)
 
-    // Moyennes cavernes
-    tiles = []
+    const mediumTiles = []
     for (let i = 0; i < MEDIUM_CAVERNS_COUNT; i++) {
       const x = seededRNG.randomGetMinMax(2, WORLD_WIDTH - 3)
       const y = seededRNG.randomGetMinMax(1, WORLD_HEIGHT - 3)
-      const t = this.digNoisyCircle(x, y, 4, 12, code)
-      for (let j = 0; j < t.length; j++) tiles.push(t[j])
+      this.digNoisyCircle(mediumTiles, x, y, 4, 12, code)
     }
-    this.applyTiles(tiles)
+    this.applyTiles(mediumTiles)
   }
 
-  debugFillWithCircles () {
-    const code = NODES.VOID.code
-    const step = 32
+  /**
+ * Passe de nettoyage globale après tous les creusements.
+ * Parcours séquentiel index croissant (haut→bas, gauche→droite).
+ * Les modifications sont in-place — la cascade est naturelle.
+ * Protège les tuiles ETERNAL contre tout écrasement.
+ */
+  cleanupAfterCarving () {
+    const world = worldBuffer.world
+    const VOID = NODES.VOID.code
+    const SKY = NODES.SKY.code
+    const W = WORLD_WIDTH
+    const H = WORLD_HEIGHT
 
-    for (let cy = step; cy < WORLD_HEIGHT - step; cy += step) {
-      for (let cx = step; cx < WORLD_WIDTH - step; cx += step) {
-        const radiusMin = seededRNG.randomGetMinMax(6, 8)
-        const radiusMax = radiusMin + seededRNG.randomGetMinMax(2, 4)
-        const tiles = this.digNoisyCircle(cx, cy, radiusMin, radiusMax, code)
-        for (let i = 0; i < tiles.length; i++) {
-          worldBuffer.write(tiles[i].x, tiles[i].y, code)
+    const PROTECTED = new Set([
+      NODES.FOG.code,
+      NODES.DEEPSEA.code,
+      NODES.BASALT.code,
+      NODES.LAVA.code
+    ])
+
+    for (let y = 1; y < H - 1; y++) {
+      for (let x = 1; x < W - 1; x++) {
+        const idx = (y << 10) | x
+        const code = world[idx]
+        const isVoid = code === VOID
+
+        // Règle 1 — VOID sous SKY devient SKY (cascade naturelle)
+        if (isVoid && world[idx - W] === SKY) {
+          world[idx] = SKY
+          continue
+        }
+
+        const top = world[idx - W]
+        const bot = world[idx + W]
+        const left = world[idx - 1]
+        const right = world[idx + 1]
+
+        if (isVoid) {
+        // Règle 2 — VOID avec 4 voisins non VOID → devient l'un d'eux
+          if (top !== VOID && bot !== VOID && left !== VOID && right !== VOID) {
+            const candidates = [top, bot, left, right]
+            world[idx] = candidates[seededRNG.randomGetMax(3)]
+            continue
+          }
+
+          // Règle 4 — paire horizontale VOID (x,y)+(x+1,y), 6 voisins non VOID → devient l'un des 6
+          if (x < W - 2 && right === VOID) {
+            const top2 = world[idx - W + 1]
+            const bot2 = world[idx + W + 1]
+            const right2 = world[idx + 2]
+            if (top !== VOID && top2 !== VOID &&
+              bot !== VOID && bot2 !== VOID &&
+              left !== VOID && right2 !== VOID) {
+              const candidates = [top, top2, bot, bot2, left, right2]
+              world[idx] = candidates[seededRNG.randomGetMax(5)]
+              continue
+            }
+          }
+
+          // Règle 6 — paire verticale VOID (x,y)+(x,y+1), 6 voisins non VOID → devient l'un des 6
+          if (y < H - 2 && bot === VOID) {
+            const left2 = world[idx + W - 1]
+            const right2 = world[idx + W + 1]
+            const top2 = world[idx + W + W]
+            if (top !== VOID &&
+              left !== VOID && left2 !== VOID &&
+              right !== VOID && right2 !== VOID &&
+              top2 !== VOID) {
+              const candidates = [top, left, left2, right, right2, top2]
+              world[idx] = candidates[seededRNG.randomGetMax(5)]
+              continue
+            }
+          }
+        } else {
+          if (PROTECTED.has(code)) continue
+
+          // Règle 3 — non VOID avec 4 voisins VOID → devient VOID
+          if (top === VOID && bot === VOID && left === VOID && right === VOID) {
+            world[idx] = VOID
+            continue
+          }
+
+          // Règle 5 — paire horizontale non VOID (x,y)+(x+1,y), 6 voisins VOID → devient VOID
+          if (x < W - 2 && right !== VOID) {
+            const top2 = world[idx - W + 1]
+            const bot2 = world[idx + W + 1]
+            const right2 = world[idx + 2]
+            if (top === VOID && top2 === VOID &&
+              bot === VOID && bot2 === VOID &&
+              left === VOID && right2 === VOID) {
+              world[idx] = VOID
+              continue
+            }
+          }
+
+          // Règle 7 — paire verticale non VOID (x,y)+(x,y+1), 6 voisins VOID → devient VOID
+          if (y < H - 2 && bot !== VOID) {
+            const left2 = world[idx + W - 1]
+            const right2 = world[idx + W + 1]
+            const bot2 = world[idx + W + W]
+            if (top === VOID &&
+              left === VOID && left2 === VOID &&
+              right === VOID && right2 === VOID &&
+              bot2 === VOID) {
+              world[idx] = VOID
+              continue
+            }
+          }
         }
       }
     }
+  }
+
+  /**
+ * DEBUG — Trace un tunnel unique depuis le centre du monde.
+ * À supprimer après validation.
+ */
+  debugTraceTunnel () {
+    const code = NODES.VOID.code
+    const path = this.pathTunnel(
+      WORLD_WIDTH >> 1, WORLD_HEIGHT >> 1, // centre du monde
+      8, // radiusMax
+      300, // longueur
+      90, // angle initial : horizontal
+      20 // déviation max par pas
+    )
+    const tiles = []
+    for (let i = 0; i < path.length; i++) {
+      const p = path[i]
+      this.digNoisyCircle(tiles, p.x, p.y, p.radiusMin, p.radiusMax, code, 0.8)
+    }
+    this.applyTiles(tiles)
   }
 }
 
