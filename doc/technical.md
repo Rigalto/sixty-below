@@ -704,6 +704,8 @@ Génère des tunnels et des cavernes (tuiles VOID).
 |---|---|---|
 | `digNoisyCircle` | `(tiles, cx, cy, radiusMin, radiusMax, code, frequency?): void` | Creuse un trou circulaire bruité (Perlin noise) - Peut générer des tuiles et des trous isolés - Pousse les tuiles directement dans `tiles` (pas de retour). |
 | `applyTiles` | `(tiles: Array<{x, y, index, code}>): void` | Écrit les tuiles dans `worldBuffer` via `writeAt`. Ignore les tuiles hors bornes et protège `FOG`, `DEEPSEA`, `BASALT`, `LAVA`, `SKY`, `SEA` contre l'écrasement. |
+| `pathTunnel` | `(x0, y0, radiusMax, maxLength, angle, deltaAngle): Array<{x, y, radiusMin, radiusMax}>` | Calcule le chemin d'un tunnel par accumulation angulaire. `angle` et `deltaAngle` en degrés. Longueur effective ~25% supérieure à `maxLength` (facteur 0.8). Utilitaire pur — ne creuse pas. |
+| `carveAlongPath` | `(path: Array<{x, y, radiusMin, radiusMax}>): void` | Creuse un tunnel le long d'un chemin `pathTunnel`. Accumule tous les cercles en un seul tableau avant `applyTiles`. |
 | `worldAddSmallCaverns` | `(): void` | ajout de petites cavernes (r3–8) et de moyennes cavernes (r4–12), réparties aléatoirement dans tout le monde. Deux passes `applyTiles` séparées. Constantes dans `data-gen.mjs`. |
 | `cleanupAfterCarving` | `(): void` | Passe de nettoyage globale post-creusement. 7 règles in-place : propagation SKY, suppression tuiles isolées VOID/non-VOID (4-connexe et paires horizontales/verticales). Parcours séquentiel index croissant — cascade naturelle. |
 

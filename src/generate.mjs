@@ -161,9 +161,16 @@ class WorldGenerator {
     // 6. Creusement (plus de creusement ensuite, ou alors très localisé) - TODO
 
     // 6.1 Creusement des tunnels et cavernes - TODO
-    // worldCarver.addSmallCaverns()
-    worldCarver.debugTraceTunnel()
-    worldCarver.cleanupAfterCarving()
+    worldCarver.digSmallCaverns()
+    worldCarver.digSurfaceTunnel(skySurface)
+    // TODO
+    // const zigzagCount = seededRNG.randomGetMinMax(2, 3)
+    // for (let i = 0; i < zigzagCount; i++) { worldCarver.digSurfaceZigzag() }
+    // worldCarver.digUndergroundTunnel()
+    // worldCarver.digCavernTunnel()
+
+    // A supprimer
+    // worldCarver.debugTraceTunnel()
 
     // 6.2 Creusement des mini-biomes avec peuplement - TODO
 
@@ -171,8 +178,15 @@ class WorldGenerator {
 
     // 7. Traitement des surfaces végétales + désert - TODO
 
-    // N-7 Remplissage de la mer (gauche et droite) - TODO
+    // 7.1. Erosion naturelle (on rend la surface plus lisse)
+
+    // 7.2. Ajout des topsoils / natural (forêt et jungle)
+
+    // 7.3. Ajout du sable (désert) - écoulement et consolidation des tunnels/cavernes
+
+    // N-7 Remplissage de la mer (gauche et droite)
     liquidFiller.fillSea()
+    worldCarver.cleanupAfterCarving() // 85774
     console.log('[WorldGenerator::liquidFiller] - Sea', (performance.now() - t0).toFixed(3), 'ms')
 
     // N-6 Ajout de la plage (Shore) et du fond de la mer - TODO
@@ -1179,10 +1193,27 @@ class WorldCarver {
   }
 
   /**
+ * Creuse un tunnel le long d'un chemin calculé par pathTunnel.
+ * Accumule tous les cercles en un seul tableau avant d'appeler applyTiles.
+ *
+ * @param {Array<{x, y, radiusMin, radiusMax}>} path - Chemin retourné par pathTunnel
+ */
+  carveAlongPath (path) {
+    const code = NODES.VOID.code
+
+    const tiles = []
+    for (let j = 0; j < path.length; j++) {
+      const p = path[j]
+      this.digNoisyCircle(tiles, p.x, p.y, p.radiusMin, p.radiusMax, code)
+    }
+    this.applyTiles(tiles)
+  }
+
+  /**
  * Disperse des petites et moyennes cavernes aléatoirement dans tout le monde.
  * 128 itérations (64 chunks × 32 / 16), chacune creuse une petite + une moyenne caverne.
  */
-  addSmallCaverns () {
+  digSmallCaverns () {
     const code = NODES.VOID.code
 
     const smallTiles = []
@@ -1200,6 +1231,23 @@ class WorldCarver {
       this.digNoisyCircle(mediumTiles, x, y, 4, 12, code)
     }
     this.applyTiles(mediumTiles)
+  }
+
+  digSurfaceTunnel (skySurface) {
+    const count = seededRNG.randomGetMinMax(25, 35)
+    for (let i = 0; i < count; i++) {
+      const x0 = seededRNG.randomGetMinMax(0, WORLD_WIDTH - 1)
+      const y0 = skySurface[x0] + seededRNG.randomGetMinMax(-5, 5)
+      const direction = seededRNG.randomGetBool() ? 1 : -1
+      const angle = direction * seededRNG.randomGetMinMax(110, 125)
+      const length = seededRNG.randomGetMinMax(25, 40)
+      // chemin obligatoirement en pente
+      let path
+      do {
+        path = this.pathTunnel(x0, y0, 4, length, angle, 15)
+      } while (path[path.length - 1].y <= y0)
+      this.carveAlongPath(path)
+    }
   }
 
   /**
@@ -1222,17 +1270,32 @@ class WorldCarver {
       NODES.LAVA.code
     ])
 
+    const propagateSky = (idx) => {
+      world[idx] = SKY
+      let below = idx + W
+      while (below < W * (H - 1) && world[below] === VOID) {
+        world[below] = SKY
+        below += W
+      }
+    }
+
+    // Passe 1 — propagation SKY vers le bas colonne par colonne
+    for (let x = 1; x < W - 1; x++) {
+      for (let y = 1; y < H - 1; y++) {
+        const idx = (y << 10) | x
+        const code = world[idx]
+        if (code === SKY) continue
+        if (code === VOID) { world[idx] = SKY; continue }
+        break
+      }
+    }
+
     for (let y = 1; y < H - 1; y++) {
       for (let x = 1; x < W - 1; x++) {
         const idx = (y << 10) | x
         const code = world[idx]
         const isVoid = code === VOID
-
-        // Règle 1 — VOID sous SKY devient SKY (cascade naturelle)
-        if (isVoid && world[idx - W] === SKY) {
-          world[idx] = SKY
-          continue
-        }
+        const isSKY = code === SKY
 
         const top = world[idx - W]
         const bot = world[idx + W]
@@ -1242,8 +1305,12 @@ class WorldCarver {
         if (isVoid) {
         // Règle 2 — VOID avec 4 voisins non VOID → devient l'un d'eux
           if (top !== VOID && bot !== VOID && left !== VOID && right !== VOID) {
-            const candidates = [top, bot, left, right]
-            world[idx] = candidates[seededRNG.randomGetMax(3)]
+            const candidates = []
+            if (top !== SKY) candidates.push(top)
+            if (bot !== SKY) candidates.push(bot)
+            if (left !== SKY) candidates.push(left)
+            if (right !== SKY) candidates.push(right)
+            world[idx] = seededRNG.randomGetArrayValue(candidates)
             continue
           }
 
@@ -1252,11 +1319,15 @@ class WorldCarver {
             const top2 = world[idx - W + 1]
             const bot2 = world[idx + W + 1]
             const right2 = world[idx + 2]
-            if (top !== VOID && top2 !== VOID &&
-              bot !== VOID && bot2 !== VOID &&
-              left !== VOID && right2 !== VOID) {
-              const candidates = [top, top2, bot, bot2, left, right2]
-              world[idx] = candidates[seededRNG.randomGetMax(5)]
+            if (top !== VOID && top2 !== VOID && bot !== VOID && bot2 !== VOID && left !== VOID && right2 !== VOID) {
+              const candidates = []
+              if (top !== SKY) candidates.push(top)
+              if (top2 !== SKY) candidates.push(top2)
+              if (bot !== SKY) candidates.push(bot)
+              if (bot2 !== SKY) candidates.push(bot2)
+              if (left !== SKY) candidates.push(left)
+              if (right2 !== SKY) candidates.push(right2)
+              world[idx] = seededRNG.randomGetArrayValue(candidates)
               continue
             }
           }
@@ -1266,20 +1337,24 @@ class WorldCarver {
             const left2 = world[idx + W - 1]
             const right2 = world[idx + W + 1]
             const top2 = world[idx + W + W]
-            if (top !== VOID &&
-              left !== VOID && left2 !== VOID &&
-              right !== VOID && right2 !== VOID &&
-              top2 !== VOID) {
-              const candidates = [top, left, left2, right, right2, top2]
-              world[idx] = candidates[seededRNG.randomGetMax(5)]
+            if (top !== VOID && left !== VOID && left2 !== VOID && right !== VOID && right2 !== VOID && top2 !== VOID) {
+              const candidates = []
+              if (top !== SKY) candidates.push(top)
+              if (left !== SKY) candidates.push(left)
+              if (left2 !== SKY) candidates.push(left2)
+              if (right !== SKY) candidates.push(right)
+              if (right2 !== SKY) candidates.push(right2)
+              if (top2 !== SKY) candidates.push(top2)
+              world[idx] = seededRNG.randomGetArrayValue(candidates)
               continue
             }
           }
         } else {
           if (PROTECTED.has(code)) continue
+          if (isSKY) continue
 
           // Règle 3 — non VOID avec 4 voisins VOID → devient VOID
-          if (top === VOID && bot === VOID && left === VOID && right === VOID) {
+          if (top === VOID && bot === VOID && (left === VOID || left === SKY) && (right === VOID || right === SKY)) {
             world[idx] = VOID
             continue
           }
@@ -1289,9 +1364,7 @@ class WorldCarver {
             const top2 = world[idx - W + 1]
             const bot2 = world[idx + W + 1]
             const right2 = world[idx + 2]
-            if (top === VOID && top2 === VOID &&
-              bot === VOID && bot2 === VOID &&
-              left === VOID && right2 === VOID) {
+            if (top === VOID && top2 === VOID && bot === VOID && bot2 === VOID && left === VOID && right2 === VOID) {
               world[idx] = VOID
               continue
             }
@@ -1302,11 +1375,39 @@ class WorldCarver {
             const left2 = world[idx + W - 1]
             const right2 = world[idx + W + 1]
             const bot2 = world[idx + W + W]
-            if (top === VOID &&
-              left === VOID && left2 === VOID &&
-              right === VOID && right2 === VOID &&
-              bot2 === VOID) {
+            if (top === VOID && left === VOID && left2 === VOID && right === VOID && right2 === VOID && bot2 === VOID) {
               world[idx] = VOID
+              continue
+            }
+          }
+
+          // Règle 8 — pic isolé dans le ciel → SKY + propagation vers le bas
+          if (top === SKY && left === SKY && right === SKY && bot === VOID) {
+            propagateSky(idx)
+            world[idx] = SKY
+            continue
+          }
+
+          // Règle 9 — pic double vertical dans le ciel → SKY + propagation vers le bas
+          if (y < H - 2 && top === SKY && left === SKY && right === SKY) {
+            const bot2code = world[idx + W + W]
+            const left2 = world[idx + W - 1]
+            const right2 = world[idx + W + 1]
+            if (bot !== VOID && bot !== SKY && left2 === SKY && right2 === SKY && (bot2code === VOID || bot2code === SKY)) {
+              world[idx] = SKY
+              propagateSky(idx + W)
+              continue
+            }
+          }
+
+          // Règle 10 — pic double horizontal dans le ciel → SKY + propagation vers le bas
+          if (x < W - 2 && top === SKY && (bot === VOID || bot === SKY)) {
+            const top2 = world[idx - W + 1]
+            const bot2 = world[idx + W + 1]
+            const right2 = world[idx + 2]
+            if (right !== VOID && right !== SKY && top2 === SKY && (bot2 === VOID || bot2 === SKY) && right2 === SKY) {
+              propagateSky(idx)
+              propagateSky(idx + 1)
               continue
             }
           }

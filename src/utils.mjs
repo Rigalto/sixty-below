@@ -746,6 +746,7 @@ export class SeededRNG {
       }
       this.#seed = ((h ^ h >>> 16) >>> 0)
     }
+    this.randomPerlinInit()
   }
 
   /**
