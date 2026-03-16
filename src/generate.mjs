@@ -1,6 +1,6 @@
 import {seededRNG} from './utils.mjs'
 import {database} from './database.mjs'
-import {NODES, NODES_LOOKUP, NODE_TYPE, WEATHER_TYPE, BIOME_TYPE, WORLD_WIDTH, WORLD_HEIGHT, SEA_LEVEL, BIOME_TILE_MAP, SEA_MAX_JITTER, SEA_MAX_WIDTH, SEA_MAX_HEIGHT, CLUSTER_SCATTER_MAP, ORE_GEM_SCATTER_MAP, SMALL_CAVERNS_COUNT, MEDIUM_CAVERNS_COUNT, UNDERGROUND_TUNNEL_COUNT} from '../assets/data/data-gen.mjs'
+import {NODES, NODES_LOOKUP, NODE_TYPE, WEATHER_TYPE, BIOME_TYPE, WORLD_WIDTH, WORLD_HEIGHT, SEA_LEVEL, BIOME_TILE_MAP, SEA_MAX_JITTER, SEA_MAX_WIDTH, SEA_MAX_HEIGHT, CLUSTER_SCATTER_MAP, ORE_GEM_SCATTER_MAP, SMALL_CAVERNS_COUNT, MEDIUM_CAVERNS_COUNT, UNDERGROUND_TUNNEL_COUNT, CAVERNS_TUNNEL_COUNT} from '../assets/data/data-gen.mjs'
 
 /* ====================================================================================================
    WORLD BUFFER (CREATION DU MONDE)
@@ -161,11 +161,12 @@ class WorldGenerator {
     // 6. Creusement (plus de creusement ensuite, ou alors très localisé) - TODO
 
     // 6.1 Creusement des tunnels et cavernes - TODO
-    worldCarver.digSmallCaverns()
     worldCarver.digSurfaceTunnel(skySurface)
+    worldCarver.digSmallCaverns(surfaceUnder)
     const zigzagCount = seededRNG.randomGetMinMax(2, 3)
     for (let i = 0; i < zigzagCount; i++) { worldCarver.digZigzagTunnel() }
     worldCarver.digUndergroundTunnels(surfaceUnder, underCaverns)
+    worldCarver.digCavernsTunnels(underCaverns)
     // TODO
     // worldCarver.digCavernTunnel()
 
@@ -1213,22 +1214,22 @@ class WorldCarver {
  * Disperse des petites et moyennes cavernes aléatoirement dans tout le monde.
  * 128 itérations (64 chunks × 32 / 16), chacune creuse une petite + une moyenne caverne.
  */
-  digSmallCaverns () {
+  digSmallCaverns (surfaceUnder) {
     const code = NODES.VOID.code
 
     const smallTiles = []
     for (let i = 0; i < SMALL_CAVERNS_COUNT; i++) {
       const x = seededRNG.randomGetMinMax(2, WORLD_WIDTH - 3)
-      const y = seededRNG.randomGetMinMax(1, WORLD_HEIGHT - 3)
-      this.digNoisyCircle(smallTiles, x, y, 3, 8, code)
+      const y = seededRNG.randomGetMinMax(surfaceUnder[x], WORLD_HEIGHT - 3)
+      this.digNoisyCircle(smallTiles, x, y, 3, 6, code)
     }
     this.applyTiles(smallTiles)
 
     const mediumTiles = []
     for (let i = 0; i < MEDIUM_CAVERNS_COUNT; i++) {
       const x = seededRNG.randomGetMinMax(2, WORLD_WIDTH - 3)
-      const y = seededRNG.randomGetMinMax(1, WORLD_HEIGHT - 3)
-      this.digNoisyCircle(mediumTiles, x, y, 4, 12, code)
+      const y = seededRNG.randomGetMinMax(surfaceUnder[x], WORLD_HEIGHT - 3)
+      this.digNoisyCircle(mediumTiles, x, y, 6, 12, code)
     }
     this.applyTiles(mediumTiles)
   }
@@ -1242,8 +1243,9 @@ class WorldCarver {
  * @param {Int16Array} skySurface - Altitudes de la surface par colonne X
  */
   digSurfaceTunnel (skySurface) {
-    const count = seededRNG.randomGetMinMax(25, 35)
+    const count = seededRNG.randomGetMinMax(30, 45)
     for (let i = 0; i < count; i++) {
+      const radius = seededRNG.randomGetMinMax(4, 7)
       const x0 = seededRNG.randomGetMinMax(0, WORLD_WIDTH - 1)
       const y0 = skySurface[x0] + seededRNG.randomGetMinMax(-5, 5)
       const direction = seededRNG.randomGetBool() ? 1 : -1
@@ -1252,7 +1254,7 @@ class WorldCarver {
       // chemin obligatoirement en pente
       let path
       do {
-        path = this.pathTunnel(x0, y0, 4, length, angle, 15)
+        path = this.pathTunnel(x0, y0, radius, length, angle, 15)
       } while (path[path.length - 1].y <= y0)
       this.carveAlongPath(path)
     }
@@ -1271,15 +1273,15 @@ class WorldCarver {
     let y = 32
 
     let length = 0
-    const lengthMax = seededRNG.randomGetMinMax(200, 250)
+    const lengthMax = seededRNG.randomGetMinMax(240, 320)
 
     while (length < lengthMax) {
       const segmentLength = seededRNG.randomGetMinMax(lengthMax / 5 | 0, lengthMax / 4 | 0)
       const angle = seededRNG.randomGetBool()
         ? seededRNG.randomGetMinMax(130, 160)
         : seededRNG.randomGetMinMax(200, 230)
-
-      const path = this.pathTunnel(x, y, 8, segmentLength, angle, 10)
+      const radius = seededRNG.randomGetMinMax(8, 10)
+      const path = this.pathTunnel(x, y, radius, segmentLength, angle, 10)
       this.carveAlongPath(path)
 
       length += segmentLength
@@ -1297,14 +1299,35 @@ class WorldCarver {
  * @param {Int16Array} underCaverns  - Altitudes haute caverne par colonne X
  */
   digUndergroundTunnels (surfaceUnder, underCaverns) {
-    const radius = seededRNG.randomGetMinMax(7, 9)
     for (let i = 0; i < UNDERGROUND_TUNNEL_COUNT; i++) {
+      const radius = seededRNG.randomGetMinMax(9, 11)
       const cx = seededRNG.randomGetMinMax(radius, WORLD_WIDTH - radius - 1)
       const cy = seededRNG.randomGetMinMax(surfaceUnder[cx] - radius, underCaverns[cx] - radius)
 
       const length = seededRNG.randomGetMinMax(30, 50)
       const angle = seededRNG.randomGetMinMax(0, 360)
       const path = this.pathTunnel(cx, cy, radius, length, angle, 25)
+      this.carveAlongPath(path)
+    }
+  }
+
+  /**
+ * Creuse CAVERN_TUNNEL_COUNT tunnels dans la zone cavernes.
+ * X et Y tirés aléatoirement entre underCaverns et le plafond de l'enfer.
+ * Direction initiale aléatoire (0–360°), déviation max 50°.
+ *
+ * @param {Int16Array} underCaverns - Altitudes haute caverne par colonne X
+ */
+  digCavernsTunnels (underCaverns) {
+    const hellTop = WORLD_HEIGHT - 32
+    for (let i = 0; i < CAVERNS_TUNNEL_COUNT; i++) {
+      const radius = seededRNG.randomGetMinMax(9, 12)
+      const cx = seededRNG.randomGetMinMax(radius, WORLD_WIDTH - radius - 1)
+      const cy = seededRNG.randomGetMinMax(underCaverns[cx] + radius, hellTop - radius)
+
+      const length = seededRNG.randomGetMinMax(40, 60)
+      const angle = seededRNG.randomGetMinMax(0, 360)
+      const path = this.pathTunnel(cx, cy, radius, length, angle, 50)
       this.carveAlongPath(path)
     }
   }
