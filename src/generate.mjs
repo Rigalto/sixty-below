@@ -163,9 +163,9 @@ class WorldGenerator {
     // 6.1 Creusement des tunnels et cavernes - TODO
     worldCarver.digSmallCaverns()
     worldCarver.digSurfaceTunnel(skySurface)
+    const zigzagCount = seededRNG.randomGetMinMax(2, 3)
+    for (let i = 0; i < zigzagCount; i++) { worldCarver.digZigzagTunnel() }
     // TODO
-    // const zigzagCount = seededRNG.randomGetMinMax(2, 3)
-    // for (let i = 0; i < zigzagCount; i++) { worldCarver.digSurfaceZigzag() }
     // worldCarver.digUndergroundTunnel()
     // worldCarver.digCavernTunnel()
 
@@ -1233,6 +1233,14 @@ class WorldCarver {
     this.applyTiles(mediumTiles)
   }
 
+  /**
+ * Creuse un tunnel depuis la surface vers la profondeur.
+ * Chaque tunnel part d'un X aléatoire, ancré à skySurface[x0] ± 5.
+ * Direction obligatoirement descendante (retirage si nécessaire).
+ * Appelée N fois depuis generate() — ne boucle pas en interne.
+ *
+ * @param {Int16Array} skySurface - Altitudes de la surface par colonne X
+ */
   digSurfaceTunnel (skySurface) {
     const count = seededRNG.randomGetMinMax(25, 35)
     for (let i = 0; i < count; i++) {
@@ -1247,6 +1255,36 @@ class WorldCarver {
         path = this.pathTunnel(x0, y0, 4, length, angle, 15)
       } while (path[path.length - 1].y <= y0)
       this.carveAlongPath(path)
+    }
+  }
+
+  /**
+ * Creuse un tunnel en zigzag depuis la surface vers la profondeur.
+ * Chaque segment alterne entre ~135° et ~225° (±45° autour du bas).
+ * Le point de départ de chaque segment est la fin du précédent.
+ *
+ * @param {Int16Array} skySurface - Altitudes de la surface par colonne X
+ */
+  digZigzagTunnel (skySurface) {
+    const cx = seededRNG.randomGetMinMax(150, WORLD_WIDTH - 151)
+    let x = cx
+    let y = 32
+
+    let length = 0
+    const lengthMax = seededRNG.randomGetMinMax(200, 250)
+
+    while (length < lengthMax) {
+      const segmentLength = seededRNG.randomGetMinMax(lengthMax / 5 | 0, lengthMax / 4 | 0)
+      const angle = seededRNG.randomGetBool()
+        ? seededRNG.randomGetMinMax(130, 160)
+        : seededRNG.randomGetMinMax(200, 230)
+
+      const path = this.pathTunnel(x, y, 8, segmentLength, angle, 10)
+      this.carveAlongPath(path)
+
+      length += segmentLength
+      x = path[path.length - 1].x
+      y = path[path.length - 1].y
     }
   }
 
