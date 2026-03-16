@@ -1,6 +1,6 @@
 import {seededRNG} from './utils.mjs'
 import {database} from './database.mjs'
-import {NODES, NODES_LOOKUP, NODE_TYPE, WEATHER_TYPE, BIOME_TYPE, WORLD_WIDTH, WORLD_HEIGHT, SEA_LEVEL, BIOME_TILE_MAP, SEA_MAX_JITTER, SEA_MAX_WIDTH, SEA_MAX_HEIGHT, CLUSTER_SCATTER_MAP, ORE_GEM_SCATTER_MAP, SMALL_CAVERNS_COUNT, MEDIUM_CAVERNS_COUNT, UNDERGROUND_TUNNEL_COUNT, CAVERNS_TUNNEL_COUNT} from '../assets/data/data-gen.mjs'
+import {NODES, NODES_LOOKUP, NODE_TYPE, WEATHER_TYPE, BIOME_TYPE, WORLD_WIDTH, WORLD_HEIGHT, SEA_LEVEL, BIOME_TILE_MAP, SEA_MAX_JITTER, SEA_MAX_WIDTH, SEA_MAX_HEIGHT, CLUSTER_SCATTER_MAP, ORE_GEM_SCATTER_MAP, SMALL_CAVERNS_COUNT, MEDIUM_CAVERNS_COUNT, UNDERGROUND_TUNNEL_COUNT, CAVERNS_TUNNEL_COUNT, SMALL_TUNNELS_COUNT} from '../assets/data/data-gen.mjs'
 
 /* ====================================================================================================
    WORLD BUFFER (CREATION DU MONDE)
@@ -143,7 +143,7 @@ class WorldGenerator {
     seededRNG.init(seed)
 
     // 2. Génération des biomes (rectangles)
-    const {biomesDescription, leftSeaWidth, rightSeaWidth} = biomesGenerator.generate()
+    const {biomesDescription, leftSeaWidth, rightSeaWidth, biomeCounts} = biomesGenerator.generate()
     console.log('[WorldGenerator::biomesDescription] - Biomes', biomesDescription, leftSeaWidth, rightSeaWidth, (performance.now() - t0).toFixed(3), 'ms')
 
     // 3. Rafinement des biomes (Perlin + diffusion)
@@ -160,15 +160,14 @@ class WorldGenerator {
 
     // 6. Creusement (plus de creusement ensuite, ou alors très localisé) - TODO
 
-    // 6.1 Creusement des tunnels et cavernes - TODO
+    // 6.1 Creusement des tunnels et cavernes
     worldCarver.digSurfaceTunnel(skySurface)
     worldCarver.digSmallCaverns(surfaceUnder)
     const zigzagCount = seededRNG.randomGetMinMax(2, 3)
     for (let i = 0; i < zigzagCount; i++) { worldCarver.digZigzagTunnel() }
     worldCarver.digUndergroundTunnels(surfaceUnder, underCaverns)
     worldCarver.digCavernsTunnels(underCaverns)
-    // TODO
-    // worldCarver.digCavernTunnel()
+    worldCarver.digSmallTunnels(surfaceUnder)
 
     // A supprimer
     // worldCarver.debugTraceTunnel()
@@ -274,6 +273,205 @@ class WorldGenerator {
   }
 }
 export const worldGenerator = new WorldGenerator()
+
+/* ====================================================================================================
+   DECOUPE LE MONDE EN BIOMES
+   ==================================================================================================== */
+
+class BiomesGenerator {
+  generate () {
+    // 1. Détermination des Mers (Largeurs fixes)
+    const leftIsSmall = seededRNG.randomGetBool()
+    const leftSeaWidthChunks = leftIsSmall ? 3 : 4
+    const rightSeaWidthChunks = leftIsSmall ? 4 : 3
+
+    // 2. Forêt Centrale (6 à 8 chunks)
+    const forestWidth = seededRNG.randomGetMinMax(6, 8)
+
+    // 3. Calcul de l'espace restant pour les biomes latéraux
+    // On divise le reste du monde (64 - forêt) en deux
+    const remainingTotal = 64 - forestWidth
+    let leftChunkCount, rightChunkCount
+    if (seededRNG.randomGetBool()) {
+      leftChunkCount = Math.floor(remainingTotal / 2)
+      rightChunkCount = remainingTotal - leftChunkCount
+    } else {
+      rightChunkCount = Math.floor(remainingTotal / 2)
+      leftChunkCount = remainingTotal - rightChunkCount
+    }
+
+    // 4. Génération des segments organiques (Desert / Jungle / Forest)
+    const leftSegments = this.#generateSideData(leftChunkCount).reverse()
+    const rightSegments = this.#generateSideData(rightChunkCount)
+
+    // 5. Assemblage initial (en chunks)
+    const all = [
+      ...leftSegments,
+      {width: forestWidth, type: BIOME_TYPE.FOREST},
+      ...rightSegments
+    ]
+
+    // 6. Sécurités
+    this.#ensureBiomeDiversity(all)
+    this.#ensureMinimumWidth(all)
+
+    // 7. Conversion finale en tuiles (biomesDescription)
+    let currentOffset = 0
+    const biomesDescription = all.map(s => {
+      const widthInTiles = s.width * 16
+      const segment = {
+        biome: s.type,
+        width: widthInTiles,
+        offset: currentOffset
+      }
+      currentOffset += widthInTiles
+      return segment
+    })
+    if (currentOffset !== 1024) {
+      throw new Error(`[BiomesGenerator] Invalid world width: ${currentOffset} tiles instead of 1024`)
+    }
+
+    // 9. Retour des informations à l'appelant
+    return {
+      biomesDescription,
+      leftSeaWidth: leftSeaWidthChunks,
+      rightSeaWidth: rightSeaWidthChunks,
+      biomeCounts: this.countBiomes(biomesDescription)
+    }
+  }
+
+  #ensureBiomeDiversity (all) {
+    const requiredBiomes = [BIOME_TYPE.DESERT, BIOME_TYPE.JUNGLE, BIOME_TYPE.FOREST]
+
+    // 1. Chaque biome doit avoir au moins une zone
+    const counts = []
+    for (const b of requiredBiomes) { counts[b] = 0 }
+    for (const s of all) { counts[s.type]++ }
+
+    for (const type of requiredBiomes) {
+      if (counts[type] === 0) {
+        // 1.1. Trouver le type ayant le maximum d'occurrences
+        const maxType = requiredBiomes.reduce((maxIdx, currType) => {
+          return (counts[currType] > counts[maxIdx]) ? currType : maxIdx
+        }, requiredBiomes[0])
+        // 1. 2. On remplace la première occurrence du biome dominant
+        const target = all.find(s => s.type === maxType)
+        if (target) {
+          target.type = type
+          counts[maxType]--
+          counts[type]++
+        }
+      }
+    }
+  }
+
+  #ensureMinimumWidth (all) {
+    // Taille Minimum (Le don de chunk)
+    const MIN_W = 3
+    for (const s of all) {
+      if (s.width < MIN_W) {
+        const diff = MIN_W - s.width
+        // Sélection du segment le plus large du monde comme donneur
+        const donor = all.reduce((prev, curr) => (curr.width > prev.width) ? curr : prev)
+
+        if (donor && donor.width >= (MIN_W + diff)) {
+          donor.width -= diff
+          s.width += diff
+        }
+      }
+    }
+  }
+
+  /**
+   * Crée les définitions de zones pour un côté.
+   * @returns {Array<{width: number, type: number}>}
+   */
+  #generateSideData (totalChunks) {
+    const zoneCount = seededRNG.randomGetMinMax(3, 4)
+    const segments = []
+
+    // Pool alternant : on commence sans FOREST pour forcer le changement à côté du centre
+    const available = [BIOME_TYPE.DESERT, BIOME_TYPE.JUNGLE]
+    let lastType = BIOME_TYPE.FOREST
+    let remaining = totalChunks
+
+    for (let i = 0; i < zoneCount; i++) {
+      // const width = (i === zoneCount - 1) ? remaining : Math.floor(totalChunks / zoneCount)
+      const width = (i === zoneCount - 1) ? remaining : Math.floor(remaining / (zoneCount - i))
+
+      // Tirage et alternance
+      const rollIdx = seededRNG.randomGetMinMax(0, available.length - 1)
+      const currentType = available.splice(rollIdx, 1)[0]
+
+      segments.push({width, type: currentType})
+
+      // On remet le type précédent dans le pool pour la prochaine itération
+      available.push(lastType)
+      lastType = currentType
+      remaining -= width
+    }
+    // application d'un écart pour tailles moins uniformes
+    const offsets = this.#generateZeroSumSequence(zoneCount)
+    for (let i = 0; i < zoneCount; i++) {
+      segments[i].width += offsets[i]
+    }
+    return segments
+  }
+
+  /**
+ * Génère une suite de décalages dont la somme est strictement égale à zéro.
+ * @param {number} count - Nombre d'éléments (3 ou 4).
+ * @returns {number[]}
+ */
+  #generateZeroSumSequence (count) {
+    const offsets = new Array(count)
+    let sum = 0
+
+    // On boucle jusqu'à obtenir un dernier chiffre qui reste dans une fourchette acceptable
+    // (Sinon le dernier segment pourrait subir une modification trop violente)
+    let valid = false
+    while (!valid) {
+      sum = 0
+      for (let i = 0; i < count - 1; i++) {
+        const val = seededRNG.randomGetMinMax(-2, 2)
+        offsets[i] = val
+        sum += val
+      }
+
+      const lastVal = -sum
+      // On accepte une tolérance un peu plus large pour le dernier (-3 à 3)
+      // pour éviter de boucler trop longtemps, tout en restant raisonnable.
+      if (lastVal >= -2 && lastVal <= 2) {
+        offsets[count - 1] = lastVal
+        valid = true
+      }
+    }
+
+    return offsets
+  }
+
+  /**
+ * Comptabilise le nombre de zones par type de biome.
+ *
+ * @param {Array<{biome, width}>} biomesDescription
+ * @returns {{forest: number, desert: number, jungle: number}}
+ */
+  countBiomes (biomesDescription) {
+    const counts = {forest: 0, desert: 0, jungle: 0}
+    for (let i = 0; i < biomesDescription.length; i++) {
+      const {biome} = biomesDescription[i]
+      if (biome === BIOME_TYPE.FOREST) counts.forest++
+      else if (biome === BIOME_TYPE.DESERT) counts.desert++
+      else if (biome === BIOME_TYPE.JUNGLE) counts.jungle++
+    }
+    return counts
+  }
+}
+export const biomesGenerator = new BiomesGenerator()
+
+/* ====================================================================================================
+   REND LA SEPARATION DES BIOMES PLUS NATURELLE
+   ==================================================================================================== */
 
 export class BiomeNaturalizer {
   naturalize (biomesDescription, leftSeaWidth, rightSeaWidth) {
@@ -567,178 +765,9 @@ export class BiomeNaturalizer {
 }
 export const biomeNaturalizer = new BiomeNaturalizer()
 
-class BiomesGenerator {
-  generate () {
-    // 1. Détermination des Mers (Largeurs fixes)
-    const leftIsSmall = seededRNG.randomGetBool()
-    const leftSeaWidthChunks = leftIsSmall ? 3 : 4
-    const rightSeaWidthChunks = leftIsSmall ? 4 : 3
-
-    // 2. Forêt Centrale (6 à 8 chunks)
-    const forestWidth = seededRNG.randomGetMinMax(6, 8)
-
-    // 3. Calcul de l'espace restant pour les biomes latéraux
-    // On divise le reste du monde (64 - forêt) en deux
-    const remainingTotal = 64 - forestWidth
-    let leftChunkCount, rightChunkCount
-    if (seededRNG.randomGetBool()) {
-      leftChunkCount = Math.floor(remainingTotal / 2)
-      rightChunkCount = remainingTotal - leftChunkCount
-    } else {
-      rightChunkCount = Math.floor(remainingTotal / 2)
-      leftChunkCount = remainingTotal - rightChunkCount
-    }
-
-    // 4. Génération des segments organiques (Desert / Jungle / Forest)
-    const leftSegments = this.#generateSideData(leftChunkCount).reverse()
-    const rightSegments = this.#generateSideData(rightChunkCount)
-
-    // 5. Assemblage initial (en chunks)
-    const all = [
-      ...leftSegments,
-      {width: forestWidth, type: BIOME_TYPE.FOREST},
-      ...rightSegments
-    ]
-
-    // 6. Sécurités
-    this.#ensureBiomeDiversity(all)
-    this.#ensureMinimumWidth(all)
-
-    // 7. Conversion finale en tuiles (biomesDescription)
-    let currentOffset = 0
-    const biomesDescription = all.map(s => {
-      const widthInTiles = s.width * 16
-      const segment = {
-        biome: s.type,
-        width: widthInTiles,
-        offset: currentOffset
-      }
-      currentOffset += widthInTiles
-      return segment
-    })
-    if (currentOffset !== 1024) {
-      throw new Error(`[BiomesGenerator] Invalid world width: ${currentOffset} tiles instead of 1024`)
-    }
-
-    // 8. Retour des informations à l'appelant
-    return {
-      biomesDescription,
-      leftSeaWidth: leftSeaWidthChunks,
-      rightSeaWidth: rightSeaWidthChunks
-    }
-  }
-
-  #ensureBiomeDiversity (all) {
-    const requiredBiomes = [BIOME_TYPE.DESERT, BIOME_TYPE.JUNGLE, BIOME_TYPE.FOREST]
-
-    // 1. Chaque biome doit avoir au moins une zone
-    const counts = []
-    for (const b of requiredBiomes) { counts[b] = 0 }
-    for (const s of all) { counts[s.type]++ }
-
-    for (const type of requiredBiomes) {
-      if (counts[type] === 0) {
-        // 1.1. Trouver le type ayant le maximum d'occurrences
-        const maxType = requiredBiomes.reduce((maxIdx, currType) => {
-          return (counts[currType] > counts[maxIdx]) ? currType : maxIdx
-        }, requiredBiomes[0])
-        // 1. 2. On remplace la première occurrence du biome dominant
-        const target = all.find(s => s.type === maxType)
-        if (target) {
-          target.type = type
-          counts[maxType]--
-          counts[type]++
-        }
-      }
-    }
-  }
-
-  #ensureMinimumWidth (all) {
-    // Taille Minimum (Le don de chunk)
-    const MIN_W = 3
-    for (const s of all) {
-      if (s.width < MIN_W) {
-        const diff = MIN_W - s.width
-        // Sélection du segment le plus large du monde comme donneur
-        const donor = all.reduce((prev, curr) => (curr.width > prev.width) ? curr : prev)
-
-        if (donor && donor.width >= (MIN_W + diff)) {
-          donor.width -= diff
-          s.width += diff
-        }
-      }
-    }
-  }
-
-  /**
-   * Crée les définitions de zones pour un côté.
-   * @returns {Array<{width: number, type: number}>}
-   */
-  #generateSideData (totalChunks) {
-    const zoneCount = seededRNG.randomGetMinMax(3, 4)
-    const segments = []
-
-    // Pool alternant : on commence sans FOREST pour forcer le changement à côté du centre
-    const available = [BIOME_TYPE.DESERT, BIOME_TYPE.JUNGLE]
-    let lastType = BIOME_TYPE.FOREST
-    let remaining = totalChunks
-
-    for (let i = 0; i < zoneCount; i++) {
-      // const width = (i === zoneCount - 1) ? remaining : Math.floor(totalChunks / zoneCount)
-      const width = (i === zoneCount - 1) ? remaining : Math.floor(remaining / (zoneCount - i))
-
-      // Tirage et alternance
-      const rollIdx = seededRNG.randomGetMinMax(0, available.length - 1)
-      const currentType = available.splice(rollIdx, 1)[0]
-
-      segments.push({width, type: currentType})
-
-      // On remet le type précédent dans le pool pour la prochaine itération
-      available.push(lastType)
-      lastType = currentType
-      remaining -= width
-    }
-    // application d'un écart pour tailles moins uniformes
-    const offsets = this.#generateZeroSumSequence(zoneCount)
-    for (let i = 0; i < zoneCount; i++) {
-      segments[i].width += offsets[i]
-    }
-    return segments
-  }
-
-  /**
- * Génère une suite de décalages dont la somme est strictement égale à zéro.
- * @param {number} count - Nombre d'éléments (3 ou 4).
- * @returns {number[]}
- */
-  #generateZeroSumSequence (count) {
-    const offsets = new Array(count)
-    let sum = 0
-
-    // On boucle jusqu'à obtenir un dernier chiffre qui reste dans une fourchette acceptable
-    // (Sinon le dernier segment pourrait subir une modification trop violente)
-    let valid = false
-    while (!valid) {
-      sum = 0
-      for (let i = 0; i < count - 1; i++) {
-        const val = seededRNG.randomGetMinMax(-2, 2)
-        offsets[i] = val
-        sum += val
-      }
-
-      const lastVal = -sum
-      // On accepte une tolérance un peu plus large pour le dernier (-3 à 3)
-      // pour éviter de boucler trop longtemps, tout en restant raisonnable.
-      if (lastVal >= -2 && lastVal <= 2) {
-        offsets[count - 1] = lastVal
-        valid = true
-      }
-    }
-
-    return offsets
-  }
-}
-export const biomesGenerator = new BiomesGenerator()
+/* ====================================================================================================
+   AJOUT DES LIQUIDES DANS LE MONDE
+   ==================================================================================================== */
 
 class LiquidFiller {
   fillSea () {
@@ -817,6 +846,10 @@ class LiquidFiller {
 }
 
 export const liquidFiller = new LiquidFiller()
+
+/* ====================================================================================================
+   AJOUT DES CLUSTERS DE MATERIAUX DANS LE MONDE
+   ==================================================================================================== */
 
 class ClusterGenerator {
   /**
@@ -1038,12 +1071,17 @@ class ClusterGenerator {
 
 export const clusterGenerator = new ClusterGenerator()
 
+/* ====================================================================================================
+   CREUSEMENT DE TUNNELS ET DE CAVERNES DANS LE MONDE
+   ==================================================================================================== */
+
 class WorldCarver {
 /**
  * Génère un cercle bruité dont les bords sont irréguliers (aspect naturel).
  * Les tuiles isolées (≤ 1 voisin 4-connexe dans le résultat) sont éliminées
  * pour garantir un contour compact sans pixel orphelin.
  *
+ * @param {Array} tiles      - Tableau accumulant les tuiles
  * @param {number} cx        - Centre X (tuiles)
  * @param {number} cy        - Centre Y (tuiles)
  * @param {number} radiusMin - Rayon minimum (bords les plus rentrés)
@@ -1052,60 +1090,6 @@ class WorldCarver {
  * @param {number} frequency - Fréquence spatiale du bruit (défaut : 0.3)
  * @returns {Array<{x: number, y: number, index: number, code: number}>}
  */
-  digNoisyCircle_ (cx, cy, radiusMin, radiusMax, code, frequency = 0.3) {
-    const radius = (radiusMin + radiusMax) >> 1
-    const spread = radiusMax - radiusMin
-    const period = 1 / frequency
-
-    // 1. Carré englobant — clampé aux ghost cells
-    const xMin = Math.max(2, cx - radiusMax)
-    const xMax = Math.min(WORLD_WIDTH - 3, cx + radiusMax)
-    const yMin = Math.max(2, cy - radiusMax)
-    const yMax = Math.min(WORLD_HEIGHT - 3, cy + radiusMax)
-
-    // 2. Candidats : toutes les tuiles dans le cercle bruité
-    const candidates = new Set()
-    for (let x = xMin; x <= xMax; x++) {
-      for (let y = yMin; y <= yMax; y++) {
-        const dx = x - cx
-        const dy = y - cy
-        // distance² pour éviter Math.hypot (sqrt) dans la boucle serrée
-        const dist2 = dx * dx + dy * dy
-        if (dist2 > radiusMax * radiusMax) continue // rejet rapide hors carré englobant réel
-
-        const dist = Math.sqrt(dist2)
-        const noise = seededRNG.randomPerlin(x / period, y / period) // [0, 1]
-        const threshold = radius + (noise * 2 - 1) * spread // [radius-spread, radius+spread]
-
-        if (dist <= threshold) {
-          candidates.add((y << 10) | x)
-        }
-      }
-    }
-
-    // 3. Filtrage compacité : on élimine les tuiles avec < 2 voisins 4-connexes dans candidates
-    const result = []
-    for (const idx of candidates) {
-      const x = idx & 0x3FF
-      const y = idx >> 10
-      let neighbors = 0
-      if (candidates.has(((y - 1) << 10) | x)) neighbors++
-      if (candidates.has(((y + 1) << 10) | x)) neighbors++
-      if (candidates.has((y << 10) | (x - 1))) neighbors++
-      if (candidates.has((y << 10) | (x + 1))) neighbors++
-      if (neighbors >= 2) result.push({x, y, index: idx, code})
-    }
-
-    return result
-  }
-
-  /**
- * DEBUG — Quadrillage de cercles bruités sur tout le monde.
- * Rayon aléatoire entre 6 et 10, espacés de 20 tuiles.
- * Écrit VOID directement dans worldBuffer pour validation visuelle.
- * À supprimer après validation.
- */
-
   digNoisyCircle (tiles, cx, cy, radiusMin, radiusMax, code, frequency = 0.3) {
     const radius = (radiusMin + radiusMax) >> 1
     const spread = radiusMax - radiusMin
@@ -1211,8 +1195,13 @@ class WorldCarver {
   }
 
   /**
- * Disperse des petites et moyennes cavernes aléatoirement dans tout le monde.
- * 128 itérations (64 chunks × 32 / 16), chacune creuse une petite + une moyenne caverne.
+ * Disperse SMALL_CAVERNS_COUNT petites cavernes (rayon 3–6) et
+ * MEDIUM_CAVERNS_COUNT moyennes cavernes (rayon 6–12) dans les zones
+ * underground et cavernes uniquement. Les plages se chevauchent sur r=6
+ * pour lisser la transition entre les deux tailles.
+ * Deux passes applyTiles séparées.
+ *
+ * @param {Int16Array} surfaceUnder - Altitudes basse surface par colonne X
  */
   digSmallCaverns (surfaceUnder) {
     const code = NODES.VOID.code
@@ -1300,7 +1289,7 @@ class WorldCarver {
  */
   digUndergroundTunnels (surfaceUnder, underCaverns) {
     for (let i = 0; i < UNDERGROUND_TUNNEL_COUNT; i++) {
-      const radius = seededRNG.randomGetMinMax(9, 11)
+      const radius = seededRNG.randomGetMinMax(8, 10)
       const cx = seededRNG.randomGetMinMax(radius, WORLD_WIDTH - radius - 1)
       const cy = seededRNG.randomGetMinMax(surfaceUnder[cx] - radius, underCaverns[cx] - radius)
 
@@ -1321,13 +1310,32 @@ class WorldCarver {
   digCavernsTunnels (underCaverns) {
     const hellTop = WORLD_HEIGHT - 32
     for (let i = 0; i < CAVERNS_TUNNEL_COUNT; i++) {
-      const radius = seededRNG.randomGetMinMax(9, 12)
+      const radius = seededRNG.randomGetMinMax(7, 10)
       const cx = seededRNG.randomGetMinMax(radius, WORLD_WIDTH - radius - 1)
       const cy = seededRNG.randomGetMinMax(underCaverns[cx] + radius, hellTop - radius)
 
       const length = seededRNG.randomGetMinMax(40, 60)
       const angle = seededRNG.randomGetMinMax(0, 360)
-      const path = this.pathTunnel(cx, cy, radius, length, angle, 50)
+      const path = this.pathTunnel(cx, cy, radius, length, angle, 35)
+      this.carveAlongPath(path)
+    }
+  }
+
+  /**
+ * Creuse SMALL_TUNNELS_COUNT aleries sinueuses dans les zones
+ * underground et cavernes.
+ *
+ * @param {Int16Array} surfaceUnder - Altitudes basse surface par colonne X
+ */
+  digSmallTunnels (surfaceUnder) {
+    const hellTop = WORLD_HEIGHT - 32
+    for (let i = 0; i < SMALL_TUNNELS_COUNT; i++) {
+      const cx = seededRNG.randomGetMinMax(2, WORLD_WIDTH - 3)
+      const cy = seededRNG.randomGetMinMax(surfaceUnder[cx], hellTop)
+      const length = seededRNG.randomGetMinMax(60, 100)
+      const angle = seededRNG.randomGetMinMax(0, 360)
+      const radius = seededRNG.randomGetMinMax(2, 4)
+      const path = this.pathTunnel(cx, cy, radius, length, angle, 40)
       this.carveAlongPath(path)
     }
   }

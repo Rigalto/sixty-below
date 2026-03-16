@@ -151,3 +151,80 @@ describe('BiomesGenerator — leftSeaWidth + rightSeaWidth = 7 chunks', () => {
   assert('leftSeaWidth + rightSeaWidth toujours 7', errors === 0)
   assert('leftSeaWidth toujours 3 ou 4', errors === 0)
 })
+
+// ─── countBiomes ──────────────────────────────────────────────────────────────
+
+describe('BiomesGenerator — countBiomes() : tableau vide → tous à zéro', () => {
+  const result = biomesGenerator.countBiomes([])
+  assert('forest === 0', result.forest === 0)
+  assert('desert === 0', result.desert === 0)
+  assert('jungle === 0', result.jungle === 0)
+})
+
+describe('BiomesGenerator — countBiomes() : un seul biome de chaque type', () => {
+  const desc = [
+    {biome: BIOME_TYPE.FOREST, width: 400},
+    {biome: BIOME_TYPE.DESERT, width: 300},
+    {biome: BIOME_TYPE.JUNGLE, width: 324}
+  ]
+  const result = biomesGenerator.countBiomes(desc)
+  assert('forest === 1', result.forest === 1)
+  assert('desert === 1', result.desert === 1)
+  assert('jungle === 1', result.jungle === 1)
+})
+
+describe('BiomesGenerator — countBiomes() : plusieurs zones du même biome', () => {
+  const desc = [
+    {biome: BIOME_TYPE.FOREST, width: 200},
+    {biome: BIOME_TYPE.JUNGLE, width: 200},
+    {biome: BIOME_TYPE.FOREST, width: 200},
+    {biome: BIOME_TYPE.DESERT, width: 200},
+    {biome: BIOME_TYPE.JUNGLE, width: 224}
+  ]
+  const result = biomesGenerator.countBiomes(desc)
+  assert('forest === 2', result.forest === 2)
+  assert('desert === 1', result.desert === 1)
+  assert('jungle === 2', result.jungle === 2)
+})
+
+describe('BiomesGenerator — countBiomes() : hiveCount = min(3, 2 * jungle)', () => {
+  const one = biomesGenerator.countBiomes([
+    {biome: BIOME_TYPE.JUNGLE, width: 400},
+    {biome: BIOME_TYPE.FOREST, width: 400},
+    {biome: BIOME_TYPE.DESERT, width: 224}
+  ])
+  const two = biomesGenerator.countBiomes([
+    {biome: BIOME_TYPE.JUNGLE, width: 300},
+    {biome: BIOME_TYPE.FOREST, width: 300},
+    {biome: BIOME_TYPE.JUNGLE, width: 200},
+    {biome: BIOME_TYPE.DESERT, width: 224}
+  ])
+  assert('1 jungle → hiveCount = min(3, 2) = 2', Math.min(3, 2 * one.jungle) === 2)
+  assert('2 jungle → hiveCount = min(3, 4) = 3', Math.min(3, 2 * two.jungle) === 3)
+})
+
+describe('BiomesGenerator — generate() retourne biomeCounts avec les trois attributs', () => {
+  seededRNG.init('biome-counts-test')
+  const result = biomesGenerator.generate()
+  assert('biomeCounts existe', typeof result.biomeCounts === 'object' && result.biomeCounts !== null)
+  assert('forest est un number', typeof result.biomeCounts.forest === 'number')
+  assert('desert est un number', typeof result.biomeCounts.desert === 'number')
+  assert('jungle est un number', typeof result.biomeCounts.jungle === 'number')
+})
+
+describe('BiomesGenerator — generate() : biomeCounts cohérent avec biomesDescription', () => {
+  seededRNG.init('biome-counts-coherence')
+  const {biomesDescription, biomeCounts} = biomesGenerator.generate()
+  let forest = 0
+  let desert = 0
+  let jungle = 0
+  for (let i = 0; i < biomesDescription.length; i++) {
+    const {biome} = biomesDescription[i]
+    if (biome === BIOME_TYPE.FOREST) forest++
+    else if (biome === BIOME_TYPE.DESERT) desert++
+    else if (biome === BIOME_TYPE.JUNGLE) jungle++
+  }
+  assert('forest cohérent', biomeCounts.forest === forest)
+  assert('desert cohérent', biomeCounts.desert === desert)
+  assert('jungle cohérent', biomeCounts.jungle === jungle)
+})

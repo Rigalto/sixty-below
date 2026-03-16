@@ -710,6 +710,7 @@ Génère des tunnels et des cavernes (tuiles VOID).
 | `digZigzagTunnel` | `(skySurface: Int16Array): void` | Creuse `ZIGZAG_TUNNEL_COUNT` tunnels en zigzag depuis la surface. Chaque tunnel alterne des segments à ~135° et ~225° (±45° autour du bas). Rayon max 8. Longueur totale 200–250 tuiles, segments de 1/5 à 1/4 de la longueur totale. Accumule toutes les tuiles avant `applyTiles`. Constante dans `data-gen.mjs`. |
 | `digUndergroundTunnels` | `(surfaceUnder: Int16Array, underCaverns: Int16Array): void` | Creuse `UNDERGROUND_TUNNEL_COUNT` tunnels horizontaux avec un ou deux coudes en zone underground. Rayon 9, longueur 30–50, angle initial 0–360°, déviation 25°. Constante dans `data-gen.mjs`. |
 | `digCavernsTunnels` | `(underCaverns: Int16Array): void` | Creuse `CAVERN_TUNNEL_COUNT` tunnels dans la zone cavernes. Borne basse : `WORLD_HEIGHT - 32`. Rayon 9, longueur 40–60, angle initial 0–360°, déviation 50°. Constante dans `data-gen.mjs`. |
+| `digSmallTunnels` | `(surfaceUnder: Int16Array): void` | Creuse `SMALL_TUNNELS_COUNT` petites galeries sinueuses (rayon 2-4, longueur 60–100, deltaAngle 40°) dans les zones underground et cavernes. Constante dans `data-gen.mjs`. |
 | `cleanupAfterCarving` | `(): void` | Passe de nettoyage globale post-creusement. 7 règles in-place : propagation SKY, suppression tuiles isolées VOID/non-VOID (4-connexe et paires horizontales/verticales). Parcours séquentiel index croissant — cascade naturelle. |
 
 ---
