@@ -128,14 +128,6 @@ class GameCore {
     // 1. Chargement massif de l'état (1 seule requête DB)
     // Retourne un objet : {timestamp: 480000, weather: 1, playerPosition: '100|82|1', ...}
     const state = await database.getAllGameState()
-    // DEBUG
-    // const state = {
-    //   timestamp: 480 * 1000,
-    //   weather: 2,
-    //   nextWeather: 3,
-    //   player: '8192|1280|1',
-    //   worldkey: 4321
-    // }
 
     // 2. Dispatch aux systèmes (Injection de dépendance des données)
     // Valeur par défaut (480000) gérée si state.timestamp est undefined (nouveau jeu)
@@ -168,6 +160,8 @@ class GameCore {
     saveManager.init()
 
     buffManager.init()
+    // hiveSystem.init(JSON.parse(state.hives)) // TODO
+
     // Les quatre lignes ci-dessous simulent le traitement du buffManager
     eventBus.emit('buff/display-next-weather', true)
     eventBus.emit('buff/display-moon-detail', true)

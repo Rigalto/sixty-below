@@ -375,6 +375,12 @@ Les modules communiquent via l'`EventBus` (couplage faible).
 * Écoute les événements granulaires du `BuffManager` (`buff/moon`, `buff/weather`, `buff/coords`).
 * **Abonnement dynamique :** le widget ne s'abonne à `player/move` (fréquent) **que si** le buff `buff/coords-display` est actif. Désabonnement immédiat si le buff est perdu.
 
+### 7.4 Système Écosystème [`ecosystem.mjs`]
+* Gère la simulation temps réel des entités naturelles : croissance des plantes,
+  production de HONEY, reconstruction des ruches, croissance des toiles d'araignées, chute de météroites.
+* Chaque système est déclenché par le `TaskScheduler` (timer global, décorrélé des chunks).
+* Les modifications de tuiles sont ponctuelles — elles passent par le `ChunkManager`.
+
 ---
 
 ## 8. Organisation du Projet
@@ -404,6 +410,7 @@ Les modules communiquent via l'`EventBus` (couplage faible).
 │   ├── action.mjs           # Layer 4 : ActionManager (Mining, Cutting, Fishing…)
 │   ├── buff.mjs             # Layer 4 : BuffManager, StatModifiers
 │   ├── housing.mjs          # Layer 4 : FurnitureManager, HousingManager
+│   ├── ecosystem.mjs        # Layer 4 : HiveSystem, PlantSystem, CobwebSystem…
 │   ├── combat.mjs           # Layer 4 : ArenaCreator, TurnManager, SpellSystem, CombatAI
 │   ├── inventory.mjs        # Layer 4 : InventorySystem
 │   ├── craft.mjs            # Layer 4 : CraftSystem

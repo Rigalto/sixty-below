@@ -1,6 +1,6 @@
 import {seededRNG} from './utils.mjs'
 import {database} from './database.mjs'
-import {NODES, NODES_LOOKUP, NODE_TYPE, WEATHER_TYPE, BIOME_TYPE, WORLD_WIDTH, WORLD_HEIGHT, SEA_LEVEL, BIOME_TILE_MAP, SEA_MAX_JITTER, SEA_MAX_WIDTH, SEA_MAX_HEIGHT, CLUSTER_SCATTER_MAP, ORE_GEM_SCATTER_MAP, SMALL_CAVERNS_COUNT, MEDIUM_CAVERNS_COUNT, UNDERGROUND_TUNNEL_COUNT, CAVERNS_TUNNEL_COUNT, SMALL_TUNNELS_COUNT} from '../assets/data/data-gen.mjs'
+import {NODES, NODES_LOOKUP, NODE_TYPE, WEATHER_TYPE, BIOME_TYPE, WORLD_WIDTH, WORLD_HEIGHT, SEA_LEVEL, BIOME_TILE_MAP, SEA_MAX_JITTER, SEA_MAX_WIDTH, SEA_MAX_HEIGHT, CLUSTER_SCATTER_MAP, ORE_GEM_SCATTER_MAP, SMALL_CAVERNS_COUNT, MEDIUM_CAVERNS_COUNT, UNDERGROUND_TUNNEL_COUNT, CAVERNS_TUNNEL_COUNT, SMALL_TUNNELS_COUNT, HIVE_RADIUS_MIN, HIVE_RADIUS_MAX} from '../assets/data/data-gen.mjs'
 
 /* ====================================================================================================
    WORLD BUFFER (CREATION DU MONDE)
@@ -175,6 +175,7 @@ class WorldGenerator {
     // 6.2 Creusement des mini-biomes avec peuplement - TODO
 
     // 6.3 Creusement des mini-biomes avec peuplement différé - TODO
+    const hives = worldCarver.digHives(biomeCounts, biomesDescription, surfaceUnder, underCaverns)
 
     // 7. Traitement des surfaces végétales + désert - TODO
 
@@ -204,7 +205,7 @@ class WorldGenerator {
 
     // N. Stochage du monde en base de données
     if (!debug) {
-      await this.save(seed)
+      await this.save(seed, hives)
       worldBuffer.clear()
     }
 
@@ -215,7 +216,7 @@ class WorldGenerator {
     if (debug) { return worldBuffer } // appelant responsable du clear()
   }
 
-  async save (seed) {
+  async save (seed, hives) {
     const start = window.performance.now()
     // 1. Sauvegarde des tuiles
     await database.clearObjectStore('world_chunks')
@@ -255,7 +256,9 @@ class WorldGenerator {
       {key: 'goldhearts', value: 0},
       {key: 'daybloomseeds', value: ''},
       {key: 'moonglowseeds', value: ''},
-      {key: 'health', value: 100}
+      {key: 'health', value: 100},
+      {key: 'hives', value: JSON.stringify(hives)}
+
       // {key: 'honeysurface', value: this.honeysurface.join('|')}
     ])
 
@@ -1338,6 +1341,66 @@ class WorldCarver {
       const path = this.pathTunnel(cx, cy, radius, length, angle, 40)
       this.carveAlongPath(path)
     }
+  }
+
+  /**
+ * Creuse HIVE_COUNT ruches dans les zones JUNGLE (underground et caverns_top).
+ * Chaque ruche est constituée d'une paroi HIVE (cercle bruité) et d'un
+ * intérieur VOID, accessible par une galerie diagonale (45° ou -45°).
+ * Le remplissage HONEY sera effectué dans une passe ultérieure.
+ *
+ * @param {{forest, desert, jungle}}      biomeCounts
+ * @param {Array<{biome, width, offset}>} biomesDescription
+ * @param {Int16Array}            surfaceUnder       - Altitudes basse surface par colonne X
+ * @param {Int16Array}            underCaverns       - Altitudes haute caverne par colonne X
+ */
+  digHives (biomeCounts, biomesDescription, surfaceUnder, underCaverns) {
+    const hiveCount = Math.max(3, 2 * biomeCounts.jungle)
+    const hellTop = WORLD_HEIGHT - 32
+    const minDist = 2 * (HIVE_RADIUS_MAX + 3) + 50
+    const MAX_ATTEMPTS = 100
+
+    const jungleZones = []
+    for (let i = 0; i < biomesDescription.length; i++) {
+      if (biomesDescription[i].biome === BIOME_TYPE.JUNGLE) jungleZones.push(biomesDescription[i])
+    }
+    if (jungleZones.length === 0) return
+
+    const hives = []
+    for (let i = 0; i < hiveCount; i++) {
+      const zone = jungleZones[seededRNG.randomGetMinMax(0, jungleZones.length - 1)]
+      const radius = seededRNG.randomGetMinMax(HIVE_RADIUS_MIN, HIVE_RADIUS_MAX)
+
+      // on cherche un centre de HIVE éloigné des autres hives
+      let cx, cy, valid
+      let attempts = 0
+      do {
+        cx = seededRNG.randomGetMinMax(zone.offset + radius, zone.offset + zone.width - radius - 1)
+        const cavernsTop = (underCaverns[cx] + hellTop) >> 1
+        cy = seededRNG.randomGetMinMax(surfaceUnder[cx] + radius, cavernsTop - radius)
+        valid = true
+        for (let j = 0; j < hives.length; j++) {
+          const dx = cx - hives[j].cx
+          const dy = cy - hives[j].cy
+          if (dx * dx + dy * dy < minDist * minDist) { valid = false; break }
+        }
+        attempts++
+      } while (!valid && attempts < MAX_ATTEMPTS)
+      if (!valid) continue
+
+      const tiles = []
+      this.digNoisyCircle(tiles, cx, cy, radius, radius + 4, NODES.HIVE.code)
+      this.digNoisyCircle(tiles, cx, cy, radius - 3, radius, NODES.VOID.code)
+      this.applyTiles(tiles)
+
+      const angle = seededRNG.randomGetBool() ? 45 : -45
+      const length = seededRNG.randomGetMinMax(30, 50)
+      const path = this.pathTunnel(cx, cy, 4, length, angle, 10)
+      this.carveAlongPath(path)
+
+      hives.push({cx, cy, radius})
+    }
+    return hives
   }
 
   /**

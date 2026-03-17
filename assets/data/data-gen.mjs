@@ -173,3 +173,5 @@ export const MEDIUM_CAVERNS_COUNT = 120
 export const UNDERGROUND_TUNNEL_COUNT = 50
 export const CAVERNS_TUNNEL_COUNT = 75
 export const SMALL_TUNNELS_COUNT = 150
+export const HIVE_RADIUS_MIN = 10
+export const HIVE_RADIUS_MAX = 15
