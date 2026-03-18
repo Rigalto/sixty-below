@@ -703,6 +703,7 @@ Génère des tunnels et des cavernes (tuiles VOID).
 | Méthode | Signature | Description |
 |---|---|---|
 | `digNoisyCircle` | `(tiles, cx, cy, radiusMin, radiusMax, code, frequency?): void` | Creuse un trou circulaire bruité (Perlin noise) - Peut générer des tuiles et des trous isolés - Pousse les tuiles directement dans `tiles` (pas de retour). |
+| `digNoisyEllipse` | `(tiles, cx, cy, radiusXMin, radiusXMax, radiusYMin, radiusYMax, code, frequency?): void` | Creuse un trou elliptique bruité (Perlin noise). Distance normalisée par les demi-axes — même algorithme que `digNoisyCircle`. Pousse les tuiles dans `tiles`. |
 | `applyTiles` | `(tiles: Array<{x, y, index, code}>): void` | Écrit les tuiles dans `worldBuffer` via `writeAt`. Ignore les tuiles hors bornes et protège `FOG`, `DEEPSEA`, `BASALT`, `LAVA`, `SKY`, `SEA` contre l'écrasement. |
 | `pathTunnel` | `(x0, y0, radiusMax, maxLength, angle, deltaAngle): Array<{x, y, radiusMin, radiusMax}>` | Calcule le chemin d'un tunnel par accumulation angulaire. `angle` et `deltaAngle` en degrés. Longueur effective ~25% supérieure à `maxLength` (facteur 0.8). Utilitaire pur — ne creuse pas. |
 | `carveAlongPath` | `(path: Array<{x, y, radiusMin, radiusMax}>): void` | Creuse un tunnel le long d'un chemin `pathTunnel`. Accumule tous les cercles en un seul tableau avant `applyTiles`. |

@@ -161,16 +161,16 @@ class WorldGenerator {
     // 6. Creusement (plus de creusement ensuite, ou alors très localisé) - TODO
 
     // 6.1 Creusement des tunnels et cavernes
-    worldCarver.digSurfaceTunnel(skySurface)
-    worldCarver.digSmallCaverns(surfaceUnder)
-    const zigzagCount = seededRNG.randomGetMinMax(2, 3)
-    for (let i = 0; i < zigzagCount; i++) { worldCarver.digZigzagTunnel() }
-    worldCarver.digUndergroundTunnels(surfaceUnder, underCaverns)
-    worldCarver.digCavernsTunnels(underCaverns)
-    worldCarver.digSmallTunnels(surfaceUnder)
+    // worldCarver.digSurfaceTunnel(skySurface)
+    // worldCarver.digSmallCaverns(surfaceUnder)
+    // const zigzagCount = seededRNG.randomGetMinMax(2, 3)
+    // for (let i = 0; i < zigzagCount; i++) { worldCarver.digZigzagTunnel() }
+    // worldCarver.digUndergroundTunnels(surfaceUnder, underCaverns)
+    // worldCarver.digCavernsTunnels(underCaverns)
+    // worldCarver.digSmallTunnels(surfaceUnder)
 
     // A supprimer
-    // worldCarver.debugTraceTunnel()
+    worldCarver.debugTraceTunnel()
 
     // 6.2 Creusement des mini-biomes avec peuplement - TODO
 
@@ -1122,6 +1122,52 @@ class WorldCarver {
   }
 
   /**
+ * Creuse un trou elliptique bruité (Perlin noise), allongé horizontalement.
+ * Même algorithme que digNoisyCircle — la distance est normalisée par les demi-axes.
+ * Pousse les tuiles directement dans `tiles` (pas de retour).
+ *
+ * @param {Array<{x, y, index, code}>} tiles     - Tableau cible
+ * @param {number}                     cx         - X du centre (tuiles)
+ * @param {number}                     cy         - Y du centre (tuiles)
+ * @param {number}                     radiusXMin - Demi-axe horizontal minimum
+ * @param {number}                     radiusXMax - Demi-axe horizontal maximum
+ * @param {number}                     radiusYMin - Demi-axe vertical minimum
+ * @param {number}                     radiusYMax - Demi-axe vertical maximum
+ * @param {number}                     code       - Code de node à appliquer
+ * @param {number}                     frequency  - Fréquence du bruit Perlin (défaut 0.3)
+ */
+  digNoisyEllipse (tiles, cx, cy, radiusXMin, radiusXMax, radiusYMin, radiusYMax, code, frequency = 0.3) {
+    const radiusX = (radiusXMin + radiusXMax) >> 1
+    const radiusY = (radiusYMin + radiusYMax) >> 1
+    const spreadX = radiusXMax - radiusXMin
+    const spreadY = radiusYMax - radiusYMin
+    const period = 1 / frequency
+
+    const xMin = Math.max(2, cx - radiusXMax)
+    const xMax = Math.min(WORLD_WIDTH - 3, cx + radiusXMax)
+    const yMin = Math.max(2, cy - radiusYMax)
+    const yMax = Math.min(WORLD_HEIGHT - 3, cy + radiusYMax)
+
+    for (let x = xMin; x <= xMax; x++) {
+      for (let y = yMin; y <= yMax; y++) {
+        const dx = x - cx
+        const dy = y - cy
+        const ndx = dx / radiusX
+        const ndy = dy / radiusY
+        const dist = Math.sqrt(ndx * ndx + ndy * ndy)
+
+        const noise = seededRNG.randomPerlin(x / period, y / period)
+        const spread = (spreadX + spreadY) * 0.5
+        const threshold = 1 + (noise * 2 - 1) * (spread / ((radiusX + radiusY) * 0.5))
+
+        if (dist <= threshold) {
+          tiles.push({x, y, index: (y << 10) | x, code})
+        }
+      }
+    }
+  }
+
+  /**
  * Applique une liste de tuiles dans worldBuffer.
  * Protège les tuiles ETERNAL (FOG, DEEPSEA, BASALT, LAVA), SKY et VOID.
  *
@@ -1575,17 +1621,11 @@ class WorldCarver {
  */
   debugTraceTunnel () {
     const code = NODES.VOID.code
-    const path = this.pathTunnel(
-      WORLD_WIDTH >> 1, WORLD_HEIGHT >> 1, // centre du monde
-      8, // radiusMax
-      300, // longueur
-      90, // angle initial : horizontal
-      20 // déviation max par pas
-    )
     const tiles = []
-    for (let i = 0; i < path.length; i++) {
-      const p = path[i]
-      this.digNoisyCircle(tiles, p.x, p.y, p.radiusMin, p.radiusMax, code, 0.8)
+    for (let cx = 100; cx < WORLD_WIDTH - 100; cx += 60) {
+      for (let cy = 100; cy < WORLD_HEIGHT - 100; cy += 40) {
+        this.digNoisyEllipse(tiles, cx, cy, 18, 22, 6, 10, code, 0.1)
+      }
     }
     this.applyTiles(tiles)
   }
