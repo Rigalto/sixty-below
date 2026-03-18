@@ -161,16 +161,17 @@ class WorldGenerator {
     // 6. Creusement (plus de creusement ensuite, ou alors très localisé) - TODO
 
     // 6.1 Creusement des tunnels et cavernes
-    // worldCarver.digSurfaceTunnel(skySurface)
-    // worldCarver.digSmallCaverns(surfaceUnder)
-    // const zigzagCount = seededRNG.randomGetMinMax(2, 3)
-    // for (let i = 0; i < zigzagCount; i++) { worldCarver.digZigzagTunnel() }
-    // worldCarver.digUndergroundTunnels(surfaceUnder, underCaverns)
-    // worldCarver.digCavernsTunnels(underCaverns)
-    // worldCarver.digSmallTunnels(surfaceUnder)
+    worldCarver.initExclusions()
+    worldCarver.digSurfaceTunnel(skySurface)
+    worldCarver.digSmallCaverns(surfaceUnder)
+    const zigzagCount = seededRNG.randomGetMinMax(2, 3)
+    for (let i = 0; i < zigzagCount; i++) { worldCarver.digZigzagTunnel() }
+    worldCarver.digUndergroundTunnels(surfaceUnder, underCaverns)
+    worldCarver.digCavernsTunnels(underCaverns)
+    worldCarver.digSmallTunnels(surfaceUnder)
 
     // A supprimer
-    worldCarver.debugTraceTunnel()
+    // worldCarver.debugTraceTunnel()
 
     // 6.2 Creusement des mini-biomes avec peuplement - TODO
 
@@ -1079,7 +1080,17 @@ export const clusterGenerator = new ClusterGenerator()
    ==================================================================================================== */
 
 class WorldCarver {
-/**
+  #exclusions
+
+  /**
+ * Réinitialise la liste des zones d'exclusion des mini-biomes.
+ * À appeler depuis generate() avant le premier mini-biome.
+ */
+  initExclusions () {
+    this.#exclusions = []
+  }
+
+  /**
  * Génère un cercle bruité dont les bords sont irréguliers (aspect naturel).
  * Les tuiles isolées (≤ 1 voisin 4-connexe dans le résultat) sont éliminées
  * pour garantir un contour compact sans pixel orphelin.
@@ -1136,7 +1147,7 @@ class WorldCarver {
  * @param {number}                     code       - Code de node à appliquer
  * @param {number}                     frequency  - Fréquence du bruit Perlin (défaut 0.3)
  */
-  digNoisyEllipse (tiles, cx, cy, radiusXMin, radiusXMax, radiusYMin, radiusYMax, code, frequency = 0.3) {
+  digNoisyEllipse (tiles, cx, cy, radiusXMin, radiusXMax, radiusYMin, radiusYMax, code, frequency = 0.1) {
     const radiusX = (radiusXMin + radiusXMax) >> 1
     const radiusY = (radiusYMin + radiusYMax) >> 1
     const spreadX = radiusXMax - radiusXMin
@@ -1170,8 +1181,10 @@ class WorldCarver {
   /**
  * Applique une liste de tuiles dans worldBuffer.
  * Protège les tuiles ETERNAL (FOG, DEEPSEA, BASALT, LAVA), SKY et VOID.
+ * Retourne le rectangle englobant des tuiles effectivement écrites.
  *
- * @param {Array<{x: number, y: number, index: number, code: number}>} tiles
+ * @param {Array<{x, y, index, code}>} tiles
+ * @returns {{x1: number, y1: number, x2: number, y2: number}}
  */
   applyTiles (tiles) {
     const PROTECTED = new Set([
@@ -1181,6 +1194,10 @@ class WorldCarver {
       NODES.LAVA.code,
       NODES.SKY.code
     ])
+    let x1 = WORLD_WIDTH
+    let y1 = WORLD_HEIGHT
+    let x2 = 0
+    let y2 = 0
 
     for (let i = 0; i < tiles.length; i++) {
       const tile = tiles[i]
@@ -1188,7 +1205,12 @@ class WorldCarver {
       if (tile.y < 0 || tile.y >= WORLD_HEIGHT) continue
       if (PROTECTED.has(worldBuffer.readAt(tile.index))) continue
       worldBuffer.writeAt(tile.index, tile.code)
+      if (tile.x < x1) x1 = tile.x
+      if (tile.x > x2) x2 = tile.x
+      if (tile.y < y1) y1 = tile.y
+      if (tile.y > y2) y2 = tile.y
     }
+    return {x1, y1, x2, y2}
   }
 
   /**
