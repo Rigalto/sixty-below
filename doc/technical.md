@@ -716,6 +716,7 @@ Génère des tunnels et des cavernes (tuiles VOID).
 | `digCavernsTunnels` | `(underCaverns: Int16Array): void` | Creuse `CAVERN_TUNNEL_COUNT` tunnels dans la zone cavernes. Borne basse : `WORLD_HEIGHT - 32`. Rayon 9, longueur 40–60, angle initial 0–360°, déviation 50°. Constante dans `data-gen.mjs`. |
 | `digSmallTunnels` | `(surfaceUnder: Int16Array): void` | Creuse `SMALL_TUNNELS_COUNT` petites galeries sinueuses (rayon 2-4, longueur 60–100, deltaAngle 40°) dans les zones underground et cavernes. Constante dans `data-gen.mjs`. |
 | `digHives` | `(biomeCounts: {forest, desert, jungle}, biomesDescription: Array<{biome, width, offset}>, surfaceUnder: Int16Array, underCaverns: Int16Array): void` | Creuse `hiveCount` ruches en zone JUNGLE (underground → caverns_top). Paroi HIVE (rayon+4) + intérieur VOID (rayon), galerie d'accès diagonale 45° ou -45°. Remplissage par HONEY différé. Constantes `HIVE_RADIUS_MIN/MAX` dans `data-gen.mjs`. Utilise `#isExcluded` et `#exclusions`. |
+| `digCobwebCaves` | `(underCaverns: Int16Array): Array<{cx, cy, radiusX, radiusY}>` | Creuse 4–8 cavernes elliptiques dans tous les biomes, cavern_top (75%) ou cavern_bottom (25%). COBWEB différé. Rectangle englobant enregistré dans #exclusions. Constantes dans `data-gen.mjs`. |
 | `cleanupAfterCarving` | `(): void` | Passe de nettoyage globale post-creusement. 7 règles in-place : propagation SKY, suppression tuiles isolées VOID/non-VOID (4-connexe et paires horizontales/verticales). Parcours séquentiel index croissant — cascade naturelle. |
 
 ---

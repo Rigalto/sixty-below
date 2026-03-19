@@ -175,3 +175,10 @@ export const CAVERNS_TUNNEL_COUNT = 75
 export const SMALL_TUNNELS_COUNT = 150
 export const HIVE_RADIUS_MIN = 10
 export const HIVE_RADIUS_MAX = 15
+
+export const COBWEB_CAVE_COUNT_MIN = 4
+export const COBWEB_CAVE_COUNT_MAX = 8
+export const COBWEB_RADIUS_X_MIN = 16
+export const COBWEB_RADIUS_X_MAX = 22
+export const COBWEB_RADIUS_Y_MIN = 8
+export const COBWEB_RADIUS_Y_MAX = 12

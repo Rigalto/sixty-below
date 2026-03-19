@@ -1,6 +1,6 @@
 import {seededRNG} from './utils.mjs'
 import {database} from './database.mjs'
-import {NODES, NODES_LOOKUP, NODE_TYPE, WEATHER_TYPE, BIOME_TYPE, WORLD_WIDTH, WORLD_HEIGHT, SEA_LEVEL, BIOME_TILE_MAP, SEA_MAX_JITTER, SEA_MAX_WIDTH, SEA_MAX_HEIGHT, CLUSTER_SCATTER_MAP, ORE_GEM_SCATTER_MAP, SMALL_CAVERNS_COUNT, MEDIUM_CAVERNS_COUNT, UNDERGROUND_TUNNEL_COUNT, CAVERNS_TUNNEL_COUNT, SMALL_TUNNELS_COUNT, HIVE_RADIUS_MIN, HIVE_RADIUS_MAX} from '../assets/data/data-gen.mjs'
+import {NODES, NODES_LOOKUP, NODE_TYPE, WEATHER_TYPE, BIOME_TYPE, WORLD_WIDTH, WORLD_HEIGHT, SEA_LEVEL, BIOME_TILE_MAP, SEA_MAX_JITTER, SEA_MAX_WIDTH, SEA_MAX_HEIGHT, CLUSTER_SCATTER_MAP, ORE_GEM_SCATTER_MAP, SMALL_CAVERNS_COUNT, MEDIUM_CAVERNS_COUNT, UNDERGROUND_TUNNEL_COUNT, CAVERNS_TUNNEL_COUNT, SMALL_TUNNELS_COUNT, HIVE_RADIUS_MIN, HIVE_RADIUS_MAX, COBWEB_CAVE_COUNT_MIN, COBWEB_CAVE_COUNT_MAX, COBWEB_RADIUS_X_MIN, COBWEB_RADIUS_X_MAX, COBWEB_RADIUS_Y_MIN, COBWEB_RADIUS_Y_MAX} from '../assets/data/data-gen.mjs'
 
 /* ====================================================================================================
    WORLD BUFFER (CREATION DU MONDE)
@@ -177,6 +177,8 @@ class WorldGenerator {
 
     // 6.3 Creusement des mini-biomes avec peuplement différé - TODO
     const hives = worldCarver.digHives(biomeCounts, biomesDescription, surfaceUnder, underCaverns)
+    const cobwebCaves = worldCarver.digCobwebCaves(underCaverns)
+
 
     // 7. Traitement des surfaces végétales + désert - TODO
 
@@ -206,7 +208,7 @@ class WorldGenerator {
 
     // N. Stochage du monde en base de données
     if (!debug) {
-      await this.save(seed, hives)
+      await this.save(seed, {hives, cobwebCaves})
       worldBuffer.clear()
     }
 
@@ -217,7 +219,7 @@ class WorldGenerator {
     if (debug) { return worldBuffer } // appelant responsable du clear()
   }
 
-  async save (seed, hives) {
+  async save (seed, {hives, cobwebCaves}) {
     const start = window.performance.now()
     // 1. Sauvegarde des tuiles
     await database.clearObjectStore('world_chunks')
@@ -258,7 +260,8 @@ class WorldGenerator {
       {key: 'daybloomseeds', value: ''},
       {key: 'moonglowseeds', value: ''},
       {key: 'health', value: 100},
-      {key: 'hives', value: JSON.stringify(hives)}
+      {key: 'hives', value: JSON.stringify(hives)},
+      {key: 'cobwebcaves', value: JSON.stringify(cobwebCaves)}
 
       // {key: 'honeysurface', value: this.honeysurface.join('|')}
     ])
@@ -1507,53 +1510,48 @@ class WorldCarver {
     return hives
   }
 
-  digHives_ (biomeCounts, biomesDescription, surfaceUnder, underCaverns) {
-    const hiveCount = Math.max(3, 2 * biomeCounts.jungle)
+  /**
+ * Creuse entre COBWEB_CAVE_COUNT_MIN et COBWEB_CAVE_COUNT_MAX cavernes elliptiques
+ * dans tous les biomes, en zone cavern_top (75%) ou cavern_bottom (25%).
+ * Le remplissage COBWEB du toit est différé.
+ *
+ * @param {Int16Array} underCaverns - Altitudes haute caverne par colonne X
+ * @returns {Array<{cx, cy, radiusX, radiusY}>}
+ */
+  digCobwebCaves (underCaverns) {
+    const count = seededRNG.randomGetMinMax(COBWEB_CAVE_COUNT_MIN, COBWEB_CAVE_COUNT_MAX)
     const hellTop = WORLD_HEIGHT - 32
-    const minDist = 2 * (HIVE_RADIUS_MAX + 3) + 50
     const MAX_ATTEMPTS = 100
+    const caves = []
 
-    const jungleZones = []
-    for (let i = 0; i < biomesDescription.length; i++) {
-      if (biomesDescription[i].biome === BIOME_TYPE.JUNGLE) jungleZones.push(biomesDescription[i])
-    }
-    if (jungleZones.length === 0) return
+    for (let i = 0; i < count; i++) {
+      const radiusX = seededRNG.randomGetMinMax(COBWEB_RADIUS_X_MIN, COBWEB_RADIUS_X_MAX)
+      const radiusY = seededRNG.randomGetMinMax(COBWEB_RADIUS_Y_MIN, COBWEB_RADIUS_Y_MAX)
+      const isCavernTop = seededRNG.randomGetMinMax(0, 3) > 0
 
-    const hives = []
-    for (let i = 0; i < hiveCount; i++) {
-      const zone = jungleZones[seededRNG.randomGetMinMax(0, jungleZones.length - 1)]
-      const radius = seededRNG.randomGetMinMax(HIVE_RADIUS_MIN, HIVE_RADIUS_MAX)
-
-      // on cherche un centre de HIVE éloigné des autres hives
       let cx, cy, valid
       let attempts = 0
       do {
-        cx = seededRNG.randomGetMinMax(zone.offset + radius, zone.offset + zone.width - radius - 1)
-        const cavernsTop = (underCaverns[cx] + hellTop) >> 1
-        cy = seededRNG.randomGetMinMax(surfaceUnder[cx] + radius, cavernsTop - radius)
-        valid = true
-        for (let j = 0; j < hives.length; j++) {
-          const dx = cx - hives[j].cx
-          const dy = cy - hives[j].cy
-          if (dx * dx + dy * dy < minDist * minDist) { valid = false; break }
-        }
+        cx = seededRNG.randomGetMinMax(radiusX, WORLD_WIDTH - radiusX - 1)
+        const cavernMid = (underCaverns[cx] + hellTop) >> 1
+        cy = isCavernTop
+          ? seededRNG.randomGetMinMax(underCaverns[cx] + radiusY, cavernMid - radiusY)
+          : seededRNG.randomGetMinMax(cavernMid + radiusY, hellTop - radiusY)
+
+        valid = !this.isExcluded(cx - radiusX, cy - radiusY, cx + radiusX, cy + radiusY)
         attempts++
       } while (!valid && attempts < MAX_ATTEMPTS)
       if (!valid) continue
 
       const tiles = []
-      this.digNoisyCircle(tiles, cx, cy, radius, radius + 4, NODES.HIVE.code)
-      this.digNoisyCircle(tiles, cx, cy, radius - 3, radius, NODES.VOID.code)
-      this.applyTiles(tiles)
+      this.digNoisyEllipse(tiles, cx, cy, radiusX - 2, radiusX + 2, radiusY - 2, radiusY + 2, NODES.VOID.code)
+      const rect = this.applyTiles(tiles)
+      this.addExclusion(rect)
 
-      const angle = seededRNG.randomGetBool() ? 45 : -45
-      const length = seededRNG.randomGetMinMax(30, 50)
-      const path = this.pathTunnel(cx, cy, 4, length, angle, 10)
-      this.carveAlongPath(path)
-
-      hives.push({cx, cy, radius})
+      caves.push({cx, cy, radiusX, radiusY})
     }
-    return hives
+
+    return caves
   }
 
   /**
