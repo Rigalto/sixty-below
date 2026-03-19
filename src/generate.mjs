@@ -1,6 +1,6 @@
 import {seededRNG} from './utils.mjs'
 import {database} from './database.mjs'
-import {NODES, NODES_LOOKUP, NODE_TYPE, WEATHER_TYPE, BIOME_TYPE, WORLD_WIDTH, WORLD_HEIGHT, SEA_LEVEL, BIOME_TILE_MAP, SEA_MAX_JITTER, SEA_MAX_WIDTH, SEA_MAX_HEIGHT, CLUSTER_SCATTER_MAP, ORE_GEM_SCATTER_MAP, PERLIN_OFFSET_TUNNEL, PERLIN_OFFSET_SURFACE_TUNNEL, PERLIN_OFFSET_SMALL_TUNNEL, PERLIN_OFFSET_CAVERN, PERLIN_OFFSET_HIVE, PERLIN_OFFSET_COBWEB, SMALL_CAVERNS_COUNT, MEDIUM_CAVERNS_COUNT, UNDERGROUND_TUNNEL_COUNT, CAVERNS_TUNNEL_COUNT, SMALL_TUNNELS_COUNT, HIVE_RADIUS_MIN, HIVE_RADIUS_MAX, COBWEB_CAVE_COUNT_MIN, COBWEB_CAVE_COUNT_MAX, COBWEB_RADIUS_X_MIN, COBWEB_RADIUS_X_MAX, COBWEB_RADIUS_Y_MIN, COBWEB_RADIUS_Y_MAX} from '../assets/data/data-gen.mjs'
+import {NODES, NODES_LOOKUP, NODE_TYPE, WEATHER_TYPE, BIOME_TYPE, WORLD_WIDTH, WORLD_HEIGHT, SEA_LEVEL, BIOME_TILE_MAP, SEA_MAX_JITTER, SEA_MAX_WIDTH, SEA_MAX_HEIGHT, CLUSTER_SCATTER_MAP, ORE_GEM_SCATTER_MAP, PERLIN_OFFSET_NATURALIZER, PERLIN_OFFSET_TUNNEL, PERLIN_OFFSET_SURFACE_TUNNEL, PERLIN_OFFSET_SMALL_TUNNEL, PERLIN_OFFSET_CAVERN, PERLIN_OFFSET_HIVE, PERLIN_OFFSET_COBWEB, SMALL_CAVERNS_COUNT, MEDIUM_CAVERNS_COUNT, UNDERGROUND_TUNNEL_COUNT, CAVERNS_TUNNEL_COUNT, SMALL_TUNNELS_COUNT, HIVE_RADIUS_MIN, HIVE_RADIUS_MAX, COBWEB_CAVE_COUNT_MIN, COBWEB_CAVE_COUNT_MAX, COBWEB_RADIUS_X_MIN, COBWEB_RADIUS_X_MAX, COBWEB_RADIUS_Y_MIN, COBWEB_RADIUS_Y_MAX} from '../assets/data/data-gen.mjs'
 
 /* ====================================================================================================
    WORLD BUFFER (CREATION DU MONDE)
@@ -534,13 +534,13 @@ export class BiomeNaturalizer {
 
     for (let x = 0; x < 1024; x++) {
       // les valeurs de Y sont choisies éloignées pour ne pas corréler les lignes
-      let noise = seededRNG.randomPerlinScaled(x, 2.8, 30, 15) + seededRNG.randomPerlinScaled(x, 2.8, 10, 5)
+      let noise = seededRNG.randomPerlinScaled(x + PERLIN_OFFSET_NATURALIZER, 2.8, 30, 15) + seededRNG.randomPerlinScaled(x + PERLIN_OFFSET_NATURALIZER, 2.8, 10, 5)
       skySurface[x] = skySurfaceY + noise // 3 chunks * 16
-      noise = seededRNG.randomPerlinScaled(x, 13.7, 50, 20) + seededRNG.randomPerlinScaled(x, 13.7, 10, 5)
+      noise = seededRNG.randomPerlinScaled(x + PERLIN_OFFSET_NATURALIZER, 13.7, 50, 20) + seededRNG.randomPerlinScaled(x + PERLIN_OFFSET_NATURALIZER, 13.7, 10, 5)
       surfaceUnder[x] = surfaceUnderY + noise // 6 chunks total (3 sky + 6 surface)
-      noise = seededRNG.randomPerlinScaled(x, 24.6, 45, 30) + seededRNG.randomPerlinScaled(x, 24.6, 10, 5)
+      noise = seededRNG.randomPerlinScaled(x + PERLIN_OFFSET_NATURALIZER, 24.6, 45, 30) + seededRNG.randomPerlinScaled(x + PERLIN_OFFSET_NATURALIZER, 24.6, 10, 5)
       underCaverns[x] = underCavernsY + noise // + ~20 chunks
-      hell[x] = HellY - 5 * seededRNG.randomPerlin(x / 60, 35.2)
+      hell[x] = HellY - 5 * seededRNG.randomPerlin((x + PERLIN_OFFSET_NATURALIZER) / 60, 35.2)
     }
 
     return {skySurface, surfaceUnder, underCaverns, hell}
@@ -555,7 +555,7 @@ export class BiomeNaturalizer {
       boundaryCenter += width
       const boundary = new Int16Array(512)
       for (let y = 0; y < 512; y++) {
-        const noise = seededRNG.randomPerlinScaled(y, 100.2 + boundaryCenter, 30, 15) + seededRNG.randomPerlinScaled(y, 100.2 + boundaryCenter, 10, 5)
+        const noise = seededRNG.randomPerlinScaled(y + PERLIN_OFFSET_NATURALIZER, 100.2 + boundaryCenter, 30, 15) + seededRNG.randomPerlinScaled(y + PERLIN_OFFSET_NATURALIZER, 100.2 + boundaryCenter, 10, 5)
         boundary[y] = boundaryCenter + noise
       }
       verticalBoundaries.push({biome, boundary})
@@ -712,8 +712,8 @@ export class BiomeNaturalizer {
 
     for (let y = 0; y < SEA_MAX_DEPTH; y++) {
       // Bruit haute fréquence pour l'aspect rocheux
-      const leftNoise = seededRNG.randomPerlinScaled(y, 42.5, 18, 8)
-      const rightNoise = seededRNG.randomPerlinScaled(y, 252.8, 18, 8)
+      const leftNoise = seededRNG.randomPerlinScaled(y + PERLIN_OFFSET_NATURALIZER, 42.5, 18, 8)
+      const rightNoise = seededRNG.randomPerlinScaled(y + PERLIN_OFFSET_NATURALIZER, 252.8, 18, 8)
 
       // Décalage par rapport au pivot Y=70
       const deltaY = y - 70
