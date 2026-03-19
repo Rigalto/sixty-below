@@ -85,8 +85,6 @@ describe('WorldCarver — applyTiles() : tuiles hors bornes exclues du rectangle
   worldBuffer.clear()
 })
 
-
-
 // ─── pathTunnel ───────────────────────────────────────────────────────────────
 
 describe('WorldCarver — pathTunnel() : premier point = (x0, y0)', () => {
@@ -173,6 +171,111 @@ describe('WorldCarver — pathTunnel() : reproductible avec même graine', () =>
   assert('même longueur', path1.length === path2.length)
   assert('path[1].x identique', path1[1].x === path2[1].x)
   assert('path[1].y identique', path1[1].y === path2[1].y)
+
+  worldBuffer.clear()
+})
+
+// ─── isExcluded / addExclusion ────────────────────────────────────────────────
+
+describe('WorldCarver — isExcluded() : liste vide → jamais exclu', () => {
+  worldBuffer.init()
+  worldCarver.initExclusions()
+
+  assert('aucune exclusion → false', worldCarver.isExcluded(10, 10, 20, 20) === false)
+
+  worldBuffer.clear()
+})
+
+describe('WorldCarver — isExcluded() : rectangle identique → exclu', () => {
+  worldBuffer.init()
+  worldCarver.initExclusions()
+  worldCarver.addExclusion({x1: 10, y1: 10, x2: 20, y2: 20})
+
+  assert('rectangle identique → true', worldCarver.isExcluded(10, 10, 20, 20) === true)
+
+  worldBuffer.clear()
+})
+
+describe('WorldCarver — isExcluded() : rectangle totalement à gauche → non exclu', () => {
+  worldBuffer.init()
+  worldCarver.initExclusions()
+  worldCarver.addExclusion({x1: 50, y1: 50, x2: 100, y2: 100})
+
+  assert('à gauche → false', worldCarver.isExcluded(10, 50, 40, 100) === false)
+
+  worldBuffer.clear()
+})
+
+describe('WorldCarver — isExcluded() : rectangle totalement à droite → non exclu', () => {
+  worldBuffer.init()
+  worldCarver.initExclusions()
+  worldCarver.addExclusion({x1: 50, y1: 50, x2: 100, y2: 100})
+
+  assert('à droite → false', worldCarver.isExcluded(110, 50, 150, 100) === false)
+
+  worldBuffer.clear()
+})
+
+describe('WorldCarver — isExcluded() : rectangle totalement au-dessus → non exclu', () => {
+  worldBuffer.init()
+  worldCarver.initExclusions()
+  worldCarver.addExclusion({x1: 50, y1: 50, x2: 100, y2: 100})
+
+  assert('au-dessus → false', worldCarver.isExcluded(50, 10, 100, 40) === false)
+
+  worldBuffer.clear()
+})
+
+describe('WorldCarver — isExcluded() : rectangle totalement en-dessous → non exclu', () => {
+  worldBuffer.init()
+  worldCarver.initExclusions()
+  worldCarver.addExclusion({x1: 50, y1: 50, x2: 100, y2: 100})
+
+  assert('en-dessous → false', worldCarver.isExcluded(50, 110, 100, 150) === false)
+
+  worldBuffer.clear()
+})
+
+describe('WorldCarver — isExcluded() : chevauchement partiel → exclu', () => {
+  worldBuffer.init()
+  worldCarver.initExclusions()
+  worldCarver.addExclusion({x1: 50, y1: 50, x2: 100, y2: 100})
+
+  assert('chevauchement partiel droite → true', worldCarver.isExcluded(80, 50, 130, 100) === true)
+  assert('chevauchement partiel bas → true', worldCarver.isExcluded(50, 80, 100, 130) === true)
+
+  worldBuffer.clear()
+})
+
+describe('WorldCarver — isExcluded() : rectangle intérieur → exclu', () => {
+  worldBuffer.init()
+  worldCarver.initExclusions()
+  worldCarver.addExclusion({x1: 50, y1: 50, x2: 100, y2: 100})
+
+  assert('intérieur → true', worldCarver.isExcluded(60, 60, 90, 90) === true)
+
+  worldBuffer.clear()
+})
+
+describe('WorldCarver — isExcluded() : rectangle extérieur englobant → exclu', () => {
+  worldBuffer.init()
+  worldCarver.initExclusions()
+  worldCarver.addExclusion({x1: 50, y1: 50, x2: 100, y2: 100})
+
+  assert('englobant → true', worldCarver.isExcluded(40, 40, 110, 110) === true)
+
+  worldBuffer.clear()
+})
+
+describe('WorldCarver — isExcluded() : plusieurs exclusions → détecte la bonne', () => {
+  worldBuffer.init()
+  worldCarver.initExclusions()
+  worldCarver.addExclusion({x1: 10, y1: 10, x2: 30, y2: 30})
+  worldCarver.addExclusion({x1: 200, y1: 200, x2: 250, y2: 250})
+
+  assert('intersecte la première → true', worldCarver.isExcluded(20, 20, 40, 40) === true)
+  assert('intersecte la deuxième → true', worldCarver.isExcluded(220, 220, 260, 260) === true)
+  assert('entre les deux → false', worldCarver.isExcluded(50, 50, 150, 150) === false)
 
   worldBuffer.clear()
 })

@@ -1091,6 +1091,33 @@ class WorldCarver {
   }
 
   /**
+ * Ajoute un rectangle à la liste des zones d'exclusion.
+ * À appeler après applyTiles() pour les mini-biomes uniquement.
+ *
+ * @param {{x1, y1, x2, y2}} rect
+ */
+  addExclusion (rect) {
+    this.#exclusions.push(rect)
+  }
+
+  /**
+ * Vérifie si un rectangle intersecte l'une des zones d'exclusion.
+ *
+ * @param {number} x1
+ * @param {number} y1
+ * @param {number} x2
+ * @param {number} y2
+ * @returns {boolean}
+ */
+  isExcluded (x1, y1, x2, y2) {
+    for (let i = 0; i < this.#exclusions.length; i++) {
+      const e = this.#exclusions[i]
+      if (x1 <= e.x2 && x2 >= e.x1 && y1 <= e.y2 && y2 >= e.y1) return true
+    }
+    return false
+  }
+
+  /**
  * Génère un cercle bruité dont les bords sont irréguliers (aspect naturel).
  * Les tuiles isolées (≤ 1 voisin 4-connexe dans le résultat) sont éliminées
  * pour garantir un contour compact sans pixel orphelin.
@@ -1422,7 +1449,65 @@ class WorldCarver {
  * @param {Int16Array}            surfaceUnder       - Altitudes basse surface par colonne X
  * @param {Int16Array}            underCaverns       - Altitudes haute caverne par colonne X
  */
+
   digHives (biomeCounts, biomesDescription, surfaceUnder, underCaverns) {
+    const hiveCount = Math.max(3, 2 * biomeCounts.jungle)
+    const hellTop = WORLD_HEIGHT - 32
+    const MAX_ATTEMPTS = 100
+
+    const jungleZones = []
+    for (let i = 0; i < biomesDescription.length; i++) {
+      if (biomesDescription[i].biome === BIOME_TYPE.JUNGLE) jungleZones.push(biomesDescription[i])
+    }
+    if (jungleZones.length === 0) return []
+
+    const hives = []
+
+    for (let i = 0; i < hiveCount; i++) {
+      const zone = jungleZones[seededRNG.randomGetMinMax(0, jungleZones.length - 1)]
+      const radius = seededRNG.randomGetMinMax(HIVE_RADIUS_MIN, HIVE_RADIUS_MAX)
+      const cavernsTop = (underCaverns[zone.offset + (zone.width >> 1)] + hellTop) >> 1
+      const angle = seededRNG.randomGetBool() ? 45 : -45
+      const length = seededRNG.randomGetMinMax(30, 50)
+
+      // Rectangle englobant : union du carré hive + carré galerie
+      // +45° : galerie monte vers la droite
+      // -45° : galerie monte vers la gauche
+      const ex = length + 4
+      const ey = length + 4
+
+      let cx, cy, valid
+      let attempts = 0
+      do {
+        cx = seededRNG.randomGetMinMax(zone.offset + radius, zone.offset + zone.width - radius - 1)
+        cy = seededRNG.randomGetMinMax(surfaceUnder[cx] + radius, cavernsTop - radius)
+
+        const bx1 = angle === 45 ? cx - (radius + 4) : cx - ex
+        const by1 = cy - ey
+        const bx2 = angle === 45 ? cx + ex : cx + (radius + 4)
+        const by2 = cy + (radius + 4)
+
+        valid = !this.isExcluded(bx1, by1, bx2, by2)
+        attempts++
+      } while (!valid && attempts < MAX_ATTEMPTS)
+      if (!valid) continue
+
+      const tiles = []
+      this.digNoisyCircle(tiles, cx, cy, radius, radius + 4, NODES.HIVE.code)
+      this.digNoisyCircle(tiles, cx, cy, radius - 3, radius, NODES.VOID.code)
+      const rect = this.applyTiles(tiles)
+
+      const path = this.pathTunnel(cx, cy, 4, length, angle, 10)
+      this.carveAlongPath(path)
+
+      hives.push({cx, cy, radius})
+      this.addExclusion(rect)
+    }
+
+    return hives
+  }
+
+  digHives_ (biomeCounts, biomesDescription, surfaceUnder, underCaverns) {
     const hiveCount = Math.max(3, 2 * biomeCounts.jungle)
     const hellTop = WORLD_HEIGHT - 32
     const minDist = 2 * (HIVE_RADIUS_MAX + 3) + 50

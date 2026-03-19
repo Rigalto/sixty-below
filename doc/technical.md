@@ -703,6 +703,8 @@ Génère des tunnels et des cavernes (tuiles VOID).
 | Méthode | Signature | Description |
 |---|---|---|
 | `initExclusions` | `(): void` | Réinitialise la liste interne des zones d'exclusion (#exclusions). À appeler depuis generate() avant le premier mini-biome. |
+| `addExclusion` | `(rect: {x1, y1, x2, y2}): void` | Ajoute un rectangle à la liste interne d'exclusion (#exclusions). À appeler explicitement après applyTiles() pour les mini-biomes uniquement. |
+| `isExcluded` | `(x1, y1, x2, y2: number): boolean` | Vérifie si un rectangle intersecte l'une des zones d'exclusion internes (#exclusions). Retourne true dès la première intersection trouvée. |
 | `digNoisyCircle` | `(tiles, cx, cy, radiusMin, radiusMax, code, frequency?): void` | Creuse un trou circulaire bruité (Perlin noise) - Peut générer des tuiles et des trous isolés - Pousse les tuiles directement dans `tiles` (pas de retour). |
 | `digNoisyEllipse` | `(tiles, cx, cy, radiusXMin, radiusXMax, radiusYMin, radiusYMax, code, frequency?): void` | Creuse un trou elliptique bruité (Perlin noise). Distance normalisée par les demi-axes — même algorithme que `digNoisyCircle`. Pousse les tuiles dans `tiles`. |
 | `applyTiles` | `(tiles: Array<{x, y, index, code}>): {x1, y1, x2, y2}` | Écrit les tuiles dans `worldBuffer` via `writeAt`. Ignore les tuiles hors bornes et protège `FOG`, `DEEPSEA`, `BASALT`, `LAVA`, `SKY`, `SEA` contre l'écrasement. Retourne le rectangle englobant des tuiles écrites. |
@@ -713,7 +715,7 @@ Génère des tunnels et des cavernes (tuiles VOID).
 | `digUndergroundTunnels` | `(surfaceUnder: Int16Array, underCaverns: Int16Array): void` | Creuse `UNDERGROUND_TUNNEL_COUNT` tunnels horizontaux avec un ou deux coudes en zone underground. Rayon 9, longueur 30–50, angle initial 0–360°, déviation 25°. Constante dans `data-gen.mjs`. |
 | `digCavernsTunnels` | `(underCaverns: Int16Array): void` | Creuse `CAVERN_TUNNEL_COUNT` tunnels dans la zone cavernes. Borne basse : `WORLD_HEIGHT - 32`. Rayon 9, longueur 40–60, angle initial 0–360°, déviation 50°. Constante dans `data-gen.mjs`. |
 | `digSmallTunnels` | `(surfaceUnder: Int16Array): void` | Creuse `SMALL_TUNNELS_COUNT` petites galeries sinueuses (rayon 2-4, longueur 60–100, deltaAngle 40°) dans les zones underground et cavernes. Constante dans `data-gen.mjs`. |
-| `digHives` | `(biomeCounts: {forest, desert, jungle}, biomesDescription: Array<{biome, width, offset}>, surfaceUnder: Int16Array, underCaverns: Int16Array): void` | Creuse `hiveCount` ruches en zone JUNGLE (underground → caverns_top). Paroi HIVE (rayon+4) + intérieur VOID (rayon), galerie d'accès diagonale 45° ou -45°. Remplissage par HONEY différé. Constantes `HIVE_RADIUS_MIN/MAX` dans `data-gen.mjs`. |
+| `digHives` | `(biomeCounts: {forest, desert, jungle}, biomesDescription: Array<{biome, width, offset}>, surfaceUnder: Int16Array, underCaverns: Int16Array): void` | Creuse `hiveCount` ruches en zone JUNGLE (underground → caverns_top). Paroi HIVE (rayon+4) + intérieur VOID (rayon), galerie d'accès diagonale 45° ou -45°. Remplissage par HONEY différé. Constantes `HIVE_RADIUS_MIN/MAX` dans `data-gen.mjs`. Utilise `#isExcluded` et `#exclusions`. |
 | `cleanupAfterCarving` | `(): void` | Passe de nettoyage globale post-creusement. 7 règles in-place : propagation SKY, suppression tuiles isolées VOID/non-VOID (4-connexe et paires horizontales/verticales). Parcours séquentiel index croissant — cascade naturelle. |
 
 ---
