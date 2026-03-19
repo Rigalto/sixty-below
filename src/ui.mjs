@@ -302,7 +302,11 @@ class CreationDialogOverlay {
 
   #bindEvents () {
     // Actions UI
-    this.dom.btnGenerate.addEventListener('click', this.onGenerateClick.bind(this))
+    this.dom.btnGenerate.addEventListener('click', this.onGenerateClick)
+
+    this.dom.seedInput.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') this.onGenerateClick()
+    })
 
     // Écoute pour affichage/masquage
     eventBus.on('creation/open', () => {
