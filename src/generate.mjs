@@ -1,6 +1,6 @@
 import {seededRNG} from './utils.mjs'
 import {database} from './database.mjs'
-import {NODES, NODES_LOOKUP, NODE_TYPE, WEATHER_TYPE, BIOME_TYPE, WORLD_WIDTH, WORLD_HEIGHT, SEA_LEVEL, BIOME_TILE_MAP, SEA_MAX_JITTER, SEA_MAX_WIDTH, SEA_MAX_HEIGHT, CLUSTER_SCATTER_MAP, ORE_GEM_SCATTER_MAP, SMALL_CAVERNS_COUNT, MEDIUM_CAVERNS_COUNT, UNDERGROUND_TUNNEL_COUNT, CAVERNS_TUNNEL_COUNT, SMALL_TUNNELS_COUNT, HIVE_RADIUS_MIN, HIVE_RADIUS_MAX, COBWEB_CAVE_COUNT_MIN, COBWEB_CAVE_COUNT_MAX, COBWEB_RADIUS_X_MIN, COBWEB_RADIUS_X_MAX, COBWEB_RADIUS_Y_MIN, COBWEB_RADIUS_Y_MAX} from '../assets/data/data-gen.mjs'
+import {NODES, NODES_LOOKUP, NODE_TYPE, WEATHER_TYPE, BIOME_TYPE, WORLD_WIDTH, WORLD_HEIGHT, SEA_LEVEL, BIOME_TILE_MAP, SEA_MAX_JITTER, SEA_MAX_WIDTH, SEA_MAX_HEIGHT, CLUSTER_SCATTER_MAP, ORE_GEM_SCATTER_MAP, PERLIN_OFFSET_TUNNEL, PERLIN_OFFSET_SURFACE_TUNNEL, PERLIN_OFFSET_SMALL_TUNNEL, PERLIN_OFFSET_CAVERN, PERLIN_OFFSET_HIVE, PERLIN_OFFSET_COBWEB, SMALL_CAVERNS_COUNT, MEDIUM_CAVERNS_COUNT, UNDERGROUND_TUNNEL_COUNT, CAVERNS_TUNNEL_COUNT, SMALL_TUNNELS_COUNT, HIVE_RADIUS_MIN, HIVE_RADIUS_MAX, COBWEB_CAVE_COUNT_MIN, COBWEB_CAVE_COUNT_MAX, COBWEB_RADIUS_X_MIN, COBWEB_RADIUS_X_MAX, COBWEB_RADIUS_Y_MIN, COBWEB_RADIUS_Y_MAX} from '../assets/data/data-gen.mjs'
 
 /* ====================================================================================================
    WORLD BUFFER (CREATION DU MONDE)
@@ -178,7 +178,6 @@ class WorldGenerator {
     // 6.3 Creusement des mini-biomes avec peuplement différé - TODO
     const hives = worldCarver.digHives(biomeCounts, biomesDescription, surfaceUnder, underCaverns)
     const cobwebCaves = worldCarver.digCobwebCaves(underCaverns)
-
 
     // 7. Traitement des surfaces végétales + désert - TODO
 
@@ -1134,7 +1133,7 @@ class WorldCarver {
  * @param {number} frequency - Fréquence spatiale du bruit (défaut : 0.3)
  * @returns {Array<{x: number, y: number, index: number, code: number}>}
  */
-  digNoisyCircle (tiles, cx, cy, radiusMin, radiusMax, code, frequency = 0.3) {
+  digNoisyCircle (tiles, cx, cy, radiusMin, radiusMax, code, frequency = 0.3, offsetX = 0) {
     const radius = (radiusMin + radiusMax) >> 1
     const spread = radiusMax - radiusMin
     const period = 1 / frequency
@@ -1152,7 +1151,7 @@ class WorldCarver {
         if (dist2 > radiusMax * radiusMax) continue
 
         const dist = Math.sqrt(dist2)
-        const noise = seededRNG.randomPerlin(x / period, y / period)
+        const noise = seededRNG.randomPerlin((x + offsetX) / period, y / period)
         const threshold = radius + (noise * 2 - 1) * spread
 
         if (dist <= threshold) {
@@ -1177,7 +1176,7 @@ class WorldCarver {
  * @param {number}                     code       - Code de node à appliquer
  * @param {number}                     frequency  - Fréquence du bruit Perlin (défaut 0.3)
  */
-  digNoisyEllipse (tiles, cx, cy, radiusXMin, radiusXMax, radiusYMin, radiusYMax, code, frequency = 0.1) {
+  digNoisyEllipse (tiles, cx, cy, radiusXMin, radiusXMax, radiusYMin, radiusYMax, code, frequency = 0.3, offsetX = 0) {
     const radiusX = (radiusXMin + radiusXMax) >> 1
     const radiusY = (radiusYMin + radiusYMax) >> 1
     const spreadX = radiusXMax - radiusXMin
@@ -1197,7 +1196,7 @@ class WorldCarver {
         const ndy = dy / radiusY
         const dist = Math.sqrt(ndx * ndx + ndy * ndy)
 
-        const noise = seededRNG.randomPerlin(x / period, y / period)
+        const noise = seededRNG.randomPerlin((x + offsetX) / period, y / period)
         const spread = (spreadX + spreadY) * 0.5
         const threshold = 1 + (noise * 2 - 1) * (spread / ((radiusX + radiusY) * 0.5))
 
@@ -1284,13 +1283,13 @@ class WorldCarver {
  *
  * @param {Array<{x, y, radiusMin, radiusMax}>} path - Chemin retourné par pathTunnel
  */
-  carveAlongPath (path) {
+  carveAlongPath (path, offsetX = 0) {
     const code = NODES.VOID.code
 
     const tiles = []
     for (let j = 0; j < path.length; j++) {
       const p = path[j]
-      this.digNoisyCircle(tiles, p.x, p.y, p.radiusMin, p.radiusMax, code)
+      this.digNoisyCircle(tiles, p.x, p.y, p.radiusMin, p.radiusMax, code, 0.3, offsetX)
     }
     this.applyTiles(tiles)
   }
@@ -1311,7 +1310,7 @@ class WorldCarver {
     for (let i = 0; i < SMALL_CAVERNS_COUNT; i++) {
       const x = seededRNG.randomGetMinMax(2, WORLD_WIDTH - 3)
       const y = seededRNG.randomGetMinMax(surfaceUnder[x], WORLD_HEIGHT - 3)
-      this.digNoisyCircle(smallTiles, x, y, 3, 6, code)
+      this.digNoisyCircle(smallTiles, x, y, 3, 6, code, PERLIN_OFFSET_CAVERN)
     }
     this.applyTiles(smallTiles)
 
@@ -1319,7 +1318,7 @@ class WorldCarver {
     for (let i = 0; i < MEDIUM_CAVERNS_COUNT; i++) {
       const x = seededRNG.randomGetMinMax(2, WORLD_WIDTH - 3)
       const y = seededRNG.randomGetMinMax(surfaceUnder[x], WORLD_HEIGHT - 3)
-      this.digNoisyCircle(mediumTiles, x, y, 6, 12, code)
+      this.digNoisyCircle(mediumTiles, x, y, 6, 12, code, PERLIN_OFFSET_CAVERN)
     }
     this.applyTiles(mediumTiles)
   }
@@ -1346,7 +1345,7 @@ class WorldCarver {
       do {
         path = this.pathTunnel(x0, y0, radius, length, angle, 15)
       } while (path[path.length - 1].y <= y0)
-      this.carveAlongPath(path)
+      this.carveAlongPath(path, PERLIN_OFFSET_SURFACE_TUNNEL)
     }
   }
 
@@ -1372,7 +1371,7 @@ class WorldCarver {
         : seededRNG.randomGetMinMax(200, 230)
       const radius = seededRNG.randomGetMinMax(8, 10)
       const path = this.pathTunnel(x, y, radius, segmentLength, angle, 10)
-      this.carveAlongPath(path)
+      this.carveAlongPath(path, PERLIN_OFFSET_SURFACE_TUNNEL)
 
       length += segmentLength
       x = path[path.length - 1].x
@@ -1397,7 +1396,7 @@ class WorldCarver {
       const length = seededRNG.randomGetMinMax(30, 50)
       const angle = seededRNG.randomGetMinMax(0, 360)
       const path = this.pathTunnel(cx, cy, radius, length, angle, 25)
-      this.carveAlongPath(path)
+      this.carveAlongPath(path, PERLIN_OFFSET_TUNNEL)
     }
   }
 
@@ -1418,7 +1417,7 @@ class WorldCarver {
       const length = seededRNG.randomGetMinMax(40, 60)
       const angle = seededRNG.randomGetMinMax(0, 360)
       const path = this.pathTunnel(cx, cy, radius, length, angle, 35)
-      this.carveAlongPath(path)
+      this.carveAlongPath(path, PERLIN_OFFSET_TUNNEL)
     }
   }
 
@@ -1437,7 +1436,7 @@ class WorldCarver {
       const angle = seededRNG.randomGetMinMax(0, 360)
       const radius = seededRNG.randomGetMinMax(2, 4)
       const path = this.pathTunnel(cx, cy, radius, length, angle, 40)
-      this.carveAlongPath(path)
+      this.carveAlongPath(path, PERLIN_OFFSET_SMALL_TUNNEL)
     }
   }
 
@@ -1496,8 +1495,8 @@ class WorldCarver {
       if (!valid) continue
 
       const tiles = []
-      this.digNoisyCircle(tiles, cx, cy, radius, radius + 4, NODES.HIVE.code)
-      this.digNoisyCircle(tiles, cx, cy, radius - 3, radius, NODES.VOID.code)
+      this.digNoisyCircle(tiles, cx, cy, radius, radius + 4, NODES.HIVE.code, 0.3, PERLIN_OFFSET_HIVE)
+      this.digNoisyCircle(tiles, cx, cy, radius - 3, radius, NODES.VOID.code, 0.3, PERLIN_OFFSET_HIVE)
       const rect = this.applyTiles(tiles)
 
       const path = this.pathTunnel(cx, cy, 4, length, angle, 10)
@@ -1544,7 +1543,7 @@ class WorldCarver {
       if (!valid) continue
 
       const tiles = []
-      this.digNoisyEllipse(tiles, cx, cy, radiusX - 2, radiusX + 2, radiusY - 2, radiusY + 2, NODES.VOID.code)
+      this.digNoisyEllipse(tiles, cx, cy, radiusX - 2, radiusX + 2, radiusY - 2, radiusY + 2, NODES.VOID.code, 0.3, PERLIN_OFFSET_COBWEB)
       const rect = this.applyTiles(tiles)
       this.addExclusion(rect)
 
@@ -1729,7 +1728,7 @@ class WorldCarver {
     const tiles = []
     for (let cx = 100; cx < WORLD_WIDTH - 100; cx += 60) {
       for (let cy = 100; cy < WORLD_HEIGHT - 100; cy += 40) {
-        this.digNoisyEllipse(tiles, cx, cy, 18, 22, 6, 10, code, 0.1)
+        this.digNoisyEllipse(tiles, cx, cy, 18, 22, 6, 10, code)
       }
     }
     this.applyTiles(tiles)

@@ -705,11 +705,11 @@ Génère des tunnels et des cavernes (tuiles VOID).
 | `initExclusions` | `(): void` | Réinitialise la liste interne des zones d'exclusion (#exclusions). À appeler depuis generate() avant le premier mini-biome. |
 | `addExclusion` | `(rect: {x1, y1, x2, y2}): void` | Ajoute un rectangle à la liste interne d'exclusion (#exclusions). À appeler explicitement après applyTiles() pour les mini-biomes uniquement. |
 | `isExcluded` | `(x1, y1, x2, y2: number): boolean` | Vérifie si un rectangle intersecte l'une des zones d'exclusion internes (#exclusions). Retourne true dès la première intersection trouvée. |
-| `digNoisyCircle` | `(tiles, cx, cy, radiusMin, radiusMax, code, frequency?): void` | Creuse un trou circulaire bruité (Perlin noise) - Peut générer des tuiles et des trous isolés - Pousse les tuiles directement dans `tiles` (pas de retour). |
-| `digNoisyEllipse` | `(tiles, cx, cy, radiusXMin, radiusXMax, radiusYMin, radiusYMax, code, frequency?): void` | Creuse un trou elliptique bruité (Perlin noise). Distance normalisée par les demi-axes — même algorithme que `digNoisyCircle`. Pousse les tuiles dans `tiles`. |
+| `digNoisyCircle` | `(tiles, cx, cy, radiusMin, radiusMax, code, frequency?, offsetX?: void` | Creuse un trou circulaire bruité (Perlin noise) - Peut générer des tuiles et des trous isolés - Pousse les tuiles directement dans `tiles` (pas de retour). |
+| `digNoisyEllipse` | `(tiles, cx, cy, radiusXMin, radiusXMax, radiusYMin, radiusYMax, code, frequency?, offsetX?): void` | Creuse un trou elliptique bruité (Perlin noise). Distance normalisée par les demi-axes — même algorithme que `digNoisyCircle`. Pousse les tuiles dans `tiles`. |
 | `applyTiles` | `(tiles: Array<{x, y, index, code}>): {x1, y1, x2, y2}` | Écrit les tuiles dans `worldBuffer` via `writeAt`. Ignore les tuiles hors bornes et protège `FOG`, `DEEPSEA`, `BASALT`, `LAVA`, `SKY`, `SEA` contre l'écrasement. Retourne le rectangle englobant des tuiles écrites. |
 | `pathTunnel` | `(x0, y0, radiusMax, maxLength, angle, deltaAngle): Array<{x, y, radiusMin, radiusMax}>` | Calcule le chemin d'un tunnel par accumulation angulaire. `angle` et `deltaAngle` en degrés. Longueur effective ~25% supérieure à `maxLength` (facteur 0.8). Utilitaire pur — ne creuse pas. |
-| `carveAlongPath` | `(path: Array<{x, y, radiusMin, radiusMax}>): void` | Creuse un tunnel le long d'un chemin `pathTunnel`. Accumule tous les cercles en un seul tableau avant `applyTiles`. |
+| `carveAlongPath` | `(path: Array<{x, y, radiusMin, radiusMax}>, offsetX?): void` | Creuse un tunnel le long d'un chemin `pathTunnel`. Accumule tous les cercles en un seul tableau avant `applyTiles`. |
 | `digSmallCaverns` | `(surfaceUnder: Int16Array): void` | Disperse `SMALL_CAVERNS_COUNT` cavernes rayon 3–12 (tiré par caverne) dans les zones underground et cavernes. Rayon effectif : `[radius-1, radius+1]`. Constante dans `data-gen.mjs`. |
 | `digZigzagTunnel` | `(skySurface: Int16Array): void` | Creuse `ZIGZAG_TUNNEL_COUNT` tunnels en zigzag depuis la surface. Chaque tunnel alterne des segments à ~135° et ~225° (±45° autour du bas). Rayon max 8. Longueur totale 200–250 tuiles, segments de 1/5 à 1/4 de la longueur totale. Accumule toutes les tuiles avant `applyTiles`. Constante dans `data-gen.mjs`. |
 | `digUndergroundTunnels` | `(surfaceUnder: Int16Array, underCaverns: Int16Array): void` | Creuse `UNDERGROUND_TUNNEL_COUNT` tunnels horizontaux avec un ou deux coudes en zone underground. Rayon 9, longueur 30–50, angle initial 0–360°, déviation 25°. Constante dans `data-gen.mjs`. |
@@ -718,6 +718,8 @@ Génère des tunnels et des cavernes (tuiles VOID).
 | `digHives` | `(biomeCounts: {forest, desert, jungle}, biomesDescription: Array<{biome, width, offset}>, surfaceUnder: Int16Array, underCaverns: Int16Array): void` | Creuse `hiveCount` ruches en zone JUNGLE (underground → caverns_top). Paroi HIVE (rayon+4) + intérieur VOID (rayon), galerie d'accès diagonale 45° ou -45°. Remplissage par HONEY différé. Constantes `HIVE_RADIUS_MIN/MAX` dans `data-gen.mjs`. Utilise `#isExcluded` et `#exclusions`. |
 | `digCobwebCaves` | `(underCaverns: Int16Array): Array<{cx, cy, radiusX, radiusY}>` | Creuse 4–8 cavernes elliptiques dans tous les biomes, cavern_top (75%) ou cavern_bottom (25%). COBWEB différé. Rectangle englobant enregistré dans #exclusions. Constantes dans `data-gen.mjs`. |
 | `cleanupAfterCarving` | `(): void` | Passe de nettoyage globale post-creusement. 7 règles in-place : propagation SKY, suppression tuiles isolées VOID/non-VOID (4-connexe et paires horizontales/verticales). Parcours séquentiel index croissant — cascade naturelle. |
+
+Le paramètre `offsetX` permet de décorrèler le bruit Perlin des autres usages.
 
 ---
 
