@@ -85,6 +85,8 @@ describe('WorldCarver — applyTiles() : tuiles hors bornes exclues du rectangle
   worldBuffer.clear()
 })
 
+
+
 // ─── pathTunnel ───────────────────────────────────────────────────────────────
 
 describe('WorldCarver — pathTunnel() : premier point = (x0, y0)', () => {
