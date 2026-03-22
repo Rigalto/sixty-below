@@ -168,7 +168,6 @@ export const ORE_GEM_SCATTER_MAP = {
   }
 }
 
-
 export const PERLIN_OFFSET_NATURALIZER = 100
 export const PERLIN_OFFSET_TUNNEL = 200
 export const PERLIN_OFFSET_SURFACE_TUNNEL = 300
@@ -191,3 +190,8 @@ export const COBWEB_RADIUS_X_MIN = 16
 export const COBWEB_RADIUS_X_MAX = 22
 export const COBWEB_RADIUS_Y_MIN = 8
 export const COBWEB_RADIUS_Y_MAX = 12
+
+export const GEODE_CAVE_COUNT_MIN = 3
+export const GEODE_CAVE_COUNT_MAX = 4
+export const GEODE_RADIUS_MIN = 8
+export const GEODE_RADIUS_MAX = 12

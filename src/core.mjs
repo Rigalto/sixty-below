@@ -162,6 +162,7 @@ class GameCore {
     buffManager.init()
     // hiveSystem.init(JSON.parse(state.hives)) // TODO
     // cobwebSystem.init(JSON.parse(state.cobwebcaves)) // TODO
+    // geodeSystem.init(JSON.parse(state.geodecaves)) // TODO
 
     // Les quatre lignes ci-dessous simulent le traitement du buffManager
     eventBus.emit('buff/display-next-weather', true)

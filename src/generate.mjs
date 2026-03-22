@@ -1,6 +1,6 @@
 import {seededRNG} from './utils.mjs'
 import {database} from './database.mjs'
-import {NODES, NODES_LOOKUP, NODE_TYPE, WEATHER_TYPE, BIOME_TYPE, WORLD_WIDTH, WORLD_HEIGHT, SEA_LEVEL, BIOME_TILE_MAP, SEA_MAX_JITTER, SEA_MAX_WIDTH, SEA_MAX_HEIGHT, CLUSTER_SCATTER_MAP, ORE_GEM_SCATTER_MAP, PERLIN_OFFSET_NATURALIZER, PERLIN_OFFSET_TUNNEL, PERLIN_OFFSET_SURFACE_TUNNEL, PERLIN_OFFSET_SMALL_TUNNEL, PERLIN_OFFSET_CAVERN, PERLIN_OFFSET_HIVE, PERLIN_OFFSET_COBWEB, SMALL_CAVERNS_COUNT, MEDIUM_CAVERNS_COUNT, UNDERGROUND_TUNNEL_COUNT, CAVERNS_TUNNEL_COUNT, SMALL_TUNNELS_COUNT, HIVE_RADIUS_MIN, HIVE_RADIUS_MAX, COBWEB_CAVE_COUNT_MIN, COBWEB_CAVE_COUNT_MAX, COBWEB_RADIUS_X_MIN, COBWEB_RADIUS_X_MAX, COBWEB_RADIUS_Y_MIN, COBWEB_RADIUS_Y_MAX} from '../assets/data/data-gen.mjs'
+import {NODES, NODES_LOOKUP, NODE_TYPE, WEATHER_TYPE, BIOME_TYPE, WORLD_WIDTH, WORLD_HEIGHT, SEA_LEVEL, BIOME_TILE_MAP, SEA_MAX_JITTER, SEA_MAX_WIDTH, SEA_MAX_HEIGHT, CLUSTER_SCATTER_MAP, ORE_GEM_SCATTER_MAP, PERLIN_OFFSET_NATURALIZER, PERLIN_OFFSET_TUNNEL, PERLIN_OFFSET_SURFACE_TUNNEL, PERLIN_OFFSET_SMALL_TUNNEL, PERLIN_OFFSET_CAVERN, PERLIN_OFFSET_HIVE, PERLIN_OFFSET_COBWEB, SMALL_CAVERNS_COUNT, MEDIUM_CAVERNS_COUNT, UNDERGROUND_TUNNEL_COUNT, CAVERNS_TUNNEL_COUNT, SMALL_TUNNELS_COUNT, HIVE_RADIUS_MIN, HIVE_RADIUS_MAX, COBWEB_CAVE_COUNT_MIN, COBWEB_CAVE_COUNT_MAX, COBWEB_RADIUS_X_MIN, COBWEB_RADIUS_X_MAX, COBWEB_RADIUS_Y_MIN, COBWEB_RADIUS_Y_MAX, GEODE_CAVE_COUNT_MIN, GEODE_CAVE_COUNT_MAX, GEODE_RADIUS_MIN, GEODE_RADIUS_MAX} from '../assets/data/data-gen.mjs'
 
 /* ====================================================================================================
    WORLD BUFFER (CREATION DU MONDE)
@@ -136,6 +136,17 @@ class WorldGenerator {
     const t0 = performance.now()
     console.log('[WorldGenerator] - Début avec la graine', seed)
 
+    // affichage de la progression de la création dans le dialogue modal
+    const STEPS = 10
+    let step = 0
+    const progress = (topic) => {
+      step++
+      window.dispatchEvent(new CustomEvent('world-generation-progress', {
+        detail: {passed: step, total: STEPS, topic}
+      }))
+      return new Promise(resolve => setTimeout(resolve, 0))
+    }
+
     // 0. Initialisation du buffer de génération
     worldBuffer.init()
 
@@ -145,30 +156,38 @@ class WorldGenerator {
     // 2. Génération des biomes (rectangles)
     const {biomesDescription, leftSeaWidth, rightSeaWidth, biomeCounts} = biomesGenerator.generate()
     console.log('[WorldGenerator::biomesDescription] - Biomes', biomesDescription, leftSeaWidth, rightSeaWidth, (performance.now() - t0).toFixed(3), 'ms')
+    await progress('Biome generation')
 
     // 3. Rafinement des biomes (Perlin + diffusion)
     const {skySurface, surfaceUnder, underCaverns} = biomeNaturalizer.naturalize(biomesDescription, leftSeaWidth, rightSeaWidth)
     console.log('[WorldGenerator::biomeNaturalizer] - Biomes', (performance.now() - t0).toFixed(3), 'ms')
+    await progress('Biome naturalization')
 
     // 4. Clusters de substrat
     clusterGenerator.addSubstratClusters(biomesDescription, skySurface, surfaceUnder, underCaverns)
     console.log('[WorldGenerator::clusterGenerator] - Substrat clusters', (performance.now() - t0).toFixed(3), 'ms')
+    await progress('Substrate placement')
 
     // 5. Clusters ore/gem
     clusterGenerator.addOreClusters(biomesDescription, skySurface, surfaceUnder, underCaverns)
     console.log('[WorldGenerator::clusterGenerator] - Ore/Gem clusters', (performance.now() - t0).toFixed(3), 'ms')
+    await progress('Ore & gem placement')
 
     // 6. Creusement (plus de creusement ensuite, ou alors très localisé) - TODO
 
     // 6.1 Creusement des tunnels et cavernes
     worldCarver.initExclusions()
     worldCarver.digSurfaceTunnel(skySurface)
-    worldCarver.digSmallCaverns(surfaceUnder)
     const zigzagCount = seededRNG.randomGetMinMax(2, 3)
     for (let i = 0; i < zigzagCount; i++) { worldCarver.digZigzagTunnel() }
+    await progress('Surface tunnels')
+    worldCarver.digSmallCaverns(surfaceUnder)
+    await progress('Caverns')
     worldCarver.digUndergroundTunnels(surfaceUnder, underCaverns)
     worldCarver.digCavernsTunnels(underCaverns)
+    await progress('Deep tunnels')
     worldCarver.digSmallTunnels(surfaceUnder)
+    await progress('Small tunnels')
 
     // A supprimer
     // worldCarver.debugTraceTunnel()
@@ -177,7 +196,13 @@ class WorldGenerator {
 
     // 6.3 Creusement des mini-biomes avec peuplement différé - TODO
     const hives = worldCarver.digHives(biomeCounts, biomesDescription, surfaceUnder, underCaverns)
+    await progress('Hives')
     const cobwebCaves = worldCarver.digCobwebCaves(underCaverns)
+    await progress('Cobweb caves')
+    const graniteCaves = worldCarver.digGeodeCaves(underCaverns, NODES.GRANITE.code)
+    const marbleCaves = worldCarver.digGeodeCaves(underCaverns, NODES.MARBLE.code)
+    const geodeCaves = graniteCaves.concat(marbleCaves)
+    await progress('Geode caves')
 
     // 7. Traitement des surfaces végétales + désert - TODO
 
@@ -207,7 +232,7 @@ class WorldGenerator {
 
     // N. Stochage du monde en base de données
     if (!debug) {
-      await this.save(seed, {hives, cobwebCaves})
+      await this.save(seed, {hives, cobwebCaves, geodeCaves})
       worldBuffer.clear()
     }
 
@@ -218,7 +243,7 @@ class WorldGenerator {
     if (debug) { return worldBuffer } // appelant responsable du clear()
   }
 
-  async save (seed, {hives, cobwebCaves}) {
+  async save (seed, {hives, cobwebCaves, geodeCaves}) {
     const start = window.performance.now()
     // 1. Sauvegarde des tuiles
     await database.clearObjectStore('world_chunks')
@@ -260,7 +285,8 @@ class WorldGenerator {
       {key: 'moonglowseeds', value: ''},
       {key: 'health', value: 100},
       {key: 'hives', value: JSON.stringify(hives)},
-      {key: 'cobwebcaves', value: JSON.stringify(cobwebCaves)}
+      {key: 'cobwebcaves', value: JSON.stringify(cobwebCaves)},
+      {key: 'geodecaves', value: JSON.stringify(geodeCaves)}
 
       // {key: 'honeysurface', value: this.honeysurface.join('|')}
     ])
@@ -1548,6 +1574,49 @@ class WorldCarver {
       this.addExclusion(rect)
 
       caves.push({cx, cy, radiusX, radiusY})
+    }
+
+    return caves
+  }
+
+  /**
+ * Creuse GEODE_CAVE_COUNT géodes elliptiques dans la zone cavern_bottom,
+ * tous biomes confondus. Chaque géode sera ensuite remplie de granite ou marbre
+ * par ClusterGenerator.projectAndFill().
+ * Le remplissage est effectué immédiatement après chaque creusement.
+ *
+ * @param {Int16Array} underCaverns - Altitudes haute caverne par colonne X
+ * @param {number}     code         - Code du matériau (GRANITE ou MARBLE)
+ * @returns {Array<{cx, cy, radiusX, radiusY, code}>}
+ */
+  digGeodeCaves (underCaverns, code) {
+    const count = seededRNG.randomGetMinMax(GEODE_CAVE_COUNT_MIN, GEODE_CAVE_COUNT_MAX)
+    const hellTop = WORLD_HEIGHT - 32
+    const MAX_ATTEMPTS = 100
+    const caves = []
+
+    for (let i = 0; i < count; i++) {
+      const radiusX = seededRNG.randomGetMinMax(GEODE_RADIUS_MIN, GEODE_RADIUS_MAX)
+      const radiusY = seededRNG.randomGetMinMax(GEODE_RADIUS_MIN, GEODE_RADIUS_MAX)
+
+      let cx, cy, valid
+      let attempts = 0
+      do {
+        cx = seededRNG.randomGetMinMax(radiusX, WORLD_WIDTH - radiusX - 1)
+        const cavernMid = (underCaverns[cx] + hellTop) >> 1
+        cy = seededRNG.randomGetMinMax(cavernMid + radiusY, hellTop - radiusY)
+
+        valid = !this.isExcluded(cx - radiusX, cy - radiusY, cx + radiusX, cy + radiusY)
+        attempts++
+      } while (!valid && attempts < MAX_ATTEMPTS)
+      if (!valid) continue
+
+      const tiles = []
+      this.digNoisyEllipse(tiles, cx, cy, radiusX - 2, radiusX + 2, radiusY - 2, radiusY + 2, NODES.VOID.code, 0.3, PERLIN_OFFSET_CAVERN)
+      const rect = this.applyTiles(tiles)
+      this.addExclusion(rect)
+
+      caves.push({cx, cy, radiusX, radiusY, code})
     }
 
     return caves

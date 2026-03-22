@@ -253,7 +253,52 @@ class CreationDialogOverlay {
     seedContainer.appendChild(seedLabel)
     seedContainer.appendChild(seedInput)
 
-    // 4. Boutons d'action
+    // 5. Bargraph de progression — masqué par défaut
+    const progressContainer = document.createElement('div')
+    Object.assign(progressContainer.style, {
+      position: 'relative',
+      height: '36px',
+      backgroundColor: '#111',
+      border: '1px solid #444',
+      borderRadius: '4px',
+      display: 'none',
+      overflow: 'hidden'
+    })
+
+    const progressBar = document.createElement('div')
+    Object.assign(progressBar.style, {
+      position: 'absolute',
+      top: '0',
+      left: '0',
+      height: '100%',
+      width: '0%',
+      backgroundColor: '#388e3c',
+      transition: 'width 0.1s ease',
+      borderRadius: '4px'
+    })
+
+    const progressTopic = document.createElement('div')
+    Object.assign(progressTopic.style, {
+      position: 'absolute',
+      top: '0',
+      left: '0',
+      width: '100%',
+      height: '100%',
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      fontSize: '12px',
+      color: '#fff',
+      textShadow: '0 0 4px #000, 0 0 4px #000',
+      fontFamily: 'monospace',
+      pointerEvents: 'none'
+    })
+
+    progressContainer.appendChild(progressBar)
+    progressContainer.appendChild(progressTopic)
+    content.appendChild(progressContainer)
+
+    // 6. Boutons d'action
     const createBtn = (text, icon, isActive) => {
       const btn = document.createElement('button')
       // Layout icône + texte
@@ -298,6 +343,9 @@ class CreationDialogOverlay {
     this.dom.btnGenerate = btnGenerate
     this.dom.btnBackup = btnBackup
     this.dom.btnRestore = btnRestore
+    this.dom.progressContainer = progressContainer
+    this.dom.progressBar = progressBar
+    this.dom.progressTopic = progressTopic
   }
 
   #bindEvents () {
@@ -316,6 +364,10 @@ class CreationDialogOverlay {
     eventBus.on('creation/close', () => {
       this.close()
     })
+
+    // Affichage de la progression de la création du monde
+    this.onProgress = this.onProgress.bind(this)
+    window.addEventListener('world-generation-progress', this.onProgress)
 
     // Les boutons grisés ne font rien (pas d'event listener)
   }
@@ -337,6 +389,7 @@ class CreationDialogOverlay {
     const seed = parseInt(this.dom.seedInput.value.trim(), 10) || seededRNG.randomGetMinMax(1, 99999)
     console.log(`[CreationDialog]: Request generation with seed [${seed}]`)
     this.state = STATE.CREATION
+    this.#showProgress()
 
     try {
       gameCore.stopSession()
@@ -347,7 +400,28 @@ class CreationDialogOverlay {
       eventBus.emit('overlay/close', 'creation')
     } catch (error) {
       console.error('[CreationDialogOverlay] Failed to load generator:', error)
+    } finally {
+      this.#hideProgress()
     }
+  }
+
+  onProgress (e) {
+    const {passed, total, topic} = e.detail
+    const pct = Math.round(passed / total * 100)
+    this.dom.progressBar.style.width = `${pct}%`
+    this.dom.progressTopic.textContent = `${topic} (${pct}%)`
+  }
+
+  #showProgress () {
+    this.dom.btnGenerate.style.display = 'none'
+    this.dom.progressBar.style.width = '0%'
+    this.dom.progressTopic.textContent = '0%'
+    this.dom.progressContainer.style.display = 'block'
+  }
+
+  #hideProgress () {
+    this.dom.progressContainer.style.display = 'none'
+    this.dom.btnGenerate.style.display = 'block'
   }
 }
 export const creationDialogOverlay = new CreationDialogOverlay()
