@@ -1021,7 +1021,7 @@ class ClusterGenerator {
    */
   scatterClusters (x0, y0, x1, y1, percent, code, sizeMin = 5, sizeMax = 8) {
     const surface = (x1 - x0) * (y1 - y0)
-    const count = Math.max(5, Math.round(surface * percent))
+    const count = Math.max(1, Math.round(surface * percent))
     const result = []
 
     for (let i = 0; i < count; i++) {
@@ -1119,7 +1119,8 @@ class ClusterGenerator {
    */
   #scatterLayer (x0, y0, x1, y1, entries, biome, layer) {
     for (const entry of entries) {
-      const tiles = this.scatterClusters(x0, y0, x1, y1, entry.percent, entry.code)
+      const tiles = this.scatterClusters(x0, y0, x1, y1, entry.percent, entry.code, entry.sizeMin, entry.sizeMax)
+
       this.applyTiles(tiles)
     }
   }
@@ -1157,11 +1158,13 @@ class ClusterGenerator {
       const yUnder = Math.round(sumUnder / width)
       const yCaverns = WORLD_HEIGHT - 1
       const yCavernsMid = (yUnder + yCaverns) >> 1
+      const yHell = WORLD_HEIGHT - 80
 
       this.#scatterLayer(x0, ySkySurface, x1, ySurface, map.surface, zone.biome, 'surface') // ← ajout
       this.#scatterLayer(x0, ySurface, x1, yUnder, map.under, zone.biome, 'under')
       this.#scatterLayer(x0, yUnder, x1, yCavernsMid, map.caverns_top, zone.biome, 'caverns_top')
       this.#scatterLayer(x0, yCavernsMid, x1, yCaverns, map.caverns_bottom, zone.biome, 'caverns_bottom')
+      this.#scatterLayer(x0, yHell, x1, yCaverns, map.hell, zone.biome, 'hell')
     }
   }
 

@@ -89,7 +89,7 @@ export const ORE_GEM_SCATTER_MAP = {
     under: [
       {code: NODES.COPPER.code, percent: 0.008, sizeMin: 4, sizeMax: 8},
       {code: NODES.IRON.code, percent: 0.004, sizeMin: 4, sizeMax: 8},
-      {code: NODES.SILVER.code, percent: 0.001, sizeMin: 3, sizeMax: 6} // pénalisé /2
+      {code: NODES.SILVER.code, percent: 0.0003, sizeMin: 3, sizeMax: 6} // pénalisé /2
     ],
     caverns_top: [
       {code: NODES.COPPER.code, percent: 0.004, sizeMin: 4, sizeMax: 8},
@@ -108,6 +108,9 @@ export const ORE_GEM_SCATTER_MAP = {
       {code: NODES.PLATINUM.code, percent: 0.004, sizeMin: 6, sizeMax: 12},
       {code: NODES.TOPAZ.code, percent: 0.002, sizeMin: 6, sizeMax: 12},
       {code: NODES.SAPPHIRE.code, percent: 0.003, sizeMin: 8, sizeMax: 16}
+    ],
+    hell: [
+      {code: NODES.OBSIDIAN.code, percent: 0.0002, sizeMin: 16, sizeMax: 36}
     ]
   },
   [BIOME_TYPE.DESERT]: {
@@ -136,6 +139,9 @@ export const ORE_GEM_SCATTER_MAP = {
       {code: NODES.PLATINUM.code, percent: 0.004, sizeMin: 6, sizeMax: 12},
       {code: NODES.RUBY.code, percent: 0.002, sizeMin: 6, sizeMax: 12},
       {code: NODES.SAPPHIRE.code, percent: 0.003, sizeMin: 8, sizeMax: 16}
+    ],
+    hell: [
+      {code: NODES.OBSIDIAN.code, percent: 0.0003, sizeMin: 20, sizeMax: 40}
     ]
   },
   [BIOME_TYPE.JUNGLE]: {
@@ -164,6 +170,9 @@ export const ORE_GEM_SCATTER_MAP = {
       {code: NODES.PLATINUM.code, percent: 0.004, sizeMin: 6, sizeMax: 12},
       {code: NODES.EMERALD.code, percent: 0.002, sizeMin: 6, sizeMax: 12},
       {code: NODES.SAPPHIRE.code, percent: 0.003, sizeMin: 8, sizeMax: 16}
+    ],
+    hell: [
+      {code: NODES.OBSIDIAN.code, percent: 0.0002, sizeMin: 18, sizeMax: 38}
     ]
   }
 }
