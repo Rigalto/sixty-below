@@ -195,3 +195,6 @@ export const GEODE_CAVE_COUNT_MIN = 3
 export const GEODE_CAVE_COUNT_MAX = 4
 export const GEODE_RADIUS_MIN = 8
 export const GEODE_RADIUS_MAX = 12
+export const GEODE_TARGET_CLUSTER_COUNT = 20
+export const GEODE_CLUSTER_SIZE_MIN = 4
+export const GEODE_CLUSTER_SIZE_MAX = 8

@@ -1,6 +1,6 @@
 import {seededRNG} from './utils.mjs'
 import {database} from './database.mjs'
-import {NODES, NODES_LOOKUP, NODE_TYPE, WEATHER_TYPE, BIOME_TYPE, WORLD_WIDTH, WORLD_HEIGHT, SEA_LEVEL, BIOME_TILE_MAP, SEA_MAX_JITTER, SEA_MAX_WIDTH, SEA_MAX_HEIGHT, CLUSTER_SCATTER_MAP, ORE_GEM_SCATTER_MAP, PERLIN_OFFSET_NATURALIZER, PERLIN_OFFSET_TUNNEL, PERLIN_OFFSET_SURFACE_TUNNEL, PERLIN_OFFSET_SMALL_TUNNEL, PERLIN_OFFSET_CAVERN, PERLIN_OFFSET_HIVE, PERLIN_OFFSET_COBWEB, SMALL_CAVERNS_COUNT, MEDIUM_CAVERNS_COUNT, UNDERGROUND_TUNNEL_COUNT, CAVERNS_TUNNEL_COUNT, SMALL_TUNNELS_COUNT, HIVE_RADIUS_MIN, HIVE_RADIUS_MAX, COBWEB_CAVE_COUNT_MIN, COBWEB_CAVE_COUNT_MAX, COBWEB_RADIUS_X_MIN, COBWEB_RADIUS_X_MAX, COBWEB_RADIUS_Y_MIN, COBWEB_RADIUS_Y_MAX, GEODE_CAVE_COUNT_MIN, GEODE_CAVE_COUNT_MAX, GEODE_RADIUS_MIN, GEODE_RADIUS_MAX} from '../assets/data/data-gen.mjs'
+import {NODES, NODES_LOOKUP, NODE_TYPE, WEATHER_TYPE, BIOME_TYPE, WORLD_WIDTH, WORLD_HEIGHT, SEA_LEVEL, BIOME_TILE_MAP, SEA_MAX_JITTER, SEA_MAX_WIDTH, SEA_MAX_HEIGHT, CLUSTER_SCATTER_MAP, ORE_GEM_SCATTER_MAP, PERLIN_OFFSET_NATURALIZER, PERLIN_OFFSET_TUNNEL, PERLIN_OFFSET_SURFACE_TUNNEL, PERLIN_OFFSET_SMALL_TUNNEL, PERLIN_OFFSET_CAVERN, PERLIN_OFFSET_HIVE, PERLIN_OFFSET_COBWEB, SMALL_CAVERNS_COUNT, MEDIUM_CAVERNS_COUNT, UNDERGROUND_TUNNEL_COUNT, CAVERNS_TUNNEL_COUNT, SMALL_TUNNELS_COUNT, HIVE_RADIUS_MIN, HIVE_RADIUS_MAX, COBWEB_CAVE_COUNT_MIN, COBWEB_CAVE_COUNT_MAX, COBWEB_RADIUS_X_MIN, COBWEB_RADIUS_X_MAX, COBWEB_RADIUS_Y_MIN, COBWEB_RADIUS_Y_MAX, GEODE_CAVE_COUNT_MIN, GEODE_CAVE_COUNT_MAX, GEODE_RADIUS_MIN, GEODE_RADIUS_MAX, GEODE_TARGET_CLUSTER_COUNT, GEODE_CLUSTER_SIZE_MIN, GEODE_CLUSTER_SIZE_MAX} from '../assets/data/data-gen.mjs'
 
 /* ====================================================================================================
    WORLD BUFFER (CREATION DU MONDE)
@@ -137,7 +137,7 @@ class WorldGenerator {
     console.log('[WorldGenerator] - Début avec la graine', seed)
 
     // affichage de la progression de la création dans le dialogue modal
-    const STEPS = 10
+    const STEPS = 12
     let step = 0
     const progress = (topic) => {
       step++
@@ -168,7 +168,7 @@ class WorldGenerator {
     console.log('[WorldGenerator::clusterGenerator] - Substrat clusters', (performance.now() - t0).toFixed(3), 'ms')
     await progress('Substrate placement')
 
-    // 5. Clusters ore/gem
+    // 5. Clusters ore/gem/obsidian (TODO : obsidian)
     clusterGenerator.addOreClusters(biomesDescription, skySurface, surfaceUnder, underCaverns)
     console.log('[WorldGenerator::clusterGenerator] - Ore/Gem clusters', (performance.now() - t0).toFixed(3), 'ms')
     await progress('Ore & gem placement')
@@ -177,13 +177,13 @@ class WorldGenerator {
 
     // 6.1 Creusement des tunnels et cavernes
     worldCarver.initExclusions()
-    worldCarver.digSurfaceTunnel(skySurface)
-    const zigzagCount = seededRNG.randomGetMinMax(2, 3)
-    for (let i = 0; i < zigzagCount; i++) { worldCarver.digZigzagTunnel() }
-    await progress('Surface tunnels')
-    worldCarver.digSmallCaverns(surfaceUnder)
-    await progress('Caverns')
-    worldCarver.digUndergroundTunnels(surfaceUnder, underCaverns)
+    // worldCarver.digSurfaceTunnel(skySurface)
+    // const zigzagCount = seededRNG.randomGetMinMax(2, 3)
+    // for (let i = 0; i < zigzagCount; i++) { worldCarver.digZigzagTunnel() }
+    // await progress('Surface tunnels')
+    // worldCarver.digSmallCaverns(surfaceUnder)
+    // await progress('Caverns')
+    // worldCarver.digUndergroundTunnels(surfaceUnder, underCaverns)
     worldCarver.digCavernsTunnels(underCaverns)
     await progress('Deep tunnels')
     worldCarver.digSmallTunnels(surfaceUnder)
@@ -215,6 +215,8 @@ class WorldGenerator {
     // N-7 Remplissage de la mer (gauche et droite)
     liquidFiller.fillSea()
     worldCarver.cleanupAfterCarving() // 85774
+    await progress('Carving Cleanup')
+
     console.log('[WorldGenerator::liquidFiller] - Sea', (performance.now() - t0).toFixed(3), 'ms')
 
     // N-6 Ajout de la plage (Shore) et du fond de la mer - TODO
@@ -222,6 +224,8 @@ class WorldGenerator {
     // N-5 Ajout des plantes et des coraux - TODO
 
     // N-4 Peuplement des biomes qui sont à peuplement différé - TODO
+
+    for (const cave of geodeCaves) { clusterGenerator.projectAndFill(cave) }
 
     // N-3. Ajout des coffres et objets spéciaux - TODO
 
@@ -894,6 +898,8 @@ class ClusterGenerator {
    * @returns {Array<{x: number, y: number, index: number, code: number}>}
    */
   randomWalkCluster (x0, y0, size, code) {
+    const GEODE_ALLOWED = NODE_TYPE.SUBSTRAT | NODE_TYPE.ORE | NODE_TYPE.GEM
+    const geode = code === NODES.MARBLE.code || code === NODES.GRANITE.code
     const chosen = new Set()
     const fringeSet = new Set()
     const fringeArr = []
@@ -909,6 +915,11 @@ class ClusterGenerator {
       fringeArr[idx] = fringeArr[fringeArr.length - 1]
       fringeArr.pop()
       fringeSet.delete(key)
+
+      if (geode) {
+        const node = NODES_LOOKUP[worldBuffer.readAt(key)]
+        if (!node || !(node.type & GEODE_ALLOWED)) continue
+      }
 
       chosen.add(key)
       this.#pushNeighbors(key & 0x3FF, key >> 10, chosen, fringeSet, fringeArr)
@@ -938,6 +949,60 @@ class ClusterGenerator {
       const k = (y << 10) | (x + 1)
       if (!chosen.has(k) && !fringeSet.has(k)) { fringeSet.add(k); fringeArr.push(k) }
     }
+  }
+
+  /**
+ * Cluster 4-connexe par diffusion aléatoire, contraint aux tuiles SUBSTRAT, ORE et GEM.
+ * Contourne les autres types (VOID, LIQUID, SKY, ETERNAL, etc.).
+ * Utilisé par projectAndFill pour les parois de géodes.
+ *
+ * @param {number} x0   - X de départ
+ * @param {number} y0   - Y de départ
+ * @param {number} size - Nombre de tuiles cible
+ * @param {number} code - Code du matériau (GRANITE ou MARBLE)
+ * @returns {Array<{x, y, index, code}>}
+ */
+  randomWalkGeodeCluster (x0, y0, size, code) {
+    const ALLOWED = NODE_TYPE.SUBSTRAT | NODE_TYPE.ORE | NODE_TYPE.GEM
+    const visited = new Set()
+    const frontier = []
+    const result = []
+
+    const startIndex = (y0 << 10) | x0
+    const startNode = NODES_LOOKUP[worldBuffer.readAt(startIndex)]
+    if (!startNode || !(startNode.type & ALLOWED)) return result
+
+    visited.add(startIndex)
+    frontier.push({x: x0, y: y0, index: startIndex})
+
+    while (result.length < size && frontier.length > 0) {
+      const pick = seededRNG.randomGetMinMax(0, frontier.length - 1)
+      const {x, y, index} = frontier[pick]
+      frontier[pick] = frontier[frontier.length - 1]
+      frontier.pop()
+
+      result.push({x, y, index, code})
+
+      const neighbors = [
+        {x, y: y - 1, index: ((y - 1) << 10) | x},
+        {x, y: y + 1, index: ((y + 1) << 10) | x},
+        {x: x - 1, y, index: (y << 10) | (x - 1)},
+        {x: x + 1, y, index: (y << 10) | (x + 1)}
+      ]
+
+      for (let i = 0; i < neighbors.length; i++) {
+        const n = neighbors[i]
+        if (n.x <= 1 || n.x >= WORLD_WIDTH - 2) continue
+        if (n.y <= 1 || n.y >= WORLD_HEIGHT - 2) continue
+        if (visited.has(n.index)) continue
+        const node = NODES_LOOKUP[worldBuffer.readAt(n.index)]
+        if (!node || !(node.type & ALLOWED)) continue
+        visited.add(n.index)
+        frontier.push(n)
+      }
+    }
+
+    return result
   }
 
   /**
@@ -1097,6 +1162,69 @@ class ClusterGenerator {
       this.#scatterLayer(x0, ySurface, x1, yUnder, map.under, zone.biome, 'under')
       this.#scatterLayer(x0, yUnder, x1, yCavernsMid, map.caverns_top, zone.biome, 'caverns_top')
       this.#scatterLayer(x0, yCavernsMid, x1, yCaverns, map.caverns_bottom, zone.biome, 'caverns_bottom')
+    }
+  }
+
+  /**
+ * Projette des lignes depuis le centre d'une géode et fait pousser des clusters
+ * de granite/marbre sur les parois rencontrées.
+ * S'arrête quand targetTileCount tuiles sont posées ou après MAX_PROJECTIONS tentatives.
+ *
+ * @param {number} cx         - Centre X de la géode
+ * @param {number} cy         - Centre Y de la géode
+ * @param {number} code       - Code du matériau (GRANITE ou MARBLE)
+ */
+  projectAndFill ({cx, cy, code}) {
+    const targetClusterCount = GEODE_TARGET_CLUSTER_COUNT
+    const MAX_PROJECTIONS = 100
+    const FRONTIER = new Set([
+      NODES.SKY.code,
+      NODES.FOG.code,
+      NODES.DEEPSEA.code,
+      NODES.BASALT.code,
+      NODES.LAVA.code
+    ])
+
+    let placed = 0
+    let projections = 0
+
+    while (placed < targetClusterCount && projections < MAX_PROJECTIONS) {
+      projections++
+
+      const angle = seededRNG.randomGetMinMax(0, 359) * Math.PI / 180
+      const dx = Math.cos(angle)
+      const dy = Math.sin(angle)
+
+      let x = cx
+      let y = cy
+      let found = false
+
+      while (true) {
+        x += dx
+        y += dy
+        const xi = Math.round(x)
+        const yi = Math.round(y)
+
+        if (xi < 0 || xi >= WORLD_WIDTH || yi < 0 || yi >= WORLD_HEIGHT) break
+
+        const tileCode = worldBuffer.read(xi, yi)
+
+        if (FRONTIER.has(tileCode)) break
+
+        const node = NODES_LOOKUP[tileCode]
+        if (node && (node.type & NODE_TYPE.SUBSTRAT)) {
+          found = true
+          x = xi
+          y = yi
+          break
+        }
+      }
+
+      if (!found) continue
+      const size = seededRNG.randomGetMinMax(GEODE_CLUSTER_SIZE_MIN, GEODE_CLUSTER_SIZE_MAX)
+      const cluster = this.randomWalkCluster(Math.round(x), Math.round(y), size, code)
+      this.applyTiles(cluster)
+      placed += 1
     }
   }
 }

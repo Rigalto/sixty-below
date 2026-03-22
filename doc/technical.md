@@ -691,6 +691,7 @@ puis appliqués en une passe dédiée.
 | `applyTiles` | `(tiles: Array<{x, y, index, code}>): void` | Écrit les tuiles dans `worldBuffer` via `writeAt`. Ignore les tuiles hors bornes et protège `FOG`, `DEEPSEA`, `BASALT`, `LAVA`, `SKY`, `VOID` contre l'écrasement. — à appeler avant le creusement. |
 | `addSubstratClusters` | `(biomesDescription, skySurface, surfaceUnder, underCaverns): void` | Parcourt les zones biome × layer (surface / under / caverns_top / caverns_bottom) et applique les clusters définis dans `CLUSTER_SCATTER_MAP`. Caverns découpée en deux moitiés. Appelle `scatterClusters` + `applyTiles`. |
 | `addOreClusters` | `(biomesDescription, surfaceUnder, underCaverns): void` | Parcourt les zones biome × layer (under / caverns_top / caverns_bottom) et applique les clusters ore/gem définis dans `ORE_GEM_SCATTER_MAP`. Pas de clusters en surface. |
+| `projectAndFill` | `({cx, cy, code}: {cx: number, cy: number, code: number}): void` | Projette jusqu'à 100 lignes depuis le centre d'une géode. Pose `GEODE_TARGET_CLUSTER_COUNT` clusters (taille 4–8) de `code` sur la première tuile SUBSTRAT rencontrée. Ignore SKY et ETERNAL. Constantes dans `data-gen.mjs`. |
 
 **Algorithme de randomWalkCluster :** frange maintenue en doublon `Set + Array` — déduplication O(1), tirage O(1) par swap-and-pop.
 
