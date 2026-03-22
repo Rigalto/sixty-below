@@ -109,7 +109,7 @@ export const NODES = {
 
   SHORE: {code: 70, name: 'Shore', color: '#FFCC00'},
   // types utilisés de manière temporaire pendant la création du monde
-  HEART: {code: 71, name: 'Life Heart', type: NODE_TYPE.CREATION, color: '#FF19CD'},
+  HEART: {code: 71, name: 'Life Heart', type: NODE_TYPE.CREATION, color: '#FF19CD'}
 }
 
 /** Lookup par code numérique — hot path render/physics */
