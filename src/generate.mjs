@@ -164,12 +164,13 @@ class WorldGenerator {
     await progress('Biome naturalization')
 
     // 4. Clusters de substrat
-    clusterGenerator.addSubstratClusters(biomesDescription, skySurface, surfaceUnder, underCaverns)
+    clusterGenerator.initZoneRects(biomesDescription, skySurface, surfaceUnder, underCaverns)
+    clusterGenerator.addSubstratClusters()
     console.log('[WorldGenerator::clusterGenerator] - Substrat clusters', (performance.now() - t0).toFixed(3), 'ms')
     await progress('Substrate placement')
 
     // 5. Clusters ore/gem/obsidian (TODO : obsidian)
-    clusterGenerator.addOreClusters(biomesDescription, skySurface, surfaceUnder, underCaverns)
+    clusterGenerator.addOreClusters()
     console.log('[WorldGenerator::clusterGenerator] - Ore/Gem clusters', (performance.now() - t0).toFixed(3), 'ms')
     await progress('Ore & gem placement')
 
@@ -1064,6 +1065,57 @@ class ClusterGenerator {
   }
 
   /**
+ * Pré-calcule les rectangles biome × layer pour toutes les fonctions de placement.
+ * Chaque zone biome est aplatie en frontières Y moyennes, ce qui permet
+ * à toutes les fonctions downstream de travailler avec de simples rectangles.
+ *
+ * @param {Array<{biome, width, offset}>} biomesDescription
+ * @param {Int16Array}                    skySurface
+ * @param {Int16Array}                    surfaceUnder
+ * @param {Int16Array}                    underCaverns
+ * @returns {Array<{
+ *   biome:        number,
+ *   x0:           number,
+ *   x1:           number,
+ *   ySkySurface:  number,
+ *   ySurface:     number,
+ *   yUnder:       number,
+ *   yCavernsMid:  number,
+ *   yCaverns:     number,
+ *   yHell:        number
+ * }>}
+ */
+  initZoneRects (biomesDescription, skySurface, surfaceUnder, underCaverns) {
+    const yCaverns = WORLD_HEIGHT - 1
+    const yHell = WORLD_HEIGHT - 80
+    const rects = []
+
+    for (let i = 0; i < biomesDescription.length; i++) {
+      const zone = biomesDescription[i]
+      const x0 = zone.offset
+      const x1 = zone.offset + zone.width - 1
+      const width = x1 - x0 + 1
+
+      let sumSky = 0
+      let sumSurface = 0
+      let sumUnder = 0
+      for (let x = x0; x <= x1; x++) {
+        sumSky += skySurface[x]
+        sumSurface += surfaceUnder[x]
+        sumUnder += underCaverns[x]
+      }
+
+      const ySkySurface = Math.round(sumSky / width)
+      const ySurface = Math.round(sumSurface / width)
+      const yUnder = Math.round(sumUnder / width)
+      const yCavernsMid = (yUnder + yCaverns) >> 1
+
+      rects.push({biome: zone.biome, x0, x1, ySkySurface, ySurface, yUnder, yCavernsMid, yCaverns, yHell})
+    }
+    this.zoneRects = rects
+  }
+
+  /**
    * Parcourt tous les rectangles biome × layer et applique les clusters
    * de substrat définis dans CLUSTER_SCATTER_MAP.
    * La layer caverns est découpée en deux moitiés verticales (top/bottom).
@@ -1075,38 +1127,14 @@ class ClusterGenerator {
    * @param {Int16Array}                             surfaceUnder        - Frontière surface/under
    * @param {Int16Array}                             underCaverns        - Frontière under/caverns
    */
-  addSubstratClusters (biomesDescription, skySurface, surfaceUnder, underCaverns) {
-    for (const zone of biomesDescription) {
-      const map = CLUSTER_SCATTER_MAP[zone.biome]
+  addSubstratClusters () {
+    for (const rect of this.zoneRects) {
+      const map = CLUSTER_SCATTER_MAP[rect.biome]
       if (!map) continue
-
-      const x0 = zone.offset
-      const x1 = zone.offset + zone.width - 1
-
-      // Y moyen de chaque frontière sur la largeur de la zone — approx. pour les rectangles
-      let sumSkySurface = 0
-      let sumSurface = 0
-      let sumUnder = 0
-      for (let x = x0; x <= x1; x++) {
-        sumSkySurface += skySurface[x] // ← ajout
-        sumSurface += surfaceUnder[x]
-        sumUnder += underCaverns[x]
-      }
-      const width = x1 - x0 + 1
-      const ySkySurface = Math.round(sumSkySurface / width) // ← ajout
-      const ySurface = Math.round(sumSurface / width)
-      const yUnder = Math.round(sumUnder / width)
-      const yCaverns = WORLD_HEIGHT - 2
-      const yCavernsMid = (yUnder + yCaverns) >> 1
-
-      // surface
-      this.#scatterLayer(x0, ySkySurface, x1, ySurface, map.surface, zone.biome, 'surface') // ← corrigé
-      // under
-      this.#scatterLayer(x0, ySurface, x1, yUnder, map.under, zone.biome, 'under')
-      // caverns_top
-      this.#scatterLayer(x0, yUnder, x1, yCavernsMid, map.caverns_top, zone.biome, 'caverns_top')
-      // caverns_bottom
-      this.#scatterLayer(x0, yCavernsMid, x1, yCaverns, map.caverns_bottom, zone.biome, 'caverns_bottom')
+      this.#scatterLayer(rect.x0, rect.ySkySurface, rect.x1, rect.ySurface, map.surface, rect.biome, 'surface')
+      this.#scatterLayer(rect.x0, rect.ySurface, rect.x1, rect.yUnder, map.under, rect.biome, 'under')
+      this.#scatterLayer(rect.x0, rect.yUnder, rect.x1, rect.yCavernsMid, map.caverns_top, rect.biome, 'caverns_top')
+      this.#scatterLayer(rect.x0, rect.yCavernsMid, rect.x1, rect.yCaverns, map.caverns_bottom, rect.biome, 'caverns_bottom')
     }
   }
 
@@ -1135,36 +1163,128 @@ class ClusterGenerator {
    * @param {Int16Array}                    surfaceUnder   - Frontière surface/under
    * @param {Int16Array}                    underCaverns   - Frontière under/caverns
    */
-  addOreClusters (biomesDescription, skySurface, surfaceUnder, underCaverns) {
-    for (const zone of biomesDescription) {
-      const map = ORE_GEM_SCATTER_MAP[zone.biome]
+  addOreClusters () {
+    for (const rect of this.zoneRects) {
+      const map = ORE_GEM_SCATTER_MAP[rect.biome]
       if (!map) continue
+      this.#scatterLayer(rect.x0, rect.ySkySurface, rect.x1, rect.ySurface, map.surface, rect.biome, 'surface')
+      this.#scatterLayer(rect.x0, rect.ySurface, rect.x1, rect.yUnder, map.under, rect.biome, 'under')
+      this.#scatterLayer(rect.x0, rect.yUnder, rect.x1, rect.yCavernsMid, map.caverns_top, rect.biome, 'caverns_top')
+      this.#scatterLayer(rect.x0, rect.yCavernsMid, rect.x1, rect.yCaverns, map.caverns_bottom, rect.biome, 'caverns_bottom')
+      this.#scatterLayer(rect.x0, rect.yHell, rect.x1, rect.yCaverns, map.hell, rect.biome, 'hell')
+    }
+  }
 
+  /**
+ * Place des clusters de gemmes hors de leur biome/layer natif (intrusions géologiques).
+ *
+ * Règles :
+ *   - SAPPHIRE   : 1 cluster systématique en caverns_top, biome aléatoire
+ *   - TOPAZ      : 1 chance/3 → caverns_top, biome étranger aléatoire
+ *   - RUBY       : 1 chance/3 → caverns_top ou caverns_bottom, biome étranger aléatoire
+ *   - EMERALD    : 1 chance/3 → caverns_top ou caverns_bottom, biome étranger aléatoire
+ *   - Bonus under: 1 monde/4 → under, 1 gemme et 1 biome aléatoires
+ *
+ * @param {Array<{biome, width, offset}>} biomesDescription
+ * @param {Int16Array}                    surfaceUnder
+ * @param {Int16Array}                    underCaverns
+ */
+  addGemIntrusions (biomesDescription, surfaceUnder, underCaverns) {
+  // ── Pré-calcul des rectangles par biome ──────────────────────────────────
+  // Pour chaque zone : {biome, x0, x1, yUnder, yCavernsMid, yCaverns}
+    const zones = []
+    const yCaverns = WORLD_HEIGHT - 1
+    for (let i = 0; i < biomesDescription.length; i++) {
+      const zone = biomesDescription[i]
       const x0 = zone.offset
       const x1 = zone.offset + zone.width - 1
-
-      let sumSkySurface = 0
       let sumSurface = 0
       let sumUnder = 0
       for (let x = x0; x <= x1; x++) {
-        sumSkySurface += skySurface[x]
         sumSurface += surfaceUnder[x]
         sumUnder += underCaverns[x]
       }
       const width = x1 - x0 + 1
-      const ySkySurface = Math.round(sumSkySurface / width) // ← ajout
+      const yUnder = Math.round(sumSurface / width)
+      const yUndertop = Math.round(sumUnder / width)
+      const yCavernsMid = (yUndertop + yCaverns) >> 1
+      zones.push({biome: zone.biome, x0, x1, yUnder, yUndertop, yCavernsMid})
+    }
 
-      const ySurface = Math.round(sumSurface / width)
-      const yUnder = Math.round(sumUnder / width)
-      const yCaverns = WORLD_HEIGHT - 1
-      const yCavernsMid = (yUnder + yCaverns) >> 1
-      const yHell = WORLD_HEIGHT - 80
+    // ── Helpers ──────────────────────────────────────────────────────────────
+    // Retourne les sizes d'une gemme depuis ORE_GEM_SCATTER_MAP (caverns_top comme référence)
+    const getSizes = (biome, code) => {
+      const entries = ORE_GEM_SCATTER_MAP[biome]?.caverns_top
+      if (!entries) return {sizeMin: 6, sizeMax: 12}
+      for (let i = 0; i < entries.length; i++) {
+        if (entries[i].code === code) return {sizeMin: entries[i].sizeMin, sizeMax: entries[i].sizeMax}
+      }
+      return {sizeMin: 6, sizeMax: 12}
+    }
 
-      this.#scatterLayer(x0, ySkySurface, x1, ySurface, map.surface, zone.biome, 'surface') // ← ajout
-      this.#scatterLayer(x0, ySurface, x1, yUnder, map.under, zone.biome, 'under')
-      this.#scatterLayer(x0, yUnder, x1, yCavernsMid, map.caverns_top, zone.biome, 'caverns_top')
-      this.#scatterLayer(x0, yCavernsMid, x1, yCaverns, map.caverns_bottom, zone.biome, 'caverns_bottom')
-      this.#scatterLayer(x0, yHell, x1, yCaverns, map.hell, zone.biome, 'hell')
+    // Place un cluster dans une zone rectangle défini par x0/x1/y0/y1
+    const placeOne = (x0, x1, y0, y1, code, sizeMin, sizeMax) => {
+      const x = seededRNG.randomGetMinMax(x0, x1)
+      const y = seededRNG.randomGetMinMax(y0, y1)
+      const size = seededRNG.randomGetMinMax(sizeMin, sizeMax)
+      const cluster = this.randomWalkCluster(x, y, size, code)
+      this.applyTiles(cluster)
+    }
+
+    // Retourne les zones étrangères à un biome donné
+    const foreignZones = (nativeBiome) => {
+      const result = []
+      for (let i = 0; i < zones.length; i++) {
+        if (zones[i].biome !== nativeBiome) result.push(zones[i])
+      }
+      return result
+    }
+
+    // ── SAPPHIRE — caverns_top, biome aléatoire ───────────────────────────────
+    {
+      const zone = zones[seededRNG.randomGetMinMax(0, zones.length - 1)]
+      const {sizeMin, sizeMax} = getSizes(BIOME_TYPE.FOREST, NODES.SAPPHIRE.code) // FOREST = référence (tous biomes)
+      placeOne(zone.x0, zone.x1, zone.yUndertop, zone.yCavernsMid, NODES.SAPPHIRE.code, sizeMin, sizeMax)
+    }
+
+    // ── TOPAZ — caverns_top, biome étranger, 1 chance sur 3 ──────────────────
+    if (seededRNG.randomGetMinMax(0, 2) === 0) {
+      const foreign = foreignZones(BIOME_TYPE.FOREST)
+      const zone = foreign[seededRNG.randomGetMinMax(0, foreign.length - 1)]
+      const {sizeMin, sizeMax} = getSizes(BIOME_TYPE.FOREST, NODES.TOPAZ.code)
+      placeOne(zone.x0, zone.x1, zone.yUndertop, zone.yCavernsMid, NODES.TOPAZ.code, sizeMin, sizeMax)
+    }
+
+    // ── RUBY — caverns_top ou caverns_bottom, biome étranger, 1 chance sur 3 ─
+    if (seededRNG.randomGetMinMax(0, 2) === 0) {
+      const foreign = foreignZones(BIOME_TYPE.DESERT)
+      const zone = foreign[seededRNG.randomGetMinMax(0, foreign.length - 1)]
+      const {sizeMin, sizeMax} = getSizes(BIOME_TYPE.DESERT, NODES.RUBY.code)
+      const inTop = seededRNG.randomGetMinMax(0, 1) === 0
+      const y0 = inTop ? zone.yUndertop : zone.yCavernsMid
+      const y1 = inTop ? zone.yCavernsMid : WORLD_HEIGHT - 1
+      placeOne(zone.x0, zone.x1, y0, y1, NODES.RUBY.code, sizeMin, sizeMax)
+    }
+
+    // ── EMERALD — caverns_top ou caverns_bottom, biome étranger, 1 chance sur 3
+    if (seededRNG.randomGetMinMax(0, 2) === 0) {
+      const foreign = foreignZones(BIOME_TYPE.JUNGLE)
+      const zone = foreign[seededRNG.randomGetMinMax(0, foreign.length - 1)]
+      const {sizeMin, sizeMax} = getSizes(BIOME_TYPE.JUNGLE, NODES.EMERALD.code)
+      const inTop = seededRNG.randomGetMinMax(0, 1) === 0
+      const y0 = inTop ? zone.yUndertop : zone.yCavernsMid
+      const y1 = inTop ? zone.yCavernsMid : WORLD_HEIGHT - 1
+      placeOne(zone.x0, zone.x1, y0, y1, NODES.EMERALD.code, sizeMin, sizeMax)
+    }
+
+    // ── Bonus under — 1 monde sur 4, 1 gemme au hasard, 1 biome au hasard ────
+    if (seededRNG.randomGetMinMax(0, 3) === 0) {
+      const gemCodes = [NODES.TOPAZ.code, NODES.RUBY.code, NODES.EMERALD.code, NODES.SAPPHIRE.code]
+      const code = gemCodes[seededRNG.randomGetMinMax(0, 3)]
+      const zone = zones[seededRNG.randomGetMinMax(0, zones.length - 1)]
+      // under : entre yUnder (frontière surface/under) et yUndertop (frontière under/caverns)
+      const {sizeMin, sizeMax} = getSizes(BIOME_TYPE.FOREST, code)
+      placeOne(zone.x0, zone.x1, zone.yUnder, zone.yUndertop, code, sizeMin, sizeMax)
     }
   }
 

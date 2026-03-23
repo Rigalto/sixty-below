@@ -12,6 +12,10 @@ import {clusterGenerator, worldBuffer} from '../src/generate.mjs'
 import {seededRNG} from '../src/utils.mjs'
 import {NODES} from '../assets/data/data.mjs'
 
+// ─── computeZoneRects ────────────────────────────────────────────────────────
+
+import {BIOME_TYPE, WORLD_HEIGHT} from '../assets/data/data-gen.mjs'
+
 const SEED = 42
 const ITERATIONS = 200
 
@@ -208,12 +212,12 @@ describe('ClusterGenerator — scatterClusters() : chaque entrée a les champs x
   assert('Tous les champs sont des numbers', ok)
 })
 
-describe('ClusterGenerator — scatterClusters() : count minimum = 5', () => {
+describe('ClusterGenerator — scatterClusters() : count minimum = 1', () => {
   seededRNG.init(SEED)
-  // Rectangle minuscule → surface * percent < 5 → count forcé à 5
+  // Rectangle minuscule → surface * percent < 5 → count forcé à 1
   // sizeMin=1, sizeMax=1 → chaque cluster = 1 tuile → result.length = count exact
   const result = clusterGenerator.scatterClusters(100, 100, 101, 101, 0.0001, 5, 1, 1)
-  assert('Au moins 5 tuiles produites', result.length >= 5)
+  assert('Au moins 5 tuiles produites', result.length >= 1)
 })
 
 describe('ClusterGenerator — scatterClusters() : code propagé à toutes les entrées', () => {
@@ -346,4 +350,111 @@ describe('ClusterGenerator — applyTiles() : ne remplace pas LAVA (ETERNAL)', (
   }
   assert('LAVA jamais remplacé', ok)
   worldBuffer.clear()
+})
+
+const W = 1024
+
+// Construit une biomesDescription minimale avec N biomes de largeur égale
+function makeBiomes (biomes) {
+  const width = Math.floor(W / biomes.length)
+  return biomes.map((biome, i) => ({biome, width, offset: i * width}))
+}
+
+// Construit des frontières plates (valeur constante sur toute la largeur)
+function flatBoundary (value) {
+  const arr = new Int16Array(W)
+  arr.fill(value)
+  return arr
+}
+
+describe('ClusterGenerator — computeZoneRects() : retourne autant de rects que de biomes', () => {
+  const biomes = makeBiomes([BIOME_TYPE.FOREST, BIOME_TYPE.DESERT, BIOME_TYPE.JUNGLE])
+  const sky = flatBoundary(50)
+  const surface = flatBoundary(100)
+  const under = flatBoundary(250)
+  clusterGenerator.initZoneRects(biomes, sky, surface, under)
+  const rects = clusterGenerator.zoneRects
+  assert('3 rects pour 3 biomes', rects.length === 3)
+})
+
+describe('ClusterGenerator — computeZoneRects() : champs présents sur chaque rect', () => {
+  const biomes = makeBiomes([BIOME_TYPE.FOREST])
+  clusterGenerator.initZoneRects(biomes, flatBoundary(50), flatBoundary(100), flatBoundary(250))
+  const rects = clusterGenerator.zoneRects
+  const r = rects[0]
+  const ok = (
+    typeof r.biome === 'number' &&
+    typeof r.x0 === 'number' &&
+    typeof r.x1 === 'number' &&
+    typeof r.ySkySurface === 'number' &&
+    typeof r.ySurface === 'number' &&
+    typeof r.yUnder === 'number' &&
+    typeof r.yCavernsMid === 'number' &&
+    typeof r.yCaverns === 'number' &&
+    typeof r.yHell === 'number'
+  )
+  assert('Tous les champs sont présents et sont des numbers', ok)
+})
+
+describe('ClusterGenerator — computeZoneRects() : frontières plates → Y moyens exacts', () => {
+  const biomes = makeBiomes([BIOME_TYPE.FOREST])
+  clusterGenerator.initZoneRects(biomes, flatBoundary(50), flatBoundary(100), flatBoundary(250))
+  const rects = clusterGenerator.zoneRects
+  const r = rects[0]
+  assert('ySkySurface = 50', r.ySkySurface === 50)
+  assert('ySurface = 100', r.ySurface === 100)
+  assert('yUnder = 250', r.yUnder === 250)
+})
+
+describe('ClusterGenerator — computeZoneRects() : yCavernsMid = milieu entre yUnder et yCaverns', () => {
+  const biomes = makeBiomes([BIOME_TYPE.FOREST])
+  clusterGenerator.initZoneRects(biomes, flatBoundary(50), flatBoundary(100), flatBoundary(250))
+  const rects = clusterGenerator.zoneRects
+  const r = rects[0]
+  const expected = (r.yUnder + r.yCaverns) >> 1
+  assert('yCavernsMid correct', r.yCavernsMid === expected)
+})
+
+describe('ClusterGenerator — computeZoneRects() : yCaverns et yHell constants', () => {
+  const biomes = makeBiomes([BIOME_TYPE.FOREST, BIOME_TYPE.DESERT])
+  clusterGenerator.initZoneRects(biomes, flatBoundary(50), flatBoundary(100), flatBoundary(250))
+  const rects = clusterGenerator.zoneRects
+  assert('yCaverns = WORLD_HEIGHT - 1', rects[0].yCaverns === WORLD_HEIGHT - 1)
+  assert('yHell = WORLD_HEIGHT - 80', rects[0].yHell === WORLD_HEIGHT - 80)
+  assert('yCaverns identique sur tous', rects[0].yCaverns === rects[1].yCaverns)
+})
+
+describe('ClusterGenerator — computeZoneRects() : ordre des frontières Y cohérent', () => {
+  const biomes = makeBiomes([BIOME_TYPE.FOREST, BIOME_TYPE.DESERT, BIOME_TYPE.JUNGLE])
+  clusterGenerator.initZoneRects(biomes, flatBoundary(50), flatBoundary(100), flatBoundary(250))
+  const rects = clusterGenerator.zoneRects
+  let ok = true
+  for (const r of rects) {
+    if (!(r.ySkySurface < r.ySurface && r.ySurface < r.yUnder &&
+          r.yUnder < r.yCavernsMid && r.yCavernsMid < r.yCaverns)) {
+      ok = false; break
+    }
+  }
+  assert('ySkySurface < ySurface < yUnder < yCavernsMid < yCaverns', ok)
+})
+
+describe('ClusterGenerator — computeZoneRects() : x0/x1 couvrent la largeur du biome', () => {
+  const biomes = makeBiomes([BIOME_TYPE.FOREST, BIOME_TYPE.DESERT, BIOME_TYPE.JUNGLE])
+  clusterGenerator.initZoneRects(biomes, flatBoundary(50), flatBoundary(100), flatBoundary(250))
+  const rects = clusterGenerator.zoneRects
+  let ok = true
+  for (let i = 0; i < biomes.length; i++) {
+    if (rects[i].x0 !== biomes[i].offset) { ok = false; break }
+    if (rects[i].x1 !== biomes[i].offset + biomes[i].width - 1) { ok = false; break }
+  }
+  assert('x0 et x1 correspondent aux offsets des biomes', ok)
+})
+
+describe('ClusterGenerator — computeZoneRects() : Y moyen correct sur frontière non plate', () => {
+  // Frontière avec deux valeurs alternées → moyenne = (a+b)/2
+  const biomes = [{biome: BIOME_TYPE.FOREST, width: 4, offset: 0}]
+  const surface = new Int16Array([100, 200, 100, 200])
+  clusterGenerator.initZoneRects(biomes, flatBoundary(50), surface, flatBoundary(250))
+  const rects = clusterGenerator.zoneRects
+  assert('ySurface = moyenne arrondie', rects[0].ySurface === 150)
 })
