@@ -691,6 +691,9 @@ puis appliqués en une passe dédiée.
 | `applyTiles` | `(tiles: Array<{x, y, index, code}>): void` | Écrit les tuiles dans `worldBuffer` via `writeAt`. Ignore les tuiles hors bornes et protège `FOG`, `DEEPSEA`, `BASALT`, `LAVA`, `SKY`, `VOID` contre l'écrasement. — à appeler avant le creusement. |
 | `initZoneRects(biomesDescription, skySurface, surfaceUnder, underCaverns)` | Initialise `this.zoneRects`. Pré-calcule les rectangles biome × layer (Y moyens aplatis). À appeler une fois dans `generate()` avant tout placement. |
 | `zoneRects` | `Array<{biome, x0, x1, ySkySurface, ySurface, yUnder, yCavernsMid, yCaverns, yHell}>` | Résultat de `initZoneRects`. Consommé par toutes les fonctions de placement. |
+| `#getClusterSizes(biome, layer, code)` | Lit `sizeMin/sizeMax` depuis `ORE_GEM_SCATTER_MAP[biome][layer]` pour le code donné. Fallback `{6, 12}`. |
+| `#placeOneCluster(x0, x1, y0, y1, code, sizeMin, sizeMax)` | Place un unique cluster à position aléatoire dans le rectangle. |
+| `#getForeignZones(nativeBiome)` | Retourne les `zoneRects` dont le biome diffère de `nativeBiome`. |
 | `addSubstratClusters` | `(biomesDescription, skySurface, surfaceUnder, underCaverns): void` | Parcourt les zones biome × layer (surface / under / caverns_top / caverns_bottom) et applique les clusters définis dans `CLUSTER_SCATTER_MAP`. Caverns découpée en deux moitiés. Appelle `scatterClusters` + `applyTiles`. |
 | `addOreClusters` | `(biomesDescription, surfaceUnder, underCaverns): void` | Parcourt les zones biome × layer (under / caverns_top / caverns_bottom) et applique les clusters ore/gem/rock définis dans `ORE_GEM_SCATTER_MAP`. Pas de clusters en surface. |
 | `addGemIntrusions()` | Place des clusters de gemmes et d'obsidian hors de leur biome/layer natif. SAPPHIRE systématique en caverns_top ; TOPAZ/RUBY/EMERALD en biome étranger ; OBSIDIAN dans caverns (hors hell) ; bonus under. Prérequis : `initZoneRects()`. |

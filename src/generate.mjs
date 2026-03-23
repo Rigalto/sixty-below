@@ -1117,6 +1117,54 @@ class ClusterGenerator {
   }
 
   /**
+ * Retourne les tailles d'un cluster depuis ORE_GEM_SCATTER_MAP.
+ * @param {number} biome  - Biome de référence (ex: BIOME_TYPE.FOREST)
+ * @param {string} layer  - Layer de référence (ex: 'caverns_top')
+ * @param {number} code   - Code du node cherché
+ * @returns {{sizeMin: number, sizeMax: number}}
+ */
+  #getClusterSizes (biome, layer, code) {
+    const entries = ORE_GEM_SCATTER_MAP[biome]?.[layer]
+    if (entries) {
+      for (let i = 0; i < entries.length; i++) {
+        if (entries[i].code === code) return {sizeMin: entries[i].sizeMin, sizeMax: entries[i].sizeMax}
+      }
+    }
+    return {sizeMin: 6, sizeMax: 12}
+  }
+
+  /**
+ * Place un unique cluster à une position aléatoire dans le rectangle donné.
+ * @param {number} x0
+ * @param {number} x1
+ * @param {number} y0
+ * @param {number} y1
+ * @param {number} code
+ * @param {number} sizeMin
+ * @param {number} sizeMax
+ */
+  #placeOneCluster (x0, x1, y0, y1, code, sizeMin, sizeMax) {
+    const x = seededRNG.randomGetMinMax(x0, x1)
+    const y = seededRNG.randomGetMinMax(y0, y1)
+    const size = seededRNG.randomGetMinMax(sizeMin, sizeMax)
+    this.applyTiles(this.randomWalkCluster(x, y, size, code))
+    console.log(`[GemIntrusion] ${code} — x:${x} y:${y} size:${size}`)
+  }
+
+  /**
+ * Retourne les zones dont le biome est différent de nativeBiome.
+ * @param {number} nativeBiome
+ * @returns {Array}
+ */
+  #getForeignZones (nativeBiome) {
+    const result = []
+    for (let i = 0; i < this.zoneRects.length; i++) {
+      if (this.zoneRects[i].biome !== nativeBiome) result.push(this.zoneRects[i])
+    }
+    return result
+  }
+
+  /**
    * Parcourt tous les rectangles biome × layer et applique les clusters
    * de substrat définis dans CLUSTER_SCATTER_MAP.
    * La layer caverns est découpée en deux moitiés verticales (top/bottom).
@@ -1190,71 +1238,38 @@ class ClusterGenerator {
  * Prérequis : this.zoneRects initialisé par initZoneRects()
  */
   addGemIntrusions () {
-  // ── Méthodes privées réutilisables (à promouvoir en méthodes de classe) ──
-
-    // Place un unique cluster à une position aléatoire dans le rectangle donné
-    const placeOne = (x0, x1, y0, y1, code, sizeMin, sizeMax) => {
-      const x = seededRNG.randomGetMinMax(x0, x1)
-      const y = seededRNG.randomGetMinMax(y0, y1)
-      const size = seededRNG.randomGetMinMax(sizeMin, sizeMax)
-      console.log(`[GemIntrusion] ${code} — x:${x} y:${y} size:${size}`)
-
-      code = NODES.LAVA.code
-      this.applyTiles(this.randomWalkCluster(x, y, size, code))
-    }
-
-    // Retourne les sizes d'une gemme depuis ORE_GEM_SCATTER_MAP (caverns_top comme référence)
-    const getSizes = (biome, code) => {
-      const entries = ORE_GEM_SCATTER_MAP[biome]?.caverns_top
-      if (entries) {
-        for (let i = 0; i < entries.length; i++) {
-          if (entries[i].code === code) return {sizeMin: entries[i].sizeMin, sizeMax: entries[i].sizeMax}
-        }
-      }
-      return {sizeMin: 6, sizeMax: 12}
-    }
-
-    // Retourne les zones dont le biome est différent de nativeBiome
-    const foreignZones = (nativeBiome) => {
-      const result = []
-      for (let i = 0; i < this.zoneRects.length; i++) {
-        if (this.zoneRects[i].biome !== nativeBiome) result.push(this.zoneRects[i])
-      }
-      return result
-    }
-
     // ── SAPPHIRE — caverns_top, biome aléatoire ───────────────────────────────
     {
       const zone = seededRNG.randomGetArrayValue(this.zoneRects)
-      const {sizeMin, sizeMax} = getSizes(BIOME_TYPE.FOREST, NODES.SAPPHIRE.code)
-      placeOne(zone.x0, zone.x1, zone.yUnder, zone.yCavernsMid, NODES.SAPPHIRE.code, sizeMin, sizeMax)
+      const {sizeMin, sizeMax} = this.#getClusterSizes(BIOME_TYPE.FOREST, NODES.SAPPHIRE.code)
+      this.#placeOneCluster(zone.x0, zone.x1, zone.yUnder, zone.yCavernsMid, NODES.SAPPHIRE.code, sizeMin, sizeMax)
     }
 
     // ── TOPAZ — caverns_top, biome étranger, 1 chance sur 3 ──────────────────
     if (seededRNG.randomGet() < 0.40) {
-      const zone = seededRNG.randomGetArrayValue(foreignZones(BIOME_TYPE.FOREST))
-      const {sizeMin, sizeMax} = getSizes(BIOME_TYPE.FOREST, NODES.TOPAZ.code)
-      placeOne(zone.x0, zone.x1, zone.yUnder, zone.yCavernsMid, NODES.TOPAZ.code, sizeMin, sizeMax)
+      const zone = seededRNG.randomGetArrayValue(this.#getForeignZones(BIOME_TYPE.FOREST))
+      const {sizeMin, sizeMax} = this.#getClusterSizes(BIOME_TYPE.FOREST, NODES.TOPAZ.code)
+      this.#placeOneCluster(zone.x0, zone.x1, zone.yUnder, zone.yCavernsMid, NODES.TOPAZ.code, sizeMin, sizeMax)
     }
 
     // ── RUBY — caverns_top ou caverns_bottom, biome étranger, 1 chance sur 3 ─
     if (seededRNG.randomGet() < 0.40) {
-      const zone = seededRNG.randomGetArrayValue(foreignZones(BIOME_TYPE.DESERT))
-      const {sizeMin, sizeMax} = getSizes(BIOME_TYPE.DESERT, NODES.RUBY.code)
+      const zone = seededRNG.randomGetArrayValue(this.#getForeignZones(BIOME_TYPE.DESERT))
+      const {sizeMin, sizeMax} = this.#getClusterSizes(BIOME_TYPE.DESERT, NODES.RUBY.code)
       const inTop = seededRNG.randomGetBool()
       const y0 = inTop ? zone.yUnder : zone.yCavernsMid
       const y1 = inTop ? zone.yCavernsMid : zone.yCaverns
-      placeOne(zone.x0, zone.x1, y0, y1, NODES.RUBY.code, sizeMin, sizeMax)
+      this.#placeOneCluster(zone.x0, zone.x1, y0, y1, NODES.RUBY.code, sizeMin, sizeMax)
     }
 
     // ── EMERALD — caverns_top ou caverns_bottom, biome étranger, 1 chance sur 3
     if (seededRNG.randomGet() < 0.40) {
-      const zone = seededRNG.randomGetArrayValue(foreignZones(BIOME_TYPE.JUNGLE))
-      const {sizeMin, sizeMax} = getSizes(BIOME_TYPE.JUNGLE, NODES.EMERALD.code)
+      const zone = seededRNG.randomGetArrayValue(this.#getForeignZones(BIOME_TYPE.JUNGLE))
+      const {sizeMin, sizeMax} = this.#getClusterSizes(BIOME_TYPE.JUNGLE, NODES.EMERALD.code)
       const inTop = seededRNG.randomGetBool()
       const y0 = inTop ? zone.yUnder : zone.yCavernsMid
       const y1 = inTop ? zone.yCavernsMid : zone.yCaverns
-      placeOne(zone.x0, zone.x1, y0, y1, NODES.EMERALD.code, sizeMin, sizeMax)
+      this.#placeOneCluster(zone.x0, zone.x1, y0, y1, NODES.EMERALD.code, sizeMin, sizeMax)
     }
 
     // ── Bonus under — 1 monde sur 4, 1 gemme au hasard, 1 biome au hasard ────
@@ -1262,8 +1277,8 @@ class ClusterGenerator {
       const gemCodes = [NODES.TOPAZ.code, NODES.RUBY.code, NODES.EMERALD.code, NODES.SAPPHIRE.code]
       const code = seededRNG.randomGetArrayValue(gemCodes)
       const zone = seededRNG.randomGetArrayValue(this.zoneRects)
-      const {sizeMin, sizeMax} = getSizes(BIOME_TYPE.FOREST, code)
-      placeOne(zone.x0, zone.x1, zone.ySurface, zone.yUnder, code, sizeMin, sizeMax)
+      const {sizeMin, sizeMax} = this.#getClusterSizes(BIOME_TYPE.FOREST, code)
+      this.#placeOneCluster(zone.x0, zone.x1, zone.ySurface, zone.yUnder, code, sizeMin, sizeMax)
     }
 
     // ── OBSIDIAN — caverns (hors hell), biome aléatoire, 1 chance sur 3 ──────────
@@ -1273,7 +1288,7 @@ class ClusterGenerator {
       const entry = entries?.find(e => e.code === NODES.OBSIDIAN.code)
       const sizeMin = entry?.sizeMin ?? 16
       const sizeMax = entry?.sizeMax ?? 36
-      placeOne(zone.x0, zone.x1, zone.yUnder, zone.yHell, NODES.OBSIDIAN.code, sizeMin, sizeMax)
+      this.#placeOneCluster(zone.x0, zone.x1, zone.yUnder, zone.yHell, NODES.OBSIDIAN.code, sizeMin, sizeMax)
     }
   }
 
