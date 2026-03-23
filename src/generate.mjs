@@ -165,13 +165,14 @@ class WorldGenerator {
 
     // 4. Clusters de substrat
     clusterGenerator.initZoneRects(biomesDescription, skySurface, surfaceUnder, underCaverns)
-    // clusterGenerator.addSubstratClusters()
+    clusterGenerator.addSubstratClusters()
     console.log('[WorldGenerator::clusterGenerator] - Substrat clusters', (performance.now() - t0).toFixed(3), 'ms')
     await progress('Substrate placement')
 
     // 5. Clusters ore/gem/obsidian (TODO : obsidian)
     // clusterGenerator.addOreClusters()
-    clusterGenerator.addGemIntrusions()
+    // clusterGenerator.addOreIntrusions()
+    // clusterGenerator.addGemIntrusions()
     console.log('[WorldGenerator::clusterGenerator] - Ore/Gem clusters', (performance.now() - t0).toFixed(3), 'ms')
     await progress('Ore & gem placement')
 
@@ -1180,10 +1181,10 @@ class ClusterGenerator {
     for (const rect of this.zoneRects) {
       const map = CLUSTER_SCATTER_MAP[rect.biome]
       if (!map) continue
-      this.#scatterLayer(rect.x0, rect.ySkySurface, rect.x1, rect.ySurface, map.surface, rect.biome, 'surface')
-      this.#scatterLayer(rect.x0, rect.ySurface, rect.x1, rect.yUnder, map.under, rect.biome, 'under')
-      this.#scatterLayer(rect.x0, rect.yUnder, rect.x1, rect.yCavernsMid, map.caverns_top, rect.biome, 'caverns_top')
-      this.#scatterLayer(rect.x0, rect.yCavernsMid, rect.x1, rect.yCaverns, map.caverns_bottom, rect.biome, 'caverns_bottom')
+      this.#scatterLayer(rect.x0, rect.ySkySurface, rect.x1, rect.ySurface, map.surface)
+      this.#scatterLayer(rect.x0, rect.ySurface, rect.x1, rect.yUnder, map.under)
+      this.#scatterLayer(rect.x0, rect.yUnder, rect.x1, rect.yCavernsMid, map.caverns_top)
+      this.#scatterLayer(rect.x0, rect.yCavernsMid, rect.x1, rect.yCaverns, map.caverns_bottom)
     }
   }
 
@@ -1194,7 +1195,7 @@ class ClusterGenerator {
    * @param {number}   y1
    * @param {Array<{code, percent}>} entries
    */
-  #scatterLayer (x0, y0, x1, y1, entries, biome, layer) {
+  #scatterLayer (x0, y0, x1, y1, entries) {
     for (const entry of entries) {
       const tiles = this.scatterClusters(x0, y0, x1, y1, entry.percent, entry.code, entry.sizeMin, entry.sizeMax)
 
@@ -1221,6 +1222,85 @@ class ClusterGenerator {
       this.#scatterLayer(rect.x0, rect.yUnder, rect.x1, rect.yCavernsMid, map.caverns_top, rect.biome, 'caverns_top')
       this.#scatterLayer(rect.x0, rect.yCavernsMid, rect.x1, rect.yCaverns, map.caverns_bottom, rect.biome, 'caverns_bottom')
       this.#scatterLayer(rect.x0, rect.yHell, rect.x1, rect.yCaverns, map.hell, rect.biome, 'hell')
+    }
+  }
+
+  /**
+ * Place des clusters de minerais métalliques dans des layers supérieures à leur
+ * habitat normal (remontées géologiques).
+ * Le biome hôte est ignoré — position X libre sur toute la largeur du monde.
+ *
+ * Règles :
+ *   - SILVER    : 3-5 clusters en surface
+ *   - GOLD      : 0-3 clusters en surface, 4-8 clusters en under
+ *   - COBALT    : 3-7 clusters en under
+ *   - PLATINUM  : 0-3 clusters en under, 3-7 clusters en caverns_top
+ *
+ * Prérequis : this.zoneRects initialisé par initZoneRects()
+ */
+  addOreIntrusions () {
+  // Place count clusters d'un ore dans une layer donnée, X libre sur tout le monde.
+  // y0/y1 sont calculés en moyennant les frontières sur toute la largeur.
+    const placeInLayer = (count, code, sizeMin, sizeMax, y0fn, y1fn) => {
+      for (let i = 0; i < count; i++) {
+        const x = seededRNG.randomGetMinMax(1, WORLD_WIDTH - 2)
+        // Trouver le rect correspondant à ce x pour obtenir les frontières Y
+        let rect = this.zoneRects[this.zoneRects.length - 1]
+        for (let j = 0; j < this.zoneRects.length; j++) {
+          if (x <= this.zoneRects[j].x1) { rect = this.zoneRects[j]; break }
+        }
+        const y = seededRNG.randomGetMinMax(y0fn(rect), y1fn(rect))
+        const size = seededRNG.randomGetMinMax(sizeMin, sizeMax)
+        this.applyTiles(this.randomWalkCluster(x, y, size, code))
+      }
+    }
+
+    // ── SILVER — surface ──────────────────────────────────────────────────────
+    {
+      const {sizeMin, sizeMax} = this.#getClusterSizes(BIOME_TYPE.FOREST, 'under', NODES.SILVER.code)
+      const count = seededRNG.randomGetMinMax(3, 5)
+      placeInLayer(count, NODES.SILVER.code, sizeMin, sizeMax,
+        r => r.ySkySurface, r => r.ySurface)
+    }
+
+    // ── GOLD — surface ────────────────────────────────────────────────────────
+    {
+      const {sizeMin, sizeMax} = this.#getClusterSizes(BIOME_TYPE.FOREST, 'caverns_top', NODES.GOLD.code)
+      const count = seededRNG.randomGetMinMax(0, 3)
+      placeInLayer(count, NODES.GOLD.code, sizeMin, sizeMax,
+        r => r.ySkySurface, r => r.ySurface)
+    }
+
+    // ── GOLD — under ──────────────────────────────────────────────────────────
+    {
+      const {sizeMin, sizeMax} = this.#getClusterSizes(BIOME_TYPE.FOREST, 'caverns_top', NODES.GOLD.code)
+      const count = seededRNG.randomGetMinMax(4, 8)
+      placeInLayer(count, NODES.GOLD.code, sizeMin, sizeMax,
+        r => r.ySurface, r => r.yUnder)
+    }
+
+    // ── COBALT — under ────────────────────────────────────────────────────────
+    {
+      const {sizeMin, sizeMax} = this.#getClusterSizes(BIOME_TYPE.FOREST, 'caverns_top', NODES.COBALT.code)
+      const count = seededRNG.randomGetMinMax(3, 7)
+      placeInLayer(count, NODES.COBALT.code, sizeMin, sizeMax,
+        r => r.ySurface, r => r.yUnder)
+    }
+
+    // ── PLATINUM — under ──────────────────────────────────────────────────────
+    {
+      const {sizeMin, sizeMax} = this.#getClusterSizes(BIOME_TYPE.FOREST, 'caverns_bottom', NODES.PLATINUM.code)
+      const count = seededRNG.randomGetMinMax(0, 3)
+      placeInLayer(count, NODES.PLATINUM.code, sizeMin, sizeMax,
+        r => r.ySurface, r => r.yUnder)
+    }
+
+    // ── PLATINUM — caverns_top ────────────────────────────────────────────────
+    {
+      const {sizeMin, sizeMax} = this.#getClusterSizes(BIOME_TYPE.FOREST, 'caverns_bottom', NODES.PLATINUM.code)
+      const count = seededRNG.randomGetMinMax(3, 7)
+      placeInLayer(count, NODES.PLATINUM.code, sizeMin, sizeMax,
+        r => r.yUnder, r => r.yCavernsMid)
     }
   }
 

@@ -195,6 +195,43 @@ Tuiles spéciales :
 - **HONEY** : liquide créé dans les **Hive**
 - **SAP** : liquide créé dans la jungle
 
+### 3.6.1 Intrusions de Substrat
+
+Les substrats ne sont pas confinés à leur biome/layer natif. Des processus géologiques
+(érosion, pression, sédimentation) et biologiques (faune fouisseuse, racines) provoquent
+des migrations de matière entre zones adjacentes.
+
+Ces intrusions sont définies dans `CLUSTER_SCATTER_MAP` (`data-gen.mjs`) et appliquées
+par `addSubstratClusters()`. Elles suivent les règles suivantes :
+
+**Substrats de surface** (CLAY / SANDSTONE / MUD) — actifs, mélangés par les liquides,
+le vent et la faune :
+- Intrusion latérale dans la surface des 2 autres biomes — quantité moyenne
+- Migration vers le bas dans le under du même biome — quantité moyenne
+- Migration latérale + bas dans le under des 2 autres biomes — quantité faible
+
+**Substrats de under** (STONE / ASH / LIMESTONE) — semi-stables :
+- Remontée dans la surface du même biome — quantité moyenne
+- Remontée latérale dans la surface des 2 autres biomes — quantité faible
+- Intrusion latérale dans le under des 2 autres biomes — quantité moyenne
+- Descente dans les caverns_top du même biome — quantité faible
+- Descente latérale dans les caverns_top des 2 autres biomes — quantité très faible
+
+**Substrats de caverns** (HARDSTONE / HELLSTONE / SLATE) — lourds, peu mobiles :
+- Intrusion latérale dans les caverns des 2 autres biomes — quantité moyenne
+- Remontée dans le under du même biome — quantité faible
+- Remontée latérale dans le under des 2 autres biomes — quantité très faible
+
+Les caverns_bottom ne reçoivent que les flux latéraux depuis les caverns des autres
+biomes — trop profondes pour être atteintes par les remontées depuis under.
+
+| Quantité | percent dans CLUSTER_SCATTER_MAP |
+|---|---|
+| Moyenne | 0.010 |
+| Faible | 0.003 |
+| Très faible | 0.001 |
+```
+
 ### 3.7 Minerais (Ore)
 
 Six minerais métalliques, classés par tier de difficulté (`star`). Les localisations

@@ -42,6 +42,99 @@ export const SEA_MAX_JITTER = 10
 
 export const CLUSTER_SCATTER_MAP = {
   [BIOME_TYPE.FOREST]: {
+    surface: [
+      {code: NODES.SANDSTONE.code, percent: 0.010},
+      {code: NODES.MUD.code, percent: 0.010},
+      {code: NODES.STONE.code, percent: 0.010},
+      {code: NODES.ASH.code, percent: 0.003},
+      {code: NODES.LIMESTONE.code, percent: 0.003}
+    ],
+    under: [
+      {code: NODES.CLAY.code, percent: 0.010},
+      {code: NODES.SANDSTONE.code, percent: 0.003},
+      {code: NODES.MUD.code, percent: 0.003},
+      {code: NODES.ASH.code, percent: 0.010},
+      {code: NODES.LIMESTONE.code, percent: 0.010},
+      {code: NODES.HARDSTONE.code, percent: 0.003},
+      {code: NODES.HELLSTONE.code, percent: 0.001},
+      {code: NODES.SLATE.code, percent: 0.001}
+    ],
+    caverns_top: [
+      {code: NODES.HELLSTONE.code, percent: 0.010},
+      {code: NODES.SLATE.code, percent: 0.010},
+      {code: NODES.STONE.code, percent: 0.003},
+      {code: NODES.ASH.code, percent: 0.001},
+      {code: NODES.LIMESTONE.code, percent: 0.001}
+    ],
+    caverns_bottom: [
+      {code: NODES.HELLSTONE.code, percent: 0.010},
+      {code: NODES.SLATE.code, percent: 0.010}
+    ]
+  },
+  [BIOME_TYPE.DESERT]: {
+    surface: [
+      {code: NODES.CLAY.code, percent: 0.010},
+      {code: NODES.MUD.code, percent: 0.010},
+      {code: NODES.ASH.code, percent: 0.010},
+      {code: NODES.STONE.code, percent: 0.003},
+      {code: NODES.LIMESTONE.code, percent: 0.003}
+    ],
+    under: [
+      {code: NODES.SANDSTONE.code, percent: 0.010},
+      {code: NODES.CLAY.code, percent: 0.003},
+      {code: NODES.MUD.code, percent: 0.003},
+      {code: NODES.STONE.code, percent: 0.010},
+      {code: NODES.LIMESTONE.code, percent: 0.010},
+      {code: NODES.HELLSTONE.code, percent: 0.003},
+      {code: NODES.HARDSTONE.code, percent: 0.001},
+      {code: NODES.SLATE.code, percent: 0.001}
+    ],
+    caverns_top: [
+      {code: NODES.HARDSTONE.code, percent: 0.010},
+      {code: NODES.SLATE.code, percent: 0.010},
+      {code: NODES.ASH.code, percent: 0.003},
+      {code: NODES.STONE.code, percent: 0.001},
+      {code: NODES.LIMESTONE.code, percent: 0.001}
+    ],
+    caverns_bottom: [
+      {code: NODES.HARDSTONE.code, percent: 0.010},
+      {code: NODES.SLATE.code, percent: 0.010}
+    ]
+  },
+  [BIOME_TYPE.JUNGLE]: {
+    surface: [
+      {code: NODES.CLAY.code, percent: 0.010},
+      {code: NODES.SANDSTONE.code, percent: 0.010},
+      {code: NODES.LIMESTONE.code, percent: 0.010},
+      {code: NODES.STONE.code, percent: 0.003},
+      {code: NODES.ASH.code, percent: 0.003}
+    ],
+    under: [
+      {code: NODES.MUD.code, percent: 0.010},
+      {code: NODES.CLAY.code, percent: 0.003},
+      {code: NODES.SANDSTONE.code, percent: 0.003},
+      {code: NODES.STONE.code, percent: 0.010},
+      {code: NODES.ASH.code, percent: 0.010},
+      {code: NODES.SLATE.code, percent: 0.003},
+      {code: NODES.HARDSTONE.code, percent: 0.001},
+      {code: NODES.HELLSTONE.code, percent: 0.001}
+    ],
+    caverns_top: [
+      {code: NODES.HARDSTONE.code, percent: 0.010},
+      {code: NODES.HELLSTONE.code, percent: 0.010},
+      {code: NODES.LIMESTONE.code, percent: 0.003},
+      {code: NODES.STONE.code, percent: 0.001},
+      {code: NODES.ASH.code, percent: 0.001}
+    ],
+    caverns_bottom: [
+      {code: NODES.HARDSTONE.code, percent: 0.010},
+      {code: NODES.HELLSTONE.code, percent: 0.010}
+    ]
+  }
+}
+
+export const CLUSTER_SCATTER_MAP_OLD = {
+  [BIOME_TYPE.FOREST]: {
     surface: [{code: NODES.DIRT.code, percent: 0.02},
       {code: NODES.STONE.code, percent: 0.002}],
     under: [{code: NODES.STONE.code, percent: 0.02},

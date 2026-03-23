@@ -694,8 +694,9 @@ puis appliqués en une passe dédiée.
 | `#getClusterSizes(biome, layer, code)` | Lit `sizeMin/sizeMax` depuis `ORE_GEM_SCATTER_MAP[biome][layer]` pour le code donné. Fallback `{6, 12}`. |
 | `#placeOneCluster(x0, x1, y0, y1, code, sizeMin, sizeMax)` | Place un unique cluster à position aléatoire dans le rectangle. |
 | `#getForeignZones(nativeBiome)` | Retourne les `zoneRects` dont le biome diffère de `nativeBiome`. |
-| `addSubstratClusters` | `(biomesDescription, skySurface, surfaceUnder, underCaverns): void` | Parcourt les zones biome × layer (surface / under / caverns_top / caverns_bottom) et applique les clusters définis dans `CLUSTER_SCATTER_MAP`. Caverns découpée en deux moitiés. Appelle `scatterClusters` + `applyTiles`. |
+| `addSubstratClusters` | `(): void` | Parcourt `this.zoneRects` et applique les clusters définis dans `CLUSTER_SCATTER_MAP`. Appelle `scatterClusters` + `applyTiles`. Prérequis : `initZoneRects()`. |
 | `addOreClusters` | `(biomesDescription, surfaceUnder, underCaverns): void` | Parcourt les zones biome × layer (under / caverns_top / caverns_bottom) et applique les clusters ore/gem/rock définis dans `ORE_GEM_SCATTER_MAP`. Pas de clusters en surface. |
+| `addOreIntrusions()` | Place des clusters de minerais dans des layers supérieures à leur habitat normal. SILVER en surface ; GOLD en surface et under ; COBALT en under ; PLATINUM en under et caverns_top. Position X libre sur toute la largeur du monde. Prérequis : `initZoneRects()`. |
 | `addGemIntrusions()` | Place des clusters de gemmes et d'obsidian hors de leur biome/layer natif. SAPPHIRE systématique en caverns_top ; TOPAZ/RUBY/EMERALD en biome étranger ; OBSIDIAN dans caverns (hors hell) ; bonus under. Prérequis : `initZoneRects()`. |
 | `projectAndFill` | `({cx, cy, code}: {cx: number, cy: number, code: number}): void` | Projette jusqu'à 100 lignes depuis le centre d'une géode. Pose `GEODE_TARGET_CLUSTER_COUNT` clusters (taille 4–8) de `code` sur la première tuile SUBSTRAT rencontrée. Ignore SKY et ETERNAL. Constantes dans `data-gen.mjs`. |
 
