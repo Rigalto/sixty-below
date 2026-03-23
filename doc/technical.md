@@ -693,6 +693,7 @@ puis appliqués en une passe dédiée.
 | `zoneRects` | `Array<{biome, x0, x1, ySkySurface, ySurface, yUnder, yCavernsMid, yCaverns, yHell}>` | Résultat de `initZoneRects`. Consommé par toutes les fonctions de placement. |
 | `addSubstratClusters` | `(biomesDescription, skySurface, surfaceUnder, underCaverns): void` | Parcourt les zones biome × layer (surface / under / caverns_top / caverns_bottom) et applique les clusters définis dans `CLUSTER_SCATTER_MAP`. Caverns découpée en deux moitiés. Appelle `scatterClusters` + `applyTiles`. |
 | `addOreClusters` | `(biomesDescription, surfaceUnder, underCaverns): void` | Parcourt les zones biome × layer (under / caverns_top / caverns_bottom) et applique les clusters ore/gem/rock définis dans `ORE_GEM_SCATTER_MAP`. Pas de clusters en surface. |
+| `addGemIntrusions()` | Place des clusters de gemmes et d'obsidian hors de leur biome/layer natif. SAPPHIRE systématique en caverns_top ; TOPAZ/RUBY/EMERALD en biome étranger ; OBSIDIAN dans caverns (hors hell) ; bonus under. Prérequis : `initZoneRects()`. |
 | `projectAndFill` | `({cx, cy, code}: {cx: number, cy: number, code: number}): void` | Projette jusqu'à 100 lignes depuis le centre d'une géode. Pose `GEODE_TARGET_CLUSTER_COUNT` clusters (taille 4–8) de `code` sur la première tuile SUBSTRAT rencontrée. Ignore SKY et ETERNAL. Constantes dans `data-gen.mjs`. |
 
 **Algorithme de randomWalkCluster :** frange maintenue en doublon `Set + Array` — déduplication O(1), tirage O(1) par swap-and-pop.

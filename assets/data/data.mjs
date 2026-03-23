@@ -58,7 +58,7 @@ export const NODES = {
   // Desert
   SANDSTONE: {code: 23, name: 'Sandstone', type: NODE_TYPE.SUBSTRAT, stype: 'block', star: 1, solid: true, color: '#b87141', image: 'rock_16_16+5', speed: 1200, mining: [{item: 'bksandst', count: 1}]},
   ASH: {code: 24, name: 'Ash', type: NODE_TYPE.SUBSTRAT, stype: 'block', star: 2, solid: true, color: '#1b283b', image: 'substrat_16_16+8', speed: 1400, mining: [{item: 'bkash', count: 1}]},
-  HELLSTONE: {code: 25, name: 'Hellstone', type: NODE_TYPE.SUBSTRAT, stype: 'block', star: 5, solid: true, color: '#cc0030', image: 'rock_16_16+4', speed: 2200, mining: [{item: 'hellstone', count: 1}]},
+  HELLSTONE: {code: 25, name: 'Hellstone', type: NODE_TYPE.SUBSTRAT, stype: 'block', star: 5, solid: true, color: '#a14c5a', image: 'rock_16_16+4', speed: 2200, mining: [{item: 'hellstone', count: 1}]},
   // Jungle
   MUD: {code: 26, name: 'Mud', type: NODE_TYPE.SUBSTRAT, stype: 'block', star: 1, solid: true, color: '#853a51', image: 'substrat_16_16+4', speed: 1000, mining: [{item: 'bkmud', count: 1}]},
   LIMESTONE: {code: 27, name: 'Limestone', type: NODE_TYPE.SUBSTRAT, stype: 'block', star: 2, solid: true, color: '#c8c0a0', image: 'substrat_16_16+0', speed: 1400, mining: [{item: 'bklime', count: 1}]},
