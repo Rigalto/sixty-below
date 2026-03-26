@@ -230,7 +230,37 @@ biomes — trop profondes pour être atteintes par les remontées depuis under.
 | Moyenne | 0.010 |
 | Faible | 0.003 |
 | Très faible | 0.001 |
-```
+
+### 3.6.2 Clusters de Topsoil (pré-creusement)
+
+Les tuiles TOPSOIL (DIRT, SAND, SILT, HUMUS) sont dispersées en clusters avant le
+creusement des tunnels et cavernes. Leur taille varie linéairement avec la profondeur :
+grands en surface (sizeMin 8, sizeMax 14), petits en profondeur (sizeMin 3, sizeMax 6).
+La taille est calculée au moment du tirage du Y de chaque cluster.
+
+Les caverns_bottom ne reçoivent aucun TOPSOIL — les roches y sont trop dures.
+
+HUMUS est transversal : présent principalement dans FOREST et JUNGLE (under et
+caverns_top), rare en surface, et anecdotique dans DESERT (surprise géologique).
+
+Une seconde passe post-creusement (algorithme distinct) recouvrira les parois des
+tunnels et cavernes formés.
+
+Les densités sont définies dans `TOPSOIL_SCATTER_MAP` (`data-gen.mjs`).
+Les constantes d'interpolation Y sont dans `constant.mjs` (`TOPSOIL_Y_*`).
+
+| Quantité | percent |
+|---|---|
+| Natif surface | 0.020 |
+| Étranger surface | 0.012 |
+| Natif under | 0.009 |
+| Étranger under | 0.005 |
+| Natif caverns_top | 0.006 |
+| Étranger caverns_top | 0.003 |
+| HUMUS principal (under) | 0.008 |
+| HUMUS moyen (caverns_top) | 0.005 |
+| HUMUS rare (surface) | 0.002 |
+| HUMUS surprise Desert | 0.0005 |
 
 ### 3.7 Minerais (Ore)
 

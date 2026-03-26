@@ -6,10 +6,10 @@
  */
 
 import {NODES, NODES_LOOKUP, NODE_TYPE, BIOME_TYPE} from './data.mjs'
-import {WORLD_WIDTH, WORLD_HEIGHT, SEA_LEVEL, WEATHER_TYPE} from '../../src/constant.mjs'
+import {WORLD_WIDTH, WORLD_HEIGHT, SEA_LEVEL, TOPSOIL_Y_SKY_SURFACE, TOPSOIL_Y_SURFACE_UNDER, TOPSOIL_Y_UNDER_CAVERNS, TOPSOIL_Y_CAVERNS_MID, WEATHER_TYPE} from '../../src/constant.mjs'
 
 // Re-exports pour generate.mjs
-export {NODES, NODES_LOOKUP, NODE_TYPE, BIOME_TYPE, WORLD_WIDTH, WORLD_HEIGHT, SEA_LEVEL, WEATHER_TYPE}
+export {NODES, NODES_LOOKUP, NODE_TYPE, BIOME_TYPE, WORLD_WIDTH, WORLD_HEIGHT, SEA_LEVEL, TOPSOIL_Y_SKY_SURFACE, TOPSOIL_Y_SURFACE_UNDER, TOPSOIL_Y_UNDER_CAVERNS, TOPSOIL_Y_CAVERNS_MID, WEATHER_TYPE}
 
 // ── Table d'indirection biome × layer → code de tuile substrat ───────────────
 // Source de vérité : DESIGN.md
@@ -266,6 +266,67 @@ export const ORE_GEM_SCATTER_MAP = {
     ],
     hell: [
       {code: NODES.OBSIDIAN.code, percent: 0.0002, sizeMin: 18, sizeMax: 38}
+    ]
+  }
+}
+
+export const TOPSOIL_SCATTER_MAP = {
+  [BIOME_TYPE.FOREST]: {
+    surface: [
+      {code: NODES.DIRT.code, percent: 0.020}, // natif
+      {code: NODES.SAND.code, percent: 0.012}, // étranger
+      {code: NODES.SILT.code, percent: 0.012}, // étranger
+      {code: NODES.HUMUS.code, percent: 0.002} // transversal rare
+    ],
+    under: [
+      {code: NODES.DIRT.code, percent: 0.009}, // natif
+      {code: NODES.SAND.code, percent: 0.005}, // étranger
+      {code: NODES.SILT.code, percent: 0.005}, // étranger
+      {code: NODES.HUMUS.code, percent: 0.008} // transversal principal
+    ],
+    caverns_top: [
+      {code: NODES.DIRT.code, percent: 0.006}, // natif
+      {code: NODES.SAND.code, percent: 0.003}, // étranger
+      {code: NODES.SILT.code, percent: 0.003}, // étranger
+      {code: NODES.HUMUS.code, percent: 0.005} // transversal moyen
+    ]
+  },
+  [BIOME_TYPE.DESERT]: {
+    surface: [
+      {code: NODES.SAND.code, percent: 0.020}, // natif
+      {code: NODES.DIRT.code, percent: 0.012}, // étranger
+      {code: NODES.SILT.code, percent: 0.012}, // étranger
+      {code: NODES.HUMUS.code, percent: 0.0005} // surprise
+    ],
+    under: [
+      {code: NODES.SAND.code, percent: 0.009}, // natif
+      {code: NODES.DIRT.code, percent: 0.005}, // étranger
+      {code: NODES.SILT.code, percent: 0.005} // étranger
+    ],
+    caverns_top: [
+      {code: NODES.SAND.code, percent: 0.006}, // natif
+      {code: NODES.DIRT.code, percent: 0.003}, // étranger
+      {code: NODES.SILT.code, percent: 0.003} // étranger
+    ]
+  },
+  [BIOME_TYPE.JUNGLE]: {
+    surface: [
+      {code: NODES.SILT.code, percent: 0.020}, // natif
+      {code: NODES.DIRT.code, percent: 0.012}, // étranger
+      {code: NODES.SAND.code, percent: 0.012}, // étranger
+      {code: NODES.HUMUS.code, percent: 0.002} // transversal rare
+    ],
+    under: [
+      {code: NODES.SILT.code, percent: 0.009}, // natif
+      {code: NODES.DIRT.code, percent: 0.005}, // étranger
+      {code: NODES.SAND.code, percent: 0.005}, // étranger
+      {code: NODES.HUMUS.code, percent: 0.008} // transversal principal
+    ],
+    caverns_top: [
+      {code: NODES.SILT.code, percent: 0.006}, // natif
+      {code: NODES.DIRT.code, percent: 0.003}, // étranger
+      {code: NODES.SAND.code, percent: 0.003}, // étranger
+      {code: NODES.HUMUS.code, percent: 0.005} // transversal moyen
     ]
   }
 }

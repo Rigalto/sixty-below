@@ -67,6 +67,11 @@ export const CANVAS_WIDTH = 1024 // pixels
 export const CANVAS_HEIGHT = 768 // pixels
 // Niveau de la mer
 export const SEA_LEVEL = 56 // tuiles
+// Frontières Y de référence pour les différentes layers
+export const TOPSOIL_Y_SKY_SURFACE = 48
+export const TOPSOIL_Y_SURFACE_UNDER = 96
+export const TOPSOIL_Y_UNDER_CAVERNS = 240
+export const TOPSOIL_Y_CAVERNS_MID = 375
 
 // Dimensions du Monde en Chunks
 // export const WORLD_WIDTH_CHUNKS = WORLD_WIDTH / CHUNK_SIZE // 128

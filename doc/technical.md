@@ -699,6 +699,9 @@ puis appliqués en une passe dédiée.
 | `addOreIntrusions()` | Place des clusters de minerais dans des layers supérieures à leur habitat normal. SILVER en surface ; GOLD en surface et under ; COBALT en under ; PLATINUM en under et caverns_top. Position X libre sur toute la largeur du monde. Prérequis : `initZoneRects()`. |
 | `addGemIntrusions()` | Place des clusters de gemmes et d'obsidian hors de leur biome/layer natif. SAPPHIRE systématique en caverns_top ; TOPAZ/RUBY/EMERALD en biome étranger ; OBSIDIAN dans caverns (hors hell) ; bonus under. Prérequis : `initZoneRects()`. |
 | `projectAndFill` | `({cx, cy, code}: {cx: number, cy: number, code: number}): void` | Projette jusqu'à 100 lignes depuis le centre d'une géode. Pose `GEODE_TARGET_CLUSTER_COUNT` clusters (taille 4–8) de `code` sur la première tuile SUBSTRAT rencontrée. Ignore SKY et ETERNAL. Constantes dans `data-gen.mjs`. |
+| `#getLinearSizes(y, y0, y1)` | Interpolation linéaire des tailles TOPSOIL en fonction de Y. sizeMin [8→3], sizeMax [14→6]. Référence globale : TOPSOIL_Y_SKY_SURFACE → TOPSOIL_Y_CAVERNS_MID. |
+| `scatterTopsoilClusters(x0, y0, x1, y1, percent, code)` | Variante de scatterClusters pour TOPSOIL. Tailles calculées dynamiquement via #getLinearSizes après tirage du Y. count = max(0, round(surface × percent)). |
+| `addTopsoilClusters()` | Place les clusters TOPSOIL par biome × layer (surface / under / caverns_top) avant le creusement. Prérequis : initZoneRects(). |
 
 **Algorithme de randomWalkCluster :** frange maintenue en doublon `Set + Array` — déduplication O(1), tirage O(1) par swap-and-pop.
 

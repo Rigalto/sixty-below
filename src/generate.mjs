@@ -1,6 +1,6 @@
 import {seededRNG} from './utils.mjs'
 import {database} from './database.mjs'
-import {NODES, NODES_LOOKUP, NODE_TYPE, WEATHER_TYPE, BIOME_TYPE, WORLD_WIDTH, WORLD_HEIGHT, SEA_LEVEL, BIOME_TILE_MAP, SEA_MAX_JITTER, SEA_MAX_WIDTH, SEA_MAX_HEIGHT, CLUSTER_SCATTER_MAP, ORE_GEM_SCATTER_MAP, PERLIN_OFFSET_NATURALIZER, PERLIN_OFFSET_TUNNEL, PERLIN_OFFSET_SURFACE_TUNNEL, PERLIN_OFFSET_SMALL_TUNNEL, PERLIN_OFFSET_CAVERN, PERLIN_OFFSET_HIVE, PERLIN_OFFSET_COBWEB, SMALL_CAVERNS_COUNT, MEDIUM_CAVERNS_COUNT, UNDERGROUND_TUNNEL_COUNT, CAVERNS_TUNNEL_COUNT, SMALL_TUNNELS_COUNT, HIVE_RADIUS_MIN, HIVE_RADIUS_MAX, COBWEB_CAVE_COUNT_MIN, COBWEB_CAVE_COUNT_MAX, COBWEB_RADIUS_X_MIN, COBWEB_RADIUS_X_MAX, COBWEB_RADIUS_Y_MIN, COBWEB_RADIUS_Y_MAX, GEODE_CAVE_COUNT_MIN, GEODE_CAVE_COUNT_MAX, GEODE_RADIUS_MIN, GEODE_RADIUS_MAX, GEODE_TARGET_CLUSTER_COUNT, GEODE_CLUSTER_SIZE_MIN, GEODE_CLUSTER_SIZE_MAX} from '../assets/data/data-gen.mjs'
+import {NODES, NODES_LOOKUP, NODE_TYPE, WEATHER_TYPE, BIOME_TYPE, WORLD_WIDTH, WORLD_HEIGHT, SEA_LEVEL, TOPSOIL_Y_SKY_SURFACE, TOPSOIL_Y_SURFACE_UNDER, TOPSOIL_Y_UNDER_CAVERNS, TOPSOIL_Y_CAVERNS_MID, BIOME_TILE_MAP, SEA_MAX_JITTER, SEA_MAX_WIDTH, SEA_MAX_HEIGHT, CLUSTER_SCATTER_MAP, ORE_GEM_SCATTER_MAP, PERLIN_OFFSET_NATURALIZER, PERLIN_OFFSET_TUNNEL, PERLIN_OFFSET_SURFACE_TUNNEL, PERLIN_OFFSET_SMALL_TUNNEL, PERLIN_OFFSET_CAVERN, PERLIN_OFFSET_HIVE, PERLIN_OFFSET_COBWEB, SMALL_CAVERNS_COUNT, MEDIUM_CAVERNS_COUNT, UNDERGROUND_TUNNEL_COUNT, CAVERNS_TUNNEL_COUNT, SMALL_TUNNELS_COUNT, HIVE_RADIUS_MIN, HIVE_RADIUS_MAX, COBWEB_CAVE_COUNT_MIN, COBWEB_CAVE_COUNT_MAX, COBWEB_RADIUS_X_MIN, COBWEB_RADIUS_X_MAX, COBWEB_RADIUS_Y_MIN, COBWEB_RADIUS_Y_MAX, GEODE_CAVE_COUNT_MIN, GEODE_CAVE_COUNT_MAX, GEODE_RADIUS_MIN, GEODE_RADIUS_MAX, GEODE_TARGET_CLUSTER_COUNT, GEODE_CLUSTER_SIZE_MIN, GEODE_CLUSTER_SIZE_MAX, TOPSOIL_SCATTER_MAP} from '../assets/data/data-gen.mjs'
 
 /* ====================================================================================================
    WORLD BUFFER (CREATION DU MONDE)
@@ -165,7 +165,7 @@ class WorldGenerator {
 
     // 4. Clusters de substrat
     clusterGenerator.initZoneRects(biomesDescription, skySurface, surfaceUnder, underCaverns)
-    clusterGenerator.addSubstratClusters()
+    // clusterGenerator.addSubstratClusters()
     console.log('[WorldGenerator::clusterGenerator] - Substrat clusters', (performance.now() - t0).toFixed(3), 'ms')
     await progress('Substrate placement')
 
@@ -173,6 +173,7 @@ class WorldGenerator {
     // clusterGenerator.addOreClusters()
     // clusterGenerator.addOreIntrusions()
     // clusterGenerator.addGemIntrusions()
+    clusterGenerator.addTopsoilClusters()
     console.log('[WorldGenerator::clusterGenerator] - Ore/Gem clusters', (performance.now() - t0).toFixed(3), 'ms')
     await progress('Ore & gem placement')
 
@@ -522,13 +523,13 @@ export class BiomeNaturalizer {
       for (let y = 0; y < WORLD_HEIGHT; y++) {
         let code = 0
         // 2.1 protection du périmètre (NODE_TYPE.STRONG)
-        if ((x === 0) || (x === 1023)) {
+        if ((x === 0) || (x === (WORLD_WIDTH - 1))) {
           code = NODES.DEEPSEA.code
           if (y < SEA_LEVEL) code = NODES.FOG.code
           if (y > surfaceUnder[x]) code = NODES.BASALT.code
         }
         if (y === 0) code = NODES.FOG.code
-        if (y === 511) code = NODES.LAVA.code
+        if (y === (WORLD_HEIGHT - 1)) code = NODES.LAVA.code
 
         if (code === 0) {
           code = this.getSubstratCode(x, y, skySurface, surfaceUnder, underCaverns, verticalBoundaries)
@@ -560,10 +561,10 @@ export class BiomeNaturalizer {
     const underCaverns = new Int16Array(1024)
     const hell = new Int16Array(1024)
 
-    const skySurfaceY = 48
-    const surfaceUnderY = 96
-    const underCavernsY = 16 * (6 + seededRNG.randomGetMinMax(8, 10))
-    const HellY = 512
+    const skySurfaceY = TOPSOIL_Y_SKY_SURFACE
+    const surfaceUnderY = TOPSOIL_Y_SURFACE_UNDER
+    const underCavernsY = TOPSOIL_Y_UNDER_CAVERNS + 16 * (seededRNG.randomGetMinMax(0, 2) - 1)
+    const HellY = WORLD_HEIGHT
 
     for (let x = 0; x < 1024; x++) {
       // les valeurs de Y sont choisies éloignées pour ne pas corréler les lignes
@@ -1432,6 +1433,106 @@ class ClusterGenerator {
       const cluster = this.randomWalkCluster(Math.round(x), Math.round(y), size, code)
       this.applyTiles(cluster)
       placed += 1
+    }
+  }
+
+  /**
+ * Interpolation linéaire des tailles de clusters TOPSOIL en fonction de Y.
+ * Plus on est profond, plus les clusters sont petits.
+ * Référence globale : TOPSOIL_Y_SKY_SURFACE (top) → TOPSOIL_Y_CAVERNS_MID (bottom)
+ * sizeMin : [8 → 3], sizeMax : [14 → 6]
+ *
+ * @param {number} y   - Position Y du seed du cluster
+ * @param {number} y0  - Y haut de la zone (= y0 du rectangle)
+ * @param {number} y1  - Y bas de la zone (= y1 du rectangle)
+ * @returns {{sizeMin: number, sizeMax: number}}
+ */
+  #getLinearSizes (y, y0, y1) {
+    const yTop = TOPSOIL_Y_SKY_SURFACE
+    const yBot = TOPSOIL_Y_CAVERNS_MID
+    const t = Math.max(0, Math.min(1, (y - yTop) / (yBot - yTop)))
+    const sizeMin = Math.round(8 - 5 * t) // [8 → 3]
+    const sizeMax = Math.round(14 - 8 * t) // [14 → 6]
+    return {sizeMin, sizeMax}
+  }
+
+  /**
+ * Variante de scatterClusters pour les tuiles TOPSOIL.
+ * Les tailles sizeMin/sizeMax sont calculées dynamiquement via #getLinearSizes
+ * après tirage du Y — pas de tailles fixes en paramètre.
+ * count = max(0, round(surface × percent)) — pas de minimum forcé.
+ *
+ * @param {number} x0
+ * @param {number} y0
+ * @param {number} x1
+ * @param {number} y1
+ * @param {number} percent
+ * @param {number} code
+ * @returns {Array<{x, y, index, code}>}
+ */
+  scatterTopsoilClusters (x0, y0, x1, y1, percent, code) {
+    const surface = (x1 - x0) * (y1 - y0)
+    const count = Math.max(0, Math.round(surface * percent))
+    const result = []
+
+    for (let i = 0; i < count; i++) {
+      const x = seededRNG.randomGetMinMax(x0, x1)
+      const y = seededRNG.randomGetMinMax(y0, y1)
+      const {sizeMin, sizeMax} = this.#getLinearSizes(y, y0, y1)
+      const size = seededRNG.randomGetMinMax(sizeMin, sizeMax)
+      const cluster = this.randomWalkCluster(x, y, size, code)
+      for (const tile of cluster) { result.push(tile) }
+    }
+
+    return result
+  }
+
+  /**
+ * Place les clusters de tuiles TOPSOIL par biome × layer.
+ * Appelée avant le creusement — les tunnels et cavernes creuseront ensuite dans ces tuiles.
+ * Une passe post-creusement distincte (algorithme différent) recouvrira les parois
+ * de cavernes et tunnels après leur formation.
+ *
+ * Prérequis : initZoneRects()
+ */
+  addTopsoilClusters () {
+    for (const rect of this.zoneRects) {
+      const map = TOPSOIL_SCATTER_MAP[rect.biome]
+      if (!map) continue
+
+      // ── Phase 1 : étrangers en surface dans tous les biomes ──────────────────
+      for (const rect of this.zoneRects) {
+        const map = TOPSOIL_SCATTER_MAP[rect.biome]
+        if (!map) continue
+        for (const entry of map.surface) {
+          if (entry.native) continue // on saute les natifs
+          this.applyTiles(this.scatterTopsoilClusters(
+            rect.x0, rect.ySkySurface, rect.x1, rect.ySurface, entry.percent, entry.code))
+        }
+      }
+
+      // ── Phase 2 : natifs en surface dans tous les biomes ─────────────────────
+      for (const rect of this.zoneRects) {
+        const map = TOPSOIL_SCATTER_MAP[rect.biome]
+        if (!map) continue
+        for (const entry of map.surface) {
+          if (!entry.native) continue // on saute les étrangers
+          this.applyTiles(this.scatterTopsoilClusters(
+            rect.x0, rect.ySkySurface, rect.x1, rect.ySurface, entry.percent, entry.code))
+        }
+      }
+
+      // ── Phase 3 : tous les biomes de la layer underground ─────────────────────
+      for (const entry of map.under) {
+        this.applyTiles(this.scatterTopsoilClusters(
+          rect.x0, rect.ySurface, rect.x1, rect.yUnder, entry.percent, entry.code))
+      }
+
+      // ── Phase 4 : tous les biomes de la partie haute de la layer caberns ─────────────────────
+      for (const entry of map.caverns_top) {
+        this.applyTiles(this.scatterTopsoilClusters(
+          rect.x0, rect.yUnder, rect.x1, rect.yCavernsMid, entry.percent, entry.code))
+      }
     }
   }
 }
