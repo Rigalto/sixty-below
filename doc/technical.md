@@ -689,8 +689,7 @@ puis appliqués en une passe dédiée.
 | `randomWalkCluster` | `(x0, y0, size, code): Array<{x, y, index, code}>` | Cluster 4-connexe par diffusion aléatoire (drunk-walk agrégé). Retourne la liste des tuiles sans modifier le monde. `index = (y << 10) | x`, prêt pour `worldBuffer.writeAt`. Ghost cells exclues (marge de 2 tuiles). |
 | `scatterClusters` | `(x0, y0, x1, y1, percent, code, sizeMin?, sizeMax?): Array<{x, y, index, code}>` | Distribue `max(5, round(surface × percent))` clusters `randomWalkCluster` à des positions aléatoires dans le rectangle. `sizeMin` défaut 5, `sizeMax` défaut 8. Sans effet de bord. |
 | `applyTiles` | `(tiles: Array<{x, y, index, code}>): void` | Écrit les tuiles dans `worldBuffer` via `writeAt`. Ignore les tuiles hors bornes et protège `FOG`, `DEEPSEA`, `BASALT`, `LAVA`, `SKY`, `VOID` contre l'écrasement. — à appeler avant le creusement. |
-| `initZoneRects(biomesDescription, skySurface, surfaceUnder, underCaverns)` | Initialise `this.zoneRects`. Pré-calcule les rectangles biome × layer (Y moyens aplatis). À appeler une fois dans `generate()` avant tout placement. |
-| `zoneRects` | `Array<{biome, x0, x1, ySkySurface, ySurface, yUnder, yCavernsMid, yCaverns, yHell}>` | Résultat de `initZoneRects`. Consommé par toutes les fonctions de placement. |
+| `initZoneRects(biomesDescription, skySurface, surfaceUnder, underCaverns): Array<{biome, x0, x1, ySkySurface, ySurface, yUnder, yCavernsMid, yCaverns, yHell}>` | Initialise `this.zoneRects`. Pré-calcule les rectangles biome × layer (Y moyens aplatis). À appeler une fois dans `generate()` avant tout placement. Renvoie le tableau calculé |
 | `#getClusterSizes(biome, layer, code)` | Lit `sizeMin/sizeMax` depuis `ORE_GEM_SCATTER_MAP[biome][layer]` pour le code donné. Fallback `{6, 12}`. |
 | `#placeOneCluster(x0, x1, y0, y1, code, sizeMin, sizeMax)` | Place un unique cluster à position aléatoire dans le rectangle. |
 | `#getForeignZones(nativeBiome)` | Retourne les `zoneRects` dont le biome diffère de `nativeBiome`. |
@@ -713,6 +712,7 @@ Génère des tunnels et des cavernes (tuiles VOID).
 
 | Méthode | Signature | Description |
 |---|---|---|
+| `initZoneRects(zoneRects)` | Initialise `#zoneRects` depuis le résultat de `clusterGenerator.initZoneRects()`. À appeler depuis `generate()` après `clusterGenerator.initZoneRects()`. |
 | `initExclusions` | `(): void` | Réinitialise la liste interne des zones d'exclusion (#exclusions). À appeler depuis generate() avant le premier mini-biome. |
 | `addExclusion` | `(rect: {x1, y1, x2, y2}): void` | Ajoute un rectangle à la liste interne d'exclusion (#exclusions). À appeler explicitement après applyTiles() pour les mini-biomes uniquement. |
 | `isExcluded` | `(x1, y1, x2, y2: number): boolean` | Vérifie si un rectangle intersecte l'une des zones d'exclusion internes (#exclusions). Retourne true dès la première intersection trouvée. |
@@ -726,7 +726,8 @@ Génère des tunnels et des cavernes (tuiles VOID).
 | `digUndergroundTunnels` | `(surfaceUnder: Int16Array, underCaverns: Int16Array): void` | Creuse `UNDERGROUND_TUNNEL_COUNT` tunnels horizontaux avec un ou deux coudes en zone underground. Rayon 9, longueur 30–50, angle initial 0–360°, déviation 25°. Constante dans `data-gen.mjs`. |
 | `digCavernsTunnels` | `(underCaverns: Int16Array): void` | Creuse `CAVERN_TUNNEL_COUNT` tunnels dans la zone cavernes. Borne basse : `WORLD_HEIGHT - 32`. Rayon 9, longueur 40–60, angle initial 0–360°, déviation 50°. Constante dans `data-gen.mjs`. |
 | `digSmallTunnels` | `(surfaceUnder: Int16Array): void` | Creuse `SMALL_TUNNELS_COUNT` petites galeries sinueuses (rayon 2-4, longueur 60–100, deltaAngle 40°) dans les zones underground et cavernes. Constante dans `data-gen.mjs`. |
-| `digHives` | `(biomeCounts: {forest, desert, jungle}, biomesDescription: Array<{biome, width, offset}>, surfaceUnder: Int16Array, underCaverns: Int16Array): void` | Creuse `hiveCount` ruches en zone JUNGLE (underground → caverns_top). Paroi HIVE (rayon+4) + intérieur VOID (rayon), galerie d'accès diagonale 45° ou -45°. Remplissage par HONEY différé. Constantes `HIVE_RADIUS_MIN/MAX` dans `data-gen.mjs`. Utilise `#isExcluded` et `#exclusions`. |
+| `#digOneHive(rect)` | Creuse une ruche dans le rectangle de zone donné. Tire cx/cy/radius, vérifie les exclusions (MAX_ATTEMPTS=100), creuse paroi HIVE + intérieur VOID + galerie d'accès. Retourne `{cx, cy, radius}` ou `null`. Utilise `this.zoneRects`. |
+| `digHives(biomeCounts)` | Creuse `hiveCount` ruches en zone JUNGLE via `#digOneHive`. 1 monde sur 2 : une ruche intrusion dans un biome étranger (FOREST ou DESERT), même layer. Toutes les ruches (normales + intrusion) sont retournées pour le remplissage HONEY différé. Prérequis : `initZoneRects()`. |
 | `digCobwebCaves` | `(underCaverns: Int16Array): Array<{cx, cy, radiusX, radiusY}>` | Creuse 4–8 cavernes elliptiques dans tous les biomes, cavern_top (75%) ou cavern_bottom (25%). COBWEB différé. Rectangle englobant enregistré dans #exclusions. Constantes dans `data-gen.mjs`. |
 | `digGeodeCaves` | `(underCaverns: Int16Array, code: number): Array<{cx, cy, radiusX, radiusY, code}>` | Creuse 3–4 géodes elliptiques (rayon 8–12) en zone cavern_bottom, tous biomes. Retourne la description pour projectAndFill(). Constantes dans `data-gen.mjs`. |
 | `cleanupAfterCarving` | `(): void` | Passe de nettoyage globale post-creusement. 7 règles in-place : propagation SKY, suppression tuiles isolées VOID/non-VOID (4-connexe et paires horizontales/verticales). Parcours séquentiel index croissant — cascade naturelle. |

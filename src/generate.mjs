@@ -164,15 +164,17 @@ class WorldGenerator {
     await progress('Biome naturalization')
 
     // 4. Clusters de substrat
-    clusterGenerator.initZoneRects(biomesDescription, skySurface, surfaceUnder, underCaverns)
-    // clusterGenerator.addSubstratClusters()
+    const zoneRects = clusterGenerator.initZoneRects(biomesDescription, skySurface, surfaceUnder, underCaverns)
+    worldCarver.initZoneRects(zoneRects)
+
+    clusterGenerator.addSubstratClusters()
     console.log('[WorldGenerator::clusterGenerator] - Substrat clusters', (performance.now() - t0).toFixed(3), 'ms')
     await progress('Substrate placement')
 
     // 5. Clusters ore/gem/obsidian (TODO : obsidian)
-    // clusterGenerator.addOreClusters()
-    // clusterGenerator.addOreIntrusions()
-    // clusterGenerator.addGemIntrusions()
+    clusterGenerator.addOreClusters()
+    clusterGenerator.addOreIntrusions()
+    clusterGenerator.addGemIntrusions()
     clusterGenerator.addTopsoilClusters()
     console.log('[WorldGenerator::clusterGenerator] - Ore/Gem clusters', (performance.now() - t0).toFixed(3), 'ms')
     await progress('Ore & gem placement')
@@ -199,7 +201,7 @@ class WorldGenerator {
     // 6.2 Creusement des mini-biomes avec peuplement - TODO
 
     // 6.3 Creusement des mini-biomes avec peuplement différé - TODO
-    const hives = worldCarver.digHives(biomeCounts, biomesDescription, surfaceUnder, underCaverns)
+    const hives = worldCarver.digHives(biomeCounts)
     await progress('Hives')
     const cobwebCaves = worldCarver.digCobwebCaves(underCaverns)
     await progress('Cobweb caves')
@@ -1116,6 +1118,7 @@ class ClusterGenerator {
       rects.push({biome: zone.biome, x0, x1, ySkySurface, ySurface, yUnder, yCavernsMid, yCaverns, yHell})
     }
     this.zoneRects = rects
+    return rects
   }
 
   /**
@@ -1545,6 +1548,17 @@ export const clusterGenerator = new ClusterGenerator()
 
 class WorldCarver {
   #exclusions
+  #zoneRects
+
+  /**
+ * Initialise les rectangles de zones biome × layer pour WorldCarver.
+ * Reçoit le résultat de clusterGenerator.initZoneRects() via generate().
+ *
+ * @param {Array<{biome, x0, x1, ySkySurface, ySurface, yUnder, yCavernsMid, yCaverns, yHell}>} zoneRects
+ */
+  initZoneRects (zoneRects) {
+    this.#zoneRects = zoneRects
+  }
 
   /**
  * Réinitialise la liste des zones d'exclusion des mini-biomes.
@@ -1903,6 +1917,94 @@ class WorldCarver {
   }
 
   /**
+ * Creuse une ruche à une position aléatoire dans le rectangle de zone donné.
+ * Utilise this.zoneRects pour les frontières Y.
+ * Gère les tentatives et les exclusions en interne.
+ *
+ * @param {{biome, x0, x1, ySurface, yUnder, yCavernsMid}} rect
+ * @returns {{cx, cy, radius}|null} — null si MAX_ATTEMPTS épuisé
+ */
+  #digOneHive (rect) {
+    const MAX_ATTEMPTS = 100
+    const radius = seededRNG.randomGetMinMax(HIVE_RADIUS_MIN, HIVE_RADIUS_MAX)
+    const angle = seededRNG.randomGetBool() ? 45 : -45
+    const length = seededRNG.randomGetMinMax(30, 50)
+    const ex = length + 4
+    const ey = length + 4
+
+    let cx, cy, valid
+    let attempts = 0
+    do {
+      cx = seededRNG.randomGetMinMax(rect.x0 + radius, rect.x1 - radius)
+      cy = seededRNG.randomGetMinMax(rect.ySurface + radius, rect.yCavernsMid - radius)
+
+      const bx1 = angle === 45 ? cx - (radius + 4) : cx - ex
+      const by1 = cy - ey
+      const bx2 = angle === 45 ? cx + ex : cx + (radius + 4)
+      const by2 = cy + (radius + 4)
+
+      valid = !this.isExcluded(bx1, by1, bx2, by2)
+      attempts++
+    } while (!valid && attempts < MAX_ATTEMPTS)
+
+    if (!valid) return null
+
+    const tiles = []
+    this.digNoisyCircle(tiles, cx, cy, radius, radius + 4, NODES.HIVE.code, 0.3, PERLIN_OFFSET_HIVE)
+    this.digNoisyCircle(tiles, cx, cy, radius - 3, radius, NODES.VOID.code, 0.3, PERLIN_OFFSET_HIVE)
+    const rect2 = this.applyTiles(tiles)
+
+    const path = this.pathTunnel(cx, cy, 4, length, angle, 10)
+    this.carveAlongPath(path)
+
+    this.addExclusion(rect2)
+    return {cx, cy, radius}
+  }
+
+  /**
+ * Creuse hiveCount ruches en zone JUNGLE (underground → caverns_top).
+ * 1 monde sur 2 : une ruche intrusion est placée dans un biome étranger (FOREST ou DESERT),
+ * dans la même layer que les ruches normales.
+ * Le remplissage HONEY est différé.
+ *
+ * @param {{forest, desert, jungle}} biomeCounts
+ * @returns {Array<{cx, cy, radius}>}
+ */
+  digHives (biomeCounts) {
+    const hiveCount = Math.max(3, 2 * biomeCounts.jungle)
+    const hives = []
+
+    // ── Ruches normales — zones JUNGLE ───────────────────────────────────────
+    const jungleRects = []
+    for (let i = 0; i < this.#zoneRects.length; i++) {
+      if (this.#zoneRects[i].biome === BIOME_TYPE.JUNGLE) jungleRects.push(this.#zoneRects[i])
+    }
+
+    if (jungleRects.length > 0) {
+      for (let i = 0; i < hiveCount; i++) {
+        const rect = seededRNG.randomGetArrayValue(jungleRects)
+        const hive = this.#digOneHive(rect)
+        if (hive) hives.push(hive)
+      }
+    }
+
+    // ── Ruche intrusion — 1 monde sur 2, biome étranger ──────────────────────
+    if (seededRNG.randomGet() < 0.5) {
+      const foreignRects = []
+      for (let i = 0; i < this.#zoneRects.length; i++) {
+        if (this.#zoneRects[i].biome !== BIOME_TYPE.JUNGLE) foreignRects.push(this.#zoneRects[i])
+      }
+      if (foreignRects.length > 0) {
+        const rect = seededRNG.randomGetArrayValue(foreignRects)
+        const hive = this.#digOneHive(rect)
+        if (hive) hives.push(hive)
+      }
+    }
+
+    return hives
+  }
+
+  /**
  * Creuse HIVE_COUNT ruches dans les zones JUNGLE (underground et caverns_top).
  * Chaque ruche est constituée d'une paroi HIVE (cercle bruité) et d'un
  * intérieur VOID, accessible par une galerie diagonale (45° ou -45°).
@@ -1914,62 +2016,62 @@ class WorldCarver {
  * @param {Int16Array}            underCaverns       - Altitudes haute caverne par colonne X
  */
 
-  digHives (biomeCounts, biomesDescription, surfaceUnder, underCaverns) {
-    const hiveCount = Math.max(3, 2 * biomeCounts.jungle)
-    const hellTop = WORLD_HEIGHT - 32
-    const MAX_ATTEMPTS = 100
+  // digHives (biomeCounts, biomesDescription, surfaceUnder, underCaverns) {
+  //   const hiveCount = Math.max(3, 2 * biomeCounts.jungle)
+  //   const hellTop = WORLD_HEIGHT - 32
+  //   const MAX_ATTEMPTS = 100
 
-    const jungleZones = []
-    for (let i = 0; i < biomesDescription.length; i++) {
-      if (biomesDescription[i].biome === BIOME_TYPE.JUNGLE) jungleZones.push(biomesDescription[i])
-    }
-    if (jungleZones.length === 0) return []
+  //   const jungleZones = []
+  //   for (let i = 0; i < biomesDescription.length; i++) {
+  //     if (biomesDescription[i].biome === BIOME_TYPE.JUNGLE) jungleZones.push(biomesDescription[i])
+  //   }
+  //   if (jungleZones.length === 0) return []
 
-    const hives = []
+  //   const hives = []
 
-    for (let i = 0; i < hiveCount; i++) {
-      const zone = jungleZones[seededRNG.randomGetMinMax(0, jungleZones.length - 1)]
-      const radius = seededRNG.randomGetMinMax(HIVE_RADIUS_MIN, HIVE_RADIUS_MAX)
-      const cavernsTop = (underCaverns[zone.offset + (zone.width >> 1)] + hellTop) >> 1
-      const angle = seededRNG.randomGetBool() ? 45 : -45
-      const length = seededRNG.randomGetMinMax(30, 50)
+  //   for (let i = 0; i < hiveCount; i++) {
+  //     const zone = jungleZones[seededRNG.randomGetMinMax(0, jungleZones.length - 1)]
+  //     const radius = seededRNG.randomGetMinMax(HIVE_RADIUS_MIN, HIVE_RADIUS_MAX)
+  //     const cavernsTop = (underCaverns[zone.offset + (zone.width >> 1)] + hellTop) >> 1
+  //     const angle = seededRNG.randomGetBool() ? 45 : -45
+  //     const length = seededRNG.randomGetMinMax(30, 50)
 
-      // Rectangle englobant : union du carré hive + carré galerie
-      // +45° : galerie monte vers la droite
-      // -45° : galerie monte vers la gauche
-      const ex = length + 4
-      const ey = length + 4
+  //     // Rectangle englobant : union du carré hive + carré galerie
+  //     // +45° : galerie monte vers la droite
+  //     // -45° : galerie monte vers la gauche
+  //     const ex = length + 4
+  //     const ey = length + 4
 
-      let cx, cy, valid
-      let attempts = 0
-      do {
-        cx = seededRNG.randomGetMinMax(zone.offset + radius, zone.offset + zone.width - radius - 1)
-        cy = seededRNG.randomGetMinMax(surfaceUnder[cx] + radius, cavernsTop - radius)
+  //     let cx, cy, valid
+  //     let attempts = 0
+  //     do {
+  //       cx = seededRNG.randomGetMinMax(zone.offset + radius, zone.offset + zone.width - radius - 1)
+  //       cy = seededRNG.randomGetMinMax(surfaceUnder[cx] + radius, cavernsTop - radius)
 
-        const bx1 = angle === 45 ? cx - (radius + 4) : cx - ex
-        const by1 = cy - ey
-        const bx2 = angle === 45 ? cx + ex : cx + (radius + 4)
-        const by2 = cy + (radius + 4)
+  //       const bx1 = angle === 45 ? cx - (radius + 4) : cx - ex
+  //       const by1 = cy - ey
+  //       const bx2 = angle === 45 ? cx + ex : cx + (radius + 4)
+  //       const by2 = cy + (radius + 4)
 
-        valid = !this.isExcluded(bx1, by1, bx2, by2)
-        attempts++
-      } while (!valid && attempts < MAX_ATTEMPTS)
-      if (!valid) continue
+  //       valid = !this.isExcluded(bx1, by1, bx2, by2)
+  //       attempts++
+  //     } while (!valid && attempts < MAX_ATTEMPTS)
+  //     if (!valid) continue
 
-      const tiles = []
-      this.digNoisyCircle(tiles, cx, cy, radius, radius + 4, NODES.HIVE.code, 0.3, PERLIN_OFFSET_HIVE)
-      this.digNoisyCircle(tiles, cx, cy, radius - 3, radius, NODES.VOID.code, 0.3, PERLIN_OFFSET_HIVE)
-      const rect = this.applyTiles(tiles)
+  //     const tiles = []
+  //     this.digNoisyCircle(tiles, cx, cy, radius, radius + 4, NODES.HIVE.code, 0.3, PERLIN_OFFSET_HIVE)
+  //     this.digNoisyCircle(tiles, cx, cy, radius - 3, radius, NODES.VOID.code, 0.3, PERLIN_OFFSET_HIVE)
+  //     const rect = this.applyTiles(tiles)
 
-      const path = this.pathTunnel(cx, cy, 4, length, angle, 10)
-      this.carveAlongPath(path)
+  //     const path = this.pathTunnel(cx, cy, 4, length, angle, 10)
+  //     this.carveAlongPath(path)
 
-      hives.push({cx, cy, radius})
-      this.addExclusion(rect)
-    }
+  //     hives.push({cx, cy, radius})
+  //     this.addExclusion(rect)
+  //   }
 
-    return hives
-  }
+  //   return hives
+  // }
 
   /**
  * Creuse entre COBWEB_CAVE_COUNT_MIN et COBWEB_CAVE_COUNT_MAX cavernes elliptiques
