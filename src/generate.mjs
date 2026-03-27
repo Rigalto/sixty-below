@@ -203,7 +203,7 @@ class WorldGenerator {
     // 6.3 Creusement des mini-biomes avec peuplement différé - TODO
     const hives = worldCarver.digHives(biomeCounts)
     await progress('Hives')
-    const cobwebCaves = worldCarver.digCobwebCaves(underCaverns)
+    const cobwebCaves = worldCarver.digCobwebCaves()
     await progress('Cobweb caves')
     const graniteCaves = worldCarver.digGeodeCaves(underCaverns, NODES.GRANITE.code)
     const marbleCaves = worldCarver.digGeodeCaves(underCaverns, NODES.MARBLE.code)
@@ -2074,6 +2074,76 @@ class WorldCarver {
   // }
 
   /**
+ * Creuse une caverne à toiles d'araignée à une position aléatoire.
+ * y0/y1 définissent la plage verticale de placement — permet l'intrusion under.
+ *
+ * @param {number} y0 - Y minimum pour cy
+ * @param {number} y1 - Y maximum pour cy
+ * @returns {{cx, cy, radiusX, radiusY}|null} — null si MAX_ATTEMPTS épuisé
+ */
+  #digOneCobwebCave (y0, y1) {
+    const MAX_ATTEMPTS = 100
+    const radiusX = seededRNG.randomGetMinMax(COBWEB_RADIUS_X_MIN, COBWEB_RADIUS_X_MAX)
+    const radiusY = seededRNG.randomGetMinMax(COBWEB_RADIUS_Y_MIN, COBWEB_RADIUS_Y_MAX)
+
+    let cx, cy, valid
+    let attempts = 0
+    do {
+      cx = seededRNG.randomGetMinMax(radiusX, WORLD_WIDTH - radiusX - 1)
+      cy = seededRNG.randomGetMinMax(y0 + radiusY, y1 - radiusY)
+      valid = !this.isExcluded(cx - radiusX, cy - radiusY, cx + radiusX, cy + radiusY)
+      attempts++
+    } while (!valid && attempts < MAX_ATTEMPTS)
+    if (!valid) return null
+
+    const tiles = []
+    this.digNoisyEllipse(tiles, cx, cy, radiusX - 2, radiusX + 2, radiusY - 2, radiusY + 2, NODES.VOID.code, 0.3, PERLIN_OFFSET_COBWEB)
+    const rect = this.applyTiles(tiles)
+    this.addExclusion(rect)
+
+    return {cx, cy, radiusX, radiusY}
+  }
+
+  /**
+ * Creuse COBWEB_CAVE_COUNT_MIN–MAX cavernes elliptiques dans tous les biomes,
+ * caverns_top (80%) ou caverns_bottom (20%).
+ * Intrusion : 1 caverne systématique dans la layer under, biome aléatoire.
+ *
+ * @returns {Array<{cx, cy, radiusX, radiusY}>}
+ */
+  digCobwebCaves () {
+    const count = seededRNG.randomGetMinMax(COBWEB_CAVE_COUNT_MIN, COBWEB_CAVE_COUNT_MAX)
+    const caves = []
+
+    // ── Cavernes normales — caverns_top ou caverns_bottom ─────────────────────
+    for (let i = 0; i < count; i++) {
+      const isCavernTop = seededRNG.randomGetMinMax(0, 4) > 0
+
+      // Trouver le rect pour un cx libre sur tout le monde
+      const cx = seededRNG.randomGetMinMax(COBWEB_RADIUS_X_MAX, WORLD_WIDTH - COBWEB_RADIUS_X_MAX - 1)
+      let rect = this.#zoneRects[this.#zoneRects.length - 1]
+      for (let j = 0; j < this.#zoneRects.length; j++) {
+        if (cx <= this.#zoneRects[j].x1) { rect = this.#zoneRects[j]; break }
+      }
+
+      const y0 = isCavernTop ? rect.yUnder : rect.yCavernsMid
+      const y1 = isCavernTop ? rect.yCavernsMid : rect.yCaverns
+
+      const cave = this.#digOneCobwebCave(y0, y1)
+      if (cave) caves.push(cave)
+    }
+
+    // ── Intrusion — 1 caverne dans la layer under, biome aléatoire ───────────
+    {
+      const rect = seededRNG.randomGetArrayValue(this.#zoneRects)
+      const cave = this.#digOneCobwebCave(rect.ySurface, rect.yUnder)
+      if (cave) caves.push(cave)
+    }
+
+    return caves
+  }
+
+  /**
  * Creuse entre COBWEB_CAVE_COUNT_MIN et COBWEB_CAVE_COUNT_MAX cavernes elliptiques
  * dans tous les biomes, en zone cavern_top (80%) ou cavern_bottom (25%).
  * Le remplissage COBWEB du toit est différé.
@@ -2081,7 +2151,7 @@ class WorldCarver {
  * @param {Int16Array} underCaverns - Altitudes haute caverne par colonne X
  * @returns {Array<{cx, cy, radiusX, radiusY}>}
  */
-  digCobwebCaves (underCaverns) {
+  digCobwebCaves_ () {
     const count = seededRNG.randomGetMinMax(COBWEB_CAVE_COUNT_MIN, COBWEB_CAVE_COUNT_MAX)
     const MAX_ATTEMPTS = 100
     const caves = []
