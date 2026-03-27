@@ -260,6 +260,11 @@ class WorldGenerator {
     // caverns_top - Forest - WATER + HUMUS
     // const undergroundlake = worldCarver.digUndergroundLake()
 
+    // 6.3.X Blind Lake
+    // caverns_bottom - Tout biomes - WATER + HARDROCK (transformé ensuite en HARDSTONE)
+    // const blindlakes = worldCarver.digBlindLakes()
+    // await progress('Deep Water Bodies')
+
     // 7. Traitement des surfaces végétales + désert - TODO
 
     // 7.1. Erosion naturelle (on rend la surface plus lisse)

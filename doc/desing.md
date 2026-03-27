@@ -388,12 +388,14 @@ dans un biome étranger (cf. §3.9).
 
 | Mini-biome | Layer | Matériau dominant | Contenu / Lore |
 |---|---|---|---|
-| **Ancient House** | under→caverns | variable | Habitation ancienne. Artefacts passifs high-tier. Pas de combat. |
 | **Cobweb Cave** | caverns | WEB | Caverne elliptique à forte densité de toiles. Les tuiles WEB sont minables mais se régénèrent rapidement dans tout espace vide souterrain (régénération globale plus lente — cf. §3.11). Les Cobweb Caves concentrent cette régénération à un rythme bien supérieur et sont les seuls lieux où spawent les monstres SPIDER, MYGALE, et le boss TARENTULA. Les toiles entravent les déplacements mais constituent une matière première essentielle à l'artisanat. |
 | **Granite Cave** | caverns_bottom | GRANITE 4* | Géode de granite. Ennemis rocheux (Stonegnaw, Rockborer). |
 | **Marble Cave** | caverns_bottom | MARBLE 4* | Géode de marble. Ennemis rocheux.  (Stonegnaw, Rockborer). |
+| **Abandoned Mine** | caverns_bottom | OBSIDIAN + COBALTWALL | Tous biomes. Galerie horizontale creusée par une civilisation ancienne. OBSIDIAN en toit et sol. Étais de COBALTWALL tous les 5 tuiles (minables sans conséquence). Coffres de matériaux de construction et minerais extraits. Faune commune de la zone. |
+| **Blind Lake** | caverns_bottom | WATER + HARDSTONE | Tous biomes. Lac aveugle sans accès naturel — le joueur doit creuser pour y accéder. Fond et parois de HARDSTONE. Poissons aveugles et AXOLOTL pêchables (tier 4-5). Pas de faune agressive. Bioluminescence ambiante. |
+
+
 | **Crystal Pocket** | caverns | GEM natif | Géode ouverte tapissée de gemmes. Visuellement très distinctive. Pas de combat. |
-| **Abandoned Mine** | under | STONE + DIRT | Galeries creusées par des mineurs. Coffres pillés, quelques loot résiduels. Pas de combat. |
 | **Underground River** | under→caverns | WATER | Long couloir horizontal rempli d'eau. Relie plusieurs zones. Poissons rares. |
 | **Lava Bubble** | caverns_bottom | OBSIDIAN | Poche de lave refroidie en surface. OBSIDIAN sur les bords. Zone dangereuse. |
 | **Meteor Crater** | surface | METEORITE | Impact météoritique. METEORITE autour du cratère. Ennemis spécifiques. |

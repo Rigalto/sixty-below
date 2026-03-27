@@ -110,7 +110,8 @@ export const NODES = {
   SHORE: {code: 70, name: 'Shore', color: '#FFCC00'},
   // types utilisés de manière temporaire pendant la création du monde
   SAPROCK: {code: 71, name: 'Sap Rock', type: NODE_TYPE.CREATION, color: '#34e648'}, // à remplacer par SLATE
-  HEART: {code: 72, name: 'Life Heart', type: NODE_TYPE.CREATION, color: '#FF19CD'} // à replacer par VOID et un furniture
+  HARDROCK: {code: 72, name: 'Hard Rock', type: NODE_TYPE.CREATION, color: '#34e648'}, // à remplacer par HARDSTONE
+  HEART: {code: 73, name: 'Life Heart', type: NODE_TYPE.CREATION, color: '#FF19CD'} // à replacer par VOID et un furniture
 }
 
 /** Lookup par code numérique — hot path render/physics */
