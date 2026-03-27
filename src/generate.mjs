@@ -2005,75 +2005,6 @@ class WorldCarver {
   }
 
   /**
- * Creuse HIVE_COUNT ruches dans les zones JUNGLE (underground et caverns_top).
- * Chaque ruche est constituée d'une paroi HIVE (cercle bruité) et d'un
- * intérieur VOID, accessible par une galerie diagonale (45° ou -45°).
- * Le remplissage HONEY sera effectué dans une passe ultérieure.
- *
- * @param {{forest, desert, jungle}}      biomeCounts
- * @param {Array<{biome, width, offset}>} biomesDescription
- * @param {Int16Array}            surfaceUnder       - Altitudes basse surface par colonne X
- * @param {Int16Array}            underCaverns       - Altitudes haute caverne par colonne X
- */
-
-  // digHives (biomeCounts, biomesDescription, surfaceUnder, underCaverns) {
-  //   const hiveCount = Math.max(3, 2 * biomeCounts.jungle)
-  //   const hellTop = WORLD_HEIGHT - 32
-  //   const MAX_ATTEMPTS = 100
-
-  //   const jungleZones = []
-  //   for (let i = 0; i < biomesDescription.length; i++) {
-  //     if (biomesDescription[i].biome === BIOME_TYPE.JUNGLE) jungleZones.push(biomesDescription[i])
-  //   }
-  //   if (jungleZones.length === 0) return []
-
-  //   const hives = []
-
-  //   for (let i = 0; i < hiveCount; i++) {
-  //     const zone = jungleZones[seededRNG.randomGetMinMax(0, jungleZones.length - 1)]
-  //     const radius = seededRNG.randomGetMinMax(HIVE_RADIUS_MIN, HIVE_RADIUS_MAX)
-  //     const cavernsTop = (underCaverns[zone.offset + (zone.width >> 1)] + hellTop) >> 1
-  //     const angle = seededRNG.randomGetBool() ? 45 : -45
-  //     const length = seededRNG.randomGetMinMax(30, 50)
-
-  //     // Rectangle englobant : union du carré hive + carré galerie
-  //     // +45° : galerie monte vers la droite
-  //     // -45° : galerie monte vers la gauche
-  //     const ex = length + 4
-  //     const ey = length + 4
-
-  //     let cx, cy, valid
-  //     let attempts = 0
-  //     do {
-  //       cx = seededRNG.randomGetMinMax(zone.offset + radius, zone.offset + zone.width - radius - 1)
-  //       cy = seededRNG.randomGetMinMax(surfaceUnder[cx] + radius, cavernsTop - radius)
-
-  //       const bx1 = angle === 45 ? cx - (radius + 4) : cx - ex
-  //       const by1 = cy - ey
-  //       const bx2 = angle === 45 ? cx + ex : cx + (radius + 4)
-  //       const by2 = cy + (radius + 4)
-
-  //       valid = !this.isExcluded(bx1, by1, bx2, by2)
-  //       attempts++
-  //     } while (!valid && attempts < MAX_ATTEMPTS)
-  //     if (!valid) continue
-
-  //     const tiles = []
-  //     this.digNoisyCircle(tiles, cx, cy, radius, radius + 4, NODES.HIVE.code, 0.3, PERLIN_OFFSET_HIVE)
-  //     this.digNoisyCircle(tiles, cx, cy, radius - 3, radius, NODES.VOID.code, 0.3, PERLIN_OFFSET_HIVE)
-  //     const rect = this.applyTiles(tiles)
-
-  //     const path = this.pathTunnel(cx, cy, 4, length, angle, 10)
-  //     this.carveAlongPath(path)
-
-  //     hives.push({cx, cy, radius})
-  //     this.addExclusion(rect)
-  //   }
-
-  //   return hives
-  // }
-
-  /**
  * Creuse une caverne à toiles d'araignée à une position aléatoire.
  * y0/y1 définissent la plage verticale de placement — permet l'intrusion under.
  *
@@ -2138,55 +2069,6 @@ class WorldCarver {
       const rect = seededRNG.randomGetArrayValue(this.#zoneRects)
       const cave = this.#digOneCobwebCave(rect.ySurface, rect.yUnder)
       if (cave) caves.push(cave)
-    }
-
-    return caves
-  }
-
-  /**
- * Creuse entre COBWEB_CAVE_COUNT_MIN et COBWEB_CAVE_COUNT_MAX cavernes elliptiques
- * dans tous les biomes, en zone cavern_top (80%) ou cavern_bottom (25%).
- * Le remplissage COBWEB du toit est différé.
- *
- * @param {Int16Array} underCaverns - Altitudes haute caverne par colonne X
- * @returns {Array<{cx, cy, radiusX, radiusY}>}
- */
-  digCobwebCaves_ () {
-    const count = seededRNG.randomGetMinMax(COBWEB_CAVE_COUNT_MIN, COBWEB_CAVE_COUNT_MAX)
-    const MAX_ATTEMPTS = 100
-    const caves = []
-
-    for (let i = 0; i < count; i++) {
-      const radiusX = seededRNG.randomGetMinMax(COBWEB_RADIUS_X_MIN, COBWEB_RADIUS_X_MAX)
-      const radiusY = seededRNG.randomGetMinMax(COBWEB_RADIUS_Y_MIN, COBWEB_RADIUS_Y_MAX)
-      const isCavernTop = seededRNG.randomGetMinMax(0, 4) > 0
-
-      let cx, cy, valid
-      let attempts = 0
-      do {
-        cx = seededRNG.randomGetMinMax(radiusX, WORLD_WIDTH - radiusX - 1)
-
-        // Trouver le rect correspondant à cx
-        let rect = this.#zoneRects[this.#zoneRects.length - 1]
-        for (let j = 0; j < this.#zoneRects.length; j++) {
-          if (cx <= this.#zoneRects[j].x1) { rect = this.#zoneRects[j]; break }
-        }
-
-        cy = isCavernTop
-          ? seededRNG.randomGetMinMax(rect.yUnder + radiusY, rect.yCavernsMid - radiusY)
-          : seededRNG.randomGetMinMax(rect.yCavernsMid + radiusY, rect.yCaverns - radiusY)
-
-        valid = !this.isExcluded(cx - radiusX, cy - radiusY, cx + radiusX, cy + radiusY)
-        attempts++
-      } while (!valid && attempts < MAX_ATTEMPTS)
-      if (!valid) continue
-
-      const tiles = []
-      this.digNoisyEllipse(tiles, cx, cy, radiusX - 2, radiusX + 2, radiusY - 2, radiusY + 2, NODES.VOID.code, 0.3, PERLIN_OFFSET_COBWEB)
-      const rect = this.applyTiles(tiles)
-      this.addExclusion(rect)
-
-      caves.push({cx, cy, radiusX, radiusY})
     }
 
     return caves
