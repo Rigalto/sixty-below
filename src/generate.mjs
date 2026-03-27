@@ -201,14 +201,64 @@ class WorldGenerator {
     // 6.2 Creusement des mini-biomes avec peuplement - TODO
 
     // 6.3 Creusement des mini-biomes avec peuplement différé - TODO
+
+    // 6.3.1 HIVE caves
     const hives = worldCarver.digHives(biomeCounts)
     await progress('Hives')
+
+    // 6.3.2 Cobweb caves
     const cobwebCaves = worldCarver.digCobwebCaves()
     await progress('Cobweb caves')
+
+    // 6.3.3 Marble caves et  Granite caves
     const graniteCaves = worldCarver.digGeodeCaves(NODES.GRANITE.code)
     const marbleCaves = worldCarver.digGeodeCaves(NODES.MARBLE.code)
     const geodeCaves = graniteCaves.concat(marbleCaves)
     await progress('Geode caves')
+
+    // 6.3.X Mushroom caves
+    // const mushroomCaves = worldCarver.digMushroomCaves()
+
+    // 6.3.X Anthill
+    // const anthills = worldCarver.digAnthills()
+
+    // 6.3.X Termite Mound
+    // const termites = worldCarver.digTermiteMounds()
+
+    // 6.3.X Antilion Pit
+    // const antilions = worldCarver.digAntilionPits()
+
+    // 6.3.X Fern Caves
+    // Under, forest
+    // const ferns = worldCarver.digFernCaves()
+
+    // 6.3.X Pyramid
+    // le cy est tiré entre rect.yUnder et rect.yCavernsMid
+    // const pyramids = worldCarver.digPyramids()
+
+    // 6.3.X Sap Pokets
+    // Caverns_bottom, jungle - ressemble à Hive - Utiliser SAPROCK pour la paroi (demi-cercle bas uniquement)
+    // const sappockets = worldCarver.digSapPockets()
+
+    // 6.3.X Ancient House / Temple Ruin / Ruined Cabin
+    // Caverns_top, jungle - EMERALDWALL -
+    // const ancienthouse = worldCarver.digAncientHouse()
+    // Caverns_bottom, desert - GOLDWALL -
+    // const templeruin = worldCarver.digTempleRuin()
+    // Under, forest - STONEWALL -
+    // const ruinedcabin = worldCarver.digRuinedCabin()
+
+    // 6.3.X Fossil Vein
+    // caverns_top - desert - SHELL
+    // const fossilvein = worldCarver.digFossilVein()
+
+    // 6.3.X Moss Cave
+    // underground - jungle - MUD + HUMUS
+    // const mosscave = worldCarver.digMossCave()
+
+    // 6.3.X Underground Lake
+    // caverns_top - Forest - WATER + HUMUS
+    // const undergroundlake = worldCarver.digUndergroundLake()
 
     // 7. Traitement des surfaces végétales + désert - TODO
 

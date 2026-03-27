@@ -336,33 +336,204 @@ sont indicatives — les densités exactes sont définies dans `ORE_GEM_SCATTER_
 
 ---
 
-## 5. Données & Persistance
+## 5. Mini-Biomes & Lieux Remarquables
 
-### 5.1 Stockage Local
+Les mini-biomes sont des zones de taille limitée, générées procéduralement, qui
+rompent la monotonie de l'exploration. Chaque mini-biome est caractérisé par des
+matériaux distinctifs, une faune ou des pièges spécifiques, et parfois un loot unique.
+
+Certains mini-biomes déclenchent un combat tactique (§4) à l'entrée ou à l'interaction.
+Les mini-biomes peuvent apparaître dans leur biome natif ou, rarement, en intrusion
+dans un biome étranger (cf. §3.9).
+
+---
+
+### 5.1 Mini-Biomes FOREST
+
+| Mini-biome | Layer | Matériau dominant | Contenu / Lore |
+|---|---|---|---|
+| **Anthill** | surface | DIRT | Fourmilière conique s'élevant au-dessus de la surface. Reconstruite par les habitants si détruite. ANT, ANT SOLDIER. Boss ANT QUEEN. |
+| **Fern Cave** | under | HUMUS + GRASSFERN | Fougères géantes. Sol meuble. Loot végétal rare. |
+| **Ruined Cabin** | under | STONEWALL | Forest. Cabane effondrée. Murs vermoulus, pièges simples, coffre tier 3 biomes mélangés. Faune commune de la zone. |
+| **Mushroom Cave** | caverns_top | HUMUS + GRASSMUSHROOM | Champignons géants lumineux. Faune passive. Spores récoltables pour de puissantes potions. |
+| **Underground Lake** | caverns_top | WATER + HUMUS | Poche d'eau douce. Plafond de mousse. Poissons rares. Accès par tunnel vertical. |
+
+---
+
+### 5.2 Mini-Biomes DESERT
+
+| Mini-biome | Layer | Matériau dominant | Contenu / Lore |
+|---|---|---|---|
+| **Antlion Pit** | surface | SAND | Piège conique creux dans le sable. Reconstruit par les habitants si détruit. ANTLION. Boss SUNBURST ANTLION. |
+| **Pyramid** | under | SANDSTONE | Deux chambres. Chambre 1 : salle de pièges (flèches, rouleaux — combat tactique). Chambre 2 : salle triangulaire — boss Pharaon + gardes (momies, sphinx). Loot high-tier. |
+| **Sand Pocket** | under | SAND | Grande poche de SAND sous pression. S'effondre partiellement si le plafond est miné. |
+| **Fossil Vein** | caverns_top | SHELL | Veine horizontale d'accumulation sédimentaire (ancien fond marin). Minage → item Shell (ingrédient pour mécanique délicate ou potion (réduit en poudre). Source secondaire : bords et fond de mer (régénération lente). |
+| **Ancient House** | caverns_bottom | GOLDWALL | Ruines d'une civilisation ancienne. Architecture et matériaux différents du Temple Ruin. Pièges, coffres (tier 4-5). Machine ancestrale : Transmutateur. Inamovible. Faune commune de la zone. |
+
+---
+
+### 5.3 Mini-Biomes JUNGLE
+
+| Mini-biome | Layer | Matériau dominant | Contenu / Lore |
+|---|---|---|---|
+| **Termite Mound** | surface | MUD + STONEWALL | Jungle. Termitière rectangulaire s'élevant au-dessus de la surface, partie souterraine plus profonde. Reconstruite par les habitants si détruite. TERMITE, TERMITE SOLDIER. Boss TERMITE KING. Loot : matériaux de construction, ingrédients rares. |
+| **Moss Cave** | under | MUD + HUMUS | Parois recouvertes de mousse lumineuse. Faune passive rare. Loot végétal. |
+| **Hive** | caverns_top | HIVE + HONEY | Ruche d'abeilles (BEE, HORNET). Boss Queen Bee. Remplie de HONEY après génération (liquide, artisanat tier 4). HONEY difficile à récupérer car défendu par les habitants de la ruche : mise en place par le joueur d'une canalisation détournant le miel pour le récolter facilement. |
+| **Temple Ruin** | caverns_top | EMERALDWALL | Ruines d'une civilisation ancienne. Architecture et matériaux différents du Ancient House. Murs effondrés, planchers vermoulus, pièges, coffres (tier 3-4). Machine ancestrale : Décomposeur (rendement 80%). Inamovible. Faune commune de la zone. |
+| **Sap Pocket** | caverns_bottom | LIMESTONE + SAP | Poche de SAP piégeant des insectes fossilisés. Loot d'artisanat rare. |
+
+---
+
+### 5.4 Mini-Biomes Transversaux (tous biomes)
+
+| Mini-biome | Layer | Matériau dominant | Contenu / Lore |
+|---|---|---|---|
+| **Ancient House** | under→caverns | variable | Habitation ancienne. Artefacts passifs high-tier. Pas de combat. |
+| **Cobweb Cave** | caverns | WEB | Caverne elliptique à forte densité de toiles. Les tuiles WEB sont minables mais se régénèrent rapidement dans tout espace vide souterrain (régénération globale plus lente — cf. §3.11). Les Cobweb Caves concentrent cette régénération à un rythme bien supérieur et sont les seuls lieux où spawent les monstres SPIDER, MYGALE, et le boss TARENTULA. Les toiles entravent les déplacements mais constituent une matière première essentielle à l'artisanat. |
+| **Granite Cave** | caverns_bottom | GRANITE 4* | Géode de granite. Ennemis rocheux (Stonegnaw, Rockborer). |
+| **Marble Cave** | caverns_bottom | MARBLE 4* | Géode de marble. Ennemis rocheux.  (Stonegnaw, Rockborer). |
+| **Crystal Pocket** | caverns | GEM natif | Géode ouverte tapissée de gemmes. Visuellement très distinctive. Pas de combat. |
+| **Abandoned Mine** | under | STONE + DIRT | Galeries creusées par des mineurs. Coffres pillés, quelques loot résiduels. Pas de combat. |
+| **Underground River** | under→caverns | WATER | Long couloir horizontal rempli d'eau. Relie plusieurs zones. Poissons rares. |
+| **Lava Bubble** | caverns_bottom | OBSIDIAN | Poche de lave refroidie en surface. OBSIDIAN sur les bords. Zone dangereuse. |
+| **Meteor Crater** | surface | METEORITE | Impact météoritique. METEORITE autour du cratère. Ennemis spécifiques. |
+
+---
+
+### 5.5 Règles Générales
+
+- Chaque mini-biome est entouré d'une **zone d'exclusion** empêchant le chevauchement
+  avec d'autres mini-biomes (cf. `#exclusions` dans `WorldCarver`).
+- Les mini-biomes déclenchant un combat utilisent le système tactique standard (§4),
+  avec un terrain généré en fonction du biome et de la layer hôtes.
+- Un mini-biome peut apparaître en **intrusion** dans un biome étranger (1 occurrence
+  par monde maximum pour les intrusions). Les règles d'intrusion sont définies dans
+  les fonctions `digXxxIntrusions()` de `WorldCarver`.
+- Les loot et ennemis spécifiques à chaque mini-biome sont définis dans `data.mjs`.
+
+---
+
+### 5.6 Règles de Tier
+
+Le tier d'un monstre indique sa place dans la progression du joueur — à quelle
+profondeur il est prévu de le rencontrer et quel niveau d'équipement est requis
+pour le battre confortablement. Un boss de zone N a le même tier que la faune
+commune de la zone N+1 : la progression est continue, sans palier artificiel.
+
+| Tier | Zone principale | Contenu |
+|---|---|---|
+| 1 | Surface | Faune commune de surface |
+| 2 | Underground | Faune commune de under / Boss de surface |
+| 3 | Caverns_top | Faune commune de caverns_top / Boss de under |
+| 4 | Caverns_bottom | Faune commune de caverns_bottom / Boss de caverns_top |
+| 5 | — | Boss de caverns_bottom uniquement |
+
+**Règles complémentaires :**
+
+- La table est indicative — une espèce peut spawner hors de sa zone principale
+  (intrusion, migration, curiosité). Sa Strength reste celle de son tier natif,
+  ce qui crée des surprises dans les deux sens (ennemi facile en profondeur,
+  ennemi difficile en surface).
+- La densité de spawn est calibrée pour que l'exploration ne devienne pas une
+  succession infinie de combats. Leviers disponibles : délai de réaction avant
+  qu'un monstre devienne agressif, artefacts et potions qui éloignent ou calment
+  certains types, cycle jour/nuit affectant les spawns.
+- Certaines espèces ont des variantes (couleur, taille) avec des mécaniques de
+  combat différentes — destinées à habituer progressivement le joueur aux
+  systèmes tactiques. Exemple : les Slimes de forêt introduisent les bases du
+  combat dès les premiers jours.
+- Les boss ont un délai d'apparition minimum (exprimé en jours de jeu) pour
+  laisser au joueur le temps de se préparer. Exemple : Blue Slime n'apparaît
+  pas avant le jour 5. Une fois vaincu, il y a un délai de réapparition, obligeant
+  le joueur à diversifier ses activités.
+
+---
+
+## 5.7 Faune & Monstres
+
+| Nom | Tier | Strength | Biome / Mini-biome / Layer |
+|---|---|---|---|
+| **BEETLE** | 1 | ★☆☆☆☆ | Forest — surface |
+| **SCORPION** | 1 | ★★☆☆☆ | Desert — surface |
+| **SAND SNAKE** | 1 | ★★☆☆☆ | Desert — surface |
+| **JUNGLE SPIDER** | 1 | ★★☆☆☆ | Jungle — surface |
+| **BAT** | 2 | ★★☆☆☆ | Tous biomes — under |
+| **CAVE WORM** | 2 | ★★☆☆☆ | Tous biomes — under |
+| **CAVE FISH** | 3 | ★☆☆☆☆ | Underground Lake, Underground River |
+| **DEEP CRAWLER** | 4 | ★★★★☆ | Tous biomes — caverns_bottom |
+| **LAVA SPRITE** | 4 | ★★★★☆ | Tous biomes — caverns_bottom |
+| **DEEP CRAWLER KING** | 5 | ★★★★★ | Tous biomes — caverns_bottom |
+
+| **FIREFLY** | TBD| - | Critter - Tous biomes — surface (nuit) |
+| **SLUG** | TBD| - | Critter - Forest — surface |
+| **DRAGONFLY** | TBD| - | Critter -Jungle — surface (jour) |
+| **SNAIL** | TBD| - | Critter - To be defined |
+| **BUTTERFLY** | TBD| - | Critter - To be defined |
+| **FROG** | TBD| - | Critter - Forest et Jungle / Surface |
+| **WORM** | TBD| - | Critter - Forest et Jungle / Surface et under |
+| **LOCUST** | TBD | — | Critter — Desert — surface |
+
+| **GREEN SLIME** | 1 | ★☆☆☆☆ | Forest — surface, under - day |
+| **BLUE SLIME** | 1 | ★★☆☆☆ | Forest — surface, under - night |
+| **GOLDEN SLIME** | 2 | ★★★★☆ | Forest — surface, under |
+
+| **ANTLION** | 1 | ★★☆☆☆ | Antlion Pit |
+| **SUNBURST ANTLION** | 2 | ★★★★☆ | Antlion Pit |
+| **ANT** | 1 | ★☆☆☆☆ | Anthill |
+| **ANT SOLDIER** | 2 | ★★☆☆☆ | Anthill |
+| **ANT QUEEN** | 2 | ★★★☆☆ | Anthill |
+| **TERMITE** | 1 | ★☆☆☆☆ | Termite Mound |
+| **TERMITE SOLDIER** | 2 | ★★☆☆☆ | Termite Mound |
+| **TERMITE KING** | 2 | ★★★☆☆ | Termite Mound |
+| **BEE** | 2 | ★★☆☆☆ | Hive |
+| **HORNET** | 3 | ★★★☆☆ | Hive |
+| **BEE QUEEN** | 3 | ★★★★☆ | Hive |
+| **RED SLUG** | 3 | ★★☆☆☆ | Mushroom Cave |
+| **HYDRA** | 3 | ★★★☆☆ | Mushroom Cave |
+| **ISOPOD** | 4 | ★★★★★ | Mushroom Cave |
+| **SPIDER** | 3 | ★★☆☆☆ | Cobweb Cave |
+| **MYGALE** | 3 | ★★★☆☆ | Cobweb Cave |
+| **TARENTULA KING** | 4 | ★★★★☆ | Cobweb Cave |
+| **STONEGNAW** | 4 | ★★★★☆ | Granite Cave, Marble Cave |
+| **ROCKBORER** | 4 | ★★★★★ | Granite Cave, Marble Cave |
+| **MOMIE** | 3 | ★★★☆☆ | Pyramid |
+| **SPHINX** | 4 | ★★★★☆ | Pyramid |
+| **PHARAON** | 4 | ★★★★★ | Pyramid |
+| **DENDROBATE** | 2 | ★★☆☆☆ | Fern Cave |
+| **MAMBA** | 2 | ★★★☆☆ | Fern Cave |
+| **AMBER SQUID** | 4 | ★★☆☆☆ | Fish - Sap Pocket |
+| **GLIDER** | 4 | ★★☆☆☆ | Fish - Sap Pocket |
+| **MANTIS** | 4 | ★★★★☆ | Sap Pocket |
+
+---
+
+## 6. Données & Persistance
+
+### 6.1 Stockage Local
 
 * **IndexedDB** native, via wrapper custom (`database.mjs`).
 * Pas de sérialisation JSON complexe : stockage direct d'objets JS structurés.
 
-### 5.2 Stratégie "Write-Behind"
+### 6.2 Stratégie "Write-Behind"
 
 * Les modifications en jeu ne déclenchent **pas** d'écriture immédiate.
 * Chunks modifiés → **Dirty Flag** (Set de coordonnées).
 * Le `TaskScheduler` déclenche la sauvegarde des chunks dirty **toutes les 2 secondes**.
 * Chaque sauvegarde englobe chunks + métadonnées critiques (Inventaire, Position) dans **une transaction unique** → cohérence en cas de crash.
 
-### 5.3 Transfer Pool (Zero-GC)
+### 6.3 Transfer Pool (Zero-GC)
 
 * Pool de 64 buffers `Uint8Array` couvrant 99 % des cas.
 * En cas d'overflow : allocation à la volée + avertissement console + persistance du pool étendu.
 
-### 5.4 GameState (K/V Global)
+### 6.4 GameState (K/V Global)
 
 * Stockage clé/valeur pour les états dispersés (Météo, Temps, Position, Flags…).
 * **Memory First :** la variable en RAM du Manager est la source de vérité. La DB est un miroir.
 * Au démarrage de session : chargement complet du gamestate en **une seule requête**, puis injection dans chaque Manager via `.init()`.
 * En runtime : écriture "Fire & Forget" (`database.setGameState`). Jamais d'`await` bloquant.
 
-### 5.5 Identifiants Logiques vs Physiques
+### 6.5 Identifiants Logiques vs Physiques
 
 * **Problème :** La clé primaire IndexedDB est générée *a posteriori* (async). On ne peut pas lier des entités entre elles au moment de leur création si l'on doit attendre la DB.
 * **Solution :** **UID logique** généré par l'application au moment de l'instanciation. Permet de construire des graphes d'objets en mémoire avant toute sauvegarde.
@@ -370,9 +541,9 @@ sont indicatives — les densités exactes sont définies dans `ORE_GEM_SCATTER_
 
 ---
 
-## 6. Interface & Rendu (UI/UX)
+## 7. Interface & Rendu (UI/UX)
 
-### 6.1 Organisation de l'Écran
+### 7.1 Organisation de l'Écran
 
 Découpage horizontal en 3 zones :
 
@@ -385,7 +556,7 @@ Découpage horizontal en 3 zones :
   * Buffs/Debuffs actifs.
   * Debug.
 
-### 6.2 Stratégie "Layered Canvas"
+### 7.2 Stratégie "Layered Canvas"
 
 La zone centrale est composée de `<canvas>` superposés (z-index CSS) :
 
@@ -403,7 +574,7 @@ La zone centrale est composée de `<canvas>` superposés (z-index CSS) :
 
 **Overlays :** centrés sur l'écran physique. S'empilent dans un ordre prédéterminé. Interruptifs (pause du jeu) si leur `state` est non-null.
 
-### 6.3 Système d'Éclairage (LightRenderer)
+### 7.3 Système d'Éclairage (LightRenderer)
 
 * **Stratégie :** Shadow Mapping par Soustraction ("Surface & Punch").
 * Le `LightRenderer` couvre la totalité du canvas et opère en 4 passes (`globalCompositeOperation`).
@@ -412,23 +583,23 @@ La zone centrale est composée de `<canvas>` superposés (z-index CSS) :
 
 *(Détail des 4 passes → `TECHNICAL.md §Éclairage`)*
 
-### 6.4 Ordre d'Affichage (Empilement Vertical)
+### 7.4 Ordre d'Affichage (Empilement Vertical)
 
 Tuiles → Flore → Meubles → Faune → Joueur. Pas de troisième dimension.
 
 ---
 
-## 7. Modules Métier (Layer 4+)
+## 8. Modules Métier (Layer 4+)
 
 Les modules communiquent via l'`EventBus` (couplage faible).
 
-### 7.1 Système d'Inventaire [`inventory.mjs`]
+### 8.1 Système d'Inventaire [`inventory.mjs`]
 
 * Gère : stockage, slots, équipement, artefacts passifs.
 * À la fermeture de l'interface : scan du contenu → émission de `inventory/static-buffs` avec la liste des IDs d'artefacts actifs.
 * L'inventaire **ne calcule pas** les stats.
 
-### 7.2 Système de Buffs [`buff.mjs`]
+### 8.2 Système de Buffs [`buff.mjs`]
 
 * Centralise tous les bonus/malus (Temporaires, Passifs, Équipement).
 * Pattern **"Re-emitter"** sur `inventory/static-buffs` :
@@ -437,12 +608,12 @@ Les modules communiquent via l'`EventBus` (couplage faible).
   * *Ex :* `'clock_lvl2'` reçu → émet `buff/precision` (valeur).
 * **Avantage :** L'UI ignore quels items déclenchent quels buffs. Changer une règle de game design ne touche pas l'UI.
 
-### 7.3 Interface Environnement [`ui.mjs :: EnvironmentWidget`]
+### 8.3 Interface Environnement [`ui.mjs :: EnvironmentWidget`]
 
 * Écoute les événements granulaires du `BuffManager` (`buff/moon`, `buff/weather`, `buff/coords`).
 * **Abonnement dynamique :** le widget ne s'abonne à `player/move` (fréquent) **que si** le buff `buff/coords-display` est actif. Désabonnement immédiat si le buff est perdu.
 
-### 7.4 Système Écosystème [`ecosystem.mjs`]
+### 8.4 Système Écosystème [`ecosystem.mjs`]
 * Gère la simulation temps réel des entités naturelles : croissance des plantes,
   production de HONEY, reconstruction des ruches, croissance des toiles d'araignées, chute de météroites.
 * Chaque système est déclenché par le `TaskScheduler` (timer global, décorrélé des chunks).
@@ -450,9 +621,9 @@ Les modules communiquent via l'`EventBus` (couplage faible).
 
 ---
 
-## 8. Organisation du Projet
+## 9. Organisation du Projet
 
-### 8.1 Structure des Fichiers
+### 9.1 Structure des Fichiers
 
 ```
 /sixty-below
@@ -488,7 +659,7 @@ Les modules communiquent via l'`EventBus` (couplage faible).
 ├── index.html               # Entry Point + Canvas Layers + DOM Containers
 └── package.json             # ESLint + Tests uniquement
 ```
-### 8.2 Tests Unitaires
+### 9.2 Tests Unitaires
 
 Les classes du Kernel (Layer 0–2) sont testées unitairement via un mini-framework
 Vanilla JS sans dépendance, situé dans `/tests`.
@@ -512,13 +683,13 @@ Vanilla JS sans dépendance, situé dans `/tests`.
 Les algorithmes individuels (`BiomesGenerator`, `BiomeNaturalizer`...) peuvent être
 testés unitairement en instanciant directement un `WorldBuffer` sans passer par `WorldGenerator`.
 
-### 8.3 Déploiement
+### 9.3 Déploiement
 
 * GitHub Pages — hébergement statique, branche `main`.
 * Pas de build step. Le navigateur charge les modules `.mjs` nativement.
 * CI : GitHub Action sur push → exécution des tests unitaires.
 
-### 8.4 Tooling
+### 9.4 Tooling
 
 * **Linter :** Google JavaScript Style Guide.
   * Pas de point-virgule en fin d'instruction.

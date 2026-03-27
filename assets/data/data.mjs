@@ -14,7 +14,7 @@
 
 export const BIOME_TYPE = {SEA: 1, FOREST: 2, DESERT: 3, JUNGLE: 4}
 
-export const NODE_TYPE = {GAZ: 0x1, LIQUID: 0x2, SOLID: 0x4, ETERNAL: 0x8, NATURAL: 0x10, TOPSOIL: 0x20, SUBSTRAT: 0x40, ORE: 0x80, GEM: 0x100, ROCK: 0x200, WOOD: 0x400, WALL: 0x800, BWALL: 0x1000, WEB: 0x2000}
+export const NODE_TYPE = {GAZ: 0x1, LIQUID: 0x2, SOLID: 0x4, ETERNAL: 0x8, NATURAL: 0x10, TOPSOIL: 0x20, SUBSTRAT: 0x40, ORE: 0x80, GEM: 0x100, ROCK: 0x200, WOOD: 0x400, WALL: 0x800, BWALL: 0x1000, WEB: 0x2000, CREATION: 0x4000}
 
 /* ============================================================================
    2. NODES
@@ -84,7 +84,7 @@ export const NODES = {
   MARBLE: {code: 47, name: 'Marble', type: NODE_TYPE.ROCK, star: 4, solid: true, color: '#e6ddc4', image: 'rock_16_16+1', speed: 1500, mining: [{item: 'marble', count: 1}]}, // UNDERWORLD
   OBSIDIAN: {code: 48, name: 'Obsidian', type: NODE_TYPE.ROCK, star: 5, solid: true, color: '#73c882', image: 'rock_16_16+3', speed: 2000, mining: [{item: 'obsidian', count: 1}]}, // HELL
   METEORITE: {code: 49, name: 'Meteroite', type: NODE_TYPE.ROCK, stype: 'block', star: 5, solid: true, color: '#7d6f5f', image: 'rock_16_16+2', speed: 2000, mining: [{item: 'bkmtrt', count: 1}]}, // SURFACE
-  HIVE: {code: 50, name: 'Hive', type: NODE_TYPE.ROCK, stype: 'block', star: 1, solid: true, color: '#fd8431', image: 'rock_16_16+6', speed: 1200, mining: [{item: 'bkhive', count: 1}]},
+  HIVE: {code: 50, name: 'Hive', type: NODE_TYPE.ROCK, stype: 'block', star: 3, solid: true, color: '#fd8431', image: 'rock_16_16+6', speed: 1200, mining: [{item: 'bkhive', count: 1}]},
 
   // ── HOUSING (murs des maisons) ────────────────────────
 
@@ -109,7 +109,8 @@ export const NODES = {
 
   SHORE: {code: 70, name: 'Shore', color: '#FFCC00'},
   // types utilisés de manière temporaire pendant la création du monde
-  HEART: {code: 71, name: 'Life Heart', type: NODE_TYPE.CREATION, color: '#FF19CD'}
+  SAPROCK: {code: 71, name: 'Sap Rock', type: NODE_TYPE.CREATION, color: '#34e648'}, // à remplacer par SLATE
+  HEART: {code: 72, name: 'Life Heart', type: NODE_TYPE.CREATION, color: '#FF19CD'} // à replacer par VOID et un furniture
 }
 
 /** Lookup par code numérique — hot path render/physics */
@@ -118,6 +119,11 @@ export const NODES_LOOKUP = []
 /* ============================================================================
    3. ITEMS
    ============================================================================ */
+
+// OAK ROOT — drop lorsque l'on abat complètement un Oak
+// MAHOGANY ROOT — drop lorsque l'on abat complètement un Mahogany
+// TAPROOT — drop lorsque l'on abat complètement un Cactus
+// MYCELIUM — drop lorsque l'on abat complètement un Giant Mushroom
 
 /* ============================================================================
    4. RECIPES
