@@ -730,7 +730,8 @@ Génère des tunnels et des cavernes (tuiles VOID).
 | `digHives(biomeCounts)` | Creuse `hiveCount` ruches en zone JUNGLE via `#digOneHive`. 1 monde sur 2 : une ruche intrusion dans un biome étranger (FOREST ou DESERT), même layer. Toutes les ruches (normales + intrusion) sont retournées pour le remplissage HONEY différé. Prérequis : `initZoneRects()`. |
 | `#digOneCobwebCave(y0, y1)` | Creuse une caverne elliptique à toiles dans la plage verticale [y0, y1]. Gère les tentatives et exclusions. Retourne `{cx, cy, radiusX, radiusY}` ou `null`. |
 | `digCobwebCaves()` | Creuse COBWEB_CAVE_COUNT_MIN–MAX cavernes en caverns_top (80%) ou caverns_bottom (20%) + 1 intrusion systématique en layer under, biome aléatoire. Prérequis : `initZoneRects()`. |
-| `digGeodeCaves` | `(underCaverns: Int16Array, code: number): Array<{cx, cy, radiusX, radiusY, code}>` | Creuse 3–4 géodes elliptiques (rayon 8–12) en zone cavern_bottom, tous biomes. Retourne la description pour projectAndFill(). Constantes dans `data-gen.mjs`. |
+| `#digOneGeodeCave(y0, y1, code)` | Creuse une géode elliptique dans la plage verticale [y0, y1]. Gère les tentatives et exclusions. Retourne `{cx, cy, radiusX, radiusY, code}` ou `null`. |
+| `digGeodeCaves(code)` | Creuse GEODE_CAVE_COUNT_MIN–MAX géodes en caverns_bottom + 1 intrusion à 1/3 en caverns_top (code aléatoire GRANITE/MARBLE). Retourne la description complète pour `projectAndFill()`. Prérequis : `initZoneRects()`. |
 | `cleanupAfterCarving` | `(): void` | Passe de nettoyage globale post-creusement. 7 règles in-place : propagation SKY, suppression tuiles isolées VOID/non-VOID (4-connexe et paires horizontales/verticales). Parcours séquentiel index croissant — cascade naturelle. |
 
 Le paramètre `offsetX` permet de décorrèler le bruit Perlin des autres usages.

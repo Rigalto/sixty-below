@@ -205,8 +205,8 @@ class WorldGenerator {
     await progress('Hives')
     const cobwebCaves = worldCarver.digCobwebCaves()
     await progress('Cobweb caves')
-    const graniteCaves = worldCarver.digGeodeCaves(underCaverns, NODES.GRANITE.code)
-    const marbleCaves = worldCarver.digGeodeCaves(underCaverns, NODES.MARBLE.code)
+    const graniteCaves = worldCarver.digGeodeCaves(NODES.GRANITE.code)
+    const marbleCaves = worldCarver.digGeodeCaves(NODES.MARBLE.code)
     const geodeCaves = graniteCaves.concat(marbleCaves)
     await progress('Geode caves')
 
@@ -2075,43 +2075,65 @@ class WorldCarver {
   }
 
   /**
- * Creuse GEODE_CAVE_COUNT géodes elliptiques dans la zone cavern_bottom,
- * tous biomes confondus. Chaque géode sera ensuite remplie de granite ou marbre
- * par ClusterGenerator.projectAndFill().
- * Le remplissage est effectué immédiatement après chaque creusement.
+ * Creuse une géode elliptique à une position aléatoire dans la plage [y0, y1].
  *
- * @param {Int16Array} underCaverns - Altitudes haute caverne par colonne X
- * @param {number}     code         - Code du matériau (GRANITE ou MARBLE)
+ * @param {number} y0   - Y minimum pour cy
+ * @param {number} y1   - Y maximum pour cy
+ * @param {number} code - Code du matériau (GRANITE ou MARBLE)
+ * @returns {{cx, cy, radiusX, radiusY, code}|null} — null si MAX_ATTEMPTS épuisé
+ */
+  #digOneGeodeCave (y0, y1, code) {
+    const MAX_ATTEMPTS = 100
+    const radiusX = seededRNG.randomGetMinMax(GEODE_RADIUS_MIN, GEODE_RADIUS_MAX)
+    const radiusY = seededRNG.randomGetMinMax(GEODE_RADIUS_MIN, GEODE_RADIUS_MAX)
+
+    let cx, cy, valid
+    let attempts = 0
+    do {
+      cx = seededRNG.randomGetMinMax(radiusX, WORLD_WIDTH - radiusX - 1)
+      cy = seededRNG.randomGetMinMax(y0 + radiusY, y1 - radiusY)
+      valid = !this.isExcluded(cx - radiusX, cy - radiusY, cx + radiusX, cy + radiusY)
+      attempts++
+    } while (!valid && attempts < MAX_ATTEMPTS)
+    if (!valid) return null
+
+    const tiles = []
+    this.digNoisyEllipse(tiles, cx, cy, radiusX - 2, radiusX + 2, radiusY - 2, radiusY + 2, NODES.VOID.code, 0.3, PERLIN_OFFSET_CAVERN)
+    const rect = this.applyTiles(tiles)
+    this.addExclusion(rect)
+
+    return {cx, cy, radiusX, radiusY, code}
+  }
+
+  /**
+ * Creuse GEODE_CAVE_COUNT géodes elliptiques en zone caverns_bottom, tous biomes.
+ * Intrusion : 1 monde sur 3, une géode supplémentaire en caverns_top,
+ * code GRANITE ou MARBLE tiré au hasard.
+ * Retourne la description complète pour projectAndFill().
+ *
+ * @param {number} code - Code du matériau (GRANITE ou MARBLE)
  * @returns {Array<{cx, cy, radiusX, radiusY, code}>}
  */
-  digGeodeCaves (underCaverns, code) {
+  digGeodeCaves (code) {
     const count = seededRNG.randomGetMinMax(GEODE_CAVE_COUNT_MIN, GEODE_CAVE_COUNT_MAX)
-    const hellTop = WORLD_HEIGHT - 32
-    const MAX_ATTEMPTS = 100
     const caves = []
 
+    // ── Géodes normales — caverns_bottom ─────────────────────────────────────
     for (let i = 0; i < count; i++) {
-      const radiusX = seededRNG.randomGetMinMax(GEODE_RADIUS_MIN, GEODE_RADIUS_MAX)
-      const radiusY = seededRNG.randomGetMinMax(GEODE_RADIUS_MIN, GEODE_RADIUS_MAX)
+      const cx = seededRNG.randomGetMinMax(GEODE_RADIUS_MAX, WORLD_WIDTH - GEODE_RADIUS_MAX - 1)
+      let rect = this.#zoneRects[this.#zoneRects.length - 1]
+      for (let j = 0; j < this.#zoneRects.length; j++) {
+        if (cx <= this.#zoneRects[j].x1) { rect = this.#zoneRects[j]; break }
+      }
+      const cave = this.#digOneGeodeCave(rect.yCavernsMid, rect.yCaverns, code)
+      if (cave) caves.push(cave)
+    }
 
-      let cx, cy, valid
-      let attempts = 0
-      do {
-        cx = seededRNG.randomGetMinMax(radiusX, WORLD_WIDTH - radiusX - 1)
-        const cavernMid = (underCaverns[cx] + hellTop) >> 1
-        cy = seededRNG.randomGetMinMax(cavernMid + radiusY, hellTop - radiusY)
-
-        valid = !this.isExcluded(cx - radiusX, cy - radiusY, cx + radiusX, cy + radiusY)
-        attempts++
-      } while (!valid && attempts < MAX_ATTEMPTS)
-      if (!valid) continue
-
-      const tiles = []
-      this.digNoisyEllipse(tiles, cx, cy, radiusX - 2, radiusX + 2, radiusY - 2, radiusY + 2, NODES.VOID.code, 0.3, PERLIN_OFFSET_CAVERN)
-      const rect = this.applyTiles(tiles)
-      this.addExclusion(rect)
-
-      caves.push({cx, cy, radiusX, radiusY, code})
+    // ── Intrusion — 1 monde sur 2, caverns_top ───────────────
+    if (seededRNG.randomGet() < 0.5) {
+      const rect = seededRNG.randomGetArrayValue(this.#zoneRects)
+      const cave = this.#digOneGeodeCave(rect.yUnder, rect.yCavernsMid, code)
+      if (cave) caves.push(cave)
     }
 
     return caves
