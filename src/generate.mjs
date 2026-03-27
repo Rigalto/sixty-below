@@ -2075,7 +2075,7 @@ class WorldCarver {
 
   /**
  * Creuse entre COBWEB_CAVE_COUNT_MIN et COBWEB_CAVE_COUNT_MAX cavernes elliptiques
- * dans tous les biomes, en zone cavern_top (75%) ou cavern_bottom (25%).
+ * dans tous les biomes, en zone cavern_top (80%) ou cavern_bottom (25%).
  * Le remplissage COBWEB du toit est différé.
  *
  * @param {Int16Array} underCaverns - Altitudes haute caverne par colonne X
@@ -2083,23 +2083,28 @@ class WorldCarver {
  */
   digCobwebCaves (underCaverns) {
     const count = seededRNG.randomGetMinMax(COBWEB_CAVE_COUNT_MIN, COBWEB_CAVE_COUNT_MAX)
-    const hellTop = WORLD_HEIGHT - 32
     const MAX_ATTEMPTS = 100
     const caves = []
 
     for (let i = 0; i < count; i++) {
       const radiusX = seededRNG.randomGetMinMax(COBWEB_RADIUS_X_MIN, COBWEB_RADIUS_X_MAX)
       const radiusY = seededRNG.randomGetMinMax(COBWEB_RADIUS_Y_MIN, COBWEB_RADIUS_Y_MAX)
-      const isCavernTop = seededRNG.randomGetMinMax(0, 3) > 0
+      const isCavernTop = seededRNG.randomGetMinMax(0, 4) > 0
 
       let cx, cy, valid
       let attempts = 0
       do {
         cx = seededRNG.randomGetMinMax(radiusX, WORLD_WIDTH - radiusX - 1)
-        const cavernMid = (underCaverns[cx] + hellTop) >> 1
+
+        // Trouver le rect correspondant à cx
+        let rect = this.#zoneRects[this.#zoneRects.length - 1]
+        for (let j = 0; j < this.#zoneRects.length; j++) {
+          if (cx <= this.#zoneRects[j].x1) { rect = this.#zoneRects[j]; break }
+        }
+
         cy = isCavernTop
-          ? seededRNG.randomGetMinMax(underCaverns[cx] + radiusY, cavernMid - radiusY)
-          : seededRNG.randomGetMinMax(cavernMid + radiusY, hellTop - radiusY)
+          ? seededRNG.randomGetMinMax(rect.yUnder + radiusY, rect.yCavernsMid - radiusY)
+          : seededRNG.randomGetMinMax(rect.yCavernsMid + radiusY, rect.yCaverns - radiusY)
 
         valid = !this.isExcluded(cx - radiusX, cy - radiusY, cx + radiusX, cy + radiusY)
         attempts++
