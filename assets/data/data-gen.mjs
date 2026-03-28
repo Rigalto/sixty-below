@@ -338,6 +338,7 @@ export const PERLIN_OFFSET_SMALL_TUNNEL = 400
 export const PERLIN_OFFSET_CAVERN = 500
 export const PERLIN_OFFSET_HIVE = 600
 export const PERLIN_OFFSET_COBWEB = 700
+export const PERLIN_OFFSET_LAKES = 800
 
 export const SMALL_CAVERNS_COUNT = 80
 export const MEDIUM_CAVERNS_COUNT = 120
@@ -362,11 +363,25 @@ export const GEODE_TARGET_CLUSTER_COUNT = 20
 export const GEODE_CLUSTER_SIZE_MIN = 4
 export const GEODE_CLUSTER_SIZE_MAX = 8
 
-export const LAKE_RADIUS_X_MIN = 5
-export const LAKE_RADIUS_X_MAX = 8
-export const LAKE_RADIUS_Y_MIN = 2
-export const LAKE_RADIUS_Y_MAX = 3
-export const LAKE_PIT_RADIUS_X_MIN = 2
-export const LAKE_PIT_RADIUS_X_MAX = 3
+export const LAKE_RADIUS_X_MIN = 8
+export const LAKE_RADIUS_X_MAX = 12
+export const LAKE_RADIUS_Y_MIN = 4
+export const LAKE_RADIUS_Y_MAX = 6
+export const LAKE_PIT_RADIUS_X_MIN = 3
+export const LAKE_PIT_RADIUS_X_MAX = 5
 export const LAKE_PIT_RADIUS_Y_MIN = 5
-export const LAKE_PIT_RADIUS_Y_MAX = 8
+export const LAKE_PIT_RADIUS_Y_MAX = 7
+export const LAKE_CREATION_MAP = {
+  [BIOME_TYPE.FOREST]: {
+    side: NODES.LAKE_FOREST_SIDE.code,
+    bed: NODES.LAKE_FOREST_BED.code
+  },
+  [BIOME_TYPE.DESERT]: {
+    side: NODES.LAKE_DESERT_SIDE.code,
+    bed: NODES.LAKE_DESERT_BED.code
+  },
+  [BIOME_TYPE.JUNGLE]: {
+    side: NODES.LAKE_JUNGLE_SIDE.code,
+    bed: NODES.LAKE_JUNGLE_BED.code
+  }
+}

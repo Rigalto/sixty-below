@@ -1,6 +1,6 @@
 import {seededRNG} from './utils.mjs'
 import {database} from './database.mjs'
-import {NODES, NODES_LOOKUP, NODE_TYPE, WEATHER_TYPE, BIOME_TYPE, WORLD_WIDTH, WORLD_HEIGHT, SEA_LEVEL, TOPSOIL_Y_SKY_SURFACE, TOPSOIL_Y_SURFACE_UNDER, TOPSOIL_Y_UNDER_CAVERNS, TOPSOIL_Y_CAVERNS_MID, BIOME_TILE_MAP, SEA_MAX_JITTER, SEA_MAX_WIDTH, SEA_MAX_HEIGHT, CLUSTER_SCATTER_MAP, ORE_GEM_SCATTER_MAP, PERLIN_OFFSET_NATURALIZER, PERLIN_OFFSET_TUNNEL, PERLIN_OFFSET_SURFACE_TUNNEL, PERLIN_OFFSET_SMALL_TUNNEL, PERLIN_OFFSET_CAVERN, PERLIN_OFFSET_HIVE, PERLIN_OFFSET_COBWEB, SMALL_CAVERNS_COUNT, MEDIUM_CAVERNS_COUNT, UNDERGROUND_TUNNEL_COUNT, CAVERNS_TUNNEL_COUNT, SMALL_TUNNELS_COUNT, HIVE_RADIUS_MIN, HIVE_RADIUS_MAX, COBWEB_CAVE_COUNT_MIN, COBWEB_CAVE_COUNT_MAX, COBWEB_RADIUS_X_MIN, COBWEB_RADIUS_X_MAX, COBWEB_RADIUS_Y_MIN, COBWEB_RADIUS_Y_MAX, GEODE_CAVE_COUNT_MIN, GEODE_CAVE_COUNT_MAX, GEODE_RADIUS_MIN, GEODE_RADIUS_MAX, GEODE_TARGET_CLUSTER_COUNT, GEODE_CLUSTER_SIZE_MIN, GEODE_CLUSTER_SIZE_MAX, TOPSOIL_SCATTER_MAP} from '../assets/data/data-gen.mjs'
+import {NODES, NODES_LOOKUP, NODE_TYPE, WEATHER_TYPE, BIOME_TYPE, WORLD_WIDTH, WORLD_HEIGHT, SEA_LEVEL, TOPSOIL_Y_SKY_SURFACE, TOPSOIL_Y_SURFACE_UNDER, TOPSOIL_Y_UNDER_CAVERNS, TOPSOIL_Y_CAVERNS_MID, BIOME_TILE_MAP, SEA_MAX_JITTER, SEA_MAX_WIDTH, SEA_MAX_HEIGHT, CLUSTER_SCATTER_MAP, ORE_GEM_SCATTER_MAP, PERLIN_OFFSET_NATURALIZER, PERLIN_OFFSET_TUNNEL, PERLIN_OFFSET_SURFACE_TUNNEL, PERLIN_OFFSET_SMALL_TUNNEL, PERLIN_OFFSET_CAVERN, PERLIN_OFFSET_HIVE, PERLIN_OFFSET_COBWEB, PERLIN_OFFSET_LAKES, SMALL_CAVERNS_COUNT, MEDIUM_CAVERNS_COUNT, UNDERGROUND_TUNNEL_COUNT, CAVERNS_TUNNEL_COUNT, SMALL_TUNNELS_COUNT, HIVE_RADIUS_MIN, HIVE_RADIUS_MAX, COBWEB_CAVE_COUNT_MIN, COBWEB_CAVE_COUNT_MAX, COBWEB_RADIUS_X_MIN, COBWEB_RADIUS_X_MAX, COBWEB_RADIUS_Y_MIN, COBWEB_RADIUS_Y_MAX, GEODE_CAVE_COUNT_MIN, GEODE_CAVE_COUNT_MAX, GEODE_RADIUS_MIN, GEODE_RADIUS_MAX, GEODE_TARGET_CLUSTER_COUNT, GEODE_CLUSTER_SIZE_MIN, GEODE_CLUSTER_SIZE_MAX, TOPSOIL_SCATTER_MAP, LAKE_RADIUS_X_MIN, LAKE_RADIUS_X_MAX, LAKE_RADIUS_Y_MIN, LAKE_RADIUS_Y_MAX, LAKE_PIT_RADIUS_X_MIN, LAKE_PIT_RADIUS_X_MAX, LAKE_PIT_RADIUS_Y_MIN, LAKE_PIT_RADIUS_Y_MAX, LAKE_CREATION_MAP} from '../assets/data/data-gen.mjs'
 
 /* ====================================================================================================
    WORLD BUFFER (CREATION DU MONDE)
@@ -202,15 +202,22 @@ class WorldGenerator {
 
     // 6.3 Creusement des mini-biomes avec peuplement différé - TODO
 
-    // 6.3.1 HIVE caves
+    // 6.3.1 Lakes / Oasis
+
+    // ⚠️ digLakes DOIT rester en premier — il n'utilise pas #exclusions pour se placer,
+    // mais alimente la table pour tous les mini-biomes suivants.
+    const lakes = worldCarver.digLakes(skySurface)
+    await progress('Lakes & oasis')
+
+    // 6.3.2 HIVE caves
     const hives = worldCarver.digHives(biomeCounts)
     await progress('Hives')
 
-    // 6.3.2 Cobweb caves
+    // 6.3.3 Cobweb caves
     const cobwebCaves = worldCarver.digCobwebCaves()
     await progress('Cobweb caves')
 
-    // 6.3.3 Marble caves et  Granite caves
+    // 6.3.4 Marble caves et  Granite caves
     const graniteCaves = worldCarver.digGeodeCaves(NODES.GRANITE.code)
     const marbleCaves = worldCarver.digGeodeCaves(NODES.MARBLE.code)
     const geodeCaves = graniteCaves.concat(marbleCaves)
@@ -275,7 +282,7 @@ class WorldGenerator {
 
     // N-7 Remplissage de la mer (gauche et droite)
     liquidFiller.fillSea()
-    worldCarver.cleanupAfterCarving() // 85774
+    worldCarver.cleanupAfterCarving()
     await progress('Carving Cleanup')
 
     console.log('[WorldGenerator::liquidFiller] - Sea', (performance.now() - t0).toFixed(3), 'ms')
@@ -297,7 +304,7 @@ class WorldGenerator {
 
     // N. Stochage du monde en base de données
     if (!debug) {
-      await this.save(seed, {hives, cobwebCaves, geodeCaves})
+      await this.save(seed, {hives, cobwebCaves, geodeCaves, lakes})
       worldBuffer.clear()
     }
 
@@ -308,7 +315,7 @@ class WorldGenerator {
     if (debug) { return worldBuffer } // appelant responsable du clear()
   }
 
-  async save (seed, {hives, cobwebCaves, geodeCaves}) {
+  async save (seed, {hives, cobwebCaves, geodeCaves, lakes}) {
     const start = window.performance.now()
     // 1. Sauvegarde des tuiles
     await database.clearObjectStore('world_chunks')
@@ -351,6 +358,7 @@ class WorldGenerator {
       {key: 'health', value: 100},
       {key: 'hives', value: JSON.stringify(hives)},
       {key: 'cobwebcaves', value: JSON.stringify(cobwebCaves)},
+      {key: 'lakes', value: JSON.stringify(lakes)},
       {key: 'geodecaves', value: JSON.stringify(geodeCaves)}
 
       // {key: 'honeysurface', value: this.honeysurface.join('|')}
@@ -937,6 +945,61 @@ class LiquidFiller {
 
         worldBuffer.writeAt(nIdx, SEA_CODE)
         enqueue(nIdx)
+      }
+    }
+  }
+
+  /**
+ * Remplit d'eau douce (WATER) une ellipse creusée en SKY, à partir d'un point de départ,
+ * sans dépasser la ligne horizontale cy (borne stricte y >= cy).
+ * Algorithme BFS FIFO avec head cursor — même pattern que #fillOneSea.
+ * @param {number} cx
+ * @param {number} cy          - Borne supérieure stricte du fill (y >= cy)
+ * @param {number} radiusX     - Demi-largeur de l'ellipse — borne latérale
+ * @param {number} shoreCode   - Code substrat natif pour consolider les berges
+ */
+  fillLake (cx, cy, radiusX, shoreCode) {
+    const SKY_CODE = NODES.SKY.code
+    const WATER_CODE = NODES.WATER.code
+    const xMin = cx - radiusX
+    const xMax = cx + radiusX
+
+    const src = (cy << 10) | cx
+    if (worldBuffer.readAt(src) !== SKY_CODE) return
+
+    const visited = new Set()
+    const queue = []
+    let head = 0
+
+    visited.add(src)
+    queue.push(src)
+
+    while (head < queue.length) {
+      const idx = queue[head++]
+      const nx = idx & 0x3FF
+
+      // Hors bornes latérales → substrat (berge)
+      if (nx < xMin || nx > xMax) {
+        worldBuffer.writeAt(idx, shoreCode)
+        continue
+      }
+
+      worldBuffer.writeAt(idx, WATER_CODE)
+
+      const neighbors = [idx - 1, idx + 1, idx - 1024, idx + 1024]
+      for (let i = 0; i < 4; i++) {
+        const nIdx = neighbors[i]
+        if (visited.has(nIdx)) continue
+
+        const nnx = nIdx & 0x3FF
+        const nny = nIdx >> 10
+
+        if (nnx <= 1 || nnx >= 1022 || nny <= 1 || nny >= 510) continue
+        if (nny < cy) continue
+        if (worldBuffer.readAt(nIdx) !== SKY_CODE) continue
+
+        visited.add(nIdx)
+        queue.push(nIdx)
       }
     }
   }
@@ -1774,6 +1837,37 @@ class WorldCarver {
   }
 
   /**
+ * Variante de applyTiles qui autorise l'écrasement des tuiles SKY.
+ * Utilisée uniquement pour le remplissage des lacs de surface.
+ * Protège uniquement les tuiles ETERNAL (FOG, DEEPSEA, BASALT, LAVA).
+ *
+ * @param {Array<{x, y, index, code}>} tiles
+ * @returns {{x1, y1, x2, y2}}
+ */
+  applyTilesOverSky (tiles) {
+    const PROTECTED = new Set([
+      NODES.FOG.code,
+      NODES.DEEPSEA.code,
+      NODES.BASALT.code,
+      NODES.LAVA.code
+    ])
+    let x1 = WORLD_WIDTH; let y1 = WORLD_HEIGHT; let x2 = 0; let y2 = 0
+
+    for (let i = 0; i < tiles.length; i++) {
+      const tile = tiles[i]
+      if (tile.x < 0 || tile.x >= WORLD_WIDTH) continue
+      if (tile.y < 0 || tile.y >= WORLD_HEIGHT) continue
+      if (PROTECTED.has(worldBuffer.readAt(tile.index))) continue
+      worldBuffer.writeAt(tile.index, tile.code)
+      if (tile.x < x1) x1 = tile.x
+      if (tile.x > x2) x2 = tile.x
+      if (tile.y < y1) y1 = tile.y
+      if (tile.y > y2) y2 = tile.y
+    }
+    return {x1, y1, x2, y2}
+  }
+
+  /**
  * Calcule le chemin d'un tunnel comme suite de points avec rayon local.
  * Ne creuse pas — l'appelant passe chaque point à digNoisyCircle.
  *
@@ -1823,6 +1917,41 @@ class WorldCarver {
       this.digNoisyCircle(tiles, p.x, p.y, p.radiusMin, p.radiusMax, code, 0.3, offsetX)
     }
     this.applyTiles(tiles)
+  }
+
+  /**
+ * Remplace toutes les tuiles d'un rectangle par un code donné.
+ * Aucun test de protection — à utiliser uniquement dans des zones
+ * garanties hors ghost cells et hors ETERNAL.
+ *
+ * @param {number} x0
+ * @param {number} y0
+ * @param {number} x1
+ * @param {number} y1
+ * @param {number} code
+ */
+  fillRect (x0, y0, x1, y1, code) {
+    for (let y = y0; y <= y1; y++) {
+      let idx = (y << 10) | x0
+      for (let x = x0; x <= x1; x++) {
+        worldBuffer.writeAt(idx++, code)
+      }
+    }
+  }
+
+  /**
+ * Retourne le rectangle englobant de deux rectangles {x1, y1, x2, y2}.
+ * @param {{x1, y1, x2, y2}} a
+ * @param {{x1, y1, x2, y2}} b
+ * @returns {{x1, y1, x2, y2}}
+ */
+  boundingRect (a, b) {
+    return {
+      x1: Math.min(a.x1, b.x1),
+      y1: Math.min(a.y1, b.y1),
+      x2: Math.max(a.x2, b.x2),
+      y2: Math.max(a.y2, b.y2)
+    }
   }
 
   /**
@@ -2060,6 +2189,104 @@ class WorldCarver {
   }
 
   /**
+ * Creuse un lac de surface par zone de biome.
+ * Forme : ellipse horizontale (corps principal) + ellipse verticale bruitée (fosse centrale).
+ * Les bords et le fond sont protégés par des nodes CREATION spécifiques au biome,
+ * remplacés après creusement par le substrat natif.
+ * Le remplissage WATER est différé.
+ *
+ * Prérequis : initZoneRects()
+ * @returns {Array<{cx, cy, biome}>}
+ */
+
+  digLakes (skySurface) {
+    const lakes = []
+    let prevCx = -1
+
+    for (let i = 1; i < this.#zoneRects.length - 1; i++) {
+      const rect = this.#zoneRects[i]
+
+      // Passe 0 - localisation et taille du Lake/Oasis
+      const radiusX = seededRNG.randomGetMinMax(LAKE_RADIUS_X_MIN, LAKE_RADIUS_X_MAX)
+      const radiusY = seededRNG.randomGetMinMax(LAKE_RADIUS_Y_MIN, LAKE_RADIUS_Y_MAX)
+
+      const minCx = prevCx + 2 * LAKE_RADIUS_X_MAX + 4 // marge de 4 tuiles pour les berges
+      const x0 = Math.max(rect.x0 + radiusX, minCx)
+      const x1 = rect.x1 - radiusX
+
+      if (x0 > x1) continue // zone trop étroite pour placer un lac — on passe
+
+      const cx = seededRNG.randomGetMinMax(x0, x1)
+      prevCx = cx
+      // cy = minimum de skySurface sur la largeur du lac
+      let cy = 0
+      for (let x = cx - radiusX; x <= cx + radiusX; x++) {
+        if (skySurface[x] > cy) cy = skySurface[x]
+      }
+      cy -= 1
+
+      // Passe 1 - ellipse horizontale principale
+      const tiles = []
+      this.digNoisyEllipse(tiles, cx, cy, radiusX - 1, radiusX, radiusY - 1, radiusY, NODES.SKY.code, 0.2, PERLIN_OFFSET_LAKES)
+      const rect2 = this.applyTilesOverSky(tiles)
+
+      // Passe 2 - Pit — ellipse verticale bruitée, centre décalé vers le bas
+      const pitOffsetX = seededRNG.randomGetMinMax(-3, 3)
+      const pitCx = cx + pitOffsetX
+      const pitCy = cy + radiusY // bord inférieur de l'ellipse principale
+      const pitRadiusX = seededRNG.randomGetMinMax(LAKE_PIT_RADIUS_X_MIN, LAKE_PIT_RADIUS_X_MAX)
+      const pitRadiusY = seededRNG.randomGetMinMax(LAKE_PIT_RADIUS_Y_MIN, LAKE_PIT_RADIUS_Y_MAX)
+
+      const pitTiles = []
+      this.digNoisyEllipse(pitTiles, pitCx, pitCy, pitRadiusX - 1, pitRadiusX, pitRadiusY - 1, pitRadiusY, NODES.SKY.code, 0.4, PERLIN_OFFSET_CAVERN)
+      const rect3 = this.applyTilesOverSky(pitTiles)
+
+      // Passe 2 : remplir le base de l'ellipse par du WATER
+      const lakeCreation = LAKE_CREATION_MAP[rect.biome]
+      liquidFiller.fillLake(cx, cy, radiusX, lakeCreation.side)
+
+      // Passe 3 : Nettoyage des tuiles volantes au-dessus du lac
+      const cleanX0 = Math.round(cx - radiusX * 0.6)
+      const cleanX1 = Math.round(cx + radiusX * 0.6)
+      this.fillRect(cleanX0, 32, cleanX1, cy - 1, NODES.SKY.code)
+
+      // ── Passe 4 - Consolidation des berges ──────────────────────────────────────────────
+      const WATER_CODE = NODES.WATER.code
+      const sideCode = lakeCreation.side
+      const boundY2 = Math.max(rect2.y2, rect3.y2)
+      const boundX1 = Math.min(rect2.x1, rect3.x1)
+      const boundX2 = Math.max(rect2.x2, rect3.x2)
+
+      for (let y = cy; y <= boundY2; y++) {
+        for (let x = boundX1 - 1; x <= boundX2; x++) {
+          const curr = worldBuffer.read(x, y)
+          const next = worldBuffer.read(x + 1, y)
+
+          // Transition SUBSTRAT → WATER
+          if (curr !== WATER_CODE && next === WATER_CODE) {
+            worldBuffer.write(x, y, sideCode)
+            worldBuffer.write(x - 1, y, sideCode)
+          }
+
+          // Transition WATER → SUBSTRAT
+          if (curr === WATER_CODE && next !== WATER_CODE) {
+            worldBuffer.write(x + 1, y, sideCode)
+            worldBuffer.write(x + 2, y, sideCode)
+          }
+        }
+      }
+
+      worldBuffer.write(cx, cy, NODES.LAVA.code) // débug
+
+      // ── Passe 5 : exclusion ───────────────────────────────────────────────
+      this.addExclusion(this.boundingRect(rect2, rect3))
+      lakes.push({cx, cy, biome: rect.biome})
+    }
+
+    return lakes
+  }
+
+  /**
  * Creuse une caverne à toiles d'araignée à une position aléatoire.
  * y0/y1 définissent la plage verticale de placement — permet l'intrusion under.
  *
@@ -2213,6 +2440,13 @@ class WorldCarver {
       NODES.BASALT.code,
       NODES.LAVA.code
     ])
+    const LIQUID_OR_SKY = new Set([
+      NODES.SKY.code,
+      NODES.WATER.code,
+      NODES.SEA.code,
+      NODES.HONEY.code,
+      NODES.SAP.code
+    ])
 
     const propagateSky = (idx) => {
       world[idx] = SKY
@@ -2225,15 +2459,23 @@ class WorldCarver {
 
     // Passe 1 — propagation SKY vers le bas colonne par colonne
     for (let x = 1; x < W - 1; x++) {
+      let phaseB = false
       for (let y = 1; y < H - 1; y++) {
         const idx = (y << 10) | x
         const code = world[idx]
-        if (code === SKY) continue
-        if (code === VOID) { world[idx] = SKY; continue }
-        break
+        if (!phaseB) {
+          // Phase A : au-dessus de la première tuile solide
+          if (code === SKY) continue
+          if (code === VOID) { world[idx] = SKY; continue }
+          phaseB = true // tuile solide rencontrée → bascule en phase B
+        } else {
+          // Phase B : sous la première tuile solide — SKY → VOID uniquement
+          if (code === SKY) world[idx] = VOID
+        }
       }
     }
 
+    // Passe 2 — application des règles
     for (let y = 1; y < H - 1; y++) {
       for (let x = 1; x < W - 1; x++) {
         const idx = (y << 10) | x
@@ -2250,10 +2492,10 @@ class WorldCarver {
         // Règle 2 — VOID avec 4 voisins non VOID → devient l'un d'eux
           if (top !== VOID && bot !== VOID && left !== VOID && right !== VOID) {
             const candidates = []
-            if (top !== SKY) candidates.push(top)
-            if (bot !== SKY) candidates.push(bot)
-            if (left !== SKY) candidates.push(left)
-            if (right !== SKY) candidates.push(right)
+            if (!LIQUID_OR_SKY.has(top)) candidates.push(top)
+            if (!LIQUID_OR_SKY.has(bot)) candidates.push(bot)
+            if (!LIQUID_OR_SKY.has(left)) candidates.push(left)
+            if (!LIQUID_OR_SKY.has(right)) candidates.push(right)
             world[idx] = seededRNG.randomGetArrayValue(candidates)
             continue
           }
@@ -2265,12 +2507,12 @@ class WorldCarver {
             const right2 = world[idx + 2]
             if (top !== VOID && top2 !== VOID && bot !== VOID && bot2 !== VOID && left !== VOID && right2 !== VOID) {
               const candidates = []
-              if (top !== SKY) candidates.push(top)
-              if (top2 !== SKY) candidates.push(top2)
-              if (bot !== SKY) candidates.push(bot)
-              if (bot2 !== SKY) candidates.push(bot2)
-              if (left !== SKY) candidates.push(left)
-              if (right2 !== SKY) candidates.push(right2)
+              if (!LIQUID_OR_SKY.has(top)) candidates.push(top)
+              if (!LIQUID_OR_SKY.has(top2)) candidates.push(top2)
+              if (!LIQUID_OR_SKY.has(bot)) candidates.push(bot)
+              if (!LIQUID_OR_SKY.has(bot2)) candidates.push(bot2)
+              if (!LIQUID_OR_SKY.has(left)) candidates.push(left)
+              if (!LIQUID_OR_SKY.has(right2)) candidates.push(right2)
               world[idx] = seededRNG.randomGetArrayValue(candidates)
               continue
             }
@@ -2283,12 +2525,12 @@ class WorldCarver {
             const top2 = world[idx + W + W]
             if (top !== VOID && left !== VOID && left2 !== VOID && right !== VOID && right2 !== VOID && top2 !== VOID) {
               const candidates = []
-              if (top !== SKY) candidates.push(top)
-              if (left !== SKY) candidates.push(left)
-              if (left2 !== SKY) candidates.push(left2)
-              if (right !== SKY) candidates.push(right)
-              if (right2 !== SKY) candidates.push(right2)
-              if (top2 !== SKY) candidates.push(top2)
+              if (!LIQUID_OR_SKY.has(top)) candidates.push(top)
+              if (!LIQUID_OR_SKY.has(left)) candidates.push(left)
+              if (!LIQUID_OR_SKY.has(left2)) candidates.push(left2)
+              if (!LIQUID_OR_SKY.has(right)) candidates.push(right)
+              if (!LIQUID_OR_SKY.has(right2)) candidates.push(right2)
+              if (!LIQUID_OR_SKY.has(top2)) candidates.push(top2)
               world[idx] = seededRNG.randomGetArrayValue(candidates)
               continue
             }
