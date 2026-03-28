@@ -180,29 +180,11 @@ class WorldGenerator {
     await progress('Ore & gem placement')
 
     // 6. Creusement (plus de creusement ensuite, ou alors très localisé) - TODO
-
-    // 6.1 Creusement des tunnels et cavernes
     worldCarver.initExclusions()
-    // worldCarver.digSurfaceTunnel(skySurface)
-    // const zigzagCount = seededRNG.randomGetMinMax(2, 3)
-    // for (let i = 0; i < zigzagCount; i++) { worldCarver.digZigzagTunnel() }
-    // await progress('Surface tunnels')
-    // worldCarver.digSmallCaverns(surfaceUnder)
-    // await progress('Caverns')
-    // worldCarver.digUndergroundTunnels(surfaceUnder, underCaverns)
-    // worldCarver.digCavernsTunnels(underCaverns)
-    // await progress('Deep tunnels')
-    // worldCarver.digSmallTunnels(surfaceUnder)
-    // await progress('Small tunnels')
 
-    // A supprimer
-    // worldCarver.debugTraceTunnel()
+    // 6.1 Creusement des mini-biomes - TODO
 
-    // 6.2 Creusement des mini-biomes avec peuplement - TODO
-
-    // 6.3 Creusement des mini-biomes avec peuplement différé - TODO
-
-    // 6.3.1 Lakes / Oasis
+    // 6.1.1 Lakes / Oasis
 
     // ⚠️ digLakes DOIT rester en premier — il n'utilise pas #exclusions pour se placer,
     // mais alimente la table pour tous les mini-biomes suivants.
@@ -271,6 +253,22 @@ class WorldGenerator {
     // caverns_bottom - Tout biomes - WATER + HARDROCK (transformé ensuite en HARDSTONE)
     // const blindlakes = worldCarver.digBlindLakes()
     // await progress('Deep Water Bodies')
+
+    // 6.2 Creusement des tunnels et cavernes
+    worldCarver.digSurfaceTunnel(skySurface)
+    const zigzagCount = seededRNG.randomGetMinMax(2, 3)
+    for (let i = 0; i < zigzagCount; i++) { worldCarver.digZigzagTunnel() }
+    await progress('Surface tunnels')
+    worldCarver.digSmallCaverns(surfaceUnder)
+    await progress('Caverns')
+    worldCarver.digUndergroundTunnels(surfaceUnder, underCaverns)
+    worldCarver.digCavernsTunnels(underCaverns)
+    await progress('Deep tunnels')
+    worldCarver.digSmallTunnels(surfaceUnder)
+    await progress('Small tunnels')
+
+    // A supprimer
+    // worldCarver.debugTraceTunnel()
 
     // 7. Traitement des surfaces végétales + désert - TODO
 
@@ -1815,7 +1813,21 @@ class WorldCarver {
       NODES.DEEPSEA.code,
       NODES.BASALT.code,
       NODES.LAVA.code,
-      NODES.SKY.code
+      NODES.SKY.code,
+      NODES.WATER.code,
+      NODES.SEA.code,
+      NODES.HONEY.code,
+      NODES.SAP.code,
+      NODES.HIVE.code,
+      NODES.SAPROCK.code,
+      NODES.HARDROCK.code,
+      NODES.HEART.code,
+      NODES.LAKE_FOREST_SIDE.code,
+      NODES.LAKE_FOREST_BED.code,
+      NODES.LAKE_DESERT_SIDE.code,
+      NODES.LAKE_DESERT_BED.code,
+      NODES.LAKE_JUNGLE_SIDE.code,
+      NODES.LAKE_JUNGLE_BED.code
     ])
     let x1 = WORLD_WIDTH
     let y1 = WORLD_HEIGHT
