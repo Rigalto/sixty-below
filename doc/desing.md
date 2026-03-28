@@ -388,11 +388,13 @@ dans un biome étranger (cf. §3.9).
 
 | Mini-biome | Layer | Matériau dominant | Contenu / Lore |
 |---|---|---|---|
+| **Surface Lake** | surface | - | Trous composé de deux ellipses croisées, rempli de WATER et propice à la pêche. Les bords et le fond sont rempli de substrat dépendant du biome. Faune et flore spécifiques aux abords des lacs. |
 | **Cobweb Cave** | caverns | WEB | Caverne elliptique à forte densité de toiles. Les tuiles WEB sont minables mais se régénèrent rapidement dans tout espace vide souterrain (régénération globale plus lente — cf. §3.11). Les Cobweb Caves concentrent cette régénération à un rythme bien supérieur et sont les seuls lieux où spawent les monstres SPIDER, MYGALE, et le boss TARENTULA. Les toiles entravent les déplacements mais constituent une matière première essentielle à l'artisanat. |
 | **Granite Cave** | caverns_bottom | GRANITE 4* | Géode de granite. Ennemis rocheux (Stonegnaw, Rockborer). |
 | **Marble Cave** | caverns_bottom | MARBLE 4* | Géode de marble. Ennemis rocheux.  (Stonegnaw, Rockborer). |
 | **Abandoned Mine** | caverns_bottom | OBSIDIAN + COBALTWALL | Tous biomes. Galerie horizontale creusée par une civilisation ancienne. OBSIDIAN en toit et sol. Étais de COBALTWALL tous les 5 tuiles (minables sans conséquence). Coffres de matériaux de construction et minerais extraits. Faune commune de la zone. |
 | **Blind Lake** | caverns_bottom | WATER + HARDSTONE | Tous biomes. Lac aveugle sans accès naturel — le joueur doit creuser pour y accéder. Fond et parois de HARDSTONE. Poissons aveugles et AXOLOTL pêchables (tier 4-5). Pas de faune agressive. Bioluminescence ambiante. |
+| **Shore** | caverns | SAND, SANDSTONE, SHELL | Zone aux abords des deux SEA, constituant une plage de sable. Des SANDSTONE limitent l'écoulement du SAND et des SHELL parsèment cette zone. Faune et flore spécifique à ce mini-biome. |
 
 ---
 
