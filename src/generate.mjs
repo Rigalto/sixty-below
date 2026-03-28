@@ -2241,16 +2241,16 @@ class WorldCarver {
       this.digNoisyEllipse(pitTiles, pitCx, pitCy, pitRadiusX - 1, pitRadiusX, pitRadiusY - 1, pitRadiusY, NODES.SKY.code, 0.4, PERLIN_OFFSET_CAVERN)
       const rect3 = this.applyTilesOverSky(pitTiles)
 
-      // Passe 2 : remplir le base de l'ellipse par du WATER
+      // Passe 3 : remplir le base de l'ellipse par du WATER
       const lakeCreation = LAKE_CREATION_MAP[rect.biome]
       liquidFiller.fillLake(cx, cy, radiusX, lakeCreation.side)
 
-      // Passe 3 : Nettoyage des tuiles volantes au-dessus du lac
+      // Passe 4 : Nettoyage des tuiles volantes au-dessus du lac
       const cleanX0 = Math.round(cx - radiusX * 0.6)
       const cleanX1 = Math.round(cx + radiusX * 0.6)
       this.fillRect(cleanX0, 32, cleanX1, cy - 1, NODES.SKY.code)
 
-      // ── Passe 4 - Consolidation des berges ──────────────────────────────────────────────
+      // ── Passe 5 - Consolidation des berges ──────────────────────────────────────────────
       const WATER_CODE = NODES.WATER.code
       const sideCode = lakeCreation.side
       const boundY2 = Math.max(rect2.y2, rect3.y2)
@@ -2276,9 +2276,32 @@ class WorldCarver {
         }
       }
 
+      // ── PASSE 6 - Consolidation du fond ─────────────────────────────────────────────────
+      const bedCode = lakeCreation.bed
+      const SIDE_CODE = lakeCreation.side
+
+      for (let x = boundX1 - 1; x <= boundX2 + 1; x++) {
+        for (let y = cy; y <= boundY2 + 2; y++) {
+          const curr = worldBuffer.read(x, y)
+          const next = worldBuffer.read(x, y + 1)
+
+          // Transition WATER → pas d'eau (fond inférieur)
+          if (curr === WATER_CODE && next !== WATER_CODE) {
+            if (worldBuffer.read(x, y + 1) !== SIDE_CODE) worldBuffer.write(x, y + 1, bedCode)
+            if (worldBuffer.read(x, y + 2) !== SIDE_CODE) worldBuffer.write(x, y + 2, bedCode)
+          }
+
+          // Transition pas d'eau → WATER (fond supérieur du pit)
+          if (curr !== WATER_CODE && next === WATER_CODE) {
+            if (worldBuffer.read(x, y) !== SIDE_CODE) worldBuffer.write(x, y, bedCode)
+            if (worldBuffer.read(x, y - 1) !== SIDE_CODE) worldBuffer.write(x, y - 1, bedCode)
+          }
+        }
+      }
+
       worldBuffer.write(cx, cy, NODES.LAVA.code) // débug
 
-      // ── Passe 5 : exclusion ───────────────────────────────────────────────
+      // ── Passe 75 : exclusion ───────────────────────────────────────────────
       this.addExclusion(this.boundingRect(rect2, rect3))
       lakes.push({cx, cy, biome: rect.biome})
     }
