@@ -109,9 +109,16 @@ export const NODES = {
 
   SHORE: {code: 70, name: 'Shore', color: '#FFCC00'},
   // types utilisés de manière temporaire pendant la création du monde
-  SAPROCK: {code: 71, name: 'Sap Rock', type: NODE_TYPE.CREATION, color: '#34e648'}, // à remplacer par SLATE
-  HARDROCK: {code: 72, name: 'Hard Rock', type: NODE_TYPE.CREATION, color: '#34e648'}, // à remplacer par HARDSTONE
-  HEART: {code: 73, name: 'Life Heart', type: NODE_TYPE.CREATION, color: '#FF19CD'} // à replacer par VOID et un furniture
+  SAPROCK: {code: 71, name: 'Sap Rock', type: NODE_TYPE.CREATION, color: '#34e648'}, // remplacé par SLATE
+  HARDROCK: {code: 72, name: 'Hard Rock', type: NODE_TYPE.CREATION, color: '#34e648'}, // remplacé par HARDSTONE
+  HEART: {code: 73, name: 'Life Heart', type: NODE_TYPE.CREATION, color: '#FF19CD'}, // remplacé par VOID et un furniture
+  // Remplacés après creusement des tunnels par le substrat natif du biome
+  LAKE_FOREST_SIDE: {code: 74, name: 'Lake Forest Side', type: NODE_TYPE.CREATION, color: '#5a8a3c'}, // remplacé par CLAY
+  LAKE_FOREST_BED: {code: 75, name: 'Lake Forest Bed', type: NODE_TYPE.CREATION, color: '#3a6a2c'}, // remplacé par STONE
+  LAKE_DESERT_SIDE: {code: 76, name: 'Lake Desert Side', type: NODE_TYPE.CREATION, color: '#c8a850'}, // remplacé par SAND
+  LAKE_DESERT_BED: {code: 77, name: 'Lake Desert Bed', type: NODE_TYPE.CREATION, color: '#a88030'}, // remplacé par SANDSTONE
+  LAKE_JUNGLE_SIDE: {code: 78, name: 'Lake Jungle Side', type: NODE_TYPE.CREATION, color: '#2a6a4a'}, // remplacé par MUD
+  LAKE_JUNGLE_BED: {code: 79, name: 'Lake Jungle Bed', type: NODE_TYPE.CREATION, color: '#1a4a3a'} // remplacé par LIMESTONE
 }
 
 /** Lookup par code numérique — hot path render/physics */

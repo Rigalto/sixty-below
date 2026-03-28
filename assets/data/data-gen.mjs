@@ -361,3 +361,12 @@ export const GEODE_RADIUS_MAX = 12
 export const GEODE_TARGET_CLUSTER_COUNT = 20
 export const GEODE_CLUSTER_SIZE_MIN = 4
 export const GEODE_CLUSTER_SIZE_MAX = 8
+
+export const LAKE_RADIUS_X_MIN = 5
+export const LAKE_RADIUS_X_MAX = 8
+export const LAKE_RADIUS_Y_MIN = 2
+export const LAKE_RADIUS_Y_MAX = 3
+export const LAKE_PIT_RADIUS_X_MIN = 2
+export const LAKE_PIT_RADIUS_X_MAX = 3
+export const LAKE_PIT_RADIUS_Y_MIN = 5
+export const LAKE_PIT_RADIUS_Y_MAX = 8
