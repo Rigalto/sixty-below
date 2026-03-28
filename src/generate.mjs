@@ -1662,6 +1662,20 @@ export const clusterGenerator = new ClusterGenerator()
    CREUSEMENT DE TUNNELS ET DE CAVERNES DANS LE MONDE
    ==================================================================================================== */
 
+const DEFAULT_EXCLUDED = new Set([
+  NODES.FOG.code, NODES.DEEPSEA.code, NODES.BASALT.code, NODES.LAVA.code,
+  NODES.SKY.code, NODES.WATER.code, NODES.SEA.code, NODES.HONEY.code,
+  NODES.SAP.code, NODES.HIVE.code, NODES.SAPROCK.code, NODES.HARDROCK.code,
+  NODES.HEART.code,
+  NODES.LAKE_FOREST_SIDE.code, NODES.LAKE_FOREST_BED.code,
+  NODES.LAKE_DESERT_SIDE.code, NODES.LAKE_DESERT_BED.code,
+  NODES.LAKE_JUNGLE_SIDE.code, NODES.LAKE_JUNGLE_BED.code
+])
+
+const ETERNAL_EXCLUDED = new Set([
+  NODES.FOG.code, NODES.DEEPSEA.code, NODES.BASALT.code, NODES.LAVA.code
+])
+
 class WorldCarver {
   #exclusions
   #zoneRects
@@ -1807,28 +1821,7 @@ class WorldCarver {
  * @param {Array<{x, y, index, code}>} tiles
  * @returns {{x1: number, y1: number, x2: number, y2: number}}
  */
-  applyTiles (tiles) {
-    const PROTECTED = new Set([
-      NODES.FOG.code,
-      NODES.DEEPSEA.code,
-      NODES.BASALT.code,
-      NODES.LAVA.code,
-      NODES.SKY.code,
-      NODES.WATER.code,
-      NODES.SEA.code,
-      NODES.HONEY.code,
-      NODES.SAP.code,
-      NODES.HIVE.code,
-      NODES.SAPROCK.code,
-      NODES.HARDROCK.code,
-      NODES.HEART.code,
-      NODES.LAKE_FOREST_SIDE.code,
-      NODES.LAKE_FOREST_BED.code,
-      NODES.LAKE_DESERT_SIDE.code,
-      NODES.LAKE_DESERT_BED.code,
-      NODES.LAKE_JUNGLE_SIDE.code,
-      NODES.LAKE_JUNGLE_BED.code
-    ])
+  applyTiles (tiles, excluded = DEFAULT_EXCLUDED) {
     let x1 = WORLD_WIDTH
     let y1 = WORLD_HEIGHT
     let x2 = 0
@@ -1838,38 +1831,7 @@ class WorldCarver {
       const tile = tiles[i]
       if (tile.x < 0 || tile.x >= WORLD_WIDTH) continue
       if (tile.y < 0 || tile.y >= WORLD_HEIGHT) continue
-      if (PROTECTED.has(worldBuffer.readAt(tile.index))) continue
-      worldBuffer.writeAt(tile.index, tile.code)
-      if (tile.x < x1) x1 = tile.x
-      if (tile.x > x2) x2 = tile.x
-      if (tile.y < y1) y1 = tile.y
-      if (tile.y > y2) y2 = tile.y
-    }
-    return {x1, y1, x2, y2}
-  }
-
-  /**
- * Variante de applyTiles qui autorise l'écrasement des tuiles SKY.
- * Utilisée uniquement pour le remplissage des lacs de surface.
- * Protège uniquement les tuiles ETERNAL (FOG, DEEPSEA, BASALT, LAVA).
- *
- * @param {Array<{x, y, index, code}>} tiles
- * @returns {{x1, y1, x2, y2}}
- */
-  applyTilesOverSky (tiles) {
-    const PROTECTED = new Set([
-      NODES.FOG.code,
-      NODES.DEEPSEA.code,
-      NODES.BASALT.code,
-      NODES.LAVA.code
-    ])
-    let x1 = WORLD_WIDTH; let y1 = WORLD_HEIGHT; let x2 = 0; let y2 = 0
-
-    for (let i = 0; i < tiles.length; i++) {
-      const tile = tiles[i]
-      if (tile.x < 0 || tile.x >= WORLD_WIDTH) continue
-      if (tile.y < 0 || tile.y >= WORLD_HEIGHT) continue
-      if (PROTECTED.has(worldBuffer.readAt(tile.index))) continue
+      if (excluded.has(worldBuffer.readAt(tile.index))) continue
       worldBuffer.writeAt(tile.index, tile.code)
       if (tile.x < x1) x1 = tile.x
       if (tile.x > x2) x2 = tile.x
@@ -1920,7 +1882,7 @@ class WorldCarver {
  *
  * @param {Array<{x, y, radiusMin, radiusMax}>} path - Chemin retourné par pathTunnel
  */
-  carveAlongPath (path, offsetX = 0) {
+  carveAlongPath (path, offsetX = 0, excluded = DEFAULT_EXCLUDED) {
     const code = NODES.VOID.code
 
     const tiles = []
@@ -1928,7 +1890,7 @@ class WorldCarver {
       const p = path[j]
       this.digNoisyCircle(tiles, p.x, p.y, p.radiusMin, p.radiusMax, code, 0.3, offsetX)
     }
-    this.applyTiles(tiles)
+    this.applyTiles(tiles, excluded)
   }
 
   /**
@@ -2148,10 +2110,10 @@ class WorldCarver {
     const tiles = []
     this.digNoisyCircle(tiles, cx, cy, radius, radius + 4, NODES.HIVE.code, 0.3, PERLIN_OFFSET_HIVE)
     this.digNoisyCircle(tiles, cx, cy, radius - 3, radius, NODES.VOID.code, 0.3, PERLIN_OFFSET_HIVE)
-    const rect2 = this.applyTiles(tiles)
+    const rect2 = this.applyTiles(tiles, ETERNAL_EXCLUDED)
 
     const path = this.pathTunnel(cx, cy, 4, length, angle, 10)
-    this.carveAlongPath(path)
+    this.carveAlongPath(path, PERLIN_OFFSET_HIVE, ETERNAL_EXCLUDED)
 
     this.addExclusion(rect2)
     return {cx, cy, radius}
@@ -2240,7 +2202,7 @@ class WorldCarver {
       // Passe 1 - ellipse horizontale principale
       const tiles = []
       this.digNoisyEllipse(tiles, cx, cy, radiusX - 1, radiusX, radiusY - 1, radiusY, NODES.SKY.code, 0.2, PERLIN_OFFSET_LAKES)
-      const rect2 = this.applyTilesOverSky(tiles)
+      const rect2 = this.applyTiles(tiles, ETERNAL_EXCLUDED)
 
       // Passe 2 - Pit — ellipse verticale bruitée, centre décalé vers le bas
       const pitOffsetX = seededRNG.randomGetMinMax(-3, 3)
@@ -2251,7 +2213,7 @@ class WorldCarver {
 
       const pitTiles = []
       this.digNoisyEllipse(pitTiles, pitCx, pitCy, pitRadiusX - 1, pitRadiusX, pitRadiusY - 1, pitRadiusY, NODES.SKY.code, 0.4, PERLIN_OFFSET_CAVERN)
-      const rect3 = this.applyTilesOverSky(pitTiles)
+      const rect3 = this.applyTiles(pitTiles, ETERNAL_EXCLUDED)
 
       // Passe 3 : remplir le base de l'ellipse par du WATER
       const lakeCreation = LAKE_CREATION_MAP[rect.biome]

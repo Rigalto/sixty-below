@@ -19,8 +19,6 @@
 - Remplacer `RESIN` par HARDSTONE après creusement (fond des Underground Lakes)
 
 ### HIVE
-- Le creusement VOID central n'est pas tracé car `applyTiles` protège HIVE
-- Utiliser `applyTilesOverSky` (ou variante) pour le VOID intérieur des ruches
 - Remplir directement de HONEY lors de `digHives` — protégé contre tout creusement ultérieur
 
 ### Cobweb Caves
@@ -39,6 +37,8 @@
 ### `cleanupAfterCarving` — mer
 - Les règles de suppression des pixels isolés et doublets (règles 2, 4, 6) ne s'appliquent pas à la SEA
 - Étendre le nettoyage pour supprimer les isolats et doublets dans la mer
+- Ajouter la suppression d'une tuile seule avec SKY à droite, haut, gauche et SEA en bas (idem pour doublons)
+- Analyser si l'on peut refondre cette fonction pour mettre les règles en table plutôt qu'en dur dans le code
 
 ### Topsoil
 - Placement des TOPSOIL en surface
