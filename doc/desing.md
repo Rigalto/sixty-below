@@ -394,12 +394,6 @@ dans un biome étranger (cf. §3.9).
 | **Abandoned Mine** | caverns_bottom | OBSIDIAN + COBALTWALL | Tous biomes. Galerie horizontale creusée par une civilisation ancienne. OBSIDIAN en toit et sol. Étais de COBALTWALL tous les 5 tuiles (minables sans conséquence). Coffres de matériaux de construction et minerais extraits. Faune commune de la zone. |
 | **Blind Lake** | caverns_bottom | WATER + HARDSTONE | Tous biomes. Lac aveugle sans accès naturel — le joueur doit creuser pour y accéder. Fond et parois de HARDSTONE. Poissons aveugles et AXOLOTL pêchables (tier 4-5). Pas de faune agressive. Bioluminescence ambiante. |
 
-
-| **Crystal Pocket** | caverns | GEM natif | Géode ouverte tapissée de gemmes. Visuellement très distinctive. Pas de combat. |
-| **Underground River** | under→caverns | WATER | Long couloir horizontal rempli d'eau. Relie plusieurs zones. Poissons rares. |
-| **Lava Bubble** | caverns_bottom | OBSIDIAN | Poche de lave refroidie en surface. OBSIDIAN sur les bords. Zone dangereuse. |
-| **Meteor Crater** | surface | METEORITE | Impact météoritique. METEORITE autour du cratère. Ennemis spécifiques. |
-
 ---
 
 ### 5.5 Règles Générales
@@ -506,6 +500,8 @@ commune de la zone N+1 : la progression est continue, sans palier artificiel.
 | **AMBER SQUID** | 4 | ★★☆☆☆ | Fish - Sap Pocket |
 | **GLIDER** | 4 | ★★☆☆☆ | Fish - Sap Pocket |
 | **MANTIS** | 4 | ★★★★☆ | Sap Pocket |
+| **BLIND FISH** | 5 | ★★★★☆ | Fish — Blind Lake |
+| **AXOLOTL** | 5 | ★★★★★ | Fish — Blind Lake |
 
 ---
 
