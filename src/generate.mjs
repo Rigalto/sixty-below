@@ -2485,20 +2485,6 @@ class WorldCarver {
     let code, top, bot, left, right
     let topright, rightright, botleft, botright, botbot // pour doublons H et V
 
-    const PROTECTED = new Set([
-      NODES.FOG.code,
-      NODES.DEEPSEA.code,
-      NODES.BASALT.code,
-      NODES.LAVA.code
-    ])
-    const LIQUID_OR_SKY = new Set([
-      NODES.SKY.code,
-      NODES.WATER.code,
-      NODES.SEA.code,
-      NODES.HONEY.code,
-      NODES.SAP.code
-    ])
-
     const ETERNAL = new Set([
       NODES.FOG.code,
       NODES.DEEPSEA.code,
@@ -2516,6 +2502,8 @@ class WorldCarver {
       NODES.HONEY.code,
       NODES.SAP.code
     ])
+    const GAZ = new Set([NODES.SKY.code, NODES.FOG.code, NODES.VOID.code])
+    const SKY_OR_FOG = new Set([NODES.SKY.code, NODES.FOG.code])
 
     const propagateSky = (idx) => {
       world[idx] = SKY
@@ -2573,9 +2561,6 @@ class WorldCarver {
         // neighbors 2 tuiles horizontales : left, top, bot, topright, botright, rightright
         // neighbors 2 tuiles verticales : top, left, right, botleft, botright, botbot
 
-        const isVoid = code === VOID
-        const isSKY = code === SKY
-
         // Règle 1 — VOID isolé : 4 voisins solides → substrat aléatoire parmi les 4
         if (code === VOID && !LIQUID_OR_GAZ.has(top) && !LIQUID_OR_GAZ.has(bot) && !LIQUID_OR_GAZ.has(left) && !LIQUID_OR_GAZ.has(right)) {
           world[idx] = seededRNG.randomGetArrayValue([top, bot, left, right])
@@ -2602,114 +2587,155 @@ class WorldCarver {
 
         // Règle 2 — SKY, VOID non isolé, liquide, gaz : pas de modification
         if (LIQUID_OR_GAZ.has(code)) continue
+        // à partir de maintenant, on est sûr que code est solide
 
-        if (isVoid) {
-        // Règle 2 — VOID avec 4 voisins non VOID → devient l'un d'eux
-          // if (top !== VOID && bot !== VOID && left !== VOID && right !== VOID) {
-          //   const candidates = []
-          //   if (!LIQUID_OR_SKY.has(top)) candidates.push(top)
-          //   if (!LIQUID_OR_SKY.has(bot)) candidates.push(bot)
-          //   if (!LIQUID_OR_SKY.has(left)) candidates.push(left)
-          //   if (!LIQUID_OR_SKY.has(right)) candidates.push(right)
-          //   world[idx] = seededRNG.randomGetArrayValue(candidates)
-          //   continue
-          // }
-
-          // Règle 4 — paire horizontale VOID (x,y)+(x+1,y), 6 voisins non VOID → devient l'un des 6
-          // if (x < W - 2 && right === VOID) {
-          //   const top2 = world[idx - W + 1]
-          //   const bot2 = world[idx + W + 1]
-          //   const right2 = world[idx + 2]
-          //   if (top !== VOID && top2 !== VOID && bot !== VOID && bot2 !== VOID && left !== VOID && right2 !== VOID) {
-          //     const candidates = []
-          //     if (!LIQUID_OR_SKY.has(top)) candidates.push(top)
-          //     if (!LIQUID_OR_SKY.has(top2)) candidates.push(top2)
-          //     if (!LIQUID_OR_SKY.has(bot)) candidates.push(bot)
-          //     if (!LIQUID_OR_SKY.has(bot2)) candidates.push(bot2)
-          //     if (!LIQUID_OR_SKY.has(left)) candidates.push(left)
-          //     if (!LIQUID_OR_SKY.has(right2)) candidates.push(right2)
-          //     world[idx] = seededRNG.randomGetArrayValue(candidates)
-          //     continue
-          //   }
-          // }
-
-          // Règle 6 — paire verticale VOID (x,y)+(x,y+1), 6 voisins non VOID → devient l'un des 6
-          // if (y < H - 2 && bot === VOID) {
-          //   const left2 = world[idx + W - 1]
-          //   const right2 = world[idx + W + 1]
-          //   const top2 = world[idx + W + W]
-          //   if (top !== VOID && left !== VOID && left2 !== VOID && right !== VOID && right2 !== VOID && top2 !== VOID) {
-          //     const candidates = []
-          //     if (!LIQUID_OR_SKY.has(top)) candidates.push(top)
-          //     if (!LIQUID_OR_SKY.has(left)) candidates.push(left)
-          //     if (!LIQUID_OR_SKY.has(left2)) candidates.push(left2)
-          //     if (!LIQUID_OR_SKY.has(right)) candidates.push(right)
-          //     if (!LIQUID_OR_SKY.has(right2)) candidates.push(right2)
-          //     if (!LIQUID_OR_SKY.has(top2)) candidates.push(top2)
-          //     world[idx] = seededRNG.randomGetArrayValue(candidates)
-          //     continue
-          //   }
-          // }
-        } else {
-          // Règle 3 — non VOID avec 4 voisins VOID → devient VOID
-          if (top === VOID && bot === VOID && (left === VOID || left === SKY) && (right === VOID || right === SKY)) {
-            world[idx] = VOID
-            continue
-          }
-
-          // Règle 5 — paire horizontale non VOID (x,y)+(x+1,y), 6 voisins VOID → devient VOID
-          if (x < W - 2 && right !== VOID) {
-            const top2 = world[idx - W + 1]
-            const bot2 = world[idx + W + 1]
-            const right2 = world[idx + 2]
-            if (top === VOID && top2 === VOID && bot === VOID && bot2 === VOID && left === VOID && right2 === VOID) {
-              world[idx] = VOID
-              continue
-            }
-          }
-
-          // Règle 7 — paire verticale non VOID (x,y)+(x,y+1), 6 voisins VOID → devient VOID
-          if (y < H - 2 && bot !== VOID) {
-            const left2 = world[idx + W - 1]
-            const right2 = world[idx + W + 1]
-            const bot2 = world[idx + W + W]
-            if (top === VOID && left === VOID && left2 === VOID && right === VOID && right2 === VOID && bot2 === VOID) {
-              world[idx] = VOID
-              continue
-            }
-          }
-
-          // Règle 8 — pic isolé dans le ciel → SKY + propagation vers le bas
-          if (top === SKY && left === SKY && right === SKY && bot === VOID) {
-            propagateSky(idx)
-            world[idx] = SKY
-            continue
-          }
-
-          // Règle 9 — pic double vertical dans le ciel → SKY + propagation vers le bas
-          if (y < H - 2 && top === SKY && left === SKY && right === SKY) {
-            const bot2code = world[idx + W + W]
-            const left2 = world[idx + W - 1]
-            const right2 = world[idx + W + 1]
-            if (bot !== VOID && bot !== SKY && left2 === SKY && right2 === SKY && (bot2code === VOID || bot2code === SKY)) {
-              world[idx] = SKY
-              propagateSky(idx + W)
-              continue
-            }
-          }
-
-          // Règle 10 — pic double horizontal dans le ciel → SKY + propagation vers le bas
-          if (x < W - 2 && top === SKY && (bot === VOID || bot === SKY)) {
-            const top2 = world[idx - W + 1]
-            const bot2 = world[idx + W + 1]
-            const right2 = world[idx + 2]
-            if (right !== VOID && right !== SKY && top2 === SKY && (bot2 === VOID || bot2 === SKY) && right2 === SKY) {
-              propagateSky(idx)
-              propagateSky(idx + 1)
-              continue
-            }
-          }
+        // Règle 3 — tuile solide suspendue dans le ciel (top=SKY, bot=VOID, côtés SKY/FOG) → SKY propagé
+        if (top === SKY && bot === VOID && SKY_OR_FOG.has(left) && SKY_OR_FOG.has(right)) {
+          propagateSky(idx)
+          continue
         }
+
+        // Règle 3-V — paire verticale solide suspendue dans le ciel → SKY propagé sur les deux tuiles
+        if (!LIQUID_OR_GAZ.has(bot) && top === SKY && SKY_OR_FOG.has(left) && SKY_OR_FOG.has(right) && SKY_OR_FOG.has(botleft) && SKY_OR_FOG.has(botright) && botbot === VOID) {
+          world[idx] = SKY
+          propagateSky(idx + W)
+          continue
+        }
+
+        // Règle 3-H — paire horizontale solide suspendue dans le ciel → SKY propagé sur les deux tuiles
+        if (!LIQUID_OR_GAZ.has(right) && top === SKY && bot === VOID && SKY_OR_FOG.has(left) && topright === SKY && botright === VOID && SKY_OR_FOG.has(rightright)) {
+          propagateSky(idx)
+          propagateSky(idx + 1)
+          continue
+        }
+
+        // Règle 4 — tuile solide isolée dans VOID → VOID
+        if (top === VOID && bot === VOID && left === VOID && right === VOID) {
+          world[idx] = VOID
+          continue
+        }
+
+        // Règle 4-H — paire horizontale solide dans VOID → VOID
+        if (!LIQUID_OR_GAZ.has(right) && top === VOID && bot === VOID && left === VOID && topright === VOID && botright === VOID && rightright === VOID) {
+          world[idx] = VOID
+          world[idx + 1] = VOID
+          continue
+        }
+
+        // Règle 4-V — paire verticale solide dans VOID → VOID
+        if (!LIQUID_OR_GAZ.has(bot) && top === VOID && left === VOID && right === VOID && botleft === VOID && botright === VOID && botbot === VOID) {
+          world[idx] = VOID
+          world[idx + W] = VOID
+          continue
+        }
+
+        // if (isVoid) {
+        // Règle 2 — VOID avec 4 voisins non VOID → devient l'un d'eux
+        // if (top !== VOID && bot !== VOID && left !== VOID && right !== VOID) {
+        //   const candidates = []
+        //   if (!LIQUID_OR_SKY.has(top)) candidates.push(top)
+        //   if (!LIQUID_OR_SKY.has(bot)) candidates.push(bot)
+        //   if (!LIQUID_OR_SKY.has(left)) candidates.push(left)
+        //   if (!LIQUID_OR_SKY.has(right)) candidates.push(right)
+        //   world[idx] = seededRNG.randomGetArrayValue(candidates)
+        //   continue
+        // }
+
+        // Règle 4 — paire horizontale VOID (x,y)+(x+1,y), 6 voisins non VOID → devient l'un des 6
+        // if (x < W - 2 && right === VOID) {
+        //   const top2 = world[idx - W + 1]
+        //   const bot2 = world[idx + W + 1]
+        //   const right2 = world[idx + 2]
+        //   if (top !== VOID && top2 !== VOID && bot !== VOID && bot2 !== VOID && left !== VOID && right2 !== VOID) {
+        //     const candidates = []
+        //     if (!LIQUID_OR_SKY.has(top)) candidates.push(top)
+        //     if (!LIQUID_OR_SKY.has(top2)) candidates.push(top2)
+        //     if (!LIQUID_OR_SKY.has(bot)) candidates.push(bot)
+        //     if (!LIQUID_OR_SKY.has(bot2)) candidates.push(bot2)
+        //     if (!LIQUID_OR_SKY.has(left)) candidates.push(left)
+        //     if (!LIQUID_OR_SKY.has(right2)) candidates.push(right2)
+        //     world[idx] = seededRNG.randomGetArrayValue(candidates)
+        //     continue
+        //   }
+        // }
+
+        // Règle 6 — paire verticale VOID (x,y)+(x,y+1), 6 voisins non VOID → devient l'un des 6
+        // if (y < H - 2 && bot === VOID) {
+        //   const left2 = world[idx + W - 1]
+        //   const right2 = world[idx + W + 1]
+        //   const top2 = world[idx + W + W]
+        //   if (top !== VOID && left !== VOID && left2 !== VOID && right !== VOID && right2 !== VOID && top2 !== VOID) {
+        //     const candidates = []
+        //     if (!LIQUID_OR_SKY.has(top)) candidates.push(top)
+        //     if (!LIQUID_OR_SKY.has(left)) candidates.push(left)
+        //     if (!LIQUID_OR_SKY.has(left2)) candidates.push(left2)
+        //     if (!LIQUID_OR_SKY.has(right)) candidates.push(right)
+        //     if (!LIQUID_OR_SKY.has(right2)) candidates.push(right2)
+        //     if (!LIQUID_OR_SKY.has(top2)) candidates.push(top2)
+        //     world[idx] = seededRNG.randomGetArrayValue(candidates)
+        //     continue
+        //   }
+        // }
+        // } else {
+        // Règle 3 — non VOID avec 4 voisins VOID → devient VOID
+        // if (top === VOID && bot === VOID && (left === VOID || left === SKY) && (right === VOID || right === SKY)) {
+        //   world[idx] = VOID
+        //   continue
+        // }
+
+        // // Règle 5 — paire horizontale non VOID (x,y)+(x+1,y), 6 voisins VOID → devient VOID
+        // if (x < W - 2 && right !== VOID) {
+        //   const top2 = world[idx - W + 1]
+        //   const bot2 = world[idx + W + 1]
+        //   const right2 = world[idx + 2]
+        //   if (top === VOID && top2 === VOID && bot === VOID && bot2 === VOID && left === VOID && right2 === VOID) {
+        //     world[idx] = VOID
+        //     continue
+        //   }
+        // }
+
+        // // Règle 7 — paire verticale non VOID (x,y)+(x,y+1), 6 voisins VOID → devient VOID
+        // if (y < H - 2 && bot !== VOID) {
+        //   const left2 = world[idx + W - 1]
+        //   const right2 = world[idx + W + 1]
+        //   const bot2 = world[idx + W + W]
+        //   if (top === VOID && left === VOID && left2 === VOID && right === VOID && right2 === VOID && bot2 === VOID) {
+        //     world[idx] = VOID
+        //     continue
+        //   }
+        // }
+
+        // // Règle 8 — pic isolé dans le ciel → SKY + propagation vers le bas
+        // if (top === SKY && left === SKY && right === SKY && bot === VOID) {
+        //   propagateSky(idx)
+        //   world[idx] = SKY
+        //   continue
+        // }
+
+        // Règle 9 — pic double vertical dans le ciel → SKY + propagation vers le bas
+        // if (y < H - 2 && top === SKY && left === SKY && right === SKY) {
+        //   const bot2code = world[idx + W + W]
+        //   const left2 = world[idx + W - 1]
+        //   const right2 = world[idx + W + 1]
+        //   if (bot !== VOID && bot !== SKY && left2 === SKY && right2 === SKY && (bot2code === VOID || bot2code === SKY)) {
+        //     world[idx] = SKY
+        //     propagateSky(idx + W)
+        //     continue
+        //   }
+        // }
+
+        // Règle 10 — pic double horizontal dans le ciel → SKY + propagation vers le bas
+        // if (x < W - 2 && top === SKY && (bot === VOID || bot === SKY)) {
+        //   const top2 = world[idx - W + 1]
+        //   const bot2 = world[idx + W + 1]
+        //   const right2 = world[idx + 2]
+        //   if (right !== VOID && right !== SKY && top2 === SKY && (bot2 === VOID || bot2 === SKY) && right2 === SKY) {
+        //     propagateSky(idx)
+        //     propagateSky(idx + 1)
+        //     continue
+        //   }
+        // }
+        // }
       }
     }
   }
