@@ -750,6 +750,7 @@ Le paramètre `offsetX` permet de décorrèler le bruit Perlin des autres usages
 | `biomesGenerator`    | `BiomesGenerator`   | Disposition horizontale des biomes et largeurs des mers latérales.                        |
 | `biomeNaturalizer`   | `BiomeNaturalizer`  | Remplit le buffer avec les substrats par biome/couche. Prépare les zones côtières (VOID). |
 | `liquidFiller`       | `LiquidFiller`      | Flood-fill BFS des zones liquides et automate pour le SAND. |
+| `webFiller` | `WebFiller` | Peuplement WEB : `fillCobwebCave(cx, cy)` pour les caves, `scatterWebs(surfaceUnder)` pour le peuplement global différé. |
 
 ---
 

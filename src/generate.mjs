@@ -1,6 +1,6 @@
 import {seededRNG} from './utils.mjs'
 import {database} from './database.mjs'
-import {NODES, NODES_LOOKUP, NODE_TYPE, WEATHER_TYPE, BIOME_TYPE, WORLD_WIDTH, WORLD_HEIGHT, SEA_LEVEL, TOPSOIL_Y_SKY_SURFACE, TOPSOIL_Y_SURFACE_UNDER, TOPSOIL_Y_UNDER_CAVERNS, TOPSOIL_Y_CAVERNS_MID, BIOME_TILE_MAP, SEA_MAX_JITTER, SEA_MAX_WIDTH, SEA_MAX_HEIGHT, CLUSTER_SCATTER_MAP, ORE_GEM_SCATTER_MAP, PERLIN_OFFSET_NATURALIZER, PERLIN_OFFSET_TUNNEL, PERLIN_OFFSET_SURFACE_TUNNEL, PERLIN_OFFSET_SMALL_TUNNEL, PERLIN_OFFSET_CAVERN, PERLIN_OFFSET_HIVE, PERLIN_OFFSET_COBWEB, PERLIN_OFFSET_LAKES, SMALL_CAVERNS_COUNT, MEDIUM_CAVERNS_COUNT, UNDERGROUND_TUNNEL_COUNT, CAVERNS_TUNNEL_COUNT, SMALL_TUNNELS_COUNT, HIVE_RADIUS_MIN, HIVE_RADIUS_MAX, COBWEB_CAVE_COUNT_MIN, COBWEB_CAVE_COUNT_MAX, COBWEB_RADIUS_X_MIN, COBWEB_RADIUS_X_MAX, COBWEB_RADIUS_Y_MIN, COBWEB_RADIUS_Y_MAX, GEODE_CAVE_COUNT_MIN, GEODE_CAVE_COUNT_MAX, GEODE_RADIUS_MIN, GEODE_RADIUS_MAX, GEODE_TARGET_CLUSTER_COUNT, GEODE_CLUSTER_SIZE_MIN, GEODE_CLUSTER_SIZE_MAX, TOPSOIL_SCATTER_MAP, LAKE_RADIUS_X_MIN, LAKE_RADIUS_X_MAX, LAKE_RADIUS_Y_MIN, LAKE_RADIUS_Y_MAX, LAKE_PIT_RADIUS_X_MIN, LAKE_PIT_RADIUS_X_MAX, LAKE_PIT_RADIUS_Y_MIN, LAKE_PIT_RADIUS_Y_MAX, LAKE_CREATION_MAP} from '../assets/data/data-gen.mjs'
+import {NODES, NODES_LOOKUP, NODE_TYPE, WEATHER_TYPE, BIOME_TYPE, WORLD_WIDTH, WORLD_HEIGHT, SEA_LEVEL, TOPSOIL_Y_SKY_SURFACE, TOPSOIL_Y_SURFACE_UNDER, TOPSOIL_Y_UNDER_CAVERNS, TOPSOIL_Y_CAVERNS_MID, BIOME_TILE_MAP, SEA_MAX_JITTER, SEA_MAX_WIDTH, SEA_MAX_HEIGHT, CLUSTER_SCATTER_MAP, ORE_GEM_SCATTER_MAP, PERLIN_OFFSET_NATURALIZER, PERLIN_OFFSET_TUNNEL, PERLIN_OFFSET_SURFACE_TUNNEL, PERLIN_OFFSET_SMALL_TUNNEL, PERLIN_OFFSET_CAVERN, PERLIN_OFFSET_HIVE, PERLIN_OFFSET_COBWEB, PERLIN_OFFSET_LAKES, SMALL_CAVERNS_COUNT, MEDIUM_CAVERNS_COUNT, UNDERGROUND_TUNNEL_COUNT, CAVERNS_TUNNEL_COUNT, SMALL_TUNNELS_COUNT, HIVE_RADIUS_MIN, HIVE_RADIUS_MAX, COBWEB_CAVE_COUNT_MIN, COBWEB_CAVE_COUNT_MAX, COBWEB_RADIUS_X_MIN, COBWEB_RADIUS_X_MAX, COBWEB_RADIUS_Y_MIN, COBWEB_RADIUS_Y_MAX, COBWEB_CAVE_MAIN_MIN, COBWEB_CAVE_MAIN_MAX, COBWEB_CAVE_SIDE_MIN, COBWEB_CAVE_SIDE_MAX, COBWEB_SCATTER_COUNT, COBWEB_SCATTER_SIZE_MIN, COBWEB_SCATTER_SIZE_MAX, GEODE_CAVE_COUNT_MIN, GEODE_CAVE_COUNT_MAX, GEODE_RADIUS_MIN, GEODE_RADIUS_MAX, GEODE_TARGET_CLUSTER_COUNT, GEODE_CLUSTER_SIZE_MIN, GEODE_CLUSTER_SIZE_MAX, TOPSOIL_SCATTER_MAP, LAKE_RADIUS_X_MIN, LAKE_RADIUS_X_MAX, LAKE_RADIUS_Y_MIN, LAKE_RADIUS_Y_MAX, LAKE_PIT_RADIUS_X_MIN, LAKE_PIT_RADIUS_X_MAX, LAKE_PIT_RADIUS_Y_MIN, LAKE_PIT_RADIUS_Y_MAX, LAKE_CREATION_MAP, CREATION_REMAP} from '../assets/data/data-gen.mjs'
 
 /* ====================================================================================================
    WORLD BUFFER (CREATION DU MONDE)
@@ -292,6 +292,7 @@ class WorldGenerator {
     // N-4 Peuplement des biomes qui sont à peuplement différé - TODO
 
     for (const cave of geodeCaves) { clusterGenerator.projectAndFill(cave) }
+    webFiller.scatterWebs(surfaceUnder)
 
     // N-3. Ajout des coffres et objets spéciaux - TODO
 
@@ -1001,6 +1002,50 @@ class LiquidFiller {
       }
     }
   }
+
+  /**
+ * Remplit en HONEY la moitié inférieure de la cavité VOID d'une ruche.
+ * BFS depuis (cx, cy+1) — propage uniquement sur les tuiles VOID avec y >= cy.
+ * Algorithme FIFO avec head cursor — même pattern que #fillOneSea.
+ *
+ * @param {number} cx - Centre horizontal de la ruche
+ * @param {number} cy - Centre vertical de la ruche (borne supérieure stricte du fill)
+ */
+  fillHive (cx, cy) {
+    const VOID_CODE = NODES.VOID.code
+    const HONEY_CODE = NODES.HONEY.code
+
+    const src = (cy << 10) | cx
+    if (worldBuffer.readAt(src) !== VOID_CODE) return
+
+    const visited = new Set()
+    const queue = []
+    let head = 0
+
+    visited.add(src)
+    queue.push(src)
+
+    while (head < queue.length) {
+      const idx = queue[head++]
+      worldBuffer.writeAt(idx, HONEY_CODE)
+
+      const neighbors = [idx - 1, idx + 1, idx - 1024, idx + 1024]
+      for (let i = 0; i < 4; i++) {
+        const nIdx = neighbors[i]
+        if (visited.has(nIdx)) continue
+
+        const nx = nIdx & 0x3FF
+        const ny = nIdx >> 10
+
+        if (nx <= 1 || nx >= 1022 || ny <= 1 || ny >= 510) continue
+        if (ny < cy) continue
+        if (worldBuffer.readAt(nIdx) !== VOID_CODE) continue
+
+        visited.add(nIdx)
+        queue.push(nIdx)
+      }
+    }
+  }
 }
 
 export const liquidFiller = new LiquidFiller()
@@ -1665,7 +1710,7 @@ export const clusterGenerator = new ClusterGenerator()
 const DEFAULT_EXCLUDED = new Set([
   NODES.FOG.code, NODES.DEEPSEA.code, NODES.BASALT.code, NODES.LAVA.code,
   NODES.SKY.code, NODES.WATER.code, NODES.SEA.code, NODES.HONEY.code,
-  NODES.SAP.code, NODES.HIVE.code, NODES.SAPROCK.code, NODES.HARDROCK.code,
+  NODES.SAP.code, NODES.HIVE.code, NODES.WEB.code, NODES.SAPROCK.code, NODES.HARDROCK.code,
   NODES.HEART.code,
   NODES.LAKE_FOREST_SIDE.code, NODES.LAKE_FOREST_BED.code,
   NODES.LAKE_DESERT_SIDE.code, NODES.LAKE_DESERT_BED.code,
@@ -2115,6 +2160,8 @@ class WorldCarver {
     const path = this.pathTunnel(cx, cy, 4, length, angle, 10)
     this.carveAlongPath(path, PERLIN_OFFSET_HIVE, ETERNAL_EXCLUDED)
 
+    liquidFiller.fillHive(cx, cy + 2)
+
     this.addExclusion(rect2)
     return {cx, cy, radius}
   }
@@ -2309,6 +2356,10 @@ class WorldCarver {
     const tiles = []
     this.digNoisyEllipse(tiles, cx, cy, radiusX - 2, radiusX + 2, radiusY - 2, radiusY + 2, NODES.VOID.code, 0.3, PERLIN_OFFSET_COBWEB)
     const rect = this.applyTiles(tiles)
+
+    // ajout des toiles d'araignées au plafond
+    webFiller.fillCobwebCave(cx, cy)
+
     this.addExclusion(rect)
 
     return {cx, cy, radiusX, radiusY}
@@ -2431,6 +2482,9 @@ class WorldCarver {
     const W = WORLD_WIDTH
     const H = WORLD_HEIGHT
 
+    let code, top, bot, left, right
+    let topright, rightright, botleft, botright, botbot // pour doublons H et V
+
     const PROTECTED = new Set([
       NODES.FOG.code,
       NODES.DEEPSEA.code,
@@ -2441,6 +2495,24 @@ class WorldCarver {
       NODES.SKY.code,
       NODES.WATER.code,
       NODES.SEA.code,
+      NODES.HONEY.code,
+      NODES.SAP.code
+    ])
+
+    const ETERNAL = new Set([
+      NODES.FOG.code,
+      NODES.DEEPSEA.code,
+      NODES.BASALT.code,
+      NODES.LAVA.code
+    ])
+
+    const LIQUID_OR_GAZ = new Set([
+      NODES.VOID.code,
+      NODES.SKY.code,
+      NODES.FOG.code,
+      NODES.WATER.code,
+      NODES.SEA.code,
+      NODES.DEEPSEA.code,
       NODES.HONEY.code,
       NODES.SAP.code
     ])
@@ -2472,70 +2544,113 @@ class WorldCarver {
       }
     }
 
-    // Passe 2 — application des règles
+    // Passe 2 — remplacement des tuiles CREATION par leur substrat définitif
+    for (let i = 0; i < world.length; i++) {
+      const remapped = CREATION_REMAP.get(world[i])
+      if (remapped !== undefined) world[i] = remapped
+    }
+
+    // Passe 3 — application des règles
     for (let y = 1; y < H - 1; y++) {
       for (let x = 1; x < W - 1; x++) {
         const idx = (y << 10) | x
-        const code = world[idx]
+
+        // récupération de tous les codes voisins
+        code = world[idx]
+        top = world[idx - W]
+        topright = world[idx - W + 1]
+        left = world[idx - 1]
+        right = world[idx + 1]
+        rightright = world[idx + 2]
+        bot = world[idx + W]
+        botleft = world[idx + W - 1]
+        botright = world[idx + W + 1]
+        botbot = world[idx + W + W]
+        // target 1 tuile : code
+        // target 2 tuiles horizontales : code, right
+        // target 2 tuiles verticales : code, bot
+        // neighbors 1 tuile : top, right, bot, left
+        // neighbors 2 tuiles horizontales : left, top, bot, topright, botright, rightright
+        // neighbors 2 tuiles verticales : top, left, right, botleft, botright, botbot
+
         const isVoid = code === VOID
         const isSKY = code === SKY
 
-        const top = world[idx - W]
-        const bot = world[idx + W]
-        const left = world[idx - 1]
-        const right = world[idx + 1]
+        // Règle 1 — VOID isolé : 4 voisins solides → substrat aléatoire parmi les 4
+        if (code === VOID && !LIQUID_OR_GAZ.has(top) && !LIQUID_OR_GAZ.has(bot) && !LIQUID_OR_GAZ.has(left) && !LIQUID_OR_GAZ.has(right)) {
+          world[idx] = seededRNG.randomGetArrayValue([top, bot, left, right])
+          continue
+        }
+
+        // Règle 1-H — paire horizontale VOID : 6 voisins solides → substrat aléatoire parmi les 6
+        if (code === VOID && right === VOID && !LIQUID_OR_GAZ.has(top) && !LIQUID_OR_GAZ.has(bot) && !LIQUID_OR_GAZ.has(left) && !LIQUID_OR_GAZ.has(topright) && !LIQUID_OR_GAZ.has(botright) && !LIQUID_OR_GAZ.has(rightright)) {
+          const candidates = [top, bot, left, topright, botright, rightright]
+          world[idx] = seededRNG.randomGetArrayValue(candidates)
+          world[idx + 1] = seededRNG.randomGetArrayValue(candidates)
+          world[idx] = NODES.LAVA.code // débug
+          world[idx + 1] = NODES.LAVA.code // débug
+          continue
+        }
+
+        // Règle 1-V — paire verticale VOID : 6 voisins solides → substrat aléatoire parmi les 6
+        if (code === VOID && bot === VOID && !LIQUID_OR_GAZ.has(top) && !LIQUID_OR_GAZ.has(left) && !LIQUID_OR_GAZ.has(right) && !LIQUID_OR_GAZ.has(botleft) && !LIQUID_OR_GAZ.has(botright) && !LIQUID_OR_GAZ.has(botbot)) {
+          const candidates = [top, left, right, botleft, botright, botbot]
+          world[idx] = candidates[seededRNG.randomGetMax(5)]
+          world[idx + W] = candidates[seededRNG.randomGetMax(5)]
+          continue
+        }
+
+        // Règle 2 — SKY, VOID non isolé, liquide, gaz : pas de modification
+        if (LIQUID_OR_GAZ.has(code)) continue
 
         if (isVoid) {
         // Règle 2 — VOID avec 4 voisins non VOID → devient l'un d'eux
-          if (top !== VOID && bot !== VOID && left !== VOID && right !== VOID) {
-            const candidates = []
-            if (!LIQUID_OR_SKY.has(top)) candidates.push(top)
-            if (!LIQUID_OR_SKY.has(bot)) candidates.push(bot)
-            if (!LIQUID_OR_SKY.has(left)) candidates.push(left)
-            if (!LIQUID_OR_SKY.has(right)) candidates.push(right)
-            world[idx] = seededRNG.randomGetArrayValue(candidates)
-            continue
-          }
+          // if (top !== VOID && bot !== VOID && left !== VOID && right !== VOID) {
+          //   const candidates = []
+          //   if (!LIQUID_OR_SKY.has(top)) candidates.push(top)
+          //   if (!LIQUID_OR_SKY.has(bot)) candidates.push(bot)
+          //   if (!LIQUID_OR_SKY.has(left)) candidates.push(left)
+          //   if (!LIQUID_OR_SKY.has(right)) candidates.push(right)
+          //   world[idx] = seededRNG.randomGetArrayValue(candidates)
+          //   continue
+          // }
 
           // Règle 4 — paire horizontale VOID (x,y)+(x+1,y), 6 voisins non VOID → devient l'un des 6
-          if (x < W - 2 && right === VOID) {
-            const top2 = world[idx - W + 1]
-            const bot2 = world[idx + W + 1]
-            const right2 = world[idx + 2]
-            if (top !== VOID && top2 !== VOID && bot !== VOID && bot2 !== VOID && left !== VOID && right2 !== VOID) {
-              const candidates = []
-              if (!LIQUID_OR_SKY.has(top)) candidates.push(top)
-              if (!LIQUID_OR_SKY.has(top2)) candidates.push(top2)
-              if (!LIQUID_OR_SKY.has(bot)) candidates.push(bot)
-              if (!LIQUID_OR_SKY.has(bot2)) candidates.push(bot2)
-              if (!LIQUID_OR_SKY.has(left)) candidates.push(left)
-              if (!LIQUID_OR_SKY.has(right2)) candidates.push(right2)
-              world[idx] = seededRNG.randomGetArrayValue(candidates)
-              continue
-            }
-          }
+          // if (x < W - 2 && right === VOID) {
+          //   const top2 = world[idx - W + 1]
+          //   const bot2 = world[idx + W + 1]
+          //   const right2 = world[idx + 2]
+          //   if (top !== VOID && top2 !== VOID && bot !== VOID && bot2 !== VOID && left !== VOID && right2 !== VOID) {
+          //     const candidates = []
+          //     if (!LIQUID_OR_SKY.has(top)) candidates.push(top)
+          //     if (!LIQUID_OR_SKY.has(top2)) candidates.push(top2)
+          //     if (!LIQUID_OR_SKY.has(bot)) candidates.push(bot)
+          //     if (!LIQUID_OR_SKY.has(bot2)) candidates.push(bot2)
+          //     if (!LIQUID_OR_SKY.has(left)) candidates.push(left)
+          //     if (!LIQUID_OR_SKY.has(right2)) candidates.push(right2)
+          //     world[idx] = seededRNG.randomGetArrayValue(candidates)
+          //     continue
+          //   }
+          // }
 
           // Règle 6 — paire verticale VOID (x,y)+(x,y+1), 6 voisins non VOID → devient l'un des 6
-          if (y < H - 2 && bot === VOID) {
-            const left2 = world[idx + W - 1]
-            const right2 = world[idx + W + 1]
-            const top2 = world[idx + W + W]
-            if (top !== VOID && left !== VOID && left2 !== VOID && right !== VOID && right2 !== VOID && top2 !== VOID) {
-              const candidates = []
-              if (!LIQUID_OR_SKY.has(top)) candidates.push(top)
-              if (!LIQUID_OR_SKY.has(left)) candidates.push(left)
-              if (!LIQUID_OR_SKY.has(left2)) candidates.push(left2)
-              if (!LIQUID_OR_SKY.has(right)) candidates.push(right)
-              if (!LIQUID_OR_SKY.has(right2)) candidates.push(right2)
-              if (!LIQUID_OR_SKY.has(top2)) candidates.push(top2)
-              world[idx] = seededRNG.randomGetArrayValue(candidates)
-              continue
-            }
-          }
+          // if (y < H - 2 && bot === VOID) {
+          //   const left2 = world[idx + W - 1]
+          //   const right2 = world[idx + W + 1]
+          //   const top2 = world[idx + W + W]
+          //   if (top !== VOID && left !== VOID && left2 !== VOID && right !== VOID && right2 !== VOID && top2 !== VOID) {
+          //     const candidates = []
+          //     if (!LIQUID_OR_SKY.has(top)) candidates.push(top)
+          //     if (!LIQUID_OR_SKY.has(left)) candidates.push(left)
+          //     if (!LIQUID_OR_SKY.has(left2)) candidates.push(left2)
+          //     if (!LIQUID_OR_SKY.has(right)) candidates.push(right)
+          //     if (!LIQUID_OR_SKY.has(right2)) candidates.push(right2)
+          //     if (!LIQUID_OR_SKY.has(top2)) candidates.push(top2)
+          //     world[idx] = seededRNG.randomGetArrayValue(candidates)
+          //     continue
+          //   }
+          // }
         } else {
-          if (PROTECTED.has(code)) continue
-          if (isSKY) continue
-
           // Règle 3 — non VOID avec 4 voisins VOID → devient VOID
           if (top === VOID && bot === VOID && (left === VOID || left === SKY) && (right === VOID || right === SKY)) {
             world[idx] = VOID
@@ -2614,5 +2729,135 @@ class WorldCarver {
     this.applyTiles(tiles)
   }
 }
-
 export const worldCarver = new WorldCarver()
+
+/* ====================================================================================================
+   REMPLISSAGE DES TUNNELS, CAVERNES ET COBWEB CAVES PAR DES WEB
+   ==================================================================================================== */
+
+class WebFiller {
+  constructor () {
+    this.WEB = NODES.WEB.code
+    this.VOID = NODES.VOID.code
+    this.HIVE = NODES.HIVE.code
+    this.WIDTH = WORLD_WIDTH
+  }
+
+  /**
+   * Remonte au plafond depuis (cx, cy) et construit une toile organique
+   * de `count` tuiles maximum. Abandon si le plafond est HIVE.
+   *
+   * @param {number} cx
+   * @param {number} cy
+   * @param {number} count
+   */
+  #buildWeb (cx, cy, count) {
+    let idx = (cy << 10) | cx
+
+    // Remonte au plafond
+    while (worldBuffer.readAt(idx - this.WIDTH) === this.VOID) {
+      idx -= this.WIDTH
+      cy--
+    }
+    if (worldBuffer.readAt(idx - this.WIDTH) === this.HIVE) return
+
+    worldBuffer.writeAt(idx, this.WEB)
+    count--
+
+    const webX = [cx]
+    const webY = [cy]
+    let tentative = 10
+
+    while (count > 0 && tentative > 0) {
+      const i = seededRNG.randomGetMax(webX.length - 1)
+      const result = this.#stepWeb(webX[i], webY[i])
+      if (result !== null) {
+        webX.push(result.x)
+        webY.push(result.y)
+        count--
+        tentative = Math.max(10, 4 * webX.length)
+      } else {
+        tentative--
+      }
+    }
+  }
+
+  /**
+   * Tente d'étendre la toile depuis (x, y).
+   * Priorité : haut → gauche/droite (aléatoire) → bas.
+   * Retourne {x, y} de la nouvelle tuile, ou null si aucun voisin libre.
+   *
+   * @param {number} x
+   * @param {number} y
+   * @returns {{x, y}|null}
+   */
+  #stepWeb (x, y) {
+    const idx = (y << 10) | x
+
+    if (worldBuffer.readAt(idx - this.WIDTH) === this.VOID) {
+      worldBuffer.writeAt(idx - this.WIDTH, this.WEB)
+      return {x, y: y - 1}
+    }
+
+    const leftVoid = worldBuffer.readAt(idx - 1) === this.VOID
+    const rightVoid = worldBuffer.readAt(idx + 1) === this.VOID
+
+    if (leftVoid && rightVoid) {
+      if (seededRNG.randomGetBool()) {
+        worldBuffer.writeAt(idx + 1, this.WEB)
+        return {x: x + 1, y}
+      }
+      worldBuffer.writeAt(idx - 1, this.WEB)
+      return {x: x - 1, y}
+    }
+    if (rightVoid) {
+      worldBuffer.writeAt(idx + 1, this.WEB)
+      return {x: x + 1, y}
+    }
+    if (leftVoid) {
+      worldBuffer.writeAt(idx - 1, this.WEB)
+      return {x: x - 1, y}
+    }
+    if (worldBuffer.readAt(idx + this.WIDTH) === this.VOID) {
+      worldBuffer.writeAt(idx + this.WIDTH, this.WEB)
+      return {x, y: y + 1}
+    }
+    return null
+  }
+
+  /**
+   * Peuple une Cobweb Cave : 3 buildWeb depuis cx, cx-6, cx+6.
+   *
+   * @param {number} cx
+   * @param {number} cy
+   */
+  fillCobwebCave (cx, cy) {
+    const idx = (cy << 10) | cx
+    this.#buildWeb(cx, cy, seededRNG.randomGetMinMax(COBWEB_CAVE_MAIN_MIN, COBWEB_CAVE_MAIN_MAX))
+    if (worldBuffer.readAt(idx - 6) === this.VOID) {
+      this.#buildWeb(cx - 6, cy, seededRNG.randomGetMinMax(COBWEB_CAVE_SIDE_MIN, COBWEB_CAVE_SIDE_MAX))
+    }
+    if (worldBuffer.readAt(idx + 6) === this.VOID) {
+      this.#buildWeb(cx + 6, cy, seededRNG.randomGetMinMax(COBWEB_CAVE_SIDE_MIN, COBWEB_CAVE_SIDE_MAX))
+    }
+  }
+
+  /**
+   * Disperse COBWEB_SCATTER_COUNT toiles aléatoires dans tous les espaces
+   * VOID souterrains (sous surfaceUnder[x]).
+   *
+   * @param {Int16Array} surfaceUnder
+   */
+  scatterWebs (surfaceUnder) {
+    let count = COBWEB_SCATTER_COUNT
+    while (count > 0) {
+      const x = seededRNG.randomGetMinMax(32, WORLD_WIDTH - 32)
+      const y = seededRNG.randomGetMinMax(surfaceUnder[x], WORLD_HEIGHT - 32)
+      if (worldBuffer.read(x, y) === this.VOID) {
+        this.#buildWeb(x, y, seededRNG.randomGetMinMax(COBWEB_SCATTER_SIZE_MIN, COBWEB_SCATTER_SIZE_MAX))
+        count--
+      }
+    }
+  }
+}
+export const webFiller = new WebFiller()

@@ -354,6 +354,13 @@ export const COBWEB_RADIUS_X_MIN = 16
 export const COBWEB_RADIUS_X_MAX = 22
 export const COBWEB_RADIUS_Y_MIN = 8
 export const COBWEB_RADIUS_Y_MAX = 12
+export const COBWEB_CAVE_MAIN_MIN = 30
+export const COBWEB_CAVE_MAIN_MAX = 40
+export const COBWEB_CAVE_SIDE_MIN = 20
+export const COBWEB_CAVE_SIDE_MAX = 30
+export const COBWEB_SCATTER_COUNT = 200
+export const COBWEB_SCATTER_SIZE_MIN = 6
+export const COBWEB_SCATTER_SIZE_MAX = 10
 
 export const GEODE_CAVE_COUNT_MIN = 3
 export const GEODE_CAVE_COUNT_MAX = 4
@@ -385,3 +392,15 @@ export const LAKE_CREATION_MAP = {
     bed: NODES.LAKE_JUNGLE_BED.code
   }
 }
+
+export const CREATION_REMAP = new Map([
+  [NODES.SAPROCK.code, NODES.SLATE.code],
+  [NODES.HARDROCK.code, NODES.HARDSTONE.code],
+  [NODES.HEART.code, NODES.VOID.code],
+  [NODES.LAKE_FOREST_SIDE.code, NODES.CLAY.code],
+  [NODES.LAKE_FOREST_BED.code, NODES.STONE.code],
+  [NODES.LAKE_DESERT_SIDE.code, NODES.SAND.code],
+  [NODES.LAKE_DESERT_BED.code, NODES.SANDSTONE.code],
+  [NODES.LAKE_JUNGLE_SIDE.code, NODES.MUD.code],
+  [NODES.LAKE_JUNGLE_BED.code, NODES.LIMESTONE.code]
+])

@@ -7,7 +7,7 @@
 
 ## En cours
 
-- Génération du monde : lacs/oasis, mini-biomes, topsoil, nettoyage post-creusement
+- Génération du monde : finir cobweb, mini-biomes, topsoil, nettoyage post-creusement
 
 ---
 
@@ -18,9 +18,6 @@
 - Remplacer `SAPROCK` par SLATE après creusement (fond des Sap Pockets)
 - Remplacer `RESIN` par HARDSTONE après creusement (fond des Underground Lakes)
 
-### HIVE
-- Remplir directement de HONEY lors de `digHives` — protégé contre tout creusement ultérieur
-
 ### Cobweb Caves
 - Peupler de WEB dans `digCobwebCaves` pour les rendre visuellement distinctives
 - Protéger WEB contre les creusements dans `WorldCarver.applyTiles`
@@ -28,6 +25,8 @@
 ### Tunnels
 - Densité trop élevée, notamment juste sous la surface
 - Exclure les zones trop proches des zones d'exclusion des lacs de surface
+- Ne pas mettre de tunnel zigzag trop proche d'un lac de surface (passer lakes en paramètre)
+- Ne pas mettre de tunnel zoblique descendant trop proche d'un lac de surface ou d'un zig zag (passer lakes en paramètre)
 - Revoir les constantes `SMALL_TUNNELS_COUNT` et `CAVERNS_TUNNEL_COUNT`
 
 ### Mer — fuite vers le bas
@@ -73,9 +72,7 @@
 - `digCobwebIntrusions()` — 1 caverne systématique en under (déjà implémenté dans `digCobwebCaves`)
 
 ### Peuplement différé
-- Remplissage HONEY dans les ruches (post-creusement)
-- Remplissage SAP dans les Sap Pockets (post-creusement, lent)
-- Peuplement WEB dans les Cobweb Caves
+- Remplissage SAP dans les Sap Pockets
 - Projection GRANITE/MARBLE sur parois des géodes (`projectAndFill` — déjà implémenté)
 
 ### Plage et fond de mer
