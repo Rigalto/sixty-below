@@ -137,7 +137,7 @@ class WorldGenerator {
     console.log('[WorldGenerator] - Début avec la graine', seed)
 
     // affichage de la progression de la création dans le dialogue modal
-    const STEPS = 12
+    const STEPS = 14
     let step = 0
     const progress = (topic) => {
       step++
