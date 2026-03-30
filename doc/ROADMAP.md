@@ -7,37 +7,19 @@
 
 ## En cours
 
-- Génération du monde : finir cobweb, mini-biomes, topsoil, nettoyage post-creusement
+- Génération du monde : mini-biomes, topsoil, végétation, coffres, artefacts
 
 ---
 
 ## À faire — Génération du monde (`generate.mjs`)
 
-### Nodes CREATION — remplacement post-creusement
-- Remplacer les nodes `LAKE_*_SIDE` et `LAKE_*_BED` par leur substrat natif après creusement des tunnels
-- Remplacer `SAPROCK` par SLATE après creusement (fond des Sap Pockets)
-- Remplacer `RESIN` par HARDSTONE après creusement (fond des Underground Lakes)
-
-### Cobweb Caves
-- Peupler de WEB dans `digCobwebCaves` pour les rendre visuellement distinctives
-- Protéger WEB contre les creusements dans `WorldCarver.applyTiles`
-
 ### Tunnels
-- Densité trop élevée, notamment juste sous la surface
-- Exclure les zones trop proches des zones d'exclusion des lacs de surface
-- Ne pas mettre de tunnel zigzag trop proche d'un lac de surface (passer lakes en paramètre)
-- Ne pas mettre de tunnel zoblique descendant trop proche d'un lac de surface ou d'un zig zag (passer lakes en paramètre)
-- Revoir les constantes `SMALL_TUNNELS_COUNT` et `CAVERNS_TUNNEL_COUNT`
+- Densité trop élevée, notamment juste sous la surface (revoir les constantes `SMALL_TUNNELS_COUNT` et `CAVERNS_TUNNEL_COUNT`)
+- Ne pas mettre de tunnel oblique descendant trop proche d'un lac de surface (passer lakes en paramètre)
 
 ### Mer — fuite vers le bas
 - Le remplissage de la mer n'est pas bloqué vers le bas
 - Ajouter une borne basse dans `#fillOneSea` (analogue à `maxY` existant mais côté fond)
-
-### `cleanupAfterCarving` — mer
-- Les règles de suppression des pixels isolés et doublets (règles 2, 4, 6) ne s'appliquent pas à la SEA
-- Étendre le nettoyage pour supprimer les isolats et doublets dans la mer
-- Ajouter la suppression d'une tuile seule avec SKY à droite, haut, gauche et SEA en bas (idem pour doublons)
-- Analyser si l'on peut refondre cette fonction pour mettre les règles en table plutôt qu'en dur dans le code
 
 ### Topsoil
 - Placement des TOPSOIL en surface
@@ -45,7 +27,6 @@
 - Phase post-creusement : recouvrement des parois de cavernes/tunnels par TOPSOIL (algorithme distinct)
 
 ### Surface végétale
-- Erosion naturelle de la surface (lissage)
 - Ajout des NATURAL (GRASS, GRASSJUNGLE) sur les tuiles TOPSOIL exposées
 - Traitement désert : écoulement du sable, consolidation des tunnels/cavernes
 

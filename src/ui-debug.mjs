@@ -268,6 +268,14 @@ class WorldMapDebug {
         this.ctx.fillRect(x, y - 2, 1, 1)
       }
     }
+    // DEBUG — affichage de points colorés
+    if (window.DEBUG_POINTS) {
+      for (let i = 0; i < window.DEBUG_POINTS.length; i++) {
+        const {x, y, color} = window.DEBUG_POINTS[i]
+        this.ctx.fillStyle = color
+        this.ctx.fillRect(x, y, 1, 1)
+      }
+    }
 
     const t2 = performance.now()
     console.log('[WorldMapDebug] Draw:', (t2 - t1).toFixed(2), 'ms')

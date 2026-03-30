@@ -136,6 +136,8 @@ class WorldGenerator {
     const t0 = performance.now()
     console.log('[WorldGenerator] - Début avec la graine', seed)
 
+    window.DEBUG_POINTS = [] // DEGUG - à supprimer
+
     // affichage de la progression de la création dans le dialogue modal
     const STEPS = 14
     let step = 0
@@ -256,8 +258,7 @@ class WorldGenerator {
 
     // 6.2 Creusement des tunnels et cavernes
     worldCarver.digSurfaceTunnel(skySurface)
-    const zigzagCount = seededRNG.randomGetMinMax(2, 3)
-    for (let i = 0; i < zigzagCount; i++) { worldCarver.digZigzagTunnel() }
+    worldCarver.digZigzagTunnels(lakes)
     await progress('Surface tunnels')
     worldCarver.digSmallCaverns(surfaceUnder)
     await progress('Caverns')
@@ -2038,29 +2039,100 @@ class WorldCarver {
  * Chaque segment alterne entre ~135° et ~225° (±45° autour du bas).
  * Le point de départ de chaque segment est la fin du précédent.
  *
- * @param {Int16Array} skySurface - Altitudes de la surface par colonne X
  */
-  digZigzagTunnel (skySurface) {
-    const cx = seededRNG.randomGetMinMax(150, WORLD_WIDTH - 151)
-    let x = cx
-    let y = 32
+  digZigzagTunnels (lakes) {
+    const ZIGZAG_EXCLUSION_W = 25
+    const ZIGZAG_EXCLUSION_H = 20
+    const ZIGZAG_EXCLUSION_W2 = 15
+    const ZIGZAG_EXCLUSION_H2 = 10
+    const ZIGZAG_MIN_DISTANCE = 200
+    const MAX_ATTEMPTS = 100
 
-    let length = 0
-    const lengthMax = seededRNG.randomGetMinMax(240, 320)
+    const count = seededRNG.randomGetMinMax(2, 3)
+    const startXs = [] // X des tunnels déjà creusés
 
-    while (length < lengthMax) {
-      const segmentLength = seededRNG.randomGetMinMax(lengthMax / 5 | 0, lengthMax / 4 | 0)
-      const angle = seededRNG.randomGetBool()
-        ? seededRNG.randomGetMinMax(130, 160)
-        : seededRNG.randomGetMinMax(200, 230)
-      const radius = seededRNG.randomGetMinMax(8, 10)
-      const path = this.pathTunnel(x, y, radius, segmentLength, angle, 10)
-      this.carveAlongPath(path, PERLIN_OFFSET_SURFACE_TUNNEL)
-
-      length += segmentLength
-      x = path[path.length - 1].x
-      y = path[path.length - 1].y
+    const isTooClose = (x) => {
+      for (let i = 0; i < startXs.length; i++) {
+        if (Math.abs(x - startXs[i]) < ZIGZAG_MIN_DISTANCE) return true
+      }
+      return false
     }
+
+    const isNearLake = (x, y, attempts) => {
+      const hw = attempts < 50 ? ZIGZAG_EXCLUSION_W : ZIGZAG_EXCLUSION_W2
+      const hh = attempts < 50 ? ZIGZAG_EXCLUSION_H : ZIGZAG_EXCLUSION_H2
+      for (let i = 0; i < lakes.length; i++) {
+        const l = lakes[i]
+        if (x + hw >= l.cx - LAKE_RADIUS_X_MAX &&
+       x - hw <= l.cx + LAKE_RADIUS_X_MAX &&
+       y + 2 * hh >= l.cy - LAKE_RADIUS_Y_MAX &&
+       y <= l.cy + LAKE_RADIUS_Y_MAX) return true
+      }
+      return false
+    }
+
+    let attempts = 0
+    let dug = 0
+    while (dug < count && attempts < MAX_ATTEMPTS) {
+      attempts++
+      let x = seededRNG.randomGetMinMax(150, WORLD_WIDTH - 151)
+      if (isTooClose(x)) continue
+
+      let y = 32
+      let length = 0
+      const lengthMax = seededRNG.randomGetMinMax(240, 320)
+      let aborted = false
+
+      while (length < lengthMax) {
+        // window.DEBUG_POINTS.push({x, y, color: 'yellow'}) // DEBUG
+
+        const segmentLength = seededRNG.randomGetMinMax(lengthMax / 5 | 0, lengthMax / 4 | 0)
+        const angle = seededRNG.randomGetBool()
+          ? seededRNG.randomGetMinMax(130, 160)
+          : seededRNG.randomGetMinMax(200, 230)
+        const radius = seededRNG.randomGetMinMax(8, 10)
+        const path = this.pathTunnel(x, y, radius, segmentLength, angle, 10)
+
+        // Test uniquement sur le premier tronçon
+        if (length === 0) {
+          for (let i = 0; i < path.length; i++) {
+            if (isNearLake(path[i].x, path[i].y, attempts)) { aborted = true; break }
+          }
+          if (aborted) break
+        }
+
+        this.carveAlongPath(path, PERLIN_OFFSET_SURFACE_TUNNEL)
+
+        length += segmentLength
+        x = path[path.length - 1].x
+        y = path[path.length - 1].y
+      }
+
+      if (!aborted) {
+        startXs.push(x)
+        dug++
+      }
+    }
+
+    // let y = 32
+    // let x = seededRNG.randomGetMinMax(150, WORLD_WIDTH - 151)
+
+    // let length = 0
+    // const lengthMax = seededRNG.randomGetMinMax(240, 320)
+
+    // while (length < lengthMax) {
+    //   const segmentLength = seededRNG.randomGetMinMax(lengthMax / 5 | 0, lengthMax / 4 | 0)
+    //   const angle = seededRNG.randomGetBool()
+    //     ? seededRNG.randomGetMinMax(130, 160)
+    //     : seededRNG.randomGetMinMax(200, 230)
+    //   const radius = seededRNG.randomGetMinMax(8, 10)
+    //   const path = this.pathTunnel(x, y, radius, segmentLength, angle, 10)
+    //   this.carveAlongPath(path, PERLIN_OFFSET_SURFACE_TUNNEL)
+
+    //   length += segmentLength
+    //   x = path[path.length - 1].x
+    //   y = path[path.length - 1].y
+    // }
   }
 
   /**
@@ -2328,6 +2400,7 @@ class WorldCarver {
       // ── Passe 75 : exclusion ───────────────────────────────────────────────
       this.addExclusion(this.boundingRect(rect2, rect3))
       lakes.push({cx, cy, biome: rect.biome})
+      // window.DEBUG_POINTS.push({x: cx, y: cy, color: 'orange'}) // DEBUG
     }
 
     return lakes
