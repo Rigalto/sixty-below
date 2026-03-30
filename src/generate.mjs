@@ -2320,8 +2320,6 @@ class WorldCarver {
         }
       }
 
-      worldBuffer.write(cx, cy, NODES.LAVA.code) // débug
-
       // ── Passe 75 : exclusion ───────────────────────────────────────────────
       this.addExclusion(this.boundingRect(rect2, rect3))
       lakes.push({cx, cy, biome: rect.biome})
@@ -2504,6 +2502,7 @@ class WorldCarver {
     ])
     const GAZ = new Set([NODES.SKY.code, NODES.FOG.code, NODES.VOID.code])
     const SKY_OR_FOG = new Set([NODES.SKY.code, NODES.FOG.code])
+    const LIQUID = new Set([NODES.WATER.code, NODES.SEA.code, NODES.HONEY.code, NODES.SAP.code, NODES.DEEPSEA.code])
 
     const propagateSky = (idx) => {
       world[idx] = SKY
@@ -2512,6 +2511,13 @@ class WorldCarver {
         world[below] = SKY
         below += W
       }
+    }
+
+    // Remonte depuis idx jusqu'à trouver la première tuile non VOID — retourne son code
+    const solidAbove = (idx) => {
+      let above = idx - W
+      while (world[above] === VOID) above -= W
+      return world[above]
     }
 
     // Passe 1 — propagation SKY vers le bas colonne par colonne
@@ -2561,6 +2567,10 @@ class WorldCarver {
         // neighbors 2 tuiles horizontales : left, top, bot, topright, botright, rightright
         // neighbors 2 tuiles verticales : top, left, right, botleft, botright, botbot
 
+        // /////////////////////////////////// //
+        // SUPPRESSION DES TUILES VOID ISOLEES //
+        // /////////////////////////////////// //
+
         // Règle 1 — VOID isolé : 4 voisins solides → substrat aléatoire parmi les 4
         if (code === VOID && !LIQUID_OR_GAZ.has(top) && !LIQUID_OR_GAZ.has(bot) && !LIQUID_OR_GAZ.has(left) && !LIQUID_OR_GAZ.has(right)) {
           world[idx] = seededRNG.randomGetArrayValue([top, bot, left, right])
@@ -2589,6 +2599,10 @@ class WorldCarver {
         if (LIQUID_OR_GAZ.has(code)) continue
         // à partir de maintenant, on est sûr que code est solide
 
+        // ///////////////////////////////////////////////// //
+        // SUPPRESSION DES TUILES SOLIDE ISOLEES DANS LE SKY //
+        // ///////////////////////////////////////////////// //
+
         // Règle 3 — tuile solide suspendue dans le ciel (top=SKY, bot=VOID, côtés SKY/FOG) → SKY propagé
         if (top === SKY && bot === VOID && SKY_OR_FOG.has(left) && SKY_OR_FOG.has(right)) {
           propagateSky(idx)
@@ -2609,6 +2623,10 @@ class WorldCarver {
           continue
         }
 
+        // ////////////////////////////////////////////////// //
+        // SUPPRESSION DES TUILES SOLIDE ISOLEES DANS LE VOID //
+        // ////////////////////////////////////////////////// //
+
         // Règle 4 — tuile solide isolée dans VOID → VOID
         if (top === VOID && bot === VOID && left === VOID && right === VOID) {
           world[idx] = VOID
@@ -2626,6 +2644,67 @@ class WorldCarver {
         if (!LIQUID_OR_GAZ.has(bot) && top === VOID && left === VOID && right === VOID && botleft === VOID && botright === VOID && botbot === VOID) {
           world[idx] = VOID
           world[idx + W] = VOID
+          continue
+        }
+
+        // ///////////////////////////////////////////////// //
+        // SUPPRESSION DES TUILES SOLIDE TOUCHANT UN LIQUIDE //
+        // ///////////////////////////////////////////////// //
+
+        // Règle 10 — solide immergé ou juste sous la surface → LIQ
+        if (LIQUID_OR_GAZ.has(top) && LIQUID.has(bot) && LIQUID.has(left) && LIQUID.has(right)) {
+          world[idx] = bot
+          continue
+        }
+
+        // Règle 10-H — paire horizontale solide immergée ou juste sous la surface → LIQ
+        if (!LIQUID_OR_GAZ.has(right) && LIQUID_OR_GAZ.has(top) && LIQUID_OR_GAZ.has(topright) && LIQUID.has(bot) && LIQUID.has(left) && LIQUID.has(botright) && LIQUID.has(rightright)) {
+          world[idx] = bot
+          world[idx + 1] = botright
+          continue
+        }
+
+        // Règle 10-V — paire verticale solide immergée ou juste sous la surface → LIQ
+        if (!LIQUID_OR_GAZ.has(bot) && LIQUID_OR_GAZ.has(top) && LIQUID.has(left) && LIQUID.has(right) && LIQUID.has(botleft) && LIQUID.has(botright) && LIQUID.has(botbot)) {
+          world[idx] = left
+          world[idx + W] = botbot
+          continue
+        }
+
+        // Règle 11 — solide juste au-dessus de la surface → SKY/VOID du dessus
+        if (GAZ.has(top) && GAZ.has(left) && GAZ.has(right) && LIQUID.has(bot)) {
+          world[idx] = top
+          continue
+        }
+
+        // Règle 11-H — paire horizontale solide juste au-dessus de la surface → SKY/VOID du dessus
+        if (!LIQUID_OR_GAZ.has(right) && GAZ.has(top) && GAZ.has(topright) && GAZ.has(left) && GAZ.has(rightright) && LIQUID.has(bot) && LIQUID.has(botright)) {
+          world[idx] = top
+          world[idx + 1] = topright
+          continue
+        }
+
+        // Règle 11-V — paire verticale solide juste au-dessus de la surface → SKY/VOID du dessus
+        if (!LIQUID_OR_GAZ.has(bot) && GAZ.has(top) && GAZ.has(left) && GAZ.has(right) && GAZ.has(botleft) && GAZ.has(botright) && LIQUID.has(botbot)) {
+          world[idx] = top
+          world[idx + W] = top
+          continue
+        }
+
+        // Règle 12-V — paire verticale à cheval sur la surface → top pour tuile haute, LIQ pour tuile basse
+        if (!LIQUID_OR_GAZ.has(bot) && GAZ.has(top) && GAZ.has(left) && GAZ.has(right) && LIQUID.has(botleft) && LIQUID.has(botright) && LIQUID.has(botbot)) {
+          world[idx] = top
+          world[idx + W] = botbot
+          continue
+        }
+
+        // //////////////////////////////////////// //
+        // AJOUT DE SOLID AU DESSUS DES WEB ISOLEES //
+        // //////////////////////////////////////// //
+
+        // Règle 13 — WEB avec VOID au-dessus → remplace le VOID par le SOLID au-dessus
+        if (code === NODES.WEB.code && top === VOID) {
+          world[idx - W] = solidAbove(idx - W)
           continue
         }
 
