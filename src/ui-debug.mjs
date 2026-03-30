@@ -260,6 +260,15 @@ class WorldMapDebug {
 
     this.ctx.putImageData(this.imageDataForMap, 0, 0)
 
+    // DEBUG — affichage de la ligne de surface
+    if (window.DEBUG_SURFACE_LINE) {
+      this.ctx.fillStyle = 'red'
+      for (let x = 1; x < WORLD_WIDTH - 1; x++) {
+        const y = window.DEBUG_SURFACE_LINE[x]
+        this.ctx.fillRect(x, y - 2, 1, 1)
+      }
+    }
+
     const t2 = performance.now()
     console.log('[WorldMapDebug] Draw:', (t2 - t1).toFixed(2), 'ms')
   }

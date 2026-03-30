@@ -281,9 +281,14 @@ class WorldGenerator {
     // N-7 Remplissage de la mer (gauche et droite)
     liquidFiller.fillSea()
     worldCarver.cleanupAfterCarving()
+    const surfaceLine = worldCarver.buildErodedSurfaceLine()
+
+    // DEBUG — à supprimer après mise au point
+    // window.DEBUG_SURFACE_LINE = surfaceLine
+
     await progress('Carving Cleanup')
 
-    console.log('[WorldGenerator::liquidFiller] - Sea', (performance.now() - t0).toFixed(3), 'ms')
+    console.log('[WorldGenerator::liquidFiller] - Sea', (performance.now() - t0).toFixed(3), 'ms', surfaceLine)
 
     // N-6 Ajout de la plage (Shore) et du fond de la mer - TODO
 
@@ -2483,13 +2488,6 @@ class WorldCarver {
     let code, top, bot, left, right
     let topright, rightright, botleft, botright, botbot // pour doublons H et V
 
-    const ETERNAL = new Set([
-      NODES.FOG.code,
-      NODES.DEEPSEA.code,
-      NODES.BASALT.code,
-      NODES.LAVA.code
-    ])
-
     const LIQUID_OR_GAZ = new Set([
       NODES.VOID.code,
       NODES.SKY.code,
@@ -2501,7 +2499,6 @@ class WorldCarver {
       NODES.SAP.code
     ])
     const GAZ = new Set([NODES.SKY.code, NODES.FOG.code, NODES.VOID.code])
-    const SKY_OR_FOG = new Set([NODES.SKY.code, NODES.FOG.code])
     const LIQUID = new Set([NODES.WATER.code, NODES.SEA.code, NODES.HONEY.code, NODES.SAP.code, NODES.DEEPSEA.code])
 
     const propagateSky = (idx) => {
@@ -2510,6 +2507,25 @@ class WorldCarver {
       while (below < W * (H - 1) && world[below] === VOID) {
         world[below] = SKY
         below += W
+      }
+    }
+
+    // Remplace la tuile idx et toutes les tuiles SKY en dessous par VOID
+    const propagateVoid = (idx) => {
+      world[idx] = VOID
+      let below = idx + W
+      while (world[below] === SKY) {
+        world[below] = VOID
+        below += W
+      }
+    }
+
+    // Remplace par SKY toutes les tuiles solides depuis idx vers le haut, tant qu'elles ne sont pas SKY
+    const propagateSkyUp = (idx) => {
+      let above = idx
+      while (world[above] !== SKY) {
+        world[above] = SKY
+        above -= W
       }
     }
 
@@ -2604,24 +2620,13 @@ class WorldCarver {
         // ///////////////////////////////////////////////// //
 
         // Règle 3 — tuile solide suspendue dans le ciel (top=SKY, bot=VOID, côtés SKY/FOG) → SKY propagé
-        if (top === SKY && bot === VOID && SKY_OR_FOG.has(left) && SKY_OR_FOG.has(right)) {
-          propagateSky(idx)
-          continue
-        }
+        // Règle traitée par la règle P4-2
 
         // Règle 3-V — paire verticale solide suspendue dans le ciel → SKY propagé sur les deux tuiles
-        if (!LIQUID_OR_GAZ.has(bot) && top === SKY && SKY_OR_FOG.has(left) && SKY_OR_FOG.has(right) && SKY_OR_FOG.has(botleft) && SKY_OR_FOG.has(botright) && botbot === VOID) {
-          world[idx] = SKY
-          propagateSky(idx + W)
-          continue
-        }
+        // Règle traitée par la règle P4-2
 
         // Règle 3-H — paire horizontale solide suspendue dans le ciel → SKY propagé sur les deux tuiles
-        if (!LIQUID_OR_GAZ.has(right) && top === SKY && bot === VOID && SKY_OR_FOG.has(left) && topright === SKY && botright === VOID && SKY_OR_FOG.has(rightright)) {
-          propagateSky(idx)
-          propagateSky(idx + 1)
-          continue
-        }
+        // Règle traitée par la règle P4-4
 
         // ////////////////////////////////////////////////// //
         // SUPPRESSION DES TUILES SOLIDE ISOLEES DANS LE VOID //
@@ -2841,8 +2846,119 @@ class WorldCarver {
       for (let x = 1; x < W - 1; x++) {
         const idx = (y << 10) | x
         // règles ici
+
+        // Règle P4-1 — colonne blanche de 1 tuile de large → remplacée par le substrat voisin
+        if (isBlackCol(idx - 1) && isWhiteCol(idx) && isBlackCol(idx + 1)) {
+          const fill = world[idx - W - 1] !== VOID ? world[idx - W - 1] : world[idx - W + 1]
+          world[idx - W] = fill
+          world[idx] = fill
+          propagateVoid(idx + W)
+        }
+
+        // Règle P4-2 — colonne noire de 1 tuile de large → remplacée par SKY propagé
+        if (isWhiteCol(idx - 1) && isBlackCol(idx) && isWhiteCol(idx + 1)) {
+          propagateSkyUp(idx - W)
+          propagateSky(idx)
+        }
+
+        // Règle P4-3 — colonne blanche de 2 tuiles de large → remplacée par le substrat voisin
+        if (isBlackCol(idx - 1) && isWhiteCol(idx) && isWhiteCol(idx + 1) && isBlackCol(idx + 2)) {
+          const fill = world[idx - W - 1] !== VOID ? world[idx - W - 1] : world[idx - W + 2]
+          world[idx - W] = fill
+          world[idx - W + 1] = fill
+          world[idx] = fill
+          world[idx + 1] = fill
+          propagateVoid(idx + W)
+          propagateVoid(idx + W + 1)
+        }
+
+        // Règle P4-4 — colonne noire de 2 tuiles de large → remplacée par SKY propagé
+        if (isWhiteCol(idx - 1) && isBlackCol(idx) && isBlackCol(idx + 1) && isWhiteCol(idx + 2)) {
+          propagateSkyUp(idx - W)
+          propagateSkyUp(idx - W + 1)
+          propagateSky(idx)
+          propagateSky(idx + 1)
+        }
       }
     }
+  }
+
+  /**
+ * Calcule la ligne de surface (première tuile non SKY/FOG/liquide par colonne)
+ * et applique une érosion légère (suppression des trous et bosses de 1 tuile).
+ * Parcours séquentiel gauche→droite — l'érosion est in-place sur worldBuffer.
+ *
+ * @returns {Int16Array} surfaceLine — Y de la première tuile solide par colonne X
+ */
+  buildErodedSurfaceLine () {
+    const world = worldBuffer.world
+    const W = WORLD_WIDTH
+    const H = WORLD_HEIGHT
+    const surfaceLine = new Int16Array(W)
+    const SKY = NODES.SKY.code
+    const VOID = NODES.VOID.code
+
+    const LIQUID_OR_GAZ = new Set([
+      NODES.VOID.code,
+      NODES.SKY.code,
+      NODES.FOG.code,
+      NODES.WATER.code,
+      NODES.SEA.code,
+      NODES.DEEPSEA.code,
+      NODES.HONEY.code,
+      NODES.SAP.code
+    ])
+
+    // Remplace idx par SKY et descend tant que VOID → SKY
+    const propagateSky = (idx) => {
+      world[idx] = SKY
+      let below = idx + W
+      while (world[below] === VOID) {
+        world[below] = SKY
+        below += W
+      }
+    }
+
+    // Recalcule surfaceLine[x] en cherchant la première tuile non LIQUID_OR_GAZ depuis le haut
+    const calcSurface = (x) => {
+      for (let y = 1; y < H - 1; y++) {
+        if (!LIQUID_OR_GAZ.has(world[(y << 10) | x])) {
+          surfaceLine[x] = y
+          return
+        }
+      }
+    }
+
+    // Calcul de la ligne de surface
+    for (let x = 1; x < W - 1; x++) { calcSurface(x) }
+
+    // Érosion — suppression des trous et bosses de 1 tuile
+    for (let x = 1; x < W - 1; x++) {
+      const y = surfaceLine[x]
+      const idx = (y << 10) | x
+      const yLeft = surfaceLine[x - 1]
+      const yRight = surfaceLine[x + 1]
+
+      // Trou : tuile plus basse que ses deux voisins → on bouche le creux (y-1) avec la tuile solide (y)
+      if (y > yLeft && y > yRight) {
+        world[idx - W] = world[idx]
+        surfaceLine[x] = y - 1
+      }
+
+      // Bosse : tuile plus haute que ses deux voisines → on remplace par la tuile au dessus (y-1)
+      if (y < yLeft && y < yRight) {
+        if (world[idx - W] === SKY) {
+          // dans le ciel, on propage le sky
+          propagateSky(idx)
+          calcSurface(x)
+        } else {
+          // Sous l'eau (tuile au-dessus = liquide) → copie la tuile au-dessus
+          world[idx] = world[idx - W]
+          surfaceLine[x] = y + 1
+        }
+      }
+    }
+    return surfaceLine
   }
 
   /**
