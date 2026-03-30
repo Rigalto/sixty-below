@@ -2817,6 +2817,32 @@ class WorldCarver {
         // }
       }
     }
+
+    // Passe 4 — suppression des colonnes étroites SKY/VOID en surface
+    // La zone SKY est contiguë depuis le haut — dès qu'une ligne n'en contient plus,
+    // toutes les lignes suivantes en sont exemptes et le parcours peut s'arrêter.
+
+    // Retourne true si la colonne depuis idx est SKY sur au moins 3 tuiles de haut
+    const isWhiteCol = (idx) =>
+      world[idx] === SKY && world[idx + W] === SKY && world[idx + W + W] === SKY
+
+    // Retourne true si la colonne depuis idx est VOID sur au moins 3 tuiles de haut
+    const isBlackCol = (idx) =>
+      world[idx] === VOID && world[idx + W] === VOID && world[idx + W + W] === VOID
+
+    for (let y = 1; y < H - 1; y++) {
+      // Détection rapide : arrêt du traitement si cette ligne ne contient pas de SKY ?
+      let hasSky = false
+      for (let x = 1; x < W - 1; x++) {
+        if (world[(y << 10) | x] === SKY) { hasSky = true; break }
+      }
+      if (!hasSky) break
+
+      for (let x = 1; x < W - 1; x++) {
+        const idx = (y << 10) | x
+        // règles ici
+      }
+    }
   }
 
   /**
