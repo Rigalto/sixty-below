@@ -31,6 +31,8 @@
 - Traitement désert : écoulement du sable, consolidation des tunnels/cavernes
 
 ### Mini-biomes à implémenter
+- Optimiser le mécanisme de protection contre le creusement
+- Ajout des Heart (si pas de place en underground => caverns_top)
 - `digMushroomCaves()` — Forest, caverns_top, HUMUS + GRASSMUSHROOM
 - `digFernCaves()` — Forest, under, HUMUS + GRASSFERN
 - `digAnthills()` — Forest, surface, structure conique

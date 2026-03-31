@@ -139,7 +139,7 @@ class WorldGenerator {
     window.DEBUG_POINTS = [] // DEGUG - à supprimer
 
     // affichage de la progression de la création dans le dialogue modal
-    const STEPS = 14
+    const STEPS = 15
     let step = 0
     const progress = (topic) => {
       step++
@@ -268,16 +268,19 @@ class WorldGenerator {
     // worldCarver.digSmallTunnels(surfaceUnder)
     // await progress('Small tunnels')
 
+    // 6.3.X Life Heart
+    const hearts = worldCarver.digHearts(surfaceUnder, underCaverns)
+    await progress('Life Hearts')
+    console.log('>>>>>>>>>>> hearts', hearts)
+
     // A supprimer
     // worldCarver.debugTraceTunnel()
 
     // 7. Traitement des surfaces végétales + désert - TODO
 
-    // 7.1. Erosion naturelle (on rend la surface plus lisse)
+    // 7.1. Ajout des topsoils / natural (forêt et jungle)
 
-    // 7.2. Ajout des topsoils / natural (forêt et jungle)
-
-    // 7.3. Ajout du sable (désert) - écoulement et consolidation des tunnels/cavernes
+    // 7.2. Ajout du sable (désert) - écoulement et consolidation des tunnels/cavernes
 
     // N-7 Remplissage de la mer (gauche et droite)
     liquidFiller.fillSea()
@@ -2553,6 +2556,71 @@ class WorldCarver {
     }
 
     return caves
+  }
+
+  /**
+ * Place HEART_COUNT spots de Life Heart (2×2) dans la layer underground.
+ * Chaque spot nécessite 16 tuiles solides (carré 4×4 centré sur le coin haut-gauche).
+ * Fallback automatique en caverns_top si le quota n'est pas atteint en underground.
+ * Les spots sont enregistrés dans #exclusions.
+ *
+ * @param {Int16Array} surfaceUnder  - Altitudes basse surface par colonne X
+ * @param {Int16Array} underCaverns  - Altitudes haute caverne par colonne X
+ * @returns {Array<{cx, cy}>} - coin haut-gauche du carré
+ */
+  digHearts (surfaceUnder, underCaverns) {
+    const MAX_ATTEMPTS = 100
+    const HEART_COUNT = 15
+    const HEART = NODES.HEART.code
+    const LIQUID_OR_GAZ = new Set([
+      NODES.VOID.code,
+      NODES.SKY.code,
+      NODES.FOG.code,
+      NODES.WATER.code,
+      NODES.SEA.code,
+      NODES.DEEPSEA.code,
+      NODES.HONEY.code,
+      NODES.SAP.code
+    ])
+    const hearts = []
+
+    const placeHeart = (x, y) => {
+      if (this.isExcluded(x - 1, y - 1, x + 2, y + 2)) return false
+      for (let dy = -1; dy <= 2; dy++) {
+        for (let dx = -1; dx <= 2; dx++) {
+          if (LIQUID_OR_GAZ.has(worldBuffer.read(x + dx, y + dy))) return false
+        }
+      }
+      worldBuffer.write(x, y, HEART)
+      worldBuffer.write(x + 1, y, HEART)
+      worldBuffer.write(x, y + 1, HEART)
+      worldBuffer.write(x + 1, y + 1, HEART)
+      this.addExclusion({x1: x - 1, y1: y - 1, x2: x + 2, y2: y + 2})
+      hearts.push({cx: x, cy: y})
+      return true
+    }
+
+    let remaining = HEART_COUNT
+    let attempts = 0
+    while (remaining > 0 && attempts < MAX_ATTEMPTS) {
+      attempts++
+      const x = seededRNG.randomGetMinMax(152, WORLD_WIDTH - 153)
+      const y = seededRNG.randomGetMinMax(surfaceUnder[x], underCaverns[x] - 2)
+      if (placeHeart(x, y)) { remaining--; attempts = 0 }
+    }
+
+    // Fallback — caverns_top
+    if (remaining > 0) {
+      attempts = 0
+      while (remaining > 0 && attempts < MAX_ATTEMPTS) {
+        attempts++
+        const x = seededRNG.randomGetMinMax(152, WORLD_WIDTH - 153)
+        const y = seededRNG.randomGetMinMax(underCaverns[x], Math.round((underCaverns[x] + 510) / 2) - 2)
+        if (placeHeart(x, y)) { remaining--; attempts = 0 }
+      }
+    }
+
+    return hearts
   }
 
   /**
