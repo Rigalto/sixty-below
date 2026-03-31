@@ -1806,16 +1806,23 @@ class TileGuard {
    * @param {number} offsetX
    */
   addNoisyEllipse (cx, cy, radiusXMin, radiusXMax, radiusYMin, radiusYMax, frequency = 0.3, offsetX = 0) {
+    const radiusX = (radiusXMin + radiusXMax) >> 1
+    const radiusY = (radiusYMin + radiusYMax) >> 1
+    const spreadX = radiusXMax - radiusXMin
+    const spreadY = radiusYMax - radiusYMin
     const period = 1 / frequency
 
     for (let dy = -radiusYMax; dy <= radiusYMax; dy++) {
       for (let dx = -radiusXMax; dx <= radiusXMax; dx++) {
-        const normMax = (dx * dx) / (radiusXMax * radiusXMax) + (dy * dy) / (radiusYMax * radiusYMax)
-        const normMin = (dx * dx) / (radiusXMin * radiusXMin) + (dy * dy) / (radiusYMin * radiusYMin)
-        if (normMax > 1) continue
-        if (normMin < 1) continue
+        const ndx = dx / radiusX
+        const ndy = dy / radiusY
+        const dist = Math.sqrt(ndx * ndx + ndy * ndy)
+
         const noise = seededRNG.randomPerlin((cx + dx + offsetX) / period, (cy + dy) / period)
-        if (noise < 0.5) continue
+        const spread = (spreadX + spreadY) * 0.5
+        const threshold = 1 + (noise * 2 - 1) * (spread / ((radiusX + radiusY) * 0.5))
+
+        if (dist > threshold) continue
         const x = cx + dx
         const y = cy + dy
         if (x < 1 || x >= WORLD_WIDTH - 1 || y < 1 || y >= WORLD_HEIGHT - 1) continue
@@ -2540,6 +2547,8 @@ class WorldCarver {
 
       // ── Passe 75 : exclusion ───────────────────────────────────────────────
       this.addExclusion(this.boundingRect(rect2, rect3))
+      tileGuard.addNoisyEllipse(cx, cy, radiusX + 3, radiusX + 5, radiusY + 3, radiusY + 5, 0.8, PERLIN_OFFSET_LAKES)
+      tileGuard.addNoisyEllipse(pitCx, pitCy, pitRadiusX + 3, pitRadiusX + 5, pitRadiusY + 3, pitRadiusY + 5, 0.8, PERLIN_OFFSET_LAKES)
       lakes.push({cx, cy, biome: rect.biome})
       // window.DEBUG_POINTS.push({x: cx, y: cy, color: 'orange'}) // DEBUG
     }
@@ -2734,7 +2743,7 @@ class WorldCarver {
     let attempts = 0
     while (remaining > 0 && attempts < MAX_ATTEMPTS) {
       attempts++
-      const x = seededRNG.randomGetMinMax(5, WORLD_WIDTH - 6)
+      const x = seededRNG.randomGetMinMax(150, WORLD_WIDTH - 151)
       const y = seededRNG.randomGetMinMax(surfaceUnder[x], underCaverns[x] - 2)
       if (placeHeart(x, y)) { remaining--; attempts = 0 }
     }
