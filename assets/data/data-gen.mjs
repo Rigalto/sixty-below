@@ -397,7 +397,7 @@ export const LAKE_CREATION_MAP = {
 export const CREATION_REMAP = new Map([
   [NODES.SAPROCK.code, NODES.SLATE.code],
   [NODES.HARDROCK.code, NODES.HARDSTONE.code],
-  [NODES.HEART.code, NODES.LAVA.code], // DEBUG
+  [NODES.HEART.code, NODES.VOID.code],
   [NODES.LAKE_FOREST_SIDE.code, NODES.CLAY.code],
   [NODES.LAKE_FOREST_BED.code, NODES.STONE.code],
   [NODES.LAKE_DESERT_SIDE.code, NODES.SAND.code],

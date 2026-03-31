@@ -2379,6 +2379,8 @@ class WorldCarver {
     liquidFiller.fillHive(cx, cy + 2)
 
     this.addExclusion(rect2)
+    tileGuard.addNoisyCircle(cx, cy, radius + 2, radius + 6, 0.3, PERLIN_OFFSET_HIVE)
+
     return {cx, cy, radius}
   }
 
@@ -2697,7 +2699,7 @@ class WorldCarver {
   digHearts (surfaceUnder, underCaverns) {
     const MAX_ATTEMPTS = 100
     const HEART_COUNT = 15
-    const VOID = NODES.HEART.code
+    const VOID = NODES.VOID.code
     const LIQUID_OR_GAZ = new Set([
       NODES.VOID.code,
       NODES.SKY.code,
