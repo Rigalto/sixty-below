@@ -257,16 +257,16 @@ class WorldGenerator {
     // await progress('Deep Water Bodies')
 
     // 6.2 Creusement des tunnels et cavernes
-    worldCarver.digSurfaceTunnel(skySurface)
-    worldCarver.digZigzagTunnels(lakes)
+    // worldCarver.digZigzagTunnels(lakes)
+    worldCarver.digSurfaceTunnel(skySurface, lakes)
     await progress('Surface tunnels')
-    worldCarver.digSmallCaverns(surfaceUnder)
-    await progress('Caverns')
-    worldCarver.digUndergroundTunnels(surfaceUnder, underCaverns)
-    worldCarver.digCavernsTunnels(underCaverns)
-    await progress('Deep tunnels')
-    worldCarver.digSmallTunnels(surfaceUnder)
-    await progress('Small tunnels')
+    // worldCarver.digSmallCaverns(surfaceUnder)
+    // await progress('Caverns')
+    // worldCarver.digUndergroundTunnels(surfaceUnder, underCaverns)
+    // worldCarver.digCavernsTunnels(underCaverns)
+    // await progress('Deep tunnels')
+    // worldCarver.digSmallTunnels(surfaceUnder)
+    // await progress('Small tunnels')
 
     // A supprimer
     // worldCarver.debugTraceTunnel()
@@ -2016,12 +2016,22 @@ class WorldCarver {
  *
  * @param {Int16Array} skySurface - Altitudes de la surface par colonne X
  */
-  digSurfaceTunnel (skySurface) {
-    const count = seededRNG.randomGetMinMax(30, 45)
+  digSurfaceTunnel (skySurface, lakes) {
+    const MAX_ATTEMPTS = 100
+    const count = seededRNG.randomGetMinMax(20, 30)
     for (let i = 0; i < count; i++) {
       const radius = seededRNG.randomGetMinMax(4, 7)
-      const x0 = seededRNG.randomGetMinMax(0, WORLD_WIDTH - 1)
+
+      let x0
+      let attempts = 0
+      do {
+        x0 = seededRNG.randomGetMinMax(150, WORLD_WIDTH - 151)
+        attempts++
+      } while (attempts < MAX_ATTEMPTS && lakes.some(l => Math.abs(x0 - l.cx) < (3 * LAKE_RADIUS_X_MAX)))
+      if (attempts >= MAX_ATTEMPTS) continue
+
       const y0 = skySurface[x0] + seededRNG.randomGetMinMax(-5, 5)
+
       const direction = seededRNG.randomGetBool() ? 1 : -1
       const angle = direction * seededRNG.randomGetMinMax(110, 125)
       const length = seededRNG.randomGetMinMax(25, 40)
