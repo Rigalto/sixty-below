@@ -1,6 +1,6 @@
 import {seededRNG} from './utils.mjs'
 import {database} from './database.mjs'
-import {NODES, NODES_LOOKUP, NODE_TYPE, WEATHER_TYPE, BIOME_TYPE, WORLD_WIDTH, WORLD_HEIGHT, SEA_LEVEL, TOPSOIL_Y_SKY_SURFACE, TOPSOIL_Y_SURFACE_UNDER, TOPSOIL_Y_UNDER_CAVERNS, TOPSOIL_Y_CAVERNS_MID, BIOME_TILE_MAP, SEA_MAX_JITTER, SEA_MAX_WIDTH, SEA_MAX_HEIGHT, CLUSTER_SCATTER_MAP, ORE_GEM_SCATTER_MAP, PERLIN_OFFSET_NATURALIZER, PERLIN_OFFSET_TUNNEL, PERLIN_OFFSET_SURFACE_TUNNEL, PERLIN_OFFSET_SMALL_TUNNEL, PERLIN_OFFSET_CAVERN, PERLIN_OFFSET_HIVE, PERLIN_OFFSET_COBWEB, PERLIN_OFFSET_LAKES, SMALL_CAVERNS_COUNT, MEDIUM_CAVERNS_COUNT, UNDERGROUND_TUNNEL_COUNT, CAVERNS_TUNNEL_COUNT, SMALL_TUNNELS_COUNT, HIVE_RADIUS_MIN, HIVE_RADIUS_MAX, COBWEB_CAVE_COUNT_MIN, COBWEB_CAVE_COUNT_MAX, COBWEB_RADIUS_X_MIN, COBWEB_RADIUS_X_MAX, COBWEB_RADIUS_Y_MIN, COBWEB_RADIUS_Y_MAX, COBWEB_CAVE_MAIN_MIN, COBWEB_CAVE_MAIN_MAX, COBWEB_CAVE_SIDE_MIN, COBWEB_CAVE_SIDE_MAX, COBWEB_SCATTER_COUNT, COBWEB_SCATTER_SIZE_MIN, COBWEB_SCATTER_SIZE_MAX, GEODE_CAVE_COUNT_MIN, GEODE_CAVE_COUNT_MAX, GEODE_RADIUS_MIN, GEODE_RADIUS_MAX, GEODE_TARGET_CLUSTER_COUNT, GEODE_CLUSTER_SIZE_MIN, GEODE_CLUSTER_SIZE_MAX, TOPSOIL_SCATTER_MAP, LAKE_RADIUS_X_MIN, LAKE_RADIUS_X_MAX, LAKE_RADIUS_Y_MIN, LAKE_RADIUS_Y_MAX, LAKE_PIT_RADIUS_X_MIN, LAKE_PIT_RADIUS_X_MAX, LAKE_PIT_RADIUS_Y_MIN, LAKE_PIT_RADIUS_Y_MAX, LAKE_CREATION_MAP, CREATION_REMAP} from '../assets/data/data-gen.mjs'
+import {NODES, NODES_LOOKUP, NODE_TYPE, WEATHER_TYPE, BIOME_TYPE, WORLD_WIDTH, WORLD_HEIGHT, SEA_LEVEL, TOPSOIL_Y_SKY_SURFACE, TOPSOIL_Y_SURFACE_UNDER, TOPSOIL_Y_UNDER_CAVERNS, TOPSOIL_Y_CAVERNS_MID, BIOME_TILE_MAP, SEA_MAX_JITTER, SEA_MAX_WIDTH, SEA_MAX_HEIGHT, CLUSTER_SCATTER_MAP, ORE_GEM_SCATTER_MAP, PERLIN_OFFSET_NATURALIZER, PERLIN_OFFSET_TUNNEL, PERLIN_OFFSET_SURFACE_TUNNEL, PERLIN_OFFSET_SMALL_TUNNEL, PERLIN_OFFSET_CAVERN, PERLIN_OFFSET_HIVE, PERLIN_OFFSET_HEART, PERLIN_OFFSET_COBWEB, PERLIN_OFFSET_LAKES, SMALL_CAVERNS_COUNT, MEDIUM_CAVERNS_COUNT, UNDERGROUND_TUNNEL_COUNT, CAVERNS_TUNNEL_COUNT, SMALL_TUNNELS_COUNT, HIVE_RADIUS_MIN, HIVE_RADIUS_MAX, COBWEB_CAVE_COUNT_MIN, COBWEB_CAVE_COUNT_MAX, COBWEB_RADIUS_X_MIN, COBWEB_RADIUS_X_MAX, COBWEB_RADIUS_Y_MIN, COBWEB_RADIUS_Y_MAX, COBWEB_CAVE_MAIN_MIN, COBWEB_CAVE_MAIN_MAX, COBWEB_CAVE_SIDE_MIN, COBWEB_CAVE_SIDE_MAX, COBWEB_SCATTER_COUNT, COBWEB_SCATTER_SIZE_MIN, COBWEB_SCATTER_SIZE_MAX, GEODE_CAVE_COUNT_MIN, GEODE_CAVE_COUNT_MAX, GEODE_RADIUS_MIN, GEODE_RADIUS_MAX, GEODE_TARGET_CLUSTER_COUNT, GEODE_CLUSTER_SIZE_MIN, GEODE_CLUSTER_SIZE_MAX, TOPSOIL_SCATTER_MAP, LAKE_RADIUS_X_MIN, LAKE_RADIUS_X_MAX, LAKE_RADIUS_Y_MIN, LAKE_RADIUS_Y_MAX, LAKE_PIT_RADIUS_X_MIN, LAKE_PIT_RADIUS_X_MAX, LAKE_PIT_RADIUS_Y_MIN, LAKE_PIT_RADIUS_Y_MAX, LAKE_CREATION_MAP, CREATION_REMAP} from '../assets/data/data-gen.mjs'
 
 /* ====================================================================================================
    WORLD BUFFER (CREATION DU MONDE)
@@ -183,6 +183,7 @@ class WorldGenerator {
 
     // 6. Creusement (plus de creusement ensuite, ou alors très localisé) - TODO
     worldCarver.initExclusions()
+    tileGuard.init()
 
     // 6.1 Creusement des mini-biomes - TODO
 
@@ -193,45 +194,45 @@ class WorldGenerator {
     const lakes = worldCarver.digLakes(skySurface)
     await progress('Lakes & oasis')
 
-    // 6.3.2 HIVE caves
+    // 6.1.2 HIVE caves
     const hives = worldCarver.digHives(biomeCounts)
     await progress('Hives')
 
-    // 6.3.3 Cobweb caves
+    // 6.1.3 Cobweb caves
     const cobwebCaves = worldCarver.digCobwebCaves()
     await progress('Cobweb caves')
 
-    // 6.3.4 Marble caves et  Granite caves
+    // 6.1.4 Marble caves et  Granite caves
     const graniteCaves = worldCarver.digGeodeCaves(NODES.GRANITE.code)
     const marbleCaves = worldCarver.digGeodeCaves(NODES.MARBLE.code)
     const geodeCaves = graniteCaves.concat(marbleCaves)
     await progress('Geode caves')
 
-    // 6.3.X Mushroom caves
+    // 6.1.X Mushroom caves
     // const mushroomCaves = worldCarver.digMushroomCaves()
 
-    // 6.3.X Anthill
+    // 6.1.X Anthill
     // const anthills = worldCarver.digAnthills()
 
-    // 6.3.X Termite Mound
+    // 6.1.X Termite Mound
     // const termites = worldCarver.digTermiteMounds()
 
-    // 6.3.X Antilion Pit
+    // 6.1.X Antilion Pit
     // const antilions = worldCarver.digAntilionPits()
 
-    // 6.3.X Fern Caves
+    // 6.1.X Fern Caves
     // Under, forest
     // const ferns = worldCarver.digFernCaves()
 
-    // 6.3.X Pyramid
+    // 6.1.X Pyramid
     // le cy est tiré entre rect.yUnder et rect.yCavernsMid
     // const pyramids = worldCarver.digPyramids()
 
-    // 6.3.X Sap Pokets
+    // 6.1.X Sap Pokets
     // Caverns_bottom, jungle - ressemble à Hive - Utiliser SAPROCK pour la paroi (demi-cercle bas uniquement)
     // const sappockets = worldCarver.digSapPockets()
 
-    // 6.3.X Ancient House / Temple Ruin / Ruined Cabin
+    // 6.1.X Ancient House / Temple Ruin / Ruined Cabin
     // Caverns_top, jungle - EMERALDWALL -
     // const ancienthouse = worldCarver.digAncientHouse()
     // Caverns_bottom, desert - GOLDWALL -
@@ -239,39 +240,39 @@ class WorldGenerator {
     // Under, forest - STONEWALL -
     // const ruinedcabin = worldCarver.digRuinedCabin()
 
-    // 6.3.X Fossil Vein
+    // 6.1.X Fossil Vein
     // caverns_top - desert - SHELL
     // const fossilvein = worldCarver.digFossilVein()
 
-    // 6.3.X Moss Cave
+    // 6.1.X Moss Cave
     // underground - jungle - MUD + HUMUS
     // const mosscave = worldCarver.digMossCave()
 
-    // 6.3.X Underground Lake
+    // 6.1.X Underground Lake
     // caverns_top - Forest - WATER + HUMUS
     // const undergroundlake = worldCarver.digUndergroundLake()
 
-    // 6.3.X Blind Lake
+    // 6.1.X Blind Lake
     // caverns_bottom - Tout biomes - WATER + HARDROCK (transformé ensuite en HARDSTONE)
     // const blindlakes = worldCarver.digBlindLakes()
     // await progress('Deep Water Bodies')
 
-    // 6.2 Creusement des tunnels et cavernes
-    // worldCarver.digZigzagTunnels(lakes)
-    worldCarver.digSurfaceTunnel(skySurface, lakes)
-    await progress('Surface tunnels')
-    // worldCarver.digSmallCaverns(surfaceUnder)
-    // await progress('Caverns')
-    // worldCarver.digUndergroundTunnels(surfaceUnder, underCaverns)
-    // worldCarver.digCavernsTunnels(underCaverns)
-    // await progress('Deep tunnels')
-    // worldCarver.digSmallTunnels(surfaceUnder)
-    // await progress('Small tunnels')
-
-    // 6.3.X Life Heart
+    // 6.1.X Life Heart (15)
     const hearts = worldCarver.digHearts(surfaceUnder, underCaverns)
     await progress('Life Hearts')
     console.log('>>>>>>>>>>> hearts', hearts)
+
+    // 6.2 Creusement des tunnels et cavernes
+    worldCarver.digZigzagTunnels(lakes)
+    worldCarver.digSurfaceTunnel(skySurface, lakes)
+    await progress('Surface tunnels')
+    worldCarver.digSmallCaverns(surfaceUnder)
+    await progress('Caverns')
+    worldCarver.digUndergroundTunnels(surfaceUnder, underCaverns)
+    worldCarver.digCavernsTunnels(underCaverns)
+    await progress('Deep tunnels')
+    worldCarver.digSmallTunnels(surfaceUnder)
+    await progress('Small tunnels')
 
     // A supprimer
     // worldCarver.debugTraceTunnel()
@@ -304,6 +305,12 @@ class WorldGenerator {
     webFiller.scatterWebs(surfaceUnder)
 
     // N-3. Ajout des coffres et objets spéciaux - TODO
+    // XXXXX.addSurfaceChests(xxx)
+    // XXXXX.addUndergroundChests(xxx)
+    // XXXXX.addCavernsChests(xxx)
+    // XXXXX.addHearts(hearts) // 15 underground
+    // XXXXX.addTriskels(triskels) // 2 caverns_top et 1 caverns_bottom
+    // XXXXX.addAncientStations(xxx)
 
     // N-2. Nettoyage final (tuiles isolées) - TODO
 
@@ -315,6 +322,8 @@ class WorldGenerator {
       await this.save(seed, {hives, cobwebCaves, geodeCaves, lakes})
       worldBuffer.clear()
     }
+
+    // tileGuard.debug() // DEBUG
 
     // N + 1. On repasse le générateur de nombres aléatoires en mode aléatoire
     seededRNG.init()
@@ -1713,6 +1722,122 @@ class ClusterGenerator {
 export const clusterGenerator = new ClusterGenerator()
 
 /* ====================================================================================================
+   PROTECTION DES TUILES CONTRE LE CREUSEMENT
+   ==================================================================================================== */
+
+class TileGuard {
+  #tiles
+
+  constructor () {
+    this.#tiles = new Set()
+  }
+
+  /**
+   * Vide la liste des tuiles protégées.
+   * À appeler depuis generate() avant les mini-biomes.
+   */
+  init () {
+    this.#tiles.clear()
+  }
+
+  /**
+   * Teste si une tuile est protégée.
+   * @param {number} index
+   * @returns {boolean}
+   */
+  has (index) {
+    return this.#tiles.has(index)
+  }
+
+  /**
+   * Protège toutes les tuiles d'un rectangle.
+   * @param {number} x1
+   * @param {number} y1
+   * @param {number} x2
+   * @param {number} y2
+   */
+  addRect (x1, y1, x2, y2) {
+    for (let y = y1; y <= y2; y++) {
+      for (let x = x1; x <= x2; x++) {
+        this.#tiles.add((y << 10) | x)
+      }
+    }
+  }
+
+  /**
+   * Protège les tuiles d'un cercle bruité (Perlin noise).
+   * @param {number} cx
+   * @param {number} cy
+   * @param {number} radiusMin
+   * @param {number} radiusMax
+   * @param {number} frequency
+   * @param {number} offsetX
+   */
+  addNoisyCircle (cx, cy, radiusMin, radiusMax, frequency = 0.3, offsetX = 0) {
+    const radius = (radiusMin + radiusMax) >> 1
+    const spread = radiusMax - radiusMin
+    const period = 1 / frequency
+
+    for (let dy = -radiusMax; dy <= radiusMax; dy++) {
+      for (let dx = -radiusMax; dx <= radiusMax; dx++) {
+        const d2 = dx * dx + dy * dy
+        if (d2 > radiusMax * radiusMax) continue
+        const dist = Math.sqrt(d2)
+        const noise = seededRNG.randomPerlin((cx + dx + offsetX) / period, (cy + dy) / period)
+        const threshold = radius + (noise * 2 - 1) * spread
+        if (dist > threshold) continue
+        const x = cx + dx
+        const y = cy + dy
+        if (x < 1 || x >= WORLD_WIDTH - 1 || y < 1 || y >= WORLD_HEIGHT - 1) continue
+        this.#tiles.add((y << 10) | x)
+      }
+    }
+  }
+
+  /**
+   * Protège les tuiles d'une ellipse bruitée (Perlin noise).
+   * @param {number} cx
+   * @param {number} cy
+   * @param {number} radiusXMin
+   * @param {number} radiusXMax
+   * @param {number} radiusYMin
+   * @param {number} radiusYMax
+   * @param {number} frequency
+   * @param {number} offsetX
+   */
+  addNoisyEllipse (cx, cy, radiusXMin, radiusXMax, radiusYMin, radiusYMax, frequency = 0.3, offsetX = 0) {
+    const period = 1 / frequency
+
+    for (let dy = -radiusYMax; dy <= radiusYMax; dy++) {
+      for (let dx = -radiusXMax; dx <= radiusXMax; dx++) {
+        const normMax = (dx * dx) / (radiusXMax * radiusXMax) + (dy * dy) / (radiusYMax * radiusYMax)
+        const normMin = (dx * dx) / (radiusXMin * radiusXMin) + (dy * dy) / (radiusYMin * radiusYMin)
+        if (normMax > 1) continue
+        if (normMin < 1) continue
+        const noise = seededRNG.randomPerlin((cx + dx + offsetX) / period, (cy + dy) / period)
+        if (noise < 0.5) continue
+        const x = cx + dx
+        const y = cy + dy
+        if (x < 1 || x >= WORLD_WIDTH - 1 || y < 1 || y >= WORLD_HEIGHT - 1) continue
+        this.#tiles.add((y << 10) | x)
+      }
+    }
+  }
+
+  /**
+ * DEBUG — affiche les tuiles protégées en orange dans WorldMapDebug.
+ * Commenter/décommenter l'appel dans generate() pour activer/désactiver.
+ */
+  debug () {
+    for (const index of this.#tiles) {
+      window.DEBUG_POINTS.push({x: index & 0x3FF, y: index >> 10, color: 'lime'})
+    }
+  }
+}
+
+export const tileGuard = new TileGuard()
+
+/* ====================================================================================================
    CREUSEMENT DE TUNNELS ET DE CAVERNES DANS LE MONDE
    ==================================================================================================== */
 
@@ -1886,6 +2011,7 @@ class WorldCarver {
       if (tile.x < 0 || tile.x >= WORLD_WIDTH) continue
       if (tile.y < 0 || tile.y >= WORLD_HEIGHT) continue
       if (excluded.has(worldBuffer.readAt(tile.index))) continue
+      if (tileGuard.has(tile.index)) continue
       worldBuffer.writeAt(tile.index, tile.code)
       if (tile.x < x1) x1 = tile.x
       if (tile.x > x2) x2 = tile.x
@@ -2571,7 +2697,7 @@ class WorldCarver {
   digHearts (surfaceUnder, underCaverns) {
     const MAX_ATTEMPTS = 100
     const HEART_COUNT = 15
-    const HEART = NODES.HEART.code
+    const VOID = NODES.HEART.code
     const LIQUID_OR_GAZ = new Set([
       NODES.VOID.code,
       NODES.SKY.code,
@@ -2591,11 +2717,13 @@ class WorldCarver {
           if (LIQUID_OR_GAZ.has(worldBuffer.read(x + dx, y + dy))) return false
         }
       }
-      worldBuffer.write(x, y, HEART)
-      worldBuffer.write(x + 1, y, HEART)
-      worldBuffer.write(x, y + 1, HEART)
-      worldBuffer.write(x + 1, y + 1, HEART)
+      worldBuffer.write(x, y, VOID)
+      worldBuffer.write(x + 1, y, VOID)
+      worldBuffer.write(x, y + 1, VOID)
+      worldBuffer.write(x + 1, y + 1, VOID)
       this.addExclusion({x1: x - 1, y1: y - 1, x2: x + 2, y2: y + 2})
+      tileGuard.addRect(x - 1, y - 1, x + 2, y + 2)
+      tileGuard.addNoisyCircle(x, y, 2, 5, 0.3, PERLIN_OFFSET_HEART)
       hearts.push({cx: x, cy: y})
       return true
     }
@@ -2604,7 +2732,7 @@ class WorldCarver {
     let attempts = 0
     while (remaining > 0 && attempts < MAX_ATTEMPTS) {
       attempts++
-      const x = seededRNG.randomGetMinMax(152, WORLD_WIDTH - 153)
+      const x = seededRNG.randomGetMinMax(5, WORLD_WIDTH - 6)
       const y = seededRNG.randomGetMinMax(surfaceUnder[x], underCaverns[x] - 2)
       if (placeHeart(x, y)) { remaining--; attempts = 0 }
     }
@@ -2614,7 +2742,7 @@ class WorldCarver {
       attempts = 0
       while (remaining > 0 && attempts < MAX_ATTEMPTS) {
         attempts++
-        const x = seededRNG.randomGetMinMax(152, WORLD_WIDTH - 153)
+        const x = seededRNG.randomGetMinMax(5, WORLD_WIDTH - 6)
         const y = seededRNG.randomGetMinMax(underCaverns[x], Math.round((underCaverns[x] + 510) / 2) - 2)
         if (placeHeart(x, y)) { remaining--; attempts = 0 }
       }

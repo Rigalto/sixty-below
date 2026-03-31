@@ -750,6 +750,7 @@ Le paramètre `offsetX` permet de décorrèler le bruit Perlin des autres usages
 | `worldGenerator`     | `WorldGenerator`    | Orchestre toutes les passes de génération dans l'ordre et sauvegarde en base de données.                                   |
 | `biomesGenerator`    | `BiomesGenerator`   | Disposition horizontale des biomes et largeurs des mers latérales.                        |
 | `biomeNaturalizer`   | `BiomeNaturalizer`  | Remplit le buffer avec les substrats par biome/couche. Prépare les zones côtières (VOID). |
+| `tileGuard` | `TileGuard` | Protège des tuiles individuelles contre tout creusement. `init()`, `has(index)`, `addRect()`, `addNoisyCircle()`, `addNoisyEllipse()`. Consulté par `WorldCarver.applyTiles` avant chaque écriture. |
 | `liquidFiller`       | `LiquidFiller`      | Flood-fill BFS des zones liquides et automate pour le SAND. |
 | `webFiller` | `WebFiller` | Peuplement WEB : `fillCobwebCave(cx, cy)` pour les caves, `scatterWebs(surfaceUnder)` pour le peuplement global différé. |
 

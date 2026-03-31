@@ -339,6 +339,7 @@ export const PERLIN_OFFSET_CAVERN = 500
 export const PERLIN_OFFSET_HIVE = 600
 export const PERLIN_OFFSET_COBWEB = 700
 export const PERLIN_OFFSET_LAKES = 800
+export const PERLIN_OFFSET_HEART = 900
 
 export const SMALL_CAVERNS_COUNT = 80
 export const MEDIUM_CAVERNS_COUNT = 120
@@ -396,7 +397,7 @@ export const LAKE_CREATION_MAP = {
 export const CREATION_REMAP = new Map([
   [NODES.SAPROCK.code, NODES.SLATE.code],
   [NODES.HARDROCK.code, NODES.HARDSTONE.code],
-  [NODES.HEART.code, NODES.VOID.code],
+  [NODES.HEART.code, NODES.LAVA.code], // DEBUG
   [NODES.LAKE_FOREST_SIDE.code, NODES.CLAY.code],
   [NODES.LAKE_FOREST_BED.code, NODES.STONE.code],
   [NODES.LAKE_DESERT_SIDE.code, NODES.SAND.code],

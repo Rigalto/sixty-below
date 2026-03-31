@@ -396,6 +396,8 @@ dans un biome étranger (cf. §3.9).
 | **Abandoned Mine** | caverns_bottom | OBSIDIAN + COBALTWALL | Tous biomes. Galerie horizontale creusée par une civilisation ancienne. OBSIDIAN en toit et sol. Étais de COBALTWALL tous les 5 tuiles (minables sans conséquence). Coffres de matériaux de construction et minerais extraits. Faune commune de la zone. |
 | **Blind Lake** | caverns_bottom | WATER + HARDSTONE | Tous biomes. Lac aveugle sans accès naturel — le joueur doit creuser pour y accéder. Fond et parois de HARDSTONE. Poissons aveugles et AXOLOTL pêchables (tier 4-5). Pas de faune agressive. Bioluminescence ambiante. |
 | **Shore** | caverns | SAND, SANDSTONE, SHELL | Zone aux abords des deux SEA, constituant une plage de sable. Des SANDSTONE limitent l'écoulement du SAND et des SHELL parsèment cette zone. Faune et flore spécifique à ce mini-biome. |
+| **Hearts** | under | VOID | un Life Heart (furniture) dans un trou carré de 2 tuiles entouré de matière solide. |
+| **Triskels** | caverns | VOID | un des 3 triskels (furniture) dans un trou carré de 2 tuiles entouré de matière solide. 2 triskels en caverns_top et 1 en caverns_bottom. |
 
 ---
 
