@@ -302,7 +302,7 @@ class WorldGenerator {
     // N-4 Peuplement des biomes qui sont à peuplement différé - TODO
 
     for (const cave of geodeCaves) { clusterGenerator.projectAndFill(cave) }
-    webFiller.scatterWebs(surfaceUnder)
+    // webFiller.scatterWebs(surfaceUnder)
 
     // N-3. Ajout des coffres et objets spéciaux - TODO
     // XXXXX.addSurfaceChests(xxx)
@@ -1750,6 +1750,15 @@ class TileGuard {
   }
 
   /**
+   * Protège une tuiles.
+   * @param {number} index
+
+   */
+  add (index) {
+    this.#tiles.add(index)
+  }
+
+  /**
    * Protège toutes les tuiles d'un rectangle.
    * @param {number} x1
    * @param {number} y1
@@ -2789,6 +2798,7 @@ class WorldCarver {
       NODES.SAP.code
     ])
     const GAZ = new Set([NODES.SKY.code, NODES.FOG.code, NODES.VOID.code])
+    const SKY_OR_FOG = new Set([NODES.SKY.code, NODES.FOG.code])
     const LIQUID = new Set([NODES.WATER.code, NODES.SEA.code, NODES.HONEY.code, NODES.SAP.code, NODES.DEEPSEA.code])
 
     const propagateSky = (idx) => {
@@ -2820,11 +2830,12 @@ class WorldCarver {
     }
 
     // Remonte depuis idx jusqu'à trouver la première tuile non VOID — retourne son code
-    const solidAbove = (idx) => {
-      let above = idx - W
-      while (world[above] === VOID) above -= W
-      return world[above]
-    }
+    // Utilisé uniquement par la règle 13, devenue obsolète
+    // const solidAbove = (idx) => {
+    //   let above = idx - W
+    //   while (world[above] === VOID) above -= W
+    //   return world[above]
+    // }
 
     // Passe 1 — propagation SKY vers le bas colonne par colonne
     for (let x = 1; x < W - 1; x++) {
@@ -2910,14 +2921,22 @@ class WorldCarver {
         // ///////////////////////////////////////////////// //
 
         // Règle 3 — tuile solide suspendue dans le ciel (top=SKY, bot=VOID, côtés SKY/FOG) → SKY propagé
-        // Règle traitée par la règle P4-2
-
+        if (top === SKY && bot === VOID && SKY_OR_FOG.has(left) && SKY_OR_FOG.has(right)) {
+          propagateSky(idx)
+          continue
+        }
         // Règle 3-V — paire verticale solide suspendue dans le ciel → SKY propagé sur les deux tuiles
-        // Règle traitée par la règle P4-2
-
+        if (!LIQUID_OR_GAZ.has(bot) && top === SKY && SKY_OR_FOG.has(left) && SKY_OR_FOG.has(right) && SKY_OR_FOG.has(botleft) && SKY_OR_FOG.has(botright) && botbot === VOID) {
+          world[idx] = SKY
+          propagateSky(idx + W)
+          continue
+        }
         // Règle 3-H — paire horizontale solide suspendue dans le ciel → SKY propagé sur les deux tuiles
-        // Règle traitée par la règle P4-4
-
+        if (!LIQUID_OR_GAZ.has(right) && top === SKY && bot === VOID && SKY_OR_FOG.has(left) && topright === SKY && botright === VOID && SKY_OR_FOG.has(rightright)) {
+          propagateSky(idx)
+          propagateSky(idx + 1)
+          continue
+        }
         // ////////////////////////////////////////////////// //
         // SUPPRESSION DES TUILES SOLIDE ISOLEES DANS LE VOID //
         // ////////////////////////////////////////////////// //
@@ -2997,11 +3016,11 @@ class WorldCarver {
         // AJOUT DE SOLID AU DESSUS DES WEB ISOLEES //
         // //////////////////////////////////////// //
 
-        // Règle 13 — WEB avec VOID au-dessus → remplace le VOID par le SOLID au-dessus
-        if (code === NODES.WEB.code && top === VOID) {
-          world[idx - W] = solidAbove(idx - W)
-          continue
-        }
+        // Règle 13 Obsolète — WEB avec VOID au-dessus → remplace le VOID par le SOLID au-dessus
+        // if (code === NODES.WEB.code && top === VOID) {
+        //   world[idx - W] = solidAbove(idx - W)
+        //   continue
+        // }
 
         // if (isVoid) {
         // Règle 2 — VOID avec 4 voisins non VOID → devient l'un d'eux
@@ -3288,8 +3307,16 @@ class WebFiller {
    * @param {number} cy
    * @param {number} count
    */
-  #buildWeb (cx, cy, count) {
+  #buildWeb (cx, cy, count, notSolid) {
+    const NOT_SOLID = new Set([NODES.VOID.code, NODES.WEB.code])
     let idx = (cy << 10) | cx
+
+    const protect = (x, y) => {
+      const idxAbove1 = ((y - 1) << 10) | x
+      const idxAbove2 = idxAbove1 - this.WIDTH
+      if (!NOT_SOLID.has(worldBuffer.readAt(idxAbove1))) tileGuard.add(idxAbove1)
+      if (!NOT_SOLID.has(worldBuffer.readAt(idxAbove2))) tileGuard.add(idxAbove2)
+    }
 
     // Remonte au plafond
     while (worldBuffer.readAt(idx - this.WIDTH) === this.VOID) {
@@ -3299,6 +3326,7 @@ class WebFiller {
     if (worldBuffer.readAt(idx - this.WIDTH) === this.HIVE) return
 
     worldBuffer.writeAt(idx, this.WEB)
+    protect(cx, cy)
     count--
 
     const webX = [cx]
@@ -3311,6 +3339,7 @@ class WebFiller {
       if (result !== null) {
         webX.push(result.x)
         webY.push(result.y)
+        protect(result.x, result.y)
         count--
         tentative = Math.max(10, 4 * webX.length)
       } else {

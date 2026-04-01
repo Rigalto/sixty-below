@@ -7,15 +7,13 @@
 
 ## En cours
 
-- Génération du monde : mini-biomes, topsoil, végétation, coffres, artefacts
-
+- Génération du monde : topsoil, végétation, coffres, artefacts
 ---
 
 ## À faire — Génération du monde (`generate.mjs`)
 
 ### Tunnels
 - Densité trop élevée, notamment juste sous la surface (revoir les constantes `SMALL_TUNNELS_COUNT` et `CAVERNS_TUNNEL_COUNT`)
-- Ne pas mettre de tunnel oblique descendant trop proche d'un lac de surface (passer lakes en paramètre)
 
 ### Mer — fuite vers le bas
 - Le remplissage de la mer n'est pas bloqué vers le bas
@@ -31,8 +29,7 @@
 - Traitement désert : écoulement du sable, consolidation des tunnels/cavernes
 
 ### Mini-biomes à implémenter
-- Optimiser le mécanisme de protection contre le creusement
-- Ajout des Heart (si pas de place en underground => caverns_top)
+- `TileGuard` : intégrer pour tous les futurs mini-biomes
 - `digMushroomCaves()` — Forest, caverns_top, HUMUS + GRASSMUSHROOM
 - `digFernCaves()` — Forest, under, HUMUS + GRASSFERN
 - `digAnthills()` — Forest, surface, structure conique
@@ -48,6 +45,7 @@
 - `digTempleRuin()` — Jungle, caverns_top, EMERALDWALL + Décomposeur
 - `digAncientHouse()` — Desert, caverns_bottom, GOLDWALL + Transmutateur
 - `digAbandonedMine()` — Tous biomes, caverns_bottom, OBSIDIAN + COBALTWALL
+- `digTriskels()` — Tous biomes, caverns
 
 ### Intrusions (mini-biomes hors biome natif)
 - `digHiveIntrusions()` — 1 monde/2, biome étranger (déjà implémenté dans `digHives`)
@@ -194,13 +192,21 @@
 - `ClusterGenerator.addOreIntrusions` — ores dans layers supérieures
 - `LiquidFiller.fillSea` — BFS flood-fill mer gauche et droite
 - `LiquidFiller.fillLake` — BFS flood-fill lacs de surface
+- `LiquidFiller.fillHive` — BFS VOID → HONEY depuis cy+1
+- `WebFiller.fillCobwebCave` — peuplement WEB des cobweb caves
+- `WebFiller.scatterWebs` — dispersion WEB globale post-creusement
 - `WorldCarver.digCavernsTunnels` — tunnels profonds
 - `WorldCarver.digSmallTunnels` — petites galeries
-- `WorldCarver.digHives` — ruches (avec intrusion 1 monde/2)
-- `WorldCarver.digCobwebCaves` — cavernes à toiles (avec intrusion under)
+- `WorldCarver.digHives` — ruches avec HONEY, protection TileGuard (avec intrusion 1 monde/2)
+- `WorldCarver.digCobwebCaves` — cavernes à toiles d'araignées (avec intrusion under)
 - `WorldCarver.digGeodeCaves` — géodes granite/marble (avec intrusion caverns_top)
-- `WorldCarver.digLakes` — lacs/oasis de surface avec pit, berges et fond protégés
-- `WorldCarver.cleanupAfterCarving` — nettoyage post-creusement (propagation SKY/VOID, isolats)
+- `WorldCarver.digLakes` — lacs/oasis de surface avec pit, berges, fond protégés et TileGuard
+- `WorldCarver.digHearts` — placement 15 HEART 2×2, fallback caverns_top
+- `WorldCarver.digZigzagTunnels` — tunnels zigzag avec espacement minimal et évitement des lacs
+- `WorldCarver.digSurfaceTunnel` — galeries de surface avec évitement des lacs
+- `WorldCarver.cleanupAfterCarving` — nettoyage post-creusement (3 passes, règles déclaratives)
+- `WorldCarver.buildErodedSurfaceLine` — ligne de surface + érosion (trous et bosses)
+- `TileGuard` — protection tuiles contre creusement, formes bruitées (cercle, ellipse, rectangle)
 
 ### Rendu (partiel)
 - `WorldRenderer` — rendu tuiles par chunks avec cache OffscreenCanvas
