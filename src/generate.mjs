@@ -259,8 +259,9 @@ class WorldGenerator {
 
     // 6.1.X Life Heart (15)
     const hearts = worldCarver.digHearts(surfaceUnder, underCaverns)
+    const triskels = worldCarver.digTriskels(underCaverns)
     await progress('Life Hearts')
-    console.log('>>>>>>>>>>> hearts', hearts)
+    console.log('>>>>>>>>>>> hearts et triskels', hearts, triskels)
 
     // 6.2 Creusement des tunnels et cavernes
     worldCarver.digZigzagTunnels(lakes)
@@ -2769,6 +2770,70 @@ class WorldCarver {
     }
 
     return hearts
+  }
+
+  /**
+ * Place 3 Triskels (2×2) : 2 en caverns_top, 1 en caverns_bottom.
+ * Les triskels non placés en caverns_top sont reportés en caverns_bottom.
+ * Chaque spot nécessite 16 tuiles solides (carré 4×4 centré sur le coin haut-gauche).
+ * Les spots sont enregistrés dans #exclusions.
+ *
+ * @param {Int16Array} underCaverns - Altitudes haute caverne par colonne X
+ * @returns {Array<{cx, cy}>} — cx, cy = coin haut-gauche du carré 2×2
+ */
+  digTriskels (underCaverns) {
+    const MAX_ATTEMPTS = 100
+    const LIQUID_OR_GAZ = new Set([
+      NODES.VOID.code,
+      NODES.SKY.code,
+      NODES.FOG.code,
+      NODES.WATER.code,
+      NODES.SEA.code,
+      NODES.DEEPSEA.code,
+      NODES.HONEY.code,
+      NODES.SAP.code
+    ])
+    const VOID = NODES.VOID.code
+    const triskels = []
+
+    const placeTriskel = (x, y) => {
+      if (this.isExcluded(x - 1, y - 1, x + 2, y + 2)) return false
+      for (let dy = -1; dy <= 2; dy++) {
+        for (let dx = -1; dx <= 2; dx++) {
+          if (LIQUID_OR_GAZ.has(worldBuffer.read(x + dx, y + dy))) return false
+        }
+      }
+      worldBuffer.write(x, y, VOID)
+      worldBuffer.write(x + 1, y, VOID)
+      worldBuffer.write(x, y + 1, VOID)
+      worldBuffer.write(x + 1, y + 1, VOID)
+      tileGuard.addNoisyCircle(x, y, 4, 8, 0.8, PERLIN_OFFSET_HEART)
+      this.addExclusion({x1: x - 1, y1: y - 1, x2: x + 2, y2: y + 2})
+      triskels.push({cx: x, cy: y})
+      return true
+    }
+
+    // 2 triskels en caverns_top
+    let remaining = 2
+    let attempts = 0
+    while (remaining > 0 && attempts < MAX_ATTEMPTS) {
+      attempts++
+      const x = seededRNG.randomGetMinMax(5, WORLD_WIDTH - 7)
+      const y = seededRNG.randomGetMinMax(underCaverns[x], Math.round((underCaverns[x] + 510) / 2) - 2)
+      if (placeTriskel(x, y)) { remaining--; attempts = 0 }
+    }
+
+    // 1 triskel en caverns_bottom + fallback pour les triskels non placés en caverns_top
+    remaining = 1 + (2 - triskels.length)
+    attempts = 0
+    while (remaining > 0 && attempts < MAX_ATTEMPTS) {
+      attempts++
+      const x = seededRNG.randomGetMinMax(5, WORLD_WIDTH - 7)
+      const y = seededRNG.randomGetMinMax(Math.round((underCaverns[x] + 510) / 2), 508)
+      if (placeTriskel(x, y)) { remaining--; attempts = 0 }
+    }
+
+    return triskels
   }
 
   /**

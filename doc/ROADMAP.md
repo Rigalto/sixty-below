@@ -45,7 +45,6 @@
 - `digTempleRuin()` — Jungle, caverns_top, EMERALDWALL + Décomposeur
 - `digAncientHouse()` — Desert, caverns_bottom, GOLDWALL + Transmutateur
 - `digAbandonedMine()` — Tous biomes, caverns_bottom, OBSIDIAN + COBALTWALL
-- `digTriskels()` — Tous biomes, caverns
 
 ### Intrusions (mini-biomes hors biome natif)
 - `digHiveIntrusions()` — 1 monde/2, biome étranger (déjà implémenté dans `digHives`)
@@ -201,12 +200,13 @@
 - `WorldCarver.digCobwebCaves` — cavernes à toiles d'araignées (avec intrusion under)
 - `WorldCarver.digGeodeCaves` — géodes granite/marble (avec intrusion caverns_top)
 - `WorldCarver.digLakes` — lacs/oasis de surface avec pit, berges, fond protégés et TileGuard
-- `WorldCarver.digHearts` — placement 15 HEART 2×2, fallback caverns_top
+- `WorldCarver.digHearts` — placement 15 Life Cristals 2×2, under fallback caverns_top
+- `WorldCarver.digTriskels()` — placement 3 Tryskels 2×2, 2 en caverns_top fallback caverns_bottom et 1 en caverns_bottom
 - `WorldCarver.digZigzagTunnels` — tunnels zigzag avec espacement minimal et évitement des lacs
 - `WorldCarver.digSurfaceTunnel` — galeries de surface avec évitement des lacs
-- `WorldCarver.cleanupAfterCarving` — nettoyage post-creusement (3 passes, règles déclaratives)
+- `WorldCarver.cleanupAfterCarving` — nettoyage post-creusement (4 passes, règles déclaratives)
 - `WorldCarver.buildErodedSurfaceLine` — ligne de surface + érosion (trous et bosses)
-- `TileGuard` — protection tuiles contre creusement, formes bruitées (cercle, ellipse, rectangle)
+- `TileGuard` — utilitaire de protection tuiles contre creusement, formes bruitées (cercle, ellipse, rectangle)
 
 ### Rendu (partiel)
 - `WorldRenderer` — rendu tuiles par chunks avec cache OffscreenCanvas
