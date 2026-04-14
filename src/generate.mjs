@@ -192,6 +192,7 @@ class WorldGenerator {
     // ⚠️ digLakes DOIT rester en premier — il n'utilise pas #exclusions pour se placer,
     // mais alimente la table pour tous les mini-biomes suivants.
     const lakes = worldCarver.digLakes(skySurface)
+    const lakeLiquidBodies = lakes.map(h => h.liquidBody)
     await progress('Lakes & oasis')
 
     // 6.1.2 HIVE caves
@@ -321,7 +322,7 @@ class WorldGenerator {
 
     // N. Stochage du monde en base de données
     if (!debug) {
-      const liquidBodies = honeyLiquidBodies
+      const liquidBodies = [...honeyLiquidBodies, ...lakeLiquidBodies]
       await this.save(seed, {hives, cobwebCaves, geodeCaves, lakes, liquidBodies})
       worldBuffer.clear()
     }
@@ -1024,6 +1025,7 @@ class LiquidFiller {
         queue.push(nIdx)
       }
     }
+    return {index: src, nodeCode: NODES.WATER.code}
   }
 
   /**
@@ -2504,7 +2506,7 @@ class WorldCarver {
 
       // Passe 3 : remplir le base de l'ellipse par du WATER
       const lakeCreation = LAKE_CREATION_MAP[rect.biome]
-      liquidFiller.fillLake(cx, cy, radiusX, lakeCreation.side)
+      const liquidBody = liquidFiller.fillLake(cx, cy, radiusX, lakeCreation.side)
 
       // Passe 4 : Nettoyage des tuiles volantes au-dessus du lac
       const cleanX0 = Math.round(cx - radiusX * 0.6)
@@ -2564,7 +2566,7 @@ class WorldCarver {
       this.addExclusion(this.boundingRect(rect2, rect3))
       tileGuard.addNoisyEllipse(cx, cy, radiusX + 3, radiusX + 5, radiusY + 3, radiusY + 5, 0.8, PERLIN_OFFSET_LAKES)
       tileGuard.addNoisyEllipse(pitCx, pitCy, pitRadiusX + 3, pitRadiusX + 5, pitRadiusY + 3, pitRadiusY + 5, 0.8, PERLIN_OFFSET_LAKES)
-      lakes.push({cx, cy, biome: rect.biome})
+      lakes.push({cx, cy, biome: rect.biome, liquidBody})
       // window.DEBUG_POINTS.push({x: cx, y: cy, color: 'orange'}) // DEBUG
     }
 
