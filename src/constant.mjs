@@ -159,7 +159,7 @@ export const TIME_SLOT = ['Midnight', 'Dawn', 'Morning', 'Noon', 'Afternoon', 'D
 
 export const DB_CONFIG = {
   NAME: 'SixtyBelowDB',
-  VERSION: 1,
+  VERSION: 2,
   DEBUG: true,
   STORES: [
     'world_chunks', // Stockage des chunks (Uint8Array)
@@ -168,18 +168,9 @@ export const DB_CONFIG = {
     'buff', // Buffs/Debuffs
     'plant', // Trees, Herbs, Mushrooms, Flowers, Corals
     'monster', // Enemies, Criters, Bosses
-    'furniture' // Furniture (Housing), Crafting Station
+    'furniture', // Furniture (Housing), Crafting Station
+    'liquid' // 'index' et 'code' d'une des tuiles de chaque liquid body
   ]
-  // STORES1: {
-  //   WORLD: 'world_chunks', // Stockage des Uint16Array
-  //   PLAYER: 'player_data', // Position, Stats
-  //   CONFIG: 'game_config', // Time, Seed
-  //   INVENTORY: 'inventory', // Items, Gears, Chests
-  //   BUFF: 'buff', // Buffs/Debuffs
-  //   PLANT: 'plant', // Trees, Herbs, Mushrooms, Flowers, Corals
-  //   MONSTER: 'monster', // Enemies, Criters, Bosses
-  //   FURNITURE: 'furniture' // Furniture (Housing), Crafting Station
-  // }
 }
 
 /* =========================================

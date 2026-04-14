@@ -467,6 +467,8 @@ Ne jamais appeler `seededRNG` en mode déterministe depuis la game loop.
 
 ## 5. `database.mjs` (Layer 1)
 
+### 5.1. API
+
 Wrapper IndexedDB bas niveau. **Aucune connaissance du domaine métier.**
 Proxy universel : toutes les opérations d'une session transitent par cette classe.
 
@@ -489,6 +491,29 @@ Proxy universel : toutes les opérations d'une session transitent par cette clas
 | `batchUpdate`          | `(operations): Promise`                | Lot d'opérations mixtes en une transaction                    |
 | `backupDatabase`       | `(): Promise`                          | Export JSON (debug)                                           |
 | `restoreDatabase`      | `(file): Promise`                      | Import JSON (debug)                                           |
+
+---
+
+### 5.2. Structure de la base de données IndexedDB
+
+Configuration dans `constant.mjs` → `DB_CONFIG` : `NAME`, `VERSION`, `DEBUG`, `STORES`.
+
+| ObjectStore | keyPath | autoIncrement | Contenu |
+|---|---|---|---|
+| `gamestate` | `key` | non | État global du jeu (seed, position joueur...) |
+| `world_chunks` | `key` | oui | Chunks du monde (tuiles) |
+| `inventory` | `key` | oui | Items, Gears, Chests |
+| `buff` | `key` | oui | Buffs/Debuffs |
+| `plant` | `key` | oui | Trees, Herbs, Mushrooms, Flowers, Corals |
+| `monster` | `key` | oui | Enemies, Critters, Bosses |
+| `furniture` | `key` | oui | Furniture (Housing), Crafting Station |
+| `liquid` | `key` | oui | Liquid bodies générés : `{index, nodeCode}` — `index` = index monde d'une tuile du body, `nodeCode` = code du liquide (HONEY, WATER, SAP...) |
+
+**Règles :**
+- `updateObjectStore()` synchronise automatiquement les stores à chaque montée de version — ajouter un store = l'ajouter à `DB_CONFIG.STORES` et incrémenter `VERSION`.
+- `clearAllObjectStores()` vide tous les stores lors de la création d'un nouveau monde.
+- Les stores avec `autoIncrement` laissent IndexedDB attribuer la clé — ne pas fournir `key` à l'insertion.
+- `gamestate` est un store spécial à accès contrôlé — ne jamais y accéder directement. Utiliser exclusivement les méthodes dédiées : `setGameState()`, `getGameStateValue()`, `getAllGameState()`, `batchSetGameState()`.
 
 ---
 

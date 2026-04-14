@@ -196,6 +196,7 @@ class WorldGenerator {
 
     // 6.1.2 HIVE caves
     const hives = worldCarver.digHives(biomeCounts)
+    const honeyLiquidBodies = hives.map(h => h.liquidBody)
     await progress('Hives')
 
     // 6.1.3 Cobweb caves
@@ -320,7 +321,8 @@ class WorldGenerator {
 
     // N. Stochage du monde en base de données
     if (!debug) {
-      await this.save(seed, {hives, cobwebCaves, geodeCaves, lakes})
+      const liquidBodies = honeyLiquidBodies
+      await this.save(seed, {hives, cobwebCaves, geodeCaves, lakes, liquidBodies})
       worldBuffer.clear()
     }
 
@@ -333,7 +335,7 @@ class WorldGenerator {
     if (debug) { return worldBuffer } // appelant responsable du clear()
   }
 
-  async save (seed, {hives, cobwebCaves, geodeCaves, lakes}) {
+  async save (seed, {hives, cobwebCaves, geodeCaves, lakes, liquidBodies}) {
     const start = window.performance.now()
     // 1. Sauvegarde des tuiles
     await database.clearObjectStore('world_chunks')
@@ -381,6 +383,8 @@ class WorldGenerator {
 
       // {key: 'honeysurface', value: this.honeysurface.join('|')}
     ])
+    // sauvegarde des liquid bodies
+    await database.addMultipleRecords('liquid', liquidBodies)
 
     // sauvegarde des meubles
     // await database.clearObjectStore('furniture')
@@ -1064,6 +1068,7 @@ class LiquidFiller {
         queue.push(nIdx)
       }
     }
+    return {index: src, nodeCode: HONEY_CODE}
   }
 }
 
@@ -2393,12 +2398,12 @@ class WorldCarver {
     const path = this.pathTunnel(cx, cy, 4, length, angle, 10)
     this.carveAlongPath(path, PERLIN_OFFSET_HIVE, ETERNAL_EXCLUDED)
 
-    liquidFiller.fillHive(cx, cy + 2)
+    const liquidBody = liquidFiller.fillHive(cx, cy + 2)
 
     this.addExclusion(rect2)
     tileGuard.addNoisyCircle(cx, cy, radius + 2, radius + 6, 0.3, PERLIN_OFFSET_HIVE)
 
-    return {cx, cy, radius}
+    return {cx, cy, radius, liquidBody}
   }
 
   /**
