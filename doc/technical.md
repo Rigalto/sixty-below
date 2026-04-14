@@ -715,6 +715,7 @@ puis appliqués en une passe dédiée.
 | `scatterClusters` | `(x0, y0, x1, y1, percent, code, sizeMin?, sizeMax?): Array<{x, y, index, code}>` | Distribue `max(5, round(surface × percent))` clusters `randomWalkCluster` à des positions aléatoires dans le rectangle. `sizeMin` défaut 5, `sizeMax` défaut 8. Sans effet de bord. |
 | `applyTiles` | `(tiles: Array<{x, y, index, code}>): void` | Écrit les tuiles dans `worldBuffer` via `writeAt`. Ignore les tuiles hors bornes et protège `FOG`, `DEEPSEA`, `BASALT`, `LAVA`, `SKY`, `VOID` contre l'écrasement. — à appeler avant le creusement. |
 | `initZoneRects(biomesDescription, skySurface, surfaceUnder, underCaverns): Array<{biome, x0, x1, ySkySurface, ySurface, yUnder, yCavernsMid, yCaverns, yHell}>` | Initialise `this.zoneRects`. Pré-calcule les rectangles biome × layer (Y moyens aplatis). À appeler une fois dans `generate()` avant tout placement. Renvoie le tableau calculé |
+| `getRectAt(x)` | `(x: number): zoneRect` | Retourne le rectangle de zone correspondant à la colonne X en parcourant `this.zoneRects`. Utilisable après apel à `initZoneRects`. |
 | `#getClusterSizes(biome, layer, code)` | Lit `sizeMin/sizeMax` depuis `ORE_GEM_SCATTER_MAP[biome][layer]` pour le code donné. Fallback `{6, 12}`. |
 | `#placeOneCluster(x0, x1, y0, y1, code, sizeMin, sizeMax)` | Place un unique cluster à position aléatoire dans le rectangle. |
 | `#getForeignZones(nativeBiome)` | Retourne les `zoneRects` dont le biome diffère de `nativeBiome`. |

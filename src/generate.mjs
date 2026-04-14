@@ -1,6 +1,6 @@
 import {seededRNG} from './utils.mjs'
 import {database} from './database.mjs'
-import {NODES, NODES_LOOKUP, NODE_TYPE, WEATHER_TYPE, BIOME_TYPE, WORLD_WIDTH, WORLD_HEIGHT, SEA_LEVEL, TOPSOIL_Y_SKY_SURFACE, TOPSOIL_Y_SURFACE_UNDER, TOPSOIL_Y_UNDER_CAVERNS, TOPSOIL_Y_CAVERNS_MID, BIOME_TILE_MAP, SEA_MAX_JITTER, SEA_MAX_WIDTH, SEA_MAX_HEIGHT, CLUSTER_SCATTER_MAP, ORE_GEM_SCATTER_MAP, PERLIN_OFFSET_NATURALIZER, PERLIN_OFFSET_TUNNEL, PERLIN_OFFSET_SURFACE_TUNNEL, PERLIN_OFFSET_SMALL_TUNNEL, PERLIN_OFFSET_CAVERN, PERLIN_OFFSET_HIVE, PERLIN_OFFSET_HEART, PERLIN_OFFSET_COBWEB, PERLIN_OFFSET_LAKES, SMALL_CAVERNS_COUNT, MEDIUM_CAVERNS_COUNT, UNDERGROUND_TUNNEL_COUNT, CAVERNS_TUNNEL_COUNT, SMALL_TUNNELS_COUNT, HIVE_RADIUS_MIN, HIVE_RADIUS_MAX, COBWEB_CAVE_COUNT_MIN, COBWEB_CAVE_COUNT_MAX, COBWEB_RADIUS_X_MIN, COBWEB_RADIUS_X_MAX, COBWEB_RADIUS_Y_MIN, COBWEB_RADIUS_Y_MAX, COBWEB_CAVE_MAIN_MIN, COBWEB_CAVE_MAIN_MAX, COBWEB_CAVE_SIDE_MIN, COBWEB_CAVE_SIDE_MAX, COBWEB_SCATTER_COUNT, COBWEB_SCATTER_SIZE_MIN, COBWEB_SCATTER_SIZE_MAX, GEODE_CAVE_COUNT_MIN, GEODE_CAVE_COUNT_MAX, GEODE_RADIUS_MIN, GEODE_RADIUS_MAX, GEODE_TARGET_CLUSTER_COUNT, GEODE_CLUSTER_SIZE_MIN, GEODE_CLUSTER_SIZE_MAX, TOPSOIL_SCATTER_MAP, LAKE_RADIUS_X_MIN, LAKE_RADIUS_X_MAX, LAKE_RADIUS_Y_MIN, LAKE_RADIUS_Y_MAX, LAKE_PIT_RADIUS_X_MIN, LAKE_PIT_RADIUS_X_MAX, LAKE_PIT_RADIUS_Y_MIN, LAKE_PIT_RADIUS_Y_MAX, LAKE_CREATION_MAP, CREATION_REMAP} from '../assets/data/data-gen.mjs'
+import {NODES, NODES_LOOKUP, NODE_TYPE, WEATHER_TYPE, BIOME_TYPE, WORLD_WIDTH, WORLD_HEIGHT, SEA_LEVEL, TOPSOIL_Y_SKY_SURFACE, TOPSOIL_Y_SURFACE_UNDER, TOPSOIL_Y_UNDER_CAVERNS, TOPSOIL_Y_CAVERNS_MID, BIOME_TILE_MAP, SEA_MAX_JITTER, SEA_MAX_WIDTH, SEA_MAX_HEIGHT, CLUSTER_SCATTER_MAP, ORE_GEM_SCATTER_MAP, PERLIN_OFFSET_NATURALIZER, PERLIN_OFFSET_TUNNEL, PERLIN_OFFSET_SURFACE_TUNNEL, PERLIN_OFFSET_SMALL_TUNNEL, PERLIN_OFFSET_CAVERN, PERLIN_OFFSET_HIVE, PERLIN_OFFSET_HEART, PERLIN_OFFSET_COBWEB, PERLIN_OFFSET_LAKES, SMALL_CAVERNS_COUNT, MEDIUM_CAVERNS_COUNT, UNDERGROUND_TUNNEL_COUNT, CAVERNS_TUNNEL_COUNT, SMALL_TUNNELS_COUNT, HIVE_RADIUS_MIN, HIVE_RADIUS_MAX, COBWEB_CAVE_COUNT_MIN, COBWEB_CAVE_COUNT_MAX, COBWEB_RADIUS_X_MIN, COBWEB_RADIUS_X_MAX, COBWEB_RADIUS_Y_MIN, COBWEB_RADIUS_Y_MAX, COBWEB_CAVE_MAIN_MIN, COBWEB_CAVE_MAIN_MAX, COBWEB_CAVE_SIDE_MIN, COBWEB_CAVE_SIDE_MAX, COBWEB_SCATTER_COUNT, COBWEB_SCATTER_SIZE_MIN, COBWEB_SCATTER_SIZE_MAX, GEODE_CAVE_COUNT_MIN, GEODE_CAVE_COUNT_MAX, GEODE_RADIUS_MIN, GEODE_RADIUS_MAX, GEODE_TARGET_CLUSTER_COUNT, GEODE_CLUSTER_SIZE_MIN, GEODE_CLUSTER_SIZE_MAX, TOPSOIL_SCATTER_MAP, LAKE_RADIUS_X_MIN, LAKE_RADIUS_X_MAX, LAKE_RADIUS_Y_MIN, LAKE_RADIUS_Y_MAX, LAKE_PIT_RADIUS_X_MIN, LAKE_PIT_RADIUS_X_MAX, LAKE_PIT_RADIUS_Y_MIN, LAKE_PIT_RADIUS_Y_MAX, LAKE_CREATION_MAP, UNDERGROUND_LAKE_UNDER_COUNT, UNDERGROUND_LAKE_CAVERNS_COUNT, UNDERGROUND_LAKE_RADIUS_MIN, UNDERGROUND_LAKE_RADIUS_MAX, CREATION_REMAP} from '../assets/data/data-gen.mjs'
 
 /* ====================================================================================================
    WORLD BUFFER (CREATION DU MONDE)
@@ -191,8 +191,12 @@ class WorldGenerator {
 
     // ⚠️ digLakes DOIT rester en premier — il n'utilise pas #exclusions pour se placer,
     // mais alimente la table pour tous les mini-biomes suivants.
-    const lakes = worldCarver.digLakes(skySurface)
-    const lakeLiquidBodies = lakes.map(h => h.liquidBody)
+    const surfaceLakes = worldCarver.digLakes(skySurface)
+    const lakeLiquidBodies = surfaceLakes.map(h => h.liquidBody)
+    surfaceLakes.forEach(l => delete l.liquidBody)
+    const underLakes = worldCarver.digUndergroundLakes(surfaceUnder, underCaverns)
+    const underLakeLiquidBodies = underLakes.map(h => h.liquidBody)
+    underLakes.forEach(l => delete l.liquidBody)
     await progress('Lakes & oasis')
 
     // 6.1.2 HIVE caves
@@ -266,8 +270,8 @@ class WorldGenerator {
     console.log('>>>>>>>>>>> hearts et triskels', hearts, triskels)
 
     // 6.2 Creusement des tunnels et cavernes
-    worldCarver.digZigzagTunnels(lakes)
-    worldCarver.digSurfaceTunnel(skySurface, lakes)
+    worldCarver.digZigzagTunnels(surfaceLakes)
+    worldCarver.digSurfaceTunnel(skySurface, surfaceLakes)
     await progress('Surface tunnels')
     worldCarver.digSmallCaverns(surfaceUnder)
     await progress('Caverns')
@@ -322,7 +326,8 @@ class WorldGenerator {
 
     // N. Stochage du monde en base de données
     if (!debug) {
-      const liquidBodies = [...honeyLiquidBodies, ...lakeLiquidBodies]
+      const liquidBodies = [...honeyLiquidBodies, ...lakeLiquidBodies, ...underLakeLiquidBodies]
+      const lakes = [...surfaceLakes, ...underLakes]
       await this.save(seed, {hives, cobwebCaves, geodeCaves, lakes, liquidBodies})
       worldBuffer.clear()
     }
@@ -340,7 +345,6 @@ class WorldGenerator {
     const start = window.performance.now()
     // 1. Sauvegarde des tuiles
     await database.clearObjectStore('world_chunks')
-
     const chunks = worldBuffer.processWorldToChunks() // NEW
     await database.addMultipleRecords('world_chunks', chunks)
     // for (let yc = 0; yc < GEOMETRY.WORLD_CHUNK_Y; yc++) {
@@ -385,6 +389,7 @@ class WorldGenerator {
       // {key: 'honeysurface', value: this.honeysurface.join('|')}
     ])
     // sauvegarde des liquid bodies
+    await database.clearObjectStore('liquid')
     await database.addMultipleRecords('liquid', liquidBodies)
 
     // sauvegarde des meubles
@@ -980,15 +985,17 @@ class LiquidFiller {
  * @param {number} cy          - Borne supérieure stricte du fill (y >= cy)
  * @param {number} radiusX     - Demi-largeur de l'ellipse — borne latérale
  * @param {number} shoreCode   - Code substrat natif pour consolider les berges
+ * @returns {{index: number, nodeCode: number}} — index monde du premier WATER posé
  */
   fillLake (cx, cy, radiusX, shoreCode) {
-    const SKY_CODE = NODES.SKY.code
-    const WATER_CODE = NODES.WATER.code
+    const SKY = NODES.SKY.code
+    const WATER = NODES.WATER.code
+    const VOID = NODES.VOID.code
     const xMin = cx - radiusX
     const xMax = cx + radiusX
 
     const src = (cy << 10) | cx
-    if (worldBuffer.readAt(src) !== SKY_CODE) return
+    if (worldBuffer.readAt(src) !== SKY && worldBuffer.readAt(src) !== VOID) return
 
     const visited = new Set()
     const queue = []
@@ -1007,7 +1014,7 @@ class LiquidFiller {
         continue
       }
 
-      worldBuffer.writeAt(idx, WATER_CODE)
+      worldBuffer.writeAt(idx, WATER)
 
       const neighbors = [idx - 1, idx + 1, idx - 1024, idx + 1024]
       for (let i = 0; i < 4; i++) {
@@ -1019,13 +1026,14 @@ class LiquidFiller {
 
         if (nnx <= 1 || nnx >= 1022 || nny <= 1 || nny >= 510) continue
         if (nny < cy) continue
-        if (worldBuffer.readAt(nIdx) !== SKY_CODE) continue
+        const currentCode = worldBuffer.readAt(nIdx)
+        if ((currentCode !== SKY) && (currentCode !== VOID)) continue
 
         visited.add(nIdx)
         queue.push(nIdx)
       }
     }
-    return {index: src, nodeCode: NODES.WATER.code}
+    return {index: src, nodeCode: WATER}
   }
 
   /**
@@ -1035,6 +1043,7 @@ class LiquidFiller {
  *
  * @param {number} cx - Centre horizontal de la ruche
  * @param {number} cy - Centre vertical de la ruche (borne supérieure stricte du fill)
+ * @returns {{index: number, nodeCode: number}} — index monde du premier HONEY posé
  */
   fillHive (cx, cy) {
     const VOID_CODE = NODES.VOID.code
@@ -1306,6 +1315,18 @@ class ClusterGenerator {
     }
     this.zoneRects = rects
     return rects
+  }
+
+  /**
+ * Retourne le rectangle de zone correspondant à une colonne X.
+ * @param {number} x
+ * @returns {{biome, x0, x1, ySkySurface, ySurface, yUnder, yCavernsMid, yCaverns, yHell}}
+ */
+  getRectAt (x) {
+    for (let i = 0; i < this.zoneRects.length; i++) {
+      if (x <= this.zoneRects[i].x1) return this.zoneRects[i]
+    }
+    return this.zoneRects[this.zoneRects.length - 1]
   }
 
   /**
@@ -1849,6 +1870,45 @@ class TileGuard {
   }
 
   /**
+ * Protège la moitié inférieure d'une ellipse bruitée (y >= cy).
+ * Même algorithme que addNoisyEllipse — restreint aux tuiles sous le centre.
+ *
+ * @param {number} cx
+ * @param {number} cy
+ * @param {number} radiusXMin
+ * @param {number} radiusXMax
+ * @param {number} radiusYMin
+ * @param {number} radiusYMax
+ * @param {number} frequency
+ * @param {number} offsetX
+ */
+  addNoisyEllipseBottom (cx, cy, radiusXMin, radiusXMax, radiusYMin, radiusYMax, frequency = 0.3, offsetX = 0) {
+    const radiusX = (radiusXMin + radiusXMax) >> 1
+    const radiusY = (radiusYMin + radiusYMax) >> 1
+    const spreadX = radiusXMax - radiusXMin
+    const spreadY = radiusYMax - radiusYMin
+    const period = 1 / frequency
+
+    for (let dy = 0; dy <= radiusYMax; dy++) {
+      for (let dx = -radiusXMax; dx <= radiusXMax; dx++) {
+        const ndx = dx / radiusX
+        const ndy = dy / radiusY
+        const dist = Math.sqrt(ndx * ndx + ndy * ndy)
+
+        const noise = seededRNG.randomPerlin((cx + dx + offsetX) / period, (cy + dy) / period)
+        const spread = (spreadX + spreadY) * 0.5
+        const threshold = 1 + (noise * 2 - 1) * (spread / ((radiusX + radiusY) * 0.5))
+
+        if (dist > threshold) continue
+        const x = cx + dx
+        const y = cy + dy
+        if (x < 1 || x >= WORLD_WIDTH - 1 || y < 1 || y >= WORLD_HEIGHT - 1) continue
+        this.#tiles.add((y << 10) | x)
+      }
+    }
+  }
+
+  /**
  * DEBUG — affiche les tuiles protégées en orange dans WorldMapDebug.
  * Commenter/décommenter l'appel dans generate() pour activer/désactiver.
  */
@@ -2365,7 +2425,7 @@ class WorldCarver {
  * Gère les tentatives et les exclusions en interne.
  *
  * @param {{biome, x0, x1, ySurface, yUnder, yCavernsMid}} rect
- * @returns {{cx, cy, radius}|null} — null si MAX_ATTEMPTS épuisé
+ * @returns {{cx, cy, radius}|null, liquidBody: {index, nodeCode}} — null si MAX_ATTEMPTS épuisé
  */
   #digOneHive (rect) {
     const MAX_ATTEMPTS = 100
@@ -2415,7 +2475,7 @@ class WorldCarver {
  * Le remplissage HONEY est différé.
  *
  * @param {{forest, desert, jungle}} biomeCounts
- * @returns {Array<{cx, cy, radius}>}
+ * @returns {Array<{cx, cy, radius, liquidBody: {index, nodeCode}}>}
  */
   digHives (biomeCounts) {
     const hiveCount = Math.max(3, 2 * biomeCounts.jungle)
@@ -2459,7 +2519,7 @@ class WorldCarver {
  * Le remplissage WATER est différé.
  *
  * Prérequis : initZoneRects()
- * @returns {Array<{cx, cy, biome}>}
+ * @returns {Array<{cx, cy, biome, layer, liquidBody: {index, nodeCode}}>}
  */
 
   digLakes (skySurface) {
@@ -2566,9 +2626,61 @@ class WorldCarver {
       this.addExclusion(this.boundingRect(rect2, rect3))
       tileGuard.addNoisyEllipse(cx, cy, radiusX + 3, radiusX + 5, radiusY + 3, radiusY + 5, 0.8, PERLIN_OFFSET_LAKES)
       tileGuard.addNoisyEllipse(pitCx, pitCy, pitRadiusX + 3, pitRadiusX + 5, pitRadiusY + 3, pitRadiusY + 5, 0.8, PERLIN_OFFSET_LAKES)
-      lakes.push({cx, cy, biome: rect.biome, liquidBody})
+      lakes.push({cx, cy, biome: rect.biome, layer: 'surface', liquidBody})
       // window.DEBUG_POINTS.push({x: cx, y: cy, color: 'orange'}) // DEBUG
     }
+
+    return lakes
+  }
+
+  /**
+ * Creuse des lacs souterrains ellipsoïdaux bruités.
+ * Une dizaine en zone under, une quinzaine en zone caverns_top.
+ * Remplissage WATER différé.
+ *
+ * @param {Int16Array} surfaceUnder
+ * @param {Int16Array} underCaverns
+ * @returns {Array<{cx, cy, radiusX, radiusY}>}
+ */
+  digUndergroundLakes (surfaceUnder, underCaverns) {
+    const lakes = []
+
+    const digOne = (y0, y1, layer) => {
+      const radiusX = seededRNG.randomGetMinMax(UNDERGROUND_LAKE_RADIUS_MIN, UNDERGROUND_LAKE_RADIUS_MAX)
+      const radiusY = seededRNG.randomGetMinMax(UNDERGROUND_LAKE_RADIUS_MIN, UNDERGROUND_LAKE_RADIUS_MAX)
+      const cx = seededRNG.randomGetMinMax(radiusX + 2, WORLD_WIDTH - radiusX - 3)
+      const cy = seededRNG.randomGetMinMax(y0 + radiusY, y1 - radiusY)
+
+      if (this.isExcluded(cx - radiusX, cy - radiusY, cx + radiusX, cy + radiusY)) return
+
+      // creusement d'une ellipse bruitée
+      const tiles = []
+      this.digNoisyEllipse(tiles, cx, cy, radiusX - 1, radiusX, radiusY - 1, radiusY, NODES.VOID.code, 0.3, PERLIN_OFFSET_LAKES)
+      const rect = this.applyTiles(tiles)
+      this.addExclusion(rect)
+
+      // blocage des tuiles sous l'ellipse
+      tileGuard.addNoisyEllipseBottom(cx, cy, radiusX + 2, radiusX + 4, radiusY + 2, radiusY + 4, 0.8, PERLIN_OFFSET_LAKES)
+
+      // ajout de la WATER
+      const liquidBody = liquidFiller.fillLake(cx, cy + 1, radiusX + 4, NODES.WATER.code)
+
+      const biome = clusterGenerator.getRectAt(cx).biome
+      lakes.push({cx, cy, biome, layer, liquidBody})
+      window.DEBUG_POINTS.push({x: cx, y: cy, color: 'orange'}) // DEBUG
+    }
+
+    for (let i = 0; i < UNDERGROUND_LAKE_UNDER_COUNT; i++) {
+      const x = seededRNG.randomGetMinMax(2, WORLD_WIDTH - 3)
+      digOne(surfaceUnder[x], underCaverns[x], 'under')
+    }
+
+    for (let i = 0; i < UNDERGROUND_LAKE_CAVERNS_COUNT; i++) {
+      const x = seededRNG.randomGetMinMax(2, WORLD_WIDTH - 3)
+      digOne(underCaverns[x], Math.round((underCaverns[x] + 510) / 2), 'caverns_top')
+    }
+
+    console.log('bbbbbbbbbbbbbbbbbb', this.#zoneRects) // DEBUG
 
     return lakes
   }
@@ -2625,10 +2737,7 @@ class WorldCarver {
 
       // Trouver le rect pour un cx libre sur tout le monde
       const cx = seededRNG.randomGetMinMax(COBWEB_RADIUS_X_MAX, WORLD_WIDTH - COBWEB_RADIUS_X_MAX - 1)
-      let rect = this.#zoneRects[this.#zoneRects.length - 1]
-      for (let j = 0; j < this.#zoneRects.length; j++) {
-        if (cx <= this.#zoneRects[j].x1) { rect = this.#zoneRects[j]; break }
-      }
+      const rect = clusterGenerator.getRectAt(cx)
 
       const y0 = isCavernTop ? rect.yUnder : rect.yCavernsMid
       const y1 = isCavernTop ? rect.yCavernsMid : rect.yCaverns
@@ -2694,10 +2803,8 @@ class WorldCarver {
     // ── Géodes normales — caverns_bottom ─────────────────────────────────────
     for (let i = 0; i < count; i++) {
       const cx = seededRNG.randomGetMinMax(GEODE_RADIUS_MAX, WORLD_WIDTH - GEODE_RADIUS_MAX - 1)
-      let rect = this.#zoneRects[this.#zoneRects.length - 1]
-      for (let j = 0; j < this.#zoneRects.length; j++) {
-        if (cx <= this.#zoneRects[j].x1) { rect = this.#zoneRects[j]; break }
-      }
+      const rect = clusterGenerator.getRectAt(cx)
+
       const cave = this.#digOneGeodeCave(rect.yCavernsMid, rect.yCaverns, code)
       if (cave) caves.push(cave)
     }

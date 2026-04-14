@@ -339,7 +339,7 @@ export const PERLIN_OFFSET_CAVERN = 500
 export const PERLIN_OFFSET_HIVE = 600
 export const PERLIN_OFFSET_COBWEB = 700
 export const PERLIN_OFFSET_LAKES = 800
-export const PERLIN_OFFSET_HEART = 900
+export const PERLIN_OFFSET_HEART = 1000
 
 export const SMALL_CAVERNS_COUNT = 80
 export const MEDIUM_CAVERNS_COUNT = 120
@@ -393,6 +393,11 @@ export const LAKE_CREATION_MAP = {
     bed: NODES.LAKE_JUNGLE_BED.code
   }
 }
+
+export const UNDERGROUND_LAKE_UNDER_COUNT = 10
+export const UNDERGROUND_LAKE_CAVERNS_COUNT = 15
+export const UNDERGROUND_LAKE_RADIUS_MIN = 6
+export const UNDERGROUND_LAKE_RADIUS_MAX = 10
 
 export const CREATION_REMAP = new Map([
   [NODES.SAPROCK.code, NODES.SLATE.code],
