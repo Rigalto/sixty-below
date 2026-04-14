@@ -1,6 +1,6 @@
 import {seededRNG} from './utils.mjs'
 import {database} from './database.mjs'
-import {NODES, NODES_LOOKUP, NODE_TYPE, WEATHER_TYPE, BIOME_TYPE, WORLD_WIDTH, WORLD_HEIGHT, SEA_LEVEL, TOPSOIL_Y_SKY_SURFACE, TOPSOIL_Y_SURFACE_UNDER, TOPSOIL_Y_UNDER_CAVERNS, TOPSOIL_Y_CAVERNS_MID, BIOME_TILE_MAP, SEA_MAX_JITTER, SEA_MAX_WIDTH, SEA_MAX_HEIGHT, CLUSTER_SCATTER_MAP, ORE_GEM_SCATTER_MAP, PERLIN_OFFSET_NATURALIZER, PERLIN_OFFSET_TUNNEL, PERLIN_OFFSET_SURFACE_TUNNEL, PERLIN_OFFSET_SMALL_TUNNEL, PERLIN_OFFSET_CAVERN, PERLIN_OFFSET_HIVE, PERLIN_OFFSET_HEART, PERLIN_OFFSET_COBWEB, PERLIN_OFFSET_LAKES, SMALL_CAVERNS_COUNT, MEDIUM_CAVERNS_COUNT, UNDERGROUND_TUNNEL_COUNT, CAVERNS_TUNNEL_COUNT, SMALL_TUNNELS_COUNT, HIVE_RADIUS_MIN, HIVE_RADIUS_MAX, COBWEB_CAVE_COUNT_MIN, COBWEB_CAVE_COUNT_MAX, COBWEB_RADIUS_X_MIN, COBWEB_RADIUS_X_MAX, COBWEB_RADIUS_Y_MIN, COBWEB_RADIUS_Y_MAX, COBWEB_CAVE_MAIN_MIN, COBWEB_CAVE_MAIN_MAX, COBWEB_CAVE_SIDE_MIN, COBWEB_CAVE_SIDE_MAX, COBWEB_SCATTER_COUNT, COBWEB_SCATTER_SIZE_MIN, COBWEB_SCATTER_SIZE_MAX, GEODE_CAVE_COUNT_MIN, GEODE_CAVE_COUNT_MAX, GEODE_RADIUS_MIN, GEODE_RADIUS_MAX, GEODE_TARGET_CLUSTER_COUNT, GEODE_CLUSTER_SIZE_MIN, GEODE_CLUSTER_SIZE_MAX, TOPSOIL_SCATTER_MAP, LAKE_RADIUS_X_MIN, LAKE_RADIUS_X_MAX, LAKE_RADIUS_Y_MIN, LAKE_RADIUS_Y_MAX, LAKE_PIT_RADIUS_X_MIN, LAKE_PIT_RADIUS_X_MAX, LAKE_PIT_RADIUS_Y_MIN, LAKE_PIT_RADIUS_Y_MAX, LAKE_CREATION_MAP, UNDERGROUND_LAKE_UNDER_COUNT, UNDERGROUND_LAKE_CAVERNS_COUNT, UNDERGROUND_LAKE_RADIUS_MIN, UNDERGROUND_LAKE_RADIUS_MAX, CREATION_REMAP} from '../assets/data/data-gen.mjs'
+import {NODES, NODES_LOOKUP, NODE_TYPE, WEATHER_TYPE, BIOME_TYPE, WORLD_WIDTH, WORLD_HEIGHT, SEA_LEVEL, TOPSOIL_Y_SKY_SURFACE, TOPSOIL_Y_SURFACE_UNDER, TOPSOIL_Y_UNDER_CAVERNS, TOPSOIL_Y_CAVERNS_MID, BIOME_TILE_MAP, SEA_MAX_JITTER, SEA_MAX_WIDTH, SEA_MAX_HEIGHT, CLUSTER_SCATTER_MAP, ORE_GEM_SCATTER_MAP, PERLIN_OFFSET_NATURALIZER, PERLIN_OFFSET_TUNNEL, PERLIN_OFFSET_SURFACE_TUNNEL, PERLIN_OFFSET_SMALL_TUNNEL, PERLIN_OFFSET_CAVERN, PERLIN_OFFSET_HIVE, PERLIN_OFFSET_HEART, PERLIN_OFFSET_COBWEB, PERLIN_OFFSET_LAKES, SMALL_CAVERNS_COUNT, MEDIUM_CAVERNS_COUNT, UNDERGROUND_TUNNEL_COUNT, CAVERNS_TUNNEL_COUNT, SMALL_TUNNELS_COUNT, HIVE_RADIUS_MIN, HIVE_RADIUS_MAX, COBWEB_CAVE_COUNT_MIN, COBWEB_CAVE_COUNT_MAX, COBWEB_RADIUS_X_MIN, COBWEB_RADIUS_X_MAX, COBWEB_RADIUS_Y_MIN, COBWEB_RADIUS_Y_MAX, COBWEB_CAVE_MAIN_MIN, COBWEB_CAVE_MAIN_MAX, COBWEB_CAVE_SIDE_MIN, COBWEB_CAVE_SIDE_MAX, COBWEB_SCATTER_COUNT, COBWEB_SCATTER_SIZE_MIN, COBWEB_SCATTER_SIZE_MAX, GEODE_CAVE_COUNT_MIN, GEODE_CAVE_COUNT_MAX, GEODE_RADIUS_MIN, GEODE_RADIUS_MAX, GEODE_TARGET_CLUSTER_COUNT, GEODE_CLUSTER_SIZE_MIN, GEODE_CLUSTER_SIZE_MAX, TOPSOIL_SCATTER_MAP, LAKE_RADIUS_X_MIN, LAKE_RADIUS_X_MAX, LAKE_RADIUS_Y_MIN, LAKE_RADIUS_Y_MAX, LAKE_PIT_RADIUS_X_MIN, LAKE_PIT_RADIUS_X_MAX, LAKE_PIT_RADIUS_Y_MIN, LAKE_PIT_RADIUS_Y_MAX, LAKE_CREATION_MAP, UNDERGROUND_LAKE_UNDER_COUNT, UNDERGROUND_LAKE_CAVERNS_COUNT, UNDERGROUND_LAKE_RADIUS_MIN, UNDERGROUND_LAKE_RADIUS_MAX, BLIND_LAKE_COUNT, BLIND_LAKE_RADIUS_MIN, BLIND_LAKE_RADIUS_MAX, CREATION_REMAP} from '../assets/data/data-gen.mjs'
 
 /* ====================================================================================================
    WORLD BUFFER (CREATION DU MONDE)
@@ -189,14 +189,17 @@ class WorldGenerator {
 
     // 6.1.1 Lakes / Oasis
 
-    // ⚠️ digLakes DOIT rester en premier — il n'utilise pas #exclusions pour se placer,
+    // ⚠️ digSurfaceLakes DOIT rester en premier — il n'utilise pas #exclusions pour se placer,
     // mais alimente la table pour tous les mini-biomes suivants.
-    const surfaceLakes = worldCarver.digLakes(skySurface)
+    const surfaceLakes = worldCarver.digSurfaceLakes(skySurface)
     const lakeLiquidBodies = surfaceLakes.map(h => h.liquidBody)
     surfaceLakes.forEach(l => delete l.liquidBody)
     const underLakes = worldCarver.digUndergroundLakes(surfaceUnder, underCaverns)
     const underLakeLiquidBodies = underLakes.map(h => h.liquidBody)
     underLakes.forEach(l => delete l.liquidBody)
+    const blindLakes = worldCarver.digBlindLakes(underCaverns)
+    const blindLakeLiquidBodies = blindLakes.map(h => h.liquidBody)
+    blindLakes.forEach(l => delete l.liquidBody)
     await progress('Lakes & oasis')
 
     // 6.1.2 HIVE caves
@@ -257,11 +260,6 @@ class WorldGenerator {
     // 6.1.X Underground Lake
     // caverns_top - Forest - WATER + HUMUS
     // const undergroundlake = worldCarver.digUndergroundLake()
-
-    // 6.1.X Blind Lake
-    // caverns_bottom - Tout biomes - WATER + HARDROCK (transformé ensuite en HARDSTONE)
-    // const blindlakes = worldCarver.digBlindLakes()
-    // await progress('Deep Water Bodies')
 
     // 6.1.X Life Heart (15)
     const hearts = worldCarver.digHearts(surfaceUnder, underCaverns)
@@ -326,8 +324,8 @@ class WorldGenerator {
 
     // N. Stochage du monde en base de données
     if (!debug) {
-      const liquidBodies = [...honeyLiquidBodies, ...lakeLiquidBodies, ...underLakeLiquidBodies]
-      const lakes = [...surfaceLakes, ...underLakes]
+      const liquidBodies = [...honeyLiquidBodies, ...lakeLiquidBodies, ...underLakeLiquidBodies, ...blindLakeLiquidBodies]
+      const lakes = [...surfaceLakes, ...underLakes, ...blindLakes]
       await this.save(seed, {hives, cobwebCaves, geodeCaves, lakes, liquidBodies})
       worldBuffer.clear()
     }
@@ -2522,7 +2520,7 @@ class WorldCarver {
  * @returns {Array<{cx, cy, biome, layer, liquidBody: {index, nodeCode}}>}
  */
 
-  digLakes (skySurface) {
+  digSurfaceLakes (skySurface) {
     const lakes = []
     let prevCx = -1
 
@@ -2681,6 +2679,42 @@ class WorldCarver {
     }
 
     console.log('bbbbbbbbbbbbbbbbbb', this.#zoneRects) // DEBUG
+
+    return lakes
+  }
+
+  js/**
+ * Creuse BLIND_LAKE_COUNT lacs aveugles ellipsoïdaux bruités en caverns_bottom.
+ * Rayons plus grands que les lacs souterrains — protection TileGuard complète.
+ * Remplissage WATER différé.
+ *
+ * @param {Int16Array} underCaverns - Altitudes haute caverne par colonne X
+ * @returns {Array<{cx, cy, biome, layer, liquidBody: {index, nodeCode}}>}
+ */
+  digBlindLakes (underCaverns) {
+    const lakes = []
+
+    for (let i = 0; i < BLIND_LAKE_COUNT; i++) {
+      const radiusX = seededRNG.randomGetMinMax(BLIND_LAKE_RADIUS_MIN, BLIND_LAKE_RADIUS_MAX)
+      const radiusY = seededRNG.randomGetMinMax(BLIND_LAKE_RADIUS_MIN, BLIND_LAKE_RADIUS_MAX)
+      const cx = seededRNG.randomGetMinMax(radiusX + 2, WORLD_WIDTH - radiusX - 3)
+      const y0 = Math.round((underCaverns[cx] + 510) / 2)
+      const cy = seededRNG.randomGetMinMax(y0 + radiusY, 508 - radiusY)
+
+      if (this.isExcluded(cx - radiusX, cy - radiusY, cx + radiusX, cy + radiusY)) continue
+
+      const tiles = []
+      this.digNoisyEllipse(tiles, cx, cy, radiusX - 1, radiusX, radiusY - 1, radiusY, NODES.VOID.code, 0.3, PERLIN_OFFSET_LAKES)
+      const rect = this.applyTiles(tiles)
+      this.addExclusion(rect)
+
+      tileGuard.addNoisyEllipse(cx, cy, radiusX + 1, radiusX + 3, radiusY + 1, radiusY + 3, 0.8, PERLIN_OFFSET_LAKES)
+
+      const liquidBody = liquidFiller.fillLake(cx, cy + 1, radiusX + 4, NODES.WATER.code)
+      const biome = clusterGenerator.getRectAt(cx).biome
+
+      lakes.push({cx, cy, biome, layer: 'caverns_bottom', liquidBody})
+    }
 
     return lakes
   }
