@@ -1,6 +1,6 @@
 import {seededRNG} from './utils.mjs'
 import {database} from './database.mjs'
-import {NODES, NODES_LOOKUP, NODE_TYPE, WEATHER_TYPE, BIOME_TYPE, WORLD_WIDTH, WORLD_HEIGHT, SEA_LEVEL, TOPSOIL_Y_SKY_SURFACE, TOPSOIL_Y_SURFACE_UNDER, TOPSOIL_Y_UNDER_CAVERNS, TOPSOIL_Y_CAVERNS_MID, BIOME_TILE_MAP, SEA_MAX_JITTER, SEA_MAX_WIDTH, SEA_MAX_HEIGHT, CLUSTER_SCATTER_MAP, ORE_GEM_SCATTER_MAP, PERLIN_OFFSET_NATURALIZER, PERLIN_OFFSET_TUNNEL, PERLIN_OFFSET_SURFACE_TUNNEL, PERLIN_OFFSET_SMALL_TUNNEL, PERLIN_OFFSET_CAVERN, PERLIN_OFFSET_HIVE, PERLIN_OFFSET_HEART, PERLIN_OFFSET_COBWEB, PERLIN_OFFSET_LAKES, SMALL_CAVERNS_COUNT, MEDIUM_CAVERNS_COUNT, UNDERGROUND_TUNNEL_COUNT, CAVERNS_TUNNEL_COUNT, SMALL_TUNNELS_COUNT, HIVE_RADIUS_MIN, HIVE_RADIUS_MAX, COBWEB_CAVE_COUNT_MIN, COBWEB_CAVE_COUNT_MAX, COBWEB_RADIUS_X_MIN, COBWEB_RADIUS_X_MAX, COBWEB_RADIUS_Y_MIN, COBWEB_RADIUS_Y_MAX, COBWEB_CAVE_MAIN_MIN, COBWEB_CAVE_MAIN_MAX, COBWEB_CAVE_SIDE_MIN, COBWEB_CAVE_SIDE_MAX, COBWEB_SCATTER_COUNT, COBWEB_SCATTER_SIZE_MIN, COBWEB_SCATTER_SIZE_MAX, GEODE_CAVE_COUNT_MIN, GEODE_CAVE_COUNT_MAX, GEODE_RADIUS_MIN, GEODE_RADIUS_MAX, GEODE_TARGET_CLUSTER_COUNT, GEODE_CLUSTER_SIZE_MIN, GEODE_CLUSTER_SIZE_MAX, TOPSOIL_SCATTER_MAP, LAKE_RADIUS_X_MIN, LAKE_RADIUS_X_MAX, LAKE_RADIUS_Y_MIN, LAKE_RADIUS_Y_MAX, LAKE_PIT_RADIUS_X_MIN, LAKE_PIT_RADIUS_X_MAX, LAKE_PIT_RADIUS_Y_MIN, LAKE_PIT_RADIUS_Y_MAX, LAKE_CREATION_MAP, UNDERGROUND_LAKE_UNDER_COUNT, UNDERGROUND_LAKE_CAVERNS_COUNT, UNDERGROUND_LAKE_RADIUS_MIN, UNDERGROUND_LAKE_RADIUS_MAX, BLIND_LAKE_COUNT, BLIND_LAKE_RADIUS_MIN, BLIND_LAKE_RADIUS_MAX, SAP_LAKE_UNDER_COUNT, SAP_LAKE_CAVERNS_COUNT, SAP_LAKE_RADIUS_MIN, SAP_LAKE_RADIUS_MAX, CREATION_REMAP} from '../assets/data/data-gen.mjs'
+import {NODES, NODES_LOOKUP, NODE_TYPE, WEATHER_TYPE, BIOME_TYPE, WORLD_WIDTH, WORLD_HEIGHT, SEA_LEVEL, TOPSOIL_Y_SKY_SURFACE, TOPSOIL_Y_SURFACE_UNDER, TOPSOIL_Y_UNDER_CAVERNS, TOPSOIL_Y_CAVERNS_MID, BIOME_TILE_MAP, SEA_MAX_JITTER, SEA_MAX_WIDTH, SEA_MAX_HEIGHT, CLUSTER_SCATTER_MAP, ORE_GEM_SCATTER_MAP, PERLIN_OFFSET_NATURALIZER, PERLIN_OFFSET_TUNNEL, PERLIN_OFFSET_SURFACE_TUNNEL, PERLIN_OFFSET_SMALL_TUNNEL, PERLIN_OFFSET_CAVERN, PERLIN_OFFSET_HIVE, PERLIN_OFFSET_HEART, PERLIN_OFFSET_COBWEB, PERLIN_OFFSET_LAKES, SMALL_CAVERNS_COUNT, MEDIUM_CAVERNS_COUNT, UNDERGROUND_TUNNEL_COUNT, CAVERNS_TUNNEL_COUNT, SMALL_TUNNELS_COUNT, HIVE_RADIUS_MIN, HIVE_RADIUS_MAX, COBWEB_CAVE_COUNT_MIN, COBWEB_CAVE_COUNT_MAX, COBWEB_RADIUS_X_MIN, COBWEB_RADIUS_X_MAX, COBWEB_RADIUS_Y_MIN, COBWEB_RADIUS_Y_MAX, COBWEB_CAVE_MAIN_MIN, COBWEB_CAVE_MAIN_MAX, COBWEB_CAVE_SIDE_MIN, COBWEB_CAVE_SIDE_MAX, COBWEB_SCATTER_COUNT, COBWEB_SCATTER_SIZE_MIN, COBWEB_SCATTER_SIZE_MAX, GEODE_CAVE_COUNT_MIN, GEODE_CAVE_COUNT_MAX, GEODE_RADIUS_MIN, GEODE_RADIUS_MAX, GEODE_TARGET_CLUSTER_COUNT, GEODE_CLUSTER_SIZE_MIN, GEODE_CLUSTER_SIZE_MAX, TOPSOIL_SCATTER_MAP, LAKE_RADIUS_X_MIN, LAKE_RADIUS_X_MAX, LAKE_RADIUS_Y_MIN, LAKE_RADIUS_Y_MAX, LAKE_PIT_RADIUS_X_MIN, LAKE_PIT_RADIUS_X_MAX, LAKE_PIT_RADIUS_Y_MIN, LAKE_PIT_RADIUS_Y_MAX, LAKE_CREATION_MAP, UNDERGROUND_LAKE_UNDER_COUNT, UNDERGROUND_LAKE_CAVERNS_COUNT, UNDERGROUND_LAKE_RADIUS_MIN, UNDERGROUND_LAKE_RADIUS_MAX, BLIND_LAKE_COUNT, BLIND_LAKE_RADIUS_MIN, BLIND_LAKE_RADIUS_MAX, SAP_LAKE_UNDER_COUNT, SAP_LAKE_CAVERNS_COUNT, SAP_LAKE_RADIUS_MIN, SAP_LAKE_RADIUS_MAX, SAP_POCKET_COUNT, SAP_POCKET_RADIUS_MIN, SAP_POCKET_RADIUS_MAX, CREATION_REMAP} from '../assets/data/data-gen.mjs'
 
 /* ====================================================================================================
    WORLD BUFFER (CREATION DU MONDE)
@@ -139,7 +139,7 @@ class WorldGenerator {
     window.DEBUG_POINTS = [] // DEGUG - à supprimer
 
     // affichage de la progression de la création dans le dialogue modal
-    const STEPS = 15
+    const STEPS = 16
     let step = 0
     const progress = (topic) => {
       step++
@@ -202,9 +202,13 @@ class WorldGenerator {
     blindLakes.forEach(l => delete l.liquidBody)
     await progress('Lakes & oasis')
 
+    // 6.1.1 Sap Pockets
     const sapLakes = worldCarver.digSapLakes(surfaceUnder, underCaverns)
     const sapLakeLiquidBodies = sapLakes.map(h => h.liquidBody)
     sapLakes.forEach(l => delete l.liquidBody)
+    const sapPockets = worldCarver.digSapPockets(underCaverns)
+    const sapPocketLiquidBodies = sapPockets.map(h => h.liquidBody)
+    sapPockets.forEach(l => delete l.liquidBody)
     await progress('Sap Pockets')
 
     // 6.1.2 HIVE caves
@@ -241,10 +245,6 @@ class WorldGenerator {
     // 6.1.X Pyramid
     // le cy est tiré entre rect.yUnder et rect.yCavernsMid
     // const pyramids = worldCarver.digPyramids()
-
-    // 6.1.X Sap Pokets
-    // Caverns_bottom, jungle - ressemble à Hive - Utiliser SAPROCK pour la paroi (demi-cercle bas uniquement)
-    // const sappockets = worldCarver.digSapPockets()
 
     // 6.1.X Ancient House / Temple Ruin / Ruined Cabin
     // Caverns_top, jungle - EMERALDWALL -
@@ -329,8 +329,8 @@ class WorldGenerator {
 
     // N. Stochage du monde en base de données
     if (!debug) {
-      const liquidBodies = [...honeyLiquidBodies, ...lakeLiquidBodies, ...underLakeLiquidBodies, ...blindLakeLiquidBodies, ...sapLakeLiquidBodies]
-      const lakes = [...surfaceLakes, ...underLakes, ...blindLakes, ...sapLakes]
+      const liquidBodies = [...honeyLiquidBodies, ...lakeLiquidBodies, ...underLakeLiquidBodies, ...blindLakeLiquidBodies, ...sapLakeLiquidBodies, ...sapPocketLiquidBodies]
+      const lakes = [...surfaceLakes, ...underLakes, ...blindLakes, ...sapLakes, ...sapPockets]
       await this.save(seed, {hives, cobwebCaves, geodeCaves, lakes, liquidBodies})
       worldBuffer.clear()
     }
@@ -2769,6 +2769,48 @@ class WorldCarver {
     }
 
     return lakes
+  }
+
+  /**
+ * Creuse SAP_POCKET_COUNT poches de sève ellipsoïdales bruitées en caverns_bottom,
+ * uniquement dans le biome JUNGLE.
+ * Protection TileGuard complète. Remplissage SAP différé.
+ *
+ * @param {Int16Array} underCaverns - Altitudes haute caverne par colonne X
+ * @returns {Array<{cx, cy, biome, layer, liquidBody: {index, nodeCode}}>}
+ */
+  digSapPockets (underCaverns) {
+    const SAP = NODES.SAP.code
+    const pockets = []
+
+    const jungleRects = []
+    for (let i = 0; i < this.#zoneRects.length; i++) {
+      if (this.#zoneRects[i].biome === BIOME_TYPE.JUNGLE) jungleRects.push(this.#zoneRects[i])
+    }
+    if (jungleRects.length === 0) return pockets
+
+    for (let i = 0; i < SAP_POCKET_COUNT; i++) {
+      const radiusX = seededRNG.randomGetMinMax(SAP_POCKET_RADIUS_MIN, SAP_POCKET_RADIUS_MAX)
+      const radiusY = seededRNG.randomGetMinMax(SAP_POCKET_RADIUS_MIN, SAP_POCKET_RADIUS_MAX)
+      const rect = seededRNG.randomGetArrayValue(jungleRects)
+      const cx = seededRNG.randomGetMinMax(rect.x0 + radiusX + 2, rect.x1 - radiusX - 2)
+      const y0 = Math.round((underCaverns[cx] + 510) / 2)
+      const cy = seededRNG.randomGetMinMax(y0 + radiusY, 508 - radiusY)
+
+      if (this.isExcluded(cx - radiusX, cy - radiusY, cx + radiusX, cy + radiusY)) continue
+
+      const tiles = []
+      this.digNoisyEllipse(tiles, cx, cy, radiusX - 1, radiusX, radiusY - 1, radiusY, NODES.VOID.code, 0.3, PERLIN_OFFSET_CAVERN)
+      const applyRect = this.applyTiles(tiles)
+      this.addExclusion(applyRect)
+
+      tileGuard.addNoisyEllipse(cx, cy, radiusX + 1, radiusX + 3, radiusY + 1, radiusY + 3, 0.8, PERLIN_OFFSET_CAVERN)
+
+      const liquidBody = liquidFiller.fillLake(cx, cy + 1, radiusX + 4, SAP, SAP)
+      pockets.push({cx, cy, biome: BIOME_TYPE.JUNGLE, layer: 'caverns_bottom', liquidBody})
+    }
+
+    return pockets
   }
 
   /**
