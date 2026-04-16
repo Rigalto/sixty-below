@@ -333,6 +333,30 @@ sont indicatives — les densités exactes sont définies dans `ORE_GEM_SCATTER_
 * **Ligne de vue (LOS) :** Raycasting simple, bloqué par murs et entités.
 * **Challenges :** Sous-buts en combat pour diversifier les parties (cf. *Dofus*).
 * **Évolutivité :** Possibilité d'ajout de mécaniques spéciales (Boss).
+* **Damage types** : Piercing (bow, stinger), Slashing (sword, jaw, mandibles, tail, claws), Crushing (hammer, legs, tail, head)
+* **Damage over time (DOT)** : Poison, Fire, Bleeding
+
+### 4.3 Buffs & Debuffs Environnementaux
+
+Les dégâts subis par le joueur dépendent de sa position dans le monde, selon deux axes indépendants qui se cumulent.
+
+**Damage Type par layer** (s'intensifie avec la profondeur) :
+
+| Layer | Damage Type dominant |
+|---|---|
+| Surface | Piercing |
+| Underground | Slashing |
+| Caverns | Crushing |
+
+**DOT par biome** :
+
+| Biome | DOT |
+|---|---|
+| Forest | Bleeding |
+| Desert | Fire |
+| Jungle | Poison |
+
+Les deux effets se cumulent — un joueur en caverns_bottom dans la jungle subira du Crushing et du Poison simultanément. Des équipements et potions spécifiques permettent de résister à chaque type.
 
 ---
 
@@ -507,6 +531,12 @@ commune de la zone N+1 : la progression est continue, sans palier artificiel.
 | **MANTIS** | 4 | ★★★★☆ | Sap Pocket |
 | **BLIND FISH** | 5 | ★★★★☆ | Fish — Blind Lake |
 | **AXOLOTL** | 5 | ★★★★★ | Fish — Blind Lake |
+
+## 5.8 Flore
+
+| Nom | Tier | Type | Biome / Mini-biome / Layer | Loot |
+|---|---|---|---|
+| **COCONUT** | 1 | Tree | Sea shore, Desert Surface Lake Shore | Coconut (fruit), Coconut Fiber, Coconut Pulp, Coconut Milk |
 
 ---
 
