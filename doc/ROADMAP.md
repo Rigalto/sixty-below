@@ -15,10 +15,6 @@
 ### Tunnels
 - Densité trop élevée, notamment juste sous la surface (revoir les constantes `SMALL_TUNNELS_COUNT` et `CAVERNS_TUNNEL_COUNT`)
 
-### Mer — fuite vers le bas
-- Le remplissage de la mer n'est pas bloqué vers le bas
-- Ajouter une borne basse dans `#fillOneSea` (analogue à `maxY` existant mais côté fond)
-
 ### Topsoil
 - Placement des TOPSOIL en surface
 - Placement des TOPSOIL dans les cavernes et tunnels
@@ -38,25 +34,14 @@
 - `digPyramids()` — Desert, under, deux chambres (pièges + boss)
 - `digFossilVein()` — Desert, caverns_top, veine horizontale SHELL
 - `digMossCave()` — Jungle, under, MUD + HUMUS
-- `digUndergroundLake()` — Forest, caverns_top, WATER + HUMUS
-- `digBlindLake()` — Tous biomes, caverns_bottom, WATER + HARDSTONE
 - `digSapPockets()` — Jungle, caverns_bottom, SAPROCK + SAP
 - `digRuinedCabin()` — Forest, under, STONEWALL
 - `digTempleRuin()` — Jungle, caverns_top, EMERALDWALL + Décomposeur
 - `digAncientHouse()` — Desert, caverns_bottom, GOLDWALL + Transmutateur
 - `digAbandonedMine()` — Tous biomes, caverns_bottom, OBSIDIAN + COBALTWALL
 
-### Intrusions (mini-biomes hors biome natif)
-- `digHiveIntrusions()` — 1 monde/2, biome étranger (déjà implémenté dans `digHives`)
-- `digGeodeIntrusions()` — 1 monde/3, caverns_top (déjà implémenté dans `digGeodeCaves`)
-- `digCobwebIntrusions()` — 1 caverne systématique en under (déjà implémenté dans `digCobwebCaves`)
-
-### Peuplement différé
-- Remplissage SAP dans les Sap Pockets
-- Projection GRANITE/MARBLE sur parois des géodes (`projectAndFill` — déjà implémenté)
-
 ### Plage et fond de mer
-- Ajout des tuiles SHORE en bordure de mer
+- Ajout des tuiles SHORE et SHELL en bordure de mer
 - Placement des coraux et plantes marines
 - Ajout des coffres et objets spéciaux
 
@@ -197,9 +182,14 @@
 - `WorldCarver.digCavernsTunnels` — tunnels profonds
 - `WorldCarver.digSmallTunnels` — petites galeries
 - `WorldCarver.digHives` — ruches avec HONEY, protection TileGuard (avec intrusion 1 monde/2)
-- `WorldCarver.digCobwebCaves` — cavernes à toiles d'araignées (avec intrusion under)
+- `WorldCarver.digCobwebCaves` — cavernes à toiles d'araignées  (avec 1 intrusion en layer 'under')
 - `WorldCarver.digGeodeCaves` — géodes granite/marble (avec intrusion caverns_top)
-- `WorldCarver.digLakes` — lacs/oasis de surface avec pit, berges, fond protégés et TileGuard
+- `WorldCarver.digSurfaceLakes` — lacs/oasis de surface avec pit, berges, fond protégés et TileGuard
+- `WorldCarver.digUndergroundLakes` — lacs ouverts en profondeur, moitié inférieure du fond protégée et TileGuard
+- `WorldCarver.digBlindLakes` — lacs fermés en grande profondeur, protégée et TileGuard
+- `WorldCarver.digWaterPuddles` — flaques d'eau dans le fond des tunnels et cavernes
+- `WorldCarver.digSapLakes` — lacs de sève ouverts en profondeur, moitié inférieure du fond protégée et TileGuard (JUNGLE uniquemen)
+- `WorldCarver.digSapPockets` — poches des sève en grande profondeur, protégée et TileGuard (JUNGLE uniquemen)
 - `WorldCarver.digHearts` — placement 15 Life Cristals 2×2, under fallback caverns_top
 - `WorldCarver.digTriskels()` — placement 3 Tryskels 2×2, 2 en caverns_top fallback caverns_bottom et 1 en caverns_bottom
 - `WorldCarver.digZigzagTunnels` — tunnels zigzag avec espacement minimal et évitement des lacs
