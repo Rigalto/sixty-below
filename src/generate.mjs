@@ -1,6 +1,6 @@
 import {seededRNG} from './utils.mjs'
 import {database} from './database.mjs'
-import {NODES, NODES_LOOKUP, NODE_TYPE, WEATHER_TYPE, BIOME_TYPE, WORLD_WIDTH, WORLD_HEIGHT, SEA_LEVEL, TOPSOIL_Y_SKY_SURFACE, TOPSOIL_Y_SURFACE_UNDER, TOPSOIL_Y_UNDER_CAVERNS, TOPSOIL_Y_CAVERNS_MID, BIOME_TILE_MAP, SEA_MAX_JITTER, SEA_MAX_WIDTH, SEA_MAX_HEIGHT, CLUSTER_SCATTER_MAP, ORE_GEM_SCATTER_MAP, PERLIN_OFFSET_NATURALIZER, PERLIN_OFFSET_TUNNEL, PERLIN_OFFSET_SURFACE_TUNNEL, PERLIN_OFFSET_SMALL_TUNNEL, PERLIN_OFFSET_CAVERN, PERLIN_OFFSET_HIVE, PERLIN_OFFSET_HEART, PERLIN_OFFSET_COBWEB, PERLIN_OFFSET_LAKES, SMALL_CAVERNS_COUNT, MEDIUM_CAVERNS_COUNT, UNDERGROUND_TUNNEL_COUNT, CAVERNS_TUNNEL_COUNT, SMALL_TUNNELS_COUNT, HIVE_RADIUS_MIN, HIVE_RADIUS_MAX, COBWEB_CAVE_COUNT_MIN, COBWEB_CAVE_COUNT_MAX, COBWEB_RADIUS_X_MIN, COBWEB_RADIUS_X_MAX, COBWEB_RADIUS_Y_MIN, COBWEB_RADIUS_Y_MAX, COBWEB_CAVE_MAIN_MIN, COBWEB_CAVE_MAIN_MAX, COBWEB_CAVE_SIDE_MIN, COBWEB_CAVE_SIDE_MAX, COBWEB_SCATTER_COUNT, COBWEB_SCATTER_SIZE_MIN, COBWEB_SCATTER_SIZE_MAX, GEODE_CAVE_COUNT_MIN, GEODE_CAVE_COUNT_MAX, GEODE_RADIUS_MIN, GEODE_RADIUS_MAX, GEODE_TARGET_CLUSTER_COUNT, GEODE_CLUSTER_SIZE_MIN, GEODE_CLUSTER_SIZE_MAX, TOPSOIL_SCATTER_MAP, LAKE_RADIUS_X_MIN, LAKE_RADIUS_X_MAX, LAKE_RADIUS_Y_MIN, LAKE_RADIUS_Y_MAX, LAKE_PIT_RADIUS_X_MIN, LAKE_PIT_RADIUS_X_MAX, LAKE_PIT_RADIUS_Y_MIN, LAKE_PIT_RADIUS_Y_MAX, LAKE_CREATION_MAP, UNDERGROUND_LAKE_UNDER_COUNT, UNDERGROUND_LAKE_CAVERNS_COUNT, UNDERGROUND_LAKE_RADIUS_MIN, UNDERGROUND_LAKE_RADIUS_MAX, BLIND_LAKE_COUNT, BLIND_LAKE_RADIUS_MIN, BLIND_LAKE_RADIUS_MAX, SAP_LAKE_UNDER_COUNT, SAP_LAKE_CAVERNS_COUNT, SAP_LAKE_RADIUS_MIN, SAP_LAKE_RADIUS_MAX, SAP_POCKET_COUNT, SAP_POCKET_RADIUS_MIN, SAP_POCKET_RADIUS_MAX, CREATION_REMAP} from '../assets/data/data-gen.mjs'
+import {NODES, NODES_LOOKUP, NODE_TYPE, WEATHER_TYPE, BIOME_TYPE, WORLD_WIDTH, WORLD_HEIGHT, SEA_LEVEL, TOPSOIL_Y_SKY_SURFACE, TOPSOIL_Y_SURFACE_UNDER, TOPSOIL_Y_UNDER_CAVERNS, TOPSOIL_Y_CAVERNS_MID, BIOME_TILE_MAP, SEA_MAX_JITTER, SEA_MAX_WIDTH, SEA_MAX_HEIGHT, CLUSTER_SCATTER_MAP, ORE_GEM_SCATTER_MAP, PERLIN_OFFSET_NATURALIZER, PERLIN_OFFSET_TUNNEL, PERLIN_OFFSET_SURFACE_TUNNEL, PERLIN_OFFSET_SMALL_TUNNEL, PERLIN_OFFSET_CAVERN, PERLIN_OFFSET_HIVE, PERLIN_OFFSET_HEART, PERLIN_OFFSET_COBWEB, PERLIN_OFFSET_LAKES, SMALL_CAVERNS_COUNT, MEDIUM_CAVERNS_COUNT, UNDERGROUND_TUNNEL_COUNT, CAVERNS_TUNNEL_COUNT, SMALL_TUNNELS_COUNT, HIVE_RADIUS_MIN, HIVE_RADIUS_MAX, COBWEB_CAVE_COUNT_MIN, COBWEB_CAVE_COUNT_MAX, COBWEB_RADIUS_X_MIN, COBWEB_RADIUS_X_MAX, COBWEB_RADIUS_Y_MIN, COBWEB_RADIUS_Y_MAX, COBWEB_CAVE_MAIN_MIN, COBWEB_CAVE_MAIN_MAX, COBWEB_CAVE_SIDE_MIN, COBWEB_CAVE_SIDE_MAX, COBWEB_SCATTER_COUNT, COBWEB_SCATTER_SIZE_MIN, COBWEB_SCATTER_SIZE_MAX, GEODE_CAVE_COUNT_MIN, GEODE_CAVE_COUNT_MAX, GEODE_RADIUS_MIN, GEODE_RADIUS_MAX, GEODE_TARGET_CLUSTER_COUNT, GEODE_CLUSTER_SIZE_MIN, GEODE_CLUSTER_SIZE_MAX, TOPSOIL_SCATTER_MAP, LAKE_RADIUS_X_MIN, LAKE_RADIUS_X_MAX, LAKE_RADIUS_Y_MIN, LAKE_RADIUS_Y_MAX, LAKE_PIT_RADIUS_X_MIN, LAKE_PIT_RADIUS_X_MAX, LAKE_PIT_RADIUS_Y_MIN, LAKE_PIT_RADIUS_Y_MAX, LAKE_CREATION_MAP, UNDERGROUND_LAKE_UNDER_COUNT, UNDERGROUND_LAKE_CAVERNS_COUNT, UNDERGROUND_LAKE_RADIUS_MIN, UNDERGROUND_LAKE_RADIUS_MAX, BLIND_LAKE_COUNT, BLIND_LAKE_RADIUS_MIN, BLIND_LAKE_RADIUS_MAX, SAP_LAKE_UNDER_COUNT, SAP_LAKE_CAVERNS_COUNT, SAP_LAKE_RADIUS_MIN, SAP_LAKE_RADIUS_MAX, SAP_POCKET_COUNT, SAP_POCKET_RADIUS_MIN, SAP_POCKET_RADIUS_MAX, WATER_PUDDLE_COUNT, SAP_PUDDLE_COUNT, PUDDLE_HEIGHT_MIN, PUDDLE_HEIGHT_MAX, CREATION_REMAP} from '../assets/data/data-gen.mjs'
 
 /* ====================================================================================================
    WORLD BUFFER (CREATION DU MONDE)
@@ -139,7 +139,7 @@ class WorldGenerator {
     window.DEBUG_POINTS = [] // DEGUG - à supprimer
 
     // affichage de la progression de la création dans le dialogue modal
-    const STEPS = 16
+    const STEPS = 17
     let step = 0
     const progress = (topic) => {
       step++
@@ -284,19 +284,26 @@ class WorldGenerator {
     worldCarver.digSmallTunnels(surfaceUnder)
     await progress('Small tunnels')
 
+    // 6-3 Remplissage de la mer (gauche et droite)
+    liquidFiller.fillSea()
+    await progress('Sea Flooding')
+
+    // // 6.4. Nettoyage des tuiles isolées
+    worldCarver.cleanupAfterCarving()
+    const surfaceLine = worldCarver.buildErodedSurfaceLine()
+
+    // // 6.5. Ajout des flaques sousterraines
+    worldCarver.digWaterPuddles(surfaceUnder)
+    await progress('Puddles')
+
     // A supprimer
     // worldCarver.debugTraceTunnel()
 
     // 7. Traitement des surfaces végétales + désert - TODO
 
-    // 7.1. Ajout des topsoils / natural (forêt et jungle)
+    // 7.2. Ajout des topsoils / natural (forêt et jungle)
 
-    // 7.2. Ajout du sable (désert) - écoulement et consolidation des tunnels/cavernes
-
-    // N-7 Remplissage de la mer (gauche et droite)
-    liquidFiller.fillSea()
-    worldCarver.cleanupAfterCarving()
-    const surfaceLine = worldCarver.buildErodedSurfaceLine()
+    // 7.3. Ajout du sable (désert) - écoulement et consolidation des tunnels/cavernes
 
     // DEBUG — à supprimer après mise au point
     // window.DEBUG_SURFACE_LINE = surfaceLine
@@ -917,12 +924,13 @@ class LiquidFiller {
   }
 
   #fillOneSea (src, isLeft, maxWidth, maxY) {
+    const LIQUID_BORDER = new Set([NODES.WATER.code, NODES.SAP.code, NODES.HONEY.code])
+    const VOID = NODES.VOID.code
+    const SEA = NODES.SEA.code
+    const SANDSTONE = NODES.SANDSTONE.code
+
     const maxIndexTop = SEA_LEVEL * 1024 - 1
     const xLimit = isLeft ? maxWidth : 1023 - maxWidth
-
-    const VOID_CODE = NODES.VOID.code
-    const SEA_CODE = NODES.SEA.code
-    const SANDSTONE_CODE = NODES.SANDSTONE.code
 
     const visited = new Set()
     const queue = []
@@ -954,11 +962,20 @@ class LiquidFiller {
         // Ghost cells
         if (nx === 0 || nx === 1023 || ny === 0 || ny === 511) continue
 
-        // Limite basse
-        if (ny > maxY) continue
+        // Limite basse — rebouchage
+        if (ny >= maxY) {
+          const ahead1 = nIdx + 1024
+          const ahead2 = ahead1 + 1024
+          if (worldBuffer.readAt(ahead1) === VOID && worldBuffer.readAt(ahead2) === VOID) {
+            worldBuffer.writeAt(nIdx, SANDSTONE)
+            worldBuffer.writeAt(ahead1, SANDSTONE)
+            visited.add(nIdx)
+          }
+          continue
+        }
 
         const tileCode = worldBuffer.readAt(nIdx)
-        if (tileCode !== VOID_CODE) continue
+        if (tileCode !== VOID) continue
 
         // Limite X — rebouchage éventuel
         const atLimit = isLeft ? nx >= xLimit : nx <= xLimit
@@ -966,15 +983,27 @@ class LiquidFiller {
           const dir = nIdx - idx
           const ahead1 = nIdx + dir
           const ahead2 = ahead1 + dir
-          if (worldBuffer.readAt(ahead1) === VOID_CODE && worldBuffer.readAt(ahead2) === VOID_CODE) {
-            worldBuffer.writeAt(nIdx, SANDSTONE_CODE)
-            worldBuffer.writeAt(ahead1, SANDSTONE_CODE)
+          if (worldBuffer.readAt(ahead1) === VOID && worldBuffer.readAt(ahead2) === VOID) {
+            worldBuffer.writeAt(nIdx, SANDSTONE)
+            worldBuffer.writeAt(ahead1, SANDSTONE)
             visited.add(nIdx)
             continue
           }
         }
 
-        worldBuffer.writeAt(nIdx, SEA_CODE)
+        // Vérifier si nIdx a un voisin liquide
+        let hasLiquidNeighbor = false
+        const nNeighbors = [nIdx - 1, nIdx + 1, nIdx - 1024, nIdx + 1024]
+        for (let j = 0; j < 4; j++) {
+          if (LIQUID_BORDER.has(worldBuffer.readAt(nNeighbors[j]))) { hasLiquidNeighbor = true; break }
+        }
+        if (hasLiquidNeighbor) {
+          worldBuffer.writeAt(nIdx, SANDSTONE)
+          visited.add(nIdx)
+          continue
+        }
+
+        worldBuffer.writeAt(nIdx, SEA)
         enqueue(nIdx)
       }
     }
@@ -2681,9 +2710,6 @@ class WorldCarver {
       const x = seededRNG.randomGetMinMax(2, WORLD_WIDTH - 3)
       digOne(underCaverns[x], Math.round((underCaverns[x] + 510) / 2), 'caverns_top')
     }
-
-    console.log('bbbbbbbbbbbbbbbbbb', this.#zoneRects) // DEBUG
-
     return lakes
   }
 
@@ -2800,17 +2826,264 @@ class WorldCarver {
       if (this.isExcluded(cx - radiusX, cy - radiusY, cx + radiusX, cy + radiusY)) continue
 
       const tiles = []
-      this.digNoisyEllipse(tiles, cx, cy, radiusX - 1, radiusX, radiusY - 1, radiusY, NODES.VOID.code, 0.3, PERLIN_OFFSET_CAVERN)
+      this.digNoisyEllipse(tiles, cx, cy, radiusX - 1, radiusX, radiusY - 1, radiusY, NODES.VOID.code, 0.3, PERLIN_OFFSET_LAKES)
       const applyRect = this.applyTiles(tiles)
       this.addExclusion(applyRect)
 
-      tileGuard.addNoisyEllipse(cx, cy, radiusX + 1, radiusX + 3, radiusY + 1, radiusY + 3, 0.8, PERLIN_OFFSET_CAVERN)
+      tileGuard.addNoisyEllipse(cx, cy, radiusX + 1, radiusX + 3, radiusY + 1, radiusY + 3, 0.8, PERLIN_OFFSET_LAKES)
 
       const liquidBody = liquidFiller.fillLake(cx, cy + 1, radiusX + 4, SAP, SAP)
       pockets.push({cx, cy, biome: BIOME_TYPE.JUNGLE, layer: 'caverns_bottom', liquidBody})
     }
 
     return pockets
+  }
+
+  /**
+ * Vérifie qu'au moins une tuile de la surface supérieure de la flaque
+ * a du VOID au-dessus d'elle — détecte les poches fermées.
+ *
+ * @param {Set<number>} visited - Index des tuiles de la flaque (résultat du BFS)
+ * @param {number} yMin - Y minimal de la flaque
+ * @returns {boolean} — true si la flaque est ouverte vers le haut
+ */
+  #isPuddleOpen (visited, yMin) {
+    const VOID = NODES.VOID.code
+
+    for (const idx of visited) {
+      if ((idx >> 10) === yMin) {
+        if (worldBuffer.readAt(idx - WORLD_WIDTH) === VOID) return true
+      }
+    }
+    return false
+  }
+
+  /**
+ * Suit l'écoulement depuis (x, y) dans la direction dx jusqu'au point bas.
+ * Descend verticalement, puis se déplace latéralement si possible, et recommence.
+ * S'arrête quand le déplacement latéral est bloqué et qu'on ne peut pas descendre.
+ *
+ * @param {number} x
+ * @param {number} y
+ * @param {number} dx - Direction : 1 (droite) ou -1 (gauche)
+ * @returns {{x, y}|null} — coordonnées du point bas, ou null si ETERNAL atteint
+ */
+  #flowToBottom (x, y, dx) {
+    const VOID = NODES.VOID.code
+
+    while (true) {
+    // Descendre jusqu'au sol
+      while (worldBuffer.read(x, y + 1) === VOID) {
+        y++
+        if (ETERNAL_EXCLUDED.has(worldBuffer.read(x, y))) return null
+      }
+
+      // Regarder latéralement
+      const nx = x + dx
+      if (nx <= 1 || nx >= WORLD_WIDTH - 2) return {x, y}
+
+      if (worldBuffer.read(nx, y) === VOID) {
+        x = nx // se déplacer latéralement
+      } else {
+        return {x, y} // bloqué → point bas trouvé
+      }
+    }
+  }
+
+  /**
+ * Teste si un remplissage depuis (cx, cy) crée une flaque de hauteur valide.
+ * Descend depuis cy jusqu'à la première tuile solide, puis BFS sur les VOID adjacents.
+ * Annule si la hauteur dépasse PUDDLE_HEIGHT_MAX. Effectue le vrai fill si valide.
+ *
+ * @param {number} cx
+ * @param {number} cy - Point de départ — doit être VOID
+ * @param {number} nodeCode - Code du liquide à poser (WATER ou SAP)
+ * @returns {{index: number, nodeCode: number}|null} — null si hauteur invalide
+ */
+  #tryFillPuddle (cx, cy, nodeCode) {
+    const VOID = NODES.VOID.code
+    const yStart = cy
+
+    const visited = new Set()
+    const queue = []
+    let head = 0
+    let yMin = yStart
+
+    const src = (yStart << 10) | cx
+    visited.add(src)
+    queue.push(src)
+
+    while (head < queue.length) {
+      const idx = queue[head++]
+      const ny = idx >> 10
+
+      if (ny > yStart) return null
+      if (ny < yMin) yMin = ny
+
+      const neighbors = [idx - 1, idx + 1, idx - 1024, idx + 1024]
+      for (let i = 0; i < 4; i++) {
+        const nIdx = neighbors[i]
+        if (visited.has(nIdx)) continue
+        const nnx = nIdx & 0x3FF
+        const nny = nIdx >> 10
+        if (nnx <= 1 || nnx >= 1022 || nny <= 1 || nny >= 510) continue
+        if (nny <= yStart - PUDDLE_HEIGHT_MAX) continue
+        if (worldBuffer.readAt(nIdx) !== VOID) continue
+        visited.add(nIdx)
+        queue.push(nIdx)
+      }
+    }
+
+    if (yStart - yMin < PUDDLE_HEIGHT_MIN - 1) return null
+    if (!this.#isPuddleOpen(visited, yMin)) return null
+
+    // Vrai fill
+    for (const idx of visited) {
+      worldBuffer.writeAt(idx, nodeCode)
+    }
+
+    return {index: src, nodeCode}
+  }
+
+  #tryFillPuddle_ (cx, cy, nodeCode) {
+    const VOID = NODES.VOID.code
+    // const LIQUID_OR_GAZ = new Set([
+    //   NODES.VOID.code,
+    //   NODES.SKY.code,
+    //   NODES.FOG.code,
+    //   NODES.WATER.code,
+    //   NODES.SEA.code,
+    //   NODES.DEEPSEA.code,
+    //   NODES.HONEY.code,
+    //   NODES.SAP.code
+    // ])
+
+    // Descend jusqu'à la première tuile non VOID
+    // let y = cy
+    // while (y < WORLD_HEIGHT - 1 && worldBuffer.read(cx, y) === VOID) y++
+
+    // // La tuile sous le VOID doit être solide
+    // if (LIQUID_OR_GAZ.has(worldBuffer.read(cx, y))) return null
+
+    // const yStart = y - 1 // dernière tuile VOID au-dessus du solide
+
+    const yStart = cy
+
+    // BFS de test — sans modifier le monde
+    const visited = new Set()
+    const queue = []
+    let head = 0
+    let yMin = yStart
+    let yMax = yStart
+
+    const src = (yStart << 10) | cx
+    visited.add(src)
+    queue.push(src)
+
+    while (head < queue.length) {
+      const idx = queue[head++]
+      const ny = idx >> 10
+
+      if (ny < yMin) yMin = ny
+      if (ny > yMax) yMax = ny
+      // if (yMax - yMin > PUDDLE_HEIGHT_MAX) return null
+      if (ny > yStart) return null
+
+      const neighbors = [idx - 1, idx + 1, idx - 1024, idx + 1024]
+      for (let i = 0; i < 4; i++) {
+        const nIdx = neighbors[i]
+        if (visited.has(nIdx)) continue
+        const nnx = nIdx & 0x3FF
+        const nny = nIdx >> 10
+        if (nnx <= 1 || nnx >= 1022 || nny <= 1 || nny >= 510) continue
+        if (worldBuffer.readAt(nIdx) !== VOID) continue
+        visited.add(nIdx)
+        queue.push(nIdx)
+      }
+    }
+
+    if (yMax - yMin < PUDDLE_HEIGHT_MIN - 1) return null
+    if (!this.#isPuddleOpen(visited, yMin)) return null
+
+    // Vrai fill
+    for (const idx of visited) {
+      worldBuffer.writeAt(idx, nodeCode)
+    }
+
+    return {index: src, nodeCode, yStart, cx}
+    return {index: src, nodeCode}
+  }
+
+  /**
+ * Creuse WATER_PUDDLE_COUNT flaques d'eau dans les zones under et caverns.
+ * Hauteur comprise entre PUDDLE_HEIGHT_MIN et PUDDLE_HEIGHT_MAX tuiles.
+ *
+ * @param {Int16Array} surfaceUnder
+ * @returns {Array<{index, nodeCode}>}
+ */
+  digWaterPuddles (surfaceUnder) {
+    const WATER = NODES.WATER.code
+    const liquidBodies = []
+    let attempts = 0
+    let count = 0
+
+    while (count < WATER_PUDDLE_COUNT && attempts < WATER_PUDDLE_COUNT * 100) {
+      attempts++
+      const x = seededRNG.randomGetMinMax(2, WORLD_WIDTH - 3)
+      const y = seededRNG.randomGetMinMax(surfaceUnder[x], WORLD_HEIGHT - 32)
+      if (worldBuffer.read(x, y) !== NODES.VOID.code) continue
+
+      // recherche d'un point bas
+      const dx = seededRNG.randomGetBool() ? 1 : -1
+      const bottom1 = this.#flowToBottom(x, y, dx)
+      if (bottom1) {
+        console.log('BBBBBBBBBBBBBBBBBBBBd', {x, y, bottom1, value1: worldBuffer.read(x, y), value2: worldBuffer.read(bottom1.x, bottom1.y)})
+        const lb = this.#tryFillPuddle(bottom1.x, bottom1.y, WATER)
+        if (lb) { liquidBodies.push(lb); count++ }
+      }
+      if (count < WATER_PUDDLE_COUNT) {
+        const bottom2 = this.#flowToBottom(x, y, -dx)
+        if (bottom2) {
+          const lb = this.#tryFillPuddle(bottom2.x, bottom2.y, WATER)
+          if (lb) { liquidBodies.push(lb); count++ }
+        }
+      }
+    }
+
+    console.log('BBBBBBBBBBBBBBBBC digWaterPuddles', {WATER_PUDDLE_COUNT, liquidBodies})
+
+    return liquidBodies
+  }
+
+  /**
+ * Creuse SAP_PUDDLE_COUNT flaques de sève dans les zones under et caverns,
+ * uniquement en biome JUNGLE.
+ *
+ * @param {Int16Array} surfaceUnder
+ * @returns {Array<{index, nodeCode}>}
+ */
+  digSapPuddles (surfaceUnder) {
+    const liquidBodies = []
+    const jungleRects = []
+    for (let i = 0; i < this.#zoneRects.length; i++) {
+      if (this.#zoneRects[i].biome === BIOME_TYPE.JUNGLE) jungleRects.push(this.#zoneRects[i])
+    }
+    if (jungleRects.length === 0) return liquidBodies
+
+    let attempts = 0
+    let count = 0
+
+    while (count < SAP_PUDDLE_COUNT && attempts < SAP_PUDDLE_COUNT * 10) {
+      attempts++
+      const rect = seededRNG.randomGetArrayValue(jungleRects)
+      const x = seededRNG.randomGetMinMax(rect.x0 + 2, rect.x1 - 2)
+      const y = seededRNG.randomGetMinMax(surfaceUnder[x], WORLD_HEIGHT - 32)
+      if (worldBuffer.read(x, y) !== NODES.VOID.code) continue
+      const lb = this.#tryFillPuddle(x, y, NODES.SAP.code)
+      if (lb) { liquidBodies.push(lb); count++ }
+    }
+
+    return liquidBodies
   }
 
   /**

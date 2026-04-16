@@ -412,6 +412,11 @@ export const SAP_POCKET_COUNT = BLIND_LAKE_COUNT >> 1
 export const SAP_POCKET_RADIUS_MIN = BLIND_LAKE_RADIUS_MIN + 1
 export const SAP_POCKET_RADIUS_MAX = BLIND_LAKE_RADIUS_MAX + 1
 
+export const WATER_PUDDLE_COUNT = 80
+export const SAP_PUDDLE_COUNT = 20
+export const PUDDLE_HEIGHT_MIN = 2
+export const PUDDLE_HEIGHT_MAX = 3
+
 export const CREATION_REMAP = new Map([
   [NODES.SAPROCK.code, NODES.SLATE.code],
   [NODES.HARDROCK.code, NODES.HARDSTONE.code],
