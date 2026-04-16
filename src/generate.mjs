@@ -293,7 +293,8 @@ class WorldGenerator {
     const surfaceLine = worldCarver.buildErodedSurfaceLine()
 
     // // 6.5. Ajout des flaques sousterraines
-    worldCarver.digWaterPuddles(surfaceUnder)
+    const waterPuddleLiquidBodies = worldCarver.digWaterPuddles(surfaceUnder)
+    const sapPuddleLiquidBodies = worldCarver.digSapPuddles(surfaceUnder)
     await progress('Puddles')
 
     // A supprimer
@@ -336,7 +337,7 @@ class WorldGenerator {
 
     // N. Stochage du monde en base de données
     if (!debug) {
-      const liquidBodies = [...honeyLiquidBodies, ...lakeLiquidBodies, ...underLakeLiquidBodies, ...blindLakeLiquidBodies, ...sapLakeLiquidBodies, ...sapPocketLiquidBodies]
+      const liquidBodies = [...honeyLiquidBodies, ...lakeLiquidBodies, ...underLakeLiquidBodies, ...blindLakeLiquidBodies, ...sapLakeLiquidBodies, ...sapPocketLiquidBodies, ...waterPuddleLiquidBodies, ...sapPuddleLiquidBodies]
       const lakes = [...surfaceLakes, ...underLakes, ...blindLakes, ...sapLakes, ...sapPockets]
       await this.save(seed, {hives, cobwebCaves, geodeCaves, lakes, liquidBodies})
       worldBuffer.clear()
@@ -2902,12 +2903,15 @@ class WorldCarver {
  */
   #tryFillPuddle (cx, cy, nodeCode) {
     const VOID = NODES.VOID.code
+    const LIQUID = new Set([NODES.WATER.code, NODES.SEA.code, NODES.HONEY.code, NODES.SAP.code])
     const yStart = cy
 
     const visited = new Set()
     const queue = []
     let head = 0
     let yMin = yStart
+
+    if (LIQUID.has(worldBuffer.read(cx, cy + 1))) return null
 
     const src = (yStart << 10) | cx
     visited.add(src)
@@ -2928,7 +2932,10 @@ class WorldCarver {
         const nny = nIdx >> 10
         if (nnx <= 1 || nnx >= 1022 || nny <= 1 || nny >= 510) continue
         if (nny <= yStart - PUDDLE_HEIGHT_MAX) continue
-        if (worldBuffer.readAt(nIdx) !== VOID) continue
+        if (worldBuffer.readAt(nIdx) !== VOID) {
+          if (LIQUID.has(worldBuffer.readAt(nIdx))) return null
+          continue
+        }
         visited.add(nIdx)
         queue.push(nIdx)
       }
@@ -2942,75 +2949,7 @@ class WorldCarver {
       worldBuffer.writeAt(idx, nodeCode)
     }
 
-    return {index: src, nodeCode}
-  }
-
-  #tryFillPuddle_ (cx, cy, nodeCode) {
-    const VOID = NODES.VOID.code
-    // const LIQUID_OR_GAZ = new Set([
-    //   NODES.VOID.code,
-    //   NODES.SKY.code,
-    //   NODES.FOG.code,
-    //   NODES.WATER.code,
-    //   NODES.SEA.code,
-    //   NODES.DEEPSEA.code,
-    //   NODES.HONEY.code,
-    //   NODES.SAP.code
-    // ])
-
-    // Descend jusqu'à la première tuile non VOID
-    // let y = cy
-    // while (y < WORLD_HEIGHT - 1 && worldBuffer.read(cx, y) === VOID) y++
-
-    // // La tuile sous le VOID doit être solide
-    // if (LIQUID_OR_GAZ.has(worldBuffer.read(cx, y))) return null
-
-    // const yStart = y - 1 // dernière tuile VOID au-dessus du solide
-
-    const yStart = cy
-
-    // BFS de test — sans modifier le monde
-    const visited = new Set()
-    const queue = []
-    let head = 0
-    let yMin = yStart
-    let yMax = yStart
-
-    const src = (yStart << 10) | cx
-    visited.add(src)
-    queue.push(src)
-
-    while (head < queue.length) {
-      const idx = queue[head++]
-      const ny = idx >> 10
-
-      if (ny < yMin) yMin = ny
-      if (ny > yMax) yMax = ny
-      // if (yMax - yMin > PUDDLE_HEIGHT_MAX) return null
-      if (ny > yStart) return null
-
-      const neighbors = [idx - 1, idx + 1, idx - 1024, idx + 1024]
-      for (let i = 0; i < 4; i++) {
-        const nIdx = neighbors[i]
-        if (visited.has(nIdx)) continue
-        const nnx = nIdx & 0x3FF
-        const nny = nIdx >> 10
-        if (nnx <= 1 || nnx >= 1022 || nny <= 1 || nny >= 510) continue
-        if (worldBuffer.readAt(nIdx) !== VOID) continue
-        visited.add(nIdx)
-        queue.push(nIdx)
-      }
-    }
-
-    if (yMax - yMin < PUDDLE_HEIGHT_MIN - 1) return null
-    if (!this.#isPuddleOpen(visited, yMin)) return null
-
-    // Vrai fill
-    for (const idx of visited) {
-      worldBuffer.writeAt(idx, nodeCode)
-    }
-
-    return {index: src, nodeCode, yStart, cx}
+    // return {index: src, nodeCode, cx, yStart}
     return {index: src, nodeCode}
   }
 
@@ -3037,7 +2976,6 @@ class WorldCarver {
       const dx = seededRNG.randomGetBool() ? 1 : -1
       const bottom1 = this.#flowToBottom(x, y, dx)
       if (bottom1) {
-        console.log('BBBBBBBBBBBBBBBBBBBBd', {x, y, bottom1, value1: worldBuffer.read(x, y), value2: worldBuffer.read(bottom1.x, bottom1.y)})
         const lb = this.#tryFillPuddle(bottom1.x, bottom1.y, WATER)
         if (lb) { liquidBodies.push(lb); count++ }
       }
@@ -3063,6 +3001,7 @@ class WorldCarver {
  * @returns {Array<{index, nodeCode}>}
  */
   digSapPuddles (surfaceUnder) {
+    const SAP = NODES.SAP.code
     const liquidBodies = []
     const jungleRects = []
     for (let i = 0; i < this.#zoneRects.length; i++) {
@@ -3073,15 +3012,29 @@ class WorldCarver {
     let attempts = 0
     let count = 0
 
-    while (count < SAP_PUDDLE_COUNT && attempts < SAP_PUDDLE_COUNT * 10) {
+    while (count < SAP_PUDDLE_COUNT && attempts < SAP_PUDDLE_COUNT * 100) {
       attempts++
       const rect = seededRNG.randomGetArrayValue(jungleRects)
       const x = seededRNG.randomGetMinMax(rect.x0 + 2, rect.x1 - 2)
       const y = seededRNG.randomGetMinMax(surfaceUnder[x], WORLD_HEIGHT - 32)
       if (worldBuffer.read(x, y) !== NODES.VOID.code) continue
-      const lb = this.#tryFillPuddle(x, y, NODES.SAP.code)
-      if (lb) { liquidBodies.push(lb); count++ }
+
+      const dx = seededRNG.randomGetBool() ? 1 : -1
+      const bottom1 = this.#flowToBottom(x, y, dx)
+      if (bottom1) {
+        const lb = this.#tryFillPuddle(bottom1.x, bottom1.y, SAP)
+        if (lb) { liquidBodies.push(lb); count++ }
+      }
+      if (count < SAP_PUDDLE_COUNT) {
+        const bottom2 = this.#flowToBottom(x, y, -dx)
+        if (bottom2) {
+          const lb = this.#tryFillPuddle(bottom2.x, bottom2.y, SAP)
+          if (lb) { liquidBodies.push(lb); count++ }
+        }
+      }
     }
+
+    console.log('BBBBBBBBBBBBBBBBC digSapPuddles', {SAP_PUDDLE_COUNT, liquidBodies})
 
     return liquidBodies
   }
