@@ -339,7 +339,9 @@ export const PERLIN_OFFSET_CAVERN = 500
 export const PERLIN_OFFSET_HIVE = 600
 export const PERLIN_OFFSET_COBWEB = 700
 export const PERLIN_OFFSET_LAKES = 800
+export const PERLIN_OFFSET_SHELL = 900
 export const PERLIN_OFFSET_HEART = 1000
+export const PERLIN_OFFSET_FERNS = 1100
 
 export const SMALL_CAVERNS_COUNT = 80
 export const MEDIUM_CAVERNS_COUNT = 120
@@ -371,6 +373,8 @@ export const GEODE_TARGET_CLUSTER_COUNT = 20
 export const GEODE_CLUSTER_SIZE_MIN = 4
 export const GEODE_CLUSTER_SIZE_MAX = 8
 
+export const FOSSIL_VEIN_COUNT = 6
+
 export const LAKE_RADIUS_X_MIN = 8
 export const LAKE_RADIUS_X_MAX = 12
 export const LAKE_RADIUS_Y_MIN = 4
@@ -381,16 +385,16 @@ export const LAKE_PIT_RADIUS_Y_MIN = 5
 export const LAKE_PIT_RADIUS_Y_MAX = 7
 export const LAKE_CREATION_MAP = {
   [BIOME_TYPE.FOREST]: {
-    side: NODES.LAKE_FOREST_SIDE.code,
-    bed: NODES.LAKE_FOREST_BED.code
+    side: NODES.CLAY.code,
+    bed: NODES.STONE.code
   },
   [BIOME_TYPE.DESERT]: {
-    side: NODES.LAKE_DESERT_SIDE.code,
-    bed: NODES.LAKE_DESERT_BED.code
+    side: NODES.SAND.code,
+    bed: NODES.SANDSTONE.code
   },
   [BIOME_TYPE.JUNGLE]: {
-    side: NODES.LAKE_JUNGLE_SIDE.code,
-    bed: NODES.LAKE_JUNGLE_BED.code
+    side: NODES.MUD.code,
+    bed: NODES.LIMESTONE.code
   }
 }
 
@@ -416,6 +420,11 @@ export const WATER_PUDDLE_COUNT = 80
 export const SAP_PUDDLE_COUNT = 20
 export const PUDDLE_HEIGHT_MIN = 2
 export const PUDDLE_HEIGHT_MAX = 3
+
+export const FERN_CAVE_RADIUS_X_MIN = 18
+export const FERN_CAVE_RADIUS_X_MAX = 22
+export const FERN_CAVE_RADIUS_Y_MIN = 6
+export const FERN_CAVE_RADIUS_Y_MAX = 12
 
 export const CREATION_REMAP = new Map([
   [NODES.SAPROCK.code, NODES.SLATE.code],

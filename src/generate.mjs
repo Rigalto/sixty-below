@@ -1,6 +1,6 @@
 import {seededRNG} from './utils.mjs'
 import {database} from './database.mjs'
-import {NODES, NODES_LOOKUP, NODE_TYPE, WEATHER_TYPE, BIOME_TYPE, WORLD_WIDTH, WORLD_HEIGHT, SEA_LEVEL, TOPSOIL_Y_SKY_SURFACE, TOPSOIL_Y_SURFACE_UNDER, TOPSOIL_Y_UNDER_CAVERNS, TOPSOIL_Y_CAVERNS_MID, BIOME_TILE_MAP, SEA_MAX_JITTER, SEA_MAX_WIDTH, SEA_MAX_HEIGHT, CLUSTER_SCATTER_MAP, ORE_GEM_SCATTER_MAP, PERLIN_OFFSET_NATURALIZER, PERLIN_OFFSET_TUNNEL, PERLIN_OFFSET_SURFACE_TUNNEL, PERLIN_OFFSET_SMALL_TUNNEL, PERLIN_OFFSET_CAVERN, PERLIN_OFFSET_HIVE, PERLIN_OFFSET_HEART, PERLIN_OFFSET_COBWEB, PERLIN_OFFSET_LAKES, SMALL_CAVERNS_COUNT, MEDIUM_CAVERNS_COUNT, UNDERGROUND_TUNNEL_COUNT, CAVERNS_TUNNEL_COUNT, SMALL_TUNNELS_COUNT, HIVE_RADIUS_MIN, HIVE_RADIUS_MAX, COBWEB_CAVE_COUNT_MIN, COBWEB_CAVE_COUNT_MAX, COBWEB_RADIUS_X_MIN, COBWEB_RADIUS_X_MAX, COBWEB_RADIUS_Y_MIN, COBWEB_RADIUS_Y_MAX, COBWEB_CAVE_MAIN_MIN, COBWEB_CAVE_MAIN_MAX, COBWEB_CAVE_SIDE_MIN, COBWEB_CAVE_SIDE_MAX, COBWEB_SCATTER_COUNT, COBWEB_SCATTER_SIZE_MIN, COBWEB_SCATTER_SIZE_MAX, GEODE_CAVE_COUNT_MIN, GEODE_CAVE_COUNT_MAX, GEODE_RADIUS_MIN, GEODE_RADIUS_MAX, GEODE_TARGET_CLUSTER_COUNT, GEODE_CLUSTER_SIZE_MIN, GEODE_CLUSTER_SIZE_MAX, TOPSOIL_SCATTER_MAP, LAKE_RADIUS_X_MIN, LAKE_RADIUS_X_MAX, LAKE_RADIUS_Y_MIN, LAKE_RADIUS_Y_MAX, LAKE_PIT_RADIUS_X_MIN, LAKE_PIT_RADIUS_X_MAX, LAKE_PIT_RADIUS_Y_MIN, LAKE_PIT_RADIUS_Y_MAX, LAKE_CREATION_MAP, UNDERGROUND_LAKE_UNDER_COUNT, UNDERGROUND_LAKE_CAVERNS_COUNT, UNDERGROUND_LAKE_RADIUS_MIN, UNDERGROUND_LAKE_RADIUS_MAX, BLIND_LAKE_COUNT, BLIND_LAKE_RADIUS_MIN, BLIND_LAKE_RADIUS_MAX, SAP_LAKE_UNDER_COUNT, SAP_LAKE_CAVERNS_COUNT, SAP_LAKE_RADIUS_MIN, SAP_LAKE_RADIUS_MAX, SAP_POCKET_COUNT, SAP_POCKET_RADIUS_MIN, SAP_POCKET_RADIUS_MAX, WATER_PUDDLE_COUNT, SAP_PUDDLE_COUNT, PUDDLE_HEIGHT_MIN, PUDDLE_HEIGHT_MAX, CREATION_REMAP} from '../assets/data/data-gen.mjs'
+import {NODES, NODES_LOOKUP, NODE_TYPE, WEATHER_TYPE, BIOME_TYPE, WORLD_WIDTH, WORLD_HEIGHT, SEA_LEVEL, TOPSOIL_Y_SKY_SURFACE, TOPSOIL_Y_SURFACE_UNDER, TOPSOIL_Y_UNDER_CAVERNS, TOPSOIL_Y_CAVERNS_MID, BIOME_TILE_MAP, SEA_MAX_JITTER, SEA_MAX_WIDTH, SEA_MAX_HEIGHT, CLUSTER_SCATTER_MAP, ORE_GEM_SCATTER_MAP, PERLIN_OFFSET_NATURALIZER, PERLIN_OFFSET_TUNNEL, PERLIN_OFFSET_SURFACE_TUNNEL, PERLIN_OFFSET_SMALL_TUNNEL, PERLIN_OFFSET_CAVERN, PERLIN_OFFSET_HIVE, PERLIN_OFFSET_HEART, PERLIN_OFFSET_COBWEB, PERLIN_OFFSET_FERNS, PERLIN_OFFSET_LAKES, PERLIN_OFFSET_SHELL, SMALL_CAVERNS_COUNT, MEDIUM_CAVERNS_COUNT, UNDERGROUND_TUNNEL_COUNT, CAVERNS_TUNNEL_COUNT, SMALL_TUNNELS_COUNT, HIVE_RADIUS_MIN, HIVE_RADIUS_MAX, COBWEB_CAVE_COUNT_MIN, COBWEB_CAVE_COUNT_MAX, COBWEB_RADIUS_X_MIN, COBWEB_RADIUS_X_MAX, COBWEB_RADIUS_Y_MIN, COBWEB_RADIUS_Y_MAX, COBWEB_CAVE_MAIN_MIN, COBWEB_CAVE_MAIN_MAX, COBWEB_CAVE_SIDE_MIN, COBWEB_CAVE_SIDE_MAX, COBWEB_SCATTER_COUNT, COBWEB_SCATTER_SIZE_MIN, COBWEB_SCATTER_SIZE_MAX, GEODE_CAVE_COUNT_MIN, GEODE_CAVE_COUNT_MAX, GEODE_RADIUS_MIN, GEODE_RADIUS_MAX, GEODE_TARGET_CLUSTER_COUNT, GEODE_CLUSTER_SIZE_MIN, GEODE_CLUSTER_SIZE_MAX, TOPSOIL_SCATTER_MAP, LAKE_RADIUS_X_MIN, LAKE_RADIUS_X_MAX, LAKE_RADIUS_Y_MIN, LAKE_RADIUS_Y_MAX, LAKE_PIT_RADIUS_X_MIN, LAKE_PIT_RADIUS_X_MAX, LAKE_PIT_RADIUS_Y_MIN, LAKE_PIT_RADIUS_Y_MAX, LAKE_CREATION_MAP, UNDERGROUND_LAKE_UNDER_COUNT, UNDERGROUND_LAKE_CAVERNS_COUNT, UNDERGROUND_LAKE_RADIUS_MIN, UNDERGROUND_LAKE_RADIUS_MAX, BLIND_LAKE_COUNT, BLIND_LAKE_RADIUS_MIN, BLIND_LAKE_RADIUS_MAX, SAP_LAKE_UNDER_COUNT, SAP_LAKE_CAVERNS_COUNT, SAP_LAKE_RADIUS_MIN, SAP_LAKE_RADIUS_MAX, SAP_POCKET_COUNT, SAP_POCKET_RADIUS_MIN, SAP_POCKET_RADIUS_MAX, WATER_PUDDLE_COUNT, SAP_PUDDLE_COUNT, PUDDLE_HEIGHT_MIN, PUDDLE_HEIGHT_MAX, FOSSIL_VEIN_COUNT, FERN_CAVE_RADIUS_X_MIN, FERN_CAVE_RADIUS_X_MAX, FERN_CAVE_RADIUS_Y_MIN, FERN_CAVE_RADIUS_Y_MAX, CREATION_REMAP} from '../assets/data/data-gen.mjs'
 
 /* ====================================================================================================
    WORLD BUFFER (CREATION DU MONDE)
@@ -202,7 +202,10 @@ class WorldGenerator {
     blindLakes.forEach(l => delete l.liquidBody)
     await progress('Lakes & oasis')
 
-    // 6.1.1 Sap Pockets
+    // 6.1.2 Fossil Veins
+    worldCarver.digFossilVeins()
+
+    // 6.1.3 Sap Pockets
     const sapLakes = worldCarver.digSapLakes(surfaceUnder, underCaverns)
     const sapLakeLiquidBodies = sapLakes.map(h => h.liquidBody)
     sapLakes.forEach(l => delete l.liquidBody)
@@ -211,16 +214,16 @@ class WorldGenerator {
     sapPockets.forEach(l => delete l.liquidBody)
     await progress('Sap Pockets')
 
-    // 6.1.2 HIVE caves
+    // 6.1.5 HIVE caves
     const hives = worldCarver.digHives(biomeCounts)
     const honeyLiquidBodies = hives.map(h => h.liquidBody)
     await progress('Hives')
 
-    // 6.1.3 Cobweb caves
+    // 6.1.6 Cobweb caves
     const cobwebCaves = worldCarver.digCobwebCaves()
     await progress('Cobweb caves')
 
-    // 6.1.4 Marble caves et  Granite caves
+    // 6.1.7 Marble caves et  Granite caves
     const graniteCaves = worldCarver.digGeodeCaves(NODES.GRANITE.code)
     const marbleCaves = worldCarver.digGeodeCaves(NODES.MARBLE.code)
     const geodeCaves = graniteCaves.concat(marbleCaves)
@@ -238,9 +241,8 @@ class WorldGenerator {
     // 6.1.X Antilion Pit
     // const antilions = worldCarver.digAntilionPits()
 
-    // 6.1.X Fern Caves
-    // Under, forest
-    // const ferns = worldCarver.digFernCaves()
+    // 6.1.X Fern Caves (Under, Forest)
+    const ferns = worldCarver.digFernCaves()
 
     // 6.1.X Pyramid
     // le cy est tiré entre rect.yUnder et rect.yCavernsMid
@@ -273,16 +275,16 @@ class WorldGenerator {
     console.log('>>>>>>>>>>> hearts et triskels', hearts, triskels)
 
     // 6.2 Creusement des tunnels et cavernes
-    worldCarver.digZigzagTunnels(surfaceLakes)
-    worldCarver.digSurfaceTunnel(skySurface, surfaceLakes)
-    await progress('Surface tunnels')
-    worldCarver.digSmallCaverns(surfaceUnder)
-    await progress('Caverns')
-    worldCarver.digUndergroundTunnels(surfaceUnder, underCaverns)
-    worldCarver.digCavernsTunnels(underCaverns)
-    await progress('Deep tunnels')
-    worldCarver.digSmallTunnels(surfaceUnder)
-    await progress('Small tunnels')
+    // worldCarver.digZigzagTunnels(surfaceLakes)
+    // worldCarver.digSurfaceTunnel(skySurface, surfaceLakes)
+    // await progress('Surface tunnels')
+    // worldCarver.digSmallCaverns(surfaceUnder)
+    // await progress('Caverns')
+    // worldCarver.digUndergroundTunnels(surfaceUnder, underCaverns)
+    // worldCarver.digCavernsTunnels(underCaverns)
+    // await progress('Deep tunnels')
+    // worldCarver.digSmallTunnels(surfaceUnder)
+    // await progress('Small tunnels')
 
     // 6-3 Remplissage de la mer (gauche et droite)
     liquidFiller.fillSea()
@@ -339,11 +341,11 @@ class WorldGenerator {
     if (!debug) {
       const liquidBodies = [...honeyLiquidBodies, ...lakeLiquidBodies, ...underLakeLiquidBodies, ...blindLakeLiquidBodies, ...sapLakeLiquidBodies, ...sapPocketLiquidBodies, ...waterPuddleLiquidBodies, ...sapPuddleLiquidBodies]
       const lakes = [...surfaceLakes, ...underLakes, ...blindLakes, ...sapLakes, ...sapPockets]
-      await this.save(seed, {hives, cobwebCaves, geodeCaves, lakes, liquidBodies})
+      await this.save(seed, {hives, cobwebCaves, geodeCaves, lakes, liquidBodies, ferns})
       worldBuffer.clear()
     }
 
-    // tileGuard.debug() // DEBUG
+    tileGuard.debug() // DEBUG
 
     // N + 1. On repasse le générateur de nombres aléatoires en mode aléatoire
     seededRNG.init()
@@ -352,7 +354,7 @@ class WorldGenerator {
     if (debug) { return worldBuffer } // appelant responsable du clear()
   }
 
-  async save (seed, {hives, cobwebCaves, geodeCaves, lakes, liquidBodies}) {
+  async save (seed, {hives, cobwebCaves, geodeCaves, lakes, liquidBodies, ferns}) {
     const start = window.performance.now()
     // 1. Sauvegarde des tuiles
     await database.clearObjectStore('world_chunks')
@@ -395,7 +397,8 @@ class WorldGenerator {
       {key: 'hives', value: JSON.stringify(hives)},
       {key: 'cobwebcaves', value: JSON.stringify(cobwebCaves)},
       {key: 'lakes', value: JSON.stringify(lakes)},
-      {key: 'geodecaves', value: JSON.stringify(geodeCaves)}
+      {key: 'geodecaves', value: JSON.stringify(geodeCaves)},
+      {key: 'ferns', value: JSON.stringify(ferns)}
 
       // {key: 'honeysurface', value: this.honeysurface.join('|')}
     ])
@@ -1941,6 +1944,43 @@ class TileGuard {
   }
 
   /**
+ * Protège les tuiles d'un rectangle bruité (Perlin noise) sur les 4 bords.
+ * Même algorithme que addNoisyEllipse — distance de Chebyshev normalisée.
+ *
+ * @param {number} cx
+ * @param {number} cy
+ * @param {number} radiusXMin
+ * @param {number} radiusXMax
+ * @param {number} radiusYMin
+ * @param {number} radiusYMax
+ * @param {number} frequency
+ * @param {number} offsetX
+ */
+  addNoisyRect (cx, cy, radiusXMin, radiusXMax, radiusYMin, radiusYMax, frequency = 0.3, offsetX = 0) {
+    const radiusX = (radiusXMin + radiusXMax) >> 1
+    const radiusY = (radiusYMin + radiusYMax) >> 1
+    const spreadX = radiusXMax - radiusXMin
+    const spreadY = radiusYMax - radiusYMin
+    const period = 1 / frequency
+
+    for (let dy = -radiusYMax; dy <= radiusYMax; dy++) {
+      for (let dx = -radiusXMax; dx <= radiusXMax; dx++) {
+        const dist = Math.max(Math.abs(dx) / radiusX, Math.abs(dy) / radiusY)
+
+        const noise = seededRNG.randomPerlin((cx + dx + offsetX) / period, (cy + dy) / period)
+        const spread = (spreadX + spreadY) * 0.5
+        const threshold = 1 + (noise * 2 - 1) * (spread / ((radiusX + radiusY) * 0.5))
+
+        if (dist > threshold) continue
+        const x = cx + dx
+        const y = cy + dy
+        if (x < 1 || x >= WORLD_WIDTH - 1 || y < 1 || y >= WORLD_HEIGHT - 1) continue
+        this.#tiles.add((y << 10) | x)
+      }
+    }
+  }
+
+  /**
  * DEBUG — affiche les tuiles protégées en orange dans WorldMapDebug.
  * Commenter/décommenter l'appel dans generate() pour activer/désactiver.
  */
@@ -2106,6 +2146,45 @@ class WorldCarver {
   }
 
   /**
+ * Creuse un rectangle bruité (Perlin noise) sur les 4 bords.
+ * Même algorithme que digNoisyEllipse — distance de Chebyshev normalisée.
+ *
+ * @param {Array} tiles
+ * @param {number} cx
+ * @param {number} cy
+ * @param {number} radiusXMin
+ * @param {number} radiusXMax
+ * @param {number} radiusYMin
+ * @param {number} radiusYMax
+ * @param {number} code
+ * @param {number} frequency
+ * @param {number} offsetX
+ */
+  digNoisyRect (tiles, cx, cy, radiusXMin, radiusXMax, radiusYMin, radiusYMax, code, frequency = 0.3, offsetX = 0) {
+    const radiusX = (radiusXMin + radiusXMax) >> 1
+    const radiusY = (radiusYMin + radiusYMax) >> 1
+    const spreadX = radiusXMax - radiusXMin
+    const spreadY = radiusYMax - radiusYMin
+    const period = 1 / frequency
+
+    for (let dy = -radiusYMax; dy <= radiusYMax; dy++) {
+      for (let dx = -radiusXMax; dx <= radiusXMax; dx++) {
+        const dist = Math.max(Math.abs(dx) / radiusX, Math.abs(dy) / radiusY)
+
+        const noise = seededRNG.randomPerlin((cx + dx + offsetX) / period, (cy + dy) / period)
+        const spread = (spreadX + spreadY) * 0.5
+        const threshold = 1 + (noise * 2 - 1) * (spread / ((radiusX + radiusY) * 0.5))
+
+        if (dist > threshold) continue
+        const x = cx + dx
+        const y = cy + dy
+        if (x < 1 || x >= WORLD_WIDTH - 1 || y < 1 || y >= WORLD_HEIGHT - 1) continue
+        tiles.push({x, y, index: (y << 10) | x, code})
+      }
+    }
+  }
+
+  /**
  * Applique une liste de tuiles dans worldBuffer.
  * Protège les tuiles ETERNAL (FOG, DEEPSEA, BASALT, LAVA), SKY et VOID.
  * Retourne le rectangle englobant des tuiles effectivement écrites.
@@ -2157,8 +2236,9 @@ class WorldCarver {
 
     while (length < maxLength) {
       alpha += seededRNG.randomReal(-dAlpha, dAlpha)
-      const dx = Math.ceil(radius * Math.sin(alpha))
-      const dy = Math.ceil(radius * Math.cos(alpha))
+      const dx = Math.round(radius * Math.sin(alpha))
+      const dy = Math.round(radius * Math.cos(alpha))
+
       length += 0.8 * Math.hypot(dx, dy)
       x = x + dx
       y = y - dy
@@ -2336,8 +2416,6 @@ class WorldCarver {
       let aborted = false
 
       while (length < lengthMax) {
-        // window.DEBUG_POINTS.push({x, y, color: 'yellow'}) // DEBUG
-
         const segmentLength = seededRNG.randomGetMinMax(lengthMax / 5 | 0, lengthMax / 4 | 0)
         const angle = seededRNG.randomGetBool()
           ? seededRNG.randomGetMinMax(130, 160)
@@ -2696,7 +2774,6 @@ class WorldCarver {
 
       const biome = clusterGenerator.getRectAt(cx).biome
       lakes.push({cx, cy, biome, layer, liquidBody})
-      window.DEBUG_POINTS.push({x: cx, y: cy, color: 'orange'}) // DEBUG
     }
 
     for (let i = 0; i < UNDERGROUND_LAKE_UNDER_COUNT; i++) {
@@ -2711,7 +2788,7 @@ class WorldCarver {
     return lakes
   }
 
-  js/**
+  /**
  * Creuse BLIND_LAKE_COUNT lacs aveugles ellipsoïdaux bruités en caverns_bottom.
  * Rayons plus grands que les lacs souterrains — protection TileGuard complète.
  * Remplissage WATER différé.
@@ -3299,6 +3376,129 @@ class WorldCarver {
     }
 
     return triskels
+  }
+
+  /**
+ * Place FOSSIL_VEIN_COUNT veines de SHELL horizontales.
+ * Biomes : DESERT + premier et dernier rect (maritimes).
+ * Layer : caverns_top (90%), avec au maximum une migration en under ou caverns_bottom (10%, tirage 50/50).
+ * Protection TileGuard autour de chaque point du chemin (rayon + 2).
+ *
+ * @returns {void}
+ */
+  digFossilVeins () {
+    const SHELL = NODES.SHELL.code
+    const MAX_ATTEMPTS = 100
+
+    // Rects éligibles : DESERT + premier + dernier
+    const eligibleRects = []
+    for (let i = 0; i < this.#zoneRects.length; i++) {
+      const rect = this.#zoneRects[i]
+      if (rect.biome === BIOME_TYPE.DESERT || i === 0 || i === this.#zoneRects.length - 1) {
+        eligibleRects.push(rect)
+      }
+    }
+    if (eligibleRects.length === 0) return
+    let migrationDone = false
+
+    for (let i = 0; i < FOSSIL_VEIN_COUNT; i++) {
+      const rect = seededRNG.randomGetArrayValue(eligibleRects)
+
+      // Tirage de la layer
+      let y0, y1
+      if (!migrationDone && seededRNG.randomGetMax(99) < 10) {
+        migrationDone = true
+        if (seededRNG.randomGetBool()) {
+          y0 = rect.ySurface; y1 = rect.yUnder // under
+        } else {
+          y0 = rect.yCavernsMid; y1 = rect.yCaverns // caverns_bottom
+        }
+      } else {
+        y0 = rect.yUnder; y1 = rect.yCavernsMid // caverns_top
+      }
+
+      const radius = 2
+      const length = seededRNG.randomGetMinMax(16, 20)
+      const angle = seededRNG.randomGetBool() ? 90 : -90
+
+      let cx, cy, valid
+      let attempts = 0
+      do {
+        cx = seededRNG.randomGetMinMax(rect.x0 + length, rect.x1 - length)
+        cy = seededRNG.randomGetMinMax(y0 + radius, y1 - radius)
+        valid = !this.isExcluded(cx - length, cy - radius, cx + length, cy + radius)
+        attempts++
+      } while (!valid && attempts < MAX_ATTEMPTS)
+      if (!valid) continue
+
+      const path = this.pathTunnel(cx, cy, radius, length, angle, 12)
+
+      // Accumule les tuiles SHELL
+      const tiles = []
+      for (let j = 0; j < path.length; j++) {
+        const p = path[j]
+        this.digNoisyCircle(tiles, p.x, p.y, p.radiusMin, p.radiusMax, SHELL, 0.3, PERLIN_OFFSET_SHELL)
+      }
+
+      // N'écrase que les tuiles solides
+      const rect2 = this.applyTiles(tiles)
+      this.addExclusion(rect2)
+
+      // Protection TileGuard
+      for (let j = 0; j < path.length; j++) {
+        const p = path[j]
+        tileGuard.addNoisyCircle(p.x, p.y, p.radiusMin + 2, p.radiusMax + 2, 0.3, PERLIN_OFFSET_SHELL)
+      }
+    }
+  }
+
+  /**
+ * Creuse une fougère cave par zone de biome FOREST.
+ * Forme : demi-ellipse supérieure + rectangle inférieur (fond plat).
+ * Bords bruités via Perlin noise.
+ * Prérequis : initZoneRects(), initExclusions().
+ *
+ * @returns {Array<{cx, cy, radiusX, radiusY}>}
+ */
+  digFernCaves () {
+    const caves = []
+    const MAX_ATTEMPTS = 100
+
+    for (let i = 0; i < this.#zoneRects.length; i++) {
+      const rect = this.#zoneRects[i]
+      if (rect.biome !== BIOME_TYPE.FOREST) continue
+
+      const radiusX = seededRNG.randomGetMinMax(FERN_CAVE_RADIUS_X_MIN, FERN_CAVE_RADIUS_X_MAX)
+      const radiusY = seededRNG.randomGetMinMax(FERN_CAVE_RADIUS_Y_MIN, FERN_CAVE_RADIUS_Y_MAX)
+
+      let cx, cy, valid
+      let attempts = 0
+      do {
+        cx = seededRNG.randomGetMinMax(rect.x0 + radiusX, rect.x1 - radiusX)
+        cy = seededRNG.randomGetMinMax(rect.ySurface + radiusY, rect.yUnder - radiusY - 2)
+        valid = !this.isExcluded(cx - radiusX, cy - radiusY, cx + radiusX, cy + radiusY + 2)
+        attempts++
+      } while (!valid && attempts < MAX_ATTEMPTS)
+      if (!valid) continue
+
+      // Passe 1 — ellipse bruitée
+      const tiles = []
+      this.digNoisyEllipse(tiles, cx, cy, radiusX - 4, radiusX, radiusY - 4, radiusY, NODES.VOID.code, 0.3, PERLIN_OFFSET_FERNS)
+
+      // Passe 2 — rectangle inférieur
+      const rectCy = cy + Math.round((radiusY + 2) / 2)
+      const rectHalfH = Math.round((radiusY + 2) / 2)
+      this.digNoisyRect(tiles, cx, rectCy, radiusX - 1, radiusX + 3, rectHalfH - 1, rectHalfH + 1, NODES.VOID.code, 0.3, PERLIN_OFFSET_FERNS)
+
+      const rect2 = this.applyTiles(tiles)
+      this.addExclusion(rect2)
+      tileGuard.addNoisyRect(cx, cy + radiusY + 2, radiusX + 2, radiusX + 6, 2, 4, 0.8, PERLIN_OFFSET_FERNS)
+
+      window.DEBUG_POINTS.push({x: cx, y: cy, color: 'orange'}) // DEBUG
+      caves.push({cx, cy, radiusX, radiusY})
+    }
+
+    return caves
   }
 
   /**

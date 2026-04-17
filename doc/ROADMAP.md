@@ -25,15 +25,14 @@
 - Traitement désert : écoulement du sable, consolidation des tunnels/cavernes
 
 ### Mini-biomes à implémenter
-- `TileGuard` : intégrer pour tous les futurs mini-biomes
+- `TileGuard` : implémenté - A intégrer pour tous les futurs mini-biomes
 - `digMushroomCaves()` — Forest, caverns_top, HUMUS + GRASSMUSHROOM
 - `digFernCaves()` — Forest, under, HUMUS + GRASSFERN
+- `digMossCave()` — Jungle, under, MUD + HUMUS
 - `digAnthills()` — Forest, surface, structure conique
 - `digTermiteMounds()` — Jungle, surface, structure rectangulaire
 - `digAntlionPits()` — Desert, surface, creux triangulaire
 - `digPyramids()` — Desert, under, deux chambres (pièges + boss)
-- `digFossilVein()` — Desert, caverns_top, veine horizontale SHELL
-- `digMossCave()` — Jungle, under, MUD + HUMUS
 - `digRuinedCabin()` — Forest, under, STONEWALL
 - `digTempleRuin()` — Jungle, caverns_top, EMERALDWALL + Décomposeur
 - `digAncientHouse()` — Desert, caverns_bottom, GOLDWALL + Transmutateur
@@ -196,6 +195,7 @@
 - `WorldCarver.digTriskels` — placement 3 Tryskels 2×2, 2 en caverns_top fallback caverns_bottom et 1 en caverns_bottom
 - `WorldCarver.digZigzagTunnels` — tunnels zigzag avec espacement minimal et évitement des lacs
 - `WorldCarver.digSurfaceTunnel` — galeries de surface avec évitement des lacs
+- `WorldCarver.digFossilVein` — Desert + premier et dernier biome, caverns_top avec migration en under/caverns_bottom, veine horizontale SHELL
 - `WorldCarver.cleanupAfterCarving` — nettoyage post-creusement (4 passes, règles déclaratives)
 - `WorldCarver.buildErodedSurfaceLine` — ligne de surface + érosion (trous et bosses)
 - `TileGuard` — utilitaire de protection tuiles contre creusement, formes bruitées (cercle, ellipse, rectangle)
