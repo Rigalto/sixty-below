@@ -34,7 +34,6 @@
 - `digPyramids()` — Desert, under, deux chambres (pièges + boss)
 - `digFossilVein()` — Desert, caverns_top, veine horizontale SHELL
 - `digMossCave()` — Jungle, under, MUD + HUMUS
-- `digSapPockets()` — Jungle, caverns_bottom, SAPROCK + SAP
 - `digRuinedCabin()` — Forest, under, STONEWALL
 - `digTempleRuin()` — Jungle, caverns_top, EMERALDWALL + Décomposeur
 - `digAncientHouse()` — Desert, caverns_bottom, GOLDWALL + Transmutateur
@@ -50,6 +49,9 @@
 - Tuiles METEORITE minables, tier 5
 - Oxydation progressive en quelques jours (timer global)
 - À implémenter dans `ecosystem.mjs`, pas dans `generate.mjs`
+
+### Optimisation
+- Suppression complète de CREATION_REMAP et des codes de tuiles utilisés uniquement pendant la génération (tileGuard remplace cette fonctionnalité).
 
 ---
 
@@ -191,7 +193,7 @@
 - `WorldCarver.digSapLakes` — lacs de sève ouverts en profondeur, moitié inférieure du fond protégée et TileGuard (JUNGLE uniquemen)
 - `WorldCarver.digSapPockets` — poches des sève en grande profondeur, protégée et TileGuard (JUNGLE uniquemen)
 - `WorldCarver.digHearts` — placement 15 Life Cristals 2×2, under fallback caverns_top
-- `WorldCarver.digTriskels()` — placement 3 Tryskels 2×2, 2 en caverns_top fallback caverns_bottom et 1 en caverns_bottom
+- `WorldCarver.digTriskels` — placement 3 Tryskels 2×2, 2 en caverns_top fallback caverns_bottom et 1 en caverns_bottom
 - `WorldCarver.digZigzagTunnels` — tunnels zigzag avec espacement minimal et évitement des lacs
 - `WorldCarver.digSurfaceTunnel` — galeries de surface avec évitement des lacs
 - `WorldCarver.cleanupAfterCarving` — nettoyage post-creusement (4 passes, règles déclaratives)

@@ -85,6 +85,7 @@ export const NODES = {
   OBSIDIAN: {code: 48, name: 'Obsidian', type: NODE_TYPE.ROCK, star: 5, solid: true, color: '#73c882', image: 'rock_16_16+3', speed: 2000, mining: [{item: 'obsidian', count: 1}]}, // HELL
   METEORITE: {code: 49, name: 'Meteroite', type: NODE_TYPE.ROCK, stype: 'block', star: 5, solid: true, color: '#7d6f5f', image: 'rock_16_16+2', speed: 2000, mining: [{item: 'bkmtrt', count: 1}]}, // SURFACE
   HIVE: {code: 50, name: 'Hive', type: NODE_TYPE.ROCK, stype: 'block', star: 3, solid: true, color: '#fd8431', image: 'rock_16_16+6', speed: 1200, mining: [{item: 'bkhive', count: 1}]},
+  SHELL: {code: 51, name: 'Shell', type: NODE_TYPE.ROCK, stype: 'block', star: 2, solid: true, color: '#e9e3e0ff', image: 'rock_16_16+7', speed: 1800, mining: [{item: 'shell', count: 4}]},
 
   // ── HOUSING (murs des maisons) ────────────────────────
 
@@ -111,14 +112,7 @@ export const NODES = {
   // types utilisés de manière temporaire pendant la création du monde
   SAPROCK: {code: 71, name: 'Sap Rock', type: NODE_TYPE.CREATION, color: '#34e648'}, // remplacé par SLATE
   HARDROCK: {code: 72, name: 'Hard Rock', type: NODE_TYPE.CREATION, color: '#34e648'}, // remplacé par HARDSTONE
-  HEART: {code: 73, name: 'Life Heart', type: NODE_TYPE.CREATION, color: '#FF19CD'}, // remplacé par VOID et un furniture
-  // Remplacés après creusement des tunnels par le substrat natif du biome
-  LAKE_FOREST_SIDE: {code: 74, name: 'Lake Forest Side', type: NODE_TYPE.CREATION, color: '#5a8a3c'}, // remplacé par CLAY
-  LAKE_FOREST_BED: {code: 75, name: 'Lake Forest Bed', type: NODE_TYPE.CREATION, color: '#3a6a2c'}, // remplacé par STONE
-  LAKE_DESERT_SIDE: {code: 76, name: 'Lake Desert Side', type: NODE_TYPE.CREATION, color: '#c8a850'}, // remplacé par SAND
-  LAKE_DESERT_BED: {code: 77, name: 'Lake Desert Bed', type: NODE_TYPE.CREATION, color: '#a88030'}, // remplacé par SANDSTONE
-  LAKE_JUNGLE_SIDE: {code: 78, name: 'Lake Jungle Side', type: NODE_TYPE.CREATION, color: '#2a6a4a'}, // remplacé par MUD
-  LAKE_JUNGLE_BED: {code: 79, name: 'Lake Jungle Bed', type: NODE_TYPE.CREATION, color: '#1a4a3a'} // remplacé par LIMESTONE
+  HEART: {code: 73, name: 'Life Heart', type: NODE_TYPE.CREATION, color: '#FF19CD'} // remplacé par VOID et un furniture
 }
 
 /** Lookup par code numérique — hot path render/physics */

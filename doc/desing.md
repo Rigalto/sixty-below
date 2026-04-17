@@ -391,7 +391,7 @@ dans un biome étranger (cf. §3.9).
 | **Antlion Pit** | surface | SAND | Piège conique creux dans le sable. Reconstruit par les habitants si détruit. ANTLION. Boss SUNBURST ANTLION. |
 | **Pyramid** | under | SANDSTONE | Deux chambres. Chambre 1 : salle de pièges (flèches, rouleaux — combat tactique). Chambre 2 : salle triangulaire — boss Pharaon + gardes (momies, sphinx). Loot high-tier. |
 | **Sand Pocket** | under | SAND | Grande poche de SAND sous pression. S'effondre partiellement si le plafond est miné. |
-| **Fossil Vein** | caverns_top | SHELL | Veine horizontale d'accumulation sédimentaire (ancien fond marin). Minage → item Shell (ingrédient pour mécanique délicate ou potion (réduit en poudre). Source secondaire : bords et fond de mer (régénération lente). |
+| **Fossil Vein** | caverns_top | SHELL | Veine horizontale d'accumulation sédimentaire (ancien fond marin). Minage → item Shell (ingrédient pour mécanique délicate ou potion (réduit en poudre)). Source secondaire : bords et fond de mer (régénération lente). |
 | **Ancient House** | caverns_bottom | GOLDWALL | Ruines d'une civilisation ancienne. Architecture et matériaux différents du Temple Ruin. Pièges, coffres (tier 4-5). Machine ancestrale : Transmutateur. Inamovible. Faune commune de la zone. |
 
 ---
