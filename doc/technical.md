@@ -744,10 +744,7 @@ Génère des tunnels et des cavernes (tuiles VOID).
 | `isExcluded` | `(x1, y1, x2, y2: number): boolean` | Vérifie si un rectangle intersecte l'une des zones d'exclusion internes (#exclusions). Retourne true dès la première intersection trouvée. |
 | `digNoisyCircle` | `(tiles, cx, cy, radiusMin, radiusMax, code, frequency?, offsetX?: void` | Creuse un trou circulaire bruité (Perlin noise) - Peut générer des tuiles et des trous isolés - Pousse les tuiles directement dans `tiles` (pas de retour). |
 | `digNoisyEllipse` | `(tiles, cx, cy, radiusXMin, radiusXMax, radiusYMin, radiusYMax, code, frequency?, offsetX?): void` | Creuse un trou elliptique bruité (Perlin noise). Distance normalisée par les demi-axes — même algorithme que `digNoisyCircle`. Pousse les tuiles dans `tiles`. |
-
-
-rnoisyrectangle
-
+| `digNoisyRect(tiles, cx, cy, radiusXMin, radiusXMax, radiusYMin, radiusYMax, code, frequency?, offsetX?)` | Creuse un rectangle bruité (Perlin noise) sur les 4 bords. Même algorithme que `digNoisyEllipse` — distance de Chebyshev normalisée. Pousse les tuiles dans `tiles`. |
 | `applyTiles` | `(tiles: Array<{x, y, index, code}>): {x1, y1, x2, y2}` | Écrit les tuiles dans `worldBuffer` via `writeAt`. Ignore les tuiles hors bornes et protège `FOG`, `DEEPSEA`, `BASALT`, `LAVA`, `SKY`, `SEA` contre l'écrasement. Retourne le rectangle englobant des tuiles écrites. |
 | `applyTiles` | `(tiles, excluded?: Set): {x1,y1,x2,y2}` | Écrit les tuiles dans `worldBuffer` via `writeAt`. Protège les tuiles `excluded` (optionnel — défaut : `DEFAULT_EXCLUDED`). Passer `ETERNAL_EXCLUDED` pour n'exclure que les ETERNAL. Retourne le rectangle englobant  des tuiles réellement écrites. |
 | `fillRect(x0, y0, x1, y1, code)` | Remplace toutes les tuiles d'un rectangle par `code`. Sans protection — zones hors ghost cells et ETERNAL uniquement. Index calculé en dehors de la boucle interne pour performance. |
@@ -769,6 +766,7 @@ rnoisyrectangle
 | `digHearts(surfaceUnder, underCaverns)` | Place 15 spots Life Heart (2×2 tuiles HEART) en underground. Vérifie 16 tuiles solides autour de chaque spot. Fallback en caverns_top si quota non atteint. Enregistre chaque spot dans `#exclusions`. Retourne `Array<{cx, cy}>` (coin haut gauche). |
 | `digTriskels(underCaverns)` | Place 3 Triskels (2×2 tuiles) : 2 en caverns_top, 1 en caverns_bottom. Fallback caverns_bottom si quota caverns_top non atteint. Vérifie 16 tuiles solides autour de chaque spot. Enregistre dans `#exclusions`. Retourne `Array<{cx, cy}>` — coin haut-gauche. |
 | `digFossilVeins()` | Place `FOSSIL_VEIN_COUNT` veines de SHELL horizontales (rayon 2, longueur 16–20, déviation 12°). Biomes : DESERT + premier et dernier rect. Layer : caverns_top (90%), une seule migration possible en under ou caverns_bottom (10%, tirage 50/50). Protection TileGuard autour de chaque point du chemin (rayon + 2). Prérequis : `initZoneRects()`, `initExclusions()`. |
+| `digFernCaves()` | Creuse une Fern Cave elliptique bruitée par zone FOREST en layer under. Fond plat bruité (digNoisyRect). Protection TileGuard sur le bas. Tapissage du fond via `#fillFernCaveFloor` (GRASSFERN + HUMUS). Retourne `Array<{cx, cy, radiusX, radiusY}>`. Prérequis : `initZoneRects()`, `initExclusions()`. |
 | `#digOneCobwebCave(y0, y1)` | Creuse une caverne elliptique à toiles dans la plage verticale [y0, y1]. Gère les tentatives et exclusions. Retourne `{cx, cy, radiusX, radiusY}` ou `null`. |
 | `digCobwebCaves()` | Creuse COBWEB_CAVE_COUNT_MIN–MAX cavernes en caverns_top (80%) ou caverns_bottom (20%) + 1 intrusion systématique en layer under, biome aléatoire. Prérequis : `initZoneRects()`. |
 | `#digOneGeodeCave(y0, y1, code)` | Creuse une géode elliptique dans la plage verticale [y0, y1]. Gère les tentatives et exclusions. Retourne `{cx, cy, radiusX, radiusY, code}` ou `null`. |
