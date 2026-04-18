@@ -2977,7 +2977,7 @@ class WorldCarver {
  */
   #tryFillPuddle (cx, cy, nodeCode) {
     const VOID = NODES.VOID.code
-    const LIQUID = new Set([NODES.WATER.code, NODES.SEA.code, NODES.HONEY.code, NODES.SAP.code])
+    const LIQUID = new Set([NODES.WATER.code, NODES.SEA.code, NODES.HONEY.code, NODES.SAP.code, NODES.GRASSFERN.code])
     const yStart = cy
 
     const visited = new Set()
@@ -3493,7 +3493,7 @@ class WorldCarver {
       const rect2 = this.applyTiles(tiles)
       this.addExclusion(rect2)
       tileGuard.addNoisyRect(cx, cy + radiusY + 2, radiusX + 2, radiusX + 6, 2, 4, 0.8, PERLIN_OFFSET_FERNS)
-      this.#fillCaveFloor(cx, cy + 1, radiusX, NODES.GRASSFERN.code, NODES.HUMUS.code)
+      this.#fillFernCaveFloor(cx, cy + 1, radiusX)
 
       window.DEBUG_POINTS.push({x: cx, y: cy, color: 'orange'}) // DEBUG
       caves.push({cx, cy, radiusX, radiusY})
@@ -3503,7 +3503,7 @@ class WorldCarver {
   }
 
   /**
- * Tapisse le fond d'une cave elliptique avec une tuile de surface et un substrat en dessous.
+ * Tapisse le fond d'une Fern Cave avec GRASSFERN (surface) et HUMUS (substrat).
  * Parcourt les colonnes de cx-radiusX à cx+radiusX.
  * Descend depuis cy pour trouver le fond (première tuile non-VOID).
  * Profondeur du substrat : 2 ou 3 tuiles, avec transition Markov 75/25.
@@ -3514,8 +3514,11 @@ class WorldCarver {
  * @param {number} surfaceCode - Code de la tuile de surface (ex: GRASSFERN)
  * @param {number} substrateCode - Code du substrat (ex: HUMUS)
  */
-  #fillCaveFloor (cx, cy, radiusX, surfaceCode, substrateCode) {
+  #fillFernCaveFloor (cx, cy, radiusX) {
     const VOID = NODES.VOID.code
+    const surfaceCode = NODES.GRASSFERN.code
+    const substrateCode = NODES.HUMUS.code
+
     let depth = seededRNG.randomGetBool() ? 2 : 3
 
     const fillColumn = (x) => {
