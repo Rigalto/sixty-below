@@ -1,6 +1,6 @@
 import {seededRNG} from './utils.mjs'
 import {database} from './database.mjs'
-import {NODES, NODES_LOOKUP, NODE_TYPE, WEATHER_TYPE, BIOME_TYPE, WORLD_WIDTH, WORLD_HEIGHT, SEA_LEVEL, TOPSOIL_Y_SKY_SURFACE, TOPSOIL_Y_SURFACE_UNDER, TOPSOIL_Y_UNDER_CAVERNS, TOPSOIL_Y_CAVERNS_MID, BIOME_TILE_MAP, SEA_MAX_JITTER, SEA_MAX_WIDTH, SEA_MAX_HEIGHT, CLUSTER_SCATTER_MAP, ORE_GEM_SCATTER_MAP, PERLIN_OFFSET_NATURALIZER, PERLIN_OFFSET_TUNNEL, PERLIN_OFFSET_SURFACE_TUNNEL, PERLIN_OFFSET_SMALL_TUNNEL, PERLIN_OFFSET_CAVERN, PERLIN_OFFSET_HIVE, PERLIN_OFFSET_HEART, PERLIN_OFFSET_COBWEB, PERLIN_OFFSET_FERNS, PERLIN_OFFSET_LAKES, PERLIN_OFFSET_SHELL, SMALL_CAVERNS_COUNT, MEDIUM_CAVERNS_COUNT, UNDERGROUND_TUNNEL_COUNT, CAVERNS_TUNNEL_COUNT, SMALL_TUNNELS_COUNT, HIVE_RADIUS_MIN, HIVE_RADIUS_MAX, COBWEB_CAVE_COUNT_MIN, COBWEB_CAVE_COUNT_MAX, COBWEB_RADIUS_X_MIN, COBWEB_RADIUS_X_MAX, COBWEB_RADIUS_Y_MIN, COBWEB_RADIUS_Y_MAX, COBWEB_CAVE_MAIN_MIN, COBWEB_CAVE_MAIN_MAX, COBWEB_CAVE_SIDE_MIN, COBWEB_CAVE_SIDE_MAX, COBWEB_SCATTER_COUNT, COBWEB_SCATTER_SIZE_MIN, COBWEB_SCATTER_SIZE_MAX, GEODE_CAVE_COUNT_MIN, GEODE_CAVE_COUNT_MAX, GEODE_RADIUS_MIN, GEODE_RADIUS_MAX, GEODE_TARGET_CLUSTER_COUNT, GEODE_CLUSTER_SIZE_MIN, GEODE_CLUSTER_SIZE_MAX, TOPSOIL_SCATTER_MAP, LAKE_RADIUS_X_MIN, LAKE_RADIUS_X_MAX, LAKE_RADIUS_Y_MIN, LAKE_RADIUS_Y_MAX, LAKE_PIT_RADIUS_X_MIN, LAKE_PIT_RADIUS_X_MAX, LAKE_PIT_RADIUS_Y_MIN, LAKE_PIT_RADIUS_Y_MAX, LAKE_CREATION_MAP, UNDERGROUND_LAKE_UNDER_COUNT, UNDERGROUND_LAKE_CAVERNS_COUNT, UNDERGROUND_LAKE_RADIUS_MIN, UNDERGROUND_LAKE_RADIUS_MAX, BLIND_LAKE_COUNT, BLIND_LAKE_RADIUS_MIN, BLIND_LAKE_RADIUS_MAX, SAP_LAKE_UNDER_COUNT, SAP_LAKE_CAVERNS_COUNT, SAP_LAKE_RADIUS_MIN, SAP_LAKE_RADIUS_MAX, SAP_POCKET_COUNT, SAP_POCKET_RADIUS_MIN, SAP_POCKET_RADIUS_MAX, WATER_PUDDLE_COUNT, SAP_PUDDLE_COUNT, PUDDLE_HEIGHT_MIN, PUDDLE_HEIGHT_MAX, FOSSIL_VEIN_COUNT, FERN_CAVE_RADIUS_X_MIN, FERN_CAVE_RADIUS_X_MAX, FERN_CAVE_RADIUS_Y_MIN, FERN_CAVE_RADIUS_Y_MAX, CREATION_REMAP} from '../assets/data/data-gen.mjs'
+import {NODES, NODES_LOOKUP, NODE_TYPE, WEATHER_TYPE, BIOME_TYPE, WORLD_WIDTH, WORLD_HEIGHT, SEA_LEVEL, TOPSOIL_Y_SKY_SURFACE, TOPSOIL_Y_SURFACE_UNDER, TOPSOIL_Y_UNDER_CAVERNS, TOPSOIL_Y_CAVERNS_MID, BIOME_TILE_MAP, SEA_MAX_JITTER, SEA_MAX_WIDTH, SEA_MAX_HEIGHT, CLUSTER_SCATTER_MAP, ORE_GEM_SCATTER_MAP, PERLIN_OFFSET_NATURALIZER, PERLIN_OFFSET_TUNNEL, PERLIN_OFFSET_SURFACE_TUNNEL, PERLIN_OFFSET_SMALL_TUNNEL, PERLIN_OFFSET_CAVERN, PERLIN_OFFSET_HIVE, PERLIN_OFFSET_HEART, PERLIN_OFFSET_COBWEB, PERLIN_OFFSET_FERNS, PERLIN_OFFSET_LAKES, PERLIN_OFFSET_SHELL, SMALL_CAVERNS_COUNT, MEDIUM_CAVERNS_COUNT, UNDERGROUND_TUNNEL_COUNT, CAVERNS_TUNNEL_COUNT, SMALL_TUNNELS_COUNT, HIVE_RADIUS_MIN, HIVE_RADIUS_MAX, COBWEB_CAVE_COUNT_MIN, COBWEB_CAVE_COUNT_MAX, COBWEB_RADIUS_X_MIN, COBWEB_RADIUS_X_MAX, COBWEB_RADIUS_Y_MIN, COBWEB_RADIUS_Y_MAX, COBWEB_CAVE_MAIN_MIN, COBWEB_CAVE_MAIN_MAX, COBWEB_CAVE_SIDE_MIN, COBWEB_CAVE_SIDE_MAX, COBWEB_SCATTER_COUNT, COBWEB_SCATTER_SIZE_MIN, COBWEB_SCATTER_SIZE_MAX, GEODE_CAVE_COUNT_MIN, GEODE_CAVE_COUNT_MAX, GEODE_RADIUS_MIN, GEODE_RADIUS_MAX, GEODE_TARGET_CLUSTER_COUNT, GEODE_CLUSTER_SIZE_MIN, GEODE_CLUSTER_SIZE_MAX, TOPSOIL_SCATTER_MAP, LAKE_RADIUS_X_MIN, LAKE_RADIUS_X_MAX, LAKE_RADIUS_Y_MIN, LAKE_RADIUS_Y_MAX, LAKE_PIT_RADIUS_X_MIN, LAKE_PIT_RADIUS_X_MAX, LAKE_PIT_RADIUS_Y_MIN, LAKE_PIT_RADIUS_Y_MAX, LAKE_CREATION_MAP, UNDERGROUND_LAKE_UNDER_COUNT, UNDERGROUND_LAKE_CAVERNS_COUNT, UNDERGROUND_LAKE_RADIUS_MIN, UNDERGROUND_LAKE_RADIUS_MAX, BLIND_LAKE_COUNT, BLIND_LAKE_RADIUS_MIN, BLIND_LAKE_RADIUS_MAX, SAP_LAKE_UNDER_COUNT, SAP_LAKE_CAVERNS_COUNT, SAP_LAKE_RADIUS_MIN, SAP_LAKE_RADIUS_MAX, SAP_POCKET_COUNT, SAP_POCKET_RADIUS_MIN, SAP_POCKET_RADIUS_MAX, WATER_PUDDLE_COUNT, SAP_PUDDLE_COUNT, PUDDLE_HEIGHT_MIN, PUDDLE_HEIGHT_MAX, FOSSIL_VEIN_COUNT, FERN_CAVE_RADIUS_X_MIN, FERN_CAVE_RADIUS_X_MAX, FERN_CAVE_RADIUS_Y_MIN, FERN_CAVE_RADIUS_Y_MAX, MOSS_CAVE_RADIUS_X_MIN, MOSS_CAVE_RADIUS_X_MAX, MOSS_CAVE_RADIUS_Y_MIN, MOSS_CAVE_RADIUS_Y_MAX, CREATION_REMAP} from '../assets/data/data-gen.mjs'
 
 /* ====================================================================================================
    WORLD BUFFER (CREATION DU MONDE)
@@ -139,7 +139,7 @@ class WorldGenerator {
     window.DEBUG_POINTS = [] // DEGUG - à supprimer
 
     // affichage de la progression de la création dans le dialogue modal
-    const STEPS = 17
+    const STEPS = 19
     let step = 0
     const progress = (topic) => {
       step++
@@ -202,7 +202,7 @@ class WorldGenerator {
     blindLakes.forEach(l => delete l.liquidBody)
     await progress('Lakes & oasis')
 
-    // 6.1.2 Fossil Veins
+    // 6.1.2 Fossil Veins (caverns_top - desert - SHELL)
     worldCarver.digFossilVeins()
 
     // 6.1.3 Sap Pockets
@@ -229,8 +229,19 @@ class WorldGenerator {
     const geodeCaves = graniteCaves.concat(marbleCaves)
     await progress('Geode caves')
 
+    // 6.1.8 Fern Caves (Underground, Forest 6 HUMUS + GRASSFERN)
+    const ferns = worldCarver.digFernCaves()
+    await progress('Fern caves')
+
+    // 6.1.9 Moss Cave (Underground - jungle - MUD + GRASSMOSS
+    const moss = worldCarver.digMossCaves()
+    await progress('Moss caves')
+
     // 6.1.X Mushroom caves
     // const mushroomCaves = worldCarver.digMushroomCaves()
+
+    // 6.1.X Sand Pockets
+    // worldCarver.digSandPocket()
 
     // 6.1.X Anthill
     // const anthills = worldCarver.digAnthills()
@@ -240,9 +251,6 @@ class WorldGenerator {
 
     // 6.1.X Antilion Pit
     // const antilions = worldCarver.digAntilionPits()
-
-    // 6.1.X Fern Caves (Under, Forest)
-    const ferns = worldCarver.digFernCaves()
 
     // 6.1.X Pyramid
     // le cy est tiré entre rect.yUnder et rect.yCavernsMid
@@ -255,14 +263,6 @@ class WorldGenerator {
     // const templeruin = worldCarver.digTempleRuin()
     // Under, forest - STONEWALL -
     // const ruinedcabin = worldCarver.digRuinedCabin()
-
-    // 6.1.X Fossil Vein
-    // caverns_top - desert - SHELL
-    // const fossilvein = worldCarver.digFossilVein()
-
-    // 6.1.X Moss Cave
-    // underground - jungle - MUD + HUMUS
-    // const mosscave = worldCarver.digMossCave()
 
     // 6.1.X Underground Lake
     // caverns_top - Forest - WATER + HUMUS
@@ -341,7 +341,7 @@ class WorldGenerator {
     if (!debug) {
       const liquidBodies = [...honeyLiquidBodies, ...lakeLiquidBodies, ...underLakeLiquidBodies, ...blindLakeLiquidBodies, ...sapLakeLiquidBodies, ...sapPocketLiquidBodies, ...waterPuddleLiquidBodies, ...sapPuddleLiquidBodies]
       const lakes = [...surfaceLakes, ...underLakes, ...blindLakes, ...sapLakes, ...sapPockets]
-      await this.save(seed, {hives, cobwebCaves, geodeCaves, lakes, liquidBodies, ferns})
+      await this.save(seed, {hives, cobwebCaves, geodeCaves, lakes, liquidBodies, ferns, moss})
       worldBuffer.clear()
     }
 
@@ -354,7 +354,7 @@ class WorldGenerator {
     if (debug) { return worldBuffer } // appelant responsable du clear()
   }
 
-  async save (seed, {hives, cobwebCaves, geodeCaves, lakes, liquidBodies, ferns}) {
+  async save (seed, {hives, cobwebCaves, geodeCaves, lakes, liquidBodies, ferns, moss}) {
     const start = window.performance.now()
     // 1. Sauvegarde des tuiles
     await database.clearObjectStore('world_chunks')
@@ -398,7 +398,8 @@ class WorldGenerator {
       {key: 'cobwebcaves', value: JSON.stringify(cobwebCaves)},
       {key: 'lakes', value: JSON.stringify(lakes)},
       {key: 'geodecaves', value: JSON.stringify(geodeCaves)},
-      {key: 'ferns', value: JSON.stringify(ferns)}
+      {key: 'ferns', value: JSON.stringify(ferns)},
+      {key: 'moss', value: JSON.stringify(moss)}
 
       // {key: 'honeysurface', value: this.honeysurface.join('|')}
     ])
@@ -3495,7 +3496,6 @@ class WorldCarver {
       tileGuard.addNoisyRect(cx, cy + radiusY + 2, radiusX + 2, radiusX + 6, 2, 4, 0.8, PERLIN_OFFSET_FERNS)
       this.#fillFernCaveFloor(cx, cy + 1, radiusX)
 
-      window.DEBUG_POINTS.push({x: cx, y: cy, color: 'orange'}) // DEBUG
       caves.push({cx, cy, radiusX, radiusY})
     }
 
@@ -3554,6 +3554,105 @@ class WorldCarver {
     depth = seededRNG.randomGetBool() ? 2 : 3
     for (let x = cx - 1; x >= cx - radiusX; x--) {
       if (!fillColumn(x)) break
+    }
+  }
+
+  /**
+ * Creuse une Moss Cave par zone de biome JUNGLE en layer under.
+ * Forme : demi-ellipse supérieure bruitée + rectangle inférieur à fond plat bruité.
+ * Protection TileGuard sur le bas de la cave.
+ * Prérequis : initZoneRects(), initExclusions().
+ *
+ * @returns {Array<{cx, cy, radiusX, radiusY}>}
+ */
+  digMossCaves () {
+    const caves = []
+    const MAX_ATTEMPTS = 100
+
+    for (let i = 0; i < this.#zoneRects.length; i++) {
+      const rect = this.#zoneRects[i]
+      if (rect.biome !== BIOME_TYPE.JUNGLE) continue
+
+      const radiusX = seededRNG.randomGetMinMax(MOSS_CAVE_RADIUS_X_MIN, MOSS_CAVE_RADIUS_X_MAX)
+      const radiusY = seededRNG.randomGetMinMax(MOSS_CAVE_RADIUS_Y_MIN, MOSS_CAVE_RADIUS_Y_MAX)
+
+      let cx, cy, valid
+      let attempts = 0
+      do {
+        cx = seededRNG.randomGetMinMax(rect.x0 + radiusX, rect.x1 - radiusX)
+        cy = seededRNG.randomGetMinMax(rect.ySurface + radiusY, rect.yUnder - radiusY - 2)
+        valid = !this.isExcluded(cx - radiusX, cy - radiusY, cx + radiusX, cy + radiusY + 2)
+        attempts++
+      } while (!valid && attempts < MAX_ATTEMPTS)
+      if (!valid) continue
+
+      const tiles = []
+      this.digNoisyEllipse(tiles, cx, cy, radiusX - 4, radiusX, radiusY - 4, radiusY, NODES.VOID.code, 0.3, PERLIN_OFFSET_FERNS)
+
+      const rectCy = cy + Math.round((radiusY + 2) / 2)
+      const rectHalfH = Math.round((radiusY + 2) / 2)
+      this.digNoisyRect(tiles, cx, rectCy, radiusX - 1, radiusX, rectHalfH - 1, rectHalfH, NODES.VOID.code, 0.3, PERLIN_OFFSET_FERNS)
+
+      const rect2 = this.applyTiles(tiles)
+      this.addExclusion(rect2)
+      tileGuard.addNoisyRect(cx, cy + radiusY + 2, radiusX + 2, radiusX + 5, 2, 4, 0.8, PERLIN_OFFSET_FERNS)
+      this.#fillMossCaveWalls(cx, cy, radiusX, radiusY)
+
+      window.DEBUG_POINTS.push({x: cx, y: cy, color: 'orange'}) // DEBUG
+      caves.push({cx, cy, radiusX, radiusY})
+    }
+
+    return caves
+  }
+
+  /**
+ * Tapisse les parois et le sol d'une Moss Cave de GRASSMOSS (sol) et MUD (parois).
+ * La mousse pousse sur le sol (VOID au-dessus) et les parois latérales (VOID à gauche ou droite).
+ * Elle ne pousse pas sur le plafond (VOID en dessous).
+ *
+ * @param {number} cx
+ * @param {number} cy
+ * @param {number} radiusX
+ * @param {number} radiusY
+ */
+  #fillMossCaveWalls (cx, cy, radiusX, radiusY) {
+    const VOID = NODES.VOID.code
+    const GRASSMOSS = NODES.GRASSMOSS.code
+    const MUD = NODES.MUD.code
+    const LIQUID_OR_GAZ = new Set([
+      NODES.VOID.code,
+      NODES.SKY.code,
+      NODES.FOG.code,
+      NODES.WATER.code,
+      NODES.SEA.code,
+      NODES.DEEPSEA.code,
+      NODES.HONEY.code,
+      NODES.SAP.code
+    ])
+
+    const x0 = cx - radiusX - 1
+    const x1 = cx + radiusX + 1
+    const y0 = cy - radiusY - 1
+    const y1 = cy + radiusY + 3
+
+    for (let y = y0; y <= y1; y++) {
+      for (let x = x0; x <= x1; x++) {
+        const code = worldBuffer.read(x, y)
+        if (code === VOID || LIQUID_OR_GAZ.has(code)) continue
+
+        const hasVoidAbove = worldBuffer.read(x, y - 1) === VOID
+        const hasVoidBelow = worldBuffer.read(x, y + 1) === VOID
+        const hasVoidLeft = worldBuffer.read(x - 1, y) === VOID
+        const hasVoidRight = worldBuffer.read(x + 1, y) === VOID
+
+        if (hasVoidBelow && hasVoidLeft && hasVoidRight) continue
+        if (hasVoidAbove || hasVoidLeft || hasVoidRight) {
+          worldBuffer.write(x, y, GRASSMOSS)
+        }
+        if (hasVoidAbove && !hasVoidBelow) {
+          worldBuffer.write(x, y + 1, MUD)
+        }
+      }
     }
   }
 
