@@ -26,7 +26,6 @@
 
 ### Mini-biomes à implémenter
 - `TileGuard` : implémenté - A intégrer pour tous les futurs mini-biomes
-- `digSandPocket()` — Desert, under et caverns_top, SAND + SANDSTONE
 - `digMushroomCaves()` — Forest, caverns_top, HUMUS + GRASSMUSHROOM
 - `digAnthills()` — Forest, surface, structure conique
 - `digTermiteMounds()` — Jungle, surface, structure rectangulaire
@@ -195,6 +194,7 @@
 - `WorldCarver.digZigzagTunnels` — tunnels zigzag avec espacement minimal et évitement des lacs
 - `WorldCarver.digSurfaceTunnel` — galeries de surface avec évitement des lacs
 - `WorldCarver.digFossilVein` — Desert + premier et dernier biome, caverns_top avec migration en under/caverns_bottom, veine horizontale SHELL
+- `WorldCarver.digSandPocket` — Desert, under et caverns_top, SAND + SANDSTONE
 - `WorldCarver.digFernCaves)` — Forest, under, HUMUS + GRASSFERN
 - `WorldCarver.digMossCave` — Jungle, under, MUD + GRASSMOSS
 - `WorldCarver.cleanupAfterCarving` — nettoyage post-creusement (4 passes, règles déclaratives)
