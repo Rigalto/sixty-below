@@ -768,6 +768,7 @@ Génère des tunnels et des cavernes (tuiles VOID).
 | `digFossilVeins()` | Place `FOSSIL_VEIN_COUNT` veines de SHELL horizontales (rayon 2, longueur 16–20, déviation 12°). Biomes : DESERT + premier et dernier rect. Layer : caverns_top (90%), une seule migration possible en under ou caverns_bottom (10%, tirage 50/50). Protection TileGuard autour de chaque point du chemin (rayon + 2). Prérequis : `initZoneRects()`, `initExclusions()`. |
 | `digFernCaves()` | Creuse une Fern Cave elliptique bruitée par zone FOREST en layer under. Fond plat bruité (digNoisyRect). Protection TileGuard sur le bas. Tapissage du fond via `#fillFernCaveFloor` (GRASSFERN + HUMUS). Retourne `Array<{cx, cy, radiusX, radiusY}>`. Prérequis : `initZoneRects()`, `initExclusions()`. |
 | `#fillMossCaveWalls(cx, cy, radiusX, radiusY)` | Tapisse les parois et le sol d'une Moss Cave. GRASSMOSS sur toutes les tuiles solides en contact avec un VOID latéral ou supérieur (sauf tuiles isolées au plafond). MUD sur la tuile sous chaque GRASSMOSS de sol. |
+| `digSandPockets()` | Creuse 1–2 Sand Pockets elliptiques par zone DESERT (radiusX 4–8, radiusY 3–7). Layer : under (60%) ou caverns_top (40%). Intérieur SAND protégé par `tileGuard.addTiles()`. Périphérie inférieure (y >= cy) remplacée par SANDSTONE via `pocketSet`. Prérequis : `initZoneRects()`, `initExclusions()`. |
 | `#digOneCobwebCave(y0, y1)` | Creuse une caverne elliptique à toiles dans la plage verticale [y0, y1]. Gère les tentatives et exclusions. Retourne `{cx, cy, radiusX, radiusY}` ou `null`. |
 | `digCobwebCaves()` | Creuse COBWEB_CAVE_COUNT_MIN–MAX cavernes en caverns_top (80%) ou caverns_bottom (20%) + 1 intrusion systématique en layer under, biome aléatoire. Prérequis : `initZoneRects()`. |
 | `#digOneGeodeCave(y0, y1, code)` | Creuse une géode elliptique dans la plage verticale [y0, y1]. Gère les tentatives et exclusions. Retourne `{cx, cy, radiusX, radiusY, code}` ou `null`. |
@@ -785,7 +786,7 @@ Le paramètre `offsetX` permet de décorrèler le bruit Perlin des autres usages
 | `worldGenerator`     | `WorldGenerator`    | Orchestre toutes les passes de génération dans l'ordre et sauvegarde en base de données.                                   |
 | `biomesGenerator`    | `BiomesGenerator`   | Disposition horizontale des biomes et largeurs des mers latérales.                        |
 | `biomeNaturalizer`   | `BiomeNaturalizer`  | Remplit le buffer avec les substrats par biome/couche. Prépare les zones côtières (VOID). |
-| `tileGuard` | `TileGuard` | Protège des tuiles individuelles contre tout creusement. `init()`, `has(index)`, `addRect()`, `addNoisyCircle()`, `addNoisyEllipse()`, `addNoisyEllipseBottom()`, `addNoisyRect()`. Consulté par `WorldCarver.applyTiles` avant chaque écriture. |
+| `tileGuard` | `TileGuard` | Protège des tuiles individuelles contre tout creusement. `init()`, `has(index)`, `add (index)`, `addTiles (tiles)`, `addRect()`, `addNoisyCircle()`, `addNoisyEllipse()`, `addNoisyEllipseBottom()`, `addNoisyRect()`. Consulté par `WorldCarver.applyTiles` avant chaque écriture. |
 | `liquidFiller`       | `LiquidFiller`      | Flood-fill BFS des zones liquides et automate pour le SAND. |
 | `webFiller` | `WebFiller` | Peuplement WEB : `fillCobwebCave(cx, cy)` pour les caves, `scatterWebs(surfaceUnder)` pour le peuplement global différé. |
 

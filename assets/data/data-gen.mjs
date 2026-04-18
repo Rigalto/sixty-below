@@ -431,6 +431,11 @@ export const MOSS_CAVE_RADIUS_X_MAX = 22
 export const MOSS_CAVE_RADIUS_Y_MIN = 6
 export const MOSS_CAVE_RADIUS_Y_MAX = 12
 
+export const SAND_POCKET_RADIUS_X_MIN = 4
+export const SAND_POCKET_RADIUS_X_MAX = 8
+export const SAND_POCKET_RADIUS_Y_MIN = 3
+export const SAND_POCKET_RADIUS_Y_MAX = 7
+
 export const CREATION_REMAP = new Map([
   [NODES.SAPROCK.code, NODES.SLATE.code],
   [NODES.HARDROCK.code, NODES.HARDSTONE.code],

@@ -1,6 +1,6 @@
 import {seededRNG} from './utils.mjs'
 import {database} from './database.mjs'
-import {NODES, NODES_LOOKUP, NODE_TYPE, WEATHER_TYPE, BIOME_TYPE, WORLD_WIDTH, WORLD_HEIGHT, SEA_LEVEL, TOPSOIL_Y_SKY_SURFACE, TOPSOIL_Y_SURFACE_UNDER, TOPSOIL_Y_UNDER_CAVERNS, TOPSOIL_Y_CAVERNS_MID, BIOME_TILE_MAP, SEA_MAX_JITTER, SEA_MAX_WIDTH, SEA_MAX_HEIGHT, CLUSTER_SCATTER_MAP, ORE_GEM_SCATTER_MAP, PERLIN_OFFSET_NATURALIZER, PERLIN_OFFSET_TUNNEL, PERLIN_OFFSET_SURFACE_TUNNEL, PERLIN_OFFSET_SMALL_TUNNEL, PERLIN_OFFSET_CAVERN, PERLIN_OFFSET_HIVE, PERLIN_OFFSET_HEART, PERLIN_OFFSET_COBWEB, PERLIN_OFFSET_FERNS, PERLIN_OFFSET_LAKES, PERLIN_OFFSET_SHELL, SMALL_CAVERNS_COUNT, MEDIUM_CAVERNS_COUNT, UNDERGROUND_TUNNEL_COUNT, CAVERNS_TUNNEL_COUNT, SMALL_TUNNELS_COUNT, HIVE_RADIUS_MIN, HIVE_RADIUS_MAX, COBWEB_CAVE_COUNT_MIN, COBWEB_CAVE_COUNT_MAX, COBWEB_RADIUS_X_MIN, COBWEB_RADIUS_X_MAX, COBWEB_RADIUS_Y_MIN, COBWEB_RADIUS_Y_MAX, COBWEB_CAVE_MAIN_MIN, COBWEB_CAVE_MAIN_MAX, COBWEB_CAVE_SIDE_MIN, COBWEB_CAVE_SIDE_MAX, COBWEB_SCATTER_COUNT, COBWEB_SCATTER_SIZE_MIN, COBWEB_SCATTER_SIZE_MAX, GEODE_CAVE_COUNT_MIN, GEODE_CAVE_COUNT_MAX, GEODE_RADIUS_MIN, GEODE_RADIUS_MAX, GEODE_TARGET_CLUSTER_COUNT, GEODE_CLUSTER_SIZE_MIN, GEODE_CLUSTER_SIZE_MAX, TOPSOIL_SCATTER_MAP, LAKE_RADIUS_X_MIN, LAKE_RADIUS_X_MAX, LAKE_RADIUS_Y_MIN, LAKE_RADIUS_Y_MAX, LAKE_PIT_RADIUS_X_MIN, LAKE_PIT_RADIUS_X_MAX, LAKE_PIT_RADIUS_Y_MIN, LAKE_PIT_RADIUS_Y_MAX, LAKE_CREATION_MAP, UNDERGROUND_LAKE_UNDER_COUNT, UNDERGROUND_LAKE_CAVERNS_COUNT, UNDERGROUND_LAKE_RADIUS_MIN, UNDERGROUND_LAKE_RADIUS_MAX, BLIND_LAKE_COUNT, BLIND_LAKE_RADIUS_MIN, BLIND_LAKE_RADIUS_MAX, SAP_LAKE_UNDER_COUNT, SAP_LAKE_CAVERNS_COUNT, SAP_LAKE_RADIUS_MIN, SAP_LAKE_RADIUS_MAX, SAP_POCKET_COUNT, SAP_POCKET_RADIUS_MIN, SAP_POCKET_RADIUS_MAX, WATER_PUDDLE_COUNT, SAP_PUDDLE_COUNT, PUDDLE_HEIGHT_MIN, PUDDLE_HEIGHT_MAX, FOSSIL_VEIN_COUNT, FERN_CAVE_RADIUS_X_MIN, FERN_CAVE_RADIUS_X_MAX, FERN_CAVE_RADIUS_Y_MIN, FERN_CAVE_RADIUS_Y_MAX, MOSS_CAVE_RADIUS_X_MIN, MOSS_CAVE_RADIUS_X_MAX, MOSS_CAVE_RADIUS_Y_MIN, MOSS_CAVE_RADIUS_Y_MAX, CREATION_REMAP} from '../assets/data/data-gen.mjs'
+import {NODES, NODES_LOOKUP, NODE_TYPE, WEATHER_TYPE, BIOME_TYPE, WORLD_WIDTH, WORLD_HEIGHT, SEA_LEVEL, TOPSOIL_Y_SKY_SURFACE, TOPSOIL_Y_SURFACE_UNDER, TOPSOIL_Y_UNDER_CAVERNS, TOPSOIL_Y_CAVERNS_MID, BIOME_TILE_MAP, SEA_MAX_JITTER, SEA_MAX_WIDTH, SEA_MAX_HEIGHT, CLUSTER_SCATTER_MAP, ORE_GEM_SCATTER_MAP, PERLIN_OFFSET_NATURALIZER, PERLIN_OFFSET_TUNNEL, PERLIN_OFFSET_SURFACE_TUNNEL, PERLIN_OFFSET_SMALL_TUNNEL, PERLIN_OFFSET_CAVERN, PERLIN_OFFSET_HIVE, PERLIN_OFFSET_HEART, PERLIN_OFFSET_COBWEB, PERLIN_OFFSET_FERNS, PERLIN_OFFSET_LAKES, PERLIN_OFFSET_SHELL, SMALL_CAVERNS_COUNT, MEDIUM_CAVERNS_COUNT, UNDERGROUND_TUNNEL_COUNT, CAVERNS_TUNNEL_COUNT, SMALL_TUNNELS_COUNT, HIVE_RADIUS_MIN, HIVE_RADIUS_MAX, COBWEB_CAVE_COUNT_MIN, COBWEB_CAVE_COUNT_MAX, COBWEB_RADIUS_X_MIN, COBWEB_RADIUS_X_MAX, COBWEB_RADIUS_Y_MIN, COBWEB_RADIUS_Y_MAX, COBWEB_CAVE_MAIN_MIN, COBWEB_CAVE_MAIN_MAX, COBWEB_CAVE_SIDE_MIN, COBWEB_CAVE_SIDE_MAX, COBWEB_SCATTER_COUNT, COBWEB_SCATTER_SIZE_MIN, COBWEB_SCATTER_SIZE_MAX, GEODE_CAVE_COUNT_MIN, GEODE_CAVE_COUNT_MAX, GEODE_RADIUS_MIN, GEODE_RADIUS_MAX, GEODE_TARGET_CLUSTER_COUNT, GEODE_CLUSTER_SIZE_MIN, GEODE_CLUSTER_SIZE_MAX, TOPSOIL_SCATTER_MAP, LAKE_RADIUS_X_MIN, LAKE_RADIUS_X_MAX, LAKE_RADIUS_Y_MIN, LAKE_RADIUS_Y_MAX, LAKE_PIT_RADIUS_X_MIN, LAKE_PIT_RADIUS_X_MAX, LAKE_PIT_RADIUS_Y_MIN, LAKE_PIT_RADIUS_Y_MAX, LAKE_CREATION_MAP, UNDERGROUND_LAKE_UNDER_COUNT, UNDERGROUND_LAKE_CAVERNS_COUNT, UNDERGROUND_LAKE_RADIUS_MIN, UNDERGROUND_LAKE_RADIUS_MAX, BLIND_LAKE_COUNT, BLIND_LAKE_RADIUS_MIN, BLIND_LAKE_RADIUS_MAX, SAP_LAKE_UNDER_COUNT, SAP_LAKE_CAVERNS_COUNT, SAP_LAKE_RADIUS_MIN, SAP_LAKE_RADIUS_MAX, SAP_POCKET_COUNT, SAP_POCKET_RADIUS_MIN, SAP_POCKET_RADIUS_MAX, WATER_PUDDLE_COUNT, SAP_PUDDLE_COUNT, PUDDLE_HEIGHT_MIN, PUDDLE_HEIGHT_MAX, FOSSIL_VEIN_COUNT, FERN_CAVE_RADIUS_X_MIN, FERN_CAVE_RADIUS_X_MAX, FERN_CAVE_RADIUS_Y_MIN, FERN_CAVE_RADIUS_Y_MAX, MOSS_CAVE_RADIUS_X_MIN, MOSS_CAVE_RADIUS_X_MAX, MOSS_CAVE_RADIUS_Y_MIN, MOSS_CAVE_RADIUS_Y_MAX, SAND_POCKET_RADIUS_X_MIN, SAND_POCKET_RADIUS_X_MAX, SAND_POCKET_RADIUS_Y_MIN, SAND_POCKET_RADIUS_Y_MAX, CREATION_REMAP} from '../assets/data/data-gen.mjs'
 
 /* ====================================================================================================
    WORLD BUFFER (CREATION DU MONDE)
@@ -205,7 +205,10 @@ class WorldGenerator {
     // 6.1.2 Fossil Veins (caverns_top - desert - SHELL)
     worldCarver.digFossilVeins()
 
-    // 6.1.3 Sap Pockets
+    // 6.1.3 Sand Pockets
+    worldCarver.digSandPockets()
+
+    // 6.1.4 Sap Pockets
     const sapLakes = worldCarver.digSapLakes(surfaceUnder, underCaverns)
     const sapLakeLiquidBodies = sapLakes.map(h => h.liquidBody)
     sapLakes.forEach(l => delete l.liquidBody)
@@ -239,9 +242,6 @@ class WorldGenerator {
 
     // 6.1.X Mushroom caves
     // const mushroomCaves = worldCarver.digMushroomCaves()
-
-    // 6.1.X Sand Pockets
-    // worldCarver.digSandPocket()
 
     // 6.1.X Anthill
     // const anthills = worldCarver.digAnthills()
@@ -1824,6 +1824,16 @@ class TileGuard {
   }
 
   /**
+ * Protège toutes les tuiles d'un tableau de tiles.
+ * @param {Array<{index: number}>} tiles
+ */
+  addTiles (tiles) {
+    for (const tile of tiles) {
+      this.#tiles.add(tile.index)
+    }
+  }
+
+  /**
    * Protège toutes les tuiles d'un rectangle.
    * @param {number} x1
    * @param {number} y1
@@ -3063,8 +3073,6 @@ class WorldCarver {
       }
     }
 
-    console.log('BBBBBBBBBBBBBBBBC digWaterPuddles', {WATER_PUDDLE_COUNT, liquidBodies})
-
     return liquidBodies
   }
 
@@ -3454,6 +3462,70 @@ class WorldCarver {
   }
 
   /**
+ * Creuse des Sand Pockets elliptiques en biome DESERT.
+ * Intérieur : SAND protégé par tileGuard tuile par tuile.
+ * Périphérie inférieure : SANDSTONE (tuiles SAND avec voisin non-SAND et y >= cy).
+ * Layer : under (60%) ou caverns_top (40%).
+ * Prérequis : initZoneRects(), initExclusions().
+ *
+ * @returns {void}
+ */
+  digSandPockets () {
+    const SAND = NODES.SAND.code
+    const SANDSTONE = NODES.SANDSTONE.code
+    const MAX_ATTEMPTS = 100
+
+    for (let i = 0; i < this.#zoneRects.length; i++) {
+      const rect = this.#zoneRects[i]
+      if (rect.biome !== BIOME_TYPE.DESERT) continue
+
+      const count = seededRNG.randomGetMinMax(1, 2)
+
+      for (let n = 0; n < count; n++) {
+        const radiusX = seededRNG.randomGetMinMax(SAND_POCKET_RADIUS_X_MIN, SAND_POCKET_RADIUS_X_MAX)
+        const radiusY = seededRNG.randomGetMinMax(SAND_POCKET_RADIUS_Y_MIN, SAND_POCKET_RADIUS_Y_MAX)
+
+        // Tirage de la layer
+        const isUnder = seededRNG.randomGetMax(99) < 60
+        const y0 = isUnder ? rect.ySurface : rect.yUnder
+        const y1 = isUnder ? rect.yUnder : rect.yCavernsMid
+
+        let cx, cy, valid
+        let attempts = 0
+        do {
+          cx = seededRNG.randomGetMinMax(rect.x0 + radiusX, rect.x1 - radiusX)
+          cy = seededRNG.randomGetMinMax(y0 + radiusY, y1 - radiusY)
+          valid = !this.isExcluded(cx - radiusX, cy - radiusY, cx + radiusX, cy + radiusY)
+          attempts++
+        } while (!valid && attempts < MAX_ATTEMPTS)
+        if (!valid) continue
+
+        // Creusement de l'ellipse en SAND
+        const tiles = []
+        this.digNoisyEllipse(tiles, cx, cy, radiusX - 1, radiusX, radiusY - 1, radiusY, SAND, 0.3, PERLIN_OFFSET_CAVERN)
+        const rect2 = this.applyTiles(tiles)
+        this.addExclusion(rect2)
+
+        // Protection tileGuard tuile par tuile
+        tileGuard.addTiles(tiles)
+
+        // Périphérie inférieure → SANDSTONE
+        const pocketSet = new Set()
+        for (const tile of tiles) pocketSet.add(tile.index)
+
+        for (const {y, index} of tiles) {
+          if (y < cy) continue
+          if (!pocketSet.has(index - 1) || !pocketSet.has(index + 1) || !pocketSet.has(index - WORLD_WIDTH) || !pocketSet.has(index + WORLD_WIDTH)) {
+            worldBuffer.writeAt(index, SANDSTONE)
+          }
+        }
+
+        window.DEBUG_POINTS.push({x: cx, y: cy, color: 'orange'}) // DEBUG
+      }
+    }
+  }
+
+  /**
  * Creuse une fougère cave par zone de biome FOREST.
  * Forme : demi-ellipse supérieure + rectangle inférieur (fond plat).
  * Bords bruités via Perlin noise.
@@ -3598,7 +3670,6 @@ class WorldCarver {
       tileGuard.addNoisyRect(cx, cy + radiusY + 2, radiusX + 2, radiusX + 5, 2, 4, 0.8, PERLIN_OFFSET_FERNS)
       this.#fillMossCaveWalls(cx, cy, radiusX, radiusY)
 
-      window.DEBUG_POINTS.push({x: cx, y: cy, color: 'orange'}) // DEBUG
       caves.push({cx, cy, radiusX, radiusY})
     }
 
