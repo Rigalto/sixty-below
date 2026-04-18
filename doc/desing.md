@@ -390,7 +390,7 @@ dans un biome étranger (cf. §3.9).
 |---|---|---|---|
 | **Antlion Pit** | surface | SAND | Piège conique creux dans le sable. Reconstruit par les habitants si détruit. ANTLION. Boss SUNBURST ANTLION. |
 | **Pyramid** | under | SANDSTONE | Deux chambres. Chambre 1 : salle de pièges (flèches, rouleaux — combat tactique). Chambre 2 : salle triangulaire — boss Pharaon + gardes (momies, sphinx). Loot high-tier. |
-| **Sand Pocket** | under | SAND | Grande poche de SAND sous pression. S'effondre partiellement si le plafond est miné. |
+| **Sand Pocket** | under, caverns_top | SAND | Grande poche de SAND sous pression. S'effondre partiellement si le plafond est miné. |
 | **Fossil Vein** | caverns_top | SHELL | Veine horizontale d'accumulation sédimentaire (ancien fond marin). Minage → item Shell (ingrédient pour mécanique délicate ou potion (réduit en poudre)). Source secondaire : bords et fond de mer (régénération lente). |
 | **Ancient House** | caverns_bottom | GOLDWALL | Ruines d'une civilisation ancienne. Architecture et matériaux différents du Temple Ruin. Pièges, coffres (tier 4-5). Machine ancestrale : Transmutateur. Inamovible. Faune commune de la zone. |
 
@@ -401,7 +401,7 @@ dans un biome étranger (cf. §3.9).
 | Mini-biome | Layer | Matériau dominant | Contenu / Lore |
 |---|---|---|---|
 | **Termite Mound** | surface | MUD + STONEWALL | Jungle. Termitière rectangulaire s'élevant au-dessus de la surface, partie souterraine plus profonde. Reconstruite par les habitants si détruite. TERMITE, TERMITE SOLDIER. Boss TERMITE KING. Loot : matériaux de construction, ingrédients rares. |
-| **Moss Cave** | under | MUD + HUMUS | Parois recouvertes de mousse lumineuse. Faune passive rare. Loot végétal. |
+| **Moss Cave** | under | MUD + GRASSMOSS | Parois recouvertes de mousse lumineuse. Faune passive rare. Loot végétal. |
 | **Hive** | caverns_top | HIVE + HONEY | Ruche d'abeilles (BEE, HORNET). Boss Queen Bee. Remplie de HONEY après génération (liquide, artisanat tier 4). HONEY difficile à récupérer car défendu par les habitants de la ruche : mise en place par le joueur d'une canalisation détournant le miel pour le récolter facilement. |
 | **Temple Ruin** | caverns_top | EMERALDWALL | Ruines d'une civilisation ancienne. Architecture et matériaux différents du Ancient House. Murs effondrés, planchers vermoulus, pièges, coffres (tier 3-4). Machine ancestrale : Décomposeur (rendement 80%). Inamovible. Faune commune de la zone. |
 | **Sap Pocket** | caverns_bottom | LIMESTONE + SAP | Poche de SAP piégeant des insectes fossilisés. Loot d'artisanat rare. |

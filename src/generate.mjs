@@ -345,7 +345,7 @@ class WorldGenerator {
       worldBuffer.clear()
     }
 
-    tileGuard.debug() // DEBUG
+    // tileGuard.debug() // DEBUG
 
     // N + 1. On repasse le générateur de nombres aléatoires en mode aléatoire
     seededRNG.init()
@@ -3493,12 +3493,65 @@ class WorldCarver {
       const rect2 = this.applyTiles(tiles)
       this.addExclusion(rect2)
       tileGuard.addNoisyRect(cx, cy + radiusY + 2, radiusX + 2, radiusX + 6, 2, 4, 0.8, PERLIN_OFFSET_FERNS)
+      this.#fillCaveFloor(cx, cy + 1, radiusX, NODES.GRASSFERN.code, NODES.HUMUS.code)
 
       window.DEBUG_POINTS.push({x: cx, y: cy, color: 'orange'}) // DEBUG
       caves.push({cx, cy, radiusX, radiusY})
     }
 
     return caves
+  }
+
+  /**
+ * Tapisse le fond d'une cave elliptique avec une tuile de surface et un substrat en dessous.
+ * Parcourt les colonnes de cx-radiusX à cx+radiusX.
+ * Descend depuis cy pour trouver le fond (première tuile non-VOID).
+ * Profondeur du substrat : 2 ou 3 tuiles, avec transition Markov 75/25.
+ *
+ * @param {number} cx
+ * @param {number} cy
+ * @param {number} radiusX
+ * @param {number} surfaceCode - Code de la tuile de surface (ex: GRASSFERN)
+ * @param {number} substrateCode - Code du substrat (ex: HUMUS)
+ */
+  #fillCaveFloor (cx, cy, radiusX, surfaceCode, substrateCode) {
+    const VOID = NODES.VOID.code
+    let depth = seededRNG.randomGetBool() ? 2 : 3
+
+    const fillColumn = (x) => {
+    // Descend depuis cy jusqu'au fond
+      let y = cy
+      while (y < WORLD_HEIGHT - 1 && worldBuffer.read(x, y) === VOID) y++
+      if (worldBuffer.read(x, y - 1) !== VOID) return false // hors cave
+
+      // GRASSFERN sur le fond
+      worldBuffer.write(x, y, surfaceCode)
+
+      // HUMUS sur les tuiles suivantes
+      for (let d = 1; d <= depth; d++) {
+        if (worldBuffer.read(x, y + d) === VOID) break
+        worldBuffer.write(x, y + d, substrateCode)
+      }
+
+      // Transition Markov pour la prochaine colonne
+      depth = (depth === 2)
+        ? (seededRNG.randomGetMax(99) < 75 ? 2 : 3)
+        : (seededRNG.randomGetMax(99) < 75 ? 3 : 2)
+
+      return true
+    }
+
+    // Centre puis droite
+    fillColumn(cx)
+    for (let x = cx + 1; x <= cx + radiusX; x++) {
+      if (!fillColumn(x)) break
+    }
+
+    // Gauche
+    depth = seededRNG.randomGetBool() ? 2 : 3
+    for (let x = cx - 1; x >= cx - radiusX; x--) {
+      if (!fillColumn(x)) break
+    }
   }
 
   /**

@@ -26,9 +26,10 @@
 
 ### Mini-biomes à implémenter
 - `TileGuard` : implémenté - A intégrer pour tous les futurs mini-biomes
+- `digSandPocket()` — Desert, under et caverns_top, SAND + SANDSTONE
 - `digMushroomCaves()` — Forest, caverns_top, HUMUS + GRASSMUSHROOM
 - `digFernCaves()` — Forest, under, HUMUS + GRASSFERN
-- `digMossCave()` — Jungle, under, MUD + HUMUS
+- `digMossCave()` — Jungle, under, MUD + GRASSMOSS
 - `digAnthills()` — Forest, surface, structure conique
 - `digTermiteMounds()` — Jungle, surface, structure rectangulaire
 - `digAntlionPits()` — Desert, surface, creux triangulaire
