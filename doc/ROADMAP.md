@@ -28,7 +28,6 @@
 - `TileGuard` : implémenté - A intégrer pour tous les futurs mini-biomes
 - `digSandPocket()` — Desert, under et caverns_top, SAND + SANDSTONE
 - `digMushroomCaves()` — Forest, caverns_top, HUMUS + GRASSMUSHROOM
-- `digFernCaves()` — Forest, under, HUMUS + GRASSFERN
 - `digMossCave()` — Jungle, under, MUD + GRASSMOSS
 - `digAnthills()` — Forest, surface, structure conique
 - `digTermiteMounds()` — Jungle, surface, structure rectangulaire
@@ -197,6 +196,7 @@
 - `WorldCarver.digZigzagTunnels` — tunnels zigzag avec espacement minimal et évitement des lacs
 - `WorldCarver.digSurfaceTunnel` — galeries de surface avec évitement des lacs
 - `WorldCarver.digFossilVein` — Desert + premier et dernier biome, caverns_top avec migration en under/caverns_bottom, veine horizontale SHELL
+- `WorldCarver.digFernCaves)` — Forest, under, HUMUS + GRASSFERN
 - `WorldCarver.cleanupAfterCarving` — nettoyage post-creusement (4 passes, règles déclaratives)
 - `WorldCarver.buildErodedSurfaceLine` — ligne de surface + érosion (trous et bosses)
 - `TileGuard` — utilitaire de protection tuiles contre creusement, formes bruitées (cercle, ellipse, rectangle)
