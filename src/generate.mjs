@@ -875,13 +875,13 @@ export class BiomeNaturalizer {
  * @param {Int16Array} leftCliff, rightCliff
  */
   applySeaPostProcessing (leftCliff, rightCliff) {
-    const SKY_CODE = NODES.SKY.code
-    const SEA_CODE = NODES.VOID.code
+    const SKY = NODES.SKY.code
+    const SEA = NODES.VOID.code
     const SURFACE_CODES = new Set([NODES.CLAY.code, NODES.SANDSTONE.code, NODES.MUD.code, NODES.SKY.code
     ])
 
     for (let y = 1; y < SEA_MAX_DEPTH; y++) { // Environ le milieu de la zone under
-      const newCode = (y < SEA_LEVEL) ? SKY_CODE : SEA_CODE
+      const newCode = (y < SEA_LEVEL) ? SKY : SEA
       // 1. Mer Gauche
       // On vérifie si la falaise n'est pas sortie de l'écran à gauche (1)
       if (leftCliff[y] >= 1) {
@@ -1083,11 +1083,11 @@ class LiquidFiller {
  * @returns {{index: number, nodeCode: number}} — index monde du premier HONEY posé
  */
   fillHive (cx, cy) {
-    const VOID_CODE = NODES.VOID.code
-    const HONEY_CODE = NODES.HONEY.code
+    const VOID = NODES.VOID.code
+    const HONEY = NODES.HONEY.code
 
     const src = (cy << 10) | cx
-    if (worldBuffer.readAt(src) !== VOID_CODE) return
+    if (worldBuffer.readAt(src) !== VOID) return
 
     const visited = new Set()
     const queue = []
@@ -1098,7 +1098,7 @@ class LiquidFiller {
 
     while (head < queue.length) {
       const idx = queue[head++]
-      worldBuffer.writeAt(idx, HONEY_CODE)
+      worldBuffer.writeAt(idx, HONEY)
 
       const neighbors = [idx - 1, idx + 1, idx - 1024, idx + 1024]
       for (let i = 0; i < 4; i++) {
@@ -1110,13 +1110,13 @@ class LiquidFiller {
 
         if (nx <= 1 || nx >= 1022 || ny <= 1 || ny >= 510) continue
         if (ny < cy) continue
-        if (worldBuffer.readAt(nIdx) !== VOID_CODE) continue
+        if (worldBuffer.readAt(nIdx) !== VOID) continue
 
         visited.add(nIdx)
         queue.push(nIdx)
       }
     }
-    return {index: src, nodeCode: HONEY_CODE}
+    return {index: src, nodeCode: HONEY}
   }
 }
 
@@ -2642,6 +2642,7 @@ class WorldCarver {
  */
 
   digSurfaceLakes (skySurface) {
+    const WATER = NODES.WATER.code
     const lakes = []
     let prevCx = -1
 
@@ -2693,7 +2694,6 @@ class WorldCarver {
       this.fillRect(cleanX0, 32, cleanX1, cy - 1, NODES.SKY.code)
 
       // ── Passe 5 - Consolidation des berges ──────────────────────────────────────────────
-      const WATER_CODE = NODES.WATER.code
       const sideCode = lakeCreation.side
       const boundY2 = Math.max(rect2.y2, rect3.y2)
       const boundX1 = Math.min(rect2.x1, rect3.x1)
@@ -2705,13 +2705,13 @@ class WorldCarver {
           const next = worldBuffer.read(x + 1, y)
 
           // Transition SUBSTRAT → WATER
-          if (curr !== WATER_CODE && next === WATER_CODE) {
+          if (curr !== WATER && next === WATER) {
             worldBuffer.write(x, y, sideCode)
             worldBuffer.write(x - 1, y, sideCode)
           }
 
           // Transition WATER → SUBSTRAT
-          if (curr === WATER_CODE && next !== WATER_CODE) {
+          if (curr === WATER && next !== WATER) {
             worldBuffer.write(x + 1, y, sideCode)
             worldBuffer.write(x + 2, y, sideCode)
           }
@@ -2728,13 +2728,13 @@ class WorldCarver {
           const next = worldBuffer.read(x, y + 1)
 
           // Transition WATER → pas d'eau (fond inférieur)
-          if (curr === WATER_CODE && next !== WATER_CODE) {
+          if (curr === WATER && next !== WATER) {
             if (worldBuffer.read(x, y + 1) !== SIDE_CODE) worldBuffer.write(x, y + 1, bedCode)
             if (worldBuffer.read(x, y + 2) !== SIDE_CODE) worldBuffer.write(x, y + 2, bedCode)
           }
 
           // Transition pas d'eau → WATER (fond supérieur du pit)
-          if (curr !== WATER_CODE && next === WATER_CODE) {
+          if (curr !== WATER && next === WATER) {
             if (worldBuffer.read(x, y) !== SIDE_CODE) worldBuffer.write(x, y, bedCode)
             if (worldBuffer.read(x, y - 1) !== SIDE_CODE) worldBuffer.write(x, y - 1, bedCode)
           }
