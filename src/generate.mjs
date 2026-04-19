@@ -624,6 +624,11 @@ export const biomesGenerator = new BiomesGenerator()
 
 export class BiomeNaturalizer {
   naturalize (biomesDescription, leftSeaWidth, rightSeaWidth) {
+    const DEEPSEA = NODES.DEEPSEA.code
+    const FOG = NODES.FOG.code
+    const BASALT = NODES.BASALT.code
+    const LAVA = NODES.LAVA.code
+
     const {skySurface, surfaceUnder, underCaverns, hell} = this.precomputeHorizontalBoundaries()
     const verticalBoundaries = this.precomputeVerticalBoundaries(biomesDescription)
     // console.log('[WorldGenerator] - verticalBoundaries', verticalBoundaries)
@@ -633,16 +638,16 @@ export class BiomeNaturalizer {
         let code = 0
         // 2.1 protection du périmètre (NODE_TYPE.STRONG)
         if ((x === 0) || (x === (WORLD_WIDTH - 1))) {
-          code = NODES.DEEPSEA.code
-          if (y < SEA_LEVEL) code = NODES.FOG.code
-          if (y > surfaceUnder[x]) code = NODES.BASALT.code
+          code = DEEPSEA
+          if (y < SEA_LEVEL) code = FOG
+          if (y > surfaceUnder[x]) code = BASALT
         }
-        if (y === 0) code = NODES.FOG.code
-        if (y === (WORLD_HEIGHT - 1)) code = NODES.LAVA.code
+        if (y === 0) code = FOG
+        if (y === (WORLD_HEIGHT - 1)) code = LAVA
 
         if (code === 0) {
           code = this.getSubstratCode(x, y, skySurface, surfaceUnder, underCaverns, verticalBoundaries)
-          if (y >= hell[x]) code = NODES.LAVA.code
+          if (y >= hell[x]) code = LAVA
         }
         worldBuffer.write(x, y, code) // NEW
       }
@@ -827,10 +832,12 @@ export class BiomeNaturalizer {
 
   /**
    * Vérifie que la tuile peut être écrasée par la migration
+   * jamais propager VOID (SEA temporaire)
+   * jamais propager SKY
    */
   safeSetTile (x, y, newCode) {
-    if (newCode === NODES.VOID.code) return // jamais propager VOID (SEA temporaire)
-    if (newCode === NODES.SKY.code) return // jamais propager SKY
+    const EXCLUDED = new Set([NODES.VOID.code, NODES.SKY.code])
+    if (EXCLUDED.has(newCode)) return
 
     const currentType = NODES_LOOKUP[worldBuffer.read(x, y)]?.type ?? 0
     if (currentType & (NODE_TYPE.SUBSTRAT | NODE_TYPE.TOPSOIL | NODE_TYPE.NATURAL)) {
@@ -1488,8 +1495,13 @@ class ClusterGenerator {
  * Prérequis : this.zoneRects initialisé par initZoneRects()
  */
   addOreIntrusions () {
-  // Place count clusters d'un ore dans une layer donnée, X libre sur tout le monde.
-  // y0/y1 sont calculés en moyennant les frontières sur toute la largeur.
+    const SILVER = NODES.SILVER.code
+    const GOLD = NODES.GOLD.code
+    const COBALT = NODES.COBALT.code
+    const PLATINUM = NODES.PLATINUM.code
+
+    // Place count clusters d'un ore dans une layer donnée, X libre sur tout le monde.
+    // y0/y1 sont calculés en moyennant les frontières sur toute la largeur.
     const placeInLayer = (count, code, sizeMin, sizeMax, y0fn, y1fn) => {
       for (let i = 0; i < count; i++) {
         const x = seededRNG.randomGetMinMax(1, WORLD_WIDTH - 2)
@@ -1506,49 +1518,49 @@ class ClusterGenerator {
 
     // ── SILVER — surface ──────────────────────────────────────────────────────
     {
-      const {sizeMin, sizeMax} = this.#getClusterSizes(BIOME_TYPE.FOREST, 'under', NODES.SILVER.code)
+      const {sizeMin, sizeMax} = this.#getClusterSizes(BIOME_TYPE.FOREST, 'under', SILVER)
       const count = seededRNG.randomGetMinMax(3, 5)
-      placeInLayer(count, NODES.SILVER.code, sizeMin, sizeMax,
+      placeInLayer(count, SILVER, sizeMin, sizeMax,
         r => r.ySkySurface, r => r.ySurface)
     }
 
     // ── GOLD — surface ────────────────────────────────────────────────────────
     {
-      const {sizeMin, sizeMax} = this.#getClusterSizes(BIOME_TYPE.FOREST, 'caverns_top', NODES.GOLD.code)
+      const {sizeMin, sizeMax} = this.#getClusterSizes(BIOME_TYPE.FOREST, 'caverns_top', GOLD)
       const count = seededRNG.randomGetMinMax(0, 3)
-      placeInLayer(count, NODES.GOLD.code, sizeMin, sizeMax,
+      placeInLayer(count, GOLD, sizeMin, sizeMax,
         r => r.ySkySurface, r => r.ySurface)
     }
 
     // ── GOLD — under ──────────────────────────────────────────────────────────
     {
-      const {sizeMin, sizeMax} = this.#getClusterSizes(BIOME_TYPE.FOREST, 'caverns_top', NODES.GOLD.code)
+      const {sizeMin, sizeMax} = this.#getClusterSizes(BIOME_TYPE.FOREST, 'caverns_top', GOLD)
       const count = seededRNG.randomGetMinMax(4, 8)
-      placeInLayer(count, NODES.GOLD.code, sizeMin, sizeMax,
+      placeInLayer(count, GOLD, sizeMin, sizeMax,
         r => r.ySurface, r => r.yUnder)
     }
 
     // ── COBALT — under ────────────────────────────────────────────────────────
     {
-      const {sizeMin, sizeMax} = this.#getClusterSizes(BIOME_TYPE.FOREST, 'caverns_top', NODES.COBALT.code)
+      const {sizeMin, sizeMax} = this.#getClusterSizes(BIOME_TYPE.FOREST, 'caverns_top', COBALT)
       const count = seededRNG.randomGetMinMax(3, 7)
-      placeInLayer(count, NODES.COBALT.code, sizeMin, sizeMax,
+      placeInLayer(count, COBALT, sizeMin, sizeMax,
         r => r.ySurface, r => r.yUnder)
     }
 
     // ── PLATINUM — under ──────────────────────────────────────────────────────
     {
-      const {sizeMin, sizeMax} = this.#getClusterSizes(BIOME_TYPE.FOREST, 'caverns_bottom', NODES.PLATINUM.code)
+      const {sizeMin, sizeMax} = this.#getClusterSizes(BIOME_TYPE.FOREST, 'caverns_bottom', PLATINUM)
       const count = seededRNG.randomGetMinMax(0, 3)
-      placeInLayer(count, NODES.PLATINUM.code, sizeMin, sizeMax,
+      placeInLayer(count, PLATINUM, sizeMin, sizeMax,
         r => r.ySurface, r => r.yUnder)
     }
 
     // ── PLATINUM — caverns_top ────────────────────────────────────────────────
     {
-      const {sizeMin, sizeMax} = this.#getClusterSizes(BIOME_TYPE.FOREST, 'caverns_bottom', NODES.PLATINUM.code)
+      const {sizeMin, sizeMax} = this.#getClusterSizes(BIOME_TYPE.FOREST, 'caverns_bottom', PLATINUM)
       const count = seededRNG.randomGetMinMax(3, 7)
-      placeInLayer(count, NODES.PLATINUM.code, sizeMin, sizeMax,
+      placeInLayer(count, PLATINUM, sizeMin, sizeMax,
         r => r.yUnder, r => r.yCavernsMid)
     }
   }
@@ -1567,43 +1579,49 @@ class ClusterGenerator {
  * Prérequis : this.zoneRects initialisé par initZoneRects()
  */
   addGemIntrusions () {
+    const SAPPHIRE = NODES.SAPPHIRE.code
+    const TOPAZ = NODES.TOPAZ.code
+    const RUBY = NODES.RUBY.code
+    const EMERALD = NODES.EMERALD.code
+    const OBSIDIAN = NODES.OBSIDIAN.code
+
     // ── SAPPHIRE — caverns_top, biome aléatoire ───────────────────────────────
     {
       const zone = seededRNG.randomGetArrayValue(this.zoneRects)
-      const {sizeMin, sizeMax} = this.#getClusterSizes(BIOME_TYPE.FOREST, NODES.SAPPHIRE.code)
-      this.#placeOneCluster(zone.x0, zone.x1, zone.yUnder, zone.yCavernsMid, NODES.SAPPHIRE.code, sizeMin, sizeMax)
+      const {sizeMin, sizeMax} = this.#getClusterSizes(BIOME_TYPE.FOREST, SAPPHIRE)
+      this.#placeOneCluster(zone.x0, zone.x1, zone.yUnder, zone.yCavernsMid, SAPPHIRE, sizeMin, sizeMax)
     }
 
     // ── TOPAZ — caverns_top, biome étranger, 1 chance sur 3 ──────────────────
     if (seededRNG.randomGet() < 0.40) {
       const zone = seededRNG.randomGetArrayValue(this.#getForeignZones(BIOME_TYPE.FOREST))
-      const {sizeMin, sizeMax} = this.#getClusterSizes(BIOME_TYPE.FOREST, NODES.TOPAZ.code)
-      this.#placeOneCluster(zone.x0, zone.x1, zone.yUnder, zone.yCavernsMid, NODES.TOPAZ.code, sizeMin, sizeMax)
+      const {sizeMin, sizeMax} = this.#getClusterSizes(BIOME_TYPE.FOREST, TOPAZ)
+      this.#placeOneCluster(zone.x0, zone.x1, zone.yUnder, zone.yCavernsMid, TOPAZ, sizeMin, sizeMax)
     }
 
     // ── RUBY — caverns_top ou caverns_bottom, biome étranger, 1 chance sur 3 ─
     if (seededRNG.randomGet() < 0.40) {
       const zone = seededRNG.randomGetArrayValue(this.#getForeignZones(BIOME_TYPE.DESERT))
-      const {sizeMin, sizeMax} = this.#getClusterSizes(BIOME_TYPE.DESERT, NODES.RUBY.code)
+      const {sizeMin, sizeMax} = this.#getClusterSizes(BIOME_TYPE.DESERT, RUBY)
       const inTop = seededRNG.randomGetBool()
       const y0 = inTop ? zone.yUnder : zone.yCavernsMid
       const y1 = inTop ? zone.yCavernsMid : zone.yCaverns
-      this.#placeOneCluster(zone.x0, zone.x1, y0, y1, NODES.RUBY.code, sizeMin, sizeMax)
+      this.#placeOneCluster(zone.x0, zone.x1, y0, y1, RUBY, sizeMin, sizeMax)
     }
 
     // ── EMERALD — caverns_top ou caverns_bottom, biome étranger, 1 chance sur 3
     if (seededRNG.randomGet() < 0.40) {
       const zone = seededRNG.randomGetArrayValue(this.#getForeignZones(BIOME_TYPE.JUNGLE))
-      const {sizeMin, sizeMax} = this.#getClusterSizes(BIOME_TYPE.JUNGLE, NODES.EMERALD.code)
+      const {sizeMin, sizeMax} = this.#getClusterSizes(BIOME_TYPE.JUNGLE, EMERALD)
       const inTop = seededRNG.randomGetBool()
       const y0 = inTop ? zone.yUnder : zone.yCavernsMid
       const y1 = inTop ? zone.yCavernsMid : zone.yCaverns
-      this.#placeOneCluster(zone.x0, zone.x1, y0, y1, NODES.EMERALD.code, sizeMin, sizeMax)
+      this.#placeOneCluster(zone.x0, zone.x1, y0, y1, EMERALD, sizeMin, sizeMax)
     }
 
     // ── Bonus under — 1 monde sur 4, 1 gemme au hasard, 1 biome au hasard ────
     if (seededRNG.randomGet() < 0.60) {
-      const gemCodes = [NODES.TOPAZ.code, NODES.RUBY.code, NODES.EMERALD.code, NODES.SAPPHIRE.code]
+      const gemCodes = [TOPAZ, RUBY, EMERALD, SAPPHIRE]
       const code = seededRNG.randomGetArrayValue(gemCodes)
       const zone = seededRNG.randomGetArrayValue(this.zoneRects)
       const {sizeMin, sizeMax} = this.#getClusterSizes(BIOME_TYPE.FOREST, code)
@@ -1614,10 +1632,10 @@ class ClusterGenerator {
     if (seededRNG.randomGet() < 0.30) {
       const zone = seededRNG.randomGetArrayValue(this.zoneRects)
       const entries = ORE_GEM_SCATTER_MAP[zone.biome]?.hell
-      const entry = entries?.find(e => e.code === NODES.OBSIDIAN.code)
+      const entry = entries?.find(e => e.code === OBSIDIAN)
       const sizeMin = entry?.sizeMin ?? 16
       const sizeMax = entry?.sizeMax ?? 36
-      this.#placeOneCluster(zone.x0, zone.x1, zone.yUnder, zone.yHell, NODES.OBSIDIAN.code, sizeMin, sizeMax)
+      this.#placeOneCluster(zone.x0, zone.x1, zone.yUnder, zone.yHell, OBSIDIAN, sizeMin, sizeMax)
     }
   }
 
@@ -2547,7 +2565,10 @@ class WorldCarver {
  * @returns {{cx, cy, radius}|null, liquidBody: {index, nodeCode}} — null si MAX_ATTEMPTS épuisé
  */
   #digOneHive (rect) {
+    const VOID = NODES.VOID.code
+    const HIVE = NODES.HIVE.code
     const MAX_ATTEMPTS = 100
+
     const radius = seededRNG.randomGetMinMax(HIVE_RADIUS_MIN, HIVE_RADIUS_MAX)
     const angle = seededRNG.randomGetBool() ? 45 : -45
     const length = seededRNG.randomGetMinMax(30, 50)
@@ -2572,8 +2593,8 @@ class WorldCarver {
     if (!valid) return null
 
     const tiles = []
-    this.digNoisyCircle(tiles, cx, cy, radius, radius + 4, NODES.HIVE.code, 0.3, PERLIN_OFFSET_HIVE)
-    this.digNoisyCircle(tiles, cx, cy, radius - 3, radius, NODES.VOID.code, 0.3, PERLIN_OFFSET_HIVE)
+    this.digNoisyCircle(tiles, cx, cy, radius, radius + 4, HIVE, 0.3, PERLIN_OFFSET_HIVE)
+    this.digNoisyCircle(tiles, cx, cy, radius - 3, radius, VOID, 0.3, PERLIN_OFFSET_HIVE)
     const rect2 = this.applyTiles(tiles, ETERNAL_EXCLUDED)
 
     const path = this.pathTunnel(cx, cy, 4, length, angle, 10)
@@ -2642,6 +2663,7 @@ class WorldCarver {
  */
 
   digSurfaceLakes (skySurface) {
+    const SKY = NODES.SKY.code
     const WATER = NODES.WATER.code
     const lakes = []
     let prevCx = -1
@@ -2670,7 +2692,7 @@ class WorldCarver {
 
       // Passe 1 - ellipse horizontale principale
       const tiles = []
-      this.digNoisyEllipse(tiles, cx, cy, radiusX - 1, radiusX, radiusY - 1, radiusY, NODES.SKY.code, 0.2, PERLIN_OFFSET_LAKES)
+      this.digNoisyEllipse(tiles, cx, cy, radiusX - 1, radiusX, radiusY - 1, radiusY, SKY, 0.2, PERLIN_OFFSET_LAKES)
       const rect2 = this.applyTiles(tiles, ETERNAL_EXCLUDED)
 
       // Passe 2 - Pit — ellipse verticale bruitée, centre décalé vers le bas
@@ -2681,7 +2703,7 @@ class WorldCarver {
       const pitRadiusY = seededRNG.randomGetMinMax(LAKE_PIT_RADIUS_Y_MIN, LAKE_PIT_RADIUS_Y_MAX)
 
       const pitTiles = []
-      this.digNoisyEllipse(pitTiles, pitCx, pitCy, pitRadiusX - 1, pitRadiusX, pitRadiusY - 1, pitRadiusY, NODES.SKY.code, 0.4, PERLIN_OFFSET_CAVERN)
+      this.digNoisyEllipse(pitTiles, pitCx, pitCy, pitRadiusX - 1, pitRadiusX, pitRadiusY - 1, pitRadiusY, SKY, 0.4, PERLIN_OFFSET_CAVERN)
       const rect3 = this.applyTiles(pitTiles, ETERNAL_EXCLUDED)
 
       // Passe 3 : remplir le base de l'ellipse par du WATER
@@ -2691,7 +2713,7 @@ class WorldCarver {
       // Passe 4 : Nettoyage des tuiles volantes au-dessus du lac
       const cleanX0 = Math.round(cx - radiusX * 0.6)
       const cleanX1 = Math.round(cx + radiusX * 0.6)
-      this.fillRect(cleanX0, 32, cleanX1, cy - 1, NODES.SKY.code)
+      this.fillRect(cleanX0, 32, cleanX1, cy - 1, SKY)
 
       // ── Passe 5 - Consolidation des berges ──────────────────────────────────────────────
       const sideCode = lakeCreation.side
@@ -2762,6 +2784,8 @@ class WorldCarver {
  * @returns {Array<{cx, cy, radiusX, radiusY}>}
  */
   digUndergroundLakes (surfaceUnder, underCaverns) {
+    const VOID = NODES.VOID.code
+    const WATER = NODES.WATER.code
     const lakes = []
 
     const digOne = (y0, y1, layer) => {
@@ -2774,7 +2798,7 @@ class WorldCarver {
 
       // creusement d'une ellipse bruitée
       const tiles = []
-      this.digNoisyEllipse(tiles, cx, cy, radiusX - 1, radiusX, radiusY - 1, radiusY, NODES.VOID.code, 0.3, PERLIN_OFFSET_LAKES)
+      this.digNoisyEllipse(tiles, cx, cy, radiusX - 1, radiusX, radiusY - 1, radiusY, VOID, 0.3, PERLIN_OFFSET_LAKES)
       const rect = this.applyTiles(tiles)
       this.addExclusion(rect)
 
@@ -2782,7 +2806,7 @@ class WorldCarver {
       tileGuard.addNoisyEllipseBottom(cx, cy, radiusX + 2, radiusX + 4, radiusY + 2, radiusY + 4, 0.8, PERLIN_OFFSET_LAKES)
 
       // ajout de la WATER
-      const liquidBody = liquidFiller.fillLake(cx, cy + 1, radiusX + 4, NODES.WATER.code)
+      const liquidBody = liquidFiller.fillLake(cx, cy + 1, radiusX + 4, WATER)
 
       const biome = clusterGenerator.getRectAt(cx).biome
       lakes.push({cx, cy, biome, layer, liquidBody})
@@ -2809,6 +2833,8 @@ class WorldCarver {
  * @returns {Array<{cx, cy, biome, layer, liquidBody: {index, nodeCode}}>}
  */
   digBlindLakes (underCaverns) {
+    const VOID = NODES.VOID.code
+    const WATER = NODES.WATER.code
     const lakes = []
 
     for (let i = 0; i < BLIND_LAKE_COUNT; i++) {
@@ -2821,13 +2847,13 @@ class WorldCarver {
       if (this.isExcluded(cx - radiusX, cy - radiusY, cx + radiusX, cy + radiusY)) continue
 
       const tiles = []
-      this.digNoisyEllipse(tiles, cx, cy, radiusX - 1, radiusX, radiusY - 1, radiusY, NODES.VOID.code, 0.3, PERLIN_OFFSET_LAKES)
+      this.digNoisyEllipse(tiles, cx, cy, radiusX - 1, radiusX, radiusY - 1, radiusY, VOID, 0.3, PERLIN_OFFSET_LAKES)
       const rect = this.applyTiles(tiles)
       this.addExclusion(rect)
 
       tileGuard.addNoisyEllipse(cx, cy, radiusX + 1, radiusX + 3, radiusY + 1, radiusY + 3, 0.8, PERLIN_OFFSET_LAKES)
 
-      const liquidBody = liquidFiller.fillLake(cx, cy + 1, radiusX + 4, NODES.WATER.code)
+      const liquidBody = liquidFiller.fillLake(cx, cy + 1, radiusX + 4, WATER)
       const biome = clusterGenerator.getRectAt(cx).biome
 
       lakes.push({cx, cy, biome, layer: 'caverns_bottom', liquidBody})
@@ -2846,6 +2872,7 @@ class WorldCarver {
  * @returns {Array<{cx, cy, biome, layer, liquidBody: {index, nodeCode}}>}
  */
   digSapLakes (surfaceUnder, underCaverns) {
+    const VOID = NODES.VOID.code
     const SAP = NODES.SAP.code
     const lakes = []
 
@@ -2863,7 +2890,7 @@ class WorldCarver {
       if (this.isExcluded(cx - radiusX, cy - radiusY, cx + radiusX, cy + radiusY)) return
 
       const tiles = []
-      this.digNoisyEllipse(tiles, cx, cy, radiusX - 1, radiusX, radiusY - 1, radiusY, NODES.VOID.code, 0.3, PERLIN_OFFSET_CAVERN)
+      this.digNoisyEllipse(tiles, cx, cy, radiusX - 1, radiusX, radiusY - 1, radiusY, VOID, 0.3, PERLIN_OFFSET_CAVERN)
       const applyRect = this.applyTiles(tiles)
       this.addExclusion(applyRect)
 
@@ -2893,6 +2920,7 @@ class WorldCarver {
  * @returns {Array<{cx, cy, biome, layer, liquidBody: {index, nodeCode}}>}
  */
   digSapPockets (underCaverns) {
+    const VOID = NODES.VOID.code
     const SAP = NODES.SAP.code
     const pockets = []
 
@@ -2913,7 +2941,7 @@ class WorldCarver {
       if (this.isExcluded(cx - radiusX, cy - radiusY, cx + radiusX, cy + radiusY)) continue
 
       const tiles = []
-      this.digNoisyEllipse(tiles, cx, cy, radiusX - 1, radiusX, radiusY - 1, radiusY, NODES.VOID.code, 0.3, PERLIN_OFFSET_LAKES)
+      this.digNoisyEllipse(tiles, cx, cy, radiusX - 1, radiusX, radiusY - 1, radiusY, VOID, 0.3, PERLIN_OFFSET_LAKES)
       const applyRect = this.applyTiles(tiles)
       this.addExclusion(applyRect)
 
@@ -3047,6 +3075,7 @@ class WorldCarver {
  * @returns {Array<{index, nodeCode}>}
  */
   digWaterPuddles (surfaceUnder) {
+    const VOID = NODES.VOID.code
     const WATER = NODES.WATER.code
     const liquidBodies = []
     let attempts = 0
@@ -3056,7 +3085,7 @@ class WorldCarver {
       attempts++
       const x = seededRNG.randomGetMinMax(2, WORLD_WIDTH - 3)
       const y = seededRNG.randomGetMinMax(surfaceUnder[x], WORLD_HEIGHT - 32)
-      if (worldBuffer.read(x, y) !== NODES.VOID.code) continue
+      if (worldBuffer.read(x, y) !== VOID) continue
 
       // recherche d'un point bas
       const dx = seededRNG.randomGetBool() ? 1 : -1
@@ -3085,6 +3114,7 @@ class WorldCarver {
  * @returns {Array<{index, nodeCode}>}
  */
   digSapPuddles (surfaceUnder) {
+    const VOID = NODES.VOID.code
     const SAP = NODES.SAP.code
     const liquidBodies = []
     const jungleRects = []
@@ -3101,7 +3131,7 @@ class WorldCarver {
       const rect = seededRNG.randomGetArrayValue(jungleRects)
       const x = seededRNG.randomGetMinMax(rect.x0 + 2, rect.x1 - 2)
       const y = seededRNG.randomGetMinMax(surfaceUnder[x], WORLD_HEIGHT - 32)
-      if (worldBuffer.read(x, y) !== NODES.VOID.code) continue
+      if (worldBuffer.read(x, y) !== VOID) continue
 
       const dx = seededRNG.randomGetBool() ? 1 : -1
       const bottom1 = this.#flowToBottom(x, y, dx)
@@ -3132,6 +3162,7 @@ class WorldCarver {
  * @returns {{cx, cy, radiusX, radiusY}|null} — null si MAX_ATTEMPTS épuisé
  */
   #digOneCobwebCave (y0, y1) {
+    const VOID = NODES.VOID.code
     const MAX_ATTEMPTS = 100
     const radiusX = seededRNG.randomGetMinMax(COBWEB_RADIUS_X_MIN, COBWEB_RADIUS_X_MAX)
     const radiusY = seededRNG.randomGetMinMax(COBWEB_RADIUS_Y_MIN, COBWEB_RADIUS_Y_MAX)
@@ -3147,7 +3178,7 @@ class WorldCarver {
     if (!valid) return null
 
     const tiles = []
-    this.digNoisyEllipse(tiles, cx, cy, radiusX - 2, radiusX + 2, radiusY - 2, radiusY + 2, NODES.VOID.code, 0.3, PERLIN_OFFSET_COBWEB)
+    this.digNoisyEllipse(tiles, cx, cy, radiusX - 2, radiusX + 2, radiusY - 2, radiusY + 2, VOID, 0.3, PERLIN_OFFSET_COBWEB)
     const rect = this.applyTiles(tiles)
 
     // ajout des toiles d'araignées au plafond
@@ -3203,6 +3234,7 @@ class WorldCarver {
  * @returns {{cx, cy, radiusX, radiusY, code}|null} — null si MAX_ATTEMPTS épuisé
  */
   #digOneGeodeCave (y0, y1, code) {
+    const VOID = NODES.VOID.code
     const MAX_ATTEMPTS = 100
     const radiusX = seededRNG.randomGetMinMax(GEODE_RADIUS_MIN, GEODE_RADIUS_MAX)
     const radiusY = seededRNG.randomGetMinMax(GEODE_RADIUS_MIN, GEODE_RADIUS_MAX)
@@ -3218,7 +3250,7 @@ class WorldCarver {
     if (!valid) return null
 
     const tiles = []
-    this.digNoisyEllipse(tiles, cx, cy, radiusX - 2, radiusX + 2, radiusY - 2, radiusY + 2, NODES.VOID.code, 0.3, PERLIN_OFFSET_CAVERN)
+    this.digNoisyEllipse(tiles, cx, cy, radiusX - 2, radiusX + 2, radiusY - 2, radiusY + 2, VOID, 0.3, PERLIN_OFFSET_CAVERN)
     const rect = this.applyTiles(tiles)
     this.addExclusion(rect)
 
@@ -3533,6 +3565,7 @@ class WorldCarver {
  * @returns {Array<{cx, cy, radiusX, radiusY}>}
  */
   digFernCaves () {
+    const VOID = NODES.VOID.code
     const GRASSFERN = NODES.GRASSFERN.code
     const HUMUS = NODES.HUMUS.code
     const caves = []
@@ -3557,12 +3590,12 @@ class WorldCarver {
 
       // Passe 1 — ellipse bruitée
       const tiles = []
-      this.digNoisyEllipse(tiles, cx, cy, radiusX - 4, radiusX, radiusY - 4, radiusY, NODES.VOID.code, 0.3, PERLIN_OFFSET_FERNS)
+      this.digNoisyEllipse(tiles, cx, cy, radiusX - 4, radiusX, radiusY - 4, radiusY, VOID, 0.3, PERLIN_OFFSET_FERNS)
 
       // Passe 2 — rectangle inférieur
       const rectCy = cy + Math.round((radiusY + 2) / 2)
       const rectHalfH = Math.round((radiusY + 2) / 2)
-      this.digNoisyRect(tiles, cx, rectCy, radiusX - 1, radiusX + 3, rectHalfH - 1, rectHalfH + 1, NODES.VOID.code, 0.3, PERLIN_OFFSET_FERNS)
+      this.digNoisyRect(tiles, cx, rectCy, radiusX - 1, radiusX + 3, rectHalfH - 1, rectHalfH + 1, VOID, 0.3, PERLIN_OFFSET_FERNS)
 
       const rect2 = this.applyTiles(tiles)
       this.addExclusion(rect2)
@@ -3637,6 +3670,7 @@ class WorldCarver {
  * @returns {Array<{cx, cy, radiusX, radiusY}>}
  */
   digMossCaves () {
+    const VOID = NODES.VOID.code
     const caves = []
     const MAX_ATTEMPTS = 100
 
@@ -3658,11 +3692,11 @@ class WorldCarver {
       if (!valid) continue
 
       const tiles = []
-      this.digNoisyEllipse(tiles, cx, cy, radiusX - 4, radiusX, radiusY - 4, radiusY, NODES.VOID.code, 0.3, PERLIN_OFFSET_FERNS)
+      this.digNoisyEllipse(tiles, cx, cy, radiusX - 4, radiusX, radiusY - 4, radiusY, VOID, 0.3, PERLIN_OFFSET_FERNS)
 
       const rectCy = cy + Math.round((radiusY + 2) / 2)
       const rectHalfH = Math.round((radiusY + 2) / 2)
-      this.digNoisyRect(tiles, cx, rectCy, radiusX - 1, radiusX, rectHalfH - 1, rectHalfH, NODES.VOID.code, 0.3, PERLIN_OFFSET_FERNS)
+      this.digNoisyRect(tiles, cx, rectCy, radiusX - 1, radiusX, rectHalfH - 1, rectHalfH, VOID, 0.3, PERLIN_OFFSET_FERNS)
 
       const rect2 = this.applyTiles(tiles)
       this.addExclusion(rect2)
@@ -3735,6 +3769,7 @@ class WorldCarver {
  * @returns {Array<{cx, cy, radiusX, radiusY}>}
  */
   digMushroomCaves () {
+    const VOID = NODES.VOID.code
     const GRASSMUSHROOM = NODES.GRASSMUSHROOM.code
     const HUMUS = NODES.HUMUS.code
     const caves = []
@@ -3758,7 +3793,7 @@ class WorldCarver {
       if (!valid) continue
 
       const tiles = []
-      this.digNoisyRect(tiles, cx, cy, radiusX - 2, radiusX, radiusY - 2, radiusY, NODES.VOID.code, 0.3, PERLIN_OFFSET_MUSHROOM)
+      this.digNoisyRect(tiles, cx, cy, radiusX - 2, radiusX, radiusY - 2, radiusY, VOID, 0.3, PERLIN_OFFSET_MUSHROOM)
 
       const rect2 = this.applyTiles(tiles)
       this.addExclusion(rect2)
@@ -3782,15 +3817,8 @@ class WorldCarver {
  * Protège les tuiles ETERNAL contre tout écrasement.
  */
   cleanupAfterCarving () {
-    const world = worldBuffer.world
     const VOID = NODES.VOID.code
     const SKY = NODES.SKY.code
-    const W = WORLD_WIDTH
-    const H = WORLD_HEIGHT
-
-    let code, top, bot, left, right
-    let topright, rightright, botleft, botright, botbot // pour doublons H et V
-
     const LIQUID_OR_GAZ = new Set([
       NODES.VOID.code,
       NODES.SKY.code,
@@ -3804,6 +3832,13 @@ class WorldCarver {
     const GAZ = new Set([NODES.SKY.code, NODES.FOG.code, NODES.VOID.code])
     const SKY_OR_FOG = new Set([NODES.SKY.code, NODES.FOG.code])
     const LIQUID = new Set([NODES.WATER.code, NODES.SEA.code, NODES.HONEY.code, NODES.SAP.code, NODES.DEEPSEA.code])
+
+    const W = WORLD_WIDTH
+    const H = WORLD_HEIGHT
+
+    const world = worldBuffer.world
+    let code, top, bot, left, right
+    let topright, rightright, botleft, botright, botbot // pour doublons H et V
 
     const propagateSky = (idx) => {
       world[idx] = SKY
@@ -3903,8 +3938,6 @@ class WorldCarver {
           const candidates = [top, bot, left, topright, botright, rightright]
           world[idx] = seededRNG.randomGetArrayValue(candidates)
           world[idx + 1] = seededRNG.randomGetArrayValue(candidates)
-          world[idx] = NODES.LAVA.code // débug
-          world[idx + 1] = NODES.LAVA.code // débug
           continue
         }
 
@@ -4204,13 +4237,8 @@ class WorldCarver {
  * @returns {Int16Array} surfaceLine — Y de la première tuile solide par colonne X
  */
   buildErodedSurfaceLine () {
-    const world = worldBuffer.world
-    const W = WORLD_WIDTH
-    const H = WORLD_HEIGHT
-    const surfaceLine = new Int16Array(W)
     const SKY = NODES.SKY.code
     const VOID = NODES.VOID.code
-
     const LIQUID_OR_GAZ = new Set([
       NODES.VOID.code,
       NODES.SKY.code,
@@ -4221,6 +4249,10 @@ class WorldCarver {
       NODES.HONEY.code,
       NODES.SAP.code
     ])
+    const W = WORLD_WIDTH
+    const H = WORLD_HEIGHT
+    const world = worldBuffer.world
+    const surfaceLine = new Int16Array(W)
 
     // Remplace idx par SKY et descend tant que VOID → SKY
     const propagateSky = (idx) => {
@@ -4279,11 +4311,11 @@ class WorldCarver {
  * À supprimer après validation.
  */
   debugTraceTunnel () {
-    const code = NODES.VOID.code
+    const VOID = NODES.VOID.code
     const tiles = []
     for (let cx = 100; cx < WORLD_WIDTH - 100; cx += 60) {
       for (let cy = 100; cy < WORLD_HEIGHT - 100; cy += 40) {
-        this.digNoisyEllipse(tiles, cx, cy, 18, 22, 6, 10, code)
+        this.digNoisyEllipse(tiles, cx, cy, 18, 22, 6, 10, VOID)
       }
     }
     this.applyTiles(tiles)
@@ -4296,13 +4328,6 @@ export const worldCarver = new WorldCarver()
    ==================================================================================================== */
 
 class WebFiller {
-  constructor () {
-    this.WEB = NODES.WEB.code
-    this.VOID = NODES.VOID.code
-    this.HIVE = NODES.HIVE.code
-    this.WIDTH = WORLD_WIDTH
-  }
-
   /**
    * Remonte au plafond depuis (cx, cy) et construit une toile organique
    * de `count` tuiles maximum. Abandon si le plafond est HIVE.
@@ -4312,24 +4337,28 @@ class WebFiller {
    * @param {number} count
    */
   #buildWeb (cx, cy, count, notSolid) {
+    const VOID = NODES.VOID.code
+    const WEB = NODES.WEB.code
+    const HIVE = NODES.HIVE.code
+    const W = WORLD_WIDTH
     const NOT_SOLID = new Set([NODES.VOID.code, NODES.WEB.code])
-    let idx = (cy << 10) | cx
 
+    let idx = (cy << 10) | cx
     const protect = (x, y) => {
       const idxAbove1 = ((y - 1) << 10) | x
-      const idxAbove2 = idxAbove1 - this.WIDTH
+      const idxAbove2 = idxAbove1 - W
       if (!NOT_SOLID.has(worldBuffer.readAt(idxAbove1))) tileGuard.add(idxAbove1)
       if (!NOT_SOLID.has(worldBuffer.readAt(idxAbove2))) tileGuard.add(idxAbove2)
     }
 
     // Remonte au plafond
-    while (worldBuffer.readAt(idx - this.WIDTH) === this.VOID) {
-      idx -= this.WIDTH
+    while (worldBuffer.readAt(idx - W) === VOID) {
+      idx -= W
       cy--
     }
-    if (worldBuffer.readAt(idx - this.WIDTH) === this.HIVE) return
+    if (worldBuffer.readAt(idx - W) === HIVE) return
 
-    worldBuffer.writeAt(idx, this.WEB)
+    worldBuffer.writeAt(idx, WEB)
     protect(cx, cy)
     count--
 
@@ -4362,34 +4391,38 @@ class WebFiller {
    * @returns {{x, y}|null}
    */
   #stepWeb (x, y) {
+    const VOID = NODES.VOID.code
+    const WEB = NODES.WEB.code
+    const W = WORLD_WIDTH
+
     const idx = (y << 10) | x
 
-    if (worldBuffer.readAt(idx - this.WIDTH) === this.VOID) {
-      worldBuffer.writeAt(idx - this.WIDTH, this.WEB)
+    if (worldBuffer.readAt(idx - W) === VOID) {
+      worldBuffer.writeAt(idx - W, WEB)
       return {x, y: y - 1}
     }
 
-    const leftVoid = worldBuffer.readAt(idx - 1) === this.VOID
-    const rightVoid = worldBuffer.readAt(idx + 1) === this.VOID
+    const leftVoid = worldBuffer.readAt(idx - 1) === VOID
+    const rightVoid = worldBuffer.readAt(idx + 1) === VOID
 
     if (leftVoid && rightVoid) {
       if (seededRNG.randomGetBool()) {
-        worldBuffer.writeAt(idx + 1, this.WEB)
+        worldBuffer.writeAt(idx + 1, WEB)
         return {x: x + 1, y}
       }
-      worldBuffer.writeAt(idx - 1, this.WEB)
+      worldBuffer.writeAt(idx - 1, WEB)
       return {x: x - 1, y}
     }
     if (rightVoid) {
-      worldBuffer.writeAt(idx + 1, this.WEB)
+      worldBuffer.writeAt(idx + 1, WEB)
       return {x: x + 1, y}
     }
     if (leftVoid) {
-      worldBuffer.writeAt(idx - 1, this.WEB)
+      worldBuffer.writeAt(idx - 1, WEB)
       return {x: x - 1, y}
     }
-    if (worldBuffer.readAt(idx + this.WIDTH) === this.VOID) {
-      worldBuffer.writeAt(idx + this.WIDTH, this.WEB)
+    if (worldBuffer.readAt(idx + W) === VOID) {
+      worldBuffer.writeAt(idx + W, WEB)
       return {x, y: y + 1}
     }
     return null
@@ -4402,12 +4435,14 @@ class WebFiller {
    * @param {number} cy
    */
   fillCobwebCave (cx, cy) {
+    const VOID = NODES.VOID.code
+
     const idx = (cy << 10) | cx
     this.#buildWeb(cx, cy, seededRNG.randomGetMinMax(COBWEB_CAVE_MAIN_MIN, COBWEB_CAVE_MAIN_MAX))
-    if (worldBuffer.readAt(idx - 6) === this.VOID) {
+    if (worldBuffer.readAt(idx - 6) === VOID) {
       this.#buildWeb(cx - 6, cy, seededRNG.randomGetMinMax(COBWEB_CAVE_SIDE_MIN, COBWEB_CAVE_SIDE_MAX))
     }
-    if (worldBuffer.readAt(idx + 6) === this.VOID) {
+    if (worldBuffer.readAt(idx + 6) === VOID) {
       this.#buildWeb(cx + 6, cy, seededRNG.randomGetMinMax(COBWEB_CAVE_SIDE_MIN, COBWEB_CAVE_SIDE_MAX))
     }
   }
@@ -4419,11 +4454,13 @@ class WebFiller {
    * @param {Int16Array} surfaceUnder
    */
   scatterWebs (surfaceUnder) {
+    const VOID = NODES.VOID.code
+
     let count = COBWEB_SCATTER_COUNT
     while (count > 0) {
       const x = seededRNG.randomGetMinMax(32, WORLD_WIDTH - 32)
       const y = seededRNG.randomGetMinMax(surfaceUnder[x], WORLD_HEIGHT - 32)
-      if (worldBuffer.read(x, y) === this.VOID) {
+      if (worldBuffer.read(x, y) === VOID) {
         this.#buildWeb(x, y, seededRNG.randomGetMinMax(COBWEB_SCATTER_SIZE_MIN, COBWEB_SCATTER_SIZE_MAX))
         count--
       }
