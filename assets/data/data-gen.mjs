@@ -342,6 +342,8 @@ export const PERLIN_OFFSET_LAKES = 800
 export const PERLIN_OFFSET_SHELL = 900
 export const PERLIN_OFFSET_HEART = 1000
 export const PERLIN_OFFSET_FERNS = 1100
+export const PERLIN_OFFSET_MUSHROOM = 1200
+
 
 export const SMALL_CAVERNS_COUNT = 80
 export const MEDIUM_CAVERNS_COUNT = 120
@@ -435,6 +437,11 @@ export const SAND_POCKET_RADIUS_X_MIN = 4
 export const SAND_POCKET_RADIUS_X_MAX = 8
 export const SAND_POCKET_RADIUS_Y_MIN = 3
 export const SAND_POCKET_RADIUS_Y_MAX = 7
+
+export const MUSHROOM_CAVE_RADIUS_X_MIN = 15
+export const MUSHROOM_CAVE_RADIUS_X_MAX = 20
+export const MUSHROOM_CAVE_RADIUS_Y_MIN = 15
+export const MUSHROOM_CAVE_RADIUS_Y_MAX = 20
 
 export const CREATION_REMAP = new Map([
   [NODES.SAPROCK.code, NODES.SLATE.code],

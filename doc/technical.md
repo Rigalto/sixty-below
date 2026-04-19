@@ -734,48 +734,90 @@ puis appliqués en une passe dédiée.
 
 ### Class `WorldCarver` (Singleton : `worldCarver`)
 
-Génère des tunnels et des cavernes (tuiles VOID).
+Génère des tunnels, des cavernes et des mini-biomes. Maintient la liste des zones d'exclusion (`#exclusions`) et des rectangles de zones biome × layer (`#zoneRects`).
 
-| Méthode | Signature | Description |
-|---|---|---|
+---
+
+#### Utilitaires
+
+| Méthode | Description |
+|---|---|
 | `initZoneRects(zoneRects)` | Initialise `#zoneRects` depuis le résultat de `clusterGenerator.initZoneRects()`. À appeler depuis `generate()` après `clusterGenerator.initZoneRects()`. |
-| `initExclusions` | `(): void` | Réinitialise la liste interne des zones d'exclusion (#exclusions). À appeler depuis generate() avant le premier mini-biome. |
-| `addExclusion` | `(rect: {x1, y1, x2, y2}): void` | Ajoute un rectangle à la liste interne d'exclusion (#exclusions). À appeler explicitement après applyTiles() pour les mini-biomes uniquement. |
-| `isExcluded` | `(x1, y1, x2, y2: number): boolean` | Vérifie si un rectangle intersecte l'une des zones d'exclusion internes (#exclusions). Retourne true dès la première intersection trouvée. |
-| `digNoisyCircle` | `(tiles, cx, cy, radiusMin, radiusMax, code, frequency?, offsetX?: void` | Creuse un trou circulaire bruité (Perlin noise) - Peut générer des tuiles et des trous isolés - Pousse les tuiles directement dans `tiles` (pas de retour). |
-| `digNoisyEllipse` | `(tiles, cx, cy, radiusXMin, radiusXMax, radiusYMin, radiusYMax, code, frequency?, offsetX?): void` | Creuse un trou elliptique bruité (Perlin noise). Distance normalisée par les demi-axes — même algorithme que `digNoisyCircle`. Pousse les tuiles dans `tiles`. |
-| `digNoisyRect(tiles, cx, cy, radiusXMin, radiusXMax, radiusYMin, radiusYMax, code, frequency?, offsetX?)` | Creuse un rectangle bruité (Perlin noise) sur les 4 bords. Même algorithme que `digNoisyEllipse` — distance de Chebyshev normalisée. Pousse les tuiles dans `tiles`. |
-| `applyTiles` | `(tiles: Array<{x, y, index, code}>): {x1, y1, x2, y2}` | Écrit les tuiles dans `worldBuffer` via `writeAt`. Ignore les tuiles hors bornes et protège `FOG`, `DEEPSEA`, `BASALT`, `LAVA`, `SKY`, `SEA` contre l'écrasement. Retourne le rectangle englobant des tuiles écrites. |
-| `applyTiles` | `(tiles, excluded?: Set): {x1,y1,x2,y2}` | Écrit les tuiles dans `worldBuffer` via `writeAt`. Protège les tuiles `excluded` (optionnel — défaut : `DEFAULT_EXCLUDED`). Passer `ETERNAL_EXCLUDED` pour n'exclure que les ETERNAL. Retourne le rectangle englobant  des tuiles réellement écrites. |
-| `fillRect(x0, y0, x1, y1, code)` | Remplace toutes les tuiles d'un rectangle par `code`. Sans protection — zones hors ghost cells et ETERNAL uniquement. Index calculé en dehors de la boucle interne pour performance. |
-| `boundingRect(a, b)` | Retourne le rectangle englobant `{x1, y1, x2, y2}` de deux rectangles. |
-| `pathTunnel` | `(x0, y0, radiusMax, maxLength, angle, deltaAngle): Array<{x, y, radiusMin, radiusMax}>` | Calcule le chemin d'un tunnel par accumulation angulaire. `angle` et `deltaAngle` en degrés. Longueur effective ~25% supérieure à `maxLength` (facteur 0.8). Utilitaire pur — ne creuse pas. |
-| `carveAlongPath` | `(path: Array<{x, y, radiusMin, radiusMax}>, offsetX?, excluded?): void` | Creuse un tunnel le long d'un chemin `pathTunnel`. Accumule tous les cercles en un seul tableau avant `applyTiles`. `excluded` propagé à `applyTiles`. Défaut : `DEFAULT_EXCLUDED` |
-| `digSmallCaverns` | `(surfaceUnder: Int16Array): void` | Disperse `SMALL_CAVERNS_COUNT` cavernes rayon 3–12 (tiré par caverne) dans les zones underground et cavernes. Rayon effectif : `[radius-1, radius+1]`. Constante dans `data-gen.mjs`. |
-| `digZigzagTunnel` | `(skySurface: Int16Array): void` | Creuse `ZIGZAG_TUNNEL_COUNT` tunnels en zigzag depuis la surface. Chaque tunnel alterne des segments à ~135° et ~225° (±45° autour du bas). Rayon max 8. Longueur totale 200–250 tuiles, segments de 1/5 à 1/4 de la longueur totale. Accumule toutes les tuiles avant `applyTiles`. Constante dans `data-gen.mjs`. |
-| `digUndergroundTunnels` | `(surfaceUnder: Int16Array, underCaverns: Int16Array): void` | Creuse `UNDERGROUND_TUNNEL_COUNT` tunnels horizontaux avec un ou deux coudes en zone underground. Rayon 9, longueur 30–50, angle initial 0–360°, déviation 25°. Constante dans `data-gen.mjs`. |
-| `digCavernsTunnels` | `(underCaverns: Int16Array): void` | Creuse `CAVERN_TUNNEL_COUNT` tunnels dans la zone cavernes. Borne basse : `WORLD_HEIGHT - 32`. Rayon 9, longueur 40–60, angle initial 0–360°, déviation 50°. Constante dans `data-gen.mjs`. |
-| `digSmallTunnels` | `(surfaceUnder: Int16Array): void` | Creuse `SMALL_TUNNELS_COUNT` petites galeries sinueuses (rayon 2-4, longueur 60–100, deltaAngle 40°) dans les zones underground et cavernes. Constante dans `data-gen.mjs`. |
-| `#digOneHive(rect)` | Creuse une ruche dans le rectangle de zone donné. Tire cx/cy/radius, vérifie les exclusions (MAX_ATTEMPTS=100), creuse paroi HIVE + intérieur VOID + galerie d'accès. Retourne `{cx, cy, radius}` ou `null`. Utilise `this.zoneRects`. |
-| `digHives(biomeCounts)` | Creuse `hiveCount` ruches en zone JUNGLE via `#digOneHive`. 1 monde sur 2 : une ruche intrusion dans un biome étranger (FOREST ou DESERT), même layer. Toutes les ruches (normales + intrusion) sont retournées pour le remplissage HONEY différé. Prérequis : `initZoneRects()`. |
-| `digSurfaceLakes()` | Creuse un lac de surface par zone de biome (Oasis en Desert). Double ellipse : corps principal + fosse centrale bruitée avec offset aléatoire. Bords/fond protégés par nodes CREATION spécifiques au biome. Remplissage WATER différé. Prérequis : `initZoneRects()`. Retourne `Array<{cx, cy, biome}>`. |
-| `digUndergroundLakes(surfaceUnder, underCaverns)` | Creuse `UNDERGROUND_LAKE_UNDER_COUNT` lacs ellipsoïdaux bruités en zone under et `UNDERGROUND_LAKE_CAVERNS_COUNT` en caverns_top. Protection TileGuard sur la demi-ellipse inférieure. Remplissage WATER via `fillLake`. Retourne `Array<{cx, cy, biome, layer, liquidBody: {index, nodeCode}}>`. |
-| `digBlindLakes(underCaverns)` | Creuse `BLIND_LAKE_COUNT` lacs ellipsoïdaux bruités en caverns_bottom. Rayons `BLIND_LAKE_RADIUS_MIN/MAX`. Protection TileGuard complète (ellipse entière). Remplissage WATER via `fillLake`. Retourne `Array<{cx, cy, biome, layer, liquidBody: {index, nodeCode}}>`. |
-| `digSapLakes(surfaceUnder, underCaverns)` | Creuse `SAP_LAKE_UNDER_COUNT` lacs de sève en zone under et `SAP_LAKE_CAVERNS_COUNT` en caverns_top, uniquement en biome JUNGLE. Protection TileGuard sur la demi-ellipse inférieure. Remplissage SAP via `fillLake`. Retourne `Array<{cx, cy, biome, layer, liquidBody: {index, nodeCode}}>`. |
-| `digSapPockets(underCaverns)` | Creuse `SAP_POCKET_COUNT` poches de sève ellipsoïdales bruitées en caverns_bottom, uniquement en biome JUNGLE. Rayons `SAP_POCKET_RADIUS_MIN/MAX`. Protection TileGuard complète (ellipse entière). Remplissage SAP via `fillLake`. Retourne `Array<{cx, cy, biome, layer, liquidBody: {index, nodeCode}}>`. |
-| `digHearts(surfaceUnder, underCaverns)` | Place 15 spots Life Heart (2×2 tuiles HEART) en underground. Vérifie 16 tuiles solides autour de chaque spot. Fallback en caverns_top si quota non atteint. Enregistre chaque spot dans `#exclusions`. Retourne `Array<{cx, cy}>` (coin haut gauche). |
-| `digTriskels(underCaverns)` | Place 3 Triskels (2×2 tuiles) : 2 en caverns_top, 1 en caverns_bottom. Fallback caverns_bottom si quota caverns_top non atteint. Vérifie 16 tuiles solides autour de chaque spot. Enregistre dans `#exclusions`. Retourne `Array<{cx, cy}>` — coin haut-gauche. |
-| `digFossilVeins()` | Place `FOSSIL_VEIN_COUNT` veines de SHELL horizontales (rayon 2, longueur 16–20, déviation 12°). Biomes : DESERT + premier et dernier rect. Layer : caverns_top (90%), une seule migration possible en under ou caverns_bottom (10%, tirage 50/50). Protection TileGuard autour de chaque point du chemin (rayon + 2). Prérequis : `initZoneRects()`, `initExclusions()`. |
-| `digFernCaves()` | Creuse une Fern Cave elliptique bruitée par zone FOREST en layer under. Fond plat bruité (digNoisyRect). Protection TileGuard sur le bas. Tapissage du fond via `#fillFernCaveFloor` (GRASSFERN + HUMUS). Retourne `Array<{cx, cy, radiusX, radiusY}>`. Prérequis : `initZoneRects()`, `initExclusions()`. |
-| `#fillMossCaveWalls(cx, cy, radiusX, radiusY)` | Tapisse les parois et le sol d'une Moss Cave. GRASSMOSS sur toutes les tuiles solides en contact avec un VOID latéral ou supérieur (sauf tuiles isolées au plafond). MUD sur la tuile sous chaque GRASSMOSS de sol. |
-| `digSandPockets()` | Creuse 1–2 Sand Pockets elliptiques par zone DESERT (radiusX 4–8, radiusY 3–7). Layer : under (60%) ou caverns_top (40%). Intérieur SAND protégé par `tileGuard.addTiles()`. Périphérie inférieure (y >= cy) remplacée par SANDSTONE via `pocketSet`. Prérequis : `initZoneRects()`, `initExclusions()`. |
-| `#digOneCobwebCave(y0, y1)` | Creuse une caverne elliptique à toiles dans la plage verticale [y0, y1]. Gère les tentatives et exclusions. Retourne `{cx, cy, radiusX, radiusY}` ou `null`. |
-| `digCobwebCaves()` | Creuse COBWEB_CAVE_COUNT_MIN–MAX cavernes en caverns_top (80%) ou caverns_bottom (20%) + 1 intrusion systématique en layer under, biome aléatoire. Prérequis : `initZoneRects()`. |
-| `#digOneGeodeCave(y0, y1, code)` | Creuse une géode elliptique dans la plage verticale [y0, y1]. Gère les tentatives et exclusions. Retourne `{cx, cy, radiusX, radiusY, code}` ou `null`. |
-| `digGeodeCaves(code)` | Creuse GEODE_CAVE_COUNT_MIN–MAX géodes en caverns_bottom + 1 intrusion à 1/3 en caverns_top (code aléatoire GRANITE/MARBLE). Retourne la description complète pour `projectAndFill()`. Prérequis : `initZoneRects()`. |
-| `cleanupAfterCarving` | `(): void` | Passe de nettoyage globale post-creusement. 7 règles in-place : propagation SKY, suppression tuiles isolées VOID/non-VOID (4-connexe et paires horizontales/verticales). Parcours séquentiel index croissant — cascade naturelle. |
+| `initExclusions(): void` | Réinitialise la liste interne des zones d'exclusion (`#exclusions`). À appeler depuis `generate()` avant le premier mini-biome. |
+| `addExclusion(rect: {x1, y1, x2, y2}): void` | Ajoute un rectangle à la liste interne d'exclusion. À appeler explicitement après `applyTiles()` pour les mini-biomes uniquement. |
+| `isExcluded(x1, y1, x2, y2): boolean` | Vérifie si un rectangle intersecte l'une des zones d'exclusion internes. Retourne `true` dès la première intersection trouvée. |
+| `digNoisyCircle(tiles, cx, cy, radiusMin, radiusMax, code, frequency?, offsetX?): void` | Creuse un trou circulaire bruité (Perlin noise). Pousse les tuiles dans `tiles`. |
+| `digNoisyEllipse(tiles, cx, cy, radiusXMin, radiusXMax, radiusYMin, radiusYMax, code, frequency?, offsetX?): void` | Creuse un trou elliptique bruité (Perlin noise). Distance normalisée par les demi-axes. Pousse les tuiles dans `tiles`. |
+| `digNoisyRect(tiles, cx, cy, radiusXMin, radiusXMax, radiusYMin, radiusYMax, code, frequency?, offsetX?): void` | Creuse un rectangle bruité (Perlin noise) sur les 4 bords. Distance de Chebyshev normalisée. Pousse les tuiles dans `tiles`. |
+| `applyTiles(tiles, excluded?): {x1, y1, x2, y2}` | Écrit les tuiles dans `worldBuffer`. Protège les tuiles `excluded` (défaut : `DEFAULT_EXCLUDED`). Consulte `tileGuard` avant chaque écriture. Retourne le rectangle englobant des tuiles réellement écrites. Passer `ETERNAL_EXCLUDED` pour n'exclure que les ETERNAL. |
+| `fillRect(x0, y0, x1, y1, code): void` | Remplace toutes les tuiles d'un rectangle par `code`. Sans protection — zones hors ghost cells et ETERNAL uniquement. |
+| `boundingRect(a, b): {x1, y1, x2, y2}` | Retourne le rectangle englobant de deux rectangles. |
+| `pathTunnel(x0, y0, radiusMax, maxLength, angle, deltaAngle): Array<{x, y, radiusMin, radiusMax}>` | Calcule le chemin d'un tunnel par accumulation angulaire. `angle` et `deltaAngle` en degrés. Longueur effective ~25% supérieure à `maxLength` (facteur 0.8). Utilitaire pur — ne creuse pas. |
+| `carveAlongPath(path, offsetX?, excluded?): void` | Creuse un tunnel le long d'un chemin `pathTunnel`. Accumule tous les cercles en un seul tableau avant `applyTiles`. `excluded` propagé à `applyTiles`. Défaut : `DEFAULT_EXCLUDED`. |
 
-Le paramètre `offsetX` permet de décorrèler le bruit Perlin des autres usages.
+---
+
+#### Tunnels et cavernes généraux
+
+| Méthode | Description |
+|---|---|
+| `digSmallCaverns(surfaceUnder): void` | Disperse `SMALL_CAVERNS_COUNT` petites cavernes (rayon 3–6) et `MEDIUM_CAVERNS_COUNT` moyennes (rayon 6–12) dans les zones underground et cavernes. Deux passes `applyTiles` séparées. |
+| `digSurfaceTunnel(skySurface, lakes): void` | Creuse 20–30 galeries obliques depuis la surface. Évite les lacs (marge `3 × LAKE_RADIUS_X_MAX`). Direction obligatoirement descendante. |
+| `digZigzagTunnels(lakes): void` | Creuse 2–3 tunnels zigzag depuis la surface. Espacement minimal `ZIGZAG_MIN_DISTANCE`. Évite les lacs sur le premier tronçon. Au maximum une migration entre tunnels. |
+| `digUndergroundTunnels(surfaceUnder, underCaverns): void` | Creuse `UNDERGROUND_TUNNEL_COUNT` tunnels horizontaux avec un ou deux coudes en zone underground. Rayon 8–10, longueur 30–50, déviation 25°. |
+| `digCavernsTunnels(underCaverns): void` | Creuse `CAVERN_TUNNEL_COUNT` tunnels dans la zone cavernes. Borne basse : `WORLD_HEIGHT - 32`. Rayon 7–10, longueur 40–60, déviation 50°. |
+| `digSmallTunnels(surfaceUnder): void` | Creuse `SMALL_TUNNELS_COUNT` petites galeries sinueuses (rayon 2–4, longueur 60–100, deltaAngle 40°) dans les zones underground et cavernes. |
+| `cleanupAfterCarving(): void` | Passe de nettoyage globale post-creusement en 4 passes : (1) propagation SKY colonne par colonne, (2) remplacement des nodes CREATION via `CREATION_REMAP`, (3) suppression des tuiles isolées VOID/solide dans SKY/VOID/liquide (13 règles), (4) suppression des colonnes étroites SKY/VOID en surface. |
+| `buildErodedSurfaceLine(): Int16Array` | Calcule la ligne de surface (première tuile solide par colonne) et applique une érosion légère (trous et bosses de 1 tuile). Retourne `surfaceLine`. |
+
+---
+
+#### Mini-biomes — Liquides
+
+| Méthode | Description |
+|---|---|
+| `digSurfaceLakes(skySurface)` | Creuse un lac de surface par zone de biome. Double ellipse : corps principal + fosse bruitée. Bords/fond protégés par nodes CREATION. Protection TileGuard sur les deux ellipses. Retourne `Array<{cx, cy, biome, layer, liquidBody}>`. |
+| `digUndergroundLakes(surfaceUnder, underCaverns)` | Creuse `UNDERGROUND_LAKE_UNDER_COUNT` lacs en under et `UNDERGROUND_LAKE_CAVERNS_COUNT` en caverns_top. Protection TileGuard demi-ellipse inférieure. Remplissage WATER. Retourne `Array<{cx, cy, biome, layer, liquidBody}>`. |
+| `digBlindLakes(underCaverns)` | Creuse `BLIND_LAKE_COUNT` lacs en caverns_bottom. Rayons `BLIND_LAKE_RADIUS_MIN/MAX`. Protection TileGuard complète. Remplissage WATER. Retourne `Array<{cx, cy, biome, layer, liquidBody}>`. |
+| `digSapLakes(surfaceUnder, underCaverns)` | Creuse des lacs de sève en under et caverns_top, biome JUNGLE uniquement. Protection TileGuard demi-ellipse inférieure. Remplissage SAP. Retourne `Array<{cx, cy, biome, layer, liquidBody}>`. |
+| `digSapPockets(underCaverns)` | Creuse `SAP_POCKET_COUNT` poches de sève en caverns_bottom, biome JUNGLE. Protection TileGuard complète. Remplissage SAP. Retourne `Array<{cx, cy, biome, layer, liquidBody}>`. |
+| `digWaterPuddles(surfaceUnder)` | Creuse `WATER_PUDDLE_COUNT` flaques d'eau (hauteur 2–3 tuiles) dans les zones under et cavernes. Utilise `#flowToBottom` + `#tryFillPuddle`. Retourne `Array<{index, nodeCode}>`. |
+| `digSapPuddles(surfaceUnder)` | Creuse `SAP_PUDDLE_COUNT` flaques de sève en biome JUNGLE. Même algorithme que `digWaterPuddles`. Retourne `Array<{index, nodeCode}>`. |
+
+---
+
+#### Mini-biomes — Cavernes naturelles
+
+| Méthode | Description |
+|---|---|
+| `digHives(biomeCounts)` | Creuse des ruches en JUNGLE (caverns_top). 1 monde/2 : intrusion biome étranger. Remplissage HONEY via `fillHive`. Protection TileGuard cercle bruité. Retourne `Array<{cx, cy, radius, liquidBody}>`. `#digOneHive(rect)` : creuse une ruche individuelle. |
+| `digCobwebCaves()` | Creuse `COBWEB_CAVE_COUNT_MIN–MAX` cavernes elliptiques tous biomes, caverns_top (80%) ou caverns_bottom (20%) + 1 intrusion under. Peuplement WEB via `webFiller.fillCobwebCave`. `#digOneCobwebCave(y0, y1)` : creuse une caverne individuelle. |
+| `digGeodeCaves(code)` | Creuse des géodes en caverns_bottom + 1 intrusion/3 en caverns_top. Retourne la description pour `projectAndFill()`. `#digOneGeodeCave(y0, y1, code)` : creuse une géode individuelle. |
+| `digFernCaves()` | Creuse une Fern Cave par zone FOREST en under. Demi-ellipse + rectangle bruité. Tapissage fond via `#fillFernMushroomCaveFloor` (GRASSFERN + HUMUS). Protection TileGuard bas. Retourne `Array<{cx, cy, radiusX, radiusY}>`. `#fillFernMushroomCaveFloor(cx, cy, radiusX, surfaceCode, substrateCode)` : tapisse le fond (Markov 75/25, profondeur 2–3). |
+| `digMossCaves()` | Creuse une Moss Cave par zone JUNGLE en under. Demi-ellipse + rectangle bruité. Tapissage parois/sol via `#fillMossCaveWalls` (GRASSMOSS + MUD). Protection TileGuard bas. Retourne `Array<{cx, cy, radiusX, radiusY}>`. `#fillMossCaveWalls(cx, cy, radiusX, radiusY)` : GRASSMOSS sur sol et parois latérales, MUD sous le sol, pas de mousse au plafond. |
+| `digMushroomCaves()` | Creuse une Mushroom Cave rectangulaire bruitée par zone FOREST en caverns_top. Tapissage fond via `#fillFernMushroomCaveFloor` (GRASSMUSHROOM + HUMUS). Protection TileGuard moitié inférieure + marge 2. Retourne `Array<{cx, cy, radiusX, radiusY}>`. |
+
+---
+
+#### Mini-biomes — Géologie
+
+| Méthode | Description |
+|---|---|
+| `digFossilVeins()` | Place `FOSSIL_VEIN_COUNT` veines SHELL horizontales (rayon 2, longueur 16–20, déviation 12°). Biomes : DESERT + premier et dernier rect. Layer : caverns_top (90%), une migration max en under ou caverns_bottom (10%, 50/50). Protection TileGuard par point de chemin (rayon + 2). |
+| `digSandPockets()` | Creuse 1–2 Sand Pockets elliptiques par zone DESERT (radiusX 4–8, radiusY 3–7). Layer : under (60%) ou caverns_top (40%). Intérieur SAND protégé par `tileGuard.addTiles()`. Périphérie inférieure (`y >= cy`) → SANDSTONE via `pocketSet`. |
+
+---
+
+#### Mini-biomes — Artefacts
+
+| Méthode | Description |
+|---|---|
+| `digHearts(surfaceUnder, underCaverns)` | Place 15 spots Life Heart (2×2 HEART) en underground. Vérifie 16 tuiles solides. Fallback caverns_top. Enregistre dans `#exclusions` + `tileGuard`. Retourne `Array<{cx, cy}>` (coin haut-gauche). |
+| `digTriskels(underCaverns)` | Place 3 Triskels (2×2) : 2 en caverns_top, 1 en caverns_bottom. Fallback caverns_bottom si quota non atteint. Enregistre dans `#exclusions` + `tileGuard`. Retourne `Array<{cx, cy}>`. |
+
+---
+
+Le paramètre `offsetX` de `digNoisyCircle`, `digNoisyEllipse` et `digNoisyRect` permet de décorrèler le bruit Perlin des autres usages.
 
 ---
 
