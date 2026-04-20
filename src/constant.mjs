@@ -221,8 +221,6 @@ export const PALETTE = {
 // Préparation pour hydratation (sera remplacé par assets.mjs)
 //   node._imageRaw = node.image // utilité ?
 //   node._waveRaw = node.waveImage
-//   node.renderData = null
-//   node.waveRenderData = null
 
 // 3. Stockage Référence
 //   NODES_LOOKUP[node.code] = node

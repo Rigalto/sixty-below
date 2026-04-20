@@ -146,8 +146,8 @@ RECIPES.wooden_plank.result.item // → ITEMS.plank   (objet direct)
 
 **Absente de `data.mjs`** — dépend de `loadAssets()`.
 Effectuée par `core.mjs :: #hydrateNodes()` et `#hydrateItems()` après `loadAssets()`.
-Itère sur `NODES_LOOKUP` et `ITEMS`, modifie les objets en place
-(ajout de `renderData`, suppression de `image` pour libérer la mémoire).
+Itère sur `NODES_LOOKUP` et `ITEMS`, remplace les strings `image`, `placed`, etc.
+par des objets `{imageIndex, x, y, w, h}` directement utilisables pour le rendu.
 
 ---
 
@@ -532,8 +532,8 @@ Point d'entrée unique du moteur.
 **Cycle de `boot()` :**
 1. `loadAssets()` (bloquant) — charge images et sons, importe `data.mjs` en parallèle
 2. `database.init()`
-3. `#hydrateNodes()` — itère `NODES_LOOKUP`, remplace `image` par `renderData`
-4. `#hydrateItems()` — itère `ITEMS`, remplace `image` par `renderData`
+3. `#hydrateNodes()` — itère `NODES_LOOKUP`, remplace `image`, `waveImage`...
+4. `#hydrateItems()` — itère `ITEMS`, remplace `image`, `placed`...
 5. `mouseManager.init()`
 
 **Cycle de `startSession()` :**

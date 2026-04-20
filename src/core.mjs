@@ -86,7 +86,7 @@ class GameCore {
 
   /**
    * Hydratation spécifique pour les Tuiles (NODES)
-   * Transforme les strings 'image' en objets 'renderData' avec imgIndex
+   * Transforme les strings 'image' en objets 'image' avec imgIndex
    */
   #hydrateNodes () {
     let count = 0
@@ -95,10 +95,10 @@ class GameCore {
 
       // Image statique
       if (node.image) {
-        node.renderData = resolveAssetData(node.image)
-        node.image = null // Clean memory
-        if (node.renderData) count++
+        node.image = resolveAssetData(node.image)
+        count++
       }
+      if (node.waveImage) node.waveImage = resolveAssetData(node.waveImage)
     }
     console.log(`   🔹 Nodes hydratés : ${count}`)
   }

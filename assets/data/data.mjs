@@ -174,14 +174,18 @@ export const hexToRgb = (hex) => {
   return {r, g, b, rgb: `rgb(${r}, ${g}, ${b})`}
 }
 
-// — 8.1. Construction de NODES_LOOKUP + résolution mining[].item string → objet —
+// — 8.1. Construction de NODES_LOOKUP + tests intégritée + couleur + résolution mining[].item string → objet —
+const REQUIRED_NODE_FIELDS = ['code', 'name', 'type', 'star', 'image', 'color']
 for (const key in NODES) {
   const nodeDesc = NODES[key]
   NODES_LOOKUP[nodeDesc.code] = nodeDesc
-  // Préparation pour hydratation (sera remplacé par assets.mjs::resolveAssetData)
-  nodeDesc.renderData = null
+  // vérification de la présence des attributs obligatoires
+  for (const field of REQUIRED_NODE_FIELDS) {
+    if (nodeDesc[field] === undefined) {
+      console.error(`[data.mjs] NODES.${key} : champ obligatoire manquant : '${field}'`)
+    }
+  }
   // optimisation des couleurs
-  if (nodeDesc.color === undefined) { console.error('Attribut "color" manquant pour', key) }
   nodeDesc.rgbColor = hexToRgb(nodeDesc.color)
   // résolution mining[].item string → objet
 //   if (!nodeDesc.mining) continue
@@ -196,14 +200,16 @@ for (const key in NODES) {
 // — 8.2. Table des items
 const REQUIRED_ITEM_FIELDS = ['name', 'type', 'stype', 'star', 'sell', 'image', 'help', 'tooltip']
 for (const key in ITEMS) {
-  ITEMS[key].code = key // Injection du code dans chaque item (la clé devient ITEMS.worm.code)
+  const itemDesc = ITEMS[key]
+
+  itemDesc.code = key // Injection du code dans chaque item (la clé devient ITEMS.worm.code)
   // vérification de la présence des attributs obligatoires
   for (const field of REQUIRED_ITEM_FIELDS) {
-    if (ITEMS[key][field] === undefined) {
+    if (itemDesc[field] === undefined) {
       console.error(`[data.mjs] ITEMS.${key} : champ obligatoire manquant : '${field}'`)
     }
   }
-  if ((ITEMS[key].type & ITEM_TYPE.FURNITURE) && !ITEMS[key].placed) {
+  if ((itemDesc.type & ITEM_TYPE.FURNITURE) && !itemDesc.placed) {
     console.error(`[data.mjs] ITEMS.${key} : FURNITURE sans attribut 'placed'`)
   }
   // le post traitement des images est effectué par GameCore.#hydrateItems()
