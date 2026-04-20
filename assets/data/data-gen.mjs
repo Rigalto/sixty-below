@@ -5,11 +5,11 @@
  * Point d'entrée unique pour generate.mjs — re-exporte tout ce dont il a besoin.
  */
 
-import {NODES, NODES_LOOKUP, NODE_TYPE, BIOME_TYPE} from './data.mjs'
+import {NODES, BIOME_TYPE} from './data.mjs'
 import {WORLD_WIDTH, WORLD_HEIGHT, SEA_LEVEL, TOPSOIL_Y_SKY_SURFACE, TOPSOIL_Y_SURFACE_UNDER, TOPSOIL_Y_UNDER_CAVERNS, TOPSOIL_Y_CAVERNS_MID, WEATHER_TYPE} from '../../src/constant.mjs'
 
 // Re-exports pour generate.mjs
-export {NODES, NODES_LOOKUP, NODE_TYPE, BIOME_TYPE, WORLD_WIDTH, WORLD_HEIGHT, SEA_LEVEL, TOPSOIL_Y_SKY_SURFACE, TOPSOIL_Y_SURFACE_UNDER, TOPSOIL_Y_UNDER_CAVERNS, TOPSOIL_Y_CAVERNS_MID, WEATHER_TYPE}
+export {WORLD_WIDTH, WORLD_HEIGHT, SEA_LEVEL, TOPSOIL_Y_SKY_SURFACE, TOPSOIL_Y_SURFACE_UNDER, TOPSOIL_Y_UNDER_CAVERNS, TOPSOIL_Y_CAVERNS_MID, WEATHER_TYPE}
 
 // ── Table d'indirection biome × layer → code de tuile substrat ───────────────
 // Source de vérité : DESIGN.md

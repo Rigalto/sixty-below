@@ -123,10 +123,30 @@ export const NODES_LOOKUP = []
    3. ITEMS
    ============================================================================ */
 
+export const ITEM_TYPE = {
+  TOOL: 0x1, FURNITURE: 0x2, CRAFTING: 0x4, BLOCK: 0x10, WALL: 0x20, MECHANISM: 0x40, AMMUNITION: 0x80, ORE: 0x100, ARMOR: 0x200, BAR: 0x400, WEAPON: 0x800, CONSUMABLE: 0x1000, ACCESSORY: 0x2000, GEM: 0x4000, POTION: 0x10000, SEEDS: 0x20000, BAG: 0x40000, PASSIF: 0x80000, XXXXXX: 0x100000, BAIT: 0x200000, FOOD: 0x400000, USABLE: 0x800000, NONE: 0
+}
+
 // OAK ROOT — drop lorsque l'on abat complètement un Oak
 // MAHOGANY ROOT — drop lorsque l'on abat complètement un Mahogany
 // TAPROOT — drop lorsque l'on abat complètement un Cactus
-// MYCELIUM — drop lorsque l'on abat complètement un Giant Mushroom
+// MYCELIUM —
+// drop lorsque l'on abat complètement un Giant Mushroom
+
+export const ITEMS = {
+  // crystall
+  lifeCrystal: {name: 'Life Crystal', type: ITEM_TYPE.FURNITURE | ITEM_TYPE.USABLE, stype: 'life', star: 1, sell: 0, undisposable: true, image: 'furniture_32_32-12-2', placed: 'fuws_32_32-6-3', help: 'Life Crystal', tooltip: 'Permanently increases maximum life by 20\nCollect with a Hammer'}
+}
+
+ITEMS.lifeCrystal.image = {
+  image: 'furniture_32_32-12-2',
+  imageName: 'furniture_32_32',
+  imageIndex: 5,
+  x: 192,
+  y: 32,
+  w: 32,
+  h: 32
+}
 
 /* ============================================================================
    4. RECIPES
