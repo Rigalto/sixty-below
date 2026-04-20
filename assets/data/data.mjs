@@ -14,6 +14,10 @@
 
 export const BIOME_TYPE = {SEA: 1, FOREST: 2, DESERT: 3, JUNGLE: 4}
 
+// le type permet de fournir les informations suivantes :
+// l'état de la matière correspodnant : 'gaz', 'liquide', 'solide', 'eternal' donnant son comportement dynamique
+// sa nature (ce qu'il est) : 'NATURAL', 'TOPSOIL', ..., 'WEB'
+// les actions qui peuvent être conduite dessus : 'MINABLE', 'FORAGEABLE', 'BUCKETABLE'...
 export const NODE_TYPE = {GAZ: 0x1, LIQUID: 0x2, SOLID: 0x4, ETERNAL: 0x8, NATURAL: 0x10, TOPSOIL: 0x20, SUBSTRAT: 0x40, ORE: 0x80, GEM: 0x100, ROCK: 0x200, WOOD: 0x400, WALL: 0x800, BWALL: 0x1000, WEB: 0x2000, CREATION: 0x4000}
 
 /* ============================================================================
@@ -120,11 +124,14 @@ export const NODES = {
 export const NODES_LOOKUP = []
 
 /* ============================================================================
-   3. ITEMS
+   3. ITEMS - A LA FOIS DANS L'INVENTAIRE OU PLACE DANS LE MONDE
    ============================================================================ */
 
+// le type permet de fournir les informations suivantes :
+// sa nature (ce qu'il est) : 'FURNITURE', 'WALL', ...
+// les actions qui peuvent être conduite dessus : 'CRAFTING' (à renommer), 'USABLE', 'PLACABLE', 'UNDELETABLE', 'CRAFTABLLE', 'REMOVABLE', 'AMMUNITION'...
 export const ITEM_TYPE = {
-  TOOL: 0x1, FURNITURE: 0x2, CRAFTING: 0x4, BLOCK: 0x10, WALL: 0x20, MECHANISM: 0x40, AMMUNITION: 0x80, ORE: 0x100, ARMOR: 0x200, BAR: 0x400, WEAPON: 0x800, CONSUMABLE: 0x1000, ACCESSORY: 0x2000, GEM: 0x4000, POTION: 0x10000, SEEDS: 0x20000, BAG: 0x40000, PASSIF: 0x80000, XXXXXX: 0x100000, BAIT: 0x200000, FOOD: 0x400000, USABLE: 0x800000, NONE: 0
+  FURNITURE: 0x1, TOOL: 0x2, CRAFTING: 0x4, FOOD: 0x08, BLOCK: 0x10, WALL: 0x20, MECHANISM: 0x40, AMMUNITION: 0x80, ORE: 0x100, ARMOR: 0x200, BAR: 0x400, WEAPON: 0x800, CONSUMABLE: 0x1000, ACCESSORY: 0x2000, GEM: 0x4000, POTION: 0x8000, SEMABLE: 0x10000, BAG: 0x20000, BAIT: 0x40000, USABLE: 0x80000, PLACABLE: 0x100000, REMOVABLE: 0x200000, DISPOSABLE: 0x400000, NONE: 0
 }
 
 // OAK ROOT — drop lorsque l'on abat complètement un Oak
