@@ -1,6 +1,7 @@
 import {seededRNG} from './utils.mjs'
 import {database} from './database.mjs'
 import {NODES, NODES_LOOKUP, NODE_TYPE, WEATHER_TYPE, BIOME_TYPE, WORLD_WIDTH, WORLD_HEIGHT, SEA_LEVEL, TOPSOIL_Y_SKY_SURFACE, TOPSOIL_Y_SURFACE_UNDER, TOPSOIL_Y_UNDER_CAVERNS, TOPSOIL_Y_CAVERNS_MID, BIOME_TILE_MAP, SEA_MAX_JITTER, SEA_MAX_WIDTH, SEA_MAX_HEIGHT, CLUSTER_SCATTER_MAP, ORE_GEM_SCATTER_MAP, PERLIN_OFFSET_NATURALIZER, PERLIN_OFFSET_TUNNEL, PERLIN_OFFSET_SURFACE_TUNNEL, PERLIN_OFFSET_SMALL_TUNNEL, PERLIN_OFFSET_CAVERN, PERLIN_OFFSET_HIVE, PERLIN_OFFSET_HEART, PERLIN_OFFSET_MUSHROOM, PERLIN_OFFSET_COBWEB, PERLIN_OFFSET_FERNS, PERLIN_OFFSET_LAKES, PERLIN_OFFSET_SHELL, SMALL_CAVERNS_COUNT, MEDIUM_CAVERNS_COUNT, UNDERGROUND_TUNNEL_COUNT, CAVERNS_TUNNEL_COUNT, SMALL_TUNNELS_COUNT, HIVE_RADIUS_MIN, HIVE_RADIUS_MAX, COBWEB_CAVE_COUNT_MIN, COBWEB_CAVE_COUNT_MAX, COBWEB_RADIUS_X_MIN, COBWEB_RADIUS_X_MAX, COBWEB_RADIUS_Y_MIN, COBWEB_RADIUS_Y_MAX, COBWEB_CAVE_MAIN_MIN, COBWEB_CAVE_MAIN_MAX, COBWEB_CAVE_SIDE_MIN, COBWEB_CAVE_SIDE_MAX, COBWEB_SCATTER_COUNT, COBWEB_SCATTER_SIZE_MIN, COBWEB_SCATTER_SIZE_MAX, GEODE_CAVE_COUNT_MIN, GEODE_CAVE_COUNT_MAX, GEODE_RADIUS_MIN, GEODE_RADIUS_MAX, GEODE_TARGET_CLUSTER_COUNT, GEODE_CLUSTER_SIZE_MIN, GEODE_CLUSTER_SIZE_MAX, TOPSOIL_SCATTER_MAP, LAKE_RADIUS_X_MIN, LAKE_RADIUS_X_MAX, LAKE_RADIUS_Y_MIN, LAKE_RADIUS_Y_MAX, LAKE_PIT_RADIUS_X_MIN, LAKE_PIT_RADIUS_X_MAX, LAKE_PIT_RADIUS_Y_MIN, LAKE_PIT_RADIUS_Y_MAX, LAKE_CREATION_MAP, UNDERGROUND_LAKE_UNDER_COUNT, UNDERGROUND_LAKE_CAVERNS_COUNT, UNDERGROUND_LAKE_RADIUS_MIN, UNDERGROUND_LAKE_RADIUS_MAX, BLIND_LAKE_COUNT, BLIND_LAKE_RADIUS_MIN, BLIND_LAKE_RADIUS_MAX, SAP_LAKE_UNDER_COUNT, SAP_LAKE_CAVERNS_COUNT, SAP_LAKE_RADIUS_MIN, SAP_LAKE_RADIUS_MAX, SAP_POCKET_COUNT, SAP_POCKET_RADIUS_MIN, SAP_POCKET_RADIUS_MAX, WATER_PUDDLE_COUNT, SAP_PUDDLE_COUNT, PUDDLE_HEIGHT_MIN, PUDDLE_HEIGHT_MAX, FOSSIL_VEIN_COUNT, FERN_CAVE_RADIUS_X_MIN, FERN_CAVE_RADIUS_X_MAX, FERN_CAVE_RADIUS_Y_MIN, FERN_CAVE_RADIUS_Y_MAX, MOSS_CAVE_RADIUS_X_MIN, MOSS_CAVE_RADIUS_X_MAX, MOSS_CAVE_RADIUS_Y_MIN, MOSS_CAVE_RADIUS_Y_MAX, SAND_POCKET_RADIUS_X_MIN, SAND_POCKET_RADIUS_X_MAX, SAND_POCKET_RADIUS_Y_MIN, SAND_POCKET_RADIUS_Y_MAX, MUSHROOM_CAVE_RADIUS_X_MIN, MUSHROOM_CAVE_RADIUS_X_MAX, MUSHROOM_CAVE_RADIUS_Y_MIN, MUSHROOM_CAVE_RADIUS_Y_MAX, CREATION_REMAP} from '../assets/data/data-gen.mjs'
+import {PLANT_SYSTEM, GRASS_TYPE} from '../assets/data/data.mjs'
 
 /* ====================================================================================================
    WORLD BUFFER (CREATION DU MONDE)
@@ -139,7 +140,7 @@ class WorldGenerator {
     window.DEBUG_POINTS = [] // DEGUG - à supprimer
 
     // affichage de la progression de la création dans le dialogue modal
-    const STEPS = 19
+    const STEPS = 20
     let step = 0
     const progress = (topic) => {
       step++
@@ -233,15 +234,16 @@ class WorldGenerator {
     await progress('Geode caves')
 
     // 6.1.8 Fern Caves (Underground, Forest 6 HUMUS + GRASSFERN)
-    const fernsCaves = worldCarver.digFernCaves()
+    const {fernsCaves, fernsPlants} = worldCarver.digFernCaves()
     await progress('Fern caves')
 
     // 6.1.9 Moss Cave (Underground - jungle - MUD + GRASSMOSS
-    const mossCaves = worldCarver.digMossCaves()
+    const {mossCaves, mossPlants} = worldCarver.digMossCaves()
     await progress('Moss caves')
 
     // 6.1.X Mushroom caves
-    const mushroomCaves = worldCarver.digMushroomCaves()
+    const {mushroomCaves, mushroomPlants} = worldCarver.digMushroomCaves()
+    await progress('Mushroom caves')
 
     // 6.1.X Anthill
     // const anthills = worldCarver.digAnthills()
@@ -341,7 +343,8 @@ class WorldGenerator {
     if (!debug) {
       const liquidBodies = [...honeyLiquidBodies, ...lakeLiquidBodies, ...underLakeLiquidBodies, ...blindLakeLiquidBodies, ...sapLakeLiquidBodies, ...sapPocketLiquidBodies, ...waterPuddleLiquidBodies, ...sapPuddleLiquidBodies]
       const lakes = [...surfaceLakes, ...underLakes, ...blindLakes, ...sapLakes, ...sapPockets]
-      await this.save(seed, {hives, cobwebCaves, geodeCaves, lakes, liquidBodies, fernsCaves, mossCaves, mushroomCaves})
+      const plants = [...fernsPlants, ...mossPlants, ...mushroomPlants]
+      await this.save(seed, {hives, cobwebCaves, geodeCaves, lakes, liquidBodies, fernsCaves, mossCaves, mushroomCaves, plants})
       worldBuffer.clear()
     }
 
@@ -354,7 +357,7 @@ class WorldGenerator {
     if (debug) { return worldBuffer } // appelant responsable du clear()
   }
 
-  async save (seed, {hives, cobwebCaves, geodeCaves, lakes, liquidBodies, fernsCaves, mossCaves, mushroomCaves}) {
+  async save (seed, {hives, cobwebCaves, geodeCaves, lakes, liquidBodies, fernsCaves, mossCaves, mushroomCaves, plants}) {
     const start = window.performance.now()
     // 1. Sauvegarde des tuiles
     await database.clearObjectStore('world_chunks')
@@ -407,6 +410,10 @@ class WorldGenerator {
     // sauvegarde des liquid bodies
     await database.clearObjectStore('liquid')
     await database.addMultipleRecords('liquid', liquidBodies)
+
+    // sauvegarde des plantes
+    await database.clearObjectStore('plant')
+    await database.addMultipleRecords('plant', plants)
 
     // sauvegarde des meubles
     // await database.clearObjectStore('furniture')
@@ -3562,7 +3569,8 @@ class WorldCarver {
  * Bords bruités via Perlin noise.
  * Prérequis : initZoneRects(), initExclusions().
  *
- * @returns {Array<{cx, cy, radiusX, radiusY}>}
+ * @returns {fernsCaves: Array<{cx, cy, radiusX, radiusY}>, fernsPlants: Array<{index, system, type}>}
+
  */
   digFernCaves () {
     const VOID = NODES.VOID.code
@@ -3570,6 +3578,8 @@ class WorldCarver {
     const HUMUS = NODES.HUMUS.code
     const caves = []
     const MAX_ATTEMPTS = 100
+
+    const plants = []
 
     for (let i = 0; i < this.#zoneRects.length; i++) {
       const rect = this.#zoneRects[i]
@@ -3600,12 +3610,12 @@ class WorldCarver {
       const rect2 = this.applyTiles(tiles)
       this.addExclusion(rect2)
       tileGuard.addNoisyRect(cx, cy + radiusY + 2, radiusX + 2, radiusX + 6, 2, 4, 0.8, PERLIN_OFFSET_FERNS)
-      this.#fillFernMushroomCaveFloor(cx, cy + 1, radiusX, GRASSFERN, HUMUS)
+      this.#fillFernMushroomCaveFloor(cx, cy + 1, radiusX, GRASSFERN, HUMUS, GRASS_TYPE.FERN, plants)
 
       caves.push({cx, cy, radiusX, radiusY})
     }
 
-    return caves
+    return {fernsCaves: caves, fernsPlants: plants}
   }
 
   /**
@@ -3619,9 +3629,12 @@ class WorldCarver {
  * @param {number} radiusX
  * @param {number} surfaceCode - Code de la tuile de surface (ex: NODES.GRASSFERN.code)
  * @param {number} substrateCode - Code du substrat (ex: NODES.HUMUS.code)
+ * @param {number} grassType - Code du type de GRASS (GRASS_TYPE.FERN ou GRASS_TYPE.MUSHROOM)
+ * @param {Array} plants - [OUT] Tableau accumulant les enregistrements plant à sauvegarder
  */
-  #fillFernMushroomCaveFloor (cx, cy, radiusX, surfaceCode, substrateCode) {
+  #fillFernMushroomCaveFloor (cx, cy, radiusX, surfaceCode, substrateCode, grassType, plants) {
     const VOID = NODES.VOID.code
+    const GRASS_SYSTEM = PLANT_SYSTEM.GRASS
 
     let depth = seededRNG.randomGetBool() ? 2 : 3
 
@@ -3631,8 +3644,9 @@ class WorldCarver {
       while (y < WORLD_HEIGHT - 1 && worldBuffer.read(x, y) === VOID) y++
       if (worldBuffer.read(x, y - 1) !== VOID) return false // hors cave
 
-      // GRASSFERN sur le fond
+      // GRASS sur le fond
       worldBuffer.write(x, y, surfaceCode)
+      plants.push({system: GRASS_SYSTEM, type: grassType, index: (y << 10) | x})
 
       // HUMUS sur les tuiles suivantes
       for (let d = 1; d <= depth; d++) {
@@ -3667,12 +3681,14 @@ class WorldCarver {
  * Protection TileGuard sur le bas de la cave.
  * Prérequis : initZoneRects(), initExclusions().
  *
- * @returns {Array<{cx, cy, radiusX, radiusY}>}
+ * @returns {mossCaves: Array<{cx, cy, radiusX, radiusY}>, mossPlants: Array<{index, system, type}>}
  */
   digMossCaves () {
     const VOID = NODES.VOID.code
     const caves = []
     const MAX_ATTEMPTS = 100
+
+    const plants = []
 
     for (let i = 0; i < this.#zoneRects.length; i++) {
       const rect = this.#zoneRects[i]
@@ -3701,12 +3717,12 @@ class WorldCarver {
       const rect2 = this.applyTiles(tiles)
       this.addExclusion(rect2)
       tileGuard.addNoisyRect(cx, cy + radiusY + 2, radiusX + 2, radiusX + 5, 2, 4, 0.8, PERLIN_OFFSET_FERNS)
-      this.#fillMossCaveWalls(cx, cy, radiusX, radiusY)
+      this.#fillMossCaveWalls(cx, cy, radiusX, radiusY, plants)
 
       caves.push({cx, cy, radiusX, radiusY})
     }
 
-    return caves
+    return {mossCaves: caves, mossPlants: plants}
   }
 
   /**
@@ -3718,8 +3734,9 @@ class WorldCarver {
  * @param {number} cy
  * @param {number} radiusX
  * @param {number} radiusY
+ * @param {Array} plants - [OUT] Tableau accumulant les enregistrements plant à sauvegarder
  */
-  #fillMossCaveWalls (cx, cy, radiusX, radiusY) {
+  #fillMossCaveWalls (cx, cy, radiusX, radiusY, plants) {
     const VOID = NODES.VOID.code
     const GRASSMOSS = NODES.GRASSMOSS.code
     const MUD = NODES.MUD.code
@@ -3733,6 +3750,8 @@ class WorldCarver {
       NODES.HONEY.code,
       NODES.SAP.code
     ])
+    const GRASS_SYSTEM = PLANT_SYSTEM.GRASS
+    const grassType = GRASS_TYPE.MOSS
 
     const x0 = cx - radiusX - 1
     const x1 = cx + radiusX + 1
@@ -3752,6 +3771,7 @@ class WorldCarver {
         if (hasVoidBelow && hasVoidLeft && hasVoidRight) continue
         if (hasVoidAbove || hasVoidLeft || hasVoidRight) {
           worldBuffer.write(x, y, GRASSMOSS)
+          plants.push({system: GRASS_SYSTEM, type: grassType, index: (y << 10) | x})
         }
         if (hasVoidAbove && !hasVoidBelow) {
           worldBuffer.write(x, y + 1, MUD)
@@ -3766,14 +3786,16 @@ class WorldCarver {
  * Protection TileGuard sur la moitié inférieure + marge de 2 tuiles.
  * Prérequis : initZoneRects(), initExclusions().
  *
- * @returns {Array<{cx, cy, radiusX, radiusY}>}
+ * @returns {mushroomCaves: Array<{cx, cy, radiusX, radiusY}>, mushroomPlants: Array<{index, system, type}>}
  */
   digMushroomCaves () {
     const VOID = NODES.VOID.code
     const GRASSMUSHROOM = NODES.GRASSMUSHROOM.code
     const HUMUS = NODES.HUMUS.code
-    const caves = []
     const MAX_ATTEMPTS = 100
+
+    const caves = []
+    const plants = []
 
     for (let i = 0; i < this.#zoneRects.length; i++) {
       const rect = this.#zoneRects[i]
@@ -3800,14 +3822,14 @@ class WorldCarver {
 
       tileGuard.addNoisyRect(cx, cy + radiusY / 2, radiusX + 2, radiusX + 4, radiusY / 2 + 2, radiusY / 2 + 4, 0.8, PERLIN_OFFSET_MUSHROOM)
 
-      this.#fillFernMushroomCaveFloor(cx, cy, radiusX, GRASSMUSHROOM, HUMUS)
+      this.#fillFernMushroomCaveFloor(cx, cy, radiusX, GRASSMUSHROOM, HUMUS, GRASS_TYPE.MUSHROOM, plants)
 
       window.DEBUG_POINTS.push({x: cx, y: cy, color: 'orange'}) // DEBUG
 
       caves.push({cx, cy, radiusX, radiusY})
     }
 
-    return caves
+    return {mushroomCaves: caves, mushroomPlants: plants}
   }
 
   /**

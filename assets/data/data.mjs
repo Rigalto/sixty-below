@@ -39,7 +39,7 @@ export const NODES = {
   SAP: {code: 11, name: 'Sap', type: NODE_TYPE.LIQUID, color: '#008000', star: 0, viscosity: 400},
 
   // ── Natural (topsoil en surface recouvert de végétation) ─────────────────────
-  GRASS: {code: 12, name: 'Forest Grass', type: NODE_TYPE.NATURAL, star: 1, solid: true, color: '#84de50', image: 'grass_16_16+0', speed: 500, mining: [{item: 'bkdirt', count: 1}, {item: 'seedf', count: 0.2}, {item: 'worm', count: 0.02, rainy: 40}], foraging: [{item: 'seedf', count: 0.2, lucky: 1.5}, {item: 'worm', count: 0.05, lucky: 2, rainy: 10}, {item: 'slug', count: 0.04, lucky: 1.8, rainy: 10}, {item: 'goldworm', count: 0.01}]},
+  GRASSFOREST: {code: 12, name: 'Forest Grass', type: NODE_TYPE.NATURAL, star: 1, solid: true, color: '#84de50', image: 'grass_16_16+0', speed: 500, mining: [{item: 'bkdirt', count: 1}, {item: 'seedf', count: 0.2}, {item: 'worm', count: 0.02, rainy: 40}], foraging: [{item: 'seedf', count: 0.2, lucky: 1.5}, {item: 'worm', count: 0.05, lucky: 2, rainy: 10}, {item: 'slug', count: 0.04, lucky: 1.8, rainy: 10}, {item: 'goldworm', count: 0.01}]},
   GRASSJUNGLE: {code: 13, name: 'Jungle Grass', type: NODE_TYPE.NATURAL, star: 2, solid: true, color: '#56ba27', image: 'grass_16_16+1', speed: 500, mining: [{item: 'bkmud', count: 1}, {item: 'seedj', count: 0.15}], foraging: [{item: 'seedj', count: 0.15, lucky: 1.5}, {item: 'slug', count: 0.05, lucky: 2, rainy: 10}]},
   GRASSMUSHROOM: {code: 14, name: 'Mushroom Grass', type: NODE_TYPE.NATURAL, star: 3, solid: true, color: '#4cad1fff', image: 'grass_16_16+2', speed: 500, mining: [{item: 'bksilt', count: 1}, {item: 'seedm', count: 0.1, lucky: 1.5}], foraging: [{item: 'seedm', count: 0.1, lucky: 1.5}, {item: 'slug', count: 0.05, lucky: 2, rainy: 10}]},
   GRASSFERN: {code: 15, name: 'Ferns', type: NODE_TYPE.NATURAL, star: 4, solid: true, color: '#56ba27', image: 'grass_16_16+3', speed: 500, mining: [{item: 'fern', count: 4, lucky: 5}], foraging: [{item: 'fern', count: 1, lucky: 1.5}]},
@@ -135,6 +135,12 @@ export const NODES_LOOKUP = []
 /* ============================================================================
    5. PLANTS
    ============================================================================ */
+
+export const PLANT_SYSTEM = {GRASS: 1, TREE: 2, HERB: 3}
+
+export const GRASS_TYPE = {FERN: 1, MOSS: 2, MUSHROOM: 3, FOREST: 4, JUNGLE: 5}
+export const TREE_TYPE = {OAK: 1, MAHOGANY: 2, GIANT_MUSHROOM: 3, COCONUT: 4}
+export const HERB_TYPE = { }
 
 /* ============================================================================
    6. MONSTERS
