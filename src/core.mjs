@@ -125,15 +125,24 @@ class GameCore {
 
     console.log('🚀 Démarrage de la session...')
 
-    // 1. Chargement massif de l'état (1 seule requête DB)
+    // 1. Nettoyage des enregistrements invalides (system=0)
+    // Les entités détruites pendant le jeu sont marquées system=0 plutôt que
+    // supprimées (modification plus rapide qu'une suppression en temps réel).
+    // La purge physique se fait ici, hors temps réel, au lancement de session.
+    // Exception : les suppressions trop fréquentes sont faites en temps réel
+    // (à minimiser dans le design).
+    // await database.deleteInvalidPlants() // TODO
+    // await database.deleteInvalidFurnitures() // TODO
+
+    // 2. Chargement massif de l'état (1 seule requête DB)
     // Retourne un objet : {timestamp: 480000, weather: 1, playerPosition: '100|82|1', ...}
     const state = await database.getAllGameState()
 
-    // 2. Dispatch aux systèmes (Injection de dépendance des données)
+    // 3. Dispatch aux systèmes (Injection de dépendance des données)
     // Valeur par défaut (480000) gérée si state.timestamp est undefined (nouveau jeu)
     timeManager.init(state.timestamp, state.weather, state.nextWeather)
 
-    // 2. Initialisation des systèmes (Layer 1)
+    // 4. Initialisation des systèmes (Layer 1)
     this.previousTileCoords = undefined
 
     // Init RNG en mode aléatoire (Math.random()) pour la session de jeu
@@ -171,14 +180,24 @@ class GameCore {
     eventBus.emit('buff/display-time-precision', 3) // DEBUG => toutes les secondes
     eventBus.emit('buff/display-coords', true)
 
-    // 3. Initialisation des systèmes (Layer 2)
+    // 5. Initialisation des systèmes (Layer 2)
     creationDialogOverlay.init(state.worldkey)
     // C'est ici qu'on initialise les managers
     // await FloraManager.init(...)
     // await FaunaManager.init(...)
     // await PlayerManager.init(...)
 
-    // 4. Lancement de la boucle
+    // const SYSTEM_MAP = new Map([
+    //   [PLANT_SYSTEM.GRASS, grassSystem],
+    //   [PLANT_SYSTEM.TREE, treeSystem],
+    //   [PLANT_SYSTEM.HERB, herbSystem]
+    // ])
+    // // Chaque system implémente la même interface
+    // for (const record of plantRecords) {
+    //   SYSTEM_MAP.get(record.system)?.init(record)
+    // }
+
+    // 6. Lancement de la boucle
     this.isRunning = true
     this.lastTime = performance.now()
     this.loop(this.lastTime)
