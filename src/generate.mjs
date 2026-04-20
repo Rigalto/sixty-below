@@ -4517,9 +4517,9 @@ class FurnitureGenerator {
    * @param {string} code - Identifiant item ('lifeCrystal', 'woodchest'...)
    */
   addFurnitureAt (index, code) {
-    const {image, stype} = ITEMS[code]
-    const w = image.w >> 4
-    const h = image.h >> 4
+    const {placed, stype} = ITEMS[code]
+    const w = placed.sw >> 4
+    const h = placed.sh >> 4
     this.#furnitures.push({index, code, stype, w, h})
   }
 

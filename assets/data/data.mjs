@@ -138,16 +138,6 @@ export const ITEMS = {
   lifeCrystal: {name: 'Life Crystal', type: ITEM_TYPE.FURNITURE | ITEM_TYPE.USABLE, stype: 'life', star: 1, sell: 0, undisposable: true, image: 'furniture_32_32-12-2', placed: 'fuws_32_32-6-3', help: 'Life Crystal', tooltip: 'Permanently increases maximum life by 20\nCollect with a Hammer'}
 }
 
-ITEMS.lifeCrystal.image = {
-  image: 'furniture_32_32-12-2',
-  imageName: 'furniture_32_32',
-  imageIndex: 5,
-  x: 192,
-  y: 32,
-  w: 32,
-  h: 32
-}
-
 /* ============================================================================
    4. RECIPES
    ============================================================================ */
@@ -203,8 +193,21 @@ for (const key in NODES) {
 //   }
 }
 
-// — 8.2. Injection du code dans chaque item (la clé devient ITEMS.worm.code) —
-// for (const key in ITEMS) { ITEMS[key].code = key }
+// — 8.2. Table des items
+const REQUIRED_ITEM_FIELDS = ['name', 'type', 'stype', 'star', 'sell', 'image', 'help', 'tooltip']
+for (const key in ITEMS) {
+  ITEMS[key].code = key // Injection du code dans chaque item (la clé devient ITEMS.worm.code)
+  // vérification de la présence des attributs obligatoires
+  for (const field of REQUIRED_ITEM_FIELDS) {
+    if (ITEMS[key][field] === undefined) {
+      console.error(`[data.mjs] ITEMS.${key} : champ obligatoire manquant : '${field}'`)
+    }
+  }
+  if ((ITEMS[key].type & ITEM_TYPE.FURNITURE) && !ITEMS[key].placed) {
+    console.error(`[data.mjs] ITEMS.${key} : FURNITURE sans attribut 'placed'`)
+  }
+  // le post traitement des images est effectué par GameCore.#hydrateItems()
+}
 
 // — 8.3. Résolution placesNode string → objet node —
 // for (const key in ITEMS) {
