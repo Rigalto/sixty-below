@@ -103,7 +103,118 @@ It is used in many early-game [[Crafting||recipes]].
 * Copper veins are often found near [[node:stone]] clusters.
 * _Tip: [[Torches||Bring torches]] when mining underground!_ ⏳
     `
-  }, {
+  },
+  // ── World ────────────────────────────────────────────
+  // ── Layers ────────────────────────────────────────────
+  // ── Biomes ───────────────────────────────────────────────────
+  //    Forest, Desert, Jungle
+  {
+    title: 'Forest',
+    category: ['Biome'],
+    content: `
+**Description**
+The Forest is the starting biome, located at the center of the world. It is the most balanced biome, with moderate resources and fauna. The player always spawns here.
+
+**Location**
+* Center of the world
+* Layer: all layers
+
+**Materials**
+* Surface: [[node:dirt]], [[node:grass]]
+* Underground: [[node:stone]], [[node:clay]]
+* Caverns: [[node:hardstone]], [[node:slate]]
+
+**Resources**
+* Ores: [[item:copper]], [[item:iron]], [[item:silver]], [[item:topaz]]
+* Topsoil: [[node:dirt]], [[node:humus]]
+
+**Mini-biomes**
+* [[Fern Cave]] — Underground
+* [[Mushroom Cave]] — Caverns
+* [[Ruined Cabin]] — Underground ⏳
+* [[Anthill]] — Surface ⏳
+* [[Underground Lake]] — Caverns
+
+**Fauna** ⏳
+* [[monster:beetle]], [[monster:greenSlime]], [[monster:blueSlime]]
+* [[monster:bat]], [[monster:caveWorm]] — Underground
+  `
+  },
+  {
+    title: 'Desert',
+    category: ['Biome'],
+    content: `
+**Description**
+The Desert biome is characterized by its sandy terrain and arid atmosphere. It contains unique geological formations and ancient ruins. One of the two non-starting biomes.
+
+**Location**
+* Left or right of the Forest
+* Layer: all layers
+
+**Materials**
+* Surface: [[node:sand]], [[node:sandstone]]
+* Underground: [[node:sandstone]], [[node:stone]]
+* Caverns: [[node:hardstone]], [[node:slate]]
+
+**Resources**
+* Ores: [[item:copper]], [[item:iron]], [[item:gold]], [[item:ruby]]
+* Topsoil: [[node:sand]], [[node:silt]]
+
+**Mini-biomes**
+* [[Antlion Pit]] — Surface ⏳
+* [[Sand Pocket]] — Underground
+* [[Fossil Vein]] — Caverns
+* [[Pyramid]] — Underground ⏳
+* [[Ancient House]] — Caverns deep ⏳
+
+**Fauna** ⏳
+* [[monster:scorpion]], [[monster:sandSnake]] — Surface
+* [[monster:bat]], [[monster:caveWorm]] — Underground
+
+**Tips**
+* _Sand falls when unsupported — be careful when mining near Sand Pockets._
+  `
+  },
+  {
+    title: 'Jungle',
+    category: ['Biome'],
+    content: `
+**Description**
+The Jungle is a lush, dangerous biome teeming with life. It features unique liquid resources (Sap) and the most complex mini-biome ecosystem in the game.
+
+**Location**
+* Left or right of the Forest
+* Layer: all layers
+
+**Materials**
+* Surface: [[node:silt]], [[node:jungleGrass]]
+* Underground: [[node:mud]], [[node:clay]]
+* Caverns: [[node:hardstone]], [[node:hellstone]]
+
+**Resources**
+* Ores: [[item:copper]], [[item:iron]], [[item:cobalt]], [[item:emerald]]
+* Topsoil: [[node:silt]], [[node:humus]]
+* Liquid: [[node:sap]] — found in Sap Lakes and Sap Pockets
+
+**Mini-biomes**
+* [[Termite Mound]] — Surface ⏳
+* [[Moss Cave]] — Underground
+* [[Hive]] — Caverns
+* [[Sap Pocket]] — Caverns deep
+* [[Temple Ruin]] — Caverns ⏳
+
+**Fauna** ⏳
+* [[monster:jungleSpider]] — Surface
+* [[monster:bat]], [[monster:caveWorm]] — Underground
+* [[monster:bee]], [[monster:hornet]] — Hive
+
+**Tips**
+* _Sap is a rare and valuable liquid — bring containers when exploring Sap Pockets._ ⏳
+  `
+  },
+  // ── Mini-biomes / Forest ──────────────────────────────────────
+  //    Fern Cave, Mushroom Cave, Ruined Cabin, Anthill, Underground Lake
+  {
     title: 'Fern Cave',
     category: ['Mini-biome', 'Forest'],
     content: `
@@ -123,6 +234,45 @@ A large underground cave found in [[Forest]] biomes, characterized by giant fern
 * [[monster:dendrobate]]
 * [[monster:mamba]]
   `
+  },
+  // ── Mini-biomes / Desert ─────────────────────────────────────
+  //    Sand Pocket, Fossil Vein, Pyramid, Antlion Pit, Ancient House
+  // ── Mini-biomes / Jungle ─────────────────────────────────────
+  //    Moss Cave, Hive, Sap Pocket, Temple Ruin, Termite Mound
+  {
+    title: 'Moss Cave',
+    category: ['Mini-biome', 'Jungle'],
+    content: `
+**Description**
+A large underground cave found in [[Jungle]] biomes. Its walls are covered in luminous moss, creating a soft green glow. The air is humid and rich in spores.
+
+**Location**
+* Biome: [[Jungle]]
+* Layer: [[Underground]]
+* One per Jungle zone
+
+**Materials**
+* [[node:grassMoss]] — floor and lateral walls
+* [[node:mud]] — substrate beneath the moss floor
+
+**Inhabitants** ⏳
+* Passive fauna only — rare encounters
+
+**Loot** ⏳
+* Rare vegetal drops from the moss walls
+
+**Tips**
+* _The luminous moss makes this cave one of the few underground areas that doesn't require a light source._ ⏳
+* Moss grows on the floor and lateral walls, but not on the ceiling.
+  `
+  // ── Mini-biomes / Transversal ────────────────────────────────
+  //    Cobweb Cave, Geode Cave, Blind Lake, Underground Lake
+  // ── Ores & Gems ──────────────────────────────────────────────
+  // ── Accessories ──────────────────────────────────────────────
+  // ── Items & Crafting ─────────────────────────────────────────
+  // ── Fauna & Critters ─────────────────────────────────────────
+  // ── Buffs & Debuffs ──────────────────────────────────────────
+  // ── Mechanics ────────────────────────────────────────────────
   }
 ]
 
