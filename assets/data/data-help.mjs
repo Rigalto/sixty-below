@@ -383,7 +383,212 @@ A large underground cave found in [[Jungle]] biomes. Its walls are covered in lu
   // ── Mini-biomes / Transversal ────────────────────────────────
   //    Sea, Cobweb Cave, Geode Cave, Blind Lake, Underground Lake
 
+  // ── Liquid ──────────────────────────────────────────────────
+  //    Sea, Water, Honey, Sap
+
+  // ── Natural ──────────────────────────────────────────────────
+  //    Forest Grass, Jungle Grass, Mushroom Grass, Fern Grass, Moss Grass
+
+  // ── Topsoil ──────────────────────────────────────────────────
+  //    Dirt, Sand, Silt, Humus
+
+  // ── Substrat ──────────────────────────────────────────────────
+  //    Forest : Clay, Stone, Hardstone
+  //    Desert : Sandstone, Ash, Hellstone
+  //    Jungle : Mud, Limestone, Slate
+
+  {
+    title: 'Clay',
+    category: ['Substrat', 'Mining'],
+    content: `
+**Description**
+Clay is the most common substrat in [[Forest]] biomes. Its soft, workable texture makes it a versatile early-game building material.
+
+**Tier**
+{{node:clay:star}}
+
+**Main Location**
+* [[Surface]] and [[Underground]] — [[Forest]], high density
+
+**Drops** ⏳
+* {{node:clay:mining}}
+
+**Recipes** ⏳
+* {{recipe:clayBlock}}
+  `
+  },
+  {
+    title: 'Stone',
+    category: ['Substrat', 'Mining'],
+    content: `
+**Description**
+Stone is the second most common substrat in [[Forest]] biomes, found deeper than [[Clay]].
+
+**Tier**
+{{node:stone:star}}
+
+**Main Location**
+* [[Underground]] — [[Forest]], dominant (native substrat)
+* [[Caverns]] Top — [[Forest]], moderate density
+
+**Drops** ⏳
+* {{node:stone:mining}}
+
+**Recipes** ⏳
+* {{recipe:stoneBlock}}
+  `
+  },
+  {
+    title: 'Hardstone',
+    category: ['Substrat', 'Mining'],
+    content: `
+**Description**
+Hardstone is a dense, resistant substrat found in the deepest parts of [[Forest]] biome. It requires high-tier tools to mine.
+
+**Tier**
+{{node:hardstone:star}}
+
+**Main Location**
+* [[Caverns]] — [[Forest]], dominant (native substrat)
+
+**Drops** ⏳
+* {{node:hardstone:mining}}
+
+**Recipes** ⏳
+* {{recipe:hardstoneBlock}}
+  `
+  },
+  {
+    title: 'Sandstone',
+    category: ['Substrat', 'Mining'],
+    content: `
+**Description**
+Sandstone is the primary substrat of [[Desert]] biomes. It also forms the natural borders of the [[Sea]] and acts as a containment layer around [[Sand Pocket]]s.
+
+**Tier**
+{{node:sandstone:star}}
+
+**Main Location**
+* [[Surface]] and [[Underground]] — [[Desert]], high density
+* [[Sea]] borders
+* [[Sand Pocket]]: [[Caverns]] — [[Desert]]
+
+**Drops** ⏳
+* {{node:sandstone:mining}}
+
+**Recipes** ⏳
+* {{recipe:sandstoneBlock}}
+  `
+  },
+  {
+    title: 'Ash',
+    category: ['Substrat', 'Mining'],
+    content: `
+**Description**
+Ash is the second most common substrat in [[Forest]] biomes, found deeper than [[Sandstone]]. The dark color of this volcanic substrat and its fragile structure make it a distinctive material.
+
+**Tier**
+{{node:ash:star}}
+
+**Main Location**
+* [[Underground]] — [[Desert]], dominant (native substrat)
+* [[Caverns]] Top — [[Desert]], moderate density
+
+**Drops** ⏳
+* {{node:ash:mining}}
+
+**Recipes** ⏳
+* {{recipe:ashBlock}}
+  `
+  },
+  {
+    title: 'Hellstone',
+    category: ['Substrat', 'Mining'],
+    content: `
+**Description**
+Hellstone is an extremely hard volcanic substrat found in the deepest parts of [[Desert]] biome. It requires the best tools available to mine and emits a faint heat glow.
+
+**Tier**
+{{node:hellstone:star}}
+
+**Main Location**
+* [[Caverns]] — [[Desert]], dominant (native substrat)
+
+**Drops** ⏳
+* {{node:hellstone:mining}}
+
+**Recipes** ⏳
+* {{recipe:hellstoneBar}}
+
+**Tips**
+* _Hellstone is one of the hardest materials to mine — bring your best pickaxe._ ⏳
+  `
+  },
+  {
+    title: 'Mud',
+    category: ['Substrat', 'Mining'],
+    content: `
+**Description**
+Mud is the primary substrat of [[Jungle]] biomes. Its soft, damp texture supports the lush vegetation above.
+
+**Tier**
+{{node:mud:star}}
+
+**Main Location**
+* [[Surface]] and [[Underground]] — [[Jungle]], high density
+* [[Moss Cave]] walls and floor
+
+**Drops** ⏳
+* {{node:mud:mining}}
+
+**Recipes** ⏳
+* {{recipe:mudBlock}}
+  `
+  },
+  {
+    title: 'Limestone',
+    category: ['Substrat', 'Mining'],
+    content: `
+**Description**
+Limestone is a sedimentary substrat found as intrusions across [[Jungle]] biome. The pale color of this sedimentary substrat and its layered structure make it recognizable underground.
+
+**Tier**
+{{node:limestone:star}}
+
+**Main Location**
+* [[Underground]] — [[Jungle]], dominant (native substrat)
+* [[Caverns]] Top — [[Jungle]], moderate density
+
+**Drops** ⏳
+* {{node:limestone:mining}}
+
+**Recipes** ⏳
+* {{recipe:limestoneBlock}}
+  `
+  },
+  {
+    title: 'Slate',
+    category: ['Substrat', 'Mining'],
+    content: `
+**Description**
+Slate is a hard metamorphic substrat found in the deepest parts of [[Jungle]] biome. Its dark, layered structure requires advanced tools to mine.
+
+**Tier**
+{{node:slate:star}}
+
+**Main Location**
+* [[Caverns]] — [[Jungle]], dominant (native substrat)
+
+**Drops** ⏳
+* {{node:slate:mining}}
+
+**Recipes** ⏳
+* {{recipe:slateBlock}}
+  `
+  },
+
   // ── Ores ─────────────────────────────────────────────────────
+  //    Copper, Iron, Silver, Gold, Cobalt, Platinum
   {
     title: 'Copper',
     category: ['Ore', 'Mining'],
@@ -730,6 +935,8 @@ Shell is a sedimentary material formed from ancient marine organisms. It is foun
 * _Shell veins are protected by a SANDSTONE border — look for exposed Shell on cave walls to locate a vein._⏳
   `
 
+  // ── Housing (walls) ──────────────────────────────────────────
+  // ── Accessories ──────────────────────────────────────────────
   // ── Accessories ──────────────────────────────────────────────
   // ── Items & Crafting ─────────────────────────────────────────
   // ── Fauna & Critters ─────────────────────────────────────────
