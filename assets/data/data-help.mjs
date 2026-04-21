@@ -15,8 +15,8 @@
  *   | ---- | ---- |
  *
  * ── Liens inter-fiches ──────────────────────────────────────────
- *   [[node:code]]                → nom du noeud + lien vers sa fiche
- *   [[item:code]]                → nom de l'item + lien vers sa fiche
+ *   [[node:code]]                → nom du noeud (NODES.CODE.name) + lien vers sa fiche (NODES.CODE..help)
+ *   [[item:code]]                → nom de l'item (ITEMS.code.name) + lien vers sa fiche (ITEMS.code.help)
  *   [[helpTopic]]                → titre de la fiche d'aide + lien vers sa fiche
  *   [[node:code|texte affiché]]   → lien avec texte personnalisé
  *   [[item:code|texte affiché]]   → lien avec texte personnalisé
@@ -24,8 +24,8 @@
  *   (pas de lien si la fiche courante est celle du lien)
  *
  * ── Données dynamiques ──────────────────────────────────────────
- *   {{node:code:star}}  → affiche le tier de NODES.code (⭐☆☆☆☆)
- *   {{item:code:star}}  → affiche le tier de ITEMS.code (⭐☆☆☆☆)
+ *   {{node:code:star}}  → affiche le tier de NODES.CODE.star (⭐☆☆☆☆)
+ *   {{item:code:star}}  → affiche le tier de ITEMS.code.star (⭐☆☆☆☆)
  *   {{item:code}}       → affiche les infos de ITEMS.code
  *   {{node:code}}       → affiche les infos de NODES.code
  *   {{recipe:code}}     → affiche la recette de RECIPES[code]
@@ -388,7 +388,109 @@ A large underground cave found in [[Jungle]] biomes. Its walls are covered in lu
 
   // ── Natural ──────────────────────────────────────────────────
   //    Forest Grass, Jungle Grass, Mushroom Grass, Fern Grass, Moss Grass
+  // ── Natural ───────────────────────────────────────────────────
+  {
+    title: 'Forest Grass',
+    category: ['Natural', 'Mining'],
+    content: `
+**Description**
+Grass covers the surface of [[Forest]] biomes. It is the most common natural tile and supports a wide variety of surface plants and critters.
 
+**Tier**
+{{node:grassForest:star}}
+
+**Main Location**
+* [[Surface]] — [[Forest]], top layer of solid ground
+
+**Drops** ⏳
+* {{node:grass:mining}}
+
+**Tips**
+* _Grass grows back naturally on exposed [[Dirt]] tiles over time._ ⏳
+  `
+  },
+  {
+    title: 'Jungle Grass',
+    category: ['Natural', 'Mining'],
+    content: `
+**Description**
+Jungle Grass covers the surface of [[Jungle]] biomes. Denser and more vibrant than regular [[Forest Grass]], it supports exotic plants and fauna.
+
+**Tier**
+{{node:grassJungle:star}}
+
+**Main Location**
+* [[Surface]] — [[Jungle]], top layer of solid ground
+
+**Drops** ⏳
+* {{node:jungleGrass:mining}}
+
+**Tips**
+* _Jungle Grass grows back naturally on exposed [[SILT]] tiles over time._ ⏳
+  `
+  },
+  {
+    title: 'Fern Grass',
+    category: ['Natural', 'Mining'],
+    content: `
+**Description**
+Fern Grass covers the floor of [[Fern Cave]]s. Giant ferns grow from this soft, mossy substrate.
+
+**Tier**
+{{node:grassFern:star}}
+
+**Main Location**
+* [[Fern Cave]] floor — [[Underground]], [[Forest]]
+
+**Drops** ⏳
+* {{node:grassFern:mining}}
+
+**Tips**
+* _Fern Grass only grows in [[Fern Cave]]s — it cannot spread outside its native environment._ ⏳
+  `
+  },
+  {
+    title: 'Moss Grass',
+    category: ['Natural', 'Mining'],
+    content: `
+**Description**
+Luminous moss that covers the walls and floor of [[Moss Cave]]s. Its soft green glow makes it one of the few self-illuminating natural tiles.
+
+**Tier**
+{{node:grassMoss:star}}
+
+**Main Location**
+* [[Moss Cave]] walls and floor — [[Underground]], [[Jungle]]
+
+**Drops** ⏳
+* {{node:grassMoss:mining}}
+
+**Tips**
+* _Moss grows on the floor and lateral walls, but not on the ceiling._
+* _Its bioluminescence makes torches unnecessary inside a Moss Cave._ ⏳
+  `
+  },
+  {
+    title: 'Mushroom Grass',
+    category: ['Natural', 'Mining'],
+    content: `
+**Description**
+Mushroom Grass covers the floor of [[Mushroom Cave]]s. [[Giant Mushroom]]s grow from this rich substrate, providing rare ingredients.
+
+**Tier**
+{{node:grassMushroom:star}}
+
+**Main Location**
+* [[Mushroom Cave]] floor — [[Caverns]] Top, [[Forest]]
+
+**Drops** ⏳
+* {{node:grassMushroom:mining}}
+
+**Tips**
+* _Mushroom Grass is the only substrate from which giant mushrooms can grow._ ⏳
+* _Harvesting mushrooms without destroying the grass allows them to regrow over time._ ⏳
+  `
+  },
   // ── Topsoil ──────────────────────────────────────────────────
   //    Dirt, Sand, Silt, Humus
 
