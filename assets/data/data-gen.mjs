@@ -441,8 +441,3 @@ export const MUSHROOM_CAVE_RADIUS_X_MIN = 15
 export const MUSHROOM_CAVE_RADIUS_X_MAX = 20
 export const MUSHROOM_CAVE_RADIUS_Y_MIN = 15
 export const MUSHROOM_CAVE_RADIUS_Y_MAX = 20
-
-export const CREATION_REMAP = new Map([
-  [NODES.SAPROCK.code, NODES.SLATE.code],
-  [NODES.HARDROCK.code, NODES.HARDSTONE.code]
-])

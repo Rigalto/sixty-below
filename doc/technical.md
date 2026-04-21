@@ -767,7 +767,7 @@ Génère des tunnels, des cavernes et des mini-biomes. Maintient la liste des zo
 | `digUndergroundTunnels(surfaceUnder, underCaverns): void` | Creuse `UNDERGROUND_TUNNEL_COUNT` tunnels horizontaux avec un ou deux coudes en zone underground. Rayon 8–10, longueur 30–50, déviation 25°. |
 | `digCavernsTunnels(underCaverns): void` | Creuse `CAVERN_TUNNEL_COUNT` tunnels dans la zone cavernes. Borne basse : `WORLD_HEIGHT - 32`. Rayon 7–10, longueur 40–60, déviation 50°. |
 | `digSmallTunnels(surfaceUnder): void` | Creuse `SMALL_TUNNELS_COUNT` petites galeries sinueuses (rayon 2–4, longueur 60–100, deltaAngle 40°) dans les zones underground et cavernes. |
-| `cleanupAfterCarving(): void` | Passe de nettoyage globale post-creusement en 4 passes : (1) propagation SKY colonne par colonne, (2) remplacement des nodes CREATION via `CREATION_REMAP`, (3) suppression des tuiles isolées VOID/solide dans SKY/VOID/liquide (13 règles), (4) suppression des colonnes étroites SKY/VOID en surface. |
+| `cleanupAfterCarving(): void` | Passe de nettoyage globale post-creusement en 4 passes : (1) propagation SKY colonne par colonne, (2) suppression des tuiles isolées VOID/solide dans SKY/VOID/liquide (13 règles), (3) suppression des colonnes étroites SKY/VOID en surface. |
 | `buildErodedSurfaceLine(): Int16Array` | Calcule la ligne de surface (première tuile solide par colonne) et applique une érosion légère (trous et bosses de 1 tuile). Retourne `surfaceLine`. |
 
 ---

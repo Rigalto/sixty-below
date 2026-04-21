@@ -1,6 +1,6 @@
 import {seededRNG} from './utils.mjs'
 import {database} from './database.mjs'
-import {WEATHER_TYPE, WORLD_WIDTH, WORLD_HEIGHT, SEA_LEVEL, TOPSOIL_Y_SKY_SURFACE, TOPSOIL_Y_SURFACE_UNDER, TOPSOIL_Y_UNDER_CAVERNS, TOPSOIL_Y_CAVERNS_MID, BIOME_TILE_MAP, SEA_MAX_JITTER, SEA_MAX_WIDTH, SEA_MAX_HEIGHT, CLUSTER_SCATTER_MAP, ORE_GEM_SCATTER_MAP, PERLIN_OFFSET_NATURALIZER, PERLIN_OFFSET_TUNNEL, PERLIN_OFFSET_SURFACE_TUNNEL, PERLIN_OFFSET_SMALL_TUNNEL, PERLIN_OFFSET_CAVERN, PERLIN_OFFSET_HIVE, PERLIN_OFFSET_HEART, PERLIN_OFFSET_MUSHROOM, PERLIN_OFFSET_COBWEB, PERLIN_OFFSET_FERNS, PERLIN_OFFSET_LAKES, PERLIN_OFFSET_SHELL, SMALL_CAVERNS_COUNT, MEDIUM_CAVERNS_COUNT, UNDERGROUND_TUNNEL_COUNT, CAVERNS_TUNNEL_COUNT, SMALL_TUNNELS_COUNT, HIVE_RADIUS_MIN, HIVE_RADIUS_MAX, COBWEB_CAVE_COUNT_MIN, COBWEB_CAVE_COUNT_MAX, COBWEB_RADIUS_X_MIN, COBWEB_RADIUS_X_MAX, COBWEB_RADIUS_Y_MIN, COBWEB_RADIUS_Y_MAX, COBWEB_CAVE_MAIN_MIN, COBWEB_CAVE_MAIN_MAX, COBWEB_CAVE_SIDE_MIN, COBWEB_CAVE_SIDE_MAX, COBWEB_SCATTER_COUNT, COBWEB_SCATTER_SIZE_MIN, COBWEB_SCATTER_SIZE_MAX, GEODE_CAVE_COUNT_MIN, GEODE_CAVE_COUNT_MAX, GEODE_RADIUS_MIN, GEODE_RADIUS_MAX, GEODE_TARGET_CLUSTER_COUNT, GEODE_CLUSTER_SIZE_MIN, GEODE_CLUSTER_SIZE_MAX, TOPSOIL_SCATTER_MAP, LAKE_RADIUS_X_MIN, LAKE_RADIUS_X_MAX, LAKE_RADIUS_Y_MIN, LAKE_RADIUS_Y_MAX, LAKE_PIT_RADIUS_X_MIN, LAKE_PIT_RADIUS_X_MAX, LAKE_PIT_RADIUS_Y_MIN, LAKE_PIT_RADIUS_Y_MAX, LAKE_CREATION_MAP, UNDERGROUND_LAKE_UNDER_COUNT, UNDERGROUND_LAKE_CAVERNS_COUNT, UNDERGROUND_LAKE_RADIUS_MIN, UNDERGROUND_LAKE_RADIUS_MAX, BLIND_LAKE_COUNT, BLIND_LAKE_RADIUS_MIN, BLIND_LAKE_RADIUS_MAX, SAP_LAKE_UNDER_COUNT, SAP_LAKE_CAVERNS_COUNT, SAP_LAKE_RADIUS_MIN, SAP_LAKE_RADIUS_MAX, SAP_POCKET_COUNT, SAP_POCKET_RADIUS_MIN, SAP_POCKET_RADIUS_MAX, WATER_PUDDLE_COUNT, SAP_PUDDLE_COUNT, PUDDLE_HEIGHT_MIN, PUDDLE_HEIGHT_MAX, FOSSIL_VEIN_COUNT, FERN_CAVE_RADIUS_X_MIN, FERN_CAVE_RADIUS_X_MAX, FERN_CAVE_RADIUS_Y_MIN, FERN_CAVE_RADIUS_Y_MAX, MOSS_CAVE_RADIUS_X_MIN, MOSS_CAVE_RADIUS_X_MAX, MOSS_CAVE_RADIUS_Y_MIN, MOSS_CAVE_RADIUS_Y_MAX, SAND_POCKET_RADIUS_X_MIN, SAND_POCKET_RADIUS_X_MAX, SAND_POCKET_RADIUS_Y_MIN, SAND_POCKET_RADIUS_Y_MAX, MUSHROOM_CAVE_RADIUS_X_MIN, MUSHROOM_CAVE_RADIUS_X_MAX, MUSHROOM_CAVE_RADIUS_Y_MIN, MUSHROOM_CAVE_RADIUS_Y_MAX, CREATION_REMAP} from '../assets/data/data-gen.mjs'
+import {WEATHER_TYPE, WORLD_WIDTH, WORLD_HEIGHT, SEA_LEVEL, TOPSOIL_Y_SKY_SURFACE, TOPSOIL_Y_SURFACE_UNDER, TOPSOIL_Y_UNDER_CAVERNS, TOPSOIL_Y_CAVERNS_MID, BIOME_TILE_MAP, SEA_MAX_JITTER, SEA_MAX_WIDTH, SEA_MAX_HEIGHT, CLUSTER_SCATTER_MAP, ORE_GEM_SCATTER_MAP, PERLIN_OFFSET_NATURALIZER, PERLIN_OFFSET_TUNNEL, PERLIN_OFFSET_SURFACE_TUNNEL, PERLIN_OFFSET_SMALL_TUNNEL, PERLIN_OFFSET_CAVERN, PERLIN_OFFSET_HIVE, PERLIN_OFFSET_HEART, PERLIN_OFFSET_MUSHROOM, PERLIN_OFFSET_COBWEB, PERLIN_OFFSET_FERNS, PERLIN_OFFSET_LAKES, PERLIN_OFFSET_SHELL, SMALL_CAVERNS_COUNT, MEDIUM_CAVERNS_COUNT, UNDERGROUND_TUNNEL_COUNT, CAVERNS_TUNNEL_COUNT, SMALL_TUNNELS_COUNT, HIVE_RADIUS_MIN, HIVE_RADIUS_MAX, COBWEB_CAVE_COUNT_MIN, COBWEB_CAVE_COUNT_MAX, COBWEB_RADIUS_X_MIN, COBWEB_RADIUS_X_MAX, COBWEB_RADIUS_Y_MIN, COBWEB_RADIUS_Y_MAX, COBWEB_CAVE_MAIN_MIN, COBWEB_CAVE_MAIN_MAX, COBWEB_CAVE_SIDE_MIN, COBWEB_CAVE_SIDE_MAX, COBWEB_SCATTER_COUNT, COBWEB_SCATTER_SIZE_MIN, COBWEB_SCATTER_SIZE_MAX, GEODE_CAVE_COUNT_MIN, GEODE_CAVE_COUNT_MAX, GEODE_RADIUS_MIN, GEODE_RADIUS_MAX, GEODE_TARGET_CLUSTER_COUNT, GEODE_CLUSTER_SIZE_MIN, GEODE_CLUSTER_SIZE_MAX, TOPSOIL_SCATTER_MAP, LAKE_RADIUS_X_MIN, LAKE_RADIUS_X_MAX, LAKE_RADIUS_Y_MIN, LAKE_RADIUS_Y_MAX, LAKE_PIT_RADIUS_X_MIN, LAKE_PIT_RADIUS_X_MAX, LAKE_PIT_RADIUS_Y_MIN, LAKE_PIT_RADIUS_Y_MAX, LAKE_CREATION_MAP, UNDERGROUND_LAKE_UNDER_COUNT, UNDERGROUND_LAKE_CAVERNS_COUNT, UNDERGROUND_LAKE_RADIUS_MIN, UNDERGROUND_LAKE_RADIUS_MAX, BLIND_LAKE_COUNT, BLIND_LAKE_RADIUS_MIN, BLIND_LAKE_RADIUS_MAX, SAP_LAKE_UNDER_COUNT, SAP_LAKE_CAVERNS_COUNT, SAP_LAKE_RADIUS_MIN, SAP_LAKE_RADIUS_MAX, SAP_POCKET_COUNT, SAP_POCKET_RADIUS_MIN, SAP_POCKET_RADIUS_MAX, WATER_PUDDLE_COUNT, SAP_PUDDLE_COUNT, PUDDLE_HEIGHT_MIN, PUDDLE_HEIGHT_MAX, FOSSIL_VEIN_COUNT, FERN_CAVE_RADIUS_X_MIN, FERN_CAVE_RADIUS_X_MAX, FERN_CAVE_RADIUS_Y_MIN, FERN_CAVE_RADIUS_Y_MAX, MOSS_CAVE_RADIUS_X_MIN, MOSS_CAVE_RADIUS_X_MAX, MOSS_CAVE_RADIUS_Y_MIN, MOSS_CAVE_RADIUS_Y_MAX, SAND_POCKET_RADIUS_X_MIN, SAND_POCKET_RADIUS_X_MAX, SAND_POCKET_RADIUS_Y_MIN, SAND_POCKET_RADIUS_Y_MAX, MUSHROOM_CAVE_RADIUS_X_MIN, MUSHROOM_CAVE_RADIUS_X_MAX, MUSHROOM_CAVE_RADIUS_Y_MIN, MUSHROOM_CAVE_RADIUS_Y_MAX} from '../assets/data/data-gen.mjs'
 import {NODES, NODES_LOOKUP, NODE_TYPE, BIOME_TYPE, PLANT_SYSTEM, GRASS_TYPE, ITEMS} from '../assets/data/data.mjs'
 
 /* ====================================================================================================
@@ -3890,14 +3890,6 @@ class WorldCarver {
       }
     }
 
-    // Remonte depuis idx jusqu'à trouver la première tuile non VOID — retourne son code
-    // Utilisé uniquement par la règle 13, devenue obsolète
-    // const solidAbove = (idx) => {
-    //   let above = idx - W
-    //   while (world[above] === VOID) above -= W
-    //   return world[above]
-    // }
-
     // Passe 1 — propagation SKY vers le bas colonne par colonne
     for (let x = 1; x < W - 1; x++) {
       let phaseB = false
@@ -3916,13 +3908,7 @@ class WorldCarver {
       }
     }
 
-    // Passe 2 — remplacement des tuiles CREATION par leur substrat définitif
-    for (let i = 0; i < world.length; i++) {
-      const remapped = CREATION_REMAP.get(world[i])
-      if (remapped !== undefined) world[i] = remapped
-    }
-
-    // Passe 3 — application des règles
+    // Passe 2 — application des règles
     for (let y = 1; y < H - 1; y++) {
       for (let x = 1; x < W - 1; x++) {
         const idx = (y << 10) | x
@@ -4070,124 +4056,6 @@ class WorldCarver {
           world[idx + W] = botbot
           continue
         }
-
-        // //////////////////////////////////////// //
-        // AJOUT DE SOLID AU DESSUS DES WEB ISOLEES //
-        // //////////////////////////////////////// //
-
-        // Règle 13 Obsolète — WEB avec VOID au-dessus → remplace le VOID par le SOLID au-dessus
-        // if (code === NODES.WEB.code && top === VOID) {
-        //   world[idx - W] = solidAbove(idx - W)
-        //   continue
-        // }
-
-        // if (isVoid) {
-        // Règle 2 — VOID avec 4 voisins non VOID → devient l'un d'eux
-        // if (top !== VOID && bot !== VOID && left !== VOID && right !== VOID) {
-        //   const candidates = []
-        //   if (!LIQUID_OR_SKY.has(top)) candidates.push(top)
-        //   if (!LIQUID_OR_SKY.has(bot)) candidates.push(bot)
-        //   if (!LIQUID_OR_SKY.has(left)) candidates.push(left)
-        //   if (!LIQUID_OR_SKY.has(right)) candidates.push(right)
-        //   world[idx] = seededRNG.randomGetArrayValue(candidates)
-        //   continue
-        // }
-
-        // Règle 4 — paire horizontale VOID (x,y)+(x+1,y), 6 voisins non VOID → devient l'un des 6
-        // if (x < W - 2 && right === VOID) {
-        //   const top2 = world[idx - W + 1]
-        //   const bot2 = world[idx + W + 1]
-        //   const right2 = world[idx + 2]
-        //   if (top !== VOID && top2 !== VOID && bot !== VOID && bot2 !== VOID && left !== VOID && right2 !== VOID) {
-        //     const candidates = []
-        //     if (!LIQUID_OR_SKY.has(top)) candidates.push(top)
-        //     if (!LIQUID_OR_SKY.has(top2)) candidates.push(top2)
-        //     if (!LIQUID_OR_SKY.has(bot)) candidates.push(bot)
-        //     if (!LIQUID_OR_SKY.has(bot2)) candidates.push(bot2)
-        //     if (!LIQUID_OR_SKY.has(left)) candidates.push(left)
-        //     if (!LIQUID_OR_SKY.has(right2)) candidates.push(right2)
-        //     world[idx] = seededRNG.randomGetArrayValue(candidates)
-        //     continue
-        //   }
-        // }
-
-        // Règle 6 — paire verticale VOID (x,y)+(x,y+1), 6 voisins non VOID → devient l'un des 6
-        // if (y < H - 2 && bot === VOID) {
-        //   const left2 = world[idx + W - 1]
-        //   const right2 = world[idx + W + 1]
-        //   const top2 = world[idx + W + W]
-        //   if (top !== VOID && left !== VOID && left2 !== VOID && right !== VOID && right2 !== VOID && top2 !== VOID) {
-        //     const candidates = []
-        //     if (!LIQUID_OR_SKY.has(top)) candidates.push(top)
-        //     if (!LIQUID_OR_SKY.has(left)) candidates.push(left)
-        //     if (!LIQUID_OR_SKY.has(left2)) candidates.push(left2)
-        //     if (!LIQUID_OR_SKY.has(right)) candidates.push(right)
-        //     if (!LIQUID_OR_SKY.has(right2)) candidates.push(right2)
-        //     if (!LIQUID_OR_SKY.has(top2)) candidates.push(top2)
-        //     world[idx] = seededRNG.randomGetArrayValue(candidates)
-        //     continue
-        //   }
-        // }
-        // } else {
-        // Règle 3 — non VOID avec 4 voisins VOID → devient VOID
-        // if (top === VOID && bot === VOID && (left === VOID || left === SKY) && (right === VOID || right === SKY)) {
-        //   world[idx] = VOID
-        //   continue
-        // }
-
-        // // Règle 5 — paire horizontale non VOID (x,y)+(x+1,y), 6 voisins VOID → devient VOID
-        // if (x < W - 2 && right !== VOID) {
-        //   const top2 = world[idx - W + 1]
-        //   const bot2 = world[idx + W + 1]
-        //   const right2 = world[idx + 2]
-        //   if (top === VOID && top2 === VOID && bot === VOID && bot2 === VOID && left === VOID && right2 === VOID) {
-        //     world[idx] = VOID
-        //     continue
-        //   }
-        // }
-
-        // // Règle 7 — paire verticale non VOID (x,y)+(x,y+1), 6 voisins VOID → devient VOID
-        // if (y < H - 2 && bot !== VOID) {
-        //   const left2 = world[idx + W - 1]
-        //   const right2 = world[idx + W + 1]
-        //   const bot2 = world[idx + W + W]
-        //   if (top === VOID && left === VOID && left2 === VOID && right === VOID && right2 === VOID && bot2 === VOID) {
-        //     world[idx] = VOID
-        //     continue
-        //   }
-        // }
-
-        // // Règle 8 — pic isolé dans le ciel → SKY + propagation vers le bas
-        // if (top === SKY && left === SKY && right === SKY && bot === VOID) {
-        //   propagateSky(idx)
-        //   world[idx] = SKY
-        //   continue
-        // }
-
-        // Règle 9 — pic double vertical dans le ciel → SKY + propagation vers le bas
-        // if (y < H - 2 && top === SKY && left === SKY && right === SKY) {
-        //   const bot2code = world[idx + W + W]
-        //   const left2 = world[idx + W - 1]
-        //   const right2 = world[idx + W + 1]
-        //   if (bot !== VOID && bot !== SKY && left2 === SKY && right2 === SKY && (bot2code === VOID || bot2code === SKY)) {
-        //     world[idx] = SKY
-        //     propagateSky(idx + W)
-        //     continue
-        //   }
-        // }
-
-        // Règle 10 — pic double horizontal dans le ciel → SKY + propagation vers le bas
-        // if (x < W - 2 && top === SKY && (bot === VOID || bot === SKY)) {
-        //   const top2 = world[idx - W + 1]
-        //   const bot2 = world[idx + W + 1]
-        //   const right2 = world[idx + 2]
-        //   if (right !== VOID && right !== SKY && top2 === SKY && (bot2 === VOID || bot2 === SKY) && right2 === SKY) {
-        //     propagateSky(idx)
-        //     propagateSky(idx + 1)
-        //     continue
-        //   }
-        // }
-        // }
       }
     }
 

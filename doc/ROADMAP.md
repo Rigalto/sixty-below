@@ -46,9 +46,6 @@
 - Oxydation progressive en quelques jours (timer global)
 - À implémenter dans `ecosystem.mjs`, pas dans `generate.mjs`
 
-### Optimisation
-- Suppression complète de CREATION_REMAP et des codes de tuiles utilisés uniquement pendant la génération (tileGuard remplace cette fonctionnalité).
-
 ---
 
 ## À faire — Data (`data.mjs`)
