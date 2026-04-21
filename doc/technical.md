@@ -812,8 +812,8 @@ Génère des tunnels, des cavernes et des mini-biomes. Maintient la liste des zo
 
 | Méthode | Description |
 |---|---|
-| `digHearts(surfaceUnder, underCaverns)` | Place 15 spots Life Heart (2×2 HEART) en underground. Vérifie 16 tuiles solides. Fallback caverns_top. Enregistre dans `#exclusions` + `tileGuard`. Retourne `Array<{cx, cy}>` (coin haut-gauche). |
-| `digTriskels(underCaverns)` | Place 3 Triskels (2×2) : 2 en caverns_top, 1 en caverns_bottom. Fallback caverns_bottom si quota non atteint. Enregistre dans `#exclusions` + `tileGuard`. Retourne `Array<{cx, cy}>`. |
+| `digHearts(surfaceUnder, underCaverns)` | Place 15 spots Life Heart (2×2 VOID) en underground. Vérifie 16 tuiles solides. Fallback caverns_top. Ajoute le furniture 'Life Crystall'. Enregistre dans `#exclusions` + `tileGuard`. Retourne `Array<{cx, cy}>` (coin haut-gauche). |
+| `digTriskels(underCaverns)` | Place 3 Triskels (2×2) : 2 en caverns_top, 1 en caverns_bottom. Fallback caverns_bottom si quota non atteint.. Ajoute les furnitures 'Tryskel'. Enregistre dans `#exclusions` + `tileGuard`. Retourne `Array<{cx, cy}>`. |
 
 ---
 

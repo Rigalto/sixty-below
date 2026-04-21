@@ -118,8 +118,7 @@ export const NODES = {
 
   // A SUPPRIMER - types utilisés de manière temporaire pendant la création du monde
   SAPROCK: {code: 150, name: 'Sap Rock', type: NODE_TYPE.CREATION, color: '#34e648'}, // remplacé par SLATE
-  HARDROCK: {code: 151, name: 'Hard Rock', type: NODE_TYPE.CREATION, color: '#34e648'}, // remplacé par HARDSTONE
-  HEART: {code: 152, name: 'Life Heart', type: NODE_TYPE.CREATION, color: '#FF19CD'} // remplacé par VOID et un furniture
+  HARDROCK: {code: 151, name: 'Hard Rock', type: NODE_TYPE.CREATION, color: '#34e648'} // remplacé par HARDSTONE
 }
 
 /** Lookup par code numérique — hot path render/physics */
@@ -145,16 +144,16 @@ export const ITEM_TYPE = {
 
 export const ITEMS = {
   // crafting Station
-  alchemyTable: {name: 'Alchemy Table', type: ITEM_TYPE.FURNITURE | ITEM_TYPE.PLACABLE, stype: 'station', star: 1, sell: 100, image: 'furniture_32_32-12-2', placed: 'placed_32_32-6-3', help: 'Stations', tooltip: ''},
+  alchemyTable: {name: 'Alchemy Table', type: ITEM_TYPE.FURNITURE | ITEM_TYPE.PLACABLE, stype: 'station', star: 1, sell: 100, image: 'furniture_32_32-12-2', placed: 'furniture_32_32-6-3', help: 'Stations', tooltip: ''},
 
   // crystall
-  lifeCrystal: {name: 'Life Crystal', type: ITEM_TYPE.FURNITURE | ITEM_TYPE.UNIQUE | ITEM_TYPE.USABLE, stype: 'life', star: 1, sell: 0, image: 'furniture_32_32-12-2', placed: 'placed_32_32-6-3', help: 'Life Crystal', tooltip: 'Permanently increases maximum life by 20\nCollect with a Hammer'},
+  lifeCrystal: {name: 'Life Crystal', type: ITEM_TYPE.FURNITURE | ITEM_TYPE.UNIQUE | ITEM_TYPE.USABLE, stype: 'life', star: 1, sell: 0, image: 'furniture_32_32-12-2', placed: 'furniture_32_32-6-3', help: 'Life Crystal', tooltip: 'Permanently increases maximum life by 20\nCollect with a Hammer'},
 
   // triskel
-  triskelCopper: {name: 'Copper Triskel', type: ITEM_TYPE.FURNITURE | ITEM_TYPE.UNIQUE | ITEM_TYPE.MATERIAL, stype: 'triskel', star: 3, sell: 0, image: 'furniture_32_32-12-2', placed: 'placed_32_32-6-3', help: 'Triskels', tooltip: ''},
-  triskelSilver: {name: 'Silver Triskel', type: ITEM_TYPE.FURNITURE | ITEM_TYPE.UNIQUE | ITEM_TYPE.MATERIAL, stype: 'triskel', star: 4, sell: 0, image: 'furniture_32_32-12-2', placed: 'placed_32_32-6-3', help: 'Triskels', tooltip: ''},
-  triskelGold: {name: 'Gold Triskel', type: ITEM_TYPE.FURNITURE | ITEM_TYPE.UNIQUE | ITEM_TYPE.MATERIAL, stype: 'triskel', star: 5, sell: 0, image: 'furniture_32_32-12-2', placed: 'placed_32_32-6-3', help: 'Triskels', tooltip: ''},
-  triskelAncient: {name: 'Ancient Triskel', type: ITEM_TYPE.ACCESSORY | ITEM_TYPE.UNIQUE | ITEM_TYPE.CRAFTABLE, stype: 'triskel', star: 5, sell: 0, image: 'furniture_32_32-12-2', placed: 'placed_32_32-6-3', help: 'Triskels', tooltip: ''}
+  triskelCopper: {name: 'Copper Triskel', type: ITEM_TYPE.FURNITURE | ITEM_TYPE.UNIQUE | ITEM_TYPE.MATERIAL, stype: 'triskel', star: 3, sell: 0, image: 'furniture_32_32-12-2', placed: 'furniture_32_32-6-3', help: 'Triskels', tooltip: ''},
+  triskelSilver: {name: 'Silver Triskel', type: ITEM_TYPE.FURNITURE | ITEM_TYPE.UNIQUE | ITEM_TYPE.MATERIAL, stype: 'triskel', star: 4, sell: 0, image: 'furniture_32_32-12-2', placed: 'furniture_32_32-6-3', help: 'Triskels', tooltip: ''},
+  triskelGold: {name: 'Gold Triskel', type: ITEM_TYPE.FURNITURE | ITEM_TYPE.UNIQUE | ITEM_TYPE.MATERIAL, stype: 'triskel', star: 5, sell: 0, image: 'furniture_32_32-12-2', placed: 'furniture_32_32-6-3', help: 'Triskels', tooltip: ''},
+  triskelAncient: {name: 'Ancient Triskel', type: ITEM_TYPE.ACCESSORY | ITEM_TYPE.UNIQUE | ITEM_TYPE.CRAFTABLE, stype: 'triskel', star: 5, sell: 0, image: 'furniture_32_32-12-2', placed: 'furniture_32_32-6-3', help: 'Triskels', tooltip: ''}
 }
 
 /* ============================================================================
