@@ -116,7 +116,8 @@ It is used in many early-game [[Crafting||recipes]].
 The Forest is the starting biome, located at the center of the world. It is the most balanced biome, with moderate resources and fauna. The player always spawns here.
 
 **Location**
-* Center of the world
+* The world always contains at least one Forest zone, at the center — the player spawns here.
+* Additional Forest zones may appear elsewhere in the world.
 * Layer: all layers
 
 **Materials**
@@ -148,7 +149,7 @@ The Forest is the starting biome, located at the center of the world. It is the 
 The Desert biome is characterized by its sandy terrain and arid atmosphere. It contains unique geological formations and ancient ruins. One of the two non-starting biomes.
 
 **Location**
-* Left or right of the Forest
+* One or more Desert zones, distributed across the world.
 * Layer: all layers
 
 **Materials**
@@ -183,7 +184,7 @@ The Desert biome is characterized by its sandy terrain and arid atmosphere. It c
 The Jungle is a lush, dangerous biome teeming with life. It features unique liquid resources (Sap) and the most complex mini-biome ecosystem in the game.
 
 **Location**
-* Left or right of the Forest
+* One or more Jungle zones, distributed across the world.
 * Layer: all layers
 
 **Materials**
