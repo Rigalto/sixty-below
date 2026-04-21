@@ -24,6 +24,8 @@
  *   (pas de lien si la fiche courante est celle du lien)
  *
  * ── Données dynamiques ──────────────────────────────────────────
+ *   {{node:code:star}}  → affiche le tier de NODES.code (⭐☆☆☆☆)
+ *   {{item:code:star}}  → affiche le tier de ITEMS.code (⭐☆☆☆☆)
  *   {{item:code}}       → affiche les infos de ITEMS.code
  *   {{node:code}}       → affiche les infos de NODES.code
  *   {{recipe:code}}     → affiche la recette de RECIPES[code]
@@ -39,6 +41,7 @@
  * ═══════════════════════════════════════════════════════════════
  *
  *   ⭐  nombre de star (tier) de l'entité
+ *   ☆  nombre de star (tier) de l'entité
 *
  *   ⏳  Feature non encore implémentée
  *       → Tant qu'il en reste dans le fichier, l'application n'est pas terminée.
@@ -81,10 +84,9 @@ export const HELP = [
 Copper is the most common ore found near the [[Surface||Surface layer]].
 It is used in many early-game [[Crafting||recipes]].
 
-**Location**
-* Layer: [[node:surface]] and [[node:under]] ⏳
-  * More common near the surface
-  * Rarely found in [[node:caverns]]
+**Main Location**
+* All biomes
+* Layer: [[Underground]], [[Surface]]
 
 **Mining**
 <<miningInfo|copperPickaxe|1|copper>>
@@ -106,6 +108,119 @@ It is used in many early-game [[Crafting||recipes]].
   },
   // ── World ────────────────────────────────────────────
   // ── Layers ────────────────────────────────────────────
+  //    Surface, Underground, Caverns
+  {
+    title: 'Surface',
+    category: ['Layer'],
+    content: `
+**Description**
+The Surface is the topmost layer of the world, where the player begins their adventure. It is the most accessible layer, with moderate resources and fauna.
+
+**Main Location**
+* From the sky down to the Underground boundary
+* Includes several tile-layers below the visible surface line
+* Exposed to the day/night cycle and weather ⏳
+
+**Materials**
+* [[node:grass]], [[node:dirt]] — Forest
+* [[node:sand]], [[node:sandstone]] — Desert
+* [[node:jungleGrass]], [[node:silt]] — Jungle
+
+**Resources**
+* [[item:copper]], [[item:iron]] — common
+* Surface plants and critters ⏳
+
+**Mini-biomes**
+* [[Anthill]] — Forest ⏳
+* [[Antlion Pit]] — Desert ⏳
+* [[Termite Mound]] — Jungle ⏳
+
+**Damage type**
+* Piercing
+
+**Tips**
+* _The safest layer — ideal for early game exploration._
+* _Day/night cycle affects fauna behaviour and spawning._ ⏳
+  `
+  },
+  {
+    title: 'Underground',
+    category: ['Layer'],
+    content: `
+**Description**
+The Underground layer begins just below the surface. It is darker, more dangerous, and richer in resources than the surface.
+
+**Main Location**
+* Below the Surface
+* Above the Caverns
+
+**Materials**
+* [[node:stone]], [[node:clay]] — Forest
+* [[node:sandstone]], [[node:stone]] — Desert
+* [[node:mud]], [[node:clay]] — Jungle
+
+**Resources**
+* [[item:copper]], [[item:iron]], [[item:silver]] — common
+* [[item:topaz]], [[item:ruby]], [[item:emerald]] — rare ⏳
+
+**Mini-biomes**
+* [[Fern Cave]] — Forest
+* [[Moss Cave]] — Jungle
+* [[Sand Pocket]] — Desert
+* [[Ruined Cabin]] — Forest ⏳
+* [[Pyramid]] — Desert ⏳
+
+**Damage type**
+* Slashing
+
+**Tips**
+* _Bring a light source — torches are essential here._ ⏳
+* _Water puddles and Sap puddles can form in this layer._
+  `
+  },
+  {
+    title: 'Caverns',
+    category: ['Layer'],
+    content: `
+**Description**
+The Caverns are the deepest accessible layer, divided into two sub-layers : Caverns Top and Caverns Bottom. This is where the rarest resources and most dangerous fauna are found.
+
+**Main Location**
+* Below the Underground
+* Above Hell
+
+**Sub-layers**
+* _Caverns Top_ — upper half, more accessible
+* _Caverns Bottom_ — lower half, more dangerous
+
+**Materials**
+* [[node:hardstone]], [[node:slate]] — all biomes
+* [[node:hellstone]] — Jungle, rare in other biomes
+
+**Resources**
+* [[item:gold]], [[item:cobalt]], [[item:platinum]] — rare to very rare
+* [[item:sapphire]], [[item:emerald]] — very rare
+* [[node:granite]], [[node:marble]] — Geode Caves
+
+**Mini-biomes**
+* [[Mushroom Cave]] — Forest, Caverns Top
+* [[Hive]] — Jungle, Caverns Top
+* [[Fossil Vein]] — Desert, Caverns Top
+* [[Cobweb Cave]] — all biomes
+* [[Geode Cave]] — all biomes, Caverns Bottom
+* [[Blind Lake]] — all biomes, Caverns Bottom
+* [[Sap Pocket]] — Jungle, Caverns Bottom
+* [[Ancient House]] — Desert, Caverns Bottom ⏳
+* [[Temple Ruin]] — Jungle, Caverns Top ⏳
+
+**Damage type**
+* Crushing
+
+**Tips**
+* _Caverns Bottom is extremely dangerous — prepare well before venturing here._
+* _Blind Lakes contain rare fish species found nowhere else._ ⏳
+  `
+  },
   // ── Biomes ───────────────────────────────────────────────────
   //    Forest, Desert, Jungle
   {
@@ -115,7 +230,7 @@ It is used in many early-game [[Crafting||recipes]].
 **Description**
 The Forest is the starting biome, located at the center of the world. It is the most balanced biome, with moderate resources and fauna. The player always spawns here.
 
-**Location**
+**Main Location**
 * The world always contains at least one Forest zone, at the center — the player spawns here.
 * Additional Forest zones may appear elsewhere in the world.
 * Layer: all layers
@@ -148,7 +263,7 @@ The Forest is the starting biome, located at the center of the world. It is the 
 **Description**
 The Desert biome is characterized by its sandy terrain and arid atmosphere. It contains unique geological formations and ancient ruins. One of the two non-starting biomes.
 
-**Location**
+**Main Location**
 * One or more Desert zones, distributed across the world.
 * Layer: all layers
 
@@ -183,7 +298,7 @@ The Desert biome is characterized by its sandy terrain and arid atmosphere. It c
 **Description**
 The Jungle is a lush, dangerous biome teeming with life. It features unique liquid resources (Sap) and the most complex mini-biome ecosystem in the game.
 
-**Location**
+**Main Location**
 * One or more Jungle zones, distributed across the world.
 * Layer: all layers
 
@@ -222,10 +337,9 @@ The Jungle is a lush, dangerous biome teeming with life. It features unique liqu
 **Description**
 A large underground cave found in [[Forest]] biomes, characterized by giant ferns growing on its flat floor.
 
-**Location**
+**Main Location**
 * Biome: [[Forest]]
 * Layer: [[Underground]]
-* One per Forest zone
 
 **Floor**
 * [[node:grassFern]] — surface layer
@@ -247,10 +361,9 @@ A large underground cave found in [[Forest]] biomes, characterized by giant fern
 **Description**
 A large underground cave found in [[Jungle]] biomes. Its walls are covered in luminous moss, creating a soft green glow. The air is humid and rich in spores.
 
-**Location**
+**Main Location**
 * Biome: [[Jungle]]
 * Layer: [[Underground]]
-* One per Jungle zone
 
 **Materials**
 * [[node:grassMoss]] — floor and lateral walls
@@ -266,9 +379,357 @@ A large underground cave found in [[Jungle]] biomes. Its walls are covered in lu
 * _The luminous moss makes this cave one of the few underground areas that doesn't require a light source._ ⏳
 * Moss grows on the floor and lateral walls, but not on the ceiling.
   `
+  },
   // ── Mini-biomes / Transversal ────────────────────────────────
-  //    Cobweb Cave, Geode Cave, Blind Lake, Underground Lake
-  // ── Ores & Gems ──────────────────────────────────────────────
+  //    Sea, Cobweb Cave, Geode Cave, Blind Lake, Underground Lake
+
+  // ── Ores ─────────────────────────────────────────────────────
+  {
+    title: 'Copper',
+    category: ['Ore', 'Mining'],
+    content: `
+**Description**
+Copper is the most common ore in the world. It is the first metal the player will encounter and is essential for early-game crafting.
+
+**Tier**
+{{node:copper:star}}
+
+**Main Location**
+* [[Surface]] — all biomes, moderate density
+* [[Underground]] — all biomes, high density
+* [[Caverns]] Top — all biomes, moderate density
+
+**Drops** ⏳
+* {{node:copper:mining}}
+
+**Recipes** ⏳
+* {{recipe:copperBar}}
+  `
+  },
+  {
+    title: 'Iron',
+    category: ['Ore', 'Mining'],
+    content: `
+**Description**
+Iron is a common ore found from the Underground layer downwards. It is the second metal tier and is required for most basic tools and weapons.
+
+**Tier**
+{{node:iron:star}}
+
+**Main Location**
+* [[Underground]] — all biomes, moderate density
+* [[Caverns]] Top — all biomes, moderate density
+
+**Drops** ⏳
+* {{node:iron:mining}}
+
+**Recipes** ⏳
+* {{recipe:ironBar}}
+  `
+  },
+  {
+    title: 'Silver',
+    category: ['Ore', 'Mining'],
+    content: `
+**Description**
+Silver is an uncommon ore found in the Underground and Caverns. It is rarer in [[Forest]] biomes.
+
+**Tier**
+{{node:silver:star}}
+
+**Main Location**
+* [[Caverns]] Top — all biomes, moderate density
+* [[Caverns]] Bottom — all biomes, small density
+* Rarer in [[Forest]].
+
+**Drops** ⏳
+* {{node:silver:mining}}
+
+**Recipes** ⏳
+* {{recipe:silverBar}}
+  `
+  },
+  {
+    title: 'Gold',
+    category: ['Ore', 'Mining'],
+    content: `
+**Description**
+Gold is a rare ore found in the Caverns. It is rarer in [[Desert]] biomes.
+
+**Tier**
+{{node:gold:star}}
+
+**Main Location**
+* [[Caverns]] Top — all biomes, moderate density
+* [[Caverns]] Bottom — all biomes, small density
+* Rarer in [[Desert]].
+
+**Drops** ⏳
+* {{node:gold:mining}}
+
+**Recipes** ⏳
+* {{recipe:goldBar}}
+  `
+  },
+  {
+    title: 'Cobalt',
+    category: ['Ore', 'Mining'],
+    content: `
+**Description**
+Cobalt is a rare ore found deep in the Caverns. It is rarer in [[Jungle]] biomes.
+
+**Tier**
+{{node:platinum:star}}
+
+**Main Location**
+* [[Caverns]] Top — all biomes, small density
+* [[Caverns]] Bottom — all biomes, moderate density
+* Rarer in [[Jungle]].
+
+
+**Drops** ⏳
+* {{node:cobalt:mining}}
+
+**Recipes** ⏳
+* {{recipe:cobaltBar}}
+  `
+  },
+  {
+    title: 'Platinum',
+    category: ['Ore', 'Mining'],
+    content: `
+**Description**
+Platinum is the rarest metal ore in the world. It is found exclusively in the deepest part of the Caverns.
+
+**Main Location**
+* [[Caverns]] Bottom — all biomes, moderate density
+
+**Drops** ⏳
+* {{node:platinum:mining}}
+
+**Recipes** ⏳
+* {{recipe:platinumBar}}
+  `
+  },
+  // ── Gems ─────────────────────────────────────────────────────
+  //    Topaz, Ruby, Emerald, Sapphire
+  {
+    title: 'Topaz',
+    category: ['Gem', 'Mining'],
+    content: `
+**Description**
+Topaz is the most common gemstone, found in [[Forest]] biomes. Its warm golden hue makes it a sought-after crafting material.
+
+**Tier**
+{{node:topaz:star}}
+
+**Main Location**
+* Biome: [[Forest]]
+* [[Caverns]] Top — moderate density
+* [[Caverns]] Bottom — small density
+
+**Drops** ⏳
+* {{node:topaz:mining}}
+
+**Recipes** ⏳
+* {{recipe:topaz}}
+  `
+  },
+  {
+    title: 'Ruby',
+    category: ['Gem', 'Mining'],
+    content: `
+**Description**
+Ruby is an uncommon gemstone found in [[Desert]] biomes. Its deep red color is associated with fire and heat.
+
+**Tier**
+{{node:ruby:star}}
+
+**Main Location**
+* Biome: [[Desert]]
+* [[Caverns]] Top — moderate density
+* [[Caverns]] Bottom — small density
+
+**Drops** ⏳
+* {{node:ruby:mining}}
+
+**Recipes** ⏳
+* {{recipe:ruby}}
+  `
+  },
+  {
+    title: 'Emerald',
+    category: ['Gem', 'Mining'],
+    content: `
+**Description**
+Emerald is a rare gemstone found in [[Jungle]] biomes. Its vivid green reflects the lush environment it comes from.
+
+**Tier**
+{{node:emerald:star}}
+
+**Main Location**
+* Biome: [[Jungle]]
+* [[Caverns]] Top — moderate density
+* [[Caverns]] Bottom — small density
+
+**Drops** ⏳
+* {{node:emerald:mining}}
+
+**Recipes** ⏳
+* {{recipe:emerald}}
+  `
+  },
+  {
+    title: 'Sapphire',
+    category: ['Gem', 'Mining'],
+    content: `
+**Description**
+Sapphire is the rarest gemstone, found in the deepest parts of all biomes. Its brilliant blue glow is visible even in complete darkness.
+
+**Tier**
+{{node:sapphire:star}}
+
+**Main Location**
+* Biome: all biomes
+* [[Caverns]] Bottom — small density
+
+**Drops** ⏳
+* {{node:sapphire:mining}}
+
+**Recipes** ⏳
+* {{recipe:sapphire}}
+  `
+  },
+  // ── Rocks ────────────────────────────────────────────────────
+  //    Granite, Marble, Obsidian, Meteorite, Hive, Shell
+  {
+    title: 'Granite',
+    category: ['Rock', 'Mining'],
+    content: `
+**Description**
+Granite is a hard igneous rock found exclusively inside [[Geode Cave]]s. Its pink-grey crystalline structure makes it a distinctive building material.
+
+**Tier**
+{{node:granite:star}}
+
+**Main Location**
+* [[Geode Cave]] walls — all biomes, [[Caverns]] Bottom
+
+**Drops** ⏳
+* {{node:granite:mining}}
+
+**Recipes** ⏳
+* {{recipe:graniteBlock}}
+  `
+  },
+  {
+    title: 'Marble',
+    category: ['Rock', 'Mining'],
+    content: `
+**Description**
+Marble is a metamorphic rock found exclusively inside [[Geode Cave]]s. Its smooth white surface makes it a prized building material.
+
+**Tier**
+{{node:marble:star}}
+
+**Main Location**
+* [[Geode Cave]] walls — all biomes, [[Caverns]] Bottom
+
+**Drops** ⏳
+* {{node:marble:mining}}
+
+**Recipes** ⏳
+* {{recipe:marbleBlock}}
+  `
+  },
+  {
+    title: 'Obsidian',
+    category: ['Rock', 'Mining'],
+    content: `
+**Description**
+Obsidian is a volcanic glass formed where lava meets water. It is one of the hardest materials in the world, requiring high-tier tools to mine.
+
+**Tier**
+{{node:obsidian:star}}
+
+**Main Location**
+* [[Caverns]] — all biomes, rare clusters
+
+**Drops** ⏳
+* {{node:obsidian:mining}}
+
+**Recipes** ⏳
+* {{recipe:obsidianBlock}}
+  `
+  },
+  {
+    title: 'Meteorite',
+    category: ['Rock', 'Mining'],
+    content: `
+**Description**
+Meteorite is an extraterrestrial rock that falls from the sky in rare events. It glows faintly and has unique properties not found in any other material.
+
+**Tier**
+{{node:meteorite:star}}
+
+**Main Location**
+* Impact craters on the [[Surface]] — random events ⏳
+* Rare clusters near impact sites ⏳
+
+**Drops** ⏳
+* {{node:meteorite:mining}}
+
+**Recipes** ⏳
+* {{recipe:meteoriteBar}}
+  `
+  },
+  {
+    title: 'Hive',
+    category: ['Rock', 'Mining'],
+    content: `
+**Description**
+Hive is a biological material that forms the walls of [[Hive]] mini-biomes. It is secreted by bees and has a distinctive honeycomb structure.
+
+**Tier**
+{{node:hive:star}}
+
+**Main Location**
+* [[Hive]] walls — [[Jungle]], [[Caverns]] Top
+
+**Drops** ⏳
+* {{node:hive:mining}}
+
+**Recipes** ⏳
+* {{recipe:hiveBlock}}
+
+**Tips**
+* _Destroying Hive blocks will anger the inhabitants._ ⏳
+  `
+  },
+  {
+    title: 'Shell',
+    category: ['Rock', 'Mining'],
+    content: `
+**Description**
+Shell is a sedimentary material formed from ancient marine organisms. It is found in [[Fossil Vein]]s and along the shores of the [[Sea]].
+
+**Tier**
+{{node:shell:star}}
+
+**Main Location**
+* [[Fossil Vein]] — [[Desert]], [[Caverns]] Top
+* [[Sea]] borders and floor — slow regeneration ⏳
+
+**Drops** ⏳
+* {{node:shell:mining}}
+
+**Recipes** ⏳
+* {{recipe:shellPowder}}
+
+**Tips**
+* _Shell veins are protected by a SANDSTONE border — look for exposed Shell on cave walls to locate a vein._⏳
+  `
+
   // ── Accessories ──────────────────────────────────────────────
   // ── Items & Crafting ─────────────────────────────────────────
   // ── Fauna & Critters ─────────────────────────────────────────
