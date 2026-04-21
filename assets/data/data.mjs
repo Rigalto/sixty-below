@@ -26,21 +26,21 @@ export const NODE_TYPE = {GAZ: 0x1, LIQUID: 0x2, SOLID: 0x4, ETERNAL: 0x8, NATUR
 
 export const NODES = {
   // ── Pourtour (ETERNAL — indestructibles, intégrées à la lore) ────────────────
-  FOG: {code: 1, name: 'Fog', type: NODE_TYPE.ETERNAL | NODE_TYPE.GAZ, color: 'none', star: 6},
-  DEEPSEA: {code: 2, name: 'Deep Sea', type: NODE_TYPE.ETERNAL | NODE_TYPE.LIQUID, color: '#2D5EBF', star: 6, waveImage: 'liquid_16_16-4-0'},
-  BASALT: {code: 3, name: 'Basalt', type: NODE_TYPE.ETERNAL | NODE_TYPE.SOLID, color: '#3a3a3a', star: 6},
-  LAVA: {code: 4, name: 'Lava', type: NODE_TYPE.ETERNAL | NODE_TYPE.SOLID, color: '#DC143C', star: 6},
+  FOG: {code: 1, name: 'Fog', type: NODE_TYPE.ETERNAL | NODE_TYPE.GAZ, star: 6, color: 'none', image: null},
+  DEEPSEA: {code: 2, name: 'Deep Sea', type: NODE_TYPE.ETERNAL | NODE_TYPE.LIQUID, star: 6, color: '#2D5EBF', image: null, waveImage: 'liquid_16_16-4-0'},
+  BASALT: {code: 3, name: 'Basalt', type: NODE_TYPE.ETERNAL | NODE_TYPE.SOLID, star: 6, color: '#3a3a3a', image: null},
+  LAVA: {code: 4, name: 'Lava', type: NODE_TYPE.ETERNAL | NODE_TYPE.SOLID, star: 6, color: '#DC143C', image: null},
 
   // ── Gaz ──────────────────────────────────────────────────────────────────────
-  SKY: {code: 10, name: 'Sky', type: NODE_TYPE.GAZ, color: 'none', star: 0},
-  VOID: {code: 11, name: 'Void', type: NODE_TYPE.GAZ, color: '#300606', star: 0},
-  INVISIBLE: {code: 12, name: 'Invisible', type: NODE_TYPE.SOLID, color: '#300606', star: 0, solid: true},
+  SKY: {code: 10, name: 'Sky', type: NODE_TYPE.GAZ, star: 0, color: 'none', image: null},
+  VOID: {code: 11, name: 'Void', type: NODE_TYPE.GAZ, star: 0, color: '#300606', image: null},
+  INVISIBLE: {code: 12, name: 'Invisible', type: NODE_TYPE.SOLID, star: 0, color: '#300606', image: null},
 
   // ── Liquides ─────────────────────────────────────────────────────────────────
-  SEA: {code: 20, name: 'Sea', type: NODE_TYPE.LIQUID, color: '#2D5EBF', star: 0, waveImage: 'liquid_16_16-4-0', viscosity: 200},
-  WATER: {code: 21, name: 'Water', type: NODE_TYPE.LIQUID, color: '#477BFF', star: 0, viscosity: 200},
-  HONEY: {code: 22, name: 'Honey', type: NODE_TYPE.LIQUID, color: '#FFC700', star: 0, viscosity: 600},
-  SAP: {code: 23, name: 'Sap', type: NODE_TYPE.LIQUID, color: '#008000', star: 0, viscosity: 400},
+  SEA: {code: 20, name: 'Sea', type: NODE_TYPE.LIQUID, star: 0, color: '#2D5EBF', image: null, waveImage: 'liquid_16_16-4-0', viscosity: 200},
+  WATER: {code: 21, name: 'Water', type: NODE_TYPE.LIQUID, star: 0, color: '#477BFF', image: null, viscosity: 200},
+  HONEY: {code: 22, name: 'Honey', type: NODE_TYPE.LIQUID, star: 0, color: '#FFC700', image: null, viscosity: 600},
+  SAP: {code: 23, name: 'Sap', type: NODE_TYPE.LIQUID, star: 0, color: '#008000', image: null, viscosity: 400},
 
   // ── Natural (topsoil en surface recouvert de végétation) ─────────────────────
   GRASSFOREST: {code: 30, name: 'Forest Grass', type: NODE_TYPE.NATURAL, star: 1, solid: true, color: '#84de50', image: 'grass_16_16+0', speed: 500, mining: [{item: 'bkdirt', count: 1}, {item: 'seedf', count: 0.2}, {item: 'worm', count: 0.02, rainy: 40}], foraging: [{item: 'seedf', count: 0.2, lucky: 1.5}, {item: 'worm', count: 0.05, lucky: 2, rainy: 10}, {item: 'slug', count: 0.04, lucky: 1.8, rainy: 10}, {item: 'goldworm', count: 0.01}]},
@@ -114,7 +114,7 @@ export const NODES = {
   // ── DIVERS ────────────────────────
 
   WEB: {code: 120, name: 'Cobweb', type: NODE_TYPE.WEB, star: 1, solid: false, color: '#788696', image: 'substrat_16_16+9', speed: 1900, mining: [{item: 'cobweb', count: 1}, {item: 'spideregg', count: '1-3-0.08'}, {monster: 'spider', rate: '25'}]},
-  SHORE: {code: 121, name: 'Shore', color: '#FFCC00'},
+  SHORE: {code: 121, name: 'Shore', type: NODE_TYPE.SOLID, star: 1, color: '#FFCC00', image: null},
 
   // A SUPPRIMER - types utilisés de manière temporaire pendant la création du monde
   SAPROCK: {code: 150, name: 'Sap Rock', type: NODE_TYPE.CREATION, color: '#34e648'}, // remplacé par SLATE
@@ -133,8 +133,9 @@ export const NODES_LOOKUP = []
 // sa nature (ce qu'il est) : 'FURNITURE', 'WALL', ...
 // les actions qui peuvent être conduite dessus : 'CRAFTING' (à renommer), 'USABLE', 'PLACABLE', 'UNDELETABLE', 'CRAFTABLLE', 'REMOVABLE', 'AMMUNITION'...
 export const ITEM_TYPE = {
-  FURNITURE: 0x1, TOOL: 0x2, CRAFTING: 0x4, FOOD: 0x08, BLOCK: 0x10, WALL: 0x20, MECHANISM: 0x40, AMMUNITION: 0x80, ORE: 0x100, ARMOR: 0x200, BAR: 0x400, WEAPON: 0x800, CONSUMABLE: 0x1000, ACCESSORY: 0x2000, GEM: 0x4000, POTION: 0x8000, SEMABLE: 0x10000, BAG: 0x20000, BAIT: 0x40000, USABLE: 0x80000, PLACABLE: 0x100000, REMOVABLE: 0x200000, DISPOSABLE: 0x400000, NONE: 0
+  FURNITURE: 0x1, TOOL: 0x2, MATERIAL: 0x4, FOOD: 0x08, BLOCK: 0x10, WALL: 0x20, MECHANISM: 0x40, AMMUNITION: 0x80, ORE: 0x100, ARMOR: 0x200, BAR: 0x400, WEAPON: 0x800, CONSUMABLE: 0x1000, ACCESSORY: 0x2000, GEM: 0x4000, POTION: 0x8000, SEMABLE: 0x10000, BAG: 0x20000, BAIT: 0x40000, USABLE: 0x80000, PLACABLE: 0x100000, UNIQUE: 0x200000, DISPOSABLE: 0x400000, NONE: 0
 }
+// UNIQUE: objet unique, ne peut pas être détruit/vendu/démonté/transmuté
 
 // OAK ROOT — drop lorsque l'on abat complètement un Oak
 // MAHOGANY ROOT — drop lorsque l'on abat complètement un Mahogany
@@ -143,13 +144,26 @@ export const ITEM_TYPE = {
 // drop lorsque l'on abat complètement un Giant Mushroom
 
 export const ITEMS = {
+  // crafting Station
+  alchemyTable: {name: 'Alchemy Table', type: ITEM_TYPE.FURNITURE | ITEM_TYPE.PLACABLE, stype: 'station', star: 1, sell: 100, image: 'furniture_32_32-12-2', placed: 'placed_32_32-6-3', help: 'Stations', tooltip: ''},
+
   // crystall
-  lifeCrystal: {name: 'Life Crystal', type: ITEM_TYPE.FURNITURE | ITEM_TYPE.USABLE, stype: 'life', star: 1, sell: 0, undisposable: true, image: 'furniture_32_32-12-2', placed: 'fuws_32_32-6-3', help: 'Life Crystal', tooltip: 'Permanently increases maximum life by 20\nCollect with a Hammer'}
+  lifeCrystal: {name: 'Life Crystal', type: ITEM_TYPE.FURNITURE | ITEM_TYPE.UNIQUE | ITEM_TYPE.USABLE, stype: 'life', star: 1, sell: 0, image: 'furniture_32_32-12-2', placed: 'placed_32_32-6-3', help: 'Life Crystal', tooltip: 'Permanently increases maximum life by 20\nCollect with a Hammer'},
+
+  // triskel
+  triskelCopper: {name: 'Copper Triskel', type: ITEM_TYPE.FURNITURE | ITEM_TYPE.UNIQUE | ITEM_TYPE.MATERIAL, stype: 'triskel', star: 3, sell: 0, image: 'furniture_32_32-12-2', placed: 'placed_32_32-6-3', help: 'Triskels', tooltip: ''},
+  triskelSilver: {name: 'Silver Triskel', type: ITEM_TYPE.FURNITURE | ITEM_TYPE.UNIQUE | ITEM_TYPE.MATERIAL, stype: 'triskel', star: 4, sell: 0, image: 'furniture_32_32-12-2', placed: 'placed_32_32-6-3', help: 'Triskels', tooltip: ''},
+  triskelGold: {name: 'Gold Triskel', type: ITEM_TYPE.FURNITURE | ITEM_TYPE.UNIQUE | ITEM_TYPE.MATERIAL, stype: 'triskel', star: 5, sell: 0, image: 'furniture_32_32-12-2', placed: 'placed_32_32-6-3', help: 'Triskels', tooltip: ''},
+  triskelAncient: {name: 'Ancient Triskel', type: ITEM_TYPE.ACCESSORY | ITEM_TYPE.UNIQUE | ITEM_TYPE.CRAFTABLE, stype: 'triskel', star: 5, sell: 0, image: 'furniture_32_32-12-2', placed: 'placed_32_32-6-3', help: 'Triskels', tooltip: ''}
 }
 
 /* ============================================================================
    4. RECIPES
    ============================================================================ */
+
+export const RECIPES = [
+  {result: {item: 'triskelAncient', count: 1}, station: 'alchemyTable', ingredients: [{item: 'triskelCopper', count: 1}, {item: 'triskelSilver', count: 1}, {item: 'triskelGold', count: 1}]}
+]
 
 /* ============================================================================
    5. PLANTS
@@ -206,7 +220,7 @@ for (const key in NODES) {
 //   }
 }
 
-// — 8.2. Table des items
+// — 8.2. Validation des ITEMS
 const REQUIRED_ITEM_FIELDS = ['name', 'type', 'stype', 'star', 'sell', 'image', 'help', 'tooltip']
 for (const key in ITEMS) {
   const itemDesc = ITEMS[key]
@@ -249,21 +263,42 @@ for (const key in ITEMS) {
 //   }
 // }
 
-// — 8.5. Résolution RECIPES (ingredients[].item, result.item) —
-// for (const key in RECIPES) {
-//   const recipe = RECIPES[key]
+// — 8.5. Validation des RECIPES
+for (const recipe of RECIPES) {
+  if (!ITEMS[recipe.result.item]) {
+    console.error(`[data.mjs] RECIPES '${recipe.result.item}' : result item inconnu`)
+  }
+  for (const ing of recipe.ingredients) {
+    if (!ITEMS[ing.item]) {
+      console.error(`[data.mjs] RECIPES '${recipe.result.item}' : ingredient inconnu '${ing.item}'`)
+    }
+  }
+  if (!ITEMS[recipe.station]) {
+    console.error(`[data.mjs] RECIPES.${recipe.result.item} : crafting station inconnue '${recipe.station}'`)
+  }
+}
 
-//   if (recipe.ingredients) {
-//     for (let i = 0; i < recipe.ingredients.length; i++) {
-//       const entry = recipe.ingredients[i]
-//       entry.item = ITEMS[entry.item] ?? entry.item
-//     }
-//   }
+// — 8.5. Résolution RECIPES (ingredients[].item, result.item)
+const MATERIALS = new Set()
+const CRAFTABLES = new Set()
 
-//   if (recipe.result) {
-//     recipe.result.item = ITEMS[recipe.result.item] ?? recipe.result.item
-//   }
-// }
+for (const key in RECIPES) {
+  const recipe = RECIPES[key]
+  // result
+  CRAFTABLES.add(recipe.result.item)
+  ITEMS[recipe.result.item].type |= ITEM_TYPE.CRAFTABLE
+  recipe.result.item = ITEMS[recipe.result.item]
+  // ingredients
+  for (const ing of recipe.ingredients) {
+    MATERIALS.add(ing.item)
+    ITEMS[ing.item].type |= ITEM_TYPE.MATERIAL
+    ing.item = ITEMS[ing.item]
+  }
+  // crafting station
+  CRAFTABLES.add(recipe.station)
+  ITEMS[recipe.station].type |= ITEM_TYPE.CRAFTABLE
+  recipe.station = ITEMS[recipe.station]
+}
 
 /* ============================================================================
    9. VALIDATION D'INTÉGRITÉ (top-level — throw bloquant si KO)
