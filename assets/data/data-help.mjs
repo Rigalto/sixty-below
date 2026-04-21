@@ -15,8 +15,12 @@
  *   | ---- | ---- |
  *
  * ── Liens inter-fiches ──────────────────────────────────────────
- *   [[itemCode]]                 → nom de l'item + lien vers sa fiche
- *   [[itemCode|texte affiché]]   → texte personnalisé + lien
+ *   [[node:code]]                → nom du noeud + lien vers sa fiche
+ *   [[item:code]]                → nom de l'item + lien vers sa fiche
+ *   [[helpTopic]]                → titre de la fiche d'aide + lien vers sa fiche
+ *   [[node:code|texte affiché]]   → lien avec texte personnalisé
+ *   [[item:code|texte affiché]]   → lien avec texte personnalisé
+ *   [[helpTopic|texte affiché]]   → lien avec texte personnalisé
  *   (pas de lien si la fiche courante est celle du lien)
  *
  * ── Données dynamiques ──────────────────────────────────────────
@@ -34,6 +38,8 @@
  * CARACTÈRES SPÉCIAUX  (copier/coller depuis ici)
  * ═══════════════════════════════════════════════════════════════
  *
+ *   ⭐  nombre de star (tier) de l'entité
+*
  *   ⏳  Feature non encore implémentée
  *       → Tant qu'il en reste dans le fichier, l'application n'est pas terminée.
  *
@@ -43,3 +49,63 @@
  *
  * ═══════════════════════════════════════════════════════════════
  */
+
+/* ====================================================================================================
+   TEMPLATES
+   ==================================================================================================== */
+
+export const HELP_TEMPLATES = {
+  miningInfo: `
+**How to mine**
+Use a [[{1}||Pickaxe]] of at least ⭐{2} to mine [[node:{3}]].
+Mining drops: {{node:{3}:mining}}
+  `,
+
+  statTable: `
+| Name | ⭐ | Speed | Sell |
+| ---- | -- | ----- | ---- |
+{{table:stype:{1}}}
+  `
+}
+
+/* ====================================================================================================
+   FICHES D'AIDE
+   ==================================================================================================== */
+
+export const HELP = [
+  {
+    title: 'Copper Ore',
+    category: ['Mining', 'Ore'],
+    content: `
+**Description**
+Copper is the most common ore found near the [[Surface||Surface layer]].
+It is used in many early-game [[Crafting||recipes]].
+
+**Location**
+* Layer: [[node:surface]] and [[node:under]] ⏳
+  * More common near the surface
+  * Rarely found in [[node:caverns]]
+
+**Mining**
+<<miningInfo|copperPickaxe|1|copper>>
+
+**Drops**
+{{node:copper:mining}}
+
+**Recipes using Copper**
+{{recipe:copperBar}}
+{{recipe:copperSword}} ⏳
+
+**All Pickaxes**
+<<statTable|pickaxe>>
+
+**Tips**
+* Copper veins are often found near [[node:stone]] clusters.
+* _Tip: [[Torches||Bring torches]] when mining underground!_ ⏳
+    `
+  }
+]
+
+/* ====================================================================================================
+   POST-TRAITEMENTS
+   ==================================================================================================== */
