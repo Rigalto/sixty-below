@@ -54,7 +54,7 @@
    TEMPLATES
    ==================================================================================================== */
 
-export const HELP_TEMPLATES = {
+const HELP_TEMPLATES = {
   miningInfo: `
 **How to mine**
 Use a [[{1}||Pickaxe]] of at least ⭐{2} to mine [[node:{3}]].
@@ -103,9 +103,46 @@ It is used in many early-game [[Crafting||recipes]].
 * Copper veins are often found near [[node:stone]] clusters.
 * _Tip: [[Torches||Bring torches]] when mining underground!_ ⏳
     `
+  }, {
+    title: 'Fern Cave',
+    category: ['Mini-biome', 'Forest'],
+    content: `
+**Description**
+A large underground cave found in [[Forest]] biomes, characterized by giant ferns growing on its flat floor.
+
+**Location**
+* Biome: [[Forest]]
+* Layer: [[Underground]]
+* One per Forest zone
+
+**Floor**
+* [[node:grassFern]] — surface layer
+* [[node:humus]] — 2-3 tiles deep
+
+**Inhabitants** ⏳
+* [[monster:dendrobate]]
+* [[monster:mamba]]
+  `
   }
 ]
 
 /* ====================================================================================================
    POST-TRAITEMENTS
    ==================================================================================================== */
+
+// Remplacement textuel des <<...>> par le template correspondant.
+// ⚠️ est injecté si le template ou un paramètre est manquant.
+const expandTemplates = (content) =>
+  content.replace(/<<(\w+)\|?([^>]*)>>/g, (_, name, params) => {
+    const template = HELP_TEMPLATES[name]
+    if (!template) return `⚠️ template inconnu: ${name}`
+    const args = params ? params.split('|') : []
+    return template.replace(/\{(\d+)\}/g, (_, i) => args[parseInt(i) - 1] ?? `⚠️ param {${i}} manquant`)
+  })
+
+// Expansion au chargement
+for (const entry of HELP) {
+  entry.content = expandTemplates(entry.content)
+}
+
+console.log('HELP', HELP)
