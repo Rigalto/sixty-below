@@ -2037,7 +2037,7 @@ export const tileGuard = new TileGuard()
 const DEFAULT_EXCLUDED = new Set([
   NODES.FOG.code, NODES.DEEPSEA.code, NODES.BASALT.code, NODES.LAVA.code,
   NODES.SKY.code, NODES.WATER.code, NODES.SEA.code, NODES.HONEY.code,
-  NODES.SAP.code, NODES.HIVE.code, NODES.WEB.code, NODES.SAPROCK.code, NODES.HARDROCK.code
+  NODES.SAP.code, NODES.HIVE.code, NODES.WEB.code
 ])
 
 const ETERNAL_EXCLUDED = new Set([

@@ -139,13 +139,7 @@
 ## Connu mais différé
 
 - Nettoyage `ROADMAP.md` : supprimer les entrées au fur et à mesure
-- `addSubstratIntrusions()` — substrat hors biome natif (conception définie, non codée)
-- `addOreIntrusions()` — ores dans layers supérieures (déjà implémenté)
-- `addGemIntrusions()` — gemmes hors biome/layer natif (déjà implémenté)
 - Sprites manquants : HARDSTONE, LIMESTONE, SLATE, GRASSFERN, GRASSMUSHROOM
-- Optimisation `WorldCarver.applyTiles` : tester `NODE_TYPE.CREATION` de façon générique plutôt que lister chaque code
-- Variante `digLakes` avec fosse (pit) — version de référence conservée sous `_digLakes`
-
 ---
 
 ## Terminé
