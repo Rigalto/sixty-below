@@ -494,6 +494,95 @@ Mushroom Grass covers the floor of [[Mushroom Cave]]s. [[Giant Mushroom]]s grow 
   // ── Topsoil ──────────────────────────────────────────────────
   //    Dirt, Sand, Silt, Humus
 
+  // ── Topsoil ───────────────────────────────────────────────────
+  {
+    title: 'Dirt',
+    category: ['Topsoil', 'Mining'],
+    content: `
+**Description**
+Dirt is the primary topsoil of [[Forest]] biomes. It supports surface vegetation and is the most workable material for early construction⏳.
+
+**Tier**
+{{node:dirt:star}}
+
+**Main Location**
+* [[Surface]] and [[Underground]] — [[Forest]], high density
+
+**Drops** ⏳
+* {{node:dirt:mining}}
+
+**Recipes** ⏳
+* {{recipe:dirtBlock}}
+  `
+  },
+  {
+    title: 'Sand',
+    category: ['Topsoil', 'Mining'],
+    content: `
+**Description**
+Sand is the primary topsoil of [[Desert]] biomes. It is subject to gravity — unsupported sand falls and accumulates in piles.
+
+**Tier**
+{{node:sand:star}}
+
+**Main Location**
+* [[Surface]] and [[Underground]] — [[Desert]], high density
+* [[Sand Pocket]]s — [[Underground]], [[Desert]]
+
+**Drops** ⏳
+* {{node:sand:mining}}
+
+**Tips**
+* _Sand falls when the tile below is empty — be careful when mining near Sand Pockets._
+* _Sand Pockets are sealed by [[Sandstone]] borders — removing them releases the sand._ ⏳
+  `
+  },
+  {
+    title: 'Silt',
+    category: ['Topsoil', 'Mining'],
+    content: `
+**Description**
+Silt is the primary topsoil of [[Jungle]] biomes. Its fine, damp texture supports the dense jungle vegetation above.
+
+**Tier**
+{{node:silt:star}}
+
+**Main Location**
+* [[Surface]] and [[Underground]] — [[Jungle]], high density
+
+**Drops** ⏳
+* {{node:silt:mining}}
+
+**Recipes** ⏳
+* {{recipe:siltBlock}}
+  `
+  },
+  {
+    title: 'Humus',
+    category: ['Topsoil', 'Mining'],
+    content: `
+**Description**
+Humus is a rich organic topsoil found across all biomes, though it is most abundant in [[Forest]] and [[Jungle]] biomes. It forms the substrate beneath [[Fern Cave]] and [[Mushroom Cave]] floors.
+
+**Tier**
+{{node:humus:star}}
+
+**Main Location**
+* [[Underground]] and [[Caverns]] Top — [[Forest]] and [[Jungle]], moderate density
+* [[Fern Cave]] floor — [[Forest]]
+* [[Mushroom Cave]] floor — [[Forest]]
+
+**Drops** ⏳
+* {{node:humus:mining}}
+
+**Recipes** ⏳
+* {{recipe:humusBlock}}
+
+**Tips**
+* _Humus is the only topsoil found in both Forest and Jungle biomes at significant depth._
+  `
+  },
+
   // ── Substrat ──────────────────────────────────────────────────
   //    Forest : Clay, Stone, Hardstone
   //    Desert : Sandstone, Ash, Hellstone
