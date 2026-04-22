@@ -1314,3 +1314,6 @@ const expandTemplates = (content) =>
 for (const entry of HELP) {
   entry.content = expandTemplates(entry.content)
 }
+
+// Liste complète de tous les topics de l'aide
+export const HELP_TITLES = new Set(HELP.map(entry => entry.title))

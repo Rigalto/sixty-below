@@ -1,6 +1,6 @@
 import {TIME_BUDGET, MICROTASK_FN_NAME_TO_KEY, STATE, OVERLAYS} from './constant.mjs'
-import {NODES_LOOKUP, ITEMS} from '../../assets/data/data.mjs'
-import {HELP} from '../../assets/data/data-help.mjs'
+import {NODES, NODES_LOOKUP, ITEMS} from '../../assets/data/data.mjs'
+import {HELP, HELP_TITLES} from '../../assets/data/data-help.mjs'
 import {loadAssets, resolveAssetData} from './assets.mjs'
 import {timeManager, taskScheduler, microTasker, eventBus, seededRNG} from './utils.mjs'
 import {database} from './database.mjs'
@@ -133,13 +133,45 @@ class GameCore {
  */
   #hydrateHelp () {
     let count = 0
-    const errors = 0
+    let errors = 0
 
     for (const entry of HELP) {
-    // TODO : vérification des liens [[...]]
-    // TODO : résolution des données dynamiques {{...}}
-    // TODO : conversion Markdown → HTML
-    // TODO : entry.html = html généré
+      // 1. Vérification des liens [[...]]
+      entry.content = entry.content.replace(/\[\[([^\]|]+)(?:\|([^\]]*))?\]\]/g, (match, ref, text) => {
+      // Lien node:code
+        if (ref.startsWith('node:')) {
+          const code = ref.slice(5)
+          const node = NODES[code.toUpperCase()]
+          if (!node) {
+            console.error(`[help] '${entry.title}' : node inconnu '${code}'`)
+            errors++
+            return `⚠️ &lbrack;&lbrack;${ref}&rbrack;&rbrack;`
+          }
+          return match // valide — sera résolu plus tard
+        }
+
+        // Lien item:code
+        if (ref.startsWith('item:')) {
+          const code = ref.slice(5)
+          if (!ITEMS[code]) {
+            console.error(`[help] '${entry.title}' : item inconnu '${code}'`)
+            errors++
+            return `⚠️ &lbrack;&lbrack;${ref}&rbrack;&rbrack;`
+          }
+          return match // valide — sera résolu plus tard
+        }
+
+        // Lien helpTopic
+        if (!HELP_TITLES.has(ref)) {
+          console.error(`[help] '${entry.title}' : topic inconnu '${ref}'`)
+          errors++
+          return `⚠️ &lbrack;&lbrack;${ref}&rbrack;&rbrack;`
+        }
+        return match // valide — sera résolu plus tard
+      })
+      // TODO : résolution des données dynamiques {{...}}
+      // TODO : conversion Markdown → HTML
+      // TODO : entry.html = html généré
       count++
     }
 
