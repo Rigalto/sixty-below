@@ -195,7 +195,7 @@ Tuiles spéciales :
 - **HONEY** : liquide créé dans les **Hive**
 - **SAP** : liquide créé dans la jungle
 
-### 3.6.1 Intrusions de Substrat
+#### 3.6.1 Intrusions de Substrat
 
 Les substrats ne sont pas confinés à leur biome/layer natif. Des processus géologiques
 (érosion, pression, sédimentation) et biologiques (faune fouisseuse, racines) provoquent
@@ -231,7 +231,7 @@ biomes — trop profondes pour être atteintes par les remontées depuis under.
 | Faible | 0.003 |
 | Très faible | 0.001 |
 
-### 3.6.2 Clusters de Topsoil (pré-creusement)
+#### 3.6.2 Clusters de Topsoil (pré-creusement)
 
 Les tuiles TOPSOIL (DIRT, SAND, SILT, HUMUS) sont dispersées en clusters avant le
 creusement des tunnels et cavernes. Leur taille varie linéairement avec la profondeur :
@@ -261,6 +261,19 @@ Les constantes d'interpolation Y sont dans `constant.mjs` (`TOPSOIL_Y_*`).
 | HUMUS moyen (caverns_top) | 0.005 |
 | HUMUS rare (surface) | 0.002 |
 | HUMUS surprise Desert | 0.0005 |
+
+#### 3.6.3 Conventions de nommage
+
+Les tuiles et leurs items correspondants ont des noms distincts pour éviter toute ambiguïté :
+
+| Type | Tuile (monde) | Item (inventaire) | Item transformé |
+|---|---|---|---|
+| Ore | `Copper Ore` | `Copper Chunk` | `Copper Bar` (fonte) |
+| Gem | `Topaz Ore` | `Raw Topaz` | `Topaz` (taille) |
+| Rock | `Granite` | `Granite Block` | — |
+| Topsoil | `Dirt` | `Dirt Block` | — |
+| Natural | `Forest Grass` | `Dirt Block` | — |
+| Cobweb | `Cobweb` | `Silk` | `Fabric` (loom) |
 
 ### 3.7 Minerais (Ore)
 
