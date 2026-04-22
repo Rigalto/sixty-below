@@ -437,6 +437,41 @@ Fossil Veins are horizontal deposits of [[node:shell]] embedded in the rock. The
 * _Shell Powder is a rare crafting ingredient used in delicate mechanical recipes._ ⏳
   `
   },
+  {
+    title: 'Pyramid',
+    category: ['Mini-biome', 'Desert'],
+    content: `
+**Description**
+Pyramids are ancient stone structures buried deep in [[Desert]] biomes. Built from indestructible Kheprite blocks, they are the remnants of a powerful civilization that mastered stone-cutting and trap engineering.
+
+**Main Location**
+* [[Underground]] — [[Desert]]
+
+**Materials**
+* [[node:kheprite]] — indestructible walls and structure
+
+**Structure**
+* Two chambers connected by a narrow corridor
+* Chamber 1 — trap room : arrow traps, rolling boulders ⏳
+* Chamber 2 — boss room : triangular ceiling, boss spawn point ⏳
+* Entrance on the left or right side
+
+**Inhabitants** ⏳
+* [[monster:momie]] — common, both chambers
+* [[monster:sphinx]] — uncommon, boss chamber
+* [[monster:pharaon]] — boss, chamber 2
+
+**Loot** ⏳
+* Chest — tier 4-5, chamber 1 ⏳
+* Chest — tier 5, chamber 2 ⏳
+
+**Tips**
+* _The Pyramid walls are indestructible — find the entrance rather than trying to mine through._
+* _Clear the trap room carefully before engaging the boss._ ⏳
+* _The Pharaon respawns after a delay — the Pyramid is never permanently cleared._ ⏳
+* _Only one Pyramid exists per world — it is worth the effort to find it._ ⏳
+  `
+  },
   // ── Mini-biomes / Jungle ──────────────────────────────────────
   //    Moss Cave, Hive, Sap Lake, Sap Pocket, Temple Ruin, Termite Mound
   {

@@ -796,6 +796,8 @@ Génère des tunnels, des cavernes et des mini-biomes. Maintient la liste des zo
 | `digFernCaves()` | Creuse une Fern Cave par zone FOREST en under. Demi-ellipse + rectangle bruité. Tapissage fond via `#fillFernMushroomCaveFloor` (GRASSFERN + HUMUS). Protection TileGuard bas. Retourne `{caves: Array<{cx, cy, radiusX, radiusY}>, plants: Array<{index, system, type}>}`. `#fillFernMushroomCaveFloor(cx, cy, radiusX, surfaceCode, substrateCode, grassType, plants)` : tapisse le fond (Markov 75/25, profondeur 2–3). `plants` [OUT] accumulateur d'enregistrements plant. |
 | `digMossCaves()` | Creuse une Moss Cave par zone JUNGLE en under. Demi-ellipse + rectangle bruité. Tapissage parois/sol via `#fillMossCaveWalls` (GRASSMOSS + MUD). Protection TileGuard bas. Retourne `{caves: Array<{cx, cy, radiusX, radiusY}>, plants: Array<{index, system, type}>}`. `#fillMossCaveWalls(cx, cy, radiusX, radiusY, plants)` : GRASSMOSS sur sol et parois latérales, MUD sous le sol. `plants` [OUT] accumulateur d'enregistrements plant. |
 | `digMushroomCaves()` | Creuse une Mushroom Cave rectangulaire bruitée par zone FOREST en caverns_top. Tapissage fond via `#fillFernMushroomCaveFloor` (GRASSMUSHROOM + HUMUS). Protection TileGuard moitié inférieure + marge 2. Retourne `{caves: Array<{cx, cy, radiusX, radiusY}>, plants: Array<{index, system, type}>}`. |
+| `digPyramid()` | Creuse une Pyramide en KHEPRITE par zone DESERT en layer under. Structure définie par `PYRAMID_WALL_INDEXES` et `PYRAMID_VOID_INDEXES`. Orientation aléatoire (50/50). Protection TileGuard sur les tuiles KHEPRITE. Retourne `{room1: number, room2: number}` — index coin haut-gauche de chaque salle. Prérequis : `initZoneRects()`, `initExclusions()`. |
+
 
 ---
 

@@ -441,3 +441,51 @@ export const MUSHROOM_CAVE_RADIUS_X_MIN = 15
 export const MUSHROOM_CAVE_RADIUS_X_MAX = 20
 export const MUSHROOM_CAVE_RADIUS_Y_MIN = 15
 export const MUSHROOM_CAVE_RADIUS_Y_MAX = 20
+
+const PYRAMID_WALL = [
+  // row0
+  {dx: 4, dy: 0},
+  // row1
+  {dx: 3, dy: 1}, {dx: 4, dy: 1}, {dx: 5, dy: 1},
+  // row2
+  {dx: 2, dy: 2}, {dx: 3, dy: 2}, {dx: 4, dy: 2}, {dx: 5, dy: 2}, {dx: 6, dy: 2},
+  // row3
+  {dx: 1, dy: 3}, {dx: 2, dy: 3}, {dx: 3, dy: 3}, {dx: 4, dy: 3}, {dx: 5, dy: 3}, {dx: 7, dy: 3},
+  // row4
+  {dx: 0, dy: 4}, {dx: 1, dy: 4}, {dx: 2, dy: 4}, {dx: 3, dy: 4}, {dx: 4, dy: 4}, {dx: 8, dy: 4},
+  // row5
+  {dx: 3, dy: 5}, {dx: 4, dy: 5}, {dx: 8, dy: 5},
+  // row6
+  {dx: 3, dy: 6}, {dx: 4, dy: 6}, {dx: 8, dy: 6},
+  // row7
+  {dx: 8, dy: 7},
+  // row8
+  {dx: 3, dy: 8}, {dx: 4, dy: 8}, {dx: 5, dy: 8}, {dx: 6, dy: 8}, {dx: 7, dy: 8}, {dx: 8, dy: 8},
+  // row9
+  {dx: 0, dy: 9}, {dx: 1, dy: 9}, {dx: 2, dy: 9}, {dx: 3, dy: 9}, {dx: 4, dy: 9},
+  {dx: 5, dy: 9}, {dx: 6, dy: 9}, {dx: 7, dy: 9}, {dx: 8, dy: 9}
+]
+
+const PYRAMID_VOID = [
+  // row3
+  {dx: 6, dy: 3},
+  // row4
+  {dx: 5, dy: 4}, {dx: 6, dy: 4}, {dx: 7, dy: 4},
+  // row5
+  {dx: 0, dy: 5}, {dx: 1, dy: 5}, {dx: 2, dy: 5}, {dx: 5, dy: 5}, {dx: 6, dy: 5}, {dx: 7, dy: 5},
+  // row6
+  {dx: 0, dy: 6}, {dx: 1, dy: 6}, {dx: 2, dy: 6}, {dx: 5, dy: 6}, {dx: 6, dy: 6}, {dx: 7, dy: 6},
+  // row7
+  {dx: 0, dy: 7}, {dx: 1, dy: 7}, {dx: 2, dy: 7}, {dx: 3, dy: 7}, {dx: 4, dy: 7},
+  {dx: 5, dy: 7}, {dx: 6, dy: 7}, {dx: 7, dy: 7},
+  // row8
+  {dx: 0, dy: 8}, {dx: 1, dy: 8}, {dx: 2, dy: 8}
+]
+export const PYRAMID_WIDTH = 9
+export const PYRAMID_HEIGHT = 10
+// Coin haut-gauche de chaque salle — orientation normale (non miroir)
+export const PYRAMID_ROOM1_DELTA = {dx: 0, dy: 5}
+export const PYRAMID_ROOM2_DELTA = {dx: 5, dy: 4}
+// tableau d'index
+export const PYRAMID_WALL_INDEXES = PYRAMID_WALL.map(({dx, dy}) => (dy << 10) | dx)
+export const PYRAMID_VOID_INDEXES = PYRAMID_VOID.map(({dx, dy}) => (dy << 10) | dx)
