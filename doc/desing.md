@@ -316,6 +316,7 @@ sont indicatives — les densités exactes sont définies dans `ORE_GEM_SCATTER_
 ### 3.10 Physique (Exploration)
 
 * **Déplacement :** Flèches directionnelles + ZQSD. Caméra centrée joueur. Zoom possible.
+* **Hitbox joueur** : 20×36 px → 2×3 tuiles. Espace minimum praticable : 2 tuiles de large, 3 tuiles de haut.
 * **Collision :** AABB (Axis-Aligned Bounding Box) custom.
 * **Liquides :** Algorithme custom paramétrable (viscosité) pour Water, Honey, Sap. Automates cellulaires pour le sable.
 * **AI Faune :** Comportements simples (Suit, Fuit, Erre) sans pathfinding complexe en temps réel.
