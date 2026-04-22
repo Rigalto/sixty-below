@@ -452,13 +452,27 @@ Pyramids are ancient stone structures buried deep in [[Desert]] biomes. Built fr
 
 **Structure**
 * Two chambers connected by a narrow corridor
-* Chamber 1 — trap room : arrow traps, rolling boulders ⏳
-* Chamber 2 — boss room : triangular ceiling, boss spawn point ⏳
-* Entrance on the left or right side
+* Entrance on the left or right side (random per world)
+* Entering Chamber 1 triggers combat immediately ⏳
+
+**Chamber 1 — Trap Room** ⏳
+* Arrow traps and boulder launchers
+  * Even turns : boulders launch vertically
+  * Odd turns : boulders launch horizontally
+* Pressure plates trigger traps ⏳
+* Inhabitants : [[monster:momie]], [[monster:sphinx]]
+
+**Chamber 2 — Boss Room** ⏳
+* Spike traps on floor tiles
+  * Even turns : light tiles are dangerous
+  * Odd turns : dark tiles are dangerous
+* Some [[node:kheprite]] blocks conceal secret passages between tiles ⏳
+* Inhabitants : [[monster:momie]], [[monster:sphinx]], [[monster:pharaon]]
+* Chamber may be empty if the Pharaon was recently defeated ⏳
 
 **Inhabitants** ⏳
 * [[monster:momie]] — common, both chambers
-* [[monster:sphinx]] — uncommon, boss chamber
+* [[monster:sphinx]] — uncommon, both chambers
 * [[monster:pharaon]] — boss, chamber 2
 
 **Loot** ⏳
@@ -468,6 +482,8 @@ Pyramids are ancient stone structures buried deep in [[Desert]] biomes. Built fr
 **Tips**
 * _The Pyramid walls are indestructible — find the entrance rather than trying to mine through._
 * _Clear the trap room carefully before engaging the boss._ ⏳
+* _Learn the boulder pattern before advancing — even turns vertical, odd turns horizontal._ ⏳
+* _Watch the floor tile colors in Chamber 2 — standing on the wrong tile is lethal._ ⏳
 * _The Pharaon respawns after a delay — the Pyramid is never permanently cleared._ ⏳
 * _Only one Pyramid exists per world — it is worth the effort to find it._ ⏳
   `
