@@ -77,7 +77,7 @@ Mining drops: {{node:{3}:mining}}
 
 export const HELP = [
   {
-    title: 'Copper Ore',
+    title: 'Exemple: Copper Ore',
     category: ['Mining', 'Ore'],
     content: `
 **Description**
@@ -122,9 +122,9 @@ The Surface is the topmost layer of the world, where the player begins their adv
 * Exposed to the day/night cycle and weather ⏳
 
 **Materials**
-* [[node:grass]], [[node:dirt]] — Forest
+* [[node:grassForest]], [[node:dirt]] — Forest
 * [[node:sand]], [[node:sandstone]] — Desert
-* [[node:jungleGrass]], [[node:silt]] — Jungle
+* [[node:grassJungle]], [[node:silt]] — Jungle
 
 **Resources**
 * [[item:copper]], [[item:iron]] — common
@@ -237,7 +237,7 @@ The Forest is the starting biome, located at the center of the world. It is the 
 * Layer: all layers
 
 **Materials**
-* Surface: [[node:dirt]], [[node:grass]]
+* Surface: [[node:dirt]], [[node:grassForest]]
 * Underground: [[node:stone]], [[node:clay]]
 * Caverns: [[node:hardstone]], [[node:slate]]
 
@@ -304,7 +304,7 @@ The Jungle is a lush, dangerous biome teeming with life. It features unique liqu
 * Layer: all layers
 
 **Materials**
-* Surface: [[node:silt]], [[node:jungleGrass]]
+* Surface: [[node:silt]], [[node:grassJungle]]
 * Underground: [[node:mud]], [[node:clay]]
 * Caverns: [[node:hardstone]], [[node:hellstone]]
 
@@ -401,7 +401,7 @@ Despite the nuisance they represent, cobwebs are one of the most valuable resour
 * All tunnels and caverns — scattered, all biomes
 
 **Collection** ⏳
-* Mine with any [[Pickaxe]] — drops [[Silk]]
+* Mine with any [[Pickaxes]] — drops [[Silk]]
 
 **Crafting chain**
 * [[item:silk]] → [[item:fabric]] — craft at [[item:loom]] ⏳
@@ -430,7 +430,7 @@ Cobweb Caves are caverns densely packed with spider webs. They are found in all 
 * [[Caverns]] Bottom — all biomes, rarer and more dangerous
 
 **Materials**
-* [[node:cobweb]] — dense coverage on walls and ceiling
+* [[node:web]] — dense coverage on ceiling
 
 **Inhabitants** ⏳
 * [[monster:spider]] — common
@@ -939,7 +939,7 @@ Slate is a hard metamorphic substrat found in the deepest parts of [[Jungle]] bi
   // ── Ores ──────────────────────────────────────────────────────
   //    Copper, Iron, Silver, Gold, Cobalt, Platinum
   {
-    title: 'Copper',
+    title: 'Copper Ore',
     category: ['Ore', 'Mining'],
     content: `
 **Description**
@@ -961,7 +961,7 @@ Copper is the most common ore in the world. It is the first metal the player wil
   `
   },
   {
-    title: 'Iron',
+    title: 'Iron Ore',
     category: ['Ore', 'Mining'],
     content: `
 **Description**
@@ -982,7 +982,7 @@ Iron is a common ore found from the Underground layer downwards. It is the secon
   `
   },
   {
-    title: 'Silver',
+    title: 'Silver Ore',
     category: ['Ore', 'Mining'],
     content: `
 **Description**
@@ -1004,7 +1004,7 @@ Silver is an uncommon ore found in the Underground and Caverns. It is rarer in [
   `
   },
   {
-    title: 'Gold',
+    title: 'Gold Ore',
     category: ['Ore', 'Mining'],
     content: `
 **Description**
@@ -1026,7 +1026,7 @@ Gold is a rare ore found in the Caverns. It is rarer in [[Desert]] biomes.
   `
   },
   {
-    title: 'Cobalt',
+    title: 'Cobalt Ore',
     category: ['Ore', 'Mining'],
     content: `
 **Description**
@@ -1049,7 +1049,7 @@ Cobalt is a rare ore found deep in the Caverns. It is rarer in [[Jungle]] biomes
   `
   },
   {
-    title: 'Platinum',
+    title: 'Platinum Ore',
     category: ['Ore', 'Mining'],
     content: `
 **Description**
@@ -1069,7 +1069,7 @@ Platinum is the rarest metal ore in the world. It is found exclusively in the de
   // ── Gems ──────────────────────────────────────────────────────
   //    Topaz, Ruby, Emerald, Sapphire
   {
-    title: 'Topaz',
+    title: 'Topaz Deposit',
     category: ['Gem', 'Mining'],
     content: `
 **Description**
@@ -1091,7 +1091,7 @@ Topaz is the most common gemstone, found in [[Forest]] biomes. Its warm golden h
   `
   },
   {
-    title: 'Ruby',
+    title: 'Ruby Deposit',
     category: ['Gem', 'Mining'],
     content: `
 **Description**
@@ -1113,7 +1113,7 @@ Ruby is an uncommon gemstone found in [[Desert]] biomes. Its deep red color is a
   `
   },
   {
-    title: 'Emerald',
+    title: 'Emerald Deposit',
     category: ['Gem', 'Mining'],
     content: `
 **Description**
@@ -1135,7 +1135,7 @@ Emerald is a rare gemstone found in [[Jungle]] biomes. Its vivid green reflects 
   `
   },
   {
-    title: 'Sapphire',
+    title: 'Sapphire Deposit',
     category: ['Gem', 'Mining'],
     content: `
 **Description**

@@ -269,7 +269,7 @@ Les tuiles et leurs items correspondants ont des noms distincts pour éviter tou
 | Type | Tuile (monde) | Item (inventaire) | Item transformé |
 |---|---|---|---|
 | Ore | `Copper Ore` | `Copper Chunk` | `Copper Bar` (fonte) |
-| Gem | `Topaz Ore` | `Raw Topaz` | `Topaz` (taille) |
+| Gem | `Topaz Deposit` | `Raw Topaz` | `Topaz` (taille) |
 | Rock | `Granite` | `Granite Block` | — |
 | Topsoil | `Dirt` | `Dirt Block` | — |
 | Natural | `Forest Grass` | `Dirt Block` | — |
