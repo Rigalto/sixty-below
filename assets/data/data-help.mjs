@@ -26,6 +26,7 @@
  *   (pas de lien si la fiche courante est celle du lien)
  *
  * ── Données dynamiques ──────────────────────────────────────────
+ *   {{node:code:name}}  → affiche le nom de NODES.CODE.name
  *   {{node:code:star}}  → affiche le tier de NODES.CODE.star (⭐☆☆☆☆)
  *   {{item:code:star}}  → affiche le tier de ITEMS.code.star (⭐☆☆☆☆)
  *   {{item:code}}       → affiche les infos de ITEMS.code
@@ -70,7 +71,11 @@ Mining drops: {{node:{3}:mining}}
 | Name | ⭐ | Speed | Sell |
 | ---- | -- | ----- | ---- |
 {{table:stype:{1}}}
-  `
+  `,
+  // templates réels en dessous
+
+  mineableRow: '| {1} | [[node:{2}]]| {{node:{2}:star}} | {{node:{2}:mining:0:item:name}} | {{node:{2}:speed}} |'
+
 }
 
 /* ====================================================================================================
@@ -386,9 +391,72 @@ A large underground cave found in [[Jungle]] biomes. Its walls are covered in lu
 * Moss grows on the floor and lateral walls, but not on the ceiling.
   `
   },
+  {
+    title: 'Hive',
+    category: ['Mini-biome', 'Jungle'],
+    content: `
+**Description**
+Hives are large circular caverns built by bees deep in [[Jungle]] biomes. Their walls are made of [[node:hive]] blocks and their interior is filled with [[node:honey]], one of the most valuable liquids in the game. The inhabitants defend their home aggressively.
 
+**Main Location**
+* [[Caverns]] Top — [[Jungle]], main location
+
+**Materials**
+* [[node:hive]] — walls
+* [[node:honey]] — fills the interior
+
+**Access**
+* A diagonal tunnel connects the Hive to the surrounding caverns.
+
+**Inhabitants** ⏳
+* [[monster:bee]] — common
+* [[monster:hornet]] — uncommon
+* [[monster:beeQueen]] — boss
+
+**Loot** ⏳
+* [[node:honey]] — abundant, difficult to collect while defended
+* [[node:hive]] — walls
+* Chest — tier 3-4 ⏳
+
+**Tips**
+* _Honey is extremely difficult to collect while the Hive is inhabited — consider building a diversion canal to extract it safely._ ⏳
+* _Destroying [[node:hive]] blocks will anger the inhabitants immediately._ ⏳
+* _The Bee Queen must be defeated before the Hive can be safely exploited._ ⏳
+* _Hives regenerate over time if left intact — a sustainable source of Honey._ ⏳
+  `
+  },
+  {
+    title: 'Sap Pocket',
+    category: ['Mini-biome', 'Jungle'],
+    content: `
+**Description**
+Sap Pockets are pressurized elliptical cavities filled with [[node:sap]], found deep in [[Jungle]] biomes. They are sealed by a [[node:sandstone]] border — removing it releases the sap, which can flood nearby tunnels and caverns.
+
+**Main Location**
+* [[Caverns]] Bottom — [[Jungle]]
+
+**Materials**
+* [[node:sap]] — fills the entire cavity
+* [[node:sandstone]] — sealing border
+
+**Inhabitants** ⏳
+* [[monster:amberSquid]] — [[Fishing]] only
+* [[monster:glider]] — [[Fishing]] only
+* [[monster:mantis]] — aggressive
+
+**Loot** ⏳
+* Rare aquatic species unique to Sap Pockets
+* Chest — tier 4-5 ⏳
+
+**Tips**
+* _Sap Pockets are sealed — look for [[node:sandstone]] borders in the cave walls to locate one._
+* _Removing the sandstone border releases the sap — make sure you have containers ready._ ⏳
+* _Sap severely impairs movement — avoid falling in without a plan to escape._ ⏳
+* _The Mantis is extremely dangerous in the confined space of a Sap Pocket._ ⏳
+  `
+  },
   // ── Mini-biomes / Transversal ─────────────────────────────────
-  //    Cobweb Cave, Geode Cave, Blind Lake, Underground Lake
+  //    Cobweb, Cobweb Cave, Geode Cave, Blind Lake, Underground Lake
   {
     title: 'Cobweb',
     category: ['Natural'],
@@ -403,7 +471,7 @@ Despite the nuisance they represent, cobwebs are one of the most valuable resour
 * All tunnels and caverns — scattered, all biomes
 
 **Collection** ⏳
-* Mine with any [[Pickaxes]] — drops [[Silk]]
+* Mine with any [[Pickaxes]] — drops [[item:silk]]
 
 **Crafting chain**
 * [[item:silk]] → [[item:fabric]] — craft at [[item:loom]] ⏳
@@ -531,7 +599,7 @@ Underground Lakes are pockets of fresh water found below the surface. They are a
 
 **Tips**
 * _Underground Lakes are one of the few sources of fresh water below the surface._
-* _Fishing here yields species not found in surface lakes._ ⏳
+* _[[Fishing]] here yields species not found in surface lakes._ ⏳
   `
   },
   {
@@ -564,7 +632,7 @@ Surface Lakes are bodies of water found at ground level. Each biome has its own 
 **Tips**
 * _Surface Lakes are the most accessible source of water early in the game._
 * _The Desert Oasis is a landmark — it often signals the presence of underground resources nearby._ ⏳
-* _Each lake has a deeper pit section — fishing there yields rarer catches._ ⏳
+* _Each lake has a deeper pit section — [[Fishing]] there yields rarer catches._ ⏳
   `
   },
   // ── Liquid ────────────────────────────────────────────────────
@@ -692,7 +760,7 @@ Grass covers the surface of [[Forest]] biomes. It is the most common natural til
     category: ['Natural'],
     content: `
 **Description**
-Jungle Grass covers the surface of [[Jungle]] biomes. Denser and more vibrant than regular [[Forest Grass]], it supports exotic plants and fauna.
+Jungle Grass covers the surface of [[Jungle]] biomes. Denser and more vibrant than regular [[node:grassForest]], it supports exotic plants and fauna.
 
 **Tier**
 {{node:grassJungle:star}}
@@ -704,7 +772,7 @@ Jungle Grass covers the surface of [[Jungle]] biomes. Denser and more vibrant th
 * {{node:jungleGrass:mining}}
 
 **Tips**
-* _Jungle Grass grows back naturally on exposed [[SILT]] tiles over time._ ⏳
+* _Jungle Grass grows back naturally on exposed [[node:silt]] tiles over time._ ⏳
   `
   },
   {
@@ -1406,9 +1474,8 @@ Shell is a sedimentary material formed from ancient marine organisms. It is foun
   },
   // ── Housing (walls) ──────────────────────────────────────────
   // ── Accessories ──────────────────────────────────────────────
-  // ── Activities ──────────────────────────────────────────────
+  // ── Activities Mining ────────────────────────────────────────
   //    Mining, Mineable Blocks, Mining Buffs
-
   {
     title: 'Mining',
     category: ['Activities', 'Mining'],
@@ -1419,11 +1486,59 @@ Shell is a sedimentary material formed from ancient marine organisms. It is foun
     title: 'Mineable Blocks',
     category: ['Mining', 'Natural', 'Topsoil', 'Substrat', 'Ore', 'Gem', 'Rock'],
     content: `
+    **All mineable blocks**
+
+| Type | Name | Tier | Drop | Speed |
+| ---- | ---- | ---- | ---- | ----- |
+<<mineableRow|Natural|grassForest>>
+<<mineableRow|Natural|grassJungle>>
+<<mineableRow|Natural|grassFern>>
+<<mineableRow|Natural|grassMoss>>
+<<mineableRow|Natural|grassMushroom>>
+<<mineableRow|Natural|web>>
+<<mineableRow|Topsoil|dirt>>
+<<mineableRow|Topsoil|sand>>
+<<mineableRow|Topsoil|silt>>
+<<mineableRow|Topsoil|humus>>
+<<mineableRow|Substrat|clay>>
+<<mineableRow|Substrat|stone>>
+<<mineableRow|Substrat|hardstone>>
+<<mineableRow|Substrat|sandstone>>
+<<mineableRow|Substrat|ash>>
+<<mineableRow|Substrat|hellstone>>
+<<mineableRow|Substrat|mud>>
+<<mineableRow|Substrat|limestone>>
+<<mineableRow|Substrat|slate>>
+<<mineableRow|Rock|granite>>
+<<mineableRow|Rock|marble>>
+<<mineableRow|Rock|obsidian>>
+<<mineableRow|Rock|meteorite>>
+<<mineableRow|Rock|hive>>
+<<mineableRow|Rock|shell>>
+<<mineableRow|Ore|copper>>
+<<mineableRow|Ore|iron>>
+<<mineableRow|Ore|silver>>
+<<mineableRow|Ore|gold>>
+<<mineableRow|Ore|cobalt>>
+<<mineableRow|Ore|platinum>>
+<<mineableRow|Gem|topaz>>
+<<mineableRow|Gem|ruby>>
+<<mineableRow|Gem|emerald>>
+<<mineableRow|Gem|sapphire>>
     `
   },
   {
     title: 'Mining Buffs',
     category: ['Mining', 'Buffs'],
+    content: `
+    `
+  },
+
+  // ── Activities Fishing ────────────────────────────────────────
+  //    Fishing, Fishing Baits, Fisheable Monsters, Fishing Buffs
+  {
+    title: 'Fishing',
+    category: ['Activities', 'Fishing'],
     content: `
     `
   }
