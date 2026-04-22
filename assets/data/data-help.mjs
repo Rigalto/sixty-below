@@ -15,11 +15,13 @@
  *   | ---- | ---- |
  *
  * ── Liens inter-fiches ──────────────────────────────────────────
- *   [[node:code]]                → nom du noeud (NODES.CODE.name) + lien vers sa fiche (NODES.CODE..help)
- *   [[item:code]]                → nom de l'item (ITEMS.code.name) + lien vers sa fiche (ITEMS.code.help)
- *   [[helpTopic]]                → titre de la fiche d'aide + lien vers sa fiche
+ *   [[node:code]]                 → nom du noeud (NODES.CODE.name) + lien vers sa fiche (NODES.CODE..help)
+ *   [[item:code]]                 → nom de l'item (ITEMS.code.name) + lien vers sa fiche (ITEMS.code.help)
+ *   [[monster:code]]              → nom du monstre + lien vers sa fiche
+ *   [[helpTopic]]                 → titre de la fiche d'aide + lien vers sa fiche
  *   [[node:code|texte affiché]]   → lien avec texte personnalisé
  *   [[item:code|texte affiché]]   → lien avec texte personnalisé
+ *   [[monster:code|texte]]        → lien avec texte personnalisé
  *   [[helpTopic|texte affiché]]   → lien avec texte personnalisé
  *   (pas de lien si la fiche courante est celle du lien)
  *
