@@ -1,6 +1,6 @@
 import {TIME_BUDGET, MICROTASK_FN_NAME_TO_KEY, STATE, OVERLAYS} from './constant.mjs'
 import {NODES_LOOKUP, ITEMS} from '../../assets/data/data.mjs'
-import '../../assets/data/data-help.mjs'
+import {HELP} from '../../assets/data/data-help.mjs'
 import {loadAssets, resolveAssetData} from './assets.mjs'
 import {timeManager, taskScheduler, microTasker, eventBus, seededRNG} from './utils.mjs'
 import {database} from './database.mjs'
@@ -75,6 +75,7 @@ class GameCore {
     // 2. Hydratation des données statiques
     this.#hydrateNodes()
     this.#hydrateItems()
+    this.#hydrateHelp()
     // this._hydrateBuffs() ...
 
     // 3. Liens avec le DOM
@@ -121,6 +122,29 @@ class GameCore {
 
     // La logique sera identique : parsing des icônes de l'item
     console.log(`   🔹 Items hydratés : ${count}`)
+  }
+
+  /**
+ * Hydratation de l'aide en ligne.
+ * - Vérifie les références [[itemCode]] et {{node:x}}, {{item:x}}, {{recipe:x}}
+ * - Remplace les références valides par leur contenu HTML
+ * - Injecte ⚠️ pour les références inconnues
+ * - Stocke le HTML final dans entry.html
+ */
+  #hydrateHelp () {
+    let count = 0
+    const errors = 0
+
+    for (const entry of HELP) {
+    // TODO : vérification des liens [[...]]
+    // TODO : résolution des données dynamiques {{...}}
+    // TODO : conversion Markdown → HTML
+    // TODO : entry.html = html généré
+      count++
+    }
+
+    console.log(`   🔹 Help hydratée : ${count} fiches, ${errors} erreur(s)`)
+    console.log('HELP', HELP) // DEBUG
   }
 
   /* =========================================

@@ -1314,5 +1314,3 @@ const expandTemplates = (content) =>
 for (const entry of HELP) {
   entry.content = expandTemplates(entry.content)
 }
-
-console.log('HELP', HELP)
