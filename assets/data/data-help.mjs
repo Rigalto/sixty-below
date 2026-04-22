@@ -359,12 +359,86 @@ A large underground cave found in [[Forest]] biomes, characterized by giant fern
 * [[monster:mamba]]
   `
   },
+  {
+    title: 'Mushroom Cave',
+    category: ['Mini-biome', 'Forest'],
+    content: `
+**Description**
+Mushroom Caves are large caverns found deep in [[Forest]] biomes. Their floor is covered in [[node:grassMushroom]], from which giant luminous mushrooms grow, providing a natural light source and rare crafting ingredients.
+
+**Main Location**
+* [[Caverns]] Top — [[Forest]], one per Forest zone
+
+**Materials**
+* [[node:grassMushroom]] — floor
+* [[node:humus]] — substrate beneath the floor, 2-3 tiles deep
+
+**Inhabitants** ⏳
+* [[monster:redSlug]] — common, passive
+* [[monster:hydra]] — uncommon
+* [[monster:isopod]] — boss, rare
+
+**Loot** ⏳
+* Giant mushroom spores — rare harvest from mushroom caps ⏳
+* Chest — tier 3-4 ⏳
+
+**Tips**
+* _The giant mushrooms provide enough light to explore without torches._ ⏳
+* _Harvesting mushroom caps without destroying the [[node:grassMushroom]] allows them to regrow over time._ ⏳
+* _Mushroom spores are powerful potion ingredients — worth the detour._ ⏳
+  `
+  },
 
   // ── Mini-biomes / Desert ──────────────────────────────────────
   //    Sand Pocket, Fossil Vein, Pyramid, Antlion Pit, Ancient House
+  {
+    title: 'Sand Pocket',
+    category: ['Mini-biome', 'Desert'],
+    content: `
+**Description**
+Sand Pockets are pressurized elliptical cavities filled with [[node:sand]], found in [[Desert]] biomes. They are sealed by a [[node:sandstone]] border. Removing it releases the sand, which falls and accumulates in nearby tunnels and caverns.
 
+**Main Location**
+* [[Underground]] — [[Desert]], most common
+* [[Caverns]] Top — [[Desert]], less common
+
+**Materials**
+* [[node:sand]] — fills the entire cavity
+* [[node:sandstone]] — sealing border (lower half)
+
+**Tips**
+* _Sand Pockets are sealed — look for [[node:sandstone]] borders in cave walls to locate one._
+* _Removing the sandstone border releases the sand — it will fall and fill any open space below._ ⏳
+* _Sand accumulates in pyramidal piles — it can block tunnel access if released carelessly._ ⏳
+* _Experienced players use Sand Pockets as a source of bulk [[node:sand]] for construction._ ⏳
+  `
+  },
+  {
+    title: 'Fossil Vein',
+    category: ['Mini-biome', 'Desert'],
+    content: `
+**Description**
+Fossil Veins are horizontal deposits of [[node:shell]] embedded in the rock. They are the remnants of an ancient seabed, compressed over millennia into dense sedimentary layers.
+
+**Main Location**
+* [[Caverns]] Top — [[Desert]] and [[Sea||maritime zones]]
+
+**Materials**
+* [[node:shell]] — horizontal vein
+* Protected by a [[node:sandstone]] border visible on cave walls
+
+**Drops** ⏳
+* [[item:shell]] — mined from the vein
+* [[item:shellPowder]] — crafted from Shell ⏳
+
+**Tips**
+* _Fossil Veins are protected — look for exposed [[node:shell]] on cave walls to locate one._
+* _Shell is also found along the [[Sea]] floor and borders — a secondary renewable source._ ⏳
+* _Shell Powder is a rare crafting ingredient used in delicate mechanical recipes._ ⏳
+  `
+  },
   // ── Mini-biomes / Jungle ──────────────────────────────────────
-  //    Moss Cave, Hive, Sap Pocket, Temple Ruin, Termite Mound
+  //    Moss Cave, Hive, Sap Lake, Sap Pocket, Temple Ruin, Termite Mound
   {
     title: 'Moss Cave',
     category: ['Mini-biome', 'Jungle'],
@@ -426,6 +500,34 @@ Hives are large circular caverns built by bees deep in [[Jungle]] biomes. Their 
   `
   },
   {
+    title: 'Sap Lake',
+    category: ['Mini-biome', 'Jungle'],
+    content: `
+**Description**
+Sap Lakes are bodies of [[node:sap]] found in [[Jungle]] biomes. Unlike [[Sap Pocket]]s, they are open cavities accessible via natural tunnels and caverns.
+
+**Main Location**
+* [[Underground]] — [[Jungle]], most common
+* [[Caverns]] Top — [[Jungle]], less common
+
+**Materials**
+* [[node:sap]] — fills the lower half of the cavity
+
+**Inhabitants** ⏳
+* [[monster:amberSquid]] — [[Fishing]] only
+* [[monster:glider]] — [[Fishing]] only
+
+**Loot** ⏳
+* [[node:sap]] — collectable with [[item:bottle]] or [[item:bucket]] ⏳
+* Rare aquatic species unique to Sap environments ⏳
+
+**Tips**
+* _Sap Lakes are one of the few accessible sources of [[node:sap]] — bring containers._ ⏳
+* _Sap severely impairs movement — avoid falling in without a plan to escape._ ⏳
+* _[[Fishing]] in Sap yields unique species not found in water lakes._ ⏳
+  `
+  },
+  {
     title: 'Sap Pocket',
     category: ['Mini-biome', 'Jungle'],
     content: `
@@ -455,6 +557,7 @@ Sap Pockets are pressurized elliptical cavities filled with [[node:sap]], found 
 * _The Mantis is extremely dangerous in the confined space of a Sap Pocket._ ⏳
   `
   },
+
   // ── Mini-biomes / Transversal ─────────────────────────────────
   //    Cobweb, Cobweb Cave, Geode Cave, Blind Lake, Underground Lake
   {
@@ -714,7 +817,7 @@ Sap is a rare green liquid found exclusively in [[Jungle]] biomes. It fills Sap 
   },
   {
     title: 'Sea',
-    category: ['Liquid'],
+    category: ['Liquid', 'Mini-biome'],
     content: `
 **Description**
 The Sea borders both sides of the world. Its deep, dark waters are home to unique fauna and hide rare treasures on the ocean floor.
