@@ -662,7 +662,7 @@ Cobweb Caves are caverns densely packed with spider webs. They are found in all 
 * [[monster:tarentulaKing]] — boss, rare
 
 **Loot** ⏳
-* [[item:web]] — abundant
+* [[item:silk]] — abundant
 * [[item:spideregg]] — rare drop ⏳
 * [[item:spiderFang]] — rare drop ⏳
 * Chest — tier 3-4 depending on layer ⏳
@@ -1550,9 +1550,17 @@ Obsidian is a volcanic glass formed where lava meets water. It is one of the har
 
 **Main Location**
 * [[Caverns]] — all biomes, rare clusters
+* Created by the player by pouring water onto [[node:lava]] ⏳
 
-**Drops** ⏳
+**Mining** ⏳
 * {{node:obsidian:mining}}
+* Requires a tier 5 [[item:pickaxePt]] — applies to both natural and player-created Obsidian
+
+**Creating Obsidian** ⏳
+* Equip a [[item:waterBottle]]
+* Click on an empty tile above a [[node:lava]] tile
+* An Obsidian block appears at the clicked location
+* _Warning : lava is extremely dangerous — keep your distance and act quickly._
 
 **Recipes** ⏳
 * {{recipe:obsidianBlock}}
@@ -1626,7 +1634,22 @@ Shell is a sedimentary material formed from ancient marine organisms. It is foun
 * _Shell veins are protected by a SANDSTONE border — look for exposed Shell on cave walls to locate a vein._⏳
   `
   },
+
   // ── Housing (walls) ──────────────────────────────────────────
+  //    Wood Wall, Background Wall
+  {
+    title: 'Wood Wall',
+    category: ['Housing'],
+    content: `
+    `
+  },
+  {
+    title: 'Background Wall',
+    category: ['Housing'],
+    content: `
+    `
+  },
+
   // ── Accessories ──────────────────────────────────────────────
   // ── Activities Mining ────────────────────────────────────────
   //    Mining, Mineable Blocks, Mining Buffs
@@ -1640,7 +1663,7 @@ Shell is a sedimentary material formed from ancient marine organisms. It is foun
     title: 'Mineable Blocks',
     category: ['Mining', 'Natural', 'Topsoil', 'Substrat', 'Ore', 'Gem', 'Rock'],
     content: `
-    **All mineable blocks**
+**All mineable blocks**
 
 | Type | Name | Tier | Drop | Speed |
 | ---- | ---- | ---- | ---- | ----- |

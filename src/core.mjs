@@ -101,6 +101,10 @@ class GameCore {
         count++
       }
       if (node.waveImage) node.waveImage = resolveAssetData(node.waveImage)
+      //
+      if (node.help !== null && !HELP_TITLES.has(node.help)) {
+        console.error(`[core] NODES.${node.name} : help topic inconnu '${node.help}'`)
+      }
     }
     console.log(`   🔹 Nodes hydratés : ${count}`)
   }
