@@ -80,7 +80,7 @@ Mining drops: {{node:{3}:mining}}
 export const HELP = [
   {
     title: 'Exemple: Copper Ore',
-    category: ['Mining', 'Ore'],
+    category: ['Ore'],
     content: `
 **Description**
 Copper is the most common ore found near the [[Surface||Surface layer]].
@@ -228,7 +228,7 @@ The Caverns are the deepest accessible layer, divided into two sub-layers : Cave
   //    Forest, Desert, Jungle
   {
     title: 'Forest',
-    category: ['Biome'],
+    category: ['Biome', 'Forest'],
     content: `
 **Description**
 The Forest is the starting biome, located at the center of the world. It is the most balanced biome, with moderate resources and fauna. The player always spawns here.
@@ -261,7 +261,7 @@ The Forest is the starting biome, located at the center of the world. It is the 
   },
   {
     title: 'Desert',
-    category: ['Biome'],
+    category: ['Biome', 'Desert'],
     content: `
 **Description**
 The Desert biome is characterized by its sandy terrain and arid atmosphere. It contains unique geological formations and ancient ruins. One of the two non-starting biomes.
@@ -296,7 +296,7 @@ The Desert biome is characterized by its sandy terrain and arid atmosphere. It c
   },
   {
     title: 'Jungle',
-    category: ['Biome'],
+    category: ['Biome', 'Jungle'],
     content: `
 **Description**
 The Jungle is a lush, dangerous biome teeming with life. It features unique liquid resources (Sap) and the most complex mini-biome ecosystem in the game.
@@ -333,7 +333,7 @@ The Jungle is a lush, dangerous biome teeming with life. It features unique liqu
   },
 
   // ── Mini-biomes / Forest ──────────────────────────────────────
-  //    Fern Cave, Mushroom Cave, Ruined Cabin, Anthill, Underground Lake
+  //    Fern Cave, Mushroom Cave, Ruined Cabin, Anthill
   {
     title: 'Fern Cave',
     category: ['Mini-biome', 'Forest'],
@@ -391,7 +391,7 @@ A large underground cave found in [[Jungle]] biomes. Its walls are covered in lu
   //    Cobweb Cave, Geode Cave, Blind Lake, Underground Lake
   {
     title: 'Cobweb',
-    category: ['Mining'],
+    category: ['Natural'],
     content: `
 **Description**
 Cobwebs are sticky threads spun by [[Spiders]]. They slow movement significantly and accumulate progressively in tunnels and caverns if left uncleared.
@@ -422,7 +422,7 @@ Despite the nuisance they represent, cobwebs are one of the most valuable resour
   },
   {
     title: 'Cobweb Cave',
-    category: ['Mini-biome', 'Transversal'],
+    category: ['Mini-biome', 'Forest', 'Desert', 'Jungle'],
     content: `
 **Description**
 Cobweb Caves are caverns densely packed with spider webs. They are found in all biomes and are home to increasingly dangerous spider species the deeper they are located.
@@ -450,7 +450,123 @@ Cobweb Caves are caverns densely packed with spider webs. They are found in all 
 * _The deeper the Cobweb Cave, the more dangerous its inhabitants._
   `
   },
+  {
+    title: 'Geode Cave',
+    category: ['Mini-biome', 'Forest', 'Desert', 'Jungle'],
+    content: `
+**Description**
+Geode Caves are elliptical caverns lined with crystals of [[node:granite]] or [[node:marble]]. They are found in the deepest parts of all biomes and are among the most visually striking locations in the world.
 
+**Main Location**
+* [[Caverns]] Bottom — all biomes
+
+**Materials**
+* [[node:granite]] or [[node:marble]] — crystal-lined walls
+* Hollow interior
+
+**Inhabitants** ⏳
+* [[monster:stonegnaw]]
+* [[monster:rockborer]] — boss
+
+**Loot** ⏳
+* [[item:granite]] and [[item:marble]] — abundant from walls
+* Chest — tier 4-5 ⏳
+
+**Tips**
+* _Geode Caves always contain either Granite or Marble — never both._
+* _The crystals project inward from the walls — the center of the cave is always open._ ⏳
+* _Stonegnaws are attracted to the vibrations of mining — proceed carefully._ ⏳
+  `
+  },
+  {
+    title: 'Blind Lake',
+    category: ['Mini-biome', 'Forest', 'Desert', 'Jungle'],
+    content: `
+**Description**
+Blind Lakes are pockets of water found in the deepest parts of all biomes. They have no natural access — the player must dig their way in. Their isolated environment has allowed unique species to evolve in complete darkness.
+
+**Main Location**
+* [[Caverns]] Bottom — all biomes
+
+**Materials**
+* [[node:water]] — fills the bottom of the cavity
+* [[node:hardstone]] — floor and walls
+
+**Inhabitants** ⏳
+* [[monster:blindFish]] — rare, [[Fishing]] only
+* [[monster:axolotl]] — very rare, [[Fishing]] only
+
+**Loot** ⏳
+* Rare fish species found nowhere else in the world
+* Chest — tier 4-5 ⏳
+
+**Tips**
+* _Blind Lakes have no natural entrance — bring a [[Pickaxes||pickaxe]]._
+* _The fish found here are unique to this environment and cannot be found anywhere else._ ⏳
+  `
+  },
+  {
+    title: 'Underground Lake',
+    category: ['Mini-biome', 'Forest', 'Desert', 'Jungle'],
+    content: `
+**Description**
+Underground Lakes are pockets of fresh water found below the surface. They are accessible via natural tunnels and caverns, and support a variety of aquatic life rarely seen on the surface.
+
+**Main Location**
+* [[Underground]] — all biomes, most common
+* [[Caverns]] Top — all biomes, less common
+
+**Materials**
+* [[node:water]] — fills the lower half of the cavity
+* [[node:humus]] — ceiling and upper walls, [[Forest]]
+* [[node:mud]] — ceiling and upper walls, [[Jungle]]
+* [[node:sandstone]] — ceiling and upper walls, [[Desert]]
+
+**Inhabitants** ⏳
+* [[monster:caveFish]] — common, [[Fishing]] only
+
+**Loot** ⏳
+* Rare fish species ⏳
+* Chest — tier 2-3 ⏳
+
+**Tips**
+* _Underground Lakes are one of the few sources of fresh water below the surface._
+* _Fishing here yields species not found in surface lakes._ ⏳
+  `
+  },
+  {
+    title: 'Surface Lake',
+    category: ['Mini-biome', 'Forest', 'Desert', 'Jungle'],
+    content: `
+**Description**
+Surface Lakes are bodies of water found at ground level. Each biome has its own variant with distinctive materials and fauna. In the [[Desert]], they take the form of an Oasis — a rare and welcome sight in an arid landscape.
+
+**Main Location**
+* [[Surface]] — spread on all biomes
+
+**Variants**
+* [[Forest]] — freshwater lake, mossy banks
+* [[Desert]] — Oasis, sandy banks
+* [[Jungle]] — jungle lake, muddy banks
+
+**Materials**
+* [[node:water]] — fills the lake body and pit
+* Banks and floor vary by biome ⏳
+
+**Inhabitants** ⏳
+* Surface fish species — common, [[Fishing]] only
+* Aquatic critters — [[monster:frog]] near Forest lakes ⏳
+
+**Loot** ⏳
+* Common fish species
+* Chest — tier 1-2 ⏳
+
+**Tips**
+* _Surface Lakes are the most accessible source of water early in the game._
+* _The Desert Oasis is a landmark — it often signals the presence of underground resources nearby._ ⏳
+* _Each lake has a deeper pit section — fishing there yields rarer catches._ ⏳
+  `
+  },
   // ── Liquid ────────────────────────────────────────────────────
   //    Sea, Water, Honey, Sap
   // ── Liquids ───────────────────────────────────────────────────
@@ -553,7 +669,7 @@ The Sea borders both sides of the world. Its deep, dark waters are home to uniqu
   //    Forest Grass, Jungle Grass, Mushroom Grass, Fern Grass, Moss Grass
   {
     title: 'Forest Grass',
-    category: ['Natural', 'Mining'],
+    category: ['Natural'],
     content: `
 **Description**
 Grass covers the surface of [[Forest]] biomes. It is the most common natural tile and supports a wide variety of surface plants and critters.
@@ -573,7 +689,7 @@ Grass covers the surface of [[Forest]] biomes. It is the most common natural til
   },
   {
     title: 'Jungle Grass',
-    category: ['Natural', 'Mining'],
+    category: ['Natural'],
     content: `
 **Description**
 Jungle Grass covers the surface of [[Jungle]] biomes. Denser and more vibrant than regular [[Forest Grass]], it supports exotic plants and fauna.
@@ -593,7 +709,7 @@ Jungle Grass covers the surface of [[Jungle]] biomes. Denser and more vibrant th
   },
   {
     title: 'Fern Grass',
-    category: ['Natural', 'Mining'],
+    category: ['Natural'],
     content: `
 **Description**
 Fern Grass covers the floor of [[Fern Cave]]s. Giant ferns grow from this soft, mossy substrate.
@@ -613,7 +729,7 @@ Fern Grass covers the floor of [[Fern Cave]]s. Giant ferns grow from this soft, 
   },
   {
     title: 'Moss Grass',
-    category: ['Natural', 'Mining'],
+    category: ['Natural'],
     content: `
 **Description**
 Luminous moss that covers the walls and floor of [[Moss Cave]]s. Its soft green glow makes it one of the few self-illuminating natural tiles.
@@ -634,7 +750,7 @@ Luminous moss that covers the walls and floor of [[Moss Cave]]s. Its soft green 
   },
   {
     title: 'Mushroom Grass',
-    category: ['Natural', 'Mining'],
+    category: ['Natural'],
     content: `
 **Description**
 Mushroom Grass covers the floor of [[Mushroom Cave]]s. [[Giant Mushroom]]s grow from this rich substrate, providing rare ingredients.
@@ -658,7 +774,7 @@ Mushroom Grass covers the floor of [[Mushroom Cave]]s. [[Giant Mushroom]]s grow 
   //    Dirt, Sand, Silt, Humus
   {
     title: 'Dirt',
-    category: ['Topsoil', 'Mining'],
+    category: ['Topsoil'],
     content: `
 **Description**
 Dirt is the primary topsoil of [[Forest]] biomes. It supports surface vegetation and is the most workable material for early construction⏳.
@@ -678,7 +794,7 @@ Dirt is the primary topsoil of [[Forest]] biomes. It supports surface vegetation
   },
   {
     title: 'Sand',
-    category: ['Topsoil', 'Mining'],
+    category: ['Topsoil'],
     content: `
 **Description**
 Sand is the primary topsoil of [[Desert]] biomes. It is subject to gravity — unsupported sand falls and accumulates in piles.
@@ -700,7 +816,7 @@ Sand is the primary topsoil of [[Desert]] biomes. It is subject to gravity — u
   },
   {
     title: 'Silt',
-    category: ['Topsoil', 'Mining'],
+    category: ['Topsoil'],
     content: `
 **Description**
 Silt is the primary topsoil of [[Jungle]] biomes. Its fine, damp texture supports the dense jungle vegetation above.
@@ -720,7 +836,7 @@ Silt is the primary topsoil of [[Jungle]] biomes. Its fine, damp texture support
   },
   {
     title: 'Humus',
-    category: ['Topsoil', 'Mining'],
+    category: ['Topsoil'],
     content: `
 **Description**
 Humus is a rich organic topsoil found across all biomes, though it is most abundant in [[Forest]] and [[Jungle]] biomes. It forms the substrate beneath [[Fern Cave]] and [[Mushroom Cave]] floors.
@@ -750,7 +866,7 @@ Humus is a rich organic topsoil found across all biomes, though it is most abund
   //    Jungle : Mud, Limestone, Slate
   {
     title: 'Clay',
-    category: ['Substrat', 'Mining'],
+    category: ['Substrat'],
     content: `
 **Description**
 Clay is the most common substrat in [[Forest]] biomes. Its soft, workable texture makes it a versatile early-game building material.
@@ -770,7 +886,7 @@ Clay is the most common substrat in [[Forest]] biomes. Its soft, workable textur
   },
   {
     title: 'Stone',
-    category: ['Substrat', 'Mining'],
+    category: ['Substrat'],
     content: `
 **Description**
 Stone is the second most common substrat in [[Forest]] biomes, found deeper than [[Clay]].
@@ -791,7 +907,7 @@ Stone is the second most common substrat in [[Forest]] biomes, found deeper than
   },
   {
     title: 'Hardstone',
-    category: ['Substrat', 'Mining'],
+    category: ['Substrat'],
     content: `
 **Description**
 Hardstone is a dense, resistant substrat found in the deepest parts of [[Forest]] biome. It requires high-tier tools to mine.
@@ -811,7 +927,7 @@ Hardstone is a dense, resistant substrat found in the deepest parts of [[Forest]
   },
   {
     title: 'Sandstone',
-    category: ['Substrat', 'Mining'],
+    category: ['Substrat'],
     content: `
 **Description**
 Sandstone is the primary substrat of [[Desert]] biomes. It also forms the natural borders of the [[Sea]] and acts as a containment layer around [[Sand Pocket]]s.
@@ -833,7 +949,7 @@ Sandstone is the primary substrat of [[Desert]] biomes. It also forms the natura
   },
   {
     title: 'Ash',
-    category: ['Substrat', 'Mining'],
+    category: ['Substrat'],
     content: `
 **Description**
 Ash is the second most common substrat in [[Forest]] biomes, found deeper than [[Sandstone]]. The dark color of this volcanic substrat and its fragile structure make it a distinctive material.
@@ -854,7 +970,7 @@ Ash is the second most common substrat in [[Forest]] biomes, found deeper than [
   },
   {
     title: 'Hellstone',
-    category: ['Substrat', 'Mining'],
+    category: ['Substrat'],
     content: `
 **Description**
 Hellstone is an extremely hard volcanic substrat found in the deepest parts of [[Desert]] biome. It requires the best tools available to mine and emits a faint heat glow.
@@ -877,7 +993,7 @@ Hellstone is an extremely hard volcanic substrat found in the deepest parts of [
   },
   {
     title: 'Mud',
-    category: ['Substrat', 'Mining'],
+    category: ['Substrat'],
     content: `
 **Description**
 Mud is the primary substrat of [[Jungle]] biomes. Its soft, damp texture supports the lush vegetation above.
@@ -898,7 +1014,7 @@ Mud is the primary substrat of [[Jungle]] biomes. Its soft, damp texture support
   },
   {
     title: 'Limestone',
-    category: ['Substrat', 'Mining'],
+    category: ['Substrat'],
     content: `
 **Description**
 Limestone is a sedimentary substrat found as intrusions across [[Jungle]] biome. The pale color of this sedimentary substrat and its layered structure make it recognizable underground.
@@ -919,7 +1035,7 @@ Limestone is a sedimentary substrat found as intrusions across [[Jungle]] biome.
   },
   {
     title: 'Slate',
-    category: ['Substrat', 'Mining'],
+    category: ['Substrat'],
     content: `
 **Description**
 Slate is a hard metamorphic substrat found in the deepest parts of [[Jungle]] biome. Its dark, layered structure requires advanced tools to mine.
@@ -942,7 +1058,7 @@ Slate is a hard metamorphic substrat found in the deepest parts of [[Jungle]] bi
   //    Copper, Iron, Silver, Gold, Cobalt, Platinum
   {
     title: 'Copper Ore',
-    category: ['Ore', 'Mining'],
+    category: ['Ore'],
     content: `
 **Description**
 Copper is the most common ore in the world. It is the first metal the player will encounter and is essential for early-game crafting.
@@ -964,7 +1080,7 @@ Copper is the most common ore in the world. It is the first metal the player wil
   },
   {
     title: 'Iron Ore',
-    category: ['Ore', 'Mining'],
+    category: ['Ore'],
     content: `
 **Description**
 Iron is a common ore found from the Underground layer downwards. It is the second metal tier and is required for most basic tools and weapons.
@@ -985,7 +1101,7 @@ Iron is a common ore found from the Underground layer downwards. It is the secon
   },
   {
     title: 'Silver Ore',
-    category: ['Ore', 'Mining'],
+    category: ['Ore'],
     content: `
 **Description**
 Silver is an uncommon ore found in the Underground and Caverns. It is rarer in [[Forest]] biomes.
@@ -1007,7 +1123,7 @@ Silver is an uncommon ore found in the Underground and Caverns. It is rarer in [
   },
   {
     title: 'Gold Ore',
-    category: ['Ore', 'Mining'],
+    category: ['Ore'],
     content: `
 **Description**
 Gold is a rare ore found in the Caverns. It is rarer in [[Desert]] biomes.
@@ -1029,7 +1145,7 @@ Gold is a rare ore found in the Caverns. It is rarer in [[Desert]] biomes.
   },
   {
     title: 'Cobalt Ore',
-    category: ['Ore', 'Mining'],
+    category: ['Ore'],
     content: `
 **Description**
 Cobalt is a rare ore found deep in the Caverns. It is rarer in [[Jungle]] biomes.
@@ -1052,7 +1168,7 @@ Cobalt is a rare ore found deep in the Caverns. It is rarer in [[Jungle]] biomes
   },
   {
     title: 'Platinum Ore',
-    category: ['Ore', 'Mining'],
+    category: ['Ore'],
     content: `
 **Description**
 Platinum is the rarest metal ore in the world. It is found exclusively in the deepest part of the Caverns.
@@ -1072,7 +1188,7 @@ Platinum is the rarest metal ore in the world. It is found exclusively in the de
   //    Topaz, Ruby, Emerald, Sapphire
   {
     title: 'Topaz Deposit',
-    category: ['Gem', 'Mining'],
+    category: ['Gem'],
     content: `
 **Description**
 Topaz is the most common gemstone, found in [[Forest]] biomes. Its warm golden hue makes it a sought-after crafting material.
@@ -1094,7 +1210,7 @@ Topaz is the most common gemstone, found in [[Forest]] biomes. Its warm golden h
   },
   {
     title: 'Ruby Deposit',
-    category: ['Gem', 'Mining'],
+    category: ['Gem'],
     content: `
 **Description**
 Ruby is an uncommon gemstone found in [[Desert]] biomes. Its deep red color is associated with fire and heat.
@@ -1116,7 +1232,7 @@ Ruby is an uncommon gemstone found in [[Desert]] biomes. Its deep red color is a
   },
   {
     title: 'Emerald Deposit',
-    category: ['Gem', 'Mining'],
+    category: ['Gem'],
     content: `
 **Description**
 Emerald is a rare gemstone found in [[Jungle]] biomes. Its vivid green reflects the lush environment it comes from.
@@ -1138,7 +1254,7 @@ Emerald is a rare gemstone found in [[Jungle]] biomes. Its vivid green reflects 
   },
   {
     title: 'Sapphire Deposit',
-    category: ['Gem', 'Mining'],
+    category: ['Gem'],
     content: `
 **Description**
 Sapphire is the rarest gemstone, found in the deepest parts of all biomes. Its brilliant blue glow is visible even in complete darkness.
@@ -1162,7 +1278,7 @@ Sapphire is the rarest gemstone, found in the deepest parts of all biomes. Its b
   //    Granite, Marble, Obsidian, Meteorite, Hive, Shell
   {
     title: 'Granite',
-    category: ['Rock', 'Mining'],
+    category: ['Rock'],
     content: `
 **Description**
 Granite is a hard igneous rock found exclusively inside [[Geode Cave]]s. Its pink-grey crystalline structure makes it a distinctive building material.
@@ -1182,7 +1298,7 @@ Granite is a hard igneous rock found exclusively inside [[Geode Cave]]s. Its pin
   },
   {
     title: 'Marble',
-    category: ['Rock', 'Mining'],
+    category: ['Rock'],
     content: `
 **Description**
 Marble is a metamorphic rock found exclusively inside [[Geode Cave]]s. Its smooth white surface makes it a prized building material.
@@ -1202,7 +1318,7 @@ Marble is a metamorphic rock found exclusively inside [[Geode Cave]]s. Its smoot
   },
   {
     title: 'Obsidian',
-    category: ['Rock', 'Mining'],
+    category: ['Rock'],
     content: `
 **Description**
 Obsidian is a volcanic glass formed where lava meets water. It is one of the hardest materials in the world, requiring high-tier tools to mine.
@@ -1222,7 +1338,7 @@ Obsidian is a volcanic glass formed where lava meets water. It is one of the har
   },
   {
     title: 'Meteorite',
-    category: ['Rock', 'Mining'],
+    category: ['Rock'],
     content: `
 **Description**
 Meteorite is an extraterrestrial rock that falls from the sky in rare events. It glows faintly and has unique properties not found in any other material.
@@ -1243,7 +1359,7 @@ Meteorite is an extraterrestrial rock that falls from the sky in rare events. It
   },
   {
     title: 'Hive',
-    category: ['Rock', 'Mining'],
+    category: ['Rock'],
     content: `
 **Description**
 Hive is a biological material that forms the walls of [[Hive]] mini-biomes. It is secreted by bees and has a distinctive honeycomb structure.
@@ -1266,7 +1382,7 @@ Hive is a biological material that forms the walls of [[Hive]] mini-biomes. It i
   },
   {
     title: 'Shell',
-    category: ['Rock', 'Mining'],
+    category: ['Rock'],
     content: `
 **Description**
 Shell is a sedimentary material formed from ancient marine organisms. It is found in [[Fossil Vein]]s and along the shores of the [[Sea]].
@@ -1287,22 +1403,43 @@ Shell is a sedimentary material formed from ancient marine organisms. It is foun
 **Tips**
 * _Shell veins are protected by a SANDSTONE border — look for exposed Shell on cave walls to locate a vein._⏳
   `
-
+  },
   // ── Housing (walls) ──────────────────────────────────────────
   // ── Accessories ──────────────────────────────────────────────
-  // ── Accessories ──────────────────────────────────────────────
+  // ── Activities ──────────────────────────────────────────────
+  //    Mining, Mineable Blocks, Mining Buffs
+
+  {
+    title: 'Mining',
+    category: ['Activities', 'Mining'],
+    content: `
+    `
+  },
+  {
+    title: 'Mineable Blocks',
+    category: ['Mining', 'Natural', 'Topsoil', 'Substrat', 'Ore', 'Gem', 'Rock'],
+    content: `
+    `
+  },
+  {
+    title: 'Mining Buffs',
+    category: ['Mining', 'Buffs'],
+    content: `
+    `
+  }
+
   // ── Items & Crafting ─────────────────────────────────────────
   // ── Fauna & Critters ─────────────────────────────────────────
   // ── Buffs & Debuffs ──────────────────────────────────────────
   // ── Mechanics ────────────────────────────────────────────────
-  }
+
 ]
 
 /* ====================================================================================================
    POST-TRAITEMENTS
    ==================================================================================================== */
 
-// Remplacement textuel des <<...>> par le template correspondant.
+// 1. Remplacement textuel des <<...>> par le template correspondant.
 // ⚠️ est injecté si le template ou un paramètre est manquant.
 const expandTemplates = (content) =>
   content.replace(/<<(\w+)\|?([^>]*)>>/g, (_, name, params) => {
@@ -1317,5 +1454,32 @@ for (const entry of HELP) {
   entry.content = expandTemplates(entry.content)
 }
 
-// Liste complète de tous les topics de l'aide
+// 2. Liste complète de tous les topics de l'aide
 export const HELP_TITLES = new Set(HELP.map(entry => entry.title))
+
+// 3. Catégories de l'aide
+// 3.1 Set des catégories (pour le menu déroulant)
+export const HELP_CATEGORIES = new Set()
+for (const entry of HELP) {
+  for (const cat of entry.category) {
+    HELP_CATEGORIES.add(cat)
+  }
+}
+
+// 3.2 Debug — affiche chaque catégorie avec le nombre de topics
+export const debugHelpCategories = () => {
+  const counts = new Map()
+  for (const entry of HELP) {
+    for (const cat of entry.category) {
+      counts.set(cat, (counts.get(cat) ?? 0) + 1)
+    }
+  }
+  const sorted = [...counts.entries()].sort((a, b) => b[1] - a[1])
+  console.group('📚 Help categories')
+  for (const [cat, count] of sorted) {
+    console.log(`  ${cat.padEnd(20)} ${count} topic${count > 1 ? 's' : ''}`)
+  }
+  console.groupEnd()
+  console.log('.............................;;;;')
+}
+debugHelpCategories()

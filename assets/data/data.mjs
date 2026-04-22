@@ -48,6 +48,7 @@ export const NODES = {
   GRASSMUSHROOM: {code: 32, name: 'Mushroom Grass', type: NODE_TYPE.NATURAL, star: 3, solid: true, color: '#4cad1fff', image: 'grass_16_16+2', speed: 500, mining: [{item: 'bksilt', count: 1}, {item: 'seedm', count: 0.1, lucky: 1.5}], foraging: [{item: 'seedm', count: 0.1, lucky: 1.5}, {item: 'slug', count: 0.05, lucky: 2, rainy: 10}]},
   GRASSFERN: {code: 33, name: 'Fern Grass', type: NODE_TYPE.NATURAL, star: 4, solid: true, color: '#56ba27', image: 'grass_16_16+3', speed: 500, mining: [{item: 'fern', count: 4, lucky: 5}], foraging: [{item: 'fern', count: 1, lucky: 1.5}]},
   GRASSMOSS: {code: 34, name: 'Moss Grass', type: NODE_TYPE.NATURAL, star: 4, solid: true, color: '#b73ed6ff', image: 'grass_16_16+4', speed: 500, mining: [{item: 'moss', count: 2, lucky: 2.5}], foraging: [{item: 'moss', count: 1, lucky: 1.4}]},
+  WEB: {code: 35, name: 'Cobweb', type: NODE_TYPE.WEB, star: 1, solid: false, color: '#788696', image: 'substrat_16_16+9', speed: 1900, mining: [{item: 'cobweb', count: 1}, {item: 'spideregg', count: '1-3-0.08'}, {monster: 'spider', rate: '25'}]},
 
   // ── Topsoil (terrain nourricier, propice aux plantes) ────────────────────────
   DIRT: {code: 40, name: 'Dirt', type: NODE_TYPE.TOPSOIL, stype: 'block', star: 1, solid: true, color: '#835537', image: 'substrat_16_16+1', speed: 1000, mining: [{item: 'bkdirt', count: 1}, {item: 'worm', count: 0.15, lucky: 1.2, rainy: 1.7}]},
@@ -111,9 +112,8 @@ export const NODES = {
   GRANITEWALL: {code: 114, name: 'Granite Wall', type: NODE_TYPE.BWALL, star: 4, solid: false, color: '#788696', image: 'wall_16_16+14', speed: 1800, hammering: [{item: 'granitewall', count: 1}]},
   MARBLEWALL: {code: 115, name: 'Marble Wall', type: NODE_TYPE.BWALL, star: 4, solid: false, color: '#788696', image: 'wall_16_16+15', speed: 1800, hammering: [{item: 'marblewall', count: 1}]},
 
-  // ── DIVERS ────────────────────────
+  // ── A SUPPRIMER ────────────────────────
 
-  WEB: {code: 120, name: 'Cobweb', type: NODE_TYPE.WEB, star: 1, solid: false, color: '#788696', image: 'substrat_16_16+9', speed: 1900, mining: [{item: 'cobweb', count: 1}, {item: 'spideregg', count: '1-3-0.08'}, {monster: 'spider', rate: '25'}]},
   SHORE: {code: 121, name: 'Shore', type: NODE_TYPE.SOLID, star: 1, color: '#FFCC00', image: null}
 }
 
