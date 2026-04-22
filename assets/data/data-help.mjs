@@ -106,8 +106,8 @@ It is used in many early-game [[Crafting||recipes]].
 * _Tip: [[Torches||Bring torches]] when mining underground!_ ⏳
     `
   },
-  // ── World ────────────────────────────────────────────
-  // ── Layers ────────────────────────────────────────────
+  // ── World ─────────────────────────────────────────────────────
+  // ── Layers ────────────────────────────────────────────────────
   //    Surface, Underground, Caverns
   {
     title: 'Surface',
@@ -221,7 +221,8 @@ The Caverns are the deepest accessible layer, divided into two sub-layers : Cave
 * _Blind Lakes contain rare fish species found nowhere else._ ⏳
   `
   },
-  // ── Biomes ───────────────────────────────────────────────────
+
+  // ── Biomes ────────────────────────────────────────────────────
   //    Forest, Desert, Jungle
   {
     title: 'Forest',
@@ -328,6 +329,7 @@ The Jungle is a lush, dangerous biome teeming with life. It features unique liqu
 * _Sap is a rare and valuable liquid — bring containers when exploring Sap Pockets._ ⏳
   `
   },
+
   // ── Mini-biomes / Forest ──────────────────────────────────────
   //    Fern Cave, Mushroom Cave, Ruined Cabin, Anthill, Underground Lake
   {
@@ -350,9 +352,11 @@ A large underground cave found in [[Forest]] biomes, characterized by giant fern
 * [[monster:mamba]]
   `
   },
-  // ── Mini-biomes / Desert ─────────────────────────────────────
+
+  // ── Mini-biomes / Desert ──────────────────────────────────────
   //    Sand Pocket, Fossil Vein, Pyramid, Antlion Pit, Ancient House
-  // ── Mini-biomes / Jungle ─────────────────────────────────────
+
+  // ── Mini-biomes / Jungle ──────────────────────────────────────
   //    Moss Cave, Hive, Sap Pocket, Temple Ruin, Termite Mound
   {
     title: 'Moss Cave',
@@ -380,15 +384,171 @@ A large underground cave found in [[Jungle]] biomes. Its walls are covered in lu
 * Moss grows on the floor and lateral walls, but not on the ceiling.
   `
   },
-  // ── Mini-biomes / Transversal ────────────────────────────────
-  //    Sea, Cobweb Cave, Geode Cave, Blind Lake, Underground Lake
 
-  // ── Liquid ──────────────────────────────────────────────────
+  // ── Mini-biomes / Transversal ─────────────────────────────────
+  //    Cobweb Cave, Geode Cave, Blind Lake, Underground Lake
+  {
+    title: 'Cobweb',
+    category: ['Mining'],
+    content: `
+**Description**
+Cobwebs are sticky threads spun by [[Spiders]]. They slow movement significantly and accumulate progressively in tunnels and caverns if left uncleared.
+In extreme cases, cobwebs can obstruct entire tunnel networks.
+Despite the nuisance they represent, cobwebs are one of the most valuable resources in the game — the silk extracted from them is an essential component in dozens of crafting recipes, from armor to furniture and accessories.
+
+**Main Location**
+* [[Cobweb Cave]]s — concentrated, all biomes
+* All tunnels and caverns — scattered, all biomes
+
+**Collection** ⏳
+* Mine with any [[Pickaxe]] — drops [[Silk]]
+
+**Crafting chain**
+* [[item:silk]] → [[item:fabric]] — craft at [[item:loom]] ⏳
+* [[item:fabric]] is an essential ingredient for armors, furniture and accessories.
+
+**Ecosystem** ⏳
+* Spiders continuously spin new cobwebs over time.
+* If left uncleared, cobwebs will eventually fill entire tunnel sections.
+* Clearing cobwebs regularly is essential to maintain access to deep areas.
+
+**Tips**
+* _Cobwebs slow movement drastically — avoid getting surrounded by spiders while slowed._ ⏳
+* _A [[item:flamethrower]] clears large cobweb areas quickly._ ⏳
+* _Cobwebs are a renewable resource — spiders will always spin new ones._ ⏳
+  `
+  },
+  {
+    title: 'Cobweb Cave',
+    category: ['Mini-biome', 'Transversal'],
+    content: `
+**Description**
+Cobweb Caves are caverns densely packed with spider webs. They are found in all biomes and are home to increasingly dangerous spider species the deeper they are located.
+
+**Main Location**
+* [[Caverns]] Top — all biomes, most common
+* [[Caverns]] Bottom — all biomes, rarer and more dangerous
+
+**Materials**
+* [[node:cobweb]] — dense coverage on walls and ceiling
+
+**Inhabitants** ⏳
+* [[monster:spider]] — common
+* [[monster:mygale]] — uncommon
+* [[monster:tarentulaKing]] — boss, rare
+
+**Loot** ⏳
+* [[item:web]] — abundant
+* [[item:spideregg]] — rare drop ⏳
+* [[item:spiderFang]] — rare drop ⏳
+* Chest — tier 3-4 depending on layer ⏳
+
+**Tips**
+* _Clear the webs before engaging the spiders — being slowed in a Cobweb Cave is extremely dangerous._ ⏳
+* _The deeper the Cobweb Cave, the more dangerous its inhabitants._
+  `
+  },
+
+  // ── Liquid ────────────────────────────────────────────────────
   //    Sea, Water, Honey, Sap
+  // ── Liquids ───────────────────────────────────────────────────
+  {
+    title: 'Water',
+    category: ['Liquid'],
+    content: `
+**Description**
+Water is the most common liquid in the world. It fills surface lakes, underground lakes and blind lakes. It supports aquatic life and is used in many crafting recipes.
 
-  // ── Natural ──────────────────────────────────────────────────
-  //    Forest Grass, Jungle Grass, Mushroom Grass, Fern Grass, Moss Grass
+**Main Location**
+* [[Surface]] lakes — all biomes
+* [[Underground]] lakes — all biomes
+* [[Blind Lake]]s — all biomes, [[Caverns]] Bottom
+* Water puddles — [[Underground]] and [[Caverns]]
+
+**Collection** ⏳
+* [[item:bottle]] — small quantity
+* [[item:bucket]] — large quantity
+
+**Recipes** ⏳
+* {{recipe:waterBottle}}
+* {{recipe:waterBucket}}
+
+**Tips**
+* _Water puddles form naturally in tunnels and caverns._
+* _Removing the solid tile bordering a lake will cause the water to flow._ ⏳
+  `
+  },
+  {
+    title: 'Honey',
+    category: ['Liquid'],
+    content: `
+**Description**
+Honey is a viscous golden liquid produced by [[Bees]] in [[Hive]]s. It is harder to move through than water and is a valuable crafting ingredient.
+
+**Main Location**
+* [[Hive]]s — [[Jungle]], [[Caverns]] Top
+
+**Collection** ⏳
+* [[item:bottle]] — small quantity
+* [[item:bucket]] — large quantity
+
+**Recipes** ⏳
+* {{recipe:honeyBottle}}
+* {{recipe:honeyBucket}}
+
+**Tips**
+* _Honey slows movement — avoid falling into it without a plan to escape._ ⏳
+* _The [[Bees]] will defend their honey aggressively — consider building a diversion canal to collect it safely._ ⏳
+  `
+  },
+  {
+    title: 'Sap',
+    category: ['Liquid'],
+    content: `
+**Description**
+Sap is a rare green liquid found exclusively in [[Jungle]] biomes. It fills Sap Lakes and Sap Pockets and is one of the most valuable crafting ingredients in the game.
+
+**Main Location**
+* Sap Lakes — [[Jungle]], [[Underground]] and [[Caverns]] Top
+* [[Sap Pocket]]s — [[Jungle]], [[Caverns]] Bottom
+* Sap puddles — [[Jungle]], [[Underground]] and [[Caverns]]
+
+**Collection** ⏳
+* [[item:bottle]] — small quantity
+* [[item:bucket]] — large quantity
+
+**Recipes** ⏳
+* {{recipe:sapBottle}}
+* {{recipe:sapBucket}}
+
+**Tips**
+* _Sap Pockets are sealed by [[Sandstone]] borders — removing them releases the sap._ ⏳
+* _Sap is even more viscous than [[Honey]] — movement is severely impaired._ ⏳
+  `
+  },
+  {
+    title: 'Sea',
+    category: ['Liquid'],
+    content: `
+**Description**
+The Sea borders both sides of the world. Its deep, dark waters are home to unique fauna and hide rare treasures on the ocean floor.
+
+**Main Location**
+* Left and right borders of the world
+* Depth : from [[Surface]] level down to [[Caverns]] Bottom
+
+**Collection** ⏳
+* [[item:bottle]] — small quantity
+* [[item:bucket]] — large quantity
+
+**Tips**
+* _The Sea is bordered by [[Sandstone]] walls that prevent it from flooding the world. Destroying these walls may cause seawater to flood tunnels and caverns — potentially destroying entire ecosystems and making large areas of the world inaccessible._ ⏳
+* _Deep Sea areas are extremely dangerous — bring strong equipment._ ⏳
+  `
+  },
+
   // ── Natural ───────────────────────────────────────────────────
+  //    Forest Grass, Jungle Grass, Mushroom Grass, Fern Grass, Moss Grass
   {
     title: 'Forest Grass',
     category: ['Natural', 'Mining'],
@@ -491,10 +651,9 @@ Mushroom Grass covers the floor of [[Mushroom Cave]]s. [[Giant Mushroom]]s grow 
 * _Harvesting mushrooms without destroying the grass allows them to regrow over time._ ⏳
   `
   },
-  // ── Topsoil ──────────────────────────────────────────────────
-  //    Dirt, Sand, Silt, Humus
 
   // ── Topsoil ───────────────────────────────────────────────────
+  //    Dirt, Sand, Silt, Humus
   {
     title: 'Dirt',
     category: ['Topsoil', 'Mining'],
@@ -587,7 +746,6 @@ Humus is a rich organic topsoil found across all biomes, though it is most abund
   //    Forest : Clay, Stone, Hardstone
   //    Desert : Sandstone, Ash, Hellstone
   //    Jungle : Mud, Limestone, Slate
-
   {
     title: 'Clay',
     category: ['Substrat', 'Mining'],
@@ -778,7 +936,7 @@ Slate is a hard metamorphic substrat found in the deepest parts of [[Jungle]] bi
   `
   },
 
-  // ── Ores ─────────────────────────────────────────────────────
+  // ── Ores ──────────────────────────────────────────────────────
   //    Copper, Iron, Silver, Gold, Cobalt, Platinum
   {
     title: 'Copper',
@@ -907,7 +1065,8 @@ Platinum is the rarest metal ore in the world. It is found exclusively in the de
 * {{recipe:platinumBar}}
   `
   },
-  // ── Gems ─────────────────────────────────────────────────────
+
+  // ── Gems ──────────────────────────────────────────────────────
   //    Topaz, Ruby, Emerald, Sapphire
   {
     title: 'Topaz',
@@ -996,7 +1155,8 @@ Sapphire is the rarest gemstone, found in the deepest parts of all biomes. Its b
 * {{recipe:sapphire}}
   `
   },
-  // ── Rocks ────────────────────────────────────────────────────
+
+  // ── Rocks ─────────────────────────────────────────────────────
   //    Granite, Marble, Obsidian, Meteorite, Hive, Shell
   {
     title: 'Granite',
