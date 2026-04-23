@@ -504,14 +504,17 @@ const TEMPLE_RUIN_WALL = [
   {dx: 3, dy: 4}, {dx: 4, dy: 4}, {dx: 5, dy: 4}, {dx: 6, dy: 4}, {dx: 7, dy: 4}, {dx: 8, dy: 4}, {dx: 9, dy: 4}, {dx: 10, dy: 4}, {dx: 11, dy: 4},
   // row5 — architrave complète
   {dx: 0, dy: 5}, {dx: 1, dy: 5}, {dx: 2, dy: 5}, {dx: 3, dy: 5}, {dx: 4, dy: 5}, {dx: 5, dy: 5}, {dx: 6, dy: 5}, {dx: 7, dy: 5}, {dx: 8, dy: 5}, {dx: 9, dy: 5}, {dx: 10, dy: 5}, {dx: 11, dy: 5}, {dx: 12, dy: 5}, {dx: 13, dy: 5}, {dx: 14, dy: 5},
+  // row9 — base complète
+  {dx: 0, dy: 9}, {dx: 1, dy: 9}, {dx: 2, dy: 9}, {dx: 3, dy: 9}, {dx: 4, dy: 9}, {dx: 5, dy: 9}, {dx: 6, dy: 9}, {dx: 7, dy: 9}, {dx: 8, dy: 9}, {dx: 9, dy: 9}, {dx: 10, dy: 9}, {dx: 11, dy: 9}, {dx: 12, dy: 9}, {dx: 13, dy: 9}, {dx: 14, dy: 9}
+]
+export const TEMPLE_RUIN_COLUMNS = [
   // row6 — colonnes gauche et droite + murs
   {dx: 0, dy: 6}, {dx: 2, dy: 6}, {dx: 12, dy: 6}, {dx: 14, dy: 6},
   // row7
   {dx: 0, dy: 7}, {dx: 2, dy: 7}, {dx: 12, dy: 7}, {dx: 14, dy: 7},
   // row8
   {dx: 0, dy: 8}, {dx: 2, dy: 8}, {dx: 12, dy: 8}, {dx: 14, dy: 8},
-  // row9 — base complète
-  {dx: 0, dy: 9}, {dx: 1, dy: 9}, {dx: 2, dy: 9}, {dx: 3, dy: 9}, {dx: 4, dy: 9}, {dx: 5, dy: 9}, {dx: 6, dy: 9}, {dx: 7, dy: 9}, {dx: 8, dy: 9}, {dx: 9, dy: 9}, {dx: 10, dy: 9}, {dx: 11, dy: 9}, {dx: 12, dy: 9}, {dx: 13, dy: 9}, {dx: 14, dy: 9}
 ]
 
 export const TEMPLE_RUIN_WALL_INDEXES = TEMPLE_RUIN_WALL.map(({dx, dy}) => (dy << 10) | dx)
+export const TEMPLE_RUIN_COLUMNS_INDEXES = TEMPLE_RUIN_COLUMNS.map(({dx, dy}) => (dy << 10) | dx)
