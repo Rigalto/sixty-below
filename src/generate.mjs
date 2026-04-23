@@ -2225,54 +2225,6 @@ class WorldCarver {
   }
 
   /**
- * Creuse un rectangle bruité (Perlin noise) sur 3 bords (haut, gauche, droit).
- * Le bord bas est parfaitement plat — pas de variation Perlin.
- * Même algorithme que digNoisyRect — distance de Chebyshev normalisée.
- *
- * @param {Array} tiles
- * @param {number} cx
- * @param {number} cy
- * @param {number} radiusXMin
- * @param {number} radiusXMax
- * @param {number} radiusYMin
- * @param {number} radiusYMax
- * @param {number} code
- * @param {number} frequency
- * @param {number} offsetX
- */
-  digNoisyRectFlatBottom (tiles, cx, cy, radiusXMin, radiusXMax, radiusYMin, radiusYMax, code, frequency = 0.3, offsetX = 0) {
-    const radiusX = (radiusXMin + radiusXMax) >> 1
-    const radiusY = (radiusYMin + radiusYMax) >> 1
-    const spreadX = radiusXMax - radiusXMin
-    const spreadY = radiusYMax - radiusYMin
-    const period = 1 / frequency
-
-    for (let dy = -radiusYMax; dy <= radiusYMax; dy++) {
-      for (let dx = -radiusXMax; dx <= radiusXMax; dx++) {
-        const absDx = Math.abs(dx) / radiusX
-        const absDy = Math.abs(dy) / radiusY
-        const dist = Math.max(absDx, absDy)
-
-        let threshold
-        if (dy >= radiusYMax) {
-        // Bord bas — toujours inclus, pas de bruit
-          threshold = 1
-        } else {
-          const noise = seededRNG.randomPerlin((cx + dx + offsetX) / period, (cy + dy) / period)
-          const spread = (spreadX + spreadY) * 0.5
-          threshold = 1 + (noise * 2 - 1) * (spread / ((radiusX + radiusY) * 0.5))
-        }
-
-        if (dist > threshold) continue
-        const x = cx + dx
-        const y = cy + dy
-        if (x < 1 || x >= WORLD_WIDTH - 1 || y < 1 || y >= WORLD_HEIGHT - 1) continue
-        tiles.push({x, y, index: (y << 10) | x, code})
-      }
-    }
-  }
-
-  /**
  * Applique une liste de tuiles dans worldBuffer.
  * Protège les tuiles ETERNAL (FOG, DEEPSEA, BASALT, LAVA), SKY et VOID.
  * Retourne le rectangle englobant des tuiles effectivement écrites.
