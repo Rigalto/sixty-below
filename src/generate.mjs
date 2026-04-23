@@ -4054,10 +4054,21 @@ class WorldCarver {
     return {chestId: chest.id, index}
   }
 
+  /**
+ * Aplanit le fond d'une caverne sur la largeur du temple.
+ * Parcourt chaque colonne de cx-templateW/2 à cx+templateW/2.
+ * Supprime les tuiles solides au-dessus de flatY et remplit les VOID à flatY et en dessous.
+ *
+ * @param {number} cx - Centre horizontal de la caverne
+ * @param {number} templateW - Largeur du template (tuiles)
+ * @param {number} flatY - Y du fond plat souhaité
+ */
   #flattenCaveBottom (cx, templateW, flatY) {
+    const VOID = NODES.VOID.code
     const half = Math.floor(templateW / 2)
     const x0 = cx - half
     const x1 = cx + half
+    const tiles = []
 
     for (let x = x0; x <= x1; x++) {
     // Descend depuis flatY pour trouver la première tuile non VOID
@@ -4067,18 +4078,19 @@ class WorldCarver {
 
       // Remonte depuis flatY vers le haut — convertit en VOID les tuiles solides
       for (let yy = flatY - 1; yy >= flatY - 5; yy--) {
-        if (worldBuffer.read(x, yy) !== NODES.VOID.code) {
-          worldBuffer.write(x, yy, NODES.VOID.code)
+        if (worldBuffer.read(x, yy) !== VOID) {
+          tiles.push({x, y: yy, index: (yy << 10) | x, code: VOID})
         }
       }
 
       // Remplit flatY et en dessous avec le substrat trouvé
       for (let yy = flatY; yy <= flatY + 2; yy++) {
         if (worldBuffer.read(x, yy) === NODES.VOID.code) {
-          worldBuffer.write(x, yy, solidCode)
+          tiles.push({x, y: yy, index: (yy << 10) | x, code: solidCode})
         }
       }
     }
+    this.applyTiles(tiles, ETERNAL_EXCLUDED)
   }
 
   /**
@@ -4164,7 +4176,11 @@ class WorldCarver {
     }
     this.applyTiles(columnTiles, ETERNAL_EXCLUDED)
 
-    tileGuard.addRect(caveRect.x1, caveRect.y1, caveRect.x2, caveRect.y2)
+    // Protection contre le creusement
+    tileGuard.addTiles(templeTiles)
+    tileGuard.addTiles(columnTiles)
+    // Rectangle EMERALDWALL
+    tileGuard.addRect(tx + 1, ty + 6, tx + 13, ty + 8)
 
     // Salle intérieure — coin haut-gauche row6, col1
     const room = ((ty + 6) << 10) | (tx + 1)
