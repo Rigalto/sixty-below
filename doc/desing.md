@@ -538,12 +538,11 @@ commune de la zone N+1 : la progression est continue, sans palier artificiel.
 | **MOMIE** | 3 | ★★★☆☆ | Pyramid |
 | **SPHINX** | 4 | ★★★★☆ | Pyramid |
 | **PHARAON** | 4 | ★★★★★ | Pyramid |
-
+| **GHOST** | 2 | ★★★☆☆ | Ruined Cabin |
+| **ARTHUR** | 3 | ★★★★☆ | Ruined Cabin |
 | **PHARAON** | 3 | ★★★☆☆ | Lost Temple |
 | **CYCLOPS** | 4 | ★★★★☆ | Lost Temple |
 | **MINOTAUR** | 4 | ★★★★★ | Lost Temple |
-
-
 | **DENDROBATE** | 2 | ★★☆☆☆ | Fern Cave |
 | **MAMBA** | 2 | ★★★☆☆ | Fern Cave |
 | **AMBER SQUID** | 4 | ★★☆☆☆ | Fish - Sap Pocket |
