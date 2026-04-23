@@ -29,7 +29,6 @@
 - `digAnthills()` — Forest, surface, structure conique
 - `digTermiteMounds()` — Jungle, surface, structure rectangulaire
 - `digAntlionPits()` — Desert, surface, creux triangulaire
-- `digRuinedCabin()` — Forest, under, STONEWALL
 - `digTempleRuin()` — Jungle, caverns_top, EMERALDWALL + Décomposeur
 - `digAncientHouse()` — Desert, caverns_bottom, GOLDWALL + Transmutateur
 - `digAbandonedMine()` — Tous biomes, caverns_bottom, OBSIDIAN + COBALTWALL
@@ -187,7 +186,8 @@
 - `WorldCarver.digFernCaves)` — Forest, under, HUMUS + GRASSFERN
 - `WorldCarver.digMossCave` — Jungle, under, MUD + GRASSMOSS
 - `WorldCarver.digMushroomCaves` — Forest, caverns_top, HUMUS + GRASSMUSHROOM
-- `WorldCarver.digPyramid` — Desert, under, deux chambres (pièges + boss)
+- `WorldCarver.digPyramid` — Desert, under, deux chambres (pièges + boss), KEPHRITE
+- `WorldCarver.digRuinedCabin` — Forest, under, WOODWALL + STONEWALL + 1 furniture + 1 Chest
 - `WorldCarver.cleanupAfterCarving` — nettoyage post-creusement (4 passes, règles déclaratives)
 - `WorldCarver.buildErodedSurfaceLine` — ligne de surface + érosion (trous et bosses)
 - `TileGuard` — utilitaire de protection tuiles contre creusement, formes bruitées (cercle, ellipse, rectangle)

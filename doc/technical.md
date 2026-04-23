@@ -797,6 +797,7 @@ Génère des tunnels, des cavernes et des mini-biomes. Maintient la liste des zo
 | `digMossCaves()` | Creuse une Moss Cave par zone JUNGLE en under. Demi-ellipse + rectangle bruité. Tapissage parois/sol via `#fillMossCaveWalls` (GRASSMOSS + MUD). Protection TileGuard bas. Retourne `{caves: Array<{cx, cy, radiusX, radiusY}>, plants: Array<{index, system, type}>}`. `#fillMossCaveWalls(cx, cy, radiusX, radiusY, plants)` : GRASSMOSS sur sol et parois latérales, MUD sous le sol. `plants` [OUT] accumulateur d'enregistrements plant. |
 | `digMushroomCaves()` | Creuse une Mushroom Cave rectangulaire bruitée par zone FOREST en caverns_top. Tapissage fond via `#fillFernMushroomCaveFloor` (GRASSMUSHROOM + HUMUS). Protection TileGuard moitié inférieure + marge 2. Retourne `{caves: Array<{cx, cy, radiusX, radiusY}>, plants: Array<{index, system, type}>}`. |
 | `digPyramid()` | Creuse une Pyramide en KHEPRITE par zone DESERT en layer under. Structure définie par `PYRAMID_WALL_INDEXES` et `PYRAMID_VOID_INDEXES`. Orientation aléatoire (50/50). Protection TileGuard sur les tuiles KHEPRITE. Retourne `{room1: number, room2: number}` — index coin haut-gauche de chaque salle. Prérequis : `initZoneRects()`, `initExclusions()`. |
+| `digRuinedCabin()` | Creuse une Ruined Cabin par monde en biome FOREST, layer under. Structure WOODWALL (murs) + STONEWALL (fond) avec 20% de dégradation aléatoire. Porte de 3 tuiles (gauche ou droite, 50/50). Mobilier : un meuble aléatoire (chairWood/tableWood/toiletWood) + chestAncient posés sur le sol. Retourne `{chestId: string, index: number}` — identifiant et position du coffre pour le système d'événements. Prérequis : `initZoneRects()`, `initExclusions()`. |
 
 
 ---
@@ -833,6 +834,7 @@ Le paramètre `offsetX` de `digNoisyCircle`, `digNoisyEllipse` et `digNoisyRect`
 | `tileGuard` | `TileGuard` | Protège des tuiles individuelles contre tout creusement. `init()`, `has(index)`, `add (index)`, `addTiles (tiles)`, `addRect()`, `addNoisyCircle()`, `addNoisyEllipse()`, `addNoisyEllipseBottom()`, `addNoisyRect()`. Consulté par `WorldCarver.applyTiles` avant chaque écriture. |
 | `liquidFiller`       | `LiquidFiller`      | Flood-fill BFS des zones liquides et automate pour le SAND. |
 | `webFiller` | `WebFiller` | Peuplement WEB : `fillCobwebCave(cx, cy)` pour les caves, `scatterWebs(surfaceUnder)` pour le peuplement global différé. |
+| `furnitureGenerator ` | `FurnitureGenerator ` | Gestion des furnitures. `init()`, `addFurnitureAt(index, code)`, `get furnitures()` |
 
 ---
 

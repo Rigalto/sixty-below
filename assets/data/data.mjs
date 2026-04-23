@@ -150,7 +150,15 @@ export const ITEMS = {
   triskelCopper: {name: 'Copper Triskel', type: ITEM_TYPE.FURNITURE | ITEM_TYPE.UNIQUE | ITEM_TYPE.MATERIAL, stype: 'triskel', star: 3, sell: 0, image: 'furniture_32_32-12-2', placed: 'furniture_32_32-6-3', help: 'Triskels', tooltip: ''},
   triskelSilver: {name: 'Silver Triskel', type: ITEM_TYPE.FURNITURE | ITEM_TYPE.UNIQUE | ITEM_TYPE.MATERIAL, stype: 'triskel', star: 4, sell: 0, image: 'furniture_32_32-12-2', placed: 'furniture_32_32-6-3', help: 'Triskels', tooltip: ''},
   triskelGold: {name: 'Gold Triskel', type: ITEM_TYPE.FURNITURE | ITEM_TYPE.UNIQUE | ITEM_TYPE.MATERIAL, stype: 'triskel', star: 5, sell: 0, image: 'furniture_32_32-12-2', placed: 'furniture_32_32-6-3', help: 'Triskels', tooltip: ''},
-  triskelAncient: {name: 'Ancient Triskel', type: ITEM_TYPE.ACCESSORY | ITEM_TYPE.UNIQUE | ITEM_TYPE.CRAFTABLE, stype: 'triskel', star: 5, sell: 0, image: 'furniture_32_32-12-2', placed: 'furniture_32_32-6-3', help: 'Triskels', tooltip: ''}
+  triskelAncient: {name: 'Ancient Triskel', type: ITEM_TYPE.ACCESSORY | ITEM_TYPE.UNIQUE | ITEM_TYPE.CRAFTABLE, stype: 'triskel', star: 5, sell: 0, image: 'furniture_32_32-12-2', placed: 'furniture_32_32-6-3', help: 'Triskels', tooltip: ''},
+
+  // Wood furniture set
+  tableWood: {name: 'Wooden Table', type: ITEM_TYPE.FURNITURE, stype: 'station', star: 1, image: 'furniture_32_32-2-0', placed: 'fuws_48_32-1-0', help: 'Tables', tooltip: 'A precision assembly requires a very flat surface.', furnitureSet: 'wood', surface: true},
+  chairWood: {name: 'Wooden Chair', type: ITEM_TYPE.FURNITURE, stype: 'chair', star: 1, image: 'furniture_32_32-0-5', placedleft: 'fuws_16_48-1-0', placedright: 'fuws_16_48-2-0', help: 'Chairs', tooltip: 'Crafting is more precise when one is seated', furnitureSet: 'wood', comfort: true},
+  toiletWood: {name: 'Wooden Toilet', type: ITEM_TYPE.FURNITURE, stype: 'toilet', star: 1, image: 'furniture_32_32-0-5', placed: 'fuws_16_48-2-0', help: 'Toilets', tooltip: '???', furnitureSet: 'wood', comfort: true},
+
+  // chests
+  chestAncient: {name: 'Ancient Chest', type: ITEM_TYPE.FURNITURE, stype: 'chest', star: 2, capacity: 56, image: 'furniture_32_32-0-1', placed: 'fuws_32_32-0-1', locked: 'fuws_32_32-6-2', help: 'Chests', tooltip: 'Items container'}
 }
 
 /* ============================================================================

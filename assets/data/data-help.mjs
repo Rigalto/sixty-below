@@ -388,6 +388,42 @@ Mushroom Caves are large caverns found deep in [[Forest]] biomes. Their floor is
 * _Mushroom spores are powerful potion ingredients — worth the detour._ ⏳
   `
   },
+  {
+    title: 'Ruined Cabin',
+    category: ['Mini-biome', 'Forest'],
+    content: `
+**Description**
+Ruined Cabins are the remains of ancient wooden shelters found deep in [[Forest]] biomes. Their walls are crumbling, their floor is covered in old stonework, and a mysterious chest sits inside — guarded by restless spirits.
+
+**Main Location**
+* [[Underground]] — [[Forest]]
+
+**Materials**
+* [[node:woodwall]] — crumbling outer walls (degraded)
+* [[node:stonewall]] — interior background wall (degraded)
+
+**Structure**
+* Doorway on the left or right side
+* Piece of furniture — chair, table or toilet
+* One [[item:chestAncient]] — triggers combat when opened
+
+**Combat** ⏳
+* Clicking the [[item:chestAncient]] triggers a ghost encounter
+* Enemies : ghosts + Arthur, the Ghost Boss
+* Victory : the chest opens and its contents can be looted
+* Defeat : the chest disappears
+* The chest and its contents regenerate after a few in-game days
+
+**Inhabitants** ⏳
+* Ghosts — common
+* Arthur — boss
+
+**Tips**
+* _The chest contains consumables — it is worth revisiting regularly._ ⏳
+* _Defeating Arthur gets easier with better equipment — come back stronger if you fail._ ⏳
+* _The cabin walls are degraded but its floor plan is always the same — learn the layout._ ⏳
+  `
+  },
 
   // ── Mini-biomes / Desert ──────────────────────────────────────
   //    Sand Pocket, Fossil Vein, Pyramid, Antlion Pit, Ancient House
@@ -488,6 +524,7 @@ Pyramids are ancient stone structures buried deep in [[Desert]] biomes. Built fr
 * _Only one Pyramid exists per world — it is worth the effort to find it._ ⏳
   `
   },
+
   // ── Mini-biomes / Jungle ──────────────────────────────────────
   //    Moss Cave, Hive, Sap Lake, Sap Pocket, Temple Ruin, Termite Mound
   {

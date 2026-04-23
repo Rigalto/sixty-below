@@ -1,5 +1,5 @@
 import {seededRNG} from './utils.mjs'
-import {database} from './database.mjs'
+import {database, uniqueIdGenerator} from './database.mjs'
 import {WEATHER_TYPE, WORLD_WIDTH, WORLD_HEIGHT, SEA_LEVEL, TOPSOIL_Y_SKY_SURFACE, TOPSOIL_Y_SURFACE_UNDER, TOPSOIL_Y_UNDER_CAVERNS, TOPSOIL_Y_CAVERNS_MID, BIOME_TILE_MAP, SEA_MAX_JITTER, SEA_MAX_WIDTH, SEA_MAX_HEIGHT, CLUSTER_SCATTER_MAP, ORE_GEM_SCATTER_MAP, PERLIN_OFFSET_NATURALIZER, PERLIN_OFFSET_TUNNEL, PERLIN_OFFSET_SURFACE_TUNNEL, PERLIN_OFFSET_SMALL_TUNNEL, PERLIN_OFFSET_CAVERN, PERLIN_OFFSET_HIVE, PERLIN_OFFSET_HEART, PERLIN_OFFSET_MUSHROOM, PERLIN_OFFSET_COBWEB, PERLIN_OFFSET_FERNS, PERLIN_OFFSET_LAKES, PERLIN_OFFSET_SHELL, SMALL_CAVERNS_COUNT, MEDIUM_CAVERNS_COUNT, UNDERGROUND_TUNNEL_COUNT, CAVERNS_TUNNEL_COUNT, SMALL_TUNNELS_COUNT, HIVE_RADIUS_MIN, HIVE_RADIUS_MAX, COBWEB_CAVE_COUNT_MIN, COBWEB_CAVE_COUNT_MAX, COBWEB_RADIUS_X_MIN, COBWEB_RADIUS_X_MAX, COBWEB_RADIUS_Y_MIN, COBWEB_RADIUS_Y_MAX, COBWEB_CAVE_MAIN_MIN, COBWEB_CAVE_MAIN_MAX, COBWEB_CAVE_SIDE_MIN, COBWEB_CAVE_SIDE_MAX, COBWEB_SCATTER_COUNT, COBWEB_SCATTER_SIZE_MIN, COBWEB_SCATTER_SIZE_MAX, GEODE_CAVE_COUNT_MIN, GEODE_CAVE_COUNT_MAX, GEODE_RADIUS_MIN, GEODE_RADIUS_MAX, GEODE_TARGET_CLUSTER_COUNT, GEODE_CLUSTER_SIZE_MIN, GEODE_CLUSTER_SIZE_MAX, TOPSOIL_SCATTER_MAP, LAKE_RADIUS_X_MIN, LAKE_RADIUS_X_MAX, LAKE_RADIUS_Y_MIN, LAKE_RADIUS_Y_MAX, LAKE_PIT_RADIUS_X_MIN, LAKE_PIT_RADIUS_X_MAX, LAKE_PIT_RADIUS_Y_MIN, LAKE_PIT_RADIUS_Y_MAX, LAKE_CREATION_MAP, UNDERGROUND_LAKE_UNDER_COUNT, UNDERGROUND_LAKE_CAVERNS_COUNT, UNDERGROUND_LAKE_RADIUS_MIN, UNDERGROUND_LAKE_RADIUS_MAX, BLIND_LAKE_COUNT, BLIND_LAKE_RADIUS_MIN, BLIND_LAKE_RADIUS_MAX, SAP_LAKE_UNDER_COUNT, SAP_LAKE_CAVERNS_COUNT, SAP_LAKE_RADIUS_MIN, SAP_LAKE_RADIUS_MAX, SAP_POCKET_COUNT, SAP_POCKET_RADIUS_MIN, SAP_POCKET_RADIUS_MAX, WATER_PUDDLE_COUNT, SAP_PUDDLE_COUNT, PUDDLE_HEIGHT_MIN, PUDDLE_HEIGHT_MAX, FOSSIL_VEIN_COUNT, FERN_CAVE_RADIUS_X_MIN, FERN_CAVE_RADIUS_X_MAX, FERN_CAVE_RADIUS_Y_MIN, FERN_CAVE_RADIUS_Y_MAX, MOSS_CAVE_RADIUS_X_MIN, MOSS_CAVE_RADIUS_X_MAX, MOSS_CAVE_RADIUS_Y_MIN, MOSS_CAVE_RADIUS_Y_MAX, SAND_POCKET_RADIUS_X_MIN, SAND_POCKET_RADIUS_X_MAX, SAND_POCKET_RADIUS_Y_MIN, SAND_POCKET_RADIUS_Y_MAX, MUSHROOM_CAVE_RADIUS_X_MIN, MUSHROOM_CAVE_RADIUS_X_MAX, MUSHROOM_CAVE_RADIUS_Y_MIN, MUSHROOM_CAVE_RADIUS_Y_MAX, PYRAMID_WALL_INDEXES, PYRAMID_VOID_INDEXES, PYRAMID_WIDTH, PYRAMID_HEIGHT, PYRAMID_ROOM1_DELTA, PYRAMID_ROOM2_DELTA} from '../assets/data/data-gen.mjs'
 import {NODES, NODES_LOOKUP, NODE_TYPE, BIOME_TYPE, PLANT_SYSTEM, GRASS_TYPE, ITEMS} from '../assets/data/data.mjs'
 
@@ -156,6 +156,7 @@ class WorldGenerator {
 
     // 1. On passe le générateur de nombre aléatoire en mode déterminé par la clé
     seededRNG.init(seed)
+    uniqueIdGenerator.init('a')
 
     // 2. Génération des biomes (rectangles)
     const {biomesDescription, leftSeaWidth, rightSeaWidth, biomeCounts} = biomesGenerator.generate()
@@ -257,8 +258,8 @@ class WorldGenerator {
 
     // 6.1.X Pyramid
     // le cy est tiré entre rect.yUnder et rect.yCavernsMid
-    const pyramids = worldCarver.digPyramid()
-    console.log('....................pyramides', pyramids)
+    const pyramid = worldCarver.digPyramid()
+    console.log('....................pyramid', pyramid)
 
     // 6.1.X Ancient House / Temple Ruin / Ruined Cabin
     // Caverns_top, jungle - EMERALDWALL -
@@ -266,7 +267,8 @@ class WorldGenerator {
     // Caverns_bottom, desert - GOLDWALL -
     // const templeruin = worldCarver.digTempleRuin()
     // Under, forest - STONEWALL -
-    // const ruinedcabin = worldCarver.digRuinedCabin()
+    const ruinedcabin = worldCarver.digRuinedCabin()
+    console.log('....................ruinedcabin', ruinedcabin)
 
     // 6.1.X Underground Lake
     // caverns_top - Forest - WATER + HUMUS
@@ -346,7 +348,7 @@ class WorldGenerator {
       const liquidBodies = [...honeyLiquidBodies, ...lakeLiquidBodies, ...underLakeLiquidBodies, ...blindLakeLiquidBodies, ...sapLakeLiquidBodies, ...sapPocketLiquidBodies, ...waterPuddleLiquidBodies, ...sapPuddleLiquidBodies]
       const lakes = [...surfaceLakes, ...underLakes, ...blindLakes, ...sapLakes, ...sapPockets]
       const plants = [...fernsPlants, ...mossPlants, ...mushroomPlants]
-      await this.save(seed, {hives, cobwebCaves, geodeCaves, lakes, liquidBodies, fernsCaves, mossCaves, mushroomCaves, plants})
+      await this.save(seed, {hives, cobwebCaves, geodeCaves, lakes, liquidBodies, fernsCaves, mossCaves, mushroomCaves, pyramid, ruinedcabin, plants})
       worldBuffer.clear()
     }
 
@@ -359,7 +361,7 @@ class WorldGenerator {
     if (debug) { return worldBuffer } // appelant responsable du clear()
   }
 
-  async save (seed, {hives, cobwebCaves, geodeCaves, lakes, liquidBodies, fernsCaves, mossCaves, mushroomCaves, plants}) {
+  async save (seed, {hives, cobwebCaves, geodeCaves, lakes, liquidBodies, fernsCaves, mossCaves, mushroomCaves, plants, pyramid, ruinedcabin}) {
     const start = window.performance.now()
     // 1. Sauvegarde des tuiles
     await database.clearObjectStore('world_chunks')
@@ -405,7 +407,9 @@ class WorldGenerator {
       {key: 'geodecaves', value: JSON.stringify(geodeCaves)},
       {key: 'ferns', value: JSON.stringify(fernsCaves)},
       {key: 'moss', value: JSON.stringify(mossCaves)},
-      {key: 'mushrooms', value: JSON.stringify(mushroomCaves)}
+      {key: 'mushrooms', value: JSON.stringify(mushroomCaves)},
+      {key: 'pyramid', value: JSON.stringify(pyramid)},
+      {key: 'ruinedcabin', value: JSON.stringify(ruinedcabin)}
 
       // {key: 'honeysurface', value: this.honeysurface.join('|')}
     ])
@@ -3901,6 +3905,109 @@ class WorldCarver {
   }
 
   /**
+ * Creuse une Ruined Cabin par zone de biome FOREST en layer under.
+ * Structure : murs WOODWALL + fond STONEWALL + dégradation 20%.
+ * Mobilier : un meuble aléatoire + chestAncient.
+ * Prérequis : initZoneRects(), initExclusions().
+ *
+ * @returns furnitureId — identifiant du coffre, ou null si MAX_ATTEMPTS épuisé
+ *  @returns {chestId, index} — identifiant et position du coffre, ou null si MAX_ATTEMPTS épuisé
+ */
+  digRuinedCabin () {
+    const WOODWALL = NODES.WOODWALL.code
+    const STONEWALL = NODES.STONEWALL.code
+    const VOID = NODES.VOID.code
+    const MAX_ATTEMPTS = 100
+    const height = 7
+    // const FURNITURE_CODES = ['chairWood', 'tableWood', 'toiletWood']
+    const FURNITURE_CODES = ['tableWood', 'toiletWood']
+
+    const forestRects = []
+    for (let i = 0; i < this.#zoneRects.length; i++) {
+      if (this.#zoneRects[i].biome === BIOME_TYPE.FOREST) forestRects.push(this.#zoneRects[i])
+    }
+    if (forestRects.length === 0) return null
+
+    const rect = seededRNG.randomGetArrayValue(forestRects)
+    const width = seededRNG.randomGetMinMax(8, 10)
+
+    let x0, y0, valid
+    let attempts = 0
+    do {
+      x0 = seededRNG.randomGetMinMax(rect.x0 + 1, rect.x1 - width - 1)
+      y0 = seededRNG.randomGetMinMax(rect.ySurface + 1, rect.yUnder - height - 1)
+      valid = !this.isExcluded(x0, y0, x0 + width - 1, y0 + height - 1)
+      attempts++
+    } while (!valid && attempts < MAX_ATTEMPTS)
+    if (!valid) return null
+
+    const tiles = []
+    const doorLeft = seededRNG.randomGetBool()
+
+    // ── Mur haut ─────────────────────────────────────────────────
+    for (let x = x0; x < x0 + width; x++) {
+      const code = seededRNG.randomGetMax(99) >= 20 ? WOODWALL : VOID
+      tiles.push({x, y: y0, index: (y0 << 10) | x, code})
+    }
+
+    // ── Murs gauche et droit ──────────────────────────────────────
+    for (let y = y0 + 1; y < y0 + height; y++) {
+      const doorRow = y >= y0 + height - 3 // 3 tuiles depuis le sol
+
+      // Mur gauche
+      const skipLeft = doorLeft && doorRow
+      let code = seededRNG.randomGetMax(99) >= 20 ? WOODWALL : VOID
+      if (skipLeft) code = VOID
+      tiles.push({x: x0, y, index: (y << 10) | x0, code})
+
+      // Mur droit
+      const skipRight = !doorLeft && doorRow
+      code = seededRNG.randomGetMax(99) >= 20 ? WOODWALL : VOID
+      if (skipRight) code = VOID
+
+      tiles.push({x: x0 + width - 1, y, index: (y << 10) | (x0 + width - 1), code})
+    }
+
+    // ── Fond intérieur STONEWALL ──────────────────────────────────
+    for (let y = y0 + 1; y < y0 + height; y++) {
+      for (let x = x0 + 1; x < x0 + width - 1; x++) {
+        const code = seededRNG.randomGetMax(99) >= 20 ? STONEWALL : VOID
+        tiles.push({x, y, index: (y << 10) | x, code})
+      }
+    }
+
+    const rect2 = this.applyTiles(tiles, ETERNAL_EXCLUDED)
+    this.addExclusion(rect2)
+    tileGuard.addRect(x0, y0, x0 + width - 1, y0 + height - 1)
+
+    // ── Placement du mobilier ─────────────────────────────────────
+    const floorY = y0 + height - 1
+    const furnitureCode = seededRNG.randomGetArrayValue(FURNITURE_CODES)
+    const {placed: fPlaced, placedLeft: fPlacedLeft} = ITEMS[furnitureCode]
+    const fImg = fPlaced ?? fPlacedLeft
+    const fw = fImg.sw >> 4
+
+    // Position aléatoire du meuble dans l'espace intérieur
+    const fx = seededRNG.randomGetMinMax(x0 + 1, x0 + width - 1 - fw)
+    const furniture = furnitureGenerator.addFurnitureAt((floorY << 10) | fx, furnitureCode)
+    if (fPlacedLeft !== undefined) { furniture.left = seededRNG.randomGetBool() }
+
+    // Placement du coffre — à gauche ou à droite du meuble
+    const {placed: cPlaced} = ITEMS.chestAncient
+    const cw = cPlaced.sw >> 4
+    let cx
+    if (fx + fw <= x0 + width - 1 - cw) {
+      cx = fx + fw // à droite
+    } else {
+      cx = fx - cw // à gauche
+    }
+    const index = (floorY << 10) | cx
+    const chest = furnitureGenerator.addFurnitureAt(index, 'chestAncient')
+
+    return {chestId: chest.id, index}
+  }
+
+  /**
  * Passe de nettoyage globale après tous les creusements.
  * Parcours séquentiel index croissant (haut→bas, gauche→droite).
  * Les modifications sont in-place — la cascade est naturelle.
@@ -3909,6 +4016,8 @@ class WorldCarver {
   cleanupAfterCarving () {
     const VOID = NODES.VOID.code
     const SKY = NODES.SKY.code
+    const STONEWALL = NODES.STONEWALL.code
+    const WOODWALL = NODES.WOODWALL.code
     const LIQUID_OR_GAZ = new Set([
       NODES.VOID.code,
       NODES.SKY.code,
@@ -4002,6 +4111,9 @@ class WorldCarver {
         // /////////////////////////////////// //
         // SUPPRESSION DES TUILES VOID ISOLEES //
         // /////////////////////////////////// //
+
+        // Règle 0 — tuile adjacente à un mur de cabine (WOODWALL ou STONEWALL) → pas de modification
+        if (top === WOODWALL || bot === WOODWALL || left === WOODWALL || right === WOODWALL || top === STONEWALL || bot === STONEWALL || left === STONEWALL || right === STONEWALL) continue
 
         // Règle 1 — VOID isolé : 4 voisins solides → substrat aléatoire parmi les 4
         if (code === VOID && !LIQUID_OR_GAZ.has(top) && !LIQUID_OR_GAZ.has(bot) && !LIQUID_OR_GAZ.has(left) && !LIQUID_OR_GAZ.has(right)) {
@@ -4450,12 +4562,15 @@ class FurnitureGenerator {
    * Ajoute un furniture à la liste.
    * @param {number} index - Position coin haut-gauche (y << 10) | x
    * @param {string} code - Identifiant item ('lifeCrystal', 'woodchest'...)
+   *  * @returns {{id, index, code, stype, w, h}} — objet furniture ajouté
    */
   addFurnitureAt (index, code) {
     const {placed, stype} = ITEMS[code]
     const w = placed.sw >> 4
     const h = placed.sh >> 4
-    this.#furnitures.push({index, code, stype, w, h})
+    const furniture = {id: uniqueIdGenerator.getUniqueId(), index, code, stype, w, h}
+    this.#furnitures.push(furniture)
+    return furniture
   }
 
   /**
