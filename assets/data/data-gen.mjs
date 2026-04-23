@@ -343,6 +343,7 @@ export const PERLIN_OFFSET_SHELL = 900
 export const PERLIN_OFFSET_HEART = 1000
 export const PERLIN_OFFSET_FERNS = 1100
 export const PERLIN_OFFSET_MUSHROOM = 1200
+export const PERLIN_OFFSET_TEMPLE = 1300
 
 export const SMALL_CAVERNS_COUNT = 80
 export const MEDIUM_CAVERNS_COUNT = 120
@@ -489,3 +490,28 @@ export const PYRAMID_ROOM2_DELTA = {dx: 5, dy: 4}
 // tableau d'index
 export const PYRAMID_WALL_INDEXES = PYRAMID_WALL.map(({dx, dy}) => (dy << 10) | dx)
 export const PYRAMID_VOID_INDEXES = PYRAMID_VOID.map(({dx, dy}) => (dy << 10) | dx)
+
+const TEMPLE_RUIN_WALL = [
+  // row0 — sommet du fronton
+  {dx: 7, dy: 0},
+  // row1
+  {dx: 6, dy: 1}, {dx: 7, dy: 1}, {dx: 8, dy: 1},
+  // row2
+  {dx: 5, dy: 2}, {dx: 6, dy: 2}, {dx: 7, dy: 2}, {dx: 8, dy: 2}, {dx: 9, dy: 2},
+  // row3
+  {dx: 4, dy: 3}, {dx: 5, dy: 3}, {dx: 6, dy: 3}, {dx: 7, dy: 3}, {dx: 8, dy: 3}, {dx: 9, dy: 3}, {dx: 10, dy: 3},
+  // row4
+  {dx: 3, dy: 4}, {dx: 4, dy: 4}, {dx: 5, dy: 4}, {dx: 6, dy: 4}, {dx: 7, dy: 4}, {dx: 8, dy: 4}, {dx: 9, dy: 4}, {dx: 10, dy: 4}, {dx: 11, dy: 4},
+  // row5 — architrave complète
+  {dx: 0, dy: 5}, {dx: 1, dy: 5}, {dx: 2, dy: 5}, {dx: 3, dy: 5}, {dx: 4, dy: 5}, {dx: 5, dy: 5}, {dx: 6, dy: 5}, {dx: 7, dy: 5}, {dx: 8, dy: 5}, {dx: 9, dy: 5}, {dx: 10, dy: 5}, {dx: 11, dy: 5}, {dx: 12, dy: 5}, {dx: 13, dy: 5}, {dx: 14, dy: 5},
+  // row6 — colonnes gauche et droite + murs
+  {dx: 0, dy: 6}, {dx: 2, dy: 6}, {dx: 12, dy: 6}, {dx: 14, dy: 6},
+  // row7
+  {dx: 0, dy: 7}, {dx: 2, dy: 7}, {dx: 12, dy: 7}, {dx: 14, dy: 7},
+  // row8
+  {dx: 0, dy: 8}, {dx: 2, dy: 8}, {dx: 12, dy: 8}, {dx: 14, dy: 8},
+  // row9 — base complète
+  {dx: 0, dy: 9}, {dx: 1, dy: 9}, {dx: 2, dy: 9}, {dx: 3, dy: 9}, {dx: 4, dy: 9}, {dx: 5, dy: 9}, {dx: 6, dy: 9}, {dx: 7, dy: 9}, {dx: 8, dy: 9}, {dx: 9, dy: 9}, {dx: 10, dy: 9}, {dx: 11, dy: 9}, {dx: 12, dy: 9}, {dx: 13, dy: 9}, {dx: 14, dy: 9}
+]
+
+export const TEMPLE_RUIN_WALL_INDEXES = TEMPLE_RUIN_WALL.map(({dx, dy}) => (dy << 10) | dx)

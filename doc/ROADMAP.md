@@ -29,7 +29,7 @@
 - `digAnthills()` — Forest, surface, structure conique
 - `digTermiteMounds()` — Jungle, surface, structure rectangulaire
 - `digAntlionPits()` — Desert, surface, creux triangulaire
-- `digTempleRuin()` — Jungle, caverns_top, EMERALDWALL + Décomposeur
+- `digLostTemple()` — Jungle, caverns_top, EMERALDWALL + Décomposeur
 - `digAncientHouse()` — Desert, caverns_bottom, GOLDWALL + Transmutateur
 - `digAbandonedMine()` — Tous biomes, caverns_bottom, OBSIDIAN + COBALTWALL
 
@@ -82,7 +82,7 @@
 ### Housing
 - Construction shelter (protection nocturne)
 - Placement furniture (crafting stations, coffres, lits, torches...)
-- Machines ancestrales inamovibles (Temple Ruin, Ancient House)
+- Machines ancestrales inamovibles (Lost Temple, Ancient House)
 
 ### Artisanat
 - Recettes et crafting stations

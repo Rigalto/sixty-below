@@ -1,6 +1,6 @@
 import {seededRNG} from './utils.mjs'
 import {database, uniqueIdGenerator} from './database.mjs'
-import {WEATHER_TYPE, WORLD_WIDTH, WORLD_HEIGHT, SEA_LEVEL, TOPSOIL_Y_SKY_SURFACE, TOPSOIL_Y_SURFACE_UNDER, TOPSOIL_Y_UNDER_CAVERNS, TOPSOIL_Y_CAVERNS_MID, BIOME_TILE_MAP, SEA_MAX_JITTER, SEA_MAX_WIDTH, SEA_MAX_HEIGHT, CLUSTER_SCATTER_MAP, ORE_GEM_SCATTER_MAP, PERLIN_OFFSET_NATURALIZER, PERLIN_OFFSET_TUNNEL, PERLIN_OFFSET_SURFACE_TUNNEL, PERLIN_OFFSET_SMALL_TUNNEL, PERLIN_OFFSET_CAVERN, PERLIN_OFFSET_HIVE, PERLIN_OFFSET_HEART, PERLIN_OFFSET_MUSHROOM, PERLIN_OFFSET_COBWEB, PERLIN_OFFSET_FERNS, PERLIN_OFFSET_LAKES, PERLIN_OFFSET_SHELL, SMALL_CAVERNS_COUNT, MEDIUM_CAVERNS_COUNT, UNDERGROUND_TUNNEL_COUNT, CAVERNS_TUNNEL_COUNT, SMALL_TUNNELS_COUNT, HIVE_RADIUS_MIN, HIVE_RADIUS_MAX, COBWEB_CAVE_COUNT_MIN, COBWEB_CAVE_COUNT_MAX, COBWEB_RADIUS_X_MIN, COBWEB_RADIUS_X_MAX, COBWEB_RADIUS_Y_MIN, COBWEB_RADIUS_Y_MAX, COBWEB_CAVE_MAIN_MIN, COBWEB_CAVE_MAIN_MAX, COBWEB_CAVE_SIDE_MIN, COBWEB_CAVE_SIDE_MAX, COBWEB_SCATTER_COUNT, COBWEB_SCATTER_SIZE_MIN, COBWEB_SCATTER_SIZE_MAX, GEODE_CAVE_COUNT_MIN, GEODE_CAVE_COUNT_MAX, GEODE_RADIUS_MIN, GEODE_RADIUS_MAX, GEODE_TARGET_CLUSTER_COUNT, GEODE_CLUSTER_SIZE_MIN, GEODE_CLUSTER_SIZE_MAX, TOPSOIL_SCATTER_MAP, LAKE_RADIUS_X_MIN, LAKE_RADIUS_X_MAX, LAKE_RADIUS_Y_MIN, LAKE_RADIUS_Y_MAX, LAKE_PIT_RADIUS_X_MIN, LAKE_PIT_RADIUS_X_MAX, LAKE_PIT_RADIUS_Y_MIN, LAKE_PIT_RADIUS_Y_MAX, LAKE_CREATION_MAP, UNDERGROUND_LAKE_UNDER_COUNT, UNDERGROUND_LAKE_CAVERNS_COUNT, UNDERGROUND_LAKE_RADIUS_MIN, UNDERGROUND_LAKE_RADIUS_MAX, BLIND_LAKE_COUNT, BLIND_LAKE_RADIUS_MIN, BLIND_LAKE_RADIUS_MAX, SAP_LAKE_UNDER_COUNT, SAP_LAKE_CAVERNS_COUNT, SAP_LAKE_RADIUS_MIN, SAP_LAKE_RADIUS_MAX, SAP_POCKET_COUNT, SAP_POCKET_RADIUS_MIN, SAP_POCKET_RADIUS_MAX, WATER_PUDDLE_COUNT, SAP_PUDDLE_COUNT, PUDDLE_HEIGHT_MIN, PUDDLE_HEIGHT_MAX, FOSSIL_VEIN_COUNT, FERN_CAVE_RADIUS_X_MIN, FERN_CAVE_RADIUS_X_MAX, FERN_CAVE_RADIUS_Y_MIN, FERN_CAVE_RADIUS_Y_MAX, MOSS_CAVE_RADIUS_X_MIN, MOSS_CAVE_RADIUS_X_MAX, MOSS_CAVE_RADIUS_Y_MIN, MOSS_CAVE_RADIUS_Y_MAX, SAND_POCKET_RADIUS_X_MIN, SAND_POCKET_RADIUS_X_MAX, SAND_POCKET_RADIUS_Y_MIN, SAND_POCKET_RADIUS_Y_MAX, MUSHROOM_CAVE_RADIUS_X_MIN, MUSHROOM_CAVE_RADIUS_X_MAX, MUSHROOM_CAVE_RADIUS_Y_MIN, MUSHROOM_CAVE_RADIUS_Y_MAX, PYRAMID_WALL_INDEXES, PYRAMID_VOID_INDEXES, PYRAMID_WIDTH, PYRAMID_HEIGHT, PYRAMID_ROOM1_DELTA, PYRAMID_ROOM2_DELTA} from '../assets/data/data-gen.mjs'
+import {WEATHER_TYPE, WORLD_WIDTH, WORLD_HEIGHT, SEA_LEVEL, TOPSOIL_Y_SKY_SURFACE, TOPSOIL_Y_SURFACE_UNDER, TOPSOIL_Y_UNDER_CAVERNS, TOPSOIL_Y_CAVERNS_MID, BIOME_TILE_MAP, SEA_MAX_JITTER, SEA_MAX_WIDTH, SEA_MAX_HEIGHT, CLUSTER_SCATTER_MAP, ORE_GEM_SCATTER_MAP, PERLIN_OFFSET_NATURALIZER, PERLIN_OFFSET_TUNNEL, PERLIN_OFFSET_SURFACE_TUNNEL, PERLIN_OFFSET_SMALL_TUNNEL, PERLIN_OFFSET_CAVERN, PERLIN_OFFSET_HIVE, PERLIN_OFFSET_HEART, PERLIN_OFFSET_MUSHROOM, PERLIN_OFFSET_COBWEB, PERLIN_OFFSET_FERNS, PERLIN_OFFSET_LAKES, PERLIN_OFFSET_SHELL, PERLIN_OFFSET_TEMPLE, SMALL_CAVERNS_COUNT, MEDIUM_CAVERNS_COUNT, UNDERGROUND_TUNNEL_COUNT, CAVERNS_TUNNEL_COUNT, SMALL_TUNNELS_COUNT, HIVE_RADIUS_MIN, HIVE_RADIUS_MAX, COBWEB_CAVE_COUNT_MIN, COBWEB_CAVE_COUNT_MAX, COBWEB_RADIUS_X_MIN, COBWEB_RADIUS_X_MAX, COBWEB_RADIUS_Y_MIN, COBWEB_RADIUS_Y_MAX, COBWEB_CAVE_MAIN_MIN, COBWEB_CAVE_MAIN_MAX, COBWEB_CAVE_SIDE_MIN, COBWEB_CAVE_SIDE_MAX, COBWEB_SCATTER_COUNT, COBWEB_SCATTER_SIZE_MIN, COBWEB_SCATTER_SIZE_MAX, GEODE_CAVE_COUNT_MIN, GEODE_CAVE_COUNT_MAX, GEODE_RADIUS_MIN, GEODE_RADIUS_MAX, GEODE_TARGET_CLUSTER_COUNT, GEODE_CLUSTER_SIZE_MIN, GEODE_CLUSTER_SIZE_MAX, TOPSOIL_SCATTER_MAP, LAKE_RADIUS_X_MIN, LAKE_RADIUS_X_MAX, LAKE_RADIUS_Y_MIN, LAKE_RADIUS_Y_MAX, LAKE_PIT_RADIUS_X_MIN, LAKE_PIT_RADIUS_X_MAX, LAKE_PIT_RADIUS_Y_MIN, LAKE_PIT_RADIUS_Y_MAX, LAKE_CREATION_MAP, UNDERGROUND_LAKE_UNDER_COUNT, UNDERGROUND_LAKE_CAVERNS_COUNT, UNDERGROUND_LAKE_RADIUS_MIN, UNDERGROUND_LAKE_RADIUS_MAX, BLIND_LAKE_COUNT, BLIND_LAKE_RADIUS_MIN, BLIND_LAKE_RADIUS_MAX, SAP_LAKE_UNDER_COUNT, SAP_LAKE_CAVERNS_COUNT, SAP_LAKE_RADIUS_MIN, SAP_LAKE_RADIUS_MAX, SAP_POCKET_COUNT, SAP_POCKET_RADIUS_MIN, SAP_POCKET_RADIUS_MAX, WATER_PUDDLE_COUNT, SAP_PUDDLE_COUNT, PUDDLE_HEIGHT_MIN, PUDDLE_HEIGHT_MAX, FOSSIL_VEIN_COUNT, FERN_CAVE_RADIUS_X_MIN, FERN_CAVE_RADIUS_X_MAX, FERN_CAVE_RADIUS_Y_MIN, FERN_CAVE_RADIUS_Y_MAX, MOSS_CAVE_RADIUS_X_MIN, MOSS_CAVE_RADIUS_X_MAX, MOSS_CAVE_RADIUS_Y_MIN, MOSS_CAVE_RADIUS_Y_MAX, SAND_POCKET_RADIUS_X_MIN, SAND_POCKET_RADIUS_X_MAX, SAND_POCKET_RADIUS_Y_MIN, SAND_POCKET_RADIUS_Y_MAX, MUSHROOM_CAVE_RADIUS_X_MIN, MUSHROOM_CAVE_RADIUS_X_MAX, MUSHROOM_CAVE_RADIUS_Y_MIN, MUSHROOM_CAVE_RADIUS_Y_MAX, PYRAMID_WALL_INDEXES, PYRAMID_VOID_INDEXES, PYRAMID_WIDTH, PYRAMID_HEIGHT, PYRAMID_ROOM1_DELTA, PYRAMID_ROOM2_DELTA, TEMPLE_RUIN_WALL_INDEXES} from '../assets/data/data-gen.mjs'
 import {NODES, NODES_LOOKUP, NODE_TYPE, BIOME_TYPE, PLANT_SYSTEM, GRASS_TYPE, ITEMS} from '../assets/data/data.mjs'
 
 /* ====================================================================================================
@@ -261,14 +261,12 @@ class WorldGenerator {
     const pyramid = worldCarver.digPyramid()
     console.log('....................pyramid', pyramid)
 
-    // 6.1.X Ancient House / Temple Ruin / Ruined Cabin
-    // Caverns_top, jungle - EMERALDWALL -
-    // const ancienthouse = worldCarver.digAncientHouse()
-    // Caverns_bottom, desert - GOLDWALL -
-    // const templeruin = worldCarver.digTempleRuin()
-    // Under, forest - STONEWALL -
+    // 6.1.X Ancient House / Lost Temple / Ruined Cabin
     const ruinedcabin = worldCarver.digRuinedCabin()
     console.log('....................ruinedcabin', ruinedcabin)
+
+    const lostTemple = worldCarver.digLostTemple()
+    console.log('....................lostTemple', lostTemple)
 
     // 6.1.X Underground Lake
     // caverns_top - Forest - WATER + HUMUS
@@ -348,7 +346,7 @@ class WorldGenerator {
       const liquidBodies = [...honeyLiquidBodies, ...lakeLiquidBodies, ...underLakeLiquidBodies, ...blindLakeLiquidBodies, ...sapLakeLiquidBodies, ...sapPocketLiquidBodies, ...waterPuddleLiquidBodies, ...sapPuddleLiquidBodies]
       const lakes = [...surfaceLakes, ...underLakes, ...blindLakes, ...sapLakes, ...sapPockets]
       const plants = [...fernsPlants, ...mossPlants, ...mushroomPlants]
-      await this.save(seed, {hives, cobwebCaves, geodeCaves, lakes, liquidBodies, fernsCaves, mossCaves, mushroomCaves, pyramid, ruinedcabin, plants})
+      await this.save(seed, {hives, cobwebCaves, geodeCaves, lakes, liquidBodies, fernsCaves, mossCaves, mushroomCaves, pyramid, ruinedcabin, lostTemple, plants})
       worldBuffer.clear()
     }
 
@@ -361,7 +359,7 @@ class WorldGenerator {
     if (debug) { return worldBuffer } // appelant responsable du clear()
   }
 
-  async save (seed, {hives, cobwebCaves, geodeCaves, lakes, liquidBodies, fernsCaves, mossCaves, mushroomCaves, plants, pyramid, ruinedcabin}) {
+  async save (seed, {hives, cobwebCaves, geodeCaves, lakes, liquidBodies, fernsCaves, mossCaves, mushroomCaves, plants, pyramid, ruinedcabin, lostTemple}) {
     const start = window.performance.now()
     // 1. Sauvegarde des tuiles
     await database.clearObjectStore('world_chunks')
@@ -409,7 +407,8 @@ class WorldGenerator {
       {key: 'moss', value: JSON.stringify(mossCaves)},
       {key: 'mushrooms', value: JSON.stringify(mushroomCaves)},
       {key: 'pyramid', value: JSON.stringify(pyramid)},
-      {key: 'ruinedcabin', value: JSON.stringify(ruinedcabin)}
+      {key: 'ruinedcabin', value: JSON.stringify(ruinedcabin)},
+      {key: 'losttemple', value: JSON.stringify(lostTemple)}
 
       // {key: 'honeysurface', value: this.honeysurface.join('|')}
     ])
@@ -2226,6 +2225,54 @@ class WorldCarver {
   }
 
   /**
+ * Creuse un rectangle bruité (Perlin noise) sur 3 bords (haut, gauche, droit).
+ * Le bord bas est parfaitement plat — pas de variation Perlin.
+ * Même algorithme que digNoisyRect — distance de Chebyshev normalisée.
+ *
+ * @param {Array} tiles
+ * @param {number} cx
+ * @param {number} cy
+ * @param {number} radiusXMin
+ * @param {number} radiusXMax
+ * @param {number} radiusYMin
+ * @param {number} radiusYMax
+ * @param {number} code
+ * @param {number} frequency
+ * @param {number} offsetX
+ */
+  digNoisyRectFlatBottom (tiles, cx, cy, radiusXMin, radiusXMax, radiusYMin, radiusYMax, code, frequency = 0.3, offsetX = 0) {
+    const radiusX = (radiusXMin + radiusXMax) >> 1
+    const radiusY = (radiusYMin + radiusYMax) >> 1
+    const spreadX = radiusXMax - radiusXMin
+    const spreadY = radiusYMax - radiusYMin
+    const period = 1 / frequency
+
+    for (let dy = -radiusYMax; dy <= radiusYMax; dy++) {
+      for (let dx = -radiusXMax; dx <= radiusXMax; dx++) {
+        const absDx = Math.abs(dx) / radiusX
+        const absDy = Math.abs(dy) / radiusY
+        const dist = Math.max(absDx, absDy)
+
+        let threshold
+        if (dy >= radiusYMax) {
+        // Bord bas — toujours inclus, pas de bruit
+          threshold = 1
+        } else {
+          const noise = seededRNG.randomPerlin((cx + dx + offsetX) / period, (cy + dy) / period)
+          const spread = (spreadX + spreadY) * 0.5
+          threshold = 1 + (noise * 2 - 1) * (spread / ((radiusX + radiusY) * 0.5))
+        }
+
+        if (dist > threshold) continue
+        const x = cx + dx
+        const y = cy + dy
+        if (x < 1 || x >= WORLD_WIDTH - 1 || y < 1 || y >= WORLD_HEIGHT - 1) continue
+        tiles.push({x, y, index: (y << 10) | x, code})
+      }
+    }
+  }
+
+  /**
  * Applique une liste de tuiles dans worldBuffer.
  * Protège les tuiles ETERNAL (FOG, DEEPSEA, BASALT, LAVA), SKY et VOID.
  * Retourne le rectangle englobant des tuiles effectivement écrites.
@@ -3028,7 +3075,7 @@ class WorldCarver {
  */
   #tryFillPuddle (cx, cy, nodeCode) {
     const VOID = NODES.VOID.code
-    const LIQUID = new Set([NODES.WATER.code, NODES.SEA.code, NODES.HONEY.code, NODES.SAP.code, NODES.GRASSFERN.code, NODES.GRASSMOSS.code, NODES.GRASSMUSHROOM.code, NODES.KHEPRITE.code])
+    const LIQUID = new Set([NODES.WATER.code, NODES.SEA.code, NODES.HONEY.code, NODES.SAP.code, NODES.GRASSFERN.code, NODES.GRASSMOSS.code, NODES.GRASSMUSHROOM.code, NODES.KHEPRITE.code, NODES.OLYMPITE.code])
     const yStart = cy
 
     const visited = new Set()
@@ -4006,6 +4053,121 @@ class WorldCarver {
 
     return {chestId: chest.id, index}
   }
+
+  #flattenCaveBottom (cx, templateW, flatY) {
+    const half = Math.floor(templateW / 2)
+    const x0 = cx - half
+    const x1 = cx + half
+
+    for (let x = x0; x <= x1; x++) {
+    // Descend depuis flatY pour trouver la première tuile non VOID
+      let y = flatY
+      while (y < WORLD_HEIGHT - 1 && worldBuffer.read(x, y) === NODES.VOID.code) y++
+      const solidCode = worldBuffer.read(x, y)
+
+      // Remonte depuis flatY vers le haut — convertit en VOID les tuiles solides
+      for (let yy = flatY - 1; yy >= flatY - 5; yy--) {
+        if (worldBuffer.read(x, yy) !== NODES.VOID.code) {
+          worldBuffer.write(x, yy, NODES.VOID.code)
+        }
+      }
+
+      // Remplit flatY et en dessous avec le substrat trouvé
+      for (let yy = flatY; yy <= flatY + 2; yy++) {
+        if (worldBuffer.read(x, yy) === NODES.VOID.code) {
+          worldBuffer.write(x, yy, solidCode)
+        }
+      }
+    }
+  }
+
+  /**
+ * Creuse un Lost Temple en biome JUNGLE, layer caverns_top.
+ * Caverne bruitée à fond plat (19×12) contenant un temple grec en OLYMPITE (15×10).
+ * Intérieur tapissé d'EMERALDWALL. Une seule par monde.
+ * Prérequis : initZoneRects(), initExclusions().
+ *
+ * @returns {{room: number}|null} — index coin haut-gauche de la salle intérieure, ou null
+ */
+  digLostTemple () {
+    const OLYMPITE = NODES.OLYMPITE.code
+    const EMERALDWALL = NODES.EMERALDWALL.code
+    const VOID = NODES.VOID.code
+    const MAX_ATTEMPTS = 100
+    const TEMPLE_W = 15
+    const TEMPLE_H = 10
+    const CAVE_MARGIN = 2
+    const CAVE_W = TEMPLE_W + CAVE_MARGIN * 2 // 19
+    const CAVE_H = TEMPLE_H + CAVE_MARGIN // 12
+
+    const jungleRects = []
+    for (let i = 0; i < this.#zoneRects.length; i++) {
+      if (this.#zoneRects[i].biome === BIOME_TYPE.JUNGLE) jungleRects.push(this.#zoneRects[i])
+    }
+    if (jungleRects.length === 0) return null
+
+    const rect = seededRNG.randomGetArrayValue(jungleRects)
+
+    // Centre de la caverne
+    let cx, cy, valid
+    let attempts = 0
+    const halfW = Math.ceil(CAVE_W / 2)
+    const halfH = Math.ceil(CAVE_H / 2)
+    do {
+      cx = seededRNG.randomGetMinMax(rect.x0 + halfW, rect.x1 - halfW)
+      cy = seededRNG.randomGetMinMax(rect.yUnder + halfH, rect.yCavernsMid - halfH)
+      valid = !this.isExcluded(cx - halfW, cy - halfH, cx + halfW, cy + halfH)
+      attempts++
+    } while (!valid && attempts < MAX_ATTEMPTS)
+    if (!valid) return null
+
+    // ── Creusement de la caverne bruitée à fond plat ──────────────
+    const caveTiles = []
+    this.digNoisyRect(caveTiles, cx, cy, halfW - 1, halfW, halfH - 1, halfH, VOID, 0.3, PERLIN_OFFSET_TEMPLE)
+    const caveRect = this.applyTiles(caveTiles)
+    this.#flattenCaveBottom(cx, TEMPLE_W, cy + halfH)
+    this.addExclusion(caveRect)
+
+    // ── Placement du temple — coin haut-gauche ─────────────────────
+    const tx = cx - Math.floor(TEMPLE_W / 2)
+    const ty = cy + halfH - TEMPLE_H + 1
+
+    console.log('................... digLostTemple', caveTiles, caveRect.x1, caveRect.y1, caveRect.x2, caveRect.y2, tx, ty)
+    // Intérieur EMERALDWALL
+    const interiorTiles = []
+    for (let y = ty + 6; y <= ty + 8; y++) {
+      for (let x = tx + 1; x <= tx + 13; x++) {
+        interiorTiles.push({x, y, index: (y << 10) | x, code: EMERALDWALL})
+      }
+    }
+    this.applyTiles(interiorTiles, ETERNAL_EXCLUDED)
+
+    // Structure OLYMPITE via deltas
+    const templeTiles = []
+    for (const delta of TEMPLE_RUIN_WALL_INDEXES) {
+      const dx = delta & 0x3FF
+      const dy = delta >> 10
+      const x = tx + dx
+      const y = ty + dy
+      templeTiles.push({x, y, index: (y << 10) | x, code: OLYMPITE})
+    }
+    this.applyTiles(templeTiles, ETERNAL_EXCLUDED)
+
+    tileGuard.addRect(caveRect.x1, caveRect.y1, caveRect.x2, caveRect.y2)
+
+    // Salle intérieure — coin haut-gauche row6, col1
+    const room = ((ty + 6) << 10) | (tx + 1)
+
+    return {room}
+  }
+
+  //   Structure : identique à ruined cabin. WOODWALL autour, EMERALDWALL  comme mur de fond. La taille est plus grande, avec un demi étage (façon mezzanine).
+
+  // Elle se trouve dans une caverne rectangulaire à bords bruités plus grande que la
+
+  // Le sol sera pavé de KHERITE, pour éviter que l'on puisse creuser sous la station de travail.
+
+  // Il y a toujours une station de travail
 
   /**
  * Passe de nettoyage globale après tous les creusements.

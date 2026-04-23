@@ -218,7 +218,7 @@ The Caverns are the deepest accessible layer, divided into two sub-layers : Cave
 * [[Blind Lake]] — all biomes, Caverns Bottom
 * [[Sap Pocket]] — Jungle, Caverns Bottom
 * [[Ancient House]] — Desert, Caverns Bottom ⏳
-* [[Temple Ruin]] — Jungle, Caverns Top ⏳
+* [[Lost Temple]] — Jungle, Caverns Top ⏳
 
 **Damage type**
 * Crushing
@@ -325,7 +325,7 @@ The Jungle is a lush, dangerous biome teeming with life. It features unique liqu
 * [[Moss Cave]] — Underground
 * [[Hive]] — Caverns
 * [[Sap Pocket]] — Caverns deep
-* [[Temple Ruin]] — Caverns ⏳
+* [[Lost Temple]] — Caverns ⏳
 
 **Fauna** ⏳
 * [[monster:jungleSpider]] — Surface
@@ -526,7 +526,7 @@ Pyramids are ancient stone structures buried deep in [[Desert]] biomes. Built fr
   },
 
   // ── Mini-biomes / Jungle ──────────────────────────────────────
-  //    Moss Cave, Hive, Sap Lake, Sap Pocket, Temple Ruin, Termite Mound
+  //    Moss Cave, Hive, Sap Lake, Sap Pocket, Lost Temple, Termite Mound
   {
     title: 'Moss Cave',
     category: ['Mini-biome', 'Jungle'],
