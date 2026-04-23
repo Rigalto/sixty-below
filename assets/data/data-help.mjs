@@ -645,6 +645,45 @@ Sap Pockets are pressurized elliptical cavities filled with [[node:sap]], found 
 * _The Mantis is extremely dangerous in the confined space of a Sap Pocket._ ⏳
   `
   },
+  {
+    title: 'Lost Temple',
+    category: ['Mini-biome', 'Jungle'],
+    content: `
+**Description**
+The Lost Temple is an ancient Greek-style structure buried deep in the [[Jungle]] biomes. Built from indestructible [[node:Olympite]] blocks, it has stood for millennia, its columns still standing despite the encroaching jungle. A powerful guardian protects the secrets within — and the key to a unique crafting station.
+
+**Main Location**
+* [[Caverns]] Top — [[Jungle]]
+
+**Materials**
+* [[node:olympite]] — indestructible walls and fronton
+* [[node:olympitewall]] — decorative columns (passable)
+* [[node:emeraldwall]] — interior background wall
+
+**Structure**
+* Greek temple shape : triangular fronton + columns + base
+* Single interior chamber
+* One [[item:brokenDecomposer]] on the chamber floor
+
+**Combat** ⏳
+* The Minotaur attacks on sight — the chamber cannot be safely entered until it is defeated
+* Three waves :
+  * Wave 1 : 4 × [[monster:harpy]]
+  * Wave 2 : 4 × [[monster:cyclops]]
+  * Wave 3 : 2 × [[monster:harpy]], 2 × [[monster:cyclops]], 1 × [[monster:minotaur]] (boss)
+* The Minotaur drops [[item:decomposerPart]] on defeat
+
+**The Decomposer** ⏳
+* The [[item:brokenDecomposer]] becomes usable after repair
+* To repair : equip [[item:decomposerPart]] and click on the [[item:brokenDecomposer]]
+* The [[item:brokenDecomposer]] is replaced by the [[item:decomposer]] — a powerful tier 5 crafting station
+* The [[item:decomposer]] is immovable — the Lost Temple is its permanent location
+* The [[item:decomposer]] breaks down items into a portion of their crafting ingredients — a powerful tool for recovering rare materials from unwanted equipment.
+
+**Tips**
+* _Clear the Harpy waves carefully before the Cyclops arrive — their ranged attacks are dangerous in the confined space._ ⏳
+  `
+  },
 
   // ── Mini-biomes / Transversal ─────────────────────────────────
   //    Cobweb, Cobweb Cave, Geode Cave, Blind Lake, Underground Lake
