@@ -268,6 +268,9 @@ class WorldGenerator {
     const lostTemple = worldCarver.digLostTemple()
     console.log('....................lostTemple', lostTemple)
 
+    const ancientHouse = worldCarver.digAncientHouse()
+    console.log('....................ancientHouse', ancientHouse)
+
     // 6.1.X Underground Lake
     // caverns_top - Forest - WATER + HUMUS
     // const undergroundlake = worldCarver.digUndergroundLake()
@@ -346,7 +349,7 @@ class WorldGenerator {
       const liquidBodies = [...honeyLiquidBodies, ...lakeLiquidBodies, ...underLakeLiquidBodies, ...blindLakeLiquidBodies, ...sapLakeLiquidBodies, ...sapPocketLiquidBodies, ...waterPuddleLiquidBodies, ...sapPuddleLiquidBodies]
       const lakes = [...surfaceLakes, ...underLakes, ...blindLakes, ...sapLakes, ...sapPockets]
       const plants = [...fernsPlants, ...mossPlants, ...mushroomPlants]
-      await this.save(seed, {hives, cobwebCaves, geodeCaves, lakes, liquidBodies, fernsCaves, mossCaves, mushroomCaves, pyramid, ruinedcabin, lostTemple, plants})
+      await this.save(seed, {hives, cobwebCaves, geodeCaves, lakes, liquidBodies, fernsCaves, mossCaves, mushroomCaves, pyramid, ruinedcabin, lostTemple, ancientHouse, plants})
       worldBuffer.clear()
     }
 
@@ -359,7 +362,7 @@ class WorldGenerator {
     if (debug) { return worldBuffer } // appelant responsable du clear()
   }
 
-  async save (seed, {hives, cobwebCaves, geodeCaves, lakes, liquidBodies, fernsCaves, mossCaves, mushroomCaves, plants, pyramid, ruinedcabin, lostTemple}) {
+  async save (seed, {hives, cobwebCaves, geodeCaves, lakes, liquidBodies, fernsCaves, mossCaves, mushroomCaves, plants, pyramid, ruinedcabin, lostTemple, ancientHouse}) {
     const start = window.performance.now()
     // 1. Sauvegarde des tuiles
     await database.clearObjectStore('world_chunks')
@@ -408,7 +411,8 @@ class WorldGenerator {
       {key: 'mushrooms', value: JSON.stringify(mushroomCaves)},
       {key: 'pyramid', value: JSON.stringify(pyramid)},
       {key: 'ruinedcabin', value: JSON.stringify(ruinedcabin)},
-      {key: 'losttemple', value: JSON.stringify(lostTemple)}
+      {key: 'losttemple', value: JSON.stringify(lostTemple)},
+      {key: 'ancienthouse', value: JSON.stringify(ancientHouse)}
 
       // {key: 'honeysurface', value: this.honeysurface.join('|')}
     ])
@@ -3027,7 +3031,7 @@ class WorldCarver {
  */
   #tryFillPuddle (cx, cy, nodeCode) {
     const VOID = NODES.VOID.code
-    const LIQUID = new Set([NODES.WATER.code, NODES.SEA.code, NODES.HONEY.code, NODES.SAP.code, NODES.GRASSFERN.code, NODES.GRASSMOSS.code, NODES.GRASSMUSHROOM.code, NODES.KHEPRITE.code, NODES.OLYMPITE.code, NODES.OLYMPITEWALL.code])
+    const LIQUID = new Set([NODES.WATER.code, NODES.SEA.code, NODES.HONEY.code, NODES.SAP.code, NODES.GRASSFERN.code, NODES.GRASSMOSS.code, NODES.GRASSMUSHROOM.code, NODES.WOODWALL.code, NODES.STONEWALL.code, NODES.KHEPRITE.code, NODES.OLYMPITE.code, NODES.OLYMPITEWALL.code, NODES.INVISIBLE.code])
     const yStart = cy
 
     const visited = new Set()
@@ -3828,7 +3832,7 @@ class WorldCarver {
 
       this.#fillFernMushroomCaveFloor(cx, cy, radiusX, GRASSMUSHROOM, HUMUS, GRASS_TYPE.MUSHROOM, plants)
 
-      window.DEBUG_POINTS.push({x: cx, y: cy, color: 'orange'}) // DEBUG
+      // window.DEBUG_POINTS.push({x: cx, y: cy, color: 'orange'}) // DEBUG
 
       caves.push({cx, cy, radiusX, radiusY})
     }
@@ -3941,6 +3945,7 @@ class WorldCarver {
     // const FURNITURE_CODES = ['chairWood', 'tableWood', 'toiletWood']
     const FURNITURE_CODES = ['tableWood', 'toiletWood']
 
+    // 1. Détermination de la position de la cabine
     const forestRects = []
     for (let i = 0; i < this.#zoneRects.length; i++) {
       if (this.#zoneRects[i].biome === BIOME_TYPE.FOREST) forestRects.push(this.#zoneRects[i])
@@ -3952,24 +3957,34 @@ class WorldCarver {
 
     let x0, y0, valid
     let attempts = 0
+    const CAVE_MARGIN = 3
+    const CAVE_OFFSET = 2
     do {
       x0 = seededRNG.randomGetMinMax(rect.x0 + 1, rect.x1 - width - 1)
       y0 = seededRNG.randomGetMinMax(rect.ySurface + 1, rect.yUnder - height - 1)
-      valid = !this.isExcluded(x0, y0, x0 + width - 1, y0 + height - 1)
+      valid = !this.isExcluded(x0 - CAVE_MARGIN, y0 - CAVE_MARGIN - CAVE_OFFSET, x0 + width - 1 + CAVE_MARGIN, y0 + height - 1)
       attempts++
     } while (!valid && attempts < MAX_ATTEMPTS)
     if (!valid) return null
 
-    const tiles = []
-    const doorLeft = seededRNG.randomGetBool()
+    // 2. Creusement de la caverne autour de la cabine
+    const ccx = x0 + Math.floor(width / 2)
+    const ccy = y0 + Math.floor(height / 2) - CAVE_OFFSET
+    const caveTiles = []
+    this.digNoisyRect(caveTiles, ccx, ccy, Math.ceil((width + CAVE_MARGIN * 2) / 2) - 1, Math.ceil((width + CAVE_MARGIN * 2) / 2), Math.ceil((height + CAVE_MARGIN) / 2) - 1, Math.ceil((height + CAVE_MARGIN) / 2), VOID, 0.3, PERLIN_OFFSET_TEMPLE)
+    this.applyTiles(caveTiles, ETERNAL_EXCLUDED)
+    this.#flattenCaveBottom(ccx, width, y0 + height - 1)
 
-    // ── Mur haut ─────────────────────────────────────────────────
+    // 3. Ajout de la cacine
+    const doorLeft = seededRNG.randomGetBool()
+    const tiles = []
+    // ── 3.1. Mur haut ─────────────────────────────────────────────────
     for (let x = x0; x < x0 + width; x++) {
       const code = seededRNG.randomGetMax(99) >= 20 ? WOODWALL : VOID
       tiles.push({x, y: y0, index: (y0 << 10) | x, code})
     }
 
-    // ── Murs gauche et droit ──────────────────────────────────────
+    // ── 3.2. Murs gauche et droit ──────────────────────────────────────
     for (let y = y0 + 1; y < y0 + height; y++) {
       const doorRow = y >= y0 + height - 3 // 3 tuiles depuis le sol
 
@@ -3987,31 +4002,31 @@ class WorldCarver {
       tiles.push({x: x0 + width - 1, y, index: (y << 10) | (x0 + width - 1), code})
     }
 
-    // ── Fond intérieur STONEWALL ──────────────────────────────────
+    // ── 3.3. Fond intérieur STONEWALL ──────────────────────────────────
     for (let y = y0 + 1; y < y0 + height; y++) {
       for (let x = x0 + 1; x < x0 + width - 1; x++) {
         const code = seededRNG.randomGetMax(99) >= 20 ? STONEWALL : VOID
         tiles.push({x, y, index: (y << 10) | x, code})
       }
     }
-
+    // ── 3.4. Finalisation ──────────────────────────────────
     const rect2 = this.applyTiles(tiles, ETERNAL_EXCLUDED)
     this.addExclusion(rect2)
     tileGuard.addRect(x0, y0, x0 + width - 1, y0 + height - 1)
 
-    // ── Placement du mobilier ─────────────────────────────────────
+    // ── 4. Placement du mobilier ─────────────────────────────────────
     const floorY = y0 + height - 1
     const furnitureCode = seededRNG.randomGetArrayValue(FURNITURE_CODES)
     const {placed: fPlaced, placedLeft: fPlacedLeft} = ITEMS[furnitureCode]
     const fImg = fPlaced ?? fPlacedLeft
     const fw = fImg.sw >> 4
 
-    // Position aléatoire du meuble dans l'espace intérieur
+    // 5. Position aléatoire du meuble dans l'espace intérieur
     const fx = seededRNG.randomGetMinMax(x0 + 1, x0 + width - 1 - fw)
     const furniture = furnitureGenerator.addFurnitureAt((floorY << 10) | fx, furnitureCode)
     if (fPlacedLeft !== undefined) { furniture.left = seededRNG.randomGetBool() }
 
-    // Placement du coffre — à gauche ou à droite du meuble
+    // 6. Placement du coffre — à gauche ou à droite du meuble
     const {placed: cPlaced} = ITEMS.chestAncient
     const cw = cPlaced.sw >> 4
     let cx
@@ -4164,6 +4179,119 @@ class WorldCarver {
     return {room}
   }
 
+  /**
+ * Creuse une Ancient House en biome DESERT, layer caverns_bottom.
+ * Caverne bruitée à fond plat autour de la structure (28×18).
+ * Sol aplani sur 22 tuiles de large.
+ * Prérequis : initZoneRects(), initExclusions().
+ *
+ * @returns {{x0, y0}|null} — coin haut-gauche de la maison, ou null
+ */
+  digAncientHouse () {
+    const VOID = NODES.VOID.code
+    const WOODWALL = NODES.WOODWALL.code
+    const GOLDWALL = NODES.GOLDWALL.code
+    const INVISIBLE = NODES.INVISIBLE.code
+
+    const MAX_ATTEMPTS = 100
+    const HOUSE_W = 18
+    const HOUSE_H = 11
+    const ROOF_H = 4
+    const TOTAL_H = HOUSE_H + ROOF_H // 15
+    const CAVE_MARGIN_X = 5
+    const CAVE_MARGIN_Y = 3
+    const CAVE_W = HOUSE_W + CAVE_MARGIN_X * 2 // 28
+    const CAVE_H = TOTAL_H + CAVE_MARGIN_Y // 18
+    const FLAT_W = HOUSE_W + 4 // 22
+
+    // 1. Détermination de la position de la maison
+    const desertRects = []
+    for (let i = 0; i < this.#zoneRects.length; i++) {
+      if (this.#zoneRects[i].biome === BIOME_TYPE.DESERT) desertRects.push(this.#zoneRects[i])
+    }
+    if (desertRects.length === 0) return null
+
+    const rect = seededRNG.randomGetArrayValue(desertRects)
+    const halfCW = Math.ceil(CAVE_W / 2)
+    const halfCH = Math.ceil(CAVE_H / 2)
+
+    let cx, cy, valid
+    let attempts = 0
+    do {
+      cx = seededRNG.randomGetMinMax(rect.x0 + halfCW, rect.x1 - halfCW)
+      cy = seededRNG.randomGetMinMax(rect.yCavernsMid + halfCH, rect.yCaverns - halfCH)
+      valid = !this.isExcluded(cx - halfCW, cy - halfCH, cx + halfCW, cy + halfCH)
+      attempts++
+    } while (!valid && attempts < MAX_ATTEMPTS)
+    if (!valid) return null
+
+    // 2. Creusement de la caverne bruitée à fond plat ──────────────
+    const caveTiles = []
+    this.digNoisyRect(caveTiles, cx, cy, halfCW - 2, halfCW, halfCH - 2, halfCH, VOID, 0.3, PERLIN_OFFSET_TEMPLE)
+    this.applyTiles(caveTiles, ETERNAL_EXCLUDED)
+
+    // Fond plat sur FLAT_W tuiles
+    const flatY = cy + halfCH
+    this.#flattenCaveBottom(cx, FLAT_W, flatY)
+    console.log('.......', {cx, cy, flatY})
+
+    // Coin haut-gauche de la maison
+    const x0 = cx - Math.floor(HOUSE_W / 2)
+    const y0 = flatY - HOUSE_H + 1
+
+    this.addExclusion({x1: cx - halfCW, y1: cy - halfCH, x2: cx + halfCW, y2: cy + halfCH})
+
+    // 3. Ajout de la maison sans dégradation
+    // 3.1. Toit ─────────────────────────────────────────────────────
+    const roofY = y0 - 1 // première ligne du toit
+    const roofTiles = []
+    for (let x = x0 - 1; x <= x0 + HOUSE_W; x++) {
+      roofTiles.push({x, y: roofY, index: (roofY << 10) | x, code: WOODWALL})
+    }
+    this.applyTiles(roofTiles, ETERNAL_EXCLUDED)
+
+    // 3.2. Murs gauche et droit ────────────────────────────────────
+    const wallTiles = []
+    for (let y = y0; y < flatY; y++) {
+      wallTiles.push({x: x0, y, index: (y << 10) | x0, code: WOODWALL})
+      wallTiles.push({x: x0 + HOUSE_W - 1, y, index: (y << 10) | (x0 + HOUSE_W - 1), code: WOODWALL})
+    }
+    this.applyTiles(wallTiles, ETERNAL_EXCLUDED)
+
+    // 3.3. Fond intérieur GOLDWALL ────────────────────────────────
+    const interiorTiles = []
+    for (let y = y0; y < flatY; y++) {
+      for (let x = x0 + 1; x < x0 + HOUSE_W - 1; x++) {
+        interiorTiles.push({x, y, index: (y << 10) | x, code: GOLDWALL})
+      }
+    }
+    this.applyTiles(interiorTiles, ETERNAL_EXCLUDED)
+
+    // 3.4. Porte ──────────────────────────────────────────────────
+    const DOOR_CODES = ['doorWood', 'doorGlass']
+    const doorLeft = seededRNG.randomGetBool()
+    const doorX = doorLeft ? x0 : x0 + HOUSE_W - 1
+    const doorCode = seededRNG.randomGetArrayValue(DOOR_CODES)
+
+    const doorTiles = []
+    for (let y = flatY - 3; y < flatY; y++) {
+      doorTiles.push({x: doorX, y, index: (y << 10) | doorX, code: INVISIBLE})
+    }
+    this.applyTiles(doorTiles, ETERNAL_EXCLUDED)
+
+    const door = furnitureGenerator.addFurnitureAt(((flatY - 3) << 10) | doorX, doorCode)
+    door.closed = true
+
+    // Protection contre le creusement
+    tileGuard.addRect(x0 - 2, roofY, x0 + HOUSE_W + 1, flatY + 1)
+
+    window.DEBUG_POINTS.push({x: x0 - 2, y: roofY, color: 'orange'}) // DEBUG
+    window.DEBUG_POINTS.push({x: x0 + HOUSE_W + 1, y: flatY + 1, color: 'orange'}) // DEBUG
+    window.DEBUG_POINTS.push({x: x0, y: y0, color: 'lime'}) // DEBUG
+
+    return {x0, y0}
+  }
+
   //   Structure : identique à ruined cabin. WOODWALL autour, EMERALDWALL  comme mur de fond. La taille est plus grande, avec un demi étage (façon mezzanine).
 
   // Elle se trouve dans une caverne rectangulaire à bords bruités plus grande que la
@@ -4181,7 +4309,7 @@ class WorldCarver {
   cleanupAfterCarving () {
     const VOID = NODES.VOID.code
     const SKY = NODES.SKY.code
-    const PROTECTED_CODES = new Set([NODES.STONEWALL.code, NODES.WOODWALL.code, NODES.KHEPRITE.code, NODES.OLYMPITE.code])
+    const PROTECTED_CODES = new Set([NODES.STONEWALL.code, NODES.WOODWALL.code, NODES.KHEPRITE.code, NODES.OLYMPITE.code, NODES.INVISIBLE.code])
     const LIQUID_OR_GAZ = new Set([
       NODES.VOID.code,
       NODES.SKY.code,

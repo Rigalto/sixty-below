@@ -156,8 +156,15 @@ export const ITEMS = {
 
   // Wood furniture set
   tableWood: {name: 'Wooden Table', type: ITEM_TYPE.FURNITURE, stype: 'station', star: 1, image: 'furniture_32_32-2-0', placed: 'fuws_48_32-1-0', help: 'Tables', tooltip: 'A precision assembly requires a very flat surface.', furnitureSet: 'wood', surface: true},
-  chairWood: {name: 'Wooden Chair', type: ITEM_TYPE.FURNITURE, stype: 'chair', star: 1, image: 'furniture_32_32-0-5', placedLeft: 'fuws_16_48-1-0', placedRight: 'fuws_16_48-2-0', help: 'Chairs', tooltip: 'Crafting is more precise when one is seated', furnitureSet: 'wood', comfort: true},
+  chairWood: {name: 'Wooden Chair', type: ITEM_TYPE.FURNITURE, stype: 'chair', star: 1, image: 'furniture_32_32-0-5', placedLeft: 'fuws_16_48-1-0', placedRight: 'fuws_16_48-2-0', help: 'Chairs', tooltip: '???', furnitureSet: 'wood', comfort: true},
   toiletWood: {name: 'Wooden Toilet', type: ITEM_TYPE.FURNITURE, stype: 'toilet', star: 1, image: 'furniture_32_32-0-5', placed: 'fuws_16_48-2-0', help: 'Toilets', tooltip: '???', furnitureSet: 'wood', comfort: true},
+  doorWood: {name: 'Wooden Door', type: ITEM_TYPE.FURNITURE, stype: 'door', star: 1, furnitureSet: 'wood', image: 'furniture_32_32-0-6', placed: 'fuws_16_48-0-0', placedLeft: 'fuws_32_48-0-0', placedRight: 'fuws_32_48-0-1', help: 'Doors', tooltip: 'Furniture that prevent enemies from entering an area when closed'},
+
+  // Glass furniture set
+  tableGlass: {name: 'Glass Table', type: ITEM_TYPE.FURNITURE, stype: 'table', star: 1, image: 'furniture_32_32-2-0', placed: 'fuws_48_32-1-0', help: 'Tables', tooltip: '???', furnitureSet: 'glass', surface: true},
+  chairGlass: {name: 'Glass Chair', type: ITEM_TYPE.FURNITURE, stype: 'chair', star: 1, image: 'furniture_32_32-0-5', placedLeft: 'fuws_16_48-1-0', placedRight: 'fuws_16_48-2-0', help: 'Chairs', tooltip: '???', furnitureSet: 'glass', comfort: true},
+  toiletGlass: {name: 'Glass Toilet', type: ITEM_TYPE.FURNITURE, stype: 'toilet', star: 1, image: 'furniture_32_32-0-5', placed: 'fuws_16_48-2-0', help: 'Toilets', tooltip: '???', furnitureSet: 'glass', comfort: true},
+  doorGlass: {name: 'Glass Door', type: ITEM_TYPE.FURNITURE, stype: 'door', star: 1, furnitureSet: 'glass', image: 'furniture_32_32-0-6', placed: 'fuws_16_48-0-0', placedLeft: 'fuws_32_48-0-0', placedRight: 'fuws_32_48-0-1', help: 'Doors', tooltip: 'Furniture that prevent enemies from entering an area when closed'},
 
   // chests
   chestAncient: {name: 'Ancient Chest', type: ITEM_TYPE.FURNITURE, stype: 'chest', star: 2, capacity: 56, image: 'furniture_32_32-0-1', placed: 'fuws_32_32-0-1', help: 'Chests', tooltip: 'Items container'},
