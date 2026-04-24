@@ -4330,7 +4330,37 @@ class WorldCarver {
 
     this.applyTiles(degradeTiles, ETERNAL_EXCLUDED)
 
-    // Protection contre le creusement
+    // 4. Ajout des furnitures ─────────────────────────────────
+    // 4.1 Furnitures de l'étage ───────────────────────────────
+    // 3.8. Meubles de l'étage ─────────────────────────────────────
+    const FLOOR_ITEMS = ['chairWood', 'chairGlass', 'toiletWood', 'toiletGlass']
+    const smallCode = seededRNG.randomGetArrayValue(FLOOR_ITEMS)
+    const config = seededRNG.randomGetMinMax(0, 3)
+
+    let decompX, smallX
+    switch (config) {
+      case 0: decompX = floorX0; smallX = floorX0 + 4; break // XXX.C.
+      case 1: decompX = floorX0 + 1; smallX = floorX0 + 5; break // .XXX.C
+      case 2: decompX = floorX0 + 2; smallX = floorX0 + 0; break // C.XXX.
+      case 3: decompX = floorX0 + 3; smallX = floorX0 + 1; break // .C.XXX
+    }
+
+    // Transmutator
+    const {placed: tPlaced} = ITEMS.transmutator
+    const dh = tPlaced.sh >> 4
+    furnitureGenerator.addFurnitureAt(((floorY2 - dh) << 10) | decompX, 'transmutator')
+
+    // Petit meuble
+    const {placed: sPlaced, placedLeft: sPlacedLeft} = ITEMS[smallCode]
+    const sImg = sPlaced ?? sPlacedLeft
+    const sh = sImg.sh >> 4
+    const smallFurniture = furnitureGenerator.addFurnitureAt(((floorY2 - sh) << 10) | smallX, smallCode)
+    if (sPlacedLeft !== undefined) smallFurniture.left = seededRNG.randomGetBool()
+
+    // 4.2 Furnitures du toit ──────────────────────────────────
+    // 4.3 Furnitures du sol ───────────────────────────────────
+
+    // 5. Protection contre le creusement
     tileGuard.addRect(x0 - 2, roofY, x0 + HOUSE_W + 1, flatY + 1)
 
     // window.DEBUG_POINTS.push({x: x0 - 2, y: roofY, color: 'orange'}) // DEBUG
@@ -4905,9 +4935,10 @@ class FurnitureGenerator {
    *  * @returns {{id, index, code, stype, w, h}} — objet furniture ajouté
    */
   addFurnitureAt (index, code) {
-    const {placed, stype} = ITEMS[code]
-    const w = placed.sw >> 4
-    const h = placed.sh >> 4
+    const {placed, placedLeft, stype} = ITEMS[code]
+    const img = placed ?? placedLeft
+    const w = img.sw >> 4
+    const h = img.sh >> 4
     const furniture = {id: uniqueIdGenerator.getUniqueId(), index, code, stype, w, h}
     this.#furnitures.push(furniture)
     return furniture
