@@ -4192,6 +4192,7 @@ class WorldCarver {
     const WOODWALL = NODES.WOODWALL.code
     const GOLDWALL = NODES.GOLDWALL.code
     const INVISIBLE = NODES.INVISIBLE.code
+    const OLYMPITE = NODES.OLYMPITE.code
 
     const MAX_ATTEMPTS = 100
     const HOUSE_W = 18
@@ -4259,10 +4260,22 @@ class WorldCarver {
     this.applyTiles(wallTiles, ETERNAL_EXCLUDED)
 
     // 3.3. Fond intérieur GOLDWALL ────────────────────────────────
+    // Tirage des 2-4 tuiles manquantes
+    const holeCount = seededRNG.randomGetMinMax(2, 4)
+    const holeSet = new Set()
+    while (holeSet.size < holeCount) {
+      const hx = x0 + 1 + seededRNG.randomGetMinMax(0, HOUSE_W - 3)
+      const hy = y0 + seededRNG.randomGetMinMax(0, HOUSE_H - 2)
+      holeSet.add((hy << 10) | hx)
+    }
+
     const interiorTiles = []
     for (let y = y0; y < flatY; y++) {
       for (let x = x0 + 1; x < x0 + HOUSE_W - 1; x++) {
-        interiorTiles.push({x, y, index: (y << 10) | x, code: GOLDWALL})
+        const index = (y << 10) | x
+        if (!holeSet.has(index)) {
+          interiorTiles.push({x, y, index, code: GOLDWALL})
+        }
       }
     }
     this.applyTiles(interiorTiles, ETERNAL_EXCLUDED)
@@ -4282,12 +4295,47 @@ class WorldCarver {
     const door = furnitureGenerator.addFurnitureAt(((flatY - 3) << 10) | doorX, doorCode)
     door.closed = true
 
+    // 3.5. Étage ──────────────────────────────────────────────────
+    const FLOOR_W = 6
+    const floorLeft = seededRNG.randomGetBool()
+    const floorX0 = floorLeft ? x0 + 1 : x0 + HOUSE_W - FLOOR_W - 1
+    const floorY2 = flatY - 6 // 5 tuiles depuis le sol
+
+    const floorTiles = []
+    for (let x = floorX0; x < floorX0 + FLOOR_W; x++) {
+      floorTiles.push({x, y: floorY2, index: (floorY2 << 10) | x, code: OLYMPITE})
+    }
+    this.applyTiles(floorTiles, ETERNAL_EXCLUDED)
+
+    // 3.6. Dégradation Murs ────────────────────────────────────────────
+    const degradeLeft = seededRNG.randomGetBool()
+    const degradeX = degradeLeft ? x0 : x0 + HOUSE_W - 1
+    const removeX = degradeLeft ? x0 + HOUSE_W - 1 : x0
+    const degradeY = y0 + seededRNG.randomGetMinMax(0, 5) // une des 6 tuiles du haut
+    const removeY = y0 + seededRNG.randomGetMinMax(0, 5) // une des 6 tuiles du haut
+    const roofHoleX = x0 + 1 + seededRNG.randomGetMinMax(0, 13) // 14 tuiles centrales
+
+    // Retrait de la tuile du mur
+    const degradeTiles = []
+    degradeTiles.push({x: degradeX, y: degradeY, index: (degradeY << 10) | degradeX, code: VOID})
+    degradeTiles.push({x: removeX, y: removeY, index: (removeY << 10) | removeX, code: VOID})
+    degradeTiles.push({x: roofHoleX, y: roofY, index: (roofY << 10) | roofHoleX, code: VOID})
+
+    // Pose au sol
+    const fallenX = degradeLeft ? x0 - 1 : x0 + HOUSE_W
+    const fallenY = flatY - 1 // sur le sol, une tuile avant le fond
+    degradeTiles.push({x: fallenX, y: fallenY, index: (fallenY << 10) | fallenX, code: WOODWALL})
+    const fallenRoofX = roofHoleX + (seededRNG.randomGetBool() ? -1 : 1)
+    degradeTiles.push({x: fallenRoofX, y: fallenY, index: (fallenY << 10) | fallenRoofX, code: WOODWALL})
+
+    this.applyTiles(degradeTiles, ETERNAL_EXCLUDED)
+
     // Protection contre le creusement
     tileGuard.addRect(x0 - 2, roofY, x0 + HOUSE_W + 1, flatY + 1)
 
-    window.DEBUG_POINTS.push({x: x0 - 2, y: roofY, color: 'orange'}) // DEBUG
-    window.DEBUG_POINTS.push({x: x0 + HOUSE_W + 1, y: flatY + 1, color: 'orange'}) // DEBUG
-    window.DEBUG_POINTS.push({x: x0, y: y0, color: 'lime'}) // DEBUG
+    // window.DEBUG_POINTS.push({x: x0 - 2, y: roofY, color: 'orange'}) // DEBUG
+    // window.DEBUG_POINTS.push({x: x0 + HOUSE_W + 1, y: flatY + 1, color: 'orange'}) // DEBUG
+    // window.DEBUG_POINTS.push({x: x0, y: y0, color: 'lime'}) // DEBUG
 
     return {x0, y0}
   }
