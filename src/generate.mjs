@@ -3860,10 +3860,12 @@ class WorldCarver {
 
     let x0, y0, valid
     let attempts = 0
+    const CAVE_MARGIN = 3
+    const CAVE_OFFSET = 2
     do {
       x0 = seededRNG.randomGetMinMax(rect.x0 + 1, rect.x1 - PYRAMID_WIDTH - 1)
       y0 = seededRNG.randomGetMinMax(rect.ySurface + 1, rect.yUnder - PYRAMID_HEIGHT - 1)
-      valid = !this.isExcluded(x0, y0, x0 + PYRAMID_WIDTH - 1, y0 + PYRAMID_HEIGHT - 1)
+      valid = !this.isExcluded(x0 - CAVE_MARGIN, y0 - CAVE_MARGIN - CAVE_OFFSET, x0 + PYRAMID_WIDTH + CAVE_MARGIN - 1, y0 + PYRAMID_HEIGHT - 1)
       attempts++
     } while (!valid && attempts < MAX_ATTEMPTS)
     if (!valid) return null
@@ -3872,7 +3874,6 @@ class WorldCarver {
     const origin = (y0 << 10) | x0
 
     // 2. Creusement de la caverne
-    const CAVE_MARGIN = 3
     const caveW = PYRAMID_WIDTH + CAVE_MARGIN * 2 // 13
     const caveH = PYRAMID_HEIGHT + CAVE_MARGIN // 12
     const halfCW = Math.ceil(caveW / 2)
@@ -3880,7 +3881,7 @@ class WorldCarver {
 
     // cx/cy = centre de la caverne = centre de la pyramide
     const cx = x0 + Math.floor(PYRAMID_WIDTH / 2)
-    const cy = y0 + Math.floor(PYRAMID_HEIGHT / 2) - 2
+    const cy = y0 + Math.floor(PYRAMID_HEIGHT / 2) - CAVE_OFFSET
 
     const caveTiles = []
     this.digNoisyRect(caveTiles, cx, cy, halfCW - 1, halfCW, halfCH - 1, halfCH, VOID, 0.3, PERLIN_OFFSET_TEMPLE)
