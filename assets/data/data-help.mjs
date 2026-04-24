@@ -1726,6 +1726,13 @@ Shell is a sedimentary material formed from ancient marine organisms. It is foun
     `
   },
 
+  // ── Tools ────────────────────────────────────────────────────
+  {
+    title: 'Pickaxes',
+    category: ['Tool'],
+    content: `
+    `
+  },
   // ── Accessories ──────────────────────────────────────────────
   // ── Activities Mining ────────────────────────────────────────
   //    Mining, Mineable Blocks, Mining Buffs
@@ -1794,13 +1801,37 @@ Shell is a sedimentary material formed from ancient marine organisms. It is foun
     category: ['Activities', 'Fishing'],
     content: `
     `
-  }
+  },
 
   // ── Items & Crafting ─────────────────────────────────────────
   // ── Fauna & Critters ─────────────────────────────────────────
   // ── Buffs & Debuffs ──────────────────────────────────────────
   // ── Mechanics ────────────────────────────────────────────────
 
+  // ── Trees ───────────────────────────────────────────────────
+  //    Giant Mushroom
+  {
+    title: 'Giant Mushroom',
+    category: ['Trees'],
+    content: `
+    `
+  },
+  // ── Plants ───────────────────────────────────────────────────
+  // ── Fishs ────────────────────────────────────────────────────
+  // ── Monsters ─────────────────────────────────────────────────
+  //    Spiders, Bees
+  {
+    title: 'Spiders',
+    category: ['Monsters'],
+    content: `
+    `
+  },
+  {
+    title: 'Bees',
+    category: ['Monsters'],
+    content: `
+    `
+  }
 ]
 
 /* ====================================================================================================

@@ -158,11 +158,22 @@ class GameCore {
         if (ref.startsWith('item:')) {
           const code = ref.slice(5)
           if (!ITEMS[code]) {
-            console.error(`[help] '${entry.title}' : item inconnu '${code}'`)
+            console.warn(`[help] '${entry.title}' : item inconnu '${code}'`)
             errors++
             return `⚠️ &lbrack;&lbrack;${ref}&rbrack;&rbrack;`
           }
           return match // valide — sera résolu plus tard
+        }
+
+        // Lien item:code
+        if (ref.startsWith('monster:')) {
+          const code = ref.slice(8)
+          // if (!ITEMS[code]) {
+          console.warn(`[help] '${entry.title}' : monstre inconnu '${code}'`)
+          errors++
+          return `⚠️ &lbrack;&lbrack;${ref}&rbrack;&rbrack;`
+          // }
+          // return match // valide — sera résolu plus tard
         }
 
         // Lien helpTopic

@@ -513,7 +513,7 @@ export const TEMPLE_RUIN_COLUMNS = [
   // row7
   {dx: 0, dy: 7}, {dx: 2, dy: 7}, {dx: 12, dy: 7}, {dx: 14, dy: 7},
   // row8
-  {dx: 0, dy: 8}, {dx: 2, dy: 8}, {dx: 12, dy: 8}, {dx: 14, dy: 8},
+  {dx: 0, dy: 8}, {dx: 2, dy: 8}, {dx: 12, dy: 8}, {dx: 14, dy: 8}
 ]
 
 export const TEMPLE_RUIN_WALL_INDEXES = TEMPLE_RUIN_WALL.map(({dx, dy}) => (dy << 10) | dx)

@@ -4134,6 +4134,10 @@ class WorldCarver {
     // Rectangle EMERALDWALL
     tileGuard.addRect(tx + 1, ty + 6, tx + 13, ty + 8)
 
+    // ajout du decomposer
+    const decomposerX = tx + 6
+    furnitureGenerator.addFurnitureAt(((ty + 9) << 10) | decomposerX, 'brokenDecomposer')
+
     // Salle intérieure — coin haut-gauche row6, col1
     const room = ((ty + 6) << 10) | (tx + 1)
 

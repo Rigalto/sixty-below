@@ -143,24 +143,28 @@ export const ITEM_TYPE = {
 
 export const ITEMS = {
   // crafting Station
-  alchemyTable: {name: 'Alchemy Table', type: ITEM_TYPE.FURNITURE | ITEM_TYPE.PLACABLE, stype: 'station', star: 1, sell: 100, image: 'furniture_32_32-12-2', placed: 'furniture_32_32-6-3', help: 'Stations', tooltip: ''},
+  alchemyTable: {name: 'Alchemy Table', type: ITEM_TYPE.FURNITURE | ITEM_TYPE.PLACABLE, stype: 'station', star: 1, image: 'furniture_32_32-12-2', placed: 'furniture_32_32-6-3', help: 'Stations', tooltip: ''},
 
   // crystall
-  lifeCrystal: {name: 'Life Crystal', type: ITEM_TYPE.FURNITURE | ITEM_TYPE.UNIQUE | ITEM_TYPE.USABLE, stype: 'life', star: 1, sell: 0, image: 'furniture_32_32-12-2', placed: 'furniture_32_32-6-3', help: 'Life Crystal', tooltip: 'Permanently increases maximum life by 20\nCollect with a Hammer'},
+  lifeCrystal: {name: 'Life Crystal', type: ITEM_TYPE.FURNITURE | ITEM_TYPE.UNIQUE | ITEM_TYPE.USABLE, stype: 'life', star: 1, image: 'furniture_32_32-12-2', placed: 'furniture_32_32-6-3', help: 'Life Crystal', tooltip: 'Permanently increases maximum life by 20\nCollect with a Hammer'},
 
   // triskel
-  triskelCopper: {name: 'Copper Triskel', type: ITEM_TYPE.FURNITURE | ITEM_TYPE.UNIQUE | ITEM_TYPE.MATERIAL, stype: 'triskel', star: 3, sell: 0, image: 'furniture_32_32-12-2', placed: 'furniture_32_32-6-3', help: 'Triskels', tooltip: ''},
-  triskelSilver: {name: 'Silver Triskel', type: ITEM_TYPE.FURNITURE | ITEM_TYPE.UNIQUE | ITEM_TYPE.MATERIAL, stype: 'triskel', star: 4, sell: 0, image: 'furniture_32_32-12-2', placed: 'furniture_32_32-6-3', help: 'Triskels', tooltip: ''},
-  triskelGold: {name: 'Gold Triskel', type: ITEM_TYPE.FURNITURE | ITEM_TYPE.UNIQUE | ITEM_TYPE.MATERIAL, stype: 'triskel', star: 5, sell: 0, image: 'furniture_32_32-12-2', placed: 'furniture_32_32-6-3', help: 'Triskels', tooltip: ''},
-  triskelAncient: {name: 'Ancient Triskel', type: ITEM_TYPE.ACCESSORY | ITEM_TYPE.UNIQUE | ITEM_TYPE.CRAFTABLE, stype: 'triskel', star: 5, sell: 0, image: 'furniture_32_32-12-2', placed: 'furniture_32_32-6-3', help: 'Triskels', tooltip: ''},
+  triskelCopper: {name: 'Copper Triskel', type: ITEM_TYPE.FURNITURE | ITEM_TYPE.UNIQUE | ITEM_TYPE.MATERIAL, stype: 'triskel', star: 3, image: 'furniture_32_32-12-2', placed: 'furniture_32_32-6-3', help: 'Triskels', tooltip: ''},
+  triskelSilver: {name: 'Silver Triskel', type: ITEM_TYPE.FURNITURE | ITEM_TYPE.UNIQUE | ITEM_TYPE.MATERIAL, stype: 'triskel', star: 4, image: 'furniture_32_32-12-2', placed: 'furniture_32_32-6-3', help: 'Triskels', tooltip: ''},
+  triskelGold: {name: 'Gold Triskel', type: ITEM_TYPE.FURNITURE | ITEM_TYPE.UNIQUE | ITEM_TYPE.MATERIAL, stype: 'triskel', star: 5, image: 'furniture_32_32-12-2', placed: 'furniture_32_32-6-3', help: 'Triskels', tooltip: ''},
+  triskelAncient: {name: 'Ancient Triskel', type: ITEM_TYPE.ACCESSORY | ITEM_TYPE.UNIQUE | ITEM_TYPE.CRAFTABLE, stype: 'triskel', star: 5, image: 'furniture_32_32-12-2', placed: 'furniture_32_32-6-3', help: 'Triskels', tooltip: ''},
 
   // Wood furniture set
   tableWood: {name: 'Wooden Table', type: ITEM_TYPE.FURNITURE, stype: 'station', star: 1, image: 'furniture_32_32-2-0', placed: 'fuws_48_32-1-0', help: 'Tables', tooltip: 'A precision assembly requires a very flat surface.', furnitureSet: 'wood', surface: true},
-  chairWood: {name: 'Wooden Chair', type: ITEM_TYPE.FURNITURE, stype: 'chair', star: 1, image: 'furniture_32_32-0-5', placedleft: 'fuws_16_48-1-0', placedright: 'fuws_16_48-2-0', help: 'Chairs', tooltip: 'Crafting is more precise when one is seated', furnitureSet: 'wood', comfort: true},
+  chairWood: {name: 'Wooden Chair', type: ITEM_TYPE.FURNITURE, stype: 'chair', star: 1, image: 'furniture_32_32-0-5', placedLeft: 'fuws_16_48-1-0', placedRight: 'fuws_16_48-2-0', help: 'Chairs', tooltip: 'Crafting is more precise when one is seated', furnitureSet: 'wood', comfort: true},
   toiletWood: {name: 'Wooden Toilet', type: ITEM_TYPE.FURNITURE, stype: 'toilet', star: 1, image: 'furniture_32_32-0-5', placed: 'fuws_16_48-2-0', help: 'Toilets', tooltip: '???', furnitureSet: 'wood', comfort: true},
 
   // chests
-  chestAncient: {name: 'Ancient Chest', type: ITEM_TYPE.FURNITURE, stype: 'chest', star: 2, capacity: 56, image: 'furniture_32_32-0-1', placed: 'fuws_32_32-0-1', locked: 'fuws_32_32-6-2', help: 'Chests', tooltip: 'Items container'}
+  chestAncient: {name: 'Ancient Chest', type: ITEM_TYPE.FURNITURE, stype: 'chest', star: 2, capacity: 56, image: 'furniture_32_32-0-1', placed: 'fuws_32_32-0-1', help: 'Chests', tooltip: 'Items container'},
+
+  // crafting station
+  brokenDecomposer: {name: 'Broken Decomposer', type: ITEM_TYPE.FURNITURE, immovable: true, stype: 'none', star: 5, image: null, placed: 'fuws_48_32-0-1', help: 'Lost Temple', tooltip: '????'},
+  decomposer: {name: 'Decomposer', type: ITEM_TYPE.FURNITURE, immovable: true, stype: 'station', star: 5, image: null, placed: 'fuws_48_32-0-1', help: 'Decomposer', tooltip: '????'}
 }
 
 /* ============================================================================
@@ -227,7 +231,7 @@ for (const key in NODES) {
 }
 
 // — 8.2. Validation des ITEMS
-const REQUIRED_ITEM_FIELDS = ['name', 'type', 'stype', 'star', 'sell', 'image', 'help', 'tooltip']
+const REQUIRED_ITEM_FIELDS = ['name', 'type', 'stype', 'star', 'image', 'help', 'tooltip']
 for (const key in ITEMS) {
   const itemDesc = ITEMS[key]
 
@@ -238,8 +242,8 @@ for (const key in ITEMS) {
       console.error(`[data.mjs] ITEMS.${key} : champ obligatoire manquant : '${field}'`)
     }
   }
-  if ((itemDesc.type & ITEM_TYPE.FURNITURE) && !itemDesc.placed) {
-    console.error(`[data.mjs] ITEMS.${key} : FURNITURE sans attribut 'placed'`)
+  if ((itemDesc.type & ITEM_TYPE.FURNITURE) && !itemDesc.placed && !itemDesc.placedLeft) {
+    console.error(`[data.mjs] ITEMS.${key} : FURNITURE sans attribut 'placed' ni 'placedLeft'`)
   }
   // le post traitement des images est effectué par GameCore.#hydrateItems()
 }
