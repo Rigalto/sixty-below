@@ -1726,19 +1726,19 @@ Shell is a sedimentary material formed from ancient marine organisms. It is foun
     `
   },
 
-  // ── Tools ────────────────────────────────────────────────────
-  {
-    title: 'Pickaxes',
-    category: ['Tool'],
-    content: `
-    `
-  },
   // ── Accessories ──────────────────────────────────────────────
+
   // ── Activities Mining ────────────────────────────────────────
-  //    Mining, Mineable Blocks, Mining Buffs
+  //    Mining, Pickaxes, Mineable Blocks, Mining Buffs
   {
     title: 'Mining',
     category: ['Activities', 'Mining'],
+    content: `
+    `
+  },
+  {
+    title: 'Pickaxes',
+    category: ['Tool', 'Mining'],
     content: `
     `
   },
@@ -1794,11 +1794,35 @@ Shell is a sedimentary material formed from ancient marine organisms. It is foun
     `
   },
 
-  // ── Activities Fishing ────────────────────────────────────────
-  //    Fishing, Fishing Baits, Fisheable Monsters, Fishing Buffs
+  // ── Activities Fishing ───────────────────────────────────────
+  //    Fishing, Fishing Rods, Fishing Baits, Fisheable Monsters, Fishing Buffs
   {
     title: 'Fishing',
     category: ['Activities', 'Fishing'],
+    content: `
+    `
+  },
+  {
+    title: 'Fishing Rods',
+    category: ['Tool', 'Fishing'],
+    content: `
+    `
+  },
+  {
+    title: 'Fishing Baits',
+    category: ['Bait', 'Fishing'],
+    content: `
+    `
+  },
+  {
+    title: 'Fisheable Monsters',
+    category: ['Fish', 'Fishing'],
+    content: `
+    `
+  },
+  {
+    title: 'Fishing Buffs',
+    category: ['Buff', 'Fishing'],
     content: `
     `
   },
