@@ -3850,6 +3850,7 @@ class WorldCarver {
     const MAX_ATTEMPTS = 100
     const pyramids = []
 
+    // 1. Détermination de la position de la pyramide
     const desertRects = []
     for (let i = 0; i < this.#zoneRects.length; i++) {
       if (this.#zoneRects[i].biome === BIOME_TYPE.DESERT) desertRects.push(this.#zoneRects[i])
@@ -3870,30 +3871,48 @@ class WorldCarver {
     const mirror = seededRNG.randomGetBool()
     const origin = (y0 << 10) | x0
 
-    // Placement des tuiles KHEPRITE
+    // 2. Creusement de la caverne
+    const CAVE_MARGIN = 3
+    const caveW = PYRAMID_WIDTH + CAVE_MARGIN * 2 // 13
+    const caveH = PYRAMID_HEIGHT + CAVE_MARGIN // 12
+    const halfCW = Math.ceil(caveW / 2)
+    const halfCH = Math.ceil(caveH / 2)
+
+    // cx/cy = centre de la caverne = centre de la pyramide
+    const cx = x0 + Math.floor(PYRAMID_WIDTH / 2)
+    const cy = y0 + Math.floor(PYRAMID_HEIGHT / 2) - 2
+
+    const caveTiles = []
+    this.digNoisyRect(caveTiles, cx, cy, halfCW - 1, halfCW, halfCH - 1, halfCH, VOID, 0.3, PERLIN_OFFSET_TEMPLE)
+    this.applyTiles(caveTiles, ETERNAL_EXCLUDED)
+    this.#flattenCaveBottom(cx, PYRAMID_WIDTH, y0 + PYRAMID_HEIGHT - 1)
+
+    // 3. Placement des tuiles KHEPRITE
     const wallTiles = []
     for (const idx of PYRAMID_WALL_INDEXES) {
       const dx = mirror ? (PYRAMID_WIDTH - 1 - (idx & 0x3FF)) : (idx & 0x3FF)
       const dy = idx >> 10
       const tileIdx = origin + (dy << 10) + dx
-      worldBuffer.writeAt(tileIdx, KHEPRITE)
-      wallTiles.push({index: tileIdx})
+      wallTiles.push({x: tileIdx & 0x3FF, y: tileIdx >> 10, index: tileIdx, code: KHEPRITE})
     }
+    this.applyTiles(wallTiles, ETERNAL_EXCLUDED)
 
-    // Placement des tuiles VOID
+    // 4. Placement des tuiles VOID
+    const voidTiles = []
     for (const idx of PYRAMID_VOID_INDEXES) {
       const dx = mirror ? (PYRAMID_WIDTH - 1 - (idx & 0x3FF)) : (idx & 0x3FF)
       const dy = idx >> 10
       const tileIdx = origin + (dy << 10) + dx
-      worldBuffer.writeAt(tileIdx, VOID)
+      voidTiles.push({x: tileIdx & 0x3FF, y: tileIdx >> 10, index: tileIdx, code: VOID})
     }
+    this.applyTiles(voidTiles, ETERNAL_EXCLUDED)
 
-    // Exclusion et TileGuard
+    // 5. Exclusion et TileGuard
     const rect2 = {x1: x0, y1: y0, x2: x0 + PYRAMID_WIDTH - 1, y2: y0 + PYRAMID_HEIGHT - 1}
     this.addExclusion(rect2)
     tileGuard.addTiles(wallTiles)
 
-    // Coordonnées des deux salles (coin haut-gauche)
+    // 6. Coordonnées des deux salles (coin haut-gauche)
     const r1dx = mirror ? (PYRAMID_WIDTH - 1 - PYRAMID_ROOM1_DELTA.dx) : PYRAMID_ROOM1_DELTA.dx
     const r2dx = mirror ? (PYRAMID_WIDTH - 1 - PYRAMID_ROOM2_DELTA.dx) : PYRAMID_ROOM2_DELTA.dx
 
@@ -4161,8 +4180,7 @@ class WorldCarver {
   cleanupAfterCarving () {
     const VOID = NODES.VOID.code
     const SKY = NODES.SKY.code
-    const STONEWALL = NODES.STONEWALL.code
-    const WOODWALL = NODES.WOODWALL.code
+    const PROTECTED_CODES = new Set([NODES.STONEWALL.code, NODES.WOODWALL.code, NODES.KHEPRITE.code, NODES.OLYMPITE.code])
     const LIQUID_OR_GAZ = new Set([
       NODES.VOID.code,
       NODES.SKY.code,
@@ -4258,7 +4276,7 @@ class WorldCarver {
         // /////////////////////////////////// //
 
         // Règle 0 — tuile adjacente à un mur de cabine (WOODWALL ou STONEWALL) → pas de modification
-        if (top === WOODWALL || bot === WOODWALL || left === WOODWALL || right === WOODWALL || top === STONEWALL || bot === STONEWALL || left === STONEWALL || right === STONEWALL) continue
+        if (PROTECTED_CODES.has(code) || PROTECTED_CODES.has(top) || PROTECTED_CODES.has(bot) || PROTECTED_CODES.has(left) || PROTECTED_CODES.has(right)) continue
 
         // Règle 1 — VOID isolé : 4 voisins solides → substrat aléatoire parmi les 4
         if (code === VOID && !LIQUID_OR_GAZ.has(top) && !LIQUID_OR_GAZ.has(bot) && !LIQUID_OR_GAZ.has(left) && !LIQUID_OR_GAZ.has(right)) {
