@@ -29,7 +29,6 @@
 - `digAnthills()` — Forest, surface, structure conique
 - `digTermiteMounds()` — Jungle, surface, structure rectangulaire
 - `digAntlionPits()` — Desert, surface, creux triangulaire
-- `digAbandonedMine()` — Tous biomes, caverns_bottom, OBSIDIAN + COBALTWALL
 
 ### Plage et fond de mer
 - Ajout des tuiles SHORE et SHELL en bordure de mer
@@ -188,6 +187,7 @@
 - `WorldCarver.digRuinedCabin` — Forest, under, WOODWALL + STONEWALL + 1 furniture + 1 Chest
 - `WorldCarver.digLostTemple` — Jungle, caverns_top, EMERALDWALL + Décomposeur
 - `WorldCarver.digAncientHouse` — Desert, caverns_bottom, WOODWALL + GOLDWALL + OLYMPITE + Transmutator
+- `WorldCarver.digAbandonedMine` — Tous biomes, caverns_bottom, COBALT + SAPPHIRE + SANDSTONEWALL
 - `WorldCarver.cleanupAfterCarving` — nettoyage post-creusement (4 passes, règles déclaratives)
 - `WorldCarver.buildErodedSurfaceLine` — ligne de surface + érosion (trous et bosses)
 - `TileGuard` — utilitaire de protection tuiles contre creusement, formes bruitées (cercle, ellipse, rectangle)
