@@ -1,4 +1,4 @@
-import {seededRNG} from './utils.mjs'
+import {seededRNG, shuffleArray} from './utils.mjs'
 import {database, uniqueIdGenerator} from './database.mjs'
 import {WEATHER_TYPE, WORLD_WIDTH, WORLD_HEIGHT, SEA_LEVEL, TOPSOIL_Y_SKY_SURFACE, TOPSOIL_Y_SURFACE_UNDER, TOPSOIL_Y_UNDER_CAVERNS, TOPSOIL_Y_CAVERNS_MID, BIOME_TILE_MAP, SEA_MAX_JITTER, SEA_MAX_WIDTH, SEA_MAX_HEIGHT, CLUSTER_SCATTER_MAP, ORE_GEM_SCATTER_MAP, PERLIN_OFFSET_NATURALIZER, PERLIN_OFFSET_TUNNEL, PERLIN_OFFSET_SURFACE_TUNNEL, PERLIN_OFFSET_SMALL_TUNNEL, PERLIN_OFFSET_CAVERN, PERLIN_OFFSET_HIVE, PERLIN_OFFSET_HEART, PERLIN_OFFSET_MUSHROOM, PERLIN_OFFSET_COBWEB, PERLIN_OFFSET_FERNS, PERLIN_OFFSET_LAKES, PERLIN_OFFSET_SHELL, PERLIN_OFFSET_TEMPLE, SMALL_CAVERNS_COUNT, MEDIUM_CAVERNS_COUNT, UNDERGROUND_TUNNEL_COUNT, CAVERNS_TUNNEL_COUNT, SMALL_TUNNELS_COUNT, HIVE_RADIUS_MIN, HIVE_RADIUS_MAX, COBWEB_CAVE_COUNT_MIN, COBWEB_CAVE_COUNT_MAX, COBWEB_RADIUS_X_MIN, COBWEB_RADIUS_X_MAX, COBWEB_RADIUS_Y_MIN, COBWEB_RADIUS_Y_MAX, COBWEB_CAVE_MAIN_MIN, COBWEB_CAVE_MAIN_MAX, COBWEB_CAVE_SIDE_MIN, COBWEB_CAVE_SIDE_MAX, COBWEB_SCATTER_COUNT, COBWEB_SCATTER_SIZE_MIN, COBWEB_SCATTER_SIZE_MAX, GEODE_CAVE_COUNT_MIN, GEODE_CAVE_COUNT_MAX, GEODE_RADIUS_MIN, GEODE_RADIUS_MAX, GEODE_TARGET_CLUSTER_COUNT, GEODE_CLUSTER_SIZE_MIN, GEODE_CLUSTER_SIZE_MAX, TOPSOIL_SCATTER_MAP, LAKE_RADIUS_X_MIN, LAKE_RADIUS_X_MAX, LAKE_RADIUS_Y_MIN, LAKE_RADIUS_Y_MAX, LAKE_PIT_RADIUS_X_MIN, LAKE_PIT_RADIUS_X_MAX, LAKE_PIT_RADIUS_Y_MIN, LAKE_PIT_RADIUS_Y_MAX, LAKE_CREATION_MAP, UNDERGROUND_LAKE_UNDER_COUNT, UNDERGROUND_LAKE_CAVERNS_COUNT, UNDERGROUND_LAKE_RADIUS_MIN, UNDERGROUND_LAKE_RADIUS_MAX, BLIND_LAKE_COUNT, BLIND_LAKE_RADIUS_MIN, BLIND_LAKE_RADIUS_MAX, SAP_LAKE_UNDER_COUNT, SAP_LAKE_CAVERNS_COUNT, SAP_LAKE_RADIUS_MIN, SAP_LAKE_RADIUS_MAX, SAP_POCKET_COUNT, SAP_POCKET_RADIUS_MIN, SAP_POCKET_RADIUS_MAX, WATER_PUDDLE_COUNT, SAP_PUDDLE_COUNT, PUDDLE_HEIGHT_MIN, PUDDLE_HEIGHT_MAX, FOSSIL_VEIN_COUNT, FERN_CAVE_RADIUS_X_MIN, FERN_CAVE_RADIUS_X_MAX, FERN_CAVE_RADIUS_Y_MIN, FERN_CAVE_RADIUS_Y_MAX, MOSS_CAVE_RADIUS_X_MIN, MOSS_CAVE_RADIUS_X_MAX, MOSS_CAVE_RADIUS_Y_MIN, MOSS_CAVE_RADIUS_Y_MAX, SAND_POCKET_RADIUS_X_MIN, SAND_POCKET_RADIUS_X_MAX, SAND_POCKET_RADIUS_Y_MIN, SAND_POCKET_RADIUS_Y_MAX, MUSHROOM_CAVE_RADIUS_X_MIN, MUSHROOM_CAVE_RADIUS_X_MAX, MUSHROOM_CAVE_RADIUS_Y_MIN, MUSHROOM_CAVE_RADIUS_Y_MAX, PYRAMID_WALL_INDEXES, PYRAMID_VOID_INDEXES, PYRAMID_WIDTH, PYRAMID_HEIGHT, PYRAMID_ROOM1_DELTA, PYRAMID_ROOM2_DELTA, TEMPLE_RUIN_WALL_INDEXES, TEMPLE_RUIN_COLUMNS_INDEXES} from '../assets/data/data-gen.mjs'
 import {NODES, NODES_LOOKUP, NODE_TYPE, BIOME_TYPE, PLANT_SYSTEM, GRASS_TYPE, ITEMS} from '../assets/data/data.mjs'
@@ -4330,7 +4330,6 @@ class WorldCarver {
 
     // 4. Ajout des furnitures ─────────────────────────────────
     // 4.1 Furnitures de l'étage ───────────────────────────────
-    // 3.8. Meubles de l'étage ─────────────────────────────────────
     const FLOOR_ITEMS = ['chairWood', 'chairGlass', 'toiletWood', 'toiletGlass']
     const smallCode = seededRNG.randomGetArrayValue(FLOOR_ITEMS)
     const config = seededRNG.randomGetMinMax(0, 3)
@@ -4355,7 +4354,71 @@ class WorldCarver {
     if (sPlacedLeft !== undefined) smallFurniture.left = seededRNG.randomGetBool()
 
     // 4.2 Furnitures du toit ──────────────────────────────────
+    const ROOF_ITEMS = ['tableWood', 'blastFurnace', 'sawmill', 'anvilPlatinum', 'grindstone', 'loom', 'tanningRack', 'jewelerBench', 'alchemyTable', 'cookingPot']
+
+    // Mélange de la liste (Fisher-Yates)
+    const shuffled = shuffleArray([...ROOF_ITEMS])
+    const surfaceFurnitures = []
+    let rx = x0 + 1
+
+    for (const itemCode of shuffled) {
+      if (rx >= x0 + HOUSE_W - 1) break
+
+      const {w, h} = furnitureGenerator.getFurnitureSize(itemCode)
+      if (rx + w > x0 + HOUSE_W - 1) break
+
+      const ry = roofY - h
+      furnitureGenerator.addFurnitureAt((ry << 10) | rx, itemCode)
+
+      if (ITEMS[itemCode].surface) {
+        surfaceFurnitures.push({index: (ry << 10) | rx, w})
+      }
+
+      rx += w + seededRNG.randomGetMinMax(0, 3)
+    }
+
     // 4.3 Furnitures du sol ───────────────────────────────────
+    const GROUND_ITEMS = ['tableWood', 'blastFurnace', 'sawmill', 'anvilPlatinum', 'grindstone', 'loom', 'tanningRack', 'jewelerBench', 'alchemyTable', 'cookingPot']
+
+    const shuffledGround = shuffleArray([...GROUND_ITEMS])
+    let gx = x0 + 1
+
+    for (const itemCode of shuffledGround) {
+      if (gx >= x0 + HOUSE_W - 1) break
+
+      const {w, h} = furnitureGenerator.getFurnitureSize(itemCode)
+      if (gx + w > x0 + HOUSE_W - 1) break
+
+      // Vérification chevauchement avec la tuile de WOODWALL tombée
+      if (gx <= fallenRoofX && gx + w > fallenRoofX) {
+        gx = fallenRoofX + 1 + seededRNG.randomGetMinMax(0, 1)
+        if (gx + w > x0 + HOUSE_W - 1) break
+      }
+
+      const gy = flatY - h
+      const furniture = furnitureGenerator.addFurnitureAt((gy << 10) | gx, itemCode)
+      if (ITEMS[itemCode].placedLeft !== undefined) furniture.left = seededRNG.randomGetBool()
+
+      if (ITEMS[itemCode].surface) {
+        surfaceFurnitures.push({index: (gy << 10) | gx, w})
+      }
+
+      gx += w + seededRNG.randomGetMinMax(0, 3)
+    }
+
+    // 4.4 Tableware sur les meubles plats ───────────────────────────────────
+    const TABLEWARE_ITEMS = ['bowl', 'mug', 'plate', 'trencher', 'bottle', 'water', 'honey', 'sap', 'bucket', 'bucketWater', 'bucketHoney', 'bucketSap']
+
+    for (const {index, w} of surfaceFurnitures) {
+      if (seededRNG.randomGetMax(99) >= 80) continue
+
+      const tablewareCode = seededRNG.randomGetArrayValue(TABLEWARE_ITEMS)
+      const {w: tw, h: th} = furnitureGenerator.getFurnitureSize(tablewareCode)
+
+      const fx = (index & 0x3FF) + seededRNG.randomGetMinMax(0, Math.max(0, w - tw))
+      const fy = (index >> 10) - th
+      furnitureGenerator.addFurnitureAt((fy << 10) | fx, tablewareCode)
+    }
 
     // 5. Protection contre le creusement
     tileGuard.addRect(x0 - 2, roofY, x0 + HOUSE_W + 1, flatY + 1)
