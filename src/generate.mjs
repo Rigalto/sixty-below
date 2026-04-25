@@ -4427,7 +4427,7 @@ class WorldCarver {
     // window.DEBUG_POINTS.push({x: x0 + HOUSE_W + 1, y: flatY + 1, color: 'orange'}) // DEBUG
     // window.DEBUG_POINTS.push({x: x0, y: y0, color: 'lime'}) // DEBUG
 
-    return {x0, y0}
+    return {room: (y0 << 10) | (x0 + 1)}
   }
 
   //   Structure : identique à ruined cabin. WOODWALL autour, EMERALDWALL  comme mur de fond. La taille est plus grande, avec un demi étage (façon mezzanine).
