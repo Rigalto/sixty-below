@@ -4017,9 +4017,8 @@ class WorldCarver {
     // ── 4. Placement du mobilier ─────────────────────────────────────
     const floorY = y0 + height - 1
     const furnitureCode = seededRNG.randomGetArrayValue(FURNITURE_CODES)
-    const {placed: fPlaced, placedLeft: fPlacedLeft} = ITEMS[furnitureCode]
-    const fImg = fPlaced ?? fPlacedLeft
-    const fw = fImg.sw >> 4
+    const fPlacedLeft = ITEMS[furnitureCode].placedLeft
+    const fw = furnitureGenerator.getFurnitureSize(furnitureCode).w
 
     // 5. Position aléatoire du meuble dans l'espace intérieur
     const fx = seededRNG.randomGetMinMax(x0 + 1, x0 + width - 1 - fw)
@@ -4027,8 +4026,7 @@ class WorldCarver {
     if (fPlacedLeft !== undefined) { furniture.left = seededRNG.randomGetBool() }
 
     // 6. Placement du coffre — à gauche ou à droite du meuble
-    const {placed: cPlaced} = ITEMS.chestAncient
-    const cw = cPlaced.sw >> 4
+    const cw = furnitureGenerator.getFurnitureSize('chestAncient').w
     let cx
     if (fx + fw <= x0 + width - 1 - cw) {
       cx = fx + fw // à droite
@@ -4346,14 +4344,13 @@ class WorldCarver {
     }
 
     // Transmutator
-    const {placed: tPlaced} = ITEMS.transmutator
-    const dh = tPlaced.sh >> 4
+    const dh = furnitureGenerator.getFurnitureSize('transmutator').h
     furnitureGenerator.addFurnitureAt(((floorY2 - dh) << 10) | decompX, 'transmutator')
 
     // Petit meuble
-    const {placed: sPlaced, placedLeft: sPlacedLeft} = ITEMS[smallCode]
-    const sImg = sPlaced ?? sPlacedLeft
-    const sh = sImg.sh >> 4
+    const sPlacedLeft = ITEMS[smallCode].placedLeft
+    const sh = furnitureGenerator.getFurnitureSize(smallCode).h
+
     const smallFurniture = furnitureGenerator.addFurnitureAt(((floorY2 - sh) << 10) | smallX, smallCode)
     if (sPlacedLeft !== undefined) smallFurniture.left = seededRNG.randomGetBool()
 
@@ -4929,16 +4926,26 @@ class FurnitureGenerator {
   }
 
   /**
+ * Retourne les dimensions en tuiles d'un furniture.
+ * Utilise 'placed' ou 'placedLeft' si 'placed' est absent.
+ * @param {string} code - Identifiant item
+ * @returns {{w: number, h: number}}
+ */
+  getFurnitureSize (code) {
+    const {placed, placedLeft} = ITEMS[code]
+    const img = placed ?? placedLeft
+    return {w: img.sw >> 4, h: img.sh >> 4}
+  }
+
+  /**
    * Ajoute un furniture à la liste.
    * @param {number} index - Position coin haut-gauche (y << 10) | x
    * @param {string} code - Identifiant item ('lifeCrystal', 'woodchest'...)
    *  * @returns {{id, index, code, stype, w, h}} — objet furniture ajouté
    */
   addFurnitureAt (index, code) {
-    const {placed, placedLeft, stype} = ITEMS[code]
-    const img = placed ?? placedLeft
-    const w = img.sw >> 4
-    const h = img.sh >> 4
+    const stype = ITEMS[code].stype
+    const {w, h} = this.getFurnitureSize(code)
     const furniture = {id: uniqueIdGenerator.getUniqueId(), index, code, stype, w, h}
     this.#furnitures.push(furniture)
     return furniture
