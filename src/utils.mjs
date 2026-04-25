@@ -930,3 +930,17 @@ export const cosineInterpolation = (x, a, b) => {
   const f = (1 - Math.cos(x * Math.PI)) * 0.5
   return a * (1 - f) + b * f
 }
+
+/**
+ * Mélange un tableau en place (Fisher-Yates).
+ * Utilise seededRNG pour la reproductibilité.
+ * @param {Array} arr
+ * @returns {Array} — le même tableau mélangé
+ */
+export const shuffleArray = (arr) => {
+  for (let i = arr.length - 1; i > 0; i--) {
+    const j = seededRNG.randomGetMinMax(0, i)
+    const tmp = arr[i]; arr[i] = arr[j]; arr[j] = tmp
+  }
+  return arr
+}

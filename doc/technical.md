@@ -462,6 +462,7 @@ Ne jamais appeler `seededRNG` en mode déterministe depuis la game loop.
 |---|---|---|---|
 | `intFract` | `(r: number): {int, fract}` | `{int: number, fract: number}` | Partie entière (`Math.floor`) et fractionnaire. `fract` toujours `>= 0`. |
 | `cosineInterpolation` | `(x: number, a: number, b: number): number` | `[a, b]` | Interpolation cosinus. `x=0` → `a`, `x=1` → `b`, monotone sur `[0, 1]`. |
+| `shuffleArray(arr): Array` | Mélange un tableau en place (algorithme Fisher-Yates). Utilise `seededRNG` pour la reproductibilité. Retourne le même tableau mélangé. |
 
 ---
 
