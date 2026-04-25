@@ -140,7 +140,7 @@ class WorldGenerator {
     window.DEBUG_POINTS = [] // DEGUG - à supprimer
 
     // affichage de la progression de la création dans le dialogue modal
-    const STEPS = 20
+    const STEPS = 21
     let step = 0
     const progress = (topic) => {
       step++
@@ -256,12 +256,10 @@ class WorldGenerator {
     // 6.1.X Antilion Pit
     // const antilions = worldCarver.digAntilionPits()
 
-    // 6.1.X Pyramid
-    // le cy est tiré entre rect.yUnder et rect.yCavernsMid
+    // 6.1.X Pyramid / Ancient House / Lost Temple / Ruined Cabin / Abandoned Mine
     const pyramid = worldCarver.digPyramid()
     console.log('....................pyramid', pyramid)
 
-    // 6.1.X Ancient House / Lost Temple / Ruined Cabin
     const ruinedcabin = worldCarver.digRuinedCabin()
     console.log('....................ruinedcabin', ruinedcabin)
 
@@ -271,9 +269,8 @@ class WorldGenerator {
     const ancientHouse = worldCarver.digAncientHouse()
     console.log('....................ancientHouse', ancientHouse)
 
-    // 6.1.X Underground Lake
-    // caverns_top - Forest - WATER + HUMUS
-    // const undergroundlake = worldCarver.digUndergroundLake()
+    worldCarver.digAbandonedMine()
+    await progress('Ancient civilizations')
 
     // 6.1.X Life Heart (15)
     const hearts = worldCarver.digHearts(surfaceUnder, underCaverns)
@@ -3031,7 +3028,7 @@ class WorldCarver {
  */
   #tryFillPuddle (cx, cy, nodeCode) {
     const VOID = NODES.VOID.code
-    const LIQUID = new Set([NODES.WATER.code, NODES.SEA.code, NODES.HONEY.code, NODES.SAP.code, NODES.GRASSFERN.code, NODES.GRASSMOSS.code, NODES.GRASSMUSHROOM.code, NODES.WOODWALL.code, NODES.STONEWALL.code, NODES.KHEPRITE.code, NODES.OLYMPITE.code, NODES.OLYMPITEWALL.code, NODES.INVISIBLE.code])
+    const LIQUID = new Set([NODES.WATER.code, NODES.SEA.code, NODES.HONEY.code, NODES.SAP.code, NODES.GRASSFERN.code, NODES.GRASSMOSS.code, NODES.GRASSMUSHROOM.code, NODES.WOODWALL.code, NODES.STONEWALL.code, NODES.KHEPRITE.code, NODES.OLYMPITE.code, NODES.OLYMPITEWALL.code, NODES.INVISIBLE.code, NODES.SANDSTONEWALL.code])
     const yStart = cy
 
     const visited = new Set()
@@ -3492,8 +3489,7 @@ class WorldCarver {
 
       // Accumule les tuiles SHELL
       const tiles = []
-      for (let j = 0; j < path.length; j++) {
-        const p = path[j]
+      for (const p of path) {
         this.digNoisyCircle(tiles, p.x, p.y, p.radiusMin, p.radiusMax, SHELL, 0.3, PERLIN_OFFSET_SHELL)
       }
 
@@ -3502,8 +3498,7 @@ class WorldCarver {
       this.addExclusion(rect2)
 
       // Protection TileGuard
-      for (let j = 0; j < path.length; j++) {
-        const p = path[j]
+      for (const p of path) {
         tileGuard.addNoisyCircle(p.x, p.y, p.radiusMin + 2, p.radiusMax + 2, 0.3, PERLIN_OFFSET_SHELL)
       }
     }
@@ -4430,13 +4425,114 @@ class WorldCarver {
     return {room: (y0 << 10) | (x0 + 1)}
   }
 
-  //   Structure : identique à ruined cabin. WOODWALL autour, EMERALDWALL  comme mur de fond. La taille est plus grande, avec un demi étage (façon mezzanine).
+  /**
+ * Creuse une Abandoned Mine — tunnel horizontal bruité en caverns_bottom, tous biomes.
+ * Diamètre intérieur 6 tuiles, protection TileGuard diamètre 10.
+ * Une seule mine par monde.
+ * Prérequis : initZoneRects(), initExclusions().
+ *
+ * @returns {{path: Array}|null}
+ */
+  digAbandonedMine () {
+    const VOID = NODES.VOID.code
+    const COBALT = NODES.COBALT.code
+    const SAPPHIRE = NODES.SAPPHIRE.code
+    const SANDSTONEWALL = NODES.SANDSTONEWALL.code
+    const MAX_ATTEMPTS = 100
+    const RADIUS_INNER = 3
+    const RADIUS_GUARD = 5
+    const LENGTH = 40
+    const DELTA_ANGLE = 8
 
-  // Elle se trouve dans une caverne rectangulaire à bords bruités plus grande que la
+    const rect = seededRNG.randomGetArrayValue(this.#zoneRects)
+    const angle = seededRNG.randomGetBool() ? 90 : -90
 
-  // Le sol sera pavé de KHERITE, pour éviter que l'on puisse creuser sous la station de travail.
+    let cx, cy, valid
+    let attempts = 0
+    do {
+      cx = seededRNG.randomGetMinMax(rect.x0 + LENGTH, rect.x1 - LENGTH)
+      cy = seededRNG.randomGetMinMax(rect.yCavernsMid + RADIUS_GUARD, rect.yCaverns - RADIUS_GUARD)
+      valid = !this.isExcluded(cx - LENGTH, cy - RADIUS_GUARD, cx + LENGTH, cy + RADIUS_GUARD)
+      attempts++
+    } while (!valid && attempts < MAX_ATTEMPTS)
+    if (!valid) return null
 
-  // Il y a toujours une station de travail
+    const path = this.pathTunnel(cx, cy, RADIUS_INNER, LENGTH, angle, DELTA_ANGLE)
+
+    // Creusement
+    const tiles = []
+    for (const p of path) {
+      this.digNoisyCircle(tiles, p.x, p.y, p.radiusMin, p.radiusMax, VOID, 0.3, PERLIN_OFFSET_TEMPLE)
+    }
+    const rect2 = this.applyTiles(tiles)
+    this.addExclusion(rect2)
+
+    const ceilingTiles = []
+    const floorTiles = []
+    for (const p of path) {
+      for (let x = p.x - p.radiusMax; x <= p.x + p.radiusMax; x++) {
+        // Plafond — tuile solide avec VOID en dessous
+        let y = p.y - p.radiusMax
+        while (y >= 1 && worldBuffer.read(x, y) === VOID) y--
+        if (worldBuffer.read(x, y) !== VOID && worldBuffer.read(x, y + 1) === VOID) {
+          if (seededRNG.randomGetMax(99) >= 25) {
+            ceilingTiles.push({x, y, index: (y << 10) | x, code: COBALT})
+          }
+        }
+
+        // Sol — tuile solide avec VOID au dessus
+        y = p.y + p.radiusMax
+        while (y < WORLD_HEIGHT - 1 && worldBuffer.read(x, y) === VOID) y++
+        if (worldBuffer.read(x, y) !== VOID && worldBuffer.read(x, y - 1) === VOID) {
+          if (seededRNG.randomGetMax(99) < 15) {
+            floorTiles.push({x, y, index: (y << 10) | x, code: SAPPHIRE})
+          }
+        }
+      }
+    }
+    this.applyTiles(ceilingTiles)
+    this.applyTiles(floorTiles)
+
+    // Étais — colonnes verticales de SANDSTONEWALL
+    const etaiTiles = []
+
+    const startX = Math.min(path[0].x, path[path.length - 1].x)
+    const lastX = Math.max(path[0].x, path[path.length - 1].x)
+    let nextEtaiX = startX + seededRNG.randomGetMinMax(3, 5)
+
+    while (nextEtaiX < lastX) {
+      // Trouver le point du path le plus proche en X
+      let closestP = path[0]
+      for (const p of path) {
+        if (Math.abs(p.x - nextEtaiX) < Math.abs(closestP.x - nextEtaiX)) closestP = p
+      }
+
+      // Plafond — descendre depuis cy - radiusMax
+      let ceilY = closestP.y - closestP.radiusMax - 2
+      while (ceilY < WORLD_HEIGHT - 1 && worldBuffer.read(nextEtaiX, ceilY) !== VOID) ceilY++
+      // ceilY est maintenant sur le premier VOID
+
+      // Sol — monter depuis cy + radiusMax
+      let floorY = closestP.y + closestP.radiusMax + 2
+      while (floorY >= 1 && worldBuffer.read(nextEtaiX, floorY) !== VOID) floorY--
+      // floorY est maintenant sur le dernier VOID
+
+      for (let y = ceilY; y <= floorY; y++) {
+        etaiTiles.push({x: nextEtaiX, y, index: (y << 10) | nextEtaiX, code: SANDSTONEWALL})
+      }
+
+      nextEtaiX += seededRNG.randomGetMinMax(7, 10)
+    }
+
+    this.applyTiles(etaiTiles, ETERNAL_EXCLUDED)
+
+    // Protection TileGuard
+    for (const p of path) {
+      tileGuard.addNoisyCircle(p.x, p.y, RADIUS_GUARD - 1, RADIUS_GUARD + 1, 0.3, PERLIN_OFFSET_TEMPLE)
+    }
+
+    return {path}
+  }
 
   /**
  * Passe de nettoyage globale après tous les creusements.
