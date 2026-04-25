@@ -137,6 +137,7 @@ taskScheduler.enqueueAfter(
 * `randomReal(a?: any, b?: number): number`
 * `randomGetMax(max: number): number`
 * `randomGetMinMax(min: number, max: number): number`
+* `randomGetPercent(percent: number): boolean` (Retourne true avec une probabilité de percent/100)
 * `randomGetArrayValue(arr: Array): any`
 * `randomGetArrayIndex(arr: Array): int`
 * `randomGetArrayWeighted(arr: Array<{weight}>): int` (Retourne l'index)

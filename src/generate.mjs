@@ -3460,7 +3460,7 @@ class WorldCarver {
 
       // Tirage de la layer
       let y0, y1
-      if (!migrationDone && seededRNG.randomGetMax(99) < 10) {
+      if (!migrationDone && seededRNG.randomGetPercent(10)) {
         migrationDone = true
         if (seededRNG.randomGetBool()) {
           y0 = rect.ySurface; y1 = rect.yUnder // under
@@ -3529,7 +3529,7 @@ class WorldCarver {
         const radiusY = seededRNG.randomGetMinMax(SAND_POCKET_RADIUS_Y_MIN, SAND_POCKET_RADIUS_Y_MAX)
 
         // Tirage de la layer
-        const isUnder = seededRNG.randomGetMax(99) < 60
+        const isUnder = seededRNG.randomGetPercent(60)
         const y0 = isUnder ? rect.ySurface : rect.yUnder
         const y1 = isUnder ? rect.yUnder : rect.yCavernsMid
 
@@ -3659,8 +3659,8 @@ class WorldCarver {
 
       // Transition Markov pour la prochaine colonne
       depth = (depth === 2)
-        ? (seededRNG.randomGetMax(99) < 75 ? 2 : 3)
-        : (seededRNG.randomGetMax(99) < 75 ? 3 : 2)
+        ? (seededRNG.randomGetPercent(75) ? 2 : 3)
+        : (seededRNG.randomGetPercent(75) ? 3 : 2)
 
       return true
     }
@@ -3975,7 +3975,7 @@ class WorldCarver {
     const tiles = []
     // ── 3.1. Mur haut ─────────────────────────────────────────────────
     for (let x = x0; x < x0 + width; x++) {
-      const code = seededRNG.randomGetMax(99) >= 20 ? WOODWALL : VOID
+      const code = seededRNG.randomGetPercent(80) ? WOODWALL : VOID
       tiles.push({x, y: y0, index: (y0 << 10) | x, code})
     }
 
@@ -3985,13 +3985,13 @@ class WorldCarver {
 
       // Mur gauche
       const skipLeft = doorLeft && doorRow
-      let code = seededRNG.randomGetMax(99) >= 20 ? WOODWALL : VOID
+      let code = seededRNG.randomGetPercent(80) ? WOODWALL : VOID
       if (skipLeft) code = VOID
       tiles.push({x: x0, y, index: (y << 10) | x0, code})
 
       // Mur droit
       const skipRight = !doorLeft && doorRow
-      code = seededRNG.randomGetMax(99) >= 20 ? WOODWALL : VOID
+      code = seededRNG.randomGetPercent(80) ? WOODWALL : VOID
       if (skipRight) code = VOID
 
       tiles.push({x: x0 + width - 1, y, index: (y << 10) | (x0 + width - 1), code})
@@ -4000,7 +4000,7 @@ class WorldCarver {
     // ── 3.3. Fond intérieur STONEWALL ──────────────────────────────────
     for (let y = y0 + 1; y < y0 + height; y++) {
       for (let x = x0 + 1; x < x0 + width - 1; x++) {
-        const code = seededRNG.randomGetMax(99) >= 20 ? STONEWALL : VOID
+        const code = seededRNG.randomGetPercent(80) ? STONEWALL : VOID
         tiles.push({x, y, index: (y << 10) | x, code})
       }
     }
@@ -4405,7 +4405,7 @@ class WorldCarver {
     const TABLEWARE_ITEMS = ['bowl', 'mug', 'plate', 'trencher', 'bottle', 'water', 'honey', 'sap', 'bucket', 'bucketWater', 'bucketHoney', 'bucketSap']
 
     for (const {index, w} of surfaceFurnitures) {
-      if (seededRNG.randomGetMax(99) >= 80) continue
+      if (seededRNG.randomGetPercent(20)) continue
 
       const tablewareCode = seededRNG.randomGetArrayValue(TABLEWARE_ITEMS)
       const {w: tw, h: th} = furnitureGenerator.getFurnitureSize(tablewareCode)
@@ -4475,7 +4475,7 @@ class WorldCarver {
         let y = p.y - p.radiusMax
         while (y >= 1 && worldBuffer.read(x, y) === VOID) y--
         if (worldBuffer.read(x, y) !== VOID && worldBuffer.read(x, y + 1) === VOID) {
-          if (seededRNG.randomGetMax(99) >= 25) {
+          if (seededRNG.randomGetPercent(75)) {
             ceilingTiles.push({x, y, index: (y << 10) | x, code: COBALT})
           }
         }
@@ -4484,7 +4484,7 @@ class WorldCarver {
         y = p.y + p.radiusMax
         while (y < WORLD_HEIGHT - 1 && worldBuffer.read(x, y) === VOID) y++
         if (worldBuffer.read(x, y) !== VOID && worldBuffer.read(x, y - 1) === VOID) {
-          if (seededRNG.randomGetMax(99) < 15) {
+          if (seededRNG.randomGetPercent(15)) {
             floorTiles.push({x, y, index: (y << 10) | x, code: SAPPHIRE})
           }
         }

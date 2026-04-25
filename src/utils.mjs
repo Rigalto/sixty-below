@@ -816,6 +816,8 @@ export class SeededRNG {
 
   randomGetRealMinMax (min, max) { return min + this.#next() * (max - min) }
 
+  randomGetPercent (percent) { return this.#next() * 100 < percent }
+
   randomGetArrayValue (arr) {
     return arr.length === 0 ? null : arr[Math.floor(this.#next() * arr.length)]
   }
