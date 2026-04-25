@@ -2272,22 +2272,22 @@ class WorldCarver {
   pathTunnel (x0, y0, radiusMax, maxLength, angle, deltaAngle) {
     let alpha = angle * Math.PI / 180
     const dAlpha = deltaAngle * Math.PI / 180
-    let x = x0
-    let y = y0
+    let xf = x0 // position réelle float
+    let yf = y0
     let radius = seededRNG.randomGetMinMax(radiusMax >> 1, radiusMax)
-    const path = [{x, y, radiusMin: Math.floor(0.7 * radius), radiusMax: Math.ceil(1.4 * radius)}]
+    const path = [{x: x0, y: y0, radiusMin: Math.floor(0.7 * radius), radiusMax: Math.ceil(1.4 * radius)}]
     let length = 0
 
     while (length < maxLength) {
       alpha += seededRNG.randomReal(-dAlpha, dAlpha)
-      const dx = Math.round(radius * Math.sin(alpha))
-      const dy = Math.round(radius * Math.cos(alpha))
+      const dx = radius * Math.sin(alpha) // float
+      const dy = radius * Math.cos(alpha) // float
 
       length += 0.8 * Math.hypot(dx, dy)
-      x = x + dx
-      y = y - dy
+      xf += dx
+      yf -= dy
       radius = seededRNG.randomGetMinMax(radiusMax >> 1, radiusMax)
-      path.push({x, y, radiusMin: Math.floor(0.7 * radius), radiusMax: Math.ceil(1.4 * radius)})
+      path.push({x: Math.round(xf), y: Math.round(yf), radiusMin: Math.floor(0.7 * radius), radiusMax: Math.ceil(1.4 * radius)})
     }
 
     return path
