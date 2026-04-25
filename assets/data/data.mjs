@@ -131,9 +131,17 @@ export const NODES_LOOKUP = []
 // sa nature (ce qu'il est) : 'FURNITURE', 'WALL', ...
 // les actions qui peuvent être conduite dessus : 'CRAFTING' (à renommer), 'USABLE', 'PLACABLE', 'UNDELETABLE', 'CRAFTABLLE', 'REMOVABLE', 'AMMUNITION'...
 export const ITEM_TYPE = {
-  FURNITURE: 0x1, TOOL: 0x2, MATERIAL: 0x4, FOOD: 0x08, BLOCK: 0x10, WALL: 0x20, MECHANISM: 0x40, AMMUNITION: 0x80, ORE: 0x100, ARMOR: 0x200, BAR: 0x400, WEAPON: 0x800, CONSUMABLE: 0x1000, ACCESSORY: 0x2000, GEM: 0x4000, POTION: 0x8000, SEMABLE: 0x10000, BAG: 0x20000, BAIT: 0x40000, USABLE: 0x80000, PLACABLE: 0x100000, UNIQUE: 0x200000, DISPOSABLE: 0x400000, NONE: 0
+  FURNITURE: 0x1, TOOL: 0x2, MATERIAL: 0x4, FOOD: 0x08, BLOCK: 0x10, WALL: 0x20, MECHANISM: 0x40, AMMUNITION: 0x80, ORE: 0x100, ARMOR: 0x200, BAR: 0x400, WEAPON: 0x800, CRAFTABLE: 0x1000, ACCESSORY: 0x2000, GEM: 0x4000, POTION: 0x8000, SEMABLE: 0x10000, BAG: 0x20000, BAIT: 0x40000, USABLE: 0x80000, PLACABLE: 0x100000, UNIQUE: 0x200000, DISPOSABLE: 0x400000, NONE: 0
 }
+
+// MATERIAL: objet utilisé comme ingrédient dans au moins une recette
+// CRAFTABLE : objet pouvant être crée via l'artisanat
 // UNIQUE: objet unique, ne peut pas être détruit/vendu/démonté/transmuté
+// PLACABLE: objet pouvant être placé dans le monde :
+//   placed : image de l'objet symétrique dans le monde, pour les portes : image de la porte fermée
+//   placedLeft : image de gauche de l'objet asymétrique, image de la porte ouverte à gauche
+//   placedRight : image de droite de l'objet asymétrique, image de la porte ouverte à droite
+//   Remarque : un objet peut être placé dans le monde à la création, cela ne le rend pas PLACABLE
 
 // OAK ROOT — drop lorsque l'on abat complètement un Oak
 // MAHOGANY ROOT — drop lorsque l'on abat complètement un Mahogany
@@ -142,9 +150,6 @@ export const ITEM_TYPE = {
 // drop lorsque l'on abat complètement un Giant Mushroom
 
 export const ITEMS = {
-  // crafting Station
-  alchemyTable: {name: 'Alchemy Table', type: ITEM_TYPE.FURNITURE | ITEM_TYPE.PLACABLE, stype: 'station', star: 1, image: 'furniture_32_32-12-2', placed: 'furniture_32_32-6-3', help: 'Stations', tooltip: ''},
-
   // crystall
   lifeCrystal: {name: 'Life Crystal', type: ITEM_TYPE.FURNITURE | ITEM_TYPE.UNIQUE | ITEM_TYPE.USABLE, stype: 'life', star: 1, image: 'furniture_32_32-12-2', placed: 'furniture_32_32-6-3', help: 'Life Crystal', tooltip: 'Permanently increases maximum life by 20\nCollect with a Hammer'},
 
@@ -155,24 +160,61 @@ export const ITEMS = {
   triskelAncient: {name: 'Ancient Triskel', type: ITEM_TYPE.ACCESSORY | ITEM_TYPE.UNIQUE | ITEM_TYPE.CRAFTABLE, stype: 'triskel', star: 5, image: 'furniture_32_32-12-2', placed: 'furniture_32_32-6-3', help: 'Triskels', tooltip: ''},
 
   // Wood furniture set
-  tableWood: {name: 'Wooden Table', type: ITEM_TYPE.FURNITURE, stype: 'station', star: 1, image: 'furniture_32_32-2-0', placed: 'fuws_48_32-1-0', help: 'Tables', tooltip: 'A precision assembly requires a very flat surface.', furnitureSet: 'wood', surface: true},
-  chairWood: {name: 'Wooden Chair', type: ITEM_TYPE.FURNITURE, stype: 'chair', star: 1, image: 'furniture_32_32-0-5', placedLeft: 'fuws_16_48-1-0', placedRight: 'fuws_16_48-2-0', help: 'Chairs', tooltip: '???', furnitureSet: 'wood', comfort: true},
-  toiletWood: {name: 'Wooden Toilet', type: ITEM_TYPE.FURNITURE, stype: 'toilet', star: 1, image: 'furniture_32_32-0-5', placed: 'fuws_16_48-2-0', help: 'Toilets', tooltip: '???', furnitureSet: 'wood', comfort: true},
-  doorWood: {name: 'Wooden Door', type: ITEM_TYPE.FURNITURE, stype: 'door', star: 1, furnitureSet: 'wood', image: 'furniture_32_32-0-6', placed: 'fuws_16_48-0-0', placedLeft: 'fuws_32_48-0-0', placedRight: 'fuws_32_48-0-1', help: 'Doors', tooltip: 'Furniture that prevent enemies from entering an area when closed'},
+  chairWood: {name: 'Wooden Chair', type: ITEM_TYPE.FURNITURE | ITEM_TYPE.PLACABLE, stype: 'chair', star: 1, image: 'furniture_32_32-0-5', placedLeft: 'fuws_16_48-1-0', placedRight: 'fuws_16_48-2-0', help: 'Chairs', tooltip: '???', furnitureSet: 'wood', comfort: true},
+  toiletWood: {name: 'Wooden Toilet', type: ITEM_TYPE.FURNITURE | ITEM_TYPE.PLACABLE, stype: 'toilet', star: 1, image: 'furniture_32_32-0-5', placed: 'fuws_16_48-2-0', help: 'Toilets', tooltip: '???', furnitureSet: 'wood', comfort: true},
+  doorWood: {name: 'Wooden Door', type: ITEM_TYPE.FURNITURE | ITEM_TYPE.PLACABLE, stype: 'door', star: 1, furnitureSet: 'wood', image: 'furniture_32_32-0-6', placed: 'fuws_16_48-0-0', placedLeft: 'fuws_32_48-0-0', placedRight: 'fuws_32_48-0-1', help: 'Doors', tooltip: 'Furniture that prevent enemies from entering an area when closed'},
 
   // Glass furniture set
-  tableGlass: {name: 'Glass Table', type: ITEM_TYPE.FURNITURE, stype: 'table', star: 1, image: 'furniture_32_32-2-0', placed: 'fuws_48_32-1-0', help: 'Tables', tooltip: '???', furnitureSet: 'glass', surface: true},
-  chairGlass: {name: 'Glass Chair', type: ITEM_TYPE.FURNITURE, stype: 'chair', star: 1, image: 'furniture_32_32-0-5', placedLeft: 'fuws_16_48-1-0', placedRight: 'fuws_16_48-2-0', help: 'Chairs', tooltip: '???', furnitureSet: 'glass', comfort: true},
-  toiletGlass: {name: 'Glass Toilet', type: ITEM_TYPE.FURNITURE, stype: 'toilet', star: 1, image: 'furniture_32_32-0-5', placed: 'fuws_16_48-2-0', help: 'Toilets', tooltip: '???', furnitureSet: 'glass', comfort: true},
-  doorGlass: {name: 'Glass Door', type: ITEM_TYPE.FURNITURE, stype: 'door', star: 1, furnitureSet: 'glass', image: 'furniture_32_32-0-6', placed: 'fuws_16_48-0-0', placedLeft: 'fuws_32_48-0-0', placedRight: 'fuws_32_48-0-1', help: 'Doors', tooltip: 'Furniture that prevent enemies from entering an area when closed'},
+  tableGlass: {name: 'Glass Table', type: ITEM_TYPE.FURNITURE | ITEM_TYPE.PLACABLE, stype: 'table', star: 1, image: 'furniture_32_32-2-0', placed: 'fuws_48_32-1-0', help: 'Tables', tooltip: '???', furnitureSet: 'glass', surface: true},
+  chairGlass: {name: 'Glass Chair', type: ITEM_TYPE.FURNITURE | ITEM_TYPE.PLACABLE, stype: 'chair', star: 1, image: 'furniture_32_32-0-5', placedLeft: 'fuws_16_48-1-0', placedRight: 'fuws_16_48-2-0', help: 'Chairs', tooltip: '???', furnitureSet: 'glass', comfort: true},
+  toiletGlass: {name: 'Glass Toilet', type: ITEM_TYPE.FURNITURE | ITEM_TYPE.PLACABLE, stype: 'toilet', star: 1, image: 'furniture_32_32-0-5', placed: 'fuws_16_48-2-0', help: 'Toilets', tooltip: '???', furnitureSet: 'glass', comfort: true},
+  doorGlass: {name: 'Glass Door', type: ITEM_TYPE.FURNITURE | ITEM_TYPE.PLACABLE, stype: 'door', star: 1, furnitureSet: 'glass', image: 'furniture_32_32-0-6', placed: 'fuws_16_48-0-0', placedLeft: 'fuws_32_48-0-0', placedRight: 'fuws_32_48-0-1', help: 'Doors', tooltip: 'Furniture that prevent enemies from entering an area when closed'},
 
   // chests
-  chestAncient: {name: 'Ancient Chest', type: ITEM_TYPE.FURNITURE, stype: 'chest', star: 2, capacity: 56, image: 'furniture_32_32-0-1', placed: 'fuws_32_32-0-1', help: 'Chests', tooltip: 'Items container'},
+  chestAncient: {name: 'Ancient Chest', type: ITEM_TYPE.FURNITURE | ITEM_TYPE.PLACABLE, stype: 'chest', star: 2, capacity: 56, image: 'furniture_32_32-0-1', placed: 'fuws_32_32-0-1', help: 'Chests', tooltip: 'Items container'},
 
   // crafting station
-  brokenDecomposer: {name: 'Broken Decomposer', type: ITEM_TYPE.FURNITURE, immovable: true, stype: 'none', star: 5, image: null, placed: 'fuws_48_32-0-1', help: 'Lost Temple', tooltip: '????'},
+  tableWood: {name: 'Wooden Table', type: ITEM_TYPE.FURNITURE | ITEM_TYPE.PLACABLE, stype: 'station', star: 1, image: 'furniture_32_32-2-0', placed: 'fuws_48_32-1-0', help: 'Wooden Table', tooltip: 'A precision assembly requires a very flat surface.', furnitureSet: 'wood', surface: true},
+
+  workbench: {name: 'Workbench', type: ITEM_TYPE.FURNITURE | ITEM_TYPE.PLACABLE, stype: 'station', star: 1, furnitureSet: 'wood', surface: true, image: 'furniture_32_32-3-0', placed: 'fuws_48_32-2-0', help: 'Woodworking', tooltip: 'Crafting station for many essential items'},
+  sawmill: {name: 'Sawmill', type: ITEM_TYPE.FURNITURE | ITEM_TYPE.PLACABLE, stype: 'station', star: 3, image: 'furniture_32_32-0-0', placed: 'fuws_48_48-0-1', help: 'Woodworking', tooltip: ' Crafting station for advanced Wood and Furniture crafting'},
+
+  anvilIron: {name: 'Iron Anvil', type: ITEM_TYPE.FURNITURE | ITEM_TYPE.PLACABLE, stype: 'station', star: 2, image: 'furniture_32_32-8-1', placed: 'fuws_32_32-1-0', help: 'Forging', tooltip: 'Crafting station used to craft metal bars into tools, weapons, armor, and other items'},
+  anvilPlatinum: {name: 'Platinum Anvil', type: ITEM_TYPE.FURNITURE | ITEM_TYPE.PLACABLE, stype: 'station', star: 4, image: 'furniture_32_32-8-2', placed: 'fuws_32_32-2-0', help: 'Forging', tooltip: 'Crafting stations used to craft metal bars into tools, weapons, armor, and other items'},
+
+  furnace: {name: 'Furnace', type: ITEM_TYPE.FURNITURE | ITEM_TYPE.PLACABLE, stype: 'station', star: 2, image: 'furniture_32_32-6-0', placed: 'fuws_48_48-0-0', help: 'Smelting', tooltip: 'Crafting station for metal smelting'},
+  blastFurnace: {name: 'Blast Furnace', type: ITEM_TYPE.FURNITURE | ITEM_TYPE.PLACABLE, stype: 'station', star: 4, image: 'furniture_32_32-5-0', placed: 'fuws_48_48-1-0', help: 'Smelting', tooltip: 'Crafting station for strong metal smelting'},
+  grindstone: {name: 'Grindstone', type: ITEM_TYPE.FURNITURE | ITEM_TYPE.PLACABLE, stype: 'station', star: 3, image: 'furniture_32_32-1-0', placed: 'fuws_48_32-0-0', help: 'Sharpening', tooltip: 'Crafting station for sharpenig tools and weapons'},
+
+  loom: {name: 'Loom', type: ITEM_TYPE.FURNITURE | ITEM_TYPE.PLACABLE, stype: 'station', star: 2, image: 'furniture_32_32-1-0', placed: 'fuws_48_32-0-0', help: 'Weaving', tooltip: 'Crafting station for cloth'},
+  tanningRack: {name: 'Tanning Rack', type: ITEM_TYPE.FURNITURE | ITEM_TYPE.PLACABLE, stype: 'station', star: 3, image: 'furniture_32_32-1-0', placed: 'fuws_48_32-0-0', help: 'Leatherworking', tooltip: 'Crafting station for leather'},
+
+  stonecutter: {name: 'Stonecutter', type: ITEM_TYPE.FURNITURE | ITEM_TYPE.PLACABLE, stype: 'station', star: 1, image: 'furniture_32_32-2-0', placed: 'fuws_48_32-1-0', help: 'Stonecutting', tooltip: '???', surface: true},
+  jewelerBench: {name: 'Jeweler\'s Bench', type: ITEM_TYPE.FURNITURE | ITEM_TYPE.PLACABLE, stype: 'station', star: 3, surface: true, image: 'furniture_32_32-7-0', placed: 'fuws_48_48-2-0', help: 'Jewelry', tooltip: 'Crafting station for jewels and accessories'},
+  alchemyTable: {name: 'Alchemy Table', type: ITEM_TYPE.FURNITURE | ITEM_TYPE.PLACABLE, stype: 'station', star: 2, image: 'furniture_32_32-8-0', placed: 'fuws_48_48-2-1', help: 'Alchemy', tooltip: 'Crafting station for potions'},
+  cookingPot: {name: 'Cooking Pot', type: ITEM_TYPE.FURNITURE | ITEM_TYPE.PLACABLE, stype: 'station', star: 2, image: 'furniture_32_32-9-0', placed: 'fuws_32_32-7-2', help: 'Cooking', tooltip: 'Crafting station for food'},
+
+  brokenDecomposer: {name: 'Broken Decomposer', type: ITEM_TYPE.FURNITURE, immovable: true, stype: 'immovable', star: 5, image: null, placed: 'fuws_48_32-0-1', help: 'Lost Temple', tooltip: '????'},
   decomposer: {name: 'Decomposer', type: ITEM_TYPE.FURNITURE, immovable: true, stype: 'station', star: 5, image: null, placed: 'fuws_48_32-0-1', help: 'Decomposer', tooltip: '????'},
-  transmutator: {name: 'Transmutator', type: ITEM_TYPE.FURNITURE, immovable: true, stype: 'station', star: 5, image: null, placed: 'fuws_48_32-0-1', help: 'Transmutator', tooltip: '????'}
+  transmutator: {name: 'Transmutator', type: ITEM_TYPE.FURNITURE, immovable: true, stype: 'station', star: 5, image: null, placed: 'fuws_48_32-0-1', help: 'Transmutator', tooltip: '????'},
+
+  // Food containers
+  bowl: {name: 'Bowl', type: ITEM_TYPE.FURNITURE | ITEM_TYPE.PLACABLE | ITEM_TYPE.MATERIAL | ITEM_TYPE.CRAFTABLE, stype: 'tableware', star: 1, image: 'furniture_32_32-6-2', placed: 'fuws_32_32-3-0', help: 'Tableware', tooltip: 'The best soups are made in old bowls'},
+  mug: {name: 'Mug', type: ITEM_TYPE.FURNITURE | ITEM_TYPE.PLACABLE | ITEM_TYPE.MATERIAL | ITEM_TYPE.CRAFTABLE, star: 1, image: 'furniture_32_32-7-7', placed: 'fuws_32_32-1-3', help: 'Tableware', tooltip: 'The best Ale container'},
+  plate: {name: 'Plate', type: ITEM_TYPE.FURNITURE | ITEM_TYPE.PLACABLE | ITEM_TYPE.MATERIAL | ITEM_TYPE.CRAFTABLE, placable: true, star: 1, image: 'furniture_32_32-8-7', placed: 'fuws_16_16-0-0', help: 'Tableware', tooltip: 'Looks as good as it tastes'},
+  trencher: {name: 'Wooden Trencher', type: ITEM_TYPE.FURNITURE | ITEM_TYPE.PLACABLE | ITEM_TYPE.MATERIAL | ITEM_TYPE.CRAFTABLE, star: 1, image: 'furniture_32_32-9-7', placed: 'fuws_16_16-1-0', help: 'Tableware', tooltip: 'A rustic wooden plate, perfect for simple meals'},
+
+  // Liquid containers (small capacity)
+  bottle: {name: 'Bottle', type: ITEM_TYPE.FURNITURE | ITEM_TYPE.PLACABLE | ITEM_TYPE.TOOL | ITEM_TYPE.MATERIAL | ITEM_TYPE.CRAFTABLE, stype: 'tableware', star: 1, furnitureSet: 'glass', image: 'furniture_32_32-10-2', placed: 'fuws_32_32-0-0', help: 'Bottles', tooltip: 'Crafting container for potions and food'},
+  water: {name: 'Bottled Water', type: ITEM_TYPE.FURNITURE | ITEM_TYPE.PLACABLE | ITEM_TYPE.POTION | ITEM_TYPE.MATERIAL | ITEM_TYPE.USABLE , stype: 'tableware', star: 1, image: 'potions_32_32-0-5', placed: 'fuws_32_32-4-0', heal: 20, sickness: 40, help: 'Bottled Water', tooltip: 'Healing item and Crafting Material for potions'},
+  honey: {name: 'Bottled Honey', type: ITEM_TYPE.FURNITURE | ITEM_TYPE.PLACABLE | ITEM_TYPE.POTION | ITEM_TYPE.MATERIAL | ITEM_TYPE.USABLE, stype: 'tableware', star: 1, image: 'potions_32_32-1-5', heal: 80, sickness: 60, timedbuff: 'honey', time: 15, help: 'Bottled Honey', tooltip: 'Healing item'},
+  sap: {name: 'Bottled Sap', type: ITEM_TYPE.FURNITURE | ITEM_TYPE.PLACABLE | ITEM_TYPE.POTION | ITEM_TYPE.MATERIAL | ITEM_TYPE.USABLE, stype: 'tableware', star: 1, image: 'potions_32_32-1-5', heal: 80, sickness: 60, timedbuff: 'honey', time: 15, help: 'Bottled Honey', tooltip: 'Healing item'},
+
+  // Liquid containers (large capacity)
+  bucket: {name: 'Empty Bucket', type: ITEM_TYPE.FURNITURE | ITEM_TYPE.PLACABLE | ITEM_TYPE.TOOL | ITEM_TYPE.CRAFTABLE | ITEM_TYPE.ARMOR, stype: 'tableware', placable: true, sell: 500, star: 2, image: 'furniture_32_32-10-0', placed: 'fuws_32_32-5-0', help: 'Buckets', tooltip: 'Used to scoop up a small amount of water, honey or lava', placedright: 'heads_26_22-0-2', placedleft: 'heads_26_22-0-3', defense: 1, armor: 'head', set: 'bucket'},
+  bucketWater: {name: 'Water Bucket', type: ITEM_TYPE.FURNITURE | ITEM_TYPE.PLACABLE | ITEM_TYPE.TOOL | ITEM_TYPE.MATERIAL, stype: 'tableware', star: 2, image: 'furniture_32_32-11-0', placed: 'fuws_32_32-6-0', help: 'Buckets', tooltip: 'Amount of water. Can be poured ou'},
+  bucketHoney: {name: 'Honey Bucket', type: ITEM_TYPE.FURNITURE | ITEM_TYPE.PLACABLE | ITEM_TYPE.TOOL | ITEM_TYPE.MATERIAL, stype: 'tableware', star: 2, image: 'furniture_32_32-12-0', placed: 'fuws_32_32-7-0', help: 'Buckets', tooltip: 'Amount of honey. Can be poured ou'},
+  bucketSap: {name: 'Sap Bucket', type: ITEM_TYPE.FURNITURE | ITEM_TYPE.PLACABLE | ITEM_TYPE.TOOL | ITEM_TYPE.MATERIAL, stype: 'tableware', star: 2, image: 'furniture_32_32-13-0', placed: 'fuws_32_32-0-3', help: 'Buckets', tooltip: 'Amount of lava. Can be poured ou'}
 }
 
 /* ============================================================================

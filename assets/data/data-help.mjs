@@ -1827,6 +1827,205 @@ Shell is a sedimentary material formed from ancient marine organisms. It is foun
     `
   },
 
+  // ── Crafting ─────────────────────────────────────────────────
+  //    Crafting, Crafting Stations, Crafting Tree, Crafting Buffs
+  {
+    title: 'Crafting',
+    category: ['Activities', 'Crafting'],
+    content: `
+    `
+  },
+  {
+    title: 'Crafting Stations',
+    category: ['Activities', 'Crafting'],
+    content: `
+**Description**
+Crafting Stations are specialized workbenches that allow the player to [[Crafting||craft]] advanced items. Each station is dedicated to a specific material or craft type. Most stations must be crafted first and placed in the world.
+
+**Starting point**
+* [[Wood Table]] — [[item:tableWood]] ⭐ — crafted by hand, unlocks the entire crafting chain
+
+**Woodworking**
+* [[Woodworking]] — [[item:workbench]] ⭐ and [[item:sawmill]] ⭐⭐⭐
+
+**Metalworking**
+* [[Smelting]] — [[item:furnace]] ⭐⭐ and [[item:blastFurnace]] ⭐⭐⭐⭐
+* [[Forging]] — [[item:anvilIron]] ⭐⭐ and [[item:anvilPlatinum]] ⭐⭐⭐⭐
+* [[Sharpening]] — [[item:grindstone]] ⭐⭐⭐
+
+**Textiles**
+* [[Weaving]] — [[item:loom]] ⭐⭐
+* [[Leatherworking]] — [[item:tanningRack]] ⭐⭐⭐
+
+**Other crafts**
+* [[Stonecutting]] — [[item:stonecutter]] ⭐
+* [[Jewelry]] — [[item:jewelerBench]] ⭐⭐⭐
+* [[Alchemy]] — [[item:alchemyTable]] ⭐⭐
+* [[Cooking]] — [[item:cookingPot]] ⭐⭐
+
+**Ancient stations** ⏳
+* [[Decomposer]] — found in [[Lost Temple]] ⭐⭐⭐⭐⭐
+* [[Transmutator]] — found in [[Ancient House]] ⭐⭐⭐⭐⭐
+  `
+  },
+  {
+    title: 'Crafting Tree',
+    category: ['Activities', 'Crafting'],
+    content: `
+**Description**
+The crafting tree shows the order in which crafting stations must be built. Each station unlocks the next tier of crafting possibilities.
+
+* By hand
+  * [[Wood Table]] ⭐
+    * [[Workbench]] ⭐
+      * [[Stonecutter]] ⭐
+        * [[Furnace]] ⭐⭐
+          * [[Cooking Pot]] ⭐⭐
+          * [[Blast Furnace]] ⭐⭐⭐⭐
+      * [[Iron Anvil]] ⭐⭐
+        * [[Grindstone]] ⭐⭐⭐
+        * [[Jewelry]] ⭐⭐⭐
+        * [[Platinum Anvil]] ⭐⭐⭐⭐
+      * [[Alchemy]] ⭐⭐
+      * [[Weaving]] ⭐⭐
+        * [[Leatherworking]] ⭐⭐⭐
+      * [[Woodworking]] ⭐⭐⭐
+* Found in the world ⏳
+  * [[Decomposer]] ⭐⭐⭐⭐⭐ — [[Lost Temple]]
+  * [[Transmutator]] ⭐⭐⭐⭐⭐ — [[Ancient House]]
+  `
+  },
+  {
+    title: 'Crafting Buffs',
+    category: ['Buffs', 'Crafting'],
+    content: `
+    `
+  },
+
+  // ── Crafting Stations ────────────────────────────────────────
+  {
+    title: 'Wood Table',
+    category: ['Crafting', 'Crafting Stations'],
+    content: ''
+  },
+  {
+    title: 'Woodworking',
+    category: ['Crafting', 'Crafting Stations'],
+    content: ''
+  },
+  {
+    title: 'Smelting',
+    category: ['Crafting', 'Crafting Stations'],
+    content: ''
+  },
+  {
+    title: 'Forging',
+    category: ['Crafting', 'Crafting Stations'],
+    content: ''
+  },
+  {
+    title: 'Sharpening',
+    category: ['Crafting', 'Crafting Stations'],
+    content: ''
+  },
+  {
+    title: 'Leatherworking',
+    category: ['Crafting', 'Crafting Stations'],
+    content: ''
+  },
+  {
+    title: 'Weaving',
+    category: ['Crafting', 'Crafting Stations'],
+    content: ''
+  },
+  {
+    title: 'Stonecutting',
+    category: ['Crafting', 'Crafting Stations'],
+    content: ''
+  },
+  {
+    title: 'Jewelry',
+    category: ['Crafting', 'Crafting Stations'],
+    content: ''
+  },
+  {
+    title: 'Alchemy',
+    category: ['Crafting', 'Crafting Stations'],
+    content: ''
+  },
+  {
+    title: 'Cooking',
+    category: ['Crafting', 'Crafting Stations'],
+    content: ''
+  },
+  {
+    title: 'Decomposer',
+    category: ['Crafting', 'Crafting Stations'],
+    content: ''
+  },
+  {
+    title: 'Transmutator',
+    category: ['Crafting', 'Crafting Stations'],
+    content: ''
+  },
+
+  // ── Tableware ────────────────────────────────────────────────
+  //    Tableware, Bottles, Buckets
+  {
+    title: 'Tableware',
+    category: ['Items', 'Crafting'],
+    content: `
+**Description**
+Tableware is a category of [[Furniture]] that serve as containers for food and liquids. They can be placed on any flat-surfaced furniture ([[Wood Table]], [[Workbench]], etc.) as decorative items.
+
+**Food Containers**
+Empty containers used as crafting ingredients in cooking and potion recipes. They are returned to the player's inventory upon consuming the food or potion.
+* [[item:bowl]] — soups and stews
+* [[item:mug]] — ales and drinks
+* [[item:plate]] — solid food dishes
+* [[item:trencher]] — rustic wooden plate for simple meals
+
+**Small Liquid Containers**
+Filled directly from a liquid source in the world. Used as crafting ingredients in cooking and potion recipes.
+* [[item:bottle]] — empty bottle, filled by clicking on a liquid tile
+  * [[item:water]] — [[node:water|Bottled Water]] — healing item and potion ingredient
+  * [[item:honey]] — [[node:honey|Bottled Honey]] — healing item and buff
+  * [[item:sap]] — [[node:sap|Bottled Sap]] — buff
+* _Bottles are returned upon consuming the recipe result._ ⏳
+
+**Large Liquid Containers**
+Filled directly from a liquid source in the world. Used as tools to transport and pour liquids — the empty bucket is recovered after pouring.
+* [[item:bucket]] — empty bucket ⏳
+  * [[item:bucketWater]] — Water Bucket — pour water into the world ⏳
+  * [[item:bucketHoney]] — Honey Bucket — pour honey into the world ⏳
+  * [[item:bucketSap]] — Sap Bucket — pour sap into the world ⏳
+
+**See also**
+* [[Bottles]] — detailed usage and recipes
+* [[Buckets]] — detailed usage and liquid manipulation
+
+**Tips**
+* _Tableware can be placed on any flat-surfaced furniture as decoration._
+* _Bottles are the primary ingredient for all potions — stock up early._ ⏳
+* _Buckets allow precise liquid manipulation — essential for creating [[Obsidian]]._ ⏳
+* _An empty bucket worn on the head provides a surprisingly effective rudimentary helmet._ ⏳
+* _Place a bucket of liquid near your [[Cooking Pot]] or [[Alchemy Table]] to keep a ready supply of water, honey or sap within reach._ ⏳
+  `
+  },
+  {
+    title: 'Bottles',
+    category: ['Trees'],
+    content: `
+    * _See [[Tableware]] for the full list of containers._
+    `
+  },
+  {
+    title: 'Buckets',
+    category: ['Trees'],
+    content: `
+    * _See [[Tableware]] for the full list of containers._
+    `
+  },
   // ── Items & Crafting ─────────────────────────────────────────
   // ── Fauna & Critters ─────────────────────────────────────────
   // ── Buffs & Debuffs ──────────────────────────────────────────
