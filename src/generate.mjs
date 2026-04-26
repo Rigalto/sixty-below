@@ -258,17 +258,9 @@ class WorldGenerator {
 
     // 6.1.X Pyramid / Ancient House / Lost Temple / Ruined Cabin / Abandoned Mine
     const pyramid = worldCarver.digPyramid()
-    console.log('....................pyramid', pyramid)
-
     const ruinedcabin = worldCarver.digRuinedCabin()
-    console.log('....................ruinedcabin', ruinedcabin)
-
     const lostTemple = worldCarver.digLostTemple()
-    console.log('....................lostTemple', lostTemple)
-
     const ancientHouse = worldCarver.digAncientHouse()
-    console.log('....................ancientHouse', ancientHouse)
-
     worldCarver.digAbandonedMine()
     await progress('Ancient civilizations')
 
@@ -279,16 +271,16 @@ class WorldGenerator {
     console.log('>>>>>>>>>>> hearts et triskels', hearts, triskels)
 
     // 6.2 Creusement des tunnels et cavernes
-    // worldCarver.digZigzagTunnels(surfaceLakes)
-    // worldCarver.digSurfaceTunnel(skySurface, surfaceLakes)
-    // await progress('Surface tunnels')
-    // worldCarver.digSmallCaverns(surfaceUnder)
-    // await progress('Caverns')
-    // worldCarver.digUndergroundTunnels(surfaceUnder, underCaverns)
-    // worldCarver.digCavernsTunnels(underCaverns)
-    // await progress('Deep tunnels')
-    // worldCarver.digSmallTunnels(surfaceUnder)
-    // await progress('Small tunnels')
+    worldCarver.digZigzagTunnels(surfaceLakes)
+    worldCarver.digSurfaceTunnel(skySurface, surfaceLakes)
+    await progress('Surface tunnels')
+    worldCarver.digSmallCaverns(surfaceUnder)
+    await progress('Caverns')
+    worldCarver.digUndergroundTunnels(surfaceUnder, underCaverns)
+    worldCarver.digCavernsTunnels(underCaverns)
+    await progress('Deep tunnels')
+    worldCarver.digSmallTunnels(surfaceUnder)
+    await progress('Small tunnels')
 
     // 6-3 Remplissage de la mer (gauche et droite)
     liquidFiller.fillSea()
@@ -350,7 +342,7 @@ class WorldGenerator {
       worldBuffer.clear()
     }
 
-    // tileGuard.debug() // DEBUG
+    tileGuard.debug() // DEBUG
 
     // N + 1. On repasse le générateur de nombres aléatoires en mode aléatoire
     seededRNG.init()
@@ -3499,7 +3491,7 @@ class WorldCarver {
 
       // Protection TileGuard
       for (const p of path) {
-        tileGuard.addNoisyCircle(p.x, p.y, p.radiusMin + 2, p.radiusMax + 2, 0.3, PERLIN_OFFSET_SHELL)
+        tileGuard.addNoisyCircle(p.x, p.y, p.radiusMin + 3, p.radiusMax + 3, 0.3, PERLIN_OFFSET_SHELL)
       }
     }
   }
@@ -3612,8 +3604,14 @@ class WorldCarver {
 
       const rect2 = this.applyTiles(tiles)
       this.addExclusion(rect2)
-      tileGuard.addNoisyRect(cx, cy + radiusY + 2, radiusX + 2, radiusX + 6, 2, 4, 0.8, PERLIN_OFFSET_FERNS)
       this.#fillFernMushroomCaveFloor(cx, cy + 1, radiusX, GRASSFERN, HUMUS, GRASS_TYPE.FERN, plants)
+
+      const guardTop = cy + 6
+      const guardBottom = cy + radiusY + rectHalfH + 3
+      const guardHalfH = Math.round((guardBottom - guardTop) / 2)
+      const guardCy = guardTop + guardHalfH
+
+      tileGuard.addNoisyRect(cx, guardCy, radiusX + 3, radiusX + 6, guardHalfH, guardHalfH + 4, 0.8, PERLIN_OFFSET_FERNS)
 
       caves.push({cx, cy, radiusX, radiusY})
     }
@@ -3719,8 +3717,14 @@ class WorldCarver {
 
       const rect2 = this.applyTiles(tiles)
       this.addExclusion(rect2)
-      tileGuard.addNoisyRect(cx, cy + radiusY + 2, radiusX + 2, radiusX + 5, 2, 4, 0.8, PERLIN_OFFSET_FERNS)
       this.#fillMossCaveWalls(cx, cy, radiusX, radiusY, plants)
+
+      const guardTop = cy + 6
+      const guardBottom = cy + radiusY + rectHalfH + 3
+      const guardHalfH = Math.round((guardBottom - guardTop) / 2)
+      const guardCy = guardTop + guardHalfH;
+
+      tileGuard.addNoisyRect(cx, guardCy - 2, radiusX + 3, radiusX + 6, guardHalfH - 2, guardHalfH + 2, 0.8, PERLIN_OFFSET_FERNS)
 
       caves.push({cx, cy, radiusX, radiusY})
     }
@@ -3823,11 +3827,19 @@ class WorldCarver {
       const rect2 = this.applyTiles(tiles)
       this.addExclusion(rect2)
 
-      tileGuard.addNoisyRect(cx, cy + radiusY / 2, radiusX + 2, radiusX + 4, radiusY / 2 + 2, radiusY / 2 + 4, 0.8, PERLIN_OFFSET_MUSHROOM)
-
       this.#fillFernMushroomCaveFloor(cx, cy, radiusX, GRASSMUSHROOM, HUMUS, GRASS_TYPE.MUSHROOM, plants)
 
-      // window.DEBUG_POINTS.push({x: cx, y: cy, color: 'orange'}) // DEBUG
+      // tileGuard.addNoisyRect(cx, cy + radiusY / 2, radiusX + 2, radiusX + 4, radiusY / 2 + 2, radiusY / 2 + 4, 0.8, PERLIN_OFFSET_MUSHROOM)
+
+      const guardTop = cy + 6
+      const guardBottom = cy + radiusY + 3
+      const guardHalfH = Math.round((guardBottom - guardTop) / 2)
+      const guardCy = guardTop + guardHalfH
+
+      tileGuard.addNoisyRect(cx, guardCy, radiusX + 3, radiusX + 6, guardHalfH, guardHalfH + 4, 0.8, PERLIN_OFFSET_MUSHROOM)
+      window.DEBUG_POINTS.push({x: cx, y: cy, color: 'orange'}) // DEBUG
+      window.DEBUG_POINTS.push({x: cx - (radiusX + 5), y: guardCy - guardHalfH - 2, color: '#ff0002'})
+      window.DEBUG_POINTS.push({x: cx + (radiusX + 5), y: guardCy + guardHalfH + 2, color: '#ff0002'})
 
       caves.push({cx, cy, radiusX, radiusY})
     }
@@ -3911,6 +3923,7 @@ class WorldCarver {
     const rect2 = {x1: x0, y1: y0, x2: x0 + PYRAMID_WIDTH - 1, y2: y0 + PYRAMID_HEIGHT - 1}
     this.addExclusion(rect2)
     tileGuard.addTiles(wallTiles)
+    tileGuard.addRect(x0 - 1, y0 + PYRAMID_HEIGHT, x0 + PYRAMID_WIDTH, y0 + PYRAMID_HEIGHT + 1)
 
     // 6. Coordonnées des deux salles (coin haut-gauche)
     const r1dx = mirror ? (PYRAMID_WIDTH - 1 - PYRAMID_ROOM1_DELTA.dx) : PYRAMID_ROOM1_DELTA.dx
@@ -4008,6 +4021,7 @@ class WorldCarver {
     const rect2 = this.applyTiles(tiles, ETERNAL_EXCLUDED)
     this.addExclusion(rect2)
     tileGuard.addRect(x0, y0, x0 + width - 1, y0 + height - 1)
+    tileGuard.addRect(x0 - 1, y0 + height, x0 + width, y0 + height + 1)
 
     // ── 4. Placement du mobilier ─────────────────────────────────────
     const floorY = y0 + height - 1
@@ -4125,7 +4139,6 @@ class WorldCarver {
     const tx = cx - Math.floor(TEMPLE_W / 2)
     const ty = cy + halfH - TEMPLE_H + 1
 
-    console.log('................... digLostTemple', caveTiles, caveRect.x1, caveRect.y1, caveRect.x2, caveRect.y2, tx, ty)
     // Intérieur EMERALDWALL
     const interiorTiles = []
     for (let y = ty + 6; y <= ty + 8; y++) {
@@ -4161,6 +4174,8 @@ class WorldCarver {
     tileGuard.addTiles(columnTiles)
     // Rectangle EMERALDWALL
     tileGuard.addRect(tx + 1, ty + 6, tx + 13, ty + 8)
+    // Protection du sol sous le temple
+    tileGuard.addRect(tx - 1, ty + TEMPLE_H, tx + TEMPLE_W, ty + TEMPLE_H + 2)
 
     // ajout du decomposer
     const decomposerX = tx + 6
@@ -4440,7 +4455,7 @@ class WorldCarver {
     const SANDSTONEWALL = NODES.SANDSTONEWALL.code
     const MAX_ATTEMPTS = 100
     const RADIUS_INNER = 3
-    const RADIUS_GUARD = 5
+    const RADIUS_GUARD = 6
     const LENGTH = 40
     const DELTA_ANGLE = 8
 
@@ -4528,7 +4543,7 @@ class WorldCarver {
 
     // Protection TileGuard
     for (const p of path) {
-      tileGuard.addNoisyCircle(p.x, p.y, RADIUS_GUARD - 1, RADIUS_GUARD + 1, 0.3, PERLIN_OFFSET_TEMPLE)
+      tileGuard.addNoisyCircle(p.x, p.y, RADIUS_GUARD, RADIUS_GUARD + 3, 0.3, PERLIN_OFFSET_TEMPLE)
     }
 
     return {path}
