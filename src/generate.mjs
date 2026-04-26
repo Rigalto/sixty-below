@@ -342,7 +342,7 @@ class WorldGenerator {
       worldBuffer.clear()
     }
 
-    tileGuard.debug() // DEBUG
+    // tileGuard.debug() // DEBUG
 
     // N + 1. On repasse le générateur de nombres aléatoires en mode aléatoire
     seededRNG.init()

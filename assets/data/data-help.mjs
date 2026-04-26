@@ -63,7 +63,7 @@
 const HELP_TEMPLATES = {
   miningInfo: `
 **How to mine**
-Use a [[{1}||Pickaxe]] of at least ⭐{2} to mine [[node:{3}]].
+Use a [[Pickaxes|{1}]] of at least ⭐{2} to mine [[node:{3}]].
 Mining drops: {{node:{3}:mining}}
   `,
 
@@ -88,8 +88,8 @@ export const HELP = [
     category: ['Ore'],
     content: `
 **Description**
-Copper is the most common ore found near the [[Surface||Surface layer]].
-It is used in many early-game [[Crafting||recipes]].
+Copper is the most common ore found near the [[Surface|Surface layer]].
+It is used in many early-game [[Crafting|recipes]].
 
 **Main Location**
 * All biomes
@@ -110,7 +110,7 @@ It is used in many early-game [[Crafting||recipes]].
 
 **Tips**
 * Copper veins are often found near [[node:stone]] clusters.
-* _Tip: [[Torches||Bring torches]] when mining underground!_ ⏳
+* _Tip: [[Torches|Bring torches]] when mining underground!_ ⏳
     `
   },
   // ── World ─────────────────────────────────────────────────────
@@ -457,7 +457,7 @@ Sand Pockets are pressurized elliptical cavities filled with [[node:sand]], foun
 Fossil Veins are horizontal deposits of [[node:shell]] embedded in the rock. They are the remnants of an ancient seabed, compressed over millennia into dense sedimentary layers.
 
 **Main Location**
-* [[Caverns]] Top — [[Desert]] and [[Sea||maritime zones]]
+* [[Caverns]] Top — [[Desert]] and [[Sea|maritime zones]]
 
 **Materials**
 * [[node:shell]] — horizontal vein
@@ -522,6 +522,41 @@ Pyramids are ancient stone structures buried deep in [[Desert]] biomes. Built fr
 * _Watch the floor tile colors in Chamber 2 — standing on the wrong tile is lethal._ ⏳
 * _The Pharaon respawns after a delay — the Pyramid is never permanently cleared._ ⏳
 * _Only one Pyramid exists per world — it is worth the effort to find it._ ⏳
+  `
+  },
+  {
+    title: 'Ancient House',
+    category: ['Mini-biome', 'Desert'],
+    content: `
+**Description**
+The Ancient House is a large desert dwelling buried deep in [[Desert]] biomes. Unlike the [[Ruined Cabin]], it is remarkably well preserved — its walls still standing, its roof intact, and its interior furnished. It contains the [[Transmutator]], a powerful crafting station.
+
+**Main Location**
+* [[Caverns]] Bottom — [[Desert]]
+
+**Materials**
+* [[node:woodwall]] — outer walls and roof
+* [[node:olympite]] — floor
+* [[node:goldwall]] — interior background wall
+
+**Furnitures** ⏳
+* Roof : [[Crafting Stations]] and decorative furnitures
+* Floor : [[item:brokenTransmutator]]
+* Ground floor : [[Crafting Stations]], [[Chests]] and decorative furnitures
+
+**The Transmutator** ⏳
+* [[item:transmutator]] is always usable
+* The [[item:transmutator]] converts materials into other materials of equivalent value
+* The [[item:transmutator]] is immovable — the Ancient House is its permanent location
+
+**Housing** ⏳
+* The Ancient House is large enough to serve as a player home
+* Place a [[item:housingBoard]] to activate the [[Housing Buffs]] system
+
+**Tips**
+* _The Ancient House is the largest structure in the game — explore every corner._ ⏳
+* _Repair the walls and roof before using the [[item:transmutator]] — the missing tiles leave the house open to monster invasions._ ⏳
+* _The Ancient House makes an excellent base camp for [[Caverns]] [[Desert]] exploration._ ⏳
   `
   },
 
@@ -799,7 +834,7 @@ Blind Lakes are pockets of water found in the deepest parts of all biomes. They 
 * Chest — tier 4-5 ⏳
 
 **Tips**
-* _Blind Lakes have no natural entrance — bring a [[Pickaxes||pickaxe]]._
+* _Blind Lakes have no natural entrance — bring a [[Pickaxes|pickaxe]]._
 * _The fish found here are unique to this environment and cannot be found anywhere else._ ⏳
   `
   },
@@ -1712,7 +1747,44 @@ Shell is a sedimentary material formed from ancient marine organisms. It is foun
   },
 
   // ── Housing (walls) ──────────────────────────────────────────
-  //    Wood Wall, Background Wall
+  //    Housing, Housing Buffs, Furnitures, Wood Wall, Background Wall
+  {
+    title: 'Housing',
+    category: ['Activities', 'Housing'],
+    content: `
+    `
+  },
+  {
+    title: 'Housing Buffs',
+    category: ['Buff', 'Housing'],
+    content: `
+    `
+  },
+  {
+    title: 'Furnitures',
+    category: ['Housing'],
+    content: `
+
+    **Furnitures list**
+    * [[Beds]]
+    * [[Bookcases]]
+    * [[Cabinets]]
+    * [[Chairs]]
+    * [[Chests]]
+    * [[Clocks]]
+    * [[Closets]]
+    * [[Crafting Stations]]
+    * [[Doors]]
+    * [[Firecamps]]
+    * [[Fireplaces]]
+    * [[Platforms]]
+    * [[Sofas]]
+    * [[Tables]]
+    * [[Tableware]]
+    * [[Toilets]]
+    * [[Torches]]
+    `
+  },
   {
     title: 'Wood Wall',
     category: ['Housing'],
@@ -1727,6 +1799,13 @@ Shell is a sedimentary material formed from ancient marine organisms. It is foun
   },
 
   // ── Accessories ──────────────────────────────────────────────
+  //    Triskels
+  {
+    title: 'Triskels',
+    category: ['Accessory', 'Buff'],
+    content: `
+    `
+  },
 
   // ── Activities Mining ────────────────────────────────────────
   //    Mining, Pickaxes, Mineable Blocks, Mining Buffs
@@ -1789,7 +1868,7 @@ Shell is a sedimentary material formed from ancient marine organisms. It is foun
   },
   {
     title: 'Mining Buffs',
-    category: ['Mining', 'Buffs'],
+    category: ['Mining', 'Buff'],
     content: `
     `
   },
@@ -1840,10 +1919,10 @@ Shell is a sedimentary material formed from ancient marine organisms. It is foun
     category: ['Activities', 'Crafting'],
     content: `
 **Description**
-Crafting Stations are specialized workbenches that allow the player to [[Crafting||craft]] advanced items. Each station is dedicated to a specific material or craft type. Most stations must be crafted first and placed in the world.
+Crafting Stations are specialized workbenches that allow the player to [[Crafting|craft]] advanced items. Each station is dedicated to a specific material or craft type. Most stations must be crafted first and placed in the world.
 
 **Starting point**
-* [[Wood Table]] — [[item:tableWood]] ⭐ — crafted by hand, unlocks the entire crafting chain
+* [[Wooden Table]] — [[item:tableWood]] ⭐ — crafted by hand, unlocks the entire crafting chain
 
 **Woodworking**
 * [[Woodworking]] — [[item:workbench]] ⭐ and [[item:sawmill]] ⭐⭐⭐
@@ -1876,20 +1955,20 @@ Crafting Stations are specialized workbenches that allow the player to [[Craftin
 The crafting tree shows the order in which crafting stations must be built. Each station unlocks the next tier of crafting possibilities.
 
 * By hand
-  * [[Wood Table]] ⭐
-    * [[Workbench]] ⭐
-      * [[Stonecutter]] ⭐
-        * [[Furnace]] ⭐⭐
-          * [[Cooking Pot]] ⭐⭐
-          * [[Blast Furnace]] ⭐⭐⭐⭐
-      * [[Iron Anvil]] ⭐⭐
-        * [[Grindstone]] ⭐⭐⭐
-        * [[Jewelry]] ⭐⭐⭐
-        * [[Platinum Anvil]] ⭐⭐⭐⭐
-      * [[Alchemy]] ⭐⭐
-      * [[Weaving]] ⭐⭐
-        * [[Leatherworking]] ⭐⭐⭐
-      * [[Woodworking]] ⭐⭐⭐
+  * [[Wooden Table]] ⭐
+    * [[Woodworking|Workbench]] ⭐
+      * [[Stonecutting|Stonecutter]] ⭐
+        * [[Smelting|Furnace]] ⭐⭐
+          * [[Cooking|Cooking Pot]] ⭐⭐
+          * [[Smelting|Blast Furnace]] ⭐⭐⭐⭐
+      * [[Forging|Iron Anvil]] ⭐⭐
+        * [[Sharpening|Grindstone]] ⭐⭐⭐
+        * [[Jewelry|Jeweler's Bench]] ⭐⭐⭐
+        * [[Forging|Platinum Anvil]] ⭐⭐⭐⭐
+      * [[Alchemy|Alchemy Table]] ⭐⭐
+      * [[Weaving|Loom]] ⭐⭐
+        * [[Leatherworking|Tanning Rack]] ⭐⭐⭐
+      * [[Woodworking|Sawmill]] ⭐⭐⭐
 * Found in the world ⏳
   * [[Decomposer]] ⭐⭐⭐⭐⭐ — [[Lost Temple]]
   * [[Transmutator]] ⭐⭐⭐⭐⭐ — [[Ancient House]]
@@ -1897,14 +1976,15 @@ The crafting tree shows the order in which crafting stations must be built. Each
   },
   {
     title: 'Crafting Buffs',
-    category: ['Buffs', 'Crafting'],
+    category: ['Buff', 'Crafting'],
     content: `
     `
   },
 
   // ── Crafting Stations ────────────────────────────────────────
+  //    Wooden Table, Woodworking, Smelting, Forging, Sharpening, Leatherworking, Weaving
   {
-    title: 'Wood Table',
+    title: 'Wooden Table',
     category: ['Crafting', 'Crafting Stations'],
     content: ''
   },
@@ -1938,6 +2018,7 @@ The crafting tree shows the order in which crafting stations must be built. Each
     category: ['Crafting', 'Crafting Stations'],
     content: ''
   },
+  //    Stonecutting, Jewelry, Alchemy, Cooking, Decomposer, Transmutator
   {
     title: 'Stonecutting',
     category: ['Crafting', 'Crafting Stations'],
@@ -1973,10 +2054,10 @@ The crafting tree shows the order in which crafting stations must be built. Each
   //    Tableware, Bottles, Buckets
   {
     title: 'Tableware',
-    category: ['Items', 'Crafting'],
+    category: ['Furniture', 'Housing'],
     content: `
 **Description**
-Tableware is a category of [[Furniture]] that serve as containers for food and liquids. They can be placed on any flat-surfaced furniture ([[Wood Table]], [[Workbench]], etc.) as decorative items.
+Tableware is a category of [[Furnitures]] that serve as containers for food and liquids. They can be placed on any flat-surfaced furniture ([[Wooden Table]], [[Woodworking|Workbench]], etc.) as decorative items.
 
 **Food Containers**
 Empty containers used as crafting ingredients in cooking and potion recipes. They are returned to the player's inventory upon consuming the food or potion.
@@ -2009,21 +2090,126 @@ Filled directly from a liquid source in the world. Used as tools to transport an
 * _Bottles are the primary ingredient for all potions — stock up early._ ⏳
 * _Buckets allow precise liquid manipulation — essential for creating [[Obsidian]]._ ⏳
 * _An empty bucket worn on the head provides a surprisingly effective rudimentary helmet._ ⏳
-* _Place a bucket of liquid near your [[Cooking Pot]] or [[Alchemy Table]] to keep a ready supply of water, honey or sap within reach._ ⏳
+* _Place a bucket of liquid near your [[Cooking|Cooking Pot]] or [[Alchemy|Alchemy Table]] to keep a ready supply of water, honey or sap within reach._ ⏳
   `
   },
   {
     title: 'Bottles',
-    category: ['Trees'],
+    category: ['Tree'],
     content: `
     * _See [[Tableware]] for the full list of containers._
     `
   },
   {
     title: 'Buckets',
-    category: ['Trees'],
+    category: ['Tree'],
     content: `
     * _See [[Tableware]] for the full list of containers._
+    `
+  },
+
+  // ── Furniture - Light ────────────────────────────────────────
+  //    Torches, Fireplaces, Firecamps, Toilets, Doors, Beds, Chairs, Cloks
+  {
+    title: 'Torches',
+    category: ['Furniture'],
+    content: `
+    `
+  },
+  {
+    title: 'Fireplaces',
+    category: ['Furniture'],
+    content: `
+    `
+  },
+  {
+    title: 'Firecamps',
+    category: ['Furniture'],
+    content: `
+    `
+  },
+  {
+    title: 'Toilets',
+    category: ['Furniture'],
+    content: `
+    `
+  },
+  {
+    title: 'Doors',
+    category: ['Furniture'],
+    content: `
+    `
+  },
+  {
+    title: 'Beds',
+    category: ['Furniture'],
+    content: `
+    `
+  },
+  {
+    title: 'Chairs',
+    category: ['Furniture'],
+    content: `
+    `
+  },
+  {
+    title: 'Clocks',
+    category: ['Furniture'],
+    content: `
+    `
+  },
+  //    Tables, Platforms, Cabinets, Closets, Bookcases, Sofas
+  {
+    title: 'Tables',
+    category: ['Furniture'],
+    content: `
+    `
+  },
+  {
+    title: 'Platforms',
+    category: ['Furniture'],
+    content: `
+    `
+  },
+  {
+    title: 'Cabinets',
+    category: ['Furniture'],
+    content: `
+    `
+  },
+  {
+    title: 'Closets',
+    category: ['Furniture'],
+    content: `
+    `
+  },
+  {
+    title: 'Bookcases',
+    category: ['Furniture'],
+    content: `
+    `
+  },
+  {
+    title: 'Sofas',
+    category: ['Furniture'],
+    content: `
+    `
+  },
+
+  // ── Chests ───────────────────────────────────────────────────
+  //    Chests
+  {
+    title: 'Chests',
+    category: ['Tree'],
+    content: `
+    `
+  },
+  // ── Life Potion ──────────────────────────────────────────────
+  //    Life Crystal
+  {
+    title: 'Life Crystal',
+    category: ['Furniture'],
+    content: `
     `
   },
   // ── Items & Crafting ─────────────────────────────────────────
@@ -2035,7 +2221,7 @@ Filled directly from a liquid source in the world. Used as tools to transport an
   //    Giant Mushroom
   {
     title: 'Giant Mushroom',
-    category: ['Trees'],
+    category: ['Tree'],
     content: `
     `
   },
@@ -2045,13 +2231,13 @@ Filled directly from a liquid source in the world. Used as tools to transport an
   //    Spiders, Bees
   {
     title: 'Spiders',
-    category: ['Monsters'],
+    category: ['Monster'],
     content: `
     `
   },
   {
     title: 'Bees',
-    category: ['Monsters'],
+    category: ['Monster'],
     content: `
     `
   }

@@ -114,6 +114,7 @@ class GameCore {
    */
   #hydrateItems () {
     let count = 0
+    let errors = 0
 
     for (const key in ITEMS) {
       const item = ITEMS[key]
@@ -121,11 +122,15 @@ class GameCore {
       if (item.placed) item.placed = resolveAssetData(item.placed)
       if (item.placedRight) item.placedRight = resolveAssetData(item.placedRight)
       if (item.placedLeft) item.placedLeft = resolveAssetData(item.placedLeft)
+
+      if (!HELP_TITLES.has(item.help)) {
+        console.error(`[core] ITEMS.${key} : help topic inconnu '${item.help}'`)
+        errors++
+      }
       count++
     }
 
-    // La logique sera identique : parsing des icônes de l'item
-    console.log(`   🔹 Items hydratés : ${count}`)
+    console.log(`   🔹 Items hydratés : ${count}, ${errors} erreur(s)`)
   }
 
   /**
