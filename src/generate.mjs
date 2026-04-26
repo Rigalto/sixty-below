@@ -288,12 +288,15 @@ class WorldGenerator {
 
     // // 6.4. Nettoyage des tuiles isolées
     worldCarver.cleanupAfterCarving()
-    const surfaceLine = worldCarver.buildErodedSurfaceLine()
 
     // // 6.5. Ajout des flaques sousterraines
     const waterPuddleLiquidBodies = worldCarver.digWaterPuddles(surfaceUnder)
     const sapPuddleLiquidBodies = worldCarver.digSapPuddles(surfaceUnder)
     await progress('Puddles')
+
+    tileGuard.init()
+    const surfaceLine = worldCarver.buildErodedSurfaceLine()
+    worldCarver.paintSurfaceNatural(surfaceLine, biomesDescription)
 
     // A supprimer
     // worldCarver.debugTraceTunnel()
@@ -929,6 +932,11 @@ export const biomeNaturalizer = new BiomeNaturalizer()
    AJOUT DES LIQUIDES DANS LE MONDE
    ==================================================================================================== */
 
+/**
+ * BFS flood-fill des mers gauche et droite.
+ * @returns {{leftSea: number[], rightSea: number[]}} — Index des tuiles écrites en SEA (sans doublon)
+ *
+ */
 class LiquidFiller {
   fillSea () {
     const jitterLeft = seededRNG.randomGetMax(SEA_MAX_JITTER)
@@ -936,12 +944,26 @@ class LiquidFiller {
     const jitterHeight = seededRNG.randomGetMax(SEA_MAX_JITTER)
     const maxY = SEA_LEVEL + SEA_MAX_HEIGHT + jitterHeight
 
-    this.#fillOneSea(SEA_LEVEL << 10, true, SEA_MAX_WIDTH + jitterLeft, maxY)
-    this.#fillOneSea((SEA_LEVEL << 10) | 1023, false, SEA_MAX_WIDTH + jitterRight, maxY)
+    const leftSea = this.#fillOneSea(SEA_LEVEL << 10, true, SEA_MAX_WIDTH + jitterLeft, maxY)
+    const rightSea = this.#fillOneSea((SEA_LEVEL << 10) | 1023, false, SEA_MAX_WIDTH + jitterRight, maxY)
+    return {leftSea, rightSea}
   }
 
+  /**
+ * BFS flood-fill d'une mer (gauche ou droite) depuis un point de départ.
+ * Propage SEA sur toutes les tuiles VOID, GRASSFERN, GRASSMUSHROOM, GRASSMOSS connectées.
+ * Pose des murs SANDSTONE aux limites X et Y pour contenir la mer.
+ * construit un mur de SANDSTONE pour les voisins WATER, SAP, HONEY pour éviter les mélanges de liquides.
+ *
+ * @param {number}  src      — Index de départ (bord DEEPSEA à SEA_LEVEL)
+ * @param {boolean} isLeft   — true = mer gauche, false = mer droite
+ * @param {number}  maxWidth — Largeur maximale de propagation (en tuiles)
+ * @param {number}  maxY     — Borne basse exclusive (tuiles au-delà sont rebouchées)
+ * @returns {number[]}       — Index des tuiles écrites en SEA (sans doublon)
+ */
   #fillOneSea (src, isLeft, maxWidth, maxY) {
     const LIQUID_BORDER = new Set([NODES.WATER.code, NODES.SAP.code, NODES.HONEY.code])
+    const SEA_PASSABLE = new Set([NODES.VOID.code, NODES.GRASSFERN.code, NODES.GRASSMUSHROOM.code, NODES.GRASSMOSS.code])
     const VOID = NODES.VOID.code
     const SEA = NODES.SEA.code
     const SANDSTONE = NODES.SANDSTONE.code
@@ -949,6 +971,7 @@ class LiquidFiller {
     const maxIndexTop = SEA_LEVEL * 1024 - 1
     const xLimit = isLeft ? maxWidth : 1023 - maxWidth
 
+    const seaTiles = []
     const visited = new Set()
     const queue = []
     let head = 0
@@ -983,7 +1006,7 @@ class LiquidFiller {
         if (ny >= maxY) {
           const ahead1 = nIdx + 1024
           const ahead2 = ahead1 + 1024
-          if (worldBuffer.readAt(ahead1) === VOID && worldBuffer.readAt(ahead2) === VOID) {
+          if (worldBuffer.readAt(ahead1) === VOID && SEA_PASSABLE.has(worldBuffer.readAt(ahead2))) {
             worldBuffer.writeAt(nIdx, SANDSTONE)
             worldBuffer.writeAt(ahead1, SANDSTONE)
             visited.add(nIdx)
@@ -992,7 +1015,7 @@ class LiquidFiller {
         }
 
         const tileCode = worldBuffer.readAt(nIdx)
-        if (tileCode !== VOID) continue
+        if (!SEA_PASSABLE.has(tileCode)) continue
 
         // Limite X — rebouchage éventuel
         const atLimit = isLeft ? nx >= xLimit : nx <= xLimit
@@ -1000,7 +1023,7 @@ class LiquidFiller {
           const dir = nIdx - idx
           const ahead1 = nIdx + dir
           const ahead2 = ahead1 + dir
-          if (worldBuffer.readAt(ahead1) === VOID && worldBuffer.readAt(ahead2) === VOID) {
+          if (worldBuffer.readAt(ahead1) === VOID && SEA_PASSABLE.has(worldBuffer.readAt(ahead2))) {
             worldBuffer.writeAt(nIdx, SANDSTONE)
             worldBuffer.writeAt(ahead1, SANDSTONE)
             visited.add(nIdx)
@@ -1021,9 +1044,11 @@ class LiquidFiller {
         }
 
         worldBuffer.writeAt(nIdx, SEA)
+        seaTiles.push(nIdx)
         enqueue(nIdx)
       }
     }
+    return seaTiles
   }
 
   /**
@@ -3722,7 +3747,7 @@ class WorldCarver {
       const guardTop = cy + 6
       const guardBottom = cy + radiusY + rectHalfH + 3
       const guardHalfH = Math.round((guardBottom - guardTop) / 2)
-      const guardCy = guardTop + guardHalfH;
+      const guardCy = guardTop + guardHalfH
 
       tileGuard.addNoisyRect(cx, guardCy - 2, radiusX + 3, radiusX + 6, guardHalfH - 2, guardHalfH + 2, 0.8, PERLIN_OFFSET_FERNS)
 
@@ -4915,6 +4940,57 @@ class WorldCarver {
       }
     }
     return surfaceLine
+  }
+
+  /**
+ * Pose les tuiles de surface végétale sur les deux tuiles supérieures
+ * de chaque colonne solide, selon le biome courant.
+ * - Forest  : GRASS       (y) + GRASS       (y+1)
+ * - Jungle  : GRASSJUNGLE (y) + GRASSJUNGLE (y+1)
+ * - Desert  : SAND        (y) + SAND        (y+1)
+ * Dans les zones de mer (surfaceLine pointe sur SEA) : SAND quelle que soit le biome.
+ * Utilise applyTiles avec ETERNAL_EXCLUDED.
+ *
+ * @param {Int16Array}                    surfaceLine       — Y de la première tuile solide par colonne
+ * @param {Array<{biome, width, offset}>} biomesDescription — zones biome ordonnées
+ */
+  paintSurfaceNatural (surfaceLine, biomesDescription) {
+    const GRASSFOREST = NODES.GRASSFOREST.code
+    const GRASSJUNGLE = NODES.GRASSJUNGLE.code
+    const SAND = NODES.SAND.code
+    const SEA = NODES.SEA.code
+    const WATER = NODES.WATER.code
+    const W = WORLD_WIDTH
+
+    const NATURAL_CODE = []
+    NATURAL_CODE[BIOME_TYPE.FOREST] = GRASSFOREST
+    NATURAL_CODE[BIOME_TYPE.JUNGLE] = GRASSJUNGLE
+    NATURAL_CODE[BIOME_TYPE.DESERT] = SAND
+
+    const tiles = []
+    let zoneIdx = 0
+    let zone = biomesDescription[0]
+    let zoneEnd = zone.offset + zone.width
+
+    for (let x = 1; x < W - 1; x++) {
+      if (x >= zoneEnd && zoneIdx < biomesDescription.length - 1) {
+        zoneIdx++
+        zone = biomesDescription[zoneIdx]
+        zoneEnd = zone.offset + zone.width
+      }
+
+      const y = surfaceLine[x]
+      const idx = (y << 10) | x
+
+      const aboveCode = worldBuffer.readAt(idx - W) // ← tuile au-dessus de la surface
+      if (aboveCode === WATER) continue
+      const code = aboveCode === SEA ? SAND : NATURAL_CODE[zone.biome]
+
+      tiles.push({x, y, index: idx, code})
+      tiles.push({x, y: y + 1, index: idx + W, code})
+    }
+
+    this.applyTiles(tiles, ETERNAL_EXCLUDED)
   }
 
   /**

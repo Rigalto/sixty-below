@@ -769,7 +769,6 @@ Génère des tunnels, des cavernes et des mini-biomes. Maintient la liste des zo
 | `digCavernsTunnels(underCaverns): void` | Creuse `CAVERN_TUNNEL_COUNT` tunnels dans la zone cavernes. Borne basse : `WORLD_HEIGHT - 32`. Rayon 7–10, longueur 40–60, déviation 50°. |
 | `digSmallTunnels(surfaceUnder): void` | Creuse `SMALL_TUNNELS_COUNT` petites galeries sinueuses (rayon 2–4, longueur 60–100, deltaAngle 40°) dans les zones underground et cavernes. |
 | `cleanupAfterCarving(): void` | Passe de nettoyage globale post-creusement en 4 passes : (1) propagation SKY colonne par colonne, (2) suppression des tuiles isolées VOID/solide dans SKY/VOID/liquide (13 règles), (3) suppression des colonnes étroites SKY/VOID en surface. |
-| `buildErodedSurfaceLine(): Int16Array` | Calcule la ligne de surface (première tuile solide par colonne) et applique une érosion légère (trous et bosses de 1 tuile). Retourne `surfaceLine`. |
 
 ---
 
@@ -821,6 +820,14 @@ Génère des tunnels, des cavernes et des mini-biomes. Maintient la liste des zo
 | `digAncientHouse()` | Creuse une Ancient House par monde en biome DESERT, layer caverns_bottom. Caverne bruitée à fond plat (28×18) via `digNoisyRect` + `#flattenCaveBottom`. Structure 18×11 en WOODWALL (murs + toit + étage) + GOLDWALL (fond intérieur). Porte INVISIBLE (3 tuiles, gauche ou droite, 50/50). Étage 6 tuiles (gauche ou droite). Dégradation : une tuile de mur + une tuile de toit retirées. Meubles : toit (`shuffleArray` + `surfaceFurnitures`), sol (idem), tableware sur 80% des surfaces. `brokenTransmutator` posé sur l'étage. Protection TileGuard sur la structure. Retourne `{x0, y0}|null`. Prérequis : `initZoneRects()`, `initExclusions()`. |
 | `digAbandonedMine()` | Creuse une Abandoned Mine par monde, tous biomes, layer caverns_bottom. Tunnel horizontal bruité (~40 tuiles, rayon 3, deltaAngle 8°). COBALT sur 75% des tuiles de plafond, SAPPHIRE sur 15% des tuiles de sol. Étais SANDSTONEWALL verticaux espacés de 7-10 tuiles. Protection TileGuard rayon 5 sur chaque point du path. Robuste aux deux sens de tracé (90° ou -90°). Retourne `{path}|null`. Prérequis : `initZoneRects()`, `initExclusions()`. |
 
+---
+
+#### Mise à jour de la surface
+
+| Méthode | Description |
+|---|---|
+| `buildErodedSurfaceLine(): Int16Array` | Calcule la ligne de surface (première tuile solide par colonne) et applique une érosion légère (trous et bosses de 1 tuile). Retourne `surfaceLine`. |
+| `paintSurfaceNatural(surfaceLine, biomesDescription): void` | Pose les tuiles NATURAL (GRASS / GRASSJUNGLE / SAND) sur les deux tuiles supérieures de chaque colonne, selon le biome courant. Colonne en mer → SAND. Ne fait rien dans les colonnes WATER. Parcours O(n) via avance monotone sur `biomesDescription`. Délègue à `applyTiles` avec `ETERNAL_EXCLUDED`. |
 ---
 
 Le paramètre `offsetX` de `digNoisyCircle`, `digNoisyEllipse` et `digNoisyRect` permet de décorrèler le bruit Perlin des autres usages.
