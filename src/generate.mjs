@@ -140,7 +140,7 @@ class WorldGenerator {
     window.DEBUG_POINTS = [] // DEGUG - à supprimer
 
     // affichage de la progression de la création dans le dialogue modal
-    const STEPS = 21
+    const STEPS = 24
     let step = 0
     const progress = (topic) => {
       step++
@@ -282,12 +282,16 @@ class WorldGenerator {
     worldCarver.digSmallTunnels(surfaceUnder)
     await progress('Small tunnels')
 
+    for (const cave of geodeCaves) { clusterGenerator.projectAndFill(cave) }
+    await progress('Geode Caves')
+
     // 6-3 Remplissage de la mer (gauche et droite)
     const {leftSea, rightSea} = liquidFiller.fillSea()
     await progress('Sea Flooding')
 
     // // 6.4. Nettoyage des tuiles isolées
     worldCarver.cleanupAfterCarving()
+    await progress('Carving Cleanup')
 
     // // 6.5. Ajout des flaques sousterraines
     const waterPuddleLiquidBodies = worldCarver.digWaterPuddles(surfaceUnder)
@@ -297,9 +301,14 @@ class WorldGenerator {
     tileGuard.init()
     const surfaceLine = worldCarver.buildErodedSurfaceLine()
     worldCarver.paintSurfaceNatural(surfaceLine, biomesDescription)
+    await progress('Naturalizing Surface')
 
     const leftBeach = worldCarver.buildBeach(leftSea, true, surfaceLine)
     const rightBeach = worldCarver.buildBeach(rightSea, false, surfaceLine)
+
+    worldCarver.buildSeaFloorAndWalls(leftSea)
+    worldCarver.buildSeaFloorAndWalls(rightSea)
+    await progress('Beach and Sea')
 
     // A supprimer
     // worldCarver.debugTraceTunnel()
@@ -313,8 +322,6 @@ class WorldGenerator {
     // DEBUG — à supprimer après mise au point
     // window.DEBUG_SURFACE_LINE = surfaceLine
 
-    await progress('Carving Cleanup')
-
     console.log('[WorldGenerator::liquidFiller] - Sea', (performance.now() - t0).toFixed(3), 'ms', surfaceLine)
 
     // N-6 Ajout de la plage (Shore) et du fond de la mer - TODO
@@ -323,7 +330,6 @@ class WorldGenerator {
 
     // N-4 Peuplement des biomes qui sont à peuplement différé - TODO
 
-    for (const cave of geodeCaves) { clusterGenerator.projectAndFill(cave) }
     // webFiller.scatterWebs(surfaceUnder)
 
     // N-3. Ajout des coffres et objets spéciaux - TODO
@@ -5103,6 +5109,70 @@ class WorldCarver {
     return {
       beachRect: {x: cx - 28, y: SEA_LEVEL - 10, w: 56, h: 20}
     }
+  }
+
+  /**
+ * Traite le fond et les bords de la mer.
+ * @param {number[]} seaTiles — index des tuiles SEA (retour de #fillOneSea)
+ */
+  buildSeaFloorAndWalls (seaTiles) {
+    const SEA = NODES.SEA.code
+    const SAND = NODES.SAND.code
+    const SANDSTONE = NODES.SANDSTONE.code
+    const W = WORLD_WIDTH
+
+    const tiles = []
+
+    for (let i = 0; i < seaTiles.length; i++) {
+      const idx = seaTiles[i]
+      const x = idx & 0x3FF
+      const y = idx >> 10
+
+      // Traitement 1 : bord inférieur
+      const below = idx + W
+      if (worldBuffer.readAt(below) !== SEA) {
+        tiles.push({x, y: y + 1, index: below, code: SAND})
+
+        const isSand = seededRNG.randomGetBool()
+        const below2 = below + W
+        tiles.push({x, y: y + 2, index: below2, code: isSand ? SAND : SANDSTONE})
+
+        if (isSand) {
+          tiles.push({x, y: y + 3, index: below2 + W, code: SANDSTONE})
+        }
+      }
+
+      // Traitement 2 : bord supérieur
+      const above = idx - W
+      if (worldBuffer.readAt(above) === SAND) {
+        tiles.push({x, y: y - 1, index: above, code: SANDSTONE})
+      }
+    }
+
+    // écriture dans le monde
+    this.applyTiles(tiles, ETERNAL_EXCLUDED)
+
+    // Traitement 3 : bords latéraux
+    tiles.length = 0
+    for (let i = 0; i < seaTiles.length; i++) {
+      const idx = seaTiles[i]
+      const x = idx & 0x3FF
+      const y = idx >> 10
+
+      if (worldBuffer.readAt(idx) !== SEA) continue
+
+      const left = idx - 1
+      if (worldBuffer.readAt(left) === SAND && worldBuffer.readAt(idx + W) === SEA) {
+        tiles.push({x: x - 1, y, index: left, code: SANDSTONE})
+      }
+
+      const right = idx + 1
+      if (worldBuffer.readAt(right) === SAND && worldBuffer.readAt(idx + W) === SEA) {
+        tiles.push({x: x + 1, y, index: right, code: SANDSTONE})
+      }
+    }
+    this.applyTiles(tiles, ETERNAL_EXCLUDED)
+    console.log('.......... dddd', tiles)
   }
 
   /**

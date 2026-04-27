@@ -17,7 +17,10 @@
 
 ### Surface végétale
 - Ajout des NATURAL (GRASS, GRASSJUNGLE) sur les tuiles TOPSOIL exposées
-- Traitement désert : écoulement du sable, consolidation des tunnels/cavernes
+
+### Sable
+- Cconsolidation des tunnels/cavernes
+- écoulement du sable
 
 ### Mini-biomes à implémenter
 - `TileGuard` : implémenté - A intégrer pour tous les futurs mini-biomes
@@ -26,7 +29,6 @@
 - `digAntlionPits()` — Desert, surface, creux triangulaire
 
 ### Plage et fond de mer
-- Ajout des tuiles SAND/SANDSTONE en fond de mer
 - Placement des coraux et plantes marines
 
 ### Ajout des artefacts et plantes
@@ -197,6 +199,7 @@
 - `WorldCarver.buildErodedSurfaceLine` — ligne de surface + érosion (trous et bosses)
 - `WorldCarver.paintSurfaceNatural` — ajoute les tuiles NATURAL en surface
 - `WorldCarver.buildBeach` — ajoute les plages au bord des mers de gauche et de droite
+- `WorldCarver.buildSeaFloorAndWalls` — ajoute du sable en fond de mer
 
 buildBeach
 - `TileGuard` — utilitaire de protection tuiles contre creusement, formes bruitées (cercle, ellipse, rectangle)
