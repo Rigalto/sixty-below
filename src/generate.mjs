@@ -310,6 +310,8 @@ class WorldGenerator {
     worldCarver.buildSeaFloorAndWalls(rightSea)
     await progress('Beach and Sea')
 
+    worldCarver.consolidateSand()
+    await progress('Sand Falling')
     // A supprimer
     // worldCarver.debugTraceTunnel()
 
@@ -3889,9 +3891,7 @@ class WorldCarver {
       const guardCy = guardTop + guardHalfH
 
       tileGuard.addNoisyRect(cx, guardCy, radiusX + 3, radiusX + 6, guardHalfH, guardHalfH + 4, 0.8, PERLIN_OFFSET_MUSHROOM)
-      window.DEBUG_POINTS.push({x: cx, y: cy, color: 'orange'}) // DEBUG
-      window.DEBUG_POINTS.push({x: cx - (radiusX + 5), y: guardCy - guardHalfH - 2, color: '#ff0002'})
-      window.DEBUG_POINTS.push({x: cx + (radiusX + 5), y: guardCy + guardHalfH + 2, color: '#ff0002'})
+      // window.DEBUG_POINTS.push({x: cx, y: cy, color: 'orange'}) // DEBUG
 
       caves.push({cx, cy, radiusX, radiusY})
     }
@@ -5173,6 +5173,44 @@ class WorldCarver {
     }
     this.applyTiles(tiles, ETERNAL_EXCLUDED)
     console.log('.......... dddd', tiles)
+  }
+
+  /**
+ * Protège les plafonds de tunnels et cavernes contre l'écoulement du sable.
+ * Convertit en SANDSTONE tout SAND instable (qui s'écoulerait vers le bas,
+ * bas-droite ou bas-gauche dans un algorithme d'écoulement standard).
+ * Parcours séquentiel complet du monde.
+ */
+  consolidateSand () {
+    const SAND = NODES.SAND.code
+    const SANDSTONE = NODES.SANDSTONE.code
+    const VOID = NODES.VOID.code
+    const W = WORLD_WIDTH
+
+    const tiles = []
+
+    for (let y = 1; y < WORLD_HEIGHT - 1; y++) {
+      for (let x = 1; x < W - 1; x++) {
+        const idx = (y << 10) | x
+        if (worldBuffer.readAt(idx) !== SAND) continue
+
+        const below = idx + W
+        const belowLeft = below - 1
+        const belowRight = below + 1
+
+        const isUnstable =
+        worldBuffer.readAt(below) === VOID ||
+        (worldBuffer.readAt(idx + 1) === VOID && worldBuffer.readAt(belowRight) === VOID) ||
+        (worldBuffer.readAt(idx - 1) === VOID && worldBuffer.readAt(belowLeft) === VOID)
+
+        if (!isUnstable) continue
+
+        tiles.push({x, y, index: idx, code: SANDSTONE})
+      }
+    }
+
+    this.applyTiles(tiles, ETERNAL_EXCLUDED)
+    console.log(`........................consolidateSand — ${tiles.length} tuiles SAND → SANDSTONE`, tiles.map(t => ({x: t.x, y: t.y})))
   }
 
   /**
