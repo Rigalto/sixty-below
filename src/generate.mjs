@@ -140,7 +140,7 @@ class WorldGenerator {
     window.DEBUG_POINTS = [] // DEGUG - à supprimer
 
     // affichage de la progression de la création dans le dialogue modal
-    const STEPS = 24
+    const STEPS = 25
     let step = 0
     const progress = (topic) => {
       step++
@@ -311,6 +311,7 @@ class WorldGenerator {
     await progress('Beach and Sea')
 
     worldCarver.consolidateSand()
+    worldCarver.sandFalling()
     await progress('Sand Falling')
     // A supprimer
     // worldCarver.debugTraceTunnel()
@@ -5185,6 +5186,8 @@ class WorldCarver {
     const SAND = NODES.SAND.code
     const SANDSTONE = NODES.SANDSTONE.code
     const VOID = NODES.VOID.code
+    const UNSTABLE = new Set([VOID, NODES.SEA.code, NODES.WATER.code, NODES.HONEY.code, NODES.SAP.code])
+
     const W = WORLD_WIDTH
 
     const tiles = []
@@ -5199,9 +5202,9 @@ class WorldCarver {
         const belowRight = below + 1
 
         const isUnstable =
-        worldBuffer.readAt(below) === VOID ||
-        (worldBuffer.readAt(idx + 1) === VOID && worldBuffer.readAt(belowRight) === VOID) ||
-        (worldBuffer.readAt(idx - 1) === VOID && worldBuffer.readAt(belowLeft) === VOID)
+        UNSTABLE.has(worldBuffer.readAt(below)) ||
+        (UNSTABLE.has(worldBuffer.readAt(idx + 1)) && UNSTABLE.has(worldBuffer.readAt(belowRight))) ||
+        (UNSTABLE.has(worldBuffer.readAt(idx - 1)) && UNSTABLE.has(worldBuffer.readAt(belowLeft)))
 
         if (!isUnstable) continue
 
@@ -5211,6 +5214,144 @@ class WorldCarver {
 
     this.applyTiles(tiles, ETERNAL_EXCLUDED)
     console.log(`........................consolidateSand — ${tiles.length} tuiles SAND → SANDSTONE`, tiles.map(t => ({x: t.x, y: t.y})))
+  }
+
+  /**
+ * Détecte toutes les tuiles SAND instables dans le monde entier.
+ * Debug : convertit en LAVA et logue les positions.
+ */
+
+  sandFalling () {
+    const SAND = NODES.SAND.code
+    const VOID = NODES.VOID.code
+    const UNSTABLE = new Set([VOID, NODES.SKY.code, NODES.SEA.code, NODES.WATER.code, NODES.HONEY.code, NODES.SAP.code])
+    const W = WORLD_WIDTH
+
+    const isUnstableAt = (idx) => {
+      if (worldBuffer.readAt(idx) !== SAND) return false
+      const below = idx + W
+      return (
+        UNSTABLE.has(worldBuffer.readAt(below)) ||
+      (UNSTABLE.has(worldBuffer.readAt(idx + 1)) && UNSTABLE.has(worldBuffer.readAt(below + 1))) ||
+      (UNSTABLE.has(worldBuffer.readAt(idx - 1)) && UNSTABLE.has(worldBuffer.readAt(below - 1)))
+      )
+    }
+
+    // Descend verticalement depuis idx, retourne l'index de la tuile finale
+    const fallDown = (idx) => {
+      let cur = idx
+      while (true) {
+        const next = cur + W
+        const ny = next >> 10
+        if (ny >= WORLD_HEIGHT - 1) break
+        if (!UNSTABLE.has(worldBuffer.readAt(next))) break
+        cur = next
+      }
+      return cur
+    }
+
+    const dropOne = (idx) => {
+      if (!isUnstableAt(idx)) return
+
+      let cur = idx
+
+      while (true) {
+        // Tentative descente verticale
+        cur = fallDown(cur)
+        const curX = cur & 0x3FF
+
+        // Tentative diagonale
+        const canLeft = curX > 1 && UNSTABLE.has(worldBuffer.readAt(cur - 1)) && UNSTABLE.has(worldBuffer.readAt(cur + W - 1))
+        const canRight = curX < W - 2 && UNSTABLE.has(worldBuffer.readAt(cur + 1)) && UNSTABLE.has(worldBuffer.readAt(cur + W + 1))
+
+        if (!canLeft && !canRight) break // stable
+
+        const goLeft = canLeft && (!canRight || seededRNG.randomGetBool())
+        cur = goLeft ? cur - 1 : cur + 1
+        // on reboucle pour tenter la descente verticale depuis la nouvelle position
+      }
+
+      if (cur === idx) return // n'a pas bougé
+
+      // Écriture destination
+      worldBuffer.writeAt(cur, SAND)
+
+      // Remplacement source
+      const above = idx - W
+      const aboveCode = worldBuffer.readAt(above)
+      worldBuffer.writeAt(idx, UNSTABLE.has(aboveCode) ? aboveCode : VOID)
+      worldBuffer.writeAt(idx, UNSTABLE.has(aboveCode) ? aboveCode : VOID)
+
+      // Propagation SKY vers le bas
+      if (aboveCode === NODES.SKY.code) {
+        let propagate = idx + W
+        while (worldBuffer.readAt(propagate) === VOID) {
+          worldBuffer.writeAt(propagate, NODES.SKY.code)
+          propagate += W
+        }
+      }
+
+      // Ajout des voisins dans la pile
+      const neighbors = [idx - 1, idx + 1, idx - W, idx - W - 1, idx - W + 1]
+      for (let i = 0; i < neighbors.length; i++) {
+        if (isUnstableAt(neighbors[i])) unstable.push(neighbors[i])
+      }
+    }
+
+    // Construction liste initiale
+    const unstable = []
+    for (let y = WORLD_HEIGHT - 2; y >= 1; y--) {
+      for (let x = 1; x < WORLD_WIDTH - 1; x++) {
+        const idx = (y << 10) | x
+        if (!isUnstableAt(idx)) continue
+        unstable.push(idx)
+      }
+    }
+
+    console.log(`sandFalling — ${unstable.length} tuiles instables initiales`)
+
+    // Traitement
+    let count = 0
+    while (unstable.length > 0) {
+      dropOne(unstable.pop())
+      count++
+    }
+
+    console.log(`sandFalling — ${count} tuiles traitées au total`)
+  }
+
+  sandFalling_ () {
+    const SAND = NODES.SAND.code
+    // const LAVA = NODES.LAVA.code
+    const VOID = NODES.VOID.code
+    const UNSTABLE = new Set([VOID, NODES.SKY.code, NODES.SEA.code, NODES.WATER.code, NODES.HONEY.code, NODES.SAP.code])
+
+    const W = WORLD_WIDTH
+
+    // const tiles = []
+
+    const unstable = []
+    for (let y = 1; y < WORLD_HEIGHT - 1; y++) {
+      for (let x = 1; x < WORLD_WIDTH - 1; x++) {
+        const idx = (y << 10) | x
+        if (worldBuffer.readAt(idx) !== SAND) continue
+
+        const below = idx + W
+        const belowCode = worldBuffer.readAt(below)
+
+        const isUnstable =
+        UNSTABLE.has(belowCode) ||
+        (UNSTABLE.has(worldBuffer.readAt(idx + 1)) && UNSTABLE.has(worldBuffer.readAt(below + 1))) ||
+        (UNSTABLE.has(worldBuffer.readAt(idx - 1)) && UNSTABLE.has(worldBuffer.readAt(below - 1)))
+
+        if (!isUnstable) continue
+        // tiles.push({x, y, index: idx, code: LAVA})
+        unstable.push(idx)
+      }
+    }
+
+    // this.applyTiles(tiles, ETERNAL_EXCLUDED)
+    console.log(`debugUnstableSand — ${unstable.length} tuiles instables`, unstable)
   }
 
   /**
