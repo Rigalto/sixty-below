@@ -15,11 +15,6 @@
 ### Tunnels
 - Densité trop élevée, notamment juste sous la surface (revoir les constantes `SMALL_TUNNELS_COUNT` et `CAVERNS_TUNNEL_COUNT`)
 
-### Topsoil
-- Placement des TOPSOIL en surface
-- Placement des TOPSOIL dans les cavernes et tunnels
-- Phase post-creusement : recouvrement des parois de cavernes/tunnels par TOPSOIL (algorithme distinct)
-
 ### Surface végétale
 - Ajout des NATURAL (GRASS, GRASSJUNGLE) sur les tuiles TOPSOIL exposées
 - Traitement désert : écoulement du sable, consolidation des tunnels/cavernes
@@ -31,15 +26,14 @@
 - `digAntlionPits()` — Desert, surface, creux triangulaire
 
 ### Plage et fond de mer
-- Ajout des tuiles SHORE et SHELL en bordure de mer
+- Ajout des tuiles SAND/SANDSTONE en fond de mer
 - Placement des coraux et plantes marines
-- Ajout des coffres et objets spéciaux
 
-### Meteorite (événement runtime)
-- Événement rare : impact depuis l'espace, détruit arbres/plantes/shelter/furniture
-- Tuiles METEORITE minables, tier 5
-- Oxydation progressive en quelques jours (timer global)
-- À implémenter dans `ecosystem.mjs`, pas dans `generate.mjs`
+### Ajout des artefacts et plantes
+- Ajout des coffres
+- Ajout des arbres (Oak, Mahogany, Giant Mushroom, Coconut)
+- Ajout de herbes
+- Ajout des arbustes (Cactus, bambou)
 
 ---
 
@@ -84,6 +78,17 @@
 ### Artisanat
 - Recettes et crafting stations
 - Décomposeur (rendement 80%) et Transmutateur (résolution pénurie de ressources)
+
+
+### Meteorite (événement runtime)
+- Événement rare : impact depuis l'espace, détruit arbres/plantes/shelter/furniture
+- Tuiles METEORITE minables, tier 5
+- Oxydation progressive en quelques jours (timer global)
+- À implémenter dans `ecosystem.mjs`, pas dans `generate.mjs`
+
+### Invasion de pirates (événement runtime)
+
+### Invasion d'aliens (événement runtime)
 
 ---
 
@@ -190,6 +195,10 @@
 - `WorldCarver.digAbandonedMine` — Tous biomes, caverns_bottom, COBALT + SAPPHIRE + SANDSTONEWALL
 - `WorldCarver.cleanupAfterCarving` — nettoyage post-creusement (4 passes, règles déclaratives)
 - `WorldCarver.buildErodedSurfaceLine` — ligne de surface + érosion (trous et bosses)
+- `WorldCarver.paintSurfaceNatural` — ajoute les tuiles NATURAL en surface
+- `WorldCarver.buildBeach` — ajoute les plages au bord des mers de gauche et de droite
+
+buildBeach
 - `TileGuard` — utilitaire de protection tuiles contre creusement, formes bruitées (cercle, ellipse, rectangle)
 
 ### Rendu (partiel)

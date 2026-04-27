@@ -747,6 +747,7 @@ Génère des tunnels, des cavernes et des mini-biomes. Maintient la liste des zo
 | `initExclusions(): void` | Réinitialise la liste interne des zones d'exclusion (`#exclusions`). À appeler depuis `generate()` avant le premier mini-biome. |
 | `addExclusion(rect: {x1, y1, x2, y2}): void` | Ajoute un rectangle à la liste interne d'exclusion. À appeler explicitement après `applyTiles()` pour les mini-biomes uniquement. |
 | `isExcluded(x1, y1, x2, y2): boolean` | Vérifie si un rectangle intersecte l'une des zones d'exclusion internes. Retourne `true` dès la première intersection trouvée. |
+| `addSeaExclusions(): void` | Enregistre les rectangles d'exclusion des deux zones de mer (gauche et droite) aux dimensions maximales (`SEA_MAX_WIDTH + SEA_MAX_JITTER + 2`, `SEA_LEVEL + SEA_MAX_HEIGHT + SEA_MAX_JITTER + 2`). À appeler juste après `tileGuard.init()`. |
 | `digNoisyCircle(tiles, cx, cy, radiusMin, radiusMax, code, frequency?, offsetX?): void` | Creuse un trou circulaire bruité (Perlin noise). Pousse les tuiles dans `tiles`. |
 | `digNoisyEllipse(tiles, cx, cy, radiusXMin, radiusXMax, radiusYMin, radiusYMax, code, frequency?, offsetX?): void` | Creuse un trou elliptique bruité (Perlin noise). Distance normalisée par les demi-axes. Pousse les tuiles dans `tiles`. |
 | `digNoisyRect(tiles, cx, cy, radiusXMin, radiusXMax, radiusYMin, radiusYMax, code, frequency?, offsetX?): void` | Creuse un rectangle bruité (Perlin noise) sur les 4 bords. Distance de Chebyshev normalisée. Pousse les tuiles dans `tiles`. |
@@ -805,6 +806,7 @@ Génère des tunnels, des cavernes et des mini-biomes. Maintient la liste des zo
 |---|---|
 | `digFossilVeins()` | Place `FOSSIL_VEIN_COUNT` veines SHELL horizontales (rayon 2, longueur 16–20, déviation 12°). Biomes : DESERT + premier et dernier rect. Layer : caverns_top (90%), une migration max en under ou caverns_bottom (10%, 50/50). Protection TileGuard par point de chemin (rayon + 2). |
 | `digSandPockets()` | Creuse 1–2 Sand Pockets elliptiques par zone DESERT (radiusX 4–8, radiusY 3–7). Layer : under (60%) ou caverns_top (40%). Intérieur SAND protégé par `tileGuard.addTiles()`. Périphérie inférieure (`y >= cy`) → SANDSTONE via `pocketSet`. |
+| `buildBeach(seaTiles, isLeft, surfaceLine): {beachRect: {x, y, w, h}}` | Crée une plage de sable en bordure de mer. Trouve la tuile SEA la plus proche de la terre sur la première ligne de mer, pose un rectangle bruité (`digNoisyRect`, `PERLIN_OFFSET_BEACH`) de 56×20 tuiles centré à `shoreX ± 12`. Filtre les tuiles SEA/VOID/SKY/WATER. Conserve DIRT/SANDSTONE, convertit SILT/HUMUS en SANDSTONE, pose SAND ailleurs (SANDSTONE sur les bords touchant un liquide/gaz, sauf si SKY au-dessus). Disperse 15–20 tuiles SHELL aléatoires. Retourne `beachRect` (dimensions nominales, `cy = SEA_LEVEL`, `radiusY = 10`) pour le spawn de SHELL et le futur cocotier. |
 
 ---
 

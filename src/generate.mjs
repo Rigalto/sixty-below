@@ -1,6 +1,6 @@
 import {seededRNG, shuffleArray} from './utils.mjs'
 import {database, uniqueIdGenerator} from './database.mjs'
-import {WEATHER_TYPE, WORLD_WIDTH, WORLD_HEIGHT, SEA_LEVEL, TOPSOIL_Y_SKY_SURFACE, TOPSOIL_Y_SURFACE_UNDER, TOPSOIL_Y_UNDER_CAVERNS, TOPSOIL_Y_CAVERNS_MID, BIOME_TILE_MAP, SEA_MAX_JITTER, SEA_MAX_WIDTH, SEA_MAX_HEIGHT, CLUSTER_SCATTER_MAP, ORE_GEM_SCATTER_MAP, PERLIN_OFFSET_NATURALIZER, PERLIN_OFFSET_TUNNEL, PERLIN_OFFSET_SURFACE_TUNNEL, PERLIN_OFFSET_SMALL_TUNNEL, PERLIN_OFFSET_CAVERN, PERLIN_OFFSET_HIVE, PERLIN_OFFSET_HEART, PERLIN_OFFSET_MUSHROOM, PERLIN_OFFSET_COBWEB, PERLIN_OFFSET_FERNS, PERLIN_OFFSET_LAKES, PERLIN_OFFSET_SHELL, PERLIN_OFFSET_TEMPLE, SMALL_CAVERNS_COUNT, MEDIUM_CAVERNS_COUNT, UNDERGROUND_TUNNEL_COUNT, CAVERNS_TUNNEL_COUNT, SMALL_TUNNELS_COUNT, HIVE_RADIUS_MIN, HIVE_RADIUS_MAX, COBWEB_CAVE_COUNT_MIN, COBWEB_CAVE_COUNT_MAX, COBWEB_RADIUS_X_MIN, COBWEB_RADIUS_X_MAX, COBWEB_RADIUS_Y_MIN, COBWEB_RADIUS_Y_MAX, COBWEB_CAVE_MAIN_MIN, COBWEB_CAVE_MAIN_MAX, COBWEB_CAVE_SIDE_MIN, COBWEB_CAVE_SIDE_MAX, COBWEB_SCATTER_COUNT, COBWEB_SCATTER_SIZE_MIN, COBWEB_SCATTER_SIZE_MAX, GEODE_CAVE_COUNT_MIN, GEODE_CAVE_COUNT_MAX, GEODE_RADIUS_MIN, GEODE_RADIUS_MAX, GEODE_TARGET_CLUSTER_COUNT, GEODE_CLUSTER_SIZE_MIN, GEODE_CLUSTER_SIZE_MAX, TOPSOIL_SCATTER_MAP, LAKE_RADIUS_X_MIN, LAKE_RADIUS_X_MAX, LAKE_RADIUS_Y_MIN, LAKE_RADIUS_Y_MAX, LAKE_PIT_RADIUS_X_MIN, LAKE_PIT_RADIUS_X_MAX, LAKE_PIT_RADIUS_Y_MIN, LAKE_PIT_RADIUS_Y_MAX, LAKE_CREATION_MAP, UNDERGROUND_LAKE_UNDER_COUNT, UNDERGROUND_LAKE_CAVERNS_COUNT, UNDERGROUND_LAKE_RADIUS_MIN, UNDERGROUND_LAKE_RADIUS_MAX, BLIND_LAKE_COUNT, BLIND_LAKE_RADIUS_MIN, BLIND_LAKE_RADIUS_MAX, SAP_LAKE_UNDER_COUNT, SAP_LAKE_CAVERNS_COUNT, SAP_LAKE_RADIUS_MIN, SAP_LAKE_RADIUS_MAX, SAP_POCKET_COUNT, SAP_POCKET_RADIUS_MIN, SAP_POCKET_RADIUS_MAX, WATER_PUDDLE_COUNT, SAP_PUDDLE_COUNT, PUDDLE_HEIGHT_MIN, PUDDLE_HEIGHT_MAX, FOSSIL_VEIN_COUNT, FERN_CAVE_RADIUS_X_MIN, FERN_CAVE_RADIUS_X_MAX, FERN_CAVE_RADIUS_Y_MIN, FERN_CAVE_RADIUS_Y_MAX, MOSS_CAVE_RADIUS_X_MIN, MOSS_CAVE_RADIUS_X_MAX, MOSS_CAVE_RADIUS_Y_MIN, MOSS_CAVE_RADIUS_Y_MAX, SAND_POCKET_RADIUS_X_MIN, SAND_POCKET_RADIUS_X_MAX, SAND_POCKET_RADIUS_Y_MIN, SAND_POCKET_RADIUS_Y_MAX, MUSHROOM_CAVE_RADIUS_X_MIN, MUSHROOM_CAVE_RADIUS_X_MAX, MUSHROOM_CAVE_RADIUS_Y_MIN, MUSHROOM_CAVE_RADIUS_Y_MAX, PYRAMID_WALL_INDEXES, PYRAMID_VOID_INDEXES, PYRAMID_WIDTH, PYRAMID_HEIGHT, PYRAMID_ROOM1_DELTA, PYRAMID_ROOM2_DELTA, TEMPLE_RUIN_WALL_INDEXES, TEMPLE_RUIN_COLUMNS_INDEXES} from '../assets/data/data-gen.mjs'
+import {WEATHER_TYPE, WORLD_WIDTH, WORLD_HEIGHT, SEA_LEVEL, TOPSOIL_Y_SKY_SURFACE, TOPSOIL_Y_SURFACE_UNDER, TOPSOIL_Y_UNDER_CAVERNS, TOPSOIL_Y_CAVERNS_MID, BIOME_TILE_MAP, SEA_MAX_JITTER, SEA_MAX_WIDTH, SEA_MAX_HEIGHT, CLUSTER_SCATTER_MAP, ORE_GEM_SCATTER_MAP, PERLIN_OFFSET_NATURALIZER, PERLIN_OFFSET_TUNNEL, PERLIN_OFFSET_SURFACE_TUNNEL, PERLIN_OFFSET_SMALL_TUNNEL, PERLIN_OFFSET_CAVERN, PERLIN_OFFSET_HIVE, PERLIN_OFFSET_HEART, PERLIN_OFFSET_MUSHROOM, PERLIN_OFFSET_COBWEB, PERLIN_OFFSET_FERNS, PERLIN_OFFSET_LAKES, PERLIN_OFFSET_SHELL, PERLIN_OFFSET_TEMPLE, PERLIN_OFFSET_BEACH, SMALL_CAVERNS_COUNT, MEDIUM_CAVERNS_COUNT, UNDERGROUND_TUNNEL_COUNT, CAVERNS_TUNNEL_COUNT, SMALL_TUNNELS_COUNT, HIVE_RADIUS_MIN, HIVE_RADIUS_MAX, COBWEB_CAVE_COUNT_MIN, COBWEB_CAVE_COUNT_MAX, COBWEB_RADIUS_X_MIN, COBWEB_RADIUS_X_MAX, COBWEB_RADIUS_Y_MIN, COBWEB_RADIUS_Y_MAX, COBWEB_CAVE_MAIN_MIN, COBWEB_CAVE_MAIN_MAX, COBWEB_CAVE_SIDE_MIN, COBWEB_CAVE_SIDE_MAX, COBWEB_SCATTER_COUNT, COBWEB_SCATTER_SIZE_MIN, COBWEB_SCATTER_SIZE_MAX, GEODE_CAVE_COUNT_MIN, GEODE_CAVE_COUNT_MAX, GEODE_RADIUS_MIN, GEODE_RADIUS_MAX, GEODE_TARGET_CLUSTER_COUNT, GEODE_CLUSTER_SIZE_MIN, GEODE_CLUSTER_SIZE_MAX, TOPSOIL_SCATTER_MAP, LAKE_RADIUS_X_MIN, LAKE_RADIUS_X_MAX, LAKE_RADIUS_Y_MIN, LAKE_RADIUS_Y_MAX, LAKE_PIT_RADIUS_X_MIN, LAKE_PIT_RADIUS_X_MAX, LAKE_PIT_RADIUS_Y_MIN, LAKE_PIT_RADIUS_Y_MAX, LAKE_CREATION_MAP, UNDERGROUND_LAKE_UNDER_COUNT, UNDERGROUND_LAKE_CAVERNS_COUNT, UNDERGROUND_LAKE_RADIUS_MIN, UNDERGROUND_LAKE_RADIUS_MAX, BLIND_LAKE_COUNT, BLIND_LAKE_RADIUS_MIN, BLIND_LAKE_RADIUS_MAX, SAP_LAKE_UNDER_COUNT, SAP_LAKE_CAVERNS_COUNT, SAP_LAKE_RADIUS_MIN, SAP_LAKE_RADIUS_MAX, SAP_POCKET_COUNT, SAP_POCKET_RADIUS_MIN, SAP_POCKET_RADIUS_MAX, WATER_PUDDLE_COUNT, SAP_PUDDLE_COUNT, PUDDLE_HEIGHT_MIN, PUDDLE_HEIGHT_MAX, FOSSIL_VEIN_COUNT, FERN_CAVE_RADIUS_X_MIN, FERN_CAVE_RADIUS_X_MAX, FERN_CAVE_RADIUS_Y_MIN, FERN_CAVE_RADIUS_Y_MAX, MOSS_CAVE_RADIUS_X_MIN, MOSS_CAVE_RADIUS_X_MAX, MOSS_CAVE_RADIUS_Y_MIN, MOSS_CAVE_RADIUS_Y_MAX, SAND_POCKET_RADIUS_X_MIN, SAND_POCKET_RADIUS_X_MAX, SAND_POCKET_RADIUS_Y_MIN, SAND_POCKET_RADIUS_Y_MAX, MUSHROOM_CAVE_RADIUS_X_MIN, MUSHROOM_CAVE_RADIUS_X_MAX, MUSHROOM_CAVE_RADIUS_Y_MIN, MUSHROOM_CAVE_RADIUS_Y_MAX, PYRAMID_WALL_INDEXES, PYRAMID_VOID_INDEXES, PYRAMID_WIDTH, PYRAMID_HEIGHT, PYRAMID_ROOM1_DELTA, PYRAMID_ROOM2_DELTA, TEMPLE_RUIN_WALL_INDEXES, TEMPLE_RUIN_COLUMNS_INDEXES} from '../assets/data/data-gen.mjs'
 import {NODES, NODES_LOOKUP, NODE_TYPE, BIOME_TYPE, PLANT_SYSTEM, GRASS_TYPE, ITEMS} from '../assets/data/data.mjs'
 
 /* ====================================================================================================
@@ -186,7 +186,7 @@ class WorldGenerator {
 
     // 6. Creusement (plus de creusement ensuite, ou alors très localisé) - TODO
     worldCarver.initExclusions()
-    tileGuard.init()
+    worldCarver.addSeaExclusions()
 
     // 6.1 Creusement des mini-biomes - TODO
 
@@ -283,7 +283,7 @@ class WorldGenerator {
     await progress('Small tunnels')
 
     // 6-3 Remplissage de la mer (gauche et droite)
-    liquidFiller.fillSea()
+    const {leftSea, rightSea} = liquidFiller.fillSea()
     await progress('Sea Flooding')
 
     // // 6.4. Nettoyage des tuiles isolées
@@ -297,6 +297,9 @@ class WorldGenerator {
     tileGuard.init()
     const surfaceLine = worldCarver.buildErodedSurfaceLine()
     worldCarver.paintSurfaceNatural(surfaceLine, biomesDescription)
+
+    const leftBeach = worldCarver.buildBeach(leftSea, true, surfaceLine)
+    const rightBeach = worldCarver.buildBeach(rightSea, false, surfaceLine)
 
     // A supprimer
     // worldCarver.debugTraceTunnel()
@@ -341,7 +344,7 @@ class WorldGenerator {
       const liquidBodies = [...honeyLiquidBodies, ...lakeLiquidBodies, ...underLakeLiquidBodies, ...blindLakeLiquidBodies, ...sapLakeLiquidBodies, ...sapPocketLiquidBodies, ...waterPuddleLiquidBodies, ...sapPuddleLiquidBodies]
       const lakes = [...surfaceLakes, ...underLakes, ...blindLakes, ...sapLakes, ...sapPockets]
       const plants = [...fernsPlants, ...mossPlants, ...mushroomPlants]
-      await this.save(seed, {hives, cobwebCaves, geodeCaves, lakes, liquidBodies, fernsCaves, mossCaves, mushroomCaves, pyramid, ruinedcabin, lostTemple, ancientHouse, plants})
+      await this.save(seed, {hives, cobwebCaves, geodeCaves, lakes, liquidBodies, fernsCaves, mossCaves, mushroomCaves, pyramid, ruinedcabin, lostTemple, ancientHouse, leftBeach, rightBeach, plants})
       worldBuffer.clear()
     }
 
@@ -354,7 +357,7 @@ class WorldGenerator {
     if (debug) { return worldBuffer } // appelant responsable du clear()
   }
 
-  async save (seed, {hives, cobwebCaves, geodeCaves, lakes, liquidBodies, fernsCaves, mossCaves, mushroomCaves, plants, pyramid, ruinedcabin, lostTemple, ancientHouse}) {
+  async save (seed, {hives, cobwebCaves, geodeCaves, lakes, liquidBodies, fernsCaves, mossCaves, mushroomCaves, plants, pyramid, ruinedcabin, lostTemple, ancientHouse, leftBeach, rightBeach}) {
     const start = window.performance.now()
     // 1. Sauvegarde des tuiles
     await database.clearObjectStore('world_chunks')
@@ -404,7 +407,9 @@ class WorldGenerator {
       {key: 'pyramid', value: JSON.stringify(pyramid)},
       {key: 'ruinedcabin', value: JSON.stringify(ruinedcabin)},
       {key: 'losttemple', value: JSON.stringify(lostTemple)},
-      {key: 'ancienthouse', value: JSON.stringify(ancientHouse)}
+      {key: 'ancienthouse', value: JSON.stringify(ancientHouse)},
+      {key: 'leftbeach', value: JSON.stringify(leftBeach)},
+      {key: 'rightbeach', value: JSON.stringify(rightBeach)}
 
       // {key: 'honeysurface', value: this.honeysurface.join('|')}
     ])
@@ -2113,6 +2118,22 @@ class WorldCarver {
       if (x1 <= e.x2 && x2 >= e.x1 && y1 <= e.y2 && y2 >= e.y1) return true
     }
     return false
+  }
+
+  /**
+ * Ajoute les rectangles d'exclusion des deux mers (gauche et droite)
+ * pour empêcher tout mini-biome de se retrouver submergé.
+ * Doit être appelée dans generate() juste après tileGuard.init().
+ */
+  addSeaExclusions () {
+    const seaWidth = SEA_MAX_WIDTH + SEA_MAX_JITTER + 2
+    const seaBottom = SEA_LEVEL + SEA_MAX_HEIGHT + SEA_MAX_JITTER + 2
+
+    // Mer gauche
+    this.addExclusion({x1: 1, y1: SEA_LEVEL, x2: seaWidth, y2: seaBottom})
+
+    // Mer droite
+    this.addExclusion({x1: WORLD_WIDTH - 1 - seaWidth, y1: SEA_LEVEL, x2: WORLD_WIDTH - 2, y2: seaBottom})
   }
 
   /**
@@ -4984,13 +5005,104 @@ class WorldCarver {
 
       const aboveCode = worldBuffer.readAt(idx - W) // ← tuile au-dessus de la surface
       if (aboveCode === WATER) continue
-      const code = aboveCode === SEA ? SAND : NATURAL_CODE[zone.biome]
+      if (aboveCode === SEA) continue
+      // const code = aboveCode === SEA ? SAND : NATURAL_CODE[zone.biome]
+      const code = NATURAL_CODE[zone.biome]
 
       tiles.push({x, y, index: idx, code})
       tiles.push({x, y: y + 1, index: idx + W, code})
     }
 
     this.applyTiles(tiles, ETERNAL_EXCLUDED)
+  }
+
+  /**
+ * Crée une plage de sable en bordure de mer.
+ *
+ * @param {number[]}   seaTiles   — Index des tuiles SEA (retour de #fillOneSea)
+ * @param {boolean}    isLeft     — true = mer gauche, false = mer droite
+ * @param {Int16Array} surfaceLine — Y de la première tuile solide par colonne
+ */
+  buildBeach (seaTiles, isLeft, surfaceLine) {
+    const SKY = NODES.SKY.code
+    const SAND = NODES.SAND.code
+    const SANDSTONE = NODES.SANDSTONE.code
+    const SHELL = NODES.SHELL.code
+    const BEACH_EXCLUDED_TILES = new Set([NODES.SEA.code, NODES.VOID.code, SKY, NODES.WATER.code])
+    const KEEP = new Set([NODES.DIRT.code, SANDSTONE])
+    const TO_SANDSTONE = new Set([NODES.SILT.code, NODES.HUMUS.code])
+    const W = WORLD_WIDTH
+
+    const maxIndexFirstRow = (SEA_LEVEL << 10) | 1023 // borne haute inclusive de la ligne SEA_LEVEL
+
+    // 1. Trouver la tuile SEA la plus à droite (isLeft) ou à gauche (!isLeft)
+    //    sur la première ligne de SEA (y === SEA_LEVEL)
+    let shoreIdx = -1
+    for (let i = 0; i < seaTiles.length; i++) {
+      const idx = seaTiles[i]
+      if (idx > maxIndexFirstRow) continue // pas sur la ligne SEA_LEVEL
+      if (shoreIdx === -1) { shoreIdx = idx; continue }
+      if (isLeft ? idx > shoreIdx : idx < shoreIdx) shoreIdx = idx
+    }
+    if (shoreIdx === -1) return // mer vide — ne devrait pas arriver
+
+    const shoreX = shoreIdx & 0x3FF
+    console.log('................... shoreX', shoreX, SEA_LEVEL)
+
+    // 2. Rectangle bruité centré à (cx, SEA_LEVEL)
+    //    isLeft  : 16 tuiles à gauche, 40 à droite → cx = shoreX + 12, radiusX = 28
+    //    !isLeft : 40 à gauche, 16 à droite         → cx = shoreX - 12, radiusX = 28
+    const cx = isLeft ? shoreX + 12 : shoreX - 12
+    const cy = SEA_LEVEL - 8
+    const radiusX = 28 // (16 + 40) / 2
+    const radiusY = 18 // hauteur 20 / 2 + 8
+    const spread = 3 // écart bruit : radiusMax - radiusMin = 6, spread = 6/2
+
+    const tiles = []
+    this.digNoisyRect(
+      tiles, cx, cy,
+      radiusX - spread, radiusX + spread,
+      radiusY - spread, radiusY + spread,
+      NODES.LAVA.code, 0.3, PERLIN_OFFSET_BEACH
+    )
+
+    // 3. nettoyage des tuiles pour ne garder que les tuiles solides
+    const filtered = []
+    for (let i = 0; i < tiles.length; i++) {
+      if (!BEACH_EXCLUDED_TILES.has(worldBuffer.readAt(tiles[i].index))) filtered.push(tiles[i])
+    }
+
+    // 4. Remplissage par du SAND
+    for (let i = 0; i < filtered.length; i++) {
+      const {index} = filtered[i]
+      const current = worldBuffer.readAt(index)
+
+      if (KEEP.has(current)) {
+        filtered[i].code = current // on garde la tuile telle quelle
+        continue
+      }
+      const isBorder =
+    worldBuffer.readAt(index - W) !== SKY && // haut = SKY → SAND prioritaire
+    (
+      BEACH_EXCLUDED_TILES.has(worldBuffer.readAt(index - 1)) || // gauche
+      BEACH_EXCLUDED_TILES.has(worldBuffer.readAt(index + 1)) || // droite
+      BEACH_EXCLUDED_TILES.has(worldBuffer.readAt(index + W)) // bas
+    )
+
+      filtered[i].code = isBorder || TO_SANDSTONE.has(current) ? SANDSTONE : SAND
+    }
+
+    // 5. Ajout de SHELL
+    const shellCount = seededRNG.randomGetMinMax(15, 20)
+    for (let i = 0; i < shellCount; i++) {
+      seededRNG.randomGetArrayValue(filtered).code = SHELL
+    }
+    // remplacement des tuiles
+    this.applyTiles(filtered, ETERNAL_EXCLUDED)
+
+    return {
+      beachRect: {x: cx - 28, y: SEA_LEVEL - 10, w: 56, h: 20}
+    }
   }
 
   /**
