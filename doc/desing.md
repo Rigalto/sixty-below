@@ -551,11 +551,57 @@ commune de la zone N+1 : la progression est continue, sans palier artificiel.
 | **BLIND FISH** | 5 | ★★★★☆ | Fish — Blind Lake |
 | **AXOLOTL** | 5 | ★★★★★ | Fish — Blind Lake |
 
+
+## 5.7.1 Antlion
+
+Il est tapis dans un Antlion Pit.
+Dès que l'on mine une des tuiles de son piège, il la reconstitue (idéalement, il apparait dans le monde, puis la tuile est reconstituée, puis il disparaît).
+Si l'écoulement du sable fait disparaître des tuiles de son piège, il les reconstitue également.
+Si des tuiles sont placées (ou tombent) dans les 9 tuiles vides de l'entonnoir central, il les fait disparaître selon le même mécanisme que pour l'ajout.
+Si l'on marche sur son piège, il apparaît.
+Il est agressif avec une hit-box de 3 tuiles.
+Son piège est constitué ainsi :
+| | -4 | -3 | -2 | -1 | 0 | +1 | +2 | +3 | +4 |
+|---|---|---|---|---|---|---|---|---|---|
+| cy-4 | S | S | . | . | . | . | . | S | S |
+| cy-3 | . | S | S | . | . | . | S | S | . |
+| cy-2 | . | . | S | S | . | S | S | . | . |
+| cy-1 | . | . | N | S | A | S | N | . | . |
+| cy   | . | . | N | S | S | S | N | . | . |
+| cy+1 | . | . | N | N | N | N | N | . | . |
+
+Avec :
+- `S` = SAND
+- `N` = SANDSTONE
+- `A` = SAND (tuile référence du piège)
+- `.` = SKY
+
+**Techniquement :**
+* la position des Antlion Pits se trouve dans l'object store `gamestate`. Elle est lue au lancement de l'application et ne peut être modifiée.
+* Un set de tuiles correspond aux tuiles à reconstruire
+* Un set de tuiles correspond aux tuiles à conserver vides (SKY)
+* Un set de tuiles (union des deux précédents) correspond à la zone de déclenchement du piège (attaque automatique)
+* Lorsque l'Antlion est visible dans le monde, il peut être attaqué en cliquant dessus.
+
 ## 5.8 Flore
 
 | Nom | Tier | Type | Biome / Mini-biome / Layer | Loot |
 |---|---|---|---|
 | **COCONUT** | 1 | Tree | Sea shore, Desert Surface Lake Shore | Coconut (fruit), Coconut Fiber, Coconut Pulp, Coconut Milk |
+
+
+## 5.9 Mécaniques des mini-biomes
+
+### 5.9.1 Antlion Pit
+
+Voir la description du monstre Antlion.
+
+### 5.9.2 Beach
+
+Il y a une mer à gauche et à droite. Les mers sont bordées de plaque qui occupent un rectangle dont les coordonnées et la taille se trouve dans l'object store `gamestate` dans les topics `leftBeach` et `rightBeach`.
+Dans ce rectangle, se trouvent des tuiles de SHELL. Dès qu'une tuile de SHELL est minée, on planifie l'ajout d'une nouvelle tuile (délai long, 2 à 4 In-game jours) de SHELL qui sera ajoutée dans une tuile aléatoire du rectangle. La tuile sélectionnée doit être une tuile solide différente de SHELL. Elle ne doit pas non plus faire partie des tuiles du piège de l'Antlion, ni se situer sous un cocotier (tuiles interdites au minage).
+
+A la surface de la plage, se situe un Cocotier. Voir la description de cet arbre dans la flore.
 
 ---
 

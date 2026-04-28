@@ -26,7 +26,6 @@
 - `TileGuard` : implémenté - A intégrer pour tous les futurs mini-biomes
 - `digAnthills()` — Forest, surface, structure conique
 - `digTermiteMounds()` — Jungle, surface, structure rectangulaire
-- `digAntlionPits()` — Desert, surface, creux triangulaire
 
 ### Plage et fond de mer
 - Placement des coraux et plantes marines
@@ -200,8 +199,7 @@
 - `WorldCarver.paintSurfaceNatural` — ajoute les tuiles NATURAL en surface
 - `WorldCarver.buildBeach` — ajoute les plages au bord des mers de gauche et de droite
 - `WorldCarver.buildSeaFloorAndWalls` — ajoute du sable en fond de mer
-
-buildBeach
+- `WorldCarver.digAntlionPits()` — Desert, surface, creux triangulaire
 - `TileGuard` — utilitaire de protection tuiles contre creusement, formes bruitées (cercle, ellipse, rectangle)
 
 ### Rendu (partiel)

@@ -5375,9 +5375,12 @@ class WorldCarver {
 
   /**
  * Creuse des Antlion Pits en surface des zones DESERT.
- * Nombre variable selon le nombre de zones : 1 garanti dans la première,
- * puis probabilité décroissante de 20% par zone supplémentaire.
+ * Nombre variable : 1 garanti dans la première zone, probabilité décroissante de 20% par zone.
+ * Zones mélangées avant sélection pour éviter un biais spatial.
  * Prérequis : initZoneRects(), initExclusions().
+ *
+ * @param {Int16Array} surfaceLine — Y de la première tuile solide par colonne (modifiée en place)
+ * @returns {number[]} index de spawn de chaque antlion placé
  */
   digAntlionPits (surfaceLine) {
     const desertRects = []
@@ -5399,16 +5402,206 @@ class WorldCarver {
   }
 
   /**
- * Creuse un Antlion Pit dans une zone DESERT.
- * @param {{x0, x1, ySurface, yUnder, biome}} rect — zone désertique
+ * Creuse un Antlion Pit conique en surface d'une zone DESERT.
+ * Sélectionne une position valide (sans VOID dans les 3 colonnes centrales, hors exclusion).
+ * Construit la base (3 rangées SAND/SANDSTONE) puis le funnel en V remontant vers la surface.
+ * Le funnel garantit 2 tuiles SAND + SANDSTONE de protection sur les 3 premières rangées,
+ * puis s'arrête dès que la paroi rencontre une tuile non franchissable.
+ * Met à jour surfaceLine et propage SKY/VOID après modification du terrain.
+ *
+ * @param {{x0, x1, ySurface, yUnder, biome}} rect — zone désertique cible
  * @param {Int16Array} surfaceLine — Y de la première tuile solide par colonne (modifiée en place)
- * @returns {number} index de la tuile de spawn de l'antlion, ou -1 si échec
+ * @returns {number} index de spawn de l'antlion (cx, cy), ou -1 si échec après MAX_ATTEMPTS
  */
   #digOneAntlionPit (rect, surfaceLine) {
-    const cx = seededRNG.randomGetMinMax(rect.x0 + 6, rect.x1 - 6)
-    const cy = surfaceLine[cx] + 3
-    const idx = (cy << 10) | cx
+    const VOID = NODES.VOID.code
+    const SAND = NODES.SAND.code
+    const SKY = NODES.SKY.code
+    const LAVA = NODES.LAVA.code
+    const SANDSTONE = NODES.SANDSTONE.code
+    const UNSTABLE_SET = new Set([VOID, NODES.SKY.code, NODES.SEA.code, NODES.WATER.code, NODES.HONEY.code, NODES.SAP.code])
 
+    const W = WORLD_WIDTH
+    const MAX_ATTEMPTS = 100
+
+    let cx, cy, valid, yBottom
+    let attempts = 0
+
+    do {
+      cx = seededRNG.randomGetMinMax(rect.x0 + 6, rect.x1 - 6)
+
+      const yTop = Math.min(surfaceLine[cx - 1], surfaceLine[cx], surfaceLine[cx + 1])
+      yBottom = Math.max(surfaceLine[cx - 1], surfaceLine[cx], surfaceLine[cx + 1])
+      cy = yBottom + 4
+
+      // Vérification absence de VOID dans les 3 colonnes
+      let hasVoid = false
+      for (let x = cx - 1; x <= cx + 1 && !hasVoid; x++) {
+        for (let y = yTop; y <= yBottom + 2 && !hasVoid; y++) {
+          if (worldBuffer.read(x, y) === VOID) hasVoid = true
+        }
+      }
+
+      valid = !hasVoid && !this.isExcluded(cx - 6, cy - 6, cx + 6, cy + 3)
+      attempts++
+    } while (!valid && attempts < MAX_ATTEMPTS)
+
+    if (!valid) return -1
+
+    this.addExclusion({x1: cx - 6, y1: cy - 6, x2: cx + 6, y2: cy + 3})
+
+    // 1. Ajout du pit
+    const idx = (cy << 10) | cx
+    const tiles = [
+    // Rangée cy : SANDSTONE aux bords, SAND au centre
+      {x: cx - 2, y: cy, index: idx - 2, code: SANDSTONE},
+      {x: cx - 1, y: cy, index: idx - 1, code: SAND},
+      {x: cx, y: cy, index: idx, code: SAND},
+      {x: cx + 1, y: cy, index: idx + 1, code: SAND},
+      {x: cx + 2, y: cy, index: idx + 2, code: SANDSTONE},
+
+      // Rangée cy+1 : SANDSTONE aux bords, SAND au centre
+      {x: cx - 2, y: cy + 1, index: idx + W - 2, code: SANDSTONE},
+      {x: cx - 1, y: cy + 1, index: idx + W - 1, code: SAND},
+      {x: cx, y: cy + 1, index: idx + W, code: SAND},
+      {x: cx + 1, y: cy + 1, index: idx + W + 1, code: SAND},
+      {x: cx + 2, y: cy + 1, index: idx + W + 2, code: SANDSTONE},
+
+      // Rangée cy+2 : SANDSTONE
+      {x: cx - 2, y: cy + 2, index: idx + W + W - 2, code: SANDSTONE},
+      {x: cx - 1, y: cy + 2, index: idx + W + W - 1, code: SANDSTONE},
+      {x: cx, y: cy + 2, index: idx + W + W, code: SANDSTONE},
+      {x: cx + 1, y: cy + 2, index: idx + W + W + 1, code: SANDSTONE},
+      {x: cx + 2, y: cy + 2, index: idx + W + W + 2, code: SANDSTONE}
+    ]
+
+    this.applyTiles(tiles, ETERNAL_EXCLUDED)
+
+    // 2. Ajout du funnel
+    const funnelTiles = []
+    const sandTop = {}
+    const sandstoneTop = {}
+    sandTop[cx] = cy
+
+    let xRight = -1
+    let xLeft = -1
+
+    for (let i = 0; i <= 24; i++) {
+      // on stoppe si la progression est arrêtée des deux côtés
+      if (xRight !== -1 && xLeft !== -1) break
+
+      const y = cy - 1 - i
+      const row = idx - W * (i + 1)
+
+      // Partie droite
+      if (xRight === -1) {
+        for (let dx = 0; dx <= i; dx++) {
+          funnelTiles.push({x: cx + dx, y, index: row + dx, code: SKY})
+        }
+
+        let sand1 = false
+        const tIdx1 = row + i + 1
+        // Vérifier que la tuile en dessous du premier SAND n'est pas SKY/VOID
+        if (!UNSTABLE_SET.has(worldBuffer.readAt(tIdx1)) || i < 3) {
+          funnelTiles.push({x: cx + i + 1, y, index: tIdx1, code: LAVA})
+          sandTop[cx + i + 1] = y
+          sand1 = true
+        } else {
+          xRight = cx + i + 1
+        }
+
+        if (sand1) {
+          let sand2 = false
+          if (!UNSTABLE_SET.has(worldBuffer.readAt(row + i + 2)) || i < 3) {
+            funnelTiles.push({x: cx + i + 2, y, index: row + i + 2, code: LAVA})
+            sandTop[cx + i + 2] = y
+            sand2 = true
+          }
+          if (sand2 && UNSTABLE_SET.has(worldBuffer.readAt(row + i + 3))) {
+            funnelTiles.push({x: cx + i + 3, y, index: row + i + 3, code: SANDSTONE})
+            sandstoneTop[cx + i + 3] = y
+          } else {
+            if (worldBuffer.readAt(row + i + 2) === VOID) {
+              funnelTiles.push({x: cx + i + 2, y, index: row + i + 2, code: SANDSTONE})
+              sandstoneTop[cx + i + 2] = y
+            }
+            if (worldBuffer.readAt(row + i + 3) === VOID) {
+              funnelTiles.push({x: cx + i + 3, y, index: row + i + 3, code: SANDSTONE})
+              sandstoneTop[cx + i + 3] = y
+            }
+          }
+        }
+      }
+
+      // Partie gauche (symétrique)
+      if (xLeft === -1) {
+        for (let dx = 1; dx <= i; dx++) {
+          funnelTiles.push({x: cx - dx, y, index: row - dx, code: SKY})
+        }
+
+        let sandL1 = false
+        const tIdxL1 = row - i - 1
+        if (!UNSTABLE_SET.has(worldBuffer.readAt(tIdxL1)) || i < 3) {
+          funnelTiles.push({x: cx - i - 1, y, index: tIdxL1, code: LAVA})
+          sandTop[cx - i - 1] = y
+          sandL1 = true
+        } else {
+          xLeft = cx - i - 1
+        }
+
+        if (sandL1) {
+          let sandL2 = false
+          if (!UNSTABLE_SET.has(worldBuffer.readAt(row - i - 2)) || i < 3) {
+            funnelTiles.push({x: cx - i - 2, y, index: row - i - 2, code: LAVA})
+            sandTop[cx - i - 2] = y
+            sandL2 = true
+          }
+          if (sandL2 && UNSTABLE_SET.has(worldBuffer.readAt(row - i - 3))) {
+            funnelTiles.push({x: cx - i - 3, y, index: row - i - 3, code: SANDSTONE})
+            sandstoneTop[cx - i - 3] = y
+          }
+        }
+      }
+      console.log('.................. #digOneAntlionPit', {xLeft, xRight})
+    }
+
+    this.applyTiles(funnelTiles, ETERNAL_EXCLUDED)
+
+    // 3. Nettoyage ligne de surface
+
+    // Mise à jour surfaceLine et propagation SKY vers le haut
+    const skyTiles = []
+    for (const x in sandTop) {
+      const topY = sandTop[x]
+      surfaceLine[x] = topY
+
+      for (let y = topY - 1; y >= 1; y--) {
+        skyTiles.push({x: +x, y, index: (y << 10) | +x, code: SKY})
+      }
+    }
+
+    for (const x in sandstoneTop) {
+      const topY = sandstoneTop[x]
+      const above = (topY - 1 << 10) | +x
+      if (worldBuffer.readAt(above) !== SKY) continue
+
+      surfaceLine[+x] = topY
+
+      for (let y = topY - 1; y >= 1; y--) {
+        skyTiles.push({x: +x, y, index: (y << 10) | +x, code: SKY})
+      }
+
+      // Tuile en dessous du SANDSTONE : si SKY → VOID, propager vers le bas
+      let belowY = topY + 1
+      while (belowY < WORLD_HEIGHT - 1 && worldBuffer.read(+x, belowY) === SKY) {
+        skyTiles.push({x: +x, y: belowY, index: (belowY << 10) | +x, code: VOID})
+        belowY++
+      }
+    }
+
+    this.applyTiles(skyTiles, ETERNAL_EXCLUDED)
+
+    console.log('.................. #digOneAntlionPit', {cx, cy})
     return idx
   }
 

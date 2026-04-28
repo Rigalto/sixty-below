@@ -825,6 +825,14 @@ Génère des tunnels, des cavernes et des mini-biomes. Maintient la liste des zo
 
 ---
 
+#### Mini-biomes de surface généré par la faune
+
+| Méthode | Description |
+|---|---|
+| `digAntlionPits(surfaceLine): number[]` | Creuse des Antlion Pits en surface des zones DESERT. Zones désertiques extraites, mélangées (`shuffleArray`), puis sélectionnées avec probabilité décroissante : 100% (1ère), 80% (2ème), 60% (3ème)… Retourne un tableau des index de spawn des antlions placés. |
+
+---
+
 #### Mise à jour de la surface
 
 | Méthode | Description |
