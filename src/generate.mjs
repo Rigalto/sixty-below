@@ -313,6 +313,10 @@ class WorldGenerator {
     worldCarver.consolidateSand()
     worldCarver.sandFalling()
     await progress('Sand Falling')
+
+    const antlions = worldCarver.digAntlionPits(surfaceLine)
+    await progress('Surface Mini-biomes')
+
     // A supprimer
     // worldCarver.debugTraceTunnel()
 
@@ -353,7 +357,7 @@ class WorldGenerator {
       const liquidBodies = [...honeyLiquidBodies, ...lakeLiquidBodies, ...underLakeLiquidBodies, ...blindLakeLiquidBodies, ...sapLakeLiquidBodies, ...sapPocketLiquidBodies, ...waterPuddleLiquidBodies, ...sapPuddleLiquidBodies]
       const lakes = [...surfaceLakes, ...underLakes, ...blindLakes, ...sapLakes, ...sapPockets]
       const plants = [...fernsPlants, ...mossPlants, ...mushroomPlants]
-      await this.save(seed, {hives, cobwebCaves, geodeCaves, lakes, liquidBodies, fernsCaves, mossCaves, mushroomCaves, pyramid, ruinedcabin, lostTemple, ancientHouse, leftBeach, rightBeach, plants})
+      await this.save(seed, {hives, cobwebCaves, geodeCaves, lakes, liquidBodies, fernsCaves, mossCaves, mushroomCaves, pyramid, ruinedcabin, lostTemple, ancientHouse, leftBeach, rightBeach, antlions, plants})
       worldBuffer.clear()
     }
 
@@ -366,7 +370,7 @@ class WorldGenerator {
     if (debug) { return worldBuffer } // appelant responsable du clear()
   }
 
-  async save (seed, {hives, cobwebCaves, geodeCaves, lakes, liquidBodies, fernsCaves, mossCaves, mushroomCaves, plants, pyramid, ruinedcabin, lostTemple, ancientHouse, leftBeach, rightBeach}) {
+  async save (seed, {hives, cobwebCaves, geodeCaves, lakes, liquidBodies, fernsCaves, mossCaves, mushroomCaves, plants, pyramid, ruinedcabin, lostTemple, ancientHouse, leftBeach, rightBeach, antlions}) {
     const start = window.performance.now()
     // 1. Sauvegarde des tuiles
     await database.clearObjectStore('world_chunks')
@@ -418,7 +422,8 @@ class WorldGenerator {
       {key: 'losttemple', value: JSON.stringify(lostTemple)},
       {key: 'ancienthouse', value: JSON.stringify(ancientHouse)},
       {key: 'leftbeach', value: JSON.stringify(leftBeach)},
-      {key: 'rightbeach', value: JSON.stringify(rightBeach)}
+      {key: 'rightbeach', value: JSON.stringify(rightBeach)},
+      {key: 'antlions', value: JSON.stringify(antlions)}
 
       // {key: 'honeysurface', value: this.honeysurface.join('|')}
     ])
@@ -4988,6 +4993,8 @@ class WorldCarver {
     const SAND = NODES.SAND.code
     const SEA = NODES.SEA.code
     const WATER = NODES.WATER.code
+    const NOT_SOLID = new Set([NODES.VOID.code, WATER, SEA, NODES.HONEY.code, NODES.SAP.code])
+
     const W = WORLD_WIDTH
 
     const NATURAL_CODE = []
@@ -5017,7 +5024,19 @@ class WorldCarver {
       const code = NATURAL_CODE[zone.biome]
 
       tiles.push({x, y, index: idx, code})
-      tiles.push({x, y: y + 1, index: idx + W, code})
+      // 2ème tuile : 90% de chance
+      if (seededRNG.randomReal() < 0.9) {
+        tiles.push({x, y: y + 1, index: idx + W, code})
+
+        // 3ème tuile : 45% de chance, uniquement si tuile non LIQUID/GAZ
+        if (seededRNG.randomReal() < 0.45) {
+          const idx2 = idx + W + W
+          const code2 = worldBuffer.readAt(idx2)
+          if (!NOT_SOLID.has(code2)) {
+            tiles.push({x, y: y + 2, index: idx2, code})
+          }
+        }
+      }
     }
 
     this.applyTiles(tiles, ETERNAL_EXCLUDED)
@@ -5352,6 +5371,45 @@ class WorldCarver {
 
     // this.applyTiles(tiles, ETERNAL_EXCLUDED)
     console.log(`debugUnstableSand — ${unstable.length} tuiles instables`, unstable)
+  }
+
+  /**
+ * Creuse des Antlion Pits en surface des zones DESERT.
+ * Nombre variable selon le nombre de zones : 1 garanti dans la première,
+ * puis probabilité décroissante de 20% par zone supplémentaire.
+ * Prérequis : initZoneRects(), initExclusions().
+ */
+  digAntlionPits (surfaceLine) {
+    const desertRects = []
+    for (let i = 0; i < this.#zoneRects.length; i++) {
+      if (this.#zoneRects[i].biome === BIOME_TYPE.DESERT) desertRects.push(this.#zoneRects[i])
+    }
+    if (desertRects.length === 0) return []
+
+    shuffleArray(desertRects)
+
+    const antlions = []
+    for (let i = 0; i < desertRects.length; i++) {
+      const chance = 1 - i * 0.2
+      if (seededRNG.randomReal() >= chance) continue
+      const idx = this.#digOneAntlionPit(desertRects[i], surfaceLine)
+      if (idx !== -1) antlions.push(idx)
+    }
+    return antlions
+  }
+
+  /**
+ * Creuse un Antlion Pit dans une zone DESERT.
+ * @param {{x0, x1, ySurface, yUnder, biome}} rect — zone désertique
+ * @param {Int16Array} surfaceLine — Y de la première tuile solide par colonne (modifiée en place)
+ * @returns {number} index de la tuile de spawn de l'antlion, ou -1 si échec
+ */
+  #digOneAntlionPit (rect, surfaceLine) {
+    const cx = seededRNG.randomGetMinMax(rect.x0 + 6, rect.x1 - 6)
+    const cy = surfaceLine[cx] + 3
+    const idx = (cy << 10) | cx
+
+    return idx
   }
 
   /**
