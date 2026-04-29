@@ -10,6 +10,9 @@
 - Génération du monde : topsoil, végétation, coffres, artefacts
 ---
 
+## À faire — Bugs connus
+- Dans le panel qui génère un nouveau monde, il faut pouvoir rendre le champ input vide (il est rempli par '1' lorsque l'on tente de le vider, rendant très difficile l'entrée d'une graine ne commençant pas par 1)
+
 ## À faire — Génération du monde (`generate.mjs`)
 
 ### Tunnels
@@ -25,7 +28,6 @@
 ### Mini-biomes à implémenter
 - `TileGuard` : implémenté - A intégrer pour tous les futurs mini-biomes
 - `digTermiteMounds()` — Jungle, surface, structure rectangulaire
-- `digGraveyard()` — caverns bottom, tout biome, 2-3 tunels parfaitement horizontaux avec des tombes (furniture non déplaçable) dedans. 4 types de tombes différenciés uniquement par leur image (iso-fonctionnalité)
 - amélioration de l'aspect des Moss Caves : n'ajouter les tuiles de GRASSMOSS que dans 90% du temps, ajouter deux tuiles verticales de HUMUS? dans 45% du temps
 - analyser des modifications analogue à celles pour les Moss Caves, à effectuer pour les mushroom caves et les fern caves.
 
@@ -193,6 +195,7 @@
 - `WorldCarver.digMushroomCaves` — Forest, caverns_top, HUMUS + GRASSMUSHROOM
 - `WorldCarver.digPyramid` — Desert, under, deux chambres (pièges + boss), KEPHRITE
 - `WorldCarver.digRuinedCabin` — Forest, under, WOODWALL + STONEWALL + 1 furniture + 1 Chest
+- `WorldCarver.digGraveyard` — caverns bottom, tout biome, STONE + DIRT + VOID + furnitures (stype='tomb')
 - `WorldCarver.digLostTemple` — Jungle, caverns_top, EMERALDWALL + Décomposeur
 - `WorldCarver.digAncientHouse` — Desert, caverns_bottom, WOODWALL + GOLDWALL + OLYMPITE + Transmutator
 - `WorldCarver.digAbandonedMine` — Tous biomes, caverns_bottom, COBALT + SAPPHIRE + SANDSTONEWALL

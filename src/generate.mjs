@@ -140,7 +140,7 @@ class WorldGenerator {
     window.DEBUG_POINTS = [] // DEGUG - à supprimer
 
     // affichage de la progression de la création dans le dialogue modal
-    const STEPS = 25
+    const STEPS = 26
     let step = 0
     const progress = (topic) => {
       step++
@@ -262,6 +262,7 @@ class WorldGenerator {
     const lostTemple = worldCarver.digLostTemple()
     const ancientHouse = worldCarver.digAncientHouse()
     worldCarver.digAbandonedMine()
+    const graveyard = worldCarver.digGraveyards()
     await progress('Ancient civilizations')
 
     // 6.1.X Life Heart (15)
@@ -297,6 +298,7 @@ class WorldGenerator {
     const sapPuddleLiquidBodies = worldCarver.digSapPuddles(surfaceUnder)
     await progress('Puddles')
 
+    // ATTENTION : plus d'utilisation de tileGuard à partir de maintenant
     tileGuard.init()
     const surfaceLine = worldCarver.buildErodedSurfaceLine()
     worldCarver.paintSurfaceNatural(surfaceLine, biomesDescription)
@@ -355,9 +357,10 @@ class WorldGenerator {
     // N. Stochage du monde en base de données
     if (!debug) {
       const liquidBodies = [...honeyLiquidBodies, ...lakeLiquidBodies, ...underLakeLiquidBodies, ...blindLakeLiquidBodies, ...sapLakeLiquidBodies, ...sapPocketLiquidBodies, ...waterPuddleLiquidBodies, ...sapPuddleLiquidBodies]
+      console.log('.................... liquidBodies', liquidBodies)
       const lakes = [...surfaceLakes, ...underLakes, ...blindLakes, ...sapLakes, ...sapPockets]
       const plants = [...fernsPlants, ...mossPlants, ...mushroomPlants]
-      await this.save(seed, {hives, cobwebCaves, geodeCaves, lakes, liquidBodies, fernsCaves, mossCaves, mushroomCaves, pyramid, ruinedcabin, lostTemple, ancientHouse, leftBeach, rightBeach, antlions, anthill, plants, hearts, triskels})
+      await this.save(seed, {hives, cobwebCaves, geodeCaves, lakes, liquidBodies, fernsCaves, mossCaves, mushroomCaves, pyramid, ruinedcabin, lostTemple, ancientHouse, leftBeach, rightBeach, antlions, anthill, plants, hearts, triskels, graveyard})
       worldBuffer.clear()
     }
 
@@ -370,7 +373,7 @@ class WorldGenerator {
     if (debug) { return worldBuffer } // appelant responsable du clear()
   }
 
-  async save (seed, {hives, cobwebCaves, geodeCaves, lakes, liquidBodies, fernsCaves, mossCaves, mushroomCaves, plants, pyramid, ruinedcabin, lostTemple, ancientHouse, leftBeach, rightBeach, antlions, anthill, hearts, triskels}) {
+  async save (seed, {hives, cobwebCaves, geodeCaves, lakes, liquidBodies, fernsCaves, mossCaves, mushroomCaves, plants, pyramid, ruinedcabin, lostTemple, ancientHouse, leftBeach, rightBeach, antlions, anthill, hearts, triskels, graveyard}) {
     const start = window.performance.now()
     // 1. Sauvegarde des tuiles
     await database.clearObjectStore('world_chunks')
@@ -414,6 +417,7 @@ class WorldGenerator {
       {key: 'cobwebcaves', value: JSON.stringify(cobwebCaves)},
       {key: 'lakes', value: JSON.stringify(lakes)},
       {key: 'geodecaves', value: JSON.stringify(geodeCaves)},
+      {key: 'graveyard', value: JSON.stringify(graveyard)},
       {key: 'ferns', value: JSON.stringify(fernsCaves)},
       {key: 'moss', value: JSON.stringify(mossCaves)},
       {key: 'mushrooms', value: JSON.stringify(mushroomCaves)},
@@ -3091,7 +3095,7 @@ class WorldCarver {
     let head = 0
     let yMin = yStart
 
-    if (LIQUID.has(worldBuffer.read(cx, cy + 1))) return null
+    if (LIQUID.has(worldBuffer.read(cx, cy + 1)) || tileGuard.has(((cy + 1) << 10) | cx)) return null
 
     const src = (yStart << 10) | cx
     visited.add(src)
@@ -3113,7 +3117,7 @@ class WorldCarver {
         if (nnx <= 1 || nnx >= 1022 || nny <= 1 || nny >= 510) continue
         if (nny <= yStart - PUDDLE_HEIGHT_MAX) continue
         if (worldBuffer.readAt(nIdx) !== VOID) {
-          if (LIQUID.has(worldBuffer.readAt(nIdx))) return null
+          if (LIQUID.has(worldBuffer.readAt(nIdx)) || tileGuard.has(nIdx)) return null
           continue
         }
         visited.add(nIdx)
@@ -3125,9 +3129,11 @@ class WorldCarver {
     if (!this.#isPuddleOpen(visited, yMin)) return null
 
     // Vrai fill
+    const tiles = []
     for (const idx of visited) {
-      worldBuffer.writeAt(idx, nodeCode)
+      tiles.push({x: idx & 0x3FF, y: idx >> 10, index: idx, code: nodeCode})
     }
+    this.applyTiles(tiles, ETERNAL_EXCLUDED)
 
     // return {index: src, nodeCode, cx, yStart}
     return {index: src, nodeCode}
@@ -5367,6 +5373,147 @@ class WorldCarver {
 
     // this.applyTiles(tiles, ETERNAL_EXCLUDED)
     console.log(`debugUnstableSand — ${unstable.length} tuiles instables`, unstable)
+  }
+
+  /**
+ * Creuse des Graveyards (catacombes) en caverns_bottom, tous biomes.
+ * Nombre : 1 ou 2 (50/50).
+ * Prérequis : initZoneRects(), initExclusions().
+ *
+ * @returns {number[]} index coin haut-gauche de chaque graveyard placé
+ */
+  digGraveyards () {
+    const count = seededRNG.randomGetBool() ? 1 : 2
+    const graveyards = []
+
+    for (let i = 0; i < count; i++) {
+      const idx = this.#digOneGraveyard()
+      if (idx !== -1) graveyards.push(idx)
+    }
+    return graveyards
+  }
+
+  /**
+ * Creuse un Graveyard en caverns_bottom, tous biomes.
+ * Rectangle d'exclusion : 14×14, cx/cy = coin haut-gauche.
+ * Marge X : 18 tuiles de chaque côté.
+ *
+ * @returns {number} index du coin haut-gauche du graveyard, ou -1 si échec
+ */
+  #digOneGraveyard () {
+    const STONE = NODES.STONE.code
+    const DIRT = NODES.DIRT.code
+    const VOID = NODES.VOID.code
+    const W = WORLD_WIDTH
+    const MAX_ATTEMPTS = 100
+    const TOMBS = ['tomb', 'tombHead', 'tombGrave', 'tombStrange', 'tombCross']
+
+    // 1. Détermination de la position
+    // Bornes Y : caverns_bottom — on prend le min/max sur tous les rects
+    let yMin = Infinity
+    let yMax = 0
+    for (let i = 0; i < this.#zoneRects.length; i++) {
+      const rect = this.#zoneRects[i]
+      if (rect.yCavernsMid < yMin) yMin = rect.yCavernsMid
+      if (rect.yCaverns > yMax) yMax = rect.yCaverns
+    }
+
+    let cx, cy, valid
+    let attempts = 0
+    do {
+      cx = seededRNG.randomGetMinMax(18, W - 19)
+      cy = seededRNG.randomGetMinMax(yMin, yMax - 18)
+      valid = !this.isExcluded(cx, cy, cx + 14, cy + 14)
+      attempts++
+    } while (!valid && attempts < MAX_ATTEMPTS)
+
+    if (!valid) return -1
+    this.addExclusion({x1: cx - 2, y1: cy - 2, x2: cx + 15, y2: cy + 15})
+
+    // 2. Ajout du cimetière
+    const idx = (cy << 10) | cx
+
+    // Paramètres du graveyard
+    const alignLeft = seededRNG.randomGetBool()
+    const hasThirdRow = seededRNG.randomGetBool()
+    const rowCount = hasThirdRow ? 3 : 2
+
+    // Largeur de chaque tunnel (9 ou 12), tirée indépendamment
+    const tunnelWidths = []
+    for (let r = 0; r < rowCount; r++) {
+      tunnelWidths.push(seededRNG.randomGetBool() ? 9 : 12)
+    }
+
+    const tiles = []
+
+    const pushRowFromEdge = (y, startX, direction, segments) => {
+      let x = startX
+      for (const {len, code} of segments) {
+        for (let i = 0; i < len; i++) {
+          tiles.push({x, y, index: (y << 10) | x, code})
+          x += direction
+        }
+      }
+    }
+
+    const dir = alignLeft ? 1 : -1
+    const edgeX = alignLeft ? cx : cx + 13
+
+    // Plafond : 2 tuiles de STONE sur toute la largeur
+    const ceilingW = tunnelWidths[0] + 2 // tunnel + 2 STONE de terminaison
+    pushRowFromEdge(cy, edgeX, dir, [{len: ceilingW, code: STONE}])
+    pushRowFromEdge(cy + 1, edgeX, dir, [{len: ceilingW, code: STONE}])
+
+    for (let r = 0; r < rowCount; r++) {
+      const tw = tunnelWidths[r]
+      const twBelow = r === rowCount - 1 ? tw : tunnelWidths[r + 1]
+      const floorW = Math.max(tw, twBelow) + 2
+      const extW = floorW - tw
+
+      const rowBase = cy + 2 + r * 4
+
+      console.log('.............', {r, tw, twBelow, floorW, extW, rowBase})
+
+      // Lignes VOID : tw VOID puis 2 STONE de terminaison
+      pushRowFromEdge(rowBase, edgeX, dir, [{len: tw, code: VOID}, {len: 2, code: STONE}])
+      pushRowFromEdge(rowBase + 1, edgeX, dir, [{len: tw, code: VOID}, {len: 2, code: STONE}])
+
+      // DIRT sous le tunnel, STONE pour l'extension
+      pushRowFromEdge(rowBase + 2, edgeX, dir, [{len: tw, code: DIRT}, {len: extW, code: STONE}])
+
+      // STONE sol inférieur
+      pushRowFromEdge(rowBase + 3, edgeX, dir, [{len: floorW, code: STONE}])
+    }
+
+    this.applyTiles(tiles, ETERNAL_EXCLUDED)
+
+    // 3. Ajout des tombes
+    for (let r = 0; r < rowCount; r++) {
+      const tw = tunnelWidths[r]
+      const tombCount = Math.floor(tw / 3)
+      const rowBase = cy + 2 + r * 4
+
+      for (let t = 0; t < tombCount; t++) {
+        const slotOffset = t * 3
+        const offsetInSlot = seededRNG.randomGetBool() ? 0 : 1
+
+        const tombX = alignLeft
+          ? cx + slotOffset + offsetInSlot
+          : cx + 13 - slotOffset - offsetInSlot - 1
+
+        const code = seededRNG.randomGetArrayValue(TOMBS)
+        furnitureGenerator.addFurnitureAt((rowBase << 10) | tombX, code)
+        window.DEBUG_POINTS.push({x: tombX, y: rowBase, color: 'orange'}) // DEBUG
+      }
+    }
+
+    // 4 Protection et retour
+    if (hasThirdRow) {
+      tileGuard.addNoisyRect(cx + 7, cy + 7, 9, 12, 9, 12, 0.8, PERLIN_OFFSET_TEMPLE)
+    } else {
+      tileGuard.addNoisyRect(cx + 7, cy + 5, 9, 12, 7, 10, 0.8, PERLIN_OFFSET_TEMPLE)
+    }
+    return idx
   }
 
   /**
