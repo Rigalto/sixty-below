@@ -32,6 +32,7 @@ export const NODES = {
   LAVA: {code: 4, name: 'Lava', type: NODE_TYPE.ETERNAL | NODE_TYPE.SOLID, star: 6, color: '#DC143C', image: null, help: 'Obsidian'},
   KHEPRITE: {code: 5, name: 'Kheprite', type: NODE_TYPE.ETERNAL | NODE_TYPE.SOLID, stype: 'block', star: 6, color: '#D4919A', image: null, help: 'Pyramid'},
   OLYMPITE: {code: 6, name: 'Olympite', type: NODE_TYPE.ETERNAL | NODE_TYPE.SOLID, stype: 'block', star: 6, color: '#C8D8E8', image: null, help: 'Lost Temple'},
+  ANTDIRT: {code: 7, name: 'Ant Dirt', type: NODE_TYPE.ETERNAL | NODE_TYPE.SOLID, stype: 'ant', star: 6, color: '#8B4513', image: null, help: 'Ant Hill material'},
 
   // ── Gaz ──────────────────────────────────────────────────────────────────────
   SKY: {code: 10, name: 'Sky', type: NODE_TYPE.GAZ, star: 0, color: 'none', image: null, help: null},

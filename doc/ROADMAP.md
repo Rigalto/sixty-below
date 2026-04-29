@@ -24,8 +24,10 @@
 
 ### Mini-biomes à implémenter
 - `TileGuard` : implémenté - A intégrer pour tous les futurs mini-biomes
-- `digAnthills()` — Forest, surface, structure conique
 - `digTermiteMounds()` — Jungle, surface, structure rectangulaire
+- `digGraveyard()` — caverns bottom, tout biome, 2-3 tunels parfaitement horizontaux avec des tombes (furniture non déplaçable) dedans. 4 types de tombes différenciés uniquement par leur image (iso-fonctionnalité)
+- amélioration de l'aspect des Moss Caves : n'ajouter les tuiles de GRASSMOSS que dans 90% du temps, ajouter deux tuiles verticales de HUMUS? dans 45% du temps
+- analyser des modifications analogue à celles pour les Moss Caves, à effectuer pour les mushroom caves et les fern caves.
 
 ### Plage et fond de mer
 - Placement des coraux et plantes marines
@@ -199,7 +201,8 @@
 - `WorldCarver.paintSurfaceNatural` — ajoute les tuiles NATURAL en surface
 - `WorldCarver.buildBeach` — ajoute les plages au bord des mers de gauche et de droite
 - `WorldCarver.buildSeaFloorAndWalls` — ajoute du sable en fond de mer
-- `WorldCarver.digAntlionPits()` — Desert, surface, creux triangulaire
+- `WorldCarver.digAntlionPits` — Desert, surface, creux triangulaire
+- `WorldCarver.digAnthills` — Forest, surface, structure conique
 - `TileGuard` — utilitaire de protection tuiles contre creusement, formes bruitées (cercle, ellipse, rectangle)
 
 ### Rendu (partiel)

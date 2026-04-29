@@ -268,7 +268,6 @@ class WorldGenerator {
     const hearts = worldCarver.digHearts(surfaceUnder, underCaverns)
     const triskels = worldCarver.digTriskels(underCaverns)
     await progress('Life Hearts')
-    console.log('>>>>>>>>>>> hearts et triskels', hearts, triskels)
 
     // 6.2 Creusement des tunnels et cavernes
     worldCarver.digZigzagTunnels(surfaceLakes)
@@ -315,6 +314,7 @@ class WorldGenerator {
     await progress('Sand Falling')
 
     const antlions = worldCarver.digAntlionPits(surfaceLine)
+    const anthill = worldCarver.digAnthills(surfaceLine)
     await progress('Surface Mini-biomes')
 
     // A supprimer
@@ -329,7 +329,7 @@ class WorldGenerator {
     // DEBUG — à supprimer après mise au point
     // window.DEBUG_SURFACE_LINE = surfaceLine
 
-    console.log('[WorldGenerator::liquidFiller] - Sea', (performance.now() - t0).toFixed(3), 'ms', surfaceLine)
+    console.log('[WorldGenerator::liquidFiller] - Sea', (performance.now() - t0).toFixed(3), 'ms')
 
     // N-6 Ajout de la plage (Shore) et du fond de la mer - TODO
 
@@ -357,7 +357,7 @@ class WorldGenerator {
       const liquidBodies = [...honeyLiquidBodies, ...lakeLiquidBodies, ...underLakeLiquidBodies, ...blindLakeLiquidBodies, ...sapLakeLiquidBodies, ...sapPocketLiquidBodies, ...waterPuddleLiquidBodies, ...sapPuddleLiquidBodies]
       const lakes = [...surfaceLakes, ...underLakes, ...blindLakes, ...sapLakes, ...sapPockets]
       const plants = [...fernsPlants, ...mossPlants, ...mushroomPlants]
-      await this.save(seed, {hives, cobwebCaves, geodeCaves, lakes, liquidBodies, fernsCaves, mossCaves, mushroomCaves, pyramid, ruinedcabin, lostTemple, ancientHouse, leftBeach, rightBeach, antlions, plants})
+      await this.save(seed, {hives, cobwebCaves, geodeCaves, lakes, liquidBodies, fernsCaves, mossCaves, mushroomCaves, pyramid, ruinedcabin, lostTemple, ancientHouse, leftBeach, rightBeach, antlions, anthill, plants, hearts, triskels})
       worldBuffer.clear()
     }
 
@@ -370,7 +370,7 @@ class WorldGenerator {
     if (debug) { return worldBuffer } // appelant responsable du clear()
   }
 
-  async save (seed, {hives, cobwebCaves, geodeCaves, lakes, liquidBodies, fernsCaves, mossCaves, mushroomCaves, plants, pyramid, ruinedcabin, lostTemple, ancientHouse, leftBeach, rightBeach, antlions}) {
+  async save (seed, {hives, cobwebCaves, geodeCaves, lakes, liquidBodies, fernsCaves, mossCaves, mushroomCaves, plants, pyramid, ruinedcabin, lostTemple, ancientHouse, leftBeach, rightBeach, antlions, anthill, hearts, triskels}) {
     const start = window.performance.now()
     // 1. Sauvegarde des tuiles
     await database.clearObjectStore('world_chunks')
@@ -423,7 +423,10 @@ class WorldGenerator {
       {key: 'ancienthouse', value: JSON.stringify(ancientHouse)},
       {key: 'leftbeach', value: JSON.stringify(leftBeach)},
       {key: 'rightbeach', value: JSON.stringify(rightBeach)},
-      {key: 'antlions', value: JSON.stringify(antlions)}
+      {key: 'antlions', value: JSON.stringify(antlions)},
+      {key: 'anthill', value: JSON.stringify(anthill)},
+      {key: 'hearts', value: JSON.stringify(hearts)},
+      {key: 'triskels', value: JSON.stringify(triskels)}
 
       // {key: 'honeysurface', value: this.honeysurface.join('|')}
     ])
@@ -3211,8 +3214,6 @@ class WorldCarver {
       }
     }
 
-    console.log('BBBBBBBBBBBBBBBBC digSapPuddles', {SAP_PUDDLE_COUNT, liquidBodies})
-
     return liquidBodies
   }
 
@@ -4300,7 +4301,6 @@ class WorldCarver {
     // Fond plat sur FLAT_W tuiles
     const flatY = cy + halfCH
     this.#flattenCaveBottom(cx, FLAT_W, flatY)
-    console.log('.......', {cx, cy, flatY})
 
     // Coin haut-gauche de la maison
     const x0 = cx - Math.floor(HOUSE_W / 2)
@@ -5073,7 +5073,6 @@ class WorldCarver {
     if (shoreIdx === -1) return // mer vide — ne devrait pas arriver
 
     const shoreX = shoreIdx & 0x3FF
-    console.log('................... shoreX', shoreX, SEA_LEVEL)
 
     // 2. Rectangle bruité centré à (cx, SEA_LEVEL)
     //    isLeft  : 16 tuiles à gauche, 40 à droite → cx = shoreX + 12, radiusX = 28
@@ -5192,7 +5191,6 @@ class WorldCarver {
       }
     }
     this.applyTiles(tiles, ETERNAL_EXCLUDED)
-    console.log('.......... dddd', tiles)
   }
 
   /**
@@ -5232,7 +5230,7 @@ class WorldCarver {
     }
 
     this.applyTiles(tiles, ETERNAL_EXCLUDED)
-    console.log(`........................consolidateSand — ${tiles.length} tuiles SAND → SANDSTONE`, tiles.map(t => ({x: t.x, y: t.y})))
+    console.log(`[consolidateSand] — ${tiles.length} tuiles SAND → SANDSTONE`)
   }
 
   /**
@@ -5327,8 +5325,6 @@ class WorldCarver {
       }
     }
 
-    console.log(`sandFalling — ${unstable.length} tuiles instables initiales`)
-
     // Traitement
     let count = 0
     while (unstable.length > 0) {
@@ -5336,7 +5332,7 @@ class WorldCarver {
       count++
     }
 
-    console.log(`sandFalling — ${count} tuiles traitées au total`)
+    console.log(`[sandFalling] — ${count} tuiles traitées au total`)
   }
 
   sandFalling_ () {
@@ -5417,7 +5413,6 @@ class WorldCarver {
     const VOID = NODES.VOID.code
     const SAND = NODES.SAND.code
     const SKY = NODES.SKY.code
-    const LAVA = NODES.LAVA.code
     const SANDSTONE = NODES.SANDSTONE.code
     const UNSTABLE_SET = new Set([VOID, NODES.SKY.code, NODES.SEA.code, NODES.WATER.code, NODES.HONEY.code, NODES.SAP.code])
 
@@ -5503,7 +5498,7 @@ class WorldCarver {
         const tIdx1 = row + i + 1
         // Vérifier que la tuile en dessous du premier SAND n'est pas SKY/VOID
         if (!UNSTABLE_SET.has(worldBuffer.readAt(tIdx1)) || i < 3) {
-          funnelTiles.push({x: cx + i + 1, y, index: tIdx1, code: LAVA})
+          funnelTiles.push({x: cx + i + 1, y, index: tIdx1, code: SAND})
           sandTop[cx + i + 1] = y
           sand1 = true
         } else {
@@ -5513,7 +5508,7 @@ class WorldCarver {
         if (sand1) {
           let sand2 = false
           if (!UNSTABLE_SET.has(worldBuffer.readAt(row + i + 2)) || i < 3) {
-            funnelTiles.push({x: cx + i + 2, y, index: row + i + 2, code: LAVA})
+            funnelTiles.push({x: cx + i + 2, y, index: row + i + 2, code: SAND})
             sandTop[cx + i + 2] = y
             sand2 = true
           }
@@ -5542,7 +5537,7 @@ class WorldCarver {
         let sandL1 = false
         const tIdxL1 = row - i - 1
         if (!UNSTABLE_SET.has(worldBuffer.readAt(tIdxL1)) || i < 3) {
-          funnelTiles.push({x: cx - i - 1, y, index: tIdxL1, code: LAVA})
+          funnelTiles.push({x: cx - i - 1, y, index: tIdxL1, code: SAND})
           sandTop[cx - i - 1] = y
           sandL1 = true
         } else {
@@ -5552,7 +5547,7 @@ class WorldCarver {
         if (sandL1) {
           let sandL2 = false
           if (!UNSTABLE_SET.has(worldBuffer.readAt(row - i - 2)) || i < 3) {
-            funnelTiles.push({x: cx - i - 2, y, index: row - i - 2, code: LAVA})
+            funnelTiles.push({x: cx - i - 2, y, index: row - i - 2, code: SAND})
             sandTop[cx - i - 2] = y
             sandL2 = true
           }
@@ -5562,7 +5557,6 @@ class WorldCarver {
           }
         }
       }
-      console.log('.................. #digOneAntlionPit', {xLeft, xRight})
     }
 
     this.applyTiles(funnelTiles, ETERNAL_EXCLUDED)
@@ -5600,8 +5594,151 @@ class WorldCarver {
     }
 
     this.applyTiles(skyTiles, ETERNAL_EXCLUDED)
+    tileGuard.addRect(cx - 6, cy - 6, cx + 6, cy + 3)
+    return idx
+  }
 
-    console.log('.................. #digOneAntlionPit', {cx, cy})
+  /**
+ * Creuse des Ant Hills en surface des zones FOREST.
+ * Nombre variable : 1 garanti dans la première zone, probabilité décroissante de 20% par zone.
+ * Zones mélangées avant sélection pour éviter un biais spatial.
+ * Prérequis : initZoneRects(), initExclusions().
+ *
+ * @param {Int16Array} surfaceLine — Y de la première tuile solide par colonne (modifiée en place)
+ * @returns {number[]} index du coin haut-gauche de la salle de spawn de la reine (3×2 VOID),
+ *                   ou -1 si échec après MAX_ATTEMPTS
+ */
+  digAnthills (surfaceLine) {
+    const forestRects = []
+    for (let i = 0; i < this.#zoneRects.length; i++) {
+      if (this.#zoneRects[i].biome === BIOME_TYPE.FOREST) forestRects.push(this.#zoneRects[i])
+    }
+    if (forestRects.length === 0) return []
+
+    shuffleArray(forestRects)
+
+    const queens = []
+    for (let i = 0; i < forestRects.length; i++) {
+      const chance = 1 - i * 0.2
+      if (seededRNG.randomReal() >= chance) continue
+      const idx = this.#digOneAnthill(forestRects[i], surfaceLine)
+      if (idx !== -1) queens.push(idx)
+    }
+    return queens
+  }
+
+  /**
+ * Creuse un Ant Hill conique en surface d'une zone FOREST.
+ *
+ * @param {{x0, x1, ySurface, yUnder, biome}} rect — zone forestière cible
+ * @param {Int16Array} surfaceLine — Y de la première tuile solide par colonne (modifiée en place)
+ * @returns {number} index de spawn de la reine fourmi, ou -1 si échec
+ */
+  #digOneAnthill (rect, surfaceLine) {
+    const SKY = NODES.SKY.code
+    const VOID = NODES.VOID.code
+    const ANTDIRT = NODES.ANTDIRT.code
+    const MAX_ATTEMPTS = 100
+    const W = WORLD_WIDTH
+
+    //  Détermination de la position de la fourmilière
+    let cx, cy, valid
+    let attempts = 0
+    do {
+      cx = seededRNG.randomGetMinMax(rect.x0 + 6, rect.x1 - 6)
+
+      // cy = point le plus bas des 3 colonnes centrales (y maximum)
+      cy = Math.max(surfaceLine[cx - 1], surfaceLine[cx], surfaceLine[cx + 1])
+
+      // Rectangle fourmilière : 9x7, coin haut-gauche à (cx-4, cy-4)
+      // Rectangle d'exclusion : marge 2 de chaque côté → (cx-6, cy-6) à (cx+6, cy+3) (9+4=13 large, 7+4=11 haut)
+      valid = !this.isExcluded(cx - 6, cy - 6, cx + 6, cy + 3)
+      attempts++
+    } while (!valid && attempts < MAX_ATTEMPTS)
+
+    if (!valid) return -1
+
+    this.addExclusion({x1: cx - 6, y1: cy - 6, x2: cx + 6, y2: cy + 3})
+
+    // 2. Ajout du pit
+    const idx = (cy << 10) | cx
+    const tiles = [
+      // Rangée cy - 4 : 1 x ANTDIRT
+      {x: cx + 1, y: cy - 4, index: idx - W - W - W - W + 1, code: ANTDIRT},
+
+      // Rangée cy - 3 : 3 x ANTDIRT
+      {x: cx, y: cy - 3, index: idx - W - W - W, code: ANTDIRT},
+      {x: cx + 1, y: cy - 3, index: idx - W - W - W + 1, code: ANTDIRT},
+      {x: cx + 2, y: cy - 3, index: idx - W - W - W + 2, code: ANTDIRT},
+
+      // Rangée cy - 2 : 5 x ANTDIRT
+      {x: cx - 1, y: cy - 2, index: idx - W - W - 1, code: ANTDIRT},
+      {x: cx, y: cy - 2, index: idx - W - W, code: ANTDIRT},
+      {x: cx + 1, y: cy - 2, index: idx - W - W + 1, code: ANTDIRT},
+      {x: cx + 2, y: cy - 2, index: idx - W - W + 2, code: ANTDIRT},
+      {x: cx + 3, y: cy - 2, index: idx - W - W + 3, code: ANTDIRT},
+
+      // Rangée cy - 1 : 7 x ANTDIRT
+      {x: cx - 2, y: cy - 1, index: idx - W - 2, code: ANTDIRT},
+      {x: cx - 1, y: cy - 1, index: idx - W - 1, code: ANTDIRT},
+      {x: cx, y: cy - 1, index: idx - W, code: ANTDIRT},
+      {x: cx + 1, y: cy - 1, index: idx - W + 1, code: ANTDIRT},
+      {x: cx + 2, y: cy - 1, index: idx - W + 2, code: ANTDIRT},
+      {x: cx + 3, y: cy - 1, index: idx - W + 3, code: ANTDIRT},
+      {x: cx + 4, y: cy - 1, index: idx - W + 4, code: ANTDIRT},
+
+      // Rangée cy : 3 x ANTDIRT  3 x VOID 3 x ANTDIRT
+      {x: cx - 3, y: cy, index: idx - 3, code: ANTDIRT},
+      {x: cx - 2, y: cy, index: idx - 2, code: ANTDIRT},
+      {x: cx - 1, y: cy, index: idx - 1, code: ANTDIRT},
+      {x: cx, y: cy, index: idx, code: VOID},
+      {x: cx + 1, y: cy, index: idx + 1, code: VOID},
+      {x: cx + 2, y: cy, index: idx + 2, code: VOID},
+      {x: cx + 3, y: cy, index: idx + 3, code: ANTDIRT},
+      {x: cx + 4, y: cy, index: idx + 4, code: ANTDIRT},
+      {x: cx + 5, y: cy, index: idx + 5, code: ANTDIRT},
+
+      // Rangée cy+1 : 3 x ANTDIRT  3 x VOID 3 x ANTDIRT
+      {x: cx - 3, y: cy + 1, index: idx + W - 3, code: ANTDIRT},
+      {x: cx - 2, y: cy + 1, index: idx + W - 2, code: ANTDIRT},
+      {x: cx - 1, y: cy + 1, index: idx + W - 1, code: ANTDIRT},
+      {x: cx, y: cy + 1, index: idx + W, code: VOID},
+      {x: cx + 1, y: cy + 1, index: idx + W + 1, code: VOID},
+      {x: cx + 2, y: cy + 1, index: idx + W + 2, code: VOID},
+      {x: cx + 3, y: cy + 1, index: idx + W + 3, code: ANTDIRT},
+      {x: cx + 4, y: cy + 1, index: idx + W + 4, code: ANTDIRT},
+      {x: cx + 5, y: cy + 1, index: idx + W + 5, code: ANTDIRT},
+
+      // Rangée cy+2 : 9 x ANTDIRT
+      {x: cx - 3, y: cy + 2, index: idx + W + W - 3, code: ANTDIRT},
+      {x: cx - 2, y: cy + 2, index: idx + W + W - 2, code: ANTDIRT},
+      {x: cx - 1, y: cy + 2, index: idx + W + W - 1, code: ANTDIRT},
+      {x: cx, y: cy + 2, index: idx + W + W, code: ANTDIRT},
+      {x: cx + 1, y: cy + 2, index: idx + W + W + 1, code: ANTDIRT},
+      {x: cx + 2, y: cy + 2, index: idx + W + W + 2, code: ANTDIRT},
+      {x: cx + 3, y: cy + 2, index: idx + W + W + 3, code: ANTDIRT},
+      {x: cx + 4, y: cy + 2, index: idx + W + W + 4, code: ANTDIRT},
+      {x: cx + 5, y: cy + 2, index: idx + W + W + 5, code: ANTDIRT}
+    ]
+
+    this.applyTiles(tiles, ETERNAL_EXCLUDED)
+
+    // 3. Ajustement de la ligne de surface
+    const zz = [idx - 3, idx + 5, idx - W - 2, idx - W + 4, idx - W - W - 1, idx - W - W + 3, idx - W - W - W, idx - W - W - W + 2, idx - W - W - W - W + 1]
+    if (worldBuffer.read(cx - 4, cy - 1) !== SKY) zz.push(idx - W - 4)
+    if (worldBuffer.read(cx + 6, cy - 1) !== SKY) zz.push(idx - W + 6)
+    const skyTiles = []
+    for (const surfaceIdx of zz) {
+      const x = surfaceIdx & 0x3FF
+      const y = surfaceIdx >> 10
+      surfaceLine[x] = y
+      for (let sy = y - 1; sy >= 1; sy--) {
+        skyTiles.push({x, y: sy, index: (sy << 10) | x, code: SKY})
+      }
+    }
+    this.applyTiles(skyTiles, ETERNAL_EXCLUDED)
+
+    tileGuard.addRect(cx - 6, cy - 6, cx + 6, cy + 3)
     return idx
   }
 

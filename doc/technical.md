@@ -830,6 +830,7 @@ Génère des tunnels, des cavernes et des mini-biomes. Maintient la liste des zo
 | Méthode | Description |
 |---|---|
 | `digAntlionPits(surfaceLine): number[]` | Creuse des Antlion Pits en surface des zones DESERT. Zones désertiques extraites, mélangées (`shuffleArray`), puis sélectionnées avec probabilité décroissante : 100% (1ère), 80% (2ème), 60% (3ème)… Retourne un tableau des index de spawn des antlions placés. |
+| `digAnthills(surfaceLine): number[]` | Creuse des Ant Hills coniques en surface des zones FOREST. Zones mélangées (`shuffleArray`), sélectionnées avec probabilité décroissante de 20% par zone (100% pour la première). Chaque fourmilière : cône ANTDIRT (9×7 tuiles) avec salle de spawn 3×2 VOID centrée, cx/cy positionné sur le point le plus bas des 3 colonnes centrales. Protection `tileGuard.addRect` sur le rectangle d'exclusion (marge 2). Met à jour `surfaceLine` et propage SKY au-dessus des nouvelles tuiles de surface. Retourne un tableau des index coin haut-gauche des salles de spawn (reine fourmi). `#digOneAnthill(rect, surfaceLine)` : creuse une fourmilière individuelle, retourne l'index coin haut-gauche de la salle 3×2 ou -1 si échec après MAX_ATTEMPTS. |
 
 ---
 
