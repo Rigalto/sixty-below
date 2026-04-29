@@ -160,6 +160,13 @@ export const ITEMS = {
   triskelGold: {name: 'Gold Triskel', type: ITEM_TYPE.FURNITURE | ITEM_TYPE.UNIQUE | ITEM_TYPE.MATERIAL, stype: 'triskel', star: 5, image: 'furniture_32_32-12-2', placed: 'furniture_32_32-6-3', help: 'Triskels', tooltip: ''},
   triskelAncient: {name: 'Ancient Triskel', type: ITEM_TYPE.ACCESSORY | ITEM_TYPE.UNIQUE | ITEM_TYPE.CRAFTABLE, stype: 'triskel', star: 5, image: 'furniture_32_32-12-2', placed: 'furniture_32_32-6-3', help: 'Triskels', tooltip: ''},
 
+  // Tombstone
+  tomb: {name: 'Tombstone', type: ITEM_TYPE.FURNITURE, stype: 'tomb', star: 1, undisposable: true, image: 'furniture_32_32-13-2', placed: 'fuws_32_32-3-4', help: 'Tombstone', tooltip: 'Summons specific enemies'},
+  tombHead: {name: 'Headstone', type: ITEM_TYPE.FURNITURE, stype: 'tomb', star: 1, undisposable: true, image: 'furniture_32_32-4-8', placed: 'fuws_32_32-4-4', help: 'Tombstone', tooltip: 'Summons specific enemies'},
+  tombGrave: {name: 'Gravestone', type: ITEM_TYPE.FURNITURE, stype: 'tomb', star: 1, undisposable: true, image: 'furniture_32_32-5-8', placed: 'fuws_32_32-5-4', help: 'Tombstone', tooltip: 'Summons specific enemies'},
+  tombStrange: {name: 'Strange Looking Tombstone', type: ITEM_TYPE.FURNITURE, star: 1, stype: 'tomb', undisposable: true, image: 'furniture_32_32-6-8', placed: 'fuws_32_32-6-4', help: 'Tombstone', tooltip: 'Summons specific enemies'},
+  tombCross: {name: 'Cross Tombstone', type: ITEM_TYPE.FURNITURE, stype: 'tomb', star: 1, undisposable: true, image: 'furniture_32_32-7-8', placed: 'fuws_32_32-7-4', help: 'Tombstone', tooltip: 'Summons specific enemies'},
+
   // Wood furniture set
   chairWood: {name: 'Wooden Chair', type: ITEM_TYPE.FURNITURE | ITEM_TYPE.PLACABLE, stype: 'chair', star: 1, image: 'furniture_32_32-0-5', placedLeft: 'fuws_16_48-1-0', placedRight: 'fuws_16_48-2-0', help: 'Chairs', tooltip: '???', furnitureSet: 'wood', comfort: true},
   toiletWood: {name: 'Wooden Toilet', type: ITEM_TYPE.FURNITURE | ITEM_TYPE.PLACABLE, stype: 'toilet', star: 1, image: 'furniture_32_32-0-5', placed: 'fuws_16_48-2-0', help: 'Toilets', tooltip: '???', furnitureSet: 'wood', comfort: true},
