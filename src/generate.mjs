@@ -262,7 +262,7 @@ class WorldGenerator {
     await progress('Life Hearts')
 
     const provisionalSurface = worldCarver.buildErodedSurfaceLine()
-    const anthills = worldCarver.digAnthills(provisionalSurface)
+    const anthills = worldCarver.reserveAnthills(provisionalSurface)
     const termites = worldCarver.reserveTermiteMounds(provisionalSurface)
     await progress('Provisional Surface Mini-biomes')
 
@@ -295,7 +295,9 @@ class WorldGenerator {
     await progress('Puddles')
 
     // ATTENTION : plus d'utilisation de tileGuard à partir de maintenant
+    // tileGuard.debug() // DEBUG
     tileGuard.init()
+
     const surfaceLine = worldCarver.buildErodedSurfaceLine()
     worldCarver.paintSurfaceNatural(surfaceLine, biomesDescription)
     await progress('Naturalizing Surface')
@@ -312,6 +314,7 @@ class WorldGenerator {
     await progress('Sand Falling')
 
     worldCarver.buildTermiteMounds(termites, surfaceLine)
+    worldCarver.buildAnthills(anthills, surfaceLine)
     const antlions = worldCarver.digAntlionPits(surfaceLine)
     await progress('Build Surface Mini-biomes')
 
@@ -359,8 +362,6 @@ class WorldGenerator {
       await this.save(seed, {hives, cobwebCaves, geodeCaves, lakes, liquidBodies, fernsCaves, mossCaves, mushroomCaves, pyramid, ruinedcabin, lostTemple, ancientHouse, leftBeach, rightBeach, antlions, anthills, termites, plants, hearts, triskels, graveyard})
       worldBuffer.clear()
     }
-
-    // tileGuard.debug() // DEBUG
 
     // N + 1. On repasse le générateur de nombres aléatoires en mode aléatoire
     seededRNG.init()
@@ -5743,6 +5744,168 @@ class WorldCarver {
   }
 
   /**
+ * Réserve les emplacements des Ant Hills en surface des zones FOREST avant le creusement des tunnels.
+ * Pose les exclusions et tileGuard avant le creusement des tunnels.
+ * Nombre variable : 1 garanti dans la première zone, probabilité décroissante de 20% par zone.
+ *
+ * @param {Int16Array} surfaceLine — Y de la première tuile solide par colonne
+ * @returns {number[]} index des fourmilières (cy << 10) | cx, coin haut-gauche de la salle VOID 3×2
+ */
+  reserveAnthills (surfaceLine) {
+    const forestRects = []
+    for (let i = 0; i < this.#zoneRects.length; i++) {
+      if (this.#zoneRects[i].biome === BIOME_TYPE.FOREST) forestRects.push(this.#zoneRects[i])
+    }
+    if (forestRects.length === 0) return []
+
+    shuffleArray(forestRects)
+
+    const reservations = []
+    for (let i = 0; i < forestRects.length; i++) {
+      const chance = 1 - i * 0.2
+      if (seededRNG.randomReal() >= chance) continue
+      const idx = this.#reserveOneAnthill(forestRects[i], surfaceLine)
+      if (idx !== -1) reservations.push(idx)
+    }
+    return reservations
+  }
+
+  /**
+ * Réserve l'emplacement d'un Ant Hill en surface d'une zone FOREST.
+ * Pose exclusion et tileGuard.
+ *
+ * @param {{x0, x1, ySurface, yUnder, biome}} rect — zone forest cible
+ * @param {Int16Array} surfaceLine — Y de la première tuile solide par colonne
+ * @returns {number} index (cy << 10) | cx ou -1 si échec après MAX_ATTEMPTS
+ */
+  #reserveOneAnthill (rect, surfaceLine) {
+    const MAX_ATTEMPTS = 100
+
+    let cx, cy, valid
+    let attempts = 0
+
+    do {
+      cx = seededRNG.randomGetMinMax(rect.x0 + 6, rect.x1 - 6)
+      cy = Math.max(surfaceLine[cx - 1], surfaceLine[cx], surfaceLine[cx + 1])
+
+      valid = !this.isExcluded(cx - 6, cy - 6, cx + 6, cy + 3)
+      attempts++
+    } while (!valid && attempts < MAX_ATTEMPTS)
+
+    if (!valid) return -1
+
+    this.addExclusion({x1: cx - 6, y1: cy - 6, x2: cx + 6, y2: cy + 3})
+    tileGuard.addNoisyRect(cx + 1, cy, 6, 9, 6, 9, 0.8, PERLIN_OFFSET_TEMPLE)
+
+    return (cy << 10) | cx
+  }
+
+  /**
+ * Dessine les Ant Hills après le creusement des tunnels.
+ * Ajuste surfaceLine après pose des tuiles.
+ *
+ * @param {number[]}   reservations — index des fourmilières (retour de reserveAnthills)
+ * @param {Int16Array} surfaceLine  — Y de la première tuile solide par colonne (modifiée en place)
+ */
+  buildAnthills (reservations, surfaceLine) {
+    for (const idx of reservations) {
+      this.#buildOneAnthill(idx, surfaceLine)
+    }
+  }
+
+  /**
+ * Dessine un Ant Hill et ajuste surfaceLine.
+ *
+ * @param {number}     idx         — index (cy << 10) | cx, coin haut-gauche de la salle VOID 3×2
+ * @param {Int16Array} surfaceLine — Y de la première tuile solide par colonne (modifiée en place)
+ */
+  #buildOneAnthill (idx, surfaceLine) {
+    const cx = idx & 0x3FF
+    const cy = idx >> 10
+    const ANTDIRT = NODES.ANTDIRT.code
+    const VOID = NODES.VOID.code
+    const SKY = NODES.SKY.code
+    const W = WORLD_WIDTH
+
+    const tiles = [
+    // Rangée cy-4 : 1 x ANTDIRT
+      {x: cx + 1, y: cy - 4, index: idx - W * 4 + 1, code: ANTDIRT},
+
+      // Rangée cy-3 : 3 x ANTDIRT
+      {x: cx, y: cy - 3, index: idx - W * 3, code: ANTDIRT},
+      {x: cx + 1, y: cy - 3, index: idx - W * 3 + 1, code: ANTDIRT},
+      {x: cx + 2, y: cy - 3, index: idx - W * 3 + 2, code: ANTDIRT},
+
+      // Rangée cy-2 : 5 x ANTDIRT
+      {x: cx - 1, y: cy - 2, index: idx - W * 2 - 1, code: ANTDIRT},
+      {x: cx, y: cy - 2, index: idx - W * 2, code: ANTDIRT},
+      {x: cx + 1, y: cy - 2, index: idx - W * 2 + 1, code: ANTDIRT},
+      {x: cx + 2, y: cy - 2, index: idx - W * 2 + 2, code: ANTDIRT},
+      {x: cx + 3, y: cy - 2, index: idx - W * 2 + 3, code: ANTDIRT},
+
+      // Rangée cy-1 : 7 x ANTDIRT
+      {x: cx - 2, y: cy - 1, index: idx - W - 2, code: ANTDIRT},
+      {x: cx - 1, y: cy - 1, index: idx - W - 1, code: ANTDIRT},
+      {x: cx, y: cy - 1, index: idx - W, code: ANTDIRT},
+      {x: cx + 1, y: cy - 1, index: idx - W + 1, code: ANTDIRT},
+      {x: cx + 2, y: cy - 1, index: idx - W + 2, code: ANTDIRT},
+      {x: cx + 3, y: cy - 1, index: idx - W + 3, code: ANTDIRT},
+      {x: cx + 4, y: cy - 1, index: idx - W + 4, code: ANTDIRT},
+
+      // Rangée cy : 3 x ANTDIRT, 3 x VOID, 3 x ANTDIRT
+      {x: cx - 3, y: cy, index: idx - 3, code: ANTDIRT},
+      {x: cx - 2, y: cy, index: idx - 2, code: ANTDIRT},
+      {x: cx - 1, y: cy, index: idx - 1, code: ANTDIRT},
+      {x: cx, y: cy, index: idx, code: VOID},
+      {x: cx + 1, y: cy, index: idx + 1, code: VOID},
+      {x: cx + 2, y: cy, index: idx + 2, code: VOID},
+      {x: cx + 3, y: cy, index: idx + 3, code: ANTDIRT},
+      {x: cx + 4, y: cy, index: idx + 4, code: ANTDIRT},
+      {x: cx + 5, y: cy, index: idx + 5, code: ANTDIRT},
+
+      // Rangée cy+1 : 3 x ANTDIRT, 3 x VOID, 3 x ANTDIRT
+      {x: cx - 3, y: cy + 1, index: idx + W - 3, code: ANTDIRT},
+      {x: cx - 2, y: cy + 1, index: idx + W - 2, code: ANTDIRT},
+      {x: cx - 1, y: cy + 1, index: idx + W - 1, code: ANTDIRT},
+      {x: cx, y: cy + 1, index: idx + W, code: VOID},
+      {x: cx + 1, y: cy + 1, index: idx + W + 1, code: VOID},
+      {x: cx + 2, y: cy + 1, index: idx + W + 2, code: VOID},
+      {x: cx + 3, y: cy + 1, index: idx + W + 3, code: ANTDIRT},
+      {x: cx + 4, y: cy + 1, index: idx + W + 4, code: ANTDIRT},
+      {x: cx + 5, y: cy + 1, index: idx + W + 5, code: ANTDIRT},
+
+      // Rangée cy+2 : 9 x ANTDIRT
+      {x: cx - 3, y: cy + 2, index: idx + W * 2 - 3, code: ANTDIRT},
+      {x: cx - 2, y: cy + 2, index: idx + W * 2 - 2, code: ANTDIRT},
+      {x: cx - 1, y: cy + 2, index: idx + W * 2 - 1, code: ANTDIRT},
+      {x: cx, y: cy + 2, index: idx + W * 2, code: ANTDIRT},
+      {x: cx + 1, y: cy + 2, index: idx + W * 2 + 1, code: ANTDIRT},
+      {x: cx + 2, y: cy + 2, index: idx + W * 2 + 2, code: ANTDIRT},
+      {x: cx + 3, y: cy + 2, index: idx + W * 2 + 3, code: ANTDIRT},
+      {x: cx + 4, y: cy + 2, index: idx + W * 2 + 4, code: ANTDIRT},
+      {x: cx + 5, y: cy + 2, index: idx + W * 2 + 5, code: ANTDIRT}
+    ]
+
+    this.applyTiles(tiles, ETERNAL_EXCLUDED)
+
+    // Ajustement surfaceLine et propagation SKY
+    const skyTiles = []
+    const zz = [idx - 3, idx + 5, idx - W - 2, idx - W + 4, idx - W * 2 - 1,
+      idx - W * 2 + 3, idx - W * 3, idx - W * 3 + 2, idx - W * 4 + 1]
+
+    for (const surfaceIdx of zz) {
+      const x = surfaceIdx & 0x3FF
+      const y = surfaceIdx >> 10
+      surfaceLine[x] = y
+      for (let sy = y - 1; sy >= 1; sy--) {
+        skyTiles.push({x, y: sy, index: (sy << 10) | x, code: SKY})
+      }
+    }
+
+    this.applyTiles(skyTiles, ETERNAL_EXCLUDED)
+  }
+
+  /**
  * Creuse des Ant Hills en surface des zones FOREST.
  * Nombre variable : 1 garanti dans la première zone, probabilité décroissante de 20% par zone.
  * Zones mélangées avant sélection pour éviter un biais spatial.
@@ -5939,7 +6102,7 @@ class WorldCarver {
     if (!valid) return -1
 
     this.addExclusion({x1: cx - 3, y1: cy - 8, x2: cx + 4, y2: cy + 5})
-    tileGuard.addNoisyRect(cx, cy - 1, 2, 5, 5, 8, 0.8, PERLIN_OFFSET_TEMPLE)
+    tileGuard.addNoisyRect(cx, cy - 1, 4, 7, 7, 10, 0.8, PERLIN_OFFSET_TEMPLE)
     return (cy << 10) | cx
   }
 
