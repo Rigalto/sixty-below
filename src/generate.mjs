@@ -247,15 +247,6 @@ class WorldGenerator {
     const {mushroomCaves, mushroomPlants} = worldCarver.digMushroomCaves()
     await progress('Mushroom caves')
 
-    // 6.1.X Anthill
-    // const anthills = worldCarver.digAnthills()
-
-    // 6.1.X Termite Mound
-    // const termites = worldCarver.digTermiteMounds()
-
-    // 6.1.X Antilion Pit
-    // const antilions = worldCarver.digAntilionPits()
-
     // 6.1.X Pyramid / Ancient House / Lost Temple / Ruined Cabin / Abandoned Mine
     const pyramid = worldCarver.digPyramid()
     const ruinedcabin = worldCarver.digRuinedCabin()
@@ -269,6 +260,11 @@ class WorldGenerator {
     const hearts = worldCarver.digHearts(surfaceUnder, underCaverns)
     const triskels = worldCarver.digTriskels(underCaverns)
     await progress('Life Hearts')
+
+    const provisionalSurface = worldCarver.buildErodedSurfaceLine()
+    const anthills = worldCarver.digAnthills(provisionalSurface)
+    const termites = worldCarver.reserveTermiteMounds(provisionalSurface)
+    await progress('Provisional Surface Mini-biomes')
 
     // 6.2 Creusement des tunnels et cavernes
     worldCarver.digZigzagTunnels(surfaceLakes)
@@ -315,9 +311,9 @@ class WorldGenerator {
     worldCarver.sandFalling()
     await progress('Sand Falling')
 
+    worldCarver.buildTermiteMounds(termites, surfaceLine)
     const antlions = worldCarver.digAntlionPits(surfaceLine)
-    const anthill = worldCarver.digAnthills(surfaceLine)
-    await progress('Surface Mini-biomes')
+    await progress('Build Surface Mini-biomes')
 
     // A supprimer
     // worldCarver.debugTraceTunnel()
@@ -360,7 +356,7 @@ class WorldGenerator {
       console.log('.................... liquidBodies', liquidBodies)
       const lakes = [...surfaceLakes, ...underLakes, ...blindLakes, ...sapLakes, ...sapPockets]
       const plants = [...fernsPlants, ...mossPlants, ...mushroomPlants]
-      await this.save(seed, {hives, cobwebCaves, geodeCaves, lakes, liquidBodies, fernsCaves, mossCaves, mushroomCaves, pyramid, ruinedcabin, lostTemple, ancientHouse, leftBeach, rightBeach, antlions, anthill, plants, hearts, triskels, graveyard})
+      await this.save(seed, {hives, cobwebCaves, geodeCaves, lakes, liquidBodies, fernsCaves, mossCaves, mushroomCaves, pyramid, ruinedcabin, lostTemple, ancientHouse, leftBeach, rightBeach, antlions, anthills, termites, plants, hearts, triskels, graveyard})
       worldBuffer.clear()
     }
 
@@ -373,7 +369,7 @@ class WorldGenerator {
     if (debug) { return worldBuffer } // appelant responsable du clear()
   }
 
-  async save (seed, {hives, cobwebCaves, geodeCaves, lakes, liquidBodies, fernsCaves, mossCaves, mushroomCaves, plants, pyramid, ruinedcabin, lostTemple, ancientHouse, leftBeach, rightBeach, antlions, anthill, hearts, triskels, graveyard}) {
+  async save (seed, {hives, cobwebCaves, geodeCaves, lakes, liquidBodies, fernsCaves, mossCaves, mushroomCaves, plants, pyramid, ruinedcabin, lostTemple, ancientHouse, leftBeach, rightBeach, antlions, anthills, termites, hearts, triskels, graveyard}) {
     const start = window.performance.now()
     // 1. Sauvegarde des tuiles
     await database.clearObjectStore('world_chunks')
@@ -428,7 +424,8 @@ class WorldGenerator {
       {key: 'leftbeach', value: JSON.stringify(leftBeach)},
       {key: 'rightbeach', value: JSON.stringify(rightBeach)},
       {key: 'antlions', value: JSON.stringify(antlions)},
-      {key: 'anthill', value: JSON.stringify(anthill)},
+      {key: 'anthills', value: JSON.stringify(anthills)},
+      {key: 'termites', value: JSON.stringify(termites)},
       {key: 'hearts', value: JSON.stringify(hearts)},
       {key: 'triskels', value: JSON.stringify(triskels)}
 
@@ -5885,8 +5882,136 @@ class WorldCarver {
     }
     this.applyTiles(skyTiles, ETERNAL_EXCLUDED)
 
+    // 4. Protection et retour
     tileGuard.addRect(cx - 6, cy - 6, cx + 6, cy + 3)
     return idx
+  }
+
+  /**
+ * Réserve les emplacements des Termite Mounds en surface des zones JUNGLE.
+ * Pose les exclusions et tileGuard avant le creusement des tunnels.
+ * Nombre variable : 1 garanti dans la première zone, probabilité décroissante de 20% par zone.
+ *
+ * @param {Int16Array} surfaceLine — Y de la première tuile solide par colonne
+ * @returns {Array<{cx, cy}>} réservations des termitières
+ */
+  reserveTermiteMounds (surfaceLine) {
+    const jungleRects = []
+    for (let i = 0; i < this.#zoneRects.length; i++) {
+      if (this.#zoneRects[i].biome === BIOME_TYPE.JUNGLE) jungleRects.push(this.#zoneRects[i])
+    }
+    if (jungleRects.length === 0) return []
+
+    shuffleArray(jungleRects)
+
+    const reservations = []
+    for (let i = 0; i < jungleRects.length; i++) {
+      const chance = 1 - i * 0.2
+      if (seededRNG.randomReal() >= chance) continue
+      const idx = this.#reserveOneTermiteMound(jungleRects[i], surfaceLine)
+      if (idx !== -1) reservations.push(idx)
+    }
+    return reservations
+  }
+
+  /**
+ * Réserve l'emplacement d'une Termite Mound en surface d'une zone JUNGLE.
+ * Pose exclusion et tileGuard.
+ *
+ * @param {{x0, x1, ySurface, yUnder, biome}} rect — zone jungle cible
+ * @param {Int16Array} surfaceLine — Y de la première tuile solide par colonne
+ * @returns {{cx, cy}|null} réservation ou null si échec après MAX_ATTEMPTS
+ */
+  #reserveOneTermiteMound (rect, surfaceLine) {
+    const MAX_ATTEMPTS = 100
+
+    let cx, cy, valid
+    let attempts = 0
+
+    do {
+      cx = seededRNG.randomGetMinMax(rect.x0 + 4, rect.x1 - 4)
+      cy = Math.min(surfaceLine[cx - 1], surfaceLine[cx], surfaceLine[cx + 1]) + 4
+
+      valid = !this.isExcluded(cx - 3, cy - 8, cx + 4, cy + 5)
+      attempts++
+    } while (!valid && attempts < MAX_ATTEMPTS)
+
+    if (!valid) return -1
+
+    this.addExclusion({x1: cx - 3, y1: cy - 8, x2: cx + 4, y2: cy + 5})
+    tileGuard.addNoisyRect(cx, cy - 1, 2, 5, 5, 8, 0.8, PERLIN_OFFSET_TEMPLE)
+    return (cy << 10) | cx
+  }
+
+  /**
+ * Dessine les Termite Mounds après le creusement des tunnels.
+ * Ajuste surfaceLine après pose des tuiles.
+ *
+ * @param {number[]}   reservations — index des termitières (retour de reserveTermiteMounds)
+ * @param {Int16Array} surfaceLine  — Y de la première tuile solide par colonne (modifiée en place)
+ */
+  buildTermiteMounds (reservations, surfaceLine) {
+    for (const idx of reservations) {
+      this.#buildOneTermiteMound(idx, surfaceLine)
+    }
+  }
+
+  /**
+ * Dessine une Termite Mound et ajuste surfaceLine.
+ *
+ * @param {number}     idx         — index du coin haut-gauche de la chambre VOID
+ * @param {Int16Array} surfaceLine — Y de la première tuile solide par colonne (modifiée en place)
+ */
+  #buildOneTermiteMound (idx, surfaceLine) {
+    const cx = idx & 0x3FF
+    const cy = idx >> 10
+    const ANTDIRT = NODES.ANTDIRT.code
+    const VOID = NODES.VOID.code
+    const SKY = NODES.SKY.code
+    const W = WORLD_WIDTH
+
+    const tiles = []
+
+    // 6 rangées ANTDIRT au-dessus de la chambre
+    for (let dy = -6; dy <= -1; dy++) {
+      const row = idx + dy * W
+      tiles.push({x: cx - 1, y: cy + dy, index: row - 1, code: ANTDIRT})
+      tiles.push({x: cx, y: cy + dy, index: row, code: ANTDIRT})
+      tiles.push({x: cx + 1, y: cy + dy, index: row + 1, code: ANTDIRT})
+      tiles.push({x: cx + 2, y: cy + dy, index: row + 2, code: ANTDIRT})
+    }
+
+    // 2 rangées chambre VOID
+    for (let dy = 0; dy <= 1; dy++) {
+      const row = idx + dy * W
+      tiles.push({x: cx - 1, y: cy + dy, index: row - 1, code: ANTDIRT})
+      tiles.push({x: cx, y: cy + dy, index: row, code: VOID})
+      tiles.push({x: cx + 1, y: cy + dy, index: row + 1, code: VOID})
+      tiles.push({x: cx + 2, y: cy + dy, index: row + 2, code: ANTDIRT})
+    }
+
+    // 2 rangées ANTDIRT en dessous
+    for (let dy = 2; dy <= 3; dy++) {
+      const row = idx + dy * W
+      tiles.push({x: cx - 1, y: cy + dy, index: row - 1, code: ANTDIRT})
+      tiles.push({x: cx, y: cy + dy, index: row, code: ANTDIRT})
+      tiles.push({x: cx + 1, y: cy + dy, index: row + 1, code: ANTDIRT})
+      tiles.push({x: cx + 2, y: cy + dy, index: row + 2, code: ANTDIRT})
+    }
+
+    this.applyTiles(tiles, ETERNAL_EXCLUDED)
+
+    // Ajustement surfaceLine et propagation SKY
+    const skyTiles = []
+    const topY = cy - 6
+    for (let dx = -1; dx <= 2; dx++) {
+      const x = cx + dx
+      surfaceLine[x] = topY
+      for (let y = topY - 1; y >= 1; y--) {
+        skyTiles.push({x, y, index: (y << 10) | x, code: SKY})
+      }
+    }
+    this.applyTiles(skyTiles, ETERNAL_EXCLUDED)
   }
 
   /**

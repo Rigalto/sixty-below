@@ -11,6 +11,8 @@
 ---
 
 ## À faire — Bugs connus
+- décomposer la création des fourmilières comme pour les termitières
+- corriger le Antlion Pit qui laisse des tuiles blanches sous les tuiles de SANDSTONE ajoutées
 - Dans le panel qui génère un nouveau monde, il faut pouvoir rendre le champ input vide (il est rempli par '1' lorsque l'on tente de le vider, rendant très difficile l'entrée d'une graine ne commençant pas par 1)
 
 ## À faire — Génération du monde (`generate.mjs`)
@@ -27,7 +29,6 @@
 
 ### Mini-biomes à implémenter
 - `TileGuard` : implémenté - A intégrer pour tous les futurs mini-biomes
-- `digTermiteMounds()` — Jungle, surface, structure rectangulaire
 - amélioration de l'aspect des Moss Caves : n'ajouter les tuiles de GRASSMOSS que dans 90% du temps, ajouter deux tuiles verticales de HUMUS? dans 45% du temps
 - analyser des modifications analogue à celles pour les Moss Caves, à effectuer pour les mushroom caves et les fern caves.
 
@@ -205,7 +206,8 @@
 - `WorldCarver.buildBeach` — ajoute les plages au bord des mers de gauche et de droite
 - `WorldCarver.buildSeaFloorAndWalls` — ajoute du sable en fond de mer
 - `WorldCarver.digAntlionPits` — Desert, surface, creux triangulaire
-- `WorldCarver.digAnthills` — Forest, surface, structure conique
+- `WorldCarver.digAnthills` — Forest, surface, structure conique ANTDIRT + VOID
+- `WorldCarver.reserveTermiteMounds`, `WorldCarver.buildTermiteMounds` — Jungle, surface, structure rectangulaire ANTDIRT + VOID
 - `TileGuard` — utilitaire de protection tuiles contre creusement, formes bruitées (cercle, ellipse, rectangle)
 
 ### Rendu (partiel)
