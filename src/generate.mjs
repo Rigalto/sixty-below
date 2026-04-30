@@ -243,11 +243,11 @@ class WorldGenerator {
     const {mossCaves, mossPlants} = worldCarver.digMossCaves()
     await progress('Moss caves')
 
-    // 6.1.X Mushroom caves
+    // 6.1.10 Mushroom caves
     const {mushroomCaves, mushroomPlants} = worldCarver.digMushroomCaves()
     await progress('Mushroom caves')
 
-    // 6.1.X Pyramid / Ancient House / Lost Temple / Ruined Cabin / Abandoned Mine
+    // 6.1.11 Pyramid / Ancient House / Lost Temple / Ruined Cabin / Abandoned Mine
     const pyramid = worldCarver.digPyramid()
     const ruinedcabin = worldCarver.digRuinedCabin()
     const lostTemple = worldCarver.digLostTemple()
@@ -256,17 +256,19 @@ class WorldGenerator {
     const graveyard = worldCarver.digGraveyards()
     await progress('Ancient civilizations')
 
-    // 6.1.X Life Heart (15)
+    // 6.1.12 Life Heart (15)
     const hearts = worldCarver.digHearts(surfaceUnder, underCaverns)
     const triskels = worldCarver.digTriskels(underCaverns)
     await progress('Life Hearts')
 
+    // 6.1.13. Réservation des mini-biomes de surface
     const provisionalSurface = worldCarver.buildErodedSurfaceLine()
     const anthills = worldCarver.reserveAnthills(provisionalSurface)
     const termites = worldCarver.reserveTermiteMounds(provisionalSurface)
+    const antlions = worldCarver.reserveAntlionPits(provisionalSurface)
     await progress('Provisional Surface Mini-biomes')
 
-    // 6.2 Creusement des tunnels et cavernes
+    // 6.2. Creusement des tunnels et cavernes
     worldCarver.digZigzagTunnels(surfaceLakes)
     worldCarver.digSurfaceTunnel(skySurface, surfaceLakes)
     await progress('Surface tunnels')
@@ -281,27 +283,37 @@ class WorldGenerator {
     for (const cave of geodeCaves) { clusterGenerator.projectAndFill(cave) }
     await progress('Geode Caves')
 
-    // 6-3 Remplissage de la mer (gauche et droite)
+    // 6.3. Remplissage de la mer (gauche et droite)
     const {leftSea, rightSea} = liquidFiller.fillSea()
     await progress('Sea Flooding')
 
-    // // 6.4. Nettoyage des tuiles isolées
+    // 6.4. Nettoyage des tuiles isolées
     worldCarver.cleanupAfterCarving()
     await progress('Carving Cleanup')
 
-    // // 6.5. Ajout des flaques sousterraines
+    // 6.5. Ajout des flaques sousterraines
     const waterPuddleLiquidBodies = worldCarver.digWaterPuddles(surfaceUnder)
     const sapPuddleLiquidBodies = worldCarver.digSapPuddles(surfaceUnder)
     await progress('Puddles')
 
+    // 7. Traitement de la surface
     // ATTENTION : plus d'utilisation de tileGuard à partir de maintenant
     // tileGuard.debug() // DEBUG
     tileGuard.init()
-
     const surfaceLine = worldCarver.buildErodedSurfaceLine()
-    worldCarver.paintSurfaceNatural(surfaceLine, biomesDescription)
+
+    // 7.1. Ajout des mini-biomes de surface
+    const termiteGuarded = worldCarver.buildTermiteMounds(termites, surfaceLine)
+    const anthillGuarded = worldCarver.buildAnthills(anthills, surfaceLine)
+    const antlionGuarded = worldCarver.buildAntlionPits(antlions, surfaceLine)
+    await progress('Build Surface Mini-biomes')
+
+    // 7.2. Ajout du Natural en surface
+    const guarded = new Set([...termiteGuarded, ...anthillGuarded, ...antlionGuarded])
+    worldCarver.paintSurfaceNatural(surfaceLine, biomesDescription, guarded)
     await progress('Naturalizing Surface')
 
+    // 7.3. Traitement de la mer
     const leftBeach = worldCarver.buildBeach(leftSea, true, surfaceLine)
     const rightBeach = worldCarver.buildBeach(rightSea, false, surfaceLine)
 
@@ -309,51 +321,36 @@ class WorldGenerator {
     worldCarver.buildSeaFloorAndWalls(rightSea)
     await progress('Beach and Sea')
 
+    // 7.4. Traitement du sable
     worldCarver.consolidateSand()
     worldCarver.sandFalling()
     await progress('Sand Falling')
 
-    worldCarver.buildTermiteMounds(termites, surfaceLine)
-    worldCarver.buildAnthills(anthills, surfaceLine)
-    const antlions = worldCarver.digAntlionPits(surfaceLine)
-    await progress('Build Surface Mini-biomes')
+    // 8. Traitenents non relatifs aux tuiles
 
     // A supprimer
     // worldCarver.debugTraceTunnel()
 
-    // 7. Traitement des surfaces végétales + désert - TODO
-
-    // 7.2. Ajout des topsoils / natural (forêt et jungle)
-
-    // 7.3. Ajout du sable (désert) - écoulement et consolidation des tunnels/cavernes
+    // 8.1. Ajout des topsoils / natural (forêt et jungle)
 
     // DEBUG — à supprimer après mise au point
     // window.DEBUG_SURFACE_LINE = surfaceLine
 
     console.log('[WorldGenerator::liquidFiller] - Sea', (performance.now() - t0).toFixed(3), 'ms')
 
-    // N-6 Ajout de la plage (Shore) et du fond de la mer - TODO
+    // 8.2. Ajout des plantes et des coraux - TODO
 
-    // N-5 Ajout des plantes et des coraux - TODO
-
-    // N-4 Peuplement des biomes qui sont à peuplement différé - TODO
-
-    // webFiller.scatterWebs(surfaceUnder)
-
-    // N-3. Ajout des coffres et objets spéciaux - TODO
+    // 8.3. Ajout des coffres et objets spéciaux - TODO
     // XXXXX.addSurfaceChests(xxx)
     // XXXXX.addUndergroundChests(xxx)
     // XXXXX.addCavernsChests(xxx)
-    // XXXXX.addHearts(hearts) // 15 underground
-    // XXXXX.addTriskels(triskels) // 2 caverns_top et 1 caverns_bottom
-    // XXXXX.addAncientStations(xxx)
 
-    // N-2. Nettoyage final (tuiles isolées) - TODO
+    // 9. Traitements finaux
 
-    // N-1 Affichage de statistiques)
+    // 9.1. Affichage de statistiques)
     worldBuffer.logStats()
 
-    // N. Stochage du monde en base de données
+    // 9.2. Stochage du monde en base de données
     if (!debug) {
       const liquidBodies = [...honeyLiquidBodies, ...lakeLiquidBodies, ...underLakeLiquidBodies, ...blindLakeLiquidBodies, ...sapLakeLiquidBodies, ...sapPocketLiquidBodies, ...waterPuddleLiquidBodies, ...sapPuddleLiquidBodies]
       console.log('.................... liquidBodies', liquidBodies)
@@ -363,7 +360,7 @@ class WorldGenerator {
       worldBuffer.clear()
     }
 
-    // N + 1. On repasse le générateur de nombres aléatoires en mode aléatoire
+    // 9.3. On repasse le générateur de nombres aléatoires en mode aléatoire
     seededRNG.init()
 
     console.log('[WorldGenerator] - Terminé en', (performance.now() - t0).toFixed(3), 'ms')
@@ -4990,8 +4987,9 @@ class WorldCarver {
  *
  * @param {Int16Array}                    surfaceLine       — Y de la première tuile solide par colonne
  * @param {Array<{biome, width, offset}>} biomesDescription — zones biome ordonnées
+ * @param {Set<number>} xPositions — ensemble des coordonnées X protégées contre la transformation en NATURAL
  */
-  paintSurfaceNatural (surfaceLine, biomesDescription) {
+  paintSurfaceNatural (surfaceLine, biomesDescription, guarded) {
     const GRASSFOREST = NODES.GRASSFOREST.code
     const GRASSJUNGLE = NODES.GRASSJUNGLE.code
     const SAND = NODES.SAND.code
@@ -5012,6 +5010,8 @@ class WorldCarver {
     let zoneEnd = zone.offset + zone.width
 
     for (let x = 1; x < W - 1; x++) {
+      if (guarded.has(x)) continue
+
       if (x >= zoneEnd && zoneIdx < biomesDescription.length - 1) {
         zoneIdx++
         zone = biomesDescription[zoneIdx]
@@ -5024,10 +5024,10 @@ class WorldCarver {
       const aboveCode = worldBuffer.readAt(idx - W) // ← tuile au-dessus de la surface
       if (aboveCode === WATER) continue
       if (aboveCode === SEA) continue
-      // const code = aboveCode === SEA ? SAND : NATURAL_CODE[zone.biome]
-      const code = NATURAL_CODE[zone.biome]
 
+      const code = NATURAL_CODE[zone.biome]
       tiles.push({x, y, index: idx, code})
+
       // 2ème tuile : 90% de chance
       if (seededRNG.randomReal() < 0.9) {
         tiles.push({x, y: y + 1, index: idx + W, code})
@@ -5515,15 +5515,14 @@ class WorldCarver {
   }
 
   /**
- * Creuse des Antlion Pits en surface des zones DESERT.
+ * Réserve les emplacements des Antlion Pits en surface des zones DESERT avant le creusement.
+ * Pose les exclusions et tileGuard avant le creusement des tunnels.
  * Nombre variable : 1 garanti dans la première zone, probabilité décroissante de 20% par zone.
- * Zones mélangées avant sélection pour éviter un biais spatial.
- * Prérequis : initZoneRects(), initExclusions().
  *
- * @param {Int16Array} surfaceLine — Y de la première tuile solide par colonne (modifiée en place)
- * @returns {number[]} index de spawn de chaque antlion placé
+ * @param {Int16Array} surfaceLine — Y de la première tuile solide par colonne
+ * @returns {number[]} index de spawn de chaque antlion (cy << 10) | cx
  */
-  digAntlionPits (surfaceLine) {
+  reserveAntlionPits (surfaceLine) {
     const desertRects = []
     for (let i = 0; i < this.#zoneRects.length; i++) {
       if (this.#zoneRects[i].biome === BIOME_TYPE.DESERT) desertRects.push(this.#zoneRects[i])
@@ -5536,62 +5535,80 @@ class WorldCarver {
     for (let i = 0; i < desertRects.length; i++) {
       const chance = 1 - i * 0.2
       if (seededRNG.randomReal() >= chance) continue
-      const idx = this.#digOneAntlionPit(desertRects[i], surfaceLine)
+      const idx = this.#reserveOneAntlionPit(desertRects[i], surfaceLine)
       if (idx !== -1) antlions.push(idx)
     }
     return antlions
   }
 
   /**
- * Creuse un Antlion Pit conique en surface d'une zone DESERT.
- * Sélectionne une position valide (sans VOID dans les 3 colonnes centrales, hors exclusion).
- * Construit la base (3 rangées SAND/SANDSTONE) puis le funnel en V remontant vers la surface.
- * Le funnel garantit 2 tuiles SAND + SANDSTONE de protection sur les 3 premières rangées,
- * puis s'arrête dès que la paroi rencontre une tuile non franchissable.
- * Met à jour surfaceLine et propage SKY/VOID après modification du terrain.
+ * Réserve l'emplacement d'un Antlion Pit en surface d'une zone DESERT.
+ * Pose exclusion et tileGuard.
  *
  * @param {{x0, x1, ySurface, yUnder, biome}} rect — zone désertique cible
- * @param {Int16Array} surfaceLine — Y de la première tuile solide par colonne (modifiée en place)
- * @returns {number} index de spawn de l'antlion (cx, cy), ou -1 si échec après MAX_ATTEMPTS
+ * @param {Int16Array} surfaceLine — Y de la première tuile solide par colonne
+ * @returns {number} index (cy << 10) | cx ou -1 si échec après MAX_ATTEMPTS
  */
-  #digOneAntlionPit (rect, surfaceLine) {
-    const VOID = NODES.VOID.code
-    const SAND = NODES.SAND.code
-    const SKY = NODES.SKY.code
-    const SANDSTONE = NODES.SANDSTONE.code
-    const UNSTABLE_SET = new Set([VOID, NODES.SKY.code, NODES.SEA.code, NODES.WATER.code, NODES.HONEY.code, NODES.SAP.code])
-
-    const W = WORLD_WIDTH
+  #reserveOneAntlionPit (rect, surfaceLine) {
     const MAX_ATTEMPTS = 100
 
-    let cx, cy, valid, yBottom
+    let cx, cy, valid
     let attempts = 0
 
     do {
       cx = seededRNG.randomGetMinMax(rect.x0 + 6, rect.x1 - 6)
-
-      const yTop = Math.min(surfaceLine[cx - 1], surfaceLine[cx], surfaceLine[cx + 1])
-      yBottom = Math.max(surfaceLine[cx - 1], surfaceLine[cx], surfaceLine[cx + 1])
+      const yBottom = Math.max(surfaceLine[cx - 1], surfaceLine[cx], surfaceLine[cx + 1])
       cy = yBottom + 4
 
-      // Vérification absence de VOID dans les 3 colonnes
-      let hasVoid = false
-      for (let x = cx - 1; x <= cx + 1 && !hasVoid; x++) {
-        for (let y = yTop; y <= yBottom + 2 && !hasVoid; y++) {
-          if (worldBuffer.read(x, y) === VOID) hasVoid = true
-        }
-      }
-
-      valid = !hasVoid && !this.isExcluded(cx - 6, cy - 6, cx + 6, cy + 3)
+      valid = !this.isExcluded(cx - 6, cy - 6, cx + 6, cy + 5)
       attempts++
     } while (!valid && attempts < MAX_ATTEMPTS)
 
     if (!valid) return -1
 
-    this.addExclusion({x1: cx - 6, y1: cy - 6, x2: cx + 6, y2: cy + 3})
+    this.addExclusion({x1: cx - 6, y1: cy - 6, x2: cx + 6, y2: cy + 5})
+    tileGuard.addNoisyRect(cx, cy - 1, 5, 8, 5, 8, 0.8, PERLIN_OFFSET_TEMPLE)
+
+    return (cy << 10) | cx
+  }
+
+  /**
+ * Dessine les Antlion Pits après le creusement des tunnels.
+ *
+ * @param {number[]}   reservations — index des antlions (retour de reserveAntlionPits)
+ * @param {Int16Array} surfaceLine  — Y de la première tuile solide par colonne (modifiée en place)
+ * @returns {[number[]]} coordonnées X protégées contre la transformation en NATURAL
+ */
+  buildAntlionPits (reservations, surfaceLine) {
+    const guarded = []
+    for (const idx of reservations) {
+      this.#buildOneAntlionPit(idx, surfaceLine)
+
+      const cx = idx & 0x3FF
+      for (let dx = -4; dx <= 4; dx++) {
+        guarded.push(cx + dx)
+      }
+    }
+    return guarded
+  }
+
+  /**
+ * Dessine un Antlion Pit et ajuste surfaceLine.
+ *
+ * @param {number}     idx         — index (cy << 10) | cx
+ * @param {Int16Array} surfaceLine — Y de la première tuile solide par colonne (modifiée en place)
+ */
+  #buildOneAntlionPit (idx, surfaceLine) {
+    const cx = idx & 0x3FF
+    const cy = idx >> 10
+    const VOID = NODES.VOID.code
+    const SAND = NODES.SAND.code
+    const SKY = NODES.SKY.code
+    const SANDSTONE = NODES.SANDSTONE.code
+    const UNSTABLE_SET = new Set([VOID, NODES.SKY.code, NODES.SEA.code, NODES.WATER.code, NODES.HONEY.code, NODES.SAP.code])
+    const W = WORLD_WIDTH
 
     // 1. Ajout du pit
-    const idx = (cy << 10) | cx
     const tiles = [
     // Rangée cy : SANDSTONE aux bords, SAND au centre
       {x: cx - 2, y: cy, index: idx - 2, code: SANDSTONE},
@@ -5608,11 +5625,11 @@ class WorldCarver {
       {x: cx + 2, y: cy + 1, index: idx + W + 2, code: SANDSTONE},
 
       // Rangée cy+2 : SANDSTONE
-      {x: cx - 2, y: cy + 2, index: idx + W + W - 2, code: SANDSTONE},
-      {x: cx - 1, y: cy + 2, index: idx + W + W - 1, code: SANDSTONE},
-      {x: cx, y: cy + 2, index: idx + W + W, code: SANDSTONE},
-      {x: cx + 1, y: cy + 2, index: idx + W + W + 1, code: SANDSTONE},
-      {x: cx + 2, y: cy + 2, index: idx + W + W + 2, code: SANDSTONE}
+      {x: cx - 2, y: cy + 2, index: idx + W * 2 - 2, code: SANDSTONE},
+      {x: cx - 1, y: cy + 2, index: idx + W * 2 - 1, code: SANDSTONE},
+      {x: cx, y: cy + 2, index: idx + W * 2, code: SANDSTONE},
+      {x: cx + 1, y: cy + 2, index: idx + W * 2 + 1, code: SANDSTONE},
+      {x: cx + 2, y: cy + 2, index: idx + W * 2 + 2, code: SANDSTONE}
     ]
 
     this.applyTiles(tiles, ETERNAL_EXCLUDED)
@@ -5627,7 +5644,6 @@ class WorldCarver {
     let xLeft = -1
 
     for (let i = 0; i <= 24; i++) {
-      // on stoppe si la progression est arrêtée des deux côtés
       if (xRight !== -1 && xLeft !== -1) break
 
       const y = cy - 1 - i
@@ -5641,7 +5657,6 @@ class WorldCarver {
 
         let sand1 = false
         const tIdx1 = row + i + 1
-        // Vérifier que la tuile en dessous du premier SAND n'est pas SKY/VOID
         if (!UNSTABLE_SET.has(worldBuffer.readAt(tIdx1)) || i < 3) {
           funnelTiles.push({x: cx + i + 1, y, index: tIdx1, code: SAND})
           sandTop[cx + i + 1] = y
@@ -5707,13 +5722,10 @@ class WorldCarver {
     this.applyTiles(funnelTiles, ETERNAL_EXCLUDED)
 
     // 3. Nettoyage ligne de surface
-
-    // Mise à jour surfaceLine et propagation SKY vers le haut
     const skyTiles = []
     for (const x in sandTop) {
       const topY = sandTop[x]
-      surfaceLine[x] = topY
-
+      surfaceLine[+x] = topY
       for (let y = topY - 1; y >= 1; y--) {
         skyTiles.push({x: +x, y, index: (y << 10) | +x, code: SKY})
       }
@@ -5721,26 +5733,23 @@ class WorldCarver {
 
     for (const x in sandstoneTop) {
       const topY = sandstoneTop[x]
-      const above = (topY - 1 << 10) | +x
-      if (worldBuffer.readAt(above) !== SKY) continue
 
-      surfaceLine[+x] = topY
-
-      for (let y = topY - 1; y >= 1; y--) {
-        skyTiles.push({x: +x, y, index: (y << 10) | +x, code: SKY})
-      }
-
-      // Tuile en dessous du SANDSTONE : si SKY → VOID, propager vers le bas
       let belowY = topY + 1
       while (belowY < WORLD_HEIGHT - 1 && worldBuffer.read(+x, belowY) === SKY) {
         skyTiles.push({x: +x, y: belowY, index: (belowY << 10) | +x, code: VOID})
         belowY++
       }
+
+      const above = ((topY - 1) << 10) | +x
+      if (worldBuffer.readAt(above) !== SKY) continue
+
+      surfaceLine[+x] = topY
+      for (let y = topY - 1; y >= 1; y--) {
+        skyTiles.push({x: +x, y, index: (y << 10) | +x, code: SKY})
+      }
     }
 
     this.applyTiles(skyTiles, ETERNAL_EXCLUDED)
-    tileGuard.addRect(cx - 6, cy - 6, cx + 6, cy + 3)
-    return idx
   }
 
   /**
@@ -5786,7 +5795,7 @@ class WorldCarver {
 
     do {
       cx = seededRNG.randomGetMinMax(rect.x0 + 6, rect.x1 - 6)
-      cy = Math.max(surfaceLine[cx - 1], surfaceLine[cx], surfaceLine[cx + 1])
+      cy = Math.max(surfaceLine[cx - 1], surfaceLine[cx], surfaceLine[cx + 1]) + 1
 
       valid = !this.isExcluded(cx - 6, cy - 6, cx + 6, cy + 3)
       attempts++
@@ -5806,11 +5815,20 @@ class WorldCarver {
  *
  * @param {number[]}   reservations — index des fourmilières (retour de reserveAnthills)
  * @param {Int16Array} surfaceLine  — Y de la première tuile solide par colonne (modifiée en place)
+ * @returns {[number[]]} coordonnées X protégées contre la transformation en NATURAL
  */
   buildAnthills (reservations, surfaceLine) {
+    const guarded = []
     for (const idx of reservations) {
       this.#buildOneAnthill(idx, surfaceLine)
+
+      const cx = idx & 0x3FF
+      for (let dx = -4; dx <= 6; dx++) {
+        guarded.push(cx + dx)
+      }
     }
+
+    return guarded
   }
 
   /**
@@ -5906,151 +5924,6 @@ class WorldCarver {
   }
 
   /**
- * Creuse des Ant Hills en surface des zones FOREST.
- * Nombre variable : 1 garanti dans la première zone, probabilité décroissante de 20% par zone.
- * Zones mélangées avant sélection pour éviter un biais spatial.
- * Prérequis : initZoneRects(), initExclusions().
- *
- * @param {Int16Array} surfaceLine — Y de la première tuile solide par colonne (modifiée en place)
- * @returns {number[]} index du coin haut-gauche de la salle de spawn de la reine (3×2 VOID),
- *                   ou -1 si échec après MAX_ATTEMPTS
- */
-  digAnthills (surfaceLine) {
-    const forestRects = []
-    for (let i = 0; i < this.#zoneRects.length; i++) {
-      if (this.#zoneRects[i].biome === BIOME_TYPE.FOREST) forestRects.push(this.#zoneRects[i])
-    }
-    if (forestRects.length === 0) return []
-
-    shuffleArray(forestRects)
-
-    const queens = []
-    for (let i = 0; i < forestRects.length; i++) {
-      const chance = 1 - i * 0.2
-      if (seededRNG.randomReal() >= chance) continue
-      const idx = this.#digOneAnthill(forestRects[i], surfaceLine)
-      if (idx !== -1) queens.push(idx)
-    }
-    return queens
-  }
-
-  /**
- * Creuse un Ant Hill conique en surface d'une zone FOREST.
- *
- * @param {{x0, x1, ySurface, yUnder, biome}} rect — zone forestière cible
- * @param {Int16Array} surfaceLine — Y de la première tuile solide par colonne (modifiée en place)
- * @returns {number} index de spawn de la reine fourmi, ou -1 si échec
- */
-  #digOneAnthill (rect, surfaceLine) {
-    const SKY = NODES.SKY.code
-    const VOID = NODES.VOID.code
-    const ANTDIRT = NODES.ANTDIRT.code
-    const MAX_ATTEMPTS = 100
-    const W = WORLD_WIDTH
-
-    //  Détermination de la position de la fourmilière
-    let cx, cy, valid
-    let attempts = 0
-    do {
-      cx = seededRNG.randomGetMinMax(rect.x0 + 6, rect.x1 - 6)
-
-      // cy = point le plus bas des 3 colonnes centrales (y maximum)
-      cy = Math.max(surfaceLine[cx - 1], surfaceLine[cx], surfaceLine[cx + 1])
-
-      // Rectangle fourmilière : 9x7, coin haut-gauche à (cx-4, cy-4)
-      // Rectangle d'exclusion : marge 2 de chaque côté → (cx-6, cy-6) à (cx+6, cy+3) (9+4=13 large, 7+4=11 haut)
-      valid = !this.isExcluded(cx - 6, cy - 6, cx + 6, cy + 3)
-      attempts++
-    } while (!valid && attempts < MAX_ATTEMPTS)
-
-    if (!valid) return -1
-
-    this.addExclusion({x1: cx - 6, y1: cy - 6, x2: cx + 6, y2: cy + 3})
-
-    // 2. Ajout du pit
-    const idx = (cy << 10) | cx
-    const tiles = [
-      // Rangée cy - 4 : 1 x ANTDIRT
-      {x: cx + 1, y: cy - 4, index: idx - W - W - W - W + 1, code: ANTDIRT},
-
-      // Rangée cy - 3 : 3 x ANTDIRT
-      {x: cx, y: cy - 3, index: idx - W - W - W, code: ANTDIRT},
-      {x: cx + 1, y: cy - 3, index: idx - W - W - W + 1, code: ANTDIRT},
-      {x: cx + 2, y: cy - 3, index: idx - W - W - W + 2, code: ANTDIRT},
-
-      // Rangée cy - 2 : 5 x ANTDIRT
-      {x: cx - 1, y: cy - 2, index: idx - W - W - 1, code: ANTDIRT},
-      {x: cx, y: cy - 2, index: idx - W - W, code: ANTDIRT},
-      {x: cx + 1, y: cy - 2, index: idx - W - W + 1, code: ANTDIRT},
-      {x: cx + 2, y: cy - 2, index: idx - W - W + 2, code: ANTDIRT},
-      {x: cx + 3, y: cy - 2, index: idx - W - W + 3, code: ANTDIRT},
-
-      // Rangée cy - 1 : 7 x ANTDIRT
-      {x: cx - 2, y: cy - 1, index: idx - W - 2, code: ANTDIRT},
-      {x: cx - 1, y: cy - 1, index: idx - W - 1, code: ANTDIRT},
-      {x: cx, y: cy - 1, index: idx - W, code: ANTDIRT},
-      {x: cx + 1, y: cy - 1, index: idx - W + 1, code: ANTDIRT},
-      {x: cx + 2, y: cy - 1, index: idx - W + 2, code: ANTDIRT},
-      {x: cx + 3, y: cy - 1, index: idx - W + 3, code: ANTDIRT},
-      {x: cx + 4, y: cy - 1, index: idx - W + 4, code: ANTDIRT},
-
-      // Rangée cy : 3 x ANTDIRT  3 x VOID 3 x ANTDIRT
-      {x: cx - 3, y: cy, index: idx - 3, code: ANTDIRT},
-      {x: cx - 2, y: cy, index: idx - 2, code: ANTDIRT},
-      {x: cx - 1, y: cy, index: idx - 1, code: ANTDIRT},
-      {x: cx, y: cy, index: idx, code: VOID},
-      {x: cx + 1, y: cy, index: idx + 1, code: VOID},
-      {x: cx + 2, y: cy, index: idx + 2, code: VOID},
-      {x: cx + 3, y: cy, index: idx + 3, code: ANTDIRT},
-      {x: cx + 4, y: cy, index: idx + 4, code: ANTDIRT},
-      {x: cx + 5, y: cy, index: idx + 5, code: ANTDIRT},
-
-      // Rangée cy+1 : 3 x ANTDIRT  3 x VOID 3 x ANTDIRT
-      {x: cx - 3, y: cy + 1, index: idx + W - 3, code: ANTDIRT},
-      {x: cx - 2, y: cy + 1, index: idx + W - 2, code: ANTDIRT},
-      {x: cx - 1, y: cy + 1, index: idx + W - 1, code: ANTDIRT},
-      {x: cx, y: cy + 1, index: idx + W, code: VOID},
-      {x: cx + 1, y: cy + 1, index: idx + W + 1, code: VOID},
-      {x: cx + 2, y: cy + 1, index: idx + W + 2, code: VOID},
-      {x: cx + 3, y: cy + 1, index: idx + W + 3, code: ANTDIRT},
-      {x: cx + 4, y: cy + 1, index: idx + W + 4, code: ANTDIRT},
-      {x: cx + 5, y: cy + 1, index: idx + W + 5, code: ANTDIRT},
-
-      // Rangée cy+2 : 9 x ANTDIRT
-      {x: cx - 3, y: cy + 2, index: idx + W + W - 3, code: ANTDIRT},
-      {x: cx - 2, y: cy + 2, index: idx + W + W - 2, code: ANTDIRT},
-      {x: cx - 1, y: cy + 2, index: idx + W + W - 1, code: ANTDIRT},
-      {x: cx, y: cy + 2, index: idx + W + W, code: ANTDIRT},
-      {x: cx + 1, y: cy + 2, index: idx + W + W + 1, code: ANTDIRT},
-      {x: cx + 2, y: cy + 2, index: idx + W + W + 2, code: ANTDIRT},
-      {x: cx + 3, y: cy + 2, index: idx + W + W + 3, code: ANTDIRT},
-      {x: cx + 4, y: cy + 2, index: idx + W + W + 4, code: ANTDIRT},
-      {x: cx + 5, y: cy + 2, index: idx + W + W + 5, code: ANTDIRT}
-    ]
-
-    this.applyTiles(tiles, ETERNAL_EXCLUDED)
-
-    // 3. Ajustement de la ligne de surface
-    const zz = [idx - 3, idx + 5, idx - W - 2, idx - W + 4, idx - W - W - 1, idx - W - W + 3, idx - W - W - W, idx - W - W - W + 2, idx - W - W - W - W + 1]
-    if (worldBuffer.read(cx - 4, cy - 1) !== SKY) zz.push(idx - W - 4)
-    if (worldBuffer.read(cx + 6, cy - 1) !== SKY) zz.push(idx - W + 6)
-    const skyTiles = []
-    for (const surfaceIdx of zz) {
-      const x = surfaceIdx & 0x3FF
-      const y = surfaceIdx >> 10
-      surfaceLine[x] = y
-      for (let sy = y - 1; sy >= 1; sy--) {
-        skyTiles.push({x, y: sy, index: (sy << 10) | x, code: SKY})
-      }
-    }
-    this.applyTiles(skyTiles, ETERNAL_EXCLUDED)
-
-    // 4. Protection et retour
-    tileGuard.addRect(cx - 6, cy - 6, cx + 6, cy + 3)
-    return idx
-  }
-
-  /**
  * Réserve les emplacements des Termite Mounds en surface des zones JUNGLE.
  * Pose les exclusions et tileGuard avant le creusement des tunnels.
  * Nombre variable : 1 garanti dans la première zone, probabilité décroissante de 20% par zone.
@@ -6112,11 +5985,19 @@ class WorldCarver {
  *
  * @param {number[]}   reservations — index des termitières (retour de reserveTermiteMounds)
  * @param {Int16Array} surfaceLine  — Y de la première tuile solide par colonne (modifiée en place)
+ * @returns {[number[]]} coordonnées X protégées contre la transformation en NATURAL
  */
   buildTermiteMounds (reservations, surfaceLine) {
+    const guarded = []
     for (const idx of reservations) {
       this.#buildOneTermiteMound(idx, surfaceLine)
+
+      const cx = idx & 0x3FF
+      for (let dx = -2; dx <= 3; dx++) {
+        guarded.push(cx + dx)
+      }
     }
+    return guarded
   }
 
   /**
