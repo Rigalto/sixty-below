@@ -5722,6 +5722,10 @@ class WorldCarver {
     this.applyTiles(funnelTiles, ETERNAL_EXCLUDED)
 
     // 3. Nettoyage ligne de surface
+    for (let dx = -2; dx <= 2; dx++) {
+      sandstoneTop[cx + dx] = cy + 2
+    }
+
     const skyTiles = []
     for (const x in sandTop) {
       const topY = sandTop[x]
@@ -5920,6 +5924,17 @@ class WorldCarver {
       }
     }
 
+    // passage à VOID d'éventuelles tuiles SKY sous la fourmillière
+    for (let dx = -3; dx <= 5; dx++) {
+      const x = cx + dx
+      let belowY = cy + 3
+
+      while (belowY < WORLD_HEIGHT - 1 && worldBuffer.read(x, belowY) === SKY) {
+        skyTiles.push({x, y: belowY, index: (belowY << 10) | x, code: VOID})
+        belowY++
+      }
+    }
+
     this.applyTiles(skyTiles, ETERNAL_EXCLUDED)
   }
 
@@ -6055,6 +6070,18 @@ class WorldCarver {
         skyTiles.push({x, y, index: (y << 10) | x, code: SKY})
       }
     }
+
+    // passage à VOID d'éventuelles tuiles SKY sous la fourmillière
+    for (let dx = -1; dx <= 2; dx++) {
+      const x = cx + dx
+      let belowY = cy + 4
+
+      while (belowY < WORLD_HEIGHT - 1 && worldBuffer.read(x, belowY) === SKY) {
+        skyTiles.push({x, y: belowY, index: (belowY << 10) | x, code: VOID})
+        belowY++
+      }
+    }
+
     this.applyTiles(skyTiles, ETERNAL_EXCLUDED)
   }
 

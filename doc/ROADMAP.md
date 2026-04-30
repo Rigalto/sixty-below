@@ -11,8 +11,6 @@
 ---
 
 ## À faire — Bugs connus
-- décomposer la création des fourmilières comme pour les termitières
-- corriger le Antlion Pit qui laisse des tuiles blanches sous les tuiles de SANDSTONE ajoutées
 - Dans le panel qui génère un nouveau monde, il faut pouvoir rendre le champ input vide (il est rempli par '1' lorsque l'on tente de le vider, rendant très difficile l'entrée d'une graine ne commençant pas par 1)
 - Ajouter dans le panel de droite la clé courante de génération du monde
 
