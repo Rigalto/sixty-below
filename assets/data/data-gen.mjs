@@ -6,6 +6,7 @@
  */
 
 import {NODES, BIOME_TYPE} from './data.mjs'
+import {parseLootEntry} from '../../src/utils.mjs'
 import {WORLD_WIDTH, WORLD_HEIGHT, SEA_LEVEL, TOPSOIL_Y_SKY_SURFACE, TOPSOIL_Y_SURFACE_UNDER, TOPSOIL_Y_UNDER_CAVERNS, TOPSOIL_Y_CAVERNS_MID, WEATHER_TYPE} from '../../src/constant.mjs'
 
 // Re-exports pour generate.mjs
@@ -519,3 +520,20 @@ export const TEMPLE_RUIN_COLUMNS = [
 
 export const TEMPLE_RUIN_WALL_INDEXES = TEMPLE_RUIN_WALL.map(({dx, dy}) => (dy << 10) | dx)
 export const TEMPLE_RUIN_COLUMNS_INDEXES = TEMPLE_RUIN_COLUMNS.map(({dx, dy}) => (dy << 10) | dx)
+
+export const CHEST_CONTENT = {
+  copperChest: ['copperChunk:80:5-8'],
+  silverChest: ['copperChunk:80:5-8'],
+  goldChest: ['copperChunk:80:5-8'],
+  woodChest: ['copperChunk:80:5-8'],
+  mahoganyChest: ['copperChunk:80:5-8'],
+  sandstoneChest: ['copperChunk:80:5-8'],
+  oceanChest: ['copperChunk:80:5-8'],
+  forestChest: ['copperChunk:80:5-8'],
+  desertChest: ['copperChunk:80:5-8'],
+  jungleChest: ['copperChunk:80:5-8']
+}
+
+for (const type in CHEST_CONTENT) {
+  CHEST_CONTENT[type] = CHEST_CONTENT[type].map(parseLootEntry)
+}
