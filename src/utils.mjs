@@ -946,3 +946,75 @@ export const shuffleArray = (arr) => {
   }
   return arr
 }
+
+/**
+ * Loot Table utilities — parseLootEntry / rollLoot
+ *
+ * Format d'une entrée : 'itemId:weight:count'
+ *   count peut être :
+ *     '3'       → fixe
+ *     '1.40'    → fixe + 40% d'un item supplémentaire
+ *     '5-8'     → range uniforme
+ *     '5-8.40'  → range + 40% d'un item supplémentaire
+ *
+ * flags (3 bits) :
+ *   bit 0 : hasRange    (countMin !== countMax)
+ *   bit 1 : hasBonus    (bonus > 0)
+ *   bit 2 : weightIs100 (weight === 100)
+ *
+ * @typedef {{itemId: string, weight: number, countMin: number, countMax: number, bonus: number, flags: number}} LootEntry
+ */
+
+/**
+ * Parse une chaîne de loot en LootEntry précalculée.
+ * @param {string} str — entrée au format 'itemId:weight:count'
+ * @returns {LootEntry}
+ */
+export const parseLootEntry = (str) => {
+  const [itemId, weightStr, countStr] = str.split(':')
+  const weight = parseInt(weightStr)
+
+  // Séparation count et bonus
+  const dotIdx = countStr.indexOf('.')
+  const bonus = dotIdx === -1 ? 0 : parseInt(countStr.slice(dotIdx + 1))
+  const countPart = dotIdx === -1 ? countStr : countStr.slice(0, dotIdx)
+
+  // Séparation min et max
+  const dashIdx = countPart.indexOf('-')
+  const countMin = parseInt(countPart)
+  const countMax = dashIdx === -1 ? countMin : parseInt(countPart.slice(dashIdx + 1))
+
+  const flags =
+    (countMin !== countMax ? 0b001 : 0) |
+    (bonus > 0 ? 0b010 : 0) |
+    (weight === 100 ? 0b100 : 0)
+
+  return {itemId, weight, countMin, countMax, bonus, flags}
+}
+
+const ROLL_FN = [
+  // 0b000 : weight < 100, fixe, pas de bonus
+  (entry) => seededRNG.randomGetPercent(entry.weight) ? entry.countMin : 0,
+  // 0b001 : weight < 100, range, pas de bonus
+  (entry) => seededRNG.randomGetPercent(entry.weight) ? seededRNG.randomGetMinMax(entry.countMin, entry.countMax) : 0,
+  // 0b010 : weight < 100, fixe, bonus
+  (entry) => seededRNG.randomGetPercent(entry.weight) ? entry.countMin + (seededRNG.randomGetPercent(entry.bonus) ? 1 : 0) : 0,
+  // 0b011 : weight < 100, range, bonus
+  (entry) => seededRNG.randomGetPercent(entry.weight) ? seededRNG.randomGetMinMax(entry.countMin, entry.countMax) + (seededRNG.randomGetPercent(entry.bonus) ? 1 : 0) : 0,
+  // 0b100 : weight === 100, fixe, pas de bonus
+  (entry) => entry.countMin,
+  // 0b101 : weight === 100, range, pas de bonus
+  (entry) => seededRNG.randomGetMinMax(entry.countMin, entry.countMax),
+  // 0b110 : weight === 100, fixe, bonus
+  (entry) => entry.countMin + (seededRNG.randomGetPercent(entry.bonus) ? 1 : 0),
+  // 0b111 : weight === 100, range, bonus
+  (entry) => seededRNG.randomGetMinMax(entry.countMin, entry.countMax) + (seededRNG.randomGetPercent(entry.bonus) ? 1 : 0)
+]
+
+/**
+ * Effectue un tirage de loot pour une entrée précalculée.
+ * Retourne 0 si le weight n'est pas atteint.
+ * @param {LootEntry} entry — entrée précalculée par parseLootEntry
+ * @returns {number} quantité d'items obtenus (0 si non sélectionné)
+ */
+export const rollLoot = (entry) => ROLL_FN[entry.flags](entry)
