@@ -343,9 +343,10 @@ class WorldGenerator {
     // 8.3. Ajout des coffres et objets spéciaux - TODO
     furnitureGenerator.placeSeaChests(leftSeaRect)
     furnitureGenerator.placeSeaChests(rightSeaRect)
-    // XXXXX.addSurfaceChests(xxx)
-    // XXXXX.addUndergroundChests(xxx)
-    // XXXXX.addCavernsChests(xxx)
+    furnitureGenerator.placeSurfaceLineChests(surfaceLine, guarded, biomesDescription)
+    furnitureGenerator.placeSurfaceChests(zoneRects)
+    furnitureGenerator.placeUndergroundChests(zoneRects)
+    furnitureGenerator.placeCavernChests(zoneRects)
 
     // 9. Traitements finaux
 
@@ -6349,6 +6350,227 @@ class FurnitureGenerator {
       const chestX = goLeft ? cx - 1 : cx
 
       const chest = this.addFurnitureAt(((y - 2) << 10) | chestX, 'oceanChest')
+      this.fillChest(chest)
+      placed++
+    }
+  }
+
+  /**
+ * Place des coffres dans la layer Caverns pour chaque tranche de biome.
+ * @param {Array<{x0, x1, yUnder, yCaverns, biome}>} zoneRects — tranches de biomes
+ */
+  placeCavernChests (zoneRects) {
+    const VOID = NODES.VOID.code
+    const LIQUIDS = new Set([NODES.WATER.code, NODES.HONEY.code, NODES.SAP.code])
+
+    const CHEST_TYPE = []
+    CHEST_TYPE[BIOME_TYPE.FOREST] = 'forestChest'
+    CHEST_TYPE[BIOME_TYPE.DESERT] = 'desertChest'
+    CHEST_TYPE[BIOME_TYPE.JUNGLE] = 'jungleChest'
+
+    const MAX_ATTEMPTS = 100
+
+    for (const rect of zoneRects) {
+      const count = seededRNG.randomGetMinMax(1, 3)
+      const chestType = CHEST_TYPE[rect.biome]
+
+      let placed = 0
+
+      for (let attempts = 0; attempts < MAX_ATTEMPTS && placed < count; attempts++) {
+        const cx = seededRNG.randomGetMinMax(rect.x0 + 1, rect.x1 - 2)
+        const cy = seededRNG.randomGetMinMax(rect.yUnder + 1, rect.yCaverns - 2)
+
+        if (worldBuffer.read(cx, cy) !== VOID) continue
+
+        // Descendre jusqu'à la première tuile non VOID
+        let y = cy
+        while (y < rect.yCaverns && worldBuffer.read(cx, y) === VOID) y++
+
+        if (worldBuffer.read(cx, y) === VOID) continue // fond non atteint
+        if (LIQUIDS.has(worldBuffer.read(cx, y))) continue // fond liquide
+
+        // Tester placement à droite
+        const canRight = worldBuffer.read(cx + 1, y) !== VOID &&
+                       !LIQUIDS.has(worldBuffer.read(cx + 1, y)) &&
+                       worldBuffer.read(cx + 1, y - 1) === VOID &&
+                       worldBuffer.read(cx + 1, y - 2) === VOID
+
+        // Tester placement à gauche
+        const canLeft = worldBuffer.read(cx - 1, y) !== VOID &&
+                       !LIQUIDS.has(worldBuffer.read(cx - 1, y)) &&
+                       worldBuffer.read(cx - 1, y - 1) === VOID &&
+                       worldBuffer.read(cx - 1, y - 2) === VOID
+
+        if (!canLeft && !canRight) continue
+
+        const goLeft = canLeft && (!canRight || seededRNG.randomGetBool())
+        const chestX = goLeft ? cx - 1 : cx
+
+        const chest = this.addFurnitureAt(((y - 2) << 10) | chestX, chestType)
+        this.fillChest(chest)
+        placed++
+      }
+    }
+  }
+
+  /**
+ * Place des coffres dans la layer Underground pour chaque tranche de biome.
+ * @param {Array<{x0, x1, yUnder, yCaverns, biome}>} zoneRects — tranches de biomes
+ */
+  placeUndergroundChests (zoneRects) {
+    const VOID = NODES.VOID.code
+    const LIQUIDS = new Set([NODES.WATER.code, NODES.HONEY.code, NODES.SAP.code])
+
+    const CHEST_TYPE = []
+    CHEST_TYPE[BIOME_TYPE.FOREST] = 'copperChest'
+    CHEST_TYPE[BIOME_TYPE.DESERT] = 'silverChest'
+    CHEST_TYPE[BIOME_TYPE.JUNGLE] = 'goldChest'
+
+    const MAX_ATTEMPTS = 100
+
+    for (const rect of zoneRects) {
+      const count = seededRNG.randomGetMinMax(1, 2)
+      const chestType = CHEST_TYPE[rect.biome]
+
+      let placed = 0
+
+      for (let attempts = 0; attempts < MAX_ATTEMPTS && placed < count; attempts++) {
+        const cx = seededRNG.randomGetMinMax(rect.x0 + 1, rect.x1 - 2)
+        const cy = seededRNG.randomGetMinMax(rect.ySurface + 1, rect.yUnder - 2)
+
+        if (worldBuffer.read(cx, cy) !== VOID) continue
+
+        // Descendre jusqu'à la première tuile non VOID
+        let y = cy
+        while (y < rect.yCaverns && worldBuffer.read(cx, y) === VOID) y++
+
+        if (worldBuffer.read(cx, y) === VOID) continue // fond non atteint
+        if (LIQUIDS.has(worldBuffer.read(cx, y))) continue // fond liquide
+
+        // Tester placement à droite
+        const canRight = worldBuffer.read(cx + 1, y) !== VOID &&
+                       !LIQUIDS.has(worldBuffer.read(cx + 1, y)) &&
+                       worldBuffer.read(cx + 1, y - 1) === VOID &&
+                       worldBuffer.read(cx + 1, y - 2) === VOID
+
+        // Tester placement à gauche
+        const canLeft = worldBuffer.read(cx - 1, y) !== VOID &&
+                       !LIQUIDS.has(worldBuffer.read(cx - 1, y)) &&
+                       worldBuffer.read(cx - 1, y - 1) === VOID &&
+                       worldBuffer.read(cx - 1, y - 2) === VOID
+
+        if (!canLeft && !canRight) continue
+
+        const goLeft = canLeft && (!canRight || seededRNG.randomGetBool())
+        const chestX = goLeft ? cx - 1 : cx
+
+        const chest = this.addFurnitureAt(((y - 2) << 10) | chestX, chestType)
+        this.fillChest(chest)
+        placed++
+      }
+    }
+  }
+
+  /**
+ * Place des coffres dans la layer Surface pour chaque tranche de biome.
+ * @param {Array<{x0, x1, yUnder, yCaverns, biome}>} zoneRects — tranches de biomes
+ */
+  placeSurfaceChests (zoneRects) {
+    const VOID = NODES.VOID.code
+    const LIQUIDS = new Set([NODES.WATER.code, NODES.HONEY.code, NODES.SAP.code])
+
+    const CHEST_TYPE = []
+    CHEST_TYPE[BIOME_TYPE.FOREST] = 'woodChest'
+    CHEST_TYPE[BIOME_TYPE.DESERT] = 'mahoganyChest'
+    CHEST_TYPE[BIOME_TYPE.JUNGLE] = 'sandstoneChest'
+
+    const MAX_ATTEMPTS = 100
+
+    for (const rect of zoneRects) {
+      const count = 1 + seededRNG.randomGetPercent(20) ? 1 : 0
+      const chestType = CHEST_TYPE[rect.biome]
+      let placed = 0
+
+      for (let attempts = 0; attempts < MAX_ATTEMPTS && placed < count; attempts++) {
+        const cx = seededRNG.randomGetMinMax(rect.x0 + 1, rect.x1 - 2)
+        const cy = seededRNG.randomGetMinMax(rect.skySurface + 1, rect.ySurface - 2)
+
+        if (worldBuffer.read(cx, cy) !== VOID) continue
+
+        // Descendre jusqu'à la première tuile non VOID
+        let y = cy
+        while (y < rect.yCaverns && worldBuffer.read(cx, y) === VOID) y++
+
+        if (worldBuffer.read(cx, y) === VOID) continue // fond non atteint
+        if (LIQUIDS.has(worldBuffer.read(cx, y))) continue // fond liquide
+
+        // Tester placement à droite
+        const canRight = worldBuffer.read(cx + 1, y) !== VOID &&
+                       !LIQUIDS.has(worldBuffer.read(cx + 1, y)) &&
+                       worldBuffer.read(cx + 1, y - 1) === VOID &&
+                       worldBuffer.read(cx + 1, y - 2) === VOID
+
+        // Tester placement à gauche
+        const canLeft = worldBuffer.read(cx - 1, y) !== VOID &&
+                       !LIQUIDS.has(worldBuffer.read(cx - 1, y)) &&
+                       worldBuffer.read(cx - 1, y - 1) === VOID &&
+                       worldBuffer.read(cx - 1, y - 2) === VOID
+
+        if (!canLeft && !canRight) continue
+
+        const goLeft = canLeft && (!canRight || seededRNG.randomGetBool())
+        const chestX = goLeft ? cx - 1 : cx
+
+        const chest = this.addFurnitureAt(((y - 2) << 10) | chestX, chestType)
+        this.fillChest(chest)
+        placed++
+      }
+    }
+  }
+
+  /**
+ * Place des coffres sur la ligne de surface.
+ * @param {Int16Array} surfaceLine — Y de la première tuile solide par colonne
+ * @param {Set<number>} guardedX — coordonnées X protégées
+ * @param {Array<{biome, width, offset}>} biomesDescription — zones biome ordonnées
+ */
+  placeSurfaceLineChests (surfaceLine, guardedX, biomesDescription) {
+    const SEA = NODES.SEA.code
+    const WATER = NODES.WATER.code
+
+    const CHEST_TYPE = []
+    CHEST_TYPE[BIOME_TYPE.FOREST] = 'woodChest'
+    CHEST_TYPE[BIOME_TYPE.DESERT] = 'mahoganyChest'
+    CHEST_TYPE[BIOME_TYPE.JUNGLE] = 'sandstoneChest'
+
+    const count = seededRNG.randomGetMinMax(8, 10)
+    const MAX_ATTEMPTS = 100
+
+    let placed = 0
+
+    for (let attempts = 0; attempts < MAX_ATTEMPTS && placed < count; attempts++) {
+      const cx = seededRNG.randomGetMinMax(2, WORLD_WIDTH - 3)
+      if (guardedX.has(cx)) continue
+
+      const y = surfaceLine[cx]
+      const tileCode = worldBuffer.read(cx, y)
+      if (tileCode === SEA || tileCode === WATER) continue
+
+      const canRight = !guardedX.has(cx + 1) && surfaceLine[cx + 1] === y
+      const canLeft = !guardedX.has(cx - 1) && surfaceLine[cx - 1] === y
+
+      if (!canLeft && !canRight) continue
+
+      // Détermination du biome
+      let biome = biomesDescription[0].biome
+      for (const zone of biomesDescription) {
+        if (cx >= zone.offset && cx < zone.offset + zone.width) { biome = zone.biome; break }
+      }
+
+      const goLeft = canLeft && (!canRight || seededRNG.randomGetBool())
+      const chestX = goLeft ? cx - 1 : cx
+
+      const chest = this.addFurnitureAt(((y - 1) << 10) | chestX, CHEST_TYPE[biome])
       this.fillChest(chest)
       placed++
     }
