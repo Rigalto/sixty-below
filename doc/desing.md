@@ -328,6 +328,45 @@ sont indicatives — les densités exactes sont définies dans `ORE_GEM_SCATTER_
 * **Flore :** Croissance **décorrélée des chunks**. Données dans le store `plant` (liste clairsemée). Calcul temporel global (timestamp) → une forêt peut pousser hors-vue sans charger ses chunks.
 * **Régénération :** Minerais rares, ruches et toiles d'araignées se régénèrent via timers globaux générant des modifications de tuiles ponctuelles.
 
+### 3.12 Loot & Récompenses
+
+## 3.12 Loot Tables
+
+Les tables de loot sont utilisées partout dans le jeu : contenu des coffres, drops de monstres, résultats de minage, abattage d'arbres, récolte de plantes, etc.
+
+### Format d'une entrée
+
+Chaque entrée est une chaîne de caractères au format :
+itemId:weight:count
+
+| Champ | Type | Description |
+|---|---|---|
+| `itemId` | string | Identifiant de l'item (clé dans `ITEMS`) |
+| `weight` | entier (0-100) | Probabilité en % que cet item soit inclus dans le loot |
+| `count` | voir ci-dessous | Quantité d'items obtenus si l'item est sélectionné |
+
+### Syntaxe de `count`
+
+| Notation | Exemples | Résultat |
+|---|---|---|
+| Valeur fixe | `3` | Toujours 3 items |
+| Valeur fixe + bonus | `1.40` | 1 garanti + 40% d'un item supplémentaire |
+| Range | `5-8` | Entre 5 et 8 items (uniforme) |
+| Range + bonus | `5-8.40` | Entre 5 et 8, avec 40% d'obtenir une unité supplémentaire |
+
+### Exemples complets
+
+| Entrée | Résultat |
+|---|---|
+| `'copperChunk:80:3'` | Toujours 3 'Copper Chunk', poids 80 |
+| `'healthPotionSmall:20:1.40'` | 1 potion garantie + 40% d'en avoir 2, poids 20 |
+| `'worm:100:5-8'` | Entre 5 et 8 vers de terre, poids 100 |
+| `'ironChunk:60:5-8.40'` | Entre 5 et 8 'Iron Chunk' + 40% d'un de plus, poids 60 |
+
+### Évaluation
+
+Chaque entrée est évaluée **indépendamment**. Un seul loot peut donc produire plusieurs items simultanément. Par exemple, un coffre avec trois entrées à 80%, 40% et 20% peut donner 0, 1, 2 ou 3 types d'items à la fois.
+
 ---
 
 ## 4. Système "Tactical" (Combat)
