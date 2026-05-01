@@ -747,7 +747,7 @@ Génère des tunnels, des cavernes et des mini-biomes. Maintient la liste des zo
 | `initExclusions(): void` | Réinitialise la liste interne des zones d'exclusion (`#exclusions`). À appeler depuis `generate()` avant le premier mini-biome. |
 | `addExclusion(rect: {x1, y1, x2, y2}): void` | Ajoute un rectangle à la liste interne d'exclusion. À appeler explicitement après `applyTiles()` pour les mini-biomes uniquement. |
 | `isExcluded(x1, y1, x2, y2): boolean` | Vérifie si un rectangle intersecte l'une des zones d'exclusion internes. Retourne `true` dès la première intersection trouvée. |
-| `addSeaExclusions(): void` | Enregistre les rectangles d'exclusion des deux zones de mer (gauche et droite) aux dimensions maximales (`SEA_MAX_WIDTH + SEA_MAX_JITTER + 2`, `SEA_LEVEL + SEA_MAX_HEIGHT + SEA_MAX_JITTER + 2`). À appeler juste après `tileGuard.init()`. |
+| `addSeaExclusions(): {leftSeaRect, rightSeaRect}` | Enregistre les rectangles d'exclusion des deux zones de mer aux dimensions maximales (`SEA_MAX_WIDTH + SEA_MAX_JITTER + 2`, `SEA_LEVEL + SEA_MAX_HEIGHT + SEA_MAX_JITTER + 2`). Retourne `{leftSeaRect, rightSeaRect}` pour usage ultérieur. À appeler juste après `tileGuard.init()`. |
 | `digNoisyCircle(tiles, cx, cy, radiusMin, radiusMax, code, frequency?, offsetX?): void` | Creuse un trou circulaire bruité (Perlin noise). Pousse les tuiles dans `tiles`. |
 | `digNoisyEllipse(tiles, cx, cy, radiusXMin, radiusXMax, radiusYMin, radiusYMax, code, frequency?, offsetX?): void` | Creuse un trou elliptique bruité (Perlin noise). Distance normalisée par les demi-axes. Pousse les tuiles dans `tiles`. |
 | `digNoisyRect(tiles, cx, cy, radiusXMin, radiusXMax, radiusYMin, radiusYMax, code, frequency?, offsetX?): void` | Creuse un rectangle bruité (Perlin noise) sur les 4 bords. Distance de Chebyshev normalisée. Pousse les tuiles dans `tiles`. |
@@ -859,7 +859,7 @@ Le paramètre `offsetX` de `digNoisyCircle`, `digNoisyEllipse` et `digNoisyRect`
 | `tileGuard` | `TileGuard` | Protège des tuiles individuelles contre tout creusement. `init()`, `has(index)`, `add (index)`, `addTiles (tiles)`, `addRect()`, `addNoisyCircle()`, `addNoisyEllipse()`, `addNoisyEllipseBottom()`, `addNoisyRect()`. Consulté par `WorldCarver.applyTiles` avant chaque écriture. |
 | `liquidFiller`       | `LiquidFiller`      | Flood-fill BFS des zones liquides et automate pour le SAND. |
 | `webFiller` | `WebFiller` | Peuplement WEB : `fillCobwebCave(cx, cy)` pour les caves, `scatterWebs(surfaceUnder)` pour le peuplement global différé. |
-| `furnitureGenerator ` | `FurnitureGenerator ` | Gestion des furnitures. `init()`, `addFurnitureAt(index, code)`, `get furnitures()` |
+| `furnitureGenerator ` | `FurnitureGenerator ` | Gestion des furnitures. `init()`, `addFurnitureAt(index, code)`, `get furnitures()`, `placeSeaChests(seaRect)` |
 
 ---
 

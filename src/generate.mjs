@@ -186,7 +186,7 @@ class WorldGenerator {
 
     // 6. Creusement (plus de creusement ensuite, ou alors très localisé) - TODO
     worldCarver.initExclusions()
-    worldCarver.addSeaExclusions()
+    const {leftSeaRect, rightSeaRect} = worldCarver.addSeaExclusions()
 
     // 6.1 Creusement des mini-biomes - TODO
 
@@ -341,6 +341,8 @@ class WorldGenerator {
     // 8.2. Ajout des plantes et des coraux - TODO
 
     // 8.3. Ajout des coffres et objets spéciaux - TODO
+    furnitureGenerator.placeSeaChests(leftSeaRect)
+    furnitureGenerator.placeSeaChests(rightSeaRect)
     // XXXXX.addSurfaceChests(xxx)
     // XXXXX.addUndergroundChests(xxx)
     // XXXXX.addCavernsChests(xxx)
@@ -2137,19 +2139,26 @@ class WorldCarver {
   }
 
   /**
- * Ajoute les rectangles d'exclusion des deux mers (gauche et droite)
+ * Ajoute les rectangles d'exclusion des deux mers (gauche et droite).
  * pour empêcher tout mini-biome de se retrouver submergé.
  * Doit être appelée dans generate() juste après tileGuard.init().
+ *
+ * @returns {{leftSeaRect: {x1,y1,x2,y2}, rightSeaRect: {x1,y1,x2,y2}}}
+ *   Rectangles théoriques des deux mers (dimensions maximales)
  */
   addSeaExclusions () {
     const seaWidth = SEA_MAX_WIDTH + SEA_MAX_JITTER + 2
     const seaBottom = SEA_LEVEL + SEA_MAX_HEIGHT + SEA_MAX_JITTER + 2
 
     // Mer gauche
-    this.addExclusion({x1: 1, y1: SEA_LEVEL, x2: seaWidth, y2: seaBottom})
+    const leftSeaRect = {x1: 1, y1: SEA_LEVEL, x2: seaWidth, y2: seaBottom}
+    this.addExclusion(leftSeaRect)
 
     // Mer droite
-    this.addExclusion({x1: WORLD_WIDTH - 1 - seaWidth, y1: SEA_LEVEL, x2: WORLD_WIDTH - 2, y2: seaBottom})
+    const rightSeaRect = {x1: WORLD_WIDTH - 1 - seaWidth, y1: SEA_LEVEL, x2: WORLD_WIDTH - 2, y2: seaBottom}
+    this.addExclusion(rightSeaRect)
+
+    return {leftSeaRect, rightSeaRect}
   }
 
   /**
@@ -6299,6 +6308,54 @@ class FurnitureGenerator {
    */
   get furnitures () {
     return this.#furnitures
+  }
+
+  /**
+ * Place des coffres océaniques dans une zone de mer.
+ * @param {{x1, y1, x2, y2}} seaRect — rectangle englobant la mer
+ */
+  placeSeaChests (seaRect) {
+    const SEA = NODES.SEA.code
+    const count = seededRNG.randomGetBool() ? 2 : 3
+
+    let placed = 0
+    const MAX_ATTEMPTS = 100
+
+    for (let attempts = 0; attempts < MAX_ATTEMPTS && placed < count; attempts++) {
+      const cx = seededRNG.randomGetMinMax(seaRect.x1 + 1, seaRect.x2 - 2)
+      const cy = seededRNG.randomGetMinMax(seaRect.y1 + 1, seaRect.y2 - 2)
+
+      if (worldBuffer.read(cx, cy) !== SEA) continue
+
+      // Descendre jusqu'à la première tuile non SEA
+      let y = cy
+      while (y < seaRect.y2 && worldBuffer.read(cx, y) === SEA) y++
+
+      if (worldBuffer.read(cx, y) === SEA) continue // fond non atteint
+
+      // Tester placement à droite : cx et cx+1, tuiles au-dessus SEA
+      const canRight = worldBuffer.read(cx + 1, y) !== SEA &&
+                     worldBuffer.read(cx + 1, y - 1) === SEA &&
+                     worldBuffer.read(cx + 1, y - 2) === SEA
+
+      // Tester placement à gauche : cx et cx-1, tuiles au-dessus SEA
+      const canLeft = worldBuffer.read(cx - 1, y) !== SEA &&
+                     worldBuffer.read(cx - 1, y - 1) === SEA &&
+                     worldBuffer.read(cx - 1, y - 2) === SEA
+
+      if (!canLeft && !canRight) continue
+
+      const goLeft = canLeft && (!canRight || seededRNG.randomGetBool())
+      const chestX = goLeft ? cx - 1 : cx
+
+      const chest = this.addFurnitureAt(((y - 2) << 10) | chestX, 'oceanChest')
+      this.fillChest(chest)
+      placed++
+    }
+  }
+
+  fillChest (chest) {
+    console.log('...... remplissage du coffre', chest)
   }
 }
 
