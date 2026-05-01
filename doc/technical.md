@@ -466,7 +466,6 @@ Ne jamais appeler `seededRNG` en mode déterministe depuis la game loop.
 | `parseLootEntry(str): LootEntry` | Parse une chaîne de loot (`'itemId:weight:count'`) en objet précalculé `{itemId, weight, countMin, countMax, bonus, flags}`. `flags` encode sur 3 bits : bit0=hasRange, bit1=hasBonus, bit2=weightIs100. À appeler une seule fois au chargement des données. |
 | `rollLoot(entry): number` | Effectue un tirage de loot pour une `LootEntry` précalculée. Retourne la quantité d'items obtenus (0 si weight non atteint). Zéro branche — dispatche via tableau de 8 fonctions indexé par `entry.flags`. |
 
-
 ---
 
 ## 5. `database.mjs` (Layer 1)
