@@ -134,13 +134,14 @@ The Surface is the topmost layer of the world, where the player begins their adv
 * [[node:grassJungle]], [[node:silt]] — Jungle
 
 **Resources**
-* [[item:copper]], [[item:iron]] — common
+* [[item:chunkCopper]], [[item:chunkIron]] — common
 * Surface plants and critters ⏳
 
 **Mini-biomes**
-* [[Anthill]] — Forest ⏳
-* [[Antlion Pit]] — Desert ⏳
-* [[Termite Mound]] — Jungle ⏳
+* [[Ant Hill]] — Forest
+* [[Antlion Pit]] — Desert
+* [[Termite Mound]] — Jungle
+* [[Surface Lake]] — All biomes
 
 **Damage type**
 * Piercing
@@ -167,15 +168,16 @@ The Underground layer begins just below the surface. It is darker, more dangerou
 * [[node:mud]], [[node:clay]] — Jungle
 
 **Resources**
-* [[item:copper]], [[item:iron]], [[item:silver]] — common
+* [[item:chunkCopper]], [[item:chunkIron]], [[item:chunkSilver]] — common
 * [[item:topaz]], [[item:ruby]], [[item:emerald]] — rare ⏳
 
 **Mini-biomes**
 * [[Fern Cave]] — Forest
 * [[Moss Cave]] — Jungle
 * [[Sand Pocket]] — Desert
-* [[Ruined Cabin]] — Forest ⏳
-* [[Pyramid]] — Desert ⏳
+* [[Ruined Cabin]] — Forest
+* [[Pyramid]] — Desert
+* [[Underground Lake]] — All biomes
 
 **Damage type**
 * Slashing
@@ -205,7 +207,7 @@ The Caverns are the deepest accessible layer, divided into two sub-layers : Cave
 * [[node:hellstone]] — Jungle, rare in other biomes
 
 **Resources**
-* [[item:gold]], [[item:cobalt]], [[item:platinum]] — rare to very rare
+* [[item:chunkGold]], [[item:chunkCobalt]], [[item:chunkPlatinum]] — rare to very rare
 * [[item:sapphire]], [[item:emerald]] — very rare
 * [[node:granite]], [[node:marble]] — Geode Caves
 
@@ -217,8 +219,9 @@ The Caverns are the deepest accessible layer, divided into two sub-layers : Cave
 * [[Geode Cave]] — all biomes, Caverns Bottom
 * [[Blind Lake]] — all biomes, Caverns Bottom
 * [[Sap Pocket]] — Jungle, Caverns Bottom
-* [[Ancient House]] — Desert, Caverns Bottom ⏳
-* [[Lost Temple]] — Jungle, Caverns Top ⏳
+* [[Ancient House]] — Desert, Caverns Bottom
+* [[Lost Temple]] — Jungle, Caverns Top
+* [[Graveyard]] — all biomes, Caverns Bottom
 
 **Damage type**
 * Crushing
@@ -249,15 +252,17 @@ The Forest is the starting biome, located at the center of the world. It is the 
 * Caverns: [[node:hardstone]], [[node:slate]]
 
 **Resources**
-* Ores: [[item:copper]], [[item:iron]], [[item:silver]], [[item:topaz]]
+* [[Metals|Chunks]]: [[item:chunkCopper]], [[item:chunkIron]], [[item:chunkSilver]], [[item:chunkGold]], [[item:chunkCobalt]], [[item:chunkPlatinum]]
+* Gems: [[item:topaz]], [[item:sapphire]]
 * Topsoil: [[node:dirt]], [[node:humus]]
 
 **Mini-biomes**
 * [[Fern Cave]] — Underground
 * [[Mushroom Cave]] — Caverns
-* [[Ruined Cabin]] — Underground ⏳
-* [[Anthill]] — Surface ⏳
+* [[Ruined Cabin]] — Underground
+* [[Ant Hill]] — Surface
 * [[Underground Lake]] — Caverns
+* [[Graveyard]] — Caverns Bottom
 
 **Fauna** ⏳
 * [[monster:beetle]], [[monster:greenSlime]], [[monster:blueSlime]]
@@ -281,15 +286,17 @@ The Desert biome is characterized by its sandy terrain and arid atmosphere. It c
 * Caverns: [[node:hardstone]], [[node:slate]]
 
 **Resources**
-* Ores: [[item:copper]], [[item:iron]], [[item:gold]], [[item:ruby]]
+* [[Metals|Chunks]]: [[item:chunkCopper]], [[item:chunkIron]], [[item:chunkSilver]], [[item:chunkGold]], [[item:chunkCobalt]], [[item:chunkPlatinum]]
+* Gems: [[item:ruby]], [[item:sapphire]]
 * Topsoil: [[node:sand]], [[node:silt]]
 
 **Mini-biomes**
-* [[Antlion Pit]] — Surface ⏳
+* [[Antlion Pit]] — Surface
 * [[Sand Pocket]] — Underground
 * [[Fossil Vein]] — Caverns
-* [[Pyramid]] — Underground ⏳
-* [[Ancient House]] — Caverns deep ⏳
+* [[Pyramid]] — Underground
+* [[Ancient House]] — Caverns deep
+* [[Graveyard]] — Caverns Bottom
 
 **Fauna** ⏳
 * [[monster:scorpion]], [[monster:sandSnake]] — Surface
@@ -316,16 +323,19 @@ The Jungle is a lush, dangerous biome teeming with life. It features unique liqu
 * Caverns: [[node:hardstone]], [[node:hellstone]]
 
 **Resources**
-* Ores: [[item:copper]], [[item:iron]], [[item:cobalt]], [[item:emerald]]
+* [[Metals|Chunks]]: [[item:chunkCopper]], [[item:chunkIron]], [[item:chunkSilver]], [[item:chunkGold]], [[item:chunkCobalt]], [[item:chunkPlatinum]]
+* Gems: [[item:emerald]], [[item:sapphire]]
 * Topsoil: [[node:silt]], [[node:humus]]
 * Liquid: [[node:sap]] — found in Sap Lakes and Sap Pockets
+* [[Bees]] product: [[node:honey], [[node:hive] — found in [[Hive]]s
 
 **Mini-biomes**
-* [[Termite Mound]] — Surface ⏳
+* [[Termite Mound]] — Surface
 * [[Moss Cave]] — Underground
 * [[Hive]] — Caverns
 * [[Sap Pocket]] — Caverns deep
-* [[Lost Temple]] — Caverns ⏳
+* [[Lost Temple]] — Caverns
+* [[Graveyard]] — Caverns Bottom
 
 **Fauna** ⏳
 * [[monster:jungleSpider]] — Surface
@@ -338,7 +348,7 @@ The Jungle is a lush, dangerous biome teeming with life. It features unique liqu
   },
 
   // ── Mini-biomes / Forest ──────────────────────────────────────
-  //    Fern Cave, Mushroom Cave, Ruined Cabin, Anthill
+  //    Fern Cave, Mushroom Cave, Ruined Cabin, Ant Hill
   {
     title: 'Fern Cave',
     category: ['Mini-biome', 'Forest'],
@@ -422,6 +432,34 @@ Ruined Cabins are the remains of ancient wooden shelters found deep in [[Forest]
 * _The chest contains consumables — it is worth revisiting regularly._ ⏳
 * _Defeating Arthur gets easier with better equipment — come back stronger if you fail._ ⏳
 * _The cabin walls are degraded but its floor plan is always the same — learn the layout._ ⏳
+  `
+  },
+  {
+    title: 'Ant Hill',
+    category: ['Mini-biome', 'Forest'],
+    content: `
+**Description**
+Ant Hills are conical mounds of [[Compacted Earth]] found on the surface of [[Forest]] biomes. They are home to a colony of ants led by a powerful queen. If destroyed, the ants will rebuild their home over time.
+
+**Main Location**
+* Biome: [[Forest]]
+* Layer: Surface
+
+**Materials**
+* [[node:antDirt]] — [[Compacted Earth]], indestructible
+
+**Structure**
+* Conical mound rising above the surface
+* Underground chamber housing the Ant Queen
+
+**Inhabitants** ⏳
+* [[monster:ant]] — common
+* [[monster:antSoldier]] — defender
+* [[monster:antQueen]] — boss, spawns in the underground chamber
+
+**Tips**
+* _Ant Hills are indestructible — the ants will always defend their home._
+* _Defeating the Ant Queen will temporarily stop ant activity._ ⏳
   `
   },
 
@@ -522,6 +560,34 @@ Pyramids are ancient stone structures buried deep in [[Desert]] biomes. Built fr
 * _Watch the floor tile colors in Chamber 2 — standing on the wrong tile is lethal._ ⏳
 * _The Pharaon respawns after a delay — the Pyramid is never permanently cleared._ ⏳
 * _Only one Pyramid exists per world — it is worth the effort to find it._ ⏳
+  `
+  },
+  {
+    title: 'Antlion Pit',
+    category: ['Mini-biome', 'Desert'],
+    content: `
+**Description**
+Antlion Pits are conical hollow traps found on the surface of [[Desert]] biomes. The steep sandy walls cause anything that steps inside to slide helplessly toward the waiting antlion at the bottom. If destroyed, the antlion will rebuild its trap over time.
+
+**Main Location**
+* Biome: [[Desert]]
+* Layer: Surface
+
+**Materials**
+* [[node:sand]] — unstable, causes sliding
+* [[node:sandstone]] — structural borders
+
+**Structure**
+* Inverted cone dug into the sand surface
+* Antlion waiting at the bottom center
+
+**Inhabitants** ⏳
+* [[monster:antlion]] — ambush predator at the pit bottom
+* [[monster:sunburstAntlion]] — boss variant, rare
+
+**Tips**
+* _Once you fall in, the sand walls make it very difficult to climb back out._ ⏳
+* _Ranged attacks from above are the safest strategy._ ⏳
   `
   },
   {
@@ -719,9 +785,37 @@ The Lost Temple is an ancient Greek-style structure buried deep in the [[Jungle]
 * _Clear the Harpy waves carefully before the Cyclops arrive — their ranged attacks are dangerous in the confined space._ ⏳
   `
   },
+  {
+    title: 'Termite Mound',
+    category: ['Mini-biome', 'Jungle'],
+    content: `
+**Description**
+Termite Mounds are tall cylindar structures of [[Compacted Earth]] rising above the surface of [[Jungle]] biomes. They house a thriving termite colony led by a powerful king. If destroyed, the termites will rebuild their home over time.
+
+**Main Location**
+* Biome: [[Jungle]]
+* Layer: Surface
+
+**Materials**
+* [[node:antDirt]] — [[Compacted Earth]], indestructible
+
+**Structure**
+* Rectangular tower rising above the surface
+* Underground chamber housing the Termite King
+
+**Inhabitants** ⏳
+* [[monster:termite]] — common
+* [[monster:termiteSoldier]] — defender
+* [[monster:termiteKing]] — boss, spawns in the underground chamber
+
+**Tips**
+* _Termite Mounds are indestructible — the termites will always defend their home._
+* _Defeating the Termite King will temporarily stop termite activity._ ⏳
+  `
+  },
 
   // ── Mini-biomes / Transversal ─────────────────────────────────
-  //    Cobweb, Cobweb Cave, Geode Cave, Blind Lake, Underground Lake
+  //    Cobweb, Cobweb Cave, Geode Cave, Blind Lake, Underground Lake, Graveyard
   {
     title: 'Cobweb',
     category: ['Natural'],
@@ -900,6 +994,46 @@ Surface Lakes are bodies of water found at ground level. Each biome has its own 
 * _Each lake has a deeper pit section — [[Fishing]] there yields rarer catches._ ⏳
   `
   },
+  {
+    title: 'Graveyard',
+    category: ['Mini-biome', 'Forest', 'Desert', 'Jungle'],
+    content: `
+**Description**
+Graveyards are ancient burial chambers found deep underground in all biomes. Their catacomb-like structure features rows of burial tunnels separated by layers of dirt and stone. They are haunted by restless spirits and guarded by undead creatures.
+
+**Main Location**
+* All biomes
+* Layer: [[Caverns]] Bottom
+
+**Materials**
+* [[node:stone]] — walls, ceiling and floor
+* [[node:dirt]] — burial tunnel floors
+
+**Structure**
+* 2 or 3 rows of burial tunnels
+* Accessible from connecting caverns
+
+**Tombstones**
+Tombstones are found inside the burial tunnels. All tombstones behave identically — they differ only in appearance.
+* [[item:tomb]]
+* [[item:tombHead]]
+* [[item:tombGrave]]
+* [[item:tombStrange]]
+* [[item:tombCross]]
+
+**Inhabitants** ⏳
+* [[monster:ghost]] — common
+* [[monster:skeleton]] — common
+* [[monster:lich]] — rare boss
+
+**Loot** ⏳
+* Tombstones — interacting triggers a combat encounter, rewards high-tier items ⏳
+
+**Tips**
+* _Tombs can be visited for rare crafting ingredients._ ⏳
+  `
+  },
+
   // ── Liquid ────────────────────────────────────────────────────
   //    Sea, Water, Honey, Sap
   // ── Liquids ───────────────────────────────────────────────────
@@ -1104,7 +1238,7 @@ Mushroom Grass covers the floor of [[Mushroom Cave]]s. [[Giant Mushroom]]s grow 
   },
 
   // ── Topsoil ───────────────────────────────────────────────────
-  //    Dirt, Sand, Silt, Humus
+  //    Dirt, Sand, Silt, Humus, Commpacted Earth
   {
     title: 'Dirt',
     category: ['Topsoil'],
@@ -1190,6 +1324,25 @@ Humus is a rich organic topsoil found across all biomes, though it is most abund
 
 **Tips**
 * _Humus is the only topsoil found in both Forest and Jungle biomes at significant depth._
+  `
+  },
+  {
+    title: 'Compacted Earth',
+    category: ['Surface'],
+    content: `
+**Description**
+Compacted Earth is a dense, hardened form of soil found exclusively in [[Ant Hill]] and [[Termite Mound]] structures. It cannot be mined or destroyed by the player.
+
+**Properties**
+* Indestructible — cannot be mined
+* Solid — the player can walk on it
+
+**Location**
+* [[Ant Hill]] — [[Forest]] surface
+* [[Termite Mound]] — [[Jungle]] surface
+
+**Tips**
+* _Compacted Earth is maintained by the colony — destroying the structure is impossible._ ⏳
   `
   },
 
@@ -1387,136 +1540,64 @@ Slate is a hard metamorphic substrat found in the deepest parts of [[Jungle]] bi
   `
   },
 
-  // ── Ores ──────────────────────────────────────────────────────
+  // ── Mettalic Ores / Chunks / Bars ──────────────────────────────────────────────────────
   //    Copper, Iron, Silver, Gold, Cobalt, Platinum
   {
-    title: 'Copper Ore',
-    category: ['Ore'],
+    title: 'Metals',
+    category: ['Crafting'],
     content: `
 **Description**
-Copper is the most common ore in the world. It is the first metal the player will encounter and is essential for early-game crafting.
+Metals are the primary crafting materials in Sixty-Below. Each metal exists in three forms : ore (placed in the World), chunk (dropped when mined), and bar (smelted from chunks at a furnace).
 
-**Tier**
-{{node:copper:star}}
+**Forms & Transformation**
 
-**Main Location**
-* [[Surface]] — all biomes, moderate density
-* [[Underground]] — all biomes, high density
-* [[Caverns]] Top — all biomes, moderate density
+| Form | How to obtain | Notes |
+|---|---|---|
+| Ore | Ore veins placed in the World | Not directly usable |
+| Chunk | Dropped when [[Mining]] ore | Crafting ingredient |
+| Bar | Smelt chunks at a [[Smelting||Furnace]] | Higher-tier crafting |
 
-**Drops** ⏳
-* {{node:copper:mining}}
+**Metal Ores**
 
-**Recipes** ⏳
-* {{recipe:copperBar}}
+| Metal | Tier | Layer |
+|---|---|---|---|
+| [[node:copper]] | {{node:copper:star}} | [[Surface]], [[Underground]] |
+| [[node:iron]] | {{node:iron:star}} | [[Underground]] |
+| [[node:silver]] | {{node:silver:star}} | [[Caverns]] Top |
+| [[node:gold]] | {{node:gold:star}} | [[Caverns]] |
+| [[node:cobalt]] | {{node:cobalt:star}} | [[Caverns]] |
+| [[node:platinum]] | {{node:platinum:star}} | [[Caverns]] Bottom |
+
+**Metal Chunks**
+
+Metal chunks are placed in your [[Inventory]] when mined with a [[Pickaxes||Pickaxe]].
+
+| Ore | Chunk | Chunk Tier | Pickaxe | Pickaxe Tier |
+|---|---|---|---|---|
+| [[node:platinum]] | [[item:chunkPlatinum]] | {{item:chunkPlatinum:star}} | [[item:pickaxeCopper]] | {{item:pickaxeCopper:star}} |
+
+**Metal Bars**
+
+| Chunk | Chunk Tier | Crafting Station | Bar | Bar Tier |
+|---|---|---|---|---|
+| [[item:chunkPlatinum]] | {{item:chunkPlatinum:star}} | [[Smelting|Furnace]] | [[item:barPlatinum]] | {{item:barPlatinum:star}} |
+
+**Usages**
+
+| Metal | Equipment tier | Other uses |
+|---|---|---|
+| [[item:barCopper]] | {{item:barCopper:star}} — basic tools & armor | ⏳ |
+| [[item:barIron]] | {{item:barIron:star}} — improved tools & armor | ⏳ |
+| [[item:barSilver]] | {{item:barSilver:star}} — advanced armor | ⏳ |
+| [[item:barGold]] | {{item:barGold:star}} — advanced armor | ⏳ |
+| [[item:barCobalt]] | {{item:barCobalt:star}} — expert armor | ⏳ |
+| [[item:barPlatinum]] | {{item:barPlatinum:star}} — master armor | ⏳ |
+
+**Tips**
+* _Always bring a [[Pickaxes|Pickaxe]] strong enough to mine the ores of the layer you are exploring — deeper metals require better tools._ ⏳
+* _Platinum is extremely rare and only found in the deepest caverns._ ⏳
   `
   },
-  {
-    title: 'Iron Ore',
-    category: ['Ore'],
-    content: `
-**Description**
-Iron is a common ore found from the Underground layer downwards. It is the second metal tier and is required for most basic tools and weapons.
-
-**Tier**
-{{node:iron:star}}
-
-**Main Location**
-* [[Underground]] — all biomes, moderate density
-* [[Caverns]] Top — all biomes, moderate density
-
-**Drops** ⏳
-* {{node:iron:mining}}
-
-**Recipes** ⏳
-* {{recipe:ironBar}}
-  `
-  },
-  {
-    title: 'Silver Ore',
-    category: ['Ore'],
-    content: `
-**Description**
-Silver is an uncommon ore found in the Underground and Caverns. It is rarer in [[Forest]] biomes.
-
-**Tier**
-{{node:silver:star}}
-
-**Main Location**
-* [[Caverns]] Top — all biomes, moderate density
-* [[Caverns]] Bottom — all biomes, small density
-* Rarer in [[Forest]].
-
-**Drops** ⏳
-* {{node:silver:mining}}
-
-**Recipes** ⏳
-* {{recipe:silverBar}}
-  `
-  },
-  {
-    title: 'Gold Ore',
-    category: ['Ore'],
-    content: `
-**Description**
-Gold is a rare ore found in the Caverns. It is rarer in [[Desert]] biomes.
-
-**Tier**
-{{node:gold:star}}
-
-**Main Location**
-* [[Caverns]] Top — all biomes, moderate density
-* [[Caverns]] Bottom — all biomes, small density
-* Rarer in [[Desert]].
-
-**Drops** ⏳
-* {{node:gold:mining}}
-
-**Recipes** ⏳
-* {{recipe:goldBar}}
-  `
-  },
-  {
-    title: 'Cobalt Ore',
-    category: ['Ore'],
-    content: `
-**Description**
-Cobalt is a rare ore found deep in the Caverns. It is rarer in [[Jungle]] biomes.
-
-**Tier**
-{{node:platinum:star}}
-
-**Main Location**
-* [[Caverns]] Top — all biomes, small density
-* [[Caverns]] Bottom — all biomes, moderate density
-* Rarer in [[Jungle]].
-
-
-**Drops** ⏳
-* {{node:cobalt:mining}}
-
-**Recipes** ⏳
-* {{recipe:cobaltBar}}
-  `
-  },
-  {
-    title: 'Platinum Ore',
-    category: ['Ore'],
-    content: `
-**Description**
-Platinum is the rarest metal ore in the world. It is found exclusively in the deepest part of the Caverns.
-
-**Main Location**
-* [[Caverns]] Bottom — all biomes, moderate density
-
-**Drops** ⏳
-* {{node:platinum:mining}}
-
-**Recipes** ⏳
-* {{recipe:platinumBar}}
-  `
-  },
-
   // ── Gems ──────────────────────────────────────────────────────
   //    Topaz, Ruby, Emerald, Sapphire
   {
@@ -1665,10 +1746,10 @@ Obsidian is a volcanic glass formed where lava meets water. It is one of the har
 
 **Mining** ⏳
 * {{node:obsidian:mining}}
-* Requires a tier 5 [[item:pickaxePt]] — applies to both natural and player-created Obsidian
+* Requires a tier 5 [[item:pickaxePlatinum]] — applies to both natural and player-created Obsidian
 
 **Creating Obsidian** ⏳
-* Equip a [[item:waterBottle]]
+* Equip a [[item:water]]
 * Click on an empty tile above a [[node:lava]] tile
 * An Obsidian block appears at the clicked location
 * _Warning : lava is extremely dangerous — keep your distance and act quickly._
@@ -2208,12 +2289,14 @@ Filled directly from a liquid source in the world. Used as tools to transport an
     title: 'Cabinets',
     category: ['Furniture'],
     content: `
+    48 slots
     `
   },
   {
     title: 'Closets',
     category: ['Furniture'],
     content: `
+    64 slots
     `
   },
   {
@@ -2235,6 +2318,7 @@ Filled directly from a liquid source in the world. Used as tools to transport an
     title: 'Chests',
     category: ['Tree'],
     content: `
+    56 slots
     `
   },
   // ── Life Potion ──────────────────────────────────────────────
@@ -2271,6 +2355,20 @@ Filled directly from a liquid source in the world. Used as tools to transport an
   {
     title: 'Bees',
     category: ['Monster'],
+    content: `
+    `
+  },
+
+  // ── Gameplay ─────────────────────────────────────────────────
+  {
+    title: 'Inventory',
+    category: ['Gameplay'],
+    content: `
+    `
+  },
+  {
+    title: 'World Creation',
+    category: ['Gameplay', 'World'],
     content: `
     `
   }

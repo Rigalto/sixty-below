@@ -32,7 +32,7 @@ export const NODES = {
   LAVA: {code: 4, name: 'Lava', type: NODE_TYPE.ETERNAL | NODE_TYPE.SOLID, star: 6, color: '#DC143C', image: null, help: 'Obsidian'},
   KHEPRITE: {code: 5, name: 'Kheprite', type: NODE_TYPE.ETERNAL | NODE_TYPE.SOLID, stype: 'block', star: 6, color: '#D4919A', image: null, help: 'Pyramid'},
   OLYMPITE: {code: 6, name: 'Olympite', type: NODE_TYPE.ETERNAL | NODE_TYPE.SOLID, stype: 'block', star: 6, color: '#C8D8E8', image: null, help: 'Lost Temple'},
-  ANTDIRT: {code: 7, name: 'Ant Dirt', type: NODE_TYPE.ETERNAL | NODE_TYPE.SOLID, stype: 'ant', star: 6, color: '#8B4513', image: null, help: 'Ant Hill material'},
+  ANTDIRT: {code: 7, name: 'Ant Dirt', type: NODE_TYPE.ETERNAL | NODE_TYPE.SOLID, stype: 'ant', star: 6, color: '#8B4513', image: null, help: 'Compacted Earth'},
 
   // ── Gaz ──────────────────────────────────────────────────────────────────────
   SKY: {code: 10, name: 'Sky', type: NODE_TYPE.GAZ, star: 0, color: 'none', image: null, help: null},
@@ -74,12 +74,12 @@ export const NODES = {
   SLATE: {code: 58, name: 'Slate', type: NODE_TYPE.SUBSTRAT, stype: 'block', star: 3, solid: true, color: '#2a3a4a', image: 'substrat_16_16+0', speed: 1600, mining: [{item: 'bkslate', count: 1}], help: 'Slate'},
 
   // ── Ore (gisement de minerais) ────────────────────────
-  COPPER: {code: 70, name: 'Copper Ore', type: NODE_TYPE.ORE, star: 1, solid: true, color: '#fe602f', image: 'ore_16_16+0', speed: 1000, mining: [{item: 'orcu', count: 1}], help: 'Copper Ore'},
-  IRON: {code: 71, name: 'Iron Ore', type: NODE_TYPE.ORE, star: 1, solid: true, color: '#af784d', image: 'ore_16_16+1', speed: 1100, mining: [{item: 'orfe', count: 1}], help: 'Iron Ore'},
-  SILVER: {code: 72, name: 'Silver Ore', type: NODE_TYPE.ORE, star: 2, solid: true, color: '#788696', image: 'ore_16_16+2', speed: 1200, mining: [{item: 'orag', count: 1}], help: 'Silver Ore'},
-  GOLD: {code: 73, name: 'Gold Ore', type: NODE_TYPE.ORE, star: 3, solid: true, color: '#ffaa33', image: 'ore_16_16+3', speed: 1400, mining: [{item: 'orau', count: 1}], help: 'Gold Ore'},
-  COBALT: {code: 74, name: 'Cobalt Ore', type: NODE_TYPE.ORE, star: 4, solid: true, color: '#2797ea', image: 'ore_16_16+4', speed: 1600, mining: [{item: 'orco', count: 1}], help: 'Cobalt Ore'},
-  PLATINUM: {code: 75, name: 'Platinum Ore', type: NODE_TYPE.ORE, star: 5, solid: true, color: '#25874d', image: 'ore_16_16+5', speed: 1800, mining: [{item: 'orpt', count: 1}], help: 'Platinum Ore'},
+  COPPER: {code: 70, name: 'Copper Ore', type: NODE_TYPE.ORE, star: 1, solid: true, color: '#fe602f', image: 'ore_16_16+0', speed: 1000, mining: [{item: 'orcu', count: 1}], help: 'Metals'},
+  IRON: {code: 71, name: 'Iron Ore', type: NODE_TYPE.ORE, star: 1, solid: true, color: '#af784d', image: 'ore_16_16+1', speed: 1100, mining: [{item: 'orfe', count: 1}], help: 'Metals'},
+  SILVER: {code: 72, name: 'Silver Ore', type: NODE_TYPE.ORE, star: 2, solid: true, color: '#788696', image: 'ore_16_16+2', speed: 1200, mining: [{item: 'orag', count: 1}], help: 'Metals'},
+  GOLD: {code: 73, name: 'Gold Ore', type: NODE_TYPE.ORE, star: 3, solid: true, color: '#ffaa33', image: 'ore_16_16+3', speed: 1400, mining: [{item: 'orau', count: 1}], help: 'Metals'},
+  COBALT: {code: 74, name: 'Cobalt Ore', type: NODE_TYPE.ORE, star: 4, solid: true, color: '#2797ea', image: 'ore_16_16+4', speed: 1600, mining: [{item: 'orco', count: 1}], help: 'Metals'},
+  PLATINUM: {code: 75, name: 'Platinum Ore', type: NODE_TYPE.ORE, star: 5, solid: true, color: '#25874d', image: 'ore_16_16+5', speed: 1800, mining: [{item: 'orpt', count: 1}], help: 'Metals'},
 
   // ── Gem (gisement de pierres précieuses) ────────────────────────
   TOPAZ: {code: 80, name: 'Topaz Deposit', type: NODE_TYPE.GEM, star: 2, solid: true, color: '#788696', image: 'gem_16_16+0', speed: 900, mining: [{item: 'topaz', count: 1}], help: 'Topaz Deposit'},
@@ -132,7 +132,7 @@ export const NODES_LOOKUP = []
 // sa nature (ce qu'il est) : 'FURNITURE', 'WALL', ...
 // les actions qui peuvent être conduite dessus : 'CRAFTING' (à renommer), 'USABLE', 'PLACABLE', 'UNDELETABLE', 'CRAFTABLLE', 'REMOVABLE', 'AMMUNITION'...
 export const ITEM_TYPE = {
-  FURNITURE: 0x1, TOOL: 0x2, MATERIAL: 0x4, FOOD: 0x08, BLOCK: 0x10, WALL: 0x20, MECHANISM: 0x40, AMMUNITION: 0x80, ORE: 0x100, ARMOR: 0x200, BAR: 0x400, WEAPON: 0x800, CRAFTABLE: 0x1000, ACCESSORY: 0x2000, GEM: 0x4000, POTION: 0x8000, SEMABLE: 0x10000, BAG: 0x20000, BAIT: 0x40000, USABLE: 0x80000, PLACABLE: 0x100000, UNIQUE: 0x200000, DISPOSABLE: 0x400000, NONE: 0
+  FURNITURE: 0x1, TOOL: 0x2, MATERIAL: 0x4, FOOD: 0x08, BLOCK: 0x10, WALL: 0x20, MECHANISM: 0x40, AMMUNITION: 0x80, CHUNK: 0x100, ARMOR: 0x200, BAR: 0x400, WEAPON: 0x800, CRAFTABLE: 0x1000, ACCESSORY: 0x2000, GEM: 0x4000, POTION: 0x8000, SEMABLE: 0x10000, BAG: 0x20000, BAIT: 0x40000, USABLE: 0x80000, PLACABLE: 0x100000, UNIQUE: 0x200000, DISPOSABLE: 0x400000, NONE: 0
 }
 
 // MATERIAL: objet utilisé comme ingrédient dans au moins une recette
@@ -151,8 +151,31 @@ export const ITEM_TYPE = {
 // drop lorsque l'on abat complètement un Giant Mushroom
 
 export const ITEMS = {
+
+  // Chunks
+  chunkCopper: {name: 'Copper Chunk', type: ITEM_TYPE.MATERIAL, star: 1, stype: 'chunk', image: 'blocks_16_16-0-0', help: 'Metals', tooltip: 'Primary crafting materials crafted into bars at a Furnace'},
+  chunkIron: {name: 'Iron Chunk', type: ITEM_TYPE.MATERIAL, star: 2, stype: 'chunk', image: 'blocks_16_16-0-0', help: 'Metals', tooltip: 'Primary crafting materials crafted into bars at a Furnace'},
+  chunkSilver: {name: 'Silver Chunk', type: ITEM_TYPE.MATERIAL, star: 3, stype: 'chunk', image: 'blocks_16_16-0-0', help: 'Metals', tooltip: 'Primary crafting materials crafted into bars at a Furnace'},
+  chunkGold: {name: 'Gold Chunk', type: ITEM_TYPE.MATERIAL, star: 3, stype: 'chunk', image: 'blocks_16_16-0-0', help: 'Metals', tooltip: 'Primary crafting materials crafted into bars at a Furnace'},
+  chunkCobalt: {name: 'Cobalt Chunk', type: ITEM_TYPE.MATERIAL, star: 4, stype: 'chunk', image: 'blocks_16_16-0-0', help: 'Metals', tooltip: 'Primary crafting materials crafted into bars at a Furnace'},
+  chunkPlatinum: {name: 'Platinum Chunk', type: ITEM_TYPE.MATERIAL, star: 5, stype: 'chunk', image: 'blocks_16_16-0-0', help: 'Metals', tooltip: 'Primary crafting materials crafted into bars at a Furnace'},
+
+  // Bars
+  barCopper: {name: 'Copper Bar', type: ITEM_TYPE.MATERIAL | ITEM_TYPE.CRAFTABLE, star: 1, stype: 'bar', image: 'blocks_16_16-0-0', help: 'Metals', tooltip: 'Crafting material used to craft tools, weapons, armor, and other items'},
+  barIron: {name: 'Iron Bar', type: ITEM_TYPE.MATERIAL | ITEM_TYPE.CRAFTABLE, star: 2, stype: 'bar', image: 'blocks_16_16-0-0', help: 'Metals', tooltip: 'Crafting material used to craft tools, weapons, armor, and other items'},
+  barSilver: {name: 'Silver Bar', type: ITEM_TYPE.MATERIAL | ITEM_TYPE.CRAFTABLE, star: 3, stype: 'bar', image: 'blocks_16_16-0-0', help: 'Metals', tooltip: 'Crafting material used to craft tools, weapons, armor, and other items'},
+  barGold: {name: 'Gold Bar', type: ITEM_TYPE.MATERIAL | ITEM_TYPE.CRAFTABLE, star: 3, stype: 'bar', image: 'blocks_16_16-0-0', help: 'Metals', tooltip: 'Crafting material used to craft tools, weapons, armor, and other items'},
+  barCobalt: {name: 'Cobalt Bar', type: ITEM_TYPE.MATERIAL | ITEM_TYPE.CRAFTABLE, star: 4, stype: 'bar', image: 'blocks_16_16-0-0', help: 'Metals', tooltip: 'Crafting material used to craft tools, weapons, armor, and other items'},
+  barPlatinum: {name: 'Platinum Bar', type: ITEM_TYPE.MATERIAL | ITEM_TYPE.CRAFTABLE, star: 5, stype: 'bar', image: 'blocks_16_16-0-0', help: 'Metals', tooltip: 'Crafting material used to craft tools, weapons, armor, and other items'},
+
   // pickaxes
-  pickaxeCopper: {name: 'Copper Pickaxe', type: ITEM_TYPE.TOOL | ITEM_TYPE.MATERIAL, stype: 'pickaxe', star: 2, image: 'tools_32_32-4-0', placedright: 'w_42_42-0-0', placedleft: 'w_42_42-0-1', speed: 0, help: 'Pickaxes', tooltip: 'Tools used to remove blocks, converting them to item form', mining: 1, hitbox: {front: 3, top: 2, bottom: 2, back: 0, location: 'front', minAngle: -95, maxAngle: 95}},
+  pickaxeCopper: {name: 'Copper Pickaxe', type: ITEM_TYPE.TOOL | ITEM_TYPE.MATERIAL, stype: 'pickaxe', star: 2, image: 'tools_32_32-4-0', placedright: 'w_42_42-0-0', placedleft: 'w_42_42-0-1', speed: 0, help: 'Pickaxes', tooltip: 'Tools used to remove blocks, converting them to item form'},
+  pickaxeIron: {name: 'Iron Pickaxe', type: ITEM_TYPE.TOOL | ITEM_TYPE.MATERIAL, stype: 'pickaxe', star: 2, image: 'tools_32_32-4-0', placedright: 'w_42_42-0-0', placedleft: 'w_42_42-0-1', speed: 0, help: 'Pickaxes', tooltip: 'Tools used to remove blocks, converting them to item form'},
+  pickaxeSilver: {name: 'Silver Pickaxe', type: ITEM_TYPE.TOOL | ITEM_TYPE.MATERIAL, stype: 'pickaxe', star: 3, image: 'tools_32_32-4-0', placedright: 'w_42_42-0-0', placedleft: 'w_42_42-0-1', speed: 0, help: 'Pickaxes', tooltip: 'Tools used to remove blocks, converting them to item form'},
+  pickaxeGold: {name: 'Gold Pickaxe', type: ITEM_TYPE.TOOL | ITEM_TYPE.MATERIAL, stype: 'pickaxe', star: 3, image: 'tools_32_32-4-0', placedright: 'w_42_42-0-0', placedleft: 'w_42_42-0-1', speed: 0, help: 'Pickaxes', tooltip: 'Tools used to remove blocks, converting them to item form'},
+  pickaxeCobalt: {name: 'Cobalt Pickaxe', type: ITEM_TYPE.TOOL | ITEM_TYPE.MATERIAL, stype: 'pickaxe', star: 4, image: 'tools_32_32-4-0', placedright: 'w_42_42-0-0', placedleft: 'w_42_42-0-1', speed: 0, help: 'Pickaxes', tooltip: 'Tools used to remove blocks, converting them to item form'},
+  pickaxePlatinum: {name: 'Platinum Pickaxe', type: ITEM_TYPE.TOOL | ITEM_TYPE.MATERIAL, stype: 'pickaxe', star: 4, image: 'tools_32_32-4-0', placedright: 'w_42_42-0-0', placedleft: 'w_42_42-0-1', speed: 0, help: 'Pickaxes', tooltip: 'Tools used to remove blocks, converting them to item form'},
+  pickaxeBone: {name: 'Bone Pickaxe', type: ITEM_TYPE.TOOL | ITEM_TYPE.MATERIAL, stype: 'pickaxe', star: 4, image: 'tools_32_32-4-0', placedright: 'w_42_42-0-0', placedleft: 'w_42_42-0-1', speed: 0, help: 'Pickaxes', tooltip: 'Tools used to remove blocks, converting them to item form'},
 
   // hammers
   hammerCopper: {name: 'Copper Hammer', type: ITEM_TYPE.TOOL | ITEM_TYPE.MATERIAL, stype: 'hammer', star: 2, image: 'tools_32_32-4-0', placedright: 'w_42_42-0-0', placedleft: 'w_42_42-0-1', speed: 0, help: 'Hammers', tooltip: 'Tools used to remove wall, furniture, workstation, converting them to item form'},
@@ -176,11 +199,11 @@ export const ITEMS = {
   triskelAncient: {name: 'Ancient Triskel', type: ITEM_TYPE.ACCESSORY | ITEM_TYPE.UNIQUE | ITEM_TYPE.CRAFTABLE, stype: 'triskel', star: 5, image: 'furniture_32_32-12-2', placed: 'furniture_32_32-6-3', help: 'Triskels', tooltip: ''},
 
   // Tombstone
-  tomb: {name: 'Tombstone', type: ITEM_TYPE.FURNITURE, stype: 'tomb', star: 1, undisposable: true, image: 'furniture_32_32-13-2', placed: 'fuws_32_32-3-4', help: 'Tombstone', tooltip: 'Summons specific enemies'},
-  tombHead: {name: 'Headstone', type: ITEM_TYPE.FURNITURE, stype: 'tomb', star: 1, undisposable: true, image: 'furniture_32_32-4-8', placed: 'fuws_32_32-4-4', help: 'Tombstone', tooltip: 'Summons specific enemies'},
-  tombGrave: {name: 'Gravestone', type: ITEM_TYPE.FURNITURE, stype: 'tomb', star: 1, undisposable: true, image: 'furniture_32_32-5-8', placed: 'fuws_32_32-5-4', help: 'Tombstone', tooltip: 'Summons specific enemies'},
-  tombStrange: {name: 'Strange Looking Tombstone', type: ITEM_TYPE.FURNITURE, star: 1, stype: 'tomb', undisposable: true, image: 'furniture_32_32-6-8', placed: 'fuws_32_32-6-4', help: 'Tombstone', tooltip: 'Summons specific enemies'},
-  tombCross: {name: 'Cross Tombstone', type: ITEM_TYPE.FURNITURE, stype: 'tomb', star: 1, undisposable: true, image: 'furniture_32_32-7-8', placed: 'fuws_32_32-7-4', help: 'Tombstone', tooltip: 'Summons specific enemies'},
+  tomb: {name: 'Tombstone', type: ITEM_TYPE.FURNITURE, stype: 'tomb', star: 1, undisposable: true, image: 'furniture_32_32-13-2', placed: 'fuws_32_32-3-4', help: 'Graveyard', tooltip: 'Summons specific enemies'},
+  tombHead: {name: 'Headstone', type: ITEM_TYPE.FURNITURE, stype: 'tomb', star: 1, undisposable: true, image: 'furniture_32_32-4-8', placed: 'fuws_32_32-4-4', help: 'Graveyard', tooltip: 'Summons specific enemies'},
+  tombGrave: {name: 'Gravestone', type: ITEM_TYPE.FURNITURE, stype: 'tomb', star: 1, undisposable: true, image: 'furniture_32_32-5-8', placed: 'fuws_32_32-5-4', help: 'Graveyard', tooltip: 'Summons specific enemies'},
+  tombStrange: {name: 'Strange Looking Tombstone', type: ITEM_TYPE.FURNITURE, star: 1, stype: 'tomb', undisposable: true, image: 'furniture_32_32-6-8', placed: 'fuws_32_32-6-4', help: 'Graveyard', tooltip: 'Summons specific enemies'},
+  tombCross: {name: 'Cross Tombstone', type: ITEM_TYPE.FURNITURE, stype: 'tomb', star: 1, undisposable: true, image: 'furniture_32_32-7-8', placed: 'fuws_32_32-7-4', help: 'Graveyard', tooltip: 'Summons specific enemies'},
 
   // Wood furniture set
   chairWood: {name: 'Wooden Chair', type: ITEM_TYPE.FURNITURE | ITEM_TYPE.PLACABLE, stype: 'chair', star: 1, image: 'furniture_32_32-0-5', placedLeft: 'fuws_16_48-1-0', placedRight: 'fuws_16_48-2-0', help: 'Chairs', tooltip: '???', furnitureSet: 'wood', comfort: true},
@@ -194,7 +217,6 @@ export const ITEMS = {
   doorGlass: {name: 'Glass Door', type: ITEM_TYPE.FURNITURE | ITEM_TYPE.PLACABLE, stype: 'door', star: 1, furnitureSet: 'glass', image: 'furniture_32_32-0-6', placed: 'fuws_16_48-0-0', placedLeft: 'fuws_32_48-0-0', placedRight: 'fuws_32_48-0-1', help: 'Doors', tooltip: 'Furniture that prevent enemies from entering an area when closed'},
 
   // chests (56 slots)
-  chestAncient: {name: 'Ancient Chest', type: ITEM_TYPE.FURNITURE | ITEM_TYPE.PLACABLE, stype: 'chest', star: 2, capacity: 56, image: 'furniture_32_32-0-1', placed: 'fuws_32_32-0-1', help: 'Chests', tooltip: 'Items container'},
   // Sea Chests
   oceanChest: {name: 'Water Chest', type: ITEM_TYPE.FURNITURE | ITEM_TYPE.PLACABLE, stype: 'chest', star: 1, capacity: 56, image: 'furniture_32_32-6-1', placed: 'fuws_32_32-6-1', help: 'Chests', tooltip: 'Items container'},
   // Surface Chests
@@ -210,12 +232,13 @@ export const ITEMS = {
   desertChest: {name: 'Desert Chest', type: ITEM_TYPE.FURNITURE | ITEM_TYPE.PLACABLE, stype: 'chest', star: 4, capacity: 56, image: 'furniture_32_32-5-1', placed: 'fuws_32_32-5-1', help: 'Chests', tooltip: 'Items container'},
   jungleChest: {name: 'Jungle Chest', type: ITEM_TYPE.FURNITURE | ITEM_TYPE.PLACABLE, stype: 'chest', star: 4, capacity: 56, image: 'furniture_32_32-4-1', placed: 'fuws_32_32-4-1', help: 'Chests', tooltip: 'Items container'},
   // Autres Chests
-  boletechest: {name: 'Mushroom Chest', type: ITEM_TYPE.FURNITURE | ITEM_TYPE.PLACABLE, stype: 'chest', capacity: 56, star: 4, key: 'junglekey', sell: 15500, image: 'furniture_32_32-7-1', placed: 'fuws_32_32-7-1', locked: 'fuws_32_32-6-2', help: 'Chests', tooltip: 'Items container'},
-  cobwebchest: {name: 'Web Covered Chest', type: ITEM_TYPE.FURNITURE | ITEM_TYPE.PLACABLE, stype: 'chest', capacity: 56, star: 1, key: 'desertkey', sell: 800, image: 'furniture_32_32-0-2', placed: 'fuws_32_32-0-2', locked: 'fuws_32_32-6-2', help: 'Chests', tooltip: 'Items container'},
-  nitechest: {name: 'Granite Chest', type: ITEM_TYPE.FURNITURE | ITEM_TYPE.PLACABLE, stype: 'chest', capacity: 56, star: 4, key: 'strongkey', sell: 7200, image: 'furniture_32_32-1-2', placed: 'fuws_32_32-1-2', locked: 'fuws_32_32-6-2', help: 'Chests', tooltip: 'Items container'},
-  rblechest: {name: 'Marble Chest', type: ITEM_TYPE.FURNITURE | ITEM_TYPE.PLACABLE, stype: 'chest', capacity: 56, star: 4, key: 'strongkey', sell: 7200, image: 'furniture_32_32-2-2', placed: 'fuws_32_32-2-2', locked: 'fuws_32_32-6-2', help: 'Chests', tooltip: 'Items container'},
-  ashchest: {name: 'Shadow Chest', type: ITEM_TYPE.FURNITURE | ITEM_TYPE.PLACABLE, stype: 'chest', capacity: 56, star: 5, key: 'shadowkey', sell: 26600, image: 'furniture_32_32-3-2', placed: 'fuws_32_32-3-2', locked: 'fuws_32_32-6-2', help: 'Chests', tooltip: 'Items container'},
-  piratchest: {name: 'Golden Chest', type: ITEM_TYPE.FURNITURE | ITEM_TYPE.PLACABLE, stype: 'chest', capacity: 56, star: 1, key: 'piratekey', sell: 800, image: 'furniture_32_32-4-2', placed: 'fuws_32_32-4-2', locked: 'fuws_32_32-6-2', help: 'Chests', tooltip: 'Items container'},
+  chestAncient: {name: 'Ancient Chest', type: ITEM_TYPE.FURNITURE | ITEM_TYPE.PLACABLE, stype: 'chest', star: 2, capacity: 56, image: 'furniture_32_32-0-1', placed: 'fuws_32_32-0-1', help: 'Chests', tooltip: 'Items container'},
+  // boletechest: {name: 'Mushroom Chest', type: ITEM_TYPE.FURNITURE | ITEM_TYPE.PLACABLE, stype: 'chest', capacity: 56, star: 4, key: 'junglekey', sell: 15500, image: 'furniture_32_32-7-1', placed: 'fuws_32_32-7-1', locked: 'fuws_32_32-6-2', help: 'Chests', tooltip: 'Items container'},
+  // cobwebchest: {name: 'Web Covered Chest', type: ITEM_TYPE.FURNITURE | ITEM_TYPE.PLACABLE, stype: 'chest', capacity: 56, star: 1, key: 'desertkey', sell: 800, image: 'furniture_32_32-0-2', placed: 'fuws_32_32-0-2', locked: 'fuws_32_32-6-2', help: 'Chests', tooltip: 'Items container'},
+  // nitechest: {name: 'Granite Chest', type: ITEM_TYPE.FURNITURE | ITEM_TYPE.PLACABLE, stype: 'chest', capacity: 56, star: 4, key: 'strongkey', sell: 7200, image: 'furniture_32_32-1-2', placed: 'fuws_32_32-1-2', locked: 'fuws_32_32-6-2', help: 'Chests', tooltip: 'Items container'},
+  // rblechest: {name: 'Marble Chest', type: ITEM_TYPE.FURNITURE | ITEM_TYPE.PLACABLE, stype: 'chest', capacity: 56, star: 4, key: 'strongkey', sell: 7200, image: 'furniture_32_32-2-2', placed: 'fuws_32_32-2-2', locked: 'fuws_32_32-6-2', help: 'Chests', tooltip: 'Items container'},
+  // ashchest: {name: 'Shadow Chest', type: ITEM_TYPE.FURNITURE | ITEM_TYPE.PLACABLE, stype: 'chest', capacity: 56, star: 5, key: 'shadowkey', sell: 26600, image: 'furniture_32_32-3-2', placed: 'fuws_32_32-3-2', locked: 'fuws_32_32-6-2', help: 'Chests', tooltip: 'Items container'},
+  // piratchest: {name: 'Golden Chest', type: ITEM_TYPE.FURNITURE | ITEM_TYPE.PLACABLE, stype: 'chest', capacity: 56, star: 1, key: 'piratekey', sell: 800, image: 'furniture_32_32-4-2', placed: 'fuws_32_32-4-2', locked: 'fuws_32_32-6-2', help: 'Chests', tooltip: 'Items container'},
 
   // cabinet (48 slots)
 
