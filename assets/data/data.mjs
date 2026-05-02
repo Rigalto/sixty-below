@@ -151,6 +151,21 @@ export const ITEM_TYPE = {
 // drop lorsque l'on abat complètement un Giant Mushroom
 
 export const ITEMS = {
+  // pickaxes
+  pickaxeCopper: {name: 'Copper Pickaxe', type: ITEM_TYPE.TOOL | ITEM_TYPE.MATERIAL, stype: 'pickaxe', star: 2, image: 'tools_32_32-4-0', placedright: 'w_42_42-0-0', placedleft: 'w_42_42-0-1', speed: 0, help: 'Pickaxes', tooltip: 'Tools used to remove blocks, converting them to item form', mining: 1, hitbox: {front: 3, top: 2, bottom: 2, back: 0, location: 'front', minAngle: -95, maxAngle: 95}},
+
+  // hammers
+  hammerCopper: {name: 'Copper Hammer', type: ITEM_TYPE.TOOL | ITEM_TYPE.MATERIAL, stype: 'hammer', star: 2, image: 'tools_32_32-4-0', placedright: 'w_42_42-0-0', placedleft: 'w_42_42-0-1', speed: 0, help: 'Hammers', tooltip: 'Tools used to remove wall, furniture, workstation, converting them to item form'},
+
+  // Axes
+  axeCopper: {name: 'Copper Axe', type: ITEM_TYPE.TOOL | ITEM_TYPE.WEAPON | ITEM_TYPE.MATERIAL, stype: 'axe', star: 2, image: 'tools_32_32-4-0', placedright: 'w_42_42-0-0', placedleft: 'w_42_42-0-1', speed: 0, help: 'Axes', tooltip: 'Basic tools used to chop trees. Can be used as a slow weapon'},
+
+  // Swords
+  swordCopper: {name: 'Copper Sword', type: ITEM_TYPE.WEAPON | ITEM_TYPE.MATERIAL, stype: 'axe', star: 2, image: 'tools_32_32-4-0', placedright: 'w_42_42-0-0', placedleft: 'w_42_42-0-1', speed: 0, help: 'Swords', tooltip: 'Melee weapon'},
+
+  // Bows
+  bowCopper: {name: 'Copper Bow', type: ITEM_TYPE.WEAPON | ITEM_TYPE.MATERIAL, stype: 'bow', star: 2, image: 'tools_32_32-4-0', placedright: 'w_42_42-0-0', placedleft: 'w_42_42-0-1', speed: 0, help: 'Bows', tooltip: 'Range weapon'},
+
   // crystall
   lifeCrystal: {name: 'Life Crystal', type: ITEM_TYPE.FURNITURE | ITEM_TYPE.UNIQUE | ITEM_TYPE.USABLE, stype: 'life', star: 1, image: 'furniture_32_32-12-2', placed: 'furniture_32_32-6-3', help: 'Life Crystal', tooltip: 'Permanently increases maximum life by 20\nCollect with a Hammer'},
 
@@ -178,7 +193,7 @@ export const ITEMS = {
   toiletGlass: {name: 'Glass Toilet', type: ITEM_TYPE.FURNITURE | ITEM_TYPE.PLACABLE, stype: 'toilet', star: 1, image: 'furniture_32_32-0-5', placed: 'fuws_16_48-2-0', help: 'Toilets', tooltip: '???', furnitureSet: 'glass', comfort: true},
   doorGlass: {name: 'Glass Door', type: ITEM_TYPE.FURNITURE | ITEM_TYPE.PLACABLE, stype: 'door', star: 1, furnitureSet: 'glass', image: 'furniture_32_32-0-6', placed: 'fuws_16_48-0-0', placedLeft: 'fuws_32_48-0-0', placedRight: 'fuws_32_48-0-1', help: 'Doors', tooltip: 'Furniture that prevent enemies from entering an area when closed'},
 
-  // chests
+  // chests (56 slots)
   chestAncient: {name: 'Ancient Chest', type: ITEM_TYPE.FURNITURE | ITEM_TYPE.PLACABLE, stype: 'chest', star: 2, capacity: 56, image: 'furniture_32_32-0-1', placed: 'fuws_32_32-0-1', help: 'Chests', tooltip: 'Items container'},
   // Sea Chests
   oceanChest: {name: 'Water Chest', type: ITEM_TYPE.FURNITURE | ITEM_TYPE.PLACABLE, stype: 'chest', star: 1, capacity: 56, image: 'furniture_32_32-6-1', placed: 'fuws_32_32-6-1', help: 'Chests', tooltip: 'Items container'},
@@ -201,6 +216,10 @@ export const ITEMS = {
   rblechest: {name: 'Marble Chest', type: ITEM_TYPE.FURNITURE | ITEM_TYPE.PLACABLE, stype: 'chest', capacity: 56, star: 4, key: 'strongkey', sell: 7200, image: 'furniture_32_32-2-2', placed: 'fuws_32_32-2-2', locked: 'fuws_32_32-6-2', help: 'Chests', tooltip: 'Items container'},
   ashchest: {name: 'Shadow Chest', type: ITEM_TYPE.FURNITURE | ITEM_TYPE.PLACABLE, stype: 'chest', capacity: 56, star: 5, key: 'shadowkey', sell: 26600, image: 'furniture_32_32-3-2', placed: 'fuws_32_32-3-2', locked: 'fuws_32_32-6-2', help: 'Chests', tooltip: 'Items container'},
   piratchest: {name: 'Golden Chest', type: ITEM_TYPE.FURNITURE | ITEM_TYPE.PLACABLE, stype: 'chest', capacity: 56, star: 1, key: 'piratekey', sell: 800, image: 'furniture_32_32-4-2', placed: 'fuws_32_32-4-2', locked: 'fuws_32_32-6-2', help: 'Chests', tooltip: 'Items container'},
+
+  // cabinet (48 slots)
+
+  // closet (64 slots)
 
   // crafting station
   tableWood: {name: 'Wooden Table', type: ITEM_TYPE.FURNITURE | ITEM_TYPE.PLACABLE, stype: 'station', star: 1, image: 'furniture_32_32-2-0', placed: 'fuws_48_32-1-0', help: 'Wooden Table', tooltip: 'A precision assembly requires a very flat surface.', furnitureSet: 'wood', surface: true},
@@ -248,6 +267,7 @@ export const ITEMS = {
   bucketHoney: {name: 'Honey Bucket', type: ITEM_TYPE.FURNITURE | ITEM_TYPE.PLACABLE | ITEM_TYPE.TOOL | ITEM_TYPE.MATERIAL, stype: 'tableware', star: 2, image: 'furniture_32_32-12-0', placed: 'fuws_32_32-7-0', help: 'Buckets', tooltip: 'Amount of honey. Can be poured ou'},
   bucketSap: {name: 'Sap Bucket', type: ITEM_TYPE.FURNITURE | ITEM_TYPE.PLACABLE | ITEM_TYPE.TOOL | ITEM_TYPE.MATERIAL, stype: 'tableware', star: 2, image: 'furniture_32_32-13-0', placed: 'fuws_32_32-0-3', help: 'Buckets', tooltip: 'Amount of lava. Can be poured ou'}
 }
+export const BAG_CAPACITY = 64
 
 /* ============================================================================
    4. RECIPES

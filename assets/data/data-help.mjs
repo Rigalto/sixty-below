@@ -1906,6 +1906,39 @@ Shell is a sedimentary material formed from ancient marine organisms. It is foun
     `
   },
 
+  // ── Activities Hamming  ─────────────────────────────────────
+  //    Axes
+  {
+    title: 'Hammers',
+    category: ['Tool'],
+    content: `
+    `
+  },
+
+  // ── Activities Chopping  ─────────────────────────────────────
+  //    Axes
+  {
+    title: 'Axes',
+    category: ['Tool'],
+    content: `
+    `
+  },
+
+  // ── Activities Fighting ──────────────────────────────────────
+  //    Swords, Bows
+  {
+    title: 'Swords',
+    category: ['Weapon'],
+    content: `
+    `
+  },
+  {
+    title: 'Bows',
+    category: ['Weapon'],
+    content: `
+    `
+  },
+
   // ── Crafting ─────────────────────────────────────────────────
   //    Crafting, Crafting Stations, Crafting Tree, Crafting Buffs
   {

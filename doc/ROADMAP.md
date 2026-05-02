@@ -35,7 +35,6 @@
 - Placement des coraux et plantes marines
 
 ### Ajout des artefacts et plantes
-- Ajout des coffres
 - Ajout des arbres (Oak, Mahogany, Giant Mushroom, Coconut)
 - Ajout de herbes
 - Ajout des arbustes (Cactus, bambou)
@@ -208,6 +207,7 @@
 - `WorldCarver.digAnthills` — Forest, surface, structure conique ANTDIRT + VOID
 - `WorldCarver.reserveTermiteMounds`, `WorldCarver.buildTermiteMounds` — Jungle, surface, structure rectangulaire ANTDIRT + VOID
 - `TileGuard` — utilitaire de protection tuiles contre creusement, formes bruitées (cercle, ellipse, rectangle)
+- `furnitureGenerator.place...Chests` - ajout des coffres
 
 ### Rendu (partiel)
 - `WorldRenderer` — rendu tuiles par chunks avec cache OffscreenCanvas
