@@ -74,8 +74,11 @@ Mining drops: {{node:{3}:mining}}
   `,
   // templates réels en dessous
 
-  mineableRow: '| {1} | [[node:{2}]]| {{node:{2}:star}} | {{node:{2}:mining:0:item:name}} | {{node:{2}:speed}} |'
-
+  mineableRow: '| {1} | [[node:{2}]]| {{node:{2}:star}} | {{node:{2}:mining:0:item:name}} | {{node:{2}:speed}} |',
+  metalChunksRow: '| [[node:{1}]] | [[item:{2}]] | {{item:{2}:star}} | [[item:{3}]] | {{item:{3}:star}} |',
+  metalBarsRow: '| [[item:{1}]] | {{item:{1}:star}} | [[Smelting|Furnace]] | [[item:{2}]] | {{item:{2}:star}} |',
+  gemRawRow: '| [[node:{1}]] | [[item:{2}]] | {{item:{2}:star}} | [[item:{3}]] | {{item:{3}:star}} |',
+  gemCutRow: '| [[item:{1}]] | {{item:{1}:star}} | [[Smelting|Furnace]] | [[item:{2}]] | {{item:{2}:star}} |'
 }
 
 /* ====================================================================================================
@@ -169,7 +172,6 @@ The Underground layer begins just below the surface. It is darker, more dangerou
 
 **Resources**
 * [[item:chunkCopper]], [[item:chunkIron]], [[item:chunkSilver]] — common
-* [[item:topaz]], [[item:ruby]], [[item:emerald]] — rare ⏳
 
 **Mini-biomes**
 * [[Fern Cave]] — Forest
@@ -205,11 +207,12 @@ The Caverns are the deepest accessible layer, divided into two sub-layers : Cave
 **Materials**
 * [[node:hardstone]], [[node:slate]] — all biomes
 * [[node:hellstone]] — Jungle, rare in other biomes
+* [[node:granite]], [[node:marble]] — [[Geode Cave]]s
 
 **Resources**
 * [[item:chunkGold]], [[item:chunkCobalt]], [[item:chunkPlatinum]] — rare to very rare
-* [[item:sapphire]], [[item:emerald]] — very rare
-* [[node:granite]], [[node:marble]] — Geode Caves
+* [[item:rawTopaz]], [[item:rawRuby]], [[item:rawEmerald]], [[item:rawSapphire]] — rare to very rare⏳
+* [[item:blockGranite]], [[item:blockMarble]] — [[Geode Cave]]s
 
 **Mini-biomes**
 * [[Mushroom Cave]] — Forest, Caverns Top
@@ -253,7 +256,7 @@ The Forest is the starting biome, located at the center of the world. It is the 
 
 **Resources**
 * [[Metals|Chunks]]: [[item:chunkCopper]], [[item:chunkIron]], [[item:chunkSilver]], [[item:chunkGold]], [[item:chunkCobalt]], [[item:chunkPlatinum]]
-* Gems: [[item:topaz]], [[item:sapphire]]
+* Gems: [[item:rawTopaz]], [[item:rawSapphire]]
 * Topsoil: [[node:dirt]], [[node:humus]]
 
 **Mini-biomes**
@@ -287,7 +290,7 @@ The Desert biome is characterized by its sandy terrain and arid atmosphere. It c
 
 **Resources**
 * [[Metals|Chunks]]: [[item:chunkCopper]], [[item:chunkIron]], [[item:chunkSilver]], [[item:chunkGold]], [[item:chunkCobalt]], [[item:chunkPlatinum]]
-* Gems: [[item:ruby]], [[item:sapphire]]
+* Gems: [[item:rawRuby]], [[item:rawSapphire]]
 * Topsoil: [[node:sand]], [[node:silt]]
 
 **Mini-biomes**
@@ -324,7 +327,7 @@ The Jungle is a lush, dangerous biome teeming with life. It features unique liqu
 
 **Resources**
 * [[Metals|Chunks]]: [[item:chunkCopper]], [[item:chunkIron]], [[item:chunkSilver]], [[item:chunkGold]], [[item:chunkCobalt]], [[item:chunkPlatinum]]
-* Gems: [[item:emerald]], [[item:sapphire]]
+* Gems: [[item:rawEmerald]], [[item:rawSapphire]]
 * Topsoil: [[node:silt]], [[node:humus]]
 * Liquid: [[node:sap]] — found in Sap Lakes and Sap Pockets
 * [[Bees]] product: [[node:honey], [[node:hive] — found in [[Hive]]s
@@ -607,7 +610,7 @@ The Ancient House is a large desert dwelling buried deep in [[Desert]] biomes. U
 
 **Furnitures** ⏳
 * Roof : [[Crafting Stations]] and decorative furnitures
-* Floor : [[item:brokenTransmutator]]
+* Floor : [[item:transmutator]]
 * Ground floor : [[Crafting Stations]], [[Chests]] and decorative furnitures
 
 **The Transmutator** ⏳
@@ -617,7 +620,7 @@ The Ancient House is a large desert dwelling buried deep in [[Desert]] biomes. U
 
 **Housing** ⏳
 * The Ancient House is large enough to serve as a player home
-* Place a [[item:housingBoard]] to activate the [[Housing Buffs]] system
+* Place a [[item:noticeBoard]] to activate the [[Housing Buffs]] system
 
 **Tips**
 * _The Ancient House is the largest structure in the game — explore every corner._ ⏳
@@ -831,6 +834,7 @@ Despite the nuisance they represent, cobwebs are one of the most valuable resour
 
 **Collection** ⏳
 * Mine with any [[Pickaxes]] — drops [[item:silk]]
+* Deleted with a [[item:flamethrower]] - No loot
 
 **Crafting chain**
 * [[item:silk]] → [[item:fabric]] — craft at [[item:loom]] ⏳
@@ -868,7 +872,7 @@ Cobweb Caves are caverns densely packed with spider webs. They are found in all 
 
 **Loot** ⏳
 * [[item:silk]] — abundant
-* [[item:spideregg]] — rare drop ⏳
+* [[item:spiderEgg]] — rare drop ⏳
 * [[item:spiderFang]] — rare drop ⏳
 * Chest — tier 3-4 depending on layer ⏳
 
@@ -896,8 +900,7 @@ Geode Caves are elliptical caverns lined with crystals of [[node:granite]] or [[
 * [[monster:rockborer]] — boss
 
 **Loot** ⏳
-* [[item:granite]] and [[item:marble]] — abundant from walls
-* Chest — tier 4-5 ⏳
+* [[Mining]] : [[item:blockGranite]] and [[item:blockMarble]] — abundant from walls
 
 **Tips**
 * _Geode Caves always contain either Granite or Marble — never both._
@@ -1574,13 +1577,26 @@ Metal chunks are placed in your [[Inventory]] when mined with a [[Pickaxes||Pick
 
 | Ore | Chunk | Chunk Tier | Pickaxe | Pickaxe Tier |
 |---|---|---|---|---|
-| [[node:platinum]] | [[item:chunkPlatinum]] | {{item:chunkPlatinum:star}} | [[item:pickaxeCopper]] | {{item:pickaxeCopper:star}} |
+{{metalChunksRow|copper|chunkCopper|pickaxeCopper}}
+{{metalChunksRow|iron|chunkIron|pickaxeCopper}}
+{{metalChunksRow|silver|chunkSilver|pickaxeIron}}
+{{metalChunksRow|gold|chunkGold|pickaxeSilver}}
+{{metalChunksRow|cobalt|chunkCobalt|pickaxeGold}}
+{{metalChunksRow|platinum|chunkPlatinum|pickaxeCobalt}}
 
 **Metal Bars**
 
 | Chunk | Chunk Tier | Crafting Station | Bar | Bar Tier |
 |---|---|---|---|---|
-| [[item:chunkPlatinum]] | {{item:chunkPlatinum:star}} | [[Smelting|Furnace]] | [[item:barPlatinum]] | {{item:barPlatinum:star}} |
+{{metalBarsRow|chunkCopper|barCopper}}
+{{metalBarsRow|chunkIron|barIron}}
+{{metalBarsRow|chunkSilver|barSilver}}
+{{metalBarsRow|chunkGold|barGold}}
+{{metalBarsRow|chunkCobalt|barCobalt}}
+{{metalBarsRow|chunkPlatinum|barPlatinum}}
+
+**Metal Bars Recipes** ⏳
+* {{recipe:shellPowder}}
 
 **Usages**
 
@@ -1598,136 +1614,112 @@ Metal chunks are placed in your [[Inventory]] when mined with a [[Pickaxes||Pick
 * _Platinum is extremely rare and only found in the deepest caverns._ ⏳
   `
   },
-  // ── Gems ──────────────────────────────────────────────────────
-  //    Topaz, Ruby, Emerald, Sapphire
+  // ── Gems ─────────────────────────────────────────────────────
+  //    Gems, Geode Stones
   {
-    title: 'Topaz Deposit',
-    category: ['Gem'],
+    title: 'Gems',
+    category: ['Crafting', 'Mining'],
     content: `
 **Description**
-Topaz is the most common gemstone, found in [[Forest]] biomes. Its warm golden hue makes it a sought-after crafting material.
+Gems are rare crafting materials found deep underground. Each gem exists in three forms : gem deposits (placed in the World), raw gem (dropped when mined) and cut gem (shaped at a [[Stonecutting||Stonecutter]]).
 
-**Tier**
-{{node:topaz:star}}
+**Forms & Transformation**
 
-**Main Location**
-* Biome: [[Forest]]
-* [[Caverns]] Top — moderate density
-* [[Caverns]] Bottom — small density
+| Form | How to obtain | Notes |
+|---|---|---|
+| Gem Deposit | Gem veins placed in the World | Not directly usable |
+| Raw Gem | Dropped when [[Mining]] deposits | Crafting ingredient |
+| Cut Gem | Cut raw gems at a [[Stonecutting||Stonecutter]] | Crafting ingredient |
 
-**Drops** ⏳
-* {{node:topaz:mining}}
+**Gem Deposits**
 
-**Recipes** ⏳
-* {{recipe:topaz}}
-  `
-  },
-  {
-    title: 'Ruby Deposit',
-    category: ['Gem'],
-    content: `
-**Description**
-Ruby is an uncommon gemstone found in [[Desert]] biomes. Its deep red color is associated with fire and heat.
+| Gem | Tier | Biome | Layer |
+|---|---|---|---|
+| [[node:topaz]] | {{node:topaz:star}} | [[Forest]] | [[Caverns]] |
+| [[node:ruby]] | {{node:ruby:star}} | [[Desert]] | [[Caverns]] |
+| [[node:emerald]] | {{node:emerald:star}} | [[Jungle]] | [[Caverns]] |
+| [[node:sapphire]] | {{node:sapphire:star}} | All biomes | [[Caverns]] Bottom |
 
-**Tier**
-{{node:ruby:star}}
+**Raw Gems**
 
-**Main Location**
-* Biome: [[Desert]]
-* [[Caverns]] Top — moderate density
-* [[Caverns]] Bottom — small density
+Raw gems are placed in your [[Inventory]] when mined with a [[Pickaxes||Pickaxe]].
 
-**Drops** ⏳
-* {{node:ruby:mining}}
+| Deposit | Raw Gem | Raw Gem Tier | Pickaxe | Pickaxe Tier |
+|---|---|---|---|---|
+{{gemRawRow|topaz|rawTopaz|pickaxeCopper}}
+{{gemRawRow|ruby|rawRuby|pickaxeCopper}}
+{{gemRawRow|emerald|rawEmerald|pickaxeIron}}
+{{gemRawRow|sapphire|rawSapphire|pickaxeSilver}}
 
-**Recipes** ⏳
-* {{recipe:ruby}}
-  `
-  },
-  {
-    title: 'Emerald Deposit',
-    category: ['Gem'],
-    content: `
-**Description**
-Emerald is a rare gemstone found in [[Jungle]] biomes. Its vivid green reflects the lush environment it comes from.
+**Raw Gems Recipes** ⏳
+* {{recipe:shellPowder}}
 
-**Tier**
-{{node:emerald:star}}
+**Cut Gems**
 
-**Main Location**
-* Biome: [[Jungle]]
-* [[Caverns]] Top — moderate density
-* [[Caverns]] Bottom — small density
+| Raw Gem | Raw Gem Tier | Crafting Station | Cut Gem | Cut Gem Tier |
+|---|---|---|---|---|
+{{gemCutRow|rawTopaz|Topaz}}
+{{gemCutRow|rawRuby|Ruby}}
+{{gemCutRow|rawEmerald|Emerald}}
+{{gemCutRow|rawSapphire|Sapphire}}
 
-**Drops** ⏳
-* {{node:emerald:mining}}
+**Usages**
 
-**Recipes** ⏳
-* {{recipe:emerald}}
-  `
-  },
-  {
-    title: 'Sapphire Deposit',
-    category: ['Gem'],
-    content: `
-**Description**
-Sapphire is the rarest gemstone, found in the deepest parts of all biomes. Its brilliant blue glow is visible even in complete darkness.
+| Gem | Equipment tier | Other uses |
+|---|---|---|
+| [[item:rawTopaz]] | {{item:rawTopaz:star}} — accessories, weapons | ⏳ |
+| [[item:rawRuby]] | {{item:rawRuby:star}} — accessories, weapons | ⏳ |
+| [[item:rawEmerald]] | {{item:rawEmerald:star}} — accessories, weapons | ⏳ |
+| [[item:rawSapphire]] | {{item:rawSapphire:star}} — accessories, weapons | ⏳ |
 
-**Tier**
-{{node:sapphire:star}}
-
-**Main Location**
-* Biome: all biomes
-* [[Caverns]] Bottom — small density
-
-**Drops** ⏳
-* {{node:sapphire:mining}}
-
-**Recipes** ⏳
-* {{recipe:sapphire}}
+**Tips**
+* _Gems are biome-specific — explore the right biome to find the gem you need._ ⏳
+* _Always bring a [[Pickaxes|Pickaxe]] strong enough to mine the gems of the layer you are exploring._ ⏳
   `
   },
 
   // ── Rocks ─────────────────────────────────────────────────────
-  //    Granite, Marble, Obsidian, Meteorite, Hive, Shell
+  //    Geode Stones, Obsidian, Meteorite, Hive, Shell
   {
-    title: 'Granite',
-    category: ['Rock'],
+    title: 'Geode Stones',
+    category: ['Crafting', 'Mining'],
     content: `
 **Description**
-Granite is a hard igneous rock found exclusively inside [[Geode Cave]]s. Its pink-grey crystalline structure makes it a distinctive building material.
+Geode Stones are rare decorative and structural materials found exclusively in [[Geode Cave]]s deep underground. Their distinctive crystalline appearance makes them highly sought after for construction and furniture crafting.
 
-**Tier**
-{{node:granite:star}}
+**Forms & Transformation**
 
-**Main Location**
-* [[Geode Cave]] walls — all biomes, [[Caverns]] Bottom
+| Form | How to obtain | Notes |
+|---|---|---|
+| Stone | Stone placed in [[Geode Cave]]s in the World | Not directly usable |
+| Stone Block | Dropped when [[Mining]] Stones | Crafting ingredient |
 
-**Drops** ⏳
-* {{node:granite:mining}}
+**Geode Stone**
 
-**Recipes** ⏳
-* {{recipe:graniteBlock}}
-  `
-  },
-  {
-    title: 'Marble',
-    category: ['Rock'],
-    content: `
-**Description**
-Marble is a metamorphic rock found exclusively inside [[Geode Cave]]s. Its smooth white surface makes it a prized building material.
+| Stone | Tier | Biome | Layer |
+|---|---|---|---|
+| [[node:granite]] | {{node:granite:star}} | All biomes | [[Caverns]] Bottom |
+| [[node:marble]] | {{node:marble:star}} | All biomes | [[Caverns]] Bottom |
 
-**Tier**
-{{node:marble:star}}
+**Geode Stone Blocks**
 
-**Main Location**
-* [[Geode Cave]] walls — all biomes, [[Caverns]] Bottom
+Blocks are placed in your [[Inventory]] when mined with a [[Pickaxes||Pickaxe]].
 
-**Drops** ⏳
-* {{node:marble:mining}}
+| Deposit | Block | Block Tier | Pickaxe | Pickaxe Tier |
+|---|---|---|---|---|
+{{geodeRow|Granite|blockGranite|pickaxeCobalt}}
+{{geodeRow|Marble|blockMarble|pickaxeCobalt}}
 
-**Recipes** ⏳
-* {{recipe:marbleBlock}}
+**Usages**
+
+| Block | Tier | Uses |
+|---|---|---|
+| [[item:blockGranite]] | {{item:blockGranite:star}} | Construction, furniture ⏳ |
+| [[item:blockMarble]] | {{item:blockMarble:star}} | Construction, furniture ⏳ |
+
+**Tips**
+* _Geode Caves always contain either Granite or Marble — never both._ ⏳
+* _Always bring a [[Pickaxes|Pickaxe]] strong enough to mine the stones of the layer you are exploring._ ⏳
   `
   },
   {
@@ -1817,13 +1809,20 @@ Shell is a sedimentary material formed from ancient marine organisms. It is foun
 * [[Sea]] borders and floor — slow regeneration ⏳
 
 **Drops** ⏳
-* {{node:shell:mining}}
+* [[Mining]] with [[Pickaxes]] (any tier): {{node:shell:mining}}
+
+**Main Usages** ⏳
+* Basic ingredient for furntiure and construction
+* Decorative ingredient for tools and weapons
+* Secondary ingredient for accessories
+* Can be grinded at a [[Stonecutting|Stonecutter]] in [[item:shellPowder]] {{item:shellPowder:star}}
+* [[item:shellPowder]] is used in potions
 
 **Recipes** ⏳
 * {{recipe:shellPowder}}
 
 **Tips**
-* _Shell veins are protected by a SANDSTONE border — look for exposed Shell on cave walls to locate a vein._⏳
+* _Shell veins are protected by a [[Sandstone]] border — look for exposed Shell on cave walls to locate a vein._⏳
   `
   },
 
@@ -1839,6 +1838,7 @@ Shell is a sedimentary material formed from ancient marine organisms. It is foun
     title: 'Housing Buffs',
     category: ['Buff', 'Housing'],
     content: `
+    Managed trough the [[item:noticeBoard]].
     `
   },
   {
@@ -2017,6 +2017,17 @@ Shell is a sedimentary material formed from ancient marine organisms. It is foun
     title: 'Bows',
     category: ['Weapon'],
     content: `
+    `
+  },
+  {
+    title: 'Flamethrower',
+    category: ['Weapon', 'Tool'],
+    content: `
+**Tier**
+{{node:shell:star}}
+
+**Main usages**
+* Used as a tool for deleting large bulks of [[Cobweb]]⏳
     `
   },
 
@@ -2350,6 +2361,15 @@ Filled directly from a liquid source in the world. Used as tools to transport an
     title: 'Spiders',
     category: ['Monster'],
     content: `
+**Loot** ⏳
+* [[item:spiderFang]] — common ⏳
+* [[item:spiderEgg]] — common ⏳
+* [[item:silk]] — rare drop⏳
+
+Note: those ingredients can also be dropped by [[Mining]] [[Cobwaeb]] with any [[Pickaxes|Pickaxe]].
+
+**Tips**
+* if you are looking for [[item:silk]], prefers [[Mining]] [[Cobwaeb]] as the drop rate is far better
     `
   },
   {

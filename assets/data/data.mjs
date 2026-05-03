@@ -82,18 +82,18 @@ export const NODES = {
   PLATINUM: {code: 75, name: 'Platinum Ore', type: NODE_TYPE.ORE, star: 5, solid: true, color: '#25874d', image: 'ore_16_16+5', speed: 1800, mining: [{item: 'orpt', count: 1}], help: 'Metals'},
 
   // ── Gem (gisement de pierres précieuses) ────────────────────────
-  TOPAZ: {code: 80, name: 'Topaz Deposit', type: NODE_TYPE.GEM, star: 2, solid: true, color: '#788696', image: 'gem_16_16+0', speed: 900, mining: [{item: 'topaz', count: 1}], help: 'Topaz Deposit'},
-  RUBY: {code: 81, name: 'Ruby Deposit', type: NODE_TYPE.GEM, star: 3, solid: true, color: '#788696', image: 'gem_16_16+1', speed: 900, mining: [{item: 'ruby', count: 1}], help: 'Ruby Deposit'},
-  EMERALD: {code: 82, name: 'Emerald Deposit', type: NODE_TYPE.GEM, star: 4, solid: true, color: '#788696', image: 'gem_16_16+2', speed: 900, mining: [{item: 'emerald', count: 1}], help: 'Emerald Deposit'},
-  SAPPHIRE: {code: 83, name: 'Sapphire Deposit', type: NODE_TYPE.GEM, star: 5, solid: true, color: '#788696', image: 'gem_16_16+3', speed: 1100, mining: [{item: 'sapphire', count: 1}], help: 'Sapphire Deposit'},
+  TOPAZ: {code: 80, name: 'Topaz Deposit', type: NODE_TYPE.GEM, star: 2, solid: true, color: '#788696', image: 'gem_16_16+0', speed: 900, mining: [{item: 'rawTopaz', count: 1}], help: 'Gems'},
+  RUBY: {code: 81, name: 'Ruby Deposit', type: NODE_TYPE.GEM, star: 3, solid: true, color: '#788696', image: 'gem_16_16+1', speed: 900, mining: [{item: 'rawRuby', count: 1}], help: 'Gems'},
+  EMERALD: {code: 82, name: 'Emerald Deposit', type: NODE_TYPE.GEM, star: 4, solid: true, color: '#788696', image: 'gem_16_16+2', speed: 900, mining: [{item: 'rawEmerald', count: 1}], help: 'Gems'},
+  SAPPHIRE: {code: 83, name: 'Sapphire Deposit', type: NODE_TYPE.GEM, star: 5, solid: true, color: '#788696', image: 'gem_16_16+3', speed: 1100, mining: [{item: 'rawSapphire', count: 1}], help: 'Gems'},
 
   // ── Rock (gisement de pierres précieuses) ────────────────────────
 
-  GRANITE: {code: 90, name: 'Granite', type: NODE_TYPE.ROCK, star: 4, solid: true, color: '#1966cc', image: 'rock_16_16+0', speed: 1500, mining: [{item: 'granite', count: 1}], help: 'Granite'}, // UNDERWORLD
-  MARBLE: {code: 91, name: 'Marble', type: NODE_TYPE.ROCK, star: 4, solid: true, color: '#e6ddc4', image: 'rock_16_16+1', speed: 1500, mining: [{item: 'marble', count: 1}], help: 'Marble'}, // UNDERWORLD
+  GRANITE: {code: 90, name: 'Granite', type: NODE_TYPE.ROCK, star: 4, solid: true, color: '#1966cc', image: 'rock_16_16+0', speed: 1500, mining: [{item: 'blockGranite', count: 1}], help: 'Geode Stones'}, // UNDERWORLD
+  MARBLE: {code: 91, name: 'Marble', type: NODE_TYPE.ROCK, star: 4, solid: true, color: '#e6ddc4', image: 'rock_16_16+1', speed: 1500, mining: [{item: 'blockMarble', count: 1}], help: 'Geode Stones'}, // UNDERWORLD
   OBSIDIAN: {code: 92, name: 'Obsidian', type: NODE_TYPE.ROCK, star: 5, solid: true, color: '#73c882', image: 'rock_16_16+3', speed: 2000, mining: [{item: 'obsidian', count: 1}], help: 'Obsidian'}, // HELL
   METEORITE: {code: 93, name: 'Meteorite', type: NODE_TYPE.ROCK, stype: 'block', star: 5, solid: true, color: '#7d6f5f', image: 'rock_16_16+2', speed: 2000, mining: [{item: 'bkmtrt', count: 1}], help: 'Meteorite'}, // SURFACE
-  HIVE: {code: 94, name: 'Hive', type: NODE_TYPE.ROCK, stype: 'block', star: 3, solid: true, color: '#fd8431', image: 'rock_16_16+6', speed: 1200, mining: [{item: 'bkhive', count: 1}], help: 'Hive'},
+  HIVE: {code: 94, name: 'Hive', type: NODE_TYPE.ROCK, stype: 'block', star: 3, solid: true, color: '#fd8431', image: 'rock_16_16+6', speed: 1200, mining: [{item: 'blokHive', count: 1}], help: 'Hive'},
   SHELL: {code: 95, name: 'Shell', type: NODE_TYPE.ROCK, stype: 'block', star: 2, solid: true, color: '#e9e3e0ff', image: 'rock_16_16+7', speed: 1800, mining: [{item: 'shell', count: 4}], help: 'Shell'},
 
   // ── HOUSING (murs des maisons) ────────────────────────
@@ -168,6 +168,24 @@ export const ITEMS = {
   barCobalt: {name: 'Cobalt Bar', type: ITEM_TYPE.MATERIAL | ITEM_TYPE.CRAFTABLE, star: 4, stype: 'bar', image: 'blocks_16_16-0-0', help: 'Metals', tooltip: 'Crafting material used to craft tools, weapons, armor, and other items'},
   barPlatinum: {name: 'Platinum Bar', type: ITEM_TYPE.MATERIAL | ITEM_TYPE.CRAFTABLE, star: 5, stype: 'bar', image: 'blocks_16_16-0-0', help: 'Metals', tooltip: 'Crafting material used to craft tools, weapons, armor, and other items'},
 
+  // Gems
+  rawTopaz: {name: 'Raw Topaz', type: ITEM_TYPE.MATERIAL, star: 3, stype: 'gem', image: 'blocks_16_16-0-0', help: 'Gems', tooltip: 'Valuable crafting materials to be cut at a Stonecutter'},
+  rawRuby: {name: 'Raw Ruby', type: ITEM_TYPE.MATERIAL, star: 3, stype: 'gem', image: 'blocks_16_16-0-0', help: 'Gems', tooltip: 'Valuable crafting materials to be cut at a Stonecutter'},
+  rawEmerald: {name: 'Raw Emerald', type: ITEM_TYPE.MATERIAL, star: 3, stype: 'gem', image: 'blocks_16_16-0-0', help: 'Gems', tooltip: 'Valuable crafting materials to be cut at a Stonecutter'},
+  rawSapphire: {name: 'Raw Sapphire', type: ITEM_TYPE.MATERIAL, star: 3, stype: 'gem', image: 'blocks_16_16-0-0', help: 'Gems', tooltip: 'Valuable crafting materials to be cut at a Stonecutter'},
+
+  // Geode Stones
+  blockGranite: {name: 'Granite Block', type: ITEM_TYPE.MATERIAL, star: 4, stype: 'stone', image: 'blocks_16_16-0-0', help: 'Geode Stones', tooltip: 'Prized crafting materials found in crystalline structures'},
+  blockMarble: {name: 'Marble Block', type: ITEM_TYPE.MATERIAL, star: 4, stype: 'stone', image: 'blocks_16_16-0-0', help: 'Geode Stones', tooltip: 'Prized crafting materials found in crystalline structures'},
+
+  // Shell
+  shell: {name: 'Shell', type: ITEM_TYPE.MATERIAL, star: 1, stype: 'shell', image: 'blocks_16_16-0-0', help: 'Shell', tooltip: '???'},
+  shellPowder: {name: 'Shell Powder', type: ITEM_TYPE.MATERIAL | ITEM_TYPE.CRAFTABLE, star: 1, stype: 'shell', image: 'blocks_16_16-0-0', help: 'Shell', tooltip: '???'},
+
+  // Cobweb
+  silk: {name: 'Silk', type: ITEM_TYPE.MATERIAL, star: 1, stype: 'cobweb', image: 'blocks_16_16-0-0', help: 'Cobweb', tooltip: '???'},
+  fabric: {name: 'Fabric', type: ITEM_TYPE.MATERIAL | ITEM_TYPE.CRAFTABLE, star: 1, stype: 'cobweb', image: 'blocks_16_16-0-0', help: 'Cobweb', tooltip: '???'},
+
   // pickaxes
   pickaxeCopper: {name: 'Copper Pickaxe', type: ITEM_TYPE.TOOL | ITEM_TYPE.MATERIAL, stype: 'pickaxe', star: 2, image: 'tools_32_32-4-0', placedright: 'w_42_42-0-0', placedleft: 'w_42_42-0-1', speed: 0, help: 'Pickaxes', tooltip: 'Tools used to remove blocks, converting them to item form'},
   pickaxeIron: {name: 'Iron Pickaxe', type: ITEM_TYPE.TOOL | ITEM_TYPE.MATERIAL, stype: 'pickaxe', star: 2, image: 'tools_32_32-4-0', placedright: 'w_42_42-0-0', placedleft: 'w_42_42-0-1', speed: 0, help: 'Pickaxes', tooltip: 'Tools used to remove blocks, converting them to item form'},
@@ -188,6 +206,13 @@ export const ITEMS = {
 
   // Bows
   bowCopper: {name: 'Copper Bow', type: ITEM_TYPE.WEAPON | ITEM_TYPE.MATERIAL, stype: 'bow', star: 2, image: 'tools_32_32-4-0', placedright: 'w_42_42-0-0', placedleft: 'w_42_42-0-1', speed: 0, help: 'Bows', tooltip: 'Range weapon'},
+
+  // Other Weapons
+  flamethrower: {name: 'Flamethrower', type: ITEM_TYPE.WEAPON | ITEM_TYPE.TOOL, stype: 'fire', star: 5, image: 'tools_32_32-4-0', placedright: 'w_42_42-0-0', placedleft: 'w_42_42-0-1', speed: 0, help: 'Flamethrower', tooltip: 'Small Range weapon - Can be used for removing Cobweb'},
+
+  // Monster - Spiders
+  spiderEgg: {name: 'Spider Egg', type: ITEM_TYPE.MATERIAL, stype: 'egg', star: 2, image: 'tools_32_32-4-0', placedright: 'w_42_42-0-0', placedleft: 'w_42_42-0-1', help: 'Spiders', tooltip: '???'},
+  spiderFang: {name: 'Spider Fang', type: ITEM_TYPE.MATERIAL, stype: 'fang', star: 3, image: 'tools_32_32-4-0', placedright: 'w_42_42-0-0', placedleft: 'w_42_42-0-1', help: 'Spiders', tooltip: '???'},
 
   // crystall
   lifeCrystal: {name: 'Life Crystal', type: ITEM_TYPE.FURNITURE | ITEM_TYPE.UNIQUE | ITEM_TYPE.USABLE, stype: 'life', star: 1, image: 'furniture_32_32-12-2', placed: 'furniture_32_32-6-3', help: 'Life Crystal', tooltip: 'Permanently increases maximum life by 20\nCollect with a Hammer'},
@@ -266,6 +291,7 @@ export const ITEMS = {
   cookingPot: {name: 'Cooking Pot', type: ITEM_TYPE.FURNITURE | ITEM_TYPE.PLACABLE, stype: 'station', star: 2, image: 'furniture_32_32-9-0', placed: 'fuws_32_32-7-2', help: 'Cooking', tooltip: 'Crafting station for food'},
 
   brokenDecomposer: {name: 'Broken Decomposer', type: ITEM_TYPE.FURNITURE, immovable: true, stype: 'immovable', star: 5, image: null, placed: 'fuws_48_32-0-1', help: 'Lost Temple', tooltip: '????'},
+  decomposerPart: {name: 'Decomposer Part', type: ITEM_TYPE.TOOL, stype: 'part', star: 5, image: null, placed: 'fuws_48_32-0-1', help: 'Decomposer', tooltip: 'Part used to repair Broken Decomposer'},
   decomposer: {name: 'Decomposer', type: ITEM_TYPE.FURNITURE, immovable: true, stype: 'station', star: 5, image: null, placed: 'fuws_48_32-0-1', help: 'Decomposer', tooltip: '????'},
   transmutator: {name: 'Transmutator', type: ITEM_TYPE.FURNITURE, immovable: true, stype: 'station', star: 5, image: null, placed: 'fuws_48_32-0-1', help: 'Transmutator', tooltip: '????'},
 

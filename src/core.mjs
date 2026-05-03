@@ -163,7 +163,7 @@ class GameCore {
         if (ref.startsWith('item:')) {
           const code = ref.slice(5)
           if (!ITEMS[code]) {
-            console.warn(`[help] '${entry.title}' : item inconnu '${code}'`)
+            console.error(`[help] '${entry.title}' : item inconnu '${code}'`)
             errors++
             return `⚠️ &lbrack;&lbrack;${ref}&rbrack;&rbrack;`
           }
