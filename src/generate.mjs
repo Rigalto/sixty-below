@@ -1,7 +1,7 @@
 import {seededRNG, shuffleArray, rollLoot} from './utils.mjs'
 import {database, uniqueIdGenerator} from './database.mjs'
 import {WEATHER_TYPE, WORLD_WIDTH, WORLD_HEIGHT, SEA_LEVEL, TOPSOIL_Y_SKY_SURFACE, TOPSOIL_Y_SURFACE_UNDER, TOPSOIL_Y_UNDER_CAVERNS, TOPSOIL_Y_CAVERNS_MID, BIOME_TILE_MAP, SEA_MAX_JITTER, SEA_MAX_WIDTH, SEA_MAX_HEIGHT, CLUSTER_SCATTER_MAP, ORE_GEM_SCATTER_MAP, PERLIN_OFFSET_NATURALIZER, PERLIN_OFFSET_TUNNEL, PERLIN_OFFSET_SURFACE_TUNNEL, PERLIN_OFFSET_SMALL_TUNNEL, PERLIN_OFFSET_CAVERN, PERLIN_OFFSET_HIVE, PERLIN_OFFSET_HEART, PERLIN_OFFSET_MUSHROOM, PERLIN_OFFSET_COBWEB, PERLIN_OFFSET_FERNS, PERLIN_OFFSET_LAKES, PERLIN_OFFSET_SHELL, PERLIN_OFFSET_TEMPLE, PERLIN_OFFSET_BEACH, SMALL_CAVERNS_COUNT, MEDIUM_CAVERNS_COUNT, UNDERGROUND_TUNNEL_COUNT, CAVERNS_TUNNEL_COUNT, SMALL_TUNNELS_COUNT, HIVE_RADIUS_MIN, HIVE_RADIUS_MAX, COBWEB_CAVE_COUNT_MIN, COBWEB_CAVE_COUNT_MAX, COBWEB_RADIUS_X_MIN, COBWEB_RADIUS_X_MAX, COBWEB_RADIUS_Y_MIN, COBWEB_RADIUS_Y_MAX, COBWEB_CAVE_MAIN_MIN, COBWEB_CAVE_MAIN_MAX, COBWEB_CAVE_SIDE_MIN, COBWEB_CAVE_SIDE_MAX, COBWEB_SCATTER_COUNT, COBWEB_SCATTER_SIZE_MIN, COBWEB_SCATTER_SIZE_MAX, GEODE_CAVE_COUNT_MIN, GEODE_CAVE_COUNT_MAX, GEODE_RADIUS_MIN, GEODE_RADIUS_MAX, GEODE_TARGET_CLUSTER_COUNT, GEODE_CLUSTER_SIZE_MIN, GEODE_CLUSTER_SIZE_MAX, TOPSOIL_SCATTER_MAP, LAKE_RADIUS_X_MIN, LAKE_RADIUS_X_MAX, LAKE_RADIUS_Y_MIN, LAKE_RADIUS_Y_MAX, LAKE_PIT_RADIUS_X_MIN, LAKE_PIT_RADIUS_X_MAX, LAKE_PIT_RADIUS_Y_MIN, LAKE_PIT_RADIUS_Y_MAX, LAKE_CREATION_MAP, UNDERGROUND_LAKE_UNDER_COUNT, UNDERGROUND_LAKE_CAVERNS_COUNT, UNDERGROUND_LAKE_RADIUS_MIN, UNDERGROUND_LAKE_RADIUS_MAX, BLIND_LAKE_COUNT, BLIND_LAKE_RADIUS_MIN, BLIND_LAKE_RADIUS_MAX, SAP_LAKE_UNDER_COUNT, SAP_LAKE_CAVERNS_COUNT, SAP_LAKE_RADIUS_MIN, SAP_LAKE_RADIUS_MAX, SAP_POCKET_COUNT, SAP_POCKET_RADIUS_MIN, SAP_POCKET_RADIUS_MAX, WATER_PUDDLE_COUNT, SAP_PUDDLE_COUNT, PUDDLE_HEIGHT_MIN, PUDDLE_HEIGHT_MAX, FOSSIL_VEIN_COUNT, FERN_CAVE_RADIUS_X_MIN, FERN_CAVE_RADIUS_X_MAX, FERN_CAVE_RADIUS_Y_MIN, FERN_CAVE_RADIUS_Y_MAX, MOSS_CAVE_RADIUS_X_MIN, MOSS_CAVE_RADIUS_X_MAX, MOSS_CAVE_RADIUS_Y_MIN, MOSS_CAVE_RADIUS_Y_MAX, SAND_POCKET_RADIUS_X_MIN, SAND_POCKET_RADIUS_X_MAX, SAND_POCKET_RADIUS_Y_MIN, SAND_POCKET_RADIUS_Y_MAX, MUSHROOM_CAVE_RADIUS_X_MIN, MUSHROOM_CAVE_RADIUS_X_MAX, MUSHROOM_CAVE_RADIUS_Y_MIN, MUSHROOM_CAVE_RADIUS_Y_MAX, PYRAMID_WALL_INDEXES, PYRAMID_VOID_INDEXES, PYRAMID_WIDTH, PYRAMID_HEIGHT, PYRAMID_ROOM1_DELTA, PYRAMID_ROOM2_DELTA, TEMPLE_RUIN_WALL_INDEXES, TEMPLE_RUIN_COLUMNS_INDEXES, CHEST_CONTENT} from '../assets/data/data-gen.mjs'
-import {NODES, NODES_LOOKUP, NODE_TYPE, BIOME_TYPE, PLANT_KIND, GRASS_TYPE, ITEMS, BAG_CAPACITY} from '../assets/data/data.mjs'
+import {NODES, NODES_LOOKUP, NODE_TYPE, BIOME_TYPE, PLANT_KIND, ITEMS, BAG_CAPACITY} from '../assets/data/data.mjs'
 
 /* ====================================================================================================
    WORLD BUFFER (CREATION DU MONDE)
@@ -153,6 +153,7 @@ class WorldGenerator {
     // 0. Initialisation du buffer de génération et des object stores
     worldBuffer.init()
     furnitureGenerator.init()
+    plantGenerator.init()
 
     // 1. On passe le générateur de nombre aléatoire en mode déterminé par la clé
     seededRNG.init(seed)
@@ -358,7 +359,7 @@ class WorldGenerator {
       const liquidBodies = [...honeyLiquidBodies, ...lakeLiquidBodies, ...underLakeLiquidBodies, ...blindLakeLiquidBodies, ...sapLakeLiquidBodies, ...sapPocketLiquidBodies, ...waterPuddleLiquidBodies, ...sapPuddleLiquidBodies]
       console.log('.................... liquidBodies', liquidBodies)
       const lakes = [...surfaceLakes, ...underLakes, ...blindLakes, ...sapLakes, ...sapPockets]
-      const plants = [...fernsPlants, ...mossPlants, ...mushroomPlants, ...surfacePlants]
+      const plants = [...fernsPlants, ...mossPlants, ...mushroomPlants, ...surfacePlants, ...plantGenerator.plants]
       await this.save(seed, {hives, cobwebCaves, geodeCaves, lakes, liquidBodies, fernsCaves, mossCaves, mushroomCaves, pyramid, ruinedcabin, lostTemple, ancientHouse, leftBeach, rightBeach, antlions, anthills, termites, plants, hearts, triskels, graveyard})
       worldBuffer.clear()
     }
@@ -3699,7 +3700,6 @@ class WorldCarver {
  * @param {number} radiusX
  * @param {number} surfaceCode - Code de la tuile de surface (ex: NODES.GRASSFERN.code)
  * @param {number} substrateCode - Code du substrat (ex: NODES.HUMUS.code)
- * @param {number} grassType - Code du type de GRASS (GRASS_TYPE.FERN ou GRASS_TYPE.MUSHROOM)
  * @param {Array} plants - [OUT] Tableau accumulant les enregistrements plant à sauvegarder
  * @returns {plants: Array<{kind, index, type, deleted}>}
  */
@@ -3811,7 +3811,6 @@ class WorldCarver {
  * @param {number} radiusX
  * @param {number} radiusY
  * @param {Array} plants - [OUT] Tableau accumulant les enregistrements plant à sauvegarder
- * @returns {plants: Array<{kind, index, type, deleted}>}
  */
   #fillMossCaveWalls (cx, cy, radiusX, radiusY, plants) {
     const VOID = NODES.VOID.code
@@ -6672,3 +6671,20 @@ class FurnitureGenerator {
 }
 
 export const furnitureGenerator = new FurnitureGenerator()
+
+/* ====================================================================================================
+   PLANT GENERATOR
+   ==================================================================================================== */
+
+class PlantGenerator {
+  #plants
+
+  init () {
+    this.#plants = []
+  }
+
+  get plants () {
+    return this.#plants
+  }
+}
+export const plantGenerator = new PlantGenerator()

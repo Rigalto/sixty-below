@@ -888,7 +888,7 @@ Génère des tunnels, des cavernes et des mini-biomes. Maintient la liste des zo
 | Méthode | Description |
 |---|---|
 | `buildErodedSurfaceLine(): Int16Array` | Calcule la ligne de surface (première tuile solide par colonne) et applique une érosion légère (trous et bosses de 1 tuile). Retourne `surfaceLine`. |
-| `paintSurfaceNatural(surfaceLine, biomesDescription): void` | Pose les tuiles NATURAL (GRASS / GRASSJUNGLE / SAND) sur les deux tuiles supérieures de chaque colonne, selon le biome courant. Colonne en mer → SAND. Ne fait rien dans les colonnes WATER. Parcours O(n) via avance monotone sur `biomesDescription`. Délègue à `applyTiles` avec `ETERNAL_EXCLUDED`. |
+| `paintSurfaceNatural(surfaceLine, biomesDescription): void` | Pose les tuiles NATURAL (GRASS / GRASSJUNGLE / SAND) sur les deux tuiles supérieures de chaque colonne, selon le biome courant. Colonne en mer → SAND. Ne fait rien dans les colonnes WATER. Parcours O(n) via avance monotone sur `biomesDescription`. Retourne la liste des enregistrements NATURAL (GRASSFOREST et GRASSJUNGLE uniquement) pour l'objectstore `plant`. Délègue à `applyTiles` avec `ETERNAL_EXCLUDED`. |
 ---
 
 Le paramètre `offsetX` de `digNoisyCircle`, `digNoisyEllipse` et `digNoisyRect` permet de décorrèler le bruit Perlin des autres usages.
@@ -906,6 +906,7 @@ Le paramètre `offsetX` de `digNoisyCircle`, `digNoisyEllipse` et `digNoisyRect`
 | `liquidFiller`       | `LiquidFiller`      | Flood-fill BFS des zones liquides et automate pour le SAND. |
 | `webFiller` | `WebFiller` | Peuplement WEB : `fillCobwebCave(cx, cy)` pour les caves, `scatterWebs(surfaceUnder)` pour le peuplement global différé. |
 | `furnitureGenerator ` | `FurnitureGenerator ` | Gestion des furnitures. `init()`, `getFurnitureSize(code)`, `addFurnitureAt(index, code)`, `get furnitures()`, `firstAvailableSlot(container, capacity, furnitureId)`, `addInBag(item, count)`, `addInChest(chest, item, count)`, `get inventory()`, `placeSeaChests(seaRect)`, `placeCavernChests(zoneRects)`, `placeUndergroundChests(zoneRects)`, `placeSurfaceChests(zoneRects)`, `placeSurfaceLineChests(surfaceLine, guardedX, biomesDescription)`, `fillChest (chest)` |
+| `plantGenerator`       | `PlantGenerator`      | Ajout de la flore dans le monde. `init()`, `get plants()` |
 
 ---
 

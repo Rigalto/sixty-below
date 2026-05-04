@@ -340,10 +340,6 @@ export const PLANT_KIND = {
   SEED: 5 // graines plantées ()
 }
 
-export const GRASS_TYPE = {FERN: 1, MOSS: 2, MUSHROOM: 3, FOREST: 4, JUNGLE: 5}
-export const TREE_TYPE = {OAK: 1, MAHOGANY: 2, GIANT_MUSHROOM: 3, COCONUT: 4}
-export const HERB_TYPE = { }
-
 /* ============================================================================
    6. MONSTERS
    ============================================================================ */
