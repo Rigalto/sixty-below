@@ -520,6 +520,50 @@ Configuration dans `constant.mjs` → `DB_CONFIG` : `NAME`, `VERSION`, `DEBUG`, 
 
 ---
 
+### 5.2.1 ObjectStore 'plant'
+
+Cet ObjectStore contient toutes les informations relatives à la croissance des plantes.
+Les enregistrements sont de natures très différentes, nature déterminée par l'attribut '???' :
+* `kind` NATURAL : liste des tuiles NATURAL
+  * `index` : position des tuiles de `type` NATURAL
+  * `type` : type de la tuile : NODES.GRASSFOREST.code, NODES.GRASSJUNGLE.code, NODES.GRASSMUSHROOM.code, NODES.GRASSFERN.code, NODES.GRASSMOSS.code
+* `kind` TREE : liste des arbres présents dans le monde
+  * `id` : identifiant unique de l'abre
+  * `index` : position de l'abre (coint haut gauche du rectangle englobant)
+  * `type` : type de l'arbre : OAK, MAHOGANY, GIANTMUSHROOM, COCONUT
+  * `w` et `h` : taille maximale de l'arbre
+  * `soilIndex` : position de la tuile solide sous la gauche de l'arbre (`index + h * 1024`)
+  * `size` : croissance actuelle (0 à 4)
+  * `images` : tableau de 7 images (selon `size`, les images suivantes sont empilées : `0 => [0, 6]`, `1 => [0, 1, 6]`, `2 => [0, 1, 2, 6]`, `3 => [0, 1, 2, 3, 6]`, `4 => [0, 1, 2, 3, 4, 5]`)
+  * `grass` : type de tuile sur lequel l'arbre pousse (NODES.GRASSFOREST.code, NODES.GRASSJUNGLE.code, NODES.GRASSMUSHROOM.code, NODES.SAND.code)
+  * `growthTimestamp` : heure (timestamp) de prochaine croissance (`null` si `size` === 0)
+  * `shakedTimestamp` : heure (timestamp) à partir de laquelle l'arbre peut être secoué de nouveau
+* `kind` MUSHROOM : liste des spots de champignons présents dans le monde
+  * `id` : identifiant unique du spot de champignon
+  * `index` : position du spot de champignon (coin haut gauche de l'image)
+  * `type` : type du champignon qui pousse sur le spot : Bolet, Pink Mycenia
+  * `w` et `h` : taille du champignon
+  * `soilIndex` : position de la tuile solide sous la gauche du champignon (`index + h * 1024`)
+  * `present` : booléen indiquant si un champignon est présent (`true`) ou non sur le spot de champignon
+  * _Visibilité pilotée globalement par l'heure in-game — les champignons d'un même type apparaissent et disparaissent simultanément._
+* `kind` HERB : liste des herbes présentes dans le monde
+  * `id` : identifiant unique de l'herbe
+  * `index` : position de l'herbe (coin haut gauche de l'image)
+  * `type` : type d'herbe : Blinkroot, Coral, Daybloom, Fireblossom, Oleander, Skorn, Waterleaf
+  * `w` et `h` : taille de l'herbe
+  * `soilIndex` : position de la tuile solide sous la gauche de l'herbe (`index + h * 1024`)
+  * `image` : image de l'herbe (pour les coraux, quatre images aléatoires)
+  * `bloom` : l'herbe est mature et peut être récoltée (`true`)
+  * `bloomTimestamp` : heure (timestamp) de prochaine récolte possible
+* `kind` SEED : liste des graines plantées dans le monde
+  * `id` : identifiant unique de la graine
+  * `index` : position de la graine (tuile où elle se trouve)
+  * `type` : type de graine : à concevoir
+
+Tous les enregistrements possèdent en plus un champ `deleted` permettant de décaler la suppression des enregistrements dans la phase d'initialisation de la sessin de jeu suivante.
+
+---
+
 ## 6. `core.mjs` (Layer 2)
 
 ### Class `GameCore` (Singleton : `gameCore`)

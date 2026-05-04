@@ -275,9 +275,11 @@ class GameCore {
     // await PlayerManager.init(...)
 
     // const SYSTEM_MAP = new Map([
-    //   [PLANT_SYSTEM.GRASS, grassSystem],
-    //   [PLANT_SYSTEM.TREE, treeSystem],
-    //   [PLANT_SYSTEM.HERB, herbSystem]
+    //   [PLANT_KIND.NATURAL, naturalSystem],
+    //   [PLANT_KIND.TREE, treeSystem],
+    //   [PLANT_KIND.MUSHROOM, mushroomSystem],
+    //   [PLANT_KIND.HERB, herbSystem],
+    //   [PLANT_KIND.SEEDERB, seedSystem]
     // ])
     // // Chaque system implémente la même interface
     // for (const record of plantRecords) {

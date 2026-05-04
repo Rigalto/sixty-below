@@ -332,6 +332,14 @@ export const RECIPES = [
 
 export const PLANT_SYSTEM = {GRASS: 1, TREE: 2, HERB: 3}
 
+export const PLANT_KIND = {
+  NATURAL: 1, // tuiles NATURAL (GRASSFOREST, GRASSJUNGLE, GRASSMOSS, GRASSFERN, GRASSMUSHROOM)
+  TREE: 2, // arbres (Oak, Mahogany, Giant Mushroom, Coconut)
+  MUSHROOM: 3, // champignons (Bolete, Pink Mycenia)
+  HERB: 4, // herbes ()
+  SEED: 5 // graines plantées ()
+}
+
 export const GRASS_TYPE = {FERN: 1, MOSS: 2, MUSHROOM: 3, FOREST: 4, JUNGLE: 5}
 export const TREE_TYPE = {OAK: 1, MAHOGANY: 2, GIANT_MUSHROOM: 3, COCONUT: 4}
 export const HERB_TYPE = { }
