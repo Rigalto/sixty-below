@@ -534,7 +534,7 @@ Les enregistrements sont de natures très différentes, nature déterminée par 
   * `w` et `h` : taille maximale de l'arbre
   * `soilIndex` : position de la tuile solide sous la gauche de l'arbre (`index + h * 1024`)
   * `size` : croissance actuelle (0 à 4)
-  * `images` : tableau de 7 images (selon `size`, les images suivantes sont empilées : `0 => [0, 6]`, `1 => [0, 1, 6]`, `2 => [0, 1, 2, 6]`, `3 => [0, 1, 2, 3, 6]`, `4 => [0, 1, 2, 3, 4, 5]`)
+  * `images` : tableau de 7 images (selon `size`, les images suivantes sont empilées : `0 => [0, 4]`, `1 => [0, 1, 4]`, `2 => [0, 1, 2, 4]`, `3 => [0, 1, 2, 3, 4]`, `4 => [0, 1, 2, 3, 5, 6]`)
   * `grass` : type de tuile sur lequel l'arbre pousse (NODES.GRASSFOREST.code, NODES.GRASSJUNGLE.code, NODES.GRASSMUSHROOM.code, NODES.SAND.code)
   * `growthTimestamp` : heure (timestamp) de prochaine croissance (`null` si `size` === 0)
   * `shakedTimestamp` : heure (timestamp) à partir de laquelle l'arbre peut être secoué de nouveau
@@ -887,7 +887,8 @@ Génère des tunnels, des cavernes et des mini-biomes. Maintient la liste des zo
 
 | Méthode | Description |
 |---|---|
-| `buildErodedSurfaceLine(): Int16Array` | Calcule la ligne de surface (première tuile solide par colonne) et applique une érosion légère (trous et bosses de 1 tuile). Retourne `surfaceLine`. |
+| `buildSurfaceLine(): Int16Array` | Calcule la ligne de surface — Y de la première tuile solide (non `LIQUID_OR_GAZ`) par colonne. Retourne `surfaceLine`. |
+| `buildErodedSurfaceLine(): Int16Array` | Calcule la ligne de surface (première tuile solide (non `LIQUID_OR_GAZ`) par colonne) et applique une érosion légère (trous et bosses de 1 tuile). Retourne `surfaceLine`. |
 | `paintSurfaceNatural(surfaceLine, biomesDescription): void` | Pose les tuiles NATURAL (GRASS / GRASSJUNGLE / SAND) sur les deux tuiles supérieures de chaque colonne, selon le biome courant. Colonne en mer → SAND. Ne fait rien dans les colonnes WATER. Parcours O(n) via avance monotone sur `biomesDescription`. Retourne la liste des enregistrements NATURAL (GRASSFOREST et GRASSJUNGLE uniquement) pour l'objectstore `plant`. Délègue à `applyTiles` avec `ETERNAL_EXCLUDED`. |
 ---
 

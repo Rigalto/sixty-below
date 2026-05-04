@@ -301,12 +301,13 @@ class WorldGenerator {
     // ATTENTION : plus d'utilisation de tileGuard à partir de maintenant
     // tileGuard.debug() // DEBUG
     tileGuard.init()
-    const surfaceLine = worldCarver.buildErodedSurfaceLine()
+    let surfaceLine = worldCarver.buildErodedSurfaceLine()
 
     // 7.1. Ajout des mini-biomes de surface
-    const termiteGuarded = worldCarver.buildTermiteMounds(termites, surfaceLine)
-    const anthillGuarded = worldCarver.buildAnthills(anthills, surfaceLine)
-    const antlionGuarded = worldCarver.buildAntlionPits(antlions, surfaceLine)
+    const termiteGuarded = worldCarver.buildTermiteMounds(termites)
+    const anthillGuarded = worldCarver.buildAnthills(anthills)
+    const antlionGuarded = worldCarver.buildAntlionPits(antlions)
+    surfaceLine = worldCarver.buildSurfaceLine()
     await progress('Build Surface Mini-biomes')
 
     // 7.2. Ajout du Natural en surface
@@ -315,8 +316,8 @@ class WorldGenerator {
     await progress('Naturalizing Surface')
 
     // 7.3. Traitement de la mer
-    const leftBeach = worldCarver.buildBeach(leftSea, true, surfaceLine)
-    const rightBeach = worldCarver.buildBeach(rightSea, false, surfaceLine)
+    const leftBeach = worldCarver.buildBeach(leftSea, true)
+    const rightBeach = worldCarver.buildBeach(rightSea, false)
 
     worldCarver.buildSeaFloorAndWalls(leftSea)
     worldCarver.buildSeaFloorAndWalls(rightSea)
@@ -325,6 +326,7 @@ class WorldGenerator {
     // 7.4. Traitement du sable
     worldCarver.consolidateSand()
     worldCarver.sandFalling()
+    surfaceLine = worldCarver.buildSurfaceLine() // recalcul après sandFalling
     await progress('Sand Falling')
 
     // 8. Traitenents non relatifs aux tuiles
@@ -339,15 +341,17 @@ class WorldGenerator {
 
     console.log('[WorldGenerator::liquidFiller] - Sea', (performance.now() - t0).toFixed(3), 'ms')
 
-    // 8.2. Ajout des plantes et des coraux - TODO
-
-    // 8.3. Ajout des coffres et objets spéciaux
+    // 8.2. Ajout des coffres et objets spéciaux
     furnitureGenerator.placeSeaChests(leftSeaRect)
     furnitureGenerator.placeSeaChests(rightSeaRect)
     furnitureGenerator.placeSurfaceLineChests(surfaceLine, guarded, biomesDescription)
     furnitureGenerator.placeSurfaceChests(zoneRects)
     furnitureGenerator.placeUndergroundChests(zoneRects)
     furnitureGenerator.placeCavernChests(zoneRects)
+
+    // 8.3. Ajout des plantes et des coraux - TODO
+    plantGenerator.placeCoconut(leftBeach.beachRect, surfaceLine, true, guarded)
+    plantGenerator.placeCoconut(rightBeach.beachRect, surfaceLine, false, guarded)
 
     // 9. Traitements finaux
 
@@ -4981,6 +4985,32 @@ class WorldCarver {
   }
 
   /**
+ * Calcule la ligne de surface — Y de la première tuile solide (non LIQUID_OR_GAZ) par colonne.
+*
+ * @returns {Int16Array} surfaceLine — Y de la première tuile solide par colonne
+ */
+  buildSurfaceLine () {
+    const surfaceLine = new Int16Array(WORLD_WIDTH)
+    const LIQUID_OR_GAZ = new Set([
+      NODES.VOID.code,
+      NODES.SKY.code,
+      NODES.FOG.code,
+      NODES.WATER.code,
+      NODES.SEA.code,
+      NODES.DEEPSEA.code,
+      NODES.HONEY.code,
+      NODES.SAP.code
+    ])
+
+    for (let x = 1; x < WORLD_WIDTH - 1; x++) {
+      let y = 1
+      while (y < WORLD_HEIGHT - 1 && LIQUID_OR_GAZ.has(worldBuffer.read(x, y))) y++
+      surfaceLine[x] = y
+    }
+    return surfaceLine
+  }
+
+  /**
  * Pose les tuiles de surface végétale sur les deux tuiles supérieures
  * de chaque colonne solide, selon le biome courant.
  * - Forest  : GRASS       (y) + GRASS       (y+1)
@@ -5064,9 +5094,8 @@ class WorldCarver {
  *
  * @param {number[]}   seaTiles   — Index des tuiles SEA (retour de #fillOneSea)
  * @param {boolean}    isLeft     — true = mer gauche, false = mer droite
- * @param {Int16Array} surfaceLine — Y de la première tuile solide par colonne
  */
-  buildBeach (seaTiles, isLeft, surfaceLine) {
+  buildBeach (seaTiles, isLeft) {
     const SKY = NODES.SKY.code
     const SAND = NODES.SAND.code
     const SANDSTONE = NODES.SANDSTONE.code
@@ -5592,10 +5621,10 @@ class WorldCarver {
  * @param {Int16Array} surfaceLine  — Y de la première tuile solide par colonne (modifiée en place)
  * @returns {[number[]]} coordonnées X protégées contre la transformation en NATURAL
  */
-  buildAntlionPits (reservations, surfaceLine) {
+  buildAntlionPits (reservations) {
     const guarded = []
     for (const idx of reservations) {
-      this.#buildOneAntlionPit(idx, surfaceLine)
+      this.#buildOneAntlionPit(idx)
 
       const cx = idx & 0x3FF
       for (let dx = -4; dx <= 4; dx++) {
@@ -5609,9 +5638,8 @@ class WorldCarver {
  * Dessine un Antlion Pit et ajuste surfaceLine.
  *
  * @param {number}     idx         — index (cy << 10) | cx
- * @param {Int16Array} surfaceLine — Y de la première tuile solide par colonne (modifiée en place)
  */
-  #buildOneAntlionPit (idx, surfaceLine) {
+  #buildOneAntlionPit (idx) {
     const cx = idx & 0x3FF
     const cy = idx >> 10
     const VOID = NODES.VOID.code
@@ -5742,7 +5770,6 @@ class WorldCarver {
     const skyTiles = []
     for (const x in sandTop) {
       const topY = sandTop[x]
-      surfaceLine[+x] = topY
       for (let y = topY - 1; y >= 1; y--) {
         skyTiles.push({x: +x, y, index: (y << 10) | +x, code: SKY})
       }
@@ -5760,7 +5787,6 @@ class WorldCarver {
       const above = ((topY - 1) << 10) | +x
       if (worldBuffer.readAt(above) !== SKY) continue
 
-      surfaceLine[+x] = topY
       for (let y = topY - 1; y >= 1; y--) {
         skyTiles.push({x: +x, y, index: (y << 10) | +x, code: SKY})
       }
@@ -5834,10 +5860,10 @@ class WorldCarver {
  * @param {Int16Array} surfaceLine  — Y de la première tuile solide par colonne (modifiée en place)
  * @returns {[number[]]} coordonnées X protégées contre la transformation en NATURAL
  */
-  buildAnthills (reservations, surfaceLine) {
+  buildAnthills (reservations) {
     const guarded = []
     for (const idx of reservations) {
-      this.#buildOneAnthill(idx, surfaceLine)
+      this.#buildOneAnthill(idx)
 
       const cx = idx & 0x3FF
       for (let dx = -4; dx <= 6; dx++) {
@@ -5852,9 +5878,8 @@ class WorldCarver {
  * Dessine un Ant Hill et ajuste surfaceLine.
  *
  * @param {number}     idx         — index (cy << 10) | cx, coin haut-gauche de la salle VOID 3×2
- * @param {Int16Array} surfaceLine — Y de la première tuile solide par colonne (modifiée en place)
  */
-  #buildOneAnthill (idx, surfaceLine) {
+  #buildOneAnthill (idx) {
     const cx = idx & 0x3FF
     const cy = idx >> 10
     const ANTDIRT = NODES.ANTDIRT.code
@@ -5931,7 +5956,6 @@ class WorldCarver {
     for (const surfaceIdx of zz) {
       const x = surfaceIdx & 0x3FF
       const y = surfaceIdx >> 10
-      surfaceLine[x] = y
       for (let sy = y - 1; sy >= 1; sy--) {
         skyTiles.push({x, y: sy, index: (sy << 10) | x, code: SKY})
       }
@@ -6015,10 +6039,10 @@ class WorldCarver {
  * @param {Int16Array} surfaceLine  — Y de la première tuile solide par colonne (modifiée en place)
  * @returns {[number[]]} coordonnées X protégées contre la transformation en NATURAL
  */
-  buildTermiteMounds (reservations, surfaceLine) {
+  buildTermiteMounds (reservations) {
     const guarded = []
     for (const idx of reservations) {
-      this.#buildOneTermiteMound(idx, surfaceLine)
+      this.#buildOneTermiteMound(idx)
 
       const cx = idx & 0x3FF
       for (let dx = -2; dx <= 3; dx++) {
@@ -6032,9 +6056,8 @@ class WorldCarver {
  * Dessine une Termite Mound et ajuste surfaceLine.
  *
  * @param {number}     idx         — index du coin haut-gauche de la chambre VOID
- * @param {Int16Array} surfaceLine — Y de la première tuile solide par colonne (modifiée en place)
- */
-  #buildOneTermiteMound (idx, surfaceLine) {
+*/
+  #buildOneTermiteMound (idx) {
     const cx = idx & 0x3FF
     const cy = idx >> 10
     const ANTDIRT = NODES.ANTDIRT.code
@@ -6078,7 +6101,6 @@ class WorldCarver {
     const topY = cy - 6
     for (let dx = -1; dx <= 2; dx++) {
       const x = cx + dx
-      surfaceLine[x] = topY
       for (let y = topY - 1; y >= 1; y--) {
         skyTiles.push({x, y, index: (y << 10) | x, code: SKY})
       }
@@ -6685,6 +6707,63 @@ class PlantGenerator {
 
   get plants () {
     return this.#plants
+  }
+
+  /**
+ * Place un cocotier sur une plage en bord de mer.
+ * @param {{x, y, w, h}} beachRect — rectangle de la plage
+ * @param {Int16Array} surfaceLine — Y de la première tuile solide par colonne
+ * @param {boolean} isLeft — true = plage gauche (parcours gauche→droite), false = droite→gauche
+ */
+  placeCoconut (beachRect, surfaceLine, isLeft, guarded) {
+    const SEA = NODES.SEA.code
+    const WATER = NODES.WATER.code
+    const SAND = NODES.SAND.code
+    const W = WORLD_WIDTH
+    const h = 15
+    const w = 2
+
+    const x0 = isLeft ? beachRect.x : beachRect.x + beachRect.w - 1
+    const x1 = isLeft ? beachRect.x + beachRect.w - 1 : beachRect.x
+    const dir = isLeft ? 1 : -1
+
+    for (let x = x0; isLeft ? x < x1 : x > x1; x += dir) {
+      const y = surfaceLine[x]
+      const yNext = surfaceLine[x + dir]
+
+      if (y !== yNext) continue
+      console.log('PlantGenerator.placeCoconut #plants.......................', {x, y, dir, current: worldBuffer.read(x, y), side: worldBuffer.read(x + dir, y), currentTop: worldBuffer.read(x, y - 1), sideTop: worldBuffer.read(x + dir, y - 1)})
+
+      if (guarded.has(x) || guarded.has(x + dir)) continue
+
+      if (worldBuffer.read(x, y) !== SAND) continue
+      if (worldBuffer.read(x + dir, y) !== SAND) continue
+      if (worldBuffer.read(x, y - 1) === SEA || worldBuffer.read(x, y - 1) === WATER) continue
+      if (worldBuffer.read(x + dir, y - 1) === SEA || worldBuffer.read(x + dir, y - 1) === WATER) continue
+
+      const soilIndex = (y << 10) | (isLeft ? x : x - 1)
+      const index = soilIndex - h * W
+
+      guarded.add(x)
+      guarded.add(x + dir)
+
+      this.#plants.push({
+        kind: PLANT_KIND.TREE,
+        type: 'coconut',
+        index,
+        soilIndex,
+        w,
+        h,
+        size: 3,
+        images: [],
+        grass: SAND,
+        growthTimestamp: null,
+        shakedTimestamp: null,
+        deleted: false
+      })
+      console.log('PlantGenerator.placeCoconut #plants.......................', this.#plants)
+      return
+    }
   }
 }
 export const plantGenerator = new PlantGenerator()
