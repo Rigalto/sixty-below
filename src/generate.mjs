@@ -310,7 +310,7 @@ class WorldGenerator {
 
     // 7.2. Ajout du Natural en surface
     const guarded = new Set([...termiteGuarded, ...anthillGuarded, ...antlionGuarded])
-    worldCarver.paintSurfaceNatural(surfaceLine, biomesDescription, guarded)
+    const surfacePlants = worldCarver.paintSurfaceNatural(surfaceLine, biomesDescription, guarded)
     await progress('Naturalizing Surface')
 
     // 7.3. Traitement de la mer
@@ -358,7 +358,7 @@ class WorldGenerator {
       const liquidBodies = [...honeyLiquidBodies, ...lakeLiquidBodies, ...underLakeLiquidBodies, ...blindLakeLiquidBodies, ...sapLakeLiquidBodies, ...sapPocketLiquidBodies, ...waterPuddleLiquidBodies, ...sapPuddleLiquidBodies]
       console.log('.................... liquidBodies', liquidBodies)
       const lakes = [...surfaceLakes, ...underLakes, ...blindLakes, ...sapLakes, ...sapPockets]
-      const plants = [...fernsPlants, ...mossPlants, ...mushroomPlants]
+      const plants = [...fernsPlants, ...mossPlants, ...mushroomPlants, ...surfacePlants]
       await this.save(seed, {hives, cobwebCaves, geodeCaves, lakes, liquidBodies, fernsCaves, mossCaves, mushroomCaves, pyramid, ruinedcabin, lostTemple, ancientHouse, leftBeach, rightBeach, antlions, anthills, termites, plants, hearts, triskels, graveyard})
       worldBuffer.clear()
     }
@@ -3673,7 +3673,7 @@ class WorldCarver {
 
       const rect2 = this.applyTiles(tiles)
       this.addExclusion(rect2)
-      this.#fillFernMushroomCaveFloor(cx, cy + 1, radiusX, GRASSFERN, HUMUS, GRASS_TYPE.FERN, plants)
+      this.#fillFernMushroomCaveFloor(cx, cy + 1, radiusX, GRASSFERN, HUMUS, plants)
 
       const guardTop = cy + 6
       const guardBottom = cy + radiusY + rectHalfH + 3
@@ -3701,10 +3701,10 @@ class WorldCarver {
  * @param {number} substrateCode - Code du substrat (ex: NODES.HUMUS.code)
  * @param {number} grassType - Code du type de GRASS (GRASS_TYPE.FERN ou GRASS_TYPE.MUSHROOM)
  * @param {Array} plants - [OUT] Tableau accumulant les enregistrements plant à sauvegarder
+ * @returns {plants: Array<{kind, index, type, deleted}>}
  */
-  #fillFernMushroomCaveFloor (cx, cy, radiusX, surfaceCode, substrateCode, grassType, plants) {
+  #fillFernMushroomCaveFloor (cx, cy, radiusX, surfaceCode, substrateCode, plants) {
     const VOID = NODES.VOID.code
-    const GRASS_SYSTEM = PLANT_KIND.NATURAL
 
     let depth = seededRNG.randomGetBool() ? 2 : 3
 
@@ -3716,7 +3716,7 @@ class WorldCarver {
 
       // GRASS sur le fond
       worldBuffer.write(x, y, surfaceCode)
-      plants.push({system: GRASS_SYSTEM, type: grassType, index: (y << 10) | x})
+      plants.push({kind: PLANT_KIND.NATURAL, type: surfaceCode, index: (y << 10) | x, deleted: false})
 
       // HUMUS sur les tuiles suivantes
       for (let d = 1; d <= depth; d++) {
@@ -3811,6 +3811,7 @@ class WorldCarver {
  * @param {number} radiusX
  * @param {number} radiusY
  * @param {Array} plants - [OUT] Tableau accumulant les enregistrements plant à sauvegarder
+ * @returns {plants: Array<{kind, index, type, deleted}>}
  */
   #fillMossCaveWalls (cx, cy, radiusX, radiusY, plants) {
     const VOID = NODES.VOID.code
@@ -3826,9 +3827,6 @@ class WorldCarver {
       NODES.HONEY.code,
       NODES.SAP.code
     ])
-    const GRASS_SYSTEM = PLANT_KIND.NATURAL
-    const grassType = GRASS_TYPE.MOSS
-
     const x0 = cx - radiusX - 1
     const x1 = cx + radiusX + 1
     const y0 = cy - radiusY - 1
@@ -3847,7 +3845,7 @@ class WorldCarver {
         if (hasVoidBelow && hasVoidLeft && hasVoidRight) continue
         if (hasVoidAbove || hasVoidLeft || hasVoidRight) {
           worldBuffer.write(x, y, GRASSMOSS)
-          plants.push({system: GRASS_SYSTEM, type: grassType, index: (y << 10) | x})
+          plants.push({kind: PLANT_KIND.NATURAL, type: GRASSMOSS, index: (y << 10) | x, deleted: false})
         }
         if (hasVoidAbove && !hasVoidBelow) {
           worldBuffer.write(x, y + 1, MUD)
@@ -3896,7 +3894,7 @@ class WorldCarver {
       const rect2 = this.applyTiles(tiles)
       this.addExclusion(rect2)
 
-      this.#fillFernMushroomCaveFloor(cx, cy, radiusX, GRASSMUSHROOM, HUMUS, GRASS_TYPE.MUSHROOM, plants)
+      this.#fillFernMushroomCaveFloor(cx, cy, radiusX, GRASSMUSHROOM, HUMUS, plants)
 
       // tileGuard.addNoisyRect(cx, cy + radiusY / 2, radiusX + 2, radiusX + 4, radiusY / 2 + 2, radiusY / 2 + 4, 0.8, PERLIN_OFFSET_MUSHROOM)
 
@@ -4995,6 +4993,8 @@ class WorldCarver {
  * @param {Int16Array}                    surfaceLine       — Y de la première tuile solide par colonne
  * @param {Array<{biome, width, offset}>} biomesDescription — zones biome ordonnées
  * @param {Set<number>} xPositions — ensemble des coordonnées X protégées contre la transformation en NATURAL
+ *  @returns {plants: Array<{kind, index, type, deleted}>}
+
  */
   paintSurfaceNatural (surfaceLine, biomesDescription, guarded) {
     const GRASSFOREST = NODES.GRASSFOREST.code
@@ -5012,6 +5012,7 @@ class WorldCarver {
     NATURAL_CODE[BIOME_TYPE.DESERT] = SAND
 
     const tiles = []
+    const naturalPlants = []
     let zoneIdx = 0
     let zone = biomesDescription[0]
     let zoneEnd = zone.offset + zone.width
@@ -5035,6 +5036,11 @@ class WorldCarver {
       const code = NATURAL_CODE[zone.biome]
       tiles.push({x, y, index: idx, code})
 
+      // Enregistrement NATURAL pour Forest et Jungle
+      if (code === GRASSFOREST || code === GRASSJUNGLE) {
+        naturalPlants.push({kind: PLANT_KIND.NATURAL, type: code, index: idx, deleted: false})
+      }
+
       // 2ème tuile : 90% de chance
       if (seededRNG.randomReal() < 0.9) {
         tiles.push({x, y: y + 1, index: idx + W, code})
@@ -5051,6 +5057,7 @@ class WorldCarver {
     }
 
     this.applyTiles(tiles, ETERNAL_EXCLUDED)
+    return naturalPlants
   }
 
   /**
