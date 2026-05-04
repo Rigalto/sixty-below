@@ -907,7 +907,7 @@ Le paramètre `offsetX` de `digNoisyCircle`, `digNoisyEllipse` et `digNoisyRect`
 | `liquidFiller`       | `LiquidFiller`      | Flood-fill BFS des zones liquides et automate pour le SAND. |
 | `webFiller` | `WebFiller` | Peuplement WEB : `fillCobwebCave(cx, cy)` pour les caves, `scatterWebs(surfaceUnder)` pour le peuplement global différé. |
 | `furnitureGenerator ` | `FurnitureGenerator ` | Gestion des furnitures. `init()`, `getFurnitureSize(code)`, `addFurnitureAt(index, code)`, `get furnitures()`, `firstAvailableSlot(container, capacity, furnitureId)`, `addInBag(item, count)`, `addInChest(chest, item, count)`, `get inventory()`, `placeSeaChests(seaRect)`, `placeCavernChests(zoneRects)`, `placeUndergroundChests(zoneRects)`, `placeSurfaceChests(zoneRects)`, `placeSurfaceLineChests(surfaceLine, guardedX, biomesDescription)`, `fillChest (chest)` |
-| `plantGenerator`       | `PlantGenerator`      | Ajout de la flore dans le monde. `init()`, `get plants()` |
+| `plantGenerator`       | `PlantGenerator`      | Ajout de la flore dans le monde. `init()`, `get plants()`, `placeSeaCoconut(beachRect, surfaceLine, isLeft, guarded)` |
 
 ---
 

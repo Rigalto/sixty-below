@@ -27,7 +27,6 @@
 - écoulement du sable
 
 ### Mini-biomes à implémenter
-- `TileGuard` : implémenté - A intégrer pour tous les futurs mini-biomes
 - amélioration de l'aspect des Moss Caves : n'ajouter les tuiles de GRASSMOSS que dans 90% du temps, ajouter deux tuiles verticales de HUMUS? dans 45% du temps
 - analyser des modifications analogue à celles pour les Moss Caves, à effectuer pour les mushroom caves et les fern caves.
 
@@ -35,7 +34,7 @@
 - Placement des coraux et plantes marines
 
 ### Ajout des artefacts et plantes
-- Ajout des arbres (Oak, Mahogany, Giant Mushroom, Coconut)
+- Ajout des arbres : Oak, Mahogany, Giant Mushroom
 - Ajout de herbes
 - Ajout des arbustes (Cactus, bambou)
 
@@ -208,6 +207,7 @@
 - `WorldCarver.reserveTermiteMounds`, `WorldCarver.buildTermiteMounds` — Jungle, surface, structure rectangulaire ANTDIRT + VOID
 - `TileGuard` — utilitaire de protection tuiles contre creusement, formes bruitées (cercle, ellipse, rectangle)
 - `furnitureGenerator.place...Chests` - ajout des coffres
+- `plantGenerator.placeSeaCoconut` - ajout des cocotiers
 
 ### Rendu (partiel)
 - `WorldRenderer` — rendu tuiles par chunks avec cache OffscreenCanvas

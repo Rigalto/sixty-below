@@ -340,6 +340,37 @@ export const PLANT_KIND = {
   SEED: 5 // graines plantées ()
 }
 
+export const TREE_IMAGES = {
+  coconut: [
+    ['coconut_64_48-0-0', 'coconut_64_48-0-1', 'coconut_64_48-0-2'],
+    ['coconut_64_48-0-3', 'coconut_64_48-0-4', 'coconut_64_48-0-5'],
+    ['coconut_64_48-1-0', 'coconut_64_48-1-1'],
+    ['coconut_64_48-1-2', 'coconut_64_48-1-3', 'coconut_64_48-1-4'],
+    ['coconut_64_48-1-5', 'coconut_64_48-2-0', 'coconut_64_48-2-1', 'coconut_64_48-2-2']
+  ],
+  oak: [
+    ['oak_80_48-0-0', 'oak_80_48-0-1', 'oak_80_48-0-2'],
+    ['oak_80_48-0-3', 'oak_80_48-0-4', 'oak_80_48-0-5'],
+    ['oak_80_48-1-0', 'oak_80_48-1-1'],
+    ['oak_80_48-1-2', 'oak_80_48-1-3', 'oak_80_48-1-4'],
+    ['oak_80_48-1-5', 'oak_80_48-2-0', 'oak_80_48-2-1', 'oak_80_48-2-2']
+  ],
+  mahogany: [
+    ['mahogany_80_48-0-0', 'mahogany_80_48-0-1', 'mahogany_80_48-0-2'],
+    ['mahogany_80_48-0-3', 'mahogany_80_48-0-4', 'mahogany_80_48-0-5'],
+    ['mahogany_80_48-1-0', 'mahogany_80_48-1-1'],
+    ['mahogany_80_48-1-2', 'mahogany_80_48-1-3', 'mahogany_80_48-1-4'],
+    ['mahogany_80_48-1-5', 'mahogany_80_48-2-0', 'mahogany_80_48-2-1', 'mahogany_80_48-2-2']
+  ],
+  giantMushroom: [
+    ['giantmushroom_64_48-0-0', 'giantmushroom_64_48-0-1', 'giantmushroom_64_48-0-2'],
+    ['giantmushroom_64_48-0-3', 'giantmushroom_64_48-0-4', 'giantmushroom_64_48-0-5'],
+    ['giantmushroom_64_48-1-0', 'giantmushroom_64_48-1-1'],
+    ['giantmushroom_64_48-1-2', 'giantmushroom_64_48-1-3', 'giantmushroom_64_48-1-4'],
+    ['giantmushroom_64_48-1-5', 'giantmushroom_64_48-2-0', 'giantmushroom_64_48-2-1', 'giantmushroom_64_48-2-2']
+  ]
+}
+
 /* ============================================================================
    6. MONSTERS
    ============================================================================ */

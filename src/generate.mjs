@@ -1,7 +1,7 @@
 import {seededRNG, shuffleArray, rollLoot} from './utils.mjs'
 import {database, uniqueIdGenerator} from './database.mjs'
 import {WEATHER_TYPE, WORLD_WIDTH, WORLD_HEIGHT, SEA_LEVEL, TOPSOIL_Y_SKY_SURFACE, TOPSOIL_Y_SURFACE_UNDER, TOPSOIL_Y_UNDER_CAVERNS, TOPSOIL_Y_CAVERNS_MID, BIOME_TILE_MAP, SEA_MAX_JITTER, SEA_MAX_WIDTH, SEA_MAX_HEIGHT, CLUSTER_SCATTER_MAP, ORE_GEM_SCATTER_MAP, PERLIN_OFFSET_NATURALIZER, PERLIN_OFFSET_TUNNEL, PERLIN_OFFSET_SURFACE_TUNNEL, PERLIN_OFFSET_SMALL_TUNNEL, PERLIN_OFFSET_CAVERN, PERLIN_OFFSET_HIVE, PERLIN_OFFSET_HEART, PERLIN_OFFSET_MUSHROOM, PERLIN_OFFSET_COBWEB, PERLIN_OFFSET_FERNS, PERLIN_OFFSET_LAKES, PERLIN_OFFSET_SHELL, PERLIN_OFFSET_TEMPLE, PERLIN_OFFSET_BEACH, SMALL_CAVERNS_COUNT, MEDIUM_CAVERNS_COUNT, UNDERGROUND_TUNNEL_COUNT, CAVERNS_TUNNEL_COUNT, SMALL_TUNNELS_COUNT, HIVE_RADIUS_MIN, HIVE_RADIUS_MAX, COBWEB_CAVE_COUNT_MIN, COBWEB_CAVE_COUNT_MAX, COBWEB_RADIUS_X_MIN, COBWEB_RADIUS_X_MAX, COBWEB_RADIUS_Y_MIN, COBWEB_RADIUS_Y_MAX, COBWEB_CAVE_MAIN_MIN, COBWEB_CAVE_MAIN_MAX, COBWEB_CAVE_SIDE_MIN, COBWEB_CAVE_SIDE_MAX, COBWEB_SCATTER_COUNT, COBWEB_SCATTER_SIZE_MIN, COBWEB_SCATTER_SIZE_MAX, GEODE_CAVE_COUNT_MIN, GEODE_CAVE_COUNT_MAX, GEODE_RADIUS_MIN, GEODE_RADIUS_MAX, GEODE_TARGET_CLUSTER_COUNT, GEODE_CLUSTER_SIZE_MIN, GEODE_CLUSTER_SIZE_MAX, TOPSOIL_SCATTER_MAP, LAKE_RADIUS_X_MIN, LAKE_RADIUS_X_MAX, LAKE_RADIUS_Y_MIN, LAKE_RADIUS_Y_MAX, LAKE_PIT_RADIUS_X_MIN, LAKE_PIT_RADIUS_X_MAX, LAKE_PIT_RADIUS_Y_MIN, LAKE_PIT_RADIUS_Y_MAX, LAKE_CREATION_MAP, UNDERGROUND_LAKE_UNDER_COUNT, UNDERGROUND_LAKE_CAVERNS_COUNT, UNDERGROUND_LAKE_RADIUS_MIN, UNDERGROUND_LAKE_RADIUS_MAX, BLIND_LAKE_COUNT, BLIND_LAKE_RADIUS_MIN, BLIND_LAKE_RADIUS_MAX, SAP_LAKE_UNDER_COUNT, SAP_LAKE_CAVERNS_COUNT, SAP_LAKE_RADIUS_MIN, SAP_LAKE_RADIUS_MAX, SAP_POCKET_COUNT, SAP_POCKET_RADIUS_MIN, SAP_POCKET_RADIUS_MAX, WATER_PUDDLE_COUNT, SAP_PUDDLE_COUNT, PUDDLE_HEIGHT_MIN, PUDDLE_HEIGHT_MAX, FOSSIL_VEIN_COUNT, FERN_CAVE_RADIUS_X_MIN, FERN_CAVE_RADIUS_X_MAX, FERN_CAVE_RADIUS_Y_MIN, FERN_CAVE_RADIUS_Y_MAX, MOSS_CAVE_RADIUS_X_MIN, MOSS_CAVE_RADIUS_X_MAX, MOSS_CAVE_RADIUS_Y_MIN, MOSS_CAVE_RADIUS_Y_MAX, SAND_POCKET_RADIUS_X_MIN, SAND_POCKET_RADIUS_X_MAX, SAND_POCKET_RADIUS_Y_MIN, SAND_POCKET_RADIUS_Y_MAX, MUSHROOM_CAVE_RADIUS_X_MIN, MUSHROOM_CAVE_RADIUS_X_MAX, MUSHROOM_CAVE_RADIUS_Y_MIN, MUSHROOM_CAVE_RADIUS_Y_MAX, PYRAMID_WALL_INDEXES, PYRAMID_VOID_INDEXES, PYRAMID_WIDTH, PYRAMID_HEIGHT, PYRAMID_ROOM1_DELTA, PYRAMID_ROOM2_DELTA, TEMPLE_RUIN_WALL_INDEXES, TEMPLE_RUIN_COLUMNS_INDEXES, CHEST_CONTENT} from '../assets/data/data-gen.mjs'
-import {NODES, NODES_LOOKUP, NODE_TYPE, BIOME_TYPE, PLANT_KIND, ITEMS, BAG_CAPACITY} from '../assets/data/data.mjs'
+import {NODES, NODES_LOOKUP, NODE_TYPE, BIOME_TYPE, PLANT_KIND, ITEMS, BAG_CAPACITY, TREE_IMAGES} from '../assets/data/data.mjs'
 
 /* ====================================================================================================
    WORLD BUFFER (CREATION DU MONDE)
@@ -350,8 +350,8 @@ class WorldGenerator {
     furnitureGenerator.placeCavernChests(zoneRects)
 
     // 8.3. Ajout des plantes et des coraux - TODO
-    plantGenerator.placeCoconut(leftBeach.beachRect, surfaceLine, true, guarded)
-    plantGenerator.placeCoconut(rightBeach.beachRect, surfaceLine, false, guarded)
+    plantGenerator.placeSeaCoconut(leftBeach.beachRect, surfaceLine, true, guarded)
+    plantGenerator.placeSeaCoconut(rightBeach.beachRect, surfaceLine, false, guarded)
 
     // 9. Traitements finaux
 
@@ -6715,7 +6715,7 @@ class PlantGenerator {
  * @param {Int16Array} surfaceLine — Y de la première tuile solide par colonne
  * @param {boolean} isLeft — true = plage gauche (parcours gauche→droite), false = droite→gauche
  */
-  placeCoconut (beachRect, surfaceLine, isLeft, guarded) {
+  placeSeaCoconut (beachRect, surfaceLine, isLeft, guarded) {
     const SEA = NODES.SEA.code
     const WATER = NODES.WATER.code
     const SAND = NODES.SAND.code
@@ -6732,7 +6732,7 @@ class PlantGenerator {
       const yNext = surfaceLine[x + dir]
 
       if (y !== yNext) continue
-      console.log('PlantGenerator.placeCoconut #plants.......................', {x, y, dir, current: worldBuffer.read(x, y), side: worldBuffer.read(x + dir, y), currentTop: worldBuffer.read(x, y - 1), sideTop: worldBuffer.read(x + dir, y - 1)})
+      console.log('PlantGenerator.placeSeaCoconut #plants.......................', {x, y, dir, current: worldBuffer.read(x, y), side: worldBuffer.read(x + dir, y), currentTop: worldBuffer.read(x, y - 1), sideTop: worldBuffer.read(x + dir, y - 1)})
 
       if (guarded.has(x) || guarded.has(x + dir)) continue
 
@@ -6747,6 +6747,18 @@ class PlantGenerator {
       guarded.add(x)
       guarded.add(x + dir)
 
+      // génération de l'image
+      const soilX = soilIndex & 0x3FF
+      const soilY = soilIndex >> 10
+      const imageTable = TREE_IMAGES.coconut
+      const images = []
+      for (let i = 0; i < imageTable.length; i++) {
+        const src = seededRNG.randomGetArrayValue(imageTable[i])
+        const x = soilX - 1
+        const y = soilY - (imageTable.length - i) * 3
+        images.push({src, x, y})
+      }
+
       this.#plants.push({
         kind: PLANT_KIND.TREE,
         type: 'coconut',
@@ -6755,13 +6767,13 @@ class PlantGenerator {
         w,
         h,
         size: 3,
-        images: [],
+        images,
         grass: SAND,
         growthTimestamp: null,
         shakedTimestamp: null,
         deleted: false
       })
-      console.log('PlantGenerator.placeCoconut #plants.......................', this.#plants)
+      console.log('PlantGenerator.placeSeaCoconut #plants.......................', this.#plants)
       return
     }
   }
