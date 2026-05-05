@@ -1,5 +1,5 @@
 import {TIME_BUDGET, MICROTASK_FN_NAME_TO_KEY, STATE, OVERLAYS} from './constant.mjs'
-import {NODES, NODES_LOOKUP, ITEMS} from '../../assets/data/data.mjs'
+import {NODES, NODES_LOOKUP, ITEMS, TREE_IMAGES} from '../../assets/data/data.mjs'
 import {HELP, HELP_TITLES} from '../../assets/data/data-help.mjs'
 import {loadAssets, resolveAssetData} from './assets.mjs'
 import {timeManager, taskScheduler, microTasker, eventBus, seededRNG} from './utils.mjs'
@@ -75,6 +75,7 @@ class GameCore {
     // 2. Hydratation des données statiques
     this.#hydrateNodes()
     this.#hydrateItems()
+    this.#hydrateTreeImages()
     this.#hydrateHelp()
     // this._hydrateBuffs() ...
 
@@ -131,6 +132,23 @@ class GameCore {
     }
 
     console.log(`   🔹 Items hydratés : ${count}, ${errors} erreur(s)`)
+  }
+
+  /**
+   * Hydratation spécifique pour les images des arbres
+   */
+  #hydrateTreeImages () {
+    let count = 0
+    for (const treeType in TREE_IMAGES) {
+      const rows = TREE_IMAGES[treeType]
+      for (const images of rows) {
+        for (let col = 0; col < images.length; col++) {
+          images[col] = resolveAssetData(images[col])
+          count++
+        }
+      }
+    }
+    console.log(`   🔹 Tree images hydratées : ${count}`)
   }
 
   /**

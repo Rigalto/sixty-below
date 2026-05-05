@@ -6828,8 +6828,8 @@ class PlantGenerator {
     const images = []
 
     for (let i = 0; i < imageTable.length; i++) {
-      const src = seededRNG.randomGetArrayValue(imageTable[i])
-      images.push({src, x: soilX - 1, y: soilY - (imageTable.length - i) * 3})
+      const col = seededRNG.randomGetArrayIndex(imageTable[i])
+      images.push({tree: 'coconut', row: i, col, x: soilX - 1, y: soilY - (imageTable.length - i) * 3})
     }
 
     this.#plants.push({
