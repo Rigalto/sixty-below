@@ -532,6 +532,9 @@ Les enregistrements sont de natures très différentes, nature déterminée par 
   * `index` : position de l'abre (coint haut gauche du rectangle englobant)
   * `type` : type de l'arbre : OAK, MAHOGANY, GIANTMUSHROOM, COCONUT
   * `w` et `h` : taille maximale de l'arbre
+  * `x`: coordonnée pour le clipping de l'image
+  * `yTop`: coordonnée pour le clipping de l'image (affichée si `x,yTop` est dans le rectangle visible)
+  * `yBottom`: coordonnée pour le clipping de l'image (ou si `x,yBottom` est dans le rectangle visible)
   * `soilIndex` : position de la tuile solide sous la gauche de l'arbre (`index + h * 1024`)
   * `size` : croissance actuelle (0 à 4)
   * `images` : tableau de 7 images (selon `size`, les images suivantes sont empilées : `0 => [0, 4]`, `1 => [0, 1, 4]`, `2 => [0, 1, 2, 4]`, `3 => [0, 1, 2, 3, 4]`, `4 => [0, 1, 2, 3, 5, 6]`)
@@ -543,6 +546,7 @@ Les enregistrements sont de natures très différentes, nature déterminée par 
   * `index` : position du spot de champignon (coin haut gauche de l'image)
   * `type` : type du champignon qui pousse sur le spot : Bolet, Pink Mycenia
   * `w` et `h` : taille du champignon
+  * `x` et `y` : coordonnées pour le clipping de l'image (affichée si `x,y` est dans le rectangle visible)
   * `soilIndex` : position de la tuile solide sous la gauche du champignon (`index + h * 1024`)
   * `present` : booléen indiquant si un champignon est présent (`true`) ou non sur le spot de champignon
   * _Visibilité pilotée globalement par l'heure in-game — les champignons d'un même type apparaissent et disparaissent simultanément._
@@ -551,6 +555,7 @@ Les enregistrements sont de natures très différentes, nature déterminée par 
   * `index` : position de l'herbe (coin haut gauche de l'image)
   * `type` : type d'herbe : Blinkroot, Coral, Daybloom, Fireblossom, Oleander, Skorn, Waterleaf
   * `w` et `h` : taille de l'herbe
+  * `x` et `y` : coordonnées pour le clipping de l'image (affichée si `x,y` est dans le rectangle visible)
   * `soilIndex` : position de la tuile solide sous la gauche de l'herbe (`index + h * 1024`)
   * `image` : image de l'herbe (pour les coraux, quatre images aléatoires)
   * `bloom` : l'herbe est mature et peut être récoltée (`true`)
@@ -558,6 +563,7 @@ Les enregistrements sont de natures très différentes, nature déterminée par 
 * `kind` SEED : liste des graines plantées dans le monde
   * `id` : identifiant unique de la graine
   * `index` : position de la graine (tuile où elle se trouve)
+  * `x` et `y` : coordonnées pour le clipping de l'image (affichée si `x,y` est dans le rectangle visible)
   * `type` : type de graine : à concevoir
 
 Tous les enregistrements possèdent en plus un champ `deleted` permettant de décaler la suppression des enregistrements dans la phase d'initialisation de la sessin de jeu suivante.
