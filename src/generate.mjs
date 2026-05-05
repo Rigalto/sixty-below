@@ -1,6 +1,6 @@
 import {seededRNG, shuffleArray, rollLoot} from './utils.mjs'
 import {database, uniqueIdGenerator} from './database.mjs'
-import {WEATHER_TYPE, WORLD_WIDTH, WORLD_HEIGHT, SEA_LEVEL, TOPSOIL_Y_SKY_SURFACE, TOPSOIL_Y_SURFACE_UNDER, TOPSOIL_Y_UNDER_CAVERNS, TOPSOIL_Y_CAVERNS_MID, BIOME_TILE_MAP, SEA_MAX_JITTER, SEA_MAX_WIDTH, SEA_MAX_HEIGHT, CLUSTER_SCATTER_MAP, ORE_GEM_SCATTER_MAP, PERLIN_OFFSET_NATURALIZER, PERLIN_OFFSET_TUNNEL, PERLIN_OFFSET_SURFACE_TUNNEL, PERLIN_OFFSET_SMALL_TUNNEL, PERLIN_OFFSET_CAVERN, PERLIN_OFFSET_HIVE, PERLIN_OFFSET_HEART, PERLIN_OFFSET_MUSHROOM, PERLIN_OFFSET_COBWEB, PERLIN_OFFSET_FERNS, PERLIN_OFFSET_LAKES, PERLIN_OFFSET_SHELL, PERLIN_OFFSET_TEMPLE, PERLIN_OFFSET_BEACH, SMALL_CAVERNS_COUNT, MEDIUM_CAVERNS_COUNT, UNDERGROUND_TUNNEL_COUNT, CAVERNS_TUNNEL_COUNT, SMALL_TUNNELS_COUNT, HIVE_RADIUS_MIN, HIVE_RADIUS_MAX, COBWEB_CAVE_COUNT_MIN, COBWEB_CAVE_COUNT_MAX, COBWEB_RADIUS_X_MIN, COBWEB_RADIUS_X_MAX, COBWEB_RADIUS_Y_MIN, COBWEB_RADIUS_Y_MAX, COBWEB_CAVE_MAIN_MIN, COBWEB_CAVE_MAIN_MAX, COBWEB_CAVE_SIDE_MIN, COBWEB_CAVE_SIDE_MAX, COBWEB_SCATTER_COUNT, COBWEB_SCATTER_SIZE_MIN, COBWEB_SCATTER_SIZE_MAX, GEODE_CAVE_COUNT_MIN, GEODE_CAVE_COUNT_MAX, GEODE_RADIUS_MIN, GEODE_RADIUS_MAX, GEODE_TARGET_CLUSTER_COUNT, GEODE_CLUSTER_SIZE_MIN, GEODE_CLUSTER_SIZE_MAX, TOPSOIL_SCATTER_MAP, LAKE_RADIUS_X_MIN, LAKE_RADIUS_X_MAX, LAKE_RADIUS_Y_MIN, LAKE_RADIUS_Y_MAX, LAKE_PIT_RADIUS_X_MIN, LAKE_PIT_RADIUS_X_MAX, LAKE_PIT_RADIUS_Y_MIN, LAKE_PIT_RADIUS_Y_MAX, LAKE_CREATION_MAP, UNDERGROUND_LAKE_UNDER_COUNT, UNDERGROUND_LAKE_CAVERNS_COUNT, UNDERGROUND_LAKE_RADIUS_MIN, UNDERGROUND_LAKE_RADIUS_MAX, BLIND_LAKE_COUNT, BLIND_LAKE_RADIUS_MIN, BLIND_LAKE_RADIUS_MAX, SAP_LAKE_UNDER_COUNT, SAP_LAKE_CAVERNS_COUNT, SAP_LAKE_RADIUS_MIN, SAP_LAKE_RADIUS_MAX, SAP_POCKET_COUNT, SAP_POCKET_RADIUS_MIN, SAP_POCKET_RADIUS_MAX, WATER_PUDDLE_COUNT, SAP_PUDDLE_COUNT, PUDDLE_HEIGHT_MIN, PUDDLE_HEIGHT_MAX, FOSSIL_VEIN_COUNT, FERN_CAVE_RADIUS_X_MIN, FERN_CAVE_RADIUS_X_MAX, FERN_CAVE_RADIUS_Y_MIN, FERN_CAVE_RADIUS_Y_MAX, MOSS_CAVE_RADIUS_X_MIN, MOSS_CAVE_RADIUS_X_MAX, MOSS_CAVE_RADIUS_Y_MIN, MOSS_CAVE_RADIUS_Y_MAX, SAND_POCKET_RADIUS_X_MIN, SAND_POCKET_RADIUS_X_MAX, SAND_POCKET_RADIUS_Y_MIN, SAND_POCKET_RADIUS_Y_MAX, MUSHROOM_CAVE_RADIUS_X_MIN, MUSHROOM_CAVE_RADIUS_X_MAX, MUSHROOM_CAVE_RADIUS_Y_MIN, MUSHROOM_CAVE_RADIUS_Y_MAX, PYRAMID_WALL_INDEXES, PYRAMID_VOID_INDEXES, PYRAMID_WIDTH, PYRAMID_HEIGHT, PYRAMID_ROOM1_DELTA, PYRAMID_ROOM2_DELTA, TEMPLE_RUIN_WALL_INDEXES, TEMPLE_RUIN_COLUMNS_INDEXES, CHEST_CONTENT} from '../assets/data/data-gen.mjs'
+import {WEATHER_TYPE, WORLD_WIDTH, WORLD_HEIGHT, SEA_LEVEL, TOPSOIL_Y_SKY_SURFACE, TOPSOIL_Y_SURFACE_UNDER, TOPSOIL_Y_UNDER_CAVERNS, TOPSOIL_Y_CAVERNS_MID, BIOME_TILE_MAP, SEA_MAX_JITTER, SEA_MAX_WIDTH, SEA_MAX_HEIGHT, CLUSTER_SCATTER_MAP, ORE_GEM_SCATTER_MAP, PERLIN_OFFSET_NATURALIZER, PERLIN_OFFSET_TUNNEL, PERLIN_OFFSET_SURFACE_TUNNEL, PERLIN_OFFSET_SMALL_TUNNEL, PERLIN_OFFSET_CAVERN, PERLIN_OFFSET_HIVE, PERLIN_OFFSET_HEART, PERLIN_OFFSET_MUSHROOM, PERLIN_OFFSET_COBWEB, PERLIN_OFFSET_FERNS, PERLIN_OFFSET_LAKES, PERLIN_OFFSET_SHELL, PERLIN_OFFSET_TEMPLE, PERLIN_OFFSET_BEACH, SMALL_CAVERNS_COUNT, MEDIUM_CAVERNS_COUNT, UNDERGROUND_TUNNEL_COUNT, CAVERNS_TUNNEL_COUNT, SMALL_TUNNELS_COUNT, HIVE_RADIUS_MIN, HIVE_RADIUS_MAX, COBWEB_CAVE_COUNT_MIN, COBWEB_CAVE_COUNT_MAX, COBWEB_RADIUS_X_MIN, COBWEB_RADIUS_X_MAX, COBWEB_RADIUS_Y_MIN, COBWEB_RADIUS_Y_MAX, COBWEB_CAVE_MAIN_MIN, COBWEB_CAVE_MAIN_MAX, COBWEB_CAVE_SIDE_MIN, COBWEB_CAVE_SIDE_MAX, COBWEB_SCATTER_COUNT, COBWEB_SCATTER_SIZE_MIN, COBWEB_SCATTER_SIZE_MAX, GEODE_CAVE_COUNT_MIN, GEODE_CAVE_COUNT_MAX, GEODE_RADIUS_MIN, GEODE_RADIUS_MAX, GEODE_TARGET_CLUSTER_COUNT, GEODE_CLUSTER_SIZE_MIN, GEODE_CLUSTER_SIZE_MAX, TOPSOIL_SCATTER_MAP, LAKE_RADIUS_X_MIN, LAKE_RADIUS_X_MAX, LAKE_RADIUS_Y_MIN, LAKE_RADIUS_Y_MAX, LAKE_PIT_RADIUS_X_MIN, LAKE_PIT_RADIUS_X_MAX, LAKE_PIT_RADIUS_Y_MIN, LAKE_PIT_RADIUS_Y_MAX, LAKE_CREATION_MAP, UNDERGROUND_LAKE_UNDER_COUNT, UNDERGROUND_LAKE_CAVERNS_COUNT, UNDERGROUND_LAKE_RADIUS_MIN, UNDERGROUND_LAKE_RADIUS_MAX, BLIND_LAKE_COUNT, BLIND_LAKE_RADIUS_MIN, BLIND_LAKE_RADIUS_MAX, SAP_LAKE_UNDER_COUNT, SAP_LAKE_CAVERNS_COUNT, SAP_LAKE_RADIUS_MIN, SAP_LAKE_RADIUS_MAX, SAP_POCKET_COUNT, SAP_POCKET_RADIUS_MIN, SAP_POCKET_RADIUS_MAX, WATER_PUDDLE_COUNT, SAP_PUDDLE_COUNT, PUDDLE_HEIGHT_MIN, PUDDLE_HEIGHT_MAX, FOSSIL_VEIN_COUNT, FERN_CAVE_RADIUS_X_MIN, FERN_CAVE_RADIUS_X_MAX, FERN_CAVE_RADIUS_Y_MIN, FERN_CAVE_RADIUS_Y_MAX, MOSS_CAVE_RADIUS_X_MIN, MOSS_CAVE_RADIUS_X_MAX, MOSS_CAVE_RADIUS_Y_MIN, MOSS_CAVE_RADIUS_Y_MAX, SAND_POCKET_RADIUS_X_MIN, SAND_POCKET_RADIUS_X_MAX, SAND_POCKET_RADIUS_Y_MIN, SAND_POCKET_RADIUS_Y_MAX, MUSHROOM_CAVE_RADIUS_X_MIN, MUSHROOM_CAVE_RADIUS_X_MAX, MUSHROOM_CAVE_RADIUS_Y_MIN, MUSHROOM_CAVE_RADIUS_Y_MAX, PYRAMID_WALL_INDEXES, PYRAMID_VOID_INDEXES, PYRAMID_WIDTH, PYRAMID_HEIGHT, PYRAMID_ROOM1_DELTA, PYRAMID_ROOM2_DELTA, TEMPLE_RUIN_WALL_INDEXES, TEMPLE_RUIN_COLUMNS_INDEXES, CHEST_CONTENT, TREES_INIT_SIZE} from '../assets/data/data-gen.mjs'
 import {NODES, NODES_LOOKUP, NODE_TYPE, BIOME_TYPE, PLANT_KIND, ITEMS, BAG_CAPACITY, TREE_IMAGES} from '../assets/data/data.mjs'
 
 /* ====================================================================================================
@@ -140,7 +140,7 @@ class WorldGenerator {
     window.DEBUG_POINTS = [] // DEGUG - à supprimer
 
     // affichage de la progression de la création dans le dialogue modal
-    const STEPS = 26
+    const STEPS = 31
     let step = 0
     const progress = (topic) => {
       step++
@@ -350,6 +350,7 @@ class WorldGenerator {
     furnitureGenerator.placeSurfaceChests(zoneRects)
     furnitureGenerator.placeUndergroundChests(zoneRects)
     furnitureGenerator.placeCavernChests(zoneRects)
+    await progress('Chests')
 
     // 8.3. Ajout des plantes et des coraux - TODO
     // 8.3.1. Coconut
@@ -358,11 +359,17 @@ class WorldGenerator {
     for (const lake of surfaceLakes) {
       plantGenerator.placeOasisCoconut(lake, surfaceLine, guarded)
     }
+    await progress('Coconuts')
+
     // 8.3.2. Oak / Mahogany
+    plantGenerator.placeTrees(surfaceLine, guarded)
+    await progress('Oaks & Mahoganies')
+
     // 8.3.3. Giant Mushroom
     // 8.3.4. Coral
     plantGenerator.placeCorals(leftSeaRect, guarded)
     plantGenerator.placeCorals(rightSeaRect, guarded)
+    await progress('Corals')
 
     // 9. Traitements finaux
 
@@ -6740,10 +6747,7 @@ class PlantGenerator {
       const yNext = surfaceLine[x + dir]
 
       if (y !== yNext) continue
-      console.log('PlantGenerator.placeSeaCoconut #plants.......................', {x, y, dir, current: worldBuffer.read(x, y), side: worldBuffer.read(x + dir, y), currentTop: worldBuffer.read(x, y - 1), sideTop: worldBuffer.read(x + dir, y - 1)})
-
       if (guarded.has(x) || guarded.has(x + dir)) continue
-
       if (worldBuffer.read(x, y) !== SAND) continue
       if (worldBuffer.read(x + dir, y) !== SAND) continue
       if (worldBuffer.read(x, y - 1) === SEA || worldBuffer.read(x, y - 1) === WATER) continue
@@ -6925,6 +6929,116 @@ class PlantGenerator {
         deleted: false
       })
       placed++
+    }
+  }
+
+  /**
+ * Place les arbres Oak et Mahogany ainsi que les champignons associés sur la ligne de surface.
+ * Oak sur GRASSFOREST (3 tuiles), Mahogany sur GRASSJUNGLE (3 tuiles).
+ * Champignons : Bolete près des Oak, Pink Mycenia près des Mahogany.
+ *
+ * @param {Int16Array} surfaceLine — Y de la première tuile solide par colonne
+ * @param {Set<number>} guarded — colonnes protégées (modifié en place)
+ */
+  placeTrees (surfaceLine, guarded) {
+    const GRASSFOREST = NODES.GRASSFOREST.code
+    const GRASSJUNGLE = NODES.GRASSJUNGLE.code
+    const W = WORLD_WIDTH
+    const TREE_H = 18
+    const TREE_W = 3
+    const MUSH_H = 2
+    const MUSH_W = 1
+
+    const placeTree = (soilX, y, grassCode) => {
+      const treeType = grassCode === GRASSFOREST ? 'oak' : 'mahogany'
+      const mushType = grassCode === GRASSFOREST ? 'bolete' : 'pinkMycenia'
+      const soilIndex = (y << 10) | soilX
+      const size = seededRNG.randomGetArrayValue(TREES_INIT_SIZE)
+      const imageTable = TREE_IMAGES[treeType]
+      const images = []
+
+      for (let i = 0; i < imageTable.length; i++) {
+        const col = seededRNG.randomGetArrayIndex(imageTable[i])
+        images.push({tree: treeType, row: i, col, x: soilX - 1, y: y - (imageTable.length - i) * 3})
+      }
+
+      this.#plants.push({
+        kind: PLANT_KIND.TREE,
+        type: treeType,
+        index: soilIndex - TREE_H * W,
+        soilIndex,
+        w: TREE_W,
+        h: TREE_H,
+        size,
+        images,
+        grass: grassCode,
+        x: soilX,
+        yTop: y - TREE_H,
+        yBottom: y - 1,
+        growthTimestamp: null,
+        shakedTimestamp: null,
+        deleted: false
+      })
+
+      // guarded : 5 tuiles centrées sur l'arbre (soilX est la tuile gauche → centre = soilX + 1)
+      for (let dx = -1; dx <= 3; dx++) guarded.add(soilX + dx)
+
+      return {mushType, soilIndex}
+    }
+
+    const placeMushroom = (soilX, y, mushType) => {
+      const soilIndex = (y << 10) | soilX
+      this.#plants.push({
+        kind: PLANT_KIND.MUSHROOM,
+        type: mushType,
+        index: soilIndex - MUSH_H * W,
+        soilIndex,
+        w: MUSH_W,
+        h: MUSH_H,
+        present: false,
+        deleted: false
+      })
+      guarded.add(soilX)
+    }
+
+    let x = 1
+    while (x < W - 1) {
+      if (guarded.has(x)) { x++; continue }
+
+      const y = surfaceLine[x]
+      const code = worldBuffer.read(x, y)
+      if (code !== GRASSFOREST && code !== GRASSJUNGLE) { x++; continue }
+
+      // Compter les tuiles consécutives valides au même y
+      let count = 1
+      while (
+        count < 5 &&
+      x + count < W - 1 &&
+      !guarded.has(x + count) &&
+      surfaceLine[x + count] === y &&
+      worldBuffer.read(x + count, y) === code
+      ) count++
+
+      if (count < 3) { x++; continue }
+
+      if (count === 3) {
+        placeTree(x, y, code)
+        x += 5 // skip les 5 tuiles guardées
+      } else if (count === 4) {
+        const treeLeft = seededRNG.randomGetBool()
+        const treeX = treeLeft ? x : x + 1
+        const mushX = treeLeft ? x + 3 : x
+        const {mushType} = placeTree(treeX, y, code)
+        placeMushroom(mushX, y, mushType)
+        x += 6
+      } else { // count === 5
+        const treeX = x + 1 // tuile centrale → arbre sur x+1, x+2, x+3
+        const mushLeft = seededRNG.randomGetBool()
+        const mushX = mushLeft ? x : x + 4
+        const {mushType} = placeTree(treeX, y, code)
+        placeMushroom(mushX, y, mushType)
+        x += 6
+      }
     }
   }
 }

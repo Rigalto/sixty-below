@@ -496,3 +496,5 @@ export const CHEST_CONTENT = {
 for (const type in CHEST_CONTENT) {
   CHEST_CONTENT[type] = CHEST_CONTENT[type].map(parseLootEntry)
 }
+
+export const TREES_INIT_SIZE = [0, 1, 1, 2, 2, 2, 3, 3, 3, 3, 3, 4, 4, 4, 4, 4, 4, 4, 4, 4] // 5% par entrée

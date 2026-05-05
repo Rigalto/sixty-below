@@ -31,7 +31,7 @@
 - analyser des modifications analogue à celles pour les Moss Caves, à effectuer pour les mushroom caves et les fern caves.
 
 ### Ajout des artefacts et plantes
-- Ajout des arbres : Oak, Mahogany, Giant Mushroom
+- Ajout des arbres : Giant Mushroom
 - Ajout de herbes
 - Ajout des arbustes (Cactus, bambou)
 
@@ -206,6 +206,7 @@
 - `furnitureGenerator.place...Chests` - ajout des coffres
 - `plantGenerator.placeSeaCoconut` - ajout des cocotiers
 - `plantGenerator.placeCorals` - ajout des coraux
+- `plantGenerator.placeTrees` - ajout des Oaks et Mahoganies
 
 ### Rendu (partiel)
 - `WorldRenderer` — rendu tuiles par chunks avec cache OffscreenCanvas

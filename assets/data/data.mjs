@@ -353,6 +353,8 @@ export const TREE_IMAGES = {
     ['oak_80_48-0-3', 'oak_80_48-0-4', 'oak_80_48-0-5'],
     ['oak_80_48-1-0', 'oak_80_48-1-1'],
     ['oak_80_48-1-2', 'oak_80_48-1-3', 'oak_80_48-1-4'],
+    ['oak_80_48-1-5', 'oak_80_48-2-0', 'oak_80_48-2-1', 'oak_80_48-2-2'],
+    ['oak_80_48-1-5', 'oak_80_48-2-0', 'oak_80_48-2-1', 'oak_80_48-2-2'],
     ['oak_80_48-1-5', 'oak_80_48-2-0', 'oak_80_48-2-1', 'oak_80_48-2-2']
   ],
   mahogany: [
@@ -360,6 +362,8 @@ export const TREE_IMAGES = {
     ['mahogany_80_48-0-3', 'mahogany_80_48-0-4', 'mahogany_80_48-0-5'],
     ['mahogany_80_48-1-0', 'mahogany_80_48-1-1'],
     ['mahogany_80_48-1-2', 'mahogany_80_48-1-3', 'mahogany_80_48-1-4'],
+    ['mahogany_80_48-1-5', 'mahogany_80_48-2-0', 'mahogany_80_48-2-1', 'mahogany_80_48-2-2'],
+    ['mahogany_80_48-1-5', 'mahogany_80_48-2-0', 'mahogany_80_48-2-1', 'mahogany_80_48-2-2'],
     ['mahogany_80_48-1-5', 'mahogany_80_48-2-0', 'mahogany_80_48-2-1', 'mahogany_80_48-2-2']
   ],
   giantMushroom: [
