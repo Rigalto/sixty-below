@@ -2366,10 +2366,10 @@ Filled directly from a liquid source in the world. Used as tools to transport an
 * [[item:spiderEgg]] — common ⏳
 * [[item:silk]] — rare drop⏳
 
-Note: those ingredients can also be dropped by [[Mining]] [[Cobwaeb]] with any [[Pickaxes|Pickaxe]].
+Note: those ingredients can also be dropped by [[Mining]] [[Cobweb]] with any [[Pickaxes|Pickaxe]].
 
 **Tips**
-* if you are looking for [[item:silk]], prefers [[Mining]] [[Cobwaeb]] as the drop rate is far better
+* if you are looking for [[item:silk]], prefers [[Mining]] [[Cobweb]] as the drop rate is far better
     `
   },
   {
