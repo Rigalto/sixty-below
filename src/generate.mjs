@@ -3728,8 +3728,6 @@ class WorldCarver {
   #fillFernMushroomCaveFloor (cx, cy, radiusX, surfaceCode, substrateCode, plants) {
     const VOID = NODES.VOID.code
 
-    let depth = seededRNG.randomGetBool() ? 2 : 3
-
     const fillColumn = (x) => {
     // Descend depuis cy jusqu'au fond
       let y = cy
@@ -3737,8 +3735,11 @@ class WorldCarver {
       if (worldBuffer.read(x, y - 1) !== VOID) return false // hors cave
 
       // GRASS sur le fond
-      worldBuffer.write(x, y, surfaceCode)
-      plants.push({kind: PLANT_KIND.NATURAL, type: surfaceCode, index: (y << 10) | x, deleted: false})
+      const sCode = seededRNG.randomGetPercent(90) ? surfaceCode : substrateCode
+      worldBuffer.write(x, y, sCode)
+      if (sCode === surfaceCode) {
+        plants.push({kind: PLANT_KIND.NATURAL, type: surfaceCode, index: (y << 10) | x, deleted: false})
+      }
 
       // HUMUS sur les tuiles suivantes
       for (let d = 1; d <= depth; d++) {
@@ -3755,6 +3756,7 @@ class WorldCarver {
     }
 
     // Centre puis droite
+    let depth = seededRNG.randomGetBool() ? 2 : 3
     fillColumn(cx)
     for (let x = cx + 1; x <= cx + radiusX; x++) {
       if (!fillColumn(x)) break
@@ -3865,11 +3867,17 @@ class WorldCarver {
 
         if (hasVoidBelow && hasVoidLeft && hasVoidRight) continue
         if (hasVoidAbove || hasVoidLeft || hasVoidRight) {
-          worldBuffer.write(x, y, GRASSMOSS)
-          plants.push({kind: PLANT_KIND.NATURAL, type: GRASSMOSS, index: (y << 10) | x, deleted: false})
+          const sCode = seededRNG.randomGetPercent(90) ? GRASSMOSS : MUD
+          worldBuffer.write(x, y, sCode)
+          if (sCode === GRASSMOSS) {
+            plants.push({kind: PLANT_KIND.NATURAL, type: GRASSMOSS, index: (y << 10) | x, deleted: false})
+          }
         }
         if (hasVoidAbove && !hasVoidBelow) {
           worldBuffer.write(x, y + 1, MUD)
+          if (seededRNG.randomGetBool()) {
+            worldBuffer.write(x, y + 2, MUD)
+          }
         }
       }
     }

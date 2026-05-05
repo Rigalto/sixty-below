@@ -19,17 +19,6 @@
 ### Tunnels
 - Densité trop élevée, notamment juste sous la surface (revoir les constantes `SMALL_TUNNELS_COUNT` et `CAVERNS_TUNNEL_COUNT`)
 
-### Surface végétale
-- Ajout des NATURAL (GRASS, GRASSJUNGLE) sur les tuiles TOPSOIL exposées
-
-### Sable
-- Cconsolidation des tunnels/cavernes
-- écoulement du sable
-
-### Mini-biomes à implémenter
-- amélioration de l'aspect des Moss Caves : n'ajouter les tuiles de GRASSMOSS que dans 90% du temps, ajouter deux tuiles verticales de HUMUS? dans 45% du temps
-- analyser des modifications analogue à celles pour les Moss Caves, à effectuer pour les mushroom caves et les fern caves.
-
 ### Ajout des artefacts et plantes
 - Ajout des arbres : Giant Mushroom
 - Ajout de herbes
