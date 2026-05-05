@@ -553,11 +553,10 @@ Les enregistrements sont de natures très différentes, nature déterminée par 
 * `kind` HERB : liste des herbes présentes dans le monde
   * `id` : identifiant unique de l'herbe
   * `index` : position de l'herbe (coin haut gauche de l'image)
-  * `type` : type d'herbe : Blinkroot, Coral, Daybloom, Fireblossom, Oleander, Skorn, Waterleaf
+  * `type` : type d'herbe : Blinkroot, Coral, Daybloom, Fireblossom, Oleander, Skorn, Waterleaf (idntifiant de l'item correspondant)
   * `w` et `h` : taille de l'herbe
   * `x` et `y` : coordonnées pour le clipping de l'image (affichée si `x,y` est dans le rectangle visible)
   * `soilIndex` : position de la tuile solide sous la gauche de l'herbe (`index + h * 1024`)
-  * `image` : image de l'herbe (pour les coraux, quatre images aléatoires)
   * `bloom` : l'herbe est mature et peut être récoltée (`true`)
   * `bloomTimestamp` : heure (timestamp) de prochaine récolte possible
 * `kind` SEED : liste des graines plantées dans le monde
@@ -913,7 +912,7 @@ Le paramètre `offsetX` de `digNoisyCircle`, `digNoisyEllipse` et `digNoisyRect`
 | `liquidFiller`       | `LiquidFiller`      | Flood-fill BFS des zones liquides et automate pour le SAND. |
 | `webFiller` | `WebFiller` | Peuplement WEB : `fillCobwebCave(cx, cy)` pour les caves, `scatterWebs(surfaceUnder)` pour le peuplement global différé. |
 | `furnitureGenerator ` | `FurnitureGenerator ` | Gestion des furnitures. `init()`, `getFurnitureSize(code)`, `addFurnitureAt(index, code)`, `get furnitures()`, `firstAvailableSlot(container, capacity, furnitureId)`, `addInBag(item, count)`, `addInChest(chest, item, count)`, `get inventory()`, `placeSeaChests(seaRect)`, `placeCavernChests(zoneRects)`, `placeUndergroundChests(zoneRects)`, `placeSurfaceChests(zoneRects)`, `placeSurfaceLineChests(surfaceLine, guardedX, biomesDescription)`, `fillChest (chest)` |
-| `plantGenerator`       | `PlantGenerator`      | Ajout de la flore dans le monde. `init()`, `get plants()`, `placeSeaCoconut(beachRect, surfaceLine, isLeft, guarded)`, `placeOasisCoconut(lake, surfaceLine, guarded)` |
+| `plantGenerator`       | `PlantGenerator`      | Ajout de la flore dans le monde. `init()`, `get plants()`, `placeSeaCoconut(beachRect, surfaceLine, isLeft, guarded)`, `placeOasisCoconut(lake, surfaceLine, guarded)`, `placeCorals(seaRect, guarded)` |
 
 ---
 

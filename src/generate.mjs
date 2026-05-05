@@ -361,6 +361,8 @@ class WorldGenerator {
     // 8.3.2. Oak / Mahogany
     // 8.3.3. Giant Mushroom
     // 8.3.4. Coral
+    plantGenerator.placeCorals(leftSeaRect, guarded)
+    plantGenerator.placeCorals(rightSeaRect, guarded)
 
     // 9. Traitements finaux
 
@@ -6849,6 +6851,81 @@ class PlantGenerator {
       shakedTimestamp: null,
       deleted: false
     })
+  }
+
+  /**
+ * Place des coraux dans une zone de mer.
+ * @param {{x1, y1, x2, y2}} seaRect — rectangle englobant la mer
+ * @param {Set<number>} guarded — colonnes protégées (modifié en place)
+ */
+  placeCorals (seaRect, guarded) {
+    const SEA = NODES.SEA.code
+    const SAND = NODES.SAND.code
+    const CORAL_TYPES = ['coralr', 'coralp', 'coraly', 'coralg']
+    const W = WORLD_WIDTH
+    const h = 2
+    const w = 2
+
+    const count = seededRNG.randomGetMinMax(5, 8)
+    const MAX_ATTEMPTS = 200
+
+    let placed = 0
+
+    for (let attempts = 0; attempts < MAX_ATTEMPTS && placed < count; attempts++) {
+      const cx = seededRNG.randomGetMinMax(seaRect.x1 + 1, seaRect.x2 - 2)
+      const cy = seededRNG.randomGetMinMax(seaRect.y1 + 1, seaRect.y2 - 2)
+
+      if (worldBuffer.read(cx, cy) !== SEA) continue
+
+      // Descendre jusqu'à la première tuile non SEA
+      let y = cy
+      while (y < seaRect.y2 && worldBuffer.read(cx, y) === SEA) y++
+      if (worldBuffer.read(cx, y) === SEA) continue
+
+      // Le fond doit être SAND
+      if (worldBuffer.read(cx, y) !== SAND) continue
+
+      // Tester placement à droite
+      const canRight = !guarded.has(cx) && !guarded.has(cx + 1) &&
+                     worldBuffer.read(cx + 1, y) === SAND &&
+                     worldBuffer.read(cx, y - 1) === SEA &&
+                     worldBuffer.read(cx + 1, y - 1) === SEA &&
+                     worldBuffer.read(cx, y - 2) === SEA &&
+                     worldBuffer.read(cx + 1, y - 2) === SEA
+
+      // Tester placement à gauche
+      const canLeft = !guarded.has(cx) && !guarded.has(cx - 1) &&
+                     worldBuffer.read(cx - 1, y) === SAND &&
+                     worldBuffer.read(cx, y - 1) === SEA &&
+                     worldBuffer.read(cx - 1, y - 1) === SEA &&
+                     worldBuffer.read(cx, y - 2) === SEA &&
+                     worldBuffer.read(cx - 1, y - 2) === SEA
+
+      if (!canLeft && !canRight) continue
+
+      const goLeft = canLeft && (!canRight || seededRNG.randomGetBool())
+      const coralX = goLeft ? cx - 1 : cx
+      const soilIndex = (y << 10) | coralX
+      const itemId = seededRNG.randomGetArrayValue(CORAL_TYPES)
+
+      guarded.add(coralX)
+      guarded.add(coralX + 1)
+
+      this.#plants.push({
+        kind: PLANT_KIND.HERB,
+        type: itemId,
+        index: soilIndex - h * W,
+        soilIndex,
+        w,
+        h,
+        x: coralX,
+        y: y - 2,
+        bloom: true,
+        bloomTimestamp: null,
+        deleted: false
+      })
+      placed++
+    }
   }
 }
 export const plantGenerator = new PlantGenerator()

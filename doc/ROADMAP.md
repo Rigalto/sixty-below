@@ -30,9 +30,6 @@
 - amélioration de l'aspect des Moss Caves : n'ajouter les tuiles de GRASSMOSS que dans 90% du temps, ajouter deux tuiles verticales de HUMUS? dans 45% du temps
 - analyser des modifications analogue à celles pour les Moss Caves, à effectuer pour les mushroom caves et les fern caves.
 
-### Plage et fond de mer
-- Placement des coraux et plantes marines
-
 ### Ajout des artefacts et plantes
 - Ajout des arbres : Oak, Mahogany, Giant Mushroom
 - Ajout de herbes
@@ -208,6 +205,7 @@
 - `TileGuard` — utilitaire de protection tuiles contre creusement, formes bruitées (cercle, ellipse, rectangle)
 - `furnitureGenerator.place...Chests` - ajout des coffres
 - `plantGenerator.placeSeaCoconut` - ajout des cocotiers
+- `plantGenerator.placeCorals` - ajout des coraux
 
 ### Rendu (partiel)
 - `WorldRenderer` — rendu tuiles par chunks avec cache OffscreenCanvas
