@@ -311,6 +311,8 @@ class WorldGenerator {
     await progress('Build Surface Mini-biomes')
 
     // 7.2. Ajout du Natural en surface
+    // guarded va protéger la surface contre l'empilement de :
+    // termite mounds, anthills, antlion pits, surface chests, coconuts
     const guarded = new Set([...termiteGuarded, ...anthillGuarded, ...antlionGuarded])
     const surfacePlants = worldCarver.paintSurfaceNatural(surfaceLine, biomesDescription, guarded)
     await progress('Naturalizing Surface')
@@ -350,8 +352,15 @@ class WorldGenerator {
     furnitureGenerator.placeCavernChests(zoneRects)
 
     // 8.3. Ajout des plantes et des coraux - TODO
+    // 8.3.1. Coconut
     plantGenerator.placeSeaCoconut(leftBeach.beachRect, surfaceLine, true, guarded)
     plantGenerator.placeSeaCoconut(rightBeach.beachRect, surfaceLine, false, guarded)
+    for (const lake of surfaceLakes) {
+      plantGenerator.placeOasisCoconut(lake, surfaceLine, guarded)
+    }
+    // 8.3.2. Oak / Mahogany
+    // 8.3.3. Giant Mushroom
+    // 8.3.4. Coral
 
     // 9. Traitements finaux
 
@@ -6719,9 +6728,6 @@ class PlantGenerator {
     const SEA = NODES.SEA.code
     const WATER = NODES.WATER.code
     const SAND = NODES.SAND.code
-    const W = WORLD_WIDTH
-    const h = 15
-    const w = 2
 
     const x0 = isLeft ? beachRect.x : beachRect.x + beachRect.w - 1
     const x1 = isLeft ? beachRect.x + beachRect.w - 1 : beachRect.x
@@ -6741,41 +6747,105 @@ class PlantGenerator {
       if (worldBuffer.read(x, y - 1) === SEA || worldBuffer.read(x, y - 1) === WATER) continue
       if (worldBuffer.read(x + dir, y - 1) === SEA || worldBuffer.read(x + dir, y - 1) === WATER) continue
 
-      const soilIndex = (y << 10) | (isLeft ? x : x - 1)
-      const index = soilIndex - h * W
-
       guarded.add(x)
       guarded.add(x + dir)
 
-      // génération de l'image
-      const soilX = soilIndex & 0x3FF
-      const soilY = soilIndex >> 10
-      const imageTable = TREE_IMAGES.coconut
-      const images = []
-      for (let i = 0; i < imageTable.length; i++) {
-        const src = seededRNG.randomGetArrayValue(imageTable[i])
-        const x = soilX - 1
-        const y = soilY - (imageTable.length - i) * 3
-        images.push({src, x, y})
-      }
-
-      this.#plants.push({
-        kind: PLANT_KIND.TREE,
-        type: 'coconut',
-        index,
-        soilIndex,
-        w,
-        h,
-        size: 3,
-        images,
-        grass: SAND,
-        growthTimestamp: null,
-        shakedTimestamp: null,
-        deleted: false
-      })
-      console.log('PlantGenerator.placeSeaCoconut #plants.......................', this.#plants)
+      const soilIndex = (y << 10) | (isLeft ? x : x - 1)
+      this.#placeOneCoconut(soilIndex)
       return
     }
+  }
+
+  /**
+ * Place un cocotier au bord d'un lac de surface.
+ * Cherche de chaque côté du centre du lac une paire de tuiles SAND valides,
+ * à moins de 16 tuiles d'une tuile ayant de l'eau au-dessus.
+ * Si deux positions valides trouvées, tirage 50/50.
+ *
+ * @param {{cx, cy}} lake — lac de surface
+ * @param {Int16Array} surfaceLine — Y de la première tuile solide par colonne
+ * @param {Set<number>} guarded — colonnes protégées (modifié en place)
+ */
+  placeOasisCoconut (lake, surfaceLine, guarded) {
+    const SEA = NODES.SEA.code
+    const WATER = NODES.WATER.code
+    const SAND = NODES.SAND.code
+    const W = WORLD_WIDTH
+    const MAX_DIST = 16
+
+    const findSide = (startX, dir) => {
+      let lastWaterX = startX // on est sûr que cx est sous l'eau
+
+      for (let x = startX; x > 1 && x < W - 2; x += dir) {
+        const y = surfaceLine[x]
+        const above = worldBuffer.read(x, y - 1)
+
+        if (above === WATER || above === SEA) { lastWaterX = x; continue }
+        if (Math.abs(x - lastWaterX) > MAX_DIST) return null
+
+        const yNext = surfaceLine[x + dir]
+        if (y !== yNext) continue
+        if (guarded.has(x) || guarded.has(x + dir)) continue
+        if (worldBuffer.read(x, y) !== SAND) continue
+        if (worldBuffer.read(x + dir, y) !== SAND) continue
+        if (above === WATER || above === SEA) continue
+        if (worldBuffer.read(x + dir, y - 1) === WATER || worldBuffer.read(x + dir, y - 1) === SEA) continue
+
+        return {x, y, dir}
+      }
+      return null
+    }
+
+    const right = findSide(lake.cx, 1)
+    const left = findSide(lake.cx, -1)
+
+    if (!right && !left) return
+
+    const chosen = (right && left)
+      ? (seededRNG.randomGetBool() ? right : left)
+      : (right ?? left)
+
+    const {x, y, dir} = chosen
+    guarded.add(x)
+    guarded.add(x + dir)
+
+    const soilIndex = (y << 10) | (dir === 1 ? x : x - 1)
+    this.#placeOneCoconut(soilIndex)
+  }
+
+  /**
+ * Crée et enregistre un cocotier dans l'objectstore plant.
+ * @param {number} soilIndex — index de la tuile support droite du cocotier (coin bas-droit)
+ */
+  #placeOneCoconut (soilIndex) {
+    const SAND = NODES.SAND.code
+    const h = 15
+    const w = 2
+    const index = soilIndex - h * WORLD_WIDTH
+    const soilX = soilIndex & 0x3FF
+    const soilY = soilIndex >> 10
+    const imageTable = TREE_IMAGES.coconut
+    const images = []
+
+    for (let i = 0; i < imageTable.length; i++) {
+      const src = seededRNG.randomGetArrayValue(imageTable[i])
+      images.push({src, x: soilX - 1, y: soilY - (imageTable.length - i) * 3})
+    }
+
+    this.#plants.push({
+      kind: PLANT_KIND.TREE,
+      type: 'coconut',
+      index,
+      soilIndex,
+      w,
+      h,
+      size: 3,
+      images,
+      grass: SAND,
+      growthTimestamp: null,
+      shakedTimestamp: null,
+      deleted: false
+    })
   }
 }
 export const plantGenerator = new PlantGenerator()
