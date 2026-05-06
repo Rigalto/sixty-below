@@ -341,6 +341,26 @@ export const PLANT_KIND = {
   SEED: 6 // Graines plantées
 }
 
+export const PLANT_TYPE = {
+  NONE: 0,
+  // Trees
+  OAK: 11,
+  MAHOGANY: 11,
+  COCONUT: 12,
+  GIANT_MUSHROOM: 4,
+  // Herbs
+  OLEANDER: 21,
+  BLINKROOT: 22,
+  DAYBLOOM: 23,
+  FIREBLOSSOM: 24,
+  SKORN: 25,
+  WATERLEAF: 26,
+  CORAL_R: 27,
+  CORAL_P: 28,
+  CORAL_Y: 29,
+  CORAL_G: 30
+}
+
 export const TREE_IMAGES = {
   coconut: [
     ['coconut_64_48-0-0', 'coconut_64_48-0-1', 'coconut_64_48-0-2'],

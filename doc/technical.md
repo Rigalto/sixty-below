@@ -523,11 +523,12 @@ Cet ObjectStore contient toutes les informations relatives à la croissance des 
 Les enregistrements sont de natures très différentes, nature déterminée par l'attribut '???' :
 * `kind` NATURAL : liste des tuiles NATURAL
   * `index` : position des tuiles de `type` NATURAL
-  * `type` : type de la tuile : NODES.GRASSFOREST.code, NODES.GRASSJUNGLE.code, NODES.GRASSMUSHROOM.code, NODES.GRASSFERN.code, NODES.GRASSMOSS.code
+  * `type` : `PLANT_TYPE.NONE`
+  * `naturalCode` : type de la tuile : NODES.GRASSFOREST.code, NODES.GRASSJUNGLE.code, NODES.GRASSMUSHROOM.code, NODES.GRASSFERN.code, NODES.GRASSMOSS.code
 * `kind` TREE : liste des arbres présents dans le monde
   * `id` : identifiant unique de l'abre
   * `index` : position de l'abre (coint haut gauche du rectangle englobant)
-  * `type` : type de l'arbre : OAK, MAHOGANY, GIANTMUSHROOM, COCONUT
+  * `type` : type de l'arbre : PLANT_TYPE.OAK, PLANT_TYPE.MAHOGANY, PLANT_TYPE.GIANTMUSHROOM, PLANT_TYPE.COCONUT
   * `w` et `h` : taille maximale de l'arbre
   * `x`: coordonnée pour le clipping de l'image
   * `yTop`: coordonnée pour le clipping de l'image (affichée si `x,yTop` est dans le rectangle visible)
@@ -541,16 +542,18 @@ Les enregistrements sont de natures très différentes, nature déterminée par 
 * `kind` MUSHROOM : liste des spots de champignons présents dans le monde
   * `id` : identifiant unique du spot de champignon
   * `index` : position du spot de champignon (coin haut gauche de l'image)
-  * `type` : type du champignon qui pousse sur le spot : Bolet, Pink Mycenia
+  * `type` : `PLANT_TYPE.NONE`
+  * `itemId` : item correspondant au champignon qui pousse sur le spot : `ITEMS.bolete.code` et `ITEMS.pinkMycena.code`
   * `w` et `h` : taille du champignon
   * `x` et `y` : coordonnées pour le clipping de l'image (affichée si `x,y` est dans le rectangle visible)
   * `soilIndex` : position de la tuile solide sous la gauche du champignon (`index + h * 1024`)
   * `present` : booléen indiquant si un champignon est présent (`true`) ou non sur le spot de champignon
   * _Visibilité pilotée globalement par l'heure in-game — les champignons d'un même type apparaissent et disparaissent simultanément._
-* `kind` HERB : liste des herbes présentes dans le monde
+* `kind` HERB : liste des herbes présentes dans le monde (Blinkroot, Coral, Daybloom, Fireblossom, Oleander, Skorn, Waterleaf)
   * `id` : identifiant unique de l'herbe
   * `index` : position de l'herbe (coin haut gauche de l'image)
-  * `type` : type d'herbe : Blinkroot, Coral, Daybloom, Fireblossom, Oleander, Skorn, Waterleaf (identifiant de l'item correspondant)
+  * `type` : type d'herbe (PLANT_TYPE.XXX)
+  * `ìtemId` : identifiant de l'item correspondant à l'herbe
   * `w` et `h` : taille de l'herbe
   * `x` et `y` : coordonnées pour le clipping de l'image (affichée si `x,y` est dans le rectangle visible)
   * `soilIndex` : position de la tuile solide sous la gauche de l'herbe (`index + h * 1024`)
@@ -558,6 +561,7 @@ Les enregistrements sont de natures très différentes, nature déterminée par 
   * `bloomTimestamp` : heure (timestamp) de prochaine récolte possible
 * `kind` SPREAD : liste des tuiles auto-propagées dans le monde
   * `id` : identifiant unique de la graine
+  * `type` : `PLANT_TYPE.NONE`
   * `index` : position de la graine (tuile où elle se trouve)
   * `topsoilCode` : type de tuile ensemencée (`NODES.CLAY.code`, `NODES.MUD.code`, `NODES.HUMUS.code`)
   * `naturalCode` : type de tuile ensemencée (`NODES.GRASSFOREST.code`, `NODES.GRASSJUNGLE.code`, `NODES.GRASSMUSHROOM.code`)

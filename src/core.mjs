@@ -1,5 +1,5 @@
 import {TIME_BUDGET, MICROTASK_FN_NAME_TO_KEY, STATE, OVERLAYS} from './constant.mjs'
-import {NODES, NODES_LOOKUP, ITEMS, TREE_IMAGES} from '../../assets/data/data.mjs'
+import {NODES, NODES_LOOKUP, ITEMS, TREE_IMAGES, PLANT_KIND, PLANT_TYPE} from '../../assets/data/data.mjs'
 import {HELP, HELP_TITLES} from '../../assets/data/data-help.mjs'
 import {loadAssets, resolveAssetData} from './assets.mjs'
 import {timeManager, taskScheduler, microTasker, eventBus, seededRNG} from './utils.mjs'
@@ -288,20 +288,35 @@ class GameCore {
     // 5. Initialisation des systèmes (Layer 2)
     creationDialogOverlay.init(state.worldkey)
     // C'est ici qu'on initialise les managers
-    // await FloraManager.init(...)
     // await FaunaManager.init(...)
     // await PlayerManager.init(...)
 
+    console.log({PLANT_KIND, PLANT_TYPE})
     // const SYSTEM_MAP = new Map([
-    //   [PLANT_KIND.NATURAL, naturalSystem],
-    //   [PLANT_KIND.TREE, treeSystem],
-    //   [PLANT_KIND.MUSHROOM, mushroomSystem],
-    //   [PLANT_KIND.HERB, herbSystem],
-    //   [PLANT_KIND.SEEDERB, seedSystem]
+    //   [PLANT_KIND.NATURAL * 100 + PLANT_TYPE.NONE, naturalSystem],
+    //   [PLANT_KIND.TREE * 100 + PLANT_TYPE.OAK, treeSystem],
+    //   [PLANT_KIND.TREE * 100 + PLANT_TYPE.MAHOGANY, treeSystem],
+    //   [PLANT_KIND.TREE * 100 + PLANT_TYPE.COCONUT, treeSystem],
+    //   [PLANT_KIND.TREE * 100 + PLANT_TYPE.GIANT_MUSHROOM, treeSystem],
+    //   [PLANT_KIND.MUSHROOM * 100 + PLANT_TYPE.NONE, mushroomSystem],
+    //   [PLANT_KIND.HERB * 100 + PLANT_TYPE.PLANT_TYPE.OLEANDER, oleanderSystem],
+    //   [PLANT_KIND.HERB * 100 + PLANT_TYPE.BLINKROOT, blinkrootSystem],
+    //   [PLANT_KIND.HERB * 100 + PLANT_TYPE.DAYBLOOM, daybloomSystem],
+    //   [PLANT_KIND.HERB * 100 + PLANT_TYPE.FIREBLOSSOM, fireblossomSystem],
+    //   [PLANT_KIND.HERB * 100 + PLANT_TYPE.SKORN, skornSystem],
+    //   [PLANT_KIND.HERB * 100 + PLANT_TYPE.WATERLEAF, waterleafSystem],
+    //   [PLANT_KIND.HERB * 100 + PLANT_TYPE.CORAL_R, coralSystem],
+    //   [PLANT_KIND.HERB * 100 + PLANT_TYPE.CORAL_P, coralSystem],
+    //   [PLANT_KIND.HERB * 100 + PLANT_TYPE.CORAL_Y, coralSystem],
+    //   [PLANT_KIND.HERB * 100 + PLANT_TYPE.CORAL_G, coralSystem],
+    //   [PLANT_KIND.SPREAD * 100 + PLANT_TYPE.NONE, spreadSystem],
+    //   [PLANT_KIND.SEED * 100 + PLANT_TYPE.NONE, seedSystem]
     // ])
-    // // Chaque system implémente la même interface
+
+    // // managers des plantes
+    // const plantRecords = await database.readAllFromObjectStore('plant')
     // for (const record of plantRecords) {
-    //   SYSTEM_MAP.get(record.system)?.init(record)
+    //   SYSTEM_MAP.get(record.kind * 100 + record.type)?.init(record)
     // }
 
     // 6. Lancement de la boucle
