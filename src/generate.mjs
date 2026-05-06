@@ -6752,6 +6752,23 @@ class PlantGenerator {
   }
 
   /**
+ * Construit le tableau d'images d'un arbre en tirant aléatoirement parmi les variantes disponibles.
+ * @param {string} treeName — clé dans TREE_IMAGES ('oak', 'mahogany', 'coconut', 'giantMushroom')
+ * @param {number} soilX — coordonnée X de la tuile support gauche
+ * @param {number} soilY — coordonnée Y de la tuile support
+ * @returns {Array<{tree, row, col, x, y}>} tableau d'images précalculées
+ */
+  #buildTreeImages (treeName, soilX, soilY) {
+    const imageTable = TREE_IMAGES[treeName]
+    const images = []
+    for (let i = 0; i < imageTable.length; i++) {
+      const col = seededRNG.randomGetArrayIndex(imageTable[i])
+      images.push({tree: treeName, row: i, col, x: soilX - 1, y: soilY - (imageTable.length - i) * 3})
+    }
+    return images
+  }
+
+  /**
  * Place un cocotier sur une plage en bord de mer.
  * @param {{x, y, w, h}} beachRect — rectangle de la plage
  * @param {Int16Array} surfaceLine — Y de la première tuile solide par colonne
@@ -6854,13 +6871,7 @@ class PlantGenerator {
     const index = soilIndex - h * WORLD_WIDTH
     const soilX = soilIndex & 0x3FF
     const soilY = soilIndex >> 10
-    const imageTable = TREE_IMAGES.coconut
-    const images = []
-
-    for (let i = 0; i < imageTable.length; i++) {
-      const col = seededRNG.randomGetArrayIndex(imageTable[i])
-      images.push({tree: 'coconut', row: i, col, x: soilX - 1, y: soilY - (imageTable.length - i) * 3})
-    }
+    const images = this.#buildTreeImages('coconut', soilX, soilY)
 
     this.#plants.push({
       kind: PLANT_KIND.TREE,
@@ -6985,13 +6996,7 @@ class PlantGenerator {
       const mushroomId = grassCode === GRASSFOREST ? 'bolete' : 'pinkMycenia'
       const soilIndex = (y << 10) | soilX
       const size = seededRNG.randomGetArrayValue(TREES_INIT_SIZE)
-      const imageTable = TREE_IMAGES[treeName]
-      const images = []
-
-      for (let i = 0; i < imageTable.length; i++) {
-        const col = seededRNG.randomGetArrayIndex(imageTable[i])
-        images.push({tree: treeName, row: i, col, x: soilX - 1, y: y - (imageTable.length - i) * 3})
-      }
+      const images = this.#buildTreeImages(treeName, soilX, y)
 
       this.#plants.push({
         kind: PLANT_KIND.TREE,
@@ -7109,13 +7114,7 @@ class PlantGenerator {
 
       const soilIndex = idx // tuile gauche
       const size = seededRNG.randomGetArrayValue(GIANT_MUSHROOM_INIT_SIZE)
-      const imageTable = TREE_IMAGES.giantMushroom
-      const images = []
-
-      for (let i = 0; i < imageTable.length; i++) {
-        const col = seededRNG.randomGetArrayIndex(imageTable[i])
-        images.push({tree: 'giantMushroom', row: i, col, x: x - 1, y: y - (imageTable.length - i) * 3})
-      }
+      const images = this.#buildTreeImages('giantMushroom', x, y)
 
       this.#plants.push({
         kind: PLANT_KIND.TREE,
