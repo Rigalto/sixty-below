@@ -21,7 +21,6 @@
 - Densité trop élevée en Underground et Caverns (revoir les constantes `SMALL_TUNNELS_COUNT` et `CAVERNS_TUNNEL_COUNT`)
 
 ### Ajout des artefacts et plantes
-- Ajout des arbres : Giant Mushroom
 - Ajout de herbes : Blinkroot, Daybloom, Fireblossom, Oleander, Skorn, Waterleaf
 - Ajout des arbustes : Cactus, bambou
 
@@ -199,6 +198,7 @@
 - `plantGenerator.placeSeaCoconut` - ajout des cocotiers
 - `plantGenerator.placeCorals` - ajout des coraux
 - `plantGenerator.placeTrees` - ajout des Oaks et Mahoganies
+- `plantGenerator.placeGiantMushrooms` - ajout des Giant Mushrooms
 
 ### Rendu (partiel)
 - `WorldRenderer` — rendu tuiles par chunks avec cache OffscreenCanvas

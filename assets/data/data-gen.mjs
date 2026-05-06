@@ -498,3 +498,4 @@ for (const type in CHEST_CONTENT) {
 }
 
 export const TREES_INIT_SIZE = [0, 1, 1, 2, 2, 2, 3, 3, 3, 3, 3, 4, 4, 4, 4, 4, 4, 4, 4, 4] // 5% par entrée
+export const GIANT_MUSHROOM_INIT_SIZE = [0, 0, 1, 1, 1, 2, 2, 2, 2, 2] // 20/30/50%
