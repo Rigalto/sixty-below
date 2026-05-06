@@ -2366,7 +2366,13 @@ Filled directly from a liquid source in the world. Used as tools to transport an
   // ── Mechanics ────────────────────────────────────────────────
 
   // ── Plants - Trees ───────────────────────────────────────────
-  //    Giant Mushroom, Coconut
+  //    Oak & Mahogany, Giant Mushroom, Coconut
+  {
+    title: 'Oak & Mahogany',
+    category: ['Tree'],
+    content: `
+    `
+  },
   {
     title: 'Giant Mushroom',
     category: ['Tree'],

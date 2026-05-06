@@ -322,10 +322,10 @@ export const ITEMS = {
   coconutPulp: {name: 'Coconut Pulp', type: ITEM_TYPE.MATERIAL, stype: 'fruit', star: 1, image: 'potions_32_32-1-5', help: 'Coconut', tooltip: '???'},
   coconutMilk: {name: 'Coconut Milk', type: ITEM_TYPE.MATERIAL, stype: 'beverage', star: 1, image: 'potions_32_32-1-5', help: 'Coconut', tooltip: '???'},
 
-  logOak: {name: 'Wood Log', type: ITEM_TYPE.MATERIAL, stype: 'tree', star: 1, image: 'potions_32_32-1-5', help: 'Oak', tooltip: '???'},
-  acorn: {name: 'Acorn', type: ITEM_TYPE.MATERIAL, stype: 'seed', star: 1, image: 'potions_32_32-1-5', help: 'Oak', tooltip: '???'},
-  logMahogany: {name: 'Mahogany Log', type: ITEM_TYPE.MATERIAL, stype: 'tree', star: 1, image: 'potions_32_32-1-5', help: 'Oak', tooltip: '???'},
-  samara: {name: 'Samara', type: ITEM_TYPE.MATERIAL, stype: 'seed', star: 1, image: 'potions_32_32-1-5', help: 'Oak', tooltip: '???'},
+  logOak: {name: 'Wood Log', type: ITEM_TYPE.MATERIAL, stype: 'tree', star: 1, image: 'potions_32_32-1-5', help: 'Oak & Mahogany', tooltip: '???'},
+  acorn: {name: 'Acorn', type: ITEM_TYPE.MATERIAL, stype: 'seed', star: 1, image: 'potions_32_32-1-5', help: 'Oak & Mahogany', tooltip: '???'},
+  logMahogany: {name: 'Mahogany Log', type: ITEM_TYPE.MATERIAL, stype: 'tree', star: 1, image: 'potions_32_32-1-5', help: 'Oak & Mahogany', tooltip: '???'},
+  samara: {name: 'Samara', type: ITEM_TYPE.MATERIAL, stype: 'seed', star: 1, image: 'potions_32_32-1-5', help: 'Oak & Mahogany', tooltip: '???'},
 
   // Mushrooms
   bolete: {name: 'Bolete', type: ITEM_TYPE.MATERIAL, stype: 'mushroom', star: 1, image: 'potions_32_32-1-5', placed: 'fuws_32_32-4-0', help: 'Surface Mushrooms', tooltip: '???'},
