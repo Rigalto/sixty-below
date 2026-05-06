@@ -337,7 +337,8 @@ export const PLANT_KIND = {
   TREE: 2, // arbres (Oak, Mahogany, Giant Mushroom, Coconut)
   MUSHROOM: 3, // champignons (Bolete, Pink Mycenia)
   HERB: 4, // herbes (Coral)
-  SEED: 5 // graines plantées ()
+  SPREAD: 5, // tuiles ensemencées (GRASSFOREST, GRASSJUNGLE)
+  SEED: 6 // Graines plantées
 }
 
 export const TREE_IMAGES = {

@@ -7,7 +7,7 @@
 
 ## En cours
 
-- Génération du monde : topsoil, végétation, coffres, artefacts
+- Génération du monde : végétation
 ---
 
 ## À faire — Bugs connus
@@ -23,8 +23,6 @@
 ### Ajout des artefacts et plantes
 - Ajout de herbes : Blinkroot, Daybloom, Fireblossom, Oleander, Skorn, Waterleaf
 - Ajout des arbustes : Cactus, bambou
-
-### Ajout des seeds
 
 ---
 
@@ -199,6 +197,7 @@
 - `plantGenerator.placeCorals` - ajout des coraux
 - `plantGenerator.placeTrees` - ajout des Oaks et Mahoganies
 - `plantGenerator.placeGiantMushrooms` - ajout des Giant Mushrooms
+- `plantGenerator.spreadNatural` - ajout des tuiles de TOPSOIL ensemencées par des tuiles de NATURAL
 
 ### Rendu (partiel)
 - `WorldRenderer` — rendu tuiles par chunks avec cache OffscreenCanvas

@@ -371,6 +371,11 @@ class WorldGenerator {
     plantGenerator.placeCorals(rightSeaRect, guarded)
     await progress('Corals')
 
+    // 8.3.4. Natural Spreading
+    plantGenerator.spreadNatural(surfacePlants, NODES.GRASSFOREST.code, NODES.CLAY.code, NODES.SKY.code)
+    plantGenerator.spreadNatural(surfacePlants, NODES.GRASSJUNGLE.code, NODES.MUD.code, NODES.SKY.code)
+    plantGenerator.spreadNatural(mushroomPlants, NODES.GRASSMUSHROOM.code, NODES.HUMUS.code, NODES.VOID.code)
+
     // 9. Traitements finaux
 
     // 9.1. Affichage de statistiques)
@@ -5054,6 +5059,8 @@ class WorldCarver {
   paintSurfaceNatural (surfaceLine, biomesDescription, guarded) {
     const GRASSFOREST = NODES.GRASSFOREST.code
     const GRASSJUNGLE = NODES.GRASSJUNGLE.code
+    const CLAY = NODES.CLAY.code
+    const MUD = NODES.MUD.code
     const SAND = NODES.SAND.code
     const SEA = NODES.SEA.code
     const WATER = NODES.WATER.code
@@ -5065,6 +5072,11 @@ class WorldCarver {
     NATURAL_CODE[BIOME_TYPE.FOREST] = GRASSFOREST
     NATURAL_CODE[BIOME_TYPE.JUNGLE] = GRASSJUNGLE
     NATURAL_CODE[BIOME_TYPE.DESERT] = SAND
+
+    const TOPSOIL_CODE = []
+    TOPSOIL_CODE[BIOME_TYPE.FOREST] = CLAY
+    TOPSOIL_CODE[BIOME_TYPE.JUNGLE] = MUD
+    TOPSOIL_CODE[BIOME_TYPE.DESERT] = SAND
 
     const tiles = []
     const naturalPlants = []
@@ -5088,24 +5100,28 @@ class WorldCarver {
       if (aboveCode === WATER) continue
       if (aboveCode === SEA) continue
 
-      const code = NATURAL_CODE[zone.biome]
-      tiles.push({x, y, index: idx, code})
+      const naturalCode = NATURAL_CODE[zone.biome]
+      const topsoilCode = TOPSOIL_CODE[zone.biome]
+
+      // on modifie la première tuile
+      const topCode = seededRNG.randomGetPercent(90) ? naturalCode : topsoilCode
+      tiles.push({x, y, index: idx, code: topCode})
 
       // Enregistrement NATURAL pour Forest et Jungle
-      if (code === GRASSFOREST || code === GRASSJUNGLE) {
-        naturalPlants.push({kind: PLANT_KIND.NATURAL, type: code, index: idx, deleted: false})
+      if (topCode === GRASSFOREST || topCode === GRASSJUNGLE) {
+        naturalPlants.push({kind: PLANT_KIND.NATURAL, type: topCode, index: idx, deleted: false})
       }
 
-      // 2ème tuile : 90% de chance
-      if (seededRNG.randomReal() < 0.9) {
-        tiles.push({x, y: y + 1, index: idx + W, code})
+      // 2ème tuile : 90% de chance d'être modifiée
+      if (seededRNG.randomGetPercent(90)) {
+        tiles.push({x, y: y + 1, index: idx + W, code: topsoilCode})
 
         // 3ème tuile : 45% de chance, uniquement si tuile non LIQUID/GAZ
-        if (seededRNG.randomReal() < 0.45) {
+        if (seededRNG.randomGetPercent(45)) {
           const idx2 = idx + W + W
           const code2 = worldBuffer.readAt(idx2)
           if (!NOT_SOLID.has(code2)) {
-            tiles.push({x, y: y + 2, index: idx2, code})
+            tiles.push({x, y: y + 2, index: idx2, code: topsoilCode})
           }
         }
       }
@@ -7116,6 +7132,56 @@ class PlantGenerator {
         for (let dy = -4; dy <= 4; dy++) {
           blocked.add(((y + dy) << 10) | (x + dx))
         }
+      }
+    }
+  }
+
+  /**
+ * Ensemence les tuiles TOPSOIL exposées au GAZ voisines des tuiles NATURAL.
+ * Crée des enregistrements SPREAD dans l'objectstore plant.
+ *
+ * @param {Array<{kind, type, index, deleted}>} naturalPlants — tuiles NATURAL (filtrées par naturalCode)
+ * @param {number} naturalCode — code NATURAL (GRASSFOREST, GRASSJUNGLE, GRASSMUSHROOM)
+ * @param {number} topsoilCode — code TOPSOIL (CLAY, MUD, HUMUS)
+ * @param {number} gazCode     — code GAZ (SKY ou VOID)
+ */
+  spreadNatural (naturalPlants, naturalCode, topsoilCode, gazCode) {
+    const W = WORLD_WIDTH
+    const DAY_MS = 1_440_000
+    const seeded = new Set() // évite les doublons
+
+    for (const plant of naturalPlants) {
+      if (plant.type !== naturalCode) continue // filtrage imparfait
+
+      const idx = plant.index
+
+      // 6 voisins : gauche, droite, haut-gauche, bas-gauche, haut-droite, bas-droite
+      const neighbors = [
+        idx - 1, // gauche
+        idx + 1, // droite
+        idx - W - 1, // haut-gauche
+        idx + W - 1, // bas-gauche
+        idx - W + 1, // haut-droite
+        idx + W + 1 // bas-droite
+      ]
+
+      for (const nIdx of neighbors) {
+        if (seeded.has(nIdx)) continue
+        if (worldBuffer.readAt(nIdx) !== topsoilCode) continue
+        if (worldBuffer.readAt(nIdx - W) !== gazCode) continue // exposée au GAZ ?
+
+        seeded.add(nIdx)
+
+        // const delay = Math.round(seededRNG.randomGetRealMinMax(1, 4) * DAY_MS)
+        const delay = (seededRNG.randomGetRealMinMax(1, 4) * DAY_MS) | 0
+        this.#plants.push({
+          kind: PLANT_KIND.SPREAD,
+          index: nIdx,
+          naturalCode,
+          topsoilCode,
+          spreadTimestamp: delay,
+          deleted: false
+        })
       }
     }
   }

@@ -556,11 +556,12 @@ Les enregistrements sont de natures très différentes, nature déterminée par 
   * `soilIndex` : position de la tuile solide sous la gauche de l'herbe (`index + h * 1024`)
   * `bloom` : l'herbe est mature et peut être récoltée (`true`)
   * `bloomTimestamp` : heure (timestamp) de prochaine récolte possible
-* `kind` SEED : liste des graines plantées dans le monde
+* `kind` SPREAD : liste des tuiles auto-propagées dans le monde
   * `id` : identifiant unique de la graine
   * `index` : position de la graine (tuile où elle se trouve)
-  * `x` et `y` : coordonnées pour le clipping de l'image (affichée si `x,y` est dans le rectangle visible)
-  * `type` : type de graine : à concevoir
+  * `topsoilCode` : type de tuile ensemencée (`NODES.CLAY.code`, `NODES.MUD.code`, `NODES.HUMUS.code`)
+  * `naturalCode` : type de tuile ensemencée (`NODES.GRASSFOREST.code`, `NODES.GRASSJUNGLE.code`, `NODES.GRASSMUSHROOM.code`)
+  * `spreadTimestamp` : timestamp auquel la transformation sera effectuée
 
 Tous les enregistrements possèdent en plus un champ `deleted` permettant de décaler la suppression des enregistrements dans la phase d'initialisation de la sessin de jeu suivante.
 
@@ -912,7 +913,7 @@ Le paramètre `offsetX` de `digNoisyCircle`, `digNoisyEllipse` et `digNoisyRect`
 | `liquidFiller`       | `LiquidFiller`      | Flood-fill BFS des zones liquides et automate pour le SAND. |
 | `webFiller` | `WebFiller` | Peuplement WEB : `fillCobwebCave(cx, cy)` pour les caves, `scatterWebs(surfaceUnder)` pour le peuplement global différé. |
 | `furnitureGenerator ` | `FurnitureGenerator ` | Gestion des furnitures. `init()`, `getFurnitureSize(code)`, `addFurnitureAt(index, code)`, `get furnitures()`, `firstAvailableSlot(container, capacity, furnitureId)`, `addInBag(item, count)`, `addInChest(chest, item, count)`, `get inventory()`, `placeSeaChests(seaRect)`, `placeCavernChests(zoneRects)`, `placeUndergroundChests(zoneRects)`, `placeSurfaceChests(zoneRects)`, `placeSurfaceLineChests(surfaceLine, guardedX, biomesDescription)`, `fillChest (chest)` |
-| `plantGenerator`       | `PlantGenerator`      | Ajout de la flore dans le monde. `init()`, `get plants()`, `placeSeaCoconut(beachRect, surfaceLine, isLeft, guarded)`, `placeOasisCoconut(lake, surfaceLine, guarded)`, `placeCorals(seaRect, guarded)`, `placeTrees(surfaceLine, guarded)`, `placeGiantMushrooms(mushroomPlants)` |
+| `plantGenerator`       | `PlantGenerator`      | Ajout de la flore dans le monde. `init()`, `get plants()`, `placeSeaCoconut(beachRect, surfaceLine, isLeft, guarded)`, `placeOasisCoconut(lake, surfaceLine, guarded)`, `placeCorals(seaRect, guarded)`, `placeTrees(surfaceLine, guarded)`, `placeGiantMushrooms(mushroomPlants)`, `spreadNatural(naturalPlants, naturalCode, topsoilCode, gazCode)` |
 
 ---
 
