@@ -304,7 +304,7 @@ class GameCore {
     //   [PLANT_KIND.HERB * 100 + PLANT_TYPE.DAYBLOOM, daybloomSystem],
     //   [PLANT_KIND.HERB * 100 + PLANT_TYPE.FIREBLOSSOM, fireblossomSystem],
     //   [PLANT_KIND.HERB * 100 + PLANT_TYPE.SKORN, skornSystem],
-    //   [PLANT_KIND.HERB * 100 + PLANT_TYPE.WATERLEAF, waterleafSystem],
+    //   [PLANT_KIND.HERB * 100 + PLANT_TYPE.AMBERMIRAGE, ambermirageSystem],
     //   [PLANT_KIND.HERB * 100 + PLANT_TYPE.CORAL_R, coralSystem],
     //   [PLANT_KIND.HERB * 100 + PLANT_TYPE.CORAL_P, coralSystem],
     //   [PLANT_KIND.HERB * 100 + PLANT_TYPE.CORAL_Y, coralSystem],
