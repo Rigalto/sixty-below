@@ -130,12 +130,13 @@ export const SKY_COLORS = [
   '#FFF8D7', '#FFFFCF', '#FFFFE7', '#E6F3FF' // Jour (Index 35)
 ]
 
+export const WEATHER_TYPE_CODE = {SUNNY: 0, CLOUDY: 1, RAINY: 2, WINDY: 3, STORMY: 4}
 export const WEATHER_TYPE = [
-  {code: 0, name: 'Sunny', weight: 10, icon: '☀️'},
-  {code: 1, name: 'Cloudy', weight: 20, icon: '☁️'},
-  {code: 2, name: 'Rainy', weight: 30, icon: '🌧️'},
-  {code: 3, name: 'Windy', weight: 25, icon: '💨'},
-  {code: 4, name: 'Stormy', weight: 15, icon: '⛈️'}
+  {code: WEATHER_TYPE_CODE.SUNNY, name: 'Sunny', weight: 10, icon: '☀️'},
+  {code: WEATHER_TYPE_CODE.CLOUDY, name: 'Cloudy', weight: 20, icon: '☁️'},
+  {code: WEATHER_TYPE_CODE.RAINY, name: 'Rainy', weight: 30, icon: '🌧️'},
+  {code: WEATHER_TYPE_CODE.WINDY, name: 'Windy', weight: 25, icon: '💨'},
+  {code: WEATHER_TYPE_CODE.STORMY, name: 'Stormy', weight: 15, icon: '⛈️'}
 ]
 
 export const MOON_PHASE = [

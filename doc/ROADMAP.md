@@ -21,7 +21,7 @@
 - Densité trop élevée en Underground et Caverns (revoir les constantes `SMALL_TUNNELS_COUNT` et `CAVERNS_TUNNEL_COUNT`)
 
 ### Ajout des artefacts et plantes
-- Ajout de herbes : Blinkroot, Daybloom, Fireblossom, Oleander, Skorn, Ambermirage
+- Ajout de herbes : Blinkroot, Daybloom, Fireblossom, Oleander, Skorn
 - Ajout des arbustes : Cactus, bambou
 
 ---
@@ -198,6 +198,7 @@
 - `plantGenerator.placeTrees` - ajout des Oaks et Mahoganies
 - `plantGenerator.placeGiantMushrooms` - ajout des Giant Mushrooms
 - `plantGenerator.spreadNatural` - ajout des tuiles de TOPSOIL ensemencées par des tuiles de NATURAL
+- `plantGenerator.placeAmbermirages` - ajout des herbe Ambermirage sur les tuiles de SAND
 
 ### Rendu (partiel)
 - `WorldRenderer` — rendu tuiles par chunks avec cache OffscreenCanvas

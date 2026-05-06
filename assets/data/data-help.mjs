@@ -397,7 +397,7 @@ Mushroom Caves are large caverns found deep in [[Forest]] biomes. Their floor is
 
 **Tips**
 * _The giant mushrooms provide enough light to explore without torches._ ⏳
-* _Harvesting mushroom caps without destroying the [[node:grassMushroom]] allows them to regrow over time._ ⏳
+* _[[Foraging]] mushroom caps without destroying the [[node:grassMushroom]] allows them to regrow over time._ ⏳
 * _Mushroom spores are powerful potion ingredients — worth the detour._ ⏳
   `
   },
@@ -1236,7 +1236,7 @@ Mushroom Grass covers the floor of [[Mushroom Cave]]s. [[Giant Mushroom]]s grow 
 
 **Tips**
 * _Mushroom Grass is the only substrate from which giant mushrooms can grow._ ⏳
-* _Harvesting mushrooms without destroying the grass allows them to regrow over time._ ⏳
+* _[[Foraging]] mushrooms without destroying the grass allows them to regrow over time._ ⏳
   `
   },
 
@@ -2031,7 +2031,7 @@ Shell is a sedimentary material formed from ancient marine organisms. It is foun
     `
   },
 
-  // ── Crafting ─────────────────────────────────────────────────
+  // ── Activities Crafting ──────────────────────────────────────
   //    Crafting, Crafting Stations, Crafting Tree, Crafting Buffs
   {
     title: 'Crafting',
@@ -2106,6 +2106,26 @@ The crafting tree shows the order in which crafting stations must be built. Each
     `
   },
 
+  // ── Activities Foraging ──────────────────────────────────────
+  //    Foraging, Foraging Tools, Foraging Buffs
+  {
+    title: 'Foraging',
+    category: ['Activities', 'Foraging'],
+    content: `
+    `
+  },
+  {
+    title: 'Foraging Tools',
+    category: ['Tool', 'Foraging'],
+    content: `
+    `
+  },
+  {
+    title: 'Foraging Buffs',
+    category: ['Buff', 'Foraging'],
+    content: `
+    `
+  },
   // ── Crafting Stations ────────────────────────────────────────
   //    Wooden Table, Woodworking, Smelting, Forging, Sharpening, Leatherworking, Weaving
   {
@@ -2345,15 +2365,67 @@ Filled directly from a liquid source in the world. Used as tools to transport an
   // ── Buffs & Debuffs ──────────────────────────────────────────
   // ── Mechanics ────────────────────────────────────────────────
 
-  // ── Trees ───────────────────────────────────────────────────
-  //    Giant Mushroom
+  // ── Plants - Trees ───────────────────────────────────────────
+  //    Giant Mushroom, Coconut
   {
     title: 'Giant Mushroom',
     category: ['Tree'],
     content: `
     `
   },
-  // ── Plants ───────────────────────────────────────────────────
+  {
+    title: 'Coconut',
+    category: ['Tree'],
+    content: `
+      `
+  },
+
+  // ── Plants - Mushrooms ───────────────────────────────────────────
+  // Surface Mushrooms
+  {
+    title: 'Surface Mushrooms',
+    category: ['Plant'],
+    content: `
+      `
+  },
+
+  // ── Plants - Herbs ───────────────────────────────────────────
+  // Ambermirage, Corals
+  {
+    title: 'Ambermirage',
+    category: ['Plant', 'Desert'],
+    content: `
+**Description**
+The Ambermirage is a common desert flower that blooms only during the hottest hours of the day. Its golden petals close tightly at dawn and dusk, making it nearly invisible outside its blooming window. It never appears during rain or storms.
+
+**Location**
+* Biome: [[Desert]]
+* Layer: [[Surface]]
+* Grows on [[node:sand]] exposed to the sky
+
+**Blooming Hours**
+* Appears at 10:00 and disappears at 14:00 (in-game time)
+* Never appears during Rainy or Stormy [[Weather]]
+
+**Harvest**
+* Tool: any Sickle⏳
+* [[Foraging|Interact to harvest]] — the flower disappears on harvest⏳
+* Drops: [[item:ambermirage]]⏳
+
+**Usages** ⏳
+* [[item:ambermirage]] — crafting ingredient
+
+**Tips**
+* _Plan your desert expeditions around the blooming window — Ambermirages are only available for 4 hours a day._
+* _Bad weather cancels all blooming for the entire day._ ⏳
+  `
+  },
+  {
+    title: 'Corals',
+    category: ['Plant', 'Sea'],
+    content: `
+      `
+  },
   // ── Fishs ────────────────────────────────────────────────────
   // ── Monsters ─────────────────────────────────────────────────
   //    Spiders, Bees
@@ -2383,6 +2455,12 @@ Note: those ingredients can also be dropped by [[Mining]] [[Cobweb]] with any [[
   {
     title: 'Inventory',
     category: ['Gameplay'],
+    content: `
+    `
+  },
+  {
+    title: 'Weather',
+    category: ['Gameplay', 'Plant', 'Foraging', 'Fishing'],
     content: `
     `
   },

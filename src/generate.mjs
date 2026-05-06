@@ -1,7 +1,8 @@
 import {seededRNG, shuffleArray, rollLoot} from './utils.mjs'
 import {database, uniqueIdGenerator} from './database.mjs'
-import {WEATHER_TYPE, WORLD_WIDTH, WORLD_HEIGHT, SEA_LEVEL, TOPSOIL_Y_SKY_SURFACE, TOPSOIL_Y_SURFACE_UNDER, TOPSOIL_Y_UNDER_CAVERNS, TOPSOIL_Y_CAVERNS_MID, BIOME_TILE_MAP, SEA_MAX_JITTER, SEA_MAX_WIDTH, SEA_MAX_HEIGHT, CLUSTER_SCATTER_MAP, ORE_GEM_SCATTER_MAP, PERLIN_OFFSET_NATURALIZER, PERLIN_OFFSET_TUNNEL, PERLIN_OFFSET_SURFACE_TUNNEL, PERLIN_OFFSET_SMALL_TUNNEL, PERLIN_OFFSET_CAVERN, PERLIN_OFFSET_HIVE, PERLIN_OFFSET_HEART, PERLIN_OFFSET_MUSHROOM, PERLIN_OFFSET_COBWEB, PERLIN_OFFSET_FERNS, PERLIN_OFFSET_LAKES, PERLIN_OFFSET_SHELL, PERLIN_OFFSET_TEMPLE, PERLIN_OFFSET_BEACH, SMALL_CAVERNS_COUNT, MEDIUM_CAVERNS_COUNT, UNDERGROUND_TUNNEL_COUNT, CAVERNS_TUNNEL_COUNT, SMALL_TUNNELS_COUNT, HIVE_RADIUS_MIN, HIVE_RADIUS_MAX, COBWEB_CAVE_COUNT_MIN, COBWEB_CAVE_COUNT_MAX, COBWEB_RADIUS_X_MIN, COBWEB_RADIUS_X_MAX, COBWEB_RADIUS_Y_MIN, COBWEB_RADIUS_Y_MAX, COBWEB_CAVE_MAIN_MIN, COBWEB_CAVE_MAIN_MAX, COBWEB_CAVE_SIDE_MIN, COBWEB_CAVE_SIDE_MAX, COBWEB_SCATTER_COUNT, COBWEB_SCATTER_SIZE_MIN, COBWEB_SCATTER_SIZE_MAX, GEODE_CAVE_COUNT_MIN, GEODE_CAVE_COUNT_MAX, GEODE_RADIUS_MIN, GEODE_RADIUS_MAX, GEODE_TARGET_CLUSTER_COUNT, GEODE_CLUSTER_SIZE_MIN, GEODE_CLUSTER_SIZE_MAX, TOPSOIL_SCATTER_MAP, LAKE_RADIUS_X_MIN, LAKE_RADIUS_X_MAX, LAKE_RADIUS_Y_MIN, LAKE_RADIUS_Y_MAX, LAKE_PIT_RADIUS_X_MIN, LAKE_PIT_RADIUS_X_MAX, LAKE_PIT_RADIUS_Y_MIN, LAKE_PIT_RADIUS_Y_MAX, LAKE_CREATION_MAP, UNDERGROUND_LAKE_UNDER_COUNT, UNDERGROUND_LAKE_CAVERNS_COUNT, UNDERGROUND_LAKE_RADIUS_MIN, UNDERGROUND_LAKE_RADIUS_MAX, BLIND_LAKE_COUNT, BLIND_LAKE_RADIUS_MIN, BLIND_LAKE_RADIUS_MAX, SAP_LAKE_UNDER_COUNT, SAP_LAKE_CAVERNS_COUNT, SAP_LAKE_RADIUS_MIN, SAP_LAKE_RADIUS_MAX, SAP_POCKET_COUNT, SAP_POCKET_RADIUS_MIN, SAP_POCKET_RADIUS_MAX, WATER_PUDDLE_COUNT, SAP_PUDDLE_COUNT, PUDDLE_HEIGHT_MIN, PUDDLE_HEIGHT_MAX, FOSSIL_VEIN_COUNT, FERN_CAVE_RADIUS_X_MIN, FERN_CAVE_RADIUS_X_MAX, FERN_CAVE_RADIUS_Y_MIN, FERN_CAVE_RADIUS_Y_MAX, MOSS_CAVE_RADIUS_X_MIN, MOSS_CAVE_RADIUS_X_MAX, MOSS_CAVE_RADIUS_Y_MIN, MOSS_CAVE_RADIUS_Y_MAX, SAND_POCKET_RADIUS_X_MIN, SAND_POCKET_RADIUS_X_MAX, SAND_POCKET_RADIUS_Y_MIN, SAND_POCKET_RADIUS_Y_MAX, MUSHROOM_CAVE_RADIUS_X_MIN, MUSHROOM_CAVE_RADIUS_X_MAX, MUSHROOM_CAVE_RADIUS_Y_MIN, MUSHROOM_CAVE_RADIUS_Y_MAX, PYRAMID_WALL_INDEXES, PYRAMID_VOID_INDEXES, PYRAMID_WIDTH, PYRAMID_HEIGHT, PYRAMID_ROOM1_DELTA, PYRAMID_ROOM2_DELTA, TEMPLE_RUIN_WALL_INDEXES, TEMPLE_RUIN_COLUMNS_INDEXES, CHEST_CONTENT, TREES_INIT_SIZE, GIANT_MUSHROOM_INIT_SIZE} from '../assets/data/data-gen.mjs'
+import {WORLD_WIDTH, WORLD_HEIGHT, SEA_LEVEL, TOPSOIL_Y_SKY_SURFACE, TOPSOIL_Y_SURFACE_UNDER, TOPSOIL_Y_UNDER_CAVERNS, TOPSOIL_Y_CAVERNS_MID, BIOME_TILE_MAP, SEA_MAX_JITTER, SEA_MAX_WIDTH, SEA_MAX_HEIGHT, CLUSTER_SCATTER_MAP, ORE_GEM_SCATTER_MAP, PERLIN_OFFSET_NATURALIZER, PERLIN_OFFSET_TUNNEL, PERLIN_OFFSET_SURFACE_TUNNEL, PERLIN_OFFSET_SMALL_TUNNEL, PERLIN_OFFSET_CAVERN, PERLIN_OFFSET_HIVE, PERLIN_OFFSET_HEART, PERLIN_OFFSET_MUSHROOM, PERLIN_OFFSET_COBWEB, PERLIN_OFFSET_FERNS, PERLIN_OFFSET_LAKES, PERLIN_OFFSET_SHELL, PERLIN_OFFSET_TEMPLE, PERLIN_OFFSET_BEACH, SMALL_CAVERNS_COUNT, MEDIUM_CAVERNS_COUNT, UNDERGROUND_TUNNEL_COUNT, CAVERNS_TUNNEL_COUNT, SMALL_TUNNELS_COUNT, HIVE_RADIUS_MIN, HIVE_RADIUS_MAX, COBWEB_CAVE_COUNT_MIN, COBWEB_CAVE_COUNT_MAX, COBWEB_RADIUS_X_MIN, COBWEB_RADIUS_X_MAX, COBWEB_RADIUS_Y_MIN, COBWEB_RADIUS_Y_MAX, COBWEB_CAVE_MAIN_MIN, COBWEB_CAVE_MAIN_MAX, COBWEB_CAVE_SIDE_MIN, COBWEB_CAVE_SIDE_MAX, COBWEB_SCATTER_COUNT, COBWEB_SCATTER_SIZE_MIN, COBWEB_SCATTER_SIZE_MAX, GEODE_CAVE_COUNT_MIN, GEODE_CAVE_COUNT_MAX, GEODE_RADIUS_MIN, GEODE_RADIUS_MAX, GEODE_TARGET_CLUSTER_COUNT, GEODE_CLUSTER_SIZE_MIN, GEODE_CLUSTER_SIZE_MAX, TOPSOIL_SCATTER_MAP, LAKE_RADIUS_X_MIN, LAKE_RADIUS_X_MAX, LAKE_RADIUS_Y_MIN, LAKE_RADIUS_Y_MAX, LAKE_PIT_RADIUS_X_MIN, LAKE_PIT_RADIUS_X_MAX, LAKE_PIT_RADIUS_Y_MIN, LAKE_PIT_RADIUS_Y_MAX, LAKE_CREATION_MAP, UNDERGROUND_LAKE_UNDER_COUNT, UNDERGROUND_LAKE_CAVERNS_COUNT, UNDERGROUND_LAKE_RADIUS_MIN, UNDERGROUND_LAKE_RADIUS_MAX, BLIND_LAKE_COUNT, BLIND_LAKE_RADIUS_MIN, BLIND_LAKE_RADIUS_MAX, SAP_LAKE_UNDER_COUNT, SAP_LAKE_CAVERNS_COUNT, SAP_LAKE_RADIUS_MIN, SAP_LAKE_RADIUS_MAX, SAP_POCKET_COUNT, SAP_POCKET_RADIUS_MIN, SAP_POCKET_RADIUS_MAX, WATER_PUDDLE_COUNT, SAP_PUDDLE_COUNT, PUDDLE_HEIGHT_MIN, PUDDLE_HEIGHT_MAX, FOSSIL_VEIN_COUNT, FERN_CAVE_RADIUS_X_MIN, FERN_CAVE_RADIUS_X_MAX, FERN_CAVE_RADIUS_Y_MIN, FERN_CAVE_RADIUS_Y_MAX, MOSS_CAVE_RADIUS_X_MIN, MOSS_CAVE_RADIUS_X_MAX, MOSS_CAVE_RADIUS_Y_MIN, MOSS_CAVE_RADIUS_Y_MAX, SAND_POCKET_RADIUS_X_MIN, SAND_POCKET_RADIUS_X_MAX, SAND_POCKET_RADIUS_Y_MIN, SAND_POCKET_RADIUS_Y_MAX, MUSHROOM_CAVE_RADIUS_X_MIN, MUSHROOM_CAVE_RADIUS_X_MAX, MUSHROOM_CAVE_RADIUS_Y_MIN, MUSHROOM_CAVE_RADIUS_Y_MAX, PYRAMID_WALL_INDEXES, PYRAMID_VOID_INDEXES, PYRAMID_WIDTH, PYRAMID_HEIGHT, PYRAMID_ROOM1_DELTA, PYRAMID_ROOM2_DELTA, TEMPLE_RUIN_WALL_INDEXES, TEMPLE_RUIN_COLUMNS_INDEXES, CHEST_CONTENT, TREES_INIT_SIZE, GIANT_MUSHROOM_INIT_SIZE} from '../assets/data/data-gen.mjs'
 import {NODES, NODES_LOOKUP, NODE_TYPE, BIOME_TYPE, PLANT_KIND, PLANT_TYPE, ITEMS, BAG_CAPACITY, TREE_IMAGES} from '../assets/data/data.mjs'
+import {WEATHER_TYPE, WEATHER_TYPE_CODE} from './constant.mjs'
 
 /* ====================================================================================================
    WORLD BUFFER (CREATION DU MONDE)
@@ -140,7 +141,7 @@ class WorldGenerator {
     window.DEBUG_POINTS = [] // DEGUG - à supprimer
 
     // affichage de la progression de la création dans le dialogue modal
-    const STEPS = 31
+    const STEPS = 33
     let step = 0
     const progress = (topic) => {
       step++
@@ -353,6 +354,12 @@ class WorldGenerator {
     await progress('Chests')
 
     // 8.3. Ajout des plantes et des coraux - TODO
+
+    // 8.3.0. Détermination du temps
+    const currentWeather = seededRNG.randomGetArrayWeighted(WEATHER_TYPE)
+    const nextWeather = seededRNG.randomGetArrayWeighted(WEATHER_TYPE)
+    const weather = {currentWeather, nextWeather}
+
     // 8.3.1. Coconut
     plantGenerator.placeSeaCoconut(leftBeach.beachRect, surfaceLine, true, guarded)
     plantGenerator.placeSeaCoconut(rightBeach.beachRect, surfaceLine, false, guarded)
@@ -375,6 +382,10 @@ class WorldGenerator {
     plantGenerator.spreadNatural(surfacePlants, NODES.GRASSFOREST.code, NODES.CLAY.code, NODES.SKY.code)
     plantGenerator.spreadNatural(surfacePlants, NODES.GRASSJUNGLE.code, NODES.MUD.code, NODES.SKY.code)
     plantGenerator.spreadNatural(mushroomPlants, NODES.GRASSMUSHROOM.code, NODES.HUMUS.code, NODES.VOID.code)
+    await progress('Natural Spreading')
+
+    plantGenerator.placeAmbermirages(surfaceLine, guarded, currentWeather)
+    await progress('Surface Herbs')
 
     // 9. Traitements finaux
 
@@ -387,7 +398,7 @@ class WorldGenerator {
       console.log('.................... liquidBodies', liquidBodies)
       const lakes = [...surfaceLakes, ...underLakes, ...blindLakes, ...sapLakes, ...sapPockets]
       const plants = [...fernsPlants, ...mossPlants, ...mushroomPlants, ...surfacePlants, ...plantGenerator.plants]
-      await this.save(seed, {hives, cobwebCaves, geodeCaves, lakes, liquidBodies, fernsCaves, mossCaves, mushroomCaves, pyramid, ruinedcabin, lostTemple, ancientHouse, leftBeach, rightBeach, antlions, anthills, termites, plants, hearts, triskels, graveyard})
+      await this.save(seed, {hives, cobwebCaves, geodeCaves, lakes, liquidBodies, fernsCaves, mossCaves, mushroomCaves, pyramid, ruinedcabin, lostTemple, ancientHouse, leftBeach, rightBeach, antlions, anthills, termites, plants, hearts, triskels, graveyard, weather})
       worldBuffer.clear()
     }
 
@@ -398,7 +409,7 @@ class WorldGenerator {
     if (debug) { return worldBuffer } // appelant responsable du clear()
   }
 
-  async save (seed, {hives, cobwebCaves, geodeCaves, lakes, liquidBodies, fernsCaves, mossCaves, mushroomCaves, plants, pyramid, ruinedcabin, lostTemple, ancientHouse, leftBeach, rightBeach, antlions, anthills, termites, hearts, triskels, graveyard}) {
+  async save (seed, {hives, cobwebCaves, geodeCaves, lakes, liquidBodies, fernsCaves, mossCaves, mushroomCaves, plants, pyramid, ruinedcabin, lostTemple, ancientHouse, leftBeach, rightBeach, antlions, anthills, termites, hearts, triskels, graveyard, weather}) {
     const start = window.performance.now()
     // 1. Sauvegarde des tuiles
     await database.clearObjectStore('world_chunks')
@@ -420,9 +431,6 @@ class WorldGenerator {
     // await database.clearObjectStore('trees')
     // await database.addMultipleRecords('trees', this.treeSpots)
 
-    const weather = seededRNG.randomGetArrayWeighted(WEATHER_TYPE)
-    const nextweather = seededRNG.randomGetArrayWeighted(WEATHER_TYPE)
-
     await database.clearObjectStore('gamestate')
     await database.batchSetGameState([
       {key: 'player', value: '8192|1280|1'},
@@ -430,9 +438,8 @@ class WorldGenerator {
       {key: 'randomkey', value: seed},
       {key: 'uniqueidseed', value: 'a'},
       {key: 'timestamp', value: 480 * 1000}, // Day 1 - 8:00
-      {key: 'weather', value: weather},
-      {key: 'nextweather', value: nextweather},
-
+      {key: 'weather', value: weather.currentWeather},
+      {key: 'nextweather', value: weather.nextWeather},
       {key: 'redhearts', value: 5},
       {key: 'goldhearts', value: 0},
       {key: 'daybloomseeds', value: ''},
@@ -6874,6 +6881,7 @@ class PlantGenerator {
     const images = this.#buildTreeImages('coconut', soilX, soilY)
 
     this.#plants.push({
+      id: uniqueIdGenerator.getUniqueId(),
       kind: PLANT_KIND.TREE,
       type: PLANT_TYPE.COCONUT,
       index,
@@ -6956,6 +6964,7 @@ class PlantGenerator {
       guarded.add(coralX + 1)
 
       this.#plants.push({
+        id: uniqueIdGenerator.getUniqueId(),
         kind: PLANT_KIND.HERB,
         type,
         itemId,
@@ -6999,6 +7008,7 @@ class PlantGenerator {
       const images = this.#buildTreeImages(treeName, soilX, y)
 
       this.#plants.push({
+        id: uniqueIdGenerator.getUniqueId(),
         kind: PLANT_KIND.TREE,
         type: treeType,
         index: soilIndex - TREE_H * W,
@@ -7025,6 +7035,7 @@ class PlantGenerator {
     const placeMushroom = (soilX, y, mushroomId) => {
       const soilIndex = (y << 10) | soilX
       this.#plants.push({
+        id: uniqueIdGenerator.getUniqueId(),
         kind: PLANT_KIND.MUSHROOM,
         type: PLANT_TYPE.NONE,
         itemId: mushroomId,
@@ -7117,6 +7128,7 @@ class PlantGenerator {
       const images = this.#buildTreeImages('giantMushroom', x, y)
 
       this.#plants.push({
+        id: uniqueIdGenerator.getUniqueId(),
         kind: PLANT_KIND.TREE,
         type: PLANT_TYPE.GIANT_MUSHROOM,
         index: soilIndex - MUSH_H * W,
@@ -7182,6 +7194,7 @@ class PlantGenerator {
         // const delay = Math.round(seededRNG.randomGetRealMinMax(1, 4) * DAY_MS)
         const delay = (seededRNG.randomGetRealMinMax(1, 4) * DAY_MS) | 0
         this.#plants.push({
+          id: uniqueIdGenerator.getUniqueId(),
           kind: PLANT_KIND.SPREAD,
           type: PLANT_TYPE.NONE,
           index: nIdx,
@@ -7191,6 +7204,40 @@ class PlantGenerator {
           deleted: false
         })
       }
+    }
+  }
+
+  placeAmbermirages (surfaceLine, guarded, initialWeather) {
+    const SAND = NODES.SAND.code
+    const W = WORLD_WIDTH
+
+    const badWeather = initialWeather === WEATHER_TYPE_CODE.RAINY || initialWeather === WEATHER_TYPE_CODE.STORMY
+
+    for (let x = 2; x < W - 2; x++) {
+      if (guarded.has(x)) continue
+
+      const y = surfaceLine[x]
+      if (worldBuffer.read(x, y) !== SAND) continue
+      if (worldBuffer.read(x - 1, surfaceLine[x - 1]) !== SAND) continue
+      if (worldBuffer.read(x + 1, surfaceLine[x + 1]) !== SAND) continue
+
+      const soilIndex = (y << 10) | x
+      const present = !badWeather && seededRNG.randomGetMinMax(0, 4) === 0
+
+      this.#plants.push({
+        id: uniqueIdGenerator.getUniqueId(),
+        kind: PLANT_KIND.HERB,
+        type: PLANT_TYPE.AMBERMIRAGE,
+        index: soilIndex - W,
+        soilIndex,
+        itemId: 'ambermirage',
+        w: 1,
+        h: 1,
+        x,
+        y: y - 1,
+        present,
+        deleted: false
+      })
     }
   }
 }
