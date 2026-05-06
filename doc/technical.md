@@ -133,10 +133,7 @@ RECIPES.wooden_plank.result.item // → ITEMS.plank   (objet direct)
 
 1. Injection de `code` dans chaque item (`ITEMS.worm.code === 'worm'`)
 2. Construction de `NODES_LOOKUP` par code numérique
-3. Résolution `NODES.mining[].item` : string → objet item
-4. Résolution `ITEMS.placesNode` : string → objet node
-5. Résolution `PLANTS.growsOn[]` : string → objet node
-6. Résolution `PLANTS.drops[].item` : string → objet item
+3. Résolution `NODES.mining[].item` : string → objet item - TODO
 7. Résolution `RECIPES.ingredients[].item` et `result.item` : string → objet item
 8. **Validation d'intégrité** — `throw` bloquant si KO :
    - Codes `NODES` uniques
@@ -145,8 +142,8 @@ RECIPES.wooden_plank.result.item // → ITEMS.plank   (objet direct)
 ### Hydratation des images
 
 **Absente de `data.mjs`** — dépend de `loadAssets()`.
-Effectuée par `core.mjs :: #hydrateNodes()` et `#hydrateItems()` après `loadAssets()`.
-Itère sur `NODES_LOOKUP` et `ITEMS`, remplace les strings `image`, `placed`, etc.
+Effectuée par `core.mjs :: #hydrateNodes()`, `#hydrateItems()` et `hydrateTreeImages()` après `loadAssets()`.
+Itère sur `NODES_LOOKUP`, `ITEMS` et `TREE_IMAGES`, remplace les strings `image`, `placed`, etc.
 par des objets `{imageIndex, x, y, w, h}` directement utilisables pour le rendu.
 
 ---
@@ -537,7 +534,7 @@ Les enregistrements sont de natures très différentes, nature déterminée par 
   * `yBottom`: coordonnée pour le clipping de l'image (ou si `x,yBottom` est dans le rectangle visible)
   * `soilIndex` : position de la tuile solide sous la gauche de l'arbre (`index + h * 1024`)
   * `size` : croissance actuelle (0 à 4)
-  * `images` : tableau de 7 images (selon `size`, les images suivantes sont empilées : `0 => [0, 4]`, `1 => [0, 1, 4]`, `2 => [0, 1, 2, 4]`, `3 => [0, 1, 2, 3, 4]`, `4 => [0, 1, 2, 3, 5, 6]`). Chaque image est définie par les attributs `x` et `y` (position dans le monde où l'image doit être affichée) ainsi que `tree`, `row` et `col` (détermine l'image dans TREE_IMAGES).
+  * `images` : tableau de 7 images (selon `size`, les images suivantes sont empilées : `0 => [1, 0]`, `1 => [1, 2, 0]`, `2 => [1, 2, 3, 0]`, `3 => [1, 2, 3, 4, 0]`, `4 => [1, 2, 3, 4, 5, 6]`). Chaque image est définie par les attributs `x` et `y` (position dans le monde où l'image doit être affichée) ainsi que `tree`, `row` et `col` (détermine l'image dans TREE_IMAGES).
   * `grass` : type de tuile sur lequel l'arbre pousse (NODES.GRASSFOREST.code, NODES.GRASSJUNGLE.code, NODES.GRASSMUSHROOM.code, NODES.SAND.code)
   * `growthTimestamp` : heure (timestamp) de prochaine croissance (`null` si `size` === 0)
   * `shakedTimestamp` : heure (timestamp) à partir de laquelle l'arbre peut être secoué de nouveau
@@ -553,7 +550,7 @@ Les enregistrements sont de natures très différentes, nature déterminée par 
 * `kind` HERB : liste des herbes présentes dans le monde
   * `id` : identifiant unique de l'herbe
   * `index` : position de l'herbe (coin haut gauche de l'image)
-  * `type` : type d'herbe : Blinkroot, Coral, Daybloom, Fireblossom, Oleander, Skorn, Waterleaf (idntifiant de l'item correspondant)
+  * `type` : type d'herbe : Blinkroot, Coral, Daybloom, Fireblossom, Oleander, Skorn, Waterleaf (identifiant de l'item correspondant)
   * `w` et `h` : taille de l'herbe
   * `x` et `y` : coordonnées pour le clipping de l'image (affichée si `x,y` est dans le rectangle visible)
   * `soilIndex` : position de la tuile solide sous la gauche de l'herbe (`index + h * 1024`)
@@ -584,9 +581,12 @@ Point d'entrée unique du moteur.
 **Cycle de `boot()` :**
 1. `loadAssets()` (bloquant) — charge images et sons, importe `data.mjs` en parallèle
 2. `database.init()`
-3. `#hydrateNodes()` — itère `NODES_LOOKUP`, remplace `image`, `waveImage`...
-4. `#hydrateItems()` — itère `ITEMS`, remplace `image`, `placed`...
+3. `#hydrateNodes()` — itère `NODES_LOOKUP`, remplace `image`, `waveImage`... (*)
+4. `#hydrateItems()` — itère `ITEMS`, remplace `image`, `placed`... (*)
+4. `#hydrateTreeImages()` — itère `TREE_IMAGES`, remplace toutes string
 5. `mouseManager.init()`
+
+_(*) Vérification que la fiche d'aide existe_
 
 **Cycle de `startSession()` :**
 1. `database.getAllGameState()` → chargement en une requête

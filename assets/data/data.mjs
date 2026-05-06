@@ -336,7 +336,7 @@ export const PLANT_KIND = {
   NATURAL: 1, // tuiles NATURAL (GRASSFOREST, GRASSJUNGLE, GRASSMOSS, GRASSFERN, GRASSMUSHROOM)
   TREE: 2, // arbres (Oak, Mahogany, Giant Mushroom, Coconut)
   MUSHROOM: 3, // champignons (Bolete, Pink Mycenia)
-  HERB: 4, // herbes ()
+  HERB: 4, // herbes (Coral)
   SEED: 5 // graines plantées ()
 }
 

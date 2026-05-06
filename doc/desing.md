@@ -627,7 +627,10 @@ Avec :
 | Nom | Tier | Type | Biome / Mini-biome / Layer | Loot |
 |---|---|---|---|
 | **COCONUT** | 1 | Tree | Sea shore, Desert Surface Lake Shore | Coconut (fruit), Coconut Fiber, Coconut Pulp, Coconut Milk |
-
+| **OAK** | 1 | Tree | Forest / Surface | Wood Log, Acorn |
+| **MAHOGANY** | 1 | Tree | Jungle / Surface | Mahogany Log |
+| **GIANT MUSHROOM** | 1 | Tree | Mushroom Caves | ??? |
+| **CORAL** | 1 | Herb | Under Sea / SAND | Coral |
 
 ## 5.9 Mécaniques des mini-biomes
 

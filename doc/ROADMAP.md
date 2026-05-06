@@ -17,12 +17,15 @@
 ## À faire — Génération du monde (`generate.mjs`)
 
 ### Tunnels
-- Densité trop élevée, notamment juste sous la surface (revoir les constantes `SMALL_TUNNELS_COUNT` et `CAVERNS_TUNNEL_COUNT`)
+- Densité un peu trop faible en Surface
+- Densité trop élevée en Underground et Caverns (revoir les constantes `SMALL_TUNNELS_COUNT` et `CAVERNS_TUNNEL_COUNT`)
 
 ### Ajout des artefacts et plantes
 - Ajout des arbres : Giant Mushroom
-- Ajout de herbes
-- Ajout des arbustes (Cactus, bambou)
+- Ajout de herbes : Blinkroot, Daybloom, Fireblossom, Oleander, Skorn, Waterleaf
+- Ajout des arbustes : Cactus, bambou
+
+### Ajout des seeds
 
 ---
 
