@@ -2475,6 +2475,7 @@ The Ambermirage is a common desert flower that blooms only during the hottest ho
 
 **Dangers**
 * Harvesting an AmberMirage may disturb a [[monster:scorpion]] hiding beneath its petals — be ready to [[Fighting|fight]]. ⏳
+
 **Usages** ⏳
 * [[item:ambermirage]] — crafting ingredient
 
@@ -2487,6 +2488,28 @@ The Ambermirage is a common desert flower that blooms only during the hottest ho
     title: 'Corals',
     category: ['Plant', 'Sea'],
     content: `
+      `
+  },
+  {
+    title: 'Amber-Moss',
+    category: ['Plant', 'Forest'],
+    content: `
+    <<Note pour l'IA : fiche à traduire, la décision d'intégration de cette plante n'est pas encore prise>>
+    La Mousse d'Ambre (Amber-Moss)
+C'est une mousse d'un orange vif, presque luminescente, qui pousse exclusivement sur le côté nord des vieux chênes, là où l'humidité est constante.
+
+**Benefits**⏳
+* Hémostatique naturel (Soin) : Appliquée directement sur une plaie, elle stoppe instantanément le saignement. C'est le "pansement" de base du début de jeu.
+* Allume-feu (Survie) : Une fois séchée, cette mousse devient extrêmement inflammable. Elle est indispensable pour réussir à allumer un Campfire ou une Torch.
+* Filtration : Placée dans un récipient, elle peut servir de filtre rudimentaire utilisé en cuisine.
+
+
+Localisation : Base of Oak trees.
+
+Foraging : [[Harvesting|Sickle]] any tier.⏳
+
+**Usages**⏳
+* onguent qui diminue de 50% les démangeaisons causées par les [[monster:hornet]]s.
       `
   },
 
