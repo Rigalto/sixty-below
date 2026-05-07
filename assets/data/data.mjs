@@ -332,6 +332,8 @@ export const ITEMS = {
   pinkMycenia: {name: 'Pink Mycenia', type: ITEM_TYPE.MATERIAL, stype: 'mushroom', star: 1, image: 'potions_32_32-1-5', placed: 'fuws_32_32-4-0', help: 'Surface Mushrooms', tooltip: '???'},
 
   // Herbs
+  parsnip: {name: 'Parsnip', type: ITEM_TYPE.MATERIAL, stype: 'herb', star: 1, image: 'potions_32_32-1-5', placed: 'fuws_32_32-4-0', help: 'Parsnip', tooltip: '???'},
+  sunflower: {name: 'Sunflower', type: ITEM_TYPE.MATERIAL, stype: 'herb', star: 1, image: 'potions_32_32-1-5', placed: 'fuws_32_32-4-0', help: 'Sunflower', tooltip: '???'},
   ambermirage: {name: 'Ambermirage', type: ITEM_TYPE.MATERIAL, stype: 'herb', star: 1, image: 'potions_32_32-1-5', placed: 'fuws_32_32-4-0', help: 'Ambermirage', tooltip: '???'},
   coralr: {name: 'Sunburst Brain Coral', type: 0, stype: 'herb', star: 2, image: null, placed: 'fuws_32_32-2-3', speed: 1900, foraging: [{item: 'coral', count: 1, rainy: 1.8, windy: 1.8}], help: 'Corals', tooltip: 'Crafting Material for Potions and Furniture'},
   coralp: {name: 'Starfire Pillar Coral', type: 0, stype: 'herb', star: 2, image: null, placed: 'fuws_32_32-3-3', speed: 1900, foraging: [{item: 'coral', count: 1, rainy: 1.8, windy: 1.8}], help: 'Corals', tooltip: 'Crafting Material for Potions and Furniture'},
@@ -371,17 +373,20 @@ export const PLANT_TYPE = {
   MAHOGANY: 11,
   COCONUT: 12,
   GIANT_MUSHROOM: 4,
-  // Herbs
-  PARSNIP: 23,
-  AMBERMIRAGE: 26,
-  OLEANDER: 21,
-  BLINKROOT: 22,
-  FIREBLOSSOM: 24,
-  SKORN: 25,
-  CORAL_R: 27,
-  CORAL_P: 28,
-  CORAL_Y: 29,
-  CORAL_G: 30
+  // Surface Herbs
+  PARSNIP: 21,
+  SUNFLOWER: 22,
+  AMBERMIRAGE: 24,
+  // Underground Herbs
+  OLEANDER: 31,
+  BLINKROOT: 32,
+  FIREBLOSSOM: 33,
+  SKORN: 34,
+  // Under Sea Herbs
+  CORAL_R: 41,
+  CORAL_P: 42,
+  CORAL_Y: 43,
+  CORAL_G: 44
 }
 
 export const PARSNIP_COUNT = 12

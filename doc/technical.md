@@ -549,7 +549,7 @@ Les enregistrements sont de natures très différentes, nature déterminée par 
   * `soilIndex` : position de la tuile solide sous la gauche du champignon (`index + h * 1024`)
   * `present` : booléen indiquant si un champignon est présent (`true`) ou non sur le spot de champignon
   * _Visibilité pilotée globalement par l'heure in-game — les champignons d'un même type apparaissent et disparaissent simultanément._
-* `kind` HERB : liste des herbes présentes dans le monde (Blinkroot, Coral, Parsnip, Fireblossom, Oleander, Skorn, Ambermirage)
+* `kind` HERB : liste des herbes présentes dans le monde (Blinkroot, Coral, Parsnip, Sunflower, Fireblossom, Oleander, Skorn, Ambermirage)
   * `id` : identifiant unique de l'herbe
   * `index` : position de l'herbe (coin haut gauche de l'image)
   * `type` : type d'herbe (PLANT_TYPE.XXX)
@@ -917,7 +917,7 @@ Le paramètre `offsetX` de `digNoisyCircle`, `digNoisyEllipse` et `digNoisyRect`
 | `liquidFiller`       | `LiquidFiller`      | Flood-fill BFS des zones liquides et automate pour le SAND. |
 | `webFiller` | `WebFiller` | Peuplement WEB : `fillCobwebCave(cx, cy)` pour les caves, `scatterWebs(surfaceUnder)` pour le peuplement global différé. |
 | `furnitureGenerator ` | `FurnitureGenerator ` | Gestion des furnitures. `init()`, `getFurnitureSize(code)`, `addFurnitureAt(index, code)`, `get furnitures()`, `firstAvailableSlot(container, capacity, furnitureId)`, `addInBag(item, count)`, `addInChest(chest, item, count)`, `get inventory()`, `placeSeaChests(seaRect)`, `placeCavernChests(zoneRects)`, `placeUndergroundChests(zoneRects)`, `placeSurfaceChests(zoneRects)`, `placeSurfaceLineChests(surfaceLine, guardedX, biomesDescription)`, `fillChest (chest)` |
-| `plantGenerator`       | `PlantGenerator`      | Ajout de la flore dans le monde. `init()`, `get plants()`, `placeSeaCoconut(beachRect, surfaceLine, isLeft, guarded)`, `placeOasisCoconut(lake, surfaceLine, guarded)`, `placeCorals(seaRect, guarded)`, `placeTrees(surfaceLine, guarded)`, `placeGiantMushrooms(mushroomPlants)`, `spreadNatural(naturalPlants, naturalCode, topsoilCode, gazCode)`, `placeAmbermirages(surfaceLine, guarded, initialWeather)` |
+| `plantGenerator`       | `PlantGenerator`      | Ajout de la flore dans le monde. `init()`, `get plants()`, `placeSeaCoconut(beachRect, surfaceLine, isLeft, guarded)`, `placeOasisCoconut(lake, surfaceLine, guarded)`, `placeCorals(seaRect, guarded)`, `placeTrees(surfaceLine, guarded)`, `placeGiantMushrooms(mushroomPlants)`, `spreadNatural(naturalPlants, naturalCode, topsoilCode, gazCode)`, `placeAmbermirages(surfaceLine, guarded, initialWeather)`, `.placeParsnipsSunflowers(surfaceLine, guarded, oakPositions)` |
 
 ---
 

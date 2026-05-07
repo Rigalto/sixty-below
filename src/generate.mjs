@@ -369,7 +369,7 @@ class WorldGenerator {
     await progress('Coconuts')
 
     // 8.3.2. Oak / Mahogany / Giant Mushroom
-    plantGenerator.placeTrees(surfaceLine, guarded)
+    const oakPositions = plantGenerator.placeTrees(surfaceLine, guarded)
     plantGenerator.placeGiantMushrooms(mushroomPlants)
     await progress('Trees')
 
@@ -385,7 +385,7 @@ class WorldGenerator {
     await progress('Natural Spreading')
 
     plantGenerator.placeAmbermirages(surfaceLine, guarded, currentWeather)
-    plantGenerator.placeParsnips(surfaceLine, guarded)
+    plantGenerator.placeParsnipsSunflowers(surfaceLine, guarded, oakPositions)
     await progress('Surface Herbs')
 
     // 9. Traitements finaux
@@ -6990,6 +6990,7 @@ class PlantGenerator {
  *
  * @param {Int16Array} surfaceLine — Y de la première tuile solide par colonne
  * @param {Set<number>} guarded — colonnes protégées (modifié en place)
+ * @returns {Set<number>} — coordonnées X du centre des oaks réellement présents
  */
   placeTrees (surfaceLine, guarded) {
     const GRASSFOREST = NODES.GRASSFOREST.code
@@ -6999,6 +7000,7 @@ class PlantGenerator {
     const TREE_W = 3
     const MUSH_H = 2
     const MUSH_W = 1
+    const oakPositions = new Set()
 
     const placeTree = (soilX, y, grassCode) => {
       const treeType = grassCode === GRASSFOREST ? PLANT_TYPE.OAK : PLANT_TYPE.MAHOGANY
@@ -7008,6 +7010,7 @@ class PlantGenerator {
       const size = seededRNG.randomGetArrayValue(TREES_INIT_SIZE)
       const images = this.#buildTreeImages(treeName, soilX, y)
 
+      if (treeType === PLANT_TYPE.OAK) oakPositions.add(soilX + 1)
       this.#plants.push({
         id: uniqueIdGenerator.getUniqueId(),
         kind: PLANT_KIND.TREE,
@@ -7089,6 +7092,7 @@ class PlantGenerator {
         x += 6
       }
     }
+    return oakPositions
   }
 
   /**
@@ -7256,15 +7260,16 @@ class PlantGenerator {
   }
 
   /**
- * Place les spots de Parsnip sur la surface.
- * Tous les spots valides sont enregistrés — exactement PARSNIP_COUNT sont présents au démarrage.
- * Tuile GRASSFOREST exposée au SKY, tuiles voisines (x-1, x+1) également GRASSFOREST.
+ * Place les spots de Parsnip et Sunflower sur les tuiles GRASSFOREST de surface.
+ * Parsnip : PARSNIP_COUNT spots tirés aléatoirement parmi tous les spots valides.
+ * Sunflower : 18% des spots valides, à plus de 3 tuiles de tout Oak (hors spots guardés).
  * Ajoute à guarded les colonnes des spots présents.
  *
  * @param {Int16Array} surfaceLine — Y de la première tuile solide par colonne
  * @param {Set<number>} guarded — colonnes protégées (modifié en place)
+ * @param {number[]} oakPositions — positions X centrales des Oak plantés
  */
-  placeParsnips (surfaceLine, guarded) {
+  placeParsnipsSunflowers (surfaceLine, guarded, oakPositions) {
     const GRASSFOREST = NODES.GRASSFOREST.code
     const SKY = NODES.SKY.code
     const W = WORLD_WIDTH
@@ -7293,7 +7298,7 @@ class PlantGenerator {
     for (const x of spots) {
       const y = surfaceLine[x]
       const soilIndex = (y << 10) | x
-      const present = presentSet.has(x)
+      let present = presentSet.has(x)
 
       if (present) guarded.add(x)
 
@@ -7308,6 +7313,32 @@ class PlantGenerator {
         h: 1,
         x,
         y: y - 1,
+        present,
+        deleted: false
+      })
+
+      // Sunflower : spot potentiel sauf si proche d'un Oak
+      let nearOak = false
+      for (const oakX of oakPositions) {
+        if (Math.abs(x - oakX) <= 3) { nearOak = true; break }
+      }
+      if (nearOak) continue
+
+      present = !present && seededRNG.randomGetPercent(18)
+
+      if (present) guarded.add(x)
+
+      this.#plants.push({
+        id: uniqueIdGenerator.getUniqueId(),
+        kind: PLANT_KIND.HERB,
+        type: PLANT_TYPE.SUNFLOWER,
+        index: soilIndex - W,
+        soilIndex,
+        itemId: 'sunflower',
+        w: 1,
+        h: 2,
+        x,
+        y: y - 2,
         present,
         deleted: false
       })

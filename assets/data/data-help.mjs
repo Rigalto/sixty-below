@@ -2451,7 +2451,19 @@ Filled directly from a liquid source in the world. Used as tools to transport an
   },
 
   // ── Plants - Herbs ───────────────────────────────────────────
-  // Ambermirage, Corals
+  // Parsnip, Sunflower, Ambermirage, Corals
+  {
+    title: 'Parsnip',
+    category: ['Plant'],
+    content: `
+      `
+  },
+  {
+    title: 'Sunflower',
+    category: ['Plant'],
+    content: `
+      `
+  },
   {
     title: 'Ambermirage',
     category: ['Plant', 'Desert'],
