@@ -333,6 +333,8 @@ export const ITEMS = {
 
   // Herbs
   parsnip: {name: 'Parsnip', type: ITEM_TYPE.MATERIAL, stype: 'herb', star: 1, image: 'potions_32_32-1-5', placed: 'fuws_32_32-4-0', help: 'Parsnip', tooltip: '???'},
+  parsnipMash: {name: 'Parsnip Mash', type: ITEM_TYPE.FOOD | ITEM_TYPE.CRAFTABLE | ITEM_TYPE.USABLE, stype: 'food', star: 1, image: 'potions_32_32-1-5', help: 'Parsnip', tooltip: '???'},
+  vegetableSoup: {name: 'Vegetable Soup', type: ITEM_TYPE.FOOD | ITEM_TYPE.CRAFTABLE | ITEM_TYPE.USABLE, stype: 'food', star: 2, image: 'potions_32_32-1-5', help: 'Soups', tooltip: '???'},
 
   sunflower: {name: 'Sunflower', type: 0, stype: 'herb', star: 1, image: null, placed: 'fuws_32_32-4-0', placedLeft: 'fuws_32_32-4-0', placedRight: 'fuws_32_32-4-0', help: 'Sunflower', tooltip: '???'},
   sunflowerSeed: {name: 'Sunflower Seed', type: ITEM_TYPE.MATERIAL | ITEM_TYPE.SEED, stype: 'seed', star: 1, image: 'potions_32_32-1-5', placed: 'fuws_32_32-4-0', help: 'Sunflower', tooltip: '???'},

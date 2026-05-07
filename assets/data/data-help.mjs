@@ -2549,6 +2549,18 @@ Filled directly from a liquid source in the world. Used as tools to transport an
   // ── Buffs & Debuffs ──────────────────────────────────────────
   // ── Mechanics ────────────────────────────────────────────────
 
+  // ── Food ────────────────────────────────────────────────
+  //    Soups
+  {
+    title: 'Soups',
+    category: ['Food'],
+    content: `
+
+    **Recipes**
+    [[item:vegetableSoup]]
+      `
+  },
+
   // ── Plants - Trees ───────────────────────────────────────────
   //    Oak & Mahogany, Giant Mushroom, Coconut
   {
@@ -2583,9 +2595,35 @@ Filled directly from a liquid source in the world. Used as tools to transport an
   // Parsnip, Sunflower, Ambermirage, Corals, Oleander
   {
     title: 'Parsnip',
-    category: ['Plant'],
+    category: ['Plant', 'Forest'],
     content: `
-      `
+**Description**
+Parsnips are root vegetables found growing on the [[Forest]] floor. Their white flowers make them easy to spot among the undergrowth.
+
+**Location**
+* Biome: [[Forest]]
+* Layer: [[Surface]]
+* Grows on [[node:grassForest]]
+
+**Harvest**
+* [[Foraging|Interact to harvest]] — the plant disappears on harvest
+* Tool: any [[Harvesting Tools|Sickle]]⏳
+* Drops: [[item:parsnip]]
+
+**Usages** ⏳
+* [[item:parsnip]] — food (when used, give +20 Health during 1 in game hour)
+* [[item:parsnip]] — crafting ingredient ⏳
+* [[item:parsnipMash]] — when used, give +20 Health and +10 Max Health during 2 in game hours)
+* [[item:vegetableSoup]] — when used, give +20 Health and ???
+
+**Recipes** ⏳
+* [[item:parsnipMash]]
+* [[item:vegetableSoup]]
+
+**Tips**
+* _Harvesting parsnips repeatedly in the same forest area will gradually deplete the local population._
+* _Varying your foraging routes across different forest zones ensures a steady supply._ ⏳
+  `
   },
   {
     title: 'Sunflower',
@@ -2604,6 +2642,7 @@ Sunflowers grow in forest clearings, thriving where sunlight reaches the ground 
 
 **Harvest**
 * [[Foraging|Interact to harvest]] — the flower disappears on harvest
+* Tool: any [[Harvesting Tools|Sickle]]⏳
 * Drops: [[item:sunflowerSeed]]
 
 **Dangers**
@@ -2639,8 +2678,8 @@ The Ambermirage is a common desert flower that blooms only during the hottest ho
 * Never appears during Rainy or Stormy [[Weather]]
 
 **Harvest**
-* Tool: any [[Harvesting Tools|Sickle]]⏳
 * [[Foraging|Interact to harvest]] — the flower disappears on harvest⏳
+* Tool: any [[Harvesting Tools|Sickle]]⏳
 * Drops: [[item:ambermirage]]⏳
 
 **Dangers**
