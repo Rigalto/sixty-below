@@ -2006,12 +2006,130 @@ Shell is a sedimentary material formed from ancient marine organisms. It is foun
   },
 
   // ── Activities Fighting ──────────────────────────────────────
-  //    Fighting, Swords, Bows, Flamethrower
+  //    Fighting, Damage Types, Gear Prefixes, Weapons, Swords, Bows, Flamethrower
   {
     title: 'Fighting',
     category: ['Activities', 'Weapon'],
     content: `
     `
+  },
+  {
+    title: 'Damage Types',
+    category: ['Fighting'],
+    content: `
+**Description**
+Every source of damage in Sixty-Below deals a specific type. Understanding damage types helps you choose the right equipment and potions for each environment and enemy.
+
+**Physical Damage**
+
+| Type | Layer | Weapon | Fauna Sources |
+|---|---|---|---|
+| Piercing | [[Surface]] | Bows | stingers, spines, quills |
+| Slashing | [[Underground]] | Swords | jaws, mandibles, tails, claws |
+| Crushing | [[Caverns]] | Hammers | legs, tails, heads |
+
+**Damage Over Time (DOT)**
+
+| Type | Biome | Sources | Notes |
+|---|---|---|---|
+| Bleeding | [[Forest]] | [[Forest]] fauna | Deals damage over time |
+| Fire | [[Desert]] | [[Desert]] fauna and environment | Deals damage over time |
+| Poison | [[Jungle]] [[Jungle]] fauna | Deals damage over time |
+
+**Environment**
+Damage accumulates based on your position in the world. The two independent axes are applied simultaneously.
+
+_Example : in [[Caverns]] Bottom in the [[Jungle]] monsters inflict Crushing and Poison simultaneously._
+
+**Description**
+Every source of damage in Sixty-Below deals a specific type. Understanding damage types helps you choose the right equipment and potions for each environment and enemy.
+
+**Physical Damage**
+
+| Type | Layer | Weapon | Fauna Sources |
+|---|---|---|---|
+| Piercing | [[Surface]] | Bows | stingers, spines, quills |
+| Slashing | [[Underground]] | Swords | jaws, mandibles, tails, claws |
+| Crushing | [[Caverns]] | Hammers | legs, tails, heads |
+
+**Damage Over Time (DOT)**
+
+| Type | Biome | Sources | Notes |
+|---|---|---|---|
+| Bleeding | [[Forest]] | [[Forest]] fauna | Deals damage over time |
+| Fire | [[Desert]] | [[Desert]] fauna and environment | Deals damage over time |
+| Poison | [[Jungle]] [[Jungle]] fauna | Deals damage over time |
+
+**Environment**
+Damage accumulates based on your position in the world. The two independent axes are applied simultaneously.
+
+_Example : in [[Caverns]] Bottom in the [[Jungle]] monsters inflict Crushing and Poison simultaneously._
+
+_Some monsters may deal unexpected damage types for their environment — stay alert._  ⏳
+_Bosses can combine multiple physical damage types and DOT effects simultaneously._ ⏳
+
+**Tips**
+* _Physical damage is mitigated by armor and shields — invest in good equipment before exploring deeper layers._ ⏳
+* _DOT effects can be cured with the appropriate antidote potion._ ⏳
+* _Equip the right armor and potions before venturing into a new layer or biome._ ⏳
+  `
+  },
+  {
+    title: 'Gear Prefixes',
+    category: ['Fighting', 'Crafting'],
+    content: `
+**Description**
+Prefixes enhance weapons, armors and tools, adding special properties beyond their base stats. A piece of gear can carry at most one prefix.
+
+**Prefixes**
+
+| Prefix | Effect | Type |
+|---|---|---|
+| Quick | +PA (Action Points) | Offensive |
+| Swift | +PM (Movement Points) | Mobility |
+| Farshot | +PO (Range) | Mobility |
+| Keen | +ATQ (Attack) | Offensive |
+| Sturdy | +DEF (Defense) | Defensive |
+| Extended | +Tool Range | Utility |
+| Blazing | Inflicts [[Damage Types|Fire]] DOT on hit | DOT |
+| Venomous | Inflicts [[Damage Types|Poison]] DOT on hit | DOT |
+| Serrated | Inflicts [[Damage Types|Bleeding]] DOT on hit | DOT |
+
+**Prefix Compatibility**
+
+[[Weapons]] are split by range (Melee, Mid-range, Ranged) and [[Armors]] by slot (Head, Torso, Feet).
+
+| Prefix | Melee | Mid-range | Ranged | Head | Torso | Feet | Tool |
+|---|---|---|---|---|---|---|---|
+| Quick | ✅ | ✅ | ✅ | ✅ | ✅ | | ✅ |
+| Swift | | ✅ | ✅ | | | ✅ | |
+| Farshot | | | ✅ | | | | |
+| Keen | ✅ | ✅ | ✅ | | | | ✅ |
+| Sturdy | | | | ✅ | ✅ | ✅ | ✅ |
+| Extended | | | | | | | ✅ |
+| Blazing | ✅ | ✅ | ✅ | | | | |
+| Venomous | ✅ | ✅ | ✅ | | | | |
+| Serrated | ✅ | ✅ | ✅ | | | | |
+
+_Some specific gear pieces may deviate from these rules._ ⏳
+
+**Obtaining Prefixes** ⏳
+* Mechanics to be defined
+* Found on looted gear in chests and monster drops
+* Craftable at specific crafting stations ⏳
+
+**Tips**
+* _DOT prefixes are especially effective against high-health enemies — the damage adds up over time._ ⏳
+* _Combine Keen with a DOT prefix for a devastating offensive build._ ⏳
+* _Sturdy is essential for deep layer exploration where environmental damage accumulates._ ⏳
+  `
+  },
+  {
+    title: 'Weapons',
+    category: ['Fighting', 'Weapon', 'Armor'],
+    content: `
+    Three ranges: Melee, Mid-range, Ranged
+      `
   },
   {
     title: 'Swords',
@@ -2034,6 +2152,17 @@ Shell is a sedimentary material formed from ancient marine organisms. It is foun
 
 **Main usages**
 * Used as a tool for deleting large bulks of [[Cobweb]]⏳
+    `
+  },
+
+  // ── Activities Fighting ──────────────────────────────────────
+  //    Armors
+  {
+    title: 'Armors',
+    category: ['Armor'],
+    content: `
+    Three slots: Head, Torso, Feet
+    Armor prefixes :
     `
   },
 
@@ -2451,7 +2580,7 @@ Filled directly from a liquid source in the world. Used as tools to transport an
   },
 
   // ── Plants - Herbs ───────────────────────────────────────────
-  // Parsnip, Sunflower, Ambermirage, Corals
+  // Parsnip, Sunflower, Ambermirage, Corals, Oleander
   {
     title: 'Parsnip',
     category: ['Plant'],
@@ -2460,9 +2589,38 @@ Filled directly from a liquid source in the world. Used as tools to transport an
   },
   {
     title: 'Sunflower',
-    category: ['Plant'],
+    category: ['Plant', 'Forest'],
     content: `
-      `
+**Description**
+Sunflowers grow in forest clearings, thriving where sunlight reaches the ground unobstructed by the canopy. They bloom at dawn and close at dusk, following the arc of the sun throughout the day.
+
+**Location**
+* Biome: [[Forest]]
+* Layer: [[Surface]]
+* Grows on [[node:grassForest]] in open clearings, away from [[Oak & Mahogany|Oak]] trees
+
+**Blooming Hours**
+* Appears at dawn and disappears at dusk (in-game time)
+
+**Harvest**
+* [[Foraging|Interact to harvest]] — the flower disappears on harvest
+* Drops: [[item:sunflowerSeed]]
+
+**Dangers**
+* Harvesting a Sunflower may disturb a [[monster:hedgehog]] hiding nearby — its spines inflict [[Damage Types|Piercing]] damage and may cause [[Damage Types|Bleeding]]. ⏳
+
+**Planting**
+* Place a [[item:sunflowerSeed]] on a [[node:grassForest]] tile to increase the chance of a Sunflower growing the next day (from 18% to 80%). ⏳
+
+**Usages**
+* [[item:sunflowerSeed]] — replanting Sunflowers ⏳
+* [[item:sunflowerOil]] — extracted from seeds, essential ingredient for food and ointments ⏳
+* [[item:oleanderOil]] — contains 50% [[item:sunflowerOil]] ⏳
+
+**Tips**
+* _Sunflowers only grow in clearings — planting too many [[Oak & Mahogany|Oak]] trees will eliminate their growing spots._
+* _Managing your forest density is key : fewer trees means more Sunflowers, and vice versa._ ⏳
+  `
   },
   {
     title: 'Ambermirage',
@@ -2503,6 +2661,12 @@ The Ambermirage is a common desert flower that blooms only during the hottest ho
       `
   },
   {
+    title: 'Oleander',
+    category: ['Plant', 'Underground'],
+    content: `
+      `
+  },
+  {
     title: 'Amber-Moss',
     category: ['Plant', 'Forest'],
     content: `
@@ -2518,7 +2682,7 @@ C'est une mousse d'un orange vif, presque luminescente, qui pousse exclusivement
 
 Localisation : Base of Oak trees.
 
-Foraging : [[Harvesting|Sickle]] any tier.⏳
+Foraging : [[Foraging|Sickle]] any tier.⏳
 
 **Usages**⏳
 * onguent qui diminue de 50% les démangeaisons causées par les [[monster:hornet]]s.

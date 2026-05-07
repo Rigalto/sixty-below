@@ -58,6 +58,7 @@
 - Croissance des arbres (Oak, Mahogany, Cactus, Giant Mushroom)
 - Drops à l'abattage complet (Root, Mycelium, Taproot)
 - Agriculture : semences, pousses, récolte
+- Utiliser `placed`, `placedLeft` et `placedRight` pour sunfower en fonction de l'heure du jour
 
 ### Housing
 - Construction shelter (protection nocturne)
