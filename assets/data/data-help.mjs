@@ -2006,7 +2006,13 @@ Shell is a sedimentary material formed from ancient marine organisms. It is foun
   },
 
   // ── Activities Fighting ──────────────────────────────────────
-  //    Swords, Bows
+  //    Fighting, Swords, Bows, Flamethrower
+  {
+    title: 'Fighting',
+    category: ['Activities', 'Weapon'],
+    content: `
+    `
+  },
   {
     title: 'Swords',
     category: ['Weapon'],
@@ -2024,7 +2030,7 @@ Shell is a sedimentary material formed from ancient marine organisms. It is foun
     category: ['Weapon', 'Tool'],
     content: `
 **Tier**
-{{node:shell:star}}
+{{node:flamethrower:star}}
 
 **Main usages**
 * Used as a tool for deleting large bulks of [[Cobweb]]⏳
@@ -2107,7 +2113,7 @@ The crafting tree shows the order in which crafting stations must be built. Each
   },
 
   // ── Activities Foraging ──────────────────────────────────────
-  //    Foraging, Foraging Tools, Foraging Buffs
+  //    Foraging, Harvesting Tools (Sickles), Harvesting Buffs
   {
     title: 'Foraging',
     category: ['Activities', 'Foraging'],
@@ -2115,17 +2121,63 @@ The crafting tree shows the order in which crafting stations must be built. Each
     `
   },
   {
-    title: 'Foraging Tools',
+    title: 'Harvesting Tools',
     category: ['Tool', 'Foraging'],
     content: `
+    Sickles
     `
   },
   {
-    title: 'Foraging Buffs',
+    title: 'Harvesting Buffs',
     category: ['Buff', 'Foraging'],
     content: `
     `
   },
+
+  // ── Activities Logging ─────────────────────────────────────
+  //    Logging, Chopping Tools (Axes), Shaking Buffs
+  {
+    title: 'Logging',
+    category: ['Activities', 'Logging'],
+    content: `
+    `
+  },
+  {
+    title: 'Chopping Tools',
+    category: ['Tool', 'Logging'],
+    content: `
+    Sickles
+    `
+  },
+  {
+    title: 'Chopping Buffs',
+    category: ['Buff', 'Logging'],
+    content: `
+    `
+  },
+
+  // ── Activities Shaking ─────────────────────────────────────
+  //    Shaking, Shaking Tools (Hammers), Shaking Buffs
+  {
+    title: 'Shaking',
+    category: ['Activities', 'Shaking'],
+    content: `
+    `
+  },
+  {
+    title: 'Shaking Tools',
+    category: ['Tool', 'Shaking'],
+    content: `
+    Sickles
+    `
+  },
+  {
+    title: 'Shaking Buffs',
+    category: ['Buff', 'Shaking'],
+    content: `
+    `
+  },
+
   // ── Crafting Stations ────────────────────────────────────────
   //    Wooden Table, Woodworking, Smelting, Forging, Sharpening, Leatherworking, Weaving
   {
@@ -2163,6 +2215,7 @@ The crafting tree shows the order in which crafting stations must be built. Each
     category: ['Crafting', 'Crafting Stations'],
     content: ''
   },
+
   //    Stonecutting, Jewelry, Alchemy, Cooking, Decomposer, Transmutator
   {
     title: 'Stonecutting',
@@ -2352,6 +2405,7 @@ Filled directly from a liquid source in the world. Used as tools to transport an
     56 slots
     `
   },
+
   // ── Life Potion ──────────────────────────────────────────────
   //    Life Crystal
   {
@@ -2360,6 +2414,7 @@ Filled directly from a liquid source in the world. Used as tools to transport an
     content: `
     `
   },
+
   // ── Items & Crafting ─────────────────────────────────────────
   // ── Fauna & Critters ─────────────────────────────────────────
   // ── Buffs & Debuffs ──────────────────────────────────────────
@@ -2414,16 +2469,18 @@ The Ambermirage is a common desert flower that blooms only during the hottest ho
 * Never appears during Rainy or Stormy [[Weather]]
 
 **Harvest**
-* Tool: any Sickle⏳
+* Tool: any [[Harvesting Tools|Sickle]]⏳
 * [[Foraging|Interact to harvest]] — the flower disappears on harvest⏳
 * Drops: [[item:ambermirage]]⏳
 
+**Dangers**
+* Harvesting an AmberMirage may disturb a [[monster:scorpion]] hiding beneath its petals — be ready to [[Fighting|fight]]. ⏳
 **Usages** ⏳
 * [[item:ambermirage]] — crafting ingredient
 
 **Tips**
 * _Plan your desert expeditions around the blooming window — Ambermirages are only available for 4 hours a day._
-* _Bad weather cancels all blooming for the entire day._ ⏳
+* _Bad [[Weather]] cancels all blooming for the entire day._ ⏳
   `
   },
   {
@@ -2432,6 +2489,7 @@ The Ambermirage is a common desert flower that blooms only during the hottest ho
     content: `
       `
   },
+
   // ── Fishs ────────────────────────────────────────────────────
   // ── Monsters ─────────────────────────────────────────────────
   //    Spiders, Bees

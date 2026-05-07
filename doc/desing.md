@@ -532,7 +532,7 @@ commune de la zone N+1 : la progression est continue, sans palier artificiel.
 | Nom | Tier | Strength | Biome / Mini-biome / Layer |
 |---|---|---|---|
 | **BEETLE** | 1 | ★☆☆☆☆ | Forest — surface |
-| **SCORPION** | 1 | ★★☆☆☆ | Desert — surface |
+| **Scorpion** | 1 | ★★☆☆☆ | Desert — surface / Harvesting Ambermirage |
 | **SAND SNAKE** | 1 | ★★☆☆☆ | Desert — surface |
 | **JUNGLE SPIDER** | 1 | ★★☆☆☆ | Jungle — surface |
 | **BAT** | 2 | ★★☆☆☆ | Tous biomes — under |
@@ -564,7 +564,7 @@ commune de la zone N+1 : la progression est continue, sans palier artificiel.
 | **TERMITE SOLDIER** | 2 | ★★☆☆☆ | Termite Mound |
 | **TERMITE KING** | 2 | ★★★☆☆ | Termite Mound |
 | **BEE** | 2 | ★★☆☆☆ | Hive |
-| **HORNET** | 3 | ★★★☆☆ | Hive |
+| **Hornet** | 3 | ★★★☆☆ | Hive / Shaking Oak |
 | **BEE QUEEN** | 3 | ★★★★☆ | Hive |
 | **RED SLUG** | 3 | ★★☆☆☆ | Mushroom Cave |
 | **HYDRA** | 3 | ★★★☆☆ | Mushroom Cave |
@@ -590,6 +590,15 @@ commune de la zone N+1 : la progression est continue, sans palier artificiel.
 | **BLIND FISH** | 5 | ★★★★☆ | Fish — Blind Lake |
 | **AXOLOTL** | 5 | ★★★★★ | Fish — Blind Lake |
 
+| **Coconut Crab** | 1 | ★☆☆☆☆ | Shaking Coconut |
+| **Moray** | 2 | ★★☆☆☆ | Fishing / Harvesting Coral |
+| **Eyelash Viper** | 2 | ★★☆☆☆ | Shaking Mahogny |
+| **Bullet Ant** | 2 | ★★☆☆☆ | Chopping Mahogny |
+| **Boar** | 2 | ★★☆☆☆ | Fighting / Shaking Oak |
+| **Adder** | 2 | ★★☆☆☆ | Harvesting Bolete |
+| **Giant Red Slug** | 2 | ★★☆☆☆ | Harvesting Pink Mycenia |
+
+_Adder = Vipère Péliade_
 
 ## 5.7.1 Antlion
 
@@ -624,13 +633,16 @@ Avec :
 
 ## 5.8 Flore
 
-| Nom | Tier | Type | Biome / Mini-biome / Layer | Loot |
+| Nom | Tier | Type | Biome / Mini-biome / Layer | Loot | Encounters |
 |---|---|---|---|
-| **COCONUT** | 1 | Tree | Sea shore, Desert Surface Lake Shore | Coconut (fruit), Coconut Fiber, Coconut Pulp, Coconut Milk |
-| **OAK** | 1 | Tree | Forest / Surface | Wood Log, Acorn |
-| **MAHOGANY** | 1 | Tree | Jungle / Surface | Mahogany Log |
-| **GIANT MUSHROOM** | 1 | Tree | Mushroom Caves | ??? |
-| **CORAL** | 1 | Herb | Under Sea / SAND | Coral |
+| **Coconut** | 1 | Tree | Sea shore, Desert Surface Lake Shore | Coconut (fruit), Coconut Fiber, Coconut Pulp, Coconut Milk | Coconut Crab (Shaking) |
+| **Oak** | 1 | Tree | Forest / Surface | Wood Log, Acorn | Hornet (Shaking) / Boar (Chopping) |
+| **Mahogany** | 1 | Tree | Jungle / Surface | Mahogany Log | Eyelash Viper (Shaking) / Bullet Ant (Chopping) |
+| **Giant MUSHROOM** | 1 | Tree | Mushroom Caves | ??? | ??? (Foraging) |
+| **Bolete** | 1 | Mushroom | Foret / Surface | Bolete | Adder (Foraging) |
+| **Pink Mycenia** | 1 | Mushroom | Jungle / Surface | Pink Mycenia | Giant Red Slug (Foraging) |
+| **Coral** | 1 | Herb | Under Sea / SAND | Coral | Moray (Foraging) |
+| **Ambermirage** | 1 | Herb | Surface / SAND | ambermirage | Scorpion (Foraging) |
 
 ## 5.9 Mécaniques des mini-biomes
 
