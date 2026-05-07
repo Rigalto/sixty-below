@@ -2307,6 +2307,28 @@ The crafting tree shows the order in which crafting stations must be built. Each
     `
   },
 
+  // ── Activities Gardening ───────────────────────────────────
+  //    Gardening, Clay Pots, Gardening Buffs
+  {
+    title: 'Gardening',
+    category: ['Activities', 'Gardening'],
+    content: `
+    `
+  },
+  {
+    title: 'Clay Pots',
+    category: ['Tool', 'Gardening'],
+    content: `
+    Sickles
+    `
+  },
+  {
+    title: 'Gardening Buffs',
+    category: ['Buff', 'Gardening'],
+    content: `
+    `
+  },
+
   // ── Crafting Stations ────────────────────────────────────────
   //    Wooden Table, Woodworking, Smelting, Forging, Sharpening, Leatherworking, Weaving
   {
@@ -2549,7 +2571,7 @@ Filled directly from a liquid source in the world. Used as tools to transport an
   // ── Buffs & Debuffs ──────────────────────────────────────────
   // ── Mechanics ────────────────────────────────────────────────
 
-  // ── Food ────────────────────────────────────────────────
+  // ── Food ─────────────────────────────────────────────────────
   //    Soups
   {
     title: 'Soups',
@@ -2561,6 +2583,42 @@ Filled directly from a liquid source in the world. Used as tools to transport an
       `
   },
 
+  // ── Plants ───────────────────────────────────────────────────
+  //    Flora
+  {
+    title: 'Flora',
+    category: ['Plant', 'Gameplay'],
+    content: `
+**Description**
+All plants found in the world of Sixty-Below. Plants can be harvested for loot, and some may trigger an encounter when disturbed. Some plants can also be cultivated through [[Gardening]].
+
+## Wild Plants
+
+| Name | Tier | Type | Location | Main Loot | Encounters |
+|---|---|---|---|---|---|
+| [[item:coconut]] | {{item:coconut:star}} | Tree | Sea shore, Desert Oasis shore | [[item:coconut]], [[item:coconutFiber]], [[item:coconutPulp]], [[item:coconutMilk]] | [[monster:coconutCrab]] (Shaking) |
+| [[item:oak]] | {{item:oak:star}} | Tree | [[Forest]] / [[Surface]] | [[item:logOak]], [[item:acorn]] | [[monster:hornet]] (Shaking) / [[monster:boar]] (Chopping) |
+| [[item:mahogany]] | {{item:mahogany:star}} | Tree | [[Jungle]] / [[Surface]] | [[item:logMahogany]] | [[monster:eyelashViper]] (Shaking) / [[monster:bulletAnt]] (Chopping) |
+| [[item:giantMushroom]] | {{item:giantMushroom:star}} | Tree | [[Mushroom Cave]] | ⏳ | ⏳ |
+| [[item:bolete]] | {{item:bolete:star}} | Mushroom | [[Forest]] / [[Surface]] | [[item:bolete]] | [[monster:adder]] (Foraging) |
+| [[item:pinkMycenia]] | {{item:pinkMycenia:star}} | Mushroom | [[Jungle]] / [[Surface]] | [[item:pinkMycenia]] | [[monster:giantRedSlug]] (Foraging) |
+| [[item:coralr]] | {{item:coralr:star}} | Herb | Under Sea / [[node:sand]] | [[item:coral]] | [[monster:moray]] (Foraging) |
+| [[item:coralp]] | {{item:coralp:star}} | Herb | Under Sea / [[node:sand]] | [[item:coral]] | [[monster:moray]] (Foraging) |
+| [[item:coraly]] | {{item:coraly:star}} | Herb | Under Sea / [[node:sand]] | [[item:coral]] | [[monster:moray]] (Foraging) |
+| [[item:coralg]] | {{item:coralg:star}} | Herb | Under Sea / [[node:sand]] | [[item:coral]] | [[monster:moray]] (Foraging) |
+| [[item:ambermirage]] | {{item:ambermirage:star}} | Herb | [[Surface]] / [[node:sand]] | [[item:ambermirage]] | [[monster:scorpion]] (Foraging) |
+| [[item:parsnip]] | {{item:parsnip:star}} | Herb | [[Forest]] / [[Surface]] | [[item:parsnip]] | [[monster:vole]] (Foraging) |
+| [[item:sunflower]] | {{item:sunflower:star}} | Herb | [[Forest]] / [[Surface]] | [[item:sunflowerSeed]] | [[monster:hedgehog]] (Foraging) |
+
+_For detailed information on each plant, click its name._
+
+## Gardening ⏳
+
+Plants cultivated in [[Clay Pots]] stacked in [[Underground]] and [[Caverns]] zones. These plants are not found in the wild and require active care from the player.
+
+_Gardening plants and their details will be added in a future update._ ⏳
+  `
+  },
   // ── Plants - Trees ───────────────────────────────────────────
   //    Oak & Mahogany, Giant Mushroom, Coconut
   {
@@ -2609,6 +2667,9 @@ Parsnips are root vegetables found growing on the [[Forest]] floor. Their white 
 * [[Foraging|Interact to harvest]] — the plant disappears on harvest
 * Tool: any [[Harvesting Tools|Sickle]]⏳
 * Drops: [[item:parsnip]]
+
+**Dangers**
+* Harvesting a Parsnip may disturb a [[monster:vole]] hiding among the roots — its bite inflicts [[Damage Types|Piercing]] damage and may cause [[Damage Types|Bleeding]]. ⏳
 
 **Usages** ⏳
 * [[item:parsnip]] — food (when used, give +20 Health during 1 in game hour)

@@ -322,10 +322,15 @@ export const ITEMS = {
   coconutPulp: {name: 'Coconut Pulp', type: ITEM_TYPE.MATERIAL, stype: 'fruit', star: 1, image: 'potions_32_32-1-5', help: 'Coconut', tooltip: '???'},
   coconutMilk: {name: 'Coconut Milk', type: ITEM_TYPE.MATERIAL, stype: 'beverage', star: 1, image: 'potions_32_32-1-5', help: 'Coconut', tooltip: '???'},
 
+  oak: {name: 'Oak', type: 0, stype: 'tree', star: 1, image: null, help: 'Oak & Mahogany', tooltip: '???'},
   logOak: {name: 'Wood Log', type: ITEM_TYPE.MATERIAL, stype: 'tree', star: 1, image: 'potions_32_32-1-5', help: 'Oak & Mahogany', tooltip: '???'},
   acorn: {name: 'Acorn', type: ITEM_TYPE.MATERIAL, stype: 'seed', star: 1, image: 'potions_32_32-1-5', help: 'Oak & Mahogany', tooltip: '???'},
+
+  mahogany: {name: 'Mahogany', type: 0, stype: 'tree', star: 1, image: null, help: 'Oak & Mahogany', tooltip: '???'},
   logMahogany: {name: 'Mahogany Log', type: ITEM_TYPE.MATERIAL, stype: 'tree', star: 1, image: 'potions_32_32-1-5', help: 'Oak & Mahogany', tooltip: '???'},
   samara: {name: 'Samara', type: ITEM_TYPE.MATERIAL, stype: 'seed', star: 1, image: 'potions_32_32-1-5', help: 'Oak & Mahogany', tooltip: '???'},
+
+  giantMushroom: {name: 'Giant Mushroom', type: 0, stype: 'tree', star: 1, image: null, help: 'Oak & Mahogany', tooltip: '???'},
 
   // Mushrooms
   bolete: {name: 'Bolete', type: ITEM_TYPE.MATERIAL, stype: 'mushroom', star: 1, image: 'potions_32_32-1-5', placed: 'fuws_32_32-4-0', help: 'Surface Mushrooms', tooltip: '???'},
@@ -349,7 +354,13 @@ export const ITEMS = {
   coralp: {name: 'Starfire Pillar Coral', type: 0, stype: 'herb', star: 2, image: null, placed: 'fuws_32_32-3-3', speed: 1900, foraging: [{item: 'coral', count: 1, rainy: 1.8, windy: 1.8}], help: 'Corals', tooltip: 'Crafting Material for Potions and Furniture'},
   coraly: {name: 'Flickering Torch Coral', type: 0, stype: 'herb', star: 2, image: null, placed: 'fuws_32_32-4-3', speed: 1900, foraging: [{item: 'coral', count: 1, rainy: 1.8, windy: 1.8}], help: 'Corals', tooltip: 'Crafting Material for Potions and Furniture'},
   coralg: {name: 'Whispering Fan Coral', type: 0, stype: 'herb', star: 2, image: null, placed: 'fuws_32_32-5-3', speed: 1900, foraging: [{item: 'coral', count: 1, rainy: 1.8, windy: 1.8}], help: 'Corals', tooltip: 'Crafting Material for Potions and Furniture'},
-  coral: {name: 'Coral', type: ITEM_TYPE.MATERIAL, stype: 'herb', star: 2, image: 'crafting_32_32-0-1', help: 'Corals', tooltip: 'Crafting Material for Potions and Furniture'}
+  coral: {name: 'Coral', type: ITEM_TYPE.MATERIAL, stype: 'herb', star: 2, image: 'crafting_32_32-0-1', help: 'Corals', tooltip: 'Crafting Material for Potions and Furniture'},
+
+  // Gardening
+  clayPot1: {name: 'Clay Pot (1x1)', type: ITEM_TYPE.FURNITURE | ITEM_TYPE.PLACABLE | ITEM_TYPE.CRAFTABLE, stype: 'pot', star: 1, capacity: 1, image: 'furniture_32_32-0-8', surface: true, placed: 'fuws_16_16-0-2', placedleft: 'fuws_16_16-1-2', placedright: 'fuws_16_16-2-2', help: 'Clay Pots', tooltip: 'Gardening Container'},
+  clayPot2: {name: 'Clay Pot (2x1)', type: ITEM_TYPE.FURNITURE | ITEM_TYPE.PLACABLE | ITEM_TYPE.CRAFTABLE, stype: 'pot', star: 1, capacity: 2, image: 'furniture_32_32-1-8', surface: true, placed: 'fuws_32_16-0-0', placedleft: 'fuws_32_16-1-0', placedright: 'fuws_32_16-2-0', help: 'Clay Pots', tooltip: 'Gardening Container'},
+  clayPot3: {name: 'Clay Pot (3x1)', type: ITEM_TYPE.FURNITURE | ITEM_TYPE.PLACABLE | ITEM_TYPE.CRAFTABLE, stype: 'pot', star: 1, capacity: 3, image: 'furniture_32_32-2-8', surface: true, placed: 'fuws_48_16-0-0', placedleft: 'fuws_48_16-1-0', placedright: 'fuws_48_16-2-0', help: 'Clay Pots', tooltip: 'Gardening Container'},
+  clayPot4: {name: 'Clay Pot (2x2)', type: ITEM_TYPE.FURNITURE | ITEM_TYPE.PLACABLE | ITEM_TYPE.CRAFTABLE, stype: 'pot', star: 1, capacity: 4, image: 'furniture_32_32-3-8', surface: true, placed: 'fuws_32_32-0-4', placedleft: 'fuws_32_32-1-4', placedright: 'fuws_32_32-2-4', help: 'Clay Pots', tooltip: 'Gardening Container'}
 }
 export const BAG_CAPACITY = 64
 

@@ -597,6 +597,8 @@ commune de la zone N+1 : la progression est continue, sans palier artificiel.
 | **Boar** | 2 | ★★☆☆☆ | Fighting / Shaking Oak |
 | **Adder** | 2 | ★★☆☆☆ | Harvesting Bolete |
 | **Giant Red Slug** | 2 | ★★☆☆☆ | Harvesting Pink Mycenia |
+| **Vole** | 2 | ★★☆☆☆ | Harvesting Parsnip |
+| **Hedgehog** | 2 | ★★☆☆☆ | Harvesting Sunflower |
 
 _Adder = Vipère Péliade_
 
@@ -642,7 +644,9 @@ Avec :
 | **Bolete** | 1 | Mushroom | Foret / Surface | Bolete | Adder (Foraging) |
 | **Pink Mycenia** | 1 | Mushroom | Jungle / Surface | Pink Mycenia | Giant Red Slug (Foraging) |
 | **Coral** | 1 | Herb | Under Sea / SAND | Coral | Moray (Foraging) |
-| **Ambermirage** | 1 | Herb | Surface / SAND | ambermirage | Scorpion (Foraging) |
+| **Ambermirage** | 1 | Herb | Surface / SAND | Ambermirage | Scorpion (Foraging) |
+| **Parnsnip** | 1 | Herb | Forest / Surface | Parsnip | Vole (Foraging) |
+| **Sunflower** | 1 | Herb | Forest / Surface | Sunflover Seed | Hedgehog (Foraging) |
 
 ## 5.9 Mécaniques des mini-biomes
 
