@@ -301,7 +301,7 @@ class GameCore {
     //   [PLANT_KIND.MUSHROOM * 100 + PLANT_TYPE.NONE, mushroomSystem],
     //   [PLANT_KIND.HERB * 100 + PLANT_TYPE.PLANT_TYPE.OLEANDER, oleanderSystem],
     //   [PLANT_KIND.HERB * 100 + PLANT_TYPE.BLINKROOT, blinkrootSystem],
-    //   [PLANT_KIND.HERB * 100 + PLANT_TYPE.DAYBLOOM, daybloomSystem],
+    //   [PLANT_KIND.HERB * 100 + PLANT_TYPE.PARSNIP, parsnipSystem],
     //   [PLANT_KIND.HERB * 100 + PLANT_TYPE.FIREBLOSSOM, fireblossomSystem],
     //   [PLANT_KIND.HERB * 100 + PLANT_TYPE.SKORN, skornSystem],
     //   [PLANT_KIND.HERB * 100 + PLANT_TYPE.AMBERMIRAGE, ambermirageSystem],

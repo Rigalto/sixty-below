@@ -372,17 +372,19 @@ export const PLANT_TYPE = {
   COCONUT: 12,
   GIANT_MUSHROOM: 4,
   // Herbs
+  PARSNIP: 23,
+  AMBERMIRAGE: 26,
   OLEANDER: 21,
   BLINKROOT: 22,
-  DAYBLOOM: 23,
   FIREBLOSSOM: 24,
   SKORN: 25,
-  AMBERMIRAGE: 26,
   CORAL_R: 27,
   CORAL_P: 28,
   CORAL_Y: 29,
   CORAL_G: 30
 }
+
+export const PARSNIP_COUNT = 12
 
 export const TREE_IMAGES = {
   coconut: [

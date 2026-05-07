@@ -21,7 +21,7 @@
 - Densité trop élevée en Underground et Caverns (revoir les constantes `SMALL_TUNNELS_COUNT` et `CAVERNS_TUNNEL_COUNT`)
 
 ### Ajout des artefacts et plantes
-- Ajout de herbes : Blinkroot, Daybloom, Fireblossom, Oleander, Skorn
+- Ajout de herbes : Blinkroot, Parsnip, Fireblossom, Oleander, Skorn
 - Ajout des arbustes : Cactus, bambou
 
 ---
