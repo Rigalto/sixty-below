@@ -7026,8 +7026,8 @@ class PlantGenerator {
         deleted: false
       })
 
-      // guarded : 5 tuiles centrées sur l'arbre (soilX est la tuile gauche → centre = soilX + 1)
-      for (let dx = -1; dx <= 3; dx++) guarded.add(soilX + dx)
+      // guarded : 3 tuiles sous l'arbre (soilX est la tuile gauche)
+      for (let dx = 0; dx <= 2; dx++) guarded.add(soilX + dx)
 
       return {mushroomId, soilIndex}
     }
@@ -7207,6 +7207,16 @@ class PlantGenerator {
     }
   }
 
+  /**
+ * Place les spots d'AmberMirage sur la surface.
+ * Tous les spots valides sont enregistrés — seul 1 sur 5 est présent au démarrage (aucun si badWeather).
+ * Tuile SAND exposée au SKY, tuiles voisines (x-1, x+1) également SAND.
+ * Ajoute à guarded les colonnes des spots présents.
+ *
+ * @param {Int16Array} surfaceLine — Y de la première tuile solide par colonne
+ * @param {Set<number>} guarded — colonnes protégées (modifié en place)
+ * @param {number} initialWeather — weather du premier jour (WEATHER_TYPE_CODE)
+ */
   placeAmbermirages (surfaceLine, guarded, initialWeather) {
     const SAND = NODES.SAND.code
     const W = WORLD_WIDTH
@@ -7223,6 +7233,7 @@ class PlantGenerator {
 
       const soilIndex = (y << 10) | x
       const present = !badWeather && seededRNG.randomGetMinMax(0, 4) === 0
+      if (present) guarded.add(x)
 
       this.#plants.push({
         id: uniqueIdGenerator.getUniqueId(),
