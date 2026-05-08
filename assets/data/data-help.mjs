@@ -1336,6 +1336,9 @@ Humus is a rich organic topsoil found across all biomes, though it is most abund
 **Description**
 Compacted Earth is a dense, hardened form of soil found exclusively in [[Ant Hill]] and [[Termite Mound]] structures. It cannot be mined or destroyed by the player.
 
+**Tier**
+{{node:antdirt:star}}
+
 **Properties**
 * Indestructible — cannot be mined
 * Solid — the player can walk on it
@@ -2410,14 +2413,14 @@ Tableware is a category of [[Furnitures]] that serve as containers for food and 
 
 **Food Containers**
 Empty containers used as crafting ingredients in cooking and potion recipes. They are returned to the player's inventory upon consuming the food or potion.
-* [[item:bowl]] — soups and stews
-* [[item:mug]] — ales and drinks
-* [[item:plate]] — solid food dishes
-* [[item:trencher]] — rustic wooden plate for simple meals
+* [[item:bowl]] ({{item:bowl:star}}) — soups and stews
+* [[item:mug]] ({{item:botmugtle:star}}) — ales and drinks
+* [[item:plate]] ({{item:plate:star}}) — solid food dishes
+* [[item:trencher]] ({{item:trencher:star}}) — rustic wooden plate for simple meals
 
 **Small Liquid Containers**
 Filled directly from a liquid source in the world. Used as crafting ingredients in cooking and potion recipes.
-* [[item:bottle]] — empty bottle, filled by clicking on a liquid tile
+* [[item:bottle]] ({{item:bottle:star}}) — empty bottle, filled by clicking on a liquid tile
   * [[item:water]] — [[node:water|Bottled Water]] — healing item and potion ingredient
   * [[item:honey]] — [[node:honey|Bottled Honey]] — healing item and buff
   * [[item:sap]] — [[node:sap|Bottled Sap]] — buff
@@ -2425,7 +2428,7 @@ Filled directly from a liquid source in the world. Used as crafting ingredients 
 
 **Large Liquid Containers**
 Filled directly from a liquid source in the world. Used as tools to transport and pour liquids — the empty bucket is recovered after pouring.
-* [[item:bucket]] — empty bucket ⏳
+* [[item:bucket]] ({{item:bucket:star}}) — empty bucket ⏳
   * [[item:bucketWater]] — Water Bucket — pour water into the world ⏳
   * [[item:bucketHoney]] — Honey Bucket — pour honey into the world ⏳
   * [[item:bucketSap]] — Sap Bucket — pour sap into the world ⏳
@@ -2577,9 +2580,11 @@ Filled directly from a liquid source in the world. Used as tools to transport an
     title: 'Soups',
     category: ['Food'],
     content: `
+**Tier**
+{{item:vegetableSoup:star}}
 
-    **Recipes**
-    [[item:vegetableSoup]]
+**Recipes**
+[[item:vegetableSoup]]
       `
   },
 
@@ -2602,14 +2607,19 @@ All plants found in the world of Sixty-Below. Plants can be harvested for loot, 
 | [[item:giantMushroom]] | {{item:giantMushroom:star}} | Tree | [[Mushroom Cave]] | ⏳ | ⏳ |
 | [[item:bolete]] | {{item:bolete:star}} | Mushroom | [[Forest]] / [[Surface]] | [[item:bolete]] | [[monster:adder]] (Foraging) |
 | [[item:pinkMycenia]] | {{item:pinkMycenia:star}} | Mushroom | [[Jungle]] / [[Surface]] | [[item:pinkMycenia]] | [[monster:giantRedSlug]] (Foraging) |
-| [[item:coralr]] | {{item:coralr:star}} | Herb | Under Sea / [[node:sand]] | [[item:coral]] | [[monster:moray]] (Foraging) |
-| [[item:coralp]] | {{item:coralp:star}} | Herb | Under Sea / [[node:sand]] | [[item:coral]] | [[monster:moray]] (Foraging) |
-| [[item:coraly]] | {{item:coraly:star}} | Herb | Under Sea / [[node:sand]] | [[item:coral]] | [[monster:moray]] (Foraging) |
-| [[item:coralg]] | {{item:coralg:star}} | Herb | Under Sea / [[node:sand]] | [[item:coral]] | [[monster:moray]] (Foraging) |
+| [[item:coralR]] | {{item:coralR:star}} | Herb | Under Sea / [[node:sand]] | [[item:coral]] | [[monster:moray]] (Foraging) |
+| [[item:coralP]] | {{item:coralP:star}} | Herb | Under Sea / [[node:sand]] | [[item:coral]] | [[monster:moray]] (Foraging) |
+| [[item:coralY]] | {{item:coralY:star}} | Herb | Under Sea / [[node:sand]] | [[item:coral]] | [[monster:moray]] (Foraging) |
+| [[item:coralG]] | {{item:coralG:star}} | Herb | Under Sea / [[node:sand]] | [[item:coral]] | [[monster:moray]] (Foraging) |
 | [[item:ambermirage]] | {{item:ambermirage:star}} | Herb | [[Surface]] / [[node:sand]] | [[item:ambermirage]] | [[monster:scorpion]] (Foraging) |
 | [[item:parsnip]] | {{item:parsnip:star}} | Herb | [[Forest]] / [[Surface]] | [[item:parsnip]] | [[monster:vole]] (Foraging) |
 | [[item:sunflower]] | {{item:sunflower:star}} | Herb | [[Forest]] / [[Surface]] | [[item:sunflowerSeed]] | [[monster:hedgehog]] (Foraging) |
 | [[item:bloodmoon]] | {{item:bloodmoon:star}} | Herb | [[Jungle]] / [[Surface]] | [[item:bloodmoon]] | [[monster:hedgehog]] (Foraging) |
+| [[item:fernS]] | {{item:fernS:star}} | Herb | Fern Cave / [[node:grassfern]] | [[monster:moray]] (Foraging) |
+| [[item:fernC]] | {{item:fernC:star}} | Herb | Fern Cave / [[node:grassfern]] | [[monster:moray]] (Foraging) |
+| [[item:fernG]] | {{item:fernG:star}} | Herb | Fern Cave / [[node:grassfern]] | [[monster:moray]] (Foraging) |
+| [[item:fernM]] | {{item:fernM:star}} | Herb | Fern Cave / [[node:grassfern]] | [[monster:moray]] (Foraging) |
+
 
 _For detailed information on each plant, click its name._
 
@@ -2625,9 +2635,57 @@ _Gardening plants and their details will be added in a future update._ ⏳
   //    Oak & Mahogany, Giant Mushroom, Coconut
   {
     title: 'Oak & Mahogany',
-    category: ['Tree'],
+    category: ['Plant', 'Forest', 'Jungle'],
     content: `
-    `
+**Description**
+Oaks and Mahoganies are the dominant trees of the [[Forest]] and [[Jungle]] biomes respectively. They grow on the surface, providing wood, seeds and shelter for various creatures. Both species share the same growth mechanics and interactions.
+sickle
+**Location**
+* [[item:oak]] ({{item:oak:star}}) — [[Forest]] / [[Surface]], grows on [[node:grassForest]]
+* [[item:mahogany]] ({{item:mahogany:star}}) — [[Jungle]] / [[Surface]], grows on [[node:grassJungle]]
+
+**Growth**
+* Trees grow through 5 visible stages (1 to 5)
+* A new section grows every 2-3 in-game days for Oak, 3-4 days for Mahogany ⏳
+* Maximum size is 5 sections
+
+**Interactions - Shaking**
+
+* A tree can only be shaken once per in-game day — shaking too frequently weakens the tree. ⏳
+
+| Tree | Tool | Encounter |
+| [[item:oak]] | Any [[Shaking Tools|Hammers]] | [[monster:hornet]] |
+| [[item:mahogany]] | [[Shaking Tools|Iron Hammers]] or better | [[monster:eyelashViper]] |
+
+| Tree | Drops |
+| [[item:oak]] | {{item:oak:shaking:items}} |
+| [[item:mahogany]] | {{item:oak:shaking:items}} |
+
+**Interactions - Logging**
+
+* Chopping removes one section — the tree shrinks by one stage
+* When the last section is chopped, the tree disappears completely and yields an extra drop
+* A chopped tree will regrow naturally over time if at least one section remains
+
+| Tree | Tool | Encounter |
+| [[item:oak]] | Any [[Chopping Tools|Axes]] | [[monster:boar]] |
+| [[item:mahogany]] | [[Chopping Tools|Iron Axes]] or better | [[monster:bulletAnt]] |
+
+| Tree | Drops | Extra Drop |
+| [[item:oak]] | {{item:oak:logging:items}} | [[item:rootOak]] |
+| [[item:mahogany]] | {{item:oak:logging:items}} | [[item:rootMahogany]] |
+
+**Planting**
+* Shaking and logging both yield [[item:acorn]] (Oak) or [[item:samara]] (Mahogany)
+* Place a seed on 3 consecutive horizontal [[node:grassForest]] (acorn) or [[node:grassJungle]] (samara) tiles
+* The tree immediately appears at stage 1 and grows naturally from there
+
+**Tips**
+* _Chopping a tree down to its last section is risky — one more chop removes it permanently._ ⏳
+* _Shaking a tree is less rewarding but safer than chopping — no wood, but no stumps either._ ⏳
+* _Chopping removes the tree permanently — it will not regrow unless replanted._ ⏳
+* _Too many oaks reduce [[Sunflower]] growing spots — manage your forest density carefully._ ⏳
+  `
   },
   {
     title: 'Giant Mushroom',
@@ -2651,14 +2709,17 @@ _Gardening plants and their details will be added in a future update._ ⏳
       `
   },
 
-  // ── Plants - Herbs ───────────────────────────────────────────
-  // Parsnip, Sunflower, Ambermirage, Bloodmoon, Corals, Oleander
+  // ── Plants - Surface Herbs ───────────────────────────────────
+  // Parsnip, Sunflower, Ambermirage, Bloodmoon, Corals
   {
     title: 'Parsnip',
     category: ['Plant', 'Forest'],
     content: `
 **Description**
 Parsnips are root vegetables found growing on the [[Forest]] floor. Their white flowers make them easy to spot among the undergrowth.
+
+**Tier**
+{{item:parsnip:star}}
 
 **Location**
 * Biome: [[Forest]]
@@ -2694,6 +2755,9 @@ Parsnips are root vegetables found growing on the [[Forest]] floor. Their white 
     content: `
 **Description**
 Sunflowers grow in forest clearings, thriving where sunlight reaches the ground unobstructed by the canopy. They bloom at dawn and close at dusk, following the arc of the sun throughout the day.
+
+**Tier**
+{{item:sunflowerSeed:star}}
 
 **Location**
 * Biome: [[Forest]]
@@ -2731,6 +2795,9 @@ Sunflowers grow in forest clearings, thriving where sunlight reaches the ground 
 **Description**
 The Ambermirage is a common desert flower that blooms only during the hottest hours of the day. Its golden petals close tightly at dawn and dusk, making it nearly invisible outside its blooming window. It never appears during rain or storms.
 
+**Tier**
+{{item:ambermirage:star}}
+
 **Location**
 * Biome: [[Desert]]
 * Layer: [[Surface]]
@@ -2762,6 +2829,9 @@ The Ambermirage is a common desert flower that blooms only during the hottest ho
     content: `
 **Description**
 The Bloodmoon is a nocturnal flower found in the [[Jungle]] forests. Its deep crimson petals unfurl only under moonlight, making it both elusive and dangerous to harvest. Its powerful regenerative properties make it an essential ingredient for any explorer venturing [[Underground]].
+
+**Tier**
+{{item:bloodmoon:star}}
 
 **Location**
 * Biome: [[Jungle]]
@@ -2797,14 +2867,104 @@ The Bloodmoon is a nocturnal flower found in the [[Jungle]] forests. Its deep cr
   },
   {
     title: 'Corals',
-    category: ['Plant', 'Sea'],
+    category: ['Plant', 'Ocean'],
     content: `
-      `
+**Description**
+Corals are marine organisms found on the sandy floor of the ocean. Four distinct species thrive in the underwater environment, each recognizable by its unique color.
+
+**Tier**
+{{item:coralR:star}}
+
+**Location**
+* Layer: Under Sea
+* Grows on [[node:sand]] — ocean floor only
+
+**Species**
+
+| Name | Color |
+|---|---|
+| [[item:coralR]] | Red |
+| [[item:coralP]] | Purple |
+| [[item:coralY]] | Yellow |
+| [[item:coralG]] | Green |
+
+**Harvest**
+* [[Foraging|Interact to harvest]] — the coral disappears on harvest
+* Tool: any [[Harvesting Tools|Sickle]] ⏳
+* Drops: [[item:coral]]
+
+**Regrowth**
+* Harvesting a coral triggers the slow growth of another coral elsewhere on the ocean floor
+* New corals take 2 to 4 in-game days to fully grow before they can be harvested
+
+**Usages** ⏳
+* [[item:coral]] — crafting ingredient ⏳
+
+**Dangers**
+* [[monster:moray]] may attack when harvesting coral. ⏳
+
+**Tips**
+* _The ocean always maintains the same number of corals — patience is rewarded._ ⏳
+* _Bring a breathing potion before diving to harvest corals._ ⏳
+  `
   },
+
+  // ── Plants - Mini-biome Herbs ────────────────────────────────
+  // Ferns
+  {
+    title: 'Ferns',
+    category: ['Plant', 'Forest'],
+    content: `
+**Description**
+Ferns are ancient plants thriving in the humid darkness of [[Fern Cave|Fern Caves]]. Four distinct species have adapted to this underground environment, each recognizable by its unique color and frond shape. Their dense, overlapping foliage creates a lush, tangled undergrowth.
+
+**Tier**
+{{item:fernS:star}}. — Found exclusively in [[Fern Cave|Fern Caves]], a tier-3 environment.
+
+**Location**
+* Biome: [[Forest]]
+* Layer: [[Underground]]
+* Grows exclusively in [[Fern Cave|Fern Caves]] on [[node:grassFern]]
+
+**Species**
+
+| Name | Color | Shape |
+|---|---|---|
+| [[item:fernS]] | Very dark green, almost black | Wide, drooping fronds |
+| [[item:fernC]] | Deep red | Serrated fronds |
+| [[item:fernG]] | Golden, translucent | Fine, luminous fronds |
+| [[item:fernM]] | Blue-grey | Vaporous, delicate fronds |
+
+**Harvest**
+* [[Foraging|Interact to harvest]] — the fern enters a dormant state and regrows after a few in-game hours
+* Tool: [[Harvesting Tools|Silver Sickle]] ({{item:sickleSilver:star}}) or better⏳
+* Drops: [[item:fernLeaf]], rare chance of [[item:fernSpore]]
+
+**Planting** ⏳
+* Place a [[item:fernSpore]] on a [[node:grassFern]] tile to grow a new fern ⏳
+* The tile must have [[node:grassFern]] on both its left and right neighbours ⏳
+
+**Usages** ⏳
+* [[item:fernLeaf]] — crafting ingredient ⏳
+* [[item:fernSpore]] — rare ingredient, planting ⏳
+
+**Dangers**
+* [[monster:dendrobate]] and [[monster:mamba]] inhabit Fern Caves — expect encounters while foraging. ⏳
+
+**Tips**
+* _Ferns grow densely and their fronds overlap — the caves can feel like a living maze._ ⏳
+* _Harvesting temporarily removes the fern — return after a few hours for a fresh crop._ ⏳
+* _FernSpores are rare but valuable — prioritize harvesting mature ferns._ ⏳
+  `
+  },
+  // ── Plants - Underground Herbs ───────────────────────────────
+  // Oleander, Amber-Moss
   {
     title: 'Oleander',
     category: ['Plant', 'Underground'],
     content: `
+**Tier**
+{{item:oleander:star}}
       `
   },
   {
@@ -2814,6 +2974,9 @@ The Bloodmoon is a nocturnal flower found in the [[Jungle]] forests. Its deep cr
     <<Note pour l'IA : fiche à traduire, la décision d'intégration de cette plante n'est pas encore prise>>
     La Mousse d'Ambre (Amber-Moss)
 C'est une mousse d'un orange vif, presque luminescente, qui pousse exclusivement sur le côté nord des vieux chênes, là où l'humidité est constante.
+
+**Tier**
+{{item:amberMoss:star}}
 
 **Benefits**⏳
 * Hémostatique naturel (Soin) : Appliquée directement sur une plaie, elle stoppe instantanément le saignement. C'est le "pansement" de base du début de jeu.
@@ -2838,9 +3001,9 @@ Foraging : [[Foraging|Sickle]] any tier.⏳
     category: ['Monster'],
     content: `
 **Loot** ⏳
-* [[item:spiderFang]] — common ⏳
-* [[item:spiderEgg]] — common ⏳
-* [[item:silk]] — rare drop⏳
+* [[item:spiderFang]] ({{item:spiderFang:star}}) — common ⏳
+* [[item:spiderEgg]] ({{item:spiderEgg:star}}) — common ⏳
+* [[item:silk]] ({{item:silk:star}}) — rare drop⏳
 
 Note: those ingredients can also be dropped by [[Mining]] [[Cobweb]] with any [[Pickaxes|Pickaxe]].
 
