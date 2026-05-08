@@ -350,6 +350,10 @@ export const ITEMS = {
   oleanderOil: {name: 'Oleander Oil', type: ITEM_TYPE.MATERIAL | ITEM_TYPE.CRAFTABLE, stype: 'seed', star: 1, image: 'potions_32_32-1-5', placed: 'fuws_32_32-4-0', help: 'Oleander', tooltip: '???'},
 
   ambermirage: {name: 'Ambermirage', type: ITEM_TYPE.MATERIAL, stype: 'herb', star: 1, image: 'potions_32_32-1-5', placed: 'fuws_32_32-4-0', help: 'Ambermirage', tooltip: '???'},
+
+  bloodmoon: {name: 'Bloodmoon', type: ITEM_TYPE.MATERIAL, stype: 'herb', star: 2, image: 'potions_32_32-1-5', placed: 'fuws_32_32-4-0', help: 'Bloodmoon', tooltip: '???'},
+  bloodmoonSeed: {name: 'Bloodmoon Seed', type: ITEM_TYPE.MATERIAL | ITEM_TYPE.SEED, stype: 'seed', star: 2, image: 'potions_32_32-1-5', placed: 'fuws_32_32-4-0', help: 'Bloodmoon', tooltip: '???'},
+
   coralr: {name: 'Sunburst Brain Coral', type: 0, stype: 'herb', star: 2, image: null, placed: 'fuws_32_32-2-3', speed: 1900, foraging: [{item: 'coral', count: 1, rainy: 1.8, windy: 1.8}], help: 'Corals', tooltip: 'Crafting Material for Potions and Furniture'},
   coralp: {name: 'Starfire Pillar Coral', type: 0, stype: 'herb', star: 2, image: null, placed: 'fuws_32_32-3-3', speed: 1900, foraging: [{item: 'coral', count: 1, rainy: 1.8, windy: 1.8}], help: 'Corals', tooltip: 'Crafting Material for Potions and Furniture'},
   coraly: {name: 'Flickering Torch Coral', type: 0, stype: 'herb', star: 2, image: null, placed: 'fuws_32_32-4-3', speed: 1900, foraging: [{item: 'coral', count: 1, rainy: 1.8, windy: 1.8}], help: 'Corals', tooltip: 'Crafting Material for Potions and Furniture'},
@@ -398,6 +402,7 @@ export const PLANT_TYPE = {
   PARSNIP: 21,
   SUNFLOWER: 22,
   AMBERMIRAGE: 24,
+  BLOODMOON: 25,
   // Underground Herbs
   OLEANDER: 31,
   BLINKROOT: 32,

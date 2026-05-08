@@ -201,6 +201,7 @@
 - `plantGenerator.spreadNatural` - ajout des tuiles de TOPSOIL ensemencées par des tuiles de NATURAL
 - `plantGenerator.placeAmbermirages` - ajout des Ambermirages sur les tuiles de SAND
 - `plantGenerator.placeParsnipsSunflowers` - ajout des Parsnips et Sunflowers sur les tuiles de GRASSFOREST
+- `plantGenerator.placeBloodmoons` - ajout des Bloodmoon sur les tuiles de GRASSJUNGLE
 
 ### Rendu (partiel)
 - `WorldRenderer` — rendu tuiles par chunks avec cache OffscreenCanvas

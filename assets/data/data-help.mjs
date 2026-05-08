@@ -2609,6 +2609,7 @@ All plants found in the world of Sixty-Below. Plants can be harvested for loot, 
 | [[item:ambermirage]] | {{item:ambermirage:star}} | Herb | [[Surface]] / [[node:sand]] | [[item:ambermirage]] | [[monster:scorpion]] (Foraging) |
 | [[item:parsnip]] | {{item:parsnip:star}} | Herb | [[Forest]] / [[Surface]] | [[item:parsnip]] | [[monster:vole]] (Foraging) |
 | [[item:sunflower]] | {{item:sunflower:star}} | Herb | [[Forest]] / [[Surface]] | [[item:sunflowerSeed]] | [[monster:hedgehog]] (Foraging) |
+| [[item:bloodmoon]] | {{item:bloodmoon:star}} | Herb | [[Jungle]] / [[Surface]] | [[item:bloodmoon]] | [[monster:hedgehog]] (Foraging) |
 
 _For detailed information on each plant, click its name._
 
@@ -2619,6 +2620,7 @@ Plants cultivated in [[Clay Pots]] stacked in [[Underground]] and [[Caverns]] zo
 _Gardening plants and their details will be added in a future update._ ⏳
   `
   },
+
   // ── Plants - Trees ───────────────────────────────────────────
   //    Oak & Mahogany, Giant Mushroom, Coconut
   {
@@ -2650,7 +2652,7 @@ _Gardening plants and their details will be added in a future update._ ⏳
   },
 
   // ── Plants - Herbs ───────────────────────────────────────────
-  // Parsnip, Sunflower, Ambermirage, Corals, Oleander
+  // Parsnip, Sunflower, Ambermirage, Bloodmoon, Corals, Oleander
   {
     title: 'Parsnip',
     category: ['Plant', 'Forest'],
@@ -2755,6 +2757,45 @@ The Ambermirage is a common desert flower that blooms only during the hottest ho
   `
   },
   {
+    title: 'Bloodmoon',
+    category: ['Plant', 'Jungle'],
+    content: `
+**Description**
+The Bloodmoon is a nocturnal flower found in the [[Jungle]] forests. Its deep crimson petals unfurl only under moonlight, making it both elusive and dangerous to harvest. Its powerful regenerative properties make it an essential ingredient for any explorer venturing [[Underground]].
+
+**Location**
+* Biome: [[Jungle]]
+* Layer: [[Surface]]
+* Grows on [[node:grassJungle]]
+
+**Blooming Hours**
+* Appears at night and disappears at dawn⏳
+* Does not bloom during the [[Moon Phases|New Moon]] — nourished by moonlight⏳
+
+**Harvest**
+* [[Foraging|Interact to harvest]] the flower — it will regrow next night
+* Tool: any [[Harvesting Tools|Sickle]]⏳
+* The plant is permanently destroyed only by [[Mining]] its supporting tile with a [[Pickaxes|Pickaxe]]
+* Drops: [[item:bloodmoon]], rare chance of [[item:bloodmoonSeed]]
+
+**Planting**
+* Place a [[item:bloodmoonSeed]] on a [[node:mud]] tile to grow a new Bloodmoon plant ⏳
+
+**Usages** ⏳
+* [[item:bloodmoon]] — health regeneration during combat
+* [[item:bloodmoon]] — essential ingredient for [[Underground]] potions ⏳
+
+**Dangers**
+* Harvesting a Bloodmoon at night may disturb a [[monster:mamba]] hiding among the undergrowth — its bite inflicts [[Damage Types|Piercing]] damage and [[Damage Types|Poison]]. ⏳
+* Harvesting at night in the [[Jungle]] exposes you to increased fauna activity — proceed with caution. ⏳
+
+**Tips**
+* _The Bloodmoon does not bloom during the [[Moon Phases|New Moon]] — plan your foraging around the lunar cycle._
+* _Its regenerative potions are essential before venturing into the [[Underground]]._ ⏳
+* _The supporting tile can be mined to permanently remove the plant — useful for clearing paths, but irreversible._ ⏳
+  `
+  },
+  {
     title: 'Corals',
     category: ['Plant', 'Sea'],
     content: `
@@ -2815,6 +2856,7 @@ Note: those ingredients can also be dropped by [[Mining]] [[Cobweb]] with any [[
   },
 
   // ── Gameplay ─────────────────────────────────────────────────
+  //    Inventory, Weather, Moon Phases, World Creation
   {
     title: 'Inventory',
     category: ['Gameplay'],
@@ -2823,6 +2865,12 @@ Note: those ingredients can also be dropped by [[Mining]] [[Cobweb]] with any [[
   },
   {
     title: 'Weather',
+    category: ['Gameplay', 'Plant', 'Foraging', 'Fishing'],
+    content: `
+    `
+  },
+  {
+    title: 'Moon Phases',
     category: ['Gameplay', 'Plant', 'Foraging', 'Fishing'],
     content: `
     `

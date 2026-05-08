@@ -635,18 +635,7 @@ Avec :
 
 ## 5.8 Flore
 
-| Nom | Tier | Type | Biome / Mini-biome / Layer | Loot | Encounters |
-|---|---|---|---|
-| **Coconut** | 1 | Tree | Sea shore, Desert Surface Lake Shore | Coconut (fruit), Coconut Fiber, Coconut Pulp, Coconut Milk | Coconut Crab (Shaking) |
-| **Oak** | 1 | Tree | Forest / Surface | Wood Log, Acorn | Hornet (Shaking) / Boar (Chopping) |
-| **Mahogany** | 1 | Tree | Jungle / Surface | Mahogany Log | Eyelash Viper (Shaking) / Bullet Ant (Chopping) |
-| **Giant MUSHROOM** | 1 | Tree | Mushroom Caves | ??? | ??? (Foraging) |
-| **Bolete** | 1 | Mushroom | Foret / Surface | Bolete | Adder (Foraging) |
-| **Pink Mycenia** | 1 | Mushroom | Jungle / Surface | Pink Mycenia | Giant Red Slug (Foraging) |
-| **Coral** | 1 | Herb | Under Sea / SAND | Coral | Moray (Foraging) |
-| **Ambermirage** | 1 | Herb | Surface / SAND | Ambermirage | Scorpion (Foraging) |
-| **Parnsnip** | 1 | Herb | Forest / Surface | Parsnip | Vole (Foraging) |
-| **Sunflower** | 1 | Herb | Forest / Surface | Sunflover Seed | Hedgehog (Foraging) |
+La référence pour la liste de la flore est la fiche d'aide `Flora` dans le fichier `data-help.mjs`.
 
 ## 5.9 Mécaniques des mini-biomes
 

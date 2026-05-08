@@ -386,6 +386,7 @@ class WorldGenerator {
 
     plantGenerator.placeAmbermirages(surfaceLine, guarded, currentWeather)
     plantGenerator.placeParsnipsSunflowers(surfaceLine, guarded, oakPositions)
+    plantGenerator.placeBloodmoons(surfaceLine, guarded)
     await progress('Surface Herbs')
 
     // 9. Traitements finaux
@@ -7271,7 +7272,6 @@ class PlantGenerator {
  */
   placeParsnipsSunflowers (surfaceLine, guarded, oakPositions) {
     const GRASSFOREST = NODES.GRASSFOREST.code
-    const SKY = NODES.SKY.code
     const W = WORLD_WIDTH
 
     const spots = []
@@ -7281,7 +7281,6 @@ class PlantGenerator {
 
       const y = surfaceLine[x]
       if (worldBuffer.read(x, y) !== GRASSFOREST) continue
-      if (worldBuffer.read(x, y - 1) !== SKY) continue
       if (worldBuffer.read(x - 1, surfaceLine[x - 1]) !== GRASSFOREST) continue
       if (worldBuffer.read(x + 1, surfaceLine[x + 1]) !== GRASSFOREST) continue
 
@@ -7339,6 +7338,51 @@ class PlantGenerator {
         h: 2,
         x,
         y: y - 2,
+        present,
+        deleted: false
+      })
+    }
+  }
+
+  /**
+ * Place les spots de Bloodmoon sur les tuiles GRASSJUNGLE de surface.
+ * Tous les spots valides sont enregistrés — 15% sont présents au démarrage.
+ * Le jeu démarrant à 8h00, bloom = false pour tous les enregistrements.
+ * Ajoute à guarded les colonnes des spots présents.
+ *
+ * @param {Int16Array} surfaceLine — Y de la première tuile solide par colonne
+ * @param {Set<number>} guarded — colonnes protégées (modifié en place)
+ */
+  placeBloodmoons (surfaceLine, guarded) {
+    const GRASSJUNGLE = NODES.GRASSJUNGLE.code
+    const W = WORLD_WIDTH
+
+    for (let x = 2; x < W - 2; x++) {
+      if (guarded.has(x)) continue
+
+      const y = surfaceLine[x]
+      if (worldBuffer.read(x, y) !== GRASSJUNGLE) continue
+      if (worldBuffer.read(x - 1, surfaceLine[x - 1]) !== GRASSJUNGLE) continue
+      if (worldBuffer.read(x + 1, surfaceLine[x + 1]) !== GRASSJUNGLE) continue
+
+      const soilIndex = (y << 10) | x
+      const present = seededRNG.randomGetPercent(15)
+
+      if (present) guarded.add(x)
+
+      this.#plants.push({
+        id: uniqueIdGenerator.getUniqueId(),
+        kind: PLANT_KIND.HERB,
+        type: PLANT_TYPE.BLOODMOON,
+        index: soilIndex - W,
+        soilIndex,
+        itemId: 'bloodmoon',
+        w: 1,
+        h: 1,
+        x,
+        y: y - 1,
+        bloom: false,
+        bloomTimestamp: null,
         present,
         deleted: false
       })
