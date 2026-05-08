@@ -2689,24 +2689,112 @@ sickle
   },
   {
     title: 'Giant Mushroom',
-    category: ['Tree'],
+    category: ['Plant', 'Forest'],
     content: `
-    `
+**Description**
+Giant Mushrooms grow in the depths of [[Mushroom Cave|Mushroom Caves]], their bioluminescent caps providing the only light source in these dark caverns. They grow in dense clusters, their overlapping caps creating a spectacular underground canopy. ⏳
+
+**Tier**
+{{item:giantMushroom:star}}
+
+**Location**
+* Biome: [[Forest]]
+* Layer: [[Caverns]] Top
+* Grows exclusively in [[Mushroom Cave|Mushroom Caves]] on [[node:grassMushroom]]
+
+**Growth**
+* Giant Mushrooms grow through 3 stages (1 to 3)
+* Growth takes several in-game days between each stage ⏳
+
+**Interactions — Logging**
+
+* Chopping removes one section — the mushroom shrinks by one stage
+* When the last section is chopped, the mushroom disappears completely
+
+| Tool | Drops | Extra Drop (last section) |
+|---|---|---|
+| Any [[Chopping Tools|Axe]] | {{item:giantMushroom:logging:items}} | ⏳ |
+
+**Tips**
+* _Giant Mushrooms provide natural light in [[Mushroom Cave|Mushroom Caves]] — chopping them all will leave the cave in complete darkness._ ⏳
+* _Their bioluminescent spores are rare and highly valuable crafting ingredients._ ⏳
+  `
   },
   {
     title: 'Coconut',
-    category: ['Tree'],
+    category: ['Plant', 'Forest', 'Desert'],
     content: `
-      `
+**Description**
+Coconut trees grow on sandy shores — along the ocean coastline and at the edges of desert oases. Their tall silhouette and distinctive crown make them easy to spot from a distance. Unlike Oaks and Mahoganies, Coconut trees do not grow or change size.
+
+**Tier**
+{{item:coconut:star}}
+
+**Location**
+* Ocean shoreline — left and right sea borders
+* Desert [[Surface Lake|Oasis]] shores
+* Grows on [[node:sand]]
+
+**Interactions — Shaking**
+
+* A tree can only be shaken once per in-game day — shaking too frequently weakens the tree. ⏳
+
+| Tool | Drops | Encounter |
+|---|---|---|
+| Any [[Shaking Tools|Hammer]] | {{item:coconut:shaking:items}} | [[monster:coconutCrab]] |
+
+**Interactions — Logging**
+
+* Coconut trees cannot be logged — they are permanently rooted in the sand ⏳
+
+**Recipes**
+
+TODO : add recipes with dropped items as ingredient⏳
+
+**Tips**
+* _Coconut trees never grow or shrink — they are a permanent fixture of the landscape._ ⏳
+* _Coconut Crabs are attracted by the vibration of shaking — be ready to fight._ ⏳
+* _[[item:coconutMilk]] and [[item:coconutPulp]] are valuable food ingredients._ ⏳
+  `
   },
 
   // ── Plants - Mushrooms ───────────────────────────────────────────
   // Surface Mushrooms
   {
     title: 'Surface Mushrooms',
-    category: ['Plant'],
+    category: ['Plant', 'Forest', 'Jungle'],
     content: `
-      `
+**Description**
+Surface Mushrooms grow at the base of [[Oak & Mahogany|Trees]] on the [[Forest]] and [[Jungle]] floor. Two species have been identified, each associated with a specific tree species. They appear and disappear with the night cycle, fruiting in darkness and retreating at dawn.
+
+**Location**
+* [[item:bolete]] ({{item:bolete:star}}) — [[Forest]] / [[Surface]], grows near [[Oak & Mahogany|Oak]] trees on [[node:grassForest]]
+* [[item:pinkMycenia]] ({{item:pinkMycenia:star}}) — [[Jungle]] / [[Surface]], grows near [[Oak & Mahogany|Mahogany]] trees on [[node:grassJungle]]
+
+**Blooming**
+* Appears at night and disappears at dawn⏳
+* All mushrooms of the same species appear and disappear almost simultaneously⏳
+* Mushrooms are more abundant during [[Weather|Rainy Weather]]. ⏳
+
+**Harvest**
+* [[Foraging|Interact to harvest]] — the mushroom disappears on harvest
+
+| Mushroom | Tool | Drops |
+|  [[item:bolete]] | Any [[Harvesting Tools|Sickle]] | {{item:bolete:foraging:items}} |
+|  [[item:pinkMycenia]] | [[Harvesting Tools|Iron Sickle]] or better | {{item:pinkMycenia:foraging:items}} |
+
+**Usages**
+* Food, potion and crafting ingredient. ⏳
+
+**Dangers**
+* [[monster:adder]] may attack when harvesting [[item:bolete]]. ⏳
+* [[monster:giantRedSlug]] may attack when harvesting [[item:pinkMycenia]]. ⏳
+
+**Tips**
+* _Surface Mushrooms only appear at night — plan your foraging accordingly._ ⏳
+* _Knowing tomorrow's weather helps plan your foraging — the [[item:bottledFrog]] accessory reveals the next day's forecast._ ⏳
+* _All mushrooms of the same species appear simultaneously — a single rainy night can yield a large harvest._ ⏳
+  `
   },
 
   // ── Plants - Surface Herbs ───────────────────────────────────
@@ -3030,6 +3118,9 @@ Note: those ingredients can also be dropped by [[Mining]] [[Cobweb]] with any [[
     title: 'Weather',
     category: ['Gameplay', 'Plant', 'Foraging', 'Fishing'],
     content: `
+
+    **Buffs**
+    If [[item:bottledFrog]] accessory is in your [[Inventory]], the weather for tomorow is displayed at the right of current weather.
     `
   },
   {
