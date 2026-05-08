@@ -582,8 +582,8 @@ commune de la zone N+1 : la progression est continue, sans palier artificiel.
 | **PHARAON** | 3 | ★★★☆☆ | Lost Temple |
 | **CYCLOPS** | 4 | ★★★★☆ | Lost Temple |
 | **MINOTAUR** | 4 | ★★★★★ | Lost Temple |
-| **DENDROBATE** | 2 | ★★☆☆☆ | Fern Cave |
-| **MAMBA** | 2 | ★★★☆☆ | Fern Cave |
+| **Dendrobate** | 3 | ★★★☆☆ | Fern Cave / Harvesting Bloodmoon |
+| **Mamba** | 3 | ★★★☆☆ | Fern Cave / Harvesting Bloodmoon |
 | **AMBER SQUID** | 4 | ★★☆☆☆ | Fish - Sap Pocket |
 | **GLIDER** | 4 | ★★☆☆☆ | Fish - Sap Pocket |
 | **MANTIS** | 4 | ★★★★☆ | Sap Pocket |
@@ -594,7 +594,7 @@ commune de la zone N+1 : la progression est continue, sans palier artificiel.
 | **Moray** | 2 | ★★☆☆☆ | Fishing / Harvesting Coral |
 | **Eyelash Viper** | 2 | ★★☆☆☆ | Shaking Mahogny |
 | **Bullet Ant** | 2 | ★★☆☆☆ | Chopping Mahogny |
-| **Boar** | 2 | ★★☆☆☆ | Fighting / Shaking Oak |
+| **Boar** | 2 | ★★☆☆☆ | Fighting / Chopping Oak |
 | **Adder** | 2 | ★★☆☆☆ | Harvesting Bolete |
 | **Giant Red Slug** | 2 | ★★☆☆☆ | Harvesting Pink Mycenia |
 | **Vole** | 2 | ★★☆☆☆ | Harvesting Parsnip |

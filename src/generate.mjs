@@ -141,7 +141,7 @@ class WorldGenerator {
     window.DEBUG_POINTS = [] // DEGUG - à supprimer
 
     // affichage de la progression de la création dans le dialogue modal
-    const STEPS = 33
+    const STEPS = 34
     let step = 0
     const progress = (topic) => {
       step++
@@ -389,6 +389,9 @@ class WorldGenerator {
     plantGenerator.placeBloodmoons(surfaceLine, guarded)
     await progress('Surface Herbs')
 
+    const fernCount = plantGenerator.placeFerns(fernsPlants)
+    await progress('Mini-biome Plants')
+
     // 9. Traitements finaux
 
     // 9.1. Affichage de statistiques)
@@ -400,7 +403,7 @@ class WorldGenerator {
       console.log('.................... liquidBodies', liquidBodies)
       const lakes = [...surfaceLakes, ...underLakes, ...blindLakes, ...sapLakes, ...sapPockets]
       const plants = [...fernsPlants, ...mossPlants, ...mushroomPlants, ...surfacePlants, ...plantGenerator.plants]
-      await this.save(seed, {hives, cobwebCaves, geodeCaves, lakes, liquidBodies, fernsCaves, mossCaves, mushroomCaves, pyramid, ruinedcabin, lostTemple, ancientHouse, leftBeach, rightBeach, antlions, anthills, termites, plants, hearts, triskels, graveyard, weather})
+      await this.save(seed, {hives, cobwebCaves, geodeCaves, lakes, liquidBodies, fernsCaves, mossCaves, mushroomCaves, pyramid, ruinedcabin, lostTemple, ancientHouse, leftBeach, rightBeach, antlions, anthills, termites, plants, hearts, triskels, graveyard, weather, fernCount})
       worldBuffer.clear()
     }
 
@@ -411,7 +414,7 @@ class WorldGenerator {
     if (debug) { return worldBuffer } // appelant responsable du clear()
   }
 
-  async save (seed, {hives, cobwebCaves, geodeCaves, lakes, liquidBodies, fernsCaves, mossCaves, mushroomCaves, plants, pyramid, ruinedcabin, lostTemple, ancientHouse, leftBeach, rightBeach, antlions, anthills, termites, hearts, triskels, graveyard, weather}) {
+  async save (seed, {hives, cobwebCaves, geodeCaves, lakes, liquidBodies, fernsCaves, mossCaves, mushroomCaves, plants, pyramid, ruinedcabin, lostTemple, ancientHouse, leftBeach, rightBeach, antlions, anthills, termites, hearts, triskels, graveyard, weather, fernCount}) {
     const start = window.performance.now()
     // 1. Sauvegarde des tuiles
     await database.clearObjectStore('world_chunks')
@@ -447,6 +450,7 @@ class WorldGenerator {
       {key: 'parsnipseeds', value: ''},
       {key: 'moonglowseeds', value: ''},
       {key: 'health', value: 100},
+      {key: 'ferncount', value: fernCount},
       {key: 'hives', value: JSON.stringify(hives)},
       {key: 'cobwebcaves', value: JSON.stringify(cobwebCaves)},
       {key: 'lakes', value: JSON.stringify(lakes)},
@@ -6911,16 +6915,16 @@ class PlantGenerator {
     const SEA = NODES.SEA.code
     const SAND = NODES.SAND.code
     const CORAL_TYPES = [
-      {type: PLANT_TYPE.CORAL_R, itemId: 'coralr'},
-      {type: PLANT_TYPE.CORAL_P, itemId: 'coralp'},
-      {type: PLANT_TYPE.CORAL_Y, itemId: 'coraly'},
-      {type: PLANT_TYPE.CORAL_G, itemId: 'coralg'}
+      {type: PLANT_TYPE.CORAL_R, itemId: 'coralR'},
+      {type: PLANT_TYPE.CORAL_P, itemId: 'coralP'},
+      {type: PLANT_TYPE.CORAL_Y, itemId: 'coralY'},
+      {type: PLANT_TYPE.CORAL_G, itemId: 'coralG'}
     ]
     const W = WORLD_WIDTH
     const h = 2
     const w = 2
 
-    const count = seededRNG.randomGetMinMax(5, 8)
+    const count = seededRNG.randomGetMinMax(7, 11)
     const MAX_ATTEMPTS = 200
 
     let placed = 0
@@ -6983,6 +6987,18 @@ class PlantGenerator {
       placed++
     }
   }
+
+  // Lors de la récolte, le corail disparait (bloom = false, bloomTimestamp = null)
+  // Lors de cette récolte, on détermine un emplacement pour un autre corail (algorithme identique à celui dans generate.mjs).
+  // l'enregistrement du corail a été récolté est utilisé pour celui qui va pousser (nombre constant)
+  // quand l'emplacement est trouvé, ses coordonnées sont placées, sa nature est tirée aléatoirement, 'bloom = false' et un bloomTimestamp de 2 à 4 jours in-game.
+  // on lance le timer sur bloomTimestamp (après la récolte et au chargement de la session)
+  // quand le bloomTimestamp arrive à échéance, le corail passe à bloom = true et il apparaît dans le monde, bloomTimestamp = null
+
+  // on a ainsi 3 états :
+  // * bloom = true, bloomTimestamp = null => coral présent dans le monde
+  // * bloom = false, bloomTimestamp = null => recherche d'une nouvelle position (microTasker)
+  // * bloom = false, bloomTimestamp = timestamp => position déterminée, attente fin de croissance (taskScheduler)
 
   /**
  * Place les arbres Oak et Mahogany ainsi que les champignons associés sur la ligne de surface.
@@ -7387,6 +7403,71 @@ class PlantGenerator {
         deleted: false
       })
     }
+  }
+
+  /**
+ * Place les fougères dans les Fern Caves.
+ * 60% des spots valides sont peuplés.
+ * Un spot est valide si les 8 tuiles F de l'image sont VOID.
+ * Le nombre de fougères placées est retourné pour stockage en base (population constante).
+ *
+ * @param {Array<{kind, type, index, deleted}>} fernPlants — tuiles GRASSFERN
+ * @returns {number} nombre de fougères placées
+ */
+  placeFerns (fernsPlants) {
+    const VOID = NODES.VOID.code
+    const W = WORLD_WIDTH
+
+    const FERN_TYPES = [
+      {type: PLANT_TYPE.SHADOWFERN, itemId: 'fernS'},
+      {type: PLANT_TYPE.CRIMSONFROND, itemId: 'fernC'},
+      {type: PLANT_TYPE.GOLDENVEIL, itemId: 'fernG'},
+      {type: PLANT_TYPE.MISTFERN, itemId: 'fernM'}
+    ]
+
+    let count = 0
+
+    for (const plant of fernsPlants) {
+      const idx = plant.index
+      const x = idx & 0x3FF
+      const y = idx >> 10
+
+      // Vérification des 8 tuiles F
+      if (worldBuffer.readAt(idx - W) !== VOID) continue // y-1, x
+      if (worldBuffer.readAt(idx - W * 2) !== VOID) continue // y-2, x
+      if (worldBuffer.readAt(idx - W * 3 - 1) !== VOID) continue // y-3, x-1
+      if (worldBuffer.readAt(idx - W * 3) !== VOID) continue // y-3, x
+      if (worldBuffer.readAt(idx - W * 3 + 1) !== VOID) continue // y-3, x+1
+      if (worldBuffer.readAt(idx - W * 4 - 1) !== VOID) continue // y-4, x-1
+      if (worldBuffer.readAt(idx - W * 4) !== VOID) continue // y-4, x
+      if (worldBuffer.readAt(idx - W * 4 + 1) !== VOID) continue // y-4, x+1
+
+      // 60% de chance
+      if (!seededRNG.randomGetPercent(60)) continue
+
+      const {type, itemId} = seededRNG.randomGetArrayValue(FERN_TYPES)
+      const soilIndex = idx
+
+      this.#plants.push({
+        id: uniqueIdGenerator.getUniqueId(),
+        kind: PLANT_KIND.HERB,
+        type,
+        index: soilIndex - W * 4,
+        soilIndex,
+        itemId,
+        w: 3,
+        h: 4,
+        x: x - 1,
+        y: y - 4,
+        bloom: true,
+        bloomTimestamp: null,
+        present: true,
+        deleted: false
+      })
+      count++
+    }
+
+    return count
   }
 }
 export const plantGenerator = new PlantGenerator()

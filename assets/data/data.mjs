@@ -195,6 +195,11 @@ export const ITEMS = {
   pickaxePlatinum: {name: 'Platinum Pickaxe', type: ITEM_TYPE.TOOL | ITEM_TYPE.MATERIAL, stype: 'pickaxe', star: 4, image: 'tools_32_32-4-0', placedright: 'w_42_42-0-0', placedleft: 'w_42_42-0-1', speed: 0, help: 'Pickaxes', tooltip: 'Tools used to remove blocks, converting them to item form'},
   pickaxeBone: {name: 'Bone Pickaxe', type: ITEM_TYPE.TOOL | ITEM_TYPE.MATERIAL, stype: 'pickaxe', star: 4, image: 'tools_32_32-4-0', placedright: 'w_42_42-0-0', placedleft: 'w_42_42-0-1', speed: 0, help: 'Pickaxes', tooltip: 'Tools used to remove blocks, converting them to item form'},
 
+  // Sickles
+  sickleCopper: {name: 'Copper Sickle', type: ITEM_TYPE.TOOL | ITEM_TYPE.MATERIAL | ITEM_TYPE.CRAFTABLE, stype: 'pickaxe', star: 1, image: 'tools_32_32-4-0', placedright: 'w_42_42-0-0', placedleft: 'w_42_42-0-1', speed: 0, help: 'Harvesting Tools', tooltip: 'Tools used to harvest plants'},
+  sickleSilver: {name: 'Silver Sickle', type: ITEM_TYPE.TOOL | ITEM_TYPE.MATERIAL | ITEM_TYPE.CRAFTABLE, stype: 'pickaxe', star: 3, image: 'tools_32_32-4-0', placedright: 'w_42_42-0-0', placedleft: 'w_42_42-0-1', speed: 0, help: 'Harvesting Tools', tooltip: 'Tools used to harvest plants'},
+  sickleGold: {name: 'Gold Sickle', type: ITEM_TYPE.TOOL | ITEM_TYPE.CRAFTABLE, stype: 'pickaxe', star: 5, image: 'tools_32_32-4-0', placedright: 'w_42_42-0-0', placedleft: 'w_42_42-0-1', speed: 0, help: 'Harvesting Tools', tooltip: 'Tools used to harvest plants'},
+
   // hammers
   hammerCopper: {name: 'Copper Hammer', type: ITEM_TYPE.TOOL | ITEM_TYPE.MATERIAL, stype: 'hammer', star: 2, image: 'tools_32_32-4-0', placedright: 'w_42_42-0-0', placedleft: 'w_42_42-0-1', speed: 0, help: 'Hammers', tooltip: 'Tools used to remove wall, furniture, workstation, converting them to item form'},
 
@@ -323,12 +328,14 @@ export const ITEMS = {
   coconutMilk: {name: 'Coconut Milk', type: ITEM_TYPE.MATERIAL, stype: 'beverage', star: 1, image: 'potions_32_32-1-5', help: 'Coconut', tooltip: '???'},
 
   oak: {name: 'Oak', type: 0, stype: 'tree', star: 1, image: null, help: 'Oak & Mahogany', tooltip: '???'},
-  logOak: {name: 'Wood Log', type: ITEM_TYPE.MATERIAL, stype: 'tree', star: 1, image: 'potions_32_32-1-5', help: 'Oak & Mahogany', tooltip: '???'},
+  logOak: {name: 'Wood Log', type: ITEM_TYPE.MATERIAL, stype: 'wood', star: 1, image: 'potions_32_32-1-5', help: 'Oak & Mahogany', tooltip: '???'},
+  rootOak: {name: 'Wood Root', type: ITEM_TYPE.MATERIAL, stype: 'root', star: 1, image: 'potions_32_32-1-5', help: 'Oak & Mahogany', tooltip: '???'},
   acorn: {name: 'Acorn', type: ITEM_TYPE.MATERIAL, stype: 'seed', star: 1, image: 'potions_32_32-1-5', help: 'Oak & Mahogany', tooltip: '???'},
 
-  mahogany: {name: 'Mahogany', type: 0, stype: 'tree', star: 1, image: null, help: 'Oak & Mahogany', tooltip: '???'},
-  logMahogany: {name: 'Mahogany Log', type: ITEM_TYPE.MATERIAL, stype: 'tree', star: 1, image: 'potions_32_32-1-5', help: 'Oak & Mahogany', tooltip: '???'},
-  samara: {name: 'Samara', type: ITEM_TYPE.MATERIAL, stype: 'seed', star: 1, image: 'potions_32_32-1-5', help: 'Oak & Mahogany', tooltip: '???'},
+  mahogany: {name: 'Mahogany', type: 0, stype: 'tree', star: 2, image: null, help: 'Oak & Mahogany', tooltip: '???'},
+  logMahogany: {name: 'Mahogany Log', type: ITEM_TYPE.MATERIAL, stype: 'wood', star: 2, image: 'potions_32_32-1-5', help: 'Oak & Mahogany', tooltip: '???'},
+  rootMahogany: {name: 'Mahogany Root', type: ITEM_TYPE.MATERIAL, stype: 'root', star: 2, image: 'potions_32_32-1-5', help: 'Oak & Mahogany', tooltip: '???'},
+  samara: {name: 'Samara', type: ITEM_TYPE.MATERIAL, stype: 'seed', star: 2, image: 'potions_32_32-1-5', help: 'Oak & Mahogany', tooltip: '???'},
 
   giantMushroom: {name: 'Giant Mushroom', type: 0, stype: 'tree', star: 1, image: null, help: 'Oak & Mahogany', tooltip: '???'},
 
@@ -354,10 +361,18 @@ export const ITEMS = {
   bloodmoon: {name: 'Bloodmoon', type: ITEM_TYPE.MATERIAL, stype: 'herb', star: 2, image: 'potions_32_32-1-5', placed: 'fuws_32_32-4-0', help: 'Bloodmoon', tooltip: '???'},
   bloodmoonSeed: {name: 'Bloodmoon Seed', type: ITEM_TYPE.MATERIAL | ITEM_TYPE.SEED, stype: 'seed', star: 2, image: 'potions_32_32-1-5', placed: 'fuws_32_32-4-0', help: 'Bloodmoon', tooltip: '???'},
 
-  coralr: {name: 'Sunburst Brain Coral', type: 0, stype: 'herb', star: 2, image: null, placed: 'fuws_32_32-2-3', speed: 1900, foraging: [{item: 'coral', count: 1, rainy: 1.8, windy: 1.8}], help: 'Corals', tooltip: 'Crafting Material for Potions and Furniture'},
-  coralp: {name: 'Starfire Pillar Coral', type: 0, stype: 'herb', star: 2, image: null, placed: 'fuws_32_32-3-3', speed: 1900, foraging: [{item: 'coral', count: 1, rainy: 1.8, windy: 1.8}], help: 'Corals', tooltip: 'Crafting Material for Potions and Furniture'},
-  coraly: {name: 'Flickering Torch Coral', type: 0, stype: 'herb', star: 2, image: null, placed: 'fuws_32_32-4-3', speed: 1900, foraging: [{item: 'coral', count: 1, rainy: 1.8, windy: 1.8}], help: 'Corals', tooltip: 'Crafting Material for Potions and Furniture'},
-  coralg: {name: 'Whispering Fan Coral', type: 0, stype: 'herb', star: 2, image: null, placed: 'fuws_32_32-5-3', speed: 1900, foraging: [{item: 'coral', count: 1, rainy: 1.8, windy: 1.8}], help: 'Corals', tooltip: 'Crafting Material for Potions and Furniture'},
+  fernS: {name: 'Shadowfern', type: 0, stype: 'herb', star: 3, image: null, placed: 'fuws_32_32-2-3', speed: 1900, foraging: [{item: 'fernLeaf', count: 1, rainy: 1.8, windy: 1.8}], help: 'Ferns', tooltip: '???'},
+  fernC: {name: 'Crimsonfrond', type: 0, stype: 'herb', star: 3, image: null, placed: 'fuws_32_32-2-3', speed: 1900, foraging: [{item: 'fernLeaf', count: 1, rainy: 1.8, windy: 1.8}], help: 'Ferns', tooltip: '???'},
+  fernG: {name: 'Goldenveil', type: 0, stype: 'herb', star: 3, image: null, placed: 'fuws_32_32-2-3', speed: 1900, foraging: [{item: 'fernLeaf', count: 1, rainy: 1.8, windy: 1.8}], help: 'Ferns', tooltip: '???'},
+  fernM: {name: 'Mistfern', type: 0, stype: 'herb', star: 3, image: null, placed: 'fuws_32_32-2-3', speed: 1900, foraging: [{item: 'fernLeaf', count: 1, rainy: 1.8, windy: 1.8}], help: 'Ferns', tooltip: '???'},
+  fernLeaves: {name: 'Fern Leaves', type: ITEM_TYPE.MATERIAL, stype: 'herb', star: 3, image: 'crafting_32_32-0-1', help: 'Ferns', tooltip: 'Crafting Material for Potions and Furniture'},
+  fernLeaf: {name: 'Fern Leaf', type: ITEM_TYPE.MATERIAL, stype: 'herb', star: 3, image: 'crafting_32_32-0-1', help: 'Ferns', tooltip: 'Crafting Material for Potions and Furniture'},
+  fernSpore: {name: 'Fern Spore', type: ITEM_TYPE.MATERIAL, stype: 'herb', star: 3, image: 'crafting_32_32-0-1', help: 'Ferns', tooltip: 'Crafting Material for Potions and Furniture'},
+
+  coralR: {name: 'Sunburst Brain Coral', type: 0, stype: 'herb', star: 2, image: null, placed: 'fuws_32_32-2-3', speed: 1900, foraging: [{item: 'coral', count: 1, rainy: 1.8, windy: 1.8}], help: 'Corals', tooltip: 'Crafting Material for Potions and Furniture'},
+  coralP: {name: 'Starfire Pillar Coral', type: 0, stype: 'herb', star: 2, image: null, placed: 'fuws_32_32-3-3', speed: 1900, foraging: [{item: 'coral', count: 1, rainy: 1.8, windy: 1.8}], help: 'Corals', tooltip: 'Crafting Material for Potions and Furniture'},
+  coralY: {name: 'Flickering Torch Coral', type: 0, stype: 'herb', star: 2, image: null, placed: 'fuws_32_32-4-3', speed: 1900, foraging: [{item: 'coral', count: 1, rainy: 1.8, windy: 1.8}], help: 'Corals', tooltip: 'Crafting Material for Potions and Furniture'},
+  coralG: {name: 'Whispering Fan Coral', type: 0, stype: 'herb', star: 2, image: null, placed: 'fuws_32_32-5-3', speed: 1900, foraging: [{item: 'coral', count: 1, rainy: 1.8, windy: 1.8}], help: 'Corals', tooltip: 'Crafting Material for Potions and Furniture'},
   coral: {name: 'Coral', type: ITEM_TYPE.MATERIAL, stype: 'herb', star: 2, image: 'crafting_32_32-0-1', help: 'Corals', tooltip: 'Crafting Material for Potions and Furniture'},
 
   // Gardening
@@ -403,16 +418,21 @@ export const PLANT_TYPE = {
   SUNFLOWER: 22,
   AMBERMIRAGE: 24,
   BLOODMOON: 25,
+  // Mini-biome Herbs
+  SHADOWFERN: 31,
+  CRIMSONFROND: 32,
+  GOLDENVEIL: 33,
+  MISTFERN: 34,
   // Underground Herbs
-  OLEANDER: 31,
-  BLINKROOT: 32,
-  FIREBLOSSOM: 33,
+  OLEANDER: 41,
+  BLINKROOT: 42,
+  FIREBLOSSOM: 43,
   SKORN: 34,
   // Under Sea Herbs
-  CORAL_R: 41,
-  CORAL_P: 42,
-  CORAL_Y: 43,
-  CORAL_G: 44
+  CORAL_R: 51,
+  CORAL_P: 52,
+  CORAL_Y: 53,
+  CORAL_G: 54
 }
 
 export const PARSNIP_COUNT = 12

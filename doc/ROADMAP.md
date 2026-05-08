@@ -202,6 +202,7 @@
 - `plantGenerator.placeAmbermirages` - ajout des Ambermirages sur les tuiles de SAND
 - `plantGenerator.placeParsnipsSunflowers` - ajout des Parsnips et Sunflowers sur les tuiles de GRASSFOREST
 - `plantGenerator.placeBloodmoons` - ajout des Bloodmoon sur les tuiles de GRASSJUNGLE
+- `plantGenerator.placeFerns` - ajout des Ferns sur les tuiles de GRASSFERN
 
 ### Rendu (partiel)
 - `WorldRenderer` — rendu tuiles par chunks avec cache OffscreenCanvas
