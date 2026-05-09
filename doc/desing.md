@@ -566,9 +566,12 @@ commune de la zone N+1 : la progression est continue, sans palier artificiel.
 | **BEE** | 2 | ★★☆☆☆ | Hive |
 | **Hornet** | 3 | ★★★☆☆ | Hive / Shaking Oak |
 | **BEE QUEEN** | 3 | ★★★★☆ | Hive |
-| **RED SLUG** | 3 | ★★☆☆☆ | Mushroom Cave |
-| **HYDRA** | 3 | ★★★☆☆ | Mushroom Cave |
-| **ISOPOD** | 4 | ★★★★★ | Mushroom Cave |
+
+| **Blue Slug** | 3 | ★★☆☆☆ | Mushroom Cave / Chopping Giant Mushroom / Foraging Cave Mushrooms |
+| **Woodlouse** | 3 | ★★☆☆☆ | Mushroom Cave / Foraging Cave Mushrooms |
+| **Hydra** | 3 | ★★★☆☆ | Mushroom Cave / Chopping Giant Mushroom |
+| **Isopod** | 4 | ★★★★★ | Mushroom Cave / Chopping Giant Mushroom |
+
 | **SPIDER** | 3 | ★★☆☆☆ | Cobweb Cave |
 | **MYGALE** | 3 | ★★★☆☆ | Cobweb Cave |
 | **TARENTULA KING** | 4 | ★★★★☆ | Cobweb Cave |
@@ -582,8 +585,8 @@ commune de la zone N+1 : la progression est continue, sans palier artificiel.
 | **PHARAON** | 3 | ★★★☆☆ | Lost Temple |
 | **CYCLOPS** | 4 | ★★★★☆ | Lost Temple |
 | **MINOTAUR** | 4 | ★★★★★ | Lost Temple |
-| **Dendrobate** | 3 | ★★★☆☆ | Fern Cave / Harvesting Bloodmoon |
-| **Mamba** | 3 | ★★★☆☆ | Fern Cave / Harvesting Bloodmoon |
+| **Dendrobate** | 3 | ★★★☆☆ | Fern Cave / Harvesting Ferns |
+| **Mamba** | 3 | ★★★☆☆ | Fern Cave / Harvesting Bloodmoon or Ferns |
 | **AMBER SQUID** | 4 | ★★☆☆☆ | Fish - Sap Pocket |
 | **GLIDER** | 4 | ★★☆☆☆ | Fish - Sap Pocket |
 | **MANTIS** | 4 | ★★★★☆ | Sap Pocket |
@@ -599,6 +602,7 @@ commune de la zone N+1 : la progression est continue, sans palier artificiel.
 | **Giant Red Slug** | 2 | ★★☆☆☆ | Harvesting Pink Mycenia |
 | **Vole** | 2 | ★★☆☆☆ | Harvesting Parsnip |
 | **Hedgehog** | 2 | ★★☆☆☆ | Harvesting Sunflower |
+| **Millipede** | 4 | ★★★☆☆ | Harvesting Velvetmoss |
 
 _Adder = Vipère Péliade_
 

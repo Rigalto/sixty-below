@@ -370,7 +370,7 @@ class WorldGenerator {
 
     // 8.3.2. Oak / Mahogany / Giant Mushroom
     const oakPositions = plantGenerator.placeTrees(surfaceLine, guarded)
-    plantGenerator.placeGiantMushrooms(mushroomPlants)
+    const giantOccupied = plantGenerator.placeGiantMushrooms(mushroomPlants)
     await progress('Trees')
 
     // 8.3.3. Coral
@@ -391,6 +391,7 @@ class WorldGenerator {
 
     const fernCount = plantGenerator.placeFerns(fernsPlants)
     plantGenerator.placeMoss(mossPlants)
+    plantGenerator.placeCaveMushrooms(mushroomPlants, currentWeather, giantOccupied)
     await progress('Mini-biome Plants')
 
     // 9. Traitements finaux
@@ -7056,10 +7057,11 @@ class PlantGenerator {
 
     const placeMushroom = (soilX, y, mushroomId) => {
       const soilIndex = (y << 10) | soilX
+      const type = mushroomId === 'bolete' ? PLANT_TYPE.BOLETE : PLANT_TYPE.PINKMYCENIA
       this.#plants.push({
         id: uniqueIdGenerator.getUniqueId(),
         kind: PLANT_KIND.MUSHROOM,
-        type: PLANT_TYPE.NONE,
+        type,
         itemId: mushroomId,
         index: soilIndex - MUSH_H * W,
         soilIndex,
@@ -7123,6 +7125,7 @@ class PlantGenerator {
     const MUSH_H = 12
     const MUSH_W = 2
     const W = WORLD_WIDTH
+    const occupied = new Set()
 
     // Construire un Set des index GRASSMUSHROOM pour lookup O(1)
     const grassSet = new Set()
@@ -7150,6 +7153,9 @@ class PlantGenerator {
       const size = seededRNG.randomGetArrayValue(GIANT_MUSHROOM_INIT_SIZE)
       const images = this.#buildTreeImages('giantMushroom', x, y)
 
+      occupied.add(soilIndex)
+      occupied.add(soilIndex + 1) // tuile droite (w=2)
+
       this.#plants.push({
         id: uniqueIdGenerator.getUniqueId(),
         kind: PLANT_KIND.TREE,
@@ -7176,6 +7182,7 @@ class PlantGenerator {
         }
       }
     }
+    return occupied
   }
 
   /**
@@ -7527,6 +7534,57 @@ class PlantGenerator {
         h: 1,
         x: mossX,
         y: mossY,
+        present,
+        deleted: false
+      })
+    }
+  }
+
+  /**
+   * Place les spots de Frostcap et Dawncap dans les Mushroom Caves.
+   * Tous les spots valides sont enregistrés — 35% sont présents au démarrage,
+   * sauf si le temps initial est Sunny (present = false pour tous).
+   * Un spot valide est une tuile GRASSMUSHROOM avec les deux tuiles VOID au-dessus,
+   * sans Giant Mushroom déjà présent (tuile VOID à y-1 et y-2).
+   * Les deux espèces sont réparties aléatoirement à parts égales.
+   * Pop : 8:30 in-game. Dépop : 21:30 in-game.
+   *
+   * @param {Array<{kind, type, index, naturalCode, deleted}>} mushroomPlants — tuiles GRASSMUSHROOM
+   * @param {number} initialWeather — weather du premier jour (WEATHER_TYPE_CODE)
+   */
+  placeCaveMushrooms (mushroomPlants, initialWeather, giantOccupied) {
+    const VOID = NODES.VOID.code
+    const GRASSMUSHROOM = NODES.GRASSMUSHROOM.code
+    const W = WORLD_WIDTH
+    const sunny = initialWeather === WEATHER_TYPE_CODE.SUNNY
+
+    for (const plant of mushroomPlants) {
+      if (plant.naturalCode !== GRASSMUSHROOM) continue
+
+      const idx = plant.index
+      const x = idx & 0x3FF
+      const y = idx >> 10
+
+      if (giantOccupied.has(idx)) continue
+      if (worldBuffer.readAt(idx - W) !== VOID) continue // y-1 VOID
+      if (worldBuffer.readAt(idx - W - W) !== VOID) continue // y-2 VOID
+
+      const itemId = seededRNG.randomGetBool() ? 'frostcap' : 'dawncap'
+      const type = itemId === 'frostcap' ? PLANT_TYPE.FROSTCAP : PLANT_TYPE.DAWNCAP
+      const soilIndex = idx
+      const present = !sunny && seededRNG.randomGetPercent(35)
+
+      this.#plants.push({
+        id: uniqueIdGenerator.getUniqueId(),
+        kind: PLANT_KIND.MUSHROOM,
+        type,
+        index: soilIndex - W - W,
+        soilIndex,
+        itemId,
+        w: 1,
+        h: 2,
+        x,
+        y: y - 2,
         present,
         deleted: false
       })

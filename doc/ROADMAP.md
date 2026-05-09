@@ -223,6 +223,7 @@ fs.writeFileSync('docs/help-rendered.html', htmlHelp.join('\n'))
 - `plantGenerator.placeBloodmoons` - ajout des Bloodmoon sur les tuiles de GRASSJUNGLE
 - `plantGenerator.placeFerns` - ajout des Ferns sur les tuiles de GRASSFERN
 - `plantGenerator.placeMoss` - ajout de la mousse sur les tuiles de GRASSMOSS
+- `plantGenerator.placeCaveMushrooms` - ajout des champignons sur les tuiles de GRASSMUSHROOM
 
 ### Rendu (partiel)
 - `WorldRenderer` — rendu tuiles par chunks avec cache OffscreenCanvas

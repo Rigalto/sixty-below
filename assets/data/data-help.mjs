@@ -387,9 +387,13 @@ Mushroom Caves are large caverns found deep in [[Forest]] biomes. Their floor is
 * [[node:humus]] — substrate beneath the floor, 2-3 tiles deep
 
 **Inhabitants** ⏳
-* [[monster:redSlug]] — common, passive
-* [[monster:hydra]] — uncommon
-* [[monster:isopod]] — boss, rare
+
+| Monster | Role | Trigger |
+|---|---|---|
+| [[monster:blueSlug]] | Common, passive | Ambient / Harvesting [[Cave Mushrooms]] / Chopping [[Giant Mushroom|Giant Mushrooms]] |
+| [[monster:woodlouse]] | Common | Harvesting [[Cave Mushrooms]] |
+| [[monster:hydra]] | Uncommon | Chopping [[Giant Mushroom|Giant Mushrooms]] |
+| [[monster:isopod]] | Mini-boss, rare | Chopping [[Giant Mushroom|Giant Mushrooms]] |
 
 **Loot** ⏳
 * Giant mushroom spores — rare harvest from mushroom caps ⏳
@@ -646,11 +650,16 @@ A large underground cave found in [[Jungle]] biomes. Its walls are covered in lu
 * [[node:grassMoss]] — floor and lateral walls
 * [[node:mud]] — substrate beneath the moss floor
 
+
 **Inhabitants** ⏳
-* Passive fauna only — rare encounters
+
+| Monster | Role | Trigger |
+|---|---|---|
+| [[monster:millipede]] | Common | Harvesting [[Velvetmoss]] — attacks in waves of 4-5 |
 
 **Loot** ⏳
 * Rare vegetal drops from the moss walls
+* Crafting material from millipedes
 
 **Tips**
 * _The luminous moss makes this cave one of the few underground areas that doesn't require a light source._ ⏳
@@ -2609,7 +2618,7 @@ All plants found in the world of Sixty-Below. Plants can be harvested for loot, 
 | [[item:coconut]] | {{item:coconut:star}} | Tree | Sea shore, Desert Oasis shore | [[item:coconut]], [[item:coconutFiber]], [[item:coconutPulp]], [[item:coconutMilk]] | [[monster:coconutCrab]] (Shaking) |
 | [[item:oak]] | {{item:oak:star}} | Tree | [[Forest]] / [[Surface]] | [[item:logOak]], [[item:acorn]] | [[monster:hornet]] (Shaking) / [[monster:boar]] (Chopping) |
 | [[item:mahogany]] | {{item:mahogany:star}} | Tree | [[Jungle]] / [[Surface]] | [[item:logMahogany]] | [[monster:eyelashViper]] (Shaking) / [[monster:bulletAnt]] (Chopping) |
-| [[item:giantMushroom]] | {{item:giantMushroom:star}} | Tree | [[Mushroom Cave]] | ⏳ | ⏳ |
+| [[item:giantMushroom]] | {{item:giantMushroom:star}} | Tree | [[Mushroom Cave]] | ⏳ | [[monster:isopod]]  (Chopping) |
 | [[item:bolete]] | {{item:bolete:star}} | Mushroom | [[Forest]] / [[Surface]] | [[item:bolete]] | [[monster:adder]] (Foraging) |
 | [[item:pinkMycenia]] | {{item:pinkMycenia:star}} | Mushroom | [[Jungle]] / [[Surface]] | [[item:pinkMycenia]] | [[monster:giantRedSlug]] (Foraging) |
 | [[item:coralR]] | {{item:coralR:star}} | Herb | Under Sea / [[node:sand]] | [[item:coral]] | [[monster:moray]] (Foraging) |
@@ -2619,11 +2628,16 @@ All plants found in the world of Sixty-Below. Plants can be harvested for loot, 
 | [[item:ambermirage]] | {{item:ambermirage:star}} | Herb | [[Surface]] / [[node:sand]] | [[item:ambermirage]] | [[monster:scorpion]] (Foraging) |
 | [[item:parsnip]] | {{item:parsnip:star}} | Herb | [[Forest]] / [[Surface]] | [[item:parsnip]] | [[monster:vole]] (Foraging) |
 | [[item:sunflower]] | {{item:sunflower:star}} | Herb | [[Forest]] / [[Surface]] | [[item:sunflowerSeed]] | [[monster:hedgehog]] (Foraging) |
-| [[item:bloodmoon]] | {{item:bloodmoon:star}} | Herb | [[Jungle]] / [[Surface]] | [[item:bloodmoon]] | [[monster:hedgehog]] (Foraging) |
-| [[item:fernS]] | {{item:fernS:star}} | Herb | Fern Cave / [[node:grassfern]] | [[monster:moray]] (Foraging) |
-| [[item:fernC]] | {{item:fernC:star}} | Herb | Fern Cave / [[node:grassfern]] | [[monster:moray]] (Foraging) |
-| [[item:fernG]] | {{item:fernG:star}} | Herb | Fern Cave / [[node:grassfern]] | [[monster:moray]] (Foraging) |
-| [[item:fernM]] | {{item:fernM:star}} | Herb | Fern Cave / [[node:grassfern]] | [[monster:moray]] (Foraging) |
+| [[item:bloodmoon]] | {{item:bloodmoon:star}} | Herb | [[Jungle]] / [[Surface]] | [[item:bloodmoon]] | [[monster:mamba]] (Foraging) |
+| [[item:fernS]] | {{item:fernS:star}} | Herb | Fern Cave / [[node:grassfern]] | [[item:fernLeaf]] / [[fernSpore]] | [[monster:dendrobate]] /  [[monster:mamba]] (Foraging) |
+| [[item:fernC]] | {{item:fernC:star}} | Herb | Fern Cave / [[node:grassfern]] | [[item:fernLeaf]] / [[fernSpore]] | [[monster:dendrobate]] /  [[monster:mamba]] (Foraging) |
+| [[item:fernG]] | {{item:fernG:star}} | Herb | Fern Cave / [[node:grassfern]] | [[item:fernLeaf]] / [[fernSpore]] | [[monster:dendrobate]] /  [[monster:mamba]] (Foraging) |
+| [[item:fernM]] | {{item:fernM:star}} | Herb | Fern Cave / [[node:grassfern]] | [[item:fernLeaf]] / [[fernSpore]] | [[monster:dendrobate]] /  [[monster:mamba]] (Foraging) |
+| [[item:velvetmoss]] | {{item:velvetmoss:star}} | Herb | Moss Cave / [[node:grassmoss]] | [[item:velvetmoss]] | [[monster:woodlouse]] (Foraging) |
+
+| [[item:frostcap]] | {{item:frostcap:star}} | Herb | Mushroom Cave / [[node:grassmushroom]] | [[item:mushroomGill]] | [[monster:woodlouse]] (Foraging) |
+| [[item:dawncap]] | {{item:dawncap:star}} | Herb | Mushroom Cave / [[node:grassmushroom]] | [[item:mushroomGill]] | [[monster:woodlouse]] (Foraging) |
+
 
 
 _For detailed information on each plant, click its name._
@@ -2716,9 +2730,9 @@ Giant Mushrooms grow in the depths of [[Mushroom Cave|Mushroom Caves]], their bi
 * Chopping removes one section — the mushroom shrinks by one stage
 * When the last section is chopped, the mushroom disappears completely
 
-| Tool | Drops | Extra Drop (last section) |
-|---|---|---|
-| Any [[Chopping Tools|Axe]] | {{item:giantMushroom:logging:items}} | ⏳ |
+| Tool | Drops | Extra Drop (last section) | Encounter |
+|---|---|---|---|
+| Any [[Chopping Tools|Axe]] | {{item:giantMushroom:logging:items}} | ⏳ | [[monster:isopod]] |
 
 **Tips**
 * _Giant Mushrooms provide natural light in [[Mushroom Cave|Mushroom Caves]] — chopping them all will leave the cave in complete darkness._ ⏳
@@ -2764,7 +2778,7 @@ TODO : add recipes with dropped items as ingredient⏳
   },
 
   // ── Plants - Mushrooms ───────────────────────────────────────────
-  // Surface Mushrooms
+  // Surface Mushrooms, Cave Mushrooms
   {
     title: 'Surface Mushrooms',
     category: ['Plant', 'Forest', 'Jungle'],
@@ -2777,9 +2791,15 @@ Surface Mushrooms grow at the base of [[Oak & Mahogany|Trees]] on the [[Forest]]
 * [[item:pinkMycenia]] ({{item:pinkMycenia:star}}) — [[Jungle]] / [[Surface]], grows near [[Oak & Mahogany|Mahogany]] trees on [[node:grassJungle]]
 
 **Blooming**
-* Appears at night and disappears at dawn⏳
-* All mushrooms of the same species appear and disappear almost simultaneously⏳
-* Mushrooms are more abundant during [[Weather|Rainy Weather]]. ⏳
+
+| Mushroom | Appears | Disappears |
+|---|---|---|
+| [[item:bolete]] | 21:00 | 9:00 |
+| [[item:pinkMycenia]] | 22:00 | 7:00 |
+_All times are in-game. See [[Day & Night Cycle]] for reference._
+
+* All mushrooms of the same species appear and disappear simultaneously ⏳
+* Mushrooms are more abundant during [[Weather|Rainy Weather]] ⏳
 
 **Harvest**
 * [[Foraging|Interact to harvest]] — the mushroom disappears on harvest
@@ -2799,6 +2819,58 @@ Surface Mushrooms grow at the base of [[Oak & Mahogany|Trees]] on the [[Forest]]
 * _Surface Mushrooms only appear at night — plan your foraging accordingly._ ⏳
 * _Knowing tomorrow's weather helps plan your foraging — the [[item:bottledFrog]] accessory reveals the next day's forecast._ ⏳
 * _All mushrooms of the same species appear simultaneously — a single rainy night can yield a large harvest._ ⏳
+  `
+  },
+  {
+    title: 'Cave Mushrooms',
+    category: ['Plant', 'Forest'],
+    content: `
+**Description**
+Cave Mushrooms grow on the floor of [[Mushroom Cave|Mushroom Caves]], thriving in the dim light cast by the [[Giant Mushroom|Giant Mushrooms]] above them. Two species have been identified, both pale and luminous, fruiting during daylight hours and retreating at nightfall.
+
+**Tier**
+{{item:frostcap:star}}
+
+**Location**
+* Biome: [[Forest]]
+* Layer: [[Caverns]] Top
+* Grows exclusively in [[Mushroom Cave|Mushroom Caves]] on [[node:grassMushroom]]
+
+**Species**
+
+| Name | Appearance |
+|---|---|
+| [[item:frostcap]] | Pale blue-white, domed cap, pearlescent sheen |
+| [[item:dawncap]] | Golden yellow, flat cap, translucent |
+
+**Blooming Hours**
+
+| Mushroom | Appears | Disappears |
+|---|---|---|
+| [[item:frostcap]] | 8:30 | 21:30 |
+| [[item:dawncap]] | 8:30 | 21:30 |
+
+_All times are in-game. See [[Day & Night Cycle]] for reference._
+
+* All cave mushrooms appear and disappear simultaneously ⏳
+* Never appear on [[Weather|Sunny]] days ⏳
+
+**Harvest**
+* [[Foraging|Interact to harvest]] — the mushroom disappears on harvest
+* Tool: [[Harvesting Tools|Silver Sickle]] or better ⏳
+* Drops: [[item:mushroomGill]]
+
+**Usages** ⏳
+[[item:mushroomGill]] — food and crafting ingredient ⏳
+
+**Dangers**
+* [[monster:redSlug]] — common in [[Mushroom Cave|Mushroom Caves]] ⏳
+* [[monster:hydra]] — uncommon, aggressive ⏳
+
+**Tips**
+* _Cave Mushrooms are the inverse of [[Surface Mushrooms]] — they fruit by day and retreat at night. Plan accordingly._ ⏳
+* _Sunny days cancel all blooming — check the weather before making the trip underground._ ⏳
+* _[[Giant Mushroom|Giant Mushrooms]] provide just enough light to harvest without a torch — but only just._ ⏳
   `
   },
 
@@ -2828,9 +2900,9 @@ Parsnips are root vegetables found growing on the [[Forest]] floor. Their white 
 * Harvesting a Parsnip may disturb a [[monster:vole]] hiding among the roots — its bite inflicts [[Damage Types|Piercing]] damage and may cause [[Damage Types|Bleeding]]. ⏳
 
 **Usages** ⏳
-* [[item:parsnip]] — food (when used, give +20 Health during 1 in game hour)
+* [[item:parsnip]] — food (when used, give +20 Health during 1 in-game hour)
 * [[item:parsnip]] — crafting ingredient ⏳
-* [[item:parsnipMash]] — when used, give +20 Health and +10 Max Health during 2 in game hours)
+* [[item:parsnipMash]] — when used, give +20 Health and +10 Max Health during 2 in-game hours)
 * [[item:vegetableSoup]] — when used, give +20 Health and ???
 
 **Recipes** ⏳
@@ -3092,7 +3164,7 @@ Velvetmoss is a slow-growing, deep-purple moss found exclusively in [[Moss Cave|
 * [[item:velvetmoss]] — crafting ingredient ⏳
 
 **Dangers**
-* [[monster:???]] ⏳
+* Harvesting Velvetmoss may disturb a colony of [[monster:millipede|Millipedes]] hidden beneath the moss — they attack in successive waves. Clear the first wave quickly or risk being overwhelmed. ⏳
 
 **Tips**
 * _Velvetmoss grows slowly but persistently — even a single unoccupied spot will eventually be claimed._ ⏳
@@ -3211,7 +3283,7 @@ The world of Sixty-Below follows a continuous day/night cycle, shaped by time, [
 
 **Time Rate**
 
-| In-Game | Real World |
+| In-game | Real World |
 |---|---|
 | 1 minute | 1 second |
 | 1 hour | 1 minute |
@@ -3250,7 +3322,6 @@ The world of Sixty-Below follows a continuous day/night cycle, shaped by time, [
     content: `
     `
   }
-
 ]
 
 /* ====================================================================================================

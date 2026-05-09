@@ -340,6 +340,9 @@ export const ITEMS = {
   // Mushrooms
   bolete: {name: 'Bolete', type: ITEM_TYPE.MATERIAL, stype: 'mushroom', star: 1, image: 'potions_32_32-1-5', placed: 'fuws_32_32-4-0', help: 'Surface Mushrooms', tooltip: '???'},
   pinkMycenia: {name: 'Pink Mycenia', type: ITEM_TYPE.MATERIAL, stype: 'mushroom', star: 1, image: 'potions_32_32-1-5', placed: 'fuws_32_32-4-0', help: 'Surface Mushrooms', tooltip: '???'},
+  frostcap: {name: 'Frostcap', type: 0, stype: 'mushroom', star: 3, image: null, placed: 'potions_32_32-1-5', help: 'Cave Mushrooms', tooltip: '???'},
+  dawncap: {name: 'Dawncap', type: 0, stype: 'mushroom', star: 3, image: null, placed: 'potions_32_32-1-5', help: 'Cave Mushrooms', tooltip: '???'},
+  mushroomGill: {name: 'Mushroom Gill', type: ITEM_TYPE.MATERIAL, stype: 'mushroom', star: 3, image: 'potions_32_32-1-5', help: 'Cave Mushrooms', tooltip: '???'},
 
   // Herbs
   parsnip: {name: 'Parsnip', type: ITEM_TYPE.MATERIAL, stype: 'herb', star: 1, image: 'potions_32_32-1-5', placed: 'fuws_32_32-4-0', help: 'Parsnip', tooltip: '???'},
@@ -363,7 +366,6 @@ export const ITEMS = {
   fernC: {name: 'Crimsonfrond', type: 0, stype: 'herb', star: 3, image: null, placed: 'fuws_32_32-2-3', speed: 1900, foraging: [{item: 'fernLeaf', count: 1, rainy: 1.8, windy: 1.8}], help: 'Ferns', tooltip: '???'},
   fernG: {name: 'Goldenveil', type: 0, stype: 'herb', star: 3, image: null, placed: 'fuws_32_32-2-3', speed: 1900, foraging: [{item: 'fernLeaf', count: 1, rainy: 1.8, windy: 1.8}], help: 'Ferns', tooltip: '???'},
   fernM: {name: 'Mistfern', type: 0, stype: 'herb', star: 3, image: null, placed: 'fuws_32_32-2-3', speed: 1900, foraging: [{item: 'fernLeaf', count: 1, rainy: 1.8, windy: 1.8}], help: 'Ferns', tooltip: '???'},
-  fernLeaves: {name: 'Fern Leaves', type: ITEM_TYPE.MATERIAL, stype: 'herb', star: 3, image: 'crafting_32_32-0-1', help: 'Ferns', tooltip: 'Crafting Material for Potions and Furniture'},
   fernLeaf: {name: 'Fern Leaf', type: ITEM_TYPE.MATERIAL, stype: 'herb', star: 3, image: 'crafting_32_32-0-1', help: 'Ferns', tooltip: 'Crafting Material for Potions and Furniture'},
   fernSpore: {name: 'Fern Spore', type: ITEM_TYPE.MATERIAL, stype: 'herb', star: 3, image: 'crafting_32_32-0-1', help: 'Ferns', tooltip: 'Crafting Material for Potions and Furniture'},
 
@@ -436,7 +438,12 @@ export const PLANT_TYPE = {
   CORAL_R: 51,
   CORAL_P: 52,
   CORAL_Y: 53,
-  CORAL_G: 54
+  CORAL_G: 54,
+  // Mushrooms
+  BOLETE: 61,
+  PINKMYCENIA: 62,
+  FROSTCAP: 63,
+  DAWNCAP: 64
 }
 
 export const PARSNIP_COUNT = 12
