@@ -367,6 +367,8 @@ export const ITEMS = {
   fernLeaf: {name: 'Fern Leaf', type: ITEM_TYPE.MATERIAL, stype: 'herb', star: 3, image: 'crafting_32_32-0-1', help: 'Ferns', tooltip: 'Crafting Material for Potions and Furniture'},
   fernSpore: {name: 'Fern Spore', type: ITEM_TYPE.MATERIAL, stype: 'herb', star: 3, image: 'crafting_32_32-0-1', help: 'Ferns', tooltip: 'Crafting Material for Potions and Furniture'},
 
+  velvetmoss: {name: 'Velvetmoss', type: ITEM_TYPE.MATERIAL, stype: 'herb', star: 3, image: 'crafting_32_32-0-1', placed: 'fuws_32_32-2-3', speed: 1900, foraging: [{item: 'velvetmoss', count: 1, rainy: 1.8, windy: 1.8}], help: 'Velvetmoss', tooltip: '???'},
+
   coralR: {name: 'Sunburst Brain Coral', type: 0, stype: 'herb', star: 2, image: null, placed: 'fuws_32_32-2-3', speed: 1900, foraging: [{item: 'coral', count: 1, rainy: 1.8, windy: 1.8}], help: 'Corals', tooltip: 'Crafting Material for Potions and Furniture'},
   coralP: {name: 'Starfire Pillar Coral', type: 0, stype: 'herb', star: 2, image: null, placed: 'fuws_32_32-3-3', speed: 1900, foraging: [{item: 'coral', count: 1, rainy: 1.8, windy: 1.8}], help: 'Corals', tooltip: 'Crafting Material for Potions and Furniture'},
   coralY: {name: 'Flickering Torch Coral', type: 0, stype: 'herb', star: 2, image: null, placed: 'fuws_32_32-4-3', speed: 1900, foraging: [{item: 'coral', count: 1, rainy: 1.8, windy: 1.8}], help: 'Corals', tooltip: 'Crafting Material for Potions and Furniture'},
@@ -424,6 +426,7 @@ export const PLANT_TYPE = {
   CRIMSONFROND: 32,
   GOLDENVEIL: 33,
   MISTFERN: 34,
+  VELVETMOSS: 35,
   // Underground Herbs
   OLEANDER: 41,
   BLINKROOT: 42,

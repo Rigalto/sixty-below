@@ -272,6 +272,7 @@ class GameCore {
     //   [PLANT_KIND.HERB * 100 + PLANT_TYPE.CRIMSONFROND, fernSystem],
     //   [PLANT_KIND.HERB * 100 + PLANT_TYPE.GOLDENVEIL, fernSystem],
     //   [PLANT_KIND.HERB * 100 + PLANT_TYPE.MISTFERN, fernSystem],
+    //   [PLANT_KIND.HERB * 100 + PLANT_TYPE.VELVETMOSS, mossSystem],
     //   [PLANT_KIND.HERB * 100 + PLANT_TYPE.CORAL_R, coralSystem],
     //   [PLANT_KIND.HERB * 100 + PLANT_TYPE.CORAL_P, coralSystem],
     //   [PLANT_KIND.HERB * 100 + PLANT_TYPE.CORAL_Y, coralSystem],

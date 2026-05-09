@@ -222,6 +222,7 @@ fs.writeFileSync('docs/help-rendered.html', htmlHelp.join('\n'))
 - `plantGenerator.placeParsnipsSunflowers` - ajout des Parsnips et Sunflowers sur les tuiles de GRASSFOREST
 - `plantGenerator.placeBloodmoons` - ajout des Bloodmoon sur les tuiles de GRASSJUNGLE
 - `plantGenerator.placeFerns` - ajout des Ferns sur les tuiles de GRASSFERN
+- `plantGenerator.placeMoss` - ajout de la mousse sur les tuiles de GRASSMOSS
 
 ### Rendu (partiel)
 - `WorldRenderer` — rendu tuiles par chunks avec cache OffscreenCanvas

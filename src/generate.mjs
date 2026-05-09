@@ -390,6 +390,7 @@ class WorldGenerator {
     await progress('Surface Herbs')
 
     const fernCount = plantGenerator.placeFerns(fernsPlants)
+    plantGenerator.placeMoss(mossPlants)
     await progress('Mini-biome Plants')
 
     // 9. Traitements finaux
@@ -7468,6 +7469,68 @@ class PlantGenerator {
     }
 
     return count
+  }
+
+  /**
+   * Place les spots de Velvetmoss dans les Moss Caves.
+   * Tous les spots valides sont enregistrés en base — 80% sont présents au démarrage.
+   * Un spot valide est une tuile GRASSMOSS avec VOID au-dessus, à gauche et à droite.
+   * La Velvetmoss occupe 1×1 tuile, s'interconnecte dans les 4 sens.
+   * En temps réel, une mousse pousse tous les 2–3 jours in-game sur un spot libre.
+   *
+   * @param {Array<{kind, type, index, naturalCode, deleted}>} mossPlants — tuiles GRASSMOSS
+   */
+  placeMoss (mossPlants) {
+    const VOID = NODES.VOID.code
+    const GRASSMOSS = NODES.GRASSMOSS.code
+    const W = WORLD_WIDTH
+    const occupied = new Set()
+
+    for (const plant of mossPlants) {
+      if (plant.naturalCode !== GRASSMOSS) continue
+
+      const idx = plant.index
+      const x = idx & 0x3FF
+      const y = idx >> 10
+
+      const voidAbove = worldBuffer.readAt(idx - W) === VOID
+      const voidLeft = worldBuffer.readAt(idx - 1) === VOID
+      const voidRight = worldBuffer.readAt(idx + 1) === VOID
+      if (!voidAbove && !voidLeft && !voidRight) continue
+
+      // Position de la mousse selon priorité : dessus > droite > gauche
+      let mossX, mossY
+      if (voidAbove) {
+        mossX = x
+        mossY = y - 1
+      } else if (voidRight) {
+        mossX = x + 1
+        mossY = y
+      } else {
+        mossX = x - 1
+        mossY = y
+      }
+
+      const mossIndex = (mossY << 10) | mossX
+      const collision = occupied.has(mossIndex)
+      const present = collision ? false : seededRNG.randomGetPercent(80)
+      if (!collision) occupied.add(mossIndex)
+
+      this.#plants.push({
+        id: uniqueIdGenerator.getUniqueId(),
+        kind: PLANT_KIND.HERB,
+        type: PLANT_TYPE.VELVETMOSS,
+        index: mossIndex,
+        soilIndex: idx,
+        itemId: 'velvetmoss',
+        w: 1,
+        h: 1,
+        x: mossX,
+        y: mossY,
+        present,
+        deleted: false
+      })
+    }
   }
 }
 export const plantGenerator = new PlantGenerator()

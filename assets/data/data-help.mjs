@@ -845,6 +845,11 @@ Despite the nuisance they represent, cobwebs are one of the most valuable resour
 * If left uncleared, cobwebs will eventually fill entire tunnel sections.
 * Clearing cobwebs regularly is essential to maintain access to deep areas.
 
+**Terrain Effect** ⏳
+* Cobweb threads are nearly invisible until you are already tangled in them — by then, each step pulls a dozen more filaments across your legs and arms.
+* Walking through [[node:web]] reduces movement speed ({{node:web:buffs:movementSpeed}}%)
+* See [[Movement Speed]] for details
+
 **Tips**
 * _Cobwebs slow movement drastically — avoid getting surrounded by spiders while slowed._ ⏳
 * _A [[item:flamethrower]] clears large cobweb areas quickly._ ⏳
@@ -2998,7 +3003,7 @@ Corals are marine organisms found on the sandy floor of the ocean. Four distinct
   },
 
   // ── Plants - Mini-biome Herbs ────────────────────────────────
-  // Ferns
+  // Ferns, Velvet Moss
   {
     title: 'Ferns',
     category: ['Plant', 'Forest'],
@@ -3045,6 +3050,57 @@ Ferns are ancient plants thriving in the humid darkness of [[Fern Cave|Fern Cave
 * _FernSpores are rare but valuable — prioritize harvesting mature ferns._ ⏳
   `
   },
+  // ── Plants - Mini-biome Herbs ────────────────────────────────
+  // Ferns, Velvetmoss
+  {
+    title: 'Velvetmoss',
+    category: ['Plant', 'Jungle'],
+    content: `
+**Description**
+Velvetmoss is a slow-growing, deep-purple moss found exclusively in [[Moss Cave|Moss Caves]]. Its velvety surface clings to the floor and lateral walls of the cave, forming dense interconnected patches that slowly reclaim every exposed surface over time.
+
+**Tier**
+{{item:velvetmoss:star}}
+
+**Location**
+* Biome: [[Jungle]]
+* Layer: [[Underground]]
+* Grows exclusively in [[Moss Cave|Moss Caves]] on [[node:grassMoss]]
+
+**Harvest**
+* [[Foraging|Interact to harvest]] — the patch disappears on harvest
+* Tool: [[Harvesting Tools|Silver Sickle]] or better ⏳
+* Drops: [[item:velvetmoss]]
+
+**Regrowth**
+* Harvesting a patch removes it permanently from that spot — the moss does not regrow where it was picked
+* Velvetmoss spreads slowly but relentlessly across every exposed [[node:grassMoss]] surface in the cave
+* A new patch appears every 2 to 3 in-game days on a random unoccupied spot
+* Left unharvested, the moss will eventually cover every available surface
+
+**Terrain Effect** ⏳
+* Velvetmoss secretes a thin, permanent moisture that makes every step a negotiation with gravity — the harder you push, the more it slips away from under you.
+* Walking on Velvetmoss reduces movement speed ({{item:velvetmoss:buffs:movementSpeed}}%)
+* See [[Movement Speed]] for details
+
+**Placement**
+* Grows on the floor (below open air) and on lateral walls (beside open air)
+* Does not grow on the ceiling
+* Each patch interconnects visually with its neighbours in all four directions
+
+**Usages** ⏳
+* [[item:velvetmoss]] — crafting ingredient ⏳
+
+**Dangers**
+* [[monster:???]] ⏳
+
+**Tips**
+* _Velvetmoss grows slowly but persistently — even a single unoccupied spot will eventually be claimed._ ⏳
+* _Its purple hue deepens near the cave floor — patches near the ceiling tend to be paler._ ⏳
+* _Harvest systematically from one side to the other — scattered harvesting wastes regrowth cycles._ ⏳
+  `
+  },
+
   // ── Plants - Underground Herbs ───────────────────────────────
   // Oleander, Amber-Moss
   {
@@ -3107,7 +3163,30 @@ Note: those ingredients can also be dropped by [[Mining]] [[Cobweb]] with any [[
   },
 
   // ── Gameplay ─────────────────────────────────────────────────
-  //    Inventory, Weather, Moon Phases, World Creation
+  //    Movement Spped, Inventory, Weather, Moon Phases, World Creation
+  {
+    title: 'Movement Speed',
+    category: ['Gameplay'],
+    content: `
+**Description**
+Movement speed determines how fast the player moves through the world. The base speed can be altered by terrain, equipment, and buffs.
+
+**Terrain Modifiers**
+
+| Terrain | Effect | Location |
+|---|---|---|
+| [[node:web]] | -50% | [[Cobweb Cave]] and [[node:web]] hanging from ceilings of dark corners |
+| [[item:velvetmoss]] | -10% | [[Moss Cave]] floor and walls |
+
+**Equipment Modifiers** ⏳
+
+**Buff & Debuff Modifiers** ⏳
+
+**Tips**
+* _Velvetmoss patches are visually distinct — you can plan your path to avoid them if speed matters._ ⏳
+* _Boots with traction bonuses can partially offset terrain penalties._ ⏳
+  `
+  },
   {
     title: 'Inventory',
     category: ['Gameplay'],
