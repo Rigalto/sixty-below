@@ -33,6 +33,24 @@
 - Recettes utilisant les nouveaux matériaux (marbre, granite, obsidian, shell...)
 - Machines ancestrales : Décomposeur (rendement 80%) et Transmutateur — comme Furniture spécial
 
+### Utilitaire node.js pour génération du fichier d'aide
+
+Le fichier d'aide servira de référence pour l'IA, format HTML.
+
+```javascript
+import {HELP, hydrateHelp} from '../src/data-help.mjs'
+import {NODES, ITEMS, RECIPES} from '../src/data.mjs'
+import fs from 'fs'
+
+hydrateHelp(NODES, ITEMS, RECIPES)
+const htmlHelp = []
+for (const {html} of HELP)
+  htmlHelp.push(html)
+  htmlHelp.push('<hr>')
+}
+fs.writeFileSync('docs/help-rendered.html', htmlHelp.join('\n'))
+```
+
 ---
 
 ## À faire — Gameplay
