@@ -3163,7 +3163,7 @@ Note: those ingredients can also be dropped by [[Mining]] [[Cobweb]] with any [[
   },
 
   // ── Gameplay ─────────────────────────────────────────────────
-  //    Movement Spped, Inventory, Weather, Moon Phases, World Creation
+  //    Movement Speed, Inventory, Weather, Moon Phases, World Creation
   {
     title: 'Movement Speed',
     category: ['Gameplay'],
@@ -3194,6 +3194,48 @@ Movement speed determines how fast the player moves through the world. The base 
     `
   },
   {
+    title: 'World Creation',
+    category: ['Gameplay', 'World'],
+    content: `
+    `
+  },
+
+  // ── Gameplay ─────────────────────────────────────────────────
+  //    Day & Night Cycle, Weather, Moon Phases
+  {
+    title: 'Day & Night Cycle',
+    category: ['Gameplay'],
+    content: `
+**Description**
+The world of Sixty-Below follows a continuous day/night cycle, shaped by time, [[Weather]], and [[Moon phases]]. Surviving the night is one of the core challenges — it brings unique dangers, but also unique opportunities.
+
+**Time Rate**
+
+| In-Game | Real World |
+|---|---|
+| 1 minute | 1 second |
+| 1 hour | 1 minute |
+| 1 full day | 24 minutes |
+
+**Day Periods**
+
+| Period | From | To | |
+|---|---|---|---|
+| Midnight | 0:00 | 2:59 | Night |
+| Dawn | 3:00 | 5:59 | Night |
+| Morning | 6:00 | 8:59 | Day |
+| Noon | 9:00 | 11:59 | Day |
+| Afternoon | 12:00 | 14:59 | Day |
+| Dusk | 15:00 | 17:59 | Day |
+| Evening | 18:00 | 20:59 | Day |
+| Night | 21:00 | 23:59 | Night |
+
+**Tips**
+* _Night lasts 6 in-game hours — make sure you are sheltered before 21:00._ ⏳
+* _Dawn and Midnight are the most dangerous periods — monsters are most active._ ⏳
+  `
+  },
+  {
     title: 'Weather',
     category: ['Gameplay', 'Plant', 'Foraging', 'Fishing'],
     content: `
@@ -3207,13 +3249,8 @@ Movement speed determines how fast the player moves through the world. The base 
     category: ['Gameplay', 'Plant', 'Foraging', 'Fishing'],
     content: `
     `
-  },
-  {
-    title: 'World Creation',
-    category: ['Gameplay', 'World'],
-    content: `
-    `
   }
+
 ]
 
 /* ====================================================================================================
