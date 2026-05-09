@@ -36,6 +36,7 @@
 ### Utilitaire node.js pour génération du fichier d'aide
 
 Le fichier d'aide servira de référence pour l'IA, format HTML.
+Mettre le fichier dans le dossier 'Téléchargement'.
 
 ```javascript
 import {HELP, hydrateHelp} from '../src/data-help.mjs'
