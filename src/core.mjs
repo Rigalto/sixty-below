@@ -291,8 +291,23 @@ class GameCore {
     // await FaunaManager.init(...)
     // await PlayerManager.init(...)
 
-    console.log({PLANT_KIND, PLANT_TYPE})
-    // const SYSTEM_MAP = new Map([
+    // 5.1 Objectstore Inventory => à remplacer par await inventoryManager.init(plantRecords)
+    // const itemsToDelete = []
+    // const inventoryRecords = await database.readAllFromObjectStore('inventory')
+    // for (const record of inventoryRecords) {
+    //   if (record.deleted) {
+    //     itemsToDelete.push(record.key)
+    //     continue
+    //   }
+    //   inventoryManager.init(record)
+    // }
+    // if (itemsToDelete.length > 0) {
+    //   await database.deleteMultipleRecords('plant', itemsToDelete)
+    // }
+
+    // 5.2 Objectstore Plant => à remplacer par await plantManager.init(plantRecords)
+    console.log(PLANT_KIND, PLANT_TYPE) // pour éviter une erreur dans VSCode
+    // const PLANT_SYSTEM_MAP = new Map([
     //   [PLANT_KIND.NATURAL * 100 + PLANT_TYPE.NONE, naturalSystem],
     //   [PLANT_KIND.TREE * 100 + PLANT_TYPE.OAK, treeSystem],
     //   [PLANT_KIND.TREE * 100 + PLANT_TYPE.MAHOGANY, treeSystem],
@@ -319,10 +334,18 @@ class GameCore {
     //   [PLANT_KIND.SEED * 100 + PLANT_TYPE.NONE, seedSystem]
     // ])
 
-    // // managers des plantes
+    // // managers des plantes et suppressions des enregistrements périmés
+    // const plantsToDelete = []
     // const plantRecords = await database.readAllFromObjectStore('plant')
     // for (const record of plantRecords) {
-    //   SYSTEM_MAP.get(record.kind * 100 + record.type)?.init(record)
+    //   if (record.deleted) {
+    //     plantsToDelete.push(record.key)
+    //     continue
+    //   }
+    //   PLANT_SYSTEM_MAP.get(record.kind * 100 + record.type)?.init(record)
+    // }
+    // if (plantsToDelete.length > 0) {
+    //   await database.deleteMultipleRecords('plant', plantsToDelete)
     // }
 
     // 6. Lancement de la boucle
