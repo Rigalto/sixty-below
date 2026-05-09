@@ -580,6 +580,7 @@ commune de la zone N+1 : la progression est continue, sans palier artificiel.
 | **MOMIE** | 3 | ★★★☆☆ | Pyramid |
 | **SPHINX** | 4 | ★★★★☆ | Pyramid |
 | **PHARAON** | 4 | ★★★★★ | Pyramid |
+| **Wraith** | 2 | ★★☆☆☆ | Harvesting Mandrake |
 | **GHOST** | 2 | ★★★☆☆ | Ruined Cabin |
 | **ARTHUR** | 3 | ★★★★☆ | Ruined Cabin |
 | **PHARAON** | 3 | ★★★☆☆ | Lost Temple |

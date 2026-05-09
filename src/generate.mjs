@@ -1,7 +1,7 @@
 import {seededRNG, shuffleArray, rollLoot} from './utils.mjs'
 import {database, uniqueIdGenerator} from './database.mjs'
 import {WORLD_WIDTH, WORLD_HEIGHT, SEA_LEVEL, TOPSOIL_Y_SKY_SURFACE, TOPSOIL_Y_SURFACE_UNDER, TOPSOIL_Y_UNDER_CAVERNS, TOPSOIL_Y_CAVERNS_MID, BIOME_TILE_MAP, SEA_MAX_JITTER, SEA_MAX_WIDTH, SEA_MAX_HEIGHT, CLUSTER_SCATTER_MAP, ORE_GEM_SCATTER_MAP, PERLIN_OFFSET_NATURALIZER, PERLIN_OFFSET_TUNNEL, PERLIN_OFFSET_SURFACE_TUNNEL, PERLIN_OFFSET_SMALL_TUNNEL, PERLIN_OFFSET_CAVERN, PERLIN_OFFSET_HIVE, PERLIN_OFFSET_HEART, PERLIN_OFFSET_MUSHROOM, PERLIN_OFFSET_COBWEB, PERLIN_OFFSET_FERNS, PERLIN_OFFSET_LAKES, PERLIN_OFFSET_SHELL, PERLIN_OFFSET_TEMPLE, PERLIN_OFFSET_BEACH, SMALL_CAVERNS_COUNT, MEDIUM_CAVERNS_COUNT, UNDERGROUND_TUNNEL_COUNT, CAVERNS_TUNNEL_COUNT, SMALL_TUNNELS_COUNT, HIVE_RADIUS_MIN, HIVE_RADIUS_MAX, COBWEB_CAVE_COUNT_MIN, COBWEB_CAVE_COUNT_MAX, COBWEB_RADIUS_X_MIN, COBWEB_RADIUS_X_MAX, COBWEB_RADIUS_Y_MIN, COBWEB_RADIUS_Y_MAX, COBWEB_CAVE_MAIN_MIN, COBWEB_CAVE_MAIN_MAX, COBWEB_CAVE_SIDE_MIN, COBWEB_CAVE_SIDE_MAX, COBWEB_SCATTER_COUNT, COBWEB_SCATTER_SIZE_MIN, COBWEB_SCATTER_SIZE_MAX, GEODE_CAVE_COUNT_MIN, GEODE_CAVE_COUNT_MAX, GEODE_RADIUS_MIN, GEODE_RADIUS_MAX, GEODE_TARGET_CLUSTER_COUNT, GEODE_CLUSTER_SIZE_MIN, GEODE_CLUSTER_SIZE_MAX, TOPSOIL_SCATTER_MAP, LAKE_RADIUS_X_MIN, LAKE_RADIUS_X_MAX, LAKE_RADIUS_Y_MIN, LAKE_RADIUS_Y_MAX, LAKE_PIT_RADIUS_X_MIN, LAKE_PIT_RADIUS_X_MAX, LAKE_PIT_RADIUS_Y_MIN, LAKE_PIT_RADIUS_Y_MAX, LAKE_CREATION_MAP, UNDERGROUND_LAKE_UNDER_COUNT, UNDERGROUND_LAKE_CAVERNS_COUNT, UNDERGROUND_LAKE_RADIUS_MIN, UNDERGROUND_LAKE_RADIUS_MAX, BLIND_LAKE_COUNT, BLIND_LAKE_RADIUS_MIN, BLIND_LAKE_RADIUS_MAX, SAP_LAKE_UNDER_COUNT, SAP_LAKE_CAVERNS_COUNT, SAP_LAKE_RADIUS_MIN, SAP_LAKE_RADIUS_MAX, SAP_POCKET_COUNT, SAP_POCKET_RADIUS_MIN, SAP_POCKET_RADIUS_MAX, WATER_PUDDLE_COUNT, SAP_PUDDLE_COUNT, PUDDLE_HEIGHT_MIN, PUDDLE_HEIGHT_MAX, FOSSIL_VEIN_COUNT, FERN_CAVE_RADIUS_X_MIN, FERN_CAVE_RADIUS_X_MAX, FERN_CAVE_RADIUS_Y_MIN, FERN_CAVE_RADIUS_Y_MAX, MOSS_CAVE_RADIUS_X_MIN, MOSS_CAVE_RADIUS_X_MAX, MOSS_CAVE_RADIUS_Y_MIN, MOSS_CAVE_RADIUS_Y_MAX, SAND_POCKET_RADIUS_X_MIN, SAND_POCKET_RADIUS_X_MAX, SAND_POCKET_RADIUS_Y_MIN, SAND_POCKET_RADIUS_Y_MAX, MUSHROOM_CAVE_RADIUS_X_MIN, MUSHROOM_CAVE_RADIUS_X_MAX, MUSHROOM_CAVE_RADIUS_Y_MIN, MUSHROOM_CAVE_RADIUS_Y_MAX, PYRAMID_WALL_INDEXES, PYRAMID_VOID_INDEXES, PYRAMID_WIDTH, PYRAMID_HEIGHT, PYRAMID_ROOM1_DELTA, PYRAMID_ROOM2_DELTA, TEMPLE_RUIN_WALL_INDEXES, TEMPLE_RUIN_COLUMNS_INDEXES, CHEST_CONTENT, TREES_INIT_SIZE, GIANT_MUSHROOM_INIT_SIZE} from '../assets/data/data-gen.mjs'
-import {NODES, NODES_LOOKUP, NODE_TYPE, BIOME_TYPE, PLANT_KIND, PLANT_TYPE, ITEMS, BAG_CAPACITY, TREE_IMAGES, PARSNIP_COUNT} from '../assets/data/data.mjs'
+import {NODES, NODES_LOOKUP, NODE_TYPE, BIOME_TYPE, PLANT_KIND, PLANT_TYPE, ITEMS, BAG_CAPACITY, TREE_IMAGES, PARSNIP_COUNT, MANDRAKE_COUNT, CACTUS_COUNT, BAMBOO_COUNT} from '../assets/data/data.mjs'
 import {WEATHER_TYPE, WEATHER_TYPE_CODE} from './constant.mjs'
 
 /* ====================================================================================================
@@ -141,7 +141,7 @@ class WorldGenerator {
     window.DEBUG_POINTS = [] // DEGUG - à supprimer
 
     // affichage de la progression de la création dans le dialogue modal
-    const STEPS = 34
+    const STEPS = 36
     let step = 0
     const progress = (topic) => {
       step++
@@ -348,9 +348,10 @@ class WorldGenerator {
     furnitureGenerator.placeSeaChests(leftSeaRect)
     furnitureGenerator.placeSeaChests(rightSeaRect)
     furnitureGenerator.placeSurfaceLineChests(surfaceLine, guarded, biomesDescription)
-    furnitureGenerator.placeSurfaceChests(zoneRects)
-    furnitureGenerator.placeUndergroundChests(zoneRects)
-    furnitureGenerator.placeCavernChests(zoneRects)
+    const surfaceChestIndexes = furnitureGenerator.placeSurfaceChests(zoneRects)
+    const underChestIndexes = furnitureGenerator.placeUndergroundChests(zoneRects)
+    const cavernChestIndexes = furnitureGenerator.placeCavernChests(zoneRects)
+    const chestIndexes = new Set([...surfaceChestIndexes, ...underChestIndexes, ...cavernChestIndexes])
     await progress('Chests')
 
     // 8.3. Ajout des plantes et des coraux - TODO
@@ -393,6 +394,11 @@ class WorldGenerator {
     plantGenerator.placeMoss(mossPlants)
     plantGenerator.placeCaveMushrooms(mushroomPlants, currentWeather, giantOccupied)
     await progress('Mini-biome Plants')
+
+    plantGenerator.placeMandrakes(zoneRects, chestIndexes)
+    await progress('Underground Plants')
+
+    await progress('Caverns Plants')
 
     // 9. Traitements finaux
 
@@ -6511,6 +6517,7 @@ class FurnitureGenerator {
       const chestX = goLeft ? cx - 1 : cx
 
       const chest = this.addFurnitureAt(((y - 2) << 10) | chestX, 'oceanChest')
+
       this.fillChest(chest)
       placed++
     }
@@ -6519,6 +6526,7 @@ class FurnitureGenerator {
   /**
  * Place des coffres dans la layer Caverns pour chaque tranche de biome.
  * @param {Array<{x0, x1, yUnder, yCaverns, biome}>} zoneRects — tranches de biomes
+ * @returns {Set<number>} — index des tuiles occupées par les coffres
  */
   placeCavernChests (zoneRects) {
     const VOID = NODES.VOID.code
@@ -6530,6 +6538,7 @@ class FurnitureGenerator {
     CHEST_TYPE[BIOME_TYPE.JUNGLE] = 'jungleChest'
 
     const MAX_ATTEMPTS = 100
+    const chestIndexes = new Set()
 
     for (const rect of zoneRects) {
       const count = seededRNG.randomGetMinMax(1, 3)
@@ -6567,16 +6576,22 @@ class FurnitureGenerator {
         const goLeft = canLeft && (!canRight || seededRNG.randomGetBool())
         const chestX = goLeft ? cx - 1 : cx
 
-        const chest = this.addFurnitureAt(((y - 2) << 10) | chestX, chestType)
+        const chestIndex = ((y - 2) << 10) | chestX
+        chestIndexes.add(chestIndex)
+        chestIndexes.add(chestIndex + 1) // coffre occupe 2 tuiles de large
+        const chest = this.addFurnitureAt(chestIndex, chestType)
+
         this.fillChest(chest)
         placed++
       }
     }
+    return chestIndexes
   }
 
   /**
  * Place des coffres dans la layer Underground pour chaque tranche de biome.
  * @param {Array<{x0, x1, yUnder, yCaverns, biome}>} zoneRects — tranches de biomes
+ * @returns {Set<number>} — index des tuiles occupées par les coffres
  */
   placeUndergroundChests (zoneRects) {
     const VOID = NODES.VOID.code
@@ -6588,6 +6603,7 @@ class FurnitureGenerator {
     CHEST_TYPE[BIOME_TYPE.JUNGLE] = 'goldChest'
 
     const MAX_ATTEMPTS = 100
+    const chestIndexes = new Set()
 
     for (const rect of zoneRects) {
       const count = seededRNG.randomGetMinMax(1, 2)
@@ -6625,16 +6641,22 @@ class FurnitureGenerator {
         const goLeft = canLeft && (!canRight || seededRNG.randomGetBool())
         const chestX = goLeft ? cx - 1 : cx
 
-        const chest = this.addFurnitureAt(((y - 2) << 10) | chestX, chestType)
+        const chestIndex = ((y - 2) << 10) | chestX
+        chestIndexes.add(chestIndex)
+        chestIndexes.add(chestIndex + 1) // coffre occupe 2 tuiles de large
+        const chest = this.addFurnitureAt(chestIndex, chestType)
+
         this.fillChest(chest)
         placed++
       }
     }
+    return chestIndexes
   }
 
   /**
  * Place des coffres dans la layer Surface pour chaque tranche de biome.
  * @param {Array<{x0, x1, yUnder, yCaverns, biome}>} zoneRects — tranches de biomes
+ * @returns {Set<number>} — index des tuiles occupées par les coffres
  */
   placeSurfaceChests (zoneRects) {
     const VOID = NODES.VOID.code
@@ -6646,6 +6668,7 @@ class FurnitureGenerator {
     CHEST_TYPE[BIOME_TYPE.JUNGLE] = 'sandstoneChest'
 
     const MAX_ATTEMPTS = 100
+    const chestIndexes = new Set()
 
     for (const rect of zoneRects) {
       const count = 1 + seededRNG.randomGetPercent(20) ? 1 : 0
@@ -6682,11 +6705,16 @@ class FurnitureGenerator {
         const goLeft = canLeft && (!canRight || seededRNG.randomGetBool())
         const chestX = goLeft ? cx - 1 : cx
 
-        const chest = this.addFurnitureAt(((y - 2) << 10) | chestX, chestType)
+        const chestIndex = ((y - 2) << 10) | chestX
+        chestIndexes.add(chestIndex)
+        chestIndexes.add(chestIndex + 1) // coffre occupe 2 tuiles de large
+        const chest = this.addFurnitureAt(chestIndex, chestType)
+
         this.fillChest(chest)
         placed++
       }
     }
+    return chestIndexes
   }
 
   /**
@@ -7588,6 +7616,73 @@ class PlantGenerator {
         present,
         deleted: false
       })
+    }
+  }
+
+  /**
+   * Place les Mandrakes dans les layers surface et under du biome Forest.
+   * Substrat : DIRT avec VOID en y-1, y-2, y-3.
+   * Nombre constant défini par MANDRAKE_COUNT.
+   * Arrêt après MAX_CONSECUTIVE_FAILURES tirages infructueux consécutifs.
+   *
+   * @param {Array<{x0, x1, ySurface, yUnder, yCaverns, biome}>} zoneRects
+   * @param {Set<number>} chestIndexes — index interdits (coffres)
+   */
+  placeMandrakes (zoneRects, chestIndexes) {
+    const VOID = NODES.VOID.code
+    const DIRT = NODES.DIRT.code
+    const W = WORLD_WIDTH
+    const MAX_ATTEMPTS = 100
+
+    // Collecter les rectangles Forest surface + under
+    const rects = []
+    for (const rect of zoneRects) {
+      if (rect.biome !== BIOME_TYPE.FOREST) continue
+      rects.push({x0: rect.x0, x1: rect.x1, y0: rect.ySkySurface, y1: rect.yUnder})
+    }
+    if (rects.length === 0) return
+
+    let placed = 0
+    let consecutiveFailures = 0
+
+    while (placed < MANDRAKE_COUNT && consecutiveFailures < MAX_ATTEMPTS) {
+      const rect = seededRNG.randomGetArrayValue(rects)
+      const cx = seededRNG.randomGetMinMax(rect.x0 + 1, rect.x1 - 1)
+      const cy = seededRNG.randomGetMinMax(rect.y0 + 2, rect.y1 - 1)
+
+      if (worldBuffer.read(cx, cy) !== VOID) { consecutiveFailures++; continue }
+
+      // Descendre jusqu'à la première tuile non VOID dans le rectangle
+      let y = cy
+      while (y < rect.y1 && worldBuffer.read(cx, y) === VOID) y++
+
+      if (worldBuffer.read(cx, y) !== DIRT) { consecutiveFailures++; continue }
+
+      // Vérifier VOID en y-1, y-2, y-3
+      if (worldBuffer.read(cx, y - 1) !== VOID) { consecutiveFailures++; continue }
+      if (worldBuffer.read(cx, y - 2) !== VOID) { consecutiveFailures++; continue }
+      if (worldBuffer.read(cx, y - 3) !== VOID) { consecutiveFailures++; continue }
+
+      const soilIndex = (y << 10) | cx
+      if (chestIndexes.has(soilIndex)) { consecutiveFailures++; continue }
+
+      consecutiveFailures = 0
+
+      this.#plants.push({
+        id: uniqueIdGenerator.getUniqueId(),
+        kind: PLANT_KIND.HERB,
+        type: PLANT_TYPE.MANDRAKE,
+        index: soilIndex - 3 * W,
+        soilIndex,
+        itemId: 'mandrake',
+        w: 1,
+        h: 3,
+        x: cx,
+        y: y - 3,
+        present: true,
+        deleted: false
+      })
+      placed++
     }
   }
 }

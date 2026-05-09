@@ -2637,8 +2637,7 @@ All plants found in the world of Sixty-Below. Plants can be harvested for loot, 
 
 | [[item:frostcap]] | {{item:frostcap:star}} | Herb | Mushroom Cave / [[node:grassmushroom]] | [[item:mushroomGill]] | [[monster:woodlouse]] (Foraging) |
 | [[item:dawncap]] | {{item:dawncap:star}} | Herb | Mushroom Cave / [[node:grassmushroom]] | [[item:mushroomGill]] | [[monster:woodlouse]] (Foraging) |
-
-
+| [[item:mandrake]] | {{item:mandrake:star}} | Herb | FOREST Underground / [[node:dirt]] | [[item:mandrakeRoot]] | [[monster:wraith]] (Foraging) |
 
 _For detailed information on each plant, click its name._
 
@@ -3174,6 +3173,42 @@ Velvetmoss is a slow-growing, deep-purple moss found exclusively in [[Moss Cave|
   },
 
   // ── Plants - Underground Herbs ───────────────────────────────
+  //    Mandrake, Cactus, Bamboo, Oleander
+  {
+    title: 'Mandrake',
+    category: ['Plant', 'Forest'],
+    content: `
+**Description**
+The Mandrake is a root plant found in the tunnels and underground passages of [[Forest]] biomes. Its gnarled, humanoid root is unmistakable — and its scream when uprooted is said to drive the unwary mad. Whether that is true or merely a story told to scare apprentice foragers is a matter of debate.
+
+**Tier**
+{{item:mandrakeRoot:star}}
+
+**Location**
+* Biome: [[Forest]]
+* Layer: [[Surface]] tunnels and [[Underground]]
+* Grows on [[node:dirt]]
+
+**Population**
+* The species neither grows nor declines — natural balance maintains the population
+* Harvested Mandrakes do not regrow
+
+**Harvest**
+* [[Foraging|Interact to harvest]] — the plant disappears permanently on harvest
+* Tool: [[Harvesting Tools|Silver Sickle]] or better ⏳
+* Drops: [[item:mandrakeRoot]]
+
+**Dangers**
+* Uprooting a Mandrake releases a piercing scream that attracts a [[monster:wraith]] from the surrounding darkness. ⏳
+
+**Usages** ⏳
+* [[item:mandrakeRoot]] — crafting ingredient ⏳
+
+**Tips**
+* _Their humanoid silhouette makes them recognizable even in dim underground light._ ⏳
+  `
+  },
+
   // Oleander, Amber-Moss
   {
     title: 'Oleander',
