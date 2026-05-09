@@ -6,8 +6,6 @@
  * Post-traitements exécutés au premier import (top-level).
  */
 
-// import {NODE_TYPE} from '../../src/constant.mjs'
-
 /* ============================================================================
    1. ENUMS MÉTIER
    ============================================================================ */

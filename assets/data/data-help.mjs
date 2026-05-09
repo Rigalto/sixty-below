@@ -3185,3 +3185,67 @@ export const debugHelpCategories = () => {
   console.log('.............................;;;;')
 }
 debugHelpCategories()
+
+// /////////////
+// 4 HYDRATATION
+// /////////////
+
+export const hydrateHelp = (NODES, ITEMS) => {
+  let count = 0
+  let errors = 0
+
+  for (const entry of HELP) {
+    // 1. Vérification des liens [[...]]
+    entry.content = entry.content.replace(/\[\[([^\]|]+)(?:\|([^\]]*))?\]\]/g, (match, ref, text) => {
+      // Lien node:code
+      if (ref.startsWith('node:')) {
+        const code = ref.slice(5)
+        const node = NODES[code.toUpperCase()]
+        if (!node) {
+          console.error(`[help] '${entry.title}' : node inconnu '${code}'`)
+          errors++
+          return `⚠️ &lbrack;&lbrack;${ref}&rbrack;&rbrack;`
+        }
+        return match // valide — sera résolu plus tard
+      }
+
+      // Lien item:code
+      if (ref.startsWith('item:')) {
+        const code = ref.slice(5)
+        if (!ITEMS[code]) {
+          console.error(`[help] '${entry.title}' : item inconnu '${code}'`)
+          errors++
+          return `⚠️ &lbrack;&lbrack;${ref}&rbrack;&rbrack;`
+        }
+        return match // valide — sera résolu plus tard
+      }
+
+      // Lien item:code
+      if (ref.startsWith('monster:')) {
+        const code = ref.slice(8)
+        // if (!ITEMS[code]) {
+        console.warn(`[help] '${entry.title}' : monstre inconnu '${code}'`)
+        errors++
+        return `⚠️ &lbrack;&lbrack;${ref}&rbrack;&rbrack;`
+        // }
+        // return match // valide — sera résolu plus tard
+      }
+
+      // Lien helpTopic
+      if (!HELP_TITLES.has(ref)) {
+        console.error(`[help] '${entry.title}' : topic inconnu '${ref}'`)
+        errors++
+        return `⚠️ &lbrack;&lbrack;${ref}&rbrack;&rbrack;`
+      }
+      return match // valide — sera résolu plus tard
+    })
+    // TODO : résolution des données dynamiques {{...}}
+    // TODO : conversion Markdown → HTML
+    // TODO : entry.html = html généré
+    count++
+  }
+
+  console.log('HELP', HELP) // DEBUG
+
+  return {count, errors}
+}
