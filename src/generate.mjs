@@ -348,10 +348,13 @@ class WorldGenerator {
     furnitureGenerator.placeSeaChests(leftSeaRect)
     furnitureGenerator.placeSeaChests(rightSeaRect)
     furnitureGenerator.placeSurfaceLineChests(surfaceLine, guarded, biomesDescription)
-    const surfaceChestIndexes = furnitureGenerator.placeSurfaceChests(zoneRects)
-    const underChestIndexes = furnitureGenerator.placeUndergroundChests(zoneRects)
-    const cavernChestIndexes = furnitureGenerator.placeCavernChests(zoneRects)
-    const chestIndexes = new Set([...surfaceChestIndexes, ...underChestIndexes, ...cavernChestIndexes])
+
+    const {chestIndexes: si, chestRects: sr} = furnitureGenerator.placeSurfaceChests(zoneRects)
+    const {chestIndexes: ui, chestRects: ur} = furnitureGenerator.placeUndergroundChests(zoneRects)
+    const {chestIndexes: ci, chestRects: cr} = furnitureGenerator.placeCavernChests(zoneRects)
+
+    const chestIndexes = new Set([...si, ...ui, ...ci])
+    const chestRects = [...sr, ...ur, ...cr]
     await progress('Chests')
 
     // 8.3. Ajout des plantes et des coraux - TODO
@@ -396,6 +399,7 @@ class WorldGenerator {
     await progress('Mini-biome Plants')
 
     plantGenerator.placeMandrakes(zoneRects, chestIndexes)
+    // plantGenerator.placeCactus(zoneRects, chestRects)
     await progress('Underground Plants')
 
     await progress('Caverns Plants')
@@ -6526,7 +6530,7 @@ class FurnitureGenerator {
   /**
  * Place des coffres dans la layer Caverns pour chaque tranche de biome.
  * @param {Array<{x0, x1, yUnder, yCaverns, biome}>} zoneRects — tranches de biomes
- * @returns {Set<number>} — index des tuiles occupées par les coffres
+ * @returns {{chestIndexes: Set<number>, chestRects: Array<{x, y, w, h}>}} — tuiles et rectangles occupés par les coffres
  */
   placeCavernChests (zoneRects) {
     const VOID = NODES.VOID.code
@@ -6539,6 +6543,7 @@ class FurnitureGenerator {
 
     const MAX_ATTEMPTS = 100
     const chestIndexes = new Set()
+    const chestRects = []
 
     for (const rect of zoneRects) {
       const count = seededRNG.randomGetMinMax(1, 3)
@@ -6579,19 +6584,20 @@ class FurnitureGenerator {
         const chestIndex = ((y - 2) << 10) | chestX
         chestIndexes.add(chestIndex)
         chestIndexes.add(chestIndex + 1) // coffre occupe 2 tuiles de large
+        chestRects.push({x: chestX, y: y - 2, w: 2, h: 2})
         const chest = this.addFurnitureAt(chestIndex, chestType)
 
         this.fillChest(chest)
         placed++
       }
     }
-    return chestIndexes
+    return {chestIndexes, chestRects}
   }
 
   /**
  * Place des coffres dans la layer Underground pour chaque tranche de biome.
  * @param {Array<{x0, x1, yUnder, yCaverns, biome}>} zoneRects — tranches de biomes
- * @returns {Set<number>} — index des tuiles occupées par les coffres
+ * @returns {{chestIndexes: Set<number>, chestRects: Array<{x, y, w, h}>}} — tuiles et rectangles occupés par les coffres
  */
   placeUndergroundChests (zoneRects) {
     const VOID = NODES.VOID.code
@@ -6604,6 +6610,7 @@ class FurnitureGenerator {
 
     const MAX_ATTEMPTS = 100
     const chestIndexes = new Set()
+    const chestRects = []
 
     for (const rect of zoneRects) {
       const count = seededRNG.randomGetMinMax(1, 2)
@@ -6644,19 +6651,20 @@ class FurnitureGenerator {
         const chestIndex = ((y - 2) << 10) | chestX
         chestIndexes.add(chestIndex)
         chestIndexes.add(chestIndex + 1) // coffre occupe 2 tuiles de large
+        chestRects.push({x: chestX, y: y - 2, w: 2, h: 2})
         const chest = this.addFurnitureAt(chestIndex, chestType)
 
         this.fillChest(chest)
         placed++
       }
     }
-    return chestIndexes
+    return {chestIndexes, chestRects}
   }
 
   /**
  * Place des coffres dans la layer Surface pour chaque tranche de biome.
  * @param {Array<{x0, x1, yUnder, yCaverns, biome}>} zoneRects — tranches de biomes
- * @returns {Set<number>} — index des tuiles occupées par les coffres
+ * @returns {{chestIndexes: Set<number>, chestRects: Array<{x, y, w, h}>}} — tuiles et rectangles occupés par les coffres
  */
   placeSurfaceChests (zoneRects) {
     const VOID = NODES.VOID.code
@@ -6669,6 +6677,7 @@ class FurnitureGenerator {
 
     const MAX_ATTEMPTS = 100
     const chestIndexes = new Set()
+    const chestRects = []
 
     for (const rect of zoneRects) {
       const count = 1 + seededRNG.randomGetPercent(20) ? 1 : 0
@@ -6708,13 +6717,14 @@ class FurnitureGenerator {
         const chestIndex = ((y - 2) << 10) | chestX
         chestIndexes.add(chestIndex)
         chestIndexes.add(chestIndex + 1) // coffre occupe 2 tuiles de large
+        chestRects.push({x: chestX, y: y - 2, w: 2, h: 2})
         const chest = this.addFurnitureAt(chestIndex, chestType)
 
         this.fillChest(chest)
         placed++
       }
     }
-    return chestIndexes
+    return {chestIndexes, chestRects}
   }
 
   /**
