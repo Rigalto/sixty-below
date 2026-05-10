@@ -606,6 +606,11 @@ commune de la zone N+1 : la progression est continue, sans palier artificiel.
 | **Millipede** | 4 | ★★★☆☆ | Harvesting Velvetmoss |
 | **Centipede** | 3 | ★★★☆☆ | Harvesting Bamboo |
 | **Cave Beetle** | 3 | ★★★☆☆ | Harvesting Oleander |
+| **Firesalamander** | 4 | ★★★★☆ | Harvesting Santan's Cube |
+| **Vampire** | 4 | ★★★★☆ | Harvesting Sneakthorn  |
+| **Fire Ant** | 4 | ★★★★☆ | Harvesting Cursedcrown  |
+| **Lava Worm** | 5 | ★★★★★ | Harvesting HHH  |
+| **Magma Crab** | 5 | ★★★★★ | Harvesting HHH  |
 
 _Adder = Vipère Péliade_
 

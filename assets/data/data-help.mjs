@@ -2663,10 +2663,10 @@ All plants found in the world of Sixty-Below. Plants can be harvested for loot, 
 | [[item:oleander]] | {{item:oleander:star}} | Herb | Underground / [[node:stone]] | [[item:oleander]] | [[monster:caveBeetle]] (Foraging) |
 
 | [[item:satansCube]] | {{item:satansCube:star}} | Herb | FOREST+DESERT Caverns | [[item:satansCube]] | [[monster:firesalamander]] (Foraging) |
-| [[item:sneakthorn]] | {{item:sneakthorn:star}} | Herb | FOREST+JUNGLE Caverns | [[item:sneakthorn]] | [[monster:bat]] (Foraging) |
-| [[item:cursedcrown ]] | {{item:cursedcrown :star}} | Herb | JUNGLE+DESERT Caverns | [[item:cursedcrown ]] | [[monster:fireAnt]] (Foraging) |
+| [[item:sneakthorn]] | {{item:sneakthorn:star}} | Herb | FOREST+JUNGLE Caverns | [[item:sneakthorn]] | [[monster:vampire]] (Foraging) |
+| [[item:cursedcrown]] | {{item:cursedcrown:star}} | Herb | JUNGLE+DESERT Caverns | [[item:cursedcrown]] | [[monster:fireAnt]] (Foraging) |
 
-| [[item:H ]] | {{item:H :star}} | Herb | Caverns bottom | [[item:H ]] | [[monster:magmaCrab]] + [[monster:lavaWorm]]  (Foraging) |
+| [[item:H]] | {{item:H:star}} | Herb | Caverns bottom | [[item:H]] | [[monster:magmaCrab]] + [[monster:lavaWorm]]  (Foraging) |
 
 _For detailed information on each plant, click its name._
 
@@ -3349,7 +3349,44 @@ Oleander is a common shrub found in the underground passages of all three biomes
   },
 
   // ── Plants - Caverns Herbs ───────────────────────────────────
-  //    Amber-Moss
+  //    Satan's Cube, Amber-Moss
+  {
+    title: 'Satan\'s Cube',
+    category: ['Plant', 'Forest', 'Desert', 'Caverns'],
+    content: `
+**Description**
+Satan's Cube is one of the strangest organisms found in the deep [[Caverns]]. Its perfectly geometric shape — stacked cubes offset in alternating directions — has led many explorers to mistake it for a mineral formation. Its vivid yellow and electric orange colouring is nature's warning: do not touch.
+
+**Tier**
+{{item:satansCube:star}}
+
+**Location**
+* Biome: [[Forest]], [[Desert]]
+* Layer: [[Caverns]]
+* Grows on any [[Mineable Blocks|Topsoil]] or [[Mineable Blocks|Substrat]] surface with 3 tiles of clearance above
+
+**Population**
+* The species neither grows nor declines — natural balance maintains the population
+* Harvested plants do not regrow
+
+**Harvest**
+* [[Foraging|Interact to harvest]] — the plant disappears permanently on harvest
+* Tool: [[Harvesting Tools|Gold Sickle]] ⏳
+* Drops: [[item:satansCube]] ⏳
+
+**Dangers**
+* Harvesting disturbs a [[monster:firesalamander]] lurking in the nearby rock — its burning claws inflict both [[Fire DOT]] and [[Bleeding DOT]] simultaneously. ⏳
+
+**Usages** ⏳
+* [[item:satansCube]] — ingredient for anti-burn preparations ⏳
+
+**Tips**
+* _Its geometric shape looks like a mineral formation — easy to walk past without noticing._ ⏳
+* _The Firesalamander strikes fast — clear the area before harvesting._ ⏳
+* _Consuming preparations made from Satan's Cube provides resistance to [[Fire DOT]]._ ⏳
+  `
+  },
+
   {
     title: 'Amber-Moss',
     category: ['Plant', 'Forest'],

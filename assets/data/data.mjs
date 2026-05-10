@@ -392,6 +392,11 @@ export const ITEMS = {
   bambooStalk: {name: 'Bamboo Stalk', type: ITEM_TYPE.MATERIAL, stype: 'herb', star: 2, image: 'fuws_32_32-2-3', help: 'Bamboo', tooltip: '???'},
   bambooShoot: {name: 'Bamboo Shoot', type: ITEM_TYPE.MATERIAL, stype: 'herb', star: 2, image: 'fuws_32_32-2-3', help: 'Bamboo', tooltip: '???'},
 
+  satansCube: {name: 'Satan\'s Cube', type: ITEM_TYPE.MATERIAL, stype: 'herb', star: 4, image: 'fuws_32_32-2-3', placed: 'fuws_32_32-2-3', foraging: [{item: 'satansCube', count: 1, rainy: 1.8, windy: 1.8}], help: 'Satan\'s Cube', tooltip: 'Harvest to collect Potions and Food ingredients'},
+  sneakthorn: {name: 'Sneakthorn', type: ITEM_TYPE.MATERIAL, stype: 'herb', star: 4, image: 'fuws_32_32-2-3', placed: 'fuws_32_32-2-3', foraging: [{item: 'sneakthorn', count: 1, rainy: 1.8, windy: 1.8}], help: 'Satan\'s Cube', tooltip: 'Harvest to collect Potions and Food ingredients'},
+  cursedcrown: {name: 'Cursedcrown ', type: ITEM_TYPE.MATERIAL, stype: 'herb', star: 4, image: 'fuws_32_32-2-3', placed: 'fuws_32_32-2-3', foraging: [{item: 'cursedcrown', count: 1, rainy: 1.8, windy: 1.8}], help: 'Satan\'s Cube', tooltip: 'Harvest to collect Potions and Food ingredients'},
+  H: {name: 'HHH', type: ITEM_TYPE.MATERIAL, stype: 'herb', star: 4, image: 'fuws_32_32-2-3', placed: 'fuws_32_32-2-3', foraging: [{item: 'H', count: 1, rainy: 1.8, windy: 1.8}], help: 'Satan\'s Cube', tooltip: 'Harvest to collect Potions and Food ingredients'},
+
   // Gardening
   clayPot1: {name: 'Clay Pot (1x1)', type: ITEM_TYPE.FURNITURE | ITEM_TYPE.PLACABLE | ITEM_TYPE.CRAFTABLE, stype: 'pot', star: 1, capacity: 1, image: 'furniture_32_32-0-8', surface: true, placed: 'fuws_16_16-0-2', placedleft: 'fuws_16_16-1-2', placedright: 'fuws_16_16-2-2', help: 'Clay Pots', tooltip: 'Gardening Container'},
   clayPot2: {name: 'Clay Pot (2x1)', type: ITEM_TYPE.FURNITURE | ITEM_TYPE.PLACABLE | ITEM_TYPE.CRAFTABLE, stype: 'pot', star: 1, capacity: 2, image: 'furniture_32_32-1-8', surface: true, placed: 'fuws_32_16-0-0', placedleft: 'fuws_32_16-1-0', placedright: 'fuws_32_16-2-0', help: 'Clay Pots', tooltip: 'Gardening Container'},
