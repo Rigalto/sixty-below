@@ -399,7 +399,7 @@ class WorldGenerator {
     await progress('Mini-biome Plants')
 
     plantGenerator.placeMandrakes(zoneRects, chestIndexes)
-    // plantGenerator.placeCactus(zoneRects, chestRects)
+    plantGenerator.placeCactus(zoneRects, chestRects)
     await progress('Underground Plants')
 
     await progress('Caverns Plants')
@@ -7688,6 +7688,105 @@ class PlantGenerator {
         w: 1,
         h: 3,
         x: cx,
+        y: y - 3,
+        present: true,
+        deleted: false
+      })
+      placed++
+    }
+  }
+
+  /**
+   * Place les Cactus dans les layers surface et under du biome Desert.
+   * Substrat : SAND avec VOID en y-1, y-2, y-3.
+   * Nombre constant défini par CACTUS_COUNT.
+   * Arrêt après MAX_CONSECUTIVE_FAILURES tirages infructueux consécutifs.
+   * Anti-densité : rectangle d'exclusion 5×7 centré sur soilIndex.
+   * Anti-coffre : test AABB avec chestRects.
+   *
+   * @param {Array<{x0, x1, ySkySurface, ySurface, yUnder, yCaverns, biome}>} zoneRects
+   * @param {Array<{x, y, w, h}>} chestRects — rectangles coffres pour test AABB
+   */
+  placeCactus (zoneRects, chestRects) {
+    const VOID = NODES.VOID.code
+    const SAND = NODES.SAND.code
+    const W = WORLD_WIDTH
+    const MAX_ATTEMPTS = 100
+    const cactusIds = ['cactus1', 'cactus2', 'cactus3', 'cactus4']
+
+    const overlaps = (ax, ay, aw, ah, b) =>
+      ax < b.x + b.w && ax + aw > b.x &&
+      ay < b.y + b.h && ay + ah > b.y
+
+    // Collecter les rectangles Desert surface + under
+    const rects = []
+    for (const rect of zoneRects) {
+      if (rect.biome !== BIOME_TYPE.DESERT) continue
+      rects.push({x0: rect.x0, x1: rect.x1, y0: rect.ySkySurface, y1: rect.yUnder})
+    }
+    if (rects.length === 0) return
+
+    const guardedCactus = new Set()
+    let placed = 0
+    let consecutiveFailures = 0
+
+    while (placed < CACTUS_COUNT && consecutiveFailures < MAX_ATTEMPTS) {
+      const rect = seededRNG.randomGetArrayValue(rects)
+      const cx = seededRNG.randomGetMinMax(rect.x0 + 2, rect.x1 - 2)
+      const cy = seededRNG.randomGetMinMax(rect.y0 + 1, rect.y1 - 1)
+
+      if (worldBuffer.read(cx, cy) !== VOID) { consecutiveFailures++; continue }
+
+      // Descendre jusqu'à la première tuile non VOID dans le rectangle
+      let y = cy
+      while (y < rect.y1 && worldBuffer.read(cx, y) === VOID) y++
+
+      if (worldBuffer.read(cx, y) !== SAND) { consecutiveFailures++; continue }
+
+      // Vérifier VOID en y-1, y-2, y-3
+      if (worldBuffer.read(cx, y - 1) !== VOID) { consecutiveFailures++; continue }
+      if (worldBuffer.read(cx, y - 2) !== VOID) { consecutiveFailures++; continue }
+      if (worldBuffer.read(cx, y - 3) !== VOID) { consecutiveFailures++; continue }
+
+      // Vérifier VOID sur les tuiles latérales (colonnes cx-1 et cx+1, y-1 à y-3)
+      if (worldBuffer.read(cx - 1, y - 1) !== VOID) { consecutiveFailures++; continue }
+      if (worldBuffer.read(cx + 1, y - 1) !== VOID) { consecutiveFailures++; continue }
+      if (worldBuffer.read(cx - 1, y - 2) !== VOID) { consecutiveFailures++; continue }
+      if (worldBuffer.read(cx + 1, y - 2) !== VOID) { consecutiveFailures++; continue }
+      if (worldBuffer.read(cx - 1, y - 3) !== VOID) { consecutiveFailures++; continue }
+      if (worldBuffer.read(cx + 1, y - 3) !== VOID) { consecutiveFailures++; continue }
+
+      const soilIndex = (y << 10) | cx
+
+      // Anti-densité
+      if (guardedCactus.has(soilIndex)) { consecutiveFailures++; continue }
+
+      // Anti-coffre AABB : cactus occupe {x: cx-1, y: y-3, w: 3, h: 4}
+      let blocked = false
+      for (const rect of chestRects) {
+        if (overlaps(cx - 1, y - 3, 3, 4, rect)) { blocked = true; break }
+      }
+      if (blocked) { consecutiveFailures++; continue }
+
+      consecutiveFailures = 0
+
+      // Remplir le Set d'exclusion 5×7 centré sur soilIndex
+      for (let dx = -2; dx <= 2; dx++) {
+        for (let dy = -3; dy <= 3; dy++) {
+          guardedCactus.add(((y + dy) << 10) | (cx + dx))
+        }
+      }
+
+      this.#plants.push({
+        id: uniqueIdGenerator.getUniqueId(),
+        kind: PLANT_KIND.HERB,
+        type: PLANT_TYPE.CACTUS,
+        index: soilIndex - 3 * W,
+        soilIndex,
+        itemId: seededRNG.randomGetArrayValue(cactusIds),
+        w: 3,
+        h: 4,
+        x: cx - 1,
         y: y - 3,
         present: true,
         deleted: false

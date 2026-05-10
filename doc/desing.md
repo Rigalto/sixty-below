@@ -532,7 +532,7 @@ commune de la zone N+1 : la progression est continue, sans palier artificiel.
 | Nom | Tier | Strength | Biome / Mini-biome / Layer |
 |---|---|---|---|
 | **BEETLE** | 1 | ★☆☆☆☆ | Forest — surface |
-| **Scorpion** | 1 | ★★☆☆☆ | Desert — surface / Harvesting Ambermirage |
+| **Scorpion** | 1 | ★★☆☆☆ | Desert — surface & underground / Harvesting Ambermirage,or Cactus |
 | **SAND SNAKE** | 1 | ★★☆☆☆ | Desert — surface |
 | **JUNGLE SPIDER** | 1 | ★★☆☆☆ | Jungle — surface |
 | **BAT** | 2 | ★★☆☆☆ | Tous biomes — under |

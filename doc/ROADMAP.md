@@ -22,7 +22,6 @@
 
 ### Ajout des artefacts et plantes
 - Ajout de herbes : Blinkroot, Fireblossom, Oleander, Skorn
-- Ajout plante Cactus : biome Desert / zone surface (tunnels/caverns) et zone underground
 - Ajout plante bambou : biome Jungle / zone surface (tunnels/caverns) et zone underground
 - Ajout plante Oleander : tous biomes / zone surface (tunnels/caverns) et zone underground
 - Ajout plante E : biome Forest et Desert / zone caverns
@@ -232,6 +231,7 @@ fs.writeFileSync('docs/help-rendered.html', htmlHelp.join('\n'))
 - `plantGenerator.placeMoss` - ajout de la mousse sur les tuiles de GRASSMOSS
 - `plantGenerator.placeCaveMushrooms` - ajout des champignons sur les tuiles de GRASSMUSHROOM
 - `plantGenerator.placeMandrakes` - ajout des Mandrakes en FOREST / Underground
+- `plantGenerator.placeCactus` - ajout des Cactus en DESERT / Underground
 
 ### Rendu (partiel)
 - `WorldRenderer` — rendu tuiles par chunks avec cache OffscreenCanvas

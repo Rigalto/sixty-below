@@ -2638,6 +2638,7 @@ All plants found in the world of Sixty-Below. Plants can be harvested for loot, 
 | [[item:frostcap]] | {{item:frostcap:star}} | Herb | Mushroom Cave / [[node:grassmushroom]] | [[item:mushroomGill]] | [[monster:woodlouse]] (Foraging) |
 | [[item:dawncap]] | {{item:dawncap:star}} | Herb | Mushroom Cave / [[node:grassmushroom]] | [[item:mushroomGill]] | [[monster:woodlouse]] (Foraging) |
 | [[item:mandrake]] | {{item:mandrake:star}} | Herb | FOREST Underground / [[node:dirt]] | [[item:mandrakeRoot]] | [[monster:wraith]] (Foraging) |
+| [[item:cactus]] | {{item:cactus:star}} | Herb | DESERT Underground / [[node:sand]] | [[item:cactus]] | [[monster:scorpion]] (Foraging) |
 
 _For detailed information on each plant, click its name._
 
@@ -3206,6 +3207,44 @@ The Mandrake is a root plant found in the tunnels and underground passages of [[
 
 **Tips**
 * _Their humanoid silhouette makes them recognizable even in dim underground light._ ⏳
+  `
+  },
+  {
+    title: 'Cactus',
+    category: ['Plant', 'Desert'],
+    content: `
+**Description**
+The underground Cactus is a hardy desert plant that has adapted to the complete absence of sunlight. Its thick, ribbed trunk and characteristic branching arms are unmistakable — even in the dark tunnels of [[Desert]] biomes.
+
+**Tier**
+{{item:cactus:star}}
+
+**Location**
+* Biome: [[Desert]]
+* Layer: [[Surface]] tunnels and [[Underground]]
+* Grows on [[node:sand]]
+
+**Population**
+* The species neither grows nor declines — natural balance maintains the population
+* Harvested Cactus do not regrow
+
+**Harvest**
+* [[Foraging|Interact to harvest]] — the plant disappears permanently on harvest
+* Tool: [[Harvesting Tools|Silver Sickle]] or better ⏳
+* Drops: [[item:cactus]], [[item:cactusFiber]], [[item:cactusSpine]]
+
+**Dangers**
+* Harvesting a Cactus triggers the spines — each harvest inflicts [[buff:bleeding|Bleeding]] regardless of equipment. ⏳
+* The disturbance may attract a [[monster:scorpion]] lurking in the surrounding tunnels. ⏳
+
+**Usages** ⏳
+* [[item:cactus]] — food and crafting ingredient ⏳
+* [[item:cactusFiber]] — crafting ingredient ⏳
+* [[item:cactusSpine]] — crafting ingredient ⏳
+
+**Tips**
+* _Cactus plants are well-spaced — finding one rarely means finding another nearby._ ⏳
+* _Their silhouette is recognizable even without a [[Torch]] — use that to navigate._ ⏳
   `
   },
 

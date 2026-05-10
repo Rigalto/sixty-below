@@ -380,6 +380,14 @@ export const ITEMS = {
   mandrake: {name: 'Mandrake', type: 0, stype: 'herb', star: 2, image: null, placed: 'fuws_32_32-2-3', speed: 1900, foraging: [{item: 'mandrakeRoot', count: 1, rainy: 1.8, windy: 1.8}], help: 'Mandrake', tooltip: 'Harvest to collect Potions and Food ingredients'},
   mandrakeRoot: {name: 'Mandrake Root', type: ITEM_TYPE.MATERIAL, stype: 'herb', star: 3, image: 'crafting_32_32-0-1', help: 'Mandrake', tooltip: 'Crafting Material for Potions and Food'},
 
+  cactus1: {name: 'Cactus', type: 0, stype: 'herb', star: 2, image: null, placed: 'fuws_32_32-2-3', help: 'Cactus'},
+  cactus2: {name: 'Cactus', type: 0, stype: 'herb', star: 2, image: null, placed: 'fuws_32_32-2-3', help: 'Cactus'},
+  cactus3: {name: 'Cactus', type: 0, stype: 'herb', star: 2, image: null, placed: 'fuws_32_32-2-3', help: 'Cactus'},
+  cactus4: {name: 'Cactus', type: 0, stype: 'herb', star: 2, image: null, placed: 'fuws_32_32-2-3', help: 'Cactus'},
+  cactus: {name: 'Cactus', type: ITEM_TYPE.MATERIAL, stype: 'herb', star: 2, image: 'fuws_32_32-2-3', help: 'Cactus'},
+  cactusFiber: {name: 'Cactus Fiber', type: ITEM_TYPE.MATERIAL, stype: 'herb', star: 2, image: 'fuws_32_32-2-3', help: 'Cactus'},
+  cactusSpine: {name: 'Cactus Spine', type: ITEM_TYPE.MATERIAL, stype: 'herb', star: 2, image: 'fuws_32_32-2-3', help: 'Cactus'},
+
   // Gardening
   clayPot1: {name: 'Clay Pot (1x1)', type: ITEM_TYPE.FURNITURE | ITEM_TYPE.PLACABLE | ITEM_TYPE.CRAFTABLE, stype: 'pot', star: 1, capacity: 1, image: 'furniture_32_32-0-8', surface: true, placed: 'fuws_16_16-0-2', placedleft: 'fuws_16_16-1-2', placedright: 'fuws_16_16-2-2', help: 'Clay Pots', tooltip: 'Gardening Container'},
   clayPot2: {name: 'Clay Pot (2x1)', type: ITEM_TYPE.FURNITURE | ITEM_TYPE.PLACABLE | ITEM_TYPE.CRAFTABLE, stype: 'pot', star: 1, capacity: 2, image: 'furniture_32_32-1-8', surface: true, placed: 'fuws_32_16-0-0', placedleft: 'fuws_32_16-1-0', placedright: 'fuws_32_16-2-0', help: 'Clay Pots', tooltip: 'Gardening Container'},
