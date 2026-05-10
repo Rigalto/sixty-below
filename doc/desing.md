@@ -604,6 +604,7 @@ commune de la zone N+1 : la progression est continue, sans palier artificiel.
 | **Vole** | 2 | ★★☆☆☆ | Harvesting Parsnip |
 | **Hedgehog** | 2 | ★★☆☆☆ | Harvesting Sunflower |
 | **Millipede** | 4 | ★★★☆☆ | Harvesting Velvetmoss |
+| **Centipede** | 3 | ★★★☆☆ | Harvesting Bamboo |
 
 _Adder = Vipère Péliade_
 

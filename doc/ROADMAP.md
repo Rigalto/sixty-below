@@ -13,6 +13,8 @@
 ## À faire — Bugs connus
 - Dans le panel qui génère un nouveau monde, il faut pouvoir rendre le champ input vide (il est rempli par '1' lorsque l'on tente de le vider, rendant très difficile l'entrée d'une graine ne commençant pas par 1)
 - Ajouter dans le panel de droite la clé courante de génération du monde
+- Il n'y a pas assez de Cactus dans le monde => sans doute pas assez de SAND sur le sol souterrain.
+- Il n'y a pas assez de Bamboo dans le monde => sans doute pas assez de SILT sur le sol souterrain.
 
 ## À faire — Génération du monde (`generate.mjs`)
 
@@ -230,8 +232,9 @@ fs.writeFileSync('docs/help-rendered.html', htmlHelp.join('\n'))
 - `plantGenerator.placeFerns` - ajout des Ferns sur les tuiles de GRASSFERN
 - `plantGenerator.placeMoss` - ajout de la mousse sur les tuiles de GRASSMOSS
 - `plantGenerator.placeCaveMushrooms` - ajout des champignons sur les tuiles de GRASSMUSHROOM
-- `plantGenerator.placeMandrakes` - ajout des Mandrakes en FOREST / Underground
-- `plantGenerator.placeCactus` - ajout des Cactus en DESERT / Underground
+- `plantGenerator.placeMandrakes` - ajout des Mandrakes en FOREST / Underground / DIRT
+- `plantGenerator.placeCactus` - ajout des Cactus en DESERT / Underground / SAND
+- `plantGenerator.placeBamboo` - ajout des Cactus en DESERT / Underground / SILT
 
 ### Rendu (partiel)
 - `WorldRenderer` — rendu tuiles par chunks avec cache OffscreenCanvas

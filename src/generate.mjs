@@ -400,6 +400,7 @@ class WorldGenerator {
 
     plantGenerator.placeMandrakes(zoneRects, chestIndexes)
     plantGenerator.placeCactus(zoneRects, chestRects)
+    plantGenerator.placeBamboo(zoneRects, chestIndexes)
     await progress('Underground Plants')
 
     await progress('Caverns Plants')
@@ -7787,6 +7788,71 @@ class PlantGenerator {
         w: 3,
         h: 4,
         x: cx - 1,
+        y: y - 3,
+        present: true,
+        deleted: false
+      })
+      placed++
+    }
+  }
+
+  /**
+   * Place les Bambous dans les layers surface et under du biome Jungle.
+   * Substrat : SILT avec VOID en y-1, y-2, y-3.
+   * Nombre constant défini par BAMBOO_COUNT.
+   * Arrêt après MAX_CONSECUTIVE_FAILURES tirages infructueux consécutifs.
+   * Anti-coffre : test sur chestIndexes.
+   *
+   * @param {Array<{x0, x1, ySkySurface, ySurface, yUnder, yCaverns, biome}>} zoneRects
+   * @param {Set<number>} chestIndexes — index interdits (coffres)
+   */
+  placeBamboo (zoneRects, chestIndexes) {
+    const VOID = NODES.VOID.code
+    const SILT = NODES.SILT.code
+    const W = WORLD_WIDTH
+    const MAX_ATTEMPTS = 100
+
+    const rects = []
+    for (const rect of zoneRects) {
+      if (rect.biome !== BIOME_TYPE.JUNGLE) continue
+      rects.push({x0: rect.x0, x1: rect.x1, y0: rect.ySkySurface, y1: rect.yUnder})
+    }
+    if (rects.length === 0) return
+
+    let placed = 0
+    let consecutiveFailures = 0
+
+    while (placed < BAMBOO_COUNT && consecutiveFailures < MAX_ATTEMPTS) {
+      const rect = seededRNG.randomGetArrayValue(rects)
+      const cx = seededRNG.randomGetMinMax(rect.x0 + 1, rect.x1 - 1)
+      const cy = seededRNG.randomGetMinMax(rect.y0 + 1, rect.y1 - 1)
+
+      if (worldBuffer.read(cx, cy) !== VOID) { consecutiveFailures++; continue }
+
+      let y = cy
+      while (y < rect.y1 && worldBuffer.read(cx, y) === VOID) y++
+
+      if (worldBuffer.read(cx, y) !== SILT) { consecutiveFailures++; continue }
+
+      if (worldBuffer.read(cx, y - 1) !== VOID) { consecutiveFailures++; continue }
+      if (worldBuffer.read(cx, y - 2) !== VOID) { consecutiveFailures++; continue }
+      if (worldBuffer.read(cx, y - 3) !== VOID) { consecutiveFailures++; continue }
+
+      const soilIndex = (y << 10) | cx
+      if (chestIndexes.has(soilIndex)) { consecutiveFailures++; continue }
+
+      consecutiveFailures = 0
+
+      this.#plants.push({
+        id: uniqueIdGenerator.getUniqueId(),
+        kind: PLANT_KIND.HERB,
+        type: PLANT_TYPE.BAMBOO,
+        index: soilIndex - 3 * W,
+        soilIndex,
+        itemId: 'bamboo',
+        w: 1,
+        h: 3,
+        x: cx,
         y: y - 3,
         present: true,
         deleted: false

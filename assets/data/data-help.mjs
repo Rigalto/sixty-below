@@ -2637,6 +2637,7 @@ All plants found in the world of Sixty-Below. Plants can be harvested for loot, 
 | [[item:dawncap]] | {{item:dawncap:star}} | Herb | Mushroom Cave / [[node:grassmushroom]] | [[item:mushroomGill]] | [[monster:woodlouse]] (Foraging) |
 | [[item:mandrake]] | {{item:mandrake:star}} | Herb | FOREST Underground / [[node:dirt]] | [[item:mandrakeRoot]] | [[monster:wraith]] (Foraging) |
 | [[item:cactus]] | {{item:cactus:star}} | Herb | DESERT Underground / [[node:sand]] | [[item:cactus]] | [[monster:scorpion]] (Foraging) |
+| [[item:bamboo]] | {{item:bamboo:star}} | Herb | JUNGLE Underground / [[node:silt]] | [[item:bambooStalk]] | [[monster:???]] (Foraging) |
 
 _For detailed information on each plant, click its name._
 
@@ -3243,6 +3244,42 @@ The underground Cactus is a hardy desert plant that has adapted to the complete 
 **Tips**
 * _Cactus plants are well-spaced — finding one rarely means finding another nearby._ ⏳
 * _Their silhouette is recognizable even without a [[Torches|Torch]] — use that to navigate._ ⏳
+  `
+  },
+  {
+    title: 'Bamboo',
+    category: ['Plant', 'Jungle'],
+    content: `
+**Description**
+Underground Bamboo thrives in the humid tunnels and passages of [[Jungle]] biomes. Growing in dense clusters wherever it takes root, it spreads aggressively across any available [[node:silt]] surface. Its hollow stems and tender shoots make it a versatile resource for both food and crafting.
+
+**Tier**
+{{item:bamboo:star}}
+
+**Location**
+* Biome: [[Jungle]]
+* Layer: [[Surface]] tunnels and [[Underground]]
+* Grows on [[node:silt]]
+
+**Population**
+* The species neither grows nor declines — natural balance maintains the population
+* Harvested Bamboo does not regrow
+
+**Harvest**
+* [[Foraging|Interact to harvest]] — the plant disappears permanently on harvest
+* Tool: [[Harvesting Tools|Silver Sickle]] or better ⏳
+* Drops: [[item:bambooShoot]], [[item:bambooStalk]]
+
+**Dangers**
+* Harvesting Bamboo may disturb a [[monster:centipede]] coiled around the stems — it strikes without warning and inflicts [[Poison DOT]]. ⏳
+
+**Usages** ⏳
+* [[item:bambooShoot]] — food ingredient ⏳
+* [[item:bambooStalk]] — construction and crafting ingredient ⏳
+
+**Tips**
+* _Bamboo grows in dense clusters — finding one stem usually means finding several nearby._ ⏳
+* _Bamboo Shoots are edible raw — a reliable food source during early underground exploration._ ⏳
   `
   },
   {

@@ -388,6 +388,10 @@ export const ITEMS = {
   cactusFiber: {name: 'Cactus Fiber', type: ITEM_TYPE.MATERIAL, stype: 'herb', star: 2, image: 'fuws_32_32-2-3', help: 'Cactus', tooltip: '???'},
   cactusSpine: {name: 'Cactus Spine', type: ITEM_TYPE.MATERIAL, stype: 'herb', star: 2, image: 'fuws_32_32-2-3', help: 'Cactus', tooltip: '???'},
 
+  bamboo: {name: 'Bamboo', type: 0, stype: 'herb', star: 2, image: null, placed: 'fuws_32_32-2-3', help: 'Bamboo', tooltip: '???'},
+  bambooStalk: {name: 'Bamboo Stalk', type: ITEM_TYPE.MATERIAL, stype: 'herb', star: 2, image: 'fuws_32_32-2-3', help: 'Bamboo', tooltip: '???'},
+  bambooShoot: {name: 'Bamboo Shoot', type: ITEM_TYPE.MATERIAL, stype: 'herb', star: 2, image: 'fuws_32_32-2-3', help: 'Bamboo', tooltip: '???'},
+
   // Gardening
   clayPot1: {name: 'Clay Pot (1x1)', type: ITEM_TYPE.FURNITURE | ITEM_TYPE.PLACABLE | ITEM_TYPE.CRAFTABLE, stype: 'pot', star: 1, capacity: 1, image: 'furniture_32_32-0-8', surface: true, placed: 'fuws_16_16-0-2', placedleft: 'fuws_16_16-1-2', placedright: 'fuws_16_16-2-2', help: 'Clay Pots', tooltip: 'Gardening Container'},
   clayPot2: {name: 'Clay Pot (2x1)', type: ITEM_TYPE.FURNITURE | ITEM_TYPE.PLACABLE | ITEM_TYPE.CRAFTABLE, stype: 'pot', star: 1, capacity: 2, image: 'furniture_32_32-1-8', surface: true, placed: 'fuws_32_16-0-0', placedleft: 'fuws_32_16-1-0', placedright: 'fuws_32_16-2-0', help: 'Clay Pots', tooltip: 'Gardening Container'},
