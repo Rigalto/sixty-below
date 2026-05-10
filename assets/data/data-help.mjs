@@ -2587,7 +2587,29 @@ Filled directly from a liquid source in the world. Used as tools to transport an
   // ── Mechanics ────────────────────────────────────────────────
 
   // ── Food ─────────────────────────────────────────────────────
-  //    Soups
+  //    Food, Soups
+  {
+    title: 'Food',
+    category: ['Gameplay'],
+    content: `
+**Description**
+Food restores health and provides temporary buffs. More elaborate preparations require better ingredients and equipment, but confer stronger and longer-lasting effects.
+
+**Food Tiers**
+
+| Tier | Description | Example |
+|---|---|---|
+| ★☆☆☆☆ | Raw food — no cooking required | Fruits, seeds, mushrooms |
+| ★★☆☆☆ | Cooked food — requires [[item:sunflowerOil\|Sunflower Oil]] — does not withstand high temperatures | Basic cooked meals |
+| ★★★☆☆ | Refined cooking — requires [[item:oleanderOil\|Oleander Oil]] — stable at high temperatures | High-temperature dishes |
+| ★★★★☆ | Elaborate preparations — noble ingredients conferring resistance to [[Bleeding DOT]], [[Poison DOT]], and [[Fire DOT]] ⏳ | ⏳ |
+| ★★★★★ | Pheromone mastery — allows control of specific monster species ⏳ | ⏳ |
+
+**Cooking Stations** ⏳
+
+**Tips** ⏳
+  `
+  },
   {
     title: 'Soups',
     category: ['Food'],
