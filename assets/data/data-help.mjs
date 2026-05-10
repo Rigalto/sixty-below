@@ -2049,33 +2049,9 @@ Every source of damage in Sixty-Below deals a specific type. Understanding damag
 
 | Type | Biome | Sources | Notes |
 |---|---|---|---|
-| Bleeding | [[Forest]] | [[Forest]] fauna | Deals damage over time |
-| Fire | [[Desert]] | [[Desert]] fauna and environment | Deals damage over time |
-| Poison | [[Jungle]] [[Jungle]] fauna | Deals damage over time |
-
-**Environment**
-Damage accumulates based on your position in the world. The two independent axes are applied simultaneously.
-
-_Example : in [[Caverns]] Bottom in the [[Jungle]] monsters inflict Crushing and Poison simultaneously._
-
-**Description**
-Every source of damage in Sixty-Below deals a specific type. Understanding damage types helps you choose the right equipment and potions for each environment and enemy.
-
-**Physical Damage**
-
-| Type | Layer | Weapon | Fauna Sources |
-|---|---|---|---|
-| Piercing | [[Surface]] | Bows | stingers, spines, quills |
-| Slashing | [[Underground]] | Swords | jaws, mandibles, tails, claws |
-| Crushing | [[Caverns]] | Hammers | legs, tails, heads |
-
-**Damage Over Time (DOT)**
-
-| Type | Biome | Sources | Notes |
-|---|---|---|---|
-| Bleeding | [[Forest]] | [[Forest]] fauna | Deals damage over time |
-| Fire | [[Desert]] | [[Desert]] fauna and environment | Deals damage over time |
-| Poison | [[Jungle]] [[Jungle]] fauna | Deals damage over time |
+| [[Bleeding DOT|Bleeding]] | [[Forest]] | [[Forest]] fauna | Deals damage over time |
+| [[Fire DOT|Fire]] | [[Desert]] | [[Desert]] fauna and environment | Deals damage over time |
+| [[Poison DOT|Poison]] | [[Jungle]] [[Jungle]] fauna | Deals damage over time |
 
 **Environment**
 Damage accumulates based on your position in the world. The two independent axes are applied simultaneously.
@@ -2108,9 +2084,9 @@ Prefixes enhance weapons, armors and tools, adding special properties beyond the
 | Keen | +ATQ (Attack) | Offensive |
 | Sturdy | +DEF (Defense) | Defensive |
 | Extended | +Tool Range | Utility |
-| Blazing | Inflicts [[Damage Types|Fire]] DOT on hit | DOT |
-| Venomous | Inflicts [[Damage Types|Poison]] DOT on hit | DOT |
-| Serrated | Inflicts [[Damage Types|Bleeding]] DOT on hit | DOT |
+| Blazing | Inflicts [[Fire DOT]] on hit | DOT |
+| Venomous | Inflicts [[Poison DOT]] on hit | DOT |
+| Serrated | Inflicts [[Bleeding DOT]] on hit | DOT |
 
 **Prefix Compatibility**
 
@@ -2169,6 +2145,28 @@ _Some specific gear pieces may deviate from these rules._ ⏳
 
 **Main usages**
 * Used as a tool for deleting large bulks of [[Cobweb]]⏳
+    `
+  },
+  //    Bleeding DOT, Fire DOT, Poison DOT
+  {
+    title: 'Bleeding DOT',
+    category: ['Buff'],
+    content: `
+Biome: [[Forest]]
+    `
+  },
+  {
+    title: 'Fire DOT',
+    category: ['Buff'],
+    content: `
+Biome: [[Desert]]
+    `
+  },
+  {
+    title: 'Poison DOT',
+    category: ['Buff'],
+    content: `
+Biome: [[Jungle]]
     `
   },
 
@@ -2629,10 +2627,10 @@ All plants found in the world of Sixty-Below. Plants can be harvested for loot, 
 | [[item:parsnip]] | {{item:parsnip:star}} | Herb | [[Forest]] / [[Surface]] | [[item:parsnip]] | [[monster:vole]] (Foraging) |
 | [[item:sunflower]] | {{item:sunflower:star}} | Herb | [[Forest]] / [[Surface]] | [[item:sunflowerSeed]] | [[monster:hedgehog]] (Foraging) |
 | [[item:bloodmoon]] | {{item:bloodmoon:star}} | Herb | [[Jungle]] / [[Surface]] | [[item:bloodmoon]] | [[monster:mamba]] (Foraging) |
-| [[item:fernS]] | {{item:fernS:star}} | Herb | Fern Cave / [[node:grassfern]] | [[item:fernLeaf]] / [[fernSpore]] | [[monster:dendrobate]] /  [[monster:mamba]] (Foraging) |
-| [[item:fernC]] | {{item:fernC:star}} | Herb | Fern Cave / [[node:grassfern]] | [[item:fernLeaf]] / [[fernSpore]] | [[monster:dendrobate]] /  [[monster:mamba]] (Foraging) |
-| [[item:fernG]] | {{item:fernG:star}} | Herb | Fern Cave / [[node:grassfern]] | [[item:fernLeaf]] / [[fernSpore]] | [[monster:dendrobate]] /  [[monster:mamba]] (Foraging) |
-| [[item:fernM]] | {{item:fernM:star}} | Herb | Fern Cave / [[node:grassfern]] | [[item:fernLeaf]] / [[fernSpore]] | [[monster:dendrobate]] /  [[monster:mamba]] (Foraging) |
+| [[item:fernS]] | {{item:fernS:star}} | Herb | Fern Cave / [[node:grassfern]] | [[item:fernLeaf]] | [[monster:dendrobate]] /  [[monster:mamba]] (Foraging) |
+| [[item:fernC]] | {{item:fernC:star}} | Herb | Fern Cave / [[node:grassfern]] | [[item:fernLeaf]] | [[monster:dendrobate]] /  [[monster:mamba]] (Foraging) |
+| [[item:fernG]] | {{item:fernG:star}} | Herb | Fern Cave / [[node:grassfern]] | [[item:fernLeaf]] | [[monster:dendrobate]] /  [[monster:mamba]] (Foraging) |
+| [[item:fernM]] | {{item:fernM:star}} | Herb | Fern Cave / [[node:grassfern]] | [[item:fernLeaf]] | [[monster:dendrobate]] /  [[monster:mamba]] (Foraging) |
 | [[item:velvetmoss]] | {{item:velvetmoss:star}} | Herb | Moss Cave / [[node:grassmoss]] | [[item:velvetmoss]] | [[monster:woodlouse]] (Foraging) |
 
 | [[item:frostcap]] | {{item:frostcap:star}} | Herb | Mushroom Cave / [[node:grassmushroom]] | [[item:mushroomGill]] | [[monster:woodlouse]] (Foraging) |
@@ -2897,7 +2895,7 @@ Parsnips are root vegetables found growing on the [[Forest]] floor. Their white 
 * Drops: [[item:parsnip]]
 
 **Dangers**
-* Harvesting a Parsnip may disturb a [[monster:vole]] hiding among the roots — its bite inflicts [[Damage Types|Piercing]] damage and may cause [[Damage Types|Bleeding]]. ⏳
+* Harvesting a Parsnip may disturb a [[monster:vole]] hiding among the roots — its bite inflicts [[Damage Types|Piercing]] damage and may cause [[Bleeding DOT]]. ⏳
 
 **Usages** ⏳
 * [[item:parsnip]] — food (when used, give +20 Health during 1 in-game hour)
@@ -2938,7 +2936,7 @@ Sunflowers grow in forest clearings, thriving where sunlight reaches the ground 
 * Drops: [[item:sunflowerSeed]]
 
 **Dangers**
-* Harvesting a Sunflower may disturb a [[monster:hedgehog]] hiding nearby — its spines inflict [[Damage Types|Piercing]] damage and may cause [[Damage Types|Bleeding]]. ⏳
+* Harvesting a Sunflower may disturb a [[monster:hedgehog]] hiding nearby — its spines inflict [[Damage Types|Piercing]] damage and may cause [[Bleeding DOT]]. ⏳
 
 **Planting**
 * Place a [[item:sunflowerSeed]] on a [[node:grassForest]] tile to increase the chance of a Sunflower growing the next day (from 18% to 80%). ⏳
@@ -3234,7 +3232,7 @@ The underground Cactus is a hardy desert plant that has adapted to the complete 
 * Drops: [[item:cactus]], [[item:cactusFiber]], [[item:cactusSpine]]
 
 **Dangers**
-* Harvesting a Cactus triggers the spines — each harvest inflicts [[buff:bleeding|Bleeding]] regardless of equipment. ⏳
+* Harvesting a Cactus triggers the spines — each harvest inflicts [[Bleeding DOT]] regardless of equipment. ⏳
 * The disturbance may attract a [[monster:scorpion]] lurking in the surrounding tunnels. ⏳
 
 **Usages** ⏳
@@ -3244,11 +3242,9 @@ The underground Cactus is a hardy desert plant that has adapted to the complete 
 
 **Tips**
 * _Cactus plants are well-spaced — finding one rarely means finding another nearby._ ⏳
-* _Their silhouette is recognizable even without a [[Torch]] — use that to navigate._ ⏳
+* _Their silhouette is recognizable even without a [[Torches|Torch]] — use that to navigate._ ⏳
   `
   },
-
-  // Oleander, Amber-Moss
   {
     title: 'Oleander',
     category: ['Plant', 'Underground'],
@@ -3257,6 +3253,9 @@ The underground Cactus is a hardy desert plant that has adapted to the complete 
 {{item:oleander:star}}
       `
   },
+
+  // ── Plants - Caverns Herbs ───────────────────────────────────
+  //    Amber-Moss
   {
     title: 'Amber-Moss',
     category: ['Plant', 'Forest'],
@@ -3353,7 +3352,7 @@ Movement speed determines how fast the player moves through the world. The base 
     category: ['Gameplay'],
     content: `
 **Description**
-The world of Sixty-Below follows a continuous day/night cycle, shaped by time, [[Weather]], and [[Moon phases]]. Surviving the night is one of the core challenges — it brings unique dangers, but also unique opportunities.
+The world of Sixty-Below follows a continuous day/night cycle, shaped by time, [[Weather]], and [[Moon Phases]]. Surviving the night is one of the core challenges — it brings unique dangers, but also unique opportunities.
 
 **Time Rate**
 
