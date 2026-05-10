@@ -353,9 +353,9 @@ export const ITEMS = {
   sunflowerSeed: {name: 'Sunflower Seed', type: ITEM_TYPE.MATERIAL | ITEM_TYPE.SEED, stype: 'seed', star: 1, image: 'potions_32_32-1-5', placed: 'fuws_32_32-4-0', help: 'Sunflower', tooltip: '???'},
   sunflowerOil: {name: 'Sunflower Oil', type: ITEM_TYPE.MATERIAL | ITEM_TYPE.CRAFTABLE, stype: 'seed', star: 1, image: 'potions_32_32-1-5', placed: 'fuws_32_32-4-0', help: 'Sunflower', tooltip: '???'},
 
-  oleander: {name: 'Oleander', type: 0, stype: 'herb', star: 1, image: null, placed: 'fuws_32_32-4-0', help: 'Oleander', tooltip: '???'},
-  oleanderSeed: {name: 'Oleander Seed', type: ITEM_TYPE.MATERIAL | ITEM_TYPE.SEED, stype: 'seed', star: 1, image: 'potions_32_32-1-5', placed: 'fuws_32_32-4-0', help: 'Oleander', tooltip: '???'},
+  oleander: {name: 'Oleander', type: 0, stype: 'herb', star: 1, image: 'fuws_32_32-4-0', placed: 'fuws_32_32-4-0', help: 'Oleander', tooltip: '???'},
   oleanderOil: {name: 'Oleander Oil', type: ITEM_TYPE.MATERIAL | ITEM_TYPE.CRAFTABLE, stype: 'seed', star: 1, image: 'potions_32_32-1-5', placed: 'fuws_32_32-4-0', help: 'Oleander', tooltip: '???'},
+  oleanderBulb: {name: 'Oleander Bulb', type: ITEM_TYPE.MATERIAL, stype: 'seed', star: 1, image: 'potions_32_32-1-5', placed: 'fuws_32_32-4-0', help: 'Oleander', tooltip: '???'},
 
   ambermirage: {name: 'Ambermirage', type: ITEM_TYPE.MATERIAL, stype: 'herb', star: 1, image: 'potions_32_32-1-5', placed: 'fuws_32_32-4-0', help: 'Ambermirage', tooltip: '???'},
 
@@ -466,9 +466,10 @@ export const PLANT_TYPE = {
 }
 
 export const PARSNIP_COUNT = 12
-export const MANDRAKE_COUNT = 60
-export const CACTUS_COUNT = 60
-export const BAMBOO_COUNT = 60
+export const MANDRAKE_COUNT = 40
+export const CACTUS_COUNT = 40
+export const BAMBOO_COUNT = 40
+export const OLEANDER_COUNT = 100
 
 export const TREE_IMAGES = {
   coconut: [

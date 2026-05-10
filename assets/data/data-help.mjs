@@ -2600,8 +2600,8 @@ Food restores health and provides temporary buffs. More elaborate preparations r
 | Tier | Description | Example |
 |---|---|---|
 | ★☆☆☆☆ | Raw food — no cooking required | Fruits, seeds, mushrooms |
-| ★★☆☆☆ | Cooked food — requires [[item:sunflowerOil\|Sunflower Oil]] — does not withstand high temperatures | Basic cooked meals |
-| ★★★☆☆ | Refined cooking — requires [[item:oleanderOil\|Oleander Oil]] — stable at high temperatures | High-temperature dishes |
+| ★★☆☆☆ | Cooked food — requires [[item:sunflowerOil|Sunflower Oil]] — does not withstand high temperatures | Basic cooked meals |
+| ★★★☆☆ | Refined cooking — requires [[item:oleanderOil|Oleander Oil]] — stable at high temperatures | High-temperature dishes |
 | ★★★★☆ | Elaborate preparations — noble ingredients conferring resistance to [[Bleeding DOT]], [[Poison DOT]], and [[Fire DOT]] ⏳ | ⏳ |
 | ★★★★★ | Pheromone mastery — allows control of specific monster species ⏳ | ⏳ |
 
@@ -2659,7 +2659,8 @@ All plants found in the world of Sixty-Below. Plants can be harvested for loot, 
 | [[item:dawncap]] | {{item:dawncap:star}} | Herb | Mushroom Cave / [[node:grassmushroom]] | [[item:mushroomGill]] | [[monster:woodlouse]] (Foraging) |
 | [[item:mandrake]] | {{item:mandrake:star}} | Herb | FOREST Underground / [[node:dirt]] | [[item:mandrakeRoot]] | [[monster:wraith]] (Foraging) |
 | [[item:cactus]] | {{item:cactus:star}} | Herb | DESERT Underground / [[node:sand]] | [[item:cactus]] | [[monster:scorpion]] (Foraging) |
-| [[item:bamboo]] | {{item:bamboo:star}} | Herb | JUNGLE Underground / [[node:silt]] | [[item:bambooStalk]] | [[monster:???]] (Foraging) |
+| [[item:bamboo]] | {{item:bamboo:star}} | Herb | JUNGLE Underground / [[node:silt]] | [[item:bambooStalk]] | [[monster:centipede]] (Foraging) |
+| [[item:oleander]] | {{item:oleander:star}} | Herb | Underground / [[node:stone]] | [[item:oleander]] | [[monster:caveBeetle (Foraging) |
 
 _For detailed information on each plant, click its name._
 
@@ -3143,8 +3144,6 @@ Ferns are ancient plants thriving in the humid darkness of [[Fern Cave|Fern Cave
 * _FernSpores are rare but valuable — prioritize harvesting mature ferns._ ⏳
   `
   },
-  // ── Plants - Mini-biome Herbs ────────────────────────────────
-  // Ferns, Velvetmoss
   {
     title: 'Velvetmoss',
     category: ['Plant', 'Jungle'],
@@ -3306,11 +3305,41 @@ Underground Bamboo thrives in the humid tunnels and passages of [[Jungle]] biome
   },
   {
     title: 'Oleander',
-    category: ['Plant', 'Underground'],
+    category: ['Plant', 'Forest', 'Desert', 'Jungle', 'Underground'],
     content: `
+**Description**
+Oleander is a common shrub found in the underground passages of all three biomes. Its deep purple berries contain potent alkaloids that, when steeped in [[item:sunflowerOil]], produce [[item:oleanderOil]] — a heat-stable cooking oil prized by experienced explorers.
+
 **Tier**
 {{item:oleander:star}}
-      `
+
+**Location**
+* Biome: [[Forest]], [[Desert]], [[Jungle]]
+* Layer: [[Underground]]
+* Grows on [[node:stone]]
+
+**Population**
+* The species neither grows nor declines — natural balance maintains the population
+* Harvested Oleander does not regrow
+
+**Harvest**
+* [[Foraging|Interact to harvest]] — the plant disappears permanently on harvest
+* Tool: [[Harvesting Tools|Silver Sickle]] or better ⏳
+* Drops: [[item:oleander]], [[item:oleanderBulb]]
+
+**Dangers**
+* The scent of Oleander berries attracts a [[monster:caveBeetle]] — its metallic blue-green carapace is nearly invisible against the stone walls. ⏳
+
+**Usages** ⏳
+* [[item:oleander]] — crafting ingredient ⏳
+* [[item:oleanderBulb]] — crafting ingredient ⏳
+* [[item:oleanderOil]] — heat-stable cooking oil, required for tier 3 food preparation ⏳
+
+**Tips**
+* _Oleander grows in all three biomes — it is the only underground plant found everywhere._ ⏳
+* _Its purple berries catch the torchlight — a telltale shimmer against the stone walls._ ⏳
+* _Harvest quickly — the Cave Beetle is fast and hits hard._ ⏳
+  `
   },
 
   // ── Plants - Caverns Herbs ───────────────────────────────────
@@ -3341,7 +3370,11 @@ Foraging : [[Foraging|Sickle]] any tier.⏳
       `
   },
 
-  // ── Fishs ────────────────────────────────────────────────────
+  // ── Fishs - Sea ──────────────────────────────────────────────
+  // ── Fishs - Water ────────────────────────────────────────────
+  // ── Fishs - Sap ──────────────────────────────────────────────
+  // ── Monsters ─────────────────────────────────────────────────
+  //    Fauna
   // ── Monsters ─────────────────────────────────────────────────
   //    Spiders, Bees
   {

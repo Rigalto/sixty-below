@@ -15,6 +15,7 @@
 - Ajouter dans le panel de droite la clé courante de génération du monde
 - Il n'y a pas assez de Cactus dans le monde => sans doute pas assez de SAND sur le sol souterrain.
 - Il n'y a pas assez de Bamboo dans le monde => sans doute pas assez de SILT sur le sol souterrain.
+- Il n'y a pas assez de Oleanders dans le monde => sans doute pas assez de STONE sur le sol souterrain.
 
 ## À faire — Génération du monde (`generate.mjs`)
 
@@ -24,8 +25,6 @@
 
 ### Ajout des artefacts et plantes
 - Ajout de herbes : Blinkroot, Fireblossom, Oleander, Skorn
-- Ajout plante bambou : biome Jungle / zone surface (tunnels/caverns) et zone underground
-- Ajout plante Oleander : tous biomes / zone surface (tunnels/caverns) et zone underground
 - Ajout plante E : biome Forest et Desert / zone caverns
 - Ajout plante F : biome Forest et Jungle / zone caverns
 - Ajout plante G : biome Jungle et Desert / zone caverns
@@ -53,7 +52,7 @@ import fs from 'fs'
 
 hydrateHelp(NODES, ITEMS, RECIPES)
 const htmlHelp = []
-for (const {html} of HELP)
+for (const {html} of HELP) {
   htmlHelp.push(html)
   htmlHelp.push('<hr>')
 }
@@ -234,7 +233,8 @@ fs.writeFileSync('docs/help-rendered.html', htmlHelp.join('\n'))
 - `plantGenerator.placeCaveMushrooms` - ajout des champignons sur les tuiles de GRASSMUSHROOM
 - `plantGenerator.placeMandrakes` - ajout des Mandrakes en FOREST / Underground / DIRT
 - `plantGenerator.placeCactus` - ajout des Cactus en DESERT / Underground / SAND
-- `plantGenerator.placeBamboo` - ajout des Cactus en DESERT / Underground / SILT
+- `plantGenerator.placeBamboo` - ajout des Bamboos en JUNGLE / Underground / SILT
+- `plantGenerator.placeOleanders` - ajout des Oleander en Underground / STONE
 
 ### Rendu (partiel)
 - `WorldRenderer` — rendu tuiles par chunks avec cache OffscreenCanvas

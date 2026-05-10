@@ -1,7 +1,7 @@
 import {seededRNG, shuffleArray, rollLoot} from './utils.mjs'
 import {database, uniqueIdGenerator} from './database.mjs'
 import {WORLD_WIDTH, WORLD_HEIGHT, SEA_LEVEL, TOPSOIL_Y_SKY_SURFACE, TOPSOIL_Y_SURFACE_UNDER, TOPSOIL_Y_UNDER_CAVERNS, TOPSOIL_Y_CAVERNS_MID, BIOME_TILE_MAP, SEA_MAX_JITTER, SEA_MAX_WIDTH, SEA_MAX_HEIGHT, CLUSTER_SCATTER_MAP, ORE_GEM_SCATTER_MAP, PERLIN_OFFSET_NATURALIZER, PERLIN_OFFSET_TUNNEL, PERLIN_OFFSET_SURFACE_TUNNEL, PERLIN_OFFSET_SMALL_TUNNEL, PERLIN_OFFSET_CAVERN, PERLIN_OFFSET_HIVE, PERLIN_OFFSET_HEART, PERLIN_OFFSET_MUSHROOM, PERLIN_OFFSET_COBWEB, PERLIN_OFFSET_FERNS, PERLIN_OFFSET_LAKES, PERLIN_OFFSET_SHELL, PERLIN_OFFSET_TEMPLE, PERLIN_OFFSET_BEACH, SMALL_CAVERNS_COUNT, MEDIUM_CAVERNS_COUNT, UNDERGROUND_TUNNEL_COUNT, CAVERNS_TUNNEL_COUNT, SMALL_TUNNELS_COUNT, HIVE_RADIUS_MIN, HIVE_RADIUS_MAX, COBWEB_CAVE_COUNT_MIN, COBWEB_CAVE_COUNT_MAX, COBWEB_RADIUS_X_MIN, COBWEB_RADIUS_X_MAX, COBWEB_RADIUS_Y_MIN, COBWEB_RADIUS_Y_MAX, COBWEB_CAVE_MAIN_MIN, COBWEB_CAVE_MAIN_MAX, COBWEB_CAVE_SIDE_MIN, COBWEB_CAVE_SIDE_MAX, COBWEB_SCATTER_COUNT, COBWEB_SCATTER_SIZE_MIN, COBWEB_SCATTER_SIZE_MAX, GEODE_CAVE_COUNT_MIN, GEODE_CAVE_COUNT_MAX, GEODE_RADIUS_MIN, GEODE_RADIUS_MAX, GEODE_TARGET_CLUSTER_COUNT, GEODE_CLUSTER_SIZE_MIN, GEODE_CLUSTER_SIZE_MAX, TOPSOIL_SCATTER_MAP, LAKE_RADIUS_X_MIN, LAKE_RADIUS_X_MAX, LAKE_RADIUS_Y_MIN, LAKE_RADIUS_Y_MAX, LAKE_PIT_RADIUS_X_MIN, LAKE_PIT_RADIUS_X_MAX, LAKE_PIT_RADIUS_Y_MIN, LAKE_PIT_RADIUS_Y_MAX, LAKE_CREATION_MAP, UNDERGROUND_LAKE_UNDER_COUNT, UNDERGROUND_LAKE_CAVERNS_COUNT, UNDERGROUND_LAKE_RADIUS_MIN, UNDERGROUND_LAKE_RADIUS_MAX, BLIND_LAKE_COUNT, BLIND_LAKE_RADIUS_MIN, BLIND_LAKE_RADIUS_MAX, SAP_LAKE_UNDER_COUNT, SAP_LAKE_CAVERNS_COUNT, SAP_LAKE_RADIUS_MIN, SAP_LAKE_RADIUS_MAX, SAP_POCKET_COUNT, SAP_POCKET_RADIUS_MIN, SAP_POCKET_RADIUS_MAX, WATER_PUDDLE_COUNT, SAP_PUDDLE_COUNT, PUDDLE_HEIGHT_MIN, PUDDLE_HEIGHT_MAX, FOSSIL_VEIN_COUNT, FERN_CAVE_RADIUS_X_MIN, FERN_CAVE_RADIUS_X_MAX, FERN_CAVE_RADIUS_Y_MIN, FERN_CAVE_RADIUS_Y_MAX, MOSS_CAVE_RADIUS_X_MIN, MOSS_CAVE_RADIUS_X_MAX, MOSS_CAVE_RADIUS_Y_MIN, MOSS_CAVE_RADIUS_Y_MAX, SAND_POCKET_RADIUS_X_MIN, SAND_POCKET_RADIUS_X_MAX, SAND_POCKET_RADIUS_Y_MIN, SAND_POCKET_RADIUS_Y_MAX, MUSHROOM_CAVE_RADIUS_X_MIN, MUSHROOM_CAVE_RADIUS_X_MAX, MUSHROOM_CAVE_RADIUS_Y_MIN, MUSHROOM_CAVE_RADIUS_Y_MAX, PYRAMID_WALL_INDEXES, PYRAMID_VOID_INDEXES, PYRAMID_WIDTH, PYRAMID_HEIGHT, PYRAMID_ROOM1_DELTA, PYRAMID_ROOM2_DELTA, TEMPLE_RUIN_WALL_INDEXES, TEMPLE_RUIN_COLUMNS_INDEXES, CHEST_CONTENT, TREES_INIT_SIZE, GIANT_MUSHROOM_INIT_SIZE} from '../assets/data/data-gen.mjs'
-import {NODES, NODES_LOOKUP, NODE_TYPE, BIOME_TYPE, PLANT_KIND, PLANT_TYPE, ITEMS, BAG_CAPACITY, TREE_IMAGES, PARSNIP_COUNT, MANDRAKE_COUNT, CACTUS_COUNT, BAMBOO_COUNT} from '../assets/data/data.mjs'
+import {NODES, NODES_LOOKUP, NODE_TYPE, BIOME_TYPE, PLANT_KIND, PLANT_TYPE, ITEMS, BAG_CAPACITY, TREE_IMAGES, PARSNIP_COUNT, MANDRAKE_COUNT, CACTUS_COUNT, BAMBOO_COUNT, OLEANDER_COUNT} from '../assets/data/data.mjs'
 import {WEATHER_TYPE, WEATHER_TYPE_CODE} from './constant.mjs'
 
 /* ====================================================================================================
@@ -401,6 +401,7 @@ class WorldGenerator {
     plantGenerator.placeMandrakes(zoneRects, chestIndexes)
     plantGenerator.placeCactus(zoneRects, chestRects)
     plantGenerator.placeBamboo(zoneRects, chestIndexes)
+    plantGenerator.placeOleanders(zoneRects, chestIndexes)
     await progress('Underground Plants')
 
     await progress('Caverns Plants')
@@ -7853,6 +7854,89 @@ class PlantGenerator {
         w: 1,
         h: 3,
         x: cx,
+        y: y - 3,
+        present: true,
+        deleted: false
+      })
+      placed++
+    }
+  }
+
+  /**
+   * Place les Oleanders dans la layer underground de tous les biomes.
+   * Substrat : STONE avec VOID sur les 2×3 tuiles occupées.
+   * Nombre constant défini par OLEANDER_COUNT.
+   * Arrêt après MAX_CONSECUTIVE_FAILURES tirages infructueux consécutifs.
+   * Anti-coffre : test sur chestIndexes pour les deux tuiles support.
+   *
+   * @param {Array<{x0, x1, ySkySurface, ySurface, yUnder, yCaverns, biome}>} zoneRects
+   * @param {Set<number>} chestIndexes — index interdits (coffres)
+   */
+  placeOleanders (zoneRects, chestIndexes) {
+    const VOID = NODES.VOID.code
+    const STONE = NODES.STONE.code
+    const W = WORLD_WIDTH
+    const MAX_ATTEMPTS = 100
+
+    const rects = []
+    for (const rect of zoneRects) {
+      rects.push({x0: rect.x0, x1: rect.x1, y0: rect.ySurface, y1: rect.yUnder})
+    }
+    if (rects.length === 0) return
+
+    let placed = 0
+    let consecutiveFailures = 0
+
+    while (placed < OLEANDER_COUNT && consecutiveFailures < MAX_ATTEMPTS) {
+      const rect = seededRNG.randomGetArrayValue(rects)
+      const cx = seededRNG.randomGetMinMax(rect.x0 + 2, rect.x1 - 2)
+      const cy = seededRNG.randomGetMinMax(rect.y0 + 1, rect.y1 - 1)
+
+      if (worldBuffer.read(cx, cy) !== VOID) { consecutiveFailures++; continue }
+
+      // Descendre jusqu'à la première tuile non VOID dans le rectangle
+      let y = cy
+      while (y < rect.y1 && worldBuffer.read(cx, y) === VOID) y++
+
+      if (worldBuffer.read(cx, y) !== STONE) { consecutiveFailures++; continue }
+
+      // Tester placement à droite (cx, cx+1) et à gauche (cx-1, cx)
+      const canRight = worldBuffer.read(cx + 1, y) === STONE &&
+                       worldBuffer.read(cx, y - 1) === VOID &&
+                       worldBuffer.read(cx + 1, y - 1) === VOID &&
+                       worldBuffer.read(cx, y - 2) === VOID &&
+                       worldBuffer.read(cx + 1, y - 2) === VOID &&
+                       worldBuffer.read(cx, y - 3) === VOID &&
+                       worldBuffer.read(cx + 1, y - 3) === VOID
+
+      const canLeft = worldBuffer.read(cx - 1, y) === STONE &&
+                       worldBuffer.read(cx, y - 1) === VOID &&
+                       worldBuffer.read(cx - 1, y - 1) === VOID &&
+                       worldBuffer.read(cx, y - 2) === VOID &&
+                       worldBuffer.read(cx - 1, y - 2) === VOID &&
+                       worldBuffer.read(cx, y - 3) === VOID &&
+                       worldBuffer.read(cx - 1, y - 3) === VOID
+
+      if (!canRight && !canLeft) { consecutiveFailures++; continue }
+
+      const goLeft = canLeft && (!canRight || seededRNG.randomGetBool())
+      const plantX = goLeft ? cx - 1 : cx
+
+      const soilIndex = (y << 10) | plantX
+      if (chestIndexes.has(soilIndex) || chestIndexes.has(soilIndex + 1)) { consecutiveFailures++; continue }
+
+      consecutiveFailures = 0
+
+      this.#plants.push({
+        id: uniqueIdGenerator.getUniqueId(),
+        kind: PLANT_KIND.HERB,
+        type: PLANT_TYPE.OLEANDER,
+        index: soilIndex - 3 * W,
+        soilIndex,
+        itemId: 'oleander',
+        w: 2,
+        h: 3,
+        x: plantX,
         y: y - 3,
         present: true,
         deleted: false
