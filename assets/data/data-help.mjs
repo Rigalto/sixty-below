@@ -2660,7 +2660,13 @@ All plants found in the world of Sixty-Below. Plants can be harvested for loot, 
 | [[item:mandrake]] | {{item:mandrake:star}} | Herb | FOREST Underground / [[node:dirt]] | [[item:mandrakeRoot]] | [[monster:wraith]] (Foraging) |
 | [[item:cactus]] | {{item:cactus:star}} | Herb | DESERT Underground / [[node:sand]] | [[item:cactus]] | [[monster:scorpion]] (Foraging) |
 | [[item:bamboo]] | {{item:bamboo:star}} | Herb | JUNGLE Underground / [[node:silt]] | [[item:bambooStalk]] | [[monster:centipede]] (Foraging) |
-| [[item:oleander]] | {{item:oleander:star}} | Herb | Underground / [[node:stone]] | [[item:oleander]] | [[monster:caveBeetle (Foraging) |
+| [[item:oleander]] | {{item:oleander:star}} | Herb | Underground / [[node:stone]] | [[item:oleander]] | [[monster:caveBeetle]] (Foraging) |
+
+| [[item:satansCube]] | {{item:satansCube:star}} | Herb | FOREST+DESERT Caverns | [[item:satansCube]] | [[monster:firesalamander]] (Foraging) |
+| [[item:sneakthorn]] | {{item:sneakthorn:star}} | Herb | FOREST+JUNGLE Caverns | [[item:sneakthorn]] | [[monster:bat]] (Foraging) |
+| [[item:cursedcrown ]] | {{item:cursedcrown :star}} | Herb | JUNGLE+DESERT Caverns | [[item:cursedcrown ]] | [[monster:fireAnt]] (Foraging) |
+
+| [[item:H ]] | {{item:H :star}} | Herb | Caverns bottom | [[item:H ]] | [[monster:magmaCrab]] + [[monster:lavaWorm]]  (Foraging) |
 
 _For detailed information on each plant, click its name._
 

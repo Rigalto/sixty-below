@@ -235,6 +235,7 @@ fs.writeFileSync('docs/help-rendered.html', htmlHelp.join('\n'))
 - `plantGenerator.placeCactus` - ajout des Cactus en DESERT / Underground / SAND
 - `plantGenerator.placeBamboo` - ajout des Bamboos en JUNGLE / Underground / SILT
 - `plantGenerator.placeOleanders` - ajout des Oleander en Underground / STONE
+- `plantGenerator.placeSatansCubes` - ajout des Satan's Cube en Caverns / FOREST + DESERT
 
 ### Rendu (partiel)
 - `WorldRenderer` — rendu tuiles par chunks avec cache OffscreenCanvas

@@ -450,7 +450,7 @@ export const PLANT_TYPE = {
   BAMBOO: 43,
   OLEANDER: 44,
   // Caverns Herbs
-  BLINKROOT: 51,
+  SATANS_CUBE: 51,
   FIREBLOSSOM: 52,
   SKORN: 53,
   // Under Sea Herbs
@@ -470,6 +470,7 @@ export const MANDRAKE_COUNT = 40
 export const CACTUS_COUNT = 40
 export const BAMBOO_COUNT = 40
 export const OLEANDER_COUNT = 100
+export const SATANS_CUBE_COUNT = 80
 
 export const TREE_IMAGES = {
   coconut: [
