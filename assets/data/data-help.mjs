@@ -1575,7 +1575,7 @@ Metals are the primary crafting materials in Sixty-Below. Each metal exists in t
 |---|---|---|
 | Ore | Ore veins placed in the World | Not directly usable |
 | Chunk | Dropped when [[Mining]] ore | Crafting ingredient |
-| Bar | Smelt chunks at a [[Smelting||Furnace]] | Higher-tier crafting |
+| Bar | Smelt chunks at a [[Smelting|Furnace]] | Higher-tier crafting |
 
 **Metal Ores**
 
@@ -1638,7 +1638,7 @@ Metal chunks are placed in your [[Inventory]] when mined with a [[Mining Tools|P
     category: ['Crafting', 'Mining'],
     content: `
 **Description**
-Gems are rare crafting materials found deep underground. Each gem exists in three forms : gem deposits (placed in the World), raw gem (dropped when mined) and cut gem (shaped at a [[Stonecutting||Stonecutter]]).
+Gems are rare crafting materials found deep underground. Each gem exists in three forms : gem deposits (placed in the World), raw gem (dropped when mined) and cut gem (shaped at a [[Stonecutting|Stonecutter]]).
 
 **Forms & Transformation**
 
@@ -1646,7 +1646,7 @@ Gems are rare crafting materials found deep underground. Each gem exists in thre
 |---|---|---|
 | Gem Deposit | Gem veins placed in the World | Not directly usable |
 | Raw Gem | Dropped when [[Mining]] deposits | Crafting ingredient |
-| Cut Gem | Cut raw gems at a [[Stonecutting||Stonecutter]] | Crafting ingredient |
+| Cut Gem | Cut raw gems at a [[StonecuttingStonecutter]] | Crafting ingredient |
 
 **Gem Deposits**
 
