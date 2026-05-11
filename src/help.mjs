@@ -297,6 +297,8 @@ class HelpOverlay {
       .help-grid::-webkit-scrollbar-track { background: #1e272e; border-radius: 3px; }
       .help-grid::-webkit-scrollbar-thumb { background: #4a5568; border-radius: 3px; }
       .help-grid::-webkit-scrollbar-thumb:hover { background: #4a69bd; }
+      .help-link { color: #90cdf4; text-decoration: underline; cursor: pointer; }
+      .help-link:hover { color: #bee3f8; }
     `
     document.head.appendChild(style)
   }

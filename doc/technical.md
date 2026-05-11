@@ -150,9 +150,9 @@ par des objets `{imageIndex, x, y, w, h}` directement utilisables pour le rendu.
 | Fonction | Syntaxe traitée | Statut |
 | :--- | :--- | :--- |
 | `resolveNodeLinks(entry, NODES)` | `[[node:code]]`, `[[node:code\|texte]]` | ✓ |
-| `resolveItemLinks(entry, ITEMS)` | `[[item:code]]`, `[[item:code\|texte]]` | à venir |
-| `resolveMonsterLinks(entry, MONSTERS)` | `[[monster:code]]`, `[[monster:code\|texte]]` | à venir |
-| `resolveHelpLinks(entry)` | `[[helpTopic]]`, `[[helpTopic\|texte]]` | à venir |
+| `resolveItemLinks(entry, ITEMS)` | `[[item:code]]`, `[[item:code\|texte]]` | ✓ |
+| `resolveMonsterLinks(entry, MONSTERS)` | `[[monster:code]]`, `[[monster:code\|texte]]` | ✓ |
+| `renderMarkdown(entry)` | `**xx**`, `__xx__`, `_xx_` | ✓ |
 
 ---
 
