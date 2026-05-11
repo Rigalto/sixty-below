@@ -488,7 +488,8 @@ class WorldGenerator {
       {key: 'anthills', value: JSON.stringify(anthills)},
       {key: 'termites', value: JSON.stringify(termites)},
       {key: 'hearts', value: JSON.stringify(hearts)},
-      {key: 'triskels', value: JSON.stringify(triskels)}
+      {key: 'triskels', value: JSON.stringify(triskels)},
+      {key: 'helptopic', value: 'Getting Started'}
     ])
     // sauvegarde des liquid bodies
     await database.clearObjectStore('liquid')

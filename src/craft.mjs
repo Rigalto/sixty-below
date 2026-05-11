@@ -32,7 +32,7 @@ class CraftOverlay {
     })
 
     // 2. Création du Header via la Factory
-    const header = createOverlayHeader('⚒️ Artisanat [K]', 'craft')
+    const header = createOverlayHeader('⚒️ Crafting [K]', 'craft')
     this.#header = header
 
     // 3. Zone de contenu (Vide pour l'instant, juste pour remplir)

@@ -63,7 +63,7 @@
 const HELP_TEMPLATES = {
   miningInfo: `
 **How to mine**
-Use a [[Pickaxes|{1}]] of at least ⭐{2} to mine [[node:{3}]].
+Use a [[Mining Tools|{1}]] of at least ⭐{2} to mine [[node:{3}]].
 Mining drops: {{node:{3}:mining}}
   `,
 
@@ -842,7 +842,7 @@ Despite the nuisance they represent, cobwebs are one of the most valuable resour
 * All tunnels and caverns — scattered, all biomes
 
 **Collection** ⏳
-* Mine with any [[Pickaxes]] — drops [[item:silk]]
+* Mine with any [[Mining Tools|Pickaxes]] — drops [[item:silk]]
 * Deleted with a [[item:flamethrower]] - No loot
 
 **Crafting chain**
@@ -945,7 +945,7 @@ Blind Lakes are pockets of water found in the deepest parts of all biomes. They 
 * Chest — tier 4-5 ⏳
 
 **Tips**
-* _Blind Lakes have no natural entrance — bring a [[Pickaxes|pickaxe]]._
+* _Blind Lakes have no natural entrance — bring a [[Mining Tools|pickaxe]]._
 * _The fish found here are unique to this environment and cannot be found anywhere else._ ⏳
   `
   },
@@ -1590,7 +1590,7 @@ Metals are the primary crafting materials in Sixty-Below. Each metal exists in t
 
 **Metal Chunks**
 
-Metal chunks are placed in your [[Inventory]] when mined with a [[Pickaxes||Pickaxe]].
+Metal chunks are placed in your [[Inventory]] when mined with a [[Mining Tools|Pickaxe]].
 
 | Ore | Chunk | Chunk Tier | Pickaxe | Pickaxe Tier |
 |---|---|---|---|---|
@@ -1627,7 +1627,7 @@ Metal chunks are placed in your [[Inventory]] when mined with a [[Pickaxes||Pick
 | [[item:barPlatinum]] | {{item:barPlatinum:star}} — master armor | ⏳ |
 
 **Tips**
-* _Always bring a [[Pickaxes|Pickaxe]] strong enough to mine the ores of the layer you are exploring — deeper metals require better tools._ ⏳
+* _Always bring a [[Mining Tools|Pickaxe]] strong enough to mine the ores of the layer you are exploring — deeper metals require better tools._ ⏳
 * _Platinum is extremely rare and only found in the deepest caverns._ ⏳
   `
   },
@@ -1659,7 +1659,7 @@ Gems are rare crafting materials found deep underground. Each gem exists in thre
 
 **Raw Gems**
 
-Raw gems are placed in your [[Inventory]] when mined with a [[Pickaxes||Pickaxe]].
+Raw gems are placed in your [[Inventory]] when mined with a [[Mining Tools|Pickaxe]].
 
 | Deposit | Raw Gem | Raw Gem Tier | Pickaxe | Pickaxe Tier |
 |---|---|---|---|---|
@@ -1691,7 +1691,7 @@ Raw gems are placed in your [[Inventory]] when mined with a [[Pickaxes||Pickaxe]
 
 **Tips**
 * _Gems are biome-specific — explore the right biome to find the gem you need._ ⏳
-* _Always bring a [[Pickaxes|Pickaxe]] strong enough to mine the gems of the layer you are exploring._ ⏳
+* _Always bring a [[Mining Tools|Pickaxe]] strong enough to mine the gems of the layer you are exploring._ ⏳
   `
   },
 
@@ -1720,7 +1720,7 @@ Geode Stones are rare decorative and structural materials found exclusively in [
 
 **Geode Stone Blocks**
 
-Blocks are placed in your [[Inventory]] when mined with a [[Pickaxes||Pickaxe]].
+Blocks are placed in your [[Inventory]] when mined with a [[Mining Tools|Pickaxe]].
 
 | Deposit | Block | Block Tier | Pickaxe | Pickaxe Tier |
 |---|---|---|---|---|
@@ -1736,7 +1736,7 @@ Blocks are placed in your [[Inventory]] when mined with a [[Pickaxes||Pickaxe]].
 
 **Tips**
 * _Geode Caves always contain either Granite or Marble — never both._ ⏳
-* _Always bring a [[Pickaxes|Pickaxe]] strong enough to mine the stones of the layer you are exploring._ ⏳
+* _Always bring a [[Mining Tools|Pickaxe]] strong enough to mine the stones of the layer you are exploring._ ⏳
   `
   },
   {
@@ -1826,7 +1826,7 @@ Shell is a sedimentary material formed from ancient marine organisms. It is foun
 * [[Sea]] borders and floor — slow regeneration ⏳
 
 **Drops** ⏳
-* [[Mining]] with [[Pickaxes]] (any tier): {{node:shell:mining}}
+* [[Mining]] with [[Mining Tools|Pickaxes]] (any tier): {{node:shell:mining}}
 
 **Main Usages** ⏳
 * Basic ingredient for furntiure and construction
@@ -1905,8 +1905,16 @@ Shell is a sedimentary material formed from ancient marine organisms. It is foun
     `
   },
 
+  // ── Activities ───────────────────────────────────────────────
+  {
+    title: 'Activities',
+    category: ['Gameplay'],
+    content: `
+    `
+  },
+
   // ── Activities Mining ────────────────────────────────────────
-  //    Mining, Pickaxes, Mineable Blocks, Mining Buffs
+  //    Mining, Mining Tools, Mineable Blocks, Mining Buffs
   {
     title: 'Mining',
     category: ['Activities', 'Mining'],
@@ -1914,9 +1922,10 @@ Shell is a sedimentary material formed from ancient marine organisms. It is foun
     `
   },
   {
-    title: 'Pickaxes',
+    title: 'Mining Tools',
     category: ['Tool', 'Mining'],
     content: `
+    Pickaxe
     `
   },
   {
@@ -3039,7 +3048,7 @@ The Bloodmoon is a nocturnal flower found in the [[Jungle]] forests. Its deep cr
 **Harvest**
 * [[Foraging|Interact to harvest]] the flower — it will regrow next night
 * Tool: any [[Harvesting Tools|Sickle]]⏳
-* The plant is permanently destroyed only by [[Mining]] its supporting tile with a [[Pickaxes|Pickaxe]]
+* The plant is permanently destroyed only by [[Mining]] its supporting tile with a [[Mining Tools|Pickaxe]]
 * Drops: [[item:bloodmoon]], rare chance of [[item:bloodmoonSeed]]
 
 **Planting**
@@ -3573,7 +3582,7 @@ Foraging : [[Foraging|Sickle]] any tier.⏳
 * [[item:spiderEgg]] ({{item:spiderEgg:star}}) — common ⏳
 * [[item:silk]] ({{item:silk:star}}) — rare drop⏳
 
-Note: those ingredients can also be dropped by [[Mining]] [[Cobweb]] with any [[Pickaxes|Pickaxe]].
+Note: those ingredients can also be dropped by [[Mining]] [[Cobweb]] with any [[Mining Tools|Pickaxe]].
 
 **Tips**
 * if you are looking for [[item:silk]], prefers [[Mining]] [[Cobweb]] as the drop rate is far better
@@ -3587,7 +3596,89 @@ Note: those ingredients can also be dropped by [[Mining]] [[Cobweb]] with any [[
   },
 
   // ── Gameplay ─────────────────────────────────────────────────
-  //    Movement Speed, Inventory, Weather, Moon Phases, World Creation
+  //    Getting Started, Help Panel, Hotbar, Control Panel, Inventory
+  {
+    title: 'Getting Started',
+    category: ['Gameplay'],
+    content: `
+**Welcome to Sixty-Below**
+You wake up alone on the surface of an unknown world. No instructions, no map — just the ground beneath your feet and whatever you can find.
+
+**Your first minutes**
+* Look around — the [[Surface]] layer is relatively safe during the day
+* Three tools are waiting in your [[Inventory]]:
+ * [[Chopping Tools|Copper Axe]] — chop trees to gather wood and craft your first items
+ * [[Mining Tools|Copper Pickaxe]] — mine [[node:Stone], [[node:Dirt]] and [[Metals|ore veins]] underground
+ * [[Harvesting Tools|Copper Sickle]] — harvest herbs and mushrooms on the surface
+* Open your [[Inventory]] and check what you are carrying
+* Build basic [[Crafting Stations]] as soon as possible
+
+_Many other activities await you as you progress — see [[Activities]] for an overview._
+
+**Before nightfall**
+Night brings dangerous creatures to the surface.
+Your first priority is to build a [[Housing|shelter]] before the sun sets.
+* You need walls, a background wall, and a door at minimum
+* Check the [[Day & Night Cycle]] fiche to know how much time you have
+
+**Going deeper**
+Once you have basic tools and a shelter, you can start exploring:
+* The [[Underground]] layer holds ore, gems and secrets
+* The [[Caverns]] go deeper still — come prepared
+
+**Key topics to read**
+* [[Mining]] — how to mine blocks and what tools you need
+* [[Crafting]] — crafting stations and recipes
+* [[Housing]] — building a valid shelter
+* [[Forest]], [[Desert]] and [[Jungle]] — the different regions of the world
+* Enviroment — [[Day & Night Cycle|Time]], [[Weather]] and [[Moon Phases]]
+  `
+  },
+  {
+    title: 'Help Panel',
+    category: ['Gameplay'],
+    content: `
+**The Help Panel** gives you access to all the game's reference topics at any time.
+Press **[H]** or click the 📜 button in the [[Control Panel]] to open it.
+
+**Left column — navigation**
+* Type in the search box to filter topics by title, category or content
+* When the search box is empty, use the category dropdown to browse by theme
+* Click any topic button to display its page
+* Use **◀** and **▶** to move back and forward through your reading history
+
+**Right column — topic page**
+* The topic title is displayed above the content area
+* Click any highlighted link to navigate directly to the related topic
+
+**Tips**
+* _The search box accepts partial words — typing_ \`min\` _will match_ Mining, Mining Tools, Gemstones..._
+* _The category filter updates automatically when you open a topic_
+* _Your last visited topic is remembered between sessions_
+  `
+  },
+  {
+    title: 'Hotbar',
+    category: ['Gameplay'],
+    content: `
+    `
+  },
+  {
+    title: 'Control Panel',
+    category: ['Gameplay'],
+    content: `
+    `
+  },
+
+  {
+    title: 'Inventory',
+    category: ['Gameplay'],
+    content: `
+    `
+  },
+
+  // ── Gameplay ─────────────────────────────────────────────────
+  //    Movement Speed,  World Creation
   {
     title: 'Movement Speed',
     category: ['Gameplay'],
@@ -3610,14 +3701,7 @@ Movement speed determines how fast the player moves through the world. The base 
 * _Velvetmoss patches are visually distinct — you can plan your path to avoid them if speed matters._ ⏳
 * _Boots with traction bonuses can partially offset terrain penalties._ ⏳
   `
-  },
-  {
-    title: 'Inventory',
-    category: ['Gameplay'],
-    content: `
-    `
-  },
-  {
+  }, {
     title: 'World Creation',
     category: ['Gameplay', 'World'],
     content: `
@@ -3699,13 +3783,13 @@ for (const entry of HELP) {
 export const HELP_TITLES = new Set(HELP.map(entry => entry.title))
 
 // 3. Catégories de l'aide
-// 3.1 Set des catégories (pour le menu déroulant)
-export const HELP_CATEGORIES = new Set()
+// 3.1 Array des catégories (pour le menu déroulant)
+const _catSet = new Set() // Intermédiaire : Set pour l'unicité
 for (const entry of HELP) {
-  for (const cat of entry.category) {
-    HELP_CATEGORIES.add(cat)
-  }
+  for (const cat of entry.category) _catSet.add(cat)
 }
+// Export : tableau trié alphabétiquement
+export const HELP_CATEGORIES = [..._catSet].sort()
 
 // 3.2 Debug — affiche chaque catégorie avec le nombre de topics
 export const debugHelpCategories = () => {

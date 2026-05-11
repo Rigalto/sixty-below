@@ -9,10 +9,10 @@ import {saveManager} from './persistence.mjs'
 import {camera, worldRenderer} from './render.mjs'
 import {buffManager} from './buff.mjs'
 import {creationDialogOverlay} from './ui.mjs'
+import {helpOverlay} from './help.mjs'
 import './ui-debug.mjs'
 import './inventory.mjs'
 import './craft.mjs'
-import './help.mjs'
 
 const mockup = () => {
   const debugDiv = document.createElement('div')
@@ -233,6 +233,8 @@ class GameCore {
 
     // 5. Initialisation des systèmes (Layer 2)
     creationDialogOverlay.init(state.worldkey)
+
+    helpOverlay.init(state.helptopic)
     // C'est ici qu'on initialise les managers
     // await FaunaManager.init(...)
     // await PlayerManager.init(...)
@@ -626,6 +628,10 @@ class KeyboardManager {
   onKeyDown (e) {
     // Rejet immédiat des répétitions automatiques (appui long) pour les actions "One-Shot"
     if (e.repeat) return
+
+    // Guard : ignorer toutes les touches si le focus est sur un champ de saisie
+    const tag = e.target.tagName
+    if (tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT') return
 
     // 1. Mouvements (Polling)
     const moveBit = MOVEMENT_MAP[e.code]

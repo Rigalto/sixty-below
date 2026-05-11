@@ -11,6 +11,7 @@ import {WEATHER_TYPE, MOON_PHASE, MOON_PHASE_BLURRED, STATE, OVERLAYS, UI_LAYOUT
    AFFICHAGE BOUTONS D'ACTION
    ==================================================================================================== */
 
+// MenuBarWidget → nom joueur 'Control Panel'
 class MenuBarWidget {
   constructor () {
     this.container = null

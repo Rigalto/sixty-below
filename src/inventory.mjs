@@ -32,7 +32,7 @@ class InventoryOverlay {
     })
 
     // 2. Création du Header via la Factory
-    const header = createOverlayHeader('🎒 Inventaire [I]', 'inventory')
+    const header = createOverlayHeader('🎒 Inventory [I]', 'inventory')
     this.#header = header
 
     // 3. Zone de contenu (Vide pour l'instant, juste pour remplir)
