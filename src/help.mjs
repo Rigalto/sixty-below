@@ -319,10 +319,10 @@ class HelpOverlay {
         color: #dcddde;
       }
       .help-table tr:nth-child(even) td {
-        background-color: #23272a;
+        background-color: #1e2128;
       }
       .help-table tr:nth-child(odd) td {
-        background-color: #2a2d31;
+        background-color: #2f3340;
       }
       .help-table tr:hover td {
         background-color: #3a4a6b;

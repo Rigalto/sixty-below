@@ -13,6 +13,7 @@
  *     * puce niveau 2
  *   | col1 | col2 |  (table)
  *   | ---- | ---- |
+ *   Utiliser <br> pour forcer un passage à la ligne dans une cellule.
  *
  * ⚠️ Une ligne vide est obligatoire entre chaque bloc
  *      (paragraphe, titre, liste, table).
@@ -109,11 +110,11 @@ It is used in many early-game [[Crafting|recipes]].
 
 **Node**
 
-[[node:copper]] / [[node:copper|cuivre]] /[[node:copper1]]
+[[node:copper]] / [[node:copper|cuivre]]
 {{node:copper:mining}}
 **Item**
 
-[[item:pickaxeCopper]] / [[item:pickaxeCopper|cuivre pioche]] /[[item:pickaxecopper]]
+[[item:pickaxeCopper]] / [[item:pickaxeCopper|cuivre pioche]]
 
 **Recipes using Copper**
 
@@ -453,7 +454,7 @@ Mushroom Caves are large caverns found deep in [[Forest]] biomes. Their floor is
 
 | Monster | Role | Trigger |
 |---|---|---|
-| [[monster:blueSlug]] | Common, passive | Ambient / Harvesting [[Cave Mushrooms]] / Chopping [[Giant Mushroom|Giant Mushrooms]] |
+| [[monster:blueSlug]] | Common, passive | Ambient <br> Harvesting [[Cave Mushrooms]] <br> Chopping [[Giant Mushroom|Giant Mushrooms]] |
 | [[monster:woodlouse]] | Common | Harvesting [[Cave Mushrooms]] |
 | [[monster:hydra]] | Uncommon | Chopping [[Giant Mushroom|Giant Mushrooms]] |
 | [[monster:isopod]] | Mini-boss, rare | Chopping [[Giant Mushroom|Giant Mushrooms]] |
@@ -2498,7 +2499,7 @@ _Some specific gear pieces may deviate from these rules._ ⏳
     content: `
 **Tier**
 
-{{node:flamethrower:star}}
+{{item:flamethrower:star}}
 
 **Main usages**
 
@@ -2794,7 +2795,7 @@ Tableware is a category of [[Furnitures]] that serve as containers for food and 
 
 Empty containers used as crafting ingredients in cooking and potion recipes. They are returned to the player's inventory upon consuming the food or potion.
 * [[item:bowl]] ({{item:bowl:star}}) — soups and stews
-* [[item:mug]] ({{item:botmugtle:star}}) — ales and drinks
+* [[item:mug]] ({{item:mug:star}}) — ales and drinks
 * [[item:plate]] ({{item:plate:star}}) — solid food dishes
 * [[item:trencher]] ({{item:trencher:star}}) — rustic wooden plate for simple meals
 
@@ -4079,7 +4080,7 @@ C'est une mousse d'un orange vif, presque luminescente, qui pousse exclusivement
 
 **Tier**
 
-{{item:amberMoss:star}}
+item:amberMoss:star
 
 **Benefits**⏳
 
@@ -4464,7 +4465,9 @@ const resolveLinks = (entry) => {
   entry.html = entry.html.replace(/\[\[([^\]|]+)(?:\|([^\]]*))?\]\]/g, (match, topic, label) => {
     const display = label ?? topic
     if (!HELP_TITLES.has(topic)) {
-      console.error(`[help] '${entry.title}' : topic inconnu '${topic}'`)
+      if (!display.startsWith('monster:')) {
+        console.error(`[help] '${entry.title}' : topic inconnu '${topic}'`)
+      }
       errors++
       return `⚠️ ${label ? `${topic}|${label}` : topic}`
     }
@@ -4477,7 +4480,6 @@ const renderTables = (html) => {
   const lines = html.split('\n')
   const out = []
   let inTable = false
-  let isFirstRow = true
 
   for (const line of lines) {
     if (!line.startsWith('|')) {
@@ -4486,14 +4488,13 @@ const renderTables = (html) => {
         out.push('</tbody>')
         out.push('</table>')
         inTable = false
-        isFirstRow = true
       }
       out.push(line)
       continue
     }
 
     // Ligne séparateur |---|---|---| → ignorée
-    if (line.replace(/[\|\-\s]/g, '') === '') continue
+    if (line.replace(/[|\-\s]/g, '') === '') continue
 
     // Parser les cellules
     const cells = line.split('|').map(c => c.trim()).filter((c, i, arr) => i > 0 && i < arr.length - 1)
@@ -4505,7 +4506,6 @@ const renderTables = (html) => {
       out.push('</thead>')
       out.push('<tbody>')
       inTable = true
-      isFirstRow = false
       continue
     }
 
@@ -4519,6 +4519,37 @@ const renderTables = (html) => {
   }
 
   return out.join('\n')
+}
+
+const formatStars = (star) => '⭐'.repeat(star) + '☆'.repeat(5 - star)
+
+const resolveStars = (entry, NODES, ITEMS) => {
+  let errors = 0
+  entry.content = entry.content.replace(/\{\{(node|item):([^:}]+):star\}\}/g, (match, type, code) => {
+    if (type === 'node') {
+      const node = NODES[code.toUpperCase()]
+      if (!node) {
+        console.error(`[help] '${entry.title}' : node inconnu '${code}'`)
+        errors++
+        return `⚠️ {{node:${code}:star}}`
+      }
+      let star = node.star || 1
+      if (star < 1) star = 1
+      if (star > 5) star = 5
+      return formatStars(star)
+    }
+    const item = ITEMS[code]
+    if (!item) {
+      console.error(`[help] '${entry.title}' : item inconnu '${code}'`)
+      errors++
+      return `⚠️ {{item:${code}:star}}`
+    }
+    let star = item.star || 1
+    if (star < 1) star = 1
+    if (star > 5) star = 5
+    return formatStars(star)
+  })
+  return errors
 }
 
 const renderMarkdown = (entry) => {
@@ -4536,13 +4567,17 @@ const renderMarkdown = (entry) => {
   // 4. Listes
   html = renderLists(html)
 
-  // 5. Tables
-  html = renderTables(html)
+  // 5. Liens
+  entry.html = html
+  const errors = resolveLinks(entry) // résout [[...|...]] → <a>
 
-  // 6. Passe finale : blocs → <p>
+  // 6. Tables
+  entry.html = renderTables(entry.html)
+
+  // 7. Passe finale : blocs → <p>
   const BLOCK_TAGS = ['<ul', '<table', '<ol']
 
-  html = html.split('\n\n').map(block => {
+  entry.html = entry.html.split('\n\n').map(block => {
     const trimmed = block.trim()
     if (!trimmed) return ''
     for (const tag of BLOCK_TAGS) {
@@ -4551,10 +4586,7 @@ const renderMarkdown = (entry) => {
     return `<p>${trimmed}</p>`
   }).join('\n')
 
-  entry.html = html
-
-  // 7. Liens
-  return resolveLinks(entry)
+  return errors
 }
 
 export const hydrateHelp = (NODES, ITEMS, MONSTERS = {}) => {
@@ -4562,58 +4594,16 @@ export const hydrateHelp = (NODES, ITEMS, MONSTERS = {}) => {
   let errors = 0
 
   for (const entry of HELP) {
+    // liens
     errors += resolveNodeLinks(entry, NODES)
     errors += resolveItemLinks(entry, ITEMS)
     errors += resolveMonsterLinks(entry, MONSTERS)
+    // données dynamiques
+    errors += resolveStars(entry, NODES, ITEMS)
+    // TODO : résolution des autres données dynamiques {{...}}
 
-    // 1. Vérification des liens [[...]]
-    entry.content = entry.content.replace(/\[\[([^\]|]+)(?:\|([^\]]*))?\]\]/g, (match, ref, text) => {
-      // Lien node:code
-      if (ref.startsWith('node:')) { return match }
-      //   const code = ref.slice(5)
-      //   const node = NODES[code.toUpperCase()]
-      //   if (!node) {
-      //     console.error(`[help] '${entry.title}' : node inconnu '${code}'`)
-      //     errors++
-      //     return `⚠️ &lbrack;&lbrack;${ref}&rbrack;&rbrack;`
-      //   }
-      //   return match // valide — sera résolu plus tard
-      // }
-
-      // Lien item:code
-      if (ref.startsWith('item:')) { return match }
-      //   const code = ref.slice(5)
-      //   if (!ITEMS[code]) {
-      //     console.error(`[help] '${entry.title}' : item inconnu '${code}'`)
-      //     errors++
-      //     return `⚠️ &lbrack;&lbrack;${ref}&rbrack;&rbrack;`
-      //   }
-      //   return match // valide — sera résolu plus tard
-      // }
-
-      // Lien item:code
-      if (ref.startsWith('monster:')) { return match }
-      //   const code = ref.slice(8)
-      //   // if (!ITEMS[code]) {
-      //   console.warn(`[help] '${entry.title}' : monstre inconnu '${code}'`)
-      //   errors++
-      //   return `⚠️ &lbrack;&lbrack;${ref}&rbrack;&rbrack;`
-      //   // }
-      //   // return match // valide — sera résolu plus tard
-      // }
-
-      // Lien helpTopic
-      if (!HELP_TITLES.has(ref)) {
-        console.error(`[help] '${entry.title}' : topic inconnu '${ref}'`)
-        errors++
-        return `⚠️ &lbrack;&lbrack;${ref}&rbrack;&rbrack;`
-      }
-      return match // valide — sera résolu plus tard
-    })
-    // TODO : résolution des données dynamiques {{...}}
     // Conversion Markdown → HTML (entry.html = html généré)
     errors += renderMarkdown(entry)
-
     count++
   }
 
