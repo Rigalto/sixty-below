@@ -2666,7 +2666,8 @@ All plants found in the world of Sixty-Below. Plants can be harvested for loot, 
 | [[item:sneakthorn]] | {{item:sneakthorn:star}} | Herb | FOREST+JUNGLE Caverns | [[item:sneakthorn]] | [[monster:vampire]] (Foraging) |
 | [[item:cursedcrown]] | {{item:cursedcrown:star}} | Herb | JUNGLE+DESERT Caverns | [[item:cursedcrown]] | [[monster:fireAnt]] (Foraging) |
 
-| [[item:H]] | {{item:H:star}} | Herb | Caverns bottom | [[item:H]] | [[monster:magmaCrab]] + [[monster:lavaWorm]]  (Foraging) |
+| [[item:abysshorn]] | {{item:abysshorn:star}} | Herb | Caverns top | [[item:abysshorn]] | [[monster:caveJellyfish]] (Foraging) |
+| [[item:inferncap]] | {{item:inferncap:star}} | Herb | Caverns bottom | [[item:inferncap]] | [[monster:lavaWorm]] / [[monster:magmaCrab]] (Foraging) |
 
 _For detailed information on each plant, click its name._
 
@@ -3349,7 +3350,7 @@ Oleander is a common shrub found in the underground passages of all three biomes
   },
 
   // ── Plants - Caverns Herbs ───────────────────────────────────
-  //    Satan's Cube, Sneakthorn, Amber-Moss
+  //    Satan's Cube, Sneakthorn, Cursedcrown, Abysshorn, Inferncap, Amber-Moss
   {
     title: 'Satan\'s Cube',
     category: ['Plant', 'Forest', 'Desert', 'Caverns'],
@@ -3371,7 +3372,7 @@ Satan's Cube is one of the strangest organisms found in the deep [[Caverns]]. It
 
 **Harvest**
 * [[Foraging|Interact to harvest]] — the plant disappears permanently on harvest
-* Tool: [[Harvesting Tools|Gold Sickle]] ⏳
+* Tool: [[Harvesting Tools|Gold Sickle]] required ⏳
 * Drops: [[item:satansCube]] ⏳
 
 **Dangers**
@@ -3407,7 +3408,7 @@ Sneakthorn is a deep cavern plant that grows in the humid passages shared by [[F
 
 **Harvest**
 * [[Foraging|Interact to harvest]] — the plant disappears permanently on harvest
-* Tool: [[Harvesting Tools|Gold Sickle]] ⏳
+* Tool: [[Harvesting Tools|Gold Sickle]] required ⏳
 * Drops: [[item:sneakthorn]] ⏳
 
 **Dangers**
@@ -3420,6 +3421,114 @@ Sneakthorn is a deep cavern plant that grows in the humid passages shared by [[F
 * _Its branching silhouette is easy to miss against jagged cave walls — look for the colour, not the shape._ ⏳
 * _The Vampire strikes from behind — clear your back before harvesting._ ⏳
 * _Consuming preparations made from Sneakthorn provides resistance to [[Poison DOT]]._ ⏳
+  `
+  },
+  {
+    title: 'Cursedcrown',
+    category: ['Plant', 'Jungle', 'Desert'],
+    content: `
+**Description**
+Cursedcrown is the most alien plant found in the deep caverns. Its rigid radial arms — perfectly symmetrical, branching outward like a frozen star — look more like a crystal formation than a living organism. Its electric blue and cyan colouring blazes against the dark [[node:slate]] and [[node:hellstone]] walls. Nothing that glows that brightly in the deep dark is safe to touch.
+
+**Tier**
+{{item:cursedcrown:star}}
+
+**Location**
+* Biome: [[Jungle]], [[Desert]]
+* Layer: [[Caverns]]
+* Grows on any [[Mineable Blocks|Topsoil]] or [[Mineable Blocks|Substrat]] surface
+
+**Population**
+* The species neither grows nor declines — natural balance maintains the population
+* Harvested plants do not regrow
+
+**Harvest**
+* [[Foraging|Interact to harvest]] — the plant disappears permanently on harvest
+* Tool: [[Harvesting Tools|Gold Sickle]] required ⏳
+* Drops: [[item:cursedcrown]] ⏳
+
+**Dangers**
+* Harvesting Cursedcrown agitates a nearby colony of [[monster:fireAnt|Fire Ants]] — they swarm instantly and inflict [[Fire DOT]] and [[Poison DOT]] simultaneously. ⏳
+
+**Usages** ⏳
+* [[item:cursedcrown]] — ingredient for anti-bleeding preparations ⏳
+
+**Tips**
+* _Cursedcrown is the only plant found in both [[Jungle]] and [[Desert]] caverns — a rare overlap worth seeking out._ ⏳
+* _Fire Ants swarm — area-of-effect attacks are more effective than single targets._ ⏳
+* _Consuming preparations made from Cursedcrown provides resistance to [[Bleeding DOT]]._ ⏳
+  `
+  },
+  {
+    title: 'Abysshorn',
+    category: ['Plant', 'Forest', 'Desert', 'Jungle'],
+    content: `
+**Description**
+Abysshorn is one of the strangest organisms in the known world. Its fractal structure — a single cone that splits into two, each splitting again, branching upward in an ever-widening crown of hollow trumpets — looks nothing like a plant. Its pearlescent white surface catches torchlight from across the cavern, making it unmistakable even at distance. Those who study it disagree on whether it is a plant, a fungus, or something else entirely.
+
+**Tier**
+{{item:abysshorn:star}}
+
+**Location**
+* Biome: [[Forest]], [[Desert]], [[Jungle]]
+* Layer: [[Caverns]] Top
+* Grows on any [[Mineable Blocks|Topsoil]] or [[Mineable Blocks|Substrat]] surface
+
+**Population**
+* The species neither grows nor declines — natural balance maintains the population
+* Harvested plants do not regrow
+
+**Harvest**
+* [[Foraging|Interact to harvest]] — the plant disappears permanently on harvest
+* Tool: [[Harvesting Tools|Gold Sickle]] required ⏳
+* Drops: [[item:abysshorn]] ⏳
+
+**Dangers**
+* The hollow trumpets of the Abysshorn resonate at frequencies that attract [[monster:caveJellyfish|Cave Jellyfish]] from the surrounding cavern. Their translucent bodies are nearly invisible in the dark — and their sting causes [[Poison DOT]] and [[Fire DOT]] simultaneously. ⏳
+
+**Usages** ⏳
+* [[item:abysshorn]] — ingredient for pheromone preparations ⏳
+
+**Tips**
+* _Abysshorn reflects torchlight from a great distance — scan the cavern floor before engaging monsters._ ⏳
+* _A Gold Sickle is required — lower-tier tools slide off the surface without cutting._ ⏳
+* _Cave Jellyfish are nearly invisible — bring a strong light source and clear the area before harvesting._ ⏳
+  `
+  },
+  {
+    title: 'Inferncap',
+    category: ['Plant', 'Forest', 'Desert', 'Jungle'],
+    content: `
+**Description**
+Inferncap is the deepest-growing plant in the known world. Found only in the lowest caverns, where the heat of the earth makes the air shimmer and every rock face glows faintly red, it thrives where nothing else survives. Its stacked hemispherical leaves — deep violet, spotted with vivid red circles — look like something between a mushroom and a warning sign. Both interpretations are correct.
+
+**Tier**
+{{item:inferncap:star}}
+
+**Location**
+* Biome: [[Forest]], [[Desert]], [[Jungle]]
+* Layer: [[Caverns]] Bottom
+* Grows on any [[Mineable Blocks|Topsoil]] or [[Mineable Blocks|Substrat]] surface
+
+**Population**
+* The species neither grows nor declines — natural balance maintains the population
+* Harvested plants do not regrow
+
+**Harvest**
+* [[Foraging|Interact to harvest]] — the plant disappears permanently on harvest
+* Tool: [[Harvesting Tools|Gold Sickle]] required ⏳
+* Drops: [[item:inferncap]] ⏳
+
+**Dangers**
+* Harvesting Inferncap draws both a [[monster:lavaWorm|Lava Worm]] and a [[monster:magmaCrab|Magma Crab]] from the surrounding rock. The combination is lethal — the Lava Worm attacks from below while the Magma Crab closes from the side. ⏳
+
+**Usages** ⏳
+* [[item:inferncap]] — rare ingredient for pheromone preparations ⏳
+
+**Tips**
+* _Inferncap is one of only two tier 5 plants — a Gold Sickle is required._ ⏳
+* _Difficult to harvest alone at this depth — the Lava Worm and Magma Crab attack simultaneously._ ⏳
+* _The violet and red colouring is visible without a torch — use it to spot plants from a safe distance._ ⏳
   `
   },
   {

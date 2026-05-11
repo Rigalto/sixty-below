@@ -16,6 +16,7 @@
 - Il n'y a pas assez de Cactus dans le monde => sans doute pas assez de SAND sur le sol souterrain.
 - Il n'y a pas assez de Bamboo dans le monde => sans doute pas assez de SILT sur le sol souterrain.
 - Il n'y a pas assez de Oleanders dans le monde => sans doute pas assez de STONE sur le sol souterrain.
+- Il est aussi possible que le sol soit trop accidenté pour disposer de spots élligibles en nombre suffisant, il faudrait ajouter alors une érosion partielle, en bouchant les trous et supprimant les bosses dans 80-90% des cas.
 
 ## À faire — Génération du monde (`generate.mjs`)
 
@@ -237,6 +238,9 @@ fs.writeFileSync('docs/help-rendered.html', htmlHelp.join('\n'))
 - `plantGenerator.placeOleanders` - ajout des Oleander en Underground / STONE
 - `plantGenerator.placeSatansCubes` - ajout des Satan's Cube en Caverns / FOREST + DESERT
 - `plantGenerator.placeSneakthorns` - ajout des Sneakthorns en Caverns / FOREST + JUNGLE
+- `plantGenerator.placeCursedcrowns` - ajout des Cursedcrowns en Caverns / DESERT + JUNGLE
+- `plantGenerator.placeAbysshorns` - ajout des Abysshorns en Caverns_top
+- `plantGenerator.placeInferncaps` - ajout des Inferncaps en Caverns_bottom
 
 ### Rendu (partiel)
 - `WorldRenderer` — rendu tuiles par chunks avec cache OffscreenCanvas

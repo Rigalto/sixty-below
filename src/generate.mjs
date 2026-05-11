@@ -1,7 +1,7 @@
 import {seededRNG, shuffleArray, rollLoot} from './utils.mjs'
 import {database, uniqueIdGenerator} from './database.mjs'
 import {WORLD_WIDTH, WORLD_HEIGHT, SEA_LEVEL, TOPSOIL_Y_SKY_SURFACE, TOPSOIL_Y_SURFACE_UNDER, TOPSOIL_Y_UNDER_CAVERNS, TOPSOIL_Y_CAVERNS_MID, BIOME_TILE_MAP, SEA_MAX_JITTER, SEA_MAX_WIDTH, SEA_MAX_HEIGHT, CLUSTER_SCATTER_MAP, ORE_GEM_SCATTER_MAP, PERLIN_OFFSET_NATURALIZER, PERLIN_OFFSET_TUNNEL, PERLIN_OFFSET_SURFACE_TUNNEL, PERLIN_OFFSET_SMALL_TUNNEL, PERLIN_OFFSET_CAVERN, PERLIN_OFFSET_HIVE, PERLIN_OFFSET_HEART, PERLIN_OFFSET_MUSHROOM, PERLIN_OFFSET_COBWEB, PERLIN_OFFSET_FERNS, PERLIN_OFFSET_LAKES, PERLIN_OFFSET_SHELL, PERLIN_OFFSET_TEMPLE, PERLIN_OFFSET_BEACH, SMALL_CAVERNS_COUNT, MEDIUM_CAVERNS_COUNT, UNDERGROUND_TUNNEL_COUNT, CAVERNS_TUNNEL_COUNT, SMALL_TUNNELS_COUNT, HIVE_RADIUS_MIN, HIVE_RADIUS_MAX, COBWEB_CAVE_COUNT_MIN, COBWEB_CAVE_COUNT_MAX, COBWEB_RADIUS_X_MIN, COBWEB_RADIUS_X_MAX, COBWEB_RADIUS_Y_MIN, COBWEB_RADIUS_Y_MAX, COBWEB_CAVE_MAIN_MIN, COBWEB_CAVE_MAIN_MAX, COBWEB_CAVE_SIDE_MIN, COBWEB_CAVE_SIDE_MAX, COBWEB_SCATTER_COUNT, COBWEB_SCATTER_SIZE_MIN, COBWEB_SCATTER_SIZE_MAX, GEODE_CAVE_COUNT_MIN, GEODE_CAVE_COUNT_MAX, GEODE_RADIUS_MIN, GEODE_RADIUS_MAX, GEODE_TARGET_CLUSTER_COUNT, GEODE_CLUSTER_SIZE_MIN, GEODE_CLUSTER_SIZE_MAX, TOPSOIL_SCATTER_MAP, LAKE_RADIUS_X_MIN, LAKE_RADIUS_X_MAX, LAKE_RADIUS_Y_MIN, LAKE_RADIUS_Y_MAX, LAKE_PIT_RADIUS_X_MIN, LAKE_PIT_RADIUS_X_MAX, LAKE_PIT_RADIUS_Y_MIN, LAKE_PIT_RADIUS_Y_MAX, LAKE_CREATION_MAP, UNDERGROUND_LAKE_UNDER_COUNT, UNDERGROUND_LAKE_CAVERNS_COUNT, UNDERGROUND_LAKE_RADIUS_MIN, UNDERGROUND_LAKE_RADIUS_MAX, BLIND_LAKE_COUNT, BLIND_LAKE_RADIUS_MIN, BLIND_LAKE_RADIUS_MAX, SAP_LAKE_UNDER_COUNT, SAP_LAKE_CAVERNS_COUNT, SAP_LAKE_RADIUS_MIN, SAP_LAKE_RADIUS_MAX, SAP_POCKET_COUNT, SAP_POCKET_RADIUS_MIN, SAP_POCKET_RADIUS_MAX, WATER_PUDDLE_COUNT, SAP_PUDDLE_COUNT, PUDDLE_HEIGHT_MIN, PUDDLE_HEIGHT_MAX, FOSSIL_VEIN_COUNT, FERN_CAVE_RADIUS_X_MIN, FERN_CAVE_RADIUS_X_MAX, FERN_CAVE_RADIUS_Y_MIN, FERN_CAVE_RADIUS_Y_MAX, MOSS_CAVE_RADIUS_X_MIN, MOSS_CAVE_RADIUS_X_MAX, MOSS_CAVE_RADIUS_Y_MIN, MOSS_CAVE_RADIUS_Y_MAX, SAND_POCKET_RADIUS_X_MIN, SAND_POCKET_RADIUS_X_MAX, SAND_POCKET_RADIUS_Y_MIN, SAND_POCKET_RADIUS_Y_MAX, MUSHROOM_CAVE_RADIUS_X_MIN, MUSHROOM_CAVE_RADIUS_X_MAX, MUSHROOM_CAVE_RADIUS_Y_MIN, MUSHROOM_CAVE_RADIUS_Y_MAX, PYRAMID_WALL_INDEXES, PYRAMID_VOID_INDEXES, PYRAMID_WIDTH, PYRAMID_HEIGHT, PYRAMID_ROOM1_DELTA, PYRAMID_ROOM2_DELTA, TEMPLE_RUIN_WALL_INDEXES, TEMPLE_RUIN_COLUMNS_INDEXES, CHEST_CONTENT, TREES_INIT_SIZE, GIANT_MUSHROOM_INIT_SIZE} from '../assets/data/data-gen.mjs'
-import {NODES, NODES_LOOKUP, NODE_TYPE, BIOME_TYPE, PLANT_KIND, PLANT_TYPE, ITEMS, BAG_CAPACITY, TREE_IMAGES, PARSNIP_COUNT, MANDRAKE_COUNT, CACTUS_COUNT, BAMBOO_COUNT, OLEANDER_COUNT, SATANS_CUBE_COUNT, SNEAKTHORN_COUNT} from '../assets/data/data.mjs'
+import {NODES, NODES_LOOKUP, NODE_TYPE, BIOME_TYPE, PLANT_KIND, PLANT_TYPE, ITEMS, BAG_CAPACITY, TREE_IMAGES, PARSNIP_COUNT, MANDRAKE_COUNT, CACTUS_COUNT, BAMBOO_COUNT, OLEANDER_COUNT, SATANS_CUBE_COUNT, SNEAKTHORN_COUNT, CURSEDCROWN_COUNT, ABYSSHORN_COUNT, INFERNCAP_COUNT} from '../assets/data/data.mjs'
 import {WEATHER_TYPE, WEATHER_TYPE_CODE} from './constant.mjs'
 
 /* ====================================================================================================
@@ -406,6 +406,9 @@ class WorldGenerator {
 
     plantGenerator.placeSatansCubes(zoneRects, chestIndexes)
     plantGenerator.placeSneakthorns(zoneRects, chestIndexes)
+    plantGenerator.placeCursedcrowns(zoneRects, chestIndexes)
+    plantGenerator.placeAbysshorns(zoneRects, chestIndexes)
+    plantGenerator.placeInferncaps(zoneRects, chestIndexes)
     await progress('Caverns Plants')
 
     // 9. Traitements finaux
@@ -8109,6 +8112,244 @@ class PlantGenerator {
         w: 3,
         h: 3,
         x: cx - 1,
+        y: y - 3,
+        present: true,
+        deleted: false
+      })
+      placed++
+    }
+  }
+
+  /**
+   * Place les Cursedcrowns dans les caverns des biomes Jungle et Desert.
+   * Substrat : toute tuile TOPSOIL ou SUBSTRAT (13 types, Set local).
+   * Les trois tuiles support doivent être des substrats valides.
+   * VOID requis sur les 3×3 tuiles occupées (y-1 à y-3, x-1 à x+1).
+   * Anti-coffre sur 4 tuiles support (cx-2 à cx+1).
+   * Nombre constant : CURSEDCROWN_COUNT.
+   * Arrêt après MAX_ATTEMPTS échecs consécutifs.
+   *
+   * @param {Array<{x0, x1, ySurface, yUnder, yCaverns, biome}>} zoneRects
+   * @param {Set<number>} chestIndexes — index interdits (coffres)
+   */
+  placeCursedcrowns (zoneRects, chestIndexes) {
+    const VOID = NODES.VOID.code
+    const W = WORLD_WIDTH
+    const MAX_ATTEMPTS = 100
+
+    const VALID_SUBSTRATES = new Set([
+      NODES.DIRT.code, NODES.SAND.code, NODES.SILT.code, NODES.HUMUS.code,
+      NODES.CLAY.code, NODES.SANDSTONE.code, NODES.MUD.code,
+      NODES.STONE.code, NODES.ASH.code, NODES.LIMESTONE.code,
+      NODES.HARDSTONE.code, NODES.HELLSTONE.code, NODES.SLATE.code
+    ])
+
+    const rects = []
+    for (const rect of zoneRects) {
+      if (rect.biome !== BIOME_TYPE.JUNGLE && rect.biome !== BIOME_TYPE.DESERT) continue
+      rects.push({x0: rect.x0, x1: rect.x1, y0: rect.yUnder, y1: rect.yCaverns})
+    }
+    if (rects.length === 0) return
+
+    let placed = 0
+    let consecutiveFailures = 0
+
+    while (placed < CURSEDCROWN_COUNT && consecutiveFailures < MAX_ATTEMPTS) {
+      const rect = seededRNG.randomGetArrayValue(rects)
+      const cx = seededRNG.randomGetMinMax(rect.x0 + 2, rect.x1 - 2)
+      const cy = seededRNG.randomGetMinMax(rect.y0 + 1, rect.y1 - 1)
+
+      if (worldBuffer.read(cx, cy) !== VOID) { consecutiveFailures++; continue }
+
+      let y = cy
+      while (y < rect.y1 && worldBuffer.read(cx, y) === VOID) y++
+
+      if (!VALID_SUBSTRATES.has(worldBuffer.read(cx - 1, y))) { consecutiveFailures++; continue }
+      if (!VALID_SUBSTRATES.has(worldBuffer.read(cx, y))) { consecutiveFailures++; continue }
+      if (!VALID_SUBSTRATES.has(worldBuffer.read(cx + 1, y))) { consecutiveFailures++; continue }
+
+      let voidOk = true
+      for (let dx = -1; dx <= 1 && voidOk; dx++) {
+        for (let dy = 1; dy <= 3 && voidOk; dy++) {
+          if (worldBuffer.read(cx + dx, y - dy) !== VOID) voidOk = false
+        }
+      }
+      if (!voidOk) { consecutiveFailures++; continue }
+
+      if (chestIndexes.has((y << 10) | (cx - 2))) { consecutiveFailures++; continue }
+      if (chestIndexes.has((y << 10) | (cx - 1))) { consecutiveFailures++; continue }
+      if (chestIndexes.has((y << 10) | cx)) { consecutiveFailures++; continue }
+      if (chestIndexes.has((y << 10) | (cx + 1))) { consecutiveFailures++; continue }
+
+      consecutiveFailures = 0
+
+      const soilIndex = (y << 10) | (cx - 1)
+
+      this.#plants.push({
+        id: uniqueIdGenerator.getUniqueId(),
+        kind: PLANT_KIND.HERB,
+        type: PLANT_TYPE.CURSEDCROWN,
+        index: soilIndex - 3 * W,
+        soilIndex,
+        itemId: 'cursedcrown',
+        w: 3,
+        h: 3,
+        x: cx - 1,
+        y: y - 3,
+        present: true,
+        deleted: false
+      })
+      placed++
+    }
+  }
+
+  /**
+   * Place les Abysshorns dans les caverns top de tous les biomes.
+   * Substrat : toute tuile TOPSOIL ou SUBSTRAT (13 types, Set local).
+   * Les deux tuiles support doivent être des substrats valides.
+   * VOID requis sur les 2×2 tuiles occupées (y-1, y-2, x et x+1).
+   * Anti-coffre sur 3 tuiles support (cx-1 à cx+1).
+   * Nombre constant : ABYSSHORN_COUNT.
+   * Arrêt après MAX_ATTEMPTS échecs consécutifs.
+   *
+   * @param {Array<{x0, x1, yUnder, yCaverns, biome}>} zoneRects
+   * @param {Set<number>} chestIndexes — index interdits (coffres)
+   */
+  placeAbysshorns (zoneRects, chestIndexes) {
+    const VOID = NODES.VOID.code
+    const W = WORLD_WIDTH
+    const MAX_ATTEMPTS = 100
+
+    const VALID_SUBSTRATES = new Set([
+      NODES.DIRT.code, NODES.SAND.code, NODES.SILT.code, NODES.HUMUS.code,
+      NODES.CLAY.code, NODES.SANDSTONE.code, NODES.MUD.code,
+      NODES.STONE.code, NODES.ASH.code, NODES.LIMESTONE.code,
+      NODES.HARDSTONE.code, NODES.HELLSTONE.code, NODES.SLATE.code
+    ])
+
+    const rects = []
+    for (const rect of zoneRects) {
+      rects.push({x0: rect.x0, x1: rect.x1, y0: rect.yUnder, y1: rect.yCavernsMid})
+    }
+    if (rects.length === 0) return
+
+    let placed = 0
+    let consecutiveFailures = 0
+
+    while (placed < ABYSSHORN_COUNT && consecutiveFailures < MAX_ATTEMPTS) {
+      const rect = seededRNG.randomGetArrayValue(rects)
+      const cx = seededRNG.randomGetMinMax(rect.x0 + 1, rect.x1 - 2)
+      const cy = seededRNG.randomGetMinMax(rect.y0 + 1, rect.y1 - 1)
+
+      if (worldBuffer.read(cx, cy) !== VOID) { consecutiveFailures++; continue }
+
+      let y = cy
+      while (y < rect.y1 && worldBuffer.read(cx, y) === VOID) y++
+
+      if (!VALID_SUBSTRATES.has(worldBuffer.read(cx, y))) { consecutiveFailures++; continue }
+      if (!VALID_SUBSTRATES.has(worldBuffer.read(cx + 1, y))) { consecutiveFailures++; continue }
+
+      // Vérifier VOID sur les 2×2 tuiles occupées
+      let voidOk = true
+      for (let dx = 0; dx <= 1 && voidOk; dx++) {
+        for (let dy = 1; dy <= 2 && voidOk; dy++) {
+          if (worldBuffer.read(cx + dx, y - dy) !== VOID) voidOk = false
+        }
+      }
+      if (!voidOk) { consecutiveFailures++; continue }
+
+      if (chestIndexes.has((y << 10) | (cx - 1))) { consecutiveFailures++; continue }
+      if (chestIndexes.has((y << 10) | cx)) { consecutiveFailures++; continue }
+      if (chestIndexes.has((y << 10) | (cx + 1))) { consecutiveFailures++; continue }
+
+      consecutiveFailures = 0
+
+      const soilIndex = (y << 10) | cx
+
+      this.#plants.push({
+        id: uniqueIdGenerator.getUniqueId(),
+        kind: PLANT_KIND.HERB,
+        type: PLANT_TYPE.ABYSSHORN,
+        index: soilIndex - 2 * W,
+        soilIndex,
+        itemId: 'abysshorn',
+        w: 2,
+        h: 2,
+        x: cx,
+        y: y - 2,
+        present: true,
+        deleted: false
+      })
+      placed++
+    }
+  }
+
+  /**
+   * Place les Inferncaps dans les caverns bottom de tous les biomes.
+   * Substrat : toute tuile TOPSOIL ou SUBSTRAT (13 types, Set local).
+   * La tuile support doit être un substrat valide.
+   * VOID requis en y-1, y-2, y-3.
+   * Anti-coffre sur cx-1 et cx.
+   * Nombre constant : INFERNCAP_COUNT.
+   * Arrêt après MAX_ATTEMPTS échecs consécutifs.
+   *
+   * @param {Array<{x0, x1, yCavernsMid, yCaverns, biome}>} zoneRects
+   * @param {Set<number>} chestIndexes — index interdits (coffres)
+   */
+  placeInferncaps (zoneRects, chestIndexes) {
+    const VOID = NODES.VOID.code
+    const W = WORLD_WIDTH
+    const MAX_ATTEMPTS = 100
+
+    const VALID_SUBSTRATES = new Set([
+      NODES.DIRT.code, NODES.SAND.code, NODES.SILT.code, NODES.HUMUS.code,
+      NODES.CLAY.code, NODES.SANDSTONE.code, NODES.MUD.code,
+      NODES.STONE.code, NODES.ASH.code, NODES.LIMESTONE.code,
+      NODES.HARDSTONE.code, NODES.HELLSTONE.code, NODES.SLATE.code
+    ])
+
+    const rects = []
+    for (const rect of zoneRects) {
+      rects.push({x0: rect.x0, x1: rect.x1, y0: rect.yCavernsMid, y1: rect.yCaverns})
+    }
+    if (rects.length === 0) return
+
+    let placed = 0
+    let consecutiveFailures = 0
+
+    while (placed < INFERNCAP_COUNT && consecutiveFailures < MAX_ATTEMPTS) {
+      const rect = seededRNG.randomGetArrayValue(rects)
+      const cx = seededRNG.randomGetMinMax(rect.x0 + 1, rect.x1 - 1)
+      const cy = seededRNG.randomGetMinMax(rect.y0 + 1, rect.y1 - 1)
+
+      if (worldBuffer.read(cx, cy) !== VOID) { consecutiveFailures++; continue }
+
+      let y = cy
+      while (y < rect.y1 && worldBuffer.read(cx, y) === VOID) y++
+
+      if (!VALID_SUBSTRATES.has(worldBuffer.read(cx, y))) { consecutiveFailures++; continue }
+
+      if (worldBuffer.read(cx, y - 1) !== VOID) { consecutiveFailures++; continue }
+      if (worldBuffer.read(cx, y - 2) !== VOID) { consecutiveFailures++; continue }
+      if (worldBuffer.read(cx, y - 3) !== VOID) { consecutiveFailures++; continue }
+
+      if (chestIndexes.has((y << 10) | (cx - 1))) { consecutiveFailures++; continue }
+      if (chestIndexes.has((y << 10) | cx)) { consecutiveFailures++; continue }
+
+      consecutiveFailures = 0
+
+      const soilIndex = (y << 10) | cx
+
+      this.#plants.push({
+        id: uniqueIdGenerator.getUniqueId(),
+        kind: PLANT_KIND.HERB,
+        type: PLANT_TYPE.INFERNCAP,
+        index: soilIndex - 3 * W,
+        soilIndex,
+        itemId: 'inferncap',
+        w: 1,
+        h: 3,
+        x: cx,
         y: y - 3,
         present: true,
         deleted: false

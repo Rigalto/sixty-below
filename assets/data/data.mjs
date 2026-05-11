@@ -394,8 +394,9 @@ export const ITEMS = {
 
   satansCube: {name: 'Satan\'s Cube', type: ITEM_TYPE.MATERIAL, stype: 'herb', star: 4, image: 'fuws_32_32-2-3', placed: 'fuws_32_32-2-3', foraging: [{item: 'satansCube', count: 1, rainy: 1.8, windy: 1.8}], help: 'Satan\'s Cube', tooltip: 'Harvest to collect Potions and Food ingredients'},
   sneakthorn: {name: 'Sneakthorn', type: ITEM_TYPE.MATERIAL, stype: 'herb', star: 4, image: 'fuws_32_32-2-3', placed: 'fuws_32_32-2-3', foraging: [{item: 'sneakthorn', count: 1, rainy: 1.8, windy: 1.8}], help: 'Sneakthorn', tooltip: 'Harvest to collect Potions and Food ingredients'},
-  cursedcrown: {name: 'Cursedcrown ', type: ITEM_TYPE.MATERIAL, stype: 'herb', star: 4, image: 'fuws_32_32-2-3', placed: 'fuws_32_32-2-3', foraging: [{item: 'cursedcrown', count: 1, rainy: 1.8, windy: 1.8}], help: 'Satan\'s Cube', tooltip: 'Harvest to collect Potions and Food ingredients'},
-  H: {name: 'HHH', type: ITEM_TYPE.MATERIAL, stype: 'herb', star: 5, image: 'fuws_32_32-2-3', placed: 'fuws_32_32-2-3', foraging: [{item: 'H', count: 1, rainy: 1.8, windy: 1.8}], help: 'Satan\'s Cube', tooltip: 'Harvest to collect Potions and Food ingredients'},
+  cursedcrown: {name: 'Cursedcrown ', type: ITEM_TYPE.MATERIAL, stype: 'herb', star: 4, image: 'fuws_32_32-2-3', placed: 'fuws_32_32-2-3', foraging: [{item: 'cursedcrown', count: 1, rainy: 1.8, windy: 1.8}], help: 'Cursedcrown', tooltip: 'Harvest to collect Potions and Food ingredients'},
+  abysshorn: {name: 'Abysshorn', type: ITEM_TYPE.MATERIAL, stype: 'herb', star: 5, image: 'fuws_32_32-2-3', placed: 'fuws_32_32-2-3', foraging: [{item: 'abysshorn', count: 1, rainy: 1.8, windy: 1.8}], help: 'Abysshorn', tooltip: 'Harvest to collect Potions and Food ingredients'},
+  inferncap: {name: 'Inferncap', type: ITEM_TYPE.MATERIAL, stype: 'herb', star: 5, image: 'fuws_32_32-2-3', placed: 'fuws_32_32-2-3', foraging: [{item: 'inferncap', count: 1, rainy: 1.8, windy: 1.8}], help: 'Inferncap', tooltip: 'Harvest to collect Potions and Food ingredients'},
 
   // Gardening
   clayPot1: {name: 'Clay Pot (1x1)', type: ITEM_TYPE.FURNITURE | ITEM_TYPE.PLACABLE | ITEM_TYPE.CRAFTABLE, stype: 'pot', star: 1, capacity: 1, image: 'furniture_32_32-0-8', surface: true, placed: 'fuws_16_16-0-2', placedleft: 'fuws_16_16-1-2', placedright: 'fuws_16_16-2-2', help: 'Clay Pots', tooltip: 'Gardening Container'},
@@ -457,7 +458,9 @@ export const PLANT_TYPE = {
   // Caverns Herbs
   SATANS_CUBE: 51,
   SNEAKTHORN: 52,
-  SKORN: 53,
+  CURSEDCROWN: 53,
+  ABYSSHORN: 54,
+  INFERNCAP: 55,
   // Under Sea Herbs
   CORAL_R: 61,
   CORAL_P: 62,
@@ -477,6 +480,9 @@ export const BAMBOO_COUNT = 40
 export const OLEANDER_COUNT = 100
 export const SATANS_CUBE_COUNT = 80
 export const SNEAKTHORN_COUNT = 80
+export const CURSEDCROWN_COUNT = 80
+export const ABYSSHORN_COUNT = 80
+export const INFERNCAP_COUNT = 60
 
 export const TREE_IMAGES = {
   coconut: [
