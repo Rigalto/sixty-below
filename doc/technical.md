@@ -146,6 +146,14 @@ Effectuée par `core.mjs :: #hydrateNodes()`, `#hydrateItems()` et `hydrateTreeI
 Itère sur `NODES_LOOKUP`, `ITEMS` et `TREE_IMAGES`, remplace les strings `image`, `placed`, etc.
 par des objets `{imageIndex, x, y, w, h}` directement utilisables pour le rendu.
 
+#### `hydrateHelp` — pipeline de résolution
+| Fonction | Syntaxe traitée | Statut |
+| :--- | :--- | :--- |
+| `resolveNodeLinks(entry, NODES)` | `[[node:code]]`, `[[node:code\|texte]]` | ✓ |
+| `resolveItemLinks(entry, ITEMS)` | `[[item:code]]`, `[[item:code\|texte]]` | à venir |
+| `resolveMonsterLinks(entry, MONSTERS)` | `[[monster:code]]`, `[[monster:code\|texte]]` | à venir |
+| `resolveHelpLinks(entry)` | `[[helpTopic]]`, `[[helpTopic\|texte]]` | à venir |
+
 ---
 
 ## 4. `utils.mjs` (Layer 1)

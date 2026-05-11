@@ -102,6 +102,7 @@ It is used in many early-game [[Crafting|recipes]].
 <<miningInfo|copperPickaxe|1|copper>>
 
 **Drops**
+[[node:copper]] / [[node:copper|cuivre]] /[[node:copper1]]
 {{node:copper:mining}}
 
 **Recipes using Copper**
@@ -3813,24 +3814,44 @@ debugHelpCategories()
 // 4 HYDRATATION
 // /////////////
 
+// Dans data-help.mjs, avant hydrateHelp
+
+const resolveNodeLinks = (entry, NODES) => {
+  let errors = 0
+  entry.content = entry.content.replace(/\[\[node:([^\]|]+)(?:\|([^\]]*))?\]\]/g, (match, code, text) => {
+    const node = NODES[code.toUpperCase()]
+    if (!node) {
+      console.error(`[help] '${entry.title}' : node inconnu '${code}'`)
+      errors++
+      return `⚠️ [[node:${code}]]`
+    }
+    const label = text ?? node.name
+    if (node.help === entry.title) return label
+    return `[[${node.help}|${label}]]`
+  })
+  return errors
+}
+
 export const hydrateHelp = (NODES, ITEMS) => {
   let count = 0
   let errors = 0
 
   for (const entry of HELP) {
+    errors += resolveNodeLinks(entry, NODES)
+
     // 1. Vérification des liens [[...]]
     entry.content = entry.content.replace(/\[\[([^\]|]+)(?:\|([^\]]*))?\]\]/g, (match, ref, text) => {
       // Lien node:code
-      if (ref.startsWith('node:')) {
-        const code = ref.slice(5)
-        const node = NODES[code.toUpperCase()]
-        if (!node) {
-          console.error(`[help] '${entry.title}' : node inconnu '${code}'`)
-          errors++
-          return `⚠️ &lbrack;&lbrack;${ref}&rbrack;&rbrack;`
-        }
-        return match // valide — sera résolu plus tard
-      }
+      if (ref.startsWith('node:')) { return match }
+      //   const code = ref.slice(5)
+      //   const node = NODES[code.toUpperCase()]
+      //   if (!node) {
+      //     console.error(`[help] '${entry.title}' : node inconnu '${code}'`)
+      //     errors++
+      //     return `⚠️ &lbrack;&lbrack;${ref}&rbrack;&rbrack;`
+      //   }
+      //   return match // valide — sera résolu plus tard
+      // }
 
       // Lien item:code
       if (ref.startsWith('item:')) {
