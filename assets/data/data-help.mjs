@@ -3349,7 +3349,7 @@ Oleander is a common shrub found in the underground passages of all three biomes
   },
 
   // ── Plants - Caverns Herbs ───────────────────────────────────
-  //    Satan's Cube, Amber-Moss
+  //    Satan's Cube, Sneakthorn, Amber-Moss
   {
     title: 'Satan\'s Cube',
     category: ['Plant', 'Forest', 'Desert', 'Caverns'],
@@ -3386,7 +3386,42 @@ Satan's Cube is one of the strangest organisms found in the deep [[Caverns]]. It
 * _Consuming preparations made from Satan's Cube provides resistance to [[Fire DOT]]._ ⏳
   `
   },
+  {
+    title: 'Sneakthorn',
+    category: ['Plant', 'Forest', 'Jungle'],
+    content: `
+**Description**
+Sneakthorn is a deep cavern plant that grows in the humid passages shared by [[Forest]] and [[Jungle]] biomes. Its branching arms — each splitting at 45 degrees from the one below — give it the silhouette of a frozen explosion. Its vivid scarlet and magenta colouring is an unambiguous warning. Explorers who ignore it rarely make the same mistake twice.
 
+**Tier**
+{{item:sneakthorn:star}}
+
+**Location**
+* Biome: [[Forest]], [[Jungle]]
+* Layer: [[Caverns]]
+* Grows on any [[Mineable Blocks|Topsoil]] or [[Mineable Blocks|Substrat]] surface
+
+**Population**
+* The species neither grows nor declines — natural balance maintains the population
+* Harvested plants do not regrow
+
+**Harvest**
+* [[Foraging|Interact to harvest]] — the plant disappears permanently on harvest
+* Tool: [[Harvesting Tools|Gold Sickle]] ⏳
+* Drops: [[item:sneakthorn]] ⏳
+
+**Dangers**
+* Harvesting Sneakthorn draws a [[monster:vampire]] out of the surrounding darkness — silent, fast, and venomous. Its bite inflicts both [[Bleeding DOT]] and [[Poison DOT]]. ⏳
+
+**Usages** ⏳
+* [[item:sneakthorn]] — ingredient for anti-poison preparations ⏳
+
+**Tips**
+* _Its branching silhouette is easy to miss against jagged cave walls — look for the colour, not the shape._ ⏳
+* _The Vampire strikes from behind — clear your back before harvesting._ ⏳
+* _Consuming preparations made from Sneakthorn provides resistance to [[Poison DOT]]._ ⏳
+  `
+  },
   {
     title: 'Amber-Moss',
     category: ['Plant', 'Forest'],
