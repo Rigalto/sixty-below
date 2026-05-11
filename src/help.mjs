@@ -299,6 +299,34 @@ class HelpOverlay {
       .help-grid::-webkit-scrollbar-thumb:hover { background: #4a69bd; }
       .help-link { color: #90cdf4; text-decoration: underline; cursor: pointer; }
       .help-link:hover { color: #bee3f8; }
+      .help-table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 13px;
+        margin: 4px 0;
+      }
+      .help-table th {
+        background-color: #2c3e50;
+        color: #ffffff;
+        font-weight: bold;
+        padding: 6px 10px;
+        text-align: left;
+        border-bottom: 2px solid #4a69bd;
+      }
+      .help-table td {
+        padding: 5px 10px;
+        border-bottom: 1px solid #202225;
+        color: #dcddde;
+      }
+      .help-table tr:nth-child(even) td {
+        background-color: #23272a;
+      }
+      .help-table tr:nth-child(odd) td {
+        background-color: #2a2d31;
+      }
+      .help-table tr:hover td {
+        background-color: #3a4a6b;
+      }
     `
     document.head.appendChild(style)
   }

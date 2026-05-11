@@ -99,23 +99,29 @@ Copper is the most common ore found near the [[Surface|Surface layer]].
 It is used in many early-game [[Crafting|recipes]].
 
 **Main Location**
+
 * All biomes
 * Layer: [[Underground]], [[Surface]]
 
 **Mining**
+
 <<miningInfo|copperPickaxe|1|copper>>
 
 **Node**
+
 [[node:copper]] / [[node:copper|cuivre]] /[[node:copper1]]
 {{node:copper:mining}}
 **Item**
+
 [[item:pickaxeCopper]] / [[item:pickaxeCopper|cuivre pioche]] /[[item:pickaxecopper]]
 
 **Recipes using Copper**
+
 {{recipe:copperBar}}
 {{recipe:copperSword}} ⏳
 
 **All Pickaxes**
+
 <<statTable|pickaxe>>
 
 **Tips**
@@ -136,26 +142,31 @@ It is used in many early-game [[Crafting|recipes]].
 The Surface is the topmost layer of the world, where the player begins their adventure. It is the most accessible layer, with moderate resources and fauna.
 
 **Main Location**
+
 * From the sky down to the Underground boundary
 * Includes several tile-layers below the visible surface line
 * Exposed to the day/night cycle and weather ⏳
 
 **Materials**
+
 * [[node:grassForest]], [[node:dirt]] — Forest
 * [[node:sand]], [[node:sandstone]] — Desert
 * [[node:grassJungle]], [[node:silt]] — Jungle
 
 **Resources**
+
 * [[item:chunkCopper]], [[item:chunkIron]] — common
 * Surface plants and critters ⏳
 
 **Mini-biomes**
+
 * [[Ant Hill]] — Forest
 * [[Antlion Pit]] — Desert
 * [[Termite Mound]] — Jungle
 * [[Surface Lake]] — All biomes
 
 **Damage type**
+
 * Piercing
 
 **Tips**
@@ -173,18 +184,22 @@ The Surface is the topmost layer of the world, where the player begins their adv
 The Underground layer begins just below the surface. It is darker, more dangerous, and richer in resources than the surface.
 
 **Main Location**
+
 * Below the Surface
 * Above the Caverns
 
 **Materials**
+
 * [[node:stone]], [[node:clay]] — Forest
 * [[node:sandstone]], [[node:stone]] — Desert
 * [[node:mud]], [[node:clay]] — Jungle
 
 **Resources**
+
 * [[item:chunkCopper]], [[item:chunkIron]], [[item:chunkSilver]] — common
 
 **Mini-biomes**
+
 * [[Fern Cave]] — Forest
 * [[Moss Cave]] — Jungle
 * [[Sand Pocket]] — Desert
@@ -193,6 +208,7 @@ The Underground layer begins just below the surface. It is darker, more dangerou
 * [[Underground Lake]] — All biomes
 
 **Damage type**
+
 * Slashing
 
 **Tips**
@@ -210,24 +226,29 @@ The Underground layer begins just below the surface. It is darker, more dangerou
 The Caverns are the deepest accessible layer, divided into two sub-layers : Caverns Top and Caverns Bottom. This is where the rarest resources and most dangerous fauna are found.
 
 **Main Location**
+
 * Below the Underground
 * Above Hell
 
 **Sub-layers**
+
 * _Caverns Top_ — upper half, more accessible
 * _Caverns Bottom_ — lower half, more dangerous
 
 **Materials**
+
 * [[node:hardstone]], [[node:slate]] — all biomes
 * [[node:hellstone]] — Jungle, rare in other biomes
 * [[node:granite]], [[node:marble]] — [[Geode Cave]]s
 
 **Resources**
+
 * [[item:chunkGold]], [[item:chunkCobalt]], [[item:chunkPlatinum]] — rare to very rare
 * [[item:rawTopaz]], [[item:rawRuby]], [[item:rawEmerald]], [[item:rawSapphire]] — rare to very rare⏳
 * [[item:blockGranite]], [[item:blockMarble]] — [[Geode Cave]]s
 
 **Mini-biomes**
+
 * [[Mushroom Cave]] — Forest, Caverns Top
 * [[Hive]] — Jungle, Caverns Top
 * [[Fossil Vein]] — Desert, Caverns Top
@@ -240,6 +261,7 @@ The Caverns are the deepest accessible layer, divided into two sub-layers : Cave
 * [[Graveyard]] — all biomes, Caverns Bottom
 
 **Damage type**
+
 * Crushing
 
 **Tips**
@@ -260,21 +282,25 @@ The Caverns are the deepest accessible layer, divided into two sub-layers : Cave
 The Forest is the starting biome, located at the center of the world. It is the most balanced biome, with moderate resources and fauna. The player always spawns here.
 
 **Main Location**
+
 * The world always contains at least one Forest zone, at the center — the player spawns here.
 * Additional Forest zones may appear elsewhere in the world.
 * Layer: all layers
 
 **Materials**
+
 * Surface: [[node:dirt]], [[node:grassForest]]
 * Underground: [[node:stone]], [[node:clay]]
 * Caverns: [[node:hardstone]], [[node:slate]]
 
 **Resources**
+
 * [[Metals|Chunks]]: [[item:chunkCopper]], [[item:chunkIron]], [[item:chunkSilver]], [[item:chunkGold]], [[item:chunkCobalt]], [[item:chunkPlatinum]]
 * Gems: [[item:rawTopaz]], [[item:rawSapphire]]
 * Topsoil: [[node:dirt]], [[node:humus]]
 
 **Mini-biomes**
+
 * [[Fern Cave]] — Underground
 * [[Mushroom Cave]] — Caverns
 * [[Ruined Cabin]] — Underground
@@ -283,6 +309,7 @@ The Forest is the starting biome, located at the center of the world. It is the 
 * [[Graveyard]] — Caverns Bottom
 
 **Fauna** ⏳
+
 * [[monster:beetle]], [[monster:greenSlime]], [[monster:blueSlime]]
 * [[monster:bat]], [[monster:caveWorm]] — Underground
   `
@@ -296,20 +323,24 @@ The Forest is the starting biome, located at the center of the world. It is the 
 The Desert biome is characterized by its sandy terrain and arid atmosphere. It contains unique geological formations and ancient ruins. One of the two non-starting biomes.
 
 **Main Location**
+
 * One or more Desert zones, distributed across the world.
 * Layer: all layers
 
 **Materials**
+
 * Surface: [[node:sand]], [[node:sandstone]]
 * Underground: [[node:sandstone]], [[node:stone]]
 * Caverns: [[node:hardstone]], [[node:slate]]
 
 **Resources**
+
 * [[Metals|Chunks]]: [[item:chunkCopper]], [[item:chunkIron]], [[item:chunkSilver]], [[item:chunkGold]], [[item:chunkCobalt]], [[item:chunkPlatinum]]
 * Gems: [[item:rawRuby]], [[item:rawSapphire]]
 * Topsoil: [[node:sand]], [[node:silt]]
 
 **Mini-biomes**
+
 * [[Antlion Pit]] — Surface
 * [[Sand Pocket]] — Underground
 * [[Fossil Vein]] — Caverns
@@ -318,6 +349,7 @@ The Desert biome is characterized by its sandy terrain and arid atmosphere. It c
 * [[Graveyard]] — Caverns Bottom
 
 **Fauna** ⏳
+
 * [[monster:scorpion]], [[monster:sandSnake]] — Surface
 * [[monster:bat]], [[monster:caveWorm]] — Underground
 
@@ -335,15 +367,18 @@ The Desert biome is characterized by its sandy terrain and arid atmosphere. It c
 The Jungle is a lush, dangerous biome teeming with life. It features unique liquid resources (Sap) and the most complex mini-biome ecosystem in the game.
 
 **Main Location**
+
 * One or more Jungle zones, distributed across the world.
 * Layer: all layers
 
 **Materials**
+
 * Surface: [[node:silt]], [[node:grassJungle]]
 * Underground: [[node:mud]], [[node:clay]]
 * Caverns: [[node:hardstone]], [[node:hellstone]]
 
 **Resources**
+
 * [[Metals|Chunks]]: [[item:chunkCopper]], [[item:chunkIron]], [[item:chunkSilver]], [[item:chunkGold]], [[item:chunkCobalt]], [[item:chunkPlatinum]]
 * Gems: [[item:rawEmerald]], [[item:rawSapphire]]
 * Topsoil: [[node:silt]], [[node:humus]]
@@ -351,6 +386,7 @@ The Jungle is a lush, dangerous biome teeming with life. It features unique liqu
 * [[Bees]] product: [[node:honey], [[node:hive] — found in [[Hive]]s
 
 **Mini-biomes**
+
 * [[Termite Mound]] — Surface
 * [[Moss Cave]] — Underground
 * [[Hive]] — Caverns
@@ -359,6 +395,7 @@ The Jungle is a lush, dangerous biome teeming with life. It features unique liqu
 * [[Graveyard]] — Caverns Bottom
 
 **Fauna** ⏳
+
 * [[monster:jungleSpider]] — Surface
 * [[monster:bat]], [[monster:caveWorm]] — Underground
 * [[monster:bee]], [[monster:hornet]] — Hive
@@ -380,14 +417,17 @@ The Jungle is a lush, dangerous biome teeming with life. It features unique liqu
 A large underground cave found in [[Forest]] biomes, characterized by giant ferns growing on its flat floor.
 
 **Main Location**
+
 * Biome: [[Forest]]
 * Layer: [[Underground]]
 
 **Floor**
+
 * [[node:grassFern]] — surface layer
 * [[node:humus]] — 2-3 tiles deep
 
 **Inhabitants** ⏳
+
 * [[monster:dendrobate]]
 * [[monster:mamba]]
   `
@@ -401,9 +441,11 @@ A large underground cave found in [[Forest]] biomes, characterized by giant fern
 Mushroom Caves are large caverns found deep in [[Forest]] biomes. Their floor is covered in [[node:grassMushroom]], from which giant luminous mushrooms grow, providing a natural light source and rare crafting ingredients.
 
 **Main Location**
+
 * [[Caverns]] Top — [[Forest]], one per Forest zone
 
 **Materials**
+
 * [[node:grassMushroom]] — floor
 * [[node:humus]] — substrate beneath the floor, 2-3 tiles deep
 
@@ -417,6 +459,7 @@ Mushroom Caves are large caverns found deep in [[Forest]] biomes. Their floor is
 | [[monster:isopod]] | Mini-boss, rare | Chopping [[Giant Mushroom|Giant Mushrooms]] |
 
 **Loot** ⏳
+
 * Giant mushroom spores — rare harvest from mushroom caps ⏳
 * Chest — tier 3-4 ⏳
 
@@ -436,18 +479,22 @@ Mushroom Caves are large caverns found deep in [[Forest]] biomes. Their floor is
 Ruined Cabins are the remains of ancient wooden shelters found deep in [[Forest]] biomes. Their walls are crumbling, their floor is covered in old stonework, and a mysterious chest sits inside — guarded by restless spirits.
 
 **Main Location**
+
 * [[Underground]] — [[Forest]]
 
 **Materials**
+
 * [[node:woodwall]] — crumbling outer walls (degraded)
 * [[node:stonewall]] — interior background wall (degraded)
 
 **Structure**
+
 * Doorway on the left or right side
 * Piece of furniture — chair, table or toilet
 * One [[item:chestAncient]] — triggers combat when opened
 
 **Combat** ⏳
+
 * Clicking the [[item:chestAncient]] triggers a ghost encounter
 * Enemies : ghosts + Arthur, the Ghost Boss
 * Victory : the chest opens and its contents can be looted
@@ -455,6 +502,7 @@ Ruined Cabins are the remains of ancient wooden shelters found deep in [[Forest]
 * The chest and its contents regenerate after a few in-game days
 
 **Inhabitants** ⏳
+
 * Ghosts — common
 * Arthur — boss
 
@@ -474,17 +522,21 @@ Ruined Cabins are the remains of ancient wooden shelters found deep in [[Forest]
 Ant Hills are conical mounds of [[Compacted Earth]] found on the surface of [[Forest]] biomes. They are home to a colony of ants led by a powerful queen. If destroyed, the ants will rebuild their home over time.
 
 **Main Location**
+
 * Biome: [[Forest]]
 * Layer: Surface
 
 **Materials**
+
 * [[node:antDirt]] — [[Compacted Earth]], indestructible
 
 **Structure**
+
 * Conical mound rising above the surface
 * Underground chamber housing the Ant Queen
 
 **Inhabitants** ⏳
+
 * [[monster:ant]] — common
 * [[monster:antSoldier]] — defender
 * [[monster:antQueen]] — boss, spawns in the underground chamber
@@ -507,10 +559,12 @@ Ant Hills are conical mounds of [[Compacted Earth]] found on the surface of [[Fo
 Sand Pockets are pressurized elliptical cavities filled with [[node:sand]], found in [[Desert]] biomes. They are sealed by a [[node:sandstone]] border. Removing it releases the sand, which falls and accumulates in nearby tunnels and caverns.
 
 **Main Location**
+
 * [[Underground]] — [[Desert]], most common
 * [[Caverns]] Top — [[Desert]], less common
 
 **Materials**
+
 * [[node:sand]] — fills the entire cavity
 * [[node:sandstone]] — sealing border (lower half)
 
@@ -531,13 +585,16 @@ Sand Pockets are pressurized elliptical cavities filled with [[node:sand]], foun
 Fossil Veins are horizontal deposits of [[node:shell]] embedded in the rock. They are the remnants of an ancient seabed, compressed over millennia into dense sedimentary layers.
 
 **Main Location**
+
 * [[Caverns]] Top — [[Desert]] and [[Sea|maritime zones]]
 
 **Materials**
+
 * [[node:shell]] — horizontal vein
 * Protected by a [[node:sandstone]] border visible on cave walls
 
 **Drops** ⏳
+
 * [[item:shell]] — mined from the vein
 * [[item:shellPowder]] — crafted from Shell ⏳
 
@@ -557,17 +614,21 @@ Fossil Veins are horizontal deposits of [[node:shell]] embedded in the rock. The
 Pyramids are ancient stone structures buried deep in [[Desert]] biomes. Built from indestructible Kheprite blocks, they are the remnants of a powerful civilization that mastered stone-cutting and trap engineering.
 
 **Main Location**
+
 * [[Underground]] — [[Desert]]
 
 **Materials**
+
 * [[node:kheprite]] — indestructible walls and structure
 
 **Structure**
+
 * Two chambers connected by a narrow corridor
 * Entrance on the left or right side (random per world)
 * Entering Chamber 1 triggers combat immediately ⏳
 
 **Chamber 1 — Trap Room** ⏳
+
 * Arrow traps and boulder launchers
   * Even turns : boulders launch vertically
   * Odd turns : boulders launch horizontally
@@ -575,6 +636,7 @@ Pyramids are ancient stone structures buried deep in [[Desert]] biomes. Built fr
 * Inhabitants : [[monster:momie]], [[monster:sphinx]]
 
 **Chamber 2 — Boss Room** ⏳
+
 * Spike traps on floor tiles
   * Even turns : light tiles are dangerous
   * Odd turns : dark tiles are dangerous
@@ -583,11 +645,13 @@ Pyramids are ancient stone structures buried deep in [[Desert]] biomes. Built fr
 * Chamber may be empty if the Pharaon was recently defeated ⏳
 
 **Inhabitants** ⏳
+
 * [[monster:momie]] — common, both chambers
 * [[monster:sphinx]] — uncommon, both chambers
 * [[monster:pharaon]] — boss, chamber 2
 
 **Loot** ⏳
+
 * Chest — tier 4-5, chamber 1 ⏳
 * Chest — tier 5, chamber 2 ⏳
 
@@ -610,18 +674,22 @@ Pyramids are ancient stone structures buried deep in [[Desert]] biomes. Built fr
 Antlion Pits are conical hollow traps found on the surface of [[Desert]] biomes. The steep sandy walls cause anything that steps inside to slide helplessly toward the waiting antlion at the bottom. If destroyed, the antlion will rebuild its trap over time.
 
 **Main Location**
+
 * Biome: [[Desert]]
 * Layer: Surface
 
 **Materials**
+
 * [[node:sand]] — unstable, causes sliding
 * [[node:sandstone]] — structural borders
 
 **Structure**
+
 * Inverted cone dug into the sand surface
 * Antlion waiting at the bottom center
 
 **Inhabitants** ⏳
+
 * [[monster:antlion]] — ambush predator at the pit bottom
 * [[monster:sunburstAntlion]] — boss variant, rare
 
@@ -640,24 +708,29 @@ Antlion Pits are conical hollow traps found on the surface of [[Desert]] biomes.
 The Ancient House is a large desert dwelling buried deep in [[Desert]] biomes. Unlike the [[Ruined Cabin]], it is remarkably well preserved — its walls still standing, its roof intact, and its interior furnished. It contains the [[Transmutator]], a powerful crafting station.
 
 **Main Location**
+
 * [[Caverns]] Bottom — [[Desert]]
 
 **Materials**
+
 * [[node:woodwall]] — outer walls and roof
 * [[node:olympite]] — floor
 * [[node:goldwall]] — interior background wall
 
 **Furnitures** ⏳
+
 * Roof : [[Crafting Stations]] and decorative furnitures
 * Floor : [[item:transmutator]]
 * Ground floor : [[Crafting Stations]], [[Chests]] and decorative furnitures
 
 **The Transmutator** ⏳
+
 * [[item:transmutator]] is always usable
 * The [[item:transmutator]] converts materials into other materials of equivalent value
 * The [[item:transmutator]] is immovable — the Ancient House is its permanent location
 
 **Housing** ⏳
+
 * The Ancient House is large enough to serve as a player home
 * Place a [[item:noticeBoard]] to activate the [[Housing Buffs]] system
 
@@ -680,10 +753,12 @@ The Ancient House is a large desert dwelling buried deep in [[Desert]] biomes. U
 A large underground cave found in [[Jungle]] biomes. Its walls are covered in luminous moss, creating a soft green glow. The air is humid and rich in spores.
 
 **Main Location**
+
 * Biome: [[Jungle]]
 * Layer: [[Underground]]
 
 **Materials**
+
 * [[node:grassMoss]] — floor and lateral walls
 * [[node:mud]] — substrate beneath the moss floor
 
@@ -695,6 +770,7 @@ A large underground cave found in [[Jungle]] biomes. Its walls are covered in lu
 | [[monster:millipede]] | Common | Harvesting [[Velvetmoss]] — attacks in waves of 4-5 |
 
 **Loot** ⏳
+
 * Rare vegetal drops from the moss walls
 * Crafting material from millipedes
 
@@ -713,21 +789,26 @@ A large underground cave found in [[Jungle]] biomes. Its walls are covered in lu
 Hives are large circular caverns built by bees deep in [[Jungle]] biomes. Their walls are made of [[node:hive]] blocks and their interior is filled with [[node:honey]], one of the most valuable liquids in the game. The inhabitants defend their home aggressively.
 
 **Main Location**
+
 * [[Caverns]] Top — [[Jungle]], main location
 
 **Materials**
+
 * [[node:hive]] — walls
 * [[node:honey]] — fills the interior
 
 **Access**
+
 * A diagonal tunnel connects the Hive to the surrounding caverns.
 
 **Inhabitants** ⏳
+
 * [[monster:bee]] — common
 * [[monster:hornet]] — uncommon
 * [[monster:beeQueen]] — boss
 
 **Loot** ⏳
+
 * [[node:honey]] — abundant, difficult to collect while defended
 * [[node:hive]] — walls
 * Chest — tier 3-4 ⏳
@@ -749,17 +830,21 @@ Hives are large circular caverns built by bees deep in [[Jungle]] biomes. Their 
 Sap Lakes are bodies of [[node:sap]] found in [[Jungle]] biomes. Unlike [[Sap Pocket]]s, they are open cavities accessible via natural tunnels and caverns.
 
 **Main Location**
+
 * [[Underground]] — [[Jungle]], most common
 * [[Caverns]] Top — [[Jungle]], less common
 
 **Materials**
+
 * [[node:sap]] — fills the lower half of the cavity
 
 **Inhabitants** ⏳
+
 * [[monster:amberSquid]] — [[Fishing]] only
 * [[monster:glider]] — [[Fishing]] only
 
 **Loot** ⏳
+
 * [[node:sap]] — collectable with [[item:bottle]] or [[item:bucket]] ⏳
 * Rare aquatic species unique to Sap environments ⏳
 
@@ -779,18 +864,22 @@ Sap Lakes are bodies of [[node:sap]] found in [[Jungle]] biomes. Unlike [[Sap Po
 Sap Pockets are pressurized elliptical cavities filled with [[node:sap]], found deep in [[Jungle]] biomes. They are sealed by a [[node:sandstone]] border — removing it releases the sap, which can flood nearby tunnels and caverns.
 
 **Main Location**
+
 * [[Caverns]] Bottom — [[Jungle]]
 
 **Materials**
+
 * [[node:sap]] — fills the entire cavity
 * [[node:sandstone]] — sealing border
 
 **Inhabitants** ⏳
+
 * [[monster:amberSquid]] — [[Fishing]] only
 * [[monster:glider]] — [[Fishing]] only
 * [[monster:mantis]] — aggressive
 
 **Loot** ⏳
+
 * Rare aquatic species unique to Sap Pockets
 * Chest — tier 4-5 ⏳
 
@@ -811,19 +900,23 @@ Sap Pockets are pressurized elliptical cavities filled with [[node:sap]], found 
 The Lost Temple is an ancient Greek-style structure buried deep in the [[Jungle]] biomes. Built from indestructible [[node:Olympite]] blocks, it has stood for millennia, its columns still standing despite the encroaching jungle. A powerful guardian protects the secrets within — and the key to a unique crafting station.
 
 **Main Location**
+
 * [[Caverns]] Top — [[Jungle]]
 
 **Materials**
+
 * [[node:olympite]] — indestructible walls and fronton
 * [[node:olympitewall]] — decorative columns (passable)
 * [[node:emeraldwall]] — interior background wall
 
 **Structure**
+
 * Greek temple shape : triangular fronton + columns + base
 * Single interior chamber
 * One [[item:brokenDecomposer]] on the chamber floor
 
 **Combat** ⏳
+
 * The Minotaur attacks on sight — the chamber cannot be safely entered until it is defeated
 * Three waves :
   * Wave 1 : 4 × [[monster:harpy]]
@@ -832,6 +925,7 @@ The Lost Temple is an ancient Greek-style structure buried deep in the [[Jungle]
 * The Minotaur drops [[item:decomposerPart]] on defeat
 
 **The Decomposer** ⏳
+
 * The [[item:brokenDecomposer]] becomes usable after repair
 * To repair : equip [[item:decomposerPart]] and click on the [[item:brokenDecomposer]]
 * The [[item:brokenDecomposer]] is replaced by the [[item:decomposer]] — a powerful tier 5 crafting station
@@ -852,17 +946,21 @@ The Lost Temple is an ancient Greek-style structure buried deep in the [[Jungle]
 Termite Mounds are tall cylindar structures of [[Compacted Earth]] rising above the surface of [[Jungle]] biomes. They house a thriving termite colony led by a powerful king. If destroyed, the termites will rebuild their home over time.
 
 **Main Location**
+
 * Biome: [[Jungle]]
 * Layer: Surface
 
 **Materials**
+
 * [[node:antDirt]] — [[Compacted Earth]], indestructible
 
 **Structure**
+
 * Rectangular tower rising above the surface
 * Underground chamber housing the Termite King
 
 **Inhabitants** ⏳
+
 * [[monster:termite]] — common
 * [[monster:termiteSoldier]] — defender
 * [[monster:termiteKing]] — boss, spawns in the underground chamber
@@ -887,23 +985,28 @@ In extreme cases, cobwebs can obstruct entire tunnel networks.
 Despite the nuisance they represent, cobwebs are one of the most valuable resources in the game — the silk extracted from them is an essential component in dozens of crafting recipes, from armor to furniture and accessories.
 
 **Main Location**
+
 * [[Cobweb Cave]]s — concentrated, all biomes
 * All tunnels and caverns — scattered, all biomes
 
 **Collection** ⏳
+
 * Mine with any [[Mining Tools|Pickaxes]] — drops [[item:silk]]
 * Deleted with a [[item:flamethrower]] - No loot
 
 **Crafting chain**
+
 * [[item:silk]] → [[item:fabric]] — craft at [[item:loom]] ⏳
 * [[item:fabric]] is an essential ingredient for armors, furniture and accessories.
 
 **Ecosystem** ⏳
+
 * Spiders continuously spin new cobwebs over time.
 * If left uncleared, cobwebs will eventually fill entire tunnel sections.
 * Clearing cobwebs regularly is essential to maintain access to deep areas.
 
 **Terrain Effect** ⏳
+
 * Cobweb threads are nearly invisible until you are already tangled in them — by then, each step pulls a dozen more filaments across your legs and arms.
 * Walking through [[node:web]] reduces movement speed ({{node:web:buffs:movementSpeed}}%)
 * See [[Movement Speed]] for details
@@ -924,18 +1027,22 @@ Despite the nuisance they represent, cobwebs are one of the most valuable resour
 Cobweb Caves are caverns densely packed with spider webs. They are found in all biomes and are home to increasingly dangerous spider species the deeper they are located.
 
 **Main Location**
+
 * [[Caverns]] Top — all biomes, most common
 * [[Caverns]] Bottom — all biomes, rarer and more dangerous
 
 **Materials**
+
 * [[node:web]] — dense coverage on ceiling
 
 **Inhabitants** ⏳
+
 * [[monster:spider]] — common
 * [[monster:mygale]] — uncommon
 * [[monster:tarentulaKing]] — boss, rare
 
 **Loot** ⏳
+
 * [[item:silk]] — abundant
 * [[item:spiderEgg]] — rare drop ⏳
 * [[item:spiderFang]] — rare drop ⏳
@@ -956,17 +1063,21 @@ Cobweb Caves are caverns densely packed with spider webs. They are found in all 
 Geode Caves are elliptical caverns lined with crystals of [[node:granite]] or [[node:marble]]. They are found in the deepest parts of all biomes and are among the most visually striking locations in the world.
 
 **Main Location**
+
 * [[Caverns]] Bottom — all biomes
 
 **Materials**
+
 * [[node:granite]] or [[node:marble]] — crystal-lined walls
 * Hollow interior
 
 **Inhabitants** ⏳
+
 * [[monster:stonegnaw]]
 * [[monster:rockborer]] — boss
 
 **Loot** ⏳
+
 * [[Mining]] : [[item:blockGranite]] and [[item:blockMarble]] — abundant from walls
 
 **Tips**
@@ -985,17 +1096,21 @@ Geode Caves are elliptical caverns lined with crystals of [[node:granite]] or [[
 Blind Lakes are pockets of water found in the deepest parts of all biomes. They have no natural access — the player must dig their way in. Their isolated environment has allowed unique species to evolve in complete darkness.
 
 **Main Location**
+
 * [[Caverns]] Bottom — all biomes
 
 **Materials**
+
 * [[node:water]] — fills the bottom of the cavity
 * [[node:hardstone]] — floor and walls
 
 **Inhabitants** ⏳
+
 * [[monster:blindFish]] — rare, [[Fishing]] only
 * [[monster:axolotl]] — very rare, [[Fishing]] only
 
 **Loot** ⏳
+
 * Rare fish species found nowhere else in the world
 * Chest — tier 4-5 ⏳
 
@@ -1014,19 +1129,23 @@ Blind Lakes are pockets of water found in the deepest parts of all biomes. They 
 Underground Lakes are pockets of fresh water found below the surface. They are accessible via natural tunnels and caverns, and support a variety of aquatic life rarely seen on the surface.
 
 **Main Location**
+
 * [[Underground]] — all biomes, most common
 * [[Caverns]] Top — all biomes, less common
 
 **Materials**
+
 * [[node:water]] — fills the lower half of the cavity
 * [[node:humus]] — ceiling and upper walls, [[Forest]]
 * [[node:mud]] — ceiling and upper walls, [[Jungle]]
 * [[node:sandstone]] — ceiling and upper walls, [[Desert]]
 
 **Inhabitants** ⏳
+
 * [[monster:caveFish]] — common, [[Fishing]] only
 
 **Loot** ⏳
+
 * Rare fish species ⏳
 * Chest — tier 2-3 ⏳
 
@@ -1045,22 +1164,27 @@ Underground Lakes are pockets of fresh water found below the surface. They are a
 Surface Lakes are bodies of water found at ground level. Each biome has its own variant with distinctive materials and fauna. In the [[Desert]], they take the form of an Oasis — a rare and welcome sight in an arid landscape.
 
 **Main Location**
+
 * [[Surface]] — spread on all biomes
 
 **Variants**
+
 * [[Forest]] — freshwater lake, mossy banks
 * [[Desert]] — Oasis, sandy banks
 * [[Jungle]] — jungle lake, muddy banks
 
 **Materials**
+
 * [[node:water]] — fills the lake body and pit
 * Banks and floor vary by biome ⏳
 
 **Inhabitants** ⏳
+
 * Surface fish species — common, [[Fishing]] only
 * Aquatic critters — [[monster:frog]] near Forest lakes ⏳
 
 **Loot** ⏳
+
 * Common fish species
 * Chest — tier 1-2 ⏳
 
@@ -1080,18 +1204,22 @@ Surface Lakes are bodies of water found at ground level. Each biome has its own 
 Graveyards are ancient burial chambers found deep underground in all biomes. Their catacomb-like structure features rows of burial tunnels separated by layers of dirt and stone. They are haunted by restless spirits and guarded by undead creatures.
 
 **Main Location**
+
 * All biomes
 * Layer: [[Caverns]] Bottom
 
 **Materials**
+
 * [[node:stone]] — walls, ceiling and floor
 * [[node:dirt]] — burial tunnel floors
 
 **Structure**
+
 * 2 or 3 rows of burial tunnels
 * Accessible from connecting caverns
 
 **Tombstones**
+
 Tombstones are found inside the burial tunnels. All tombstones behave identically — they differ only in appearance.
 * [[item:tomb]]
 * [[item:tombHead]]
@@ -1100,11 +1228,13 @@ Tombstones are found inside the burial tunnels. All tombstones behave identicall
 * [[item:tombCross]]
 
 **Inhabitants** ⏳
+
 * [[monster:ghost]] — common
 * [[monster:skeleton]] — common
 * [[monster:lich]] — rare boss
 
 **Loot** ⏳
+
 * Tombstones — interacting triggers a combat encounter, rewards high-tier items ⏳
 
 **Tips**
@@ -1125,16 +1255,19 @@ Tombstones are found inside the burial tunnels. All tombstones behave identicall
 Water is the most common liquid in the world. It fills surface lakes, underground lakes and blind lakes. It supports aquatic life and is used in many crafting recipes.
 
 **Main Location**
+
 * [[Surface]] lakes — all biomes
 * [[Underground]] lakes — all biomes
 * [[Blind Lake]]s — all biomes, [[Caverns]] Bottom
 * Water puddles — [[Underground]] and [[Caverns]]
 
 **Collection** ⏳
+
 * [[item:bottle]] — small quantity
 * [[item:bucket]] — large quantity
 
 **Recipes** ⏳
+
 * {{recipe:waterBottle}}
 * {{recipe:waterBucket}}
 
@@ -1153,13 +1286,16 @@ Water is the most common liquid in the world. It fills surface lakes, undergroun
 Honey is a viscous golden liquid produced by [[Bees]] in [[Hive]]s. It is harder to move through than water and is a valuable crafting ingredient.
 
 **Main Location**
+
 * [[Hive]]s — [[Jungle]], [[Caverns]] Top
 
 **Collection** ⏳
+
 * [[item:bottle]] — small quantity
 * [[item:bucket]] — large quantity
 
 **Recipes** ⏳
+
 * {{recipe:honeyBottle}}
 * {{recipe:honeyBucket}}
 
@@ -1178,15 +1314,18 @@ Honey is a viscous golden liquid produced by [[Bees]] in [[Hive]]s. It is harder
 Sap is a rare green liquid found exclusively in [[Jungle]] biomes. It fills Sap Lakes and Sap Pockets and is one of the most valuable crafting ingredients in the game.
 
 **Main Location**
+
 * Sap Lakes — [[Jungle]], [[Underground]] and [[Caverns]] Top
 * [[Sap Pocket]]s — [[Jungle]], [[Caverns]] Bottom
 * Sap puddles — [[Jungle]], [[Underground]] and [[Caverns]]
 
 **Collection** ⏳
+
 * [[item:bottle]] — small quantity
 * [[item:bucket]] — large quantity
 
 **Recipes** ⏳
+
 * {{recipe:sapBottle}}
 * {{recipe:sapBucket}}
 
@@ -1205,10 +1344,12 @@ Sap is a rare green liquid found exclusively in [[Jungle]] biomes. It fills Sap 
 The Sea borders both sides of the world. Its deep, dark waters are home to unique fauna and hide rare treasures on the ocean floor.
 
 **Main Location**
+
 * Left and right borders of the world
 * Depth : from [[Surface]] level down to [[Caverns]] Bottom
 
 **Collection** ⏳
+
 * [[item:bottle]] — small quantity
 * [[item:bucket]] — large quantity
 
@@ -1230,12 +1371,15 @@ The Sea borders both sides of the world. Its deep, dark waters are home to uniqu
 Grass covers the surface of [[Forest]] biomes. It is the most common natural tile and supports a wide variety of surface plants and critters.
 
 **Tier**
+
 {{node:grassForest:star}}
 
 **Main Location**
+
 * [[Surface]] — [[Forest]], top layer of solid ground
 
 **Drops** ⏳
+
 * {{node:grass:mining}}
 
 **Tips**
@@ -1252,12 +1396,15 @@ Grass covers the surface of [[Forest]] biomes. It is the most common natural til
 Jungle Grass covers the surface of [[Jungle]] biomes. Denser and more vibrant than regular [[node:grassForest]], it supports exotic plants and fauna.
 
 **Tier**
+
 {{node:grassJungle:star}}
 
 **Main Location**
+
 * [[Surface]] — [[Jungle]], top layer of solid ground
 
 **Drops** ⏳
+
 * {{node:jungleGrass:mining}}
 
 **Tips**
@@ -1274,12 +1421,15 @@ Jungle Grass covers the surface of [[Jungle]] biomes. Denser and more vibrant th
 Fern Grass covers the floor of [[Fern Cave]]s. Giant ferns grow from this soft, mossy substrate.
 
 **Tier**
+
 {{node:grassFern:star}}
 
 **Main Location**
+
 * [[Fern Cave]] floor — [[Underground]], [[Forest]]
 
 **Drops** ⏳
+
 * {{node:grassFern:mining}}
 
 **Tips**
@@ -1296,12 +1446,15 @@ Fern Grass covers the floor of [[Fern Cave]]s. Giant ferns grow from this soft, 
 Luminous moss that covers the walls and floor of [[Moss Cave]]s. Its soft green glow makes it one of the few self-illuminating natural tiles.
 
 **Tier**
+
 {{node:grassMoss:star}}
 
 **Main Location**
+
 * [[Moss Cave]] walls and floor — [[Underground]], [[Jungle]]
 
 **Drops** ⏳
+
 * {{node:grassMoss:mining}}
 
 **Tips**
@@ -1319,12 +1472,15 @@ Luminous moss that covers the walls and floor of [[Moss Cave]]s. Its soft green 
 Mushroom Grass covers the floor of [[Mushroom Cave]]s. [[Giant Mushroom]]s grow from this rich substrate, providing rare ingredients.
 
 **Tier**
+
 {{node:grassMushroom:star}}
 
 **Main Location**
+
 * [[Mushroom Cave]] floor — [[Caverns]] Top, [[Forest]]
 
 **Drops** ⏳
+
 * {{node:grassMushroom:mining}}
 
 **Tips**
@@ -1345,15 +1501,19 @@ Mushroom Grass covers the floor of [[Mushroom Cave]]s. [[Giant Mushroom]]s grow 
 Dirt is the primary topsoil of [[Forest]] biomes. It supports surface vegetation and is the most workable material for early construction⏳.
 
 **Tier**
+
 {{node:dirt:star}}
 
 **Main Location**
+
 * [[Surface]] and [[Underground]] — [[Forest]], high density
 
 **Drops** ⏳
+
 * {{node:dirt:mining}}
 
 **Recipes** ⏳
+
 * {{recipe:dirtBlock}}
   `
   },
@@ -1366,13 +1526,16 @@ Dirt is the primary topsoil of [[Forest]] biomes. It supports surface vegetation
 Sand is the primary topsoil of [[Desert]] biomes. It is subject to gravity — unsupported sand falls and accumulates in piles.
 
 **Tier**
+
 {{node:sand:star}}
 
 **Main Location**
+
 * [[Surface]] and [[Underground]] — [[Desert]], high density
 * [[Sand Pocket]]s — [[Underground]], [[Desert]]
 
 **Drops** ⏳
+
 * {{node:sand:mining}}
 
 **Tips**
@@ -1390,15 +1553,19 @@ Sand is the primary topsoil of [[Desert]] biomes. It is subject to gravity — u
 Silt is the primary topsoil of [[Jungle]] biomes. Its fine, damp texture supports the dense jungle vegetation above.
 
 **Tier**
+
 {{node:silt:star}}
 
 **Main Location**
+
 * [[Surface]] and [[Underground]] — [[Jungle]], high density
 
 **Drops** ⏳
+
 * {{node:silt:mining}}
 
 **Recipes** ⏳
+
 * {{recipe:siltBlock}}
   `
   },
@@ -1411,17 +1578,21 @@ Silt is the primary topsoil of [[Jungle]] biomes. Its fine, damp texture support
 Humus is a rich organic topsoil found across all biomes, though it is most abundant in [[Forest]] and [[Jungle]] biomes. It forms the substrate beneath [[Fern Cave]] and [[Mushroom Cave]] floors.
 
 **Tier**
+
 {{node:humus:star}}
 
 **Main Location**
+
 * [[Underground]] and [[Caverns]] Top — [[Forest]] and [[Jungle]], moderate density
 * [[Fern Cave]] floor — [[Forest]]
 * [[Mushroom Cave]] floor — [[Forest]]
 
 **Drops** ⏳
+
 * {{node:humus:mining}}
 
 **Recipes** ⏳
+
 * {{recipe:humusBlock}}
 
 **Tips**
@@ -1438,13 +1609,16 @@ Humus is a rich organic topsoil found across all biomes, though it is most abund
 Compacted Earth is a dense, hardened form of soil found exclusively in [[Ant Hill]] and [[Termite Mound]] structures. It cannot be mined or destroyed by the player.
 
 **Tier**
+
 {{node:antdirt:star}}
 
 **Properties**
+
 * Indestructible — cannot be mined
 * Solid — the player can walk on it
 
 **Location**
+
 * [[Ant Hill]] — [[Forest]] surface
 * [[Termite Mound]] — [[Jungle]] surface
 
@@ -1467,15 +1641,19 @@ Compacted Earth is a dense, hardened form of soil found exclusively in [[Ant Hil
 Clay is the most common substrat in [[Forest]] biomes. Its soft, workable texture makes it a versatile early-game building material.
 
 **Tier**
+
 {{node:clay:star}}
 
 **Main Location**
+
 * [[Surface]] and [[Underground]] — [[Forest]], high density
 
 **Drops** ⏳
+
 * {{node:clay:mining}}
 
 **Recipes** ⏳
+
 * {{recipe:clayBlock}}
   `
   },
@@ -1488,16 +1666,20 @@ Clay is the most common substrat in [[Forest]] biomes. Its soft, workable textur
 Stone is the second most common substrat in [[Forest]] biomes, found deeper than [[Clay]].
 
 **Tier**
+
 {{node:stone:star}}
 
 **Main Location**
+
 * [[Underground]] — [[Forest]], dominant (native substrat)
 * [[Caverns]] Top — [[Forest]], moderate density
 
 **Drops** ⏳
+
 * {{node:stone:mining}}
 
 **Recipes** ⏳
+
 * {{recipe:stoneBlock}}
   `
   },
@@ -1510,15 +1692,19 @@ Stone is the second most common substrat in [[Forest]] biomes, found deeper than
 Hardstone is a dense, resistant substrat found in the deepest parts of [[Forest]] biome. It requires high-tier tools to mine.
 
 **Tier**
+
 {{node:hardstone:star}}
 
 **Main Location**
+
 * [[Caverns]] — [[Forest]], dominant (native substrat)
 
 **Drops** ⏳
+
 * {{node:hardstone:mining}}
 
 **Recipes** ⏳
+
 * {{recipe:hardstoneBlock}}
   `
   },
@@ -1531,17 +1717,21 @@ Hardstone is a dense, resistant substrat found in the deepest parts of [[Forest]
 Sandstone is the primary substrat of [[Desert]] biomes. It also forms the natural borders of the [[Sea]] and acts as a containment layer around [[Sand Pocket]]s.
 
 **Tier**
+
 {{node:sandstone:star}}
 
 **Main Location**
+
 * [[Surface]] and [[Underground]] — [[Desert]], high density
 * [[Sea]] borders
 * [[Sand Pocket]]: [[Caverns]] — [[Desert]]
 
 **Drops** ⏳
+
 * {{node:sandstone:mining}}
 
 **Recipes** ⏳
+
 * {{recipe:sandstoneBlock}}
   `
   },
@@ -1554,16 +1744,20 @@ Sandstone is the primary substrat of [[Desert]] biomes. It also forms the natura
 Ash is the second most common substrat in [[Forest]] biomes, found deeper than [[Sandstone]]. The dark color of this volcanic substrat and its fragile structure make it a distinctive material.
 
 **Tier**
+
 {{node:ash:star}}
 
 **Main Location**
+
 * [[Underground]] — [[Desert]], dominant (native substrat)
 * [[Caverns]] Top — [[Desert]], moderate density
 
 **Drops** ⏳
+
 * {{node:ash:mining}}
 
 **Recipes** ⏳
+
 * {{recipe:ashBlock}}
   `
   },
@@ -1576,15 +1770,19 @@ Ash is the second most common substrat in [[Forest]] biomes, found deeper than [
 Hellstone is an extremely hard volcanic substrat found in the deepest parts of [[Desert]] biome. It requires the best tools available to mine and emits a faint heat glow.
 
 **Tier**
+
 {{node:hellstone:star}}
 
 **Main Location**
+
 * [[Caverns]] — [[Desert]], dominant (native substrat)
 
 **Drops** ⏳
+
 * {{node:hellstone:mining}}
 
 **Recipes** ⏳
+
 * {{recipe:hellstoneBar}}
 
 **Tips**
@@ -1601,16 +1799,20 @@ Hellstone is an extremely hard volcanic substrat found in the deepest parts of [
 Mud is the primary substrat of [[Jungle]] biomes. Its soft, damp texture supports the lush vegetation above.
 
 **Tier**
+
 {{node:mud:star}}
 
 **Main Location**
+
 * [[Surface]] and [[Underground]] — [[Jungle]], high density
 * [[Moss Cave]] walls and floor
 
 **Drops** ⏳
+
 * {{node:mud:mining}}
 
 **Recipes** ⏳
+
 * {{recipe:mudBlock}}
   `
   },
@@ -1623,16 +1825,20 @@ Mud is the primary substrat of [[Jungle]] biomes. Its soft, damp texture support
 Limestone is a sedimentary substrat found as intrusions across [[Jungle]] biome. The pale color of this sedimentary substrat and its layered structure make it recognizable underground.
 
 **Tier**
+
 {{node:limestone:star}}
 
 **Main Location**
+
 * [[Underground]] — [[Jungle]], dominant (native substrat)
 * [[Caverns]] Top — [[Jungle]], moderate density
 
 **Drops** ⏳
+
 * {{node:limestone:mining}}
 
 **Recipes** ⏳
+
 * {{recipe:limestoneBlock}}
   `
   },
@@ -1645,15 +1851,19 @@ Limestone is a sedimentary substrat found as intrusions across [[Jungle]] biome.
 Slate is a hard metamorphic substrat found in the deepest parts of [[Jungle]] biome. Its dark, layered structure requires advanced tools to mine.
 
 **Tier**
+
 {{node:slate:star}}
 
 **Main Location**
+
 * [[Caverns]] — [[Jungle]], dominant (native substrat)
 
 **Drops** ⏳
+
 * {{node:slate:mining}}
 
 **Recipes** ⏳
+
 * {{recipe:slateBlock}}
   `
   },
@@ -1712,6 +1922,7 @@ Metal chunks are placed in your [[Inventory]] when mined with a [[Mining Tools|P
 {{metalBarsRow|chunkPlatinum|barPlatinum}}
 
 **Metal Bars Recipes** ⏳
+
 * {{recipe:shellPowder}}
 
 **Usages**
@@ -1853,23 +2064,28 @@ Blocks are placed in your [[Inventory]] when mined with a [[Mining Tools|Pickaxe
 Obsidian is a volcanic glass formed where lava meets water. It is one of the hardest materials in the world, requiring high-tier tools to mine.
 
 **Tier**
+
 {{node:obsidian:star}}
 
 **Main Location**
+
 * [[Caverns]] — all biomes, rare clusters
 * Created by the player by pouring water onto [[node:lava]] ⏳
 
 **Mining** ⏳
+
 * {{node:obsidian:mining}}
 * Requires a tier 5 [[item:pickaxePlatinum]] — applies to both natural and player-created Obsidian
 
 **Creating Obsidian** ⏳
+
 * Equip a [[item:water]]
 * Click on an empty tile above a [[node:lava]] tile
 * An Obsidian block appears at the clicked location
 * _Warning : lava is extremely dangerous — keep your distance and act quickly._
 
 **Recipes** ⏳
+
 * {{recipe:obsidianBlock}}
   `
   },
@@ -1882,16 +2098,20 @@ Obsidian is a volcanic glass formed where lava meets water. It is one of the har
 Meteorite is an extraterrestrial rock that falls from the sky in rare events. It glows faintly and has unique properties not found in any other material.
 
 **Tier**
+
 {{node:meteorite:star}}
 
 **Main Location**
+
 * Impact craters on the [[Surface]] — random events ⏳
 * Rare clusters near impact sites ⏳
 
 **Drops** ⏳
+
 * {{node:meteorite:mining}}
 
 **Recipes** ⏳
+
 * {{recipe:meteoriteBar}}
   `
   },
@@ -1904,15 +2124,19 @@ Meteorite is an extraterrestrial rock that falls from the sky in rare events. It
 Hive is a biological material that forms the walls of [[Hive]] mini-biomes. It is secreted by bees and has a distinctive honeycomb structure.
 
 **Tier**
+
 {{node:hive:star}}
 
 **Main Location**
+
 * [[Hive]] walls — [[Jungle]], [[Caverns]] Top
 
 **Drops** ⏳
+
 * {{node:hive:mining}}
 
 **Recipes** ⏳
+
 * {{recipe:hiveBlock}}
 
 **Tips**
@@ -1929,16 +2153,20 @@ Hive is a biological material that forms the walls of [[Hive]] mini-biomes. It i
 Shell is a sedimentary material formed from ancient marine organisms. It is found in [[Fossil Vein]]s and along the shores of the [[Sea]].
 
 **Tier**
+
 {{node:shell:star}}
 
 **Main Location**
+
 * [[Fossil Vein]] — [[Desert]], [[Caverns]] Top
 * [[Sea]] borders and floor — slow regeneration ⏳
 
 **Drops** ⏳
+
 * [[Mining]] with [[Mining Tools|Pickaxes]] (any tier): {{node:shell:mining}}
 
 **Main Usages** ⏳
+
 * Basic ingredient for furntiure and construction
 * Decorative ingredient for tools and weapons
 * Secondary ingredient for accessories
@@ -1946,6 +2174,7 @@ Shell is a sedimentary material formed from ancient marine organisms. It is foun
 * [[item:shellPowder]] is used in potions
 
 **Recipes** ⏳
+
 * {{recipe:shellPowder}}
 
 **Tips**
@@ -1975,6 +2204,7 @@ Shell is a sedimentary material formed from ancient marine organisms. It is foun
     content: `
 
     **Furnitures list**
+
     * [[Beds]]
     * [[Bookcases]]
     * [[Cabinets]]
@@ -2175,6 +2405,7 @@ Every source of damage in Sixty-Below deals a specific type. Understanding damag
 | [[Poison DOT|Poison]] | [[Jungle]] [[Jungle]] fauna | Deals damage over time |
 
 **Environment**
+
 Damage accumulates based on your position in the world. The two independent axes are applied simultaneously.
 
 _Example : in [[Caverns]] Bottom in the [[Jungle]] monsters inflict Crushing and Poison simultaneously._
@@ -2230,6 +2461,7 @@ Prefixes enhance weapons, armors and tools, adding special properties beyond the
 _Some specific gear pieces may deviate from these rules._ ⏳
 
 **Obtaining Prefixes** ⏳
+
 * Mechanics to be defined
 * Found on looted gear in chests and monster drops
 * Craftable at specific crafting stations ⏳
@@ -2265,9 +2497,11 @@ _Some specific gear pieces may deviate from these rules._ ⏳
     category: ['Weapon', 'Tool'],
     content: `
 **Tier**
+
 {{node:flamethrower:star}}
 
 **Main usages**
+
 * Used as a tool for deleting large bulks of [[Cobweb]]⏳
     `
   },
@@ -2322,27 +2556,33 @@ Biome: [[Jungle]]
 Crafting Stations are specialized workbenches that allow the player to [[Crafting|craft]] advanced items. Each station is dedicated to a specific material or craft type. Most stations must be crafted first and placed in the world.
 
 **Starting point**
+
 * [[Wooden Table]] — [[item:tableWood]] ⭐ — crafted by hand, unlocks the entire crafting chain
 
 **Woodworking**
+
 * [[Woodworking]] — [[item:workbench]] ⭐ and [[item:sawmill]] ⭐⭐⭐
 
 **Metalworking**
+
 * [[Smelting]] — [[item:furnace]] ⭐⭐ and [[item:blastFurnace]] ⭐⭐⭐⭐
 * [[Forging]] — [[item:anvilIron]] ⭐⭐ and [[item:anvilPlatinum]] ⭐⭐⭐⭐
 * [[Sharpening]] — [[item:grindstone]] ⭐⭐⭐
 
 **Textiles**
+
 * [[Weaving]] — [[item:loom]] ⭐⭐
 * [[Leatherworking]] — [[item:tanningRack]] ⭐⭐⭐
 
 **Other crafts**
+
 * [[Stonecutting]] — [[item:stonecutter]] ⭐
 * [[Jewelry]] — [[item:jewelerBench]] ⭐⭐⭐
 * [[Alchemy]] — [[item:alchemyTable]] ⭐⭐
 * [[Cooking]] — [[item:cookingPot]] ⭐⭐
 
 **Ancient stations** ⏳
+
 * [[Decomposer]] — found in [[Lost Temple]] ⭐⭐⭐⭐⭐
 * [[Transmutator]] — found in [[Ancient House]] ⭐⭐⭐⭐⭐
   `
@@ -2551,6 +2791,7 @@ The crafting tree shows the order in which crafting stations must be built. Each
 Tableware is a category of [[Furnitures]] that serve as containers for food and liquids. They can be placed on any flat-surfaced furniture ([[Wooden Table]], [[Woodworking|Workbench]], etc.) as decorative items.
 
 **Food Containers**
+
 Empty containers used as crafting ingredients in cooking and potion recipes. They are returned to the player's inventory upon consuming the food or potion.
 * [[item:bowl]] ({{item:bowl:star}}) — soups and stews
 * [[item:mug]] ({{item:botmugtle:star}}) — ales and drinks
@@ -2558,6 +2799,7 @@ Empty containers used as crafting ingredients in cooking and potion recipes. The
 * [[item:trencher]] ({{item:trencher:star}}) — rustic wooden plate for simple meals
 
 **Small Liquid Containers**
+
 Filled directly from a liquid source in the world. Used as crafting ingredients in cooking and potion recipes.
 * [[item:bottle]] ({{item:bottle:star}}) — empty bottle, filled by clicking on a liquid tile
   * [[item:water]] — [[node:water|Bottled Water]] — healing item and potion ingredient
@@ -2566,6 +2808,7 @@ Filled directly from a liquid source in the world. Used as crafting ingredients 
 * _Bottles are returned upon consuming the recipe result._ ⏳
 
 **Large Liquid Containers**
+
 Filled directly from a liquid source in the world. Used as tools to transport and pour liquids — the empty bucket is recovered after pouring.
 * [[item:bucket]] ({{item:bucket:star}}) — empty bucket ⏳
   * [[item:bucketWater]] — Water Bucket — pour water into the world ⏳
@@ -2573,6 +2816,7 @@ Filled directly from a liquid source in the world. Used as tools to transport an
   * [[item:bucketSap]] — Sap Bucket — pour sap into the world ⏳
 
 **See also**
+
 * [[Bottles]] — detailed usage and recipes
 * [[Buckets]] — detailed usage and liquid manipulation
 
@@ -2737,6 +2981,7 @@ Food restores health and provides temporary buffs. More elaborate preparations r
 **Cooking Stations** ⏳
 
 **Tips**
+
  ⏳
   `
   },
@@ -2745,9 +2990,11 @@ Food restores health and provides temporary buffs. More elaborate preparations r
     category: ['Food'],
     content: `
 **Tier**
+
 {{item:vegetableSoup:star}}
 
 **Recipes**
+
 [[item:vegetableSoup]]
       `
   },
@@ -2820,11 +3067,14 @@ _Gardening plants and their details will be added in a future update._ ⏳
 
 Oaks and Mahoganies are the dominant trees of the [[Forest]] and [[Jungle]] biomes respectively. They grow on the surface, providing wood, seeds and shelter for various creatures. Both species share the same growth mechanics and interactions.
 sickle
+
 **Location**
+
 * [[item:oak]] ({{item:oak:star}}) — [[Forest]] / [[Surface]], grows on [[node:grassForest]]
 * [[item:mahogany]] ({{item:mahogany:star}}) — [[Jungle]] / [[Surface]], grows on [[node:grassJungle]]
 
 **Growth**
+
 * Trees grow through 5 visible stages (1 to 5)
 * A new section grows every 2-3 in-game days for Oak, 3-4 days for Mahogany ⏳
 * Maximum size is 5 sections
@@ -2856,6 +3106,7 @@ sickle
 | [[item:mahogany]] | {{item:oak:logging:items}} | [[item:rootMahogany]] |
 
 **Planting**
+
 * Shaking and logging both yield [[item:acorn]] (Oak) or [[item:samara]] (Mahogany)
 * Place a seed on 3 consecutive horizontal [[node:grassForest]] (acorn) or [[node:grassJungle]] (samara) tiles
 * The tree immediately appears at stage 1 and grows naturally from there
@@ -2877,14 +3128,17 @@ sickle
 Giant Mushrooms grow in the depths of [[Mushroom Cave|Mushroom Caves]], their bioluminescent caps providing the only light source in these dark caverns. They grow in dense clusters, their overlapping caps creating a spectacular underground canopy. ⏳
 
 **Tier**
+
 {{item:giantMushroom:star}}
 
 **Location**
+
 * Biome: [[Forest]]
 * Layer: [[Caverns]] Top
 * Grows exclusively in [[Mushroom Cave|Mushroom Caves]] on [[node:grassMushroom]]
 
 **Growth**
+
 * Giant Mushrooms grow through 3 stages (1 to 3)
 * Growth takes several in-game days between each stage ⏳
 
@@ -2912,9 +3166,11 @@ Giant Mushrooms grow in the depths of [[Mushroom Cave|Mushroom Caves]], their bi
 Coconut trees grow on sandy shores — along the ocean coastline and at the edges of desert oases. Their tall silhouette and distinctive crown make them easy to spot from a distance. Unlike Oaks and Mahoganies, Coconut trees do not grow or change size.
 
 **Tier**
+
 {{item:coconut:star}}
 
 **Location**
+
 * Ocean shoreline — left and right sea borders
 * Desert [[Surface Lake|Oasis]] shores
 * Grows on [[node:sand]]
@@ -2954,6 +3210,7 @@ TODO : add recipes with dropped items as ingredient⏳
 Surface Mushrooms grow at the base of [[Oak & Mahogany|Trees]] on the [[Forest]] and [[Jungle]] floor. Two species have been identified, each associated with a specific tree species. They appear and disappear with the night cycle, fruiting in darkness and retreating at dawn.
 
 **Location**
+
 * [[item:bolete]] ({{item:bolete:star}}) — [[Forest]] / [[Surface]], grows near [[Oak & Mahogany|Oak]] trees on [[node:grassForest]]
 * [[item:pinkMycenia]] ({{item:pinkMycenia:star}}) — [[Jungle]] / [[Surface]], grows near [[Oak & Mahogany|Mahogany]] trees on [[node:grassJungle]]
 
@@ -2969,6 +3226,7 @@ _All times are in-game. See [[Day & Night Cycle]] for reference._
 * Mushrooms are more abundant during [[Weather|Rainy Weather]] ⏳
 
 **Harvest**
+
 * [[Foraging|Interact to harvest]] — the mushroom disappears on harvest
 
 | Mushroom | Tool | Drops |
@@ -2976,9 +3234,11 @@ _All times are in-game. See [[Day & Night Cycle]] for reference._
 |  [[item:pinkMycenia]] | [[Harvesting Tools|Iron Sickle]] or better | {{item:pinkMycenia:foraging:items}} |
 
 **Usages**
+
 * Food, potion and crafting ingredient. ⏳
 
 **Dangers**
+
 * [[monster:adder]] may attack when harvesting [[item:bolete]]. ⏳
 * [[monster:giantRedSlug]] may attack when harvesting [[item:pinkMycenia]]. ⏳
 
@@ -2998,9 +3258,11 @@ _All times are in-game. See [[Day & Night Cycle]] for reference._
 Cave Mushrooms grow on the floor of [[Mushroom Cave|Mushroom Caves]], thriving in the dim light cast by the [[Giant Mushroom|Giant Mushrooms]] above them. Two species have been identified, both pale and luminous, fruiting during daylight hours and retreating at nightfall.
 
 **Tier**
+
 {{item:frostcap:star}}
 
 **Location**
+
 * Biome: [[Forest]]
 * Layer: [[Caverns]] Top
 * Grows exclusively in [[Mushroom Cave|Mushroom Caves]] on [[node:grassMushroom]]
@@ -3025,14 +3287,17 @@ _All times are in-game. See [[Day & Night Cycle]] for reference._
 * Never appear on [[Weather|Sunny]] days ⏳
 
 **Harvest**
+
 * [[Foraging|Interact to harvest]] — the mushroom disappears on harvest
 * Tool: [[Harvesting Tools|Silver Sickle]] or better ⏳
 * Drops: [[item:mushroomGill]]
 
 **Usages** ⏳
+
 [[item:mushroomGill]] — food and crafting ingredient ⏳
 
 **Dangers**
+
 * [[monster:redSlug]] — common in [[Mushroom Cave|Mushroom Caves]] ⏳
 * [[monster:hydra]] — uncommon, aggressive ⏳
 
@@ -3055,28 +3320,34 @@ _All times are in-game. See [[Day & Night Cycle]] for reference._
 Parsnips are root vegetables found growing on the [[Forest]] floor. Their white flowers make them easy to spot among the undergrowth.
 
 **Tier**
+
 {{item:parsnip:star}}
 
 **Location**
+
 * Biome: [[Forest]]
 * Layer: [[Surface]]
 * Grows on [[node:grassForest]]
 
 **Harvest**
+
 * [[Foraging|Interact to harvest]] — the plant disappears on harvest
 * Tool: any [[Harvesting Tools|Sickle]]⏳
 * Drops: [[item:parsnip]]
 
 **Dangers**
+
 * Harvesting a Parsnip may disturb a [[monster:vole]] hiding among the roots — its bite inflicts [[Damage Types|Piercing]] damage and may cause [[Bleeding DOT]]. ⏳
 
 **Usages** ⏳
+
 * [[item:parsnip]] — food (when used, give +20 Health during 1 in-game hour)
 * [[item:parsnip]] — crafting ingredient ⏳
 * [[item:parsnipMash]] — when used, give +20 Health and +10 Max Health during 2 in-game hours)
 * [[item:vegetableSoup]] — when used, give +20 Health and ???
 
 **Recipes** ⏳
+
 * [[item:parsnipMash]]
 * [[item:vegetableSoup]]
 
@@ -3095,28 +3366,35 @@ Parsnips are root vegetables found growing on the [[Forest]] floor. Their white 
 Sunflowers grow in forest clearings, thriving where sunlight reaches the ground unobstructed by the canopy. They bloom at dawn and close at dusk, following the arc of the sun throughout the day.
 
 **Tier**
+
 {{item:sunflowerSeed:star}}
 
 **Location**
+
 * Biome: [[Forest]]
 * Layer: [[Surface]]
 * Grows on [[node:grassForest]] in open clearings, away from [[Oak & Mahogany|Oak]] trees
 
 **Blooming Hours**
+
 * Appears at dawn and disappears at dusk (in-game time)
 
 **Harvest**
+
 * [[Foraging|Interact to harvest]] — the flower disappears on harvest
 * Tool: any [[Harvesting Tools|Sickle]]⏳
 * Drops: [[item:sunflowerSeed]]
 
 **Dangers**
+
 * Harvesting a Sunflower may disturb a [[monster:hedgehog]] hiding nearby — its spines inflict [[Damage Types|Piercing]] damage and may cause [[Bleeding DOT]]. ⏳
 
 **Planting**
+
 * Place a [[item:sunflowerSeed]] on a [[node:grassForest]] tile to increase the chance of a Sunflower growing the next day (from 18% to 80%). ⏳
 
 **Usages**
+
 * [[item:sunflowerSeed]] — replanting Sunflowers ⏳
 * [[item:sunflowerOil]] — extracted from seeds, essential ingredient for food and ointments ⏳
 * [[item:oleanderOil]] — contains 50% [[item:sunflowerOil]] ⏳
@@ -3136,26 +3414,32 @@ Sunflowers grow in forest clearings, thriving where sunlight reaches the ground 
 The Ambermirage is a common desert flower that blooms only during the hottest hours of the day. Its golden petals close tightly at dawn and dusk, making it nearly invisible outside its blooming window. It never appears during rain or storms.
 
 **Tier**
+
 {{item:ambermirage:star}}
 
 **Location**
+
 * Biome: [[Desert]]
 * Layer: [[Surface]]
 * Grows on [[node:sand]] exposed to the sky
 
 **Blooming Hours**
+
 * Appears at 10:00 and disappears at 14:00 (in-game time)
 * Never appears during Rainy or Stormy [[Weather]]
 
 **Harvest**
+
 * [[Foraging|Interact to harvest]] — the flower disappears on harvest⏳
 * Tool: any [[Harvesting Tools|Sickle]]⏳
 * Drops: [[item:ambermirage]]⏳
 
 **Dangers**
+
 * Harvesting an AmberMirage may disturb a [[monster:scorpion]] hiding beneath its petals — be ready to [[Fighting|fight]]. ⏳
 
 **Usages** ⏳
+
 * [[item:ambermirage]] — crafting ingredient
 
 **Tips**
@@ -3173,31 +3457,38 @@ The Ambermirage is a common desert flower that blooms only during the hottest ho
 The Bloodmoon is a nocturnal flower found in the [[Jungle]] forests. Its deep crimson petals unfurl only under moonlight, making it both elusive and dangerous to harvest. Its powerful regenerative properties make it an essential ingredient for any explorer venturing [[Underground]].
 
 **Tier**
+
 {{item:bloodmoon:star}}
 
 **Location**
+
 * Biome: [[Jungle]]
 * Layer: [[Surface]]
 * Grows on [[node:grassJungle]]
 
 **Blooming Hours**
+
 * Appears at night and disappears at dawn⏳
 * Does not bloom during the [[Moon Phases|New Moon]] — nourished by moonlight⏳
 
 **Harvest**
+
 * [[Foraging|Interact to harvest]] the flower — it will regrow next night
 * Tool: any [[Harvesting Tools|Sickle]]⏳
 * The plant is permanently destroyed only by [[Mining]] its supporting tile with a [[Mining Tools|Pickaxe]]
 * Drops: [[item:bloodmoon]], rare chance of [[item:bloodmoonSeed]]
 
 **Planting**
+
 * Place a [[item:bloodmoonSeed]] on a [[node:mud]] tile to grow a new Bloodmoon plant ⏳
 
 **Usages** ⏳
+
 * [[item:bloodmoon]] — health regeneration during combat
 * [[item:bloodmoon]] — essential ingredient for [[Underground]] potions ⏳
 
 **Dangers**
+
 * Harvesting a Bloodmoon at night may disturb a [[monster:mamba]] hiding among the undergrowth — its bite inflicts [[Damage Types|Piercing]] damage and [[Damage Types|Poison]]. ⏳
 * Harvesting at night in the [[Jungle]] exposes you to increased fauna activity — proceed with caution. ⏳
 
@@ -3217,9 +3508,11 @@ The Bloodmoon is a nocturnal flower found in the [[Jungle]] forests. Its deep cr
 Corals are marine organisms found on the sandy floor of the ocean. Four distinct species thrive in the underwater environment, each recognizable by its unique color.
 
 **Tier**
+
 {{item:coralR:star}}
 
 **Location**
+
 * Layer: Under Sea
 * Grows on [[node:sand]] — ocean floor only
 
@@ -3233,18 +3526,22 @@ Corals are marine organisms found on the sandy floor of the ocean. Four distinct
 | [[item:coralG]] | Green |
 
 **Harvest**
+
 * [[Foraging|Interact to harvest]] — the coral disappears on harvest
 * Tool: any [[Harvesting Tools|Sickle]] ⏳
 * Drops: [[item:coral]]
 
 **Regrowth**
+
 * Harvesting a coral triggers the slow growth of another coral elsewhere on the ocean floor
 * New corals take 2 to 4 in-game days to fully grow before they can be harvested
 
 **Usages** ⏳
+
 * [[item:coral]] — crafting ingredient ⏳
 
 **Dangers**
+
 * [[monster:moray]] may attack when harvesting coral. ⏳
 
 **Tips**
@@ -3265,9 +3562,11 @@ Corals are marine organisms found on the sandy floor of the ocean. Four distinct
 Ferns are ancient plants thriving in the humid darkness of [[Fern Cave|Fern Caves]]. Four distinct species have adapted to this underground environment, each recognizable by its unique color and frond shape. Their dense, overlapping foliage creates a lush, tangled undergrowth.
 
 **Tier**
+
 {{item:fernS:star}}. — Found exclusively in [[Fern Cave|Fern Caves]], a tier-3 environment.
 
 **Location**
+
 * Biome: [[Forest]]
 * Layer: [[Underground]]
 * Grows exclusively in [[Fern Cave|Fern Caves]] on [[node:grassFern]]
@@ -3282,19 +3581,23 @@ Ferns are ancient plants thriving in the humid darkness of [[Fern Cave|Fern Cave
 | [[item:fernM]] | Blue-grey | Vaporous, delicate fronds |
 
 **Harvest**
+
 * [[Foraging|Interact to harvest]] — the fern enters a dormant state and regrows after a few in-game hours
 * Tool: [[Harvesting Tools|Silver Sickle]] ({{item:sickleSilver:star}}) or better⏳
 * Drops: [[item:fernLeaf]], rare chance of [[item:fernSpore]]
 
 **Planting** ⏳
+
 * Place a [[item:fernSpore]] on a [[node:grassFern]] tile to grow a new fern ⏳
 * The tile must have [[node:grassFern]] on both its left and right neighbours ⏳
 
 **Usages** ⏳
+
 * [[item:fernLeaf]] — crafting ingredient ⏳
 * [[item:fernSpore]] — rare ingredient, planting ⏳
 
 **Dangers**
+
 * [[monster:dendrobate]] and [[monster:mamba]] inhabit Fern Caves — expect encounters while foraging. ⏳
 
 **Tips**
@@ -3317,38 +3620,46 @@ Velvetmoss is a slow-growing, deep-purple moss found exclusively in [[Moss Cave|
 {{item:velvetmoss:star}}
 
 **Location**
+
 * Biome: [[Jungle]]
 * Layer: [[Underground]]
 * Grows exclusively in [[Moss Cave|Moss Caves]] on [[node:grassMoss]]
 
 **Harvest**
+
 * [[Foraging|Interact to harvest]] — the patch disappears on harvest
 * Tool: [[Harvesting Tools|Silver Sickle]] or better ⏳
 * Drops: [[item:velvetmoss]]
 
 **Regrowth**
+
 * Harvesting a patch removes it permanently from that spot — the moss does not regrow where it was picked
 * Velvetmoss spreads slowly but relentlessly across every exposed [[node:grassMoss]] surface in the cave
 * A new patch appears every 2 to 3 in-game days on a random unoccupied spot
 * Left unharvested, the moss will eventually cover every available surface
 
 **Terrain Effect** ⏳
+
 * Velvetmoss secretes a thin, permanent moisture that makes every step a negotiation with gravity — the harder you push, the more it slips away from under you.
 * Walking on Velvetmoss reduces movement speed ({{item:velvetmoss:buffs:movementSpeed}}%)
 * See [[Movement Speed]] for details
 
 **Placement**
+
 * Grows on the floor (below open air) and on lateral walls (beside open air)
 * Does not grow on the ceiling
 * Each patch interconnects visually with its neighbours in all four directions
 
 **Usages** ⏳
+
 * [[item:velvetmoss]] — crafting ingredient ⏳
 
 **Dangers**
+
 * Harvesting Velvetmoss may disturb a colony of [[monster:millipede|Millipedes]] hidden beneath the moss — they attack in successive waves. Clear the first wave quickly or risk being overwhelmed. ⏳
 
 **Tips**
+
 * _Velvetmoss grows slowly but persistently — even a single unoccupied spot will eventually be claimed._ ⏳
 * _Its purple hue deepens near the cave floor — patches near the ceiling tend to be paler._ ⏳
 * _Harvest systematically from one side to the other — scattered harvesting wastes regrowth cycles._ ⏳
@@ -3366,26 +3677,32 @@ Velvetmoss is a slow-growing, deep-purple moss found exclusively in [[Moss Cave|
 The Mandrake is a root plant found in the tunnels and underground passages of [[Forest]] biomes. Its gnarled, humanoid root is unmistakable — and its scream when uprooted is said to drive the unwary mad. Whether that is true or merely a story told to scare apprentice foragers is a matter of debate.
 
 **Tier**
+
 {{item:mandrakeRoot:star}}
 
 **Location**
+
 * Biome: [[Forest]]
 * Layer: [[Surface]] tunnels and [[Underground]]
 * Grows on [[node:dirt]]
 
 **Population**
+
 * The species neither grows nor declines — natural balance maintains the population
 * Harvested Mandrakes do not regrow
 
 **Harvest**
+
 * [[Foraging|Interact to harvest]] — the plant disappears permanently on harvest
 * Tool: [[Harvesting Tools|Silver Sickle]] or better ⏳
 * Drops: [[item:mandrakeRoot]]
 
 **Dangers**
+
 * Uprooting a Mandrake releases a piercing scream that attracts a [[monster:wraith]] from the surrounding darkness. ⏳
 
 **Usages** ⏳
+
 * [[item:mandrakeRoot]] — crafting ingredient ⏳
 
 **Tips**
@@ -3402,27 +3719,33 @@ The Mandrake is a root plant found in the tunnels and underground passages of [[
 The underground Cactus is a hardy desert plant that has adapted to the complete absence of sunlight. Its thick, ribbed trunk and characteristic branching arms are unmistakable — even in the dark tunnels of [[Desert]] biomes.
 
 **Tier**
+
 {{item:cactus:star}}
 
 **Location**
+
 * Biome: [[Desert]]
 * Layer: [[Surface]] tunnels and [[Underground]]
 * Grows on [[node:sand]]
 
 **Population**
+
 * The species neither grows nor declines — natural balance maintains the population
 * Harvested Cactus do not regrow
 
 **Harvest**
+
 * [[Foraging|Interact to harvest]] — the plant disappears permanently on harvest
 * Tool: [[Harvesting Tools|Silver Sickle]] or better ⏳
 * Drops: [[item:cactus]], [[item:cactusFiber]], [[item:cactusSpine]]
 
 **Dangers**
+
 * Harvesting a Cactus triggers the spines — each harvest inflicts [[Bleeding DOT]] regardless of equipment. ⏳
 * The disturbance may attract a [[monster:scorpion]] lurking in the surrounding tunnels. ⏳
 
 **Usages** ⏳
+
 * [[item:cactus]] — food and crafting ingredient ⏳
 * [[item:cactusFiber]] — crafting ingredient ⏳
 * [[item:cactusSpine]] — crafting ingredient ⏳
@@ -3442,26 +3765,32 @@ The underground Cactus is a hardy desert plant that has adapted to the complete 
 Underground Bamboo thrives in the humid tunnels and passages of [[Jungle]] biomes. Growing in dense clusters wherever it takes root, it spreads aggressively across any available [[node:silt]] surface. Its hollow stems and tender shoots make it a versatile resource for both food and crafting.
 
 **Tier**
+
 {{item:bamboo:star}}
 
 **Location**
+
 * Biome: [[Jungle]]
 * Layer: [[Surface]] tunnels and [[Underground]]
 * Grows on [[node:silt]]
 
 **Population**
+
 * The species neither grows nor declines — natural balance maintains the population
 * Harvested Bamboo does not regrow
 
 **Harvest**
+
 * [[Foraging|Interact to harvest]] — the plant disappears permanently on harvest
 * Tool: [[Harvesting Tools|Silver Sickle]] or better ⏳
 * Drops: [[item:bambooShoot]], [[item:bambooStalk]]
 
 **Dangers**
+
 * Harvesting Bamboo may disturb a [[monster:centipede]] coiled around the stems — it strikes without warning and inflicts [[Poison DOT]]. ⏳
 
 **Usages** ⏳
+
 * [[item:bambooShoot]] — food ingredient ⏳
 * [[item:bambooStalk]] — construction and crafting ingredient ⏳
 
@@ -3480,26 +3809,32 @@ Underground Bamboo thrives in the humid tunnels and passages of [[Jungle]] biome
 Oleander is a common shrub found in the underground passages of all three biomes. Its deep purple berries contain potent alkaloids that, when steeped in [[item:sunflowerOil]], produce [[item:oleanderOil]] — a heat-stable cooking oil prized by experienced explorers.
 
 **Tier**
+
 {{item:oleander:star}}
 
 **Location**
+
 * Biome: [[Forest]], [[Desert]], [[Jungle]]
 * Layer: [[Underground]]
 * Grows on [[node:stone]]
 
 **Population**
+
 * The species neither grows nor declines — natural balance maintains the population
 * Harvested Oleander does not regrow
 
 **Harvest**
+
 * [[Foraging|Interact to harvest]] — the plant disappears permanently on harvest
 * Tool: [[Harvesting Tools|Silver Sickle]] or better ⏳
 * Drops: [[item:oleander]], [[item:oleanderBulb]]
 
 **Dangers**
+
 * The scent of Oleander berries attracts a [[monster:caveBeetle]] — its metallic blue-green carapace is nearly invisible against the stone walls. ⏳
 
 **Usages** ⏳
+
 * [[item:oleander]] — crafting ingredient ⏳
 * [[item:oleanderBulb]] — crafting ingredient ⏳
 * [[item:oleanderOil]] — heat-stable cooking oil, required for tier 3 food preparation ⏳
@@ -3523,26 +3858,32 @@ Oleander is a common shrub found in the underground passages of all three biomes
 Satan's Cube is one of the strangest organisms found in the deep [[Caverns]]. Its perfectly geometric shape — stacked cubes offset in alternating directions — has led many explorers to mistake it for a mineral formation. Its vivid yellow and electric orange colouring is nature's warning: do not touch.
 
 **Tier**
+
 {{item:satansCube:star}}
 
 **Location**
+
 * Biome: [[Forest]], [[Desert]]
 * Layer: [[Caverns]]
 * Grows on any [[Mineable Blocks|Topsoil]] or [[Mineable Blocks|Substrat]] surface with 3 tiles of clearance above
 
 **Population**
+
 * The species neither grows nor declines — natural balance maintains the population
 * Harvested plants do not regrow
 
 **Harvest**
+
 * [[Foraging|Interact to harvest]] — the plant disappears permanently on harvest
 * Tool: [[Harvesting Tools|Gold Sickle]] required ⏳
 * Drops: [[item:satansCube]] ⏳
 
 **Dangers**
+
 * Harvesting disturbs a [[monster:firesalamander]] lurking in the nearby rock — its burning claws inflict both [[Fire DOT]] and [[Bleeding DOT]] simultaneously. ⏳
 
 **Usages** ⏳
+
 * [[item:satansCube]] — ingredient for anti-burn preparations ⏳
 
 **Tips**
@@ -3561,26 +3902,32 @@ Satan's Cube is one of the strangest organisms found in the deep [[Caverns]]. It
 Sneakthorn is a deep cavern plant that grows in the humid passages shared by [[Forest]] and [[Jungle]] biomes. Its branching arms — each splitting at 45 degrees from the one below — give it the silhouette of a frozen explosion. Its vivid scarlet and magenta colouring is an unambiguous warning. Explorers who ignore it rarely make the same mistake twice.
 
 **Tier**
+
 {{item:sneakthorn:star}}
 
 **Location**
+
 * Biome: [[Forest]], [[Jungle]]
 * Layer: [[Caverns]]
 * Grows on any [[Mineable Blocks|Topsoil]] or [[Mineable Blocks|Substrat]] surface
 
 **Population**
+
 * The species neither grows nor declines — natural balance maintains the population
 * Harvested plants do not regrow
 
 **Harvest**
+
 * [[Foraging|Interact to harvest]] — the plant disappears permanently on harvest
 * Tool: [[Harvesting Tools|Gold Sickle]] required ⏳
 * Drops: [[item:sneakthorn]] ⏳
 
 **Dangers**
+
 * Harvesting Sneakthorn draws a [[monster:vampire]] out of the surrounding darkness — silent, fast, and venomous. Its bite inflicts both [[Bleeding DOT]] and [[Poison DOT]]. ⏳
 
 **Usages** ⏳
+
 * [[item:sneakthorn]] — ingredient for anti-poison preparations ⏳
 
 **Tips**
@@ -3599,26 +3946,32 @@ Sneakthorn is a deep cavern plant that grows in the humid passages shared by [[F
 Cursedcrown is the most alien plant found in the deep caverns. Its rigid radial arms — perfectly symmetrical, branching outward like a frozen star — look more like a crystal formation than a living organism. Its electric blue and cyan colouring blazes against the dark [[node:slate]] and [[node:hellstone]] walls. Nothing that glows that brightly in the deep dark is safe to touch.
 
 **Tier**
+
 {{item:cursedcrown:star}}
 
 **Location**
+
 * Biome: [[Jungle]], [[Desert]]
 * Layer: [[Caverns]]
 * Grows on any [[Mineable Blocks|Topsoil]] or [[Mineable Blocks|Substrat]] surface
 
 **Population**
+
 * The species neither grows nor declines — natural balance maintains the population
 * Harvested plants do not regrow
 
 **Harvest**
+
 * [[Foraging|Interact to harvest]] — the plant disappears permanently on harvest
 * Tool: [[Harvesting Tools|Gold Sickle]] required ⏳
 * Drops: [[item:cursedcrown]] ⏳
 
 **Dangers**
+
 * Harvesting Cursedcrown agitates a nearby colony of [[monster:fireAnt|Fire Ants]] — they swarm instantly and inflict [[Fire DOT]] and [[Poison DOT]] simultaneously. ⏳
 
 **Usages** ⏳
+
 * [[item:cursedcrown]] — ingredient for anti-bleeding preparations ⏳
 
 **Tips**
@@ -3637,26 +3990,32 @@ Cursedcrown is the most alien plant found in the deep caverns. Its rigid radial 
 Abysshorn is one of the strangest organisms in the known world. Its fractal structure — a single cone that splits into two, each splitting again, branching upward in an ever-widening crown of hollow trumpets — looks nothing like a plant. Its pearlescent white surface catches torchlight from across the cavern, making it unmistakable even at distance. Those who study it disagree on whether it is a plant, a fungus, or something else entirely.
 
 **Tier**
+
 {{item:abysshorn:star}}
 
 **Location**
+
 * Biome: [[Forest]], [[Desert]], [[Jungle]]
 * Layer: [[Caverns]] Top
 * Grows on any [[Mineable Blocks|Topsoil]] or [[Mineable Blocks|Substrat]] surface
 
 **Population**
+
 * The species neither grows nor declines — natural balance maintains the population
 * Harvested plants do not regrow
 
 **Harvest**
+
 * [[Foraging|Interact to harvest]] — the plant disappears permanently on harvest
 * Tool: [[Harvesting Tools|Gold Sickle]] required ⏳
 * Drops: [[item:abysshorn]] ⏳
 
 **Dangers**
+
 * The hollow trumpets of the Abysshorn resonate at frequencies that attract [[monster:caveJellyfish|Cave Jellyfish]] from the surrounding cavern. Their translucent bodies are nearly invisible in the dark — and their sting causes [[Poison DOT]] and [[Fire DOT]] simultaneously. ⏳
 
 **Usages** ⏳
+
 * [[item:abysshorn]] — ingredient for pheromone preparations ⏳
 
 **Tips**
@@ -3675,26 +4034,32 @@ Abysshorn is one of the strangest organisms in the known world. Its fractal stru
 Inferncap is the deepest-growing plant in the known world. Found only in the lowest caverns, where the heat of the earth makes the air shimmer and every rock face glows faintly red, it thrives where nothing else survives. Its stacked hemispherical leaves — deep violet, spotted with vivid red circles — look like something between a mushroom and a warning sign. Both interpretations are correct.
 
 **Tier**
+
 {{item:inferncap:star}}
 
 **Location**
+
 * Biome: [[Forest]], [[Desert]], [[Jungle]]
 * Layer: [[Caverns]] Bottom
 * Grows on any [[Mineable Blocks|Topsoil]] or [[Mineable Blocks|Substrat]] surface
 
 **Population**
+
 * The species neither grows nor declines — natural balance maintains the population
 * Harvested plants do not regrow
 
 **Harvest**
+
 * [[Foraging|Interact to harvest]] — the plant disappears permanently on harvest
 * Tool: [[Harvesting Tools|Gold Sickle]] required ⏳
 * Drops: [[item:inferncap]] ⏳
 
 **Dangers**
+
 * Harvesting Inferncap draws both a [[monster:lavaWorm|Lava Worm]] and a [[monster:magmaCrab|Magma Crab]] from the surrounding rock. The combination is lethal — the Lava Worm attacks from below while the Magma Crab closes from the side. ⏳
 
 **Usages** ⏳
+
 * [[item:inferncap]] — rare ingredient for pheromone preparations ⏳
 
 **Tips**
@@ -3713,9 +4078,11 @@ Inferncap is the deepest-growing plant in the known world. Found only in the low
 C'est une mousse d'un orange vif, presque luminescente, qui pousse exclusivement sur le côté nord des vieux chênes, là où l'humidité est constante.
 
 **Tier**
+
 {{item:amberMoss:star}}
 
 **Benefits**⏳
+
 * Hémostatique naturel (Soin) : Appliquée directement sur une plaie, elle stoppe instantanément le saignement. C'est le "pansement" de base du début de jeu.
 * Allume-feu (Survie) : Une fois séchée, cette mousse devient extrêmement inflammable. Elle est indispensable pour réussir à allumer un Campfire ou une Torch.
 * Filtration : Placée dans un récipient, elle peut servir de filtre rudimentaire utilisé en cuisine.
@@ -3726,6 +4093,7 @@ Localisation : Base of Oak trees.
 Foraging : [[Foraging|Sickle]] any tier.⏳
 
 **Usages**⏳
+
 * onguent qui diminue de 50% les démangeaisons causées par les [[monster:hornet]]s.
       `
   },
@@ -3742,6 +4110,7 @@ Foraging : [[Foraging|Sickle]] any tier.⏳
     category: ['Monster'],
     content: `
 **Loot** ⏳
+
 * [[item:spiderFang]] ({{item:spiderFang:star}}) — common ⏳
 * [[item:spiderEgg]] ({{item:spiderEgg:star}}) — common ⏳
 * [[item:silk]] ({{item:silk:star}}) — rare drop⏳
@@ -3767,9 +4136,11 @@ Note: those ingredients can also be dropped by [[Mining]] [[Cobweb]] with any [[
     category: ['Gameplay'],
     content: `
 **Welcome to Sixty-Below**
+
 You wake up alone on the surface of an unknown world. No instructions, no map — just the ground beneath your feet and whatever you can find.
 
 **Your first minutes**
+
 * Look around — the [[Surface]] layer is relatively safe during the day
 * Three tools are waiting in your [[Inventory]]:
   * [[Chopping Tools|Copper Axe]] — chop trees to gather wood and craft your first items
@@ -3781,17 +4152,20 @@ You wake up alone on the surface of an unknown world. No instructions, no map �
 _Many other activities await you as you progress — see [[Activities]] for an overview._
 
 **Before nightfall**
+
 Night brings dangerous creatures to the surface.
 Your first priority is to build a [[Housing|shelter]] before the sun sets.
 * You need walls, a background wall, and a door at minimum
 * Check the [[Day & Night Cycle]] fiche to know how much time you have
 
 **Going deeper**
+
 Once you have basic tools and a shelter, you can start exploring:
 * The [[Underground]] layer holds ore, gems and secrets
 * The [[Caverns]] go deeper still — come prepared
 
 **Key topics to read**
+
 * [[Mining]] — how to mine blocks and what tools you need
 * [[Crafting]] — crafting stations and recipes
 * [[Housing]] — building a valid shelter
@@ -3807,12 +4181,14 @@ Once you have basic tools and a shelter, you can start exploring:
 Press **[H]** or click the 📜 button in the [[Control Panel]] to open it.
 
 **Left column — navigation**
+
 * Type in the search box to filter topics by title, category or content
 * When the search box is empty, use the category dropdown to browse by theme
 * Click any topic button to display its page
 * Use **◀** and **▶** to move back and forward through your reading history
 
 **Right column — topic page**
+
 * The topic title is displayed above the content area
 * Click any highlighted link to navigate directly to the related topic
 
@@ -3919,6 +4295,7 @@ The world of Sixty-Below follows a continuous day/night cycle, shaped by time, [
     content: `
 
     **Buffs**
+
     If [[item:bottledFrog]] accessory is in your [[Inventory]], the weather for tomorow is displayed at the right of current weather.
     `
   },
@@ -4096,6 +4473,54 @@ const resolveLinks = (entry) => {
   return errors
 }
 
+const renderTables = (html) => {
+  const lines = html.split('\n')
+  const out = []
+  let inTable = false
+  let isFirstRow = true
+
+  for (const line of lines) {
+    if (!line.startsWith('|')) {
+      // Fermeture de la table en cours
+      if (inTable) {
+        out.push('</tbody>')
+        out.push('</table>')
+        inTable = false
+        isFirstRow = true
+      }
+      out.push(line)
+      continue
+    }
+
+    // Ligne séparateur |---|---|---| → ignorée
+    if (line.replace(/[\|\-\s]/g, '') === '') continue
+
+    // Parser les cellules
+    const cells = line.split('|').map(c => c.trim()).filter((c, i, arr) => i > 0 && i < arr.length - 1)
+
+    if (!inTable) {
+      out.push('<table class="help-table">')
+      out.push('<thead>')
+      out.push('<tr>' + cells.map(c => `<th>${c}</th>`).join('') + '</tr>')
+      out.push('</thead>')
+      out.push('<tbody>')
+      inTable = true
+      isFirstRow = false
+      continue
+    }
+
+    out.push('<tr>' + cells.map(c => `<td>${c}</td>`).join('') + '</tr>')
+  }
+
+  // Fermeture finale si table en fin de contenu
+  if (inTable) {
+    out.push('</tbody>')
+    out.push('</table>')
+  }
+
+  return out.join('\n')
+}
+
 const renderMarkdown = (entry) => {
   let html = entry.content
 
@@ -4111,7 +4536,10 @@ const renderMarkdown = (entry) => {
   // 4. Listes
   html = renderLists(html)
 
-  // 5. Passe finale : blocs → <p>
+  // 5. Tables
+  html = renderTables(html)
+
+  // 6. Passe finale : blocs → <p>
   const BLOCK_TAGS = ['<ul', '<table', '<ol']
 
   html = html.split('\n\n').map(block => {
@@ -4125,7 +4553,7 @@ const renderMarkdown = (entry) => {
 
   entry.html = html
 
-  // 5. Liens
+  // 7. Liens
   return resolveLinks(entry)
 }
 
