@@ -7,7 +7,11 @@
 
 ## En cours
 
-- Génération du monde : végétation
+- Affichage du Help Panel :
+  - affichage
+  - UI
+  - hydratation
+
 ---
 
 ## À faire — Bugs connus
@@ -17,20 +21,10 @@
 - Il n'y a pas assez de Bamboo dans le monde => sans doute pas assez de SILT sur le sol souterrain.
 - Il n'y a pas assez de Oleanders dans le monde => sans doute pas assez de STONE sur le sol souterrain.
 - Il est aussi possible que le sol soit trop accidenté pour disposer de spots élligibles en nombre suffisant, il faudrait ajouter alors une érosion partielle, en bouchant les trous et supprimant les bosses dans 80-90% des cas.
+- Génération du monde : densité un peu trop faible des tunnels en Surface
+- Génération du monde : densité trop élevée des tunnels en Underground et Caverns (revoir les constantes `SMALL_TUNNELS_COUNT` et `CAVERNS_TUNNEL_COUNT`)
 
-## À faire — Génération du monde (`generate.mjs`)
 
-### Tunnels
-- Densité un peu trop faible en Surface
-- Densité trop élevée en Underground et Caverns (revoir les constantes `SMALL_TUNNELS_COUNT` et `CAVERNS_TUNNEL_COUNT`)
-
-### Ajout des artefacts et plantes
-- Ajout de herbes : Blinkroot, Fireblossom, Oleander, Skorn
-- Ajout plante E : biome Forest et Desert / zone caverns
-- Ajout plante F : biome Forest et Jungle / zone caverns
-- Ajout plante G : biome Jungle et Desert / zone caverns
-- Ajout plante H : tous biomes / zone caverns top
-- Ajout plante I : tous biomes / zone caverns bottom
 
 ---
 
