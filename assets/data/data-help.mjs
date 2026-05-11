@@ -101,9 +101,11 @@ It is used in many early-game [[Crafting|recipes]].
 **Mining**
 <<miningInfo|copperPickaxe|1|copper>>
 
-**Drops**
+**Node**
 [[node:copper]] / [[node:copper|cuivre]] /[[node:copper1]]
 {{node:copper:mining}}
+**Item**
+[[item:pickaxeCopper]] / [[item:pickaxeCopper|cuivre pioche]] /[[item:pickaxecopper]]
 
 **Recipes using Copper**
 {{recipe:copperBar}}
@@ -1647,7 +1649,7 @@ Gems are rare crafting materials found deep underground. Each gem exists in thre
 |---|---|---|
 | Gem Deposit | Gem veins placed in the World | Not directly usable |
 | Raw Gem | Dropped when [[Mining]] deposits | Crafting ingredient |
-| Cut Gem | Cut raw gems at a [[StonecuttingStonecutter]] | Crafting ingredient |
+| Cut Gem | Cut raw gems at a [[Stonecutting|Stonecutter]] | Crafting ingredient |
 
 **Gem Deposits**
 
@@ -3832,12 +3834,29 @@ const resolveNodeLinks = (entry, NODES) => {
   return errors
 }
 
+const resolveItemLinks = (entry, ITEMS) => {
+  let errors = 0
+  entry.content = entry.content.replace(/\[\[item:([^\]|]+)(?:\|([^\]]*))?\]\]/g, (match, code, text) => {
+    const item = ITEMS[code]
+    if (!item) {
+      console.error(`[help] '${entry.title}' : item inconnu '${code}'`)
+      errors++
+      return `⚠️ [[item:${code}]]`
+    }
+    const label = text ?? item.name
+    if (item.help === entry.title) return label
+    return `[[${item.help}|${label}]]`
+  })
+  return errors
+}
+
 export const hydrateHelp = (NODES, ITEMS) => {
   let count = 0
   let errors = 0
 
   for (const entry of HELP) {
     errors += resolveNodeLinks(entry, NODES)
+    errors += resolveItemLinks(entry, ITEMS)
 
     // 1. Vérification des liens [[...]]
     entry.content = entry.content.replace(/\[\[([^\]|]+)(?:\|([^\]]*))?\]\]/g, (match, ref, text) => {
@@ -3854,15 +3873,15 @@ export const hydrateHelp = (NODES, ITEMS) => {
       // }
 
       // Lien item:code
-      if (ref.startsWith('item:')) {
-        const code = ref.slice(5)
-        if (!ITEMS[code]) {
-          console.error(`[help] '${entry.title}' : item inconnu '${code}'`)
-          errors++
-          return `⚠️ &lbrack;&lbrack;${ref}&rbrack;&rbrack;`
-        }
-        return match // valide — sera résolu plus tard
-      }
+      if (ref.startsWith('item:')) { return match }
+      //   const code = ref.slice(5)
+      //   if (!ITEMS[code]) {
+      //     console.error(`[help] '${entry.title}' : item inconnu '${code}'`)
+      //     errors++
+      //     return `⚠️ &lbrack;&lbrack;${ref}&rbrack;&rbrack;`
+      //   }
+      //   return match // valide — sera résolu plus tard
+      // }
 
       // Lien item:code
       if (ref.startsWith('monster:')) {
