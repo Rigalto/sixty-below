@@ -7,36 +7,52 @@
  * SYNTAXE
  * ═══════════════════════════════════════════════════════════════
  *
- * ── Markdown standard ───────────────────────────────────────────
+ *
+ * ── Markdown ────────────────────────────────────────────────────
  *   **gras**         _italique_        __souligné__
+ *
  *   * puce niveau 1
- *     * puce niveau 2
- *   | col1 | col2 |  (table)
+ *     * puce niveau 2 (multiples niveaux, 2 espaces par niveau)
+ *
+ *   | col1 | col2 |   (table — ligne vide obligatoire avant et après)
  *   | ---- | ---- |
  *   Utiliser <br> pour forcer un passage à la ligne dans une cellule.
  *
- * ⚠️ Une ligne vide est obligatoire entre chaque bloc
- *      (paragraphe, titre, liste, table).
+ *   <hr>             → ligne horizontale (HTML direct)
+ *
+ *   ⚠️ Une ligne vide obligatoire entre chaque bloc
+ *      (paragraphe, titre gras, liste, table, <hr>)
  *
  * ── Liens inter-fiches ──────────────────────────────────────────
- *   [[node:code]]                 → nom du noeud (NODES.CODE.name) + lien vers sa fiche (NODES.CODE..help)
- *   [[item:code]]                 → nom de l'item (ITEMS.code.name) + lien vers sa fiche (ITEMS.code.help)
- *   [[monster:code]]              → nom du monstre + lien vers sa fiche
- *   [[helpTopic]]                 → titre de la fiche d'aide + lien vers sa fiche
- *   [[node:code|texte affiché]]   → lien avec texte personnalisé
- *   [[item:code|texte affiché]]   → lien avec texte personnalisé
- *   [[monster:code|texte]]        → lien avec texte personnalisé
- *   [[helpTopic|texte affiché]]   → lien avec texte personnalisé
- *   (pas de lien si la fiche courante est celle du lien)
+ *   [[helpTopic]]                  → lien vers une fiche d'aide
+ *   [[helpTopic|texte affiché]]    → lien avec texte personnalisé
+ *   [[node:code]]                  → lien vers la fiche du node (node.name)
+ *   [[node:code|texte affiché]]    → lien avec texte personnalisé
+ *   [[item:code]]                  → lien vers la fiche de l'item (item.name)
+ *   [[item:code|texte affiché]]    → lien avec texte personnalisé
+ *   [[monster:code]]               → lien vers la fiche du monstre (monster.name)
+ *   [[monster:code|texte affiché]] → lien avec texte personnalisé
+ *   (aucun lien si la fiche courante est la cible du lien — texte seul)
  *
  * ── Données dynamiques ──────────────────────────────────────────
- *   {{node:code:name}}  → affiche le nom de NODES.CODE.name
- *   {{node:code:star}}  → affiche le tier de NODES.CODE.star (⭐☆☆☆☆)
- *   {{item:code:star}}  → affiche le tier de ITEMS.code.star (⭐☆☆☆☆)
- *   {{item:code}}       → affiche les infos de ITEMS.code
- *   {{node:code}}       → affiche les infos de NODES.code
- *   {{recipe:code}}     → affiche la recette de RECIPES[code]
- *   {{table:type:TOOL}} → affiche une table de tous les items du type donné
+ *   Syntaxe générale :
+ *   {{node:code:champ}}                     → valeur brute du champ
+ *   {{node:code:champ|format}}              → valeur formatée
+ *   {{node:code:champ:souschamp}}           → accès imbriqué
+ *   {{node:code:champ:souschamp|format}}    → accès imbriqué formaté
+ *   {{node:code:champ[0]:souschamp}}        → accès par index dans un tableau
+ *   {{node:code:champ[0]:souschamp|format}} → accès par index dans un tableau et formatage
+ *   {{node:code:champ[*]:souschamp|format}} → tous les éléments du tableau
+ *   (même syntaxe pour item:code et monster:code)
+ *
+ *   Formats disponibles :
+ *   |format|     → valeur brute (défaut si absent)
+ *   |star|       → tier affiché en étoiles  ⭐⭐☆☆☆
+ *   |link|       → [[obj.help|obj.name]]  (obj doit avoir .help et .name)
+ *   |optional|   → chaîne vide si absent, pas de ⚠️
+ *   |list|       → liste à puces  (* item\n* item\n...)
+ *   |lines|      → valeurs séparées par <br>
+ *   |loot|       → table de drops ⏳
  *
  * ── Templates ───────────────────────────────────────────────────
  *   <<templateName|param1|param2>>   → inclusion d'un template
@@ -47,16 +63,15 @@
  * CARACTÈRES SPÉCIAUX  (copier/coller depuis ici)
  * ═══════════════════════════════════════════════════════════════
  *
- *   ⭐  nombre de star (tier) de l'entité
- *   ☆  nombre de star (tier) de l'entité
-*
+ *   ⭐  étoile pleine (tier)
+ *   ☆   étoile vide  (tier)
+ *
  *   ⏳  Feature non encore implémentée
  *       → Tant qu'il en reste dans le fichier, l'application n'est pas terminée.
  *
  *   ⚠️  Erreur d'hydratation (référence inconnue dans ITEMS/NODES/RECIPES)
  *       → Injecté automatiquement par le moteur à la place du code invalide.
  *       → Tolérance : la fiche s'affiche malgré l'erreur, avec le code et ⚠️ visible.
- *
  * ═══════════════════════════════════════════════════════════════
  */
 
@@ -68,7 +83,7 @@ const HELP_TEMPLATES = {
   miningInfo: `
 **How to mine**
 Use a [[Mining Tools|{1}]] of at least ⭐{2} to mine [[node:{3}]].
-Mining drops: {{node:{3}:mining}}
+Mining drops: {{node:{3}:mining[*].item}}
   `,
 
   statTable: `
@@ -111,7 +126,18 @@ It is used in many early-game [[Crafting|recipes]].
 **Node**
 
 [[node:copper]] / [[node:copper|cuivre]]
-{{node:copper:mining}}
+
+{{node:copper:help}}
+
+{{node:copper:mining[0]:count|star}}
+{{node:copper:test[*]|list}}
+
+| Monster | Role | Trigger |
+|---|---|---|
+| [[monster:blueSlug]] | Common, passive | {{node:copper:test[*]|lines}} |
+
+
+
 **Item**
 
 [[item:pickaxeCopper]] / [[item:pickaxeCopper|cuivre pioche]]
@@ -1381,7 +1407,7 @@ Grass covers the surface of [[Forest]] biomes. It is the most common natural til
 
 **Drops** ⏳
 
-* {{node:grass:mining}}
+* {{node:grassForest:mining[0]:item}}
 
 **Tips**
 
@@ -1406,7 +1432,7 @@ Jungle Grass covers the surface of [[Jungle]] biomes. Denser and more vibrant th
 
 **Drops** ⏳
 
-* {{node:jungleGrass:mining}}
+* {{node:grassJungle:mining[0]:count}}
 
 **Tips**
 
@@ -1431,7 +1457,7 @@ Fern Grass covers the floor of [[Fern Cave]]s. Giant ferns grow from this soft, 
 
 **Drops** ⏳
 
-* {{node:grassFern:mining}}
+* {{node:grassFern:mining[0]:item}}
 
 **Tips**
 
@@ -1456,7 +1482,7 @@ Luminous moss that covers the walls and floor of [[Moss Cave]]s. Its soft green 
 
 **Drops** ⏳
 
-* {{node:grassMoss:mining}}
+* {{node:grassMoss:mining[0]:item}}
 
 **Tips**
 
@@ -1482,7 +1508,7 @@ Mushroom Grass covers the floor of [[Mushroom Cave]]s. [[Giant Mushroom]]s grow 
 
 **Drops** ⏳
 
-* {{node:grassMushroom:mining}}
+* {{node:grassMushroom:mining[0]:item}}
 
 **Tips**
 
@@ -1511,7 +1537,7 @@ Dirt is the primary topsoil of [[Forest]] biomes. It supports surface vegetation
 
 **Drops** ⏳
 
-* {{node:dirt:mining}}
+* {{node:dirt:mining[0]:item}}
 
 **Recipes** ⏳
 
@@ -1537,7 +1563,7 @@ Sand is the primary topsoil of [[Desert]] biomes. It is subject to gravity — u
 
 **Drops** ⏳
 
-* {{node:sand:mining}}
+* {{node:sand:mining[0]:item}}
 
 **Tips**
 
@@ -1563,7 +1589,7 @@ Silt is the primary topsoil of [[Jungle]] biomes. Its fine, damp texture support
 
 **Drops** ⏳
 
-* {{node:silt:mining}}
+* {{node:silt:mining[0]:item}}
 
 **Recipes** ⏳
 
@@ -1590,7 +1616,7 @@ Humus is a rich organic topsoil found across all biomes, though it is most abund
 
 **Drops** ⏳
 
-* {{node:humus:mining}}
+* {{node:humus:mining[0]:item}}
 
 **Recipes** ⏳
 
@@ -1651,7 +1677,7 @@ Clay is the most common substrat in [[Forest]] biomes. Its soft, workable textur
 
 **Drops** ⏳
 
-* {{node:clay:mining}}
+* {{node:clay:mining[0]:item}}
 
 **Recipes** ⏳
 
@@ -1677,7 +1703,7 @@ Stone is the second most common substrat in [[Forest]] biomes, found deeper than
 
 **Drops** ⏳
 
-* {{node:stone:mining}}
+* {{node:stone:mining[0]:item}}
 
 **Recipes** ⏳
 
@@ -1702,7 +1728,7 @@ Hardstone is a dense, resistant substrat found in the deepest parts of [[Forest]
 
 **Drops** ⏳
 
-* {{node:hardstone:mining}}
+* {{node:hardstone:mining[0]:item}}
 
 **Recipes** ⏳
 
@@ -1729,7 +1755,7 @@ Sandstone is the primary substrat of [[Desert]] biomes. It also forms the natura
 
 **Drops** ⏳
 
-* {{node:sandstone:mining}}
+* {{node:sandstone:mining[0]:item}}
 
 **Recipes** ⏳
 
@@ -1755,7 +1781,7 @@ Ash is the second most common substrat in [[Forest]] biomes, found deeper than [
 
 **Drops** ⏳
 
-* {{node:ash:mining}}
+* {{node:ash:mining[0]:item}}
 
 **Recipes** ⏳
 
@@ -1780,7 +1806,7 @@ Hellstone is an extremely hard volcanic substrat found in the deepest parts of [
 
 **Drops** ⏳
 
-* {{node:hellstone:mining}}
+* {{node:hellstone:mining[0]:item}}
 
 **Recipes** ⏳
 
@@ -1810,7 +1836,7 @@ Mud is the primary substrat of [[Jungle]] biomes. Its soft, damp texture support
 
 **Drops** ⏳
 
-* {{node:mud:mining}}
+* {{node:mud:mining[0]:item}}
 
 **Recipes** ⏳
 
@@ -1836,7 +1862,7 @@ Limestone is a sedimentary substrat found as intrusions across [[Jungle]] biome.
 
 **Drops** ⏳
 
-* {{node:limestone:mining}}
+* {{node:limestone:mining[0]:item}}
 
 **Recipes** ⏳
 
@@ -1861,7 +1887,7 @@ Slate is a hard metamorphic substrat found in the deepest parts of [[Jungle]] bi
 
 **Drops** ⏳
 
-* {{node:slate:mining}}
+* {{node:slate:mining[0]:item}}
 
 **Recipes** ⏳
 
@@ -2075,7 +2101,7 @@ Obsidian is a volcanic glass formed where lava meets water. It is one of the har
 
 **Mining** ⏳
 
-* {{node:obsidian:mining}}
+* {{node:obsidian:mining[0]:item}}
 * Requires a tier 5 [[item:pickaxePlatinum]] — applies to both natural and player-created Obsidian
 
 **Creating Obsidian** ⏳
@@ -2109,7 +2135,7 @@ Meteorite is an extraterrestrial rock that falls from the sky in rare events. It
 
 **Drops** ⏳
 
-* {{node:meteorite:mining}}
+* {{node:meteorite:mining[0]:item}}
 
 **Recipes** ⏳
 
@@ -2134,7 +2160,7 @@ Hive is a biological material that forms the walls of [[Hive]] mini-biomes. It i
 
 **Drops** ⏳
 
-* {{node:hive:mining}}
+* {{node:hive:mining[0]:item}}
 
 **Recipes** ⏳
 
@@ -2164,7 +2190,7 @@ Shell is a sedimentary material formed from ancient marine organisms. It is foun
 
 **Drops** ⏳
 
-* [[Mining]] with [[Mining Tools|Pickaxes]] (any tier): {{node:shell:mining}}
+* [[Mining]] with [[Mining Tools|Pickaxes]] (any tier): {{node:shell:mining[0]:item}}
 
 **Main Usages** ⏳
 
@@ -4561,11 +4587,166 @@ const renderParagraphs = (html) => html.split('\n\n').map(block => {
   return `<p>${trimmed}</p>`
 }).join('\n')
 
+const resolvePath = (type, code, segments, NODES, ITEMS, MONSTERS) => {
+  // 1. Objet racine
+  let obj
+  if (type === 'node') {
+    obj = NODES[code.toUpperCase()]
+  } else if (type === 'item') {
+    obj = ITEMS[code]
+  } else if (type === 'monster') {
+    obj = MONSTERS[code]
+  } else if (type === 'recipe') {
+    // ⏳ à implémenter lors de la conception de craftOverlay
+    return {value: null, tail: [], error: '⏳ recipe non implémenté'}
+  } else {
+    return {value: null, tail: [], error: `type inconnu '${type}'`}
+  }
+
+  if (!obj) return {value: null, tail: [], error: `${type} inconnu '${code}'`}
+
+  // 2. Traversal des segments
+  for (let i = 0; i < segments.length; i++) {
+    const seg = segments[i]
+    const matchIndex = seg.match(/^([^[]+)\[(\d+)\]$/)
+    const matchStar = seg.match(/^([^[]+)\[\*\]$/)
+
+    if (matchStar) {
+      // [*] — on s'arrête ici, tail = segments restants
+      const field = matchStar[1]
+      if (!Array.isArray(obj[field])) {
+        return {value: null, tail: [], error: `'${field}' n'est pas un tableau`}
+      }
+      obj = obj[field]
+      return {value: obj, tail: segments.slice(i + 1), error: null, isStar: true}
+    } else if (matchIndex) {
+      const field = matchIndex[1]
+      const idx = parseInt(matchIndex[2])
+      if (!Array.isArray(obj[field])) {
+        return {value: null, tail: [], error: `'${field}' n'est pas un tableau`}
+      }
+      obj = obj[field][idx]
+    } else {
+      obj = obj[seg]
+    }
+
+    if (obj === undefined || obj === null) {
+      return {value: null, tail: [], error: null, isMissing: true}
+    }
+  }
+
+  return {value: obj, tail: [], error: null, isStar: false}
+}
+
+const formatValue = (resolved, format, entryTitle, path) => {
+  const {value, tail, error, isStar, isMissing} = resolved
+
+  // Erreur de traversal
+  if (error) {
+    if (error === '⏳ recipe non implémenté') {
+      console.warn(`[help] '${entryTitle}' : ${error}`) // PROVISOIRE
+    } else {
+      console.error(`[help] '${entryTitle}' : ${error}`)
+    }
+    return `⚠️ ${path}`
+  }
+
+  // Champ absent
+  if (isMissing) {
+    if (format === 'optional') return ''
+    // pas de console.error — champ optionnel toléré silencieusement
+    return ''
+  }
+
+  // Valeur finale objet sans format adapté
+  if (typeof value === 'object' && !isStar && format !== 'loot') {
+    console.error(`[help] '${entryTitle}' : valeur non affichable (objet) '${path}'`)
+    return `⚠️ ${path}`
+  }
+
+  switch (format) {
+    case 'star': {
+      const n = parseInt(value)
+      if (isNaN(n) || n < 1 || n > 5) {
+        console.error(`[help] '${entryTitle}' : valeur star invalide '${value}'`)
+        return `⚠️ ${path}`
+      }
+      return '⭐'.repeat(n) + '☆'.repeat(5 - n)
+    }
+
+    case 'link': {
+      if (!value.help || !value.name) {
+        console.error(`[help] '${entryTitle}' : objet sans .help ou .name '${path}'`)
+        return `⚠️ ${path}`
+      }
+      return `[[${value.help}|${value.name}]]`
+    }
+
+    case 'list': {
+      if (!isStar) {
+        console.error(`[help] '${entryTitle}' : format 'list' requiert [*] '${path}'`)
+        return `⚠️ ${path}`
+      }
+      const lines = []
+      for (const item of value) {
+        const leaf = tail.length ? tail.reduce((o, s) => o?.[s], item) : item
+        lines.push(`* ${leaf ?? '⚠️'}`)
+      }
+      return lines.join('\n')
+    }
+
+    case 'lines': {
+      if (!isStar) {
+        console.error(`[help] '${entryTitle}' : format 'lines' requiert [*] '${path}'`)
+        return `⚠️ ${path}`
+      }
+      const parts = []
+      for (const item of value) {
+        const leaf = tail.length ? tail.reduce((o, s) => o?.[s], item) : item
+        parts.push(String(leaf ?? '⚠️'))
+      }
+      return parts.join('<br>')
+    }
+
+    case 'loot':
+      // ⏳ à implémenter lors de la conception de craftOverlay
+      return '⏳ loot'
+
+    case 'optional':
+      return String(value)
+
+    default:
+      // Pas de format ou format inconnu — valeur brute
+      if (format && format !== '') {
+        console.error(`[help] '${entryTitle}' : format inconnu '${format}'`)
+        return `⚠️ ${path}`
+      }
+      return String(value)
+  }
+}
+
+const resolveDynamic = (entry, NODES, ITEMS, MONSTERS) => {
+  let errors = 0
+  entry.html = entry.html.replace(
+    /\{\{(node|item|monster|recipe):([^:}]+)((?::[^|}]+)*?)(?:\|([^}]*))?\}\}/g,
+    (match, type, code, pathStr, format) => {
+      const segments = pathStr ? pathStr.slice(1).split(':') : []
+      const resolved = resolvePath(type, code, segments, NODES, ITEMS, MONSTERS)
+      const result = formatValue(resolved, format ?? '', entry.title, match)
+      if (result.startsWith('⚠️')) errors++
+      return result
+    }
+  )
+  return errors
+}
+
 // l'ordre est **très important**
-const renderMarkdown = (entry) => {
+const renderMarkdown = (entry, NODES, ITEMS, MONSTERS) => {
+  let errors = 0
   entry.html = entry.content
 
   // 1. Format dynamique
+  errors += resolveDynamic(entry, NODES, ITEMS, MONSTERS)
 
   // 2. Gras
   entry.html = entry.html.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
@@ -4580,7 +4761,7 @@ const renderMarkdown = (entry) => {
   entry.html = renderLists(entry.html)
 
   // 6. Liens
-  const errors = resolveLinks(entry) // résout [[...|...]] → <a>
+  errors += resolveLinks(entry) // résout [[...|...]] → <a>
 
   // 7. Tables
   entry.html = renderTables(entry.html)
@@ -4605,7 +4786,7 @@ export const hydrateHelp = (NODES, ITEMS, MONSTERS = {}) => {
     // TODO : résolution des autres données dynamiques {{...}}
 
     // Conversion Markdown → HTML (entry.html = html généré)
-    errors += renderMarkdown(entry)
+    errors += renderMarkdown(entry, NODES, ITEMS, MONSTERS)
     count++
   }
 
