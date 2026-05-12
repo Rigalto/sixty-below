@@ -330,42 +330,104 @@ sont indicatives — les densités exactes sont définies dans `ORE_GEM_SCATTER_
 
 ### 3.12 Loot & Récompenses
 
-## 3.12 Loot Tables
+#### Concept
 
-Les tables de loot sont utilisées partout dans le jeu : contenu des coffres, drops de monstres, résultats de minage, abattage d'arbres, récolte de plantes, etc.
+Le loot est le mécanisme central par lequel le joueur obtient des items. Il est déclenché par de nombreuses actions : coffre, minage, récolte, abattage, combat, pêche, secouage d'arbres, jardinage, etc. Toutes ces actions partagent la même structure et les mêmes fonctions utilitaires.
 
-### Format d'une entrée
+#### Structure source (data.mjs)
 
-Chaque entrée est une chaîne de caractères au format :
-itemId:weight:count
+Chaque action de loot est définie par un objet avec les champs suivants :
 
-| Champ | Type | Description |
+```js
+mining: {
+  speed: 1000,       // vitesse de base en ms (avant buffs)
+  items: [           // premier item = item principal (convention)
+    {
+      item: 'orcu',          // String — hydraté en ITEMS.orcu par core.mjs
+      count: '100:1',        // String — format parseLootEntry 'weight:count'
+      buffs: [               // optionnel — modificateurs et conditions
+        '+Lucky',            // condition active  : absent si Lucky inactif
+        '!Stormy',           // condition inactive : absent si Stormy actif
+        'Lucky:20',          // modificateur : +20% quantité si Lucky actif
+        'Rainy:-10'          // modificateur : -10% quantité si Rainy actif
+      ]
+    }
+  ]
+}
+```
+
+Le champ `range` (portée de l'action, rectangle centré joueur en tuiles) sera ajouté ultérieurement dans une conception transverse des ranges.
+
+#### Syntaxe des buffs
+
+| Syntaxe | Type | Logique runtime |
 |---|---|---|
-| `itemId` | string | Identifiant de l'item (clé dans `ITEMS`) |
-| `weight` | entier (0-100) | Probabilité en % que cet item soit inclus dans le loot |
-| `count` | voir ci-dessous | Quantité d'items obtenus si l'item est sélectionné |
+| `+Lucky` | condition active | item absent si Lucky inactif |
+| `!Stormy` | condition inactive | item absent si Stormy actif |
+| `Lucky:20` | modificateur | +20% quantité si Lucky actif |
+| `Rainy:-10` | modificateur | -10% quantité si Rainy actif |
 
-### Syntaxe de `count`
+**Conditions multiples :**
+- `+Lucky +Day` → Lucky ET Day actifs (AND) — sinon count = 0
+- `!Stormy !Sunny` → PAS Stormy ET PAS Sunny (AND) — sinon count = 0
 
-| Notation | Exemples | Résultat |
-|---|---|---|
-| Valeur fixe | `3` | Toujours 3 items |
-| Valeur fixe + bonus | `1.40` | 1 garanti + 40% d'un item supplémentaire |
-| Range | `5-8` | Entre 5 et 8 items (uniforme) |
-| Range + bonus | `5-8.40` | Entre 5 et 8, avec 40% d'obtenir une unité supplémentaire |
+**Application des modificateurs :**
+- Additifs entre eux (pas multiplicatifs) : `totalBuff = somme des modificateurs actifs`
+- `finalCount = rawCount * (1 + totalBuff / 100)`
+- `intFract(finalCount)` → `{int: garanti, fract: chance bonus%}`
 
-### Exemples complets
+### Structure hydratée (après core.mjs)
 
-| Entrée | Résultat |
+```js
+mining: {
+  speed: 1000,
+  buffList: ['Lucky', 'Day', 'Stormy', 'Rainy'],  // union dédupliquée
+  items: [
+    {
+      item: ITEMS.orcu,
+      count: LootEntry,
+      buffs: {
+        required:  ['Lucky', 'Day'],       // absent si l'un est inactif
+        forbidden: ['Stormy'],             // absent si l'un est actif
+        modifiers: [                       // cumulés si actifs
+          {name: 'Lucky', value: 20},
+          {name: 'Rainy', value: -10}
+        ]
+      }
+      // help: {...}  // précalculé — conception à venir
+    }
+  ]
+}
+```
+
+**Encodage de `type` :**
+| Valeur | Signification |
 |---|---|
-| `'copperChunk:80:3'` | Toujours 3 'Copper Chunk', poids 80 |
-| `'healthPotionSmall:20:1.40'` | 1 potion garantie + 40% d'en avoir 2, poids 20 |
-| `'worm:100:5-8'` | Entre 5 et 8 vers de terre, poids 100 |
-| `'ironChunk:60:5-8.40'` | Entre 5 et 8 'Iron Chunk' + 40% d'un de plus, poids 60 |
+| `1` | condition active (`+`) |
+| `-1` | condition inactive (`!`) |
+| `0` | modificateur pur |
 
-### Évaluation
+### Pipeline runtime
 
-Chaque entrée est évaluée **indépendamment**. Un seul loot peut donc produire plusieurs items simultanément. Par exemple, un coffre avec trois entrées à 80%, 40% et 20% peut donner 0, 1, 2 ou 3 types d'items à la fois.
+```
+1. buffManager.resolveLootBuffs(action.buffList)
+   → {Lucky: true, Day: true, Stormy: false, Rainy: true, ...}  // un seul appel
+
+2. Pour chaque item de action.items :
+   rollLootWithBuffs(lootItem, buffValues) → number
+   // 3 boucles simples, zéro test de type, zéro filtrage :
+   // a. for name of required  → if !buffValues[name] return 0
+   // b. for name of forbidden → if  buffValues[name] return 0
+   // c. for {name,value} of modifiers → if buffValues[name] totalBuff += value
+```
+
+### Fonctions utilitaires (utils.mjs)
+
+| Fonction | Signature | Description |
+|---|---|---|
+| `parseLootCount` | `(str: string) → LootEntry` | Délègue à `parseLootEntry`. |
+| `parseLootBuffs` | `(arr: string[]) → {buffs: {required, forbidden, modifiers}, buffList: string[]}` | Précalcule trois tableaux séparés pour le runtime. `buffList` = union dédupliquée des noms. Retourne `{buffs: {required:[], forbidden:[], modifiers:[]}, buffList:[]}` si `arr` absent. |
+| `rollLootWithBuffs` | `(lootItem, buffValues) → number` | Évalue conditions, calcule modificateurs, appelle `rollLoot`, applique `intFract`. Zéro allocation, zéro parsing. |
 
 ---
 
