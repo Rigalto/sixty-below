@@ -1399,7 +1399,7 @@ Grass covers the surface of [[Forest]] biomes. It is the most common natural til
 
 **Tier**
 
-{{node:grassForest:star}}
+{{node:grassForest:star|star}}
 
 **Main Location**
 
@@ -1424,7 +1424,7 @@ Jungle Grass covers the surface of [[Jungle]] biomes. Denser and more vibrant th
 
 **Tier**
 
-{{node:grassJungle:star}}
+{{node:grassJungle:star|star}}
 
 **Main Location**
 
@@ -1449,7 +1449,7 @@ Fern Grass covers the floor of [[Fern Cave]]s. Giant ferns grow from this soft, 
 
 **Tier**
 
-{{node:grassFern:star}}
+{{node:grassFern:star|star}}
 
 **Main Location**
 
@@ -1474,7 +1474,7 @@ Luminous moss that covers the walls and floor of [[Moss Cave]]s. Its soft green 
 
 **Tier**
 
-{{node:grassMoss:star}}
+{{node:grassMoss:star|star}}
 
 **Main Location**
 
@@ -1500,7 +1500,7 @@ Mushroom Grass covers the floor of [[Mushroom Cave]]s. [[Giant Mushroom]]s grow 
 
 **Tier**
 
-{{node:grassMushroom:star}}
+{{node:grassMushroom:star|star}}
 
 **Main Location**
 
@@ -1529,7 +1529,7 @@ Dirt is the primary topsoil of [[Forest]] biomes. It supports surface vegetation
 
 **Tier**
 
-{{node:dirt:star}}
+{{node:dirt:star|star}}
 
 **Main Location**
 
@@ -1554,7 +1554,7 @@ Sand is the primary topsoil of [[Desert]] biomes. It is subject to gravity — u
 
 **Tier**
 
-{{node:sand:star}}
+{{node:sand:star|star}}
 
 **Main Location**
 
@@ -1581,7 +1581,7 @@ Silt is the primary topsoil of [[Jungle]] biomes. Its fine, damp texture support
 
 **Tier**
 
-{{node:silt:star}}
+{{node:silt:star|star}}
 
 **Main Location**
 
@@ -1606,7 +1606,7 @@ Humus is a rich organic topsoil found across all biomes, though it is most abund
 
 **Tier**
 
-{{node:humus:star}}
+{{node:humus:star|star}}
 
 **Main Location**
 
@@ -1637,7 +1637,7 @@ Compacted Earth is a dense, hardened form of soil found exclusively in [[Ant Hil
 
 **Tier**
 
-{{node:antdirt:star}}
+{{node:antdirt:star|star}}
 
 **Properties**
 
@@ -1669,7 +1669,7 @@ Clay is the most common substrat in [[Forest]] biomes. Its soft, workable textur
 
 **Tier**
 
-{{node:clay:star}}
+{{node:clay:star|star}}
 
 **Main Location**
 
@@ -1694,7 +1694,7 @@ Stone is the second most common substrat in [[Forest]] biomes, found deeper than
 
 **Tier**
 
-{{node:stone:star}}
+{{node:stone:star|star}}
 
 **Main Location**
 
@@ -1720,7 +1720,7 @@ Hardstone is a dense, resistant substrat found in the deepest parts of [[Forest]
 
 **Tier**
 
-{{node:hardstone:star}}
+{{node:hardstone:star|star}}
 
 **Main Location**
 
@@ -1745,7 +1745,7 @@ Sandstone is the primary substrat of [[Desert]] biomes. It also forms the natura
 
 **Tier**
 
-{{node:sandstone:star}}
+{{node:sandstone:star|star}}
 
 **Main Location**
 
@@ -1772,7 +1772,7 @@ Ash is the second most common substrat in [[Forest]] biomes, found deeper than [
 
 **Tier**
 
-{{node:ash:star}}
+{{node:ash:star|star}}
 
 **Main Location**
 
@@ -1798,7 +1798,7 @@ Hellstone is an extremely hard volcanic substrat found in the deepest parts of [
 
 **Tier**
 
-{{node:hellstone:star}}
+{{node:hellstone:star|star}}
 
 **Main Location**
 
@@ -1827,7 +1827,7 @@ Mud is the primary substrat of [[Jungle]] biomes. Its soft, damp texture support
 
 **Tier**
 
-{{node:mud:star}}
+{{node:mud:star|star}}
 
 **Main Location**
 
@@ -1853,7 +1853,7 @@ Limestone is a sedimentary substrat found as intrusions across [[Jungle]] biome.
 
 **Tier**
 
-{{node:limestone:star}}
+{{node:limestone:star|star}}
 
 **Main Location**
 
@@ -1879,7 +1879,7 @@ Slate is a hard metamorphic substrat found in the deepest parts of [[Jungle]] bi
 
 **Tier**
 
-{{node:slate:star}}
+{{node:slate:star|star}}
 
 **Main Location**
 
@@ -1917,12 +1917,12 @@ Metals are the primary crafting materials in Sixty-Below. Each metal exists in t
 
 | Metal | Tier | Layer |
 |---|---|---|---|
-| [[node:copper]] | {{node:copper:star}} | [[Surface]], [[Underground]] |
-| [[node:iron]] | {{node:iron:star}} | [[Underground]] |
-| [[node:silver]] | {{node:silver:star}} | [[Caverns]] Top |
-| [[node:gold]] | {{node:gold:star}} | [[Caverns]] |
-| [[node:cobalt]] | {{node:cobalt:star}} | [[Caverns]] |
-| [[node:platinum]] | {{node:platinum:star}} | [[Caverns]] Bottom |
+| [[node:copper]] | {{node:copper:star|star}} | [[Surface]], [[Underground]] |
+| [[node:iron]] | {{node:iron:star|star}} | [[Underground]] |
+| [[node:silver]] | {{node:silver:star|star}} | [[Caverns]] Top |
+| [[node:gold]] | {{node:gold:star|star}} | [[Caverns]] |
+| [[node:cobalt]] | {{node:cobalt:star|star}} | [[Caverns]] |
+| [[node:platinum]] | {{node:platinum:star|star}} | [[Caverns]] Bottom |
 
 **Metal Chunks**
 
@@ -1956,12 +1956,12 @@ Metal chunks are placed in your [[Inventory]] when mined with a [[Mining Tools|P
 
 | Metal | Equipment tier | Other uses |
 |---|---|---|
-| [[item:barCopper]] | {{item:barCopper:star}} — basic tools & armor | ⏳ |
-| [[item:barIron]] | {{item:barIron:star}} — improved tools & armor | ⏳ |
-| [[item:barSilver]] | {{item:barSilver:star}} — advanced armor | ⏳ |
-| [[item:barGold]] | {{item:barGold:star}} — advanced armor | ⏳ |
-| [[item:barCobalt]] | {{item:barCobalt:star}} — expert armor | ⏳ |
-| [[item:barPlatinum]] | {{item:barPlatinum:star}} — master armor | ⏳ |
+| [[item:barCopper]] | {{item:barCopper:star|star}} — basic tools & armor | ⏳ |
+| [[item:barIron]] | {{item:barIron:star|star}} — improved tools & armor | ⏳ |
+| [[item:barSilver]] | {{item:barSilver:star|star}} — advanced armor | ⏳ |
+| [[item:barGold]] | {{item:barGold:star|star}} — advanced armor | ⏳ |
+| [[item:barCobalt]] | {{item:barCobalt:star|star}} — expert armor | ⏳ |
+| [[item:barPlatinum]] | {{item:barPlatinum:star|star}} — master armor | ⏳ |
 
 **Tips**
 
@@ -1991,10 +1991,10 @@ Gems are rare crafting materials found deep underground. Each gem exists in thre
 
 | Gem | Tier | Biome | Layer |
 |---|---|---|---|
-| [[node:topaz]] | {{node:topaz:star}} | [[Forest]] | [[Caverns]] |
-| [[node:ruby]] | {{node:ruby:star}} | [[Desert]] | [[Caverns]] |
-| [[node:emerald]] | {{node:emerald:star}} | [[Jungle]] | [[Caverns]] |
-| [[node:sapphire]] | {{node:sapphire:star}} | All biomes | [[Caverns]] Bottom |
+| [[node:topaz]] | {{node:topaz:star|star}} | [[Forest]] | [[Caverns]] |
+| [[node:ruby]] | {{node:ruby:star|star}} | [[Desert]] | [[Caverns]] |
+| [[node:emerald]] | {{node:emerald:star|star}} | [[Jungle]] | [[Caverns]] |
+| [[node:sapphire]] | {{node:sapphire:star|star}} | All biomes | [[Caverns]] Bottom |
 
 **Raw Gems**
 
@@ -2024,10 +2024,10 @@ Raw gems are placed in your [[Inventory]] when mined with a [[Mining Tools|Picka
 
 | Gem | Equipment tier | Other uses |
 |---|---|---|
-| [[item:rawTopaz]] | {{item:rawTopaz:star}} — accessories, weapons | ⏳ |
-| [[item:rawRuby]] | {{item:rawRuby:star}} — accessories, weapons | ⏳ |
-| [[item:rawEmerald]] | {{item:rawEmerald:star}} — accessories, weapons | ⏳ |
-| [[item:rawSapphire]] | {{item:rawSapphire:star}} — accessories, weapons | ⏳ |
+| [[item:rawTopaz]] | {{item:rawTopaz:star|star}} — accessories, weapons | ⏳ |
+| [[item:rawRuby]] | {{item:rawRuby:star|star}} — accessories, weapons | ⏳ |
+| [[item:rawEmerald]] | {{item:rawEmerald:star|star}} — accessories, weapons | ⏳ |
+| [[item:rawSapphire]] | {{item:rawSapphire:star|star}} — accessories, weapons | ⏳ |
 
 **Tips**
 
@@ -2057,8 +2057,8 @@ Geode Stones are rare decorative and structural materials found exclusively in [
 
 | Stone | Tier | Biome | Layer |
 |---|---|---|---|
-| [[node:granite]] | {{node:granite:star}} | All biomes | [[Caverns]] Bottom |
-| [[node:marble]] | {{node:marble:star}} | All biomes | [[Caverns]] Bottom |
+| [[node:granite]] | {{node:granite:star|star}} | All biomes | [[Caverns]] Bottom |
+| [[node:marble]] | {{node:marble:star|star}} | All biomes | [[Caverns]] Bottom |
 
 **Geode Stone Blocks**
 
@@ -2073,8 +2073,8 @@ Blocks are placed in your [[Inventory]] when mined with a [[Mining Tools|Pickaxe
 
 | Block | Tier | Uses |
 |---|---|---|
-| [[item:blockGranite]] | {{item:blockGranite:star}} | Construction, furniture ⏳ |
-| [[item:blockMarble]] | {{item:blockMarble:star}} | Construction, furniture ⏳ |
+| [[item:blockGranite]] | {{item:blockGranite:star|star}} | Construction, furniture ⏳ |
+| [[item:blockMarble]] | {{item:blockMarble:star|star}} | Construction, furniture ⏳ |
 
 **Tips**
 
@@ -2092,7 +2092,7 @@ Obsidian is a volcanic glass formed where lava meets water. It is one of the har
 
 **Tier**
 
-{{node:obsidian:star}}
+{{node:obsidian:star|star}}
 
 **Main Location**
 
@@ -2126,7 +2126,7 @@ Meteorite is an extraterrestrial rock that falls from the sky in rare events. It
 
 **Tier**
 
-{{node:meteorite:star}}
+{{node:meteorite:star|star}}
 
 **Main Location**
 
@@ -2152,7 +2152,7 @@ Hive is a biological material that forms the walls of [[Hive]] mini-biomes. It i
 
 **Tier**
 
-{{node:hive:star}}
+{{node:hive:star|star}}
 
 **Main Location**
 
@@ -2181,7 +2181,7 @@ Shell is a sedimentary material formed from ancient marine organisms. It is foun
 
 **Tier**
 
-{{node:shell:star}}
+{{node:shell:star|star}}
 
 **Main Location**
 
@@ -2197,7 +2197,7 @@ Shell is a sedimentary material formed from ancient marine organisms. It is foun
 * Basic ingredient for furntiure and construction
 * Decorative ingredient for tools and weapons
 * Secondary ingredient for accessories
-* Can be grinded at a [[Stonecutting|Stonecutter]] in [[item:shellPowder]] {{item:shellPowder:star}}
+* Can be grinded at a [[Stonecutting|Stonecutter]] in [[item:shellPowder]] {{item:shellPowder:star|star}}
 * [[item:shellPowder]] is used in potions
 
 **Recipes** ⏳
@@ -2525,7 +2525,7 @@ _Some specific gear pieces may deviate from these rules._ ⏳
     content: `
 **Tier**
 
-{{item:flamethrower:star}}
+{{item:flamethrower:star|star}}
 
 **Main usages**
 
@@ -2820,15 +2820,15 @@ Tableware is a category of [[Furnitures]] that serve as containers for food and 
 **Food Containers**
 
 Empty containers used as crafting ingredients in cooking and potion recipes. They are returned to the player's inventory upon consuming the food or potion.
-* [[item:bowl]] ({{item:bowl:star}}) — soups and stews
-* [[item:mug]] ({{item:mug:star}}) — ales and drinks
-* [[item:plate]] ({{item:plate:star}}) — solid food dishes
-* [[item:trencher]] ({{item:trencher:star}}) — rustic wooden plate for simple meals
+* [[item:bowl]] ({{item:bowl:star|star}}) — soups and stews
+* [[item:mug]] ({{item:mug:star|star}}) — ales and drinks
+* [[item:plate]] ({{item:plate:star|star}}) — solid food dishes
+* [[item:trencher]] ({{item:trencher:star|star}}) — rustic wooden plate for simple meals
 
 **Small Liquid Containers**
 
 Filled directly from a liquid source in the world. Used as crafting ingredients in cooking and potion recipes.
-* [[item:bottle]] ({{item:bottle:star}}) — empty bottle, filled by clicking on a liquid tile
+* [[item:bottle]] ({{item:bottle:star|star}}) — empty bottle, filled by clicking on a liquid tile
   * [[item:water]] — [[node:water|Bottled Water]] — healing item and potion ingredient
   * [[item:honey]] — [[node:honey|Bottled Honey]] — healing item and buff
   * [[item:sap]] — [[node:sap|Bottled Sap]] — buff
@@ -2837,7 +2837,7 @@ Filled directly from a liquid source in the world. Used as crafting ingredients 
 **Large Liquid Containers**
 
 Filled directly from a liquid source in the world. Used as tools to transport and pour liquids — the empty bucket is recovered after pouring.
-* [[item:bucket]] ({{item:bucket:star}}) — empty bucket ⏳
+* [[item:bucket]] ({{item:bucket:star|star}}) — empty bucket ⏳
   * [[item:bucketWater]] — Water Bucket — pour water into the world ⏳
   * [[item:bucketHoney]] — Honey Bucket — pour honey into the world ⏳
   * [[item:bucketSap]] — Sap Bucket — pour sap into the world ⏳
@@ -3018,7 +3018,7 @@ Food restores health and provides temporary buffs. More elaborate preparations r
     content: `
 **Tier**
 
-{{item:vegetableSoup:star}}
+{{item:vegetableSoup:star|star}}
 
 **Recipes**
 
@@ -3040,39 +3040,39 @@ All plants found in the world of Sixty-Below. Plants can be harvested for loot, 
 
 | Name | Tier | Type | Location | Main Loot | Encounters |
 |---|---|---|---|---|---|
-| [[item:coconut]] | {{item:coconut:star}} | Tree | Sea shore, Desert Oasis shore | [[item:coconut]], [[item:coconutFiber]], [[item:coconutPulp]], [[item:coconutMilk]] | [[monster:coconutCrab]] (Shaking) |
-| [[item:oak]] | {{item:oak:star}} | Tree | [[Forest]] / [[Surface]] | [[item:logOak]], [[item:acorn]] | [[monster:hornet]] (Shaking) / [[monster:boar]] (Chopping) |
-| [[item:mahogany]] | {{item:mahogany:star}} | Tree | [[Jungle]] / [[Surface]] | [[item:logMahogany]] | [[monster:eyelashViper]] (Shaking) / [[monster:bulletAnt]] (Chopping) |
-| [[item:giantMushroom]] | {{item:giantMushroom:star}} | Tree | [[Mushroom Cave]] | ⏳ | [[monster:isopod]]  (Chopping) |
-| [[item:bolete]] | {{item:bolete:star}} | Mushroom | [[Forest]] / [[Surface]] | [[item:bolete]] | [[monster:adder]] (Foraging) |
-| [[item:pinkMycenia]] | {{item:pinkMycenia:star}} | Mushroom | [[Jungle]] / [[Surface]] | [[item:pinkMycenia]] | [[monster:giantRedSlug]] (Foraging) |
-| [[item:coralR]] | {{item:coralR:star}} | Herb | Under Sea / [[node:sand]] | [[item:coral]] | [[monster:moray]] (Foraging) |
-| [[item:coralP]] | {{item:coralP:star}} | Herb | Under Sea / [[node:sand]] | [[item:coral]] | [[monster:moray]] (Foraging) |
-| [[item:coralY]] | {{item:coralY:star}} | Herb | Under Sea / [[node:sand]] | [[item:coral]] | [[monster:moray]] (Foraging) |
-| [[item:coralG]] | {{item:coralG:star}} | Herb | Under Sea / [[node:sand]] | [[item:coral]] | [[monster:moray]] (Foraging) |
-| [[item:ambermirage]] | {{item:ambermirage:star}} | Herb | [[Surface]] / [[node:sand]] | [[item:ambermirage]] | [[monster:scorpion]] (Foraging) |
-| [[item:parsnip]] | {{item:parsnip:star}} | Herb | [[Forest]] / [[Surface]] | [[item:parsnip]] | [[monster:vole]] (Foraging) |
-| [[item:sunflower]] | {{item:sunflower:star}} | Herb | [[Forest]] / [[Surface]] | [[item:sunflowerSeed]] | [[monster:hedgehog]] (Foraging) |
-| [[item:bloodmoon]] | {{item:bloodmoon:star}} | Herb | [[Jungle]] / [[Surface]] | [[item:bloodmoon]] | [[monster:mamba]] (Foraging) |
-| [[item:fernS]] | {{item:fernS:star}} | Herb | Fern Cave / [[node:grassfern]] | [[item:fernLeaf]] | [[monster:dendrobate]] /  [[monster:mamba]] (Foraging) |
-| [[item:fernC]] | {{item:fernC:star}} | Herb | Fern Cave / [[node:grassfern]] | [[item:fernLeaf]] | [[monster:dendrobate]] /  [[monster:mamba]] (Foraging) |
-| [[item:fernG]] | {{item:fernG:star}} | Herb | Fern Cave / [[node:grassfern]] | [[item:fernLeaf]] | [[monster:dendrobate]] /  [[monster:mamba]] (Foraging) |
-| [[item:fernM]] | {{item:fernM:star}} | Herb | Fern Cave / [[node:grassfern]] | [[item:fernLeaf]] | [[monster:dendrobate]] /  [[monster:mamba]] (Foraging) |
-| [[item:velvetmoss]] | {{item:velvetmoss:star}} | Herb | Moss Cave / [[node:grassmoss]] | [[item:velvetmoss]] | [[monster:woodlouse]] (Foraging) |
+| [[item:coconut]] | {{item:coconut:star|star}} | Tree | Sea shore, Desert Oasis shore | [[item:coconut]], [[item:coconutFiber]], [[item:coconutPulp]], [[item:coconutMilk]] | [[monster:coconutCrab]] (Shaking) |
+| [[item:oak]] | {{item:oak:star|star}} | Tree | [[Forest]] / [[Surface]] | [[item:logOak]], [[item:acorn]] | [[monster:hornet]] (Shaking) / [[monster:boar]] (Chopping) |
+| [[item:mahogany]] | {{item:mahogany:star|star}} | Tree | [[Jungle]] / [[Surface]] | [[item:logMahogany]] | [[monster:eyelashViper]] (Shaking) / [[monster:bulletAnt]] (Chopping) |
+| [[item:giantMushroom]] | {{item:giantMushroom:star|star}} | Tree | [[Mushroom Cave]] | ⏳ | [[monster:isopod]]  (Chopping) |
+| [[item:bolete]] | {{item:bolete:star|star}} | Mushroom | [[Forest]] / [[Surface]] | [[item:bolete]] | [[monster:adder]] (Foraging) |
+| [[item:pinkMycenia]] | {{item:pinkMycenia:star|star}} | Mushroom | [[Jungle]] / [[Surface]] | [[item:pinkMycenia]] | [[monster:giantRedSlug]] (Foraging) |
+| [[item:coralR]] | {{item:coralR:star|star}} | Herb | Under Sea / [[node:sand]] | [[item:coral]] | [[monster:moray]] (Foraging) |
+| [[item:coralP]] | {{item:coralP:star|star}} | Herb | Under Sea / [[node:sand]] | [[item:coral]] | [[monster:moray]] (Foraging) |
+| [[item:coralY]] | {{item:coralY:star|star}} | Herb | Under Sea / [[node:sand]] | [[item:coral]] | [[monster:moray]] (Foraging) |
+| [[item:coralG]] | {{item:coralG:star|star}} | Herb | Under Sea / [[node:sand]] | [[item:coral]] | [[monster:moray]] (Foraging) |
+| [[item:ambermirage]] | {{item:ambermirage:star|star}} | Herb | [[Surface]] / [[node:sand]] | [[item:ambermirage]] | [[monster:scorpion]] (Foraging) |
+| [[item:parsnip]] | {{item:parsnip:star|star}} | Herb | [[Forest]] / [[Surface]] | [[item:parsnip]] | [[monster:vole]] (Foraging) |
+| [[item:sunflower]] | {{item:sunflower:star|star}} | Herb | [[Forest]] / [[Surface]] | [[item:sunflowerSeed]] | [[monster:hedgehog]] (Foraging) |
+| [[item:bloodmoon]] | {{item:bloodmoon:star|star}} | Herb | [[Jungle]] / [[Surface]] | [[item:bloodmoon]] | [[monster:mamba]] (Foraging) |
+| [[item:fernS]] | {{item:fernS:star|star}} | Herb | Fern Cave / [[node:grassfern]] | [[item:fernLeaf]] | [[monster:dendrobate]] /  [[monster:mamba]] (Foraging) |
+| [[item:fernC]] | {{item:fernC:star|star}} | Herb | Fern Cave / [[node:grassfern]] | [[item:fernLeaf]] | [[monster:dendrobate]] /  [[monster:mamba]] (Foraging) |
+| [[item:fernG]] | {{item:fernG:star|star}} | Herb | Fern Cave / [[node:grassfern]] | [[item:fernLeaf]] | [[monster:dendrobate]] /  [[monster:mamba]] (Foraging) |
+| [[item:fernM]] | {{item:fernM:star|star}} | Herb | Fern Cave / [[node:grassfern]] | [[item:fernLeaf]] | [[monster:dendrobate]] /  [[monster:mamba]] (Foraging) |
+| [[item:velvetmoss]] | {{item:velvetmoss:star|star}} | Herb | Moss Cave / [[node:grassmoss]] | [[item:velvetmoss]] | [[monster:woodlouse]] (Foraging) |
 
-| [[item:frostcap]] | {{item:frostcap:star}} | Herb | Mushroom Cave / [[node:grassmushroom]] | [[item:mushroomGill]] | [[monster:woodlouse]] (Foraging) |
-| [[item:dawncap]] | {{item:dawncap:star}} | Herb | Mushroom Cave / [[node:grassmushroom]] | [[item:mushroomGill]] | [[monster:woodlouse]] (Foraging) |
-| [[item:mandrake]] | {{item:mandrake:star}} | Herb | FOREST Underground / [[node:dirt]] | [[item:mandrakeRoot]] | [[monster:wraith]] (Foraging) |
-| [[item:cactus]] | {{item:cactus:star}} | Herb | DESERT Underground / [[node:sand]] | [[item:cactus]] | [[monster:scorpion]] (Foraging) |
-| [[item:bamboo]] | {{item:bamboo:star}} | Herb | JUNGLE Underground / [[node:silt]] | [[item:bambooStalk]] | [[monster:centipede]] (Foraging) |
-| [[item:oleander]] | {{item:oleander:star}} | Herb | Underground / [[node:stone]] | [[item:oleander]] | [[monster:caveBeetle]] (Foraging) |
+| [[item:frostcap]] | {{item:frostcap:star|star}} | Herb | Mushroom Cave / [[node:grassmushroom]] | [[item:mushroomGill]] | [[monster:woodlouse]] (Foraging) |
+| [[item:dawncap]] | {{item:dawncap:star|star}} | Herb | Mushroom Cave / [[node:grassmushroom]] | [[item:mushroomGill]] | [[monster:woodlouse]] (Foraging) |
+| [[item:mandrake]] | {{item:mandrake:star|star}} | Herb | FOREST Underground / [[node:dirt]] | [[item:mandrakeRoot]] | [[monster:wraith]] (Foraging) |
+| [[item:cactus]] | {{item:cactus:star|star}} | Herb | DESERT Underground / [[node:sand]] | [[item:cactus]] | [[monster:scorpion]] (Foraging) |
+| [[item:bamboo]] | {{item:bamboo:star|star}} | Herb | JUNGLE Underground / [[node:silt]] | [[item:bambooStalk]] | [[monster:centipede]] (Foraging) |
+| [[item:oleander]] | {{item:oleander:star|star}} | Herb | Underground / [[node:stone]] | [[item:oleander]] | [[monster:caveBeetle]] (Foraging) |
 
-| [[item:satansCube]] | {{item:satansCube:star}} | Herb | FOREST+DESERT Caverns | [[item:satansCube]] | [[monster:firesalamander]] (Foraging) |
-| [[item:sneakthorn]] | {{item:sneakthorn:star}} | Herb | FOREST+JUNGLE Caverns | [[item:sneakthorn]] | [[monster:vampire]] (Foraging) |
-| [[item:cursedcrown]] | {{item:cursedcrown:star}} | Herb | JUNGLE+DESERT Caverns | [[item:cursedcrown]] | [[monster:fireAnt]] (Foraging) |
+| [[item:satansCube]] | {{item:satansCube:star|star}} | Herb | FOREST+DESERT Caverns | [[item:satansCube]] | [[monster:firesalamander]] (Foraging) |
+| [[item:sneakthorn]] | {{item:sneakthorn:star|star}} | Herb | FOREST+JUNGLE Caverns | [[item:sneakthorn]] | [[monster:vampire]] (Foraging) |
+| [[item:cursedcrown]] | {{item:cursedcrown:star|star}} | Herb | JUNGLE+DESERT Caverns | [[item:cursedcrown]] | [[monster:fireAnt]] (Foraging) |
 
-| [[item:abysshorn]] | {{item:abysshorn:star}} | Herb | Caverns top | [[item:abysshorn]] | [[monster:caveJellyfish]] (Foraging) |
-| [[item:inferncap]] | {{item:inferncap:star}} | Herb | Caverns bottom | [[item:inferncap]] | [[monster:lavaWorm]] / [[monster:magmaCrab]] (Foraging) |
+| [[item:abysshorn]] | {{item:abysshorn:star|star}} | Herb | Caverns top | [[item:abysshorn]] | [[monster:caveJellyfish]] (Foraging) |
+| [[item:inferncap]] | {{item:inferncap:star|star}} | Herb | Caverns bottom | [[item:inferncap]] | [[monster:lavaWorm]] / [[monster:magmaCrab]] (Foraging) |
 
 _For detailed information on each plant, click its name._
 
@@ -3097,8 +3097,8 @@ sickle
 
 **Location**
 
-* [[item:oak]] ({{item:oak:star}}) — [[Forest]] / [[Surface]], grows on [[node:grassForest]]
-* [[item:mahogany]] ({{item:mahogany:star}}) — [[Jungle]] / [[Surface]], grows on [[node:grassJungle]]
+* [[item:oak]] ({{item:oak:star|star}}) — [[Forest]] / [[Surface]], grows on [[node:grassForest]]
+* [[item:mahogany]] ({{item:mahogany:star|star}}) — [[Jungle]] / [[Surface]], grows on [[node:grassJungle]]
 
 **Growth**
 
@@ -3156,7 +3156,7 @@ Giant Mushrooms grow in the depths of [[Mushroom Cave|Mushroom Caves]], their bi
 
 **Tier**
 
-{{item:giantMushroom:star}}
+{{item:giantMushroom:star|star}}
 
 **Location**
 
@@ -3194,7 +3194,7 @@ Coconut trees grow on sandy shores — along the ocean coastline and at the edge
 
 **Tier**
 
-{{item:coconut:star}}
+{{item:coconut:star|star}}
 
 **Location**
 
@@ -3238,8 +3238,8 @@ Surface Mushrooms grow at the base of [[Oak & Mahogany|Trees]] on the [[Forest]]
 
 **Location**
 
-* [[item:bolete]] ({{item:bolete:star}}) — [[Forest]] / [[Surface]], grows near [[Oak & Mahogany|Oak]] trees on [[node:grassForest]]
-* [[item:pinkMycenia]] ({{item:pinkMycenia:star}}) — [[Jungle]] / [[Surface]], grows near [[Oak & Mahogany|Mahogany]] trees on [[node:grassJungle]]
+* [[item:bolete]] ({{item:bolete:star|star}}) — [[Forest]] / [[Surface]], grows near [[Oak & Mahogany|Oak]] trees on [[node:grassForest]]
+* [[item:pinkMycenia]] ({{item:pinkMycenia:star|star}}) — [[Jungle]] / [[Surface]], grows near [[Oak & Mahogany|Mahogany]] trees on [[node:grassJungle]]
 
 **Blooming**
 
@@ -3286,7 +3286,7 @@ Cave Mushrooms grow on the floor of [[Mushroom Cave|Mushroom Caves]], thriving i
 
 **Tier**
 
-{{item:frostcap:star}}
+{{item:frostcap:star|star}}
 
 **Location**
 
@@ -3348,7 +3348,7 @@ Parsnips are root vegetables found growing on the [[Forest]] floor. Their white 
 
 **Tier**
 
-{{item:parsnip:star}}
+{{item:parsnip:star|star}}
 
 **Location**
 
@@ -3394,7 +3394,7 @@ Sunflowers grow in forest clearings, thriving where sunlight reaches the ground 
 
 **Tier**
 
-{{item:sunflowerSeed:star}}
+{{item:sunflowerSeed:star|star}}
 
 **Location**
 
@@ -3442,7 +3442,7 @@ The Ambermirage is a common desert flower that blooms only during the hottest ho
 
 **Tier**
 
-{{item:ambermirage:star}}
+{{item:ambermirage:star|star}}
 
 **Location**
 
@@ -3485,7 +3485,7 @@ The Bloodmoon is a nocturnal flower found in the [[Jungle]] forests. Its deep cr
 
 **Tier**
 
-{{item:bloodmoon:star}}
+{{item:bloodmoon:star|star}}
 
 **Location**
 
@@ -3536,7 +3536,7 @@ Corals are marine organisms found on the sandy floor of the ocean. Four distinct
 
 **Tier**
 
-{{item:coralR:star}}
+{{item:coralR:star|star}}
 
 **Location**
 
@@ -3590,7 +3590,7 @@ Ferns are ancient plants thriving in the humid darkness of [[Fern Cave|Fern Cave
 
 **Tier**
 
-{{item:fernS:star}}. — Found exclusively in [[Fern Cave|Fern Caves]], a tier-3 environment.
+{{item:fernS:star|star}}. — Found exclusively in [[Fern Cave|Fern Caves]], a tier-3 environment.
 
 **Location**
 
@@ -3610,7 +3610,7 @@ Ferns are ancient plants thriving in the humid darkness of [[Fern Cave|Fern Cave
 **Harvest**
 
 * [[Foraging|Interact to harvest]] — the fern enters a dormant state and regrows after a few in-game hours
-* Tool: [[Harvesting Tools|Silver Sickle]] ({{item:sickleSilver:star}}) or better⏳
+* Tool: [[Harvesting Tools|Silver Sickle]] ({{item:sickleSilver:star|star}}) or better⏳
 * Drops: [[item:fernLeaf]], rare chance of [[item:fernSpore]]
 
 **Planting** ⏳
@@ -3644,7 +3644,7 @@ Velvetmoss is a slow-growing, deep-purple moss found exclusively in [[Moss Cave|
 
 **Tier**
 
-{{item:velvetmoss:star}}
+{{item:velvetmoss:star|star}}
 
 **Location**
 
@@ -3705,7 +3705,7 @@ The Mandrake is a root plant found in the tunnels and underground passages of [[
 
 **Tier**
 
-{{item:mandrakeRoot:star}}
+{{item:mandrakeRoot:star|star}}
 
 **Location**
 
@@ -3747,7 +3747,7 @@ The underground Cactus is a hardy desert plant that has adapted to the complete 
 
 **Tier**
 
-{{item:cactus:star}}
+{{item:cactus:star|star}}
 
 **Location**
 
@@ -3793,7 +3793,7 @@ Underground Bamboo thrives in the humid tunnels and passages of [[Jungle]] biome
 
 **Tier**
 
-{{item:bamboo:star}}
+{{item:bamboo:star|star}}
 
 **Location**
 
@@ -3837,7 +3837,7 @@ Oleander is a common shrub found in the underground passages of all three biomes
 
 **Tier**
 
-{{item:oleander:star}}
+{{item:oleander:star|star}}
 
 **Location**
 
@@ -3886,7 +3886,7 @@ Satan's Cube is one of the strangest organisms found in the deep [[Caverns]]. It
 
 **Tier**
 
-{{item:satansCube:star}}
+{{item:satansCube:star|star}}
 
 **Location**
 
@@ -3930,7 +3930,7 @@ Sneakthorn is a deep cavern plant that grows in the humid passages shared by [[F
 
 **Tier**
 
-{{item:sneakthorn:star}}
+{{item:sneakthorn:star|star}}
 
 **Location**
 
@@ -3974,7 +3974,7 @@ Cursedcrown is the most alien plant found in the deep caverns. Its rigid radial 
 
 **Tier**
 
-{{item:cursedcrown:star}}
+{{item:cursedcrown:star|star}}
 
 **Location**
 
@@ -4018,7 +4018,7 @@ Abysshorn is one of the strangest organisms in the known world. Its fractal stru
 
 **Tier**
 
-{{item:abysshorn:star}}
+{{item:abysshorn:star|star}}
 
 **Location**
 
@@ -4062,7 +4062,7 @@ Inferncap is the deepest-growing plant in the known world. Found only in the low
 
 **Tier**
 
-{{item:inferncap:star}}
+{{item:inferncap:star|star}}
 
 **Location**
 
@@ -4138,9 +4138,9 @@ Foraging : [[Foraging|Sickle]] any tier.⏳
     content: `
 **Loot** ⏳
 
-* [[item:spiderFang]] ({{item:spiderFang:star}}) — common ⏳
-* [[item:spiderEgg]] ({{item:spiderEgg:star}}) — common ⏳
-* [[item:silk]] ({{item:silk:star}}) — rare drop⏳
+* [[item:spiderFang]] ({{item:spiderFang:star|star}}) — common ⏳
+* [[item:spiderEgg]] ({{item:spiderEgg:star|star}}) — common ⏳
+* [[item:silk]] ({{item:silk:star|star}}) — rare drop⏳
 
 Note: those ingredients can also be dropped by [[Mining]] [[Cobweb]] with any [[Mining Tools|Pickaxe]].
 
@@ -4547,37 +4547,6 @@ const renderTables = (html) => {
   return out.join('\n')
 }
 
-const formatStars = (star) => '⭐'.repeat(star) + '☆'.repeat(5 - star)
-
-const resolveStars = (entry, NODES, ITEMS) => {
-  let errors = 0
-  entry.content = entry.content.replace(/\{\{(node|item):([^:}]+):star\}\}/g, (match, type, code) => {
-    if (type === 'node') {
-      const node = NODES[code.toUpperCase()]
-      if (!node) {
-        console.error(`[help] '${entry.title}' : node inconnu '${code}'`)
-        errors++
-        return `⚠️ {{node:${code}:star}}`
-      }
-      let star = node.star || 1
-      if (star < 1) star = 1
-      if (star > 5) star = 5
-      return formatStars(star)
-    }
-    const item = ITEMS[code]
-    if (!item) {
-      console.error(`[help] '${entry.title}' : item inconnu '${code}'`)
-      errors++
-      return `⚠️ {{item:${code}:star}}`
-    }
-    let star = item.star || 1
-    if (star < 1) star = 1
-    if (star > 5) star = 5
-    return formatStars(star)
-  })
-  return errors
-}
-
 const BLOCK_TAGS = ['<ul', '<table', '<ol']
 
 const renderParagraphs = (html) => html.split('\n\n').map(block => {
@@ -4666,11 +4635,12 @@ const formatValue = (resolved, format, entryTitle, path) => {
 
   switch (format) {
     case 'star': {
-      const n = parseInt(value)
-      if (isNaN(n) || n < 1 || n > 5) {
+      let n = parseInt(value)
+      if (isNaN(n)) {
         console.error(`[help] '${entryTitle}' : valeur star invalide '${value}'`)
         return `⚠️ ${path}`
       }
+      n = Math.max(1, Math.min(5, n))
       return '⭐'.repeat(n) + '☆'.repeat(5 - n)
     }
 
@@ -4781,11 +4751,8 @@ export const hydrateHelp = (NODES, ITEMS, MONSTERS = {}) => {
     errors += resolveNodeLinks(entry, NODES)
     errors += resolveItemLinks(entry, ITEMS)
     errors += resolveMonsterLinks(entry, MONSTERS)
-    // données dynamiques
-    errors += resolveStars(entry, NODES, ITEMS)
-    // TODO : résolution des autres données dynamiques {{...}}
-
-    // Conversion Markdown → HTML (entry.html = html généré)
+    // Résolution des autres données dynamiques {{...}}
+    // et conversion Markdown → HTML (entry.html = html généré)
     errors += renderMarkdown(entry, NODES, ITEMS, MONSTERS)
     count++
   }
