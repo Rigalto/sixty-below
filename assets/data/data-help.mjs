@@ -83,7 +83,7 @@ const HELP_TEMPLATES = {
   miningInfo: `
 **How to mine**
 Use a [[Mining Tools|{1}]] of at least ⭐{2} to mine [[node:{3}]].
-Mining drops: {{node:{3}:mining[*].item}}
+Mining drops: {{node:{3}:mining[:items[0]:item|link}}
   `,
 
   statTable: `
@@ -105,58 +105,6 @@ Mining drops: {{node:{3}:mining[*].item}}
    ==================================================================================================== */
 
 export const HELP = [
-  {
-    title: 'Exemple: Copper Ore',
-    category: ['Ore'],
-    content: `
-**Description**
-
-Copper is the most common ore found near the [[Surface|Surface layer]].
-It is used in many early-game [[Crafting|recipes]].
-
-**Main Location**
-
-* All biomes
-* Layer: [[Underground]], [[Surface]]
-
-**Mining**
-
-<<miningInfo|copperPickaxe|1|copper>>
-
-**Node**
-
-[[node:copper]] / [[node:copper|cuivre]]
-
-{{node:copper:help}}
-
-{{node:copper:mining[0]:count|star}}
-{{node:copper:test[*]|list}}
-
-| Monster | Role | Trigger |
-|---|---|---|
-| [[monster:blueSlug]] | Common, passive | {{node:copper:test[*]|lines}} |
-
-
-
-**Item**
-
-[[item:pickaxeCopper]] / [[item:pickaxeCopper|cuivre pioche]]
-
-**Recipes using Copper**
-
-{{recipe:copperBar}}
-{{recipe:copperSword}} ⏳
-
-**All Pickaxes**
-
-<<statTable|pickaxe>>
-
-**Tips**
-
-* Copper veins are often found near [[node:stone]] clusters.
-* _Tip: [[Torches|Bring torches]] when mining underground!_ ⏳
-    `
-  },
   // ── World ─────────────────────────────────────────────────────
   // ── Layers ────────────────────────────────────────────────────
   //    Surface, Underground, Caverns
@@ -1407,7 +1355,7 @@ Grass covers the surface of [[Forest]] biomes. It is the most common natural til
 
 **Drops** ⏳
 
-* {{node:grassForest:mining[0]:item}}
+* {{node:grassForest:mining:items[0]:item|link}}
 
 **Tips**
 
@@ -1432,7 +1380,7 @@ Jungle Grass covers the surface of [[Jungle]] biomes. Denser and more vibrant th
 
 **Drops** ⏳
 
-* {{node:grassJungle:mining[0]:count}}
+* {{node:grassJungle:mining:items[0]:item|link}}
 
 **Tips**
 
@@ -1457,7 +1405,7 @@ Fern Grass covers the floor of [[Fern Cave]]s. Giant ferns grow from this soft, 
 
 **Drops** ⏳
 
-* {{node:grassFern:mining[0]:item}}
+* {{node:grassFern:mining:items[0]:item|link}}
 
 **Tips**
 
@@ -1482,7 +1430,8 @@ Luminous moss that covers the walls and floor of [[Moss Cave]]s. Its soft green 
 
 **Drops** ⏳
 
-* {{node:grassMoss:mining[0]:item}}
+* {{node:grassMoss:mining:items[0]:item|link}}
+
 
 **Tips**
 
@@ -1508,7 +1457,8 @@ Mushroom Grass covers the floor of [[Mushroom Cave]]s. [[Giant Mushroom]]s grow 
 
 **Drops** ⏳
 
-* {{node:grassMushroom:mining[0]:item}}
+* {{node:grassMushroom:mining:items[0]:item|link}}
+
 
 **Tips**
 
@@ -1537,7 +1487,10 @@ Dirt is the primary topsoil of [[Forest]] biomes. It supports surface vegetation
 
 **Drops** ⏳
 
-* {{node:dirt:mining[0]:item}}
+* {{node:dirt:mining:items[0]:item|link}}
+* {{node:dirt:mining:items[1]:item|link}}
+* [[node:dirt]]
+* [[item:blockDirt]]
 
 **Recipes** ⏳
 
@@ -1563,7 +1516,8 @@ Sand is the primary topsoil of [[Desert]] biomes. It is subject to gravity — u
 
 **Drops** ⏳
 
-* {{node:sand:mining[0]:item}}
+* {{node:sand:mining:items[0]:item|link}}
+
 
 **Tips**
 
@@ -1589,7 +1543,8 @@ Silt is the primary topsoil of [[Jungle]] biomes. Its fine, damp texture support
 
 **Drops** ⏳
 
-* {{node:silt:mining[0]:item}}
+* {{node:silt:mining:items[0]:item|link}}
+
 
 **Recipes** ⏳
 
@@ -1616,7 +1571,7 @@ Humus is a rich organic topsoil found across all biomes, though it is most abund
 
 **Drops** ⏳
 
-* {{node:humus:mining[0]:item}}
+* {{node:humus:mining:items[0]:item|link}}
 
 **Recipes** ⏳
 
@@ -1677,7 +1632,7 @@ Clay is the most common substrat in [[Forest]] biomes. Its soft, workable textur
 
 **Drops** ⏳
 
-* {{node:clay:mining[0]:item}}
+* {{node:clay:mining:items[0]:item|link}}
 
 **Recipes** ⏳
 
@@ -1703,7 +1658,7 @@ Stone is the second most common substrat in [[Forest]] biomes, found deeper than
 
 **Drops** ⏳
 
-* {{node:stone:mining[0]:item}}
+* {{node:stone:mining:items[0]:item|link}}
 
 **Recipes** ⏳
 
@@ -1728,7 +1683,7 @@ Hardstone is a dense, resistant substrat found in the deepest parts of [[Forest]
 
 **Drops** ⏳
 
-* {{node:hardstone:mining[0]:item}}
+* {{node:hardstone:mining:items[0]:item|link}}
 
 **Recipes** ⏳
 
@@ -1755,7 +1710,7 @@ Sandstone is the primary substrat of [[Desert]] biomes. It also forms the natura
 
 **Drops** ⏳
 
-* {{node:sandstone:mining[0]:item}}
+* {{node:sandstone:mining:items[0]:item|link}}
 
 **Recipes** ⏳
 
@@ -1781,7 +1736,7 @@ Ash is the second most common substrat in [[Forest]] biomes, found deeper than [
 
 **Drops** ⏳
 
-* {{node:ash:mining[0]:item}}
+* {{node:ash:mining:items[0]:item|link}}
 
 **Recipes** ⏳
 
@@ -1806,7 +1761,7 @@ Hellstone is an extremely hard volcanic substrat found in the deepest parts of [
 
 **Drops** ⏳
 
-* {{node:hellstone:mining[0]:item}}
+* {{node:hellstone:mining:items[0]:item|link}}
 
 **Recipes** ⏳
 
@@ -1836,7 +1791,7 @@ Mud is the primary substrat of [[Jungle]] biomes. Its soft, damp texture support
 
 **Drops** ⏳
 
-* {{node:mud:mining[0]:item}}
+* {{node:mud:mining:items[0]:item|link}}
 
 **Recipes** ⏳
 
@@ -1862,7 +1817,7 @@ Limestone is a sedimentary substrat found as intrusions across [[Jungle]] biome.
 
 **Drops** ⏳
 
-* {{node:limestone:mining[0]:item}}
+* {{node:limestone:mining:items[0]:item|link}}
 
 **Recipes** ⏳
 
@@ -1887,7 +1842,7 @@ Slate is a hard metamorphic substrat found in the deepest parts of [[Jungle]] bi
 
 **Drops** ⏳
 
-* {{node:slate:mining[0]:item}}
+* {{node:slate:mining:items[0]:item|link}}
 
 **Recipes** ⏳
 
@@ -2101,7 +2056,7 @@ Obsidian is a volcanic glass formed where lava meets water. It is one of the har
 
 **Mining** ⏳
 
-* {{node:obsidian:mining[0]:item}}
+* {{node:obsidian:mining:items[0]:item|link}}
 * Requires a tier 5 [[item:pickaxePlatinum]] — applies to both natural and player-created Obsidian
 
 **Creating Obsidian** ⏳
@@ -2135,7 +2090,7 @@ Meteorite is an extraterrestrial rock that falls from the sky in rare events. It
 
 **Drops** ⏳
 
-* {{node:meteorite:mining[0]:item}}
+* {{node:meteorite:mining:items[0]:item|link}}
 
 **Recipes** ⏳
 
@@ -2160,7 +2115,7 @@ Hive is a biological material that forms the walls of [[Hive]] mini-biomes. It i
 
 **Drops** ⏳
 
-* {{node:hive:mining[0]:item}}
+* {{node:hive:mining:items[0]:item|link}}
 
 **Recipes** ⏳
 
@@ -2190,7 +2145,8 @@ Shell is a sedimentary material formed from ancient marine organisms. It is foun
 
 **Drops** ⏳
 
-* [[Mining]] with [[Mining Tools|Pickaxes]] (any tier): {{node:shell:mining[0]:item}}
+* [[Mining]] with [[Mining Tools|Pickaxes]] (any tier): {{node:shell:mining:items[0]:item|link}}
+
 
 **Main Usages** ⏳
 
@@ -2986,7 +2942,7 @@ Filled directly from a liquid source in the world. Used as tools to transport an
   // ── Mechanics ────────────────────────────────────────────────
 
   // ── Food ─────────────────────────────────────────────────────
-  //    Food, Soups
+  //    Food, Soups, Eggs
   {
     title: 'Food',
     category: ['Gameplay'],
@@ -3023,6 +2979,21 @@ Food restores health and provides temporary buffs. More elaborate preparations r
 **Recipes**
 
 [[item:vegetableSoup]]
+      `
+  },
+  {
+    title: 'Eggs',
+    category: ['Food'],
+    content: `
+**Eggs Type**
+
+{{item:vegetableSoup:star|star}}
+
+**Recipes**
+
+| Egg | Found | Usage |
+|---|---|---|
+| [[item:eggSpider]] | Mining [[node:web]] | Potions |
       `
   },
 
@@ -4628,7 +4599,7 @@ const formatValue = (resolved, format, entryTitle, path) => {
   }
 
   // Valeur finale objet sans format adapté
-  if (typeof value === 'object' && !isStar && format !== 'loot') {
+  if (typeof value === 'object' && !isStar && format !== 'loot' && format !== 'link') {
     console.error(`[help] '${entryTitle}' : valeur non affichable (objet) '${path}'`)
     return `⚠️ ${path}`
   }
@@ -4649,6 +4620,7 @@ const formatValue = (resolved, format, entryTitle, path) => {
         console.error(`[help] '${entryTitle}' : objet sans .help ou .name '${path}'`)
         return `⚠️ ${path}`
       }
+      if (value.help === entryTitle) return value.name // fiche courante → texte seul
       return `[[${value.help}|${value.name}]]`
     }
 

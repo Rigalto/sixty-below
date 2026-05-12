@@ -973,7 +973,34 @@ export const shuffleArray = (arr) => {
 export const parseLootEntry = (str) => {
   const [itemId, weightStr, countStr] = str.split(':')
   const weight = parseInt(weightStr)
+  const {countMin, countMax, bonus, flags: countFlags} = parseLootCount(countStr)
 
+  const flags = countFlags | (weight === 100 ? 0b100 : 0)
+
+  return {itemId, weight, countMin, countMax, bonus, flags}
+}
+
+/**
+ * Parse la partie count d'un item de loot en CountEntry précalculée.
+ * Utilisé pour les actions de loot (mining, harvesting...) — sans weight ni itemId.
+ *
+ * Format count :
+ *   '3'       → fixe
+ *   '1.40'    → fixe + 40% de chance d'un item supplémentaire
+ *   '5-8'     → range uniforme float
+ *   '5-8.40'  → range + 40% de chance d'un item supplémentaire
+ *
+ * flags (2 bits) :
+ *   bit 0 : hasRange  (countMin !== countMax)
+ *   bit 1 : hasBonus  (bonus > 0)
+ *
+ * @typedef {{countMin: number, countMax: number, bonus: number, flags: number}} CountEntry
+ *
+ * @param {string} countStr
+ * @returns {CountEntry}
+ */
+export const parseLootCount = (countStr) => {
+  countStr = '' + countStr
   // Séparation count et bonus
   const dotIdx = countStr.indexOf('.')
   const bonus = dotIdx === -1 ? 0 : parseInt(countStr.slice(dotIdx + 1))
@@ -981,16 +1008,19 @@ export const parseLootEntry = (str) => {
 
   // Séparation min et max
   const dashIdx = countPart.indexOf('-')
-  const countMin = parseInt(countPart)
-  const countMax = dashIdx === -1 ? countMin : parseInt(countPart.slice(dashIdx + 1))
+  const countMin = parseFloat(countPart)
+  const countMax = dashIdx === -1 ? countMin : parseFloat(countPart.slice(dashIdx + 1))
 
   const flags =
-    (countMin !== countMax ? 0b001 : 0) |
-    (bonus > 0 ? 0b010 : 0) |
-    (weight === 100 ? 0b100 : 0)
+    (countMin !== countMax ? 0b01 : 0) |
+    (bonus > 0 ? 0b10 : 0)
 
-  return {itemId, weight, countMin, countMax, bonus, flags}
+  return {countMin, countMax, bonus, flags}
 }
+
+// ///////// //
+// SANS BUFF //
+// ///////// //
 
 const ROLL_FN = [
   // 0b000 : weight < 100, fixe, pas de bonus
@@ -1018,3 +1048,39 @@ const ROLL_FN = [
  * @returns {number} quantité d'items obtenus (0 si non sélectionné)
  */
 export const rollLoot = (entry) => ROLL_FN[entry.flags](entry)
+
+// ///////// //
+// AVEC BUFF //
+// ///////// //
+
+const ROLL_BUFF_FN = [
+  // 0b00 : fixe, pas de bonus
+  (entry) => entry.countMin,
+  // 0b01 : range, pas de bonus
+  (entry) => seededRNG.randomGetRealMinMax(entry.countMin, entry.countMax),
+  // 0b10 : fixe, bonus
+  (entry) => entry.countMin + entry.bonus / 100,
+  // 0b11 : range, bonus
+  (entry) => seededRNG.randomGetRealMinMax(entry.countMin, entry.countMax) + entry.bonus / 100
+]
+
+export const rollLootWithBuffs = (lootItem, buffValues) => {
+  // 1. Conditions actives
+  for (const name of lootItem.buffs.required) {
+    if (!buffValues[name]) return 0
+  }
+  // 2. Conditions inactives
+  for (const name of lootItem.buffs.forbidden) {
+    if (buffValues[name]) return 0
+  }
+  // 3. Modificateurs
+  let totalBuff = 0
+  for (const mod of lootItem.buffs.modifiers) {
+    if (buffValues[mod.name]) totalBuff += mod.value
+  }
+  // 4. Tirage float après application du buff
+  const raw = ROLL_BUFF_FN[lootItem.count.flags](lootItem.count)
+  const buffed = raw * (1 + totalBuff / 100)
+  const {int, fract} = intFract(buffed)
+  return int + (seededRNG.randomGetPercent(fract * 100) ? 1 : 0)
+}

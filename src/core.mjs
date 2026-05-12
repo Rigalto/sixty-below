@@ -2,7 +2,7 @@ import {TIME_BUDGET, MICROTASK_FN_NAME_TO_KEY, STATE, OVERLAYS} from './constant
 import {NODES, NODES_LOOKUP, ITEMS, TREE_IMAGES, PLANT_KIND, PLANT_TYPE} from '../../assets/data/data.mjs'
 import {HELP_TITLES, hydrateHelp} from '../../assets/data/data-help.mjs'
 import {loadAssets, resolveAssetData} from './assets.mjs'
-import {timeManager, taskScheduler, microTasker, eventBus, seededRNG} from './utils.mjs'
+import {timeManager, taskScheduler, microTasker, eventBus, seededRNG, parseLootCount} from './utils.mjs'
 import {database} from './database.mjs'
 import {chunkManager} from './world.mjs'
 import {saveManager} from './persistence.mjs'
@@ -87,6 +87,18 @@ class GameCore {
     console.log('✅ Moteur prêt.')
   }
 
+  // Hydratation d'une action de loot (mining, harvesting, hamming...)
+  #hydrateLootAction (action, actionName, nodeName) {
+    for (const lootItem of action.items) {
+      const itemId = lootItem.item
+      lootItem.item = ITEMS[itemId]
+      if (!lootItem.item) {
+        console.error(`[hydrate] ${nodeName}.${actionName} : item inconnu '${itemId}'`)
+      }
+      lootItem.count = parseLootCount(lootItem.count)
+    }
+  }
+
   /**
    * Hydratation spécifique pour les Tuiles (NODES)
    * Transforme les strings 'image' en objets 'image' avec imgIndex
@@ -102,12 +114,16 @@ class GameCore {
         count++
       }
       if (node.waveImage) node.waveImage = resolveAssetData(node.waveImage)
-      //
+      // champ Help
       if (node.help !== null && !HELP_TITLES.has(node.help)) {
         console.error(`[core] NODES.${node.name} : help topic inconnu '${node.help}'`)
       }
+      // champs de loot
+      if (node.mining) this.#hydrateLootAction(node.mining, 'mining', node.name)
+      if (node.harvesting) this.#hydrateLootAction(node.harvesting, 'harvesting', node.name)
+      if (node.hamming) this.#hydrateLootAction(node.hamming, 'hamming', node.name)
     }
-    console.log(`   🔹 Nodes hydratés : ${count}`)
+    console.log(`   🔹 Nodes hydratés : ${count}`, NODES)
   }
 
   /**
