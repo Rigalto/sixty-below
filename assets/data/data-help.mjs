@@ -4552,39 +4552,41 @@ const resolveStars = (entry, NODES, ITEMS) => {
   return errors
 }
 
+const BLOCK_TAGS = ['<ul', '<table', '<ol']
+
+const renderParagraphs = (html) => html.split('\n\n').map(block => {
+  const trimmed = block.trim()
+  if (!trimmed) return ''
+  if (BLOCK_TAGS.some(tag => trimmed.startsWith(tag))) return trimmed
+  return `<p>${trimmed}</p>`
+}).join('\n')
+
+// l'ordre est **très important**
 const renderMarkdown = (entry) => {
-  let html = entry.content
+  entry.html = entry.content
 
-  // 1. Gras
-  html = html.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+  // 1. Format dynamique
 
-  // 2. Souligné (avant italique — double underscore)
-  html = html.replace(/__(.+?)__/g, '<u>$1</u>')
+  // 2. Gras
+  entry.html = entry.html.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
 
-  // 3. Italique
-  html = html.replace(/_(.+?)_/g, '<em>$1</em>')
+  // 3. Souligné (avant italique — double underscore)
+  entry.html = entry.html.replace(/__(.+?)__/g, '<u>$1</u>')
 
-  // 4. Listes
-  html = renderLists(html)
+  // 4. Italique
+  entry.html = entry.html.replace(/_(.+?)_/g, '<em>$1</em>')
 
-  // 5. Liens
-  entry.html = html
+  // 5. Listes
+  entry.html = renderLists(entry.html)
+
+  // 6. Liens
   const errors = resolveLinks(entry) // résout [[...|...]] → <a>
 
-  // 6. Tables
+  // 7. Tables
   entry.html = renderTables(entry.html)
 
-  // 7. Passe finale : blocs → <p>
-  const BLOCK_TAGS = ['<ul', '<table', '<ol']
-
-  entry.html = entry.html.split('\n\n').map(block => {
-    const trimmed = block.trim()
-    if (!trimmed) return ''
-    for (const tag of BLOCK_TAGS) {
-      if (trimmed.startsWith(tag)) return trimmed
-    }
-    return `<p>${trimmed}</p>`
-  }).join('\n')
+  // 8. Passe finale : blocs → <p>
+  entry.html = renderParagraphs(entry.html)
 
   return errors
 }
