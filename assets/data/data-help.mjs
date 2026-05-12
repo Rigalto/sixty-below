@@ -4697,7 +4697,7 @@ const formatValue = (resolved, format, entryTitle, path) => {
 
 const resolveDynamic = (entry, NODES, ITEMS, MONSTERS) => {
   let errors = 0
-  entry.html = entry.html.replace(
+  entry.content = entry.content.replace(
     /\{\{(node|item|monster|recipe):([^:}]+)((?::[^|}]+)*?)(?:\|([^}]*))?\}\}/g,
     (match, type, code, pathStr, format) => {
       const segments = pathStr ? pathStr.slice(1).split(':') : []
@@ -4711,12 +4711,10 @@ const resolveDynamic = (entry, NODES, ITEMS, MONSTERS) => {
 }
 
 // l'ordre est **très important**
-const renderMarkdown = (entry, NODES, ITEMS, MONSTERS) => {
+const renderMarkdown = (entry) => {
   let errors = 0
+  // 1. Copie dans le champ HTML
   entry.html = entry.content
-
-  // 1. Format dynamique
-  errors += resolveDynamic(entry, NODES, ITEMS, MONSTERS)
 
   // 2. Gras
   entry.html = entry.html.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
@@ -4739,6 +4737,8 @@ const renderMarkdown = (entry, NODES, ITEMS, MONSTERS) => {
   // 8. Passe finale : blocs → <p>
   entry.html = renderParagraphs(entry.html)
 
+  // entry.content est conservé intentionnellement pour le filtrage textuel dans HelpOverlay
+
   return errors
 }
 
@@ -4751,13 +4751,12 @@ export const hydrateHelp = (NODES, ITEMS, MONSTERS = {}) => {
     errors += resolveNodeLinks(entry, NODES)
     errors += resolveItemLinks(entry, ITEMS)
     errors += resolveMonsterLinks(entry, MONSTERS)
-    // Résolution des autres données dynamiques {{...}}
-    // et conversion Markdown → HTML (entry.html = html généré)
-    errors += renderMarkdown(entry, NODES, ITEMS, MONSTERS)
+    // Résolution des données dynamiques {{...}}
+    errors += resolveDynamic(entry, NODES, ITEMS, MONSTERS)
+    // Conversion Markdown → HTML (entry.html = html généré)
+    errors += renderMarkdown(entry)
     count++
   }
-
-  console.log('HELP', HELP) // DEBUG
 
   return {count, errors}
 }
