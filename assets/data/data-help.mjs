@@ -4300,6 +4300,27 @@ Press **[H]** or click the 📜 button in the [[Control Panel]] to open it.
     title: 'Control Panel',
     category: ['Gameplay'],
     content: `
+**Description**
+
+In the right part of the screen, shows:
+
+* Icon actions
+  * Open/close [[Inventory|Inventory Panel]]
+  * Open/close [[Crafting|Crafting Panel]]
+  * Open/close [[Help Panel]]
+  * Creation of a [[World Creation|new world]]
+  * Ambient sound and Music controls⏳
+* Environmental informations
+  * [[Day & Night Cycle|Day / Hours]]
+  * [[Weather]] and [[Moon Phases]]
+  * Player Position⏳
+  * Tile under the mouse⏳
+* [[Buff Panel]]⏳
+
+Note : Always Present
+
+**Tips**
+* _Activer le mode plein écran du navigateur pour voir la totalité de l'écran de jeu (à traduire)_
     `
   },
   {
@@ -4350,7 +4371,7 @@ _From the world events:_
 
 **Timed Buffs**
 
-Potions and food activate buffs with a countdown visible in the [[Control Panel]].
+Potions and food activate buffs with a countdown visible in the [[Buff Panel]].
 Consuming the same type too quickly extends the cooldown before you can benefit again.⏳
 
 **Buff Categories**
@@ -4364,6 +4385,17 @@ Consuming the same type too quickly extends the cooldown before you can benefit 
 * [[Gardening Buffs]] — better yield,
 * [[Luck Buffs]] — rare drops, special encounters
 * Environmental Buffs — [[Weather|weather]], [[Moon Phases|moon]], [[Day & Night Cycle|time of day]]
+  `
+  },
+  {
+    title: 'Buff Panel',
+    category: ['Gameplay'],
+    content: `
+  **Description**
+
+  The Buff Panel is a section in the [[Control Panel]] with display [[Buffs]] status.
+
+  To be continued ⏳
   `
   },
   {
