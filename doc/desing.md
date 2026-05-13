@@ -414,7 +414,7 @@ mining: {
    → {Lucky: true, Day: true, Stormy: false, Rainy: true, ...}  // un seul appel
 
 2. Pour chaque item de action.items :
-   rollLootWithBuffs(lootItem, buffValues) → number
+   rollLootWithBuffs(lootItem, buffValues, yieldBuff) → number
    // 3 boucles simples, zéro test de type, zéro filtrage :
    // a. for name of required  → if !buffValues[name] return 0
    // b. for name of forbidden → if  buffValues[name] return 0

@@ -468,8 +468,11 @@ Ne jamais appeler `seededRNG` en mode déterministe depuis la game loop.
 | `intFract` | `(r: number): {int, fract}` | `{int: number, fract: number}` | Partie entière (`Math.floor`) et fractionnaire. `fract` toujours `>= 0`. |
 | `cosineInterpolation` | `(x: number, a: number, b: number): number` | `[a, b]` | Interpolation cosinus. `x=0` → `a`, `x=1` → `b`, monotone sur `[0, 1]`. |
 | `shuffleArray(arr): Array` | Mélange un tableau en place (algorithme Fisher-Yates). Utilise `seededRNG` pour la reproductibilité. Retourne le même tableau mélangé. |
-| `parseLootEntry(str): LootEntry` | Parse une chaîne de loot (`'itemId:weight:count'`) en objet précalculé `{itemId, weight, countMin, countMax, bonus, flags}`. `flags` encode sur 3 bits : bit0=hasRange, bit1=hasBonus, bit2=weightIs100. À appeler une seule fois au chargement des données. |
-| `rollLoot(entry): number` | Effectue un tirage de loot pour une `LootEntry` précalculée. Retourne la quantité d'items obtenus (0 si weight non atteint). Zéro branche — dispatche via tableau de 8 fonctions indexé par `entry.flags`. |
+| `parseLootCount` | `(countStr: string|number) → CountEntry` | Parse la partie count d'un item de loot. `CountEntry = {countMin, countMax, bonus, flags}`. `flags` 2 bits : bit0=hasRange, bit1=hasBonus. Accepte string ou number. |
+| `parseLootEntry` | `(str: string) → LootEntry` | Parse `'itemId:weight:count'` en `{itemId, weight, countMin, countMax, bonus, flags}`. `flags` 3 bits : bit0=hasRange, bit1=hasBonus, bit2=weightIs100. Délègue à `parseLootCount`. À appeler une seule fois au chargement. |
+| `parseLootBuffs` | `(arr?: string[]) → {buffs: {required: string[], forbidden: string[], modifiers: {name,value}[]}, buffList: string[]}` | Pré-parse les strings buffs en structure runtime. `buffList` = union dédupliquée des noms. Retourne structures vides si `arr` absent. |
+| `rollLoot` | `(entry: LootEntry) → number` | Tirage pour les coffres. Zéro branche — dispatche via `ROLL_FN[flags]` (8 fonctions). Retourne 0 si weight non atteint. |
+| `rollLootWithBuffs` | `(lootItem, buffValues, yieldBuff?) → number` | Tirage pour les actions (mining, harvesting...). Évalue conditions, cumule modificateurs + yieldBuff, tire un float, applique `intFract`. Zéro allocation, zéro parsing. |
 
 ---
 

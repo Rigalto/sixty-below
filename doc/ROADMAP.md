@@ -7,10 +7,7 @@
 
 ## En cours
 
-- Affichage du Help Panel :
-  - affichage
-  - UI
-  - hydratation
+- conception du buffManager
 
 ---
 
