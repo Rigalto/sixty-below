@@ -1866,7 +1866,7 @@ Metals are the primary crafting materials in Sixty-Below. Each metal exists in t
 |---|---|---|
 | Ore | Ore veins placed in the World | Not directly usable |
 | Chunk | Dropped when [[Mining]] ore | Crafting ingredient |
-| Bar | Smelt chunks at a [[Smelting|Furnace]] | Higher-tier crafting |
+| Bar | Smelt chunks at a [[item:furnace]] | Higher-tier crafting |
 
 **Metal Ores**
 
@@ -1885,23 +1885,23 @@ Metal chunks are placed in your [[Inventory]] when mined with a [[Mining Tools|P
 
 | Ore | Chunk | Chunk Tier | Pickaxe | Pickaxe Tier |
 |---|---|---|---|---|
-{{metalChunksRow|copper|chunkCopper|pickaxeCopper}}
-{{metalChunksRow|iron|chunkIron|pickaxeCopper}}
-{{metalChunksRow|silver|chunkSilver|pickaxeIron}}
-{{metalChunksRow|gold|chunkGold|pickaxeSilver}}
-{{metalChunksRow|cobalt|chunkCobalt|pickaxeGold}}
-{{metalChunksRow|platinum|chunkPlatinum|pickaxeCobalt}}
+<<metalChunksRow|copper|chunkCopper|pickaxeCopper>>
+<<metalChunksRow|iron|chunkIron|pickaxeCopper>>
+<<metalChunksRow|silver|chunkSilver|pickaxeIron>>
+<<metalChunksRow|gold|chunkGold|pickaxeIron>>
+<<metalChunksRow|cobalt|chunkCobalt|pickaxeGold>>
+<<metalChunksRow|platinum|chunkPlatinum|pickaxeCobalt>>
 
 **Metal Bars**
 
 | Chunk | Chunk Tier | Crafting Station | Bar | Bar Tier |
 |---|---|---|---|---|
-{{metalBarsRow|chunkCopper|barCopper}}
-{{metalBarsRow|chunkIron|barIron}}
-{{metalBarsRow|chunkSilver|barSilver}}
-{{metalBarsRow|chunkGold|barGold}}
-{{metalBarsRow|chunkCobalt|barCobalt}}
-{{metalBarsRow|chunkPlatinum|barPlatinum}}
+<<metalBarsRow|chunkCopper|barCopper>>
+<<metalBarsRow|chunkIron|barIron>>
+<<metalBarsRow|chunkSilver|barSilver>>
+<<metalBarsRow|chunkGold|barGold>>
+<<metalBarsRow|chunkCobalt|barCobalt>>
+<<metalBarsRow|chunkPlatinum|barPlatinum>>
 
 **Metal Bars Recipes** ⏳
 

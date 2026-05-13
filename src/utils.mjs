@@ -1018,6 +1018,50 @@ export const parseLootCount = (countStr) => {
   return {countMin, countMax, bonus, flags}
 }
 
+/**
+ * Parse un tableau de strings buffs en structure runtime précalculée.
+ *
+ * Format des strings :
+ *   '+Lucky'     → condition active  (absent si Lucky inactif)
+ *   '!Stormy'    → condition inactive (absent si Stormy actif)
+ *   'Lucky:20'   → modificateur +20% si Lucky actif
+ *   'Rainy:-10'  → modificateur -10% si Rainy actif
+ *
+ * @param {string[]} arr
+ * @returns {{buffs: {required: string[], forbidden: string[], modifiers: {name: string, value: number}[]}, buffList: string[]}}
+ */
+export const parseLootBuffs = (arr) => {
+  const required = []
+  const forbidden = []
+  const modifiers = []
+  const names = new Set()
+
+  if (arr) {
+    for (const str of arr) {
+      if (str.startsWith('+')) {
+        const name = str.slice(1)
+        required.push(name)
+        names.add(name)
+      } else if (str.startsWith('!')) {
+        const name = str.slice(1)
+        forbidden.push(name)
+        names.add(name)
+      } else {
+        const colonIdx = str.indexOf(':')
+        const name = str.slice(0, colonIdx)
+        const value = parseInt(str.slice(colonIdx + 1))
+        modifiers.push({name, value})
+        names.add(name)
+      }
+    }
+  }
+
+  return {
+    buffs: {required, forbidden, modifiers},
+    buffList: [...names]
+  }
+}
+
 // ///////// //
 // SANS BUFF //
 // ///////// //

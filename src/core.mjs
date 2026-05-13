@@ -2,7 +2,7 @@ import {TIME_BUDGET, MICROTASK_FN_NAME_TO_KEY, STATE, OVERLAYS} from './constant
 import {NODES, NODES_LOOKUP, ITEMS, TREE_IMAGES, PLANT_KIND, PLANT_TYPE} from '../../assets/data/data.mjs'
 import {HELP_TITLES, hydrateHelp} from '../../assets/data/data-help.mjs'
 import {loadAssets, resolveAssetData} from './assets.mjs'
-import {timeManager, taskScheduler, microTasker, eventBus, seededRNG, parseLootCount} from './utils.mjs'
+import {timeManager, taskScheduler, microTasker, eventBus, seededRNG, parseLootCount, parseLootBuffs} from './utils.mjs'
 import {database} from './database.mjs'
 import {chunkManager} from './world.mjs'
 import {saveManager} from './persistence.mjs'
@@ -89,6 +89,8 @@ class GameCore {
 
   // Hydratation d'une action de loot (mining, harvesting, hamming...)
   #hydrateLootAction (action, actionName, nodeName) {
+    const allNames = new Set()
+
     for (const lootItem of action.items) {
       const itemId = lootItem.item
       lootItem.item = ITEMS[itemId]
@@ -96,7 +98,11 @@ class GameCore {
         console.error(`[hydrate] ${nodeName}.${actionName} : item inconnu '${itemId}'`)
       }
       lootItem.count = parseLootCount(lootItem.count)
+      const {buffs, buffList} = parseLootBuffs(lootItem.buffs)
+      lootItem.buffs = buffs
+      for (const name of buffList) allNames.add(name)
     }
+    action.buffList = [...allNames, `${actionName}-yield`]
   }
 
   /**
@@ -105,6 +111,7 @@ class GameCore {
    */
   #hydrateNodes () {
     let count = 0
+
     for (const node of NODES_LOOKUP) {
       if (!node) continue
 
@@ -120,7 +127,7 @@ class GameCore {
       }
       // champs de loot
       if (node.mining) this.#hydrateLootAction(node.mining, 'mining', node.name)
-      if (node.harvesting) this.#hydrateLootAction(node.harvesting, 'harvesting', node.name)
+      if (node.foraging) this.#hydrateLootAction(node.foraging, 'foraging', node.name)
       if (node.hamming) this.#hydrateLootAction(node.hamming, 'hamming', node.name)
     }
     console.log(`   🔹 Nodes hydratés : ${count}`, NODES)
