@@ -97,7 +97,10 @@ Mining drops: {{node:{3}:mining[:items[0]:item|link}}
   metalChunksRow: '| [[node:{1}]] | [[item:{2}]] | {{item:{2}:star}} | [[item:{3}]] | {{item:{3}:star}} |',
   metalBarsRow: '| [[item:{1}]] | {{item:{1}:star}} | [[Smelting|Furnace]] | [[item:{2}]] | {{item:{2}:star}} |',
   gemRawRow: '| [[node:{1}]] | [[item:{2}]] | {{item:{2}:star}} | [[item:{3}]] | {{item:{3}:star}} |',
-  gemCutRow: '| [[item:{1}]] | {{item:{1}:star}} | [[Smelting|Furnace]] | [[item:{2}]] | {{item:{2}:star}} |'
+  gemCutRow: '| [[item:{1}]] | {{item:{1}:star}} | [[Smelting|Furnace]] | [[item:{2}]] | {{item:{2}:star}} |',
+  lootTableHeader: '| Item | Tier | Amount | Conditions | Modifiers |\n|---|---|---|---|---|',
+  additiveNote: '_All modifiers are additive and stack with each other._',
+  lootTable: '| Item | Tier | Amount | Conditions | Modifiers |\n|---|---|---|---|---|\n{{node:{1}:{2}:items[*]:helpRow|rows}}\n\n_All modifiers are additive and stack with each other._'
 }
 
 /* ====================================================================================================
@@ -120,13 +123,13 @@ The Surface is the topmost layer of the world, where the player begins their adv
 
 * From the sky down to the Underground boundary
 * Includes several tile-layers below the visible surface line
-* Exposed to the day/night cycle and weather ⏳
+* Exposed to the [[Day & Night Cycle|day/night cycle]] and [[Weather]] ⏳
 
 **Materials**
 
-* [[node:grassForest]], [[node:dirt]] — Forest
-* [[node:sand]], [[node:sandstone]] — Desert
-* [[node:grassJungle]], [[node:silt]] — Jungle
+* [[node:grassForest]], [[node:dirt]] — [[Forest]]
+* [[node:sand]], [[node:sandstone]] — [[Desert]]
+* [[node:grassJungle]], [[node:silt]] — [[Jungle]]
 
 **Resources**
 
@@ -135,9 +138,9 @@ The Surface is the topmost layer of the world, where the player begins their adv
 
 **Mini-biomes**
 
-* [[Ant Hill]] — Forest
-* [[Antlion Pit]] — Desert
-* [[Termite Mound]] — Jungle
+* [[Ant Hill]] — [[Forest]]
+* [[Antlion Pit]] — [[Desert]]
+* [[Termite Mound]] — [[Jungle]]
 * [[Surface Lake]] — All biomes
 
 **Damage type**
@@ -147,7 +150,7 @@ The Surface is the topmost layer of the world, where the player begins their adv
 **Tips**
 
 * _The safest layer — ideal for early game exploration._
-* _Day/night cycle affects fauna behaviour and spawning._ ⏳
+* _[[Day & Night Cycle|Day/night cycle]] affects fauna behaviour and spawning._ ⏳
   `
   },
   {
@@ -165,9 +168,9 @@ The Underground layer begins just below the surface. It is darker, more dangerou
 
 **Materials**
 
-* [[node:stone]], [[node:clay]] — Forest
-* [[node:sandstone]], [[node:stone]] — Desert
-* [[node:mud]], [[node:clay]] — Jungle
+* [[node:stone]], [[node:clay]] — [[Forest]]
+* [[node:sandstone]], [[node:stone]] — [[Desert]]
+* [[node:mud]], [[node:clay]] — [[Jungle]]
 
 **Resources**
 
@@ -175,11 +178,11 @@ The Underground layer begins just below the surface. It is darker, more dangerou
 
 **Mini-biomes**
 
-* [[Fern Cave]] — Forest
-* [[Moss Cave]] — Jungle
-* [[Sand Pocket]] — Desert
-* [[Ruined Cabin]] — Forest
-* [[Pyramid]] — Desert
+* [[Fern Cave]] — [[Forest]]
+* [[Moss Cave]] — [[Jungle]]
+* [[Sand Pocket]] — [[Desert]]
+* [[Ruined Cabin]] — [[Forest]]
+* [[Pyramid]] — [[Desert]]
 * [[Underground Lake]] — All biomes
 
 **Damage type**
@@ -213,7 +216,7 @@ The Caverns are the deepest accessible layer, divided into two sub-layers : Cave
 **Materials**
 
 * [[node:hardstone]], [[node:slate]] — all biomes
-* [[node:hellstone]] — Jungle, rare in other biomes
+* [[node:hellstone]] — [[Jungle]], rare in other biomes
 * [[node:granite]], [[node:marble]] — [[Geode Cave]]s
 
 **Resources**
@@ -224,15 +227,15 @@ The Caverns are the deepest accessible layer, divided into two sub-layers : Cave
 
 **Mini-biomes**
 
-* [[Mushroom Cave]] — Forest, Caverns Top
-* [[Hive]] — Jungle, Caverns Top
-* [[Fossil Vein]] — Desert, Caverns Top
+* [[Mushroom Cave]] — [[Forest]], Caverns Top
+* [[Hive]] — [[Jungle]], Caverns Top
+* [[Fossil Vein]] — [[Desert]], Caverns Top
 * [[Cobweb Cave]] — all biomes
 * [[Geode Cave]] — all biomes, Caverns Bottom
 * [[Blind Lake]] — all biomes, Caverns Bottom
-* [[Sap Pocket]] — Jungle, Caverns Bottom
-* [[Ancient House]] — Desert, Caverns Bottom
-* [[Lost Temple]] — Jungle, Caverns Top
+* [[Sap Pocket]] — [[Jungle]], Caverns Bottom
+* [[Ancient House]] — [[Desert]], Caverns Bottom
+* [[Lost Temple]] — [[Jungle]], Caverns Top
 * [[Graveyard]] — all biomes, Caverns Bottom
 
 **Damage type**
@@ -923,7 +926,7 @@ Termite Mounds are tall cylindar structures of [[Compacted Earth]] rising above 
 **Main Location**
 
 * Biome: [[Jungle]]
-* Layer: Surface
+* Layer: [[Surface]]
 
 **Materials**
 
@@ -1353,9 +1356,17 @@ Grass covers the surface of [[Forest]] biomes. It is the most common natural til
 
 * [[Surface]] — [[Forest]], top layer of solid ground
 
-**Drops** ⏳
+**Mining Drops** ⏳
 
-* {{node:grassForest:mining:items[0]:item|link}}
+Mining Tool: [[item:pickaxeCopper]] ({{item:pickaxeCopper:star|star}}) or better
+
+<<lootTable|grassForest|mining>>
+
+**Foraging Drops** ⏳
+
+Harvesting Tool: [[item:sickleCopper]] ({{item:sickleCopper:star|star}}) or better
+
+<<lootTable|grassForest|foraging>>
 
 **Tips**
 
@@ -2077,7 +2088,7 @@ Obsidian is a volcanic glass formed where lava meets water. It is one of the har
     content: `
 **Description**
 
-Meteorite is an extraterrestrial rock that falls from the sky in rare events. It glows faintly and has unique properties not found in any other material.
+Meteorite is an extraterrestrial rock that falls from the sky in rare [[Events]]. It glows faintly and has unique properties not found in any other material.
 
 **Tier**
 
@@ -2085,7 +2096,7 @@ Meteorite is an extraterrestrial rock that falls from the sky in rare events. It
 
 **Main Location**
 
-* Impact craters on the [[Surface]] — random events ⏳
+* Impact craters on the [[Surface]] — random [[Events]] ⏳
 * Rare clusters near impact sites ⏳
 
 **Drops** ⏳
@@ -2185,26 +2196,25 @@ Shell is a sedimentary material formed from ancient marine organisms. It is foun
     title: 'Furnitures',
     category: ['Housing'],
     content: `
+**Furnitures list**
 
-    **Furnitures list**
-
-    * [[Beds]]
-    * [[Bookcases]]
-    * [[Cabinets]]
-    * [[Chairs]]
-    * [[Chests]]
-    * [[Clocks]]
-    * [[Closets]]
-    * [[Crafting Stations]]
-    * [[Doors]]
-    * [[Firecamps]]
-    * [[Fireplaces]]
-    * [[Platforms]]
-    * [[Sofas]]
-    * [[Tables]]
-    * [[Tableware]]
-    * [[Toilets]]
-    * [[Torches]]
+* [[Beds]]
+* [[Bookcases]]
+* [[Cabinets]]
+* [[Chairs]]
+* [[Chests]]
+* [[Clocks]]
+* [[Closets]]
+* [[Crafting Stations]]
+* [[Doors]]
+* [[Firecamps]]
+* [[Fireplaces]]
+* [[Platforms]]
+* [[Sofas]]
+* [[Tables]]
+* [[Tableware]]
+* [[Toilets]]
+* [[Torches]]
     `
   },
   {
@@ -2221,7 +2231,20 @@ Shell is a sedimentary material formed from ancient marine organisms. It is foun
   },
 
   // ── Accessories ──────────────────────────────────────────────
-  //    Triskels
+  //    Accessories, Trinkets, Triskels
+
+  {
+    title: 'Accessories',
+    category: ['Accessory', 'Buff'],
+    content: `
+    `
+  },
+  {
+    title: 'Trinkets',
+    category: ['Accessory', 'Buff'],
+    content: `
+    `
+  },
   {
     title: 'Triskels',
     category: ['Accessory', 'Buff'],
@@ -2732,6 +2755,7 @@ The crafting tree shows the order in which crafting stations must be built. Each
   },
 
   //    Stonecutting, Jewelry, Alchemy, Cooking, Decomposer, Transmutator
+
   {
     title: 'Stonecutting',
     category: ['Crafting', 'Crafting Stations'],
@@ -2761,6 +2785,52 @@ The crafting tree shows the order in which crafting stations must be built. Each
     title: 'Transmutator',
     category: ['Crafting', 'Crafting Stations'],
     content: ''
+  },
+
+  // ── Activities Combat ───────────────────────────────────
+  //    Combat, Combat Buffs
+  {
+    title: 'Combat',
+    category: ['Combat', 'Activities'],
+    content: `
+    `
+  },
+  {
+    title: 'Combat Buffs',
+    category: ['Combat', 'Buff'],
+    content: `
+    `
+  },
+
+  // ── Activities Events ───────────────────────────────────
+  //    Events, Alien Invasion, Pirate Attack, Meteor Strikes
+  {
+    title: 'Events',
+    category: ['Events', 'Activities'],
+    content: `
+**Events List**
+* [[Alien Invasion]]
+* [[Pirate Attack]]
+* [[Meteor Strikes]]
+    `
+  },
+  {
+    title: 'Alien Invasion',
+    category: ['Events'],
+    content: `
+    `
+  },
+  {
+    title: 'Pirate Attack',
+    category: ['Events'],
+    content: `
+    `
+  },
+  {
+    title: 'Meteor Strikes',
+    category: ['Events'],
+    content: `
+    `
   },
 
   // ── Tableware ────────────────────────────────────────────────
@@ -2877,7 +2947,9 @@ Filled directly from a liquid source in the world. Used as tools to transport an
     content: `
     `
   },
+
   //    Tables, Platforms, Cabinets, Closets, Bookcases, Sofas
+
   {
     title: 'Tables',
     category: ['Furniture'],
@@ -2939,6 +3011,14 @@ Filled directly from a liquid source in the world. Used as tools to transport an
   // ── Items & Crafting ─────────────────────────────────────────
   // ── Fauna & Critters ─────────────────────────────────────────
   // ── Buffs & Debuffs ──────────────────────────────────────────
+  //    Luck Buffs
+  {
+    title: 'Luck Buffs',
+    category: ['Buff'],
+    content: `
+    `
+  },
+
   // ── Mechanics ────────────────────────────────────────────────
 
   // ── Food ─────────────────────────────────────────────────────
@@ -2995,6 +3075,15 @@ Food restores health and provides temporary buffs. More elaborate preparations r
 |---|---|---|
 | [[item:eggSpider]] | Mining [[node:web]] | Potions |
       `
+  },
+
+  // ── Potions ──────────────────────────────────────────────────
+  //    Potions
+  {
+    title: 'Potions',
+    category: ['Gameplay'],
+    content: `
+  `
   },
 
   // ── Plants ───────────────────────────────────────────────────
@@ -3847,6 +3936,7 @@ Oleander is a common shrub found in the underground passages of all three biomes
 
   // ── Plants - Caverns Herbs ───────────────────────────────────
   //    Satan's Cube, Sneakthorn, Cursedcrown, Abysshorn, Inferncap, Amber-Moss
+
   {
     title: 'Satan\'s Cube',
     category: ['Plant', 'Forest', 'Desert', 'Caverns'],
@@ -4101,8 +4191,10 @@ Foraging : [[Foraging|Sickle]] any tier.⏳
   // ── Fishs - Sap ──────────────────────────────────────────────
   // ── Monsters ─────────────────────────────────────────────────
   //    Fauna
+
   // ── Monsters ─────────────────────────────────────────────────
   //    Spiders, Bees
+
   {
     title: 'Spiders',
     category: ['Monster'],
@@ -4129,6 +4221,7 @@ Note: those ingredients can also be dropped by [[Mining]] [[Cobweb]] with any [[
 
   // ── Gameplay ─────────────────────────────────────────────────
   //    Getting Started, Help Panel, Hotbar, Control Panel, Inventory
+
   {
     title: 'Getting Started',
     category: ['Gameplay'],
@@ -4209,7 +4302,6 @@ Press **[H]** or click the 📜 button in the [[Control Panel]] to open it.
     content: `
     `
   },
-
   {
     title: 'Inventory',
     category: ['Gameplay'],
@@ -4218,7 +4310,62 @@ Press **[H]** or click the 📜 button in the [[Control Panel]] to open it.
   },
 
   // ── Gameplay ─────────────────────────────────────────────────
-  //    Movement Speed,  World Creation
+  //    Buffs, Movement Speed,  World Creation
+
+  {
+    title: 'Buffs',
+    category: ['Gameplay'],
+    content: `
+**What are Buffs?**
+
+Buffs are temporary or permanent bonuses (and penalties) that affect almost every aspect of your character: mining speed, movement, loot quantity, crafting efficiency, and much more.
+
+Buffs stack additively — if three sources each give +10% mining speed, you get +30% in total.
+
+**Where do Buffs come from?**
+
+_From the world around you:_
+
+* The [[Moon Phases|moon phase]] influences creature behavior and rare drop rates
+* [[Weather]] affects harvesting, movement and some creature spawns
+* The [[Day & Night Cycle|time of day]] grants different bonuses depending on the period
+* Tiles beneath your feet can slow you down or grant bonuses ([[node:web]], [[node:grassMoss]]...)
+* [[Furnitures|Furniture]] placed nearby can provide passive bonuses when you are within range
+
+_From your equipment:_
+
+* Your [[Armors|armor]] (3 slots) provides protection and specialized bonuses
+* [[Trinkets]] grant bonuses simply by being present in your inventory
+* [[Accessories]] must be placed in dedicated slots to be active (4 slots)
+* The tool currently in your hand provides bonuses related to its use
+
+_From consumables:_
+
+* [[Food]] provides a timed bonus after consumption
+* [[Potions]] provide powerful timed bonuses — overuse extends the cooldown
+
+_From the world events:_
+
+* [[Events]] such as invasions or meteor strikes activate specific buffs for their duration
+
+**Timed Buffs**
+
+Potions and food activate buffs with a countdown visible in the [[Control Panel]].
+Consuming the same type too quickly extends the cooldown before you can benefit again.⏳
+
+**Buff Categories**
+
+* [[Mining Buffs]] — speed, yield, range
+* [[Harvesting Buffs]] — speed, yield, range
+* [[Movement Speed|Movement Buffs]] — speed, jump, friction
+* [[Combat Buffs]] — damage, defense, critical hits
+* [[Housing Buffs]] — placement speed, range
+* [[Fishing Buffs]] — better yield, special encounters
+* [[Gardening Buffs]] — better yield,
+* [[Luck Buffs]] — rare drops, special encounters
+* Environmental Buffs — [[Weather|weather]], [[Moon Phases|moon]], [[Day & Night Cycle|time of day]]
+  `
+  },
   {
     title: 'Movement Speed',
     category: ['Gameplay'],
@@ -4243,7 +4390,8 @@ Movement speed determines how fast the player moves through the world. The base 
 * _Velvetmoss patches are visually distinct — you can plan your path to avoid them if speed matters._ ⏳
 * _Boots with traction bonuses can partially offset terrain penalties._ ⏳
   `
-  }, {
+  },
+  {
     title: 'World Creation',
     category: ['Gameplay', 'World'],
     content: `
@@ -4648,6 +4796,19 @@ const formatValue = (resolved, format, entryTitle, path) => {
         parts.push(String(leaf ?? '⚠️'))
       }
       return parts.join('<br>')
+    }
+
+    case 'rows': {
+      if (!isStar) {
+        console.error(`[help] '${entryTitle}' : format 'rows' requiert [*]`)
+        return `⚠️ ${path}`
+      }
+      const lines = []
+      for (const item of value) {
+        const leaf = tail.length ? tail.reduce((o, s) => o?.[s], item) : item
+        lines.push(String(leaf ?? '⚠️'))
+      }
+      return lines.join('\n')
     }
 
     case 'loot':

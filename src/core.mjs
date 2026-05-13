@@ -2,7 +2,7 @@ import {TIME_BUDGET, MICROTASK_FN_NAME_TO_KEY, STATE, OVERLAYS} from './constant
 import {NODES, NODES_LOOKUP, ITEMS, TREE_IMAGES, PLANT_KIND, PLANT_TYPE} from '../../assets/data/data.mjs'
 import {HELP_TITLES, hydrateHelp} from '../../assets/data/data-help.mjs'
 import {loadAssets, resolveAssetData} from './assets.mjs'
-import {timeManager, taskScheduler, microTasker, eventBus, seededRNG, parseLootCount, parseLootBuffs} from './utils.mjs'
+import {timeManager, taskScheduler, microTasker, eventBus, seededRNG, parseLootCount, parseLootBuffs, buildLootHelpRow} from './utils.mjs'
 import {database} from './database.mjs'
 import {chunkManager} from './world.mjs'
 import {saveManager} from './persistence.mjs'
@@ -101,6 +101,7 @@ class GameCore {
       const {buffs, buffList} = parseLootBuffs(lootItem.buffs)
       lootItem.buffs = buffs
       for (const name of buffList) allNames.add(name)
+      lootItem.helpRow = buildLootHelpRow(lootItem)
     }
     action.buffList = [...allNames, `${actionName}-yield`]
   }

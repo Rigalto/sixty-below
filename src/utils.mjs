@@ -1062,6 +1062,49 @@ export const parseLootBuffs = (arr) => {
   }
 }
 
+/**
+ * Précalcule la ligne Markdown d'une table de loot pour l'aide.
+ * À appeler après parseLootBuffs, pendant l'hydratation.
+ * @param {object} lootItem — item hydraté {item, count, buffs}
+ * @returns {string} — ligne Markdown '| col | col | ... |'
+ */
+export const buildLootHelpRow = (lootItem) => {
+  // Item
+  const itemCell = lootItem.item
+    ? (lootItem.item.help ? `[[${lootItem.item.help}|${lootItem.item.name}]]` : lootItem.item.name)
+    : '⚠️'
+
+  // Tier
+  const star = lootItem.item?.star ?? 0
+  const tierCell = star ? '⭐'.repeat(star) + '☆'.repeat(5 - star) : ''
+
+  // Amount
+  const {countMin, countMax, bonus} = lootItem.count
+  let amountCell
+  if (countMin === 0 && countMax === 0) {
+    amountCell = `${bonus}% chance`
+  } else if (countMin === countMax) {
+    amountCell = bonus ? `${countMin} (+${bonus}%)` : `${countMin}`
+  } else {
+    amountCell = bonus ? `${countMin} — ${countMax} (+${bonus}%)` : `${countMin} — ${countMax}`
+  }
+
+  // Conditions
+  const condParts = []
+  if (lootItem.buffs.required.length) condParts.push(`Only if ${lootItem.buffs.required.join(', ')}`)
+  if (lootItem.buffs.forbidden.length) condParts.push(`Never if ${lootItem.buffs.forbidden.join(', ')}`)
+  const condCell = condParts.join('<br>')
+
+  // Modifiers
+  const modParts = []
+  for (const m of lootItem.buffs.modifiers) {
+    modParts.push(`${m.name}: ${m.value > 0 ? '+' : ''}${m.value}%`)
+  }
+  const modCell = modParts.join('<br>')
+
+  return `| ${itemCell} | ${tierCell} | ${amountCell} | ${condCell} | ${modCell} |`
+}
+
 // ///////// //
 // SANS BUFF //
 // ///////// //
