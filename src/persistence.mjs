@@ -1,6 +1,6 @@
 import {MICROTASK} from './constant.mjs'
 import {database} from './database.mjs'
-import {taskScheduler} from './utils.mjs'
+import {taskScheduler, timeManager} from './utils.mjs'
 import {chunkManager} from './world.mjs'
 
 class SaveManager {
@@ -80,6 +80,12 @@ class SaveManager {
     taskScheduler.enqueue('auto_save', 2000, this.processSave.bind(this), this.priority, this.capacity)
 
     const batchPayload = []
+
+    // --- A. Timestamp (toujours sauvegardé) ---
+    batchPayload.push({
+      storeName: 'gamestate',
+      record: {key: 'timestamp', value: timeManager.timestamp}
+    })
 
     // --- A. Récupération des Chunks (Layer 2 -> Layer 2) ---
     // chunkManager doit exposer une méthode getDirtyChunksData() retournant
