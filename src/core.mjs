@@ -8,7 +8,7 @@ import {chunkManager} from './world.mjs'
 import {saveManager} from './persistence.mjs'
 import {camera, worldRenderer} from './render.mjs'
 import {buffManager} from './buff.mjs'
-import {creationDialogOverlay} from './ui.mjs'
+import {creationDialogOverlay, seedWidget} from './ui.mjs'
 import {helpOverlay} from './help.mjs'
 import './ui-debug.mjs'
 import './inventory.mjs'
@@ -243,6 +243,7 @@ class GameCore {
     // Lancement de la sauvegarde périodique (toutes les deux secondes)
     saveManager.init()
 
+    seedWidget.init(state.randomkey)
     buffManager.init()
     // hiveSystem.init(JSON.parse(state.hives)) // TODO
     // cobwebSystem.init(JSON.parse(state.cobwebcaves)) // TODO

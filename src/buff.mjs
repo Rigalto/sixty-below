@@ -100,8 +100,8 @@ class BuffManager {
     // debug
     // this.#values.set('buff1', 50)
     // this.#values.set('buff2', 0)
-    // this.#values.set('dyn1', 100)
-    // this.timestamps.set('dyn1', timeManager.timestamp + 124000)
+    this.#values.set('dyn1', 100)
+    this.timestamps.set('dyn1', timeManager.timestamp + 124000)
   }
 
   onDaily ({weather, moonPhase}) {
@@ -249,7 +249,7 @@ class BuffWidget {
         textAlign: 'center',
         lineHeight: '1',
         minHeight: '12px',
-
+        userSelect: 'none',
         color: '#ffffff',
         textShadow: '1px 1px 2px #000000'
       })

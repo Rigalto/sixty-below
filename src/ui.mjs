@@ -493,7 +493,8 @@ class EnvironmentWidget {
       boxShadow: '0 2px 10px rgba(0,0,0,0.5)',
       display: 'flex',
       flexDirection: 'column',
-      gap: '6px'
+      gap: '6px',
+      userSelect: 'none'
     })
 
     // 2. Injection du HTML Statique
@@ -774,3 +775,48 @@ export function createOverlayHeader (titleText, overlayId) {
 
   return header
 }
+
+/* ====================================================================================================
+   AFFICHAGE DE LA CLEF DU MONDE
+   ==================================================================================================== */
+
+class SeedWidget {
+  #span
+
+  constructor () {
+    const container = document.createElement('div')
+    Object.assign(container.style, {
+      order: UI_LAYOUT.WORLD_KEY,
+      padding: '2px 6px',
+      fontSize: '18px',
+      color: '#000',
+      fontFamily: 'monospace',
+      userSelect: 'none'
+    })
+
+    container.textContent = 'World Seed: '
+
+    this.#span = document.createElement('span')
+    Object.assign(this.#span.style, {
+      color: '#000',
+      userSelect: 'text',
+      cursor: 'text',
+      textShadow: '0 0 4px #ffffff'
+    })
+    this.#span.title = 'Double-click to select, Ctrl-C to copy'
+    container.appendChild(this.#span)
+
+    const rightSidebar = document.getElementById('right-sidebar')
+    if (rightSidebar) {
+      rightSidebar.appendChild(container)
+    } else {
+      console.error('SeedWidget: #right-sidebar introuvable')
+    }
+  }
+
+  init (seed) {
+    this.#span.textContent = seed
+  }
+}
+
+export const seedWidget = new SeedWidget()
