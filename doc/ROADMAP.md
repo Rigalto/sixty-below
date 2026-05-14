@@ -7,12 +7,16 @@
 
 ## En cours
 
-- conception du buffManager
+- conception de `InventoryManager` et `InventoryOverlay`
+- conception de `CraftOverlay` et du tableau des recettes (`RECIPES`)
+- Ajout de l'aide pour les recettes (Markdown `{{recipes:...}}`)
+- Ajout d'un mock-up de l'interface de combat : `CombatOverlay` avec juste deux boutons : `Win` et `Lost`
+- continuer la correction et l'ajout de fiches d'aide (`HELP`) et d'items (`ITEMS`)
+- corriger les deux premiers bugs connus
 
 ---
 
 ## À faire — Bugs connus
-- Dans le panel qui génère un nouveau monde, il faut pouvoir rendre le champ input vide (il est rempli par '1' lorsque l'on tente de le vider, rendant très difficile l'entrée d'une graine ne commençant pas par 1)
 - Ajouter dans le panel de droite la clé courante de génération du monde
 - Il n'y a pas assez de Cactus dans le monde => sans doute pas assez de SAND sur le sol souterrain.
 - Il n'y a pas assez de Bamboo dans le monde => sans doute pas assez de SILT sur le sol souterrain.
@@ -23,6 +27,15 @@
 - dans le control panel, l'heure ne doit pas être sélectinnable
 - dans le control panel, le survol de l'heure doit donner la période du jour (dawn...)
 
+
+---
+
+## À faire — BuffManager
+
+- récupération des timer buffs dans la fonction `init`, lancement `TaskScheduler`
+- traitement de chaque `eventBus` qui impacte un ou plusieurs buff
+- implémenter les buffs composés à chaque fois que l'un d'entre eux est défini (`#fns`)
+- vérifier que l'affichage des anciens buffs après création du monde pendant une seconde max est acceptable
 
 ---
 
@@ -141,7 +154,6 @@ fs.writeFileSync('docs/help-rendered.html', htmlHelp.join('\n'))
 - Panel carte (touche M, échelle 1/16)
 - Buffs/debuffs actifs
 - Panel combat (overlay tactique)
-- Panel aide
 
 ---
 
@@ -233,6 +245,21 @@ fs.writeFileSync('docs/help-rendered.html', htmlHelp.join('\n'))
 - `plantGenerator.placeCursedcrowns` - ajout des Cursedcrowns en Caverns / DESERT + JUNGLE
 - `plantGenerator.placeAbysshorns` - ajout des Abysshorns en Caverns_top
 - `plantGenerator.placeInferncaps` - ajout des Inferncaps en Caverns_bottom
+
+### Overlays
+- Gestion des dialogue modaux (`ModalBlocker`, `createOverlayHeader`)
+- Nouveau monde (`CreationDialogOverlay`)
+- Help Panel (`HelpOverlay` et `hydrateHelp`) :
+  - Markdown standard
+  - Templates avec paramètres ``<<...>>`
+  - Liens inter-fiches `[[title]]`
+  - Liens `[[item:...]]` et `[[node:...]]`
+  - Informations dynamiques : `{{node:...}}` et `{{item:...}}`
+- Control Panel
+  - `MenuBarWidget`
+  - `EnvironmentWidget`
+  - `BuffWidget`
+  - `RealtimeDebugWidget`
 
 ### Rendu (partiel)
 - `WorldRenderer` — rendu tuiles par chunks avec cache OffscreenCanvas

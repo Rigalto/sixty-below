@@ -151,6 +151,11 @@ class WorldGenerator {
       return new Promise(resolve => setTimeout(resolve, 0))
     }
 
+    // TO BE DESIGNED
+    // Il faudra peut-être appeler le buffManager pour qu'il supprime tous les buffs en cours.
+    // Ainsi, il n'y aura pas de risque d'affichage invorrect dans le BuffWidget dont
+    // l'affichage pariodique (1s) est décorrellé de la boucle temps réel
+
     // 0. Initialisation du buffer de génération et des object stores
     worldBuffer.init()
     furnitureGenerator.init()
