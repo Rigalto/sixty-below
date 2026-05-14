@@ -507,6 +507,9 @@ class WorldGenerator {
     await database.clearObjectStore('inventory')
     await database.addMultipleRecords('inventory', furnitureGenerator.inventory)
 
+    // sauvegarde des buffs
+    await database.clearObjectStore('buff')
+
     console.log('Temps sauvegarde en base de données', window.performance.now() - start)
   }
 }
