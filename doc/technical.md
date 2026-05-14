@@ -253,6 +253,8 @@ Cette section définit les événements officiels. Tout nouvel événement doit 
 | `map/open`| - | Affichage de la carte au 1/16e. |
 | `map/close`| - | Disparition de la carte au 1/16e. |
 | `debug/frame-sample`| `{updateTime, renderTime, microTime}` | Temps exécution dans la loop pour les 3 budgets. |
+| `debug/buff-manager` | _(none)_ | Affiche sur la console le contenu de `#values` et `#fns`. |
+
 
 ---
 

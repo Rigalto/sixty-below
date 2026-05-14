@@ -440,7 +440,13 @@ export const ITEMS = {
   clayPot4: {name: 'Clay Pot (2x2)', type: ITEM_TYPE.FURNITURE | ITEM_TYPE.PLACABLE | ITEM_TYPE.CRAFTABLE, stype: 'pot', star: 1, capacity: 4, image: 'furniture_32_32-3-8', surface: true, placed: 'fuws_32_32-0-4', placedleft: 'fuws_32_32-1-4', placedright: 'fuws_32_32-2-4', help: 'Clay Pots', tooltip: 'Gardening Container'},
 
   // Accessories
-  bottledFrog: {name: 'Bottled Frog', type: ITEM_TYPE.ACCESSORY | ITEM_TYPE.CRAFTABLE, stype: 'pot', star: 3, image: 'furniture_32_32-3-8', help: 'Weather', tooltip: 'When in Inventory, give weather forecasts'}
+
+  // Trinkets
+  clockCopper: {name: 'Copper Clock', type: ITEM_TYPE.ACCESSORY | ITEM_TYPE.CRAFTABLE, stype: 'trinket', star: 2, image: 'furniture_32_32-3-8', help: 'Clocks', tooltip: 'When in Inventory, increases Time accuracy'},
+  clockSilver: {name: 'Silver Clock', type: ITEM_TYPE.ACCESSORY | ITEM_TYPE.CRAFTABLE, stype: 'trinket', star: 3, image: 'furniture_32_32-3-8', help: 'Clocks', tooltip: 'When in Inventory, increases Time accuracy'},
+  clockGold: {name: 'Gold Clock', type: ITEM_TYPE.ACCESSORY | ITEM_TYPE.CRAFTABLE, stype: 'trinket', star: 4, image: 'furniture_32_32-3-8', help: 'Clocks', tooltip: 'When in Inventory, increases Time accuracy'},
+  bottledFrog: {name: 'Bottled Frog', type: ITEM_TYPE.ACCESSORY | ITEM_TYPE.CRAFTABLE, stype: 'trinket', star: 3, image: 'furniture_32_32-3-8', help: 'Bottled Frog', tooltip: 'When in Inventory, give weather forecasts'},
+  sextant: {name: 'Sextant', type: ITEM_TYPE.ACCESSORY | ITEM_TYPE.CRAFTABLE, stype: 'trinket', star: 3, image: 'furniture_32_32-3-8', help: 'Sextant', tooltip: 'When in Inventory, increases Moon Phases accuracy'}
 }
 export const BAG_CAPACITY = 64
 

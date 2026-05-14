@@ -20,7 +20,8 @@
 - Il est aussi possible que le sol soit trop accidenté pour disposer de spots élligibles en nombre suffisant, il faudrait ajouter alors une érosion partielle, en bouchant les trous et supprimant les bosses dans 80-90% des cas.
 - Génération du monde : densité un peu trop faible des tunnels en Surface
 - Génération du monde : densité trop élevée des tunnels en Underground et Caverns (revoir les constantes `SMALL_TUNNELS_COUNT` et `CAVERNS_TUNNEL_COUNT`)
-
+- dans le control panel, l'heure ne doit pas être sélectinnable
+- dans le control panel, le survol de l'heure doit donner la période du jour (dawn...)
 
 
 ---

@@ -2189,7 +2189,7 @@ Shell is a sedimentary material formed from ancient marine organisms. It is foun
     title: 'Housing Buffs',
     category: ['Buff', 'Housing'],
     content: `
-    Managed trough the [[item:noticeBoard]].
+Managed trough the [[item:noticeBoard]].
     `
   },
   {
@@ -2231,7 +2231,7 @@ Shell is a sedimentary material formed from ancient marine organisms. It is foun
   },
 
   // ── Accessories ──────────────────────────────────────────────
-  //    Accessories, Trinkets, Triskels
+  //    Accessories, Trinkets, Clocks, Sextant , Triskels
 
   {
     title: 'Accessories',
@@ -2243,6 +2243,67 @@ Shell is a sedimentary material formed from ancient marine organisms. It is foun
     title: 'Trinkets',
     category: ['Accessory', 'Buff'],
     content: `
+**Description**
+
+Dire que ce sont des accessoires qui sont actifs dès lors qu'il se trouvent dans l'[[Inventory]] sans être obligé de les équiper (les placer dans un 'Accessory Slot').
+
+**Trinket List**
+
+| Trinket | Tier | Effect |
+|---|---|---|
+| [[item:clockCopper]] | {{item:clockCopper:star|star}} | Improve [[Day & Night Cycle|Time]] accuracy |
+| [[item:clockSilver]] | {{item:clockSilver:star|star}} | Improve [[Day & Night Cycle|Time]] accuracy |
+| [[item:clockGold]] | {{item:clockGold:star|star}} | Improve [[Day & Night Cycle|Time]] accuracy |
+| [[item:bottledFrog]] | {{item:bottledFrog:star|star}} | Improve [[Weather]] accuracy |
+| [[item:sextant]] | {{item:sextant:star|star}} | Improve [[Moon Phases]] accuracy |
+    `
+  },
+  {
+    title: 'Bottled Frog',
+    category: ['Accessory'],
+    content: `
+    `
+  },
+  {
+    title: 'Clocks',
+    category: ['Accessory'],
+    content: `
+**Description**
+
+Clocks are [[Trinkets|Trinket]]s which give [[Day & Night Cycle|time]] more accurately.
+
+⏳
+
+| Clock | Tier | Accuracy |
+|---|---|---|
+| [[item:clockCopper]] | {{item:clockCopper:star|star}} | 1 in-game hour |
+| [[item:clockSilver]] | {{item:clockSilver:star|star}} | 15 in-game minutes |
+| [[item:clockGold]] | {{item:clockGold:star|star}} | 5 in-game minutes |
+
+_without any clock, the precision is 3 hours._
+
+Ajouter un paragraphe 'How to use', qui sera générique pour tous les trinkets (template) avec en paramètre l'identifiant du trinket
+
+Ajouter un paragraphe qui donne la recette de fabrication (générique)
+    `
+  },
+  {
+    title: 'Sextant',
+    category: ['Accessory'],
+    content: `
+**Description**
+
+The [[item:sextant]] is a [[Trinkets|Trinket]] which give [[Moon Phases]] more accurately.
+Dire qu'il y a seulement 4 [[Moon Phases]] distingables sans sextant et 8 avec le sextant.
+
+**Tier**
+
+{{item:flamethrower:star|star}}
+
+
+Ajouter un paragraphe 'How to use', qui sera générique pour tous les trinkets (template) avec en paramètre l'identifiant du trinket
+
+Ajouter un paragraphe qui donne la recette de fabrication (générique)
     `
   },
   {
@@ -3096,7 +3157,7 @@ Food restores health and provides temporary buffs. More elaborate preparations r
 
 All plants found in the world of Sixty-Below. Plants can be harvested for loot, and some may trigger an encounter when disturbed. Some plants can also be cultivated through [[Gardening]].
 
-## Wild Plants
+**Wild Plants**
 
 | Name | Tier | Type | Location | Main Loot | Encounters |
 |---|---|---|---|---|---|
@@ -3119,26 +3180,23 @@ All plants found in the world of Sixty-Below. Plants can be harvested for loot, 
 | [[item:fernG]] | {{item:fernG:star|star}} | Herb | Fern Cave / [[node:grassfern]] | [[item:fernLeaf]] | [[monster:dendrobate]] /  [[monster:mamba]] (Foraging) |
 | [[item:fernM]] | {{item:fernM:star|star}} | Herb | Fern Cave / [[node:grassfern]] | [[item:fernLeaf]] | [[monster:dendrobate]] /  [[monster:mamba]] (Foraging) |
 | [[item:velvetmoss]] | {{item:velvetmoss:star|star}} | Herb | Moss Cave / [[node:grassmoss]] | [[item:velvetmoss]] | [[monster:woodlouse]] (Foraging) |
-
 | [[item:frostcap]] | {{item:frostcap:star|star}} | Herb | Mushroom Cave / [[node:grassmushroom]] | [[item:mushroomGill]] | [[monster:woodlouse]] (Foraging) |
 | [[item:dawncap]] | {{item:dawncap:star|star}} | Herb | Mushroom Cave / [[node:grassmushroom]] | [[item:mushroomGill]] | [[monster:woodlouse]] (Foraging) |
 | [[item:mandrake]] | {{item:mandrake:star|star}} | Herb | FOREST Underground / [[node:dirt]] | [[item:mandrakeRoot]] | [[monster:wraith]] (Foraging) |
 | [[item:cactus]] | {{item:cactus:star|star}} | Herb | DESERT Underground / [[node:sand]] | [[item:cactus]] | [[monster:scorpion]] (Foraging) |
 | [[item:bamboo]] | {{item:bamboo:star|star}} | Herb | JUNGLE Underground / [[node:silt]] | [[item:bambooStalk]] | [[monster:centipede]] (Foraging) |
 | [[item:oleander]] | {{item:oleander:star|star}} | Herb | Underground / [[node:stone]] | [[item:oleander]] | [[monster:caveBeetle]] (Foraging) |
-
 | [[item:satansCube]] | {{item:satansCube:star|star}} | Herb | FOREST+DESERT Caverns | [[item:satansCube]] | [[monster:firesalamander]] (Foraging) |
 | [[item:sneakthorn]] | {{item:sneakthorn:star|star}} | Herb | FOREST+JUNGLE Caverns | [[item:sneakthorn]] | [[monster:vampire]] (Foraging) |
 | [[item:cursedcrown]] | {{item:cursedcrown:star|star}} | Herb | JUNGLE+DESERT Caverns | [[item:cursedcrown]] | [[monster:fireAnt]] (Foraging) |
-
 | [[item:abysshorn]] | {{item:abysshorn:star|star}} | Herb | Caverns top | [[item:abysshorn]] | [[monster:caveJellyfish]] (Foraging) |
 | [[item:inferncap]] | {{item:inferncap:star|star}} | Herb | Caverns bottom | [[item:inferncap]] | [[monster:lavaWorm]] / [[monster:magmaCrab]] (Foraging) |
 
 _For detailed information on each plant, click its name._
 
-## Gardening ⏳
+**Gardening** ⏳
 
-Plants cultivated in [[Clay Pots]] stacked in [[Underground]] and [[Caverns]] zones. These plants are not found in the wild and require active care from the player.
+Plants cultivated in [[item:clayPot1||Clay Pots]] stacked in [[Underground]] and [[Caverns]] zones. These plants are not found in the wild and require active care from the player.
 
 _Gardening plants and their details will be added in a future update._ ⏳
   `
@@ -4461,27 +4519,112 @@ The world of Sixty-Below follows a continuous day/night cycle, shaped by time, [
 | Evening | 18:00 | 20:59 | Day |
 | Night | 21:00 | 23:59 | Night |
 
+**Display and Accuracy**
+
+The current time is displayed in the [[Control Panel]], below the action icons.
+
+By default, time is shown with a 3-hour precision.
+
+Carrying one of the following [[Trinkets]] in your [[Inventory]] improves accuracy:
+
+| Clock | Tier | Accuracy |
+|---|---|---|
+| [[item:clockCopper]] | {{item:clockCopper:star|star}} | 1 in-game hour |
+| [[item:clockSilver]] | {{item:clockSilver:star|star}} | 15 in-game minutes |
+| [[item:clockGold]] | {{item:clockGold:star|star}} | 5 in-game minutes |
+
 **Tips**
 
 * _Night lasts 6 in-game hours — make sure you are sheltered before 21:00._ ⏳
 * _Dawn and Midnight are the most dangerous periods — monsters are most active._ ⏳
+* _Use [[item:clockCopper|Clocks]], [[item:bottledFrog]] and [[item:sextant]] for precise environment tracking._
   `
   },
   {
     title: 'Weather',
     category: ['Gameplay', 'Plant', 'Foraging', 'Fishing'],
     content: `
+**Description**
 
-    **Buffs**
+Weather changes every night at midnight and lasts the full day.
+The current weather is displayed in the [[Control Panel]], beside the [[Moon Phases|moon phase]].
 
-    If [[item:bottledFrog]] accessory is in your [[Inventory]], the weather for tomorow is displayed at the right of current weather.
-    `
+**Weather Types**
+
+| Type | Description |
+|---|---|
+| Sunny | Clear skies and bright sunlight |
+| Cloudy | Overcast with diffuse light |
+| Rainy | Steady rainfall |
+| Windy | Strong air currents |
+| Stormy | Heavy rain with lightning |
+
+**Forecast**
+
+Carrying a [[item:bottledFrog]] in your [[Inventory]] displays tomorrow's weather in the [[Control Panel]].
+
+**Effects**
+
+* Monster spawn rates and types ⏳
+* Loot drop rates and available items ⏳
+* [[Flora|Plant]] growth speed and harvest cycles ⏳
+* [[Fishing]] conditions ⏳
+* Triggering or preventing certain [[Events]] ⏳
+
+**Tips**
+
+* _Plan your activities around the forecast — a Stormy day may unlock rare drops._
+* _Use [[item:clockCopper|Clocks]], [[item:bottledFrog]] and [[item:sextant]] for precise environment tracking._
+  `
   },
   {
     title: 'Moon Phases',
     category: ['Gameplay', 'Plant', 'Foraging', 'Fishing'],
     content: `
-    `
+**Description**
+
+The moon progresses through an eight-phase cycle, changing every night at midnight.
+Its current phase is visible in the [[Control Panel]].
+
+**Moon Cycle**
+
+| # | Phase | Description |
+|---|---|---|
+| 1 | Full Moon | Entire circular moon visible |
+| 2 | Waning Gibbous | Mostly visible, right side darkening |
+| 3 | Third Quarter | Left half visible |
+| 4 | Waning Crescent | Thin left crescent visible |
+| 5 | New Moon | No moon visible |
+| 6 | Waxing Crescent | Thin right crescent visible |
+| 7 | First Quarter | Right half visible |
+| 8 | Waxing Gibbous | Mostly visible, left side filling |
+
+The cycle begins with a Full Moon upon world creation and repeats every eight nights.
+
+**Display**
+
+By default, four icons are used to represent the eight phases:
+
+* _Full Moon_ icon — Waning Gibbous, Full Moon, Waxing Gibbous
+* _Third Quarter_ icon — Third Quarter, Waning Crescent
+* _New Moon_ icon — New Moon
+* _First Quarter_ icon — Waxing Crescent, First Quarter
+
+The [[Sextant]] displays a unique icon for each of the eight phases.
+It does not need to be equipped — carrying it in your [[Inventory]] is enough.
+
+**Effects** ⏳
+
+* Enemy spawn rates
+* [[Fishing]] power
+* [[Flora|Plant]] life cycle — growth stages and harvesting
+* Other gameplay mechanics ⏳
+
+**Tips**
+
+* _Plan activities around beneficial moon phases._
+* _Use [[item:clockCopper|Clocks]], [[item:bottledFrog]] and [[item:sextant]] for precise environment tracking._
+  `
   }
 ]
 

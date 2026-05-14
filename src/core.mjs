@@ -497,6 +497,7 @@ class GameCore {
     eventBus.debugStats()
     microTasker.debugStats()
     taskScheduler.debugStats()
+    eventBus.emit('debug/buff-manager')
   }
 }
 export const gameCore = new GameCore()
