@@ -358,7 +358,7 @@ class GameCore {
     let dt = timestamp - this.lastTime
     this.lastTime = timestamp
 
-    // --- ACCELERATION DU TEMPS (Sleepng) ---
+    // --- ACCELERATION DU TEMPS (Sleeping) ---
     if (buffManager.getBuff('sleeping')) { dt = dt * 2 }
 
     // --- PROTECTION TEMPORELLE ---

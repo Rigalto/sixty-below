@@ -604,6 +604,7 @@ export class TimeManager {
     this.timestamp += dt
     this.#recalculateAndEmit()
     this.#isFirstLoop = false
+    return this.timestamp
   }
 
   #recalculateAndEmit () {

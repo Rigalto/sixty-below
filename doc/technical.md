@@ -1030,3 +1030,76 @@ des tuiles adjacentes (`NODES.color`).
 * `for` ou `for…of` dans les hot paths. Jamais de `map`/`filter`/`forEach`.
 * Singletons exportés en minuscule (`export const chunkManager = new ChunkManager()`).
 * Les fonctions passées à `MicroTasker` doivent être des méthodes bindées — pas de lambdas anonymes.
+
+## 15. Divers
+
+### Class `BuffManager` (`src/buff.mjs`) — Singleton : `buffManager`
+
+Gestion centralisée des buffs du joueur. Deux phases obligatoires : `init()` puis abonnements `eventBus`.
+
+#### Champs
+
+| Champ | Type | Description |
+| :--- | :--- | :--- |
+| `#values` | `Map<string, number\|boolean>` | Valeurs brutes des buffs élémentaires. Mise à jour via `eventBus`. |
+| `#fns` | `Map<string, () => number>` | Fonctions de calcul des buffs composés. |
+| `timestamps` | `Map<string, number>` | Timestamps d'expiration des buffs timed (ms jeu). Lu par `BuffWidget`. |
+
+#### Notation
+
+| Notation | Type | Exemple |
+| :--- | :--- | :--- |
+| camelCase | élémentaire | `armorHelmetMiningSpeed`, `rainy`, `lucky` |
+| kebab-case | composé | `mining-speed`, `movement-speed` |
+
+#### Méthodes
+
+| Méthode | Signature | Description |
+| :--- | :--- | :--- |
+| `init` | `() → void` | Initialise les buffs environnementaux à `false`/`0`. S'abonne aux eventBus. |
+| `getBuff` | `(name: string) → number` | `#values.get(name) ?? #fns.get(name)?.() ?? 0` |
+| `getBuffs` | `(names: string[]) → Object` | Retourne `{name: value}` pour chaque nom. |
+| `onDaily` | `({moonPhase, weather}) → void` | Handler `time/daily` + `time/first-loop`. Met à jour lune et météo. |
+| `onTimeslot` | `({tslot, isDay}) → void` | Handler `time/timeslot` + `time/first-loop`. Met à jour le cycle circadien. |
+| `onDebug` | `() → void` | Handler `debug/buff-manager`. Affiche `#values` et `#fns` sur la console. |
+
+#### Buffs environnementaux initialisés
+
+| Groupe | Clés | Source |
+| :--- | :--- | :--- |
+| Lune | `fullMoon` `waningGibbous` `thirdQuarter` `waningCrescent` `newMoon` `waxingCrescent` `firstQuarter` `waxingGibbous` | `time/daily` |
+| Météo | `sunny` `cloudy` `rainy` `windy` `stormy` | `time/daily` |
+| Cycle | `midnight` `dawn` `morning` `noon` `afternoon` `dusk` `evening` `night` `isDay` `isNight` | `time/timeslot` |
+
+#### Buffs timed (à implémenter lors du premier buff timed)
+
+Structure objectStore `buff` : `{key, id, buff, value, expiration, deleted}`.
+Au démarrage, `core.mjs` supprime en base les enregistrements 'deleted===true), et passe les enregistrements non supprimés à `init()` → `taskScheduler.enqueueAbsolute`.
+À l'expiration : valeur remise à `0`, enregistrement marqué `deleted=true` en DB, suppression retardée au prochain lancement.
+
+### Class `BuffWidget` (`src/buff.mjs`) — Singleton : `buffWidget`
+
+Affiche les buffs actifs dans le Control Panel (`UI_LAYOUT.BUFF = 40`).
+Indépendant de la boucle principale — `setInterval` 1 seconde.
+Toutes les refs DOM précalculées à l'init. Zéro parcours DOM en runtime.
+
+#### `DISPLAY_BUFFS`
+
+Tableau de définitions `{id, title, x, y}` — coordonnées dans `assets/sprites/buff_32_32.png` (tuiles 32×32px).
+`id === 'armors'` : toujours visible, title dynamique mis à jour à la fermeture de l'inventaire.
+
+#### Comportement `#update` (chaque seconde)
+
+1.buffManager.getBuffs(#buffIds)  — un seul appel pour tous les buffs statiques
+2. Pour chaque buff :
+  * id === 'armors'                → toujours display:flex, skip
+  * buffManager.timestamps.get(id) → buff timed : affiche remaining (ceil((exp-now)/1000)), caché si ≤ 0
+  * sinon                          → buff statique : display selon valeur truthy/falsy
+
+#### Champs privés
+
+| Champ | Description |
+| :--- | :--- |
+| `#container` | Élément racine injecté dans `#right-sidebar` |
+| `#refs` | `Map<id, {el, timeEl}>` — refs DOM précalculées |
+| `#buffIds` | `string[]` — ids filtrés (sans `armors`), précalculés dans le constructeur |

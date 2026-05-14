@@ -1,4 +1,5 @@
-import {eventBus} from './utils.mjs'
+import {eventBus, timeManager} from './utils.mjs'
+import {UI_LAYOUT} from './constant.mjs'
 // import {timeManager, taskScheduler, microTasker, eventBus} from './utils.mjs'
 
 /**
@@ -66,6 +67,7 @@ const TIMESLOT_BUFF_KEYS = ['midnight', 'dawn', 'morning', 'noon', 'afternoon', 
 class BuffManager {
   #values = new Map() // valeurs brutes : rainy, lucky, armorHelmetMiningSpeed...
   #fns = new Map() // fonctions pur buffs composés : mining-speed, movement-speed...
+  timestamps = new Map() // buffId → expiration (timed uniquement)
   #currentWeather
   #currentTimeslot
 
@@ -94,6 +96,12 @@ class BuffManager {
 
     this.onDebug = this.onDebug.bind(this)
     eventBus.on('debug/buff-manager', this.onDebug)
+
+    // debug
+    this.#values.set('buff1', 50)
+    this.#values.set('buff2', 0)
+    this.#values.set('dyn1', 100)
+    this.timestamps.set('dyn1', timeManager.timestamp + 124000)
   }
 
   onDaily ({weather, moonPhase}) {
@@ -162,6 +170,135 @@ export const buffManager = new BuffManager()
    AFFICHAGE DES BUFFS ACTIFS
    ==================================================================================================== */
 
+/* ====================================================================================================
+   AFFICHAGE DES BUFFS ACTIFS
+   ==================================================================================================== */
+
+// Définition des buffs affichables
+// { id, title, x, y, timed }
+// x, y : coordonnées dans buff_32_32.png (multiples de 32)
+const DISPLAY_BUFFS = [
+  {id: 'armors', title: 'Armors', x: -128, y: 0},
+  {id: 'buff1', title: 'Buff 1', x: 0, y: 0},
+  {id: 'buff2', title: 'Buff 2', x: -32, y: 0},
+  {id: 'dyn1', title: 'Dynamic Buff 1', x: -64, y: 0},
+  {id: 'dyn2', title: 'Dynamic Buff 2', x: -96, y: 0}
+]
+
 class BuffWidget {
+  #container
+  #intervalId = null
+  #buffIds
+
+  // Refs DOM précalculées : Map<id, {el, timeEl}>
+  #refs = new Map()
+
+  constructor () {
+    this.#buildDOM()
+    this.#startInterval()
+    // Précalculé une fois de la liste des buffs
+    this.#buffIds = DISPLAY_BUFFS.filter(def => def.id !== 'armors').map(def => def.id)
+  }
+
+  #buildDOM () {
+    this.#container = document.createElement('div')
+    this.#container.id = 'buff-widget'
+    Object.assign(this.#container.style, {
+      display: 'flex',
+      flexWrap: 'wrap',
+      gap: '4px',
+      padding: '6px',
+      backgroundColor: 'rgba(60, 65, 75, 0.9)',
+      border: '1px solid #444',
+      borderRadius: '6px',
+      width: '100%',
+      boxSizing: 'border-box',
+      order: UI_LAYOUT.BUFF, // ← position dans le Control Panel
+      marginBottom: '10px',
+      boxShadow: '0 2px 10px rgba(0,0,0,0.5)'
+    })
+
+    for (const def of DISPLAY_BUFFS) {
+      const el = document.createElement('div')
+      el.title = def.title
+      Object.assign(el.style, {
+        display: def.id === 'armors' ? 'flex' : 'none',
+        flexDirection: 'column',
+        alignItems: 'center',
+        width: '32px',
+        cursor: 'default'
+      })
+
+      // Icône via ::before simulé avec un div dédié
+      const icon = document.createElement('div')
+      Object.assign(icon.style, {
+        width: '32px',
+        height: '32px',
+        backgroundImage: 'url(assets/sprites/buff_32_32.png)',
+        backgroundRepeat: 'no-repeat',
+        backgroundPosition: `${def.x}px ${def.y}px`,
+        imageRendering: 'pixelated',
+        flexShrink: '0'
+      })
+      el.appendChild(icon)
+
+      // Temps restant
+      const timeEl = document.createElement('div')
+      Object.assign(timeEl.style, {
+        fontSize: '10px',
+        // color: '#cccccc',
+        textAlign: 'center',
+        lineHeight: '1',
+        minHeight: '12px',
+
+        color: '#ffffff',
+        textShadow: '1px 1px 2px #000000'
+      })
+      el.appendChild(timeEl)
+
+      this.#container.appendChild(el)
+      this.#refs.set(def.id, {el, timeEl, timed: def.timed})
+    }
+
+    // Injection dans le Control Panel
+    const rightSidebar = document.getElementById('right-sidebar')
+    if (rightSidebar) {
+      rightSidebar.appendChild(this.#container)
+    } else {
+      console.error('BuffWidget: #right-sidebar introuvable')
+    }
+  }
+
+  #startInterval () {
+    this.#intervalId = setInterval(() => this.#update(), 1000)
+  }
+
+  #update () {
+    const now = timeManager.timestamp
+    const values = buffManager.getBuffs(this.#buffIds)
+
+    for (const def of DISPLAY_BUFFS) {
+      if (def.id === 'armors') continue
+      const {el, timeEl} = this.#refs.get(def.id)
+      const value = values[def.id]
+      const expiration = buffManager.timestamps.get(def.id)
+
+      if (expiration) {
+        // buff timed
+        const remaining = Math.ceil((expiration - now) / 1000)
+        if (remaining > 0) {
+          el.style.display = 'flex'
+          timeEl.textContent = remaining
+        } else {
+          el.style.display = 'none'
+          timeEl.textContent = ''
+        }
+      } else {
+        // buff statique : value = truthy/falsy
+        el.style.display = value ? 'flex' : 'none'
+      }
+    }
+  }
 }
+
 export const buffWidget = new BuffWidget()
