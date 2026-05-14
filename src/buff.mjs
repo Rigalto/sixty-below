@@ -98,10 +98,10 @@ class BuffManager {
     eventBus.on('debug/buff-manager', this.onDebug)
 
     // debug
-    this.#values.set('buff1', 50)
-    this.#values.set('buff2', 0)
-    this.#values.set('dyn1', 100)
-    this.timestamps.set('dyn1', timeManager.timestamp + 124000)
+    // this.#values.set('buff1', 50)
+    // this.#values.set('buff2', 0)
+    // this.#values.set('dyn1', 100)
+    // this.timestamps.set('dyn1', timeManager.timestamp + 124000)
   }
 
   onDaily ({weather, moonPhase}) {
@@ -187,7 +187,6 @@ const DISPLAY_BUFFS = [
 
 class BuffWidget {
   #container
-  #intervalId = null
   #buffIds
 
   // Refs DOM précalculées : Map<id, {el, timeEl}>
@@ -269,8 +268,11 @@ class BuffWidget {
     }
   }
 
+  // setInterval 1s — toujours actif, même overlay ouvert ou génération nouveau monde en cours.
+  // Si affichage erroné pendant génération : remettre les buffs à false avant génération
+  // (objectStore buff écrasé de toute façon). Ne pas arrêter/relancer le setInterval.
   #startInterval () {
-    this.#intervalId = setInterval(() => this.#update(), 1000)
+    setInterval(() => this.#update(), 1000)
   }
 
   #update () {
