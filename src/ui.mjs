@@ -247,8 +247,10 @@ class CreationDialogOverlay {
     })
 
     seedInput.addEventListener('input', function () {
-      if (this.value < 1) this.value = 1
-      if (this.value > 99999) this.value = (this.value / 10) | 0
+      if (this.value !== '' && this.value > 99999) this.value = (this.value / 10) | 0
+
+      // if (this.value < 1) this.value = 1
+      // if (this.value > 99999) this.value = (this.value / 10) | 0
     })
 
     seedContainer.appendChild(seedLabel)
