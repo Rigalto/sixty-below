@@ -433,6 +433,8 @@ export const creationDialogOverlay = new CreationDialogOverlay()
    AFFICHAGE DATE/HEURE METEO LUNE POSITION
    ==================================================================================================== */
 
+const TIMESLOT_NAMES = ['Midnight', 'Dawn', 'Morning', 'Noon', 'Afternoon', 'Dusk', 'Evening', 'Night']
+
 class EnvironmentWidget {
   #boundUpdateCoords = null // Référence pour on/off dynamique
 
@@ -554,6 +556,8 @@ class EnvironmentWidget {
     eventBus.on('buff/display-next-weather', this.#toggleNextWeather.bind(this))
     // (estimation : 50µs, microtask inutile)
     eventBus.on('buff/display-coords', this.#toggleCoords.bind(this))
+    // (estimation : 50µs, microtask inutile)
+    eventBus.on('time/timeslot', this.#updateTimeslot.bind(this))
 
     // TODO: Future: player/move -> Coords
     // eventBus.on('player/move', (pos) => this.#updateCoords(pos))
@@ -566,6 +570,7 @@ class EnvironmentWidget {
   #firstloopEnvironment (data) {
     this.#updateClockEnvironment(data)
     this.#updateEnvironment(data)
+    this.#updateTimeslot(data)
   }
 
   // temps d'exécution mesuré à 0.05 ms
@@ -587,6 +592,10 @@ class EnvironmentWidget {
       this.dom.time.textContent = timeStr
       this.lastState.minuteStr = timeStr
     }
+  }
+
+  #updateTimeslot ({tslot}) {
+    this.dom.time.title = TIMESLOT_NAMES[tslot]
   }
 
   #updateEnvironment ({day, weather, nextWeather, moonPhase}) {
