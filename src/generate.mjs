@@ -6448,11 +6448,13 @@ class FurnitureGenerator {
   addFurnitureAt (index, code) {
     const stype = ITEMS[code].stype
     const {w, h} = this.getFurnitureSize(code)
-    const furniture = {id: uniqueIdGenerator.getUniqueId(), index, code, stype, w, h}
-    this.#furnitures.push(furniture)
+    const id = uniqueIdGenerator.getUniqueId()
+    const furniture = {id, index, code, stype, w, h}
     if (CONTAINER_STYPES.has(stype)) {
-      this.#createEmptySlots(stype, CONTAINER_CAPACITY[stype], furniture.id)
+      this.#createEmptySlots(stype, CONTAINER_CAPACITY[stype], id)
+      furniture.name = `C-${id}`
     }
+    this.#furnitures.push(furniture)
     return furniture
   }
 
