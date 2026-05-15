@@ -2,7 +2,7 @@ import {seededRNG, shuffleArray, rollLoot} from './utils.mjs'
 import {database, uniqueIdGenerator} from './database.mjs'
 import {WORLD_WIDTH, WORLD_HEIGHT, SEA_LEVEL, TOPSOIL_Y_SKY_SURFACE, TOPSOIL_Y_SURFACE_UNDER, TOPSOIL_Y_UNDER_CAVERNS, TOPSOIL_Y_CAVERNS_MID, BIOME_TILE_MAP, SEA_MAX_JITTER, SEA_MAX_WIDTH, SEA_MAX_HEIGHT, CLUSTER_SCATTER_MAP, ORE_GEM_SCATTER_MAP, PERLIN_OFFSET_NATURALIZER, PERLIN_OFFSET_TUNNEL, PERLIN_OFFSET_SURFACE_TUNNEL, PERLIN_OFFSET_SMALL_TUNNEL, PERLIN_OFFSET_CAVERN, PERLIN_OFFSET_HIVE, PERLIN_OFFSET_HEART, PERLIN_OFFSET_MUSHROOM, PERLIN_OFFSET_COBWEB, PERLIN_OFFSET_FERNS, PERLIN_OFFSET_LAKES, PERLIN_OFFSET_SHELL, PERLIN_OFFSET_TEMPLE, PERLIN_OFFSET_BEACH, SMALL_CAVERNS_COUNT, MEDIUM_CAVERNS_COUNT, UNDERGROUND_TUNNEL_COUNT, CAVERNS_TUNNEL_COUNT, SMALL_TUNNELS_COUNT, HIVE_RADIUS_MIN, HIVE_RADIUS_MAX, COBWEB_CAVE_COUNT_MIN, COBWEB_CAVE_COUNT_MAX, COBWEB_RADIUS_X_MIN, COBWEB_RADIUS_X_MAX, COBWEB_RADIUS_Y_MIN, COBWEB_RADIUS_Y_MAX, COBWEB_CAVE_MAIN_MIN, COBWEB_CAVE_MAIN_MAX, COBWEB_CAVE_SIDE_MIN, COBWEB_CAVE_SIDE_MAX, COBWEB_SCATTER_COUNT, COBWEB_SCATTER_SIZE_MIN, COBWEB_SCATTER_SIZE_MAX, GEODE_CAVE_COUNT_MIN, GEODE_CAVE_COUNT_MAX, GEODE_RADIUS_MIN, GEODE_RADIUS_MAX, GEODE_TARGET_CLUSTER_COUNT, GEODE_CLUSTER_SIZE_MIN, GEODE_CLUSTER_SIZE_MAX, TOPSOIL_SCATTER_MAP, LAKE_RADIUS_X_MIN, LAKE_RADIUS_X_MAX, LAKE_RADIUS_Y_MIN, LAKE_RADIUS_Y_MAX, LAKE_PIT_RADIUS_X_MIN, LAKE_PIT_RADIUS_X_MAX, LAKE_PIT_RADIUS_Y_MIN, LAKE_PIT_RADIUS_Y_MAX, LAKE_CREATION_MAP, UNDERGROUND_LAKE_UNDER_COUNT, UNDERGROUND_LAKE_CAVERNS_COUNT, UNDERGROUND_LAKE_RADIUS_MIN, UNDERGROUND_LAKE_RADIUS_MAX, BLIND_LAKE_COUNT, BLIND_LAKE_RADIUS_MIN, BLIND_LAKE_RADIUS_MAX, SAP_LAKE_UNDER_COUNT, SAP_LAKE_CAVERNS_COUNT, SAP_LAKE_RADIUS_MIN, SAP_LAKE_RADIUS_MAX, SAP_POCKET_COUNT, SAP_POCKET_RADIUS_MIN, SAP_POCKET_RADIUS_MAX, WATER_PUDDLE_COUNT, SAP_PUDDLE_COUNT, PUDDLE_HEIGHT_MIN, PUDDLE_HEIGHT_MAX, FOSSIL_VEIN_COUNT, FERN_CAVE_RADIUS_X_MIN, FERN_CAVE_RADIUS_X_MAX, FERN_CAVE_RADIUS_Y_MIN, FERN_CAVE_RADIUS_Y_MAX, MOSS_CAVE_RADIUS_X_MIN, MOSS_CAVE_RADIUS_X_MAX, MOSS_CAVE_RADIUS_Y_MIN, MOSS_CAVE_RADIUS_Y_MAX, SAND_POCKET_RADIUS_X_MIN, SAND_POCKET_RADIUS_X_MAX, SAND_POCKET_RADIUS_Y_MIN, SAND_POCKET_RADIUS_Y_MAX, MUSHROOM_CAVE_RADIUS_X_MIN, MUSHROOM_CAVE_RADIUS_X_MAX, MUSHROOM_CAVE_RADIUS_Y_MIN, MUSHROOM_CAVE_RADIUS_Y_MAX, PYRAMID_WALL_INDEXES, PYRAMID_VOID_INDEXES, PYRAMID_WIDTH, PYRAMID_HEIGHT, PYRAMID_ROOM1_DELTA, PYRAMID_ROOM2_DELTA, TEMPLE_RUIN_WALL_INDEXES, TEMPLE_RUIN_COLUMNS_INDEXES, CHEST_CONTENT, TREES_INIT_SIZE, GIANT_MUSHROOM_INIT_SIZE} from '../assets/data/data-gen.mjs'
 import {NODES, NODES_LOOKUP, NODE_TYPE, BIOME_TYPE, PLANT_KIND, PLANT_TYPE, ITEMS, TREE_IMAGES, PARSNIP_COUNT, MANDRAKE_COUNT, CACTUS_COUNT, BAMBOO_COUNT, OLEANDER_COUNT, SATANS_CUBE_COUNT, SNEAKTHORN_COUNT, CURSEDCROWN_COUNT, ABYSSHORN_COUNT, INFERNCAP_COUNT} from '../assets/data/data.mjs'
-import {WEATHER_TYPE, WEATHER_TYPE_CODE, BAG_CAPACITY, HOTBAR_CAPACITY, ARMOR_CAPACITY, ACCESSORY_CAPACITY} from './constant.mjs'
+import {WEATHER_TYPE, WEATHER_TYPE_CODE, BAG_CAPACITY, HOTBAR_CAPACITY, ARMOR_CAPACITY, ACCESSORY_CAPACITY, CONTAINER_CAPACITY, CONTAINER_STYPES} from './constant.mjs'
 
 /* ====================================================================================================
    WORLD BUFFER (CREATION DU MONDE)
@@ -6392,9 +6392,9 @@ class FurnitureGenerator {
     this.#createEmptySlots('armor', ARMOR_CAPACITY)
     this.#createEmptySlots('accessory', ACCESSORY_CAPACITY)
     // Ajout des items par défaut dans l'inventaire
-    this.#addInHotbar('pickaxeCopper', 1, 0)
-    this.#addInHotbar('axeCopper', 1, 1)
-    this.#addInHotbar('hammerCopper', 1, 2)
+    this.#addInHotbar('pickaxeCopper', 1, '', 0)
+    this.#addInHotbar('axeCopper', 1, '', 1)
+    this.#addInHotbar('hammerCopper', 1, '', 2)
   }
 
   /**
@@ -6402,9 +6402,9 @@ class FurnitureGenerator {
    * @param {string} container
    * @param {number} capacity
    */
-  #createEmptySlots (container, capacity) {
+  #createEmptySlots (container, capacity, furnitureId = '') {
     for (let i = 0; i < capacity; i++) {
-      this.#inventory.push({container, item: '', count: 0, prefix: '', slot: i, locked: false, deleted: false})
+      this.#inventory.push({container, item: '', count: 0, prefix: '', furnitureId, slot: i, locked: false, deleted: false})
     }
   }
 
@@ -6412,13 +6412,15 @@ class FurnitureGenerator {
    * Insère un item dans un slot précis de la hotbar.
    * @param {string} item
    * @param {number} count
+   * @param {string} prefix
    * @param {number} slot
    */
-  #addInHotbar (item, count, slot) {
+  #addInHotbar (item, count, prefix, slot) {
     const record = this.#inventory.find(s => s.container === 'hotbar' && s.slot === slot)
     if (record === undefined) return
     record.item = item
     record.count = count
+    record.prefix = prefix
   }
 
   // ////////// //
@@ -6448,6 +6450,9 @@ class FurnitureGenerator {
     const {w, h} = this.getFurnitureSize(code)
     const furniture = {id: uniqueIdGenerator.getUniqueId(), index, code, stype, w, h}
     this.#furnitures.push(furniture)
+    if (CONTAINER_STYPES.has(stype)) {
+      this.#createEmptySlots(stype, CONTAINER_CAPACITY[stype], furniture.id)
+    }
     return furniture
   }
 
@@ -6464,40 +6469,19 @@ class FurnitureGenerator {
   // ////////// //
 
   /**
- * Retourne le premier slot disponible dans un container.
- * Valide uniquement pendant la génération du monde (slots remplis séquentiellement).
- * @param {'bag'|'chest'} container — type de container
- * @param {number} capacity — capacité maximale du container
- * @param {string} [furnitureId] — id du furniture (requis si container === 'chest')
- * @returns {number|null} — prochain slot disponible, ou null si plein
- */
-  firstAvailableSlot (container, capacity, furnitureId) {
-    let maxSlot = -1
-    for (const slot of this.#inventory) {
-      if (slot.container !== container) continue
-      if (container === 'chest' && slot.furnitureId !== furnitureId) continue
-      if (slot.slot > maxSlot) maxSlot = slot.slot
-    }
-    const next = maxSlot + 1
-    return next < capacity ? next : null
-  }
-
-  /**
  * Ajoute un item dans un coffre.
  * @param {{id, code}} chest — furniture coffre cible
  * @param {string} item — identifiant de l'item
  * @param {number} count — quantité
- * @returns {{container, furnitureId, item, prefix, count, slot}|undefined}
+ * @param {string} prefix — préfixe
  */
-  addInChest (chest, item, count) {
+  addInChest (chest, item, count, prefix = '') {
     if (count === 0) return
-    const capacity = ITEMS[chest.code]?.capacity ?? 0
-    if (capacity === 0) return
-    const slot = this.firstAvailableSlot('chest', capacity, chest.id)
-    if (slot === null) return
-    const inventorySlot = {container: 'chest', furnitureId: chest.id, item, prefix: '', count, slot}
-    this.#inventory.push(inventorySlot)
-    return inventorySlot
+    const record = this.#inventory.find(s => s.furnitureId === chest.id && s.item === '')
+    if (record === undefined) return
+    record.item = item
+    record.count = count
+    record.prefix = prefix
   }
 
   /**
