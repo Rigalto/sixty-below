@@ -469,53 +469,540 @@ class InventoryManager {
 }
 export const inventoryManager = new InventoryManager()
 
+// ── CSS ──────────────────────────────────────────────────────────────────────
+
+// injection des classes HTML utilisées par l'inventory Overlay
+const inventorySlotStyle = document.createElement('style')
+inventorySlotStyle.textContent = /* css */`
+inventory-slot {
+  position: relative;
+  display: inline-block;
+  width: 64px;
+  height: 64px;
+  border-radius: 6px;
+  background-color: #4A90E2;
+  color: white;
+  border: 3px solid #888;
+  box-sizing: border-box;
+  cursor: pointer;
+  transition: border-color 0.15s;
+}
+
+inventory-slot.hotbar {
+  background-color: #FFB347;
+  color: black;
+}
+
+inventory-slot.armor { background-color: #77DD77; }
+inventory-slot.armor inventory-slot.set { background-color: #69f785; }
+inventory-slot.accessory { background-color: #B39DDB; }
+inventory-slot.inactive {
+  background-color: #bbb;
+    pointer-events: none;
+}
+
+inventory-slot:hover {
+  border-color: #f1a15bff;  /* gris clair — neutre sur tous les fonds */
+}
+
+inventory-slot.selected,
+inventory-slot.selected:hover {
+  border-color: #e67e22;  /* orange prime sur le hover */
+}
+
+inventory-slot .key {
+  position: absolute;
+  top: 3px;
+  left: 4px;
+  font-size: 12px;
+  line-height: 1;
+  pointer-events: none;
+}
+
+inventory-slot .lock {
+  position: absolute;
+  top: 2px;
+  right: 3px;
+  font-size: 11px;
+  pointer-events: none;
+}
+
+inventory-slot .image {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  image-rendering: pixelated;
+  pointer-events: none;
+}
+
+inventory-slot .count {
+  position: absolute;
+  bottom: 2px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 11px;
+  color: #ffffff;
+  text-shadow: 1px 1px 2px #000;
+  line-height: 1;
+  pointer-events: none;
+}
+
+inventory-slot .hidden {
+  display: none;
+}
+
+/* ── Overlay ───────────────────────────────────────── */
+
+#ui-inventory-panel {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+    width: 1274px;
+    height: 682px;
+  background-color: #3c3e45;
+  border: 1px solid #3f4149;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.8);
+  border-radius: 4px;
+  z-index: ${OVERLAYS.inventory.zIndex};
+  display: none;
+  flex-direction: column;
+  font-family: Segoe UI, Roboto, sans-serif;
+  color: #ffffff;
+  user-select: none;
+}
+
+#ui-inventory-panel .inv-content {
+  display: grid;
+  grid-template-columns: 74px 196px 346px 60px 550px;
+  grid-template-rows: 74px 468px 74px;
+  gap: 8px;
+  padding: 8px;
+}
+
+#ui-inventory-panel .inv-hotbar    { grid-column: 1; grid-row: 1 / 4; }
+#ui-inventory-panel .inv-bag       { grid-column: 2 / 4; grid-row: 1 / 3; }
+#ui-inventory-panel .inv-armor     { grid-column: 2; grid-row: 3; }
+#ui-inventory-panel .inv-accessory { grid-column: 3; grid-row: 3; }
+#ui-inventory-panel .inv-actions   { grid-column: 4; grid-row: 1 / 4; background-color: orange; }
+#ui-inventory-panel .inv-chest-header { grid-column: 5; grid-row: 1; background-color: cyan; }
+#ui-inventory-panel .inv-chest     { grid-column: 5; grid-row: 2 / 4; }
+
+#ui-inventory-panel .inv-panel {
+  background-color: #24252c;
+  border-radius: 4px;
+  padding: 4px;
+}
+
+#ui-inventory-panel .inv-hotbar-grid {
+  display: grid;
+  grid-template-columns: 64px;
+  grid-template-rows: repeat(8, 64px);
+  gap: 4px;
+}
+
+#ui-inventory-panel .inv-armor-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 64px);
+  grid-template-rows: 64px;
+  gap: 4px;
+}
+
+#ui-inventory-panel .inv-accessory-grid {
+  display: grid;
+  grid-template-columns: repeat(5, 64px);
+  grid-template-rows: 64px;
+  gap: 4px;
+}
+
+#ui-inventory-panel .inv-bag-grid,
+#ui-inventory-panel .inv-chest-grid  {
+  display: grid;
+  grid-template-columns: repeat(8, 64px);
+  grid-template-rows: repeat(8, 64px);
+  gap: 4px;
+}
+
+#ui-inventory-panel .inv-chest-grid {
+  display: grid;
+  grid-template-columns: repeat(8, 64px);
+  grid-template-rows: repeat(8, 64px);
+  gap: 4px;
+}
+
+#ui-inventory-panel .inv-chest-header-content {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 8px;
+  background-color: #808088;
+}
+
+#ui-inventory-panel .inv-chest-select {
+  flex: 1;
+  background-color: #3e3e4e;
+  color: #d8d8d8;
+  border: 1px solid #666;
+  border-radius: 3px;
+  font-size: 13px;
+  padding: 2px 4px;
+}
+
+#ui-inventory-panel .inv-chest-rename {
+  background-color: transparent;
+  border: none;
+  cursor: pointer;
+  font-size: 16px;
+}
+
+#ui-inventory-panel .inv-chest-rename:disabled {
+  cursor: default;
+}
+`
+document.head.appendChild(inventorySlotStyle)
+
+// ── Classe ───────────────────────────────────────────────────────────────────
+
+class InventorySlot extends HTMLElement {
+  static get observedAttributes () {
+    return ['item', 'count', 'locked', 'usable']
+  }
+
+  connectedCallback () {
+    const key = this.getAttribute('key')
+    const location = this.getAttribute('location')
+
+    this.innerHTML = /* html */`
+      ${key !== null ? `<div class="key">${key}</div>` : ''}
+      <svg class="lock hidden" viewBox="0 0 24 24" width="14" height="14">
+  <path fill="currentColor" d="M4 13a3 3 0 0 1 3-3h10a3 3 0 0 1 3 3v6a3 3 0 0 1-3 3h-10a3 3 0 0 1-3-3zM6 19a1 1 0 0 0 1 1h10a1 1 0 0 0 1-1v-6a1 1 0 0 0-1-1h-10a1 1 0 0 0-1 1zM10 16a2 2 0 0 1 4 0 2 2 0 0 1-4 0zM7 11v-4a5 5 0 0 1 10 0v4h-2v-4a3 3 0 0 0-6 0v4z"/>
+</svg>
+      <div class="image hidden"></div>
+      <div class="count"></div>
+    `
+
+    this._elLock = this.querySelector('.lock')
+    this._elImage = this.querySelector('.image')
+    this._elCount = this.querySelector('.count')
+
+    this._count = 0
+    this._usable = null
+    this._location = location !== null ? `Slot : ${location}\n` : ''
+    this.setAttribute('title', this._location)
+  }
+
+  attributeChangedCallback (name, oldValue, newValue) {
+    if (oldValue === newValue) return
+    if (name === 'item') this._itemChanged(newValue)
+    else if (name === 'count') this._countChanged(newValue)
+    else if (name === 'locked') this._lockedChanged(newValue)
+    else if (name === 'usable') this._usableChanged(newValue)
+  }
+
+  _itemChanged (value) {
+    if (value === null || value === '') {
+      this.setAttribute('title', this._location)
+      this._elImage.classList.add('hidden')
+      return
+    }
+    const item = ITEMS[value]
+    const {file, sx, sy, sw, sh} = item.image
+    this._elImage.classList.remove('hidden')
+    this._elImage.style.backgroundImage = `url('/assets/${file}.png')`
+    this._elImage.style.backgroundPosition = `-${sx}px -${sy}px`
+    this._elImage.style.width = `${sw}px`
+    this._elImage.style.height = `${sh}px`
+    this.setAttribute('title', `${this._location}${item.name}`)
+  }
+
+  _countChanged (value) {
+    this._count = value !== null ? parseInt(value, 10) : 0
+    this._formatCount()
+  }
+
+  _usableChanged (value) {
+    this._usable = value !== null ? parseInt(value, 10) : null
+    this._formatCount()
+  }
+
+  _formatCount () {
+    if (this._usable === null) {
+      this._elCount.textContent = this._count > 1 ? String(this._count) : ''
+    } else {
+      this._elCount.textContent = `${this._count}/${this._usable}`
+    }
+  }
+
+  _lockedChanged (value) {
+    // value === null si absent, '' si présent
+    this._elLock.classList.toggle('hidden', value === null)
+  }
+}
+
+customElements.define('inventory-slot', InventorySlot)
+
 class InventoryOverlay {
   #container
-  #header
   #content
 
+  // Remplace le constructor entier de InventoryOverlay
+
   constructor () {
-    // 1. Création du Conteneur Principal
+  // 1. Conteneur Principal — dimensions calculées
     this.#container = document.createElement('div')
     this.#container.id = 'ui-inventory-panel'
 
-    Object.assign(this.#container.style, {
-      position: 'fixed',
-      top: '50%',
-      left: '50%',
-      transform: 'translate(-50%, -50%)',
-      width: '600px',
-      height: '400px',
-      backgroundColor: '#2f3136',
-      border: '1px solid #202225',
-      boxShadow: '0 10px 30px rgba(0,0,0,0.8)',
-      borderRadius: '4px',
-      zIndex: OVERLAYS.inventory.zIndex,
-      display: 'none', // Caché par défaut
-      flexDirection: 'column',
-      fontFamily: 'Segoe UI, Roboto, sans-serif',
-      color: '#ffffff',
-      userSelect: 'none' // On évite de sélectionner le texte en cliquant partout
-    })
+    // 2. Header
+    this.#container.appendChild(createOverlayHeader('🎒 Inventory [I]', 'inventory'))
 
-    // 2. Création du Header via la Factory
-    const header = createOverlayHeader('🎒 Inventory [I]', 'inventory')
-    this.#header = header
+    // 3. Contents
+    this.buildContent()
 
-    // 3. Zone de contenu (Vide pour l'instant, juste pour remplir)
-    this.#content = document.createElement('div')
-    Object.assign(this.#content.style, {
-      flex: '1',
-      position: 'relative'
-    })
+    // // 3. Zone de contenu — 4 colonnes horizontales
+    // this.#content = document.createElement('div')
+    // this.#content.className = 'inv-content'
 
-    // Assemblage
-    this.#container.appendChild(this.#header)
+    // // 3.1 Hotbar — colonne gauche, 8 slots verticaux
+    // const colHotbar = document.createElement('div')
+    // colHotbar.className = 'inv-hotbar inv-panel'
+    // for (let i = 0; i < HOTBAR_CAPACITY; i++) {
+    //   const slot = document.createElement('inventory-slot')
+    //   slot.setAttribute('key', String(i + 1))
+    //   slot.setAttribute('location', `hotbar/${i}`)
+    //   slot.classList.add('hotbar')
+    //   colHotbar.appendChild(slot)
+    // }
+
+    // // 3.2 Zone centrale — bag (haut) + armor/accessoires (bas)
+    // const colCenter = document.createElement('div')
+    // colCenter.className = 'inv-center'
+
+    // // Bag 8×8
+    // const gridBag = document.createElement('div')
+    // gridBag.className = 'inv-grid inv-panel'
+
+    // for (let i = 0; i < BAG_CAPACITY; i++) {
+    //   const slot = document.createElement('inventory-slot')
+    //   slot.setAttribute('location', `bag/${i}`)
+    //   gridBag.appendChild(slot)
+    // }
+
+    // // Armor + Accessoires côte à côte
+    // const rowGear = document.createElement('div')
+    // rowGear.className = 'inv-gear'
+
+    // // Armor — 3 slots horizontaux
+    // const gridArmor = document.createElement('div')
+    // gridArmor.className = 'inv-armor inv-panel'
+
+    // const ARMOR_LABELS = ['HEAD', 'BODY', 'FEET']
+    // for (let i = 0; i < ARMOR_CAPACITY; i++) {
+    //   const slot = document.createElement('inventory-slot')
+    //   slot.setAttribute('location', `armor/${ARMOR_LABELS[i]}`)
+    //   slot.classList.add('armor')
+    //   gridArmor.appendChild(slot)
+    // }
+
+    // // Accessoires — 5 slots horizontaux
+    // const gridAccessory = document.createElement('div')
+    // gridAccessory.className = 'inv-accessory inv-panel'
+
+    // for (let i = 0; i < ACCESSORY_CAPACITY; i++) {
+    //   const slot = document.createElement('inventory-slot')
+    //   slot.setAttribute('location', `accessory/${i}`)
+    //   slot.classList.add('accessory')
+    //   gridAccessory.appendChild(slot)
+    // }
+
+    // rowGear.appendChild(gridArmor)
+    // rowGear.appendChild(gridAccessory)
+    // colCenter.appendChild(gridBag)
+    // colCenter.appendChild(rowGear)
+
+    // // 3.3 Colonne actions — icônes verticales (placeholder)
+    // const colActions = document.createElement('div')
+    // colActions.className = 'inv-actions inv-panel'
+
+    // // 3.4 Zone coffre — header dropdown (haut) + grille 8×8 (bas)
+    // const colChest = document.createElement('div')
+    // colChest.className = 'inv-chest'
+
+    // // Header coffre
+    // const chestHeader = document.createElement('div')
+    // chestHeader.className = 'inv-chest-header'
+
+    // const chestSelect = document.createElement('select')
+
+    // const chestRename = document.createElement('button')
+    // chestRename.textContent = '✏️'
+    // chestRename.title = 'Renommer le coffre'
+
+    // chestHeader.appendChild(chestSelect)
+    // chestHeader.appendChild(chestRename)
+
+    // // Grille coffre 8×8
+    // const gridChest = document.createElement('div')
+    // gridChest.className = 'inv-grid inv-panel'
+
+    // for (let i = 0; i < 64; i++) {
+    //   const slot = document.createElement('inventory-slot')
+    //   slot.setAttribute('location', `chest/${i}`)
+    //   slot.classList.add('inactive')
+    //   gridChest.appendChild(slot)
+    // }
+
+    // colChest.appendChild(chestHeader)
+    // colChest.appendChild(gridChest)
+
+    // // Assemblage final
+    // this.#content.appendChild(colHotbar)
+    // this.#content.appendChild(colCenter)
+    // this.#content.appendChild(colActions)
+    // this.#content.appendChild(colChest)
     this.#container.appendChild(this.#content)
     document.body.appendChild(this.#container)
 
-    // 4. Gestion des événements
+    // 4. Événements
     this.#initEvents()
+  }
+
+  buildContent () {
+  // Zone de contenu — grille principale
+    this.#content = document.createElement('div')
+    this.#content.className = 'inv-content'
+
+    const colHotbar = document.createElement('div')
+    colHotbar.className = 'inv-hotbar'
+    const hotbarContent = this.buildHotbar()
+    colHotbar.appendChild(hotbarContent)
+
+    const bagWrap = document.createElement('div')
+    bagWrap.className = 'inv-bag'
+    const bagContent = this.buildBag()
+    bagWrap.appendChild(bagContent)
+
+    const armorWrap = document.createElement('div')
+    armorWrap.className = 'inv-armor'
+    const armorContent = this.buildArmor()
+    armorWrap.appendChild(armorContent)
+
+    const accessoryWrap = document.createElement('div')
+    accessoryWrap.className = 'inv-accessory'
+    const accessoryContent = this.buildAccessory()
+    accessoryWrap.appendChild(accessoryContent)
+
+    const colActions = document.createElement('div')
+    colActions.className = 'inv-actions'
+
+    const chestHeader = document.createElement('div')
+    chestHeader.className = 'inv-chest-header'
+    const chestHeaderContent = this.buildChestHeader()
+    chestHeader.appendChild(chestHeaderContent)
+
+    const chestWrap = document.createElement('div')
+    chestWrap.className = 'inv-chest'
+    const chestContent = this.buildChest()
+    chestWrap.appendChild(chestContent)
+
+    this.#content.appendChild(colHotbar)
+    this.#content.appendChild(bagWrap)
+    this.#content.appendChild(armorWrap)
+    this.#content.appendChild(accessoryWrap)
+    this.#content.appendChild(colActions)
+    this.#content.appendChild(chestHeader)
+    this.#content.appendChild(chestWrap)
+  }
+
+  buildHotbar () {
+    const grid = document.createElement('div')
+    grid.className = 'inv-hotbar-grid inv-panel'
+
+    for (let i = 0; i < HOTBAR_CAPACITY; i++) {
+      const slot = document.createElement('inventory-slot')
+      slot.setAttribute('key', String(i + 1))
+      slot.setAttribute('location', `hotbar/${i}`)
+      slot.classList.add('hotbar')
+      grid.appendChild(slot)
+    }
+
+    return grid
+  }
+
+  buildBag () {
+    const grid = document.createElement('div')
+    grid.className = 'inv-bag-grid inv-panel'
+
+    for (let i = 0; i < BAG_CAPACITY; i++) {
+      const slot = document.createElement('inventory-slot')
+      slot.setAttribute('location', `bag/${i}`)
+      grid.appendChild(slot)
+    }
+
+    return grid
+  }
+
+  buildArmor () {
+    const grid = document.createElement('div')
+    grid.className = 'inv-armor-grid inv-panel'
+
+    const ARMOR_LABELS = ['HEAD', 'BODY', 'FEET']
+    for (let i = 0; i < ARMOR_CAPACITY; i++) {
+      const slot = document.createElement('inventory-slot')
+      slot.setAttribute('location', `armor/${ARMOR_LABELS[i]}`)
+      slot.classList.add('armor')
+      grid.appendChild(slot)
+    }
+
+    return grid
+  }
+
+  buildAccessory () {
+    const grid = document.createElement('div')
+    grid.className = 'inv-accessory-grid inv-panel'
+
+    for (let i = 0; i < ACCESSORY_CAPACITY; i++) {
+      const slot = document.createElement('inventory-slot')
+      slot.setAttribute('location', `accessory/${i}`)
+      slot.classList.add('accessory')
+      grid.appendChild(slot)
+    }
+
+    return grid
+  }
+
+  buildChestHeader () {
+    const header = document.createElement('div')
+    header.className = 'inv-chest-header-content inv-panel'
+
+    const select = document.createElement('select')
+    select.className = 'inv-chest-select'
+
+    const btnRename = document.createElement('button')
+    btnRename.className = 'inv-chest-rename'
+    btnRename.textContent = '✏️'
+    btnRename.title = 'Renommer le coffre'
+    btnRename.disabled = true
+
+    header.appendChild(select)
+    header.appendChild(btnRename)
+
+    return header
+  }
+
+  buildChest () {
+    const grid = document.createElement('div')
+    grid.className = 'inv-chest-grid inv-panel'
+
+    for (let i = 0; i < 64; i++) {
+      const slot = document.createElement('inventory-slot')
+      slot.setAttribute('location', `chest/${i}`)
+      slot.classList.add('inactive')
+      grid.appendChild(slot)
+    }
+
+    return grid
   }
 
   #initEvents () {

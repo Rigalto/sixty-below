@@ -635,7 +635,7 @@ _(*) Vérification que la fiche d'aide existe_
 | Export           | Signature                                           | Description                                       |
 |------------------|-----------------------------------------------------|---------------------------------------------------|
 | `loadAssets`     | `(): Promise<void>`                                 | Charge toutes les images/sons                     |
-| `resolveAssetData` | `(codeStr): {imgId, sx, sy, sw, sh, isAutoTile}` | Résout une string image en UV pré-calculées       |
+| `resolveAssetData` | `(codeStr): {imgId, file, sx, sy, sw, sh, isAutoTile}` | Résout une string image en UV pré-calculées       |
 | `IMAGE_FILES`    | `Array<string>`                                     | Liste des fichiers image                          |
 
 **Zero-Cost Runtime :** les coordonnées de texture sont calculées **une seule fois** au boot via
@@ -1031,7 +1031,7 @@ des tuiles adjacentes (`NODES.color`).
 * Singletons exportés en minuscule (`export const chunkManager = new ChunkManager()`).
 * Les fonctions passées à `MicroTasker` doivent être des méthodes bindées — pas de lambdas anonymes.
 
-## 15. Divers
+## 15. Buffs
 
 ### Class `BuffManager` (`src/buff.mjs`) — Singleton : `buffManager`
 
@@ -1103,3 +1103,12 @@ Tableau de définitions `{id, title, x, y}` — coordonnées dans `assets/sprite
 | `#container` | Élément racine injecté dans `#right-sidebar` |
 | `#refs` | `Map<id, {el, timeEl}>` — refs DOM précalculées |
 | `#buffIds` | `string[]` — ids filtrés (sans `armors`), précalculés dans le constructeur |
+
+
+## 15. Inventaire
+
+### Custom Element `<inventory-slot>` (`inventory.mjs`)
+
+Attributs observés : `item` (itemId string), `count` (integer), `lock` ('yes'|'no'), `usable` (integer).
+Attributs de construction (non observés) : `key` (label raccourci), `location` (texte tooltip).
+Classes CSS : `selected` (slot actif), `inactive` (slot grisé, non interactif).

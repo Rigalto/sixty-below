@@ -162,6 +162,7 @@ export const resolveAssetData = (codeStr) => {
 
   return {
     imgIndex, // L'entier ultra-rapide pour le renderer
+    file: atlasName,
     sx: col * cellW, // Position X de base (0 pour autotile)
     sy: row * cellH, // Position Y (Ligne du matériau)
     sw: cellW,
