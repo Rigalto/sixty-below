@@ -586,7 +586,7 @@ inventory-slot .hidden {
 #ui-inventory-panel .inv-armor     { grid-column: 2; grid-row: 3; }
 #ui-inventory-panel .inv-accessory { grid-column: 3; grid-row: 3; }
 #ui-inventory-panel .inv-actions   { grid-column: 4; grid-row: 1 / 4; background-color: orange; }
-#ui-inventory-panel .inv-chest-header { grid-column: 5; grid-row: 1; background-color: cyan; }
+#ui-inventory-panel .inv-chest-header { grid-column: 5; grid-row: 1; }
 #ui-inventory-panel .inv-chest     { grid-column: 5; grid-row: 2 / 4; }
 
 #ui-inventory-panel .inv-panel {
@@ -633,17 +633,34 @@ inventory-slot .hidden {
 
 #ui-inventory-panel .inv-chest-header-content {
   display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 4px 8px;
+    background-color: #abd8ea;
+}
+
+#ui-inventory-panel .inv-chest-row {
+  display: flex;
   flex-direction: row;
   align-items: center;
   gap: 6px;
-  padding: 4px 8px;
-  background-color: #808088;
 }
 
+#ui-inventory-panel .inv-chest-icon {
+  width: 32px;
+  height: 32px;
+  background-color: #4A90E2;
+  border-radius: 4px;
+  border: 3px solid #666;
+  align-self: flex-start;
+  image-rendering: pixelated;
+}
+
+#ui-inventory-panel .inv-chest-rename-input,
 #ui-inventory-panel .inv-chest-select {
   flex: 1;
-  background-color: #3e3e4e;
-  color: #d8d8d8;
+  background-color: #2c2c2c;
+  color: #eee;
   border: 1px solid #666;
   border-radius: 3px;
   font-size: 13px;
@@ -660,6 +677,43 @@ inventory-slot .hidden {
 #ui-inventory-panel .inv-chest-rename:disabled {
   cursor: default;
 }
+
+#ui-inventory-panel .inv-chest-rename-form {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 6px;
+}
+
+#ui-inventory-panel .inv-chest-rename-label {
+  font-size: 14px;
+  color: #080808;
+  white-space: nowrap;
+}
+
+
+
+#ui-inventory-panel .inv-chest-rename-confirm,
+#ui-inventory-panel .inv-chest-rename-cancel {
+  background-color: transparent;
+  border: none;
+  cursor: pointer;
+  font-size: 18px;
+  font-weight: bold;
+}
+
+#ui-inventory-panel .inv-chest-rename-confirm {
+  color: #2ecc71;
+}
+
+#ui-inventory-panel .inv-chest-rename-cancel {
+  color: #e74c3c;
+}
+
+#ui-inventory-panel .inv-chest-rename-form.hidden {
+  display: none;
+}
+
 `
 document.head.appendChild(inventorySlotStyle)
 
@@ -973,6 +1027,70 @@ class InventoryOverlay {
   }
 
   buildChestHeader () {
+    const header = document.createElement('div')
+    header.className = 'inv-chest-header-content inv-panel'
+
+    // Ligne 1 : icône + select + bouton rename
+    const row = document.createElement('div')
+    row.className = 'inv-chest-row'
+
+    // Icône du furniture sélectionné
+    const icon = document.createElement('div')
+    icon.className = 'inv-chest-icon'
+
+    const select = document.createElement('select')
+    select.className = 'inv-chest-select'
+
+    const btnRename = document.createElement('button')
+    btnRename.className = 'inv-chest-rename'
+    // btnRename.textContent = '✏️'
+    btnRename.title = 'Rename chest'
+    btnRename.disabled = true
+
+    btnRename.innerHTML = /* html */`
+      <svg  viewBox="0 0 24 24" width="32" height="32">
+        <path fill="currentColor" d="M16.76 15.37l1.33-1.33c0.21-0.21 0.57-0.06 0.57 0.24V20.33c0 1.1-0.9 2-2 2H2c-1.1 0-2-0.9-2-2V5.67c0-1.1 0.9-2 2-2h11.4c0.3 0 0.45 0.36 0.24 0.57l-1.33 1.33c-0.06 0.06-0.15 0.1-0.24 0.1H2v14.67h14.67V15.6c0-0.09 0.03-0.17 0.1-0.23Zm6.53-8.41L12.35 17.9l-3.77 0.42c-1.09 0.12-2.02-0.8-1.9-1.9l0.42-3.77L18.04 1.71c0.95-0.95 2.5-0.95 3.45 0l1.8 1.8c0.95 0.95 0.95 2.5 0 3.45ZM19.17 8.25L16.75 5.83 9.01 13.58l-0.3 2.72 2.72-0.3L19.17 8.25Zm2.7-3.32l-1.8-1.8c-0.17-0.17-0.45-0.17-0.62 0L18.17 4.42l2.42 2.42 1.29-1.29c0.17-0.17 0.17-0.45 0-0.62Z"/>
+      </svg>`
+
+    row.appendChild(icon)
+    row.appendChild(select)
+    row.appendChild(btnRename)
+
+    // Ligne 2 : formulaire de renommage (caché par défaut)
+    const renameForm = document.createElement('div')
+    renameForm.className = 'inv-chest-rename-form hidden'
+
+    const label = document.createElement('label')
+    label.textContent = 'New name:'
+    label.className = 'inv-chest-rename-label'
+
+    const input = document.createElement('input')
+    input.type = 'text'
+    input.className = 'inv-chest-rename-input'
+    input.placeholder = 'Enter new name...'
+
+    const btnConfirm = document.createElement('button')
+    btnConfirm.className = 'inv-chest-rename-confirm'
+    btnConfirm.textContent = '✓'
+    btnConfirm.title = 'Confirm'
+
+    const btnCancel = document.createElement('button')
+    btnCancel.className = 'inv-chest-rename-cancel'
+    btnCancel.textContent = '✕'
+    btnCancel.title = 'Cancel'
+
+    renameForm.appendChild(label)
+    renameForm.appendChild(input)
+    renameForm.appendChild(btnConfirm)
+    renameForm.appendChild(btnCancel)
+
+    header.appendChild(row)
+    header.appendChild(renameForm)
+
+    return header
+  }
+
+  buildChestHeader_ () {
     const header = document.createElement('div')
     header.className = 'inv-chest-header-content inv-panel'
 
