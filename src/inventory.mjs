@@ -1,9 +1,10 @@
 // InventoryManager — inventory.mjs
 
-import {OVERLAYS, BAG_CAPACITY, HOTBAR_CAPACITY, ARMOR_CAPACITY, ACCESSORY_CAPACITY, CONTAINER_STYPES, CONTAINER_CAPACITY} from './constant.mjs'
+import {OVERLAYS, BAG_CAPACITY, HOTBAR_CAPACITY, ARMOR_CAPACITY, ACCESSORY_CAPACITY, CONTAINER_STYPES, CONTAINER_CAPACITY, ARMOR_SLOTS} from './constant.mjs'
 import {eventBus} from './utils.mjs'
 import {createOverlayHeader} from './ui.mjs'
-// import {ITEMS} from '../../assets/data/data.mjs'
+import {ITEMS} from '../../assets/data/data.mjs'
+import {saveManager} from './persistence.mjs'
 
 /**
  * @file inventory.mjs
@@ -214,7 +215,172 @@ class InventoryManager {
     // passe 3 - aucun slot libre - traitement à définir
   }
 
-  // ─── Gestion de la poubelle ──────────────────────────────────
+  /**
+   * Retourne le tableau interne correspondant au container.
+   * @param {string} container — 'bag' | 'hotbar' | 'armor' | 'accessory'
+   * @returns {Array}
+   */
+  #resolveContainer (container) {
+    if (container === 'bag') return this.#bag
+    if (container === 'hotbar') return this.#hotbar
+    if (container === 'armor') return this.#armor
+    if (container === 'accessory') return this.#accessories
+    console.error(new Error(`[InventoryManager] container inconnu : ${container}`))
+    return null
+  }
+
+  /**
+   * Swap ou stack deux slots.
+   * Stack si item et prefix identiques, swap sinon.
+   * Sans effet si l'un des slots est locked.
+   * @param {object} slotA
+   * @param {object} slotB
+   */
+  #swapOrStack (slotA, slotB) {
+    if (slotA.locked || slotB.locked) return
+    if (slotA.item === slotB.item && slotA.prefix === slotB.prefix && slotA.item !== '') {
+      slotB.count += slotA.count
+      slotA.item = ''
+      slotA.count = 0
+      slotA.prefix = ''
+    } else {
+      const item = slotA.item
+      const count = slotA.count
+      const prefix = slotA.prefix
+      slotA.item = slotB.item
+      slotA.count = slotB.count
+      slotA.prefix = slotB.prefix
+      slotB.item = item
+      slotB.count = count
+      slotB.prefix = prefix
+    }
+    this.#dirtyKeys.add(slotA)
+    this.#dirtyKeys.add(slotB)
+  }
+
+  // ─── Transferts intra-container ──────────────────────────────
+
+  /**
+   * Déplace un item entre deux slots d'un même container (swap ou stack).
+   * Sans effet si le container est inconnu ou les index identiques.
+   * @param {string} container — 'bag' | 'hotbar' | 'accessory'
+   * @param {number} sourceIndex
+   * @param {number} targetIndex
+   */
+  moveWithinContainer (container, sourceIndex, targetIndex) {
+    if (sourceIndex === targetIndex) return
+    const slots = this.#resolveContainer(container)
+    if (slots === null) return
+    this.#swapOrStack(slots[sourceIndex], slots[targetIndex])
+  }
+
+  /**
+   * Déplace un item entre deux slots d'un coffre (swap ou stack).
+   * Sans effet si le coffre est inconnu ou les index identiques.
+   * @param {string} furnitureId
+   * @param {number} sourceIndex
+   * @param {number} targetIndex
+   */
+  moveWithinChest (furnitureId, sourceIndex, targetIndex) {
+    if (sourceIndex === targetIndex) return
+    const slots = this.#containers.get(furnitureId)
+    if (slots === undefined) return
+    this.#swapOrStack(slots[sourceIndex], slots[targetIndex])
+  }
+
+  // ─── Transferts Hotbar ───────────────────────────────────────
+
+  /**
+   * Déplace un item du bag vers la hotbar (swap ou stack).
+   * @param {number} sourceIndex
+   * @param {number} targetIndex
+   */
+  moveBagToHotbar (sourceIndex, targetIndex) {
+    this.#swapOrStack(this.#bag[sourceIndex], this.#hotbar[targetIndex])
+  }
+
+  /**
+   * Déplace un item de la hotbar vers le bag (swap ou stack).
+   * @param {number} sourceIndex
+   * @param {number} targetIndex
+   */
+  moveHotbarToBag (sourceIndex, targetIndex) {
+    this.#swapOrStack(this.#hotbar[sourceIndex], this.#bag[targetIndex])
+  }
+
+  // ─── Transferts Accessory ────────────────────────────────────
+
+  /**
+   * Déplace un item du bag vers un slot accessoire (swap ou stack).
+   * @param {number} sourceIndex
+   * @param {number} targetIndex
+   */
+  moveBagToAccessory (sourceIndex, targetIndex) {
+    this.#swapOrStack(this.#bag[sourceIndex], this.#accessories[targetIndex])
+  }
+
+  /**
+   * Déplace un item d'un slot accessoire vers le bag (swap ou stack).
+   * @param {number} sourceIndex
+   * @param {number} targetIndex
+   */
+  moveAccessoryToBag (sourceIndex, targetIndex) {
+    this.#swapOrStack(this.#accessories[sourceIndex], this.#bag[targetIndex])
+  }
+
+  // ─── Transferts Armor ────────────────────────────────────────
+
+  /**
+   * Déplace un item du bag vers un slot armure.
+   * Sans effet si l'item source n'est pas compatible avec le slot armure cible.
+   * @param {number} sourceIndex
+   * @param {number} targetIndex — 0=HEAD, 1=BODY, 2=FOOT
+   */
+  moveBagToArmor (sourceIndex, targetIndex) {
+    const src = this.#bag[sourceIndex]
+    if (src.item === '') return
+    if (ITEMS[src.item].armor !== ARMOR_SLOTS[targetIndex]) return
+    this.#swapOrStack(src, this.#armor[targetIndex])
+  }
+
+  /**
+   * Déplace un item d'un slot armure vers le bag.
+   * @param {number} sourceIndex — 0=HEAD, 1=BODY, 2=FOOT
+   * @param {number} targetIndex
+   */
+  moveArmorToBag (sourceIndex, targetIndex) {
+    this.#swapOrStack(this.#armor[sourceIndex], this.#bag[targetIndex])
+  }
+
+  // ─── Transferts Chest ────────────────────────────────────────
+
+  /**
+   * Déplace un item du bag vers un slot d'un coffre (swap ou stack).
+   * Sans effet si le coffre est inconnu.
+   * @param {string} furnitureId
+   * @param {number} sourceIndex
+   * @param {number} targetIndex
+   */
+  moveBagToChest (furnitureId, sourceIndex, targetIndex) {
+    const slots = this.#containers.get(furnitureId)
+    if (slots === undefined) return
+    this.#swapOrStack(this.#bag[sourceIndex], slots[targetIndex])
+  }
+
+  /**
+   * Déplace un item d'un coffre vers le bag (swap ou stack).
+   * Sans effet si le coffre est inconnu.
+   * @param {string} furnitureId
+   * @param {number} sourceIndex
+   * @param {number} targetIndex
+   */
+  moveChestToBag (furnitureId, sourceIndex, targetIndex) {
+    const slots = this.#containers.get(furnitureId)
+    if (slots === undefined) return
+    this.#swapOrStack(slots[sourceIndex], this.#bag[targetIndex])
+  }
+
+  // ─── Transferts poubelle ─────────────────────────────────────
 
   /**
    * Déplace le contenu d'un slot bag vers la poubelle.
@@ -238,6 +404,67 @@ class InventoryManager {
     if (this.#trash === null) return
     this.#depositInBag(this.#trash.item, this.#trash.count, this.#trash.prefix)
     this.#trash = null
+  }
+
+  // ─── Loot vers inventaire ────────────────────────────────────
+
+  /**
+   * Place un item looté dans l'inventaire (bag ou hotbar).
+   * Priorité : stack bag → stack hotbar → premier libre bag → premier libre hotbar.
+   * @param {string} item
+   * @param {number} count
+   * @param {string} prefix
+   */
+  loot (item, count, prefix) {
+    // Stack bag
+    for (const slot of this.#bag) {
+      if (slot.locked || slot.item !== item || slot.prefix !== prefix) continue
+      slot.count += count
+      this.#dirtyKeys.add(slot)
+      return
+    }
+    // Stack hotbar
+    for (const slot of this.#hotbar) {
+      if (slot.locked || slot.item !== item || slot.prefix !== prefix) continue
+      slot.count += count
+      this.#dirtyKeys.add(slot)
+      return
+    }
+    // Premier libre bag
+    for (const slot of this.#bag) {
+      if (slot.locked || slot.item !== '') continue
+      slot.item = item
+      slot.count = count
+      slot.prefix = prefix
+      this.#dirtyKeys.add(slot)
+      return
+    }
+    // Premier libre hotbar
+    for (const slot of this.#hotbar) {
+      if (slot.locked || slot.item !== '') continue
+      slot.item = item
+      slot.count = count
+      slot.prefix = prefix
+      this.#dirtyKeys.add(slot)
+      return
+    }
+    console.error(new Error(`[InventoryManager] loot impossible, inventaire plein : ${item}`))
+  }
+
+  // ─── Sauvegarde ──────────────────────────────────────────────
+
+  /**
+   * Sauvegarde les slots modifiés via le SaveManager.
+   * À appeler à la fermeture de l'overlay.
+   */
+  save () {
+    if (this.#dirtyKeys.size === 0) return
+    const updates = []
+    for (const slot of this.#dirtyKeys) {
+      updates.push({storeName: 'inventory', record: slot})
+    }
+    saveManager.queueStaticUpdate(updates)
+    this.#dirtyKeys.clear()
   }
 }
 export const inventoryManager = new InventoryManager()
