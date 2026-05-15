@@ -14,6 +14,11 @@
 - continuer la correction et l'ajout de fiches d'aide (`HELP`) et d'items (`ITEMS`)
 - corriger les deux premiers bugs connus
 
+La génération doit être modifiée pour prendre en compte le changement de conception :
+- ajout d'un champ deleted à false
+- mise en base de données de tous les slots des coffres
+- ajout d'un champ locked à false
+
 ---
 
 ## À faire — Bugs connus
@@ -25,6 +30,9 @@
 - Génération du monde : densité un peu trop faible des tunnels en Surface
 - Génération du monde : densité trop élevée des tunnels en Underground et Caverns (revoir les constantes `SMALL_TUNNELS_COUNT` et `CAVERNS_TUNNEL_COUNT`)
 
+## À faire — Amélioration
+
+- Dans l'overlay de création d'un monde, ajouter, sous le champ d'introduction de la Seed, une ligne : 'Current World Seed: xxxxx', ou xxxxx est la seed du monde qui va être écrasé. On peut cliquer sur les xxxxx et la graine est alors copiée dans le champ `input`. Il faudra ajouter cela à la fiche d'aide (pas encore créée).
 
 ---
 

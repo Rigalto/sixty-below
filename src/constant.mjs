@@ -198,9 +198,19 @@ export const PALETTE = {
 }
 
 /* =========================================
-   DEFINITION DES NOEUDS
+   DEFINITION DE L'INVENTAIRE
    ========================================= */
 
+export const BAG_CAPACITY = 64
+export const HOTBAR_CAPACITY = 8
+export const ARMOR_CAPACITY = 3
+export const ACCESSORY_CAPACITY = 5
+export const CONTAINER_STYPES = new Set(['chest', 'closet', 'cabinet'])
+export const CONTAINER_CAPACITY = {chest: 56, closet: 64, cabinet: 48}
+
+/* =========================================
+   DEFINITION DES NOEUDS
+   ========================================= */
 // const tileCode = NODES.CLAY.code
 // const tileDesc = NODES.CLAY
 // const tileDesc = NODES_LOOKUP[tileCode]

@@ -1,6 +1,9 @@
-import {OVERLAYS} from './constant.mjs'
+// InventoryManager — inventory.mjs
+
+import {OVERLAYS, BAG_CAPACITY, HOTBAR_CAPACITY, ARMOR_CAPACITY, ACCESSORY_CAPACITY, CONTAINER_STYPES, CONTAINER_CAPACITY} from './constant.mjs'
 import {eventBus} from './utils.mjs'
 import {createOverlayHeader} from './ui.mjs'
+// import {ITEMS} from '../../assets/data/data.mjs'
 
 /**
  * @file inventory.mjs
@@ -91,6 +94,153 @@ import {createOverlayHeader} from './ui.mjs'
  * - Ajout d'un item dans le bag/hotbar (suite à un loot), stack si item identique, ajout dans le premier slot libre sinon (décision à prendre : que faire quand l'inventaire n'a plus de slots libre ?)
  *
  */
+
+class InventoryManager {
+  // Joueur
+  #bag // Array(64)  — slots fixes, index = numéro de slot
+  #hotbar // Array(8)   — slots fixes
+  #armor // Array(3)   — HEAD=0, CHEST=1, FEET=2
+  #accessories // Array(5)   — slots fixes
+
+  // Coffres du monde (chargés à l'ouverture de l'overlay)
+  #containers // Map<furnitureId, Array(capacity)>
+
+  // Poubelle
+  #trash // {item, count, prefix} | null — annulable jusqu'à fermeture
+
+  // Persistance
+  #dirtyKeys // Set<number> — clés DB des slots modifiés
+
+  constructor () {
+    this.#bag = []
+    this.#hotbar = []
+    this.#armor = []
+    this.#accessories = []
+    this.#containers = new Map()
+    this.#trash = null
+    this.#dirtyKeys = new Set() // Set<slot> — références directes aux slots modifiés
+  }
+
+  init () {
+    // Tableaux vides
+    this.#bag.length = 0
+    this.#hotbar.length = 0
+    this.#armor.length = 0
+    this.#accessories.length = 0
+    this.#containers.clear()
+    this.#trash = null
+    this.#dirtyKeys.clear()
+  }
+
+  /**
+   * Initialise les tableaux fixes depuis les enregistrements DB chargés au
+   * démarrage de session. À appeler une seule fois après le chargement DB.
+   *
+   * @param {Array<object>} dbSlots — tous les slots du joueur (bag/hotbar/armor/accessory)
+   */
+  initSlot (dbSlot) {
+    const {container, slot, furnitureId} = dbSlot
+    if (container === 'bag') {
+      this.#bag[slot] = dbSlot
+    } else if (container === 'hotbar') {
+      this.#hotbar[slot] = dbSlot
+    } else if (container === 'armor') {
+      this.#armor[slot] = dbSlot
+    } else if (container === 'accessory') {
+      this.#accessories[slot] = dbSlot
+    } else if (CONTAINER_STYPES.has(container)) {
+      if (!this.#containers.has(furnitureId)) {
+        this.#containers.set(furnitureId, [])
+      }
+      this.#containers.get(furnitureId)[slot] = dbSlot
+    } else {
+      console.error('InventoryManager.init container inconnu', container)
+    }
+  }
+
+  // Vérification d'intégrité
+  initCheck () {
+    if (this.#bag.length !== BAG_CAPACITY) console.error(new Error(`[InventoryManager] bag: ${this.#bag.length} slots, attendu ${BAG_CAPACITY}`))
+    if (this.#hotbar.length !== HOTBAR_CAPACITY) console.error(new Error(`[InventoryManager] hotbar: ${this.#hotbar.length} slots, attendu ${HOTBAR_CAPACITY}`))
+    if (this.#armor.length !== ARMOR_CAPACITY) console.error(new Error(`[InventoryManager] armor: ${this.#armor.length} slots, attendu ${ARMOR_CAPACITY}`))
+    if (this.#accessories.length !== ACCESSORY_CAPACITY) console.error(new Error(`[InventoryManager] accessories: ${this.#accessories.length} slots, attendu ${ACCESSORY_CAPACITY}`))
+    for (const [furnitureId, slots] of this.#containers) {
+      const expected = CONTAINER_CAPACITY[slots[0].container]
+      if (slots.length !== expected) console.error(new Error(`[InventoryManager] container ${furnitureId}: ${slots.length} slots, attendu ${expected}`))
+    }
+  }
+
+  // ─── Accesseurs (lecture seule pour l'Overlay) ───────────────
+
+  get bag () { return this.#bag }
+  get hotbar () { return this.#hotbar }
+  get armor () { return this.#armor }
+  get accessories () { return this.#accessories }
+
+  /**
+   * @param {string} furnitureId
+   * @returns {Array|undefined}
+   */
+  getContainer (furnitureId) {
+    return this.#containers.get(furnitureId)
+  }
+
+  // ─── Fonctions privées utiitaires ──────────────────────────────────
+
+  /**
+   * Dépose un item dans le bag : stack sur item identique (même prefix) en priorité,
+   * sinon premier slot libre. Sans effet si le bag est plein.
+   * @param {string} item
+   * @param {number} count
+   * @param {string} prefix
+   */
+  #depositInBag (item, count, prefix) {
+    // Passe 1 — stack
+    for (const slot of this.#bag) {
+      if (slot.locked || slot.item !== item || slot.prefix !== prefix) continue
+      slot.count += count
+      this.#dirtyKeys.add(slot)
+      return
+    }
+    // Passe 2 — premier slot libre
+    for (const slot of this.#bag) {
+      if (slot.locked || slot.item !== '') continue
+      slot.item = item
+      slot.count = count
+      slot.prefix = prefix
+      this.#dirtyKeys.add(slot)
+      return
+    }
+    // passe 3 - aucun slot libre - traitement à définir
+  }
+
+  // ─── Gestion de la poubelle ──────────────────────────────────
+
+  /**
+   * Déplace le contenu d'un slot bag vers la poubelle.
+   * Écrase l'éventuel contenu précédent (une seule annulation possible).
+   * @param {number} slotIndex
+   */
+  trashFromBag (slotIndex) {
+    const src = this.#bag[slotIndex]
+    this.#trash = {item: src.item, count: src.count, prefix: src.prefix}
+    src.item = ''
+    src.count = 0
+    src.prefix = ''
+    this.#dirtyKeys.add(src.key)
+  }
+
+  /**
+   * Restaure le contenu de la poubelle dans le bag (stack ou premier slot libre).
+   * Sans effet si la poubelle est vide.
+   */
+  restoreTrash () {
+    if (this.#trash === null) return
+    this.#depositInBag(this.#trash.item, this.#trash.count, this.#trash.prefix)
+    this.#trash = null
+  }
+}
+export const inventoryManager = new InventoryManager()
 
 class InventoryOverlay {
   #container

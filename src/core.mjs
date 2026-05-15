@@ -10,8 +10,8 @@ import {camera, worldRenderer} from './render.mjs'
 import {buffManager} from './buff.mjs'
 import {creationDialogOverlay, seedWidget} from './ui.mjs'
 import {helpOverlay} from './help.mjs'
+import {inventoryManager} from './inventory.mjs'
 import './ui-debug.mjs'
-import './inventory.mjs'
 import './craft.mjs'
 
 const mockup = () => {
@@ -265,18 +265,21 @@ class GameCore {
     // await PlayerManager.init(...)
 
     // 5.1 Objectstore Inventory => à remplacer par await inventoryManager.init(plantRecords)
-    // const itemsToDelete = []
-    // const inventoryRecords = await database.readAllFromObjectStore('inventory')
-    // for (const record of inventoryRecords) {
-    //   if (record.deleted) {
-    //     itemsToDelete.push(record.key)
-    //     continue
-    //   }
-    //   inventoryManager.init(record)
-    // }
-    // if (itemsToDelete.length > 0) {
-    //   await database.deleteMultipleRecords('plant', itemsToDelete)
-    // }
+    const itemsToDelete = []
+    const inventoryRecords = await database.readAllFromObjectStore('inventory')
+    inventoryManager.init()
+
+    for (const record of inventoryRecords) {
+      if (record.deleted) {
+        itemsToDelete.push(record.key)
+        continue
+      }
+      inventoryManager.initSlot(record)
+    }
+    if (itemsToDelete.length > 0) {
+      await database.deleteMultipleRecords('plant', itemsToDelete)
+    }
+    inventoryManager.initCheck() // vérification de l'intégrité des slots (appel optionnel)
 
     // 5.2 Objectstore Plant => à remplacer par await plantManager.init(plantRecords)
     console.log(PLANT_KIND, PLANT_TYPE) // pour éviter une erreur dans VSCode

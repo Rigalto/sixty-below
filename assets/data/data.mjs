@@ -448,7 +448,6 @@ export const ITEMS = {
   bottledFrog: {name: 'Bottled Frog', type: ITEM_TYPE.ACCESSORY | ITEM_TYPE.CRAFTABLE, stype: 'trinket', star: 3, image: 'furniture_32_32-3-8', help: 'Bottled Frog', tooltip: 'When in Inventory, give weather forecasts'},
   sextant: {name: 'Sextant', type: ITEM_TYPE.ACCESSORY | ITEM_TYPE.CRAFTABLE, stype: 'trinket', star: 3, image: 'furniture_32_32-3-8', help: 'Sextant', tooltip: 'When in Inventory, increases Moon Phases accuracy'}
 }
-export const BAG_CAPACITY = 64
 
 /* ============================================================================
    4. RECIPES
