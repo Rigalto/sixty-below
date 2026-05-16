@@ -1,6 +1,6 @@
 // InventoryManager — inventory.mjs
 
-import {OVERLAYS, BAG_CAPACITY, HOTBAR_CAPACITY, ARMOR_CAPACITY, ACCESSORY_CAPACITY, CONTAINER_STYPES, CONTAINER_CAPACITY, ARMOR_SLOTS} from './constant.mjs'
+import {OVERLAYS, BAG_CAPACITY, HOTBAR_CAPACITY, ARMOR_CAPACITY, ACCESSORY_CAPACITY, CONTAINER_STYPES, CONTAINER_CAPACITY, ARMOR_SLOTS, PATH_RENAME, PATH_LOCKED, SVG_ICON} from './constant.mjs'
 import {eventBus} from './utils.mjs'
 import {createOverlayHeader} from './ui.mjs'
 import {ITEMS} from '../../assets/data/data.mjs'
@@ -489,7 +489,7 @@ inventory-slot {
 }
 
 inventory-slot.hotbar {
-  background-color: #FFB347;
+  background-color: #e1f381;
   color: black;
 }
 
@@ -691,8 +691,6 @@ inventory-slot .hidden {
   white-space: nowrap;
 }
 
-
-
 #ui-inventory-panel .inv-chest-rename-confirm,
 #ui-inventory-panel .inv-chest-rename-cancel {
   background-color: transparent;
@@ -730,9 +728,7 @@ class InventorySlot extends HTMLElement {
 
     this.innerHTML = /* html */`
       ${key !== null ? `<div class="key">${key}</div>` : ''}
-      <svg class="lock hidden" viewBox="0 0 24 24" width="14" height="14">
-  <path fill="currentColor" d="M4 13a3 3 0 0 1 3-3h10a3 3 0 0 1 3 3v6a3 3 0 0 1-3 3h-10a3 3 0 0 1-3-3zM6 19a1 1 0 0 0 1 1h10a1 1 0 0 0 1-1v-6a1 1 0 0 0-1-1h-10a1 1 0 0 0-1 1zM10 16a2 2 0 0 1 4 0 2 2 0 0 1-4 0zM7 11v-4a5 5 0 0 1 10 0v4h-2v-4a3 3 0 0 0-6 0v4z"/>
-</svg>
+      ${SVG_ICON(PATH_LOCKED, 'class="lock hidden" width="14" height="14"')}
       <div class="image hidden"></div>
       <div class="count"></div>
     `
@@ -1047,10 +1043,7 @@ class InventoryOverlay {
     btnRename.title = 'Rename chest'
     btnRename.disabled = true
 
-    btnRename.innerHTML = /* html */`
-      <svg  viewBox="0 0 24 24" width="32" height="32">
-        <path fill="currentColor" d="M16.76 15.37l1.33-1.33c0.21-0.21 0.57-0.06 0.57 0.24V20.33c0 1.1-0.9 2-2 2H2c-1.1 0-2-0.9-2-2V5.67c0-1.1 0.9-2 2-2h11.4c0.3 0 0.45 0.36 0.24 0.57l-1.33 1.33c-0.06 0.06-0.15 0.1-0.24 0.1H2v14.67h14.67V15.6c0-0.09 0.03-0.17 0.1-0.23Zm6.53-8.41L12.35 17.9l-3.77 0.42c-1.09 0.12-2.02-0.8-1.9-1.9l0.42-3.77L18.04 1.71c0.95-0.95 2.5-0.95 3.45 0l1.8 1.8c0.95 0.95 0.95 2.5 0 3.45ZM19.17 8.25L16.75 5.83 9.01 13.58l-0.3 2.72 2.72-0.3L19.17 8.25Zm2.7-3.32l-1.8-1.8c-0.17-0.17-0.45-0.17-0.62 0L18.17 4.42l2.42 2.42 1.29-1.29c0.17-0.17 0.17-0.45 0-0.62Z"/>
-      </svg>`
+    btnRename.innerHTML = SVG_ICON(PATH_RENAME, 'width="32" height="32"')
 
     row.appendChild(icon)
     row.appendChild(select)

@@ -210,6 +210,15 @@ export const CONTAINER_CAPACITY = {chest: 56, closet: 64, cabinet: 48}
 export const ARMOR_SLOTS = ['head', 'body', 'foot']
 
 /* =========================================
+   DEFINITION DES ICONES
+   ========================================= */
+
+export const PATH_RENAME = 'M4 13a3 3 0 0 1 3-3h10a3 3 0 0 1 3 3v6a3 3 0 0 1-3 3h-10a3 3 0 0 1-3-3zM6 19a1 1 0 0 0 1 1h10a1 1 0 0 0 1-1v-6a1 1 0 0 0-1-1h-10a1 1 0 0 0-1 1zM10 16a2 2 0 0 1 4 0 2 2 0 0 1-4 0zM7 11v-4a5 5 0 0 1 10 0v4h-2v-4a3 3 0 0 0-6 0v4z'
+export const PATH_LOCKED = 'M4 13a3 3 0 0 1 3-3h10a3 3 0 0 1 3 3v6a3 3 0 0 1-3 3h-10a3 3 0 0 1-3-3zM6 19a1 1 0 0 0 1 1h10a1 1 0 0 0 1-1v-6a1 1 0 0 0-1-1h-10a1 1 0 0 0-1 1zM10 16a2 2 0 0 1 4 0 2 2 0 0 1-4 0zM7 11v-4a5 5 0 0 1 10 0v4h-2v-4a3 3 0 0 0-6 0v4z'
+
+export const SVG_ICON = (icon, config = '') => `<svg viewBox="0 0 24 24" ${config}><path fill="currentColor" d="${icon}"/></svg>`
+
+/* =========================================
    DEFINITION DES NOEUDS
    ========================================= */
 // const tileCode = NODES.CLAY.code
