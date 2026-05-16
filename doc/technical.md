@@ -219,6 +219,12 @@ Cette section définit les événements officiels. Tout nouvel événement doit 
 | `inventory/close`| - | Disparition du panel d'inventaire. |
 | `inventory/static-buffs`| `Array<string>` (List of buffs) | Émis à la fermeture de l'inventaire. |
 
+#### Hotbar (`HotbarManager`)
+*En prévision*
+| Event Name | Payload Structure | Description |
+| :--- | :--- | :--- |
+| `hotbar/changed`| `{Array<{container, furnitureId, slot, item, count, prefix, locked, deleted, key}>}` | Modification d'au moins un slot de la Hotbar. Les huit slots sont en payload |
+
 #### Craft (`CraftOverlay`)
 *En prévision*
 | Event Name | Payload Structure | Description |
