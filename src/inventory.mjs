@@ -1041,7 +1041,7 @@ class InventoryOverlay {
       const item = this.#selectedSlot?.getAttribute('item') ?? ''
       const isCraftable = item !== '' && (ITEMS[item].type & ITEM_TYPE.CRAFTABLE)
       eventBus.emit('overlay/open-request', 'craft')
-      eventBus.emit('craft/item', isCraftable ? item : '')
+      if (isCraftable) eventBus.emit('craft/item', item)
     })
     col.appendChild(btnCraft)
 
