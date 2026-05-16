@@ -1,6 +1,6 @@
 // InventoryManager — inventory.mjs
 
-import {OVERLAYS, BAG_CAPACITY, HOTBAR_CAPACITY, ARMOR_CAPACITY, ACCESSORY_CAPACITY, CONTAINER_STYPES, CONTAINER_CAPACITY, ARMOR_SLOTS, PATH_RENAME, PATH_LOCKED, PATH_UNLOCKED, SVG_ICON} from './constant.mjs'
+import {OVERLAYS, BAG_CAPACITY, HOTBAR_CAPACITY, ARMOR_CAPACITY, ARMOR_SLOT_LABELS, ACCESSORY_CAPACITY, CONTAINER_STYPES, CONTAINER_CAPACITY, ARMOR_SLOTS, PATH_RENAME, PATH_LOCKED, PATH_UNLOCKED, SVG_ICON} from './constant.mjs'
 import {eventBus, capitalize} from './utils.mjs'
 import {createOverlayHeader} from './ui.mjs'
 import {ITEMS, itemTypeToString} from '../../assets/data/data.mjs'
@@ -532,11 +532,15 @@ inventory-slot.armor inventory-slot.set { background-color: #69f785; }
 inventory-slot.accessory { background-color: #B39DDB; }
 inventory-slot.inactive {
   background-color: #bbb;
-    pointer-events: none;
+  cursor: default;
 }
 
 inventory-slot:hover {
   border-color: #f1a15bff;  /* gris clair — neutre sur tous les fonds */
+}
+
+inventory-slot.inactive:hover {
+  border-color: #888;
 }
 
 inventory-slot.selected,
@@ -686,6 +690,11 @@ inventory-slot .hidden {
 #ui-inventory-panel .inv-action-btn:disabled {
   opacity: 0.4;
   cursor: default;
+}
+
+#ui-inventory-panel .inv-action-btn:disabled:hover {
+  border-color: #444;
+  color: #bdc3c7;
 }
 
 #ui-inventory-panel .inv-action-btn .lock-closed { display: block; }
@@ -872,6 +881,10 @@ class InventoryOverlay {
   #content
   #btnLock // icône de verrouillage/déverouillage du slot sélectionné
   #hotbarSlots = [] // Array(8) — refs DOM des inventory-slot
+  #bagSlots = [] // Array(64) — refs DOM des inventory-slot
+  #armorSlots = [] // Array(3) — refs DOM des inventory-slot
+  #accessorySlots = [] // Array(5) — refs DOM des inventory-slot
+  #containerSlots = [] // Array(64) — refs DOM des inventory-slot
 
   #selectedSlot = null // référence au DOM element inventory-slot sélectionné
   #selectedFurnitureId // identifiant du coffre sélectionné
@@ -970,6 +983,7 @@ class InventoryOverlay {
       const slot = document.createElement('inventory-slot')
       slot.setAttribute('location', `bag|${i}`)
       grid.appendChild(slot)
+      this.#bagSlots[i] = slot
     }
 
     return grid
@@ -985,6 +999,7 @@ class InventoryOverlay {
       slot.setAttribute('location', `armor|${ARMOR_LABELS[i]}`)
       slot.classList.add('armor')
       grid.appendChild(slot)
+      this.#armorSlots[i] = slot
     }
 
     return grid
@@ -999,6 +1014,7 @@ class InventoryOverlay {
       slot.setAttribute('location', `accessory|${i}`)
       slot.classList.add('accessory')
       grid.appendChild(slot)
+      this.#accessorySlots[i] = slot
     }
 
     return grid
@@ -1089,6 +1105,7 @@ class InventoryOverlay {
       slot.setAttribute('location', `chest|${i}`)
       slot.classList.add('inactive')
       grid.appendChild(slot)
+      this.#containerSlots[i] = slot
     }
 
     return grid
@@ -1108,6 +1125,7 @@ class InventoryOverlay {
     this.#content.addEventListener('click', (e) => {
       const slot = e.target.closest('inventory-slot')
       if (slot === null) return
+      if (slot.classList.contains('inactive')) return
       this.#onSlotClick(slot)
     })
   }
@@ -1120,9 +1138,30 @@ class InventoryOverlay {
     this.#container.style.display = 'flex'
     // récupération des slots de la hotbar
     const hotbar = inventoryManager.hotbar
-    for (let i = 0; i < HOTBAR_CAPACITY; i++) {
+    for (let i = 0; i < hotbar.length; i++) {
       this.#updateSlotDOM(this.#hotbarSlots[i], hotbar[i])
     }
+    // récupération des slots de Armor
+    const armor = inventoryManager.armor
+    for (let i = 0; i < armor.length; i++) {
+      this.#updateSlotDOM(this.#armorSlots[i], armor[i])
+    }
+    // récupération des slots de Accessory
+    const accessory = inventoryManager.accessories
+    for (let i = 0; i < accessory.length; i++) {
+      this.#updateSlotDOM(this.#accessorySlots[i], accessory[i])
+    }
+    // récupération des slots de Bag
+    const bag = inventoryManager.bag
+    for (let i = 0; i < bag.length; i++) {
+      this.#updateSlotDOM(this.#bagSlots[i], bag[i])
+    }
+    // initialisation des slots de Container
+    const emptySlot = {item: '', count: 0, locked: false, container: 'container'}
+    for (let i = 0; i < 64; i++) {
+      this.#updateSlotDOM(this.#containerSlots[i], emptySlot)
+    }
+
     // TODO : peupler les slots depuis inventoryManager
     // TODO : peupler le dropdown des coffres dans le range
   }
@@ -1145,13 +1184,15 @@ class InventoryOverlay {
    * @returns {string}
    */
   #buildSlotTitle (slot) {
+    const armorSlot = slot.container === 'armor' ? ` ${ARMOR_SLOT_LABELS[slot.slot]}` : ''
     const container = this.#containerToString(slot.container)
-    if (slot.item === '') return `Slot: ${container}`
+    if (slot.item === '') return `Slot: ${container}${armorSlot}`
     const item = ITEMS[slot.item]
     const stars = '★'.repeat(Math.min(5, Math.max(0, item.star)))
     const prefix = slot.prefix !== '' ? `${slot.prefix} ` : ''
     const count = slot.count > 1 ? `${slot.count} ` : ''
-    return `Slot: ${container}\n${count}${prefix}${item.name}\nTier: ${stars}\n${item.tooltip}\nType: ${itemTypeToString(item.type)}`
+
+    return `Slot: ${container}${armorSlot}\n${count}${prefix}${item.name}\nTier: ${stars}\n${item.tooltip}\nType: ${itemTypeToString(item.type)}`
   }
 
   /**

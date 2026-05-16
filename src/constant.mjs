@@ -208,6 +208,7 @@ export const ACCESSORY_CAPACITY = 5
 export const CONTAINER_STYPES = new Set(['chest', 'closet', 'cabinet'])
 export const CONTAINER_CAPACITY = {chest: 56, closet: 64, cabinet: 48}
 export const ARMOR_SLOTS = ['head', 'body', 'foot']
+export const ARMOR_SLOT_LABELS = ['Head', 'Body', 'Foot']
 
 /* =========================================
    DEFINITION DES ICONES
