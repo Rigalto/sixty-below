@@ -231,6 +231,7 @@ Cette section définit les événements officiels. Tout nouvel événement doit 
 | :--- | :--- | :--- |
 | `craft/open`| - | Affichage du panel d'artisanat. |
 | `craft/close`| - | Disparition du panel d'artisanat. |
+| `craft/item` | `string` (itemId) | Navigue vers la recette d'un item craftable. '' affiche la vue prédédente. |
 
 #### Help (`HelpOverlay`)
 | Event Name | Payload Structure | Description |

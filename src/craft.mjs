@@ -60,6 +60,10 @@ class CraftOverlay {
     eventBus.on('craft/close', () => {
       this.#container.style.display = 'none'
     })
+
+    eventBus.on('craft/item', () => {
+      // TODO
+    })
   }
 }
 export const craftOverlay = new CraftOverlay()

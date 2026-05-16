@@ -1,9 +1,9 @@
 // InventoryManager — inventory.mjs
 
-import {OVERLAYS, BAG_CAPACITY, HOTBAR_CAPACITY, ARMOR_CAPACITY, ARMOR_SLOT_LABELS, ACCESSORY_CAPACITY, CONTAINER_STYPES, CONTAINER_CAPACITY, ARMOR_SLOTS, PATH_RENAME, PATH_LOCKED, PATH_UNLOCKED, SVG_ICON, PATH_HELP} from './constant.mjs'
+import {OVERLAYS, BAG_CAPACITY, HOTBAR_CAPACITY, ARMOR_CAPACITY, ARMOR_SLOT_LABELS, ACCESSORY_CAPACITY, CONTAINER_STYPES, CONTAINER_CAPACITY, ARMOR_SLOTS, PATH_RENAME, PATH_LOCKED, PATH_UNLOCKED, PATH_CRAFT, SVG_ICON, PATH_HELP} from './constant.mjs'
 import {eventBus, capitalize} from './utils.mjs'
 import {createOverlayHeader} from './ui.mjs'
-import {ITEMS, itemTypeToString} from '../../assets/data/data.mjs'
+import {ITEMS, ITEM_TYPE, itemTypeToString} from '../../assets/data/data.mjs'
 import {saveManager} from './persistence.mjs'
 import {furnitureManager} from './housing.mjs'
 
@@ -1033,11 +1033,22 @@ class InventoryOverlay {
     this.#btnLock = btnLock
     col.appendChild(btnLock)
 
+    const btnCraft = document.createElement('button')
+    btnCraft.className = 'inv-action-btn'
+    btnCraft.title = 'Open Crafting [K]'
+    btnCraft.innerHTML = SVG_ICON(PATH_CRAFT, 'class="craft-icon"')
+    btnCraft.addEventListener('click', () => {
+      const item = this.#selectedSlot?.getAttribute('item') ?? ''
+      const isCraftable = item !== '' && (ITEMS[item].type & ITEM_TYPE.CRAFTABLE)
+      eventBus.emit('overlay/open-request', 'craft')
+      eventBus.emit('craft/item', isCraftable ? item : '')
+    })
+    col.appendChild(btnCraft)
+
     const btnHelp = document.createElement('button')
     btnHelp.className = 'inv-action-btn'
-    btnHelp.title = 'Open Help'
+    btnHelp.title = 'Open Help [H]'
     btnHelp.innerHTML = SVG_ICON(PATH_HELP, 'class="help-icon"')
-
     btnHelp.addEventListener('click', () => {
       const item = this.#selectedSlot?.getAttribute('item') ?? ''
       const topic = item !== '' ? ITEMS[item].help : 'Inventory'
@@ -1045,7 +1056,6 @@ class InventoryOverlay {
       eventBus.emit('overlay/open-request', 'help')
       eventBus.emit('help/topic', topic)
     })
-
     col.appendChild(btnHelp)
 
     return col
