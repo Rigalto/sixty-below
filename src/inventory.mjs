@@ -1,6 +1,6 @@
 // InventoryManager — inventory.mjs
 
-import {OVERLAYS, BAG_CAPACITY, HOTBAR_CAPACITY, ARMOR_CAPACITY, ACCESSORY_CAPACITY, CONTAINER_STYPES, CONTAINER_CAPACITY, ARMOR_SLOTS, PATH_RENAME, PATH_LOCKED, SVG_ICON} from './constant.mjs'
+import {OVERLAYS, BAG_CAPACITY, HOTBAR_CAPACITY, ARMOR_CAPACITY, ACCESSORY_CAPACITY, CONTAINER_STYPES, CONTAINER_CAPACITY, ARMOR_SLOTS, PATH_RENAME, PATH_LOCKED, PATH_UNLOCKED, SVG_ICON} from './constant.mjs'
 import {eventBus} from './utils.mjs'
 import {createOverlayHeader} from './ui.mjs'
 import {ITEMS} from '../../assets/data/data.mjs'
@@ -184,6 +184,26 @@ class InventoryManager {
    */
   getContainer (furnitureId) {
     return this.#containers.get(furnitureId)
+  }
+
+  /**
+   * Retourne la référence mémoire d'un slot joueur.
+   * @param {string} container — 'bag' | 'hotbar' | 'armor' | 'accessory'
+   * @param {number} index
+   * @returns {object}
+   */
+  getSlot (container, index) {
+    return this.#resolveContainer(container)[index]
+  }
+
+  /**
+   * Retourne la référence mémoire d'un slot container-furniture.
+   * @param {string} furnitureId
+   * @param {number} index
+   * @returns {object}
+   */
+  getContainerSlot (furnitureId, index) {
+    return this.#containers.get(furnitureId)[index]
   }
 
   // ─── Fonctions privées utiitaires ──────────────────────────────────
@@ -406,6 +426,19 @@ class InventoryManager {
     this.#trash = null
   }
 
+  // ─── Verrouillage ────────────────────────────────────────────
+
+  /**
+   * Inverse l'état locked d'un slot et le marque dirty.
+   * @param {object} slot — référence directe au slot en mémoire
+   * @returns {boolean} — nouvel état locked
+   */
+  toggleLock (slot) {
+    slot.locked = !slot.locked
+    this.#dirtyKeys.add(slot)
+    return slot.locked
+  }
+
   // ─── Loot vers inventaire ────────────────────────────────────
 
   /**
@@ -507,7 +540,7 @@ inventory-slot:hover {
 
 inventory-slot.selected,
 inventory-slot.selected:hover {
-  border-color: #e67e22;  /* orange prime sur le hover */
+  border-color: #f80;  /* orange prime sur le hover */
 }
 
 inventory-slot .key {
@@ -585,9 +618,18 @@ inventory-slot .hidden {
 #ui-inventory-panel .inv-bag       { grid-column: 2 / 4; grid-row: 1 / 3; }
 #ui-inventory-panel .inv-armor     { grid-column: 2; grid-row: 3; }
 #ui-inventory-panel .inv-accessory { grid-column: 3; grid-row: 3; }
-#ui-inventory-panel .inv-actions   { grid-column: 4; grid-row: 1 / 4; background-color: orange; }
 #ui-inventory-panel .inv-chest-header { grid-column: 5; grid-row: 1; }
 #ui-inventory-panel .inv-chest     { grid-column: 5; grid-row: 2 / 4; }
+
+#ui-inventory-panel .inv-actions {
+  grid-column: 4;
+  grid-row: 1 / 4;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  padding: 4px;
+}
 
 #ui-inventory-panel .inv-panel {
   background-color: #24252c;
@@ -615,6 +657,40 @@ inventory-slot .hidden {
   grid-template-rows: 64px;
   gap: 4px;
 }
+
+#ui-inventory-panel .inv-action-btn svg {
+  width: 100%;
+  height: 100%;
+}
+
+#ui-inventory-panel .inv-action-btn {
+  background-color: transparent;
+  border: 1px solid #444;
+  border-radius: 4px;
+  color: #bdc3c7;
+  cursor: pointer;
+  padding: 6px;
+  width: 56px;
+  height: 56px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+#ui-inventory-panel .inv-action-btn:hover {
+  border-color: #bdc3c7;
+  color: #ffffff;
+}
+
+#ui-inventory-panel .inv-action-btn:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+
+#ui-inventory-panel .inv-action-btn .lock-closed { display: block; }
+#ui-inventory-panel .inv-action-btn .lock-open { display: none; }
+#ui-inventory-panel .inv-action-btn.unlocking .lock-closed { display: none; }
+#ui-inventory-panel .inv-action-btn.unlocking .lock-open { display: block; }
 
 #ui-inventory-panel .inv-bag-grid,
 #ui-inventory-panel .inv-chest-grid  {
@@ -796,6 +872,9 @@ customElements.define('inventory-slot', InventorySlot)
 class InventoryOverlay {
   #container
   #content
+  #btnLock // icône de verrouillage/déverouillage du slot sélectionné
+  #selectedSlot = null // référence au DOM element inventory-slot sélectionné
+  #selectedFurnitureId // identifiant du coffre sélectionné
 
   // Remplace le constructor entier de InventoryOverlay
 
@@ -810,111 +889,11 @@ class InventoryOverlay {
     // 3. Contents
     this.buildContent()
 
-    // // 3. Zone de contenu — 4 colonnes horizontales
-    // this.#content = document.createElement('div')
-    // this.#content.className = 'inv-content'
-
-    // // 3.1 Hotbar — colonne gauche, 8 slots verticaux
-    // const colHotbar = document.createElement('div')
-    // colHotbar.className = 'inv-hotbar inv-panel'
-    // for (let i = 0; i < HOTBAR_CAPACITY; i++) {
-    //   const slot = document.createElement('inventory-slot')
-    //   slot.setAttribute('key', String(i + 1))
-    //   slot.setAttribute('location', `hotbar/${i}`)
-    //   slot.classList.add('hotbar')
-    //   colHotbar.appendChild(slot)
-    // }
-
-    // // 3.2 Zone centrale — bag (haut) + armor/accessoires (bas)
-    // const colCenter = document.createElement('div')
-    // colCenter.className = 'inv-center'
-
-    // // Bag 8×8
-    // const gridBag = document.createElement('div')
-    // gridBag.className = 'inv-grid inv-panel'
-
-    // for (let i = 0; i < BAG_CAPACITY; i++) {
-    //   const slot = document.createElement('inventory-slot')
-    //   slot.setAttribute('location', `bag/${i}`)
-    //   gridBag.appendChild(slot)
-    // }
-
-    // // Armor + Accessoires côte à côte
-    // const rowGear = document.createElement('div')
-    // rowGear.className = 'inv-gear'
-
-    // // Armor — 3 slots horizontaux
-    // const gridArmor = document.createElement('div')
-    // gridArmor.className = 'inv-armor inv-panel'
-
-    // const ARMOR_LABELS = ['HEAD', 'BODY', 'FEET']
-    // for (let i = 0; i < ARMOR_CAPACITY; i++) {
-    //   const slot = document.createElement('inventory-slot')
-    //   slot.setAttribute('location', `armor/${ARMOR_LABELS[i]}`)
-    //   slot.classList.add('armor')
-    //   gridArmor.appendChild(slot)
-    // }
-
-    // // Accessoires — 5 slots horizontaux
-    // const gridAccessory = document.createElement('div')
-    // gridAccessory.className = 'inv-accessory inv-panel'
-
-    // for (let i = 0; i < ACCESSORY_CAPACITY; i++) {
-    //   const slot = document.createElement('inventory-slot')
-    //   slot.setAttribute('location', `accessory/${i}`)
-    //   slot.classList.add('accessory')
-    //   gridAccessory.appendChild(slot)
-    // }
-
-    // rowGear.appendChild(gridArmor)
-    // rowGear.appendChild(gridAccessory)
-    // colCenter.appendChild(gridBag)
-    // colCenter.appendChild(rowGear)
-
-    // // 3.3 Colonne actions — icônes verticales (placeholder)
-    // const colActions = document.createElement('div')
-    // colActions.className = 'inv-actions inv-panel'
-
-    // // 3.4 Zone coffre — header dropdown (haut) + grille 8×8 (bas)
-    // const colChest = document.createElement('div')
-    // colChest.className = 'inv-chest'
-
-    // // Header coffre
-    // const chestHeader = document.createElement('div')
-    // chestHeader.className = 'inv-chest-header'
-
-    // const chestSelect = document.createElement('select')
-
-    // const chestRename = document.createElement('button')
-    // chestRename.textContent = '✏️'
-    // chestRename.title = 'Renommer le coffre'
-
-    // chestHeader.appendChild(chestSelect)
-    // chestHeader.appendChild(chestRename)
-
-    // // Grille coffre 8×8
-    // const gridChest = document.createElement('div')
-    // gridChest.className = 'inv-grid inv-panel'
-
-    // for (let i = 0; i < 64; i++) {
-    //   const slot = document.createElement('inventory-slot')
-    //   slot.setAttribute('location', `chest/${i}`)
-    //   slot.classList.add('inactive')
-    //   gridChest.appendChild(slot)
-    // }
-
-    // colChest.appendChild(chestHeader)
-    // colChest.appendChild(gridChest)
-
-    // // Assemblage final
-    // this.#content.appendChild(colHotbar)
-    // this.#content.appendChild(colCenter)
-    // this.#content.appendChild(colActions)
-    // this.#content.appendChild(colChest)
+    // 4. Assemblage final
     this.#container.appendChild(this.#content)
     document.body.appendChild(this.#container)
 
-    // 4. Événements
+    // 5. Événements
     this.#initEvents()
   }
 
@@ -945,6 +924,8 @@ class InventoryOverlay {
 
     const colActions = document.createElement('div')
     colActions.className = 'inv-actions'
+    const actionsContent = this.buildActions()
+    colActions.appendChild(actionsContent)
 
     const chestHeader = document.createElement('div')
     chestHeader.className = 'inv-chest-header'
@@ -972,7 +953,7 @@ class InventoryOverlay {
     for (let i = 0; i < HOTBAR_CAPACITY; i++) {
       const slot = document.createElement('inventory-slot')
       slot.setAttribute('key', String(i + 1))
-      slot.setAttribute('location', `hotbar/${i}`)
+      slot.setAttribute('location', `hotbar|${i}`)
       slot.classList.add('hotbar')
       grid.appendChild(slot)
     }
@@ -986,7 +967,7 @@ class InventoryOverlay {
 
     for (let i = 0; i < BAG_CAPACITY; i++) {
       const slot = document.createElement('inventory-slot')
-      slot.setAttribute('location', `bag/${i}`)
+      slot.setAttribute('location', `bag|${i}`)
       grid.appendChild(slot)
     }
 
@@ -1000,7 +981,7 @@ class InventoryOverlay {
     const ARMOR_LABELS = ['HEAD', 'BODY', 'FEET']
     for (let i = 0; i < ARMOR_CAPACITY; i++) {
       const slot = document.createElement('inventory-slot')
-      slot.setAttribute('location', `armor/${ARMOR_LABELS[i]}`)
+      slot.setAttribute('location', `armor|${ARMOR_LABELS[i]}`)
       slot.classList.add('armor')
       grid.appendChild(slot)
     }
@@ -1014,12 +995,27 @@ class InventoryOverlay {
 
     for (let i = 0; i < ACCESSORY_CAPACITY; i++) {
       const slot = document.createElement('inventory-slot')
-      slot.setAttribute('location', `accessory/${i}`)
+      slot.setAttribute('location', `accessory|${i}`)
       slot.classList.add('accessory')
       grid.appendChild(slot)
     }
 
     return grid
+  }
+
+  buildActions () {
+    const col = document.createElement('div')
+    col.className = 'inv-actions inv-panel'
+
+    const btnLock = document.createElement('button')
+    btnLock.className = 'inv-action-btn'
+    btnLock.title = 'Lock / Unlock slot'
+    btnLock.innerHTML = SVG_ICON(PATH_LOCKED, 'class="lock-closed"') + SVG_ICON(PATH_UNLOCKED, 'class="lock-open"')
+    btnLock.disabled = true
+    btnLock.addEventListener('click', () => this.#onLockClick())
+    this.#btnLock = btnLock
+    col.appendChild(btnLock)
+    return col
   }
 
   buildChestHeader () {
@@ -1083,32 +1079,13 @@ class InventoryOverlay {
     return header
   }
 
-  buildChestHeader_ () {
-    const header = document.createElement('div')
-    header.className = 'inv-chest-header-content inv-panel'
-
-    const select = document.createElement('select')
-    select.className = 'inv-chest-select'
-
-    const btnRename = document.createElement('button')
-    btnRename.className = 'inv-chest-rename'
-    btnRename.textContent = '✏️'
-    btnRename.title = 'Renommer le coffre'
-    btnRename.disabled = true
-
-    header.appendChild(select)
-    header.appendChild(btnRename)
-
-    return header
-  }
-
   buildChest () {
     const grid = document.createElement('div')
     grid.className = 'inv-chest-grid inv-panel'
 
     for (let i = 0; i < 64; i++) {
       const slot = document.createElement('inventory-slot')
-      slot.setAttribute('location', `chest/${i}`)
+      slot.setAttribute('location', `chest|${i}`)
       slot.classList.add('inactive')
       grid.appendChild(slot)
     }
@@ -1119,12 +1096,91 @@ class InventoryOverlay {
   #initEvents () {
     // Abonnement au Bus
     eventBus.on('inventory/open', () => {
-      this.#container.style.display = 'flex'
+      this.#onOpen()
     })
 
     eventBus.on('inventory/close', () => {
-      this.#container.style.display = 'none'
+      this.#onClose()
     })
+
+    // clic sur un slot
+    this.#content.addEventListener('click', (e) => {
+      const slot = e.target.closest('inventory-slot')
+      if (slot === null) return
+      this.#onSlotClick(slot)
+    })
+  }
+
+  // ////////////////////////////// //
+  // OUVERTURE / FERMETURE DU PANEL //
+  // ////////////////////////////// //
+
+  #onOpen () {
+    this.#container.style.display = 'flex'
+    // TODO : peupler les slots depuis inventoryManager
+    // TODO : peupler le dropdown des coffres dans le range
+  }
+
+  #onClose () {
+    this.#container.style.display = 'none'
+    // Désélection du slot actif
+    if (this.#selectedSlot !== null) {
+      this.#selectedSlot.classList.remove('selected')
+      this.#selectedSlot = null
+      this.#btnLock.disabled = true
+    }
+    inventoryManager.save()
+    eventBus.emit('inventory/static-buffs', []) // TODO : payload réel
+    eventBus.emit('hotbar/changed', inventoryManager.hotbar)
+  }
+
+  // ///////////////////////////////// //
+  // SELECTION / DESELECTION D'UN SLOT //
+  // ///////////////////////////////// //
+
+  #onSlotClick (slot) {
+    if (this.#selectedSlot === slot) {
+    // Désélection
+      slot.classList.remove('selected')
+      this.#selectedSlot = null
+      this.#updateLockBtn(null)
+      return
+    }
+    // Désélection du précédent
+    if (this.#selectedSlot !== null) {
+      this.#selectedSlot.classList.remove('selected')
+    }
+    // Sélection du nouveau
+    slot.classList.add('selected')
+    this.#selectedSlot = slot
+    this.#updateLockBtn(slot)
+  }
+
+  #updateLockBtn (slot) {
+    if (slot === null) {
+      this.#btnLock.disabled = true
+      this.#btnLock.classList.remove('unlocking')
+      this.#btnLock.title = 'Lock / Unlock slot'
+      return
+    }
+    const isLocked = slot.hasAttribute('locked')
+    this.#btnLock.disabled = false
+    this.#btnLock.classList.toggle('unlocking', isLocked)
+    this.#btnLock.title = isLocked ? 'Unlock slot' : 'Lock slot'
+  }
+
+  // ////////////////////////////////////// //
+  // VERROUILAGE / DEVERROUILLAGE D'UN SLOT //
+  // ////////////////////////////////////// //
+
+  #onLockClick () {
+    const [container, index] = this.#selectedSlot.getAttribute('location').split('|')
+    const slot = CONTAINER_STYPES.has(container)
+      ? inventoryManager.getContainerSlot(this.#selectedFurnitureId, parseInt(index, 10))
+      : inventoryManager.getSlot(container, parseInt(index, 10))
+    const locked = inventoryManager.toggleLock(slot)
+    this.#selectedSlot.toggleAttribute('locked', locked)
+    this.#updateLockBtn(this.#selectedSlot)
   }
 }
 export const inventoryOverlay = new InventoryOverlay()
