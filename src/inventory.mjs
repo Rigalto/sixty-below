@@ -1,10 +1,11 @@
 // InventoryManager — inventory.mjs
 
 import {OVERLAYS, BAG_CAPACITY, HOTBAR_CAPACITY, ARMOR_CAPACITY, ACCESSORY_CAPACITY, CONTAINER_STYPES, CONTAINER_CAPACITY, ARMOR_SLOTS, PATH_RENAME, PATH_LOCKED, PATH_UNLOCKED, SVG_ICON} from './constant.mjs'
-import {eventBus} from './utils.mjs'
+import {eventBus, capitalize} from './utils.mjs'
 import {createOverlayHeader} from './ui.mjs'
-import {ITEMS} from '../../assets/data/data.mjs'
+import {ITEMS, itemTypeToString} from '../../assets/data/data.mjs'
 import {saveManager} from './persistence.mjs'
+import {furnitureManager} from './housing.mjs'
 
 /**
  * @file inventory.mjs
@@ -816,7 +817,6 @@ class InventorySlot extends HTMLElement {
     this._count = 0
     this._usable = null
     this._location = location !== null ? `Slot : ${location}\n` : ''
-    this.setAttribute('title', this._location)
   }
 
   attributeChangedCallback (name, oldValue, newValue) {
@@ -829,18 +829,16 @@ class InventorySlot extends HTMLElement {
 
   _itemChanged (value) {
     if (value === null || value === '') {
-      this.setAttribute('title', this._location)
       this._elImage.classList.add('hidden')
       return
     }
     const item = ITEMS[value]
     const {file, sx, sy, sw, sh} = item.image
     this._elImage.classList.remove('hidden')
-    this._elImage.style.backgroundImage = `url('/assets/${file}.png')`
+    this._elImage.style.backgroundImage = `url('/assets/sprites/${file}.png')`
     this._elImage.style.backgroundPosition = `-${sx}px -${sy}px`
     this._elImage.style.width = `${sw}px`
     this._elImage.style.height = `${sh}px`
-    this.setAttribute('title', `${this._location}${item.name}`)
   }
 
   _countChanged (value) {
@@ -873,6 +871,8 @@ class InventoryOverlay {
   #container
   #content
   #btnLock // icône de verrouillage/déverouillage du slot sélectionné
+  #hotbarSlots = [] // Array(8) — refs DOM des inventory-slot
+
   #selectedSlot = null // référence au DOM element inventory-slot sélectionné
   #selectedFurnitureId // identifiant du coffre sélectionné
 
@@ -956,6 +956,7 @@ class InventoryOverlay {
       slot.setAttribute('location', `hotbar|${i}`)
       slot.classList.add('hotbar')
       grid.appendChild(slot)
+      this.#hotbarSlots[i] = slot
     }
 
     return grid
@@ -1117,8 +1118,55 @@ class InventoryOverlay {
 
   #onOpen () {
     this.#container.style.display = 'flex'
+    // récupération des slots de la hotbar
+    const hotbar = inventoryManager.hotbar
+    for (let i = 0; i < HOTBAR_CAPACITY; i++) {
+      this.#updateSlotDOM(this.#hotbarSlots[i], hotbar[i])
+    }
     // TODO : peupler les slots depuis inventoryManager
     // TODO : peupler le dropdown des coffres dans le range
+  }
+
+  /**
+   * Met à jour les attributs d'un inventory-slot DOM depuis un slot mémoire.
+   * @param {HTMLElement} el — élément inventory-slot
+   * @param {object} slot — slot mémoire
+   */
+  #updateSlotDOM (el, slot) {
+    el.setAttribute('item', slot.item)
+    el.setAttribute('count', slot.count)
+    el.toggleAttribute('locked', slot.locked)
+    el.setAttribute('title', this.#buildSlotTitle(slot))
+  }
+
+  /**
+   * Construit le titre tooltip d'un slot.
+   * @param {object} slot — slot mémoire
+   * @returns {string}
+   */
+  #buildSlotTitle (slot) {
+    const container = this.#containerToString(slot.container)
+    if (slot.item === '') return `Slot: ${container}`
+    const item = ITEMS[slot.item]
+    const stars = '★'.repeat(Math.min(5, Math.max(0, item.star)))
+    const prefix = slot.prefix !== '' ? `${slot.prefix} ` : ''
+    const count = slot.count > 1 ? `${slot.count} ` : ''
+    return `Slot: ${container}\n${count}${prefix}${item.name}\nTier: ${stars}\n${item.tooltip}\nType: ${itemTypeToString(item.type)}`
+  }
+
+  /**
+   * Retourne le nom lisible du container pour le tooltip.
+   * @param {string} container
+   * @returns {string}
+   */
+  #containerToString (container) {
+    if (CONTAINER_STYPES.has(container)) {
+      if (this.#selectedFurnitureId === null) return 'Container'
+      const furniture = furnitureManager.getFurnitureById(this.#selectedFurnitureId)
+      if (furniture === undefined) return 'Container'
+      return `${capitalize(container)} — ${furniture.name}`
+    }
+    return capitalize(container)
   }
 
   #onClose () {

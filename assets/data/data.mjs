@@ -133,6 +133,28 @@ export const ITEM_TYPE = {
   FURNITURE: 0x1, TOOL: 0x2, MATERIAL: 0x4, FOOD: 0x08, BLOCK: 0x10, WALL: 0x20, MECHANISM: 0x40, AMMUNITION: 0x80, CHUNK: 0x100, ARMOR: 0x200, BAR: 0x400, WEAPON: 0x800, CRAFTABLE: 0x1000, ACCESSORY: 0x2000, GEM: 0x4000, POTION: 0x8000, SEMABLE: 0x10000, BAG: 0x20000, BAIT: 0x40000, USABLE: 0x80000, PLACABLE: 0x100000, UNIQUE: 0x200000, DISPOSABLE: 0x400000, NONE: 0
 }
 
+export const itemTypeToString = (type) => {
+  const ch = []
+  if (type & ITEM_TYPE.FURNITURE) { ch.push('Furniture') }
+  if (type & ITEM_TYPE.TOOL) { ch.push('Tool') }
+  if (type & ITEM_TYPE.MATERIAL) { ch.push('Crafting Material') }
+  if (type & ITEM_TYPE.FOOD) { ch.push('Food') }
+  if (type & ITEM_TYPE.BLOCK) { ch.push('Block') }
+  if (type & ITEM_TYPE.WALL) { ch.push('Wall') }
+  if (type & ITEM_TYPE.MECHANISM) { ch.push('Mechanism') }
+  if (type & ITEM_TYPE.AMMUNITION) { ch.push('Ammunition') }
+  if (type & ITEM_TYPE.CHUNK) { ch.push('Ore Chunk') }
+  if (type & ITEM_TYPE.ARMOR) { ch.push('Armor') }
+  if (type & ITEM_TYPE.BAR) { ch.push('Bar') }
+  if (type & ITEM_TYPE.WEAPON) { ch.push('Weapon') }
+  if (type & ITEM_TYPE.ACCESSORY) { ch.push('Accessory') }
+  if (type & ITEM_TYPE.GEM) { ch.push('Gem') }
+  if (type & ITEM_TYPE.POTION) { ch.push('Potion') }
+  if (type & ITEM_TYPE.BAG) { ch.push('Grab Bag') }
+  if (type & ITEM_TYPE.BAIT) { ch.push('Bait') }
+  return ch.join(', ')
+}
+
 // MATERIAL: objet utilisé comme ingrédient dans au moins une recette
 // CRAFTABLE : objet pouvant être crée via l'artisanat
 // UNIQUE: objet unique, ne peut pas être détruit/vendu/démonté/transmuté
@@ -235,7 +257,7 @@ export const ITEMS = {
   hammerCopper: {name: 'Copper Hammer', type: ITEM_TYPE.TOOL | ITEM_TYPE.MATERIAL, stype: 'hammer', star: 2, image: 'tools_32_32-4-0', placedright: 'w_42_42-0-0', placedleft: 'w_42_42-0-1', speed: 0, help: 'Hammers', tooltip: 'Tools used to remove wall, furniture, workstation, converting them to item form'},
 
   // Axes
-  axeCopper: {name: 'Copper Axe', type: ITEM_TYPE.TOOL | ITEM_TYPE.WEAPON | ITEM_TYPE.MATERIAL, stype: 'axe', star: 2, image: 'tools_32_32-4-0', placedright: 'w_42_42-0-0', placedleft: 'w_42_42-0-1', speed: 0, help: 'Axes', tooltip: 'Basic tools used to chop trees. Can be used as a slow weapon'},
+  axeCopper: {name: 'Copper Axe', type: ITEM_TYPE.TOOL | ITEM_TYPE.WEAPON | ITEM_TYPE.MATERIAL, stype: 'axe', star: 2, image: 'tools_32_32-2-0', placedright: 'w_42_42-0-0', placedleft: 'w_42_42-0-1', speed: 0, help: 'Axes', tooltip: 'Basic tools used to chop trees. Can be used as a slow weapon'},
 
   // Swords
   swordCopper: {name: 'Copper Sword', type: ITEM_TYPE.WEAPON | ITEM_TYPE.MATERIAL, stype: 'axe', star: 2, image: 'tools_32_32-4-0', placedright: 'w_42_42-0-0', placedleft: 'w_42_42-0-1', speed: 0, help: 'Swords', tooltip: 'Melee weapon'},
