@@ -32,6 +32,8 @@ La génération doit être modifiée pour prendre en compte le changement de con
 
 ## À faire — Amélioration
 
+- Mettre les bonnes icônes dans le haut du Control Panel
+- Mettre les bonnes icônes dans le titre des Overlays
 - Dans les slots de l'inventaire, donner les informations sur l'item contenu, quand il existe.
 - Dans l'overlay de création d'un monde, ajouter, sous le champ d'introduction de la Seed, une ligne : 'Current World Seed: xxxxx', ou xxxxx est la seed du monde qui va être écrasé. On peut cliquer sur les xxxxx et la graine est alors copiée dans le champ `input`. Il faudra ajouter cela à la fiche d'aide (pas encore créée).
 
