@@ -1,6 +1,6 @@
 // InventoryManager — inventory.mjs
 
-import {OVERLAYS, BAG_CAPACITY, HOTBAR_CAPACITY, ARMOR_CAPACITY, ARMOR_SLOT_LABELS, ACCESSORY_CAPACITY, CONTAINER_STYPES, CONTAINER_CAPACITY, ARMOR_SLOTS, PATH_RENAME, PATH_LOCKED, PATH_UNLOCKED, SVG_ICON} from './constant.mjs'
+import {OVERLAYS, BAG_CAPACITY, HOTBAR_CAPACITY, ARMOR_CAPACITY, ARMOR_SLOT_LABELS, ACCESSORY_CAPACITY, CONTAINER_STYPES, CONTAINER_CAPACITY, ARMOR_SLOTS, PATH_RENAME, PATH_LOCKED, PATH_UNLOCKED, SVG_ICON, PATH_HELP} from './constant.mjs'
 import {eventBus, capitalize} from './utils.mjs'
 import {createOverlayHeader} from './ui.mjs'
 import {ITEMS, itemTypeToString} from '../../assets/data/data.mjs'
@@ -1032,6 +1032,22 @@ class InventoryOverlay {
     btnLock.addEventListener('click', () => this.#onLockClick())
     this.#btnLock = btnLock
     col.appendChild(btnLock)
+
+    const btnHelp = document.createElement('button')
+    btnHelp.className = 'inv-action-btn'
+    btnHelp.title = 'Open Help'
+    btnHelp.innerHTML = SVG_ICON(PATH_HELP, 'class="help-icon"')
+
+    btnHelp.addEventListener('click', () => {
+      const item = this.#selectedSlot?.getAttribute('item') ?? ''
+      const topic = item !== '' ? ITEMS[item].help : 'Inventory'
+
+      eventBus.emit('overlay/open-request', 'help')
+      eventBus.emit('help/topic', topic)
+    })
+
+    col.appendChild(btnHelp)
+
     return col
   }
 

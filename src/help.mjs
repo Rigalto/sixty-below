@@ -364,6 +364,10 @@ class HelpOverlay {
       const topic = target.dataset.nav
       this.#navigateTo(topic)
     })
+
+    eventBus.on('help/topic', (topic) => {
+      this.#navigateTo(topic)
+    })
   }
 
   // ─── Logique filtre ───────────────────────────────────────────

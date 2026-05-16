@@ -237,6 +237,7 @@ Cette section définit les événements officiels. Tout nouvel événement doit 
 | :--- | :--- | :--- |
 | `help/open`| - | Affichage du panel d'aide. |
 | `help/close`| - | Disparition du panel d'aide. |
+| `help/topic` | `string` (topic title) | Navigue vers une fiche d'aide spécifique. Émis par n'importe quel composant. |
 
 #### Combat (`CombatOverlay`)
 | Event Name | Payload Structure | Description |
