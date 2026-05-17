@@ -1,6 +1,6 @@
 // InventoryManager — inventory.mjs
 
-import {OVERLAYS, BAG_CAPACITY, HOTBAR_CAPACITY, ARMOR_CAPACITY, ARMOR_SLOT_LABELS, ACCESSORY_CAPACITY, CONTAINER_STYPES, CONTAINER_CAPACITY, ARMOR_SLOTS, PATH_RENAME, PATH_LOCKED, PATH_UNLOCKED, PATH_CRAFT, SVG_ICON, PATH_HELP, PATH_DEBUG, PATH_TRASH_DOWN, PATH_TRASH_UP} from './constant.mjs'
+import {OVERLAYS, BAG_CAPACITY, HOTBAR_CAPACITY, ARMOR_CAPACITY, ARMOR_SLOT_LABELS, ACCESSORY_CAPACITY, CONTAINER_STYPES, CONTAINER_CAPACITY, ARMOR_SLOTS, PATH_RENAME, PATH_LOCKED, PATH_UNLOCKED, PATH_CRAFT, SVG_ICON, PATH_HELP, PATH_DEBUG, PATH_TRASH_DOWN, PATH_TRASH_UP, PATH_USE} from './constant.mjs'
 import {eventBus, capitalize} from './utils.mjs'
 import {createOverlayHeader} from './ui.mjs'
 import {ITEMS, ITEM_TYPE, itemTypeToString} from '../../assets/data/data.mjs'
@@ -912,6 +912,7 @@ customElements.define('inventory-slot', InventorySlot)
 class InventoryOverlay {
   #container
   #content
+  #btnUse // icône d'utilisation du slot sélectionné
   #btnLock // icône de verrouillage/déverouillage du slot sélectionné
   #btnTrash // icôns de placement du slot sélectionné dans la poubelle
   #btnRestore // icône de récupération du contenu de la poubelle
@@ -1059,6 +1060,14 @@ class InventoryOverlay {
   buildActions () {
     const col = document.createElement('div')
     col.className = 'inv-actions inv-panel'
+
+    const btnUse = document.createElement('button')
+    btnUse.className = 'inv-action-btn'
+    btnUse.disabled = true
+    btnUse.innerHTML = SVG_ICON(PATH_USE, 'class="use-icon"')
+    btnUse.addEventListener('click', () => this.#onUseClick())
+    col.appendChild(btnUse)
+    this.#btnUse = btnUse
 
     const btnLock = document.createElement('button')
     btnLock.className = 'inv-action-btn'
@@ -1349,12 +1358,26 @@ class InventoryOverlay {
     // Sélection du nouveau
     slot.classList.add('selected')
     this.#selectedSlot = slot
-    // icône d'action : Lock
+    this.#updateActionButtons()
+  }
+
+  #updateActionButtons () {
+    const slot = this.#selectedSlot
+    const item = slot?.getAttribute('item') ?? ''
+    const [container] = slot?.getAttribute('location').split('|') ?? ['']
+    const itemDef = item !== '' ? ITEMS[item] : null
+    const isLocked = slot?.hasAttribute('locked') ?? false
+
+    // Lock
     this.#updateLockBtn(slot)
-    // icône d'action : Trash
-    const item = slot.getAttribute('item')
-    const [container] = slot.getAttribute('location').split('|')
-    this.#btnTrash.disabled = container !== 'bag' || item === '' || !!(ITEMS[item]?.type & ITEM_TYPE.UNDISPOSABLE)
+
+    // Trash
+    this.#btnTrash.disabled = isLocked || container !== 'bag' || item === '' || !!(itemDef?.type & ITEM_TYPE.UNDISPOSABLE)
+
+    // Use
+    const isUsable = !isLocked && container === 'bag' && item !== '' && !!(itemDef?.type & ITEM_TYPE.USABLE)
+    this.#btnUse.disabled = !isUsable
+    this.#btnUse.title = isUsable ? (itemDef.useTitle || 'Use item') : 'Use item'
   }
 
   // /////////////////////////////////////// //
@@ -1381,7 +1404,7 @@ class InventoryOverlay {
       : inventoryManager.getSlot(container, parseInt(index, 10))
     const locked = inventoryManager.toggleLock(slot)
     this.#selectedSlot.toggleAttribute('locked', locked)
-    this.#updateLockBtn(this.#selectedSlot)
+    this.#updateActionButtons()
   }
 
   // ////////////////////// //
@@ -1395,15 +1418,32 @@ class InventoryOverlay {
     this.#updateSlotDOM(this.#selectedSlot, slot)
     this.#selectedSlot.classList.remove('selected')
     this.#selectedSlot = null
-    this.#updateLockBtn(null)
-    this.#btnTrash.disabled = true
     this.#btnRestore.disabled = false
+    this.#updateActionButtons()
   }
 
   #onRestoreClick () {
     inventoryManager.restoreTrash()
     this.refreshBag()
     this.#btnRestore.disabled = true
+    this.#updateActionButtons()
+  }
+
+  // ///////////////////// //
+  // UTILISATION D'UN ITEM //
+  // ///////////////////// //
+
+  #onUseClick () {
+    const [container, index] = this.#selectedSlot.getAttribute('location').split('|')
+    if (container !== 'bag') return // précaution - ne devrait jamais arriver
+    const slot = inventoryManager.decrementBagSlotCount(parseInt(index, 10))
+    this.#updateSlotDOM(this.#selectedSlot, slot)
+    eventBus.emit('item/used', slot.item !== '' ? this.#selectedSlot.getAttribute('item') : slot.item)
+    if (slot.item === '') {
+      this.#selectedSlot.classList.remove('selected')
+      this.#selectedSlot = null
+    }
+    this.#updateActionButtons()
   }
 }
 export const inventoryOverlay = new InventoryOverlay()
