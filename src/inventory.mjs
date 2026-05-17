@@ -474,6 +474,31 @@ class InventoryManager {
     return slot.locked
   }
 
+  // ─── Séparation pile ─────────────────────────────────────────
+
+  /**
+   * Sépare une pile en deux. La portion extraite est déposée dans le bag
+   * (p)remier slot libre).
+   * Sans effet si le bag est plein.
+   * @param {object} srcSlot — slot source (référence mémoire)
+   * @param {number} count — quantité à extraire
+   * @returns {object|null} — slot destination modifié, ou null si bag plein
+   */
+  splitSlot (srcSlot, count) {
+    // Premier slot libre
+    for (const slot of this.#bag) {
+      if (slot.locked || slot.item !== '') continue
+      slot.item = srcSlot.item
+      slot.count = count
+      slot.prefix = srcSlot.prefix
+      srcSlot.count -= count
+      this.#dirtyKeys.add(slot)
+      this.#dirtyKeys.add(srcSlot)
+      return slot
+    }
+    return null
+  }
+
   // ─── Loot vers inventaire ────────────────────────────────────
 
   /**
