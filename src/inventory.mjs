@@ -1,6 +1,6 @@
 // InventoryManager — inventory.mjs
 
-import {OVERLAYS, BAG_CAPACITY, HOTBAR_CAPACITY, ARMOR_CAPACITY, ARMOR_SLOT_LABELS, ACCESSORY_CAPACITY, CONTAINER_STYPES, CONTAINER_CAPACITY, ARMOR_SLOTS, PATH_RENAME, PATH_LOCKED, PATH_UNLOCKED, PATH_CRAFT, SVG_ICON, PATH_HELP, PATH_DEBUG} from './constant.mjs'
+import {OVERLAYS, BAG_CAPACITY, HOTBAR_CAPACITY, ARMOR_CAPACITY, ARMOR_SLOT_LABELS, ACCESSORY_CAPACITY, CONTAINER_STYPES, CONTAINER_CAPACITY, ARMOR_SLOTS, PATH_RENAME, PATH_LOCKED, PATH_UNLOCKED, PATH_CRAFT, SVG_ICON, PATH_HELP, PATH_DEBUG, PATH_TRASH_DOWN, PATH_TRASH_UP} from './constant.mjs'
 import {eventBus, capitalize} from './utils.mjs'
 import {createOverlayHeader} from './ui.mjs'
 import {ITEMS, ITEM_TYPE, itemTypeToString} from '../../assets/data/data.mjs'
@@ -407,6 +407,7 @@ class InventoryManager {
    * Déplace le contenu d'un slot bag vers la poubelle.
    * Écrase l'éventuel contenu précédent (une seule annulation possible).
    * @param {number} slotIndex
+   * @returns {object} — slot vidé
    */
   trashFromBag (slotIndex) {
     const src = this.#bag[slotIndex]
@@ -415,6 +416,7 @@ class InventoryManager {
     src.count = 0
     src.prefix = ''
     this.#dirtyKeys.add(src.key)
+    return src
   }
 
   /**
@@ -879,6 +881,9 @@ class InventoryOverlay {
   #container
   #content
   #btnLock // icône de verrouillage/déverouillage du slot sélectionné
+  #btnTrash // icôns de placement du slot sélectionné dans la poubelle
+  #btnRestore // icône de récupération du contenu de la poubelle
+
   #hotbarSlots = [] // Array(8) — refs DOM des inventory-slot
   #bagSlots = [] // Array(64) — refs DOM des inventory-slot
   #armorSlots = [] // Array(3) — refs DOM des inventory-slot
@@ -1031,6 +1036,24 @@ class InventoryOverlay {
     btnLock.addEventListener('click', () => this.#onLockClick())
     this.#btnLock = btnLock
     col.appendChild(btnLock)
+
+    const btnTrash = document.createElement('button')
+    btnTrash.className = 'inv-action-btn'
+    btnTrash.title = 'Trash item'
+    btnTrash.disabled = true
+    btnTrash.innerHTML = SVG_ICON(PATH_TRASH_DOWN, 'class="trash-icon"')
+    btnTrash.addEventListener('click', () => this.#onTrashClick())
+    col.appendChild(btnTrash)
+    this.#btnTrash = btnTrash
+
+    const btnRestore = document.createElement('button')
+    btnRestore.className = 'inv-action-btn'
+    btnRestore.title = 'Restore trashed item'
+    btnRestore.disabled = true
+    btnRestore.innerHTML = SVG_ICON(PATH_TRASH_UP, 'class="restore-icon"')
+    btnRestore.addEventListener('click', () => this.#onRestoreClick())
+    col.appendChild(btnRestore)
+    this.#btnRestore = btnRestore
 
     const btnCraft = document.createElement('button')
     btnCraft.className = 'inv-action-btn'
@@ -1281,7 +1304,10 @@ class InventoryOverlay {
     // Désélection
       slot.classList.remove('selected')
       this.#selectedSlot = null
+      // icône d'action : Lock
       this.#updateLockBtn(null)
+      // icône d'action : Trash
+      this.#btnTrash.disabled = true
       return
     }
     // Désélection du précédent
@@ -1291,8 +1317,17 @@ class InventoryOverlay {
     // Sélection du nouveau
     slot.classList.add('selected')
     this.#selectedSlot = slot
+    // icône d'action : Lock
     this.#updateLockBtn(slot)
+    // icône d'action : Trash
+    const item = slot.getAttribute('item')
+    const [container] = slot.getAttribute('location').split('|')
+    this.#btnTrash.disabled = container !== 'bag' || item === '' || !!(ITEMS[item]?.type & ITEM_TYPE.UNDISPOSABLE)
   }
+
+  // /////////////////////////////////////// //
+  // VERROUILLAGE / DEVERROUILLAGE D'UN SLOT //
+  // /////////////////////////////////////// //
 
   #updateLockBtn (slot) {
     if (slot === null) {
@@ -1307,10 +1342,6 @@ class InventoryOverlay {
     this.#btnLock.title = isLocked ? 'Unlock slot' : 'Lock slot'
   }
 
-  // ////////////////////////////////////// //
-  // VERROUILAGE / DEVERROUILLAGE D'UN SLOT //
-  // ////////////////////////////////////// //
-
   #onLockClick () {
     const [container, index] = this.#selectedSlot.getAttribute('location').split('|')
     const slot = CONTAINER_STYPES.has(container)
@@ -1319,6 +1350,28 @@ class InventoryOverlay {
     const locked = inventoryManager.toggleLock(slot)
     this.#selectedSlot.toggleAttribute('locked', locked)
     this.#updateLockBtn(this.#selectedSlot)
+  }
+
+  // ////////////////////// //
+  // GESTION DE LA POUBELLE //
+  // ////////////////////// //
+
+  #onTrashClick () {
+    const [container, index] = this.#selectedSlot.getAttribute('location').split('|')
+    if (container !== 'bag') return // précaution - ne devrait jamais arriver
+    const slot = inventoryManager.trashFromBag(parseInt(index, 10))
+    this.#updateSlotDOM(this.#selectedSlot, slot)
+    this.#selectedSlot.classList.remove('selected')
+    this.#selectedSlot = null
+    this.#updateLockBtn(null)
+    this.#btnTrash.disabled = true
+    this.#btnRestore.disabled = false
+  }
+
+  #onRestoreClick () {
+    inventoryManager.restoreTrash()
+    this.refreshBag()
+    this.#btnRestore.disabled = true
   }
 }
 export const inventoryOverlay = new InventoryOverlay()

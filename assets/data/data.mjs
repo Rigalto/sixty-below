@@ -130,7 +130,7 @@ export const NODES_LOOKUP = []
 // sa nature (ce qu'il est) : 'FURNITURE', 'WALL', ...
 // les actions qui peuvent être conduite dessus : 'CRAFTING' (à renommer), 'USABLE', 'PLACABLE', 'UNDELETABLE', 'CRAFTABLLE', 'REMOVABLE', 'AMMUNITION'...
 export const ITEM_TYPE = {
-  FURNITURE: 0x1, TOOL: 0x2, MATERIAL: 0x4, FOOD: 0x08, BLOCK: 0x10, WALL: 0x20, MECHANISM: 0x40, AMMUNITION: 0x80, CHUNK: 0x100, ARMOR: 0x200, BAR: 0x400, WEAPON: 0x800, CRAFTABLE: 0x1000, ACCESSORY: 0x2000, GEM: 0x4000, POTION: 0x8000, SEMABLE: 0x10000, BAG: 0x20000, BAIT: 0x40000, USABLE: 0x80000, PLACABLE: 0x100000, UNIQUE: 0x200000, DISPOSABLE: 0x400000, NONE: 0
+  FURNITURE: 0x1, TOOL: 0x2, MATERIAL: 0x4, FOOD: 0x08, BLOCK: 0x10, WALL: 0x20, MECHANISM: 0x40, AMMUNITION: 0x80, CHUNK: 0x100, ARMOR: 0x200, BAR: 0x400, WEAPON: 0x800, CRAFTABLE: 0x1000, ACCESSORY: 0x2000, GEM: 0x4000, POTION: 0x8000, SEMABLE: 0x10000, BAG: 0x20000, BAIT: 0x40000, USABLE: 0x80000, PLACABLE: 0x100000, UNIQUE: 0x200000, UNDISPOSABLE: 0x400000, NONE: 0
 }
 
 export const itemTypeToString = (type) => {
@@ -282,11 +282,11 @@ export const ITEMS = {
   triskelAncient: {name: 'Ancient Triskel', type: ITEM_TYPE.ACCESSORY | ITEM_TYPE.UNIQUE | ITEM_TYPE.CRAFTABLE, stype: 'triskel', star: 5, image: 'furniture_32_32-12-2', placed: 'furniture_32_32-6-3', help: 'Triskels', tooltip: ''},
 
   // Tombstone
-  tomb: {name: 'Tombstone', type: ITEM_TYPE.FURNITURE, stype: 'tomb', star: 1, undisposable: true, image: 'furniture_32_32-13-2', placed: 'fuws_32_32-3-4', help: 'Graveyard', tooltip: 'Summons specific enemies'},
-  tombHead: {name: 'Headstone', type: ITEM_TYPE.FURNITURE, stype: 'tomb', star: 1, undisposable: true, image: 'furniture_32_32-4-8', placed: 'fuws_32_32-4-4', help: 'Graveyard', tooltip: 'Summons specific enemies'},
-  tombGrave: {name: 'Gravestone', type: ITEM_TYPE.FURNITURE, stype: 'tomb', star: 1, undisposable: true, image: 'furniture_32_32-5-8', placed: 'fuws_32_32-5-4', help: 'Graveyard', tooltip: 'Summons specific enemies'},
-  tombStrange: {name: 'Strange Looking Tombstone', type: ITEM_TYPE.FURNITURE, star: 1, stype: 'tomb', undisposable: true, image: 'furniture_32_32-6-8', placed: 'fuws_32_32-6-4', help: 'Graveyard', tooltip: 'Summons specific enemies'},
-  tombCross: {name: 'Cross Tombstone', type: ITEM_TYPE.FURNITURE, stype: 'tomb', star: 1, undisposable: true, image: 'furniture_32_32-7-8', placed: 'fuws_32_32-7-4', help: 'Graveyard', tooltip: 'Summons specific enemies'},
+  tomb: {name: 'Tombstone', type: ITEM_TYPE.FURNITURE | ITEM_TYPE.UNDISPOSABLE, stype: 'tomb', star: 1, image: 'furniture_32_32-13-2', placed: 'fuws_32_32-3-4', help: 'Graveyard', tooltip: 'Summons specific enemies'},
+  tombHead: {name: 'Headstone', type: ITEM_TYPE.FURNITURE | ITEM_TYPE.UNDISPOSABLE, stype: 'tomb', star: 1, image: 'furniture_32_32-4-8', placed: 'fuws_32_32-4-4', help: 'Graveyard', tooltip: 'Summons specific enemies'},
+  tombGrave: {name: 'Gravestone', type: ITEM_TYPE.FURNITURE | ITEM_TYPE.UNDISPOSABLE, stype: 'tomb', star: 1, image: 'furniture_32_32-5-8', placed: 'fuws_32_32-5-4', help: 'Graveyard', tooltip: 'Summons specific enemies'},
+  tombStrange: {name: 'Strange Looking Tombstone', type: ITEM_TYPE.FURNITURE | ITEM_TYPE.UNDISPOSABLE, star: 1, stype: 'tomb', image: 'furniture_32_32-6-8', placed: 'fuws_32_32-6-4', help: 'Graveyard', tooltip: 'Summons specific enemies'},
+  tombCross: {name: 'Cross Tombstone', type: ITEM_TYPE.FURNITURE | ITEM_TYPE.UNDISPOSABLE, stype: 'tomb', star: 1, image: 'furniture_32_32-7-8', placed: 'fuws_32_32-7-4', help: 'Graveyard', tooltip: 'Summons specific enemies'},
 
   // Wood furniture set
   chairWood: {name: 'Wooden Chair', type: ITEM_TYPE.FURNITURE | ITEM_TYPE.PLACABLE, stype: 'chair', star: 1, image: 'furniture_32_32-0-5', placedLeft: 'fuws_16_48-1-0', placedRight: 'fuws_16_48-2-0', help: 'Chairs', tooltip: '???', furnitureSet: 'wood', comfort: true},
