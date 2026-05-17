@@ -1,6 +1,6 @@
 // InventoryManager — inventory.mjs
 
-import {OVERLAYS, BAG_CAPACITY, HOTBAR_CAPACITY, ARMOR_CAPACITY, ARMOR_SLOT_LABELS, ACCESSORY_CAPACITY, CONTAINER_STYPES, CONTAINER_CAPACITY, ARMOR_SLOTS, PATH_RENAME, PATH_LOCKED, PATH_UNLOCKED, PATH_CRAFT, SVG_ICON, PATH_HELP, PATH_DEBUG, PATH_TRASH_DOWN, PATH_TRASH_UP, PATH_USE} from './constant.mjs'
+import {OVERLAYS, BAG_CAPACITY, HOTBAR_CAPACITY, ARMOR_CAPACITY, ARMOR_SLOT_LABELS, ACCESSORY_CAPACITY, CONTAINER_STYPES, CONTAINER_CAPACITY, ARMOR_SLOTS, PATH_RENAME, PATH_LOCKED, PATH_UNLOCKED, PATH_CRAFT, SVG_ICON, PATH_HELP, PATH_DEBUG, PATH_SPLIT, PATH_TRASH_DOWN, PATH_TRASH_UP, PATH_USE} from './constant.mjs'
 import {eventBus, capitalize} from './utils.mjs'
 import {createOverlayHeader} from './ui.mjs'
 import {ITEMS, ITEM_TYPE, itemTypeToString} from '../../assets/data/data.mjs'
@@ -939,6 +939,7 @@ class InventoryOverlay {
   #content
   #btnUse // icône d'utilisation du slot sélectionné
   #btnLock // icône de verrouillage/déverouillage du slot sélectionné
+  #btnSplit // icône de séparatin d'une pile
   #btnTrash // icôns de placement du slot sélectionné dans la poubelle
   #btnRestore // icône de récupération du contenu de la poubelle
 
@@ -1102,6 +1103,15 @@ class InventoryOverlay {
     btnLock.addEventListener('click', () => this.#onLockClick())
     this.#btnLock = btnLock
     col.appendChild(btnLock)
+
+    const btnSplit = document.createElement('button')
+    btnSplit.className = 'inv-action-btn'
+    btnSplit.title = 'Split stack'
+    btnSplit.disabled = true
+    btnSplit.innerHTML = SVG_ICON(PATH_SPLIT, 'class="trash-icon"')
+    btnSplit.addEventListener('click', () => this.#onSplitClick())
+    col.appendChild(btnSplit)
+    this.#btnSplit = btnSplit
 
     const btnTrash = document.createElement('button')
     btnTrash.className = 'inv-action-btn'
@@ -1414,6 +1424,11 @@ class InventoryOverlay {
     const isUsable = !isLocked && container === 'bag' && item !== '' && !!(itemDef?.type & ITEM_TYPE.USABLE)
     this.#btnUse.disabled = !isUsable
     this.#btnUse.title = isUsable ? (itemDef.useTitle || 'Use item') : 'Use item'
+
+    // Split
+    const SPLITTABLE = new Set(['bag', 'hotbar', 'chest'])
+    const isSplittable = !isLocked && SPLITTABLE.has(container) && item !== '' && slot?.getAttribute('count') > 1
+    this.#btnSplit.disabled = !isSplittable
   }
 
   // /////////////////////////////////////// //
@@ -1479,6 +1494,35 @@ class InventoryOverlay {
       this.#selectedSlot.classList.remove('selected')
       this.#selectedSlot = null
     }
+    this.#updateActionButtons()
+  }
+
+  // ///////////////////// //
+  // SEPARATION D'UN ITEM //
+  // ///////////////////// //
+
+  #onSplitClick () {
+    const count = parseInt(this.#selectedSlot.getAttribute('count'), 10)
+    const itemName = ITEMS[this.#selectedSlot.getAttribute('item')].name
+    const value = window.prompt(`Split stack — ${itemName}\nEnter amount to extract [1-${count - 1}]:`)
+
+    if (value === null) return
+    const extracted = parseInt(value, 10)
+    if (isNaN(extracted) || extracted < 1 || extracted > count - 1) {
+      window.alert(`Invalid amount. Expected a value between 1 and ${count - 1}.`)
+      return
+    }
+    const [container, index] = this.#selectedSlot.getAttribute('location').split('|')
+    const srcSlot = CONTAINER_STYPES.has(container)
+      ? inventoryManager.getContainerSlot(this.#selectedFurnitureId, parseInt(index, 10))
+      : inventoryManager.getSlot(container, parseInt(index, 10))
+    const destSlot = inventoryManager.splitSlot(srcSlot, extracted)
+    if (destSlot === null) {
+      window.alert('Bag is full — cannot split stack.')
+      return
+    }
+    this.#updateSlotDOM(this.#selectedSlot, srcSlot)
+    this.refreshBag()
     this.#updateActionButtons()
   }
 }
