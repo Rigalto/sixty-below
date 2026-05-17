@@ -1114,6 +1114,7 @@ class InventoryOverlay {
 
     const btnUse = document.createElement('button')
     btnUse.className = 'inv-action-btn'
+    btnUse.title = 'Use item [Space]'
     btnUse.disabled = true
     btnUse.innerHTML = SVG_ICON(PATH_USE, 'class="use-icon"')
     btnUse.addEventListener('click', () => this.#onUseClick())
@@ -1122,7 +1123,7 @@ class InventoryOverlay {
 
     const btnLock = document.createElement('button')
     btnLock.className = 'inv-action-btn'
-    btnLock.title = 'Lock / Unlock slot'
+    btnLock.title = 'Lock / Unlock slot [L]'
     btnLock.innerHTML = SVG_ICON(PATH_LOCKED, 'class="lock-closed"') + SVG_ICON(PATH_UNLOCKED, 'class="lock-open"')
     btnLock.disabled = true
     btnLock.addEventListener('click', () => this.#onLockClick())
@@ -1140,7 +1141,7 @@ class InventoryOverlay {
 
     const btnTrash = document.createElement('button')
     btnTrash.className = 'inv-action-btn'
-    btnTrash.title = 'Trash item'
+    btnTrash.title = 'Trash item [Delete]'
     btnTrash.disabled = true
     btnTrash.innerHTML = SVG_ICON(PATH_TRASH_DOWN, 'class="trash-icon"')
     btnTrash.addEventListener('click', () => this.#onTrashClick())
@@ -1448,8 +1449,9 @@ class InventoryOverlay {
     // Use
     const isUsable = !isLocked && container === 'bag' && item !== '' && !!(itemDef?.type & ITEM_TYPE.USABLE)
     this.#btnUse.disabled = !isUsable
-    this.#btnUse.title = isUsable ? (itemDef.useTitle || 'Use item') : 'Use item'
-
+    this.#btnUse.title = isUsable
+      ? `${itemDef.useTitle || 'Use item'} [Space]`
+      : 'Use item [Space]'
     // Split
     const SPLITTABLE = new Set(['bag', 'hotbar', 'chest'])
     const isSplittable = !isLocked && SPLITTABLE.has(container) && item !== '' && slot?.getAttribute('count') > 1
@@ -1464,13 +1466,13 @@ class InventoryOverlay {
     if (slot === null) {
       this.#btnLock.disabled = true
       this.#btnLock.classList.remove('unlocking')
-      this.#btnLock.title = 'Lock / Unlock slot'
+      this.#btnLock.title = 'Lock / Unlock slot [L]'
       return
     }
     const isLocked = slot.hasAttribute('locked')
     this.#btnLock.disabled = false
     this.#btnLock.classList.toggle('unlocking', isLocked)
-    this.#btnLock.title = isLocked ? 'Unlock slot' : 'Lock slot'
+    this.#btnLock.title = isLocked ? 'Unlock slot [L]' : 'Lock slot [L]'
   }
 
   #onLockClick () {
@@ -1529,7 +1531,7 @@ class InventoryOverlay {
   #onSplitClick () {
     const count = parseInt(this.#selectedSlot.getAttribute('count'), 10)
     const itemName = ITEMS[this.#selectedSlot.getAttribute('item')].name
-    const value = window.prompt(`Split stack — ${itemName}\nEnter amount to extract [1-${count - 1}]:`)
+    const value = window.prompt(`Split stack — ${itemName}\nEnter amount to extract (1 to ${count - 1}):`)
 
     if (value === null) return
     const extracted = parseInt(value, 10)
