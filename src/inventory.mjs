@@ -1,6 +1,6 @@
 // InventoryManager — inventory.mjs
 
-import {OVERLAYS, BAG_CAPACITY, HOTBAR_CAPACITY, ARMOR_CAPACITY, ARMOR_SLOT_LABELS, ACCESSORY_CAPACITY, CONTAINER_STYPES, CONTAINER_CAPACITY, ARMOR_SLOTS, PATH_RENAME, PATH_LOCKED, PATH_UNLOCKED, PATH_CRAFT, SVG_ICON, PATH_HELP, PATH_DEBUG, PATH_SPLIT, PATH_TRASH_DOWN, PATH_TRASH_UP, PATH_USE} from './constant.mjs'
+import {OVERLAYS, BAG_CAPACITY, HOTBAR_CAPACITY, ARMOR_CAPACITY, ARMOR_SLOT_LABELS, ACCESSORY_CAPACITY, CONTAINER_STYPES, CONTAINER_CAPACITY, ARMOR_SLOTS, PATH_RENAME, PATH_LOCKED, PATH_UNLOCKED, PATH_CRAFT, SVG_ICON, PATH_HELP, PATH_DEBUG, PATH_SPLIT, PATH_TRASH_DOWN, PATH_TRASH_UP, PATH_USE, PATH_WARNING} from './constant.mjs'
 import {eventBus, capitalize} from './utils.mjs'
 import {createOverlayHeader} from './ui.mjs'
 import {ITEMS, ITEM_TYPE, itemTypeToString} from '../../assets/data/data.mjs'
@@ -856,6 +856,24 @@ inventory-slot .hidden {
   display: none;
 }
 
+#ui-inventory-panel .inv-chest-header {
+  position: relative;
+}
+
+#ui-inventory-panel .inv-save-warning {
+  position: absolute;
+  top: 52px;  /* hauteur du inv-chest-header-content fermé + gap */
+  left: 8px;
+  font-size: 20px;
+  color: #e67e22;
+  cursor: default;
+  z-index: 0;
+}
+
+#ui-inventory-panel .inv-chest-header-content {
+  position: relative;
+  z-index: 1;  /* ← recouvre le texte quand agrandi */
+}
 `
 document.head.appendChild(inventorySlotStyle)
 
@@ -1007,6 +1025,13 @@ class InventoryOverlay {
     chestHeader.className = 'inv-chest-header'
     const chestHeaderContent = this.buildChestHeader()
     chestHeader.appendChild(chestHeaderContent)
+
+    const saveWarning = document.createElement('div')
+    saveWarning.className = 'inv-save-warning'
+    saveWarning.innerHTML = SVG_ICON(PATH_WARNING, 'class="warning-icon" width="20" height="20" style="margin-right: 6px;"') + 'Changes are only saved when the panel is closed.'
+
+    saveWarning.title = 'No auto-save during editing.'
+    chestHeader.appendChild(saveWarning)
 
     const chestWrap = document.createElement('div')
     chestWrap.className = 'inv-chest'
