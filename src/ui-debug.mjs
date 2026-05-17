@@ -1,7 +1,8 @@
 import {MICROTASK, WORLD_WIDTH, WORLD_HEIGHT, OVERLAYS, UI_LAYOUT, SKY_COLORS} from './constant.mjs'
-import {hexToRgb, NODES_LOOKUP} from '../../assets/data/data.mjs'
+import {hexToRgb, ITEMS, NODES_LOOKUP} from '../../assets/data/data.mjs'
 import {eventBus, microTasker, taskScheduler} from './utils.mjs'
 import {chunkManager} from './world.mjs'
+import {inventoryManager, inventoryOverlay} from './inventory.mjs'
 
 /* ====================================================================================================
    PERFORMANCE MONITORING
@@ -286,3 +287,86 @@ class WorldMapDebug {
   }
 }
 export const worldMapDebug = new WorldMapDebug()
+
+/* ====================================================================================================
+   DEBUG COMMANDS
+   ==================================================================================================== */
+
+// lancé en cliquant sur l'icône de dabug de l'Inventory Panel (dernière icône de la colonne d'actions)
+
+const DEBUG_PACKS = {
+  starter: [
+    {item: 'pickaxeCopper', count: 1},
+    {item: 'axeCopper', count: 1}
+  ]
+}
+
+class InventoryDebug {
+  constructor () {
+    eventBus.on('debug/command', () => this.#onCommand())
+  }
+
+  #onCommand () {
+    const cmd = window.prompt('Debug command:')
+    if (cmd === null || cmd.trim() === '') return
+    this.#execute(cmd.trim())
+  }
+
+  #execute (cmd) {
+    const parts = cmd.split(' ')
+    const command = parts[0]
+
+    if (command === 'help') {
+      window.alert(
+        'Debug commands:\n\n' +
+        'help                   — list all debug commands\n' +
+        'add <itemId> [count]   — add items to inventory\n' +
+        'pack <packId>          — add a pre-configured pack\n' +
+        'emit <event> [payload] — trigger an eventBus event\n' +
+        'tp <x> <y>             — teleport player to tile coordinates'
+      )
+      return
+    }
+
+    if (command === 'add') {
+      const itemId = parts[1]
+      const count = parts[2] !== undefined ? parseInt(parts[2], 10) : 1
+      if (!ITEMS[itemId]) { window.alert(`Unknown item: ${itemId}`); return }
+      inventoryManager.loot(itemId, count, '')
+      inventoryOverlay.refreshBag()
+      return
+    }
+
+    if (command === 'pack') {
+      const packId = parts[1]
+      const pack = DEBUG_PACKS[packId]
+      if (!pack) {
+        const packs = Object.keys(DEBUG_PACKS).sort().join(', ')
+        window.alert(`Unknown pack: '${packId}'\nAvailable packs: ${packs}`)
+        return
+      } for (const {item, count} of pack) {
+        inventoryManager.loot(item, count, '')
+        inventoryOverlay.refreshBag()
+      }
+      return
+    }
+
+    if (command === 'emit') {
+      const eventName = parts[1]
+      const payload = parts[2] !== undefined ? parts.slice(2).join(' ') : undefined
+      eventBus.emit(eventName, payload)
+      return
+    }
+
+    if (command === 'tp') {
+      const x = parseInt(parts[1], 10)
+      const y = parseInt(parts[2], 10)
+      eventBus.emit('player/teleport', {x, y})
+      return
+    }
+
+    window.alert(`Unknown command: '${command}'\nType 'help' to list available commands.`)
+  }
+}
+
+export const inventoryDebug = new InventoryDebug()

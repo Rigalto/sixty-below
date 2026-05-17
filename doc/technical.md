@@ -211,6 +211,12 @@ Cette section définit les événements officiels. Tout nouvel événement doit 
 | `overlay/close` | `string` (Overlay ID) | Demande générique de fermeture émise par le bouton 'X' d'un overlay. Traitée par `InputManager`. |
 | `overlay/open-request`| `string` (Overlay ID) | Demande générique d'ouverture d'un overlay. Traitée par `InputManager`. |
 
+#### Player (`PlayerManager`)
+*En prévision*
+| Event Name | Payload Structure | Description |
+| :--- | :--- | :--- |
+| `player/teleport` | `{x: number, y: number}` | Téléporte le joueur aux coordonnées tuiles données. |
+
 #### Inventory (`InventoryManager`, `InventoryOverlay`)
 *En prévision*
 | Event Name | Payload Structure | Description |
@@ -262,6 +268,7 @@ Cette section définit les événements officiels. Tout nouvel événement doit 
 | `map/close`| - | Disparition de la carte au 1/16e. |
 | `debug/frame-sample`| `{updateTime, renderTime, microTime}` | Temps exécution dans la loop pour les 3 budgets. |
 | `debug/buff-manager` | _(none)_ | Affiche sur la console le contenu de `#values` et `#fns`. |
+| `debug/command` | — | Déclenche le prompt de debug. Émis par le bouton debug de l'`InventoryOverlay`. |
 
 
 ---

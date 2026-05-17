@@ -1,6 +1,6 @@
 // InventoryManager — inventory.mjs
 
-import {OVERLAYS, BAG_CAPACITY, HOTBAR_CAPACITY, ARMOR_CAPACITY, ARMOR_SLOT_LABELS, ACCESSORY_CAPACITY, CONTAINER_STYPES, CONTAINER_CAPACITY, ARMOR_SLOTS, PATH_RENAME, PATH_LOCKED, PATH_UNLOCKED, PATH_CRAFT, SVG_ICON, PATH_HELP} from './constant.mjs'
+import {OVERLAYS, BAG_CAPACITY, HOTBAR_CAPACITY, ARMOR_CAPACITY, ARMOR_SLOT_LABELS, ACCESSORY_CAPACITY, CONTAINER_STYPES, CONTAINER_CAPACITY, ARMOR_SLOTS, PATH_RENAME, PATH_LOCKED, PATH_UNLOCKED, PATH_CRAFT, SVG_ICON, PATH_HELP, PATH_DEBUG} from './constant.mjs'
 import {eventBus, capitalize} from './utils.mjs'
 import {createOverlayHeader} from './ui.mjs'
 import {ITEMS, ITEM_TYPE, itemTypeToString} from '../../assets/data/data.mjs'
@@ -580,8 +580,7 @@ inventory-slot .count {
   left: 50%;
   transform: translateX(-50%);
   font-size: 11px;
-  color: #ffffff;
-  text-shadow: 1px 1px 2px #000;
+  color: black;
   line-height: 1;
   pointer-events: none;
 }
@@ -1059,6 +1058,15 @@ class InventoryOverlay {
     })
     col.appendChild(btnHelp)
 
+    const btnDebug = document.createElement('button')
+    btnDebug.className = 'inv-action-btn'
+    btnDebug.title = 'Debug'
+    btnDebug.innerHTML = SVG_ICON(PATH_DEBUG, 'class="debug-icon"')
+    btnDebug.addEventListener('click', () => {
+      eventBus.emit('debug/command')
+    })
+    col.appendChild(btnDebug)
+
     return col
   }
 
@@ -1163,11 +1171,12 @@ class InventoryOverlay {
 
   #onOpen () {
     this.#container.style.display = 'flex'
-    // récupération des slots de la hotbar
-    const hotbar = inventoryManager.hotbar
-    for (let i = 0; i < hotbar.length; i++) {
-      this.#updateSlotDOM(this.#hotbarSlots[i], hotbar[i])
-    }
+    // récupération des slots de la hotbar et du bag
+    this.refreshBag()
+    // const hotbar = inventoryManager.hotbar
+    // for (let i = 0; i < hotbar.length; i++) {
+    //   this.#updateSlotDOM(this.#hotbarSlots[i], hotbar[i])
+    // }
     // récupération des slots de Armor
     const armor = inventoryManager.armor
     for (let i = 0; i < armor.length; i++) {
@@ -1179,18 +1188,31 @@ class InventoryOverlay {
       this.#updateSlotDOM(this.#accessorySlots[i], accessory[i])
     }
     // récupération des slots de Bag
-    const bag = inventoryManager.bag
-    for (let i = 0; i < bag.length; i++) {
-      this.#updateSlotDOM(this.#bagSlots[i], bag[i])
-    }
+    // const bag = inventoryManager.bag
+    // for (let i = 0; i < bag.length; i++) {
+    //   this.#updateSlotDOM(this.#bagSlots[i], bag[i])
+    // }
     // initialisation des slots de Container
     const emptySlot = {item: '', count: 0, locked: false, container: 'container'}
     for (let i = 0; i < 64; i++) {
       this.#updateSlotDOM(this.#containerSlots[i], emptySlot)
     }
-
-    // TODO : peupler les slots depuis inventoryManager
     // TODO : peupler le dropdown des coffres dans le range
+  }
+
+  /**
+   * Rafraîchit les slots DOM du bag et de la hotbar depuis inventoryManager.
+   * À appeler après toute modification externe (debug, loot).
+   */
+  refreshBag () {
+    const hotbar = inventoryManager.hotbar
+    for (let i = 0; i < HOTBAR_CAPACITY; i++) {
+      this.#updateSlotDOM(this.#hotbarSlots[i], hotbar[i])
+    }
+    const bag = inventoryManager.bag
+    for (let i = 0; i < BAG_CAPACITY; i++) {
+      this.#updateSlotDOM(this.#bagSlots[i], bag[i])
+    }
   }
 
   /**
