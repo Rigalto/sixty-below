@@ -309,6 +309,38 @@ class InventoryManager {
     this.#swapOrStack(slots[sourceIndex], slots[targetIndex])
   }
 
+  /**
+   * Décrémente le count d'un slot du bag. Vide le slot si count atteint 0.
+   * @param {number} slotIndex
+   * @returns {object} — slot mis à jour
+   */
+  decrementBagSlotCount (slotIndex) {
+    const slot = this.#bag[slotIndex]
+    slot.count -= 1
+    if (slot.count === 0) {
+      slot.item = ''
+      slot.prefix = ''
+    }
+    this.#dirtyKeys.add(slot)
+    return slot
+  }
+
+  /**
+   * Décrémente le count d'un slot de la hotbar. Vide le slot si count atteint 0.
+   * @param {number} slotIndex
+   * @returns {object} — slot mis à jour
+   */
+  decrementHotbarSlotCount (slotIndex) {
+    const slot = this.#hotbar[slotIndex]
+    slot.count -= 1
+    if (slot.count === 0) {
+      slot.item = ''
+      slot.prefix = ''
+    }
+    this.#dirtyKeys.add(slot)
+    return slot
+  }
+
   // ─── Transferts Hotbar ───────────────────────────────────────
 
   /**
