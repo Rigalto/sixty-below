@@ -332,6 +332,7 @@ class InventoryDebug {
       const itemId = parts[1]
       const count = parts[2] !== undefined ? parseInt(parts[2], 10) : 1
       if (!ITEMS[itemId]) { window.alert(`Unknown item: ${itemId}`); return }
+      if (ITEMS[itemId].image === null) { window.alert(`Cannot put this item in Inventory: ${itemId}`); return }
       inventoryManager.loot(itemId, count, '')
       inventoryOverlay.refreshBag()
       return
