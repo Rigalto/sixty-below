@@ -204,6 +204,11 @@ Cette section définit les événements officiels. Tout nouvel événement doit 
 | Event Name | Payload Structure | Description |
 | :--- | :--- | :--- |
 | `state/changed` | `{ state, oldState }` | Émis lorsque l'`InputManager` change l'état global du jeu (Exploration <-> Information/Combat). |
+| `inventory/keydown` | `string` (e.key) | Forwarding clavier vers l'overlay inventaire quand il est au sommet de la pile. |
+| `craft/keydown` | `string` (e.key) | Forwarding clavier vers l'overlay craft quand il est au sommet de la pile. |
+| `help/keydown` | `string` (e.key) | Forwarding clavier vers l'overlay aide quand il est au sommet de la pile. |
+| `combat/keydown` | `string` (e.key) | Forwarding clavier vers l'overlay combat quand il est au sommet de la pile. |
+| `map/keydown` | `string` (e.key) | Forwarding clavier vers l'overlay carte quand il est au sommet de la pile. |
 
 #### UI / Interface (Common)
 | Event Name | Payload Structure | Description |
@@ -223,6 +228,7 @@ Cette section définit les événements officiels. Tout nouvel événement doit 
 | :--- | :--- | :--- |
 | `inventory/open`| - | Affichage du panel d'inventaire. |
 | `inventory/close`| - | Disparition du panel d'inventaire. |
+| `inventory/keydown` | `string` (e.key) | Forwarding clavier vers l'overlay inventaire quand il est au sommet de la pile. |
 | `inventory/static-buffs`| `Array<string>` (List of buffs) | Émis à la fermeture de l'inventaire. |
 
 #### Hotbar (`HotbarManager`)
@@ -237,6 +243,7 @@ Cette section définit les événements officiels. Tout nouvel événement doit 
 | :--- | :--- | :--- |
 | `craft/open`| - | Affichage du panel d'artisanat. |
 | `craft/close`| - | Disparition du panel d'artisanat. |
+| `craft/keydown` | `string` (e.key) | Forwarding clavier vers l'overlay craft quand il est au sommet de la pile. |
 | `craft/item` | `string` (itemId) | Navigue vers la recette d'un item craftable ou d'un ingrédient. |
 
 #### Help (`HelpOverlay`)
@@ -244,6 +251,7 @@ Cette section définit les événements officiels. Tout nouvel événement doit 
 | :--- | :--- | :--- |
 | `help/open`| - | Affichage du panel d'aide. |
 | `help/close`| - | Disparition du panel d'aide. |
+| `help/keydown` | `string` (e.key) | Forwarding clavier vers l'overlay aide quand il est au sommet de la pile. |
 | `help/topic` | `string` (topic title) | Navigue vers une fiche d'aide spécifique. Émis par n'importe quel composant. |
 
 #### Combat (`CombatOverlay`)
@@ -251,6 +259,7 @@ Cette section définit les événements officiels. Tout nouvel événement doit 
 | :--- | :--- | :--- |
 | `combat/open`| - | Affichage du panel de combat. |
 | `combat/close`| - | Disparition du panel de combat. |
+| `combat/keydown` | `string` (e.key) | Forwarding clavier vers l'overlay combat quand il est au sommet de la pile. |
 
 #### Buffs Widget (`BuffManager`)
 *En prévision*
@@ -266,6 +275,7 @@ Cette section définit les événements officiels. Tout nouvel événement doit 
 | :--- | :--- | :--- |
 | `map/open`| - | Affichage de la carte au 1/16e. |
 | `map/close`| - | Disparition de la carte au 1/16e. |
+| `map/keydown` | `string` (e.key) | Forwarding clavier vers l'overlay carte quand il est au sommet de la pile. |
 | `debug/frame-sample`| `{updateTime, renderTime, microTime}` | Temps exécution dans la loop pour les 3 budgets. |
 | `debug/buff-manager` | _(none)_ | Affiche sur la console le contenu de `#values` et `#fns`. |
 | `debug/command` | — | Déclenche le prompt de debug. Émis par le bouton debug de l'`InventoryOverlay`. |

@@ -662,24 +662,10 @@ class KeyboardManager {
     const tag = e.target.tagName
     if (tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT') return
 
-    // 1. Mouvements (Polling)
-    const moveBit = MOVEMENT_MAP[e.code]
-    if (moveBit) {
-      this.directions |= moveBit
-      return
-    }
-
-    // 2. Hotbar (Selection Slot)
-    const slotIndex = HOTBAR_MAP[e.code]
-    if (slotIndex !== undefined) {
-      eventBus.emit('hotbar/select-slot', slotIndex)
-      return
-    }
-
-    // 1.5 Debug dans la console (Touche ² (AZERTY) ou ` (QWERTY))
+    // Debug dans la console (Touche ² (AZERTY) ou ` (QWERTY))
     if (e.code === 'Backquote') { this.debugTrigger = true }
 
-    // 1.5 Overlay
+    // 1 Overlay
     const overlay = OVERLAY_MAP[e.key]
     if (overlay !== undefined) {
       this.#openOverlay(overlay)
@@ -693,6 +679,25 @@ class KeyboardManager {
       } else {
         this.#closeOverlay()
       }
+    }
+
+    // 2. Forwarding vers l'overlay au sommet de la pile
+    const topId = this.#overlayStack[this.#overlayStack.length - 1]
+    if (topId) {
+      eventBus.emit(`${topId}/keydown`, e.key)
+    }
+
+    // 3. Mouvements (Polling)
+    const moveBit = MOVEMENT_MAP[e.code]
+    if (moveBit) {
+      this.directions |= moveBit
+      return
+    }
+
+    // 4. Hotbar (Selection Slot)
+    const slotIndex = HOTBAR_MAP[e.code]
+    if (slotIndex !== undefined) {
+      eventBus.emit('hotbar/select-slot', slotIndex)
     }
   }
 

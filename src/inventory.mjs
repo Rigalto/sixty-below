@@ -1227,6 +1227,17 @@ class InventoryOverlay {
       if (slot.classList.contains('inactive')) return
       this.#onSlotClick(slot)
     })
+
+    // raccourcis clavier
+    eventBus.on('inventory/keydown', (key) => {
+      if (key === 'l' || key === 'L') {
+        if (!this.#btnLock.disabled) this.#onLockClick()
+      } else if (key === ' ') {
+        if (!this.#btnUse.disabled) this.#onUseClick()
+      } else if (key === 'Delete') {
+        if (!this.#btnTrash.disabled) this.#onTrashClick()
+      }
+    })
   }
 
   // ////////////////////////////// //
