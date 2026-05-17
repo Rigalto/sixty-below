@@ -4385,6 +4385,8 @@ Note : Always Present
     title: 'Inventory',
     category: ['Gameplay'],
     content: `
+        Ne pas oublier de dire que, si un slot avec item est sélectionné, que l'item est craftable ou un Crafting Material, l'ouverture du Craft Panel se fera avec cet item de sélectionné.
+        De même pour l'aide, qui s'ouvrira sur l'aide de l'item sélectionné, s'il y en a un.
     `
   },
 

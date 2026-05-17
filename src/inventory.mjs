@@ -1039,9 +1039,10 @@ class InventoryOverlay {
     btnCraft.innerHTML = SVG_ICON(PATH_CRAFT, 'class="craft-icon"')
     btnCraft.addEventListener('click', () => {
       const item = this.#selectedSlot?.getAttribute('item') ?? ''
-      const isCraftable = item !== '' && (ITEMS[item].type & ITEM_TYPE.CRAFTABLE)
       eventBus.emit('overlay/open-request', 'craft')
-      if (isCraftable) eventBus.emit('craft/item', item)
+      if (item !== '' && (ITEMS[item].type & (ITEM_TYPE.CRAFTABLE | ITEM_TYPE.MATERIAL))) {
+        eventBus.emit('craft/item', item)
+      }
     })
     col.appendChild(btnCraft)
 
