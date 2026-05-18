@@ -364,21 +364,157 @@ class InventoryManager {
   // ─── Transferts Accessory ────────────────────────────────────
 
   /**
-   * Déplace un item du bag vers un slot accessoire (swap ou stack).
+   * Déplace un accessoire du bag vers un slot accessoire.
+   * Si le slot destination est occupé, l'item délogé est déposé dans le bag.
+   * Opération abandonnée si l'item source n'est pas ACCESSORY ou si le slot
+   * destination est occupé et le bag est plein.
    * @param {number} sourceIndex
    * @param {number} targetIndex
+   * @returns {{srcSlot, destSlot, depositSlot}|null}
    */
   moveBagToAccessory (sourceIndex, targetIndex) {
-    this.#swapOrStack(this.#bag[sourceIndex], this.#accessories[targetIndex])
+    const src = this.#bag[sourceIndex]
+    const dest = this.#accessories[targetIndex]
+
+    // Vérification item source
+    if (!(ITEMS[src.item].type & ITEM_TYPE.ACCESSORY)) return null
+
+    // Si destination occupée, vérifier qu'il y a de la place dans le bag
+    let depositSlot = null
+    if (dest.item !== '') {
+      // Si le slot source va se vider, il devient le depositSlot en priorité
+      if (src.count === 1) {
+        depositSlot = src
+      } else {
+        depositSlot = this.#findDepositSlot(dest.item, dest.prefix)
+        if (depositSlot === null) return null
+      }
+    }
+
+    // Décrémentation source
+    src.count -= 1
+    const itemToPlace = src.item
+    const prefixToPlace = src.prefix
+    if (src.count === 0) {
+      src.item = ''
+      src.prefix = ''
+    }
+    this.#dirtyKeys.add(src)
+
+    // Dépose dans destination
+    if (dest.item !== '') {
+      depositSlot.item = dest.item
+      depositSlot.count += dest.item === depositSlot.item ? 1 : 1
+      depositSlot.prefix = dest.prefix
+      this.#dirtyKeys.add(depositSlot)
+    }
+
+    dest.item = itemToPlace
+    dest.count = 1
+    dest.prefix = prefixToPlace
+    this.#dirtyKeys.add(dest)
+
+    return {srcSlot: src, destSlot: dest, depositSlot}
   }
 
   /**
-   * Déplace un item d'un slot accessoire vers le bag (swap ou stack).
+   * Trouve un slot de dépôt dans le bag (stack ou premier libre).
+   * @param {string} item
+   * @param {string} prefix
+   * @returns {object|null}
+   */
+  #findDepositSlot (item, prefix) {
+    for (const slot of this.#bag) {
+      if (slot.locked || slot.item !== item || slot.prefix !== prefix) continue
+      return slot
+    }
+    for (const slot of this.#bag) {
+      if (slot.locked || slot.item !== '') continue
+      return slot
+    }
+    return null
+  }
+
+  /**
+   * Déplace un accessoire de la zone accessoire vers le bag.
    * @param {number} sourceIndex
    * @param {number} targetIndex
+   * @returns {{srcSlot, destSlot, depositSlot}|null}
    */
   moveAccessoryToBag (sourceIndex, targetIndex) {
-    this.#swapOrStack(this.#accessories[sourceIndex], this.#bag[targetIndex])
+    const src = this.#accessories[sourceIndex]
+    const dest = this.#bag[targetIndex]
+
+    if (src.item === '') return null
+
+    // Slot destination vide
+    if (dest.item === '') {
+      dest.item = src.item
+      dest.count = 1
+      dest.prefix = src.prefix
+      src.item = ''
+      src.count = 0
+      src.prefix = ''
+      this.#dirtyKeys.add(src)
+      this.#dirtyKeys.add(dest)
+      return {srcSlot: src, destSlot: dest, depositSlot: null}
+    }
+
+    // Slot destination même item → stack
+    if (dest.item === src.item && dest.prefix === src.prefix) {
+      dest.count += 1
+      src.item = ''
+      src.count = 0
+      src.prefix = ''
+      this.#dirtyKeys.add(src)
+      this.#dirtyKeys.add(dest)
+      return {srcSlot: src, destSlot: dest, depositSlot: null}
+    }
+
+    // Slot destination item différent, count === 1, accessoire → swap 1↔1
+    if (ITEMS[dest.item].type & ITEM_TYPE.ACCESSORY && dest.count === 1) {
+      const tmpItem = dest.item
+      const tmpPrefix = dest.prefix
+      dest.item = src.item
+      dest.count = 1
+      dest.prefix = src.prefix
+      src.item = tmpItem
+      src.count = 1
+      src.prefix = tmpPrefix
+      this.#dirtyKeys.add(src)
+      this.#dirtyKeys.add(dest)
+      return {srcSlot: src, destSlot: dest, depositSlot: null}
+    }
+
+    // Slot destination item différent, count > 1, accessoire
+    if (ITEMS[dest.item].type & ITEM_TYPE.ACCESSORY && dest.count > 1) {
+      const depositSlot = this.#findDepositSlot(src.item, src.prefix)
+      if (depositSlot === null) return null
+      depositSlot.item = src.item
+      depositSlot.count = depositSlot.item === src.item ? depositSlot.count + 1 : 1
+      depositSlot.prefix = src.prefix
+      src.item = dest.item
+      src.count = 1
+      src.prefix = dest.prefix
+      dest.count -= 1
+      this.#dirtyKeys.add(src)
+      this.#dirtyKeys.add(dest)
+      this.#dirtyKeys.add(depositSlot)
+      return {srcSlot: src, destSlot: dest, depositSlot}
+    }
+
+    // Slot destination item différent, pas un accessoire
+    const depositSlot = this.#findDepositSlot(src.item, src.prefix)
+    if (depositSlot === null) return null
+    depositSlot.item = depositSlot.item === src.item ? depositSlot.item : src.item
+    depositSlot.count = depositSlot.item === src.item ? depositSlot.count + 1 : 1
+    depositSlot.prefix = src.prefix
+    src.item = ''
+    src.count = 0
+    src.prefix = ''
+    this.#dirtyKeys.add(src)
+    this.#dirtyKeys.add(depositSlot)
+    return {srcSlot: src, destSlot: dest, depositSlot}
   }
 
   // ─── Transferts Armor ────────────────────────────────────────
@@ -1425,10 +1561,80 @@ class InventoryOverlay {
       if (this.#dragSource === null) return
       const slot = e.target.closest('inventory-slot')
       this.#removeGhost()
-      if (slot === null || slot === this.#dragSource) {
+      if (slot === null || slot === this.#dragSource || slot.hasAttribute('locked')) {
         this.#dragSource = null
         return
       }
+
+      const [fromContainer, fromIndex] = this.#dragSource.getAttribute('location').split('|')
+      const [toContainer, toIndex] = slot.getAttribute('location').split('|')
+      const from = parseInt(fromIndex, 10)
+      const to = parseInt(toIndex, 10)
+      const key = `${fromContainer}→${toContainer}`
+
+      switch (key) {
+        case 'hotbar→hotbar':
+          inventoryManager.moveWithinContainer('hotbar', from, to)
+          this.#updateSlotDOM(this.#dragSource, inventoryManager.getSlot('hotbar', from))
+          this.#updateSlotDOM(slot, inventoryManager.getSlot('hotbar', to))
+          break
+        case 'bag→bag':
+          inventoryManager.moveWithinContainer('bag', from, to)
+          this.#updateSlotDOM(this.#dragSource, inventoryManager.getSlot('bag', from))
+          this.#updateSlotDOM(slot, inventoryManager.getSlot('bag', to))
+          break
+        case 'chest→chest':
+          inventoryManager.moveWithinChest(this.#selectedFurnitureId, from, to)
+          this.#updateSlotDOM(this.#dragSource, inventoryManager.getContainerSlot(this.#selectedFurnitureId, from))
+          this.#updateSlotDOM(slot, inventoryManager.getContainerSlot(this.#selectedFurnitureId, to))
+          break
+        case 'accessory→accessory':
+          inventoryManager.moveWithinContainer('accessory', from, to)
+          this.#updateSlotDOM(this.#dragSource, inventoryManager.getSlot('accessory', from))
+          this.#updateSlotDOM(slot, inventoryManager.getSlot('accessory', to))
+          break
+        case 'hotbar→bag':
+          inventoryManager.moveHotbarToBag(from, to)
+          this.#updateSlotDOM(this.#dragSource, inventoryManager.getSlot('hotbar', from))
+          this.#updateSlotDOM(slot, inventoryManager.getSlot('bag', to))
+          break
+        case 'bag→hotbar':
+          inventoryManager.moveBagToHotbar(from, to)
+          this.#updateSlotDOM(this.#dragSource, inventoryManager.getSlot('bag', from))
+          this.#updateSlotDOM(slot, inventoryManager.getSlot('hotbar', to))
+          break
+        case 'bag→chest':
+          inventoryManager.moveBagToChest(this.#selectedFurnitureId, from, to)
+          this.#updateSlotDOM(this.#dragSource, inventoryManager.getSlot('bag', from))
+          this.#updateSlotDOM(slot, inventoryManager.getContainerSlot(this.#selectedFurnitureId, to))
+          break
+        case 'chest→bag':
+          inventoryManager.moveChestToBag(this.#selectedFurnitureId, from, to)
+          this.#updateSlotDOM(this.#dragSource, inventoryManager.getContainerSlot(this.#selectedFurnitureId, from))
+          this.#updateSlotDOM(slot, inventoryManager.getSlot('bag', to))
+          break
+        case 'bag→accessory': {
+          const result = inventoryManager.moveBagToAccessory(from, to)
+          if (result === null) break
+          this.#updateSlotDOM(this.#dragSource, result.srcSlot)
+          this.#updateSlotDOM(slot, result.destSlot)
+          if (result.depositSlot !== null) {
+            this.#updateSlotDOM(this.#bagSlots[result.depositSlot.slot], result.depositSlot)
+          }
+          break
+        }
+        case 'accessory→bag': {
+          const result = inventoryManager.moveAccessoryToBag(from, to)
+          if (result === null) break
+          this.#updateSlotDOM(this.#dragSource, result.srcSlot)
+          this.#updateSlotDOM(slot, result.destSlot)
+          if (result.depositSlot !== null) {
+            this.#updateSlotDOM(this.#bagSlots[result.depositSlot.slot], result.depositSlot)
+          }
+          break
+        }
+      }
+
       console.log('drag', this.#dragSource.getAttribute('location'), '→', slot.getAttribute('location'))
       this.#dragSource = null
     })
