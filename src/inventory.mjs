@@ -1,6 +1,6 @@
 // InventoryManager — inventory.mjs
 
-import {OVERLAYS, BAG_CAPACITY, HOTBAR_CAPACITY, ARMOR_CAPACITY, ARMOR_SLOT_LABELS, ACCESSORY_CAPACITY, CONTAINER_STYPES, CONTAINER_CAPACITY, ARMOR_SLOTS, PATH_RENAME, PATH_LOCKED, PATH_UNLOCKED, PATH_CRAFT, SVG_ICON, PATH_HELP, PATH_DEBUG, PATH_SPLIT, PATH_TRASH_DOWN, PATH_TRASH_UP, PATH_USE, PATH_WARNING} from './constant.mjs'
+import {OVERLAYS, BAG_CAPACITY, HOTBAR_CAPACITY, ARMOR_CAPACITY, ARMOR_SLOT_LABELS, ACCESSORY_CAPACITY, CONTAINER_STYPES, CONTAINER_CAPACITY, ARMOR_SLOTS, PATH_RENAME, PATH_LOCKED, PATH_UNLOCKED, PATH_CRAFT, SVG_ICON, PATH_HELP, PATH_DEBUG, PATH_SPLIT, PATH_TRASH_DOWN, PATH_TRASH_UP, PATH_USE, PATH_WARNING, PATH_ARROW_RIGHT} from './constant.mjs'
 import {eventBus, capitalize} from './utils.mjs'
 import {createOverlayHeader} from './ui.mjs'
 import {ITEMS, ITEM_TYPE, itemTypeToString} from '../../assets/data/data.mjs'
@@ -770,6 +770,7 @@ inventory-slot .hidden {
   align-items: center;
   gap: 8px;
   padding: 4px;
+  margin: 12px;
 }
 
 #ui-inventory-panel .inv-panel {
@@ -952,6 +953,10 @@ inventory-slot .hidden {
   position: relative;
   z-index: 1;  /* ← recouvre le texte quand agrandi */
 }
+
+#ui-inventory-panel .inv-action-btn.transfer-left .transfer-icon {
+  transform: scaleX(-1);
+}
 `
 document.head.appendChild(inventorySlotStyle)
 
@@ -1036,6 +1041,7 @@ class InventoryOverlay {
   #btnUse // icône d'utilisation du slot sélectionné
   #btnLock // icône de verrouillage/déverouillage du slot sélectionné
   #btnSplit // icône de séparatin d'une pile
+  #btnTransfer // icône de transfert bag <-> Chest
   #btnTrash // icôns de placement du slot sélectionné dans la poubelle
   #btnRestore // icône de récupération du contenu de la poubelle
 
@@ -1212,10 +1218,18 @@ class InventoryOverlay {
     btnSplit.className = 'inv-action-btn'
     btnSplit.title = 'Split stack'
     btnSplit.disabled = true
-    btnSplit.innerHTML = SVG_ICON(PATH_SPLIT, 'class="trash-icon"')
+    btnSplit.innerHTML = SVG_ICON(PATH_SPLIT, 'class="split-icon"')
     btnSplit.addEventListener('click', () => this.#onSplitClick())
     col.appendChild(btnSplit)
     this.#btnSplit = btnSplit
+
+    const btnTransfer = document.createElement('button')
+    btnTransfer.className = 'inv-action-btn'
+    btnTransfer.disabled = true
+    btnTransfer.innerHTML = SVG_ICON(PATH_ARROW_RIGHT, 'class="transfer-icon"')
+    btnTransfer.addEventListener('click', () => this.#onTransferClick())
+    col.appendChild(btnTransfer)
+    this.#btnTransfer = btnTransfer
 
     const btnTrash = document.createElement('button')
     btnTrash.className = 'inv-action-btn'
@@ -1384,6 +1398,7 @@ class InventoryOverlay {
   // ////////////////////////////// //
 
   #onOpen () {
+    this.#selectedFurnitureId = null
     this.#container.style.display = 'flex'
     // récupération des slots de la hotbar et du bag
     this.refreshBag()
@@ -1495,10 +1510,7 @@ class InventoryOverlay {
     // Désélection
       slot.classList.remove('selected')
       this.#selectedSlot = null
-      // icône d'action : Lock
-      this.#updateLockBtn(null)
-      // icône d'action : Trash
-      this.#btnTrash.disabled = true
+      this.#updateActionButtons()
       return
     }
     // Désélection du précédent
@@ -1530,10 +1542,21 @@ class InventoryOverlay {
     this.#btnUse.title = isUsable
       ? `${itemDef.useTitle || 'Use item'} [Space]`
       : 'Use item [Space]'
+
     // Split
     const SPLITTABLE = new Set(['bag', 'hotbar', 'chest'])
     const isSplittable = !isLocked && SPLITTABLE.has(container) && item !== '' && slot?.getAttribute('count') > 1
     this.#btnSplit.disabled = !isSplittable
+
+    // Transfert
+    const isInChest = container === 'chest'
+    const isInBag = container === 'bag'
+    const hasChest = this.#selectedFurnitureId !== null
+    const isTransferable = !isLocked && item !== '' && hasChest && (isInBag || isInChest)
+
+    this.#btnTransfer.disabled = !isTransferable
+    this.#btnTransfer.title = isInChest ? 'Move to bag [Tab]' : 'Move to chest [Tab]'
+    this.#btnTransfer.classList.toggle('transfer-left', isInChest)
   }
 
   // /////////////////////////////////////// //
@@ -1628,6 +1651,27 @@ class InventoryOverlay {
     }
     this.#updateSlotDOM(this.#selectedSlot, srcSlot)
     this.refreshBag()
+    this.#updateActionButtons()
+  }
+
+  // ////////////////////// //
+  // TRANSFER BAG <-> CHEST //
+  // ////////////////////// //
+
+  #onTransferClick () {
+    const [container, index] = this.#selectedSlot.getAttribute('location').split('|')
+    const i = parseInt(index, 10)
+    if (container === 'bag') {
+      const dest = inventoryManager.moveBagToChestAuto(i, this.#selectedFurnitureId)
+      if (dest === null) return
+      this.#updateSlotDOM(this.#selectedSlot, inventoryManager.getSlot('bag', i))
+      this.#updateSlotDOM(this.#containerSlots[dest.slot], dest)
+    } else {
+      const dest = inventoryManager.moveChestToBagAuto(this.#selectedFurnitureId, i)
+      if (dest === null) return
+      this.#updateSlotDOM(this.#selectedSlot, inventoryManager.getContainerSlot(this.#selectedFurnitureId, i))
+      this.#updateSlotDOM(this.#bagSlots[dest.slot], dest)
+    }
     this.#updateActionButtons()
   }
 }
