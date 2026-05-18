@@ -957,6 +957,15 @@ inventory-slot .hidden {
 #ui-inventory-panel .inv-action-btn.transfer-left .transfer-icon {
   transform: scaleX(-1);
 }
+
+.inv-drag-ghost {
+  position: fixed;
+  pointer-events: none;
+  image-rendering: pixelated;
+  transform: translate(-50%, -50%);
+  z-index: 9999;
+  opacity: 0.8;
+}
 `
 document.head.appendChild(inventorySlotStyle)
 
@@ -1045,6 +1054,9 @@ class InventoryOverlay {
   #btnTrash // icôns de placement du slot sélectionné dans la poubelle
   #btnRestore // icône de récupération du contenu de la poubelle
 
+  #dragSource = null // départ du drag & drop
+  #ghost = null // div fantôme qui suit la souris pendant le drag & drop
+
   #hotbarSlots = [] // Array(8) — refs DOM des inventory-slot
   #bagSlots = [] // Array(64) — refs DOM des inventory-slot
   #armorSlots = [] // Array(3) — refs DOM des inventory-slot
@@ -1073,6 +1085,7 @@ class InventoryOverlay {
 
     // 5. Événements
     this.#initEvents()
+    this.#initDragAndDrop()
   }
 
   buildContent () {
@@ -1393,11 +1406,90 @@ class InventoryOverlay {
     })
   }
 
+  // /////////// //
+  // DRAG & DROP //
+  // /////////// //
+
+  #initDragAndDrop () {
+    this.#content.addEventListener('mousedown', (e) => {
+      const slot = e.target.closest('inventory-slot')
+      if (slot === null) return
+      if (slot.classList.contains('inactive')) return
+      if (slot.getAttribute('item') === '') return
+      if (slot.hasAttribute('locked')) return
+      this.#dragSource = slot
+      this.#createGhost(slot, e.clientX, e.clientY)
+    })
+
+    this.#content.addEventListener('mouseup', (e) => {
+      if (this.#dragSource === null) return
+      const slot = e.target.closest('inventory-slot')
+      this.#removeGhost()
+      if (slot === null || slot === this.#dragSource) {
+        this.#dragSource = null
+        return
+      }
+      console.log('drag', this.#dragSource.getAttribute('location'), '→', slot.getAttribute('location'))
+      this.#dragSource = null
+    })
+  }
+
+  #attachWindowHandlers () {
+    window.addEventListener('mousemove', this.#onWindowMouseMove)
+    window.addEventListener('mouseup', this.#onWindowMouseUp)
+  }
+
+  #detachWindowHandlers () {
+    window.removeEventListener('mousemove', this.#onWindowMouseMove)
+    window.removeEventListener('mouseup', this.#onWindowMouseUp)
+  }
+
+  // Champs privés — références liées
+  #onWindowMouseMove = (e) => {
+    if (this.#dragSource === null) return
+    this.#moveGhost(e.clientX, e.clientY)
+  }
+
+  #onWindowMouseUp = () => {
+    this.#removeGhost()
+    this.#dragSource = null
+  }
+
+  #createGhost (slot, x, y) {
+    const ghost = document.createElement('div')
+    ghost.className = 'inv-drag-ghost'
+    const image = slot.querySelector('.image')
+    if (image !== null) {
+      ghost.style.backgroundImage = image.style.backgroundImage
+      ghost.style.backgroundPosition = image.style.backgroundPosition
+      ghost.style.backgroundSize = image.style.backgroundSize
+      ghost.style.width = image.style.width
+      ghost.style.height = image.style.height
+    }
+    document.body.appendChild(ghost)
+    this.#ghost = ghost
+    this.#moveGhost(x, y)
+  }
+
+  #moveGhost (x, y) {
+    if (this.#ghost === null) return
+    this.#ghost.style.left = `${x}px`
+    this.#ghost.style.top = `${y}px`
+  }
+
+  #removeGhost () {
+    if (this.#ghost === null) return
+    this.#ghost.remove()
+    this.#ghost = null
+  }
+
   // ////////////////////////////// //
   // OUVERTURE / FERMETURE DU PANEL //
   // ////////////////////////////// //
 
   #onOpen () {
+    this.#attachWindowHandlers()
+
     this.#selectedFurnitureId = null
     this.#container.style.display = 'flex'
     // récupération des slots de la hotbar et du bag
@@ -1489,6 +1581,8 @@ class InventoryOverlay {
   }
 
   #onClose () {
+    this.#detachWindowHandlers()
+
     this.#container.style.display = 'none'
     // Désélection du slot actif
     if (this.#selectedSlot !== null) {
