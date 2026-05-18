@@ -499,6 +499,84 @@ class InventoryManager {
     return null
   }
 
+  // ─── Transferts rapides ──────────────────────────────────────
+
+  /**
+   * Déplace le contenu d'un slot bag vers le coffre actif.
+   * Stack sur item identique en priorité, sinon premier slot libre.
+   * @param {number} sourceIndex
+   * @param {string} furnitureId
+   * @returns {object|null} — slot destination modifié, ou null si coffre plein
+   */
+  moveBagToChestAuto (sourceIndex, furnitureId) {
+    const src = this.#bag[sourceIndex]
+    const slots = this.#containers.get(furnitureId)
+    if (slots === undefined) return null
+    // Passe 1 — stack
+    for (const slot of slots) {
+      if (slot.locked || slot.item !== src.item || slot.prefix !== src.prefix) continue
+      slot.count += src.count
+      src.item = ''
+      src.count = 0
+      src.prefix = ''
+      this.#dirtyKeys.add(slot)
+      this.#dirtyKeys.add(src)
+      return slot
+    }
+    // Passe 2 — premier slot libre
+    for (const slot of slots) {
+      if (slot.locked || slot.item !== '') continue
+      slot.item = src.item
+      slot.count = src.count
+      slot.prefix = src.prefix
+      src.item = ''
+      src.count = 0
+      src.prefix = ''
+      this.#dirtyKeys.add(slot)
+      this.#dirtyKeys.add(src)
+      return slot
+    }
+    return null
+  }
+
+  /**
+   * Déplace le contenu d'un slot du coffre actif vers le bag.
+   * Stack sur item identique en priorité, sinon premier slot libre.
+   * @param {string} furnitureId
+   * @param {number} sourceIndex
+   * @returns {object|null} — slot destination modifié, ou null si bag plein
+   */
+  moveChestToBagAuto (furnitureId, sourceIndex) {
+    const slots = this.#containers.get(furnitureId)
+    if (slots === undefined) return null
+    const src = slots[sourceIndex]
+    // Passe 1 — stack
+    for (const slot of this.#bag) {
+      if (slot.locked || slot.item !== src.item || slot.prefix !== src.prefix) continue
+      slot.count += src.count
+      src.item = ''
+      src.count = 0
+      src.prefix = ''
+      this.#dirtyKeys.add(slot)
+      this.#dirtyKeys.add(src)
+      return slot
+    }
+    // Passe 2 — premier slot libre
+    for (const slot of this.#bag) {
+      if (slot.locked || slot.item !== '') continue
+      slot.item = src.item
+      slot.count = src.count
+      slot.prefix = src.prefix
+      src.item = ''
+      src.count = 0
+      src.prefix = ''
+      this.#dirtyKeys.add(slot)
+      this.#dirtyKeys.add(src)
+      return slot
+    }
+    return null
+  }
+
   // ─── Loot vers inventaire ────────────────────────────────────
 
   /**
