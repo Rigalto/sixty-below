@@ -13,6 +13,7 @@ import {helpOverlay} from './help.mjs'
 import {inventoryManager} from './inventory.mjs'
 import './ui-debug.mjs'
 import './craft.mjs'
+import './combat.mjs'
 
 const mockup = () => {
   const debugDiv = document.createElement('div')
