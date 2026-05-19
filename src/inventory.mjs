@@ -921,8 +921,8 @@ inventory-slot.hotbar {
   color: black;
 }
 
-inventory-slot.armor { background-color: #77DD77; }
-inventory-slot.armor inventory-slot.set { background-color: #69f785; }
+inventory-slot.armor { background-color: #40e040; }
+inventory-slot.armor.slot-armor-set { background-color: #80f840; }
 inventory-slot.accessory { background-color: #B39DDB; }
 inventory-slot.inactive {
   background-color: #bbb;
@@ -1761,6 +1761,7 @@ class InventoryOverlay {
           if (result.depositSlot !== null) {
             this.#updateSlotDOM(this.#bagSlots[result.depositSlot.slot], result.depositSlot)
           }
+          this.#updateArmorSet()
           break
         }
         case 'armor→bag': {
@@ -1771,6 +1772,7 @@ class InventoryOverlay {
           if (result.depositSlot !== null) {
             this.#updateSlotDOM(this.#bagSlots[result.depositSlot.slot], result.depositSlot)
           }
+          this.#updateArmorSet()
           break
         }
       }
@@ -1778,6 +1780,23 @@ class InventoryOverlay {
       console.log('drag', this.#dragSource.getAttribute('location'), '→', slot.getAttribute('location'))
       this.#dragSource = null
     })
+  }
+
+  #updateArmorSet () {
+    const slots = inventoryManager.armor
+    let setName = null
+    // Vérifier que les trois slots sont remplis et ont le même set
+    if (slots[0].item !== '' && slots[1].item !== '' && slots[2].item !== '') {
+      const set0 = ITEMS[slots[0].item].set
+      const set1 = ITEMS[slots[1].item].set
+      const set2 = ITEMS[slots[2].item].set
+      if (set0 !== undefined && set0 === set1 && set1 === set2) {
+        setName = set0
+      }
+    }
+    for (let i = 0; i < ARMOR_CAPACITY; i++) {
+      this.#armorSlots[i].classList.toggle('slot-armor-set', setName !== null)
+    }
   }
 
   #attachWindowHandlers () {
@@ -1849,6 +1868,7 @@ class InventoryOverlay {
     for (let i = 0; i < armor.length; i++) {
       this.#updateSlotDOM(this.#armorSlots[i], armor[i])
     }
+    this.#updateArmorSet()
     // récupération des slots de Accessory
     const accessory = inventoryManager.accessories
     for (let i = 0; i < accessory.length; i++) {
