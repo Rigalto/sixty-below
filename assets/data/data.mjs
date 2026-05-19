@@ -289,7 +289,7 @@ export const ITEMS = {
   tombCross: {name: 'Cross Tombstone', type: ITEM_TYPE.FURNITURE | ITEM_TYPE.UNDISPOSABLE, stype: 'tomb', star: 1, image: 'furniture_32_32-7-8', placed: 'fuws_32_32-7-4', help: 'Graveyard', tooltip: 'Summons specific enemies'},
 
   // accessories - combat
-  bezoar: {name: 'Bezoar', type: ITEM_TYPE.ACCESSORY, stype: 'accessory', star: 3, image: 'accessories_32_32-0-0', help: 'Equipped Accessories', tooltip: 'Immunity to Bleeding, Poisoned', immunity: ['bleeding', 'poisoned']},
+  bezoar: {name: 'Bezoar', type: ITEM_TYPE.ACCESSORY, stype: 'accessory', star: 3, image: 'accessories_32_32-0-0', help: 'Accessories', tooltip: 'Immunity to Bleeding, Poisoned', immunity: ['bleeding', 'poisoned']},
 
   // Wood furniture set
   chairWood: {name: 'Wooden Chair', type: ITEM_TYPE.FURNITURE | ITEM_TYPE.PLACABLE, stype: 'chair', star: 1, image: 'furniture_32_32-0-5', placedLeft: 'fuws_16_48-1-0', placedRight: 'fuws_16_48-2-0', help: 'Chairs', tooltip: '???', furnitureSet: 'wood', comfort: true},
@@ -471,7 +471,12 @@ export const ITEMS = {
   clockSilver: {name: 'Silver Clock', type: ITEM_TYPE.TRINKET | ITEM_TYPE.CRAFTABLE, stype: 'trinket', star: 3, image: 'furniture_32_32-3-8', help: 'Clocks', tooltip: 'When in Inventory, increases Time accuracy'},
   clockGold: {name: 'Gold Clock', type: ITEM_TYPE.TRINKET | ITEM_TYPE.CRAFTABLE, stype: 'trinket', star: 4, image: 'furniture_32_32-3-8', help: 'Clocks', tooltip: 'When in Inventory, increases Time accuracy'},
   bottledFrog: {name: 'Bottled Frog', type: ITEM_TYPE.TRINKET | ITEM_TYPE.CRAFTABLE, stype: 'trinket', star: 3, image: 'furniture_32_32-3-8', help: 'Bottled Frog', tooltip: 'When in Inventory, give weather forecasts'},
-  sextant: {name: 'Sextant', type: ITEM_TYPE.TRINKET | ITEM_TYPE.CRAFTABLE, stype: 'trinket', star: 3, image: 'furniture_32_32-3-8', help: 'Sextant', tooltip: 'When in Inventory, increases Moon Phases accuracy'}
+  sextant: {name: 'Sextant', type: ITEM_TYPE.TRINKET | ITEM_TYPE.CRAFTABLE, stype: 'trinket', star: 3, image: 'furniture_32_32-3-8', help: 'Sextant', tooltip: 'When in Inventory, increases Moon Phases accuracy'},
+
+  // Armors ITEM_TYPE.ARMOR, stype: 'tableware', armor: 'head'
+  headWood: {name: 'Wood Helmet', type: ITEM_TYPE.ARMOR | ITEM_TYPE.CRAFTING, stype: 'head', armor: 'head', star: 1, image: 'tools_32_32-10-7', placedright: 'heads_26_22-1-0', placedleft: 'heads_26_22-1-1', defense: 1, help: 'Armors', tooltip: 'Provides sturdy protection', set: 'wood'},
+  bodyWood: {name: 'Wood Chainmail', type: ITEM_TYPE.ARMOR | ITEM_TYPE.CRAFTING, stype: 'body', armor: 'body', star: 1, image: 'tools_32_32-11-7', placedright: 'bodies_26_18-1-0', placedleft: 'bodies_26_18-1-1', defense: 1, help: 'Armors', tooltip: 'Provides sturdy protection', set: 'wood'},
+  footWood: {name: 'Wood Greaves', type: ITEM_TYPE.ARMOR | ITEM_TYPE.CRAFTING, stype: 'foot', armor: 'foot', star: 1, image: 'tools_32_32-12-7', placedright: 'feet_26_12-1-0', placedleft: 'feet_26_12-1-1', defense: 0, help: 'Armors', tooltip: 'Provides sturdy protection', set: 'wood'}
 }
 
 /* ============================================================================
