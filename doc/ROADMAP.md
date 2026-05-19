@@ -7,17 +7,10 @@
 
 ## En cours
 
-- conception de `InventoryManager` et `InventoryOverlay`
 - conception de `CraftOverlay` et du tableau des recettes (`RECIPES`)
 - Ajout de l'aide pour les recettes (Markdown `{{recipes:...}}`)
 - Ajout d'un mock-up de l'interface de combat : `CombatOverlay` avec juste deux boutons : `Win` et `Lost`
 - continuer la correction et l'ajout de fiches d'aide (`HELP`) et d'items (`ITEMS`)
-- corriger les deux premiers bugs connus
-
-La génération doit être modifiée pour prendre en compte le changement de conception :
-- ajout d'un champ deleted à false
-- mise en base de données de tous les slots des coffres
-- ajout d'un champ locked à false
 
 ---
 
@@ -39,12 +32,13 @@ La génération doit être modifiée pour prendre en compte le changement de con
 
 ---
 
-## À faire — BuffManager
+## À faire — Buffs
 
-- récupération des timer buffs dans la fonction `init`, lancement `TaskScheduler`
-- traitement de chaque `eventBus` qui impacte un ou plusieurs buff
-- implémenter les buffs composés à chaque fois que l'un d'entre eux est défini (`#fns`)
-- vérifier que l'affichage des anciens buffs après création du monde pendant une seconde max est acceptable
+- `BuffManager` :
+  - récupération des timer buffs dans la fonction `init`, lancement `TaskScheduler`
+  - traitement de chaque `eventBus` qui impacte un ou plusieurs buff
+  - implémenter les buffs composés à chaque fois que l'un d'entre eux est défini (`#fns`)
+  - vérifier que l'affichage des anciens buffs après création du monde pendant une seconde max est acceptable
 
 ---
 
@@ -134,6 +128,14 @@ fs.writeFileSync('docs/help-rendered.html', htmlHelp.join('\n'))
 
 ---
 
+## À faire — Inventory Panel (`inventory.mjs`)
+
+- chargement des containers (chest, cabinet, closet) à proximité
+- changement du nom du container actif
+- vérification actions relatives à la partie 'chest' (écrites, mais non testées)
+
+---
+
 ## À faire — Rendu (`render.mjs`)
 
 - Auto-tiling (transitions de texture entre tuiles adjacentes)
@@ -158,10 +160,7 @@ fs.writeFileSync('docs/help-rendered.html', htmlHelp.join('\n'))
 
 ## À faire — UI (`ui.mjs`)
 
-- Inventaire complet (slots, équipement, artefacts)
 - Panel craft
-- Panel carte (touche M, échelle 1/16)
-- Buffs/debuffs actifs
 - Panel combat (overlay tactique)
 
 ---
@@ -269,6 +268,20 @@ fs.writeFileSync('docs/help-rendered.html', htmlHelp.join('\n'))
   - `EnvironmentWidget`
   - `BuffWidget`
   - `RealtimeDebugWidget`
+- Inventory Panel (`InventoryOverlay`, `InventorySlot`)
+  - Hotbar, Bag, Chest, Armor, Accessory
+  - Barre d'actions
+  - Déplacement intra et inter containers
+  - Verrouillage/déverrouillage des slots
+  - Utilisation du contenu d'un slot
+  - Séparation d'une pile d'items en deux
+  - Gestion de la poubelle
+
+### Gameplay - gestion des items/buffs/recettes
+
+- Gestion de l'inventaire (`InventoryManager`)
+- Gestion des buffs (`BuffManager`)
+- Affichage des buffs (`BuffWidget`)
 
 ### Rendu (partiel)
 - `WorldRenderer` — rendu tuiles par chunks avec cache OffscreenCanvas
