@@ -200,10 +200,10 @@ Cette section définit les événements officiels. Tout nouvel événement doit 
 | `time/first-loop` | `{ day, hour, minute, tslot, weather, nextWeather, skyColor, moonPhase, isDay }` | Émis une seule fois au démarrage du rendu. |
 | `time/sky-color-changed`| `string` (Hex Color) | Émis uniquement si la couleur change. |
 
-#### Core / State (`InputManager`)
+#### Core / State (`KeyboardManager`)
 | Event Name | Payload Structure | Description |
 | :--- | :--- | :--- |
-| `state/changed` | `{ state, oldState }` | Émis lorsque l'`InputManager` change l'état global du jeu (Exploration <-> Information/Combat). |
+| `state/changed` | `{ state, oldState }` | Émis lorsque l'`KeyboardManager` change l'état global du jeu (Exploration <-> Information/Combat). |
 | `inventory/keydown` | `string` (e.key) | Forwarding clavier vers l'overlay inventaire quand il est au sommet de la pile. |
 | `craft/keydown` | `string` (e.key) | Forwarding clavier vers l'overlay craft quand il est au sommet de la pile. |
 | `help/keydown` | `string` (e.key) | Forwarding clavier vers l'overlay aide quand il est au sommet de la pile. |
@@ -213,8 +213,8 @@ Cette section définit les événements officiels. Tout nouvel événement doit 
 #### UI / Interface (Common)
 | Event Name | Payload Structure | Description |
 | :--- | :--- | :--- |
-| `overlay/close` | `string` (Overlay ID) | Demande générique de fermeture émise par le bouton 'X' d'un overlay. Traitée par `InputManager`. |
-| `overlay/open-request`| `string` (Overlay ID) | Demande générique d'ouverture d'un overlay. Traitée par `InputManager`. |
+| `overlay/close` | `string` (Overlay ID) | Demande générique de fermeture émise par le bouton 'X' d'un overlay. Traitée par `KeyboardManager`. |
+| `overlay/open-request`| `string` (Overlay ID) | Demande générique d'ouverture d'un overlay. Traitée par `KeyboardManager`. |
 
 #### Player (`PlayerManager`)
 *En prévision*
@@ -541,7 +541,7 @@ Configuration dans `constant.mjs` → `DB_CONFIG` : `NAME`, `VERSION`, `DEBUG`, 
 |---|---|---|---|
 | `gamestate` | `key` | non | État global du jeu (seed, position joueur...) |
 | `world_chunks` | `key` | oui | Chunks du monde (tuiles) |
-| `inventory` | `key` | oui | Items, Gears, Chests |
+| `inventory` | `key` | oui | Hotbar, Bag, Armors, Accessories, Chests |
 | `buff` | `key` | oui | Buffs/Debuffs |
 | `plant` | `key` | oui | Trees, Herbs, Mushrooms, Flowers, Corals |
 | `monster` | `key` | oui | Enemies, Critters, Bosses |
@@ -628,6 +628,7 @@ Point d'entrée unique du moteur.
 3. `#hydrateNodes()` — itère `NODES_LOOKUP`, remplace `image`, `waveImage`... (*)
 4. `#hydrateItems()` — itère `ITEMS`, remplace `image`, `placed`... (*)
 4. `#hydrateTreeImages()` — itère `TREE_IMAGES`, remplace toutes string
+4. `##hydrateHelp()` — transforme le markdown des fiches d'aide en HTML
 5. `mouseManager.init()`
 
 _(*) Vérification que la fiche d'aide existe_
@@ -640,7 +641,7 @@ _(*) Vérification que la fiche d'aide existe_
 
 ---
 
-### Class `InputManager` / `KeyboardManager` (dans `core.mjs`)
+### Class `KeyboardManager` (dans `core.mjs`)
 
 `KeyboardManager` est l'**autorité de l'état du jeu** via une pile d'overlays (`#overlayStack`).
 
@@ -653,6 +654,15 @@ _(*) Vérification que la fiche d'aide existe_
 **Ouverture/Fermeture d'overlay :**
 * Un overlay ne peut s'ouvrir que si son `zIndex` est ≥ celui du sommet de la pile.
 * Toggle : si l'overlay est déjà au sommet → fermeture.
+
+---
+
+### Class `MouseManager` (dans `core.mjs`)
+
+`MouseManager` entretient trois informations, qui sont lues dans la boucle principale du jeu :
+* `mouse ({x, y})` : position de la souris, en pixels, à l'intérieur du canvas, origine coin haut-gauche du canvas. `x` et `y` sont `null` quand la souris est en dehors du canvas.
+* `left (Boolean)` : `true` quand le bouton gauche de la souris est enfoncé (souris dans le canvas).
+* `right (Boolean)` : `true` quand le bouton droit de la souris est enfoncé (souris dans le canvas).
 
 ---
 
@@ -1133,8 +1143,114 @@ Tableau de définitions `{id, title, x, y}` — coordonnées dans `assets/sprite
 
 ## 15. Inventaire
 
+### Class `InventoryManager` (Singleton : `inventoryManager`, `inventory.mjs`)
+
+Autorité unique sur l'état mémoire de l'inventaire. Aucune logique DOM.
+
+#### Initialisation (appelée depuis `core.mjs` au `startSession`)
+
+| Méthode | Signature | Description |
+| :--- | :--- | :--- |
+| `init` | `() → void` | Vide les structures. À appeler avant `initSlot`. |
+| `initSlot` | `(dbSlot: object) → void` | Intègre un enregistrement DB dans la structure mémoire correspondante. |
+| `initCheck` | `() → void` | Vérifie l'intégrité des tableaux (taille attendue). Appel optionnel. |
+
+#### Accesseurs (lecture seule)
+
+| Propriété | Type | Description |
+| :--- | :--- | :--- |
+| `bag` | `Array(64)` | Slots bag, index = numéro de slot. |
+| `hotbar` | `Array(8)` | Slots hotbar, index = numéro de slot. |
+| `armor` | `Array(3)` | Slots armure — HEAD=0, BODY=1, FOOT=2. |
+| `accessories` | `Array(5)` | Slots accessoires, index = numéro de slot. |
+
+#### Lecture de slots
+
+| Méthode | Signature | Description |
+| :--- | :--- | :--- |
+| `getSlot` | `(container: string, index: number) → object` | Retourne la référence mémoire d'un slot joueur. |
+| `getContainerSlot` | `(furnitureId: string, index: number) → object` | Retourne la référence mémoire d'un slot container-furniture. |
+| `getContainer` | `(furnitureId: string) → Array\|undefined` | Retourne le tableau de slots d'un container chargé. |
+
+#### Modifications
+
+| Méthode | Signature | Description |
+| :--- | :--- | :--- |
+| `toggleLock` | `(slot: object) → boolean` | Inverse l'état locked. Retourne le nouvel état. |
+| `trashFromBag` | `(slotIndex: number) → object` | Déplace le contenu d'un slot bag vers la poubelle. Retourne le slot vidé. |
+| `restoreTrash` | `() → void` | Restaure la poubelle dans le bag (stack ou premier libre). |
+| `loot` | `(item: string, count: number, prefix: string) → void` | Place un item looté (stack bag → stack hotbar → libre bag → libre hotbar). |
+| `decrementBagSlotCount` | `(slotIndex: number) → object` | Décrémente le count d'un slot bag. Vide si count=0. Retourne le slot. |
+| `decrementHotbarSlotCount` | `(slotIndex: number) → object` | Décrémente le count d'un slot hotbar. Vide si count=0. Retourne le slot. |
+| `splitSlot` | `(srcSlot: object, count: number) → object\|null` | Sépare une pile — premier slot libre bag uniquement. Retourne le slot destination ou null si bag plein. |
+
+#### Déplacements intra-container
+
+| Méthode | Signature | Description |
+| :--- | :--- | :--- |
+| `moveWithinContainer` | `(container: string, sourceIndex: number, targetIndex: number) → void` | Swap ou stack dans hotbar, bag ou accessory. |
+| `moveWithinChest` | `(furnitureId: string, sourceIndex: number, targetIndex: number) → void` | Swap ou stack dans un coffre. |
+
+#### Déplacements inter-containers
+
+| Méthode | Signature | Description |
+| :--- | :--- | :--- |
+| `moveBagToHotbar` | `(sourceIndex, targetIndex) → void` | Swap ou stack. |
+| `moveHotbarToBag` | `(sourceIndex, targetIndex) → void` | Swap ou stack. |
+| `moveBagToChest` | `(furnitureId, sourceIndex, targetIndex) → void` | Swap ou stack. |
+| `moveChestToBag` | `(furnitureId, sourceIndex, targetIndex) → void` | Swap ou stack. |
+| `moveBagToChestAuto` | `(sourceIndex, furnitureId) → object\|null` | Stack ou premier libre dans le coffre. Retourne slot destination ou null. |
+| `moveChestToBagAuto` | `(furnitureId, sourceIndex) → object\|null` | Stack ou premier libre dans le bag. Retourne slot destination ou null. |
+| `moveBagToArmor` | `(sourceIndex, targetIndex) → {srcSlot, destSlot, depositSlot}\|null` | Vérifie stype. Dépose l'item délogé dans le bag. Null si impossible. |
+| `moveArmorToBag` | `(sourceIndex, targetIndex) → {srcSlot, destSlot, depositSlot}\|null` | Null si bag plein. |
+| `moveBagToAccessory` | `(sourceIndex, targetIndex) → {srcSlot, destSlot, depositSlot}\|null` | Vérifie ITEM_TYPE.ACCESSORY. Dépose l'item délogé dans le bag. Null si impossible. |
+| `moveAccessoryToBag` | `(sourceIndex, targetIndex) → {srcSlot, destSlot, depositSlot}\|null` | Null si bag plein. |
+
+#### Persistance
+
+| Méthode | Signature | Description |
+| :--- | :--- | :--- |
+| `save` | `() → void` | Passe les slots dirty au `SaveManager`. À appeler à la fermeture de l'overlay. |
+
+**Structure slot mémoire :** `{key, container, furnitureId, item, count, prefix, slot, locked, deleted}`
+**`#dirtyKeys` :** `Set<slot>` — références directes aux slots modifiés depuis la dernière sauvegarde.
+
+---
+
 ### Custom Element `<inventory-slot>` (`inventory.mjs`)
 
-Attributs observés : `item` (itemId string), `count` (integer), `lock` ('yes'|'no'), `usable` (integer).
-Attributs de construction (non observés) : `key` (label raccourci), `location` (texte tooltip).
-Classes CSS : `selected` (slot actif), `inactive` (slot grisé, non interactif).
+Attributs observés : `item` (itemId string), `count` (integer), `locked` (booléen — présence = verrouillé), `usable` (integer).
+Attributs de construction (non observés) : `key` (label raccourci), `location` (format `container|index`).
+Classes CSS : `selected` (slot actif), `inactive` (slot grisé, non interactif), `slot-armor-set` (armure set complet).
+
+---
+
+### Class `InventoryOverlay` (Singleton : `inventoryOverlay`, `inventory.mjs`)
+
+Interface DOM de l'inventaire. Aucune logique métier — délègue à `inventoryManager`.
+
+#### Points d'entrée (EventBus)
+
+| Event | Action |
+| :--- | :--- |
+| `inventory/open` | Affiche l'overlay, peuple tous les slots depuis `inventoryManager`, attache les handlers `window`. |
+| `inventory/close` | Cache l'overlay, émet `inventory/static-buffs` et `hotbar/changed`, appelle `inventoryManager.save()`, détache les handlers `window`. |
+| `inventory/keydown` | Raccourcis : `L` = lock, `Space` = use, `Delete` = trash. |
+
+#### Points de sortie (EventBus émis)
+
+| Event | Payload | Description |
+| :--- | :--- | :--- |
+| `inventory/static-buffs` | `Array<string>` | Items donnant des buffs passifs (armor + accessoires équipés + trinkets bag). |
+| `hotbar/changed` | `Array` | Contenu hotbar après fermeture. |
+| `item/used` | `string` (itemId) | Émis lors d'un clic sur l'icône Use. |
+| `craft/item` | `string` (itemId) | Navigue vers la recette d'un item craftable/material. |
+| `help/topic` | `string` (topic) | Navigue vers la fiche d'aide correspondante. |
+| `debug/command` | — | Déclenche le prompt de debug. |
+| `overlay/open-request` | `string` (overlayId) | Demande d'ouverture d'un autre overlay. |
+
+#### Méthode publique
+
+| Méthode | Signature | Description |
+| :--- | :--- | :--- |
+| `refreshBag` | `() → void` | Rafraîchit les slots DOM du bag et de la hotbar. À appeler après toute modification externe (debug). |
