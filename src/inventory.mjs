@@ -1908,7 +1908,7 @@ class InventoryOverlay {
     const prefix = slot.prefix !== '' ? `${slot.prefix} ` : ''
     const count = slot.count > 1 ? `${slot.count} ` : ''
 
-    return `Slot: ${container}${armorSlot}\n${count}${prefix}${item.name}\nTier: ${stars}\n${item.tooltip}\nType: ${itemTypeToString(item.type)}`
+    return `Slot: ${container}${armorSlot}\n${count}${prefix}${item.name}\nTier: ${stars}\n${item.tooltip}\nType: ${itemTypeToString(item.type, item.armor)}`
   }
 
   /**
