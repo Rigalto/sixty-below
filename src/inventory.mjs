@@ -1313,6 +1313,8 @@ class InventoryOverlay {
 
   #dragSource = null // départ du drag & drop
   #ghost = null // div fantôme qui suit la souris pendant le drag & drop
+  #dragStartX // position initiale de la souris
+  #dragStartY // position initiale de la souris
 
   #hotbarSlots = [] // Array(8) — refs DOM des inventory-slot
   #bagSlots = [] // Array(64) — refs DOM des inventory-slot
@@ -1674,7 +1676,8 @@ class InventoryOverlay {
       if (slot.getAttribute('item') === '') return
       if (slot.hasAttribute('locked')) return
       this.#dragSource = slot
-      this.#createGhost(slot, e.clientX, e.clientY)
+      this.#dragStartX = e.clientX
+      this.#dragStartY = e.clientY
     })
 
     this.#content.addEventListener('mouseup', (e) => {
@@ -1812,6 +1815,14 @@ class InventoryOverlay {
   // Champs privés — références liées
   #onWindowMouseMove = (e) => {
     if (this.#dragSource === null) return
+    if (this.#ghost === null) {
+      const dx = e.clientX - this.#dragStartX
+      const dy = e.clientY - this.#dragStartY
+      if (dx * dx + dy * dy > 100) {
+        this.#createGhost(this.#dragSource, e.clientX, e.clientY)
+      }
+      return
+    }
     this.#moveGhost(e.clientX, e.clientY)
   }
 
