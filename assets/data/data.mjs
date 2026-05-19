@@ -149,6 +149,7 @@ export const itemTypeToString = (type, armorSlot = null) => {
   if (type & ITEM_TYPE.ARMOR) { ch.push(armorSlot !== null ? `Armor ${capitalize(armorSlot)}` : 'Armor') }
   if (type & ITEM_TYPE.BAR) { ch.push('Bar') }
   if (type & ITEM_TYPE.WEAPON) { ch.push('Weapon') }
+  if (type & ITEM_TYPE.TRINKET) { ch.push('Trinket') }
   if (type & ITEM_TYPE.ACCESSORY) { ch.push('Accessory') }
   if (type & ITEM_TYPE.GEM) { ch.push('Gem') }
   if (type & ITEM_TYPE.POTION) { ch.push('Potion') }

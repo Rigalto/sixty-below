@@ -815,8 +815,8 @@ Les modules communiquent via l'`EventBus` (couplage faible).
 
 ### 8.1 Système d'Inventaire [`inventory.mjs`]
 
-* Gère : stockage, slots, équipement, artefacts passifs.
-* À la fermeture de l'interface : scan du contenu → émission de `inventory/static-buffs` avec la liste des IDs d'artefacts actifs.
+* Gère : stockage, slots, équipement, accessoire, armure, hotbar, containers proches.
+* À la fermeture de l'interface : scan du contenu → émission de `inventory/static-buffs` avec la liste des trinkets, accessories dans leurs slots et pièces d'armure dans leurs slots.
 * L'inventaire **ne calcule pas** les stats.
 
 ### 8.2 Système de Buffs [`buff.mjs`]
@@ -870,7 +870,7 @@ Les modules communiquent via l'`EventBus` (couplage faible).
 │   ├── housing.mjs          # Layer 4 : FurnitureManager, HousingManager
 │   ├── ecosystem.mjs        # Layer 4 : HiveSystem, PlantSystem, CobwebSystem…
 │   ├── combat.mjs           # Layer 4 : ArenaCreator, TurnManager, SpellSystem, CombatAI
-│   ├── inventory.mjs        # Layer 4 : InventorySystem
+│   ├── inventory.mjs        # Layer 4 : InventoryManager, InventorySlot, InventoryOverlay
 │   ├── craft.mjs            # Layer 4 : CraftSystem
 │   ├── ui.mjs               # Layer 4 : HUD, Panels, Factories
 │   ├── help.mjs             # Layer 4 : HelpPanel

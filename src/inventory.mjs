@@ -1780,7 +1780,7 @@ class InventoryOverlay {
         }
       }
 
-      console.log('drag', this.#dragSource.getAttribute('location'), '→', slot.getAttribute('location'))
+      // console.log('drag', this.#dragSource.getAttribute('location'), '→', slot.getAttribute('location'))
       this.#dragSource = null
     })
   }
@@ -1968,8 +1968,32 @@ class InventoryOverlay {
       this.#btnLock.disabled = true
     }
     inventoryManager.save()
-    eventBus.emit('inventory/static-buffs', []) // TODO : payload réel
+    eventBus.emit('inventory/static-buffs', this.#buildStaticBuffs())
     eventBus.emit('hotbar/changed', inventoryManager.hotbar)
+  }
+
+  /**
+   * Scanne l'inventaire et retourne la liste des items donnant des buffs passifs.
+   * Armor et accessoires équipés + trinkets présents dans le bag.
+   * @returns {Array<string>} — liste des itemIds
+   */
+  #buildStaticBuffs () {
+    const buffs = []
+    const armor = inventoryManager.armor
+    const accessories = inventoryManager.accessories
+    const bag = inventoryManager.bag
+
+    for (let i = 0; i < ARMOR_CAPACITY; i++) {
+      if (armor[i].item !== '') buffs.push(armor[i].item)
+    }
+    for (let i = 0; i < ACCESSORY_CAPACITY; i++) {
+      if (accessories[i].item !== '') buffs.push(accessories[i].item)
+    }
+    for (const slot of bag) {
+      if (slot.item !== '' && (ITEMS[slot.item].type & ITEM_TYPE.TRINKET)) buffs.push(slot.item)
+    }
+
+    return buffs
   }
 
   // ///////////////////////////////// //
