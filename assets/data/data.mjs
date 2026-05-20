@@ -808,3 +808,31 @@ for (const key in RECIPES) {
     throw new Error(`[data.mjs] Intégrité des données KO :\n${errors.join('\n')}`)
   }
 }
+
+// ─── §10. LISTES DÉRIVÉES POUR LES OVERLAYS ──────────────────────────────
+
+const _allDisplayTypes = []
+for (const mask of Object.values(ITEM_TYPE)) {
+  if (mask === 0) continue
+  const label = itemTypeToString(mask)
+  if (label) _allDisplayTypes.push({label, mask})
+}
+
+let _resultTypeBits = 0
+const _stationSet = new Set()
+const _ingredientSet = new Set()
+
+for (const key in RECIPES) {
+  const recipe = RECIPES[key]
+  _resultTypeBits |= recipe.result.item.type
+  _stationSet.add(recipe.station)
+  for (const ing of recipe.ingredients) {
+    _ingredientSet.add(ing.item)
+  }
+}
+
+export const CRAFT_RESULT_TYPES = _allDisplayTypes.filter(({mask}) => _resultTypeBits & mask)
+export const CRAFT_STATIONS = [..._stationSet].sort((a, b) => a.name.localeCompare(b.name))
+export const CRAFT_INGREDIENTS = [..._ingredientSet].sort((a, b) => a.name.localeCompare(b.name))
+
+console.log('...<<<<>>>>>....', {CRAFT_RESULT_TYPES, CRAFT_STATIONS, CRAFT_INGREDIENTS})
