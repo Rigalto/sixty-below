@@ -4320,6 +4320,21 @@ Once you have basic tools and a shelter, you can start exploring:
 * [[Housing]] — building a valid shelter
 * [[Forest]], [[Desert]] and [[Jungle]] — the different regions of the world
 * Enviroment — [[Day & Night Cycle|Time]], [[Weather]] and [[Moon Phases]]
+
+**The Game Screen**
+
+* **[[Hotbar]]** — runs along the left edge. Select a slot with **1** to **9** to hold an item ready for use or placement.
+* **World** — the central area. Move with arrow keys or **WASD**. The world extends far below the [[Surface]] — see [[Underground]] and [[Caverns]].
+* **[[Control Panel]]** — runs along the right edge.
+  * _Action buttons_ — [[Inventory]] **[I]**, [[Crafting]] **[K]**, [[Help Panel]] **[H]**, zoom, sound, new world
+  * _Environment widget_ — [[Day & Night Cycle||day, time], [[Weather]], [[Moon Phases]], player coordinates
+  * _Health gauge_
+  * _Active [[Buff Panel||buffs/debuffs]]_
+* **Overlays** — pause exploration and open a full-screen panel. Press the same key again or click ✕ to close.
+  * [[Inventory]] **[I]** — bag, hotbar, armor and accessories
+  * [[Crafting]] **[K]** — browse recipes, inspect ingredients, craft items
+  * [[Help Panel]] **[H]** — all reference topics, searchable
+  * [[Combat|Combat Panel]] — tactical combat, automatic opening, close when combat is done (win or lost)
   `
   },
   {
@@ -4391,7 +4406,7 @@ Note : Always Present
   },
 
   // ── Gameplay ─────────────────────────────────────────────────
-  //    Buffs, Movement Speed,  World Creation
+  //    Buffs, Buff Panel, Movement Speed,  World Creation
 
   {
     title: 'Buffs',

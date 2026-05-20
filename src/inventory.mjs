@@ -992,8 +992,8 @@ inventory-slot .hidden {
   transform: translate(-50%, -50%);
     width: 1274px;
     height: 682px;
-  background-color: #3c3e45;
-  border: 1px solid #3f4149;
+  background-color: var(--ov-bg-main);
+  border: 1px solid var(--ov-border);
   box-shadow: 0 10px 30px rgba(0,0,0,0.8);
   border-radius: 4px;
   z-index: ${OVERLAYS.inventory.zIndex};
@@ -1031,7 +1031,7 @@ inventory-slot .hidden {
 }
 
 #ui-inventory-panel .inv-panel {
-  background-color: #24252c;
+  background-color: var(--ov-bg-side);
   border-radius: 4px;
   padding: 4px;
 }
@@ -1116,7 +1116,7 @@ inventory-slot .hidden {
   flex-direction: column;
   gap: 6px;
   padding: 4px 8px;
-    background-color: #abd8ea;
+  background-color: var(--ov-bg-side);
 }
 
 #ui-inventory-panel .inv-chest-row {
@@ -1139,23 +1139,34 @@ inventory-slot .hidden {
 #ui-inventory-panel .inv-chest-rename-input,
 #ui-inventory-panel .inv-chest-select {
   flex: 1;
-  background-color: #2c2c2c;
-  color: #eee;
-  border: 1px solid #666;
+  background-color: var(--ov-bg-input);
+  color: var(--ov-text);
+  border: 1px solid var(--ov-border-sub);
   border-radius: 3px;
   font-size: 13px;
   padding: 2px 4px;
 }
 
+#ui-inventory-panel .inv-chest-rename-input:focus,
+#ui-inventory-panel .inv-chest-select:focus {
+  border-color: var(--ov-accent);
+}
+
 #ui-inventory-panel .inv-chest-rename {
   background-color: transparent;
+  color: #bdc3c7;
   border: none;
   cursor: pointer;
   font-size: 16px;
 }
 
 #ui-inventory-panel .inv-chest-rename:disabled {
+  opacity: 0.4;
   cursor: default;
+}
+
+#ui-inventory-panel .inv-chest-rename:hover:not(:disabled) {
+  color: var(--ov-text);
 }
 
 #ui-inventory-panel .inv-chest-rename-form {
@@ -1167,17 +1178,35 @@ inventory-slot .hidden {
 
 #ui-inventory-panel .inv-chest-rename-label {
   font-size: 14px;
-  color: #080808;
+  color: var(--ov-text);
   white-space: nowrap;
 }
 
 #ui-inventory-panel .inv-chest-rename-confirm,
 #ui-inventory-panel .inv-chest-rename-cancel {
-  background-color: transparent;
-  border: none;
+  width: 26px;
+  height: 26px;
+  background-color: var(--ov-btn-bg);
+  border: 1px solid var(--ov-border-sub);
+  border-radius: 3px;
   cursor: pointer;
   font-size: 18px;
   font-weight: bold;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  flex-shrink: 0;
+}
+
+#ui-inventory-panel .inv-chest-rename-confirm:hover {
+  background-color: #1a3d1a;
+  border-color: #3a7a3a;
+}
+
+#ui-inventory-panel .inv-chest-rename-cancel:hover {
+  background-color: #3d1a1a;
+  border-color: #7a3a3a;
 }
 
 #ui-inventory-panel .inv-chest-rename-confirm {

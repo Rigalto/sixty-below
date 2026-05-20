@@ -733,7 +733,23 @@ export function createOverlayHeader (titleText, overlayId) {
   if (!document.getElementById('ui-global-styles')) {
     const style = document.createElement('style')
     style.id = 'ui-global-styles'
-    style.textContent = '.ui-close-btn:hover { color: #ffffff !important; }'
+
+    style.textContent = `
+  :root {
+    --ov-bg-main:    #2f3136;
+    --ov-bg-side:    #23272a;
+    --ov-bg-deep:    #1e2128;
+    --ov-bg-input:   #1e2128;
+    --ov-border:     #202225;
+    --ov-border-sub: #4a5568;
+    --ov-accent:     #4a69bd;
+    --ov-text:       #ffffff;
+    --ov-text-sec:   #dcddde;
+    --ov-text-muted: #72767d;
+    --ov-btn-bg:     #2c3e50;
+  }
+  .ui-close-btn:hover { color: #ffffff !important; }
+  `
     document.head.appendChild(style)
   }
 
