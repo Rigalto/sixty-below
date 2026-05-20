@@ -65,12 +65,10 @@ class HelpOverlay {
     this.#filterInput.placeholder = 'Search…'
     this.#filterInput.className = 'help-search-input'
 
-    const btnSearch = this.#makeIconBtn('🔍', 'Search')
     const btnReset = this.#makeIconBtn('✕', 'Clear and return to categories')
     btnReset.id = 'help-btn-reset'
 
     searchRow.appendChild(this.#filterInput)
-    searchRow.appendChild(btnSearch)
     searchRow.appendChild(btnReset)
     this.#leftPane.appendChild(searchRow)
 
