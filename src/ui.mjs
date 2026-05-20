@@ -747,6 +747,13 @@ export function createOverlayHeader (titleText, overlayId) {
     --ov-text-sec:   #dcddde;
     --ov-text-muted: #72767d;
     --ov-btn-bg:     #2c3e50;
+
+    --slot-bg-default:   #4A90E2;
+    --slot-bg-hotbar:    #e1f381;
+    --slot-bg-armor:     #40e040;
+    --slot-bg-armor-set: #80f840;
+    --slot-bg-accessory: #B39DDB;
+    --slot-bg-inactive:  #bbbbbb;
   }
   .ui-close-btn:hover { color: #ffffff !important; }
   `

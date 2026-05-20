@@ -1,7 +1,7 @@
 import {OVERLAYS} from './constant.mjs'
 import {eventBus} from './utils.mjs'
 import {createOverlayHeader} from './ui.mjs'
-import {CRAFT_RESULT_TYPES, CRAFT_STATIONS, CRAFT_INGREDIENTS} from '../assets/data/data.mjs'
+import {RECIPES, CRAFT_RESULT_TYPES, CRAFT_STATIONS, CRAFT_INGREDIENTS} from '../assets/data/data.mjs'
 
 // ── CSS ──────────────────────────────────────────────────────────────────────
 
@@ -153,6 +153,21 @@ craftStyle.textContent = /* css */`
 #ui-craft-panel .cr-filter-select:focus {
   border-color: var(--ov-accent);
 }
+
+#ui-craft-panel .cr-grid-zone {
+  flex: 1;
+  overflow-y: auto;
+  padding: 6px;
+  display: flex;
+  flex-wrap: wrap;
+  align-content: flex-start;
+  gap: 4px;
+}
+
+#ui-craft-panel .cr-grid-zone::-webkit-scrollbar       { width: 6px; }
+#ui-craft-panel .cr-grid-zone::-webkit-scrollbar-track { background: var(--ov-bg-input); border-radius: 3px; }
+#ui-craft-panel .cr-grid-zone::-webkit-scrollbar-thumb { background: var(--ov-border-sub); border-radius: 3px; }
+#ui-craft-panel .cr-grid-zone::-webkit-scrollbar-thumb:hover { background: var(--ov-accent); }
 `
 document.head.appendChild(craftStyle)
 
@@ -169,6 +184,10 @@ class CraftOverlay {
   #filterMode // select 1 — type | station | ingredient
   #filterValue // select 2 — dépend de filterMode
   #btnReset
+  // zone #detailZone
+  #craftSlots = [] // inventory-slot elements de la grille
+  #selectedSlot = null
+  #selectedRecipe = null
 
   constructor () {
     // 1. Création du Conteneur Principal
@@ -330,6 +349,7 @@ class CraftOverlay {
     // Abonnement au Bus
     eventBus.on('craft/open', () => {
       this.#container.style.display = 'flex'
+      this.#applyFilter()
     })
 
     eventBus.on('craft/close', () => {
@@ -366,7 +386,59 @@ class CraftOverlay {
   }
 
   #applyFilter () {
-    // TODO — étape grille
+    const text = this.#filterInput.value.trim().toLowerCase()
+    let recipes
+
+    if (text.length > 0) {
+      recipes = RECIPES.filter(r => r.result.item.name.toLowerCase().includes(text))
+    } else {
+      const mode = this.#filterMode.value
+      const val = this.#filterValue.value
+
+      if (!val) {
+        recipes = RECIPES
+      } else if (mode === 'type') {
+        const mask = parseInt(val, 10)
+        recipes = RECIPES.filter(r => r.result.item.type & mask)
+      } else if (mode === 'station') {
+        recipes = RECIPES.filter(r => r.station.code === val)
+      } else {
+        recipes = RECIPES.filter(r => r.ingredients.some(ing => ing.item.code === val))
+      }
+    }
+
+    this.#rebuildGrid(recipes)
+  }
+
+  #rebuildGrid (recipes) {
+    while (this.#gridZone.firstChild) {
+      this.#gridZone.removeChild(this.#gridZone.firstChild)
+    }
+    this.#craftSlots = []
+    this.#selectedSlot = null
+    this.#selectedRecipe = null
+
+    for (const recipe of recipes) {
+      const slot = document.createElement('inventory-slot')
+      slot.setAttribute('item', recipe.result.item.code)
+      slot.setAttribute('count', recipe.result.count)
+      slot.title = recipe.result.item.name
+      slot._recipe = recipe
+
+      slot.addEventListener('click', () => this.#onSlotClick(slot, recipe))
+      this.#craftSlots.push(slot)
+      this.#gridZone.appendChild(slot)
+    }
+  }
+
+  #onSlotClick (slot, recipe) {
+    if (this.#selectedSlot !== null) {
+      this.#selectedSlot.classList.remove('selected')
+    }
+    this.#selectedSlot = slot
+    this.#selectedRecipe = recipe
+    slot.classList.add('selected')
+    // TODO étape détail — this.#showDetail(recipe)
   }
 }
 export const craftOverlay = new CraftOverlay()

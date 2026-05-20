@@ -908,7 +908,7 @@ inventory-slot {
   width: 64px;
   height: 64px;
   border-radius: 6px;
-  background-color: #4A90E2;
+  background-color: var(--slot-bg-default);
   color: white;
   border: 3px solid #888;
   box-sizing: border-box;
@@ -917,15 +917,15 @@ inventory-slot {
 }
 
 inventory-slot.hotbar {
-  background-color: #e1f381;
+  background-color: var(--slot-bg-hotbar);
   color: black;
 }
 
-inventory-slot.armor { background-color: #40e040; }
-inventory-slot.armor.slot-armor-set { background-color: #80f840; }
-inventory-slot.accessory { background-color: #B39DDB; }
+inventory-slot.armor { background-color: var(--slot-bg-armor); }
+inventory-slot.armor.slot-armor-set { background-color: var(--slot-bg-armor-set); }
+inventory-slot.accessory { background-color: var(--slot-bg-accessory); }
 inventory-slot.inactive {
-  background-color: #bbb;
+  background-color: var(--slot-bg-inactive);
   cursor: default;
 }
 
@@ -1129,7 +1129,7 @@ inventory-slot .hidden {
 #ui-inventory-panel .inv-chest-icon {
   width: 32px;
   height: 32px;
-  background-color: #4A90E2;
+  background-color: var(--slot-bg-default);
   border-radius: 4px;
   border: 3px solid #666;
   align-self: flex-start;
@@ -1280,6 +1280,18 @@ class InventorySlot extends HTMLElement {
     this._count = 0
     this._usable = null
     this._location = location !== null ? `Slot : ${location}\n` : ''
+
+    // Rejouer les attributs posés avant la connexion
+    const item = this.getAttribute('item')
+    if (item) this._itemChanged(item)
+
+    const count = this.getAttribute('count')
+    if (count !== null) this._countChanged(count)
+
+    if (this.hasAttribute('locked')) this._lockedChanged('')
+
+    const usable = this.getAttribute('usable')
+    if (usable !== null) this._usableChanged(usable)
   }
 
   attributeChangedCallback (name, oldValue, newValue) {
@@ -1291,6 +1303,7 @@ class InventorySlot extends HTMLElement {
   }
 
   _itemChanged (value) {
+    if (!this._elImage) return
     if (value === null || value === '') {
       this._elImage.classList.add('hidden')
       return
@@ -1305,11 +1318,13 @@ class InventorySlot extends HTMLElement {
   }
 
   _countChanged (value) {
+    if (!this._elCount) return
     this._count = value !== null ? parseInt(value, 10) : 0
     this._formatCount()
   }
 
   _usableChanged (value) {
+    if (!this._elCount) return
     this._usable = value !== null ? parseInt(value, 10) : null
     this._formatCount()
   }
@@ -1323,6 +1338,7 @@ class InventorySlot extends HTMLElement {
   }
 
   _lockedChanged (value) {
+    if (!this._elLock) return
     // value === null si absent, '' si présent
     this._elLock.classList.toggle('hidden', value === null)
   }
