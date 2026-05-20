@@ -2207,14 +2207,14 @@ Managed trough the [[item:noticeBoard]].
 * [[Closets]]
 * [[Crafting Stations]]
 * [[Doors]]
-* [[Firecamps]]
+* [[item:campfire]]
 * [[Fireplaces]]
-* [[Platforms]]
+* [[item:platformOak]]
 * [[Sofas]]
 * [[Tables]]
 * [[Tableware]]
 * [[Toilets]]
-* [[Torches]]
+* [[item:torch]]
     `
   },
   {
@@ -2622,13 +2622,16 @@ Biome: [[Jungle]]
 
 Crafting Stations are specialized workbenches that allow the player to [[Crafting|craft]] advanced items. Each station is dedicated to a specific material or craft type. Most stations must be crafted first and placed in the world.
 
+Crafting stations are required to craft higher-tier stations, forming a progression chain — see [[Crafting Tree]].
+
 **Starting point**
 
-* [[Wooden Table]] — [[item:tableWood]] ⭐ — crafted by hand, unlocks the entire crafting chain
+* [[By Hand]] — your bare hands; always available, and the entry point to the entire crafting chain
+* [[item:tableWood]] ⭐ — crafted by hand, first item of the crafting chain
 
 **Woodworking**
 
-* [[Woodworking]] — [[item:workbench]] ⭐ and [[item:sawmill]] ⭐⭐⭐
+* [[item:workbench]] ⭐ and [[item:sawmill]] ⭐⭐⭐
 
 **Metalworking**
 
@@ -2686,6 +2689,31 @@ The crafting tree shows the order in which crafting stations must be built. Each
     title: 'Crafting Buffs',
     category: ['Buff', 'Crafting'],
     content: `
+    `
+  },
+  {
+    title: 'By Hand',
+    category: ['Crafting Stations', 'Crafting'],
+    content: `
+**Description**
+
+Your bare hands are always available as a crafting station — no placement required.
+They serve two purposes: starting the crafting chain and crafting basic survival items in the field.
+
+**Crafting chain**
+
+Hands are the entry point of the entire [[Crafting Tree]].
+Without them, no other [[Crafting Stations|crafting station]] can be built.
+
+* [[item:tableWood]] — first station of the chain, unlocks most early recipes
+
+**Field crafting**
+
+A small set of essential items can be crafted anywhere, without a workstation nearby.
+
+* [[item:torch]] — basic light source
+* [[item:campfire]] — provides warmth and a resting point
+* [[item:platformOak]] — basic traversal block
     `
   },
 
@@ -2959,7 +2987,15 @@ Filled directly from a liquid source in the world. Used as tools to transport an
   },
 
   // ── Furniture - Light ────────────────────────────────────────
-  //    Torches, Fireplaces, Firecamps, Toilets, Doors, Beds, Chairs, Cloks
+  //    Torches, Fireplaces, Campfire, Toilets, Doors, Beds, Chairs, Cloks
+  {
+    title: 'Gel',
+    category: ['Crafting Ingredient'],
+    content: `
+Dropped by [[monster:slime||Slimes]]
+Used to craft [[item:torch]].
+    `
+  },
   {
     title: 'Torches',
     category: ['Furniture'],
@@ -2973,9 +3009,10 @@ Filled directly from a liquid source in the world. Used as tools to transport an
     `
   },
   {
-    title: 'Firecamps',
+    title: 'Campfires',
     category: ['Furniture'],
     content: `
+* Provide Cosy Buff (à vérifier) ⏳
     `
   },
   {
@@ -3021,6 +3058,8 @@ Filled directly from a liquid source in the world. Used as tools to transport an
     title: 'Platforms',
     category: ['Furniture'],
     content: `
+**Platform Types**
+* [[item:platformOak]]
     `
   },
   {
@@ -4230,7 +4269,7 @@ item:amberMoss:star
 **Benefits**⏳
 
 * Hémostatique naturel (Soin) : Appliquée directement sur une plaie, elle stoppe instantanément le saignement. C'est le "pansement" de base du début de jeu.
-* Allume-feu (Survie) : Une fois séchée, cette mousse devient extrêmement inflammable. Elle est indispensable pour réussir à allumer un Campfire ou une Torch.
+* Allume-feu (Survie) : Une fois séchée, cette mousse devient extrêmement inflammable. Elle est indispensable pour réussir à allumer un [[item:campfire]] ou une [[item:torch]].
 * Filtration : Placée dans un récipient, elle peut servir de filtre rudimentaire utilisé en cuisine.
 
 

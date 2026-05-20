@@ -336,6 +336,7 @@ export const ITEMS = {
   // crafting station
   tableWood: {name: 'Wooden Table', type: ITEM_TYPE.FURNITURE | ITEM_TYPE.PLACABLE, stype: 'station', star: 1, image: 'furniture_32_32-2-0', placed: 'fuws_48_32-1-0', help: 'Wooden Table', tooltip: 'A precision assembly requires a very flat surface.', furnitureSet: 'wood', surface: true},
 
+  byHand: {name: 'By Hand', type: ITEM_TYPE.FURNITURE, stype: 'station', star: 0, image: 'furniture_32_32-3-0', placed: null, help: 'Crafting Stations', tooltip: 'No Crafting Station required'},
   workbench: {name: 'Workbench', type: ITEM_TYPE.FURNITURE | ITEM_TYPE.PLACABLE, stype: 'station', star: 1, furnitureSet: 'wood', surface: true, image: 'furniture_32_32-3-0', placed: 'fuws_48_32-2-0', help: 'Woodworking', tooltip: 'Crafting station for many essential items'},
   sawmill: {name: 'Sawmill', type: ITEM_TYPE.FURNITURE | ITEM_TYPE.PLACABLE, stype: 'station', star: 3, image: 'furniture_32_32-0-0', placed: 'fuws_48_48-0-1', help: 'Woodworking', tooltip: ' Crafting station for advanced Wood and Furniture crafting'},
 
@@ -469,6 +470,32 @@ export const ITEMS = {
 
   // Accessories
 
+  // Torches
+  gel: {name: 'Gel', type: ITEM_TYPE.MATERIAL, stype: 'light', star: 1, image: 'crafting_32_32-2-0', help: 'Gel', tooltip: 'Crafting material dropped by most slimes'},
+  torch: {name: 'Torch', type: ITEM_TYPE.FURNITURE | ITEM_TYPE.PLACABLE | ITEM_TYPE.CRAFTABLE | ITEM_TYPE.MATERIAL, stype: 'light', star: 1, floating: true, furnitureSet: 'wood', image: 'furniture_32_32-0-3', placed: 'fuws_16_16-2-0', help: 'Torches', tooltip: 'Illuminates the night and closed spaces'},
+
+  // Campfires
+  campfire: {name: 'Campfire', type: ITEM_TYPE.FURNITURE | ITEM_TYPE.PLACABLE | ITEM_TYPE.CRAFTABLE, stype: 'light', star: 1, image: 'furniture_32_32-7-3', placed: 'fuws_48_32-2-1', help: 'Campfires', tooltip: 'Provides Cozy Buff when lit'},
+
+  // Platforms
+  platformOak: {name: 'Wood Platform', type: ITEM_TYPE.FURNITURE | ITEM_TYPE.PLACABLE | ITEM_TYPE.CRAFTABLE, stype: 'platform', star: 1, furnitureSet: 'wood', image: 'furniture_32_32-6-7', placed: 'fuws_16_16-0-1', placedleft: 's_42_42-0-5', placedright: 's_42_42-0-4', help: 'Platforms', tooltip: 'Can be walked on, but also allow movement through the space they occupy'},
+
+  // woodptfm: {name: 'Wood Platform', type: ITEM_TYPE.FURNITURE, stype: 'platform', floating: true, furnitureSet: 'wood', sell: 25, star: 1, image: 'furniture_32_32-6-7', placed: 'fuws_16_16-0-1', placedleft: 's_42_42-0-5', placedright: 's_42_42-0-4', help: 'Platforms', tooltip: 'Can be walked on, but also allow movement through the space they occupy'},
+
+  // reefptfm: {name: 'Reef Platform', type: ITEM_TYPE.FURNITURE, stype: 'platform', floating: true, furnitureSet: 'coral', sell: 250, star: 2, image: 'furniture_32_32-0-7', placed: 'fuws_16_16-1-1', placedleft: 's_42_42-1-5', placedright: 's_42_42-1-4', help: 'Platforms', tooltip: 'Can be walked on, but also allow movement through the space they occupy'},
+  // mahoganyptfm: {name: 'Mahogany Platform', type: ITEM_TYPE.FURNITURE, stype: 'platform', floating: true, furnitureSet: 'mahogany', sell: 75, star: 2, image: 'furniture_32_32-1-7', placed: 'fuws_16_16-2-1', placedleft: 's_42_42-2-5', placedright: 's_42_42-2-4', help: 'Platforms', tooltip: 'Can be walked on, but also allow movement through the space they occupy'},
+  // glassptfm: {name: 'Glass Platform', type: ITEM_TYPE.FURNITURE, stype: 'platform', floating: true, furnitureSet: 'glass', sell: 25, star: 1, image: 'furniture_32_32-2-7', placed: 'fuws_16_16-3-1', placedleft: 's_42_42-3-5', placedright: 's_42_42-3-4', help: 'Platforms', tooltip: 'Can be walked on, but also allow movement through the space they occupy'},
+  // stoneptfm: {name: 'Stone Platform', type: ITEM_TYPE.FURNITURE, stype: 'platform', floating: true, sell: 25, star: 1, image: 'furniture_32_32-3-7', placed: 'fuws_16_16-4-1', placedleft: 's_42_42-4-5', placedright: 's_42_42-4-4', help: 'Platforms', tooltip: 'Can be walked on, but also allow movement through the space they occupy'},
+  // sandstoneptfm: {name: 'Sandstone Platform', type: ITEM_TYPE.FURNITURE, stype: 'platform', floating: true, furnitureSet: 'sandstone', sell: 350, star: 3, image: 'furniture_32_32-4-7', placed: 'fuws_16_16-5-1', placedleft: 's_42_42-5-5', placedright: 's_42_42-5-4', help: 'Platforms', tooltip: 'Can be walked on, but also allow movement through the space they occupy'},
+  // slimeptfm: {name: 'Slime Platform', type: ITEM_TYPE.FURNITURE, stype: 'platform', floating: true, furnitureSet: 'slime', sell: 25, star: 1, image: 'furniture_32_32-5-7', placed: 'fuws_16_16-6-1', placedleft: 's_42_42-5-3', placedright: 's_42_42-5-2', help: 'Platforms', tooltip: 'Can be walked on, but also allow movement through the space they occupy'},
+
+  // coralcampfire: {name: 'Coral Campfire', type: ITEM_TYPE.FURNITURE | ITEM_TYPE.LIGHT, stype: 'onoff', cozy: true, sell: 3500, star: 2, image: 'furniture_32_32-8-3', placed: 'fuws_48_32-4-1', placedleft: 'fuws_48_32-5-1', help: 'Furniture', tooltip: 'Provides Cozy Buff when lit'},
+  // junglecampfire: {name: 'Jungle Campfire', type: ITEM_TYPE.FURNITURE | ITEM_TYPE.LIGHT, stype: 'onoff', cozy: true, sell: 1500, star: 2, image: 'furniture_32_32-9-3', placed: 'fuws_48_32-4-0', placedleft: 'fuws_48_32-5-0', help: 'Furniture', tooltip: 'Provides Cozy Buff when lit'},
+  // desertcampfire: {name: 'Desert Campfire', type: ITEM_TYPE.FURNITURE | ITEM_TYPE.LIGHT, stype: 'onoff', cozy: true, sell: 800, star: 3, image: 'furniture_32_32-10-3', placed: 'fuws_48_32-0-1', placedleft: 'fuws_48_32-1-1', help: 'Furniture', tooltip: 'Provides Cozy Buff when lit'},
+  // ancientcampfire: {name: 'Ancient Campfire', type: ITEM_TYPE.FURNITURE | ITEM_TYPE.LIGHT, stype: 'onoff', cozy: true, sell: 900, star: 2, image: 'furniture_32_32-11-3', placed: 'fuws_48_32-2-1', placedleft: 'fuws_48_32-3-1', help: 'Furniture', tooltip: 'Provides Cozy Buff when lit'},
+  // lizardcampfire: {name: 'Lizard Campfire', type: ITEM_TYPE.FURNITURE | ITEM_TYPE.LIGHT, stype: 'onoff', cozy: true, sell: 3400, star: 3, image: 'furniture_32_32-12-3', placed: 'fuws_48_32-4-1', placedleft: 'fuws_48_32-5-1', help: 'Furniture', tooltip: 'Provides Cozy Buff when lit'},
+  // ultracampfire: {name: 'Ultra Bright Campfire', type: ITEM_TYPE.FURNITURE | ITEM_TYPE.LIGHT, stype: 'onoff', cozy: true, sell: 1500, star: 4, image: 'furniture_32_32-13-3', placed: 'fuws_48_32-0-2', placedleft: 'fuws_48_32-1-2', help: 'Furniture', tooltip: 'Provides Cozy Buff when lit'},
+
   // Trinkets
   clockCopper: {name: 'Copper Clock', type: ITEM_TYPE.TRINKET | ITEM_TYPE.CRAFTABLE, stype: 'trinket', star: 2, image: 'furniture_32_32-3-8', help: 'Clocks', tooltip: 'When in Inventory, increases Time accuracy'},
   clockSilver: {name: 'Silver Clock', type: ITEM_TYPE.TRINKET | ITEM_TYPE.CRAFTABLE, stype: 'trinket', star: 3, image: 'furniture_32_32-3-8', help: 'Clocks', tooltip: 'When in Inventory, increases Time accuracy'},
@@ -487,7 +514,32 @@ export const ITEMS = {
    ============================================================================ */
 
 export const RECIPES = [
-  {result: {item: 'triskelAncient', count: 1}, station: 'alchemyTable', ingredients: [{item: 'triskelCopper', count: 1}, {item: 'triskelSilver', count: 1}, {item: 'triskelGold', count: 1}]}
+  // Accesories
+  {result: {item: 'triskelAncient', count: 1}, station: 'alchemyTable', ingredients: [{item: 'triskelCopper', count: 1}, {item: 'triskelSilver', count: 1}, {item: 'triskelGold', count: 1}]},
+
+  // Crafting Stations
+  {result: {item: 'tableWood', count: 1}, station: 'workbench', ingredients: [{item: 'logOak', count: 8}]},
+  {result: {item: 'workbench', count: 1}, station: 'byHand', ingredients: [{item: 'logOak', count: 10}]},
+
+  // {output: 'workbench', station: 'byhand', recipe: [{item: 'woodlog', count: 10}]},
+  // {output: 'furnace', station: 'workbench', recipe: [{item: 'bkston', count: 20}, {item: 'woodlog', count: 4}, {item: 'torch', count: 3}]},
+  // {output: 'anvilfe', station: 'workbench', recipe: [{item: 'brfe', count: 5}]},
+  // {output: 'potiontable', station: 'workbench', recipe: [{item: 'woodlog', count: 12}, {item: 'brcu', count: 6}, {item: 'bottle', count: 10}, {item: 'torch', count: 2}]},
+  // {output: 'cook', station: 'anvilfe', recipe: [{item: 'brfe', count: 10}, {item: 'woodlog', count: 4}, {item: 'torch', count: 2}]},
+  // {output: 'sawmill', station: 'workbench', recipe: [{item: 'woodlog', count: 10}, {item: 'brfe', count: 2}, {item: 'chain', count: 1}]},
+  // {output: 'loom', station: 'sawmill', recipe: [{item: 'woodlog', count: 12}, {item: 'brfe', count: 1}]},
+  // {output: 'anvilpt', station: 'anvilfe', recipe: [{item: 'brpt', count: 10}]},
+
+  // torches
+  {result: {item: 'torch', count: 3}, station: 'byHand', ingredients: [{item: 'gel', count: 1}, {item: 'logOak', count: 1}]}
+
+  // {output: 'coraltorch', station: 'byhand', recipe: [{item: 'gel', count: 1}, {item: 'coral', count: 1}], built: 3},
+  // {output: 'jungletorch', station: 'byhand', recipe: [{item: 'gel', count: 1}, {item: 'mahogany', count: 1}], built: 3},
+  // {output: 'ancienttorch', station: 'byhand', recipe: [{item: 'gel', count: 1}, {item: 'bkhive', count: 1}], built: 3},
+  // {output: 'deserttorch', station: 'byhand', recipe: [{item: 'gel', count: 1}, {item: 'sandstone', count: 1}], built: 3},
+  // {output: 'lizardtorch', station: 'byhand', recipe: [{item: 'gel', count: 1}, {item: 'emerald', count: 1}], built: 3},
+  // {output: 'ultratorch', station: 'byhand', recipe: [{item: 'gel', count: 1}, {item: 'marble', count: 1}], built: 3},
+
 ]
 
 /* ============================================================================
@@ -649,7 +701,8 @@ for (const key in ITEMS) {
       console.error(`[data.mjs] ITEMS.${key} : champ obligatoire manquant : '${field}'`)
     }
   }
-  if ((itemDesc.type & ITEM_TYPE.FURNITURE) && !itemDesc.placed && !itemDesc.placedLeft) {
+  const PLACABLE_FURNITURE = ITEM_TYPE.FURNITURE | ITEM_TYPE.PLACABLE
+  if ((itemDesc.type & PLACABLE_FURNITURE) === PLACABLE_FURNITURE && !itemDesc.placed && !itemDesc.placedLeft) {
     console.error(`[data.mjs] ITEMS.${key} : FURNITURE sans attribut 'placed' ni 'placedLeft'`)
   }
   // le post traitement des images est effectué par GameCore.#hydrateItems()
