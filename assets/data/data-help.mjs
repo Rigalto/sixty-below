@@ -2665,7 +2665,7 @@ Crafting stations are required to craft higher-tier stations, forming a progress
 
 The crafting tree shows the order in which crafting stations must be built. Each station unlocks the next tier of crafting possibilities.
 
-* By hand
+* [[By Hand]]
   * [[Wooden Table]] ⭐
     * [[Woodworking|Workbench]] ⭐
       * [[Stonecutting|Stonecutter]] ⭐
