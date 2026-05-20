@@ -38,39 +38,14 @@ class HelpOverlay {
   // ─── Construction DOM ──────────────────────────────────────────
 
   #buildDOM () {
-    // 1. Conteneur principal
     this.#container = document.createElement('div')
     this.#container.id = 'ui-help-panel'
-    Object.assign(this.#container.style, {
-      position: 'fixed',
-      top: '50%',
-      left: '50%',
-      transform: 'translate(-50%, -50%)',
-      width: '1000px',
-      height: '600px',
-      backgroundColor: '#2f3136',
-      border: '1px solid #202225',
-      boxShadow: '0 10px 30px rgba(0,0,0,0.8)',
-      borderRadius: '4px',
-      zIndex: OVERLAYS.help.zIndex,
-      display: 'none',
-      flexDirection: 'column',
-      fontFamily: 'Segoe UI, Roboto, sans-serif',
-      color: '#ffffff',
-      userSelect: 'none'
-    })
+    this.#container.style.zIndex = OVERLAYS.help.zIndex // seul style dynamique
 
-    // 2. Header
     this.#container.appendChild(createOverlayHeader('📜 Help [H]', 'help'))
 
-    // 3. Corps (left + right)
     const body = document.createElement('div')
-    Object.assign(body.style, {
-      display: 'flex',
-      flex: '1',
-      overflow: 'hidden'
-    })
-
+    body.className = 'help-body'
     body.appendChild(this.#buildLeftPane())
     body.appendChild(this.#buildRightPane())
     this.#container.appendChild(body)
@@ -80,40 +55,15 @@ class HelpOverlay {
 
   #buildLeftPane () {
     this.#leftPane = document.createElement('div')
-    Object.assign(this.#leftPane.style, {
-      width: '260px',
-      minWidth: '260px',
-      backgroundColor: '#23272a',
-      borderRight: '1px solid #202225',
-      display: 'flex',
-      flexDirection: 'column',
-      padding: '8px',
-      gap: '6px'
-    })
+    this.#leftPane.className = 'help-left'
 
-    // ── Ligne 1 : input texte + bouton recherche + bouton reset ──
     const searchRow = document.createElement('div')
-    Object.assign(searchRow.style, {
-      display: 'flex',
-      gap: '4px',
-      alignItems: 'center'
-    })
+    searchRow.className = 'help-search-row'
 
     this.#filterInput = document.createElement('input')
     this.#filterInput.type = 'text'
     this.#filterInput.placeholder = 'Search…'
     this.#filterInput.className = 'help-search-input'
-    Object.assign(this.#filterInput.style, {
-      flex: '1',
-      minWidth: '0',
-      padding: '4px 6px',
-      backgroundColor: '#1e272e',
-      border: '1px solid #4a5568',
-      borderRadius: '3px',
-      color: '#ffffff',
-      fontSize: '13px',
-      outline: 'none'
-    })
 
     const btnSearch = this.#makeIconBtn('🔍', 'Search')
     const btnReset = this.#makeIconBtn('✕', 'Clear and return to categories')
@@ -124,26 +74,13 @@ class HelpOverlay {
     searchRow.appendChild(btnReset)
     this.#leftPane.appendChild(searchRow)
 
-    // ── Ligne 2 : menu catégorie (masqué si texte saisi) ──
     this.#categorySelect = document.createElement('select')
     this.#categorySelect.className = 'help-category-select'
-    Object.assign(this.#categorySelect.style, {
-      width: '100%',
-      padding: '4px 6px',
-      backgroundColor: '#2c3e50',
-      border: '1px solid #4a5568',
-      borderRadius: '3px',
-      color: '#ffffff',
-      fontSize: '13px',
-      cursor: 'pointer'
-    })
 
-    // Option "Toutes"
     const optAll = document.createElement('option')
     optAll.value = ''
     optAll.textContent = '— All categories —'
     this.#categorySelect.appendChild(optAll)
-
     for (const cat of HELP_CATEGORIES) {
       const opt = document.createElement('option')
       opt.value = cat
@@ -152,32 +89,16 @@ class HelpOverlay {
     }
     this.#leftPane.appendChild(this.#categorySelect)
 
-    // ── Ligne 3 : navigation historique ──
     const navRow = document.createElement('div')
-    Object.assign(navRow.style, {
-      display: 'flex',
-      gap: '4px'
-    })
-
+    navRow.className = 'help-nav-row'
     this.#btnBack = this.#makeNavBtn('◀', 'Previous')
     this.#btnForward = this.#makeNavBtn('▶', 'Next')
     navRow.appendChild(this.#btnBack)
     navRow.appendChild(this.#btnForward)
     this.#leftPane.appendChild(navRow)
 
-    // ── Grille des fiches (scrollable) ──
     this.#grid = document.createElement('div')
     this.#grid.className = 'help-grid'
-    Object.assign(this.#grid.style, {
-      flex: '1',
-      overflowY: 'auto',
-      overflowX: 'hidden',
-      display: 'flex',
-      flexWrap: 'wrap',
-      alignContent: 'flex-start',
-      gap: '4px',
-      paddingRight: '2px' // évite que l'ascenseur chevauche les boutons
-    })
     this.#leftPane.appendChild(this.#grid)
 
     return this.#leftPane
@@ -185,36 +106,16 @@ class HelpOverlay {
 
   #buildRightPane () {
     const wrapper = document.createElement('div')
-    Object.assign(wrapper.style, {
-      flex: '1',
-      display: 'flex',
-      flexDirection: 'column',
-      overflow: 'hidden'
-    })
+    wrapper.className = 'help-right'
 
-    // Titre — fixe, hors ascenseur
     this.#rightTitle = document.createElement('div')
-    Object.assign(this.#rightTitle.style, {
-      padding: '12px 20px 8px',
-      fontSize: '18px',
-      fontWeight: 'bold',
-      color: '#ffffff',
-      borderBottom: '1px solid #202225',
-      flexShrink: '0'
-    })
+    this.#rightTitle.className = 'help-right-title'
     wrapper.appendChild(this.#rightTitle)
 
-    // Contenu — scrollable
     this.#rightPane = document.createElement('div')
-    Object.assign(this.#rightPane.style, {
-      flex: '1',
-      overflowY: 'auto',
-      padding: '14px 20px',
-      fontSize: '14px',
-      lineHeight: '1.6',
-      color: '#dcddde'
-    })
-    this.#rightPane.innerHTML = '<p style="color:#72767d;font-style:italic">Select a topic from the list.</p>'
+    this.#rightPane.className = 'help-right-content'
+    this.#rightPane.innerHTML =
+    '<p style="color:var(--ov-text-muted);font-style:italic">Select a topic from the list.</p>'
     wrapper.appendChild(this.#rightPane)
 
     return wrapper
@@ -227,29 +128,12 @@ class HelpOverlay {
     btn.textContent = icon
     btn.title = title
     btn.className = 'help-icon-btn'
-    Object.assign(btn.style, {
-      flexShrink: '0',
-      width: '26px',
-      height: '26px',
-      backgroundColor: '#2c3e50',
-      border: '1px solid #4a5568',
-      borderRadius: '3px',
-      color: '#bdc3c7',
-      cursor: 'pointer',
-      fontSize: '13px',
-      display: 'flex',
-      alignItems: 'center',
-      justifyContent: 'center',
-      padding: '0'
-    })
     return btn
   }
 
   #makeNavBtn (icon, title) {
     const btn = this.#makeIconBtn(icon, title)
-    Object.assign(btn.style, {
-      flex: '1' // les deux boutons partagent la largeur
-    })
+    btn.classList.add('help-nav-btn')
     btn.disabled = true
     return btn
   }
@@ -258,76 +142,220 @@ class HelpOverlay {
 
   #injectStyles () {
     if (document.getElementById('help-styles')) return
+
     const style = document.createElement('style')
     style.id = 'help-styles'
-    style.textContent = `
-      .help-search-input:focus {
-        border-color: #4a69bd !important;
-      }
-      .help-icon-btn:hover:not(:disabled) {
-        background-color: #3a4a6b !important;
-        color: #ffffff !important;
-      }
-      .help-icon-btn:disabled {
-        opacity: 0.35;
-        cursor: default !important;
-      }
-      .help-category-select:focus {
-        outline: none;
-        border-color: #4a69bd !important;
-      }
-      .help-topic-btn {
-        padding: 3px 8px;
-        background-color: #3a3f44;
-        border: 1px solid #4a5568;
-        border-radius: 3px;
-        color: #dcddde;
-        font-size: 12px;
-        cursor: pointer;
-        white-space: nowrap;
-        transition: background-color 0.15s, color 0.15s;
-      }
-      .help-topic-btn:hover,
-      .help-topic-btn.active {
-        background-color: #4a69bd !important;
-        color: #ffffff !important;
-        border-color: #4a69bd !important;
-      }
-      .help-grid::-webkit-scrollbar { width: 6px; }
-      .help-grid::-webkit-scrollbar-track { background: #1e272e; border-radius: 3px; }
-      .help-grid::-webkit-scrollbar-thumb { background: #4a5568; border-radius: 3px; }
-      .help-grid::-webkit-scrollbar-thumb:hover { background: #4a69bd; }
-      .help-link { color: #90cdf4; text-decoration: underline; cursor: pointer; }
-      .help-link:hover { color: #bee3f8; }
-      .help-table {
-        width: 100%;
-        border-collapse: collapse;
-        font-size: 13px;
-        margin: 4px 0;
-      }
-      .help-table th {
-        background-color: #2c3e50;
-        color: #ffffff;
-        font-weight: bold;
-        padding: 6px 10px;
-        text-align: left;
-        border-bottom: 2px solid #4a69bd;
-      }
-      .help-table td {
-        padding: 5px 10px;
-        border-bottom: 1px solid #202225;
-        color: #dcddde;
-      }
-      .help-table tr:nth-child(even) td {
-        background-color: #1e2128;
-      }
-      .help-table tr:nth-child(odd) td {
-        background-color: #2f3340;
-      }
-      .help-table tr:hover td {
-        background-color: #3a4a6b;
-      }
-    `
+    style.textContent = /* css */`
+
+    #ui-help-panel {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 1000px;
+      height: 600px;
+      background-color: var(--ov-bg-main);
+      border: 1px solid var(--ov-border);
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.8);
+      border-radius: 4px;
+      display: none;
+      flex-direction: column;
+      font-family: Segoe UI, Roboto, sans-serif;
+      color: var(--ov-text);
+      user-select: none;
+    }
+
+    #ui-help-panel.open {
+      display: flex;
+    }
+
+    /* ── Corps ── */
+
+    #ui-help-panel .help-body {
+      display: flex;
+      flex: 1;
+      overflow: hidden;
+    }
+
+    /* ── Panneau gauche ── */
+
+    #ui-help-panel .help-left {
+      width: 260px;
+      min-width: 260px;
+      background-color: var(--ov-bg-side);
+      border-right: 1px solid var(--ov-border);
+      display: flex;
+      flex-direction: column;
+      padding: 8px;
+      gap: 6px;
+    }
+
+    #ui-help-panel .help-search-row {
+      display: flex;
+      gap: 4px;
+      align-items: center;
+    }
+
+    #ui-help-panel .help-search-input {
+      flex: 1;
+      min-width: 0;
+      padding: 4px 6px;
+      background-color: var(--ov-bg-input);
+      border: 1px solid var(--ov-border-sub);
+      border-radius: 3px;
+      color: var(--ov-text);
+      font-size: 13px;
+      outline: none;
+    }
+
+    #ui-help-panel .help-search-input:focus {
+      border-color: var(--ov-accent);
+    }
+
+    #ui-help-panel .help-icon-btn {
+      flex-shrink: 0;
+      width: 26px;
+      height: 26px;
+      background-color: var(--ov-btn-bg);
+      border: 1px solid var(--ov-border-sub);
+      border-radius: 3px;
+      color: #bdc3c7;
+      cursor: pointer;
+      font-size: 13px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0;
+    }
+
+    #ui-help-panel .help-icon-btn:hover:not(:disabled) {
+      background-color: #3a4a6b;
+      color: var(--ov-text);
+    }
+
+    #ui-help-panel .help-icon-btn:disabled {
+      opacity: 0.35;
+      cursor: default;
+    }
+
+    #ui-help-panel .help-category-select {
+      width: 100%;
+      padding: 4px 6px;
+      background-color: var(--ov-bg-input);
+      border: 1px solid var(--ov-border-sub);
+      border-radius: 3px;
+      color: var(--ov-text);
+      font-size: 13px;
+      cursor: pointer;
+      outline: none;
+    }
+
+    #ui-help-panel .help-category-select:focus {
+      border-color: var(--ov-accent);
+    }
+
+    #ui-help-panel .help-nav-row {
+      display: flex;
+      gap: 4px;
+    }
+
+    #ui-help-panel .help-nav-btn {
+      flex: 1;
+    }
+
+    #ui-help-panel .help-grid {
+      flex: 1;
+      overflow-y: auto;
+      overflow-x: hidden;
+      display: flex;
+      flex-wrap: wrap;
+      align-content: flex-start;
+      gap: 4px;
+      padding-right: 2px;
+    }
+
+    #ui-help-panel .help-grid::-webkit-scrollbar { width: 6px; }
+    #ui-help-panel .help-grid::-webkit-scrollbar-track { background: var(--ov-bg-input); border-radius: 3px; }
+    #ui-help-panel .help-grid::-webkit-scrollbar-thumb { background: var(--ov-border-sub); border-radius: 3px; }
+    #ui-help-panel .help-grid::-webkit-scrollbar-thumb:hover { background: var(--ov-accent); }
+
+    #ui-help-panel .help-topic-btn {
+      padding: 3px 8px;
+      background-color: #3a3f44;
+      border: 1px solid var(--ov-border-sub);
+      border-radius: 3px;
+      color: var(--ov-text-sec);
+      font-size: 12px;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: background-color 0.15s, color 0.15s;
+    }
+
+    #ui-help-panel .help-topic-btn:hover,
+    #ui-help-panel .help-topic-btn.active {
+      background-color: var(--ov-accent);
+      color: var(--ov-text);
+      border-color: var(--ov-accent);
+    }
+
+    /* ── Panneau droit ── */
+
+    #ui-help-panel .help-right {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    #ui-help-panel .help-right-title {
+      padding: 12px 20px 8px;
+      font-size: 18px;
+      font-weight: bold;
+      color: var(--ov-text);
+      border-bottom: 1px solid var(--ov-border);
+      flex-shrink: 0;
+    }
+
+    #ui-help-panel .help-right-content {
+      flex: 1;
+      overflow-y: auto;
+      padding: 14px 20px;
+      font-size: 14px;
+      line-height: 1.6;
+      color: var(--ov-text-sec);
+    }
+
+    /* ── Contenu des fiches ── */
+
+    #ui-help-panel .help-link { color: #90cdf4; text-decoration: underline; cursor: pointer; }
+    #ui-help-panel .help-link:hover { color: #bee3f8; }
+
+    #ui-help-panel .help-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+      margin: 4px 0;
+    }
+
+    #ui-help-panel .help-table th {
+      background-color: var(--ov-btn-bg);
+      color: var(--ov-text);
+      font-weight: bold;
+      padding: 6px 10px;
+      text-align: left;
+      border-bottom: 2px solid var(--ov-accent);
+    }
+
+    #ui-help-panel .help-table td {
+      padding: 5px 10px;
+      border-bottom: 1px solid var(--ov-border);
+      color: var(--ov-text-sec);
+    }
+
+    #ui-help-panel .help-table tr:nth-child(even) td { background-color: var(--ov-bg-deep); }
+    #ui-help-panel .help-table tr:nth-child(odd) td  { background-color: #2f3340; }
+    #ui-help-panel .help-table tr:hover td           { background-color: #3a4a6b; }
+  `
     document.head.appendChild(style)
   }
 
