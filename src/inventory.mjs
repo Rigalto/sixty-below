@@ -3,7 +3,7 @@
 import {OVERLAYS, BAG_CAPACITY, HOTBAR_CAPACITY, ARMOR_CAPACITY, ARMOR_SLOT_LABELS, ACCESSORY_CAPACITY, CONTAINER_STYPES, CONTAINER_CAPACITY, ARMOR_SLOTS, PATH_RENAME, PATH_LOCKED, PATH_UNLOCKED, PATH_CRAFT, SVG_ICON, PATH_HELP, PATH_DEBUG, PATH_SPLIT, PATH_TRASH_DOWN, PATH_TRASH_UP, PATH_USE, PATH_WARNING, PATH_ARROW_RIGHT} from './constant.mjs'
 import {eventBus, capitalize} from './utils.mjs'
 import {createOverlayHeader} from './ui.mjs'
-import {ITEMS, ITEM_TYPE, itemTypeToString} from '../../assets/data/data.mjs'
+import {ITEMS, ITEM_TYPE} from '../../assets/data/data.mjs'
 import {saveManager} from './persistence.mjs'
 import {furnitureManager} from './housing.mjs'
 
