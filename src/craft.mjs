@@ -2,7 +2,7 @@ import {OVERLAYS, PATH_HELP, SVG_ICON} from './constant.mjs'
 import {eventBus} from './utils.mjs'
 import {createOverlayHeader} from './ui.mjs'
 import {database} from './database.mjs'
-import {RECIPES, CRAFT_RESULT_TYPES, CRAFT_STATIONS, CRAFT_INGREDIENTS, itemTypeToString} from '../assets/data/data.mjs'
+import {ITEM_TYPE, RECIPES, CRAFT_RESULT_TYPES, CRAFT_STATIONS, CRAFT_INGREDIENTS} from '../assets/data/data.mjs'
 
 // ── CSS ──────────────────────────────────────────────────────────────────────
 
@@ -248,6 +248,21 @@ craftStyle.textContent = /* css */`
   font-weight: 700;
   color: var(--ov-text-muted);
   flex-shrink: 0;
+}
+
+/* Curseur par défaut sur tous les slots de détail */
+#ui-craft-panel inventory-slot.cr-detail-slot {
+  cursor: default;
+}
+
+/* Non-cliquable : neutralise le hover global de inventory-slot */
+#ui-craft-panel inventory-slot.cr-detail-slot:not(.cr-clickable):hover {
+  border-color: #888;
+}
+
+/* Cliquable : le hover de inventory-slot s'applique naturellement */
+#ui-craft-panel inventory-slot.cr-detail-slot.cr-clickable {
+  cursor: pointer;
 }
 `
 document.head.appendChild(craftStyle)
@@ -639,6 +654,11 @@ class CraftOverlay {
 
     const slot = document.createElement('inventory-slot')
     slot.classList.add('cr-detail-slot')
+    if (recipe.station.type & ITEM_TYPE.CRAFTABLE) {
+      slot.classList.add('cr-clickable')
+      slot.addEventListener('click', () => this.#onDetailSlotClick(recipe.station.name))
+    }
+
     slot.setAttribute('item', recipe.station.code)
     slot.title = recipe.station.hoverTitle
 
@@ -670,6 +690,10 @@ class CraftOverlay {
 
       const slot = document.createElement('inventory-slot')
       slot.classList.add('cr-detail-slot')
+      if (ing.item.type & ITEM_TYPE.CRAFTABLE) {
+        slot.classList.add('cr-clickable')
+        slot.addEventListener('click', () => this.#onDetailSlotClick(ing.item.name))
+      }
       slot.setAttribute('item', ing.item.code)
       slot.title = ing.item.hoverTitle
 
@@ -688,6 +712,13 @@ class CraftOverlay {
     }
 
     return section
+  }
+
+  #onDetailSlotClick (name) {
+    this.#filterInput.value = name
+    this.#filterMode.style.display = 'none'
+    this.#filterValue.style.display = 'none'
+    this.#applyFilter()
   }
 }
 export const craftOverlay = new CraftOverlay()
