@@ -503,9 +503,13 @@ class CraftOverlay {
   }
 
   #onSlotClick (slot, recipe) {
-    if (this.#selectedSlot !== null) {
-      this.#selectedSlot.classList.remove('selected')
+    if (this.#selectedSlot === slot) { // ← second clic : désélection
+      slot.classList.remove('selected')
+      this.#selectedSlot = null
+      this.#selectedRecipe = null
+      return
     }
+    if (this.#selectedSlot !== null) this.#selectedSlot.classList.remove('selected')
     this.#selectedSlot = slot
     this.#selectedRecipe = recipe
     slot.classList.add('selected')
