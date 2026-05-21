@@ -168,6 +168,7 @@ Chaque combinaison biome/couche correspond à une tuile de substrat distincte av
 | **natural** | `GRASS` | — | `GRASSJUNGLE` |
 | **topsoil** | `DIRT` | `SAND` | `SILT` |
 | **surface** | `CLAY` | `SANDSTONE` | `MUD` |
+| **topsoil** | `HUMUS` | `HUMUS` | `HUMUS` |
 | **underground** | `STONE` | `ASH` | `LIMESTONE` |
 | **caverns** | `HARDSTONE` | `HELLSTONE` | `SLATE` |
 
