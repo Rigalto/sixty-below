@@ -208,6 +208,7 @@ export const ITEMS = {
   // Bars
   barCopper: {name: 'Copper Bar', type: ITEM_TYPE.MATERIAL | ITEM_TYPE.CRAFTABLE, star: 1, stype: 'bar', image: 'blocks_16_16-0-0', help: 'Metals', tooltip: 'Crafting material used to craft tools, weapons, armor, and other items'},
   barIron: {name: 'Iron Bar', type: ITEM_TYPE.MATERIAL | ITEM_TYPE.CRAFTABLE, star: 2, stype: 'bar', image: 'blocks_16_16-0-0', help: 'Metals', tooltip: 'Crafting material used to craft tools, weapons, armor, and other items'},
+  chain: {name: 'Chain', type: 0, star: 2, stype: 'misc', image: 'blocks_16_16-0-0', help: 'Metals', tooltip: '???'},
   barSilver: {name: 'Silver Bar', type: ITEM_TYPE.MATERIAL | ITEM_TYPE.CRAFTABLE, star: 3, stype: 'bar', image: 'blocks_16_16-0-0', help: 'Metals', tooltip: 'Crafting material used to craft tools, weapons, armor, and other items'},
   barGold: {name: 'Gold Bar', type: ITEM_TYPE.MATERIAL | ITEM_TYPE.CRAFTABLE, star: 3, stype: 'bar', image: 'blocks_16_16-0-0', help: 'Metals', tooltip: 'Crafting material used to craft tools, weapons, armor, and other items'},
   barCobalt: {name: 'Cobalt Bar', type: ITEM_TYPE.MATERIAL | ITEM_TYPE.CRAFTABLE, star: 4, stype: 'bar', image: 'blocks_16_16-0-0', help: 'Metals', tooltip: 'Crafting material used to craft tools, weapons, armor, and other items'},
@@ -524,15 +525,15 @@ export const RECIPES = [
   {result: {item: 'tableWood', count: 1}, station: 'byHand', ingredients: [{item: 'logOak', count: 8}]},
   {result: {item: 'workbench', count: 1}, station: 'tableWood', ingredients: [{item: 'logOak', count: 10}]},
   {result: {item: 'stonecutter', count: 1}, station: 'workbench', ingredients: [{item: 'blockSandstone', count: 10}, {item: 'logOak', count: 2}, {item: 'blockClay', count: 2}, {item: 'barCopper', count: 1}]},
-  {result: {item: 'furnace', count: 1}, station: 'workbench', ingredients: [{item: 'blockStone', count: 20}, {item: 'logOak', count: 4}, {item: 'torch', count: 3}]},
   {result: {item: 'anvilIron', count: 1}, station: 'workbench', ingredients: [{item: 'barIron', count: 5}, {item: 'logOak', count: 2}]},
+  {result: {item: 'sawmill', count: 1}, station: 'workbench', ingredients: [{item: 'barIron', count: 2}, {item: 'chain', count: 1}, {item: 'rawRuby', count: 1}]},
+  {result: {item: 'loom', count: 1}, station: 'workbench', ingredients: [{item: 'logOak', count: 12}, {item: 'barIron', count: 2}, {item: 'silk', count: 2}, {item: 'barCopper', count: 1}]},
+  {result: {item: 'tanningRack', count: 1}, station: 'loom', ingredients: [{item: 'silk', count: 12}, {item: 'logMahogany', count: 10}, {item: 'barCopper', count: 2}, {item: 'barSilver', count: 2}]},
   {result: {item: 'alchemyTable', count: 1}, station: 'workbench', ingredients: [{item: 'logMahogany', count: 6}, {item: 'logOak', count: 6}, {item: 'barCopper', count: 5}, {item: 'bottle', count: 10}, {item: 'torch', count: 2}, {item: 'sunflowerOil', count: 1}]},
+  {result: {item: 'furnace', count: 1}, station: 'stonecutter', ingredients: [{item: 'blockStone', count: 20}, {item: 'logOak', count: 4}, {item: 'torch', count: 3}]},
 
   {result: {item: 'cookingPot', count: 1}, station: 'anvilIron', ingredients: [{item: 'barCopper', count: 2}, {item: 'barIron', count: 8}, {item: 'logOak', count: 4}, {item: 'torch', count: 2}]},
-  {result: {item: 'sawmill', count: 1}, station: 'anvilIron', ingredients: [{item: 'barCopper', count: 2}, {item: 'barIron', count: 8}, {item: 'logOak', count: 4}, {item: 'torch', count: 2}]},
-  {result: {item: 'loom', count: 1}, station: 'anvilIron', ingredients: [{item: 'barCopper', count: 2}, {item: 'barIron', count: 8}, {item: 'logOak', count: 4}, {item: 'torch', count: 2}]},
 
-  // {output: 'sawmill', station: 'workbench', recipe: [{item: 'woodlog', count: 10}, {item: 'brfe', count: 2}, {item: 'chain', count: 1}]},
   // {output: 'loom', station: 'sawmill', recipe: [{item: 'woodlog', count: 12}, {item: 'brfe', count: 1}]},
   // {output: 'anvilpt', station: 'anvilfe', recipe: [{item: 'brpt', count: 10}]},
 
@@ -770,6 +771,14 @@ for (const key in RECIPES) {
   }
   // crafting station
   recipe.station = ITEMS[recipe.station]
+  // vérification de l'équivalence en star
+  let maxIngStar = 0
+  for (const ing of recipe.ingredients) {
+    if (ing.item.star > maxIngStar) maxIngStar = ing.item.star
+  }
+  if (maxIngStar !== recipe.result.item.star) {
+    console.error(`[data.mjs] RECIPES '${recipe.result.item.name}' : star mismatch — max ingredient star=${maxIngStar}, result star=${recipe.result.item.star}`)
+  }
 }
 
 /* ============================================================================
