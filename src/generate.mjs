@@ -246,11 +246,11 @@ class WorldGenerator {
     const {fernsCaves, fernsPlants} = worldCarver.digFernCaves()
     await progress('Fern caves')
 
-    // 6.1.9 Moss Cave (Underground - jungle - MUD + GRASSMOSS
+    // 6.1.9 Moss Cave (Underground - Jungle - MUD + GRASSMOSS
     const {mossCaves, mossPlants} = worldCarver.digMossCaves()
     await progress('Moss caves')
 
-    // 6.1.10 Mushroom caves
+    // 6.1.10 Mushroom caves - Forest - HUMUS + GRASSMUSHROOM
     const {mushroomCaves, mushroomPlants} = worldCarver.digMushroomCaves()
     await progress('Mushroom caves')
 
