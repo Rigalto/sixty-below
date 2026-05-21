@@ -448,7 +448,7 @@ class CraftOverlay {
       const slot = document.createElement('inventory-slot')
       slot.setAttribute('item', recipe.result.item.code)
       slot.setAttribute('count', recipe.result.count)
-      slot.title = recipe.result.item.name
+      slot.title = recipe.result.item.hoverTitle
       slot._recipe = recipe
 
       slot.addEventListener('click', () => this.#onSlotClick(slot, recipe))

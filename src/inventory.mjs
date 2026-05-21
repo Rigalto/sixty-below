@@ -1980,11 +1980,10 @@ class InventoryOverlay {
     const container = this.#containerToString(slot.container)
     if (slot.item === '') return `Slot: ${container}${armorSlot}`
     const item = ITEMS[slot.item]
-    const stars = '★'.repeat(Math.min(5, Math.max(0, item.star)))
     const prefix = slot.prefix !== '' ? `${slot.prefix} ` : ''
     const count = slot.count > 1 ? `${slot.count} ` : ''
 
-    return `Slot: ${container}${armorSlot}\n${count}${prefix}${item.name}\nTier: ${stars}\n${item.tooltip}\nType: ${itemTypeToString(item.type, item.armor)}`
+    return `Slot: ${container}${armorSlot}\n${count}${prefix}${item.hoverTitle}`
   }
 
   /**

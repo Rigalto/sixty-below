@@ -135,7 +135,8 @@ RECIPES.wooden_plank.result.item // → ITEMS.plank   (objet direct)
 2. Construction de `NODES_LOOKUP` par code numérique
 3. Résolution `NODES.mining[].item` : string → objet item - TODO
 7. Résolution `RECIPES.ingredients[].item` et `result.item` : string → objet item
-8. **Validation d'intégrité** — `throw` bloquant si KO :
+8. Génération de `hoverTitle string` — titre de survol : name, tier en étoiles, tooltip, type. Utilisé par <inventory-slot>, la grille de craft et la hotbar. Le prefix de slot est préposé par l'appelant si nécessaire.
+9. **Validation d'intégrité** — `throw` bloquant si KO :
    - Codes `NODES` uniques
    - Aucune référence croisée non résolue (string résiduelle = erreur)
 

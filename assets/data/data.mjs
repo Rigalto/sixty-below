@@ -705,6 +705,9 @@ for (const key in ITEMS) {
   if ((itemDesc.type & PLACABLE_FURNITURE) === PLACABLE_FURNITURE && !itemDesc.placed && !itemDesc.placedLeft) {
     console.error(`[data.mjs] ITEMS.${key} : FURNITURE sans attribut 'placed' ni 'placedLeft'`)
   }
+
+  const stars = '★'.repeat(Math.min(5, Math.max(0, itemDesc.star ?? 0)))
+  itemDesc.hoverTitle = `${itemDesc.name}\nTier: ${stars}\n${itemDesc.tooltip}\nType: ${itemTypeToString(itemDesc.type, itemDesc.armor)}`
   // le post traitement des images est effectué par GameCore.#hydrateItems()
 }
 
