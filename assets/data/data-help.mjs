@@ -100,7 +100,8 @@ Mining drops: {{node:{3}:mining[:items[0]:item|link}}
   gemCutRow: '| [[item:{1}]] | {{item:{1}:star}} | [[Smelting|Furnace]] | [[item:{2}]] | {{item:{2}:star}} |',
   lootTableHeader: '| Item | Tier | Amount | Conditions | Modifiers |\n|---|---|---|---|---|',
   additiveNote: '_All modifiers are additive and stack with each other._',
-  lootTable: '| Item | Tier | Amount | Conditions | Modifiers |\n|---|---|---|---|---|\n{{node:{1}:{2}:items[*]:helpRow|rows}}\n\n_All modifiers are additive and stack with each other._'
+  lootTable: '| Item | Tier | Amount | Conditions | Modifiers |\n|---|---|---|---|---|\n{{node:{1}:{2}:items[*]:helpRow|rows}}\n\n_All modifiers are additive and stack with each other._',
+  miningDrop: '{{node:{1}:mining:items[0]:item|link}} {{node:{1}:mining:items[0]:item:star|star}}'
 }
 
 /* ====================================================================================================
@@ -962,6 +963,10 @@ Cobwebs are sticky threads spun by [[Spiders]]. They slow movement significantly
 In extreme cases, cobwebs can obstruct entire tunnel networks.
 Despite the nuisance they represent, cobwebs are one of the most valuable resources in the game — the silk extracted from them is an essential component in dozens of crafting recipes, from armor to furniture and accessories.
 
+**Tier**
+
+{{node:web:star|star}}
+
 **Main Location**
 
 * [[Cobweb Cave]]s — concentrated, all biomes
@@ -969,7 +974,7 @@ Despite the nuisance they represent, cobwebs are one of the most valuable resour
 
 **Collection** ⏳
 
-* Mine with any [[Mining Tools|Pickaxes]] — drops [[item:silk]]
+* Mine with any [[Mining Tools|Pickaxes]] — drops [[item:silk]] {{item:silk:star|star}}
 * Deleted with a [[item:flamethrower]] - No loot
 
 **Crafting chain**
@@ -1221,9 +1226,8 @@ Tombstones are found inside the burial tunnels. All tombstones behave identicall
   `
   },
 
-  // ── Liquid ────────────────────────────────────────────────────
-  //    Sea, Water, Honey, Sap
   // ── Liquids ───────────────────────────────────────────────────
+  //    Sea, Water, Honey, Sap
   {
     title: 'Water',
     category: ['Liquid'],
@@ -1391,7 +1395,7 @@ Jungle Grass covers the surface of [[Jungle]] biomes. Denser and more vibrant th
 
 **Drops** ⏳
 
-* {{node:grassJungle:mining:items[0]:item|link}}
+* <<miningDrop|grassJungle>>
 
 **Tips**
 
@@ -1416,7 +1420,7 @@ Fern Grass covers the floor of [[Fern Cave]]s. Giant ferns grow from this soft, 
 
 **Drops** ⏳
 
-* {{node:grassFern:mining:items[0]:item|link}}
+* <<miningDrop|grassFern>>
 
 **Tips**
 
@@ -1468,8 +1472,7 @@ Mushroom Grass covers the floor of [[Mushroom Cave]]s. [[Giant Mushroom]]s grow 
 
 **Drops** ⏳
 
-* {{node:grassMushroom:mining:items[0]:item|link}}
-
+* <<miningDrop|grassMushroom>>
 
 **Tips**
 
@@ -1498,10 +1501,8 @@ Dirt is the primary topsoil of [[Forest]] biomes. It supports surface vegetation
 
 **Drops** ⏳
 
-* {{node:dirt:mining:items[0]:item|link}}
+* <<miningDrop|dirt>>
 * {{node:dirt:mining:items[1]:item|link}}
-* [[node:dirt]]
-* [[item:blockDirt]]
 
 **Recipes** ⏳
 
@@ -1527,13 +1528,12 @@ Sand is the primary topsoil of [[Desert]] biomes. It is subject to gravity — u
 
 **Drops** ⏳
 
-* {{node:sand:mining:items[0]:item|link}}
-
+* <<miningDrop|sand>>
 
 **Tips**
 
 * _Sand falls when the tile below is empty — be careful when mining near Sand Pockets._
-* _Sand Pockets are sealed by [[Sandstone]] borders — removing them releases the sand._ ⏳
+* _Sand Pockets are sealed by [[node:sandstone]] borders — removing them releases the sand._ ⏳
   `
   },
   {
@@ -1554,8 +1554,7 @@ Silt is the primary topsoil of [[Jungle]] biomes. Its fine, damp texture support
 
 **Drops** ⏳
 
-* {{node:silt:mining:items[0]:item|link}}
-
+* <<miningDrop|silt>>
 
 **Recipes** ⏳
 
@@ -1582,7 +1581,7 @@ Humus is a rich organic topsoil found across all biomes, though it is most abund
 
 **Drops** ⏳
 
-* {{node:humus:mining:items[0]:item|link}}
+* <<miningDrop|humus>>
 
 **Recipes** ⏳
 
@@ -1643,7 +1642,7 @@ Clay is the most common substrat in [[Forest]] biomes. Its soft, workable textur
 
 **Drops** ⏳
 
-* {{node:clay:mining:items[0]:item|link}}
+* <<miningDrop|clay>>
 
 **Recipes** ⏳
 
@@ -1669,7 +1668,7 @@ Stone is the second most common substrat in [[Forest]] biomes, found deeper than
 
 **Drops** ⏳
 
-* {{node:stone:mining:items[0]:item|link}}
+* <<miningDrop|stone>>
 
 **Recipes** ⏳
 
@@ -1694,7 +1693,7 @@ Hardstone is a dense, resistant substrat found in the deepest parts of [[Forest]
 
 **Drops** ⏳
 
-* {{node:hardstone:mining:items[0]:item|link}}
+* <<miningDrop|hardstone>>
 
 **Recipes** ⏳
 
@@ -1721,7 +1720,7 @@ Sandstone is the primary substrat of [[Desert]] biomes. It also forms the natura
 
 **Drops** ⏳
 
-* {{node:sandstone:mining:items[0]:item|link}}
+* <<miningDrop|sandstone>>
 
 **Recipes** ⏳
 
@@ -1747,7 +1746,7 @@ Ash is the second most common substrat in [[Forest]] biomes, found deeper than [
 
 **Drops** ⏳
 
-* {{node:ash:mining:items[0]:item|link}}
+* <<miningDrop|ash>>
 
 **Recipes** ⏳
 
@@ -1772,7 +1771,7 @@ Hellstone is an extremely hard volcanic substrat found in the deepest parts of [
 
 **Drops** ⏳
 
-* {{node:hellstone:mining:items[0]:item|link}}
+* <<miningDrop|hellstone>>
 
 **Recipes** ⏳
 
@@ -1802,7 +1801,7 @@ Mud is the primary substrat of [[Jungle]] biomes. Its soft, damp texture support
 
 **Drops** ⏳
 
-* {{node:mud:mining:items[0]:item|link}}
+* <<miningDrop|mud>>
 
 **Recipes** ⏳
 
@@ -1828,7 +1827,7 @@ Limestone is a sedimentary substrat found as intrusions across [[Jungle]] biome.
 
 **Drops** ⏳
 
-* {{node:limestone:mining:items[0]:item|link}}
+* <<miningDrop|limestone>>
 
 **Recipes** ⏳
 
@@ -1853,7 +1852,7 @@ Slate is a hard metamorphic substrat found in the deepest parts of [[Jungle]] bi
 
 **Drops** ⏳
 
-* {{node:slate:mining:items[0]:item|link}}
+* <<miningDrop|slate>>
 
 **Recipes** ⏳
 
@@ -1861,7 +1860,7 @@ Slate is a hard metamorphic substrat found in the deepest parts of [[Jungle]] bi
   `
   },
 
-  // ── Mettalic Ores / Chunks / Bars ──────────────────────────────────────────────────────
+  // ── Metallic Ores / Chunks / Bars ────────────────────────────
   //    Copper, Iron, Silver, Gold, Cobalt, Platinum
   {
     title: 'Metals',
@@ -2003,7 +2002,86 @@ Raw gems are placed in your [[Inventory]] when mined with a [[Mining Tools|Picka
   },
 
   // ── Rocks ─────────────────────────────────────────────────────
-  //    Geode Stones, Obsidian, Meteorite, Hive, Shell
+  //    Block Directory, Geode Stones, Obsidian, Meteorite, Hive, Shell
+  {
+    title: 'Block Directory',
+    category: ['Topsoil', 'Substrat', 'Rock'],
+    content: `
+**Description**
+
+A complete reference of all solid tile types found in the world of Sixty-Below.
+
+<hr>
+
+**Substrats**
+
+Native solid layers of each biome, from surface to bedrock.
+
+| Type | Layer | Forest | Desert | Jungle |
+|---|---|---|---|---|
+| Natural | [[Surface]] | [[node:grassForest]]<br>{{node:grassForest:star|star}} | — | [[node:grassJungle]]<br>{{node:grassJungle:star|star}} |
+| Topsoil | [[Surface]] | [[node:dirt]]<br>{{node:dirt:star|star}} | [[node:sand]]<br>{{node:sand:star|star}} | [[node:silt]]<br>{{node:silt:star|star}} |
+| Substrat | [[Surface]] | [[node:clay]]<br>{{node:clay:star|star}} | [[node:sandstone]]<br>{{node:sandstone:star|star}} | [[node:mud]]<br>{{node:mud:star|star}} |
+| Substrat | [[Underground]] | [[node:stone]]<br>{{node:stone:star|star}} | [[node:ash]]<br>{{node:ash:star|star}} | [[node:limestone]]<br>{{node:limestone:star|star}} |
+| Substrat | [[Caverns]] | [[node:hardstone]]<br>{{node:hardstone:star|star}} | [[node:hellstone]]<br>{{node:hellstone:star|star}} | [[node:slate]]<br>{{node:slate:star|star}} |
+
+<hr>
+
+**Metal Ores**
+
+Found in all biomes regardless of substrat. See [[Metals]] for chunks, bars and recipes.
+
+| Ore | Tier | Main layer |
+|---|---|---|
+| [[node:copper]] | {{node:copper:star|star}} | [[Surface]] · [[Underground]] |
+| [[node:iron]] | {{node:iron:star|star}} | [[Underground]] |
+| [[node:silver]] | {{node:silver:star|star}} | [[Caverns|Caverns top]] |
+| [[node:gold]] | {{node:gold:star|star}} | [[Caverns]] |
+| [[node:cobalt]] | {{node:cobalt:star|star}} | [[Caverns]] |
+| [[node:platinum]] | {{node:platinum:star|star}} | [[Caverns|Caverns bottom]] |
+
+<hr>
+
+**Gems**
+
+Rare deposits found only in deep caverns. Each biome has one native gem; Sapphire is transversal. See [[Gems]] for raw gems, cut gems and recipes.
+
+| Gem | Tier | Forest | Desert | Jungle |
+|---|---|---|---|---|
+| [[node:topaz]] | {{node:topaz:star|star}} | [[Caverns]] | — | — |
+| [[node:ruby]] | {{node:ruby:star|star}} | — | [[Caverns]] | — |
+| [[node:emerald]] | {{node:emerald:star|star}} | — | — | [[Caverns]] |
+| [[node:sapphire]] | {{node:sapphire:star|star}} | [[Caverns|Caverns bottom]] | [[Caverns|Caverns bottom]] | [[Caverns|Caverns bottom]] |
+
+<hr>
+
+**Rocks**
+
+Uncommon solid blocks found in specific geological formations, mini-biomes or world events — independent of the native substrat.
+
+| Rock | Tier | Location |
+|---|---|---|
+| [[node:shell]] | {{node:shell:star|star}} | Shores of the [[Sea]] [[Fossil Vein]]s |
+| [[node:hive]] | {{node:hive:star|star}} | [[Hive]]s - [[Jungle]] [[Underground]] |
+| [[node:granite]] | {{node:granite:star|star}} | [[Caverns]] |
+| [[node:marble]] | {{node:marble:star|star}} | [[Caverns]] |
+| [[node:obsidian]] | {{node:obsidian:star|star}} | [[Caverns|Caverns bottom]] |
+| [[node:meteorite]] | {{node:meteorite:star|star}} | [[Surface]] after a [[Meteor Strikes]] |
+
+**Miscellaneous**
+
+| Type | Block | Tier | Location |
+|---|---|---|---|
+| - | [[node:web]] | {{node:web:star|star}} | sticky blocks hanging from ceiling<br>More abundant in [[Cobweb Cave]]s |
+| Topsoil | [[node:humus]] | {{node:humus:star|star}} | [[Moss Cave]] and [[Fern Cave]] |
+| Topsoil | [[node:grassMushroom]] | {{node:grassMushroom:star|star}} | [[Mushroom Cave]] |
+| Topsoil | [[node:grassFern]] | {{node:grassFern:star|star}} | [[Fern Cave]] |
+| Topsoil | [[node:grassMoss]] | {{node:grassMoss:star|star}} | [[Moss Cave]] |
+
+**Tips**
+- See also [[Mineable Blocks]]
+  `
+  },
   {
     title: 'Geode Stones',
     category: ['Crafting', 'Mining'],
@@ -2379,6 +2457,9 @@ Ajouter un paragraphe qui donne la recette de fabrication (générique)
 <<mineableRow|Gem|ruby>>
 <<mineableRow|Gem|emerald>>
 <<mineableRow|Gem|sapphire>>
+
+**Tips**
+- See also [[Block Directory]]
     `
   },
   {
@@ -2610,7 +2691,7 @@ Biome: [[Jungle]]
   //    Crafting, Crafting Stations, Crafting Tree, Crafting Buffs
   {
     title: 'Crafting',
-    category: ['Activities', 'Crafting'],
+    category: ['Activities', 'Crafting', 'Crafting Stations'],
     content: `
 A traduire en anglais : La quantité affichée sur un slot de recette indique le nombre d'items produits par une exécution de la recette — indépendamment du nombre de fois où on choisit de l'exécuter.
     `
@@ -2660,30 +2741,30 @@ Crafting stations are required to craft higher-tier stations, forming a progress
   },
   {
     title: 'Crafting Tree',
-    category: ['Activities', 'Crafting'],
+    category: ['Activities', 'Crafting', 'Crafting Stations'],
     content: `
 **Description**
 
 The crafting tree shows the order in which crafting stations must be built. Each station unlocks the next tier of crafting possibilities.
 
 * [[By Hand]]
-  * [[Wooden Table]] ⭐
-    * [[Woodworking|Workbench]] ⭐
-      * [[Stonecutting|Stonecutter]] ⭐
-        * [[Smelting|Furnace]] ⭐⭐
-          * [[Cooking|Cooking Pot]] ⭐⭐
-          * [[Smelting|Blast Furnace]] ⭐⭐⭐⭐
-      * [[Forging|Iron Anvil]] ⭐⭐
-        * [[Sharpening|Grindstone]] ⭐⭐⭐
-        * [[Jewelry|Jeweler's Bench]] ⭐⭐⭐
-        * [[Forging|Platinum Anvil]] ⭐⭐⭐⭐
-      * [[Alchemy|Alchemy Table]] ⭐⭐
-      * [[Weaving|Loom]] ⭐⭐
-        * [[Leatherworking|Tanning Rack]] ⭐⭐⭐
-      * [[Woodworking|Sawmill]] ⭐⭐⭐
-* Found in the world ⏳
-  * [[Decomposer]] ⭐⭐⭐⭐⭐ — [[Lost Temple]]
-  * [[Transmutator]] ⭐⭐⭐⭐⭐ — [[Ancient House]]
+  * [[item:tableWood]] {{item:tableWood:star|star}}
+    * [[item:workbench]] {{item:workbench:star|star}}
+      * [[item:stonecutter]] {{item:stonecutter:star|star}}
+        * [[item:furnace]] {{item:furnace:star|star}}
+          * [[item:cookingPot]] {{item:cookingPot:star|star}}
+          * [[item:blastFurnace]] {{item:blastFurnace:star|star}}
+      * [[item:anvilIron]] {{item:anvilIron:star|star}}
+        * [[item:grindstone]] {{item:grindstone:star|star}}
+        * [[item:jewelerBench]] {{item:jewelerBench:star|star}}
+        * [[item:anvilPlatinum]] {{item:anvilPlatinum:star|star}}
+      * [[item:alchemyTable]] {{item:alchemyTable:star|star}}
+      * [[item:loom]] {{item:loom:star|star}}
+        * [[item:tanningRack]] {{item:tanningRack:star|star}}
+      * [[item:sawmill]] {{item:sawmill:star|star}}
+* Found in the world
+  * [[item:decomposer]] {{item:decomposer:star|star}} — [[Lost Temple]]
+  * [[item:transmutator]] {{item:transmutator:star|star}} — [[Ancient House]]
   `
   },
   {

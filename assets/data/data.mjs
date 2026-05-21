@@ -54,27 +54,27 @@ export const NODES = {
   // ── Topsoil (terrain nourricier, propice aux plantes) ────────────────────────
   DIRT: {code: 40, name: 'Dirt', type: NODE_TYPE.TOPSOIL, stype: 'block', star: 1, solid: true, color: '#835537', image: 'substrat_16_16+1', mining: {speed: 1000, items: [{item: 'blockDirt', count: 1}, {item: 'worm', count: 0.15, lucky: 1.2, rainy: 1.7}]}, help: 'Dirt'},
   SAND: {code: 41, name: 'Sand', type: NODE_TYPE.TOPSOIL, stype: 'block', star: 1, solid: true, color: '#fee267', image: 'substrat_16_16+5', mining: {speed: 500, items: [{item: 'blockSand', count: 1}]}, viscosity: 500, help: 'Sand'},
-  SILT: {code: 42, name: 'Silt', type: NODE_TYPE.TOPSOIL, stype: 'block', star: 1, solid: true, color: '#4f5b6c', image: 'substrat_16_16+7', mining: {speed: 1000, items: [{item: 'blockSilt', count: 1}]}, help: 'Silt'},
-  HUMUS: {code: 43, name: 'Humus', type: NODE_TYPE.TOPSOIL, stype: 'block', star: 1, solid: true, color: '#036632', image: 'substrat_16_16+6', mining: {speed: 1000, items: [{item: 'blockHumus', count: 1}]}, help: 'Humus'},
+  SILT: {code: 42, name: 'Silt', type: NODE_TYPE.TOPSOIL, stype: 'block', star: 2, solid: true, color: '#4f5b6c', image: 'substrat_16_16+7', mining: {speed: 1000, items: [{item: 'blockSilt', count: 1}]}, help: 'Silt'},
+  HUMUS: {code: 43, name: 'Humus', type: NODE_TYPE.TOPSOIL, stype: 'block', star: 2, solid: true, color: '#036632', image: 'substrat_16_16+6', mining: {speed: 1000, items: [{item: 'blockHumus', count: 1}]}, help: 'Humus'},
 
   // ── Substrat (roche de base, peu propice aux plantes) ────────────────────────
   // Forest
   CLAY: {code: 50, name: 'Clay', type: NODE_TYPE.SUBSTRAT, stype: 'block', star: 1, solid: true, color: '#af784d', image: 'substrat_16_16+3', mining: {speed: 1000, items: [{item: 'blockClay', count: 1}]}, help: 'Clay'},
   STONE: {code: 51, name: 'Stone', type: NODE_TYPE.SUBSTRAT, stype: 'block', star: 2, solid: true, color: '#a4937f', image: 'substrat_16_16+2', mining: {speed: 1200, items: [{item: 'blockStone', count: 1}]}, help: 'Stone'},
-  HARDSTONE: {code: 52, name: 'Hardstone', type: NODE_TYPE.SUBSTRAT, stype: 'block', star: 3, solid: true, color: '#5a5060', image: 'substrat_16_16+0', mining: {speed: 1800, items: [{item: 'blockHardstone', count: 1}]}, help: 'Hardstone'},
+  HARDSTONE: {code: 52, name: 'Hardstone', type: NODE_TYPE.SUBSTRAT, stype: 'block', star: 4, solid: true, color: '#5a5060', image: 'substrat_16_16+0', mining: {speed: 1800, items: [{item: 'blockHardstone', count: 1}]}, help: 'Hardstone'},
   // Desert
-  SANDSTONE: {code: 53, name: 'Sandstone', type: NODE_TYPE.SUBSTRAT, stype: 'block', star: 1, solid: true, color: '#b87141', image: 'rock_16_16+5', mining: {speed: 1200, items: [{item: 'blockSandstone', count: 1}]}, help: 'Sandstone'},
-  ASH: {code: 54, name: 'Ash', type: NODE_TYPE.SUBSTRAT, stype: 'block', star: 2, solid: true, color: '#1b283b', image: 'substrat_16_16+8', speed: 1400, mining: {speed: 1400, items: [{item: 'blockAsh', count: 1}]}, help: 'Ash'},
+  SANDSTONE: {code: 53, name: 'Sandstone', type: NODE_TYPE.SUBSTRAT, stype: 'block', star: 2, solid: true, color: '#b87141', image: 'rock_16_16+5', mining: {speed: 1200, items: [{item: 'blockSandstone', count: 1}]}, help: 'Sandstone'},
+  ASH: {code: 54, name: 'Ash', type: NODE_TYPE.SUBSTRAT, stype: 'block', star: 3, solid: true, color: '#1b283b', image: 'substrat_16_16+8', speed: 1400, mining: {speed: 1400, items: [{item: 'blockAsh', count: 1}]}, help: 'Ash'},
   HELLSTONE: {code: 55, name: 'Hellstone', type: NODE_TYPE.SUBSTRAT, stype: 'block', star: 5, solid: true, color: '#a14c5a', image: 'rock_16_16+4', mining: {speed: 2200, items: [{item: 'blockHellstone', count: 1}]}, help: 'Hellstone'},
   // Jungle
-  MUD: {code: 56, name: 'Mud', type: NODE_TYPE.SUBSTRAT, stype: 'block', star: 1, solid: true, color: '#853a51', image: 'substrat_16_16+4', mining: {speed: 1000, items: [{item: 'blockMud', count: 1}]}, help: 'Mud'},
-  LIMESTONE: {code: 57, name: 'Limestone', type: NODE_TYPE.SUBSTRAT, stype: 'block', star: 2, solid: true, color: '#c8c0a0', image: 'substrat_16_16+0', mining: {speed: 1400, items: [{item: 'blockLimestone', count: 1}]}, help: 'Limestone'},
-  SLATE: {code: 58, name: 'Slate', type: NODE_TYPE.SUBSTRAT, stype: 'block', star: 3, solid: true, color: '#2a3a4a', image: 'substrat_16_16+0', mining: {speed: 1600, items: [{item: 'blockSlate', count: 1}]}, help: 'Slate'},
+  MUD: {code: 56, name: 'Mud', type: NODE_TYPE.SUBSTRAT, stype: 'block', star: 2, solid: true, color: '#853a51', image: 'substrat_16_16+4', mining: {speed: 1000, items: [{item: 'blockMud', count: 1}]}, help: 'Mud'},
+  LIMESTONE: {code: 57, name: 'Limestone', type: NODE_TYPE.SUBSTRAT, stype: 'block', star: 4, solid: true, color: '#c8c0a0', image: 'substrat_16_16+0', mining: {speed: 1400, items: [{item: 'blockLimestone', count: 1}]}, help: 'Limestone'},
+  SLATE: {code: 58, name: 'Slate', type: NODE_TYPE.SUBSTRAT, stype: 'block', star: 5, solid: true, color: '#2a3a4a', image: 'substrat_16_16+0', mining: {speed: 1600, items: [{item: 'blockSlate', count: 1}]}, help: 'Slate'},
 
   // ── Ore (gisement de minerais) ────────────────────────
   COPPER: {code: 70, name: 'Copper Ore', type: NODE_TYPE.ORE, star: 1, solid: true, color: '#fe602f', image: 'ore_16_16+0', speed: 1000, mining: {speed: 1000, items: [{item: 'chunkCopper', count: 1}]}, help: 'Metals'},
-  IRON: {code: 71, name: 'Iron Ore', type: NODE_TYPE.ORE, star: 1, solid: true, color: '#af784d', image: 'ore_16_16+1', speed: 1100, mining: {speed: 1100, items: [{item: 'chunkIron', count: 1}]}, help: 'Metals'},
-  SILVER: {code: 72, name: 'Silver Ore', type: NODE_TYPE.ORE, star: 2, solid: true, color: '#788696', image: 'ore_16_16+2', mining: {speed: 1200, items: [{item: 'chunkSilver', count: 1}]}, help: 'Metals'},
+  IRON: {code: 71, name: 'Iron Ore', type: NODE_TYPE.ORE, star: 2, solid: true, color: '#af784d', image: 'ore_16_16+1', speed: 1100, mining: {speed: 1100, items: [{item: 'chunkIron', count: 1}]}, help: 'Metals'},
+  SILVER: {code: 72, name: 'Silver Ore', type: NODE_TYPE.ORE, star: 3, solid: true, color: '#788696', image: 'ore_16_16+2', mining: {speed: 1200, items: [{item: 'chunkSilver', count: 1}]}, help: 'Metals'},
   GOLD: {code: 73, name: 'Gold Ore', type: NODE_TYPE.ORE, star: 3, solid: true, color: '#ffaa33', image: 'ore_16_16+3', mining: {speed: 1400, items: [{item: 'chunkGold', count: 1}]}, help: 'Metals'},
   COBALT: {code: 74, name: 'Cobalt Ore', type: NODE_TYPE.ORE, star: 4, solid: true, color: '#2797ea', image: 'ore_16_16+4', mining: {speed: 1600, items: [{item: 'chunkCobalt', count: 1}]}, help: 'Metals'},
   PLATINUM: {code: 75, name: 'Platinum Ore', type: NODE_TYPE.ORE, star: 5, solid: true, color: '#25874d', image: 'ore_16_16+5', mining: {speed: 1800, items: [{item: 'chunkPlatinum', count: 1}]}, help: 'Metals'},
@@ -133,6 +133,9 @@ export const ITEM_TYPE = {
   FURNITURE: 0x1, TOOL: 0x2, MATERIAL: 0x4, FOOD: 0x08, BLOCK: 0x10, WALL: 0x20, MECHANISM: 0x40, AMMUNITION: 0x80, CHUNK: 0x100, ARMOR: 0x200, BAR: 0x400, WEAPON: 0x800, TRINKET: 0x1000, ACCESSORY: 0x2000, GEM: 0x4000, POTION: 0x8000, SEMABLE: 0x10000, BAG: 0x20000, BAIT: 0x40000, USABLE: 0x80000, PLACABLE: 0x100000, UNIQUE: 0x200000, UNDISPOSABLE: 0x400000, NONE: 0, CRAFTABLE: 0x800000
 }
 
+// MATERIAL et CRAFTABLE sont ajoutés automatiquement en post-traitement
+// en fonction des recettes.
+
 const capitalize = (str) => str.charAt(0).toUpperCase() + str.slice(1)
 
 export const itemTypeToString = (type, armorSlot = null) => {
@@ -158,8 +161,8 @@ export const itemTypeToString = (type, armorSlot = null) => {
   return ch.join(', ')
 }
 
-// MATERIAL: objet utilisé comme ingrédient dans au moins une recette
-// CRAFTABLE : objet pouvant être crée via l'artisanat
+// MATERIAL: objet utilisé comme ingrédient dans au moins une recette (mise à jour en post-traitement)
+// CRAFTABLE : objet pouvant être crée via l'artisanat (mise à jour en post-traitement)
 // UNIQUE: objet unique, ne peut pas être détruit/vendu/démonté/transmuté
 // PLACABLE: objet pouvant être placé dans le monde :
 //   placed : image de l'objet symétrique dans le monde, pour les portes : image de la porte fermée
@@ -176,23 +179,23 @@ export const itemTypeToString = (type, armorSlot = null) => {
 export const ITEMS = {
 
   // Topsoil Blocks
-  blockDirt: {name: 'Dirt Block', type: ITEM_TYPE.MATERIAL, star: 1, stype: 'block', image: 'blocks_16_16-0-0', help: 'Dirt', tooltip: '???'},
-  blockSand: {name: 'Sand Block', type: ITEM_TYPE.MATERIAL, star: 1, stype: 'block', image: 'blocks_16_16-0-0', help: 'Sand', tooltip: '???'},
-  blockSilt: {name: 'Silt Block', type: ITEM_TYPE.MATERIAL, star: 1, stype: 'block', image: 'blocks_16_16-0-0', help: 'Silt', tooltip: '???'},
-  blockHumus: {name: 'Humus Block', type: ITEM_TYPE.MATERIAL, star: 1, stype: 'block', image: 'blocks_16_16-0-0', help: 'Humus', tooltip: '???'},
+  blockDirt: {name: 'Dirt Block', type: 0, star: 1, stype: 'block', image: 'blocks_16_16-0-0', help: 'Dirt', tooltip: '???'},
+  blockSand: {name: 'Sand Block', type: 0, star: 1, stype: 'block', image: 'blocks_16_16-0-0', help: 'Sand', tooltip: '???'},
+  blockSilt: {name: 'Silt Block', type: 0, star: 2, stype: 'block', image: 'blocks_16_16-0-0', help: 'Silt', tooltip: '???'},
+  blockHumus: {name: 'Humus Block', type: 0, star: 2, stype: 'block', image: 'blocks_16_16-0-0', help: 'Humus', tooltip: '???'},
 
   // Forest Substrat Blocks
-  blockClay: {name: 'Clay Block', type: ITEM_TYPE.MATERIAL, star: 1, stype: 'block', image: 'blocks_16_16-0-0', help: 'Clay', tooltip: '???'},
-  blockStone: {name: 'Stone Block', type: ITEM_TYPE.MATERIAL, star: 2, stype: 'block', image: 'blocks_16_16-0-0', help: 'Stone', tooltip: '???'},
-  blockHardstone: {name: 'Hardstone Block', type: ITEM_TYPE.MATERIAL, star: 1, stype: 'block', image: 'blocks_16_16-0-0', help: 'Hardstone', tooltip: '???'},
+  blockClay: {name: 'Clay Block', type: 0, star: 1, stype: 'block', image: 'blocks_16_16-0-0', help: 'Clay', tooltip: '???'},
+  blockStone: {name: 'Stone Block', type: 0, star: 2, stype: 'block', image: 'blocks_16_16-0-0', help: 'Stone', tooltip: '???'},
+  blockHardstone: {name: 'Hardstone Block', type: 0, star: 4, stype: 'block', image: 'blocks_16_16-0-0', help: 'Hardstone', tooltip: '???'},
   // Desert Substrat Blocks
-  blockSandstone: {name: 'Sandstone Block', type: ITEM_TYPE.MATERIAL, star: 1, stype: 'block', image: 'blocks_16_16-0-0', help: 'Sandstone', tooltip: '???'},
-  blockAsh: {name: 'Ash Block', type: ITEM_TYPE.MATERIAL, star: 1, stype: 'block', image: 'blocks_16_16-0-0', help: 'Ash', tooltip: '???'},
-  blockHellstone: {name: 'Hellstone Block', type: ITEM_TYPE.MATERIAL, star: 1, stype: 'block', image: 'blocks_16_16-0-0', help: 'Hellstone', tooltip: '???'},
+  blockSandstone: {name: 'Sandstone Block', type: 0, star: 2, stype: 'block', image: 'blocks_16_16-0-0', help: 'Sandstone', tooltip: '???'},
+  blockAsh: {name: 'Ash Block', type: 0, star: 3, stype: 'block', image: 'blocks_16_16-0-0', help: 'Ash', tooltip: '???'},
+  blockHellstone: {name: 'Hellstone Block', type: 0, star: 5, stype: 'block', image: 'blocks_16_16-0-0', help: 'Hellstone', tooltip: '???'},
   // Jungle Substrat Blocks
-  blockMud: {name: 'Mud Block', type: ITEM_TYPE.MATERIAL, star: 1, stype: 'block', image: 'blocks_16_16-0-0', help: 'Mud', tooltip: '???'},
-  blockLimestone: {name: 'Limestone Block', type: ITEM_TYPE.MATERIAL, star: 1, stype: 'block', image: 'blocks_16_16-0-0', help: 'Limestone', tooltip: '???'},
-  blockSlate: {name: 'Slate Block', type: ITEM_TYPE.MATERIAL, star: 1, stype: 'block', image: 'blocks_16_16-0-0', help: 'Slate', tooltip: '???'},
+  blockMud: {name: 'Mud Block', type: 0, star: 2, stype: 'block', image: 'blocks_16_16-0-0', help: 'Mud', tooltip: '???'},
+  blockLimestone: {name: 'Limestone Block', type: 0, star: 4, stype: 'block', image: 'blocks_16_16-0-0', help: 'Limestone', tooltip: '???'},
+  blockSlate: {name: 'Slate Block', type: 0, star: 5, stype: 'block', image: 'blocks_16_16-0-0', help: 'Slate', tooltip: '???'},
 
   // Chunks
   chunkCopper: {name: 'Copper Chunk', type: ITEM_TYPE.MATERIAL, star: 1, stype: 'chunk', image: 'blocks_16_16-0-0', help: 'Metals', tooltip: 'Primary crafting materials crafted into bars at a Furnace'},
@@ -211,19 +214,19 @@ export const ITEMS = {
   barPlatinum: {name: 'Platinum Bar', type: ITEM_TYPE.MATERIAL | ITEM_TYPE.CRAFTABLE, star: 5, stype: 'bar', image: 'blocks_16_16-0-0', help: 'Metals', tooltip: 'Crafting material used to craft tools, weapons, armor, and other items'},
 
   // Gems
-  rawTopaz: {name: 'Raw Topaz', type: ITEM_TYPE.MATERIAL, star: 3, stype: 'gem', image: 'blocks_16_16-0-0', help: 'Gems', tooltip: 'Valuable crafting materials to be cut at a Stonecutter'},
+  rawTopaz: {name: 'Raw Topaz', type: ITEM_TYPE.MATERIAL, star: 2, stype: 'gem', image: 'blocks_16_16-0-0', help: 'Gems', tooltip: 'Valuable crafting materials to be cut at a Stonecutter'},
   rawRuby: {name: 'Raw Ruby', type: ITEM_TYPE.MATERIAL, star: 3, stype: 'gem', image: 'blocks_16_16-0-0', help: 'Gems', tooltip: 'Valuable crafting materials to be cut at a Stonecutter'},
-  rawEmerald: {name: 'Raw Emerald', type: ITEM_TYPE.MATERIAL, star: 3, stype: 'gem', image: 'blocks_16_16-0-0', help: 'Gems', tooltip: 'Valuable crafting materials to be cut at a Stonecutter'},
-  rawSapphire: {name: 'Raw Sapphire', type: ITEM_TYPE.MATERIAL, star: 3, stype: 'gem', image: 'blocks_16_16-0-0', help: 'Gems', tooltip: 'Valuable crafting materials to be cut at a Stonecutter'},
+  rawEmerald: {name: 'Raw Emerald', type: ITEM_TYPE.MATERIAL, star: 4, stype: 'gem', image: 'blocks_16_16-0-0', help: 'Gems', tooltip: 'Valuable crafting materials to be cut at a Stonecutter'},
+  rawSapphire: {name: 'Raw Sapphire', type: ITEM_TYPE.MATERIAL, star: 5, stype: 'gem', image: 'blocks_16_16-0-0', help: 'Gems', tooltip: 'Valuable crafting materials to be cut at a Stonecutter'},
 
   // Rock - Geode Stones
   blockGranite: {name: 'Granite Block', type: ITEM_TYPE.MATERIAL, star: 4, stype: 'stone', image: 'blocks_16_16-0-0', help: 'Geode Stones', tooltip: 'Prized crafting materials found in crystalline structures'},
   blockMarble: {name: 'Marble Block', type: ITEM_TYPE.MATERIAL, star: 4, stype: 'stone', image: 'blocks_16_16-0-0', help: 'Geode Stones', tooltip: 'Prized crafting materials found in crystalline structures'},
   // Rock - Others
-  blockObsidian: {name: 'Obsidian Block', type: ITEM_TYPE.MATERIAL, star: 4, stype: 'stone', image: 'blocks_16_16-0-0', help: 'Obsidian', tooltip: 'Hardest material'},
-  blockMeteorite: {name: 'Meteorite Block', type: ITEM_TYPE.MATERIAL, star: 4, stype: 'stone', image: 'blocks_16_16-0-0', help: 'Meteorite', tooltip: 'Falling from space, hard to use'},
-  blockHive: {name: 'Hive Block', type: ITEM_TYPE.MATERIAL, star: 4, stype: 'stone', image: 'blocks_16_16-0-0', help: 'Hive', tooltip: 'Hexagonal alveoles build by Bees'},
-  blockShell: {name: 'Shell Block', type: ITEM_TYPE.MATERIAL, star: 4, stype: 'stone', image: 'blocks_16_16-0-0', help: 'Shell', tooltip: 'Easy to moudre'},
+  blockObsidian: {name: 'Obsidian Block', type: ITEM_TYPE.MATERIAL, star: 5, stype: 'stone', image: 'blocks_16_16-0-0', help: 'Obsidian', tooltip: 'Hardest material'},
+  blockMeteorite: {name: 'Meteorite Block', type: ITEM_TYPE.MATERIAL, star: 5, stype: 'stone', image: 'blocks_16_16-0-0', help: 'Meteorite', tooltip: 'Falling from space, hard to use'},
+  blockHive: {name: 'Hive Block', type: ITEM_TYPE.MATERIAL, star: 3, stype: 'stone', image: 'blocks_16_16-0-0', help: 'Hive', tooltip: 'Hexagonal alveoles build by Bees'},
+  blockShell: {name: 'Shell Block', type: ITEM_TYPE.MATERIAL, star: 2, stype: 'stone', image: 'blocks_16_16-0-0', help: 'Shell', tooltip: 'Easy to moudre'},
 
   // Shell
   shell: {name: 'Shell', type: ITEM_TYPE.MATERIAL, star: 1, stype: 'shell', image: 'blocks_16_16-0-0', help: 'Shell', tooltip: '???'},
@@ -350,7 +353,7 @@ export const ITEMS = {
   loom: {name: 'Loom', type: ITEM_TYPE.FURNITURE | ITEM_TYPE.PLACABLE, stype: 'station', star: 2, image: 'furniture_32_32-1-0', placed: 'fuws_48_32-0-0', help: 'Weaving', tooltip: 'Crafting station for cloth'},
   tanningRack: {name: 'Tanning Rack', type: ITEM_TYPE.FURNITURE | ITEM_TYPE.PLACABLE, stype: 'station', star: 3, image: 'furniture_32_32-1-0', placed: 'fuws_48_32-0-0', help: 'Leatherworking', tooltip: 'Crafting station for leather'},
 
-  stonecutter: {name: 'Stonecutter', type: ITEM_TYPE.FURNITURE | ITEM_TYPE.PLACABLE, stype: 'station', star: 1, image: 'furniture_32_32-2-0', placed: 'fuws_48_32-1-0', help: 'Stonecutting', tooltip: '???', surface: true},
+  stonecutter: {name: 'Stonecutter', type: ITEM_TYPE.FURNITURE | ITEM_TYPE.PLACABLE, stype: 'station', star: 2, image: 'furniture_32_32-2-0', placed: 'fuws_48_32-1-0', help: 'Stonecutting', tooltip: '???', surface: true},
   jewelerBench: {name: 'Jeweler\'s Bench', type: ITEM_TYPE.FURNITURE | ITEM_TYPE.PLACABLE, stype: 'station', star: 3, surface: true, image: 'furniture_32_32-7-0', placed: 'fuws_48_48-2-0', help: 'Jewelry', tooltip: 'Crafting station for jewels and accessories'},
   alchemyTable: {name: 'Alchemy Table', type: ITEM_TYPE.FURNITURE | ITEM_TYPE.PLACABLE, stype: 'station', star: 2, image: 'furniture_32_32-8-0', placed: 'fuws_48_48-2-1', help: 'Alchemy', tooltip: 'Crafting station for potions'},
   cookingPot: {name: 'Cooking Pot', type: ITEM_TYPE.FURNITURE | ITEM_TYPE.PLACABLE, stype: 'station', star: 2, image: 'furniture_32_32-9-0', placed: 'fuws_32_32-7-2', help: 'Cooking', tooltip: 'Crafting station for food'},
@@ -361,7 +364,7 @@ export const ITEMS = {
   transmutator: {name: 'Transmutator', type: ITEM_TYPE.FURNITURE, immovable: true, stype: 'station', star: 5, image: null, placed: 'fuws_48_32-0-1', help: 'Transmutator', tooltip: '????'},
 
   // housing furniture
-  noticeBoard: {name: 'Notice Board', type: ITEM_TYPE.FURNITURE | ITEM_TYPE.PLACABLE | ITEM_TYPE.CRAFTABLE, stype: 'housing', star: 3, image: '...', placed: '...', help: 'Housing', tooltip: 'Displays and applies the housing buff of this house'},
+  noticeBoard: {name: 'Notice Board', type: ITEM_TYPE.FURNITURE | ITEM_TYPE.PLACABLE, stype: 'housing', star: 3, image: '...', placed: '...', help: 'Housing', tooltip: 'Displays and applies the housing buff of this house'},
 
   // Food containers
   bowl: {name: 'Bowl', type: ITEM_TYPE.FURNITURE | ITEM_TYPE.PLACABLE | ITEM_TYPE.MATERIAL | ITEM_TYPE.CRAFTABLE, stype: 'tableware', star: 1, image: 'furniture_32_32-6-2', placed: 'fuws_32_32-3-0', help: 'Tableware', tooltip: 'The best soups are made in old bowls'},
@@ -415,7 +418,7 @@ export const ITEMS = {
 
   sunflower: {name: 'Sunflower', type: 0, stype: 'herb', star: 1, image: null, placed: 'fuws_32_32-4-0', placedLeft: 'fuws_32_32-4-0', placedRight: 'fuws_32_32-4-0', help: 'Sunflower', tooltip: '???'},
   sunflowerSeed: {name: 'Sunflower Seed', type: ITEM_TYPE.MATERIAL | ITEM_TYPE.SEED, stype: 'seed', star: 1, image: 'potions_32_32-1-5', placed: 'fuws_32_32-4-0', help: 'Sunflower', tooltip: '???'},
-  sunflowerOil: {name: 'Sunflower Oil', type: ITEM_TYPE.MATERIAL | ITEM_TYPE.CRAFTABLE, stype: 'seed', star: 1, image: 'potions_32_32-1-5', placed: 'fuws_32_32-4-0', help: 'Sunflower', tooltip: '???'},
+  sunflowerOil: {name: 'Sunflower Oil', type: ITEM_TYPE.CRAFTABLE, stype: 'seed', star: 1, image: 'potions_32_32-1-5', placed: 'fuws_32_32-4-0', help: 'Sunflower', tooltip: '???'},
 
   oleander: {name: 'Oleander', type: 0, stype: 'herb', star: 1, image: 'fuws_32_32-4-0', placed: 'fuws_32_32-4-0', help: 'Oleander', tooltip: '???'},
   oleanderOil: {name: 'Oleander Oil', type: ITEM_TYPE.MATERIAL | ITEM_TYPE.CRAFTABLE, stype: 'seed', star: 1, image: 'potions_32_32-1-5', placed: 'fuws_32_32-4-0', help: 'Oleander', tooltip: '???'},
@@ -518,14 +521,17 @@ export const RECIPES = [
   {result: {item: 'triskelAncient', count: 1}, station: 'alchemyTable', ingredients: [{item: 'triskelCopper', count: 1}, {item: 'triskelSilver', count: 1}, {item: 'triskelGold', count: 1}]},
 
   // Crafting Stations
-  {result: {item: 'workbench', count: 1}, station: 'byHand', ingredients: [{item: 'logOak', count: 10}]},
-  {result: {item: 'tableWood', count: 1}, station: 'workbench', ingredients: [{item: 'logOak', count: 8}]},
+  {result: {item: 'tableWood', count: 1}, station: 'byHand', ingredients: [{item: 'logOak', count: 8}]},
+  {result: {item: 'workbench', count: 1}, station: 'tableWood', ingredients: [{item: 'logOak', count: 10}]},
+  {result: {item: 'stonecutter', count: 1}, station: 'workbench', ingredients: [{item: 'blockSandstone', count: 10}, {item: 'logOak', count: 2}, {item: 'blockClay', count: 2}, {item: 'barCopper', count: 1}]},
   {result: {item: 'furnace', count: 1}, station: 'workbench', ingredients: [{item: 'blockStone', count: 20}, {item: 'logOak', count: 4}, {item: 'torch', count: 3}]},
+  {result: {item: 'anvilIron', count: 1}, station: 'workbench', ingredients: [{item: 'barIron', count: 5}, {item: 'logOak', count: 2}]},
+  {result: {item: 'alchemyTable', count: 1}, station: 'workbench', ingredients: [{item: 'logMahogany', count: 6}, {item: 'logOak', count: 6}, {item: 'barCopper', count: 5}, {item: 'bottle', count: 10}, {item: 'torch', count: 2}, {item: 'sunflowerOil', count: 1}]},
 
-  // {output: 'furnace', station: 'workbench', recipe: [{item: 'bkston', count: 20}, {item: 'woodlog', count: 4}, {item: 'torch', count: 3}]},
-  // {output: 'anvilfe', station: 'workbench', recipe: [{item: 'brfe', count: 5}]},
-  // {output: 'potiontable', station: 'workbench', recipe: [{item: 'woodlog', count: 12}, {item: 'brcu', count: 6}, {item: 'bottle', count: 10}, {item: 'torch', count: 2}]},
-  // {output: 'cook', station: 'anvilfe', recipe: [{item: 'brfe', count: 10}, {item: 'woodlog', count: 4}, {item: 'torch', count: 2}]},
+  {result: {item: 'cookingPot', count: 1}, station: 'anvilIron', ingredients: [{item: 'barCopper', count: 2}, {item: 'barIron', count: 8}, {item: 'logOak', count: 4}, {item: 'torch', count: 2}]},
+  {result: {item: 'sawmill', count: 1}, station: 'anvilIron', ingredients: [{item: 'barCopper', count: 2}, {item: 'barIron', count: 8}, {item: 'logOak', count: 4}, {item: 'torch', count: 2}]},
+  {result: {item: 'loom', count: 1}, station: 'anvilIron', ingredients: [{item: 'barCopper', count: 2}, {item: 'barIron', count: 8}, {item: 'logOak', count: 4}, {item: 'torch', count: 2}]},
+
   // {output: 'sawmill', station: 'workbench', recipe: [{item: 'woodlog', count: 10}, {item: 'brfe', count: 2}, {item: 'chain', count: 1}]},
   // {output: 'loom', station: 'sawmill', recipe: [{item: 'woodlog', count: 12}, {item: 'brfe', count: 1}]},
   // {output: 'anvilpt', station: 'anvilfe', recipe: [{item: 'brpt', count: 10}]},
