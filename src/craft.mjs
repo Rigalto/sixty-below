@@ -605,6 +605,7 @@ class CraftOverlay {
     const slot = document.createElement('inventory-slot')
     slot.classList.add('cr-detail-slot')
     slot.setAttribute('item', recipe.result.item.code)
+    slot.title = recipe.result.item.hoverTitle
 
     const name = document.createElement('div')
     name.className = 'cr-detail-name'
@@ -639,6 +640,7 @@ class CraftOverlay {
     const slot = document.createElement('inventory-slot')
     slot.classList.add('cr-detail-slot')
     slot.setAttribute('item', recipe.station.code)
+    slot.title = recipe.station.hoverTitle
 
     const name = document.createElement('div')
     name.className = 'cr-detail-name'
@@ -669,6 +671,7 @@ class CraftOverlay {
       const slot = document.createElement('inventory-slot')
       slot.classList.add('cr-detail-slot')
       slot.setAttribute('item', ing.item.code)
+      slot.title = ing.item.hoverTitle
 
       const name = document.createElement('div')
       name.className = 'cr-detail-name'
