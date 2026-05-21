@@ -745,7 +745,7 @@ export function createOverlayHeader (titleText, overlayId) {
     --ov-accent:     #4a69bd;
     --ov-text:       #ffffff;
     --ov-text-sec:   #dcddde;
-    --ov-text-muted: #72767d;
+    --ov-text-muted: #cbcccd;
     --ov-btn-bg:     #2c3e50;
 
     --slot-bg-default:   #4A90E2;

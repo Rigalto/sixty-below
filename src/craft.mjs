@@ -2,7 +2,7 @@ import {OVERLAYS, PATH_HELP, SVG_ICON} from './constant.mjs'
 import {eventBus} from './utils.mjs'
 import {createOverlayHeader} from './ui.mjs'
 import {database} from './database.mjs'
-import {RECIPES, CRAFT_RESULT_TYPES, CRAFT_STATIONS, CRAFT_INGREDIENTS} from '../assets/data/data.mjs'
+import {RECIPES, CRAFT_RESULT_TYPES, CRAFT_STATIONS, CRAFT_INGREDIENTS, itemTypeToString} from '../assets/data/data.mjs'
 
 // ── CSS ──────────────────────────────────────────────────────────────────────
 
@@ -171,29 +171,84 @@ craftStyle.textContent = /* css */`
 #ui-craft-panel .cr-grid-zone::-webkit-scrollbar-thumb:hover { background: var(--ov-accent); }
 
 #ui-craft-panel .cr-action-btn {
-      background-color: transparent;
-      border: 1px solid #444;
-      border-radius: 4px;
-      color: var(--ov-text-sec);
-      cursor: pointer;
-      padding: 4px;
-      width: 32px;
-      height: 32px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      flex-shrink: 0;
-    }
+  background-color: transparent;
+  border: 1px solid #444;
+  border-radius: 4px;
+  color: var(--ov-text-sec);
+  cursor: pointer;
+  padding: 4px;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
 
-    #ui-craft-panel .cr-action-btn svg {
-      width: 100%;
-      height: 100%;
-    }
+#ui-craft-panel .cr-action-btn svg {
+  width: 100%;
+  height: 100%;
+}
 
-    #ui-craft-panel .cr-action-btn:hover {
-      border-color: var(--ov-text-sec);
-      color: var(--ov-text);
-    }
+#ui-craft-panel .cr-action-btn:hover {
+  border-color: var(--ov-text-sec);
+  color: var(--ov-text);
+}
+
+#ui-craft-panel inventory-slot.cr-detail-slot {
+  width: 36px;
+  height: 36px;
+  min-width: 36px;
+  flex-shrink: 0;
+}
+
+#ui-craft-panel .cr-empty {
+  color: var(--ov-text-muted);
+  font-style: italic;
+  font-size: 12px;
+  padding: 4px;
+}
+
+#ui-craft-panel .cr-section {
+  margin-bottom: 12px;
+}
+
+#ui-craft-panel .cr-section-label {
+  font-size: 11px;
+  color: var(--ov-text-muted);
+  text-transform: uppercase;
+  letter-spacing: .06em;
+  margin-bottom: 5px;
+}
+
+#ui-craft-panel .cr-detail-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 5px 8px;
+  border-radius: 3px;
+}
+
+#ui-craft-panel .cr-station-row {
+  border: 1px solid var(--ov-border-sub);
+}
+
+#ui-craft-panel .cr-ing-row {
+  margin-bottom: 3px;
+}
+
+#ui-craft-panel .cr-detail-name {
+  flex: 1;
+  font-size: 13px;
+  color: var(--ov-text);
+}
+
+#ui-craft-panel .cr-detail-qty {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--ov-text-muted);
+  flex-shrink: 0;
+}
 `
 document.head.appendChild(craftStyle)
 
@@ -297,7 +352,7 @@ class CraftOverlay {
 
     this.#detailZone = document.createElement('div')
     this.#detailZone.className = 'cr-detail-zone'
-    this.#detailZone.textContent = 'Zone détail recette'
+    this.#clearDetail()
 
     this.#craftZone = document.createElement('div')
     this.#craftZone.className = 'cr-craft-zone'
@@ -490,6 +545,7 @@ class CraftOverlay {
     this.#craftSlots = []
     this.#selectedSlot = null
     this.#selectedRecipe = null
+    this.#clearDetail()
 
     for (const recipe of recipes) {
       const slot = document.createElement('inventory-slot')
@@ -509,13 +565,126 @@ class CraftOverlay {
       slot.classList.remove('selected')
       this.#selectedSlot = null
       this.#selectedRecipe = null
+      this.#clearDetail()
       return
     }
     if (this.#selectedSlot !== null) this.#selectedSlot.classList.remove('selected')
     this.#selectedSlot = slot
     this.#selectedRecipe = recipe
     slot.classList.add('selected')
-    // TODO étape détail — this.#showDetail(recipe)
+    this.#showDetail(recipe)
+  }
+
+  #clearDetail () {
+    this.#detailZone.innerHTML = ''
+    const msg = document.createElement('p')
+    msg.className = 'cr-empty'
+    msg.textContent = 'Select a recipe to see details.'
+    this.#detailZone.appendChild(msg)
+  }
+
+  #showDetail (recipe) {
+    this.#detailZone.innerHTML = ''
+    this.#detailZone.appendChild(this.#buildResultSection(recipe))
+    this.#detailZone.appendChild(this.#buildStationSection(recipe))
+    this.#detailZone.appendChild(this.#buildIngredientsSection(recipe))
+  }
+
+  #buildResultSection (recipe) {
+    const section = document.createElement('div')
+    section.className = 'cr-section'
+
+    const label = document.createElement('div')
+    label.className = 'cr-section-label'
+    label.textContent = 'Result'
+    section.appendChild(label)
+
+    const row = document.createElement('div')
+    row.className = 'cr-detail-row'
+
+    const slot = document.createElement('inventory-slot')
+    slot.classList.add('cr-detail-slot')
+    slot.setAttribute('item', recipe.result.item.code)
+
+    const name = document.createElement('div')
+    name.className = 'cr-detail-name'
+    name.textContent = recipe.result.item.name
+
+    row.appendChild(slot)
+    row.appendChild(name)
+
+    if (recipe.result.count > 1) {
+      const qty = document.createElement('div')
+      qty.className = 'cr-detail-qty'
+      qty.textContent = `× ${recipe.result.count}`
+      row.appendChild(qty)
+    }
+
+    section.appendChild(row)
+    return section
+  }
+
+  #buildStationSection (recipe) {
+    const section = document.createElement('div')
+    section.className = 'cr-section'
+
+    const label = document.createElement('div')
+    label.className = 'cr-section-label'
+    label.textContent = 'Crafting Station'
+    section.appendChild(label)
+
+    const row = document.createElement('div')
+    row.className = 'cr-detail-row cr-station-row'
+
+    const slot = document.createElement('inventory-slot')
+    slot.classList.add('cr-detail-slot')
+    slot.setAttribute('item', recipe.station.code)
+
+    const name = document.createElement('div')
+    name.className = 'cr-detail-name'
+    name.style.flex = '1'
+    name.textContent = recipe.station.name
+
+    // TODO proximity badge — disponibilité des stations (FurnitureManager)
+
+    row.appendChild(slot)
+    row.appendChild(name)
+    section.appendChild(row)
+    return section
+  }
+
+  #buildIngredientsSection (recipe) {
+    const section = document.createElement('div')
+    section.className = 'cr-section'
+
+    const label = document.createElement('div')
+    label.className = 'cr-section-label'
+    label.textContent = 'Ingredients'
+    section.appendChild(label)
+
+    for (const ing of recipe.ingredients) {
+      const row = document.createElement('div')
+      row.className = 'cr-detail-row cr-ing-row'
+
+      const slot = document.createElement('inventory-slot')
+      slot.classList.add('cr-detail-slot')
+      slot.setAttribute('item', ing.item.code)
+
+      const name = document.createElement('div')
+      name.className = 'cr-detail-name'
+      name.textContent = ing.item.name
+
+      const qty = document.createElement('div')
+      qty.className = 'cr-detail-qty'
+      qty.textContent = `× ${ing.count}`
+
+      row.appendChild(slot)
+      row.appendChild(name)
+      row.appendChild(qty)
+      section.appendChild(row)
+    }
+
+    return section
   }
 }
 export const craftOverlay = new CraftOverlay()
