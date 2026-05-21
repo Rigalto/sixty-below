@@ -438,6 +438,7 @@ class CraftOverlay {
       this.#filterValue.value = this.#savedFilterValues[this.#filterMode.value]
       this.#applyFilter()
       database.setGameState('craftfiltermode', this.#filterMode.value)
+      this.#filterMode.blur()
     })
 
     this.#filterValue.addEventListener('change', () => {
@@ -445,6 +446,7 @@ class CraftOverlay {
       this.#savedFilterValues[mode] = this.#filterValue.value
       this.#applyFilter()
       database.setGameState(FILTER_KEY_MAP[mode], this.#filterValue.value)
+      this.#filterValue.blur()
     })
     // ── Lancement du craft ─────────────────────────────────────────
 
