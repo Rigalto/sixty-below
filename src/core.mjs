@@ -11,8 +11,8 @@ import {buffManager} from './buff.mjs'
 import {creationDialogOverlay, seedWidget} from './ui.mjs'
 import {helpOverlay} from './help.mjs'
 import {inventoryManager} from './inventory.mjs'
+import {craftOverlay} from './craft.mjs'
 import './ui-debug.mjs'
-import './craft.mjs'
 import './combat.mjs'
 
 const mockup = () => {
@@ -261,6 +261,7 @@ class GameCore {
     creationDialogOverlay.init(state.worldkey)
 
     helpOverlay.init(state.helptopic)
+    craftOverlay.init(state.craftfiltermode, state.craftfiltertype, state.craftfilterstation, state.craftfiltermaterial)
     // C'est ici qu'on initialise les managers
     // await FaunaManager.init(...)
     // await PlayerManager.init(...)

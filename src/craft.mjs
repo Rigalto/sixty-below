@@ -1,6 +1,7 @@
 import {OVERLAYS} from './constant.mjs'
 import {eventBus} from './utils.mjs'
 import {createOverlayHeader} from './ui.mjs'
+import {database} from './database.mjs'
 import {RECIPES, CRAFT_RESULT_TYPES, CRAFT_STATIONS, CRAFT_INGREDIENTS} from '../assets/data/data.mjs'
 
 // ── CSS ──────────────────────────────────────────────────────────────────────
@@ -171,6 +172,12 @@ craftStyle.textContent = /* css */`
 `
 document.head.appendChild(craftStyle)
 
+const FILTER_KEY_MAP = {
+  type: 'craftfiltertype',
+  station: 'craftfilterstation',
+  ingredient: 'craftfiltermaterial'
+}
+
 class CraftOverlay {
   #container
   #header
@@ -183,6 +190,7 @@ class CraftOverlay {
   #filterInput
   #filterMode // select 1 — type | station | ingredient
   #filterValue // select 2 — dépend de filterMode
+  #savedFilterValues = {type: '', station: '', ingredient: ''}
   #btnReset
   // zone #detailZone
   #craftSlots = [] // inventory-slot elements de la grille
@@ -227,6 +235,15 @@ class CraftOverlay {
 
     // 4. Gestion des événements
     this.#initEvents()
+  }
+
+  init (mode, filterType, filterStation, filterMaterial) {
+    this.#savedFilterValues.type = filterType ?? ''
+    this.#savedFilterValues.station = filterStation ?? ''
+    this.#savedFilterValues.ingredient = filterMaterial ?? ''
+    this.#filterMode.value = mode ?? 'type'
+    this.#populateFilterValue()
+    this.#filterValue.value = this.#savedFilterValues[this.#filterMode.value]
   }
 
   #initDOM () {
@@ -279,7 +296,6 @@ class CraftOverlay {
     this.#btnReset = this.#makeIconBtn('✕', 'Clear')
 
     searchRow.appendChild(this.#filterInput)
-    searchRow.appendChild(this.#makeIconBtn('🔍', 'Search'))
     searchRow.appendChild(this.#btnReset)
     this.#filterZone.appendChild(searchRow)
 
@@ -325,7 +341,7 @@ class CraftOverlay {
       allLabel = '— All types —'
       entries = CRAFT_RESULT_TYPES.map(({label, mask}) => ({value: String(mask), label}))
     } else if (mode === 'station') {
-      allLabel = '— All stations —'
+      allLabel = '— All Crafting Stations —'
       entries = CRAFT_STATIONS.map(item => ({value: item.code, label: item.name}))
     } else {
       allLabel = '— All ingredients —'
@@ -349,6 +365,9 @@ class CraftOverlay {
     // Abonnement au Bus
     eventBus.on('craft/open', () => {
       this.#container.style.display = 'flex'
+      this.#filterInput.value = '' // non mémorisé — reset à chaque ouverture
+      this.#filterMode.style.display = ''
+      this.#filterValue.style.display = ''
       this.#applyFilter()
     })
 
@@ -379,10 +398,17 @@ class CraftOverlay {
     // ── Menus déroulants ─────────────────────────────────────────
     this.#filterMode.addEventListener('change', () => {
       this.#populateFilterValue()
+      this.#filterValue.value = this.#savedFilterValues[this.#filterMode.value]
       this.#applyFilter()
+      database.setGameState('craftfiltermode', this.#filterMode.value)
     })
 
-    this.#filterValue.addEventListener('change', () => this.#applyFilter())
+    this.#filterValue.addEventListener('change', () => {
+      const mode = this.#filterMode.value
+      this.#savedFilterValues[mode] = this.#filterValue.value
+      this.#applyFilter()
+      database.setGameState(FILTER_KEY_MAP[mode], this.#filterValue.value)
+    })
   }
 
   #applyFilter () {

@@ -2612,6 +2612,7 @@ Biome: [[Jungle]]
     title: 'Crafting',
     category: ['Activities', 'Crafting'],
     content: `
+A traduire en anglais : La quantité affichée sur un slot de recette indique le nombre d'items produits par une exécution de la recette — indépendamment du nombre de fois où on choisit de l'exécuter.
     `
   },
   {
