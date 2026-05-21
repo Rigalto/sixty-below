@@ -15,13 +15,13 @@ craftStyle.textContent = /* css */`
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  width: 800px;
-  height: 500px;
+  width: 968px;
+  height: 600px;
   background-color: var(--ov-bg-main);
   border: 1px solid var(--ov-border);
   box-shadow: 0 10px 30px rgba(0,0,0,0.8);
   border-radius: 4px;
-  zIndex: ${OVERLAYS.craft.zIndex};
+  z-index: ${OVERLAYS.craft.zIndex};
   display: none;
   flex-direction: column;
   font-family: Segoe UI, Roboto, sans-serif;
@@ -36,8 +36,7 @@ craftStyle.textContent = /* css */`
 }
 
 #ui-craft-panel .cr-left {
-  width: 270px;
-  min-width: 270px;
+  flex: 1;
   background-color:  var(--ov-bg-side);
   border-right: 1px solid var(--ov-border);
   display: flex;
@@ -62,7 +61,8 @@ craftStyle.textContent = /* css */`
 }
 
 #ui-craft-panel .cr-right {
-  flex: 1;
+  width: 270px;
+  min-width: 270px;
   display: flex;
   flex-direction: column;
   overflow: hidden;
@@ -350,25 +350,6 @@ class CraftOverlay {
     this.#container = document.createElement('div')
     this.#container.id = 'ui-craft-panel'
 
-    Object.assign(this.#container.style, {
-      position: 'fixed',
-      top: '50%',
-      left: '50%',
-      transform: 'translate(-50%, -50%)',
-      width: '800px',
-      height: '500px',
-      backgroundColor: '#2f3136',
-      border: '1px solid #202225',
-      boxShadow: '0 10px 30px rgba(0,0,0,0.8)',
-      borderRadius: '4px',
-      zIndex: OVERLAYS.craft.zIndex,
-      display: 'none', // Caché par défaut
-      flexDirection: 'column',
-      fontFamily: 'Segoe UI, Roboto, sans-serif',
-      color: '#ffffff',
-      userSelect: 'none' // On évite de sélectionner le texte en cliquant partout
-    })
-
     // 2. Création du Header via la Factory
     const header = createOverlayHeader('⚒️ Crafting [K]', 'craft')
     this.#header = header
@@ -376,12 +357,12 @@ class CraftOverlay {
     // 3. Zone de contenu (Vide pour l'instant, juste pour remplir)
     const content = this.#initDOM()
 
-    // Assemblage
+    // 4. Assemblage
     this.#container.appendChild(this.#header)
     this.#container.appendChild(content)
     document.body.appendChild(this.#container)
 
-    // 4. Gestion des événements
+    // 5. Gestion des événements
     this.#initEvents()
   }
 
