@@ -1,4 +1,4 @@
-import {OVERLAYS} from './constant.mjs'
+import {OVERLAYS, PATH_HELP, SVG_ICON} from './constant.mjs'
 import {eventBus} from './utils.mjs'
 import {createOverlayHeader} from './ui.mjs'
 import {database} from './database.mjs'
@@ -169,6 +169,31 @@ craftStyle.textContent = /* css */`
 #ui-craft-panel .cr-grid-zone::-webkit-scrollbar-track { background: var(--ov-bg-input); border-radius: 3px; }
 #ui-craft-panel .cr-grid-zone::-webkit-scrollbar-thumb { background: var(--ov-border-sub); border-radius: 3px; }
 #ui-craft-panel .cr-grid-zone::-webkit-scrollbar-thumb:hover { background: var(--ov-accent); }
+
+#ui-craft-panel .cr-action-btn {
+      background-color: transparent;
+      border: 1px solid #444;
+      border-radius: 4px;
+      color: var(--ov-text-sec);
+      cursor: pointer;
+      padding: 4px;
+      width: 32px;
+      height: 32px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    #ui-craft-panel .cr-action-btn svg {
+      width: 100%;
+      height: 100%;
+    }
+
+    #ui-craft-panel .cr-action-btn:hover {
+      border-color: var(--ov-text-sec);
+      color: var(--ov-text);
+    }
 `
 document.head.appendChild(craftStyle)
 
@@ -183,19 +208,23 @@ class CraftOverlay {
   #header
   // les quatre grandes zones
   #filterZone
+  #gridZone
   #detailZone
   #craftZone
-  #gridZone
   // zone #filterZone
   #filterInput
   #filterMode // select 1 — type | station | ingredient
   #filterValue // select 2 — dépend de filterMode
   #savedFilterValues = {type: '', station: '', ingredient: ''}
   #btnReset
-  // zone #detailZone
+  // zone #gridZone
   #craftSlots = [] // inventory-slot elements de la grille
   #selectedSlot = null
   #selectedRecipe = null
+  // zone #detailZone
+
+  // zone craftZone
+  #btnHelp
 
   constructor () {
     // 1. Création du Conteneur Principal
@@ -259,7 +288,6 @@ class CraftOverlay {
 
     this.#gridZone = document.createElement('div')
     this.#gridZone.className = 'cr-grid-zone'
-    this.#gridZone.textContent = 'Zone grille (recettes)'
 
     leftPane.appendChild(this.#filterZone)
     leftPane.appendChild(this.#gridZone)
@@ -273,7 +301,7 @@ class CraftOverlay {
 
     this.#craftZone = document.createElement('div')
     this.#craftZone.className = 'cr-craft-zone'
-    this.#craftZone.textContent = 'Zone exécution craft'
+    this.#buildCraftZone()
 
     rightPane.appendChild(this.#detailZone)
     rightPane.appendChild(this.#craftZone)
@@ -361,6 +389,15 @@ class CraftOverlay {
     }
   }
 
+  #buildCraftZone () {
+    this.#btnHelp = document.createElement('button')
+    this.#btnHelp.className = 'cr-action-btn'
+    this.#btnHelp.title = 'Open Help [H]'
+    this.#btnHelp.innerHTML = SVG_ICON(PATH_HELP, 'class="cr-help-icon"')
+    this.#craftZone.appendChild(this.#btnHelp)
+    // TODO étape suivante : count input + bouton CRAFT
+  }
+
   #initEvents () {
     // Abonnement au Bus
     eventBus.on('craft/open', () => {
@@ -408,6 +445,14 @@ class CraftOverlay {
       this.#savedFilterValues[mode] = this.#filterValue.value
       this.#applyFilter()
       database.setGameState(FILTER_KEY_MAP[mode], this.#filterValue.value)
+    })
+    // ── Lancement du craft ─────────────────────────────────────────
+
+    this.#btnHelp.addEventListener('click', () => {
+      eventBus.emit('overlay/open-request', 'help')
+      if (this.#selectedRecipe !== null) {
+        eventBus.emit('help/topic', this.#selectedRecipe.result.item.help)
+      }
     })
   }
 
