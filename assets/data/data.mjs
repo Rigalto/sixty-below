@@ -518,10 +518,10 @@ export const RECIPES = [
   {result: {item: 'triskelAncient', count: 1}, station: 'alchemyTable', ingredients: [{item: 'triskelCopper', count: 1}, {item: 'triskelSilver', count: 1}, {item: 'triskelGold', count: 1}]},
 
   // Crafting Stations
-  {result: {item: 'tableWood', count: 1}, station: 'workbench', ingredients: [{item: 'logOak', count: 8}]},
   {result: {item: 'workbench', count: 1}, station: 'byHand', ingredients: [{item: 'logOak', count: 10}]},
+  {result: {item: 'tableWood', count: 1}, station: 'workbench', ingredients: [{item: 'logOak', count: 8}]},
+  {result: {item: 'furnace', count: 1}, station: 'workbench', ingredients: [{item: 'blockStone', count: 20}, {item: 'logOak', count: 4}, {item: 'torch', count: 3}]},
 
-  // {output: 'workbench', station: 'byhand', recipe: [{item: 'woodlog', count: 10}]},
   // {output: 'furnace', station: 'workbench', recipe: [{item: 'bkston', count: 20}, {item: 'woodlog', count: 4}, {item: 'torch', count: 3}]},
   // {output: 'anvilfe', station: 'workbench', recipe: [{item: 'brfe', count: 5}]},
   // {output: 'potiontable', station: 'workbench', recipe: [{item: 'woodlog', count: 12}, {item: 'brcu', count: 6}, {item: 'bottle', count: 10}, {item: 'torch', count: 2}]},
@@ -752,24 +752,17 @@ for (const recipe of RECIPES) {
 }
 
 // — 8.5. Résolution RECIPES (ingredients[].item, result.item)
-const MATERIALS = new Set()
-const CRAFTABLES = new Set()
-
 for (const key in RECIPES) {
   const recipe = RECIPES[key]
   // result
-  CRAFTABLES.add(recipe.result.item)
   ITEMS[recipe.result.item].type |= ITEM_TYPE.CRAFTABLE
   recipe.result.item = ITEMS[recipe.result.item]
   // ingredients
   for (const ing of recipe.ingredients) {
-    MATERIALS.add(ing.item)
     ITEMS[ing.item].type |= ITEM_TYPE.MATERIAL
     ing.item = ITEMS[ing.item]
   }
   // crafting station
-  CRAFTABLES.add(recipe.station)
-  ITEMS[recipe.station].type |= ITEM_TYPE.CRAFTABLE
   recipe.station = ITEMS[recipe.station]
 }
 
