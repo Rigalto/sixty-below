@@ -264,6 +264,55 @@ craftStyle.textContent = /* css */`
 #ui-craft-panel inventory-slot.cr-detail-slot.cr-clickable {
   cursor: pointer;
 }
+
+#ui-craft-panel .cr-craft-label {
+  font-size: 12px;
+  color: var(--ov-text-muted);
+  flex-shrink: 0;
+}
+
+#ui-craft-panel .cr-craft-count {
+  width: 50px;
+  padding: 3px 6px;
+  background-color: var(--ov-bg-input);
+  border: 1px solid var(--ov-border-sub);
+  border-radius: 3px;
+  color: var(--ov-text);
+  font-size: 13px;
+  text-align: center;
+  outline: none;
+  flex-shrink: 0;
+}
+
+#ui-craft-panel .cr-craft-count:focus {
+  border-color: var(--ov-accent);
+}
+
+#ui-craft-panel .cr-craft-count:disabled {
+  opacity: 0.4;
+}
+
+#ui-craft-panel .cr-craft-btn {
+  padding: 6px 14px;
+  background-color: #2a5a2a;
+  border: 1px solid #3a7a3a;
+  border-radius: 3px;
+  color: var(--ov-text);
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+#ui-craft-panel .cr-craft-btn:hover:not(:disabled) {
+  background-color: #3a7a3a;
+}
+
+#ui-craft-panel .cr-craft-btn:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
 `
 document.head.appendChild(craftStyle)
 
@@ -291,10 +340,10 @@ class CraftOverlay {
   #craftSlots = [] // inventory-slot elements de la grille
   #selectedSlot = null
   #selectedRecipe = null
-  // zone #detailZone
-
   // zone craftZone
   #btnHelp
+  #craftCount
+  #btnCraft
 
   constructor () {
     // 1. Création du Conteneur Principal
@@ -465,7 +514,29 @@ class CraftOverlay {
     this.#btnHelp.title = 'Open Help [H]'
     this.#btnHelp.innerHTML = SVG_ICON(PATH_HELP, 'class="cr-help-icon"')
     this.#craftZone.appendChild(this.#btnHelp)
-    // TODO étape suivante : count input + bouton CRAFT
+
+    const spacer = document.createElement('div')
+    spacer.style.flex = '1'
+    this.#craftZone.appendChild(spacer)
+
+    const label = document.createElement('label')
+    label.className = 'cr-craft-label'
+    label.textContent = 'Runs :'
+    this.#craftZone.appendChild(label)
+
+    this.#craftCount = document.createElement('input')
+    this.#craftCount.type = 'number'
+    this.#craftCount.className = 'cr-craft-count'
+    this.#craftCount.value = '1'
+    this.#craftCount.min = '1'
+    this.#craftCount.disabled = true
+    this.#craftZone.appendChild(this.#craftCount)
+
+    this.#btnCraft = document.createElement('button')
+    this.#btnCraft.className = 'cr-craft-btn'
+    this.#btnCraft.textContent = 'Craft'
+    this.#btnCraft.disabled = true
+    this.#craftZone.appendChild(this.#btnCraft)
   }
 
   #initEvents () {
@@ -526,6 +597,14 @@ class CraftOverlay {
         eventBus.emit('help/topic', this.#selectedRecipe.result.item.help)
       }
     })
+
+    this.#craftCount.addEventListener('input', () => {
+      if (!this.#selectedRecipe) return
+      const runs = Math.max(1, parseInt(this.#craftCount.value, 10) || 1)
+      const total = runs * this.#selectedRecipe.result.count
+      this.#btnCraft.textContent = `Craft × ${total}`
+      // TODO tenir compte des disponibilités
+    })
   }
 
   #applyFilter () {
@@ -561,6 +640,10 @@ class CraftOverlay {
     this.#selectedSlot = null
     this.#selectedRecipe = null
     this.#clearDetail()
+    this.#craftCount.disabled = true
+    this.#craftCount.value = '1'
+    this.#btnCraft.disabled = true
+    this.#btnCraft.textContent = 'Craft'
 
     for (const recipe of recipes) {
       const slot = document.createElement('inventory-slot')
@@ -581,6 +664,10 @@ class CraftOverlay {
       this.#selectedSlot = null
       this.#selectedRecipe = null
       this.#clearDetail()
+      this.#craftCount.disabled = true
+      this.#craftCount.value = '1'
+      this.#btnCraft.disabled = true
+      this.#btnCraft.textContent = 'Craft'
       return
     }
     if (this.#selectedSlot !== null) this.#selectedSlot.classList.remove('selected')
@@ -588,6 +675,10 @@ class CraftOverlay {
     this.#selectedRecipe = recipe
     slot.classList.add('selected')
     this.#showDetail(recipe)
+    this.#craftCount.disabled = false
+    this.#craftCount.value = '1'
+    this.#btnCraft.disabled = false
+    this.#btnCraft.textContent = `Craft × ${recipe.result.count}`
   }
 
   #clearDetail () {
