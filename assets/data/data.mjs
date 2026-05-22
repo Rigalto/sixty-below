@@ -531,6 +531,7 @@ export const RECIPES = [
   {result: {item: 'tanningRack', count: 1}, station: 'loom', ingredients: [{item: 'silk', count: 12}, {item: 'logMahogany', count: 10}, {item: 'barCopper', count: 2}, {item: 'barSilver', count: 2}]},
   {result: {item: 'alchemyTable', count: 1}, station: 'workbench', ingredients: [{item: 'logMahogany', count: 6}, {item: 'logOak', count: 6}, {item: 'barCopper', count: 5}, {item: 'bottle', count: 10}, {item: 'torch', count: 2}, {item: 'sunflowerOil', count: 1}]},
   {result: {item: 'furnace', count: 1}, station: 'stonecutter', ingredients: [{item: 'blockStone', count: 20}, {item: 'logOak', count: 4}, {item: 'torch', count: 3}]},
+  {result: {item: 'blastFurnace', count: 1}, station: 'furnace', ingredients: [{item: 'blockHardstone', count: 50}, {item: 'barCobalt', count: 21}, {item: 'blockLimestone', count: 12}, {item: 'logMahogany', count: 10}, {item: 'torch', count: 9}]},
 
   {result: {item: 'cookingPot', count: 1}, station: 'anvilIron', ingredients: [{item: 'barCopper', count: 2}, {item: 'barIron', count: 8}, {item: 'logOak', count: 4}, {item: 'torch', count: 2}]},
 
@@ -538,7 +539,7 @@ export const RECIPES = [
   // {output: 'anvilpt', station: 'anvilfe', recipe: [{item: 'brpt', count: 10}]},
 
   // torches
-  {result: {item: 'torch', count: 3}, station: 'byHand', ingredients: [{item: 'gel', count: 1}, {item: 'logOak', count: 1}]}
+  {result: {item: 'torch', count: 3}, station: 'byHand', ingredients: [{item: 'gel', count: 1}, {item: 'logOak', count: 1}]},
 
   // {output: 'coraltorch', station: 'byhand', recipe: [{item: 'gel', count: 1}, {item: 'coral', count: 1}], built: 3},
   // {output: 'jungletorch', station: 'byhand', recipe: [{item: 'gel', count: 1}, {item: 'mahogany', count: 1}], built: 3},
@@ -547,6 +548,13 @@ export const RECIPES = [
   // {output: 'lizardtorch', station: 'byhand', recipe: [{item: 'gel', count: 1}, {item: 'emerald', count: 1}], built: 3},
   // {output: 'ultratorch', station: 'byhand', recipe: [{item: 'gel', count: 1}, {item: 'marble', count: 1}], built: 3},
 
+  // bars
+  {result: {item: 'barCopper', count: 1}, station: 'furnace', ingredients: [{item: 'chunkCopper', count: 3}, {item: 'logOak', count: 1}]},
+  {result: {item: 'barIron', count: 1}, station: 'furnace', ingredients: [{item: 'chunkIron', count: 3}, {item: 'logOak', count: 1}]},
+  {result: {item: 'barSilver', count: 1}, station: 'furnace', ingredients: [{item: 'chunkSilver', count: 4}, {item: 'logMahogany', count: 1}]},
+  {result: {item: 'barGold', count: 1}, station: 'furnace', ingredients: [{item: 'chunkGold', count: 4}, {item: 'logMahogany', count: 1}]},
+  {result: {item: 'barCobalt', count: 1}, station: 'furnace', ingredients: [{item: 'chunkCobalt', count: 5}, {item: 'logOak', count: 1}, {item: 'logMahogany', count: 1}]},
+  {result: {item: 'barPlatinum', count: 1}, station: 'blastFurnace', ingredients: [{item: 'chunkPlatinum', count: 5}, {item: 'logOak', count: 1}, {item: 'logMahogany', count: 1}]}
 ]
 
 /* ============================================================================

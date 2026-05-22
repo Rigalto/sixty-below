@@ -54,6 +54,13 @@
  *   |lines|      → valeurs séparées par <br>
  *   |loot|       → table de drops ⏳
  *
+ *  * ── Données dynamiques des recettes ──────────────────────────
+ *   Syntaxe générale :
+ *   {{recipe:code|format}}
+ *
+ *   Formats disponibles :
+ *   |station|     → affiche la station de travail utilisée sous forme de lien [[item:station]]
+ *
  * ── Templates ───────────────────────────────────────────────────
  *   <<templateName|param1|param2>>   → inclusion d'un template
  *   Dans le template : {1}, {2}...   → placeholders des paramètres
@@ -93,11 +100,11 @@ Mining drops: {{node:{3}:mining[:items[0]:item|link}}
   `,
   // templates réels en dessous
 
-  mineableRow: '| {1} | [[node:{2}]]| {{node:{2}:star}} | {{node:{2}:mining:0:item:name}} | {{node:{2}:speed}} |',
-  metalChunksRow: '| [[node:{1}]] | [[item:{2}]] | {{item:{2}:star}} | [[item:{3}]] | {{item:{3}:star}} |',
-  metalBarsRow: '| [[item:{1}]] | {{item:{1}:star}} | [[Smelting|Furnace]] | [[item:{2}]] | {{item:{2}:star}} |',
-  gemRawRow: '| [[node:{1}]] | [[item:{2}]] | {{item:{2}:star}} | [[item:{3}]] | {{item:{3}:star}} |',
-  gemCutRow: '| [[item:{1}]] | {{item:{1}:star}} | [[Smelting|Furnace]] | [[item:{2}]] | {{item:{2}:star}} |',
+  mineableRow: '| {1} | [[node:{2}]]| {{node:{2}:star|star}} | {{node:{2}:mining:0:item:name}} | {{node:{2}:speed}} |',
+  metalChunksRow: '| [[node:{1}]] | [[item:{2}]] | {{item:{2}:star|star}} | [[item:{3}]] | {{item:{3}:star|star}} |',
+  metalBarsRow: '| [[item:{1}]] | {{item:{1}:star|star}} | {{recipe:{2}|station}} | [[item:{2}]] | {{item:{2}:star|star}} |',
+  gemRawRow: '| [[node:{1}]] | [[item:{2}]] | {{item:{2}:star|star}} | [[item:{3}]] | {{item:{3}:star|star}} |',
+  gemCutRow: '| [[item:{1}]] | {{item:{1}:star|star}} | [[Smelting|Furnace]] | [[item:{2}]] | {{item:{2}:star|star}} |',
   lootTableHeader: '| Item | Tier | Amount | Conditions | Modifiers |\n|---|---|---|---|---|',
   additiveNote: '_All modifiers are additive and stack with each other._',
   lootTable: '| Item | Tier | Amount | Conditions | Modifiers |\n|---|---|---|---|---|\n{{node:{1}:{2}:items[*]:helpRow|rows}}\n\n_All modifiers are additive and stack with each other._',
@@ -684,7 +691,7 @@ Antlion Pits are conical hollow traps found on the surface of [[Desert]] biomes.
     content: `
 **Description**
 
-The Ancient House is a large desert dwelling buried deep in [[Desert]] biomes. Unlike the [[Ruined Cabin]], it is remarkably well preserved — its walls still standing, its roof intact, and its interior furnished. It contains the [[Transmutator]], a powerful crafting station.
+The Ancient House is a large desert dwelling buried deep in [[Desert]] biomes. Unlike the [[Ruined Cabin]], it is remarkably well preserved — its walls still standing, its roof intact, and its interior furnished. It contains the [[Transmutator]], a powerful [[Crafting Stations|crafting station]].
 
 **Main Location**
 
@@ -876,7 +883,7 @@ Sap Pockets are pressurized elliptical cavities filled with [[node:sap]], found 
     content: `
 **Description**
 
-The Lost Temple is an ancient Greek-style structure buried deep in the [[Jungle]] biomes. Built from indestructible [[node:Olympite]] blocks, it has stood for millennia, its columns still standing despite the encroaching jungle. A powerful guardian protects the secrets within — and the key to a unique crafting station.
+The Lost Temple is an ancient Greek-style structure buried deep in the [[Jungle]] biomes. Built from indestructible [[node:Olympite]] blocks, it has stood for millennia, its columns still standing despite the encroaching jungle. A powerful guardian protects the secrets within — and the key to a unique [[Crafting Stations|crafting station]].
 
 **Main Location**
 
@@ -907,7 +914,7 @@ The Lost Temple is an ancient Greek-style structure buried deep in the [[Jungle]
 
 * The [[item:brokenDecomposer]] becomes usable after repair
 * To repair : equip [[item:decomposerPart]] and click on the [[item:brokenDecomposer]]
-* The [[item:brokenDecomposer]] is replaced by the [[item:decomposer]] — a powerful tier 5 crafting station
+* The [[item:brokenDecomposer]] is replaced by the [[item:decomposer]] — a powerful tier 5 [[Crafting Stations||crafting station]]
 * The [[item:decomposer]] is immovable — the Lost Temple is its permanent location
 * The [[item:decomposer]] breaks down items into a portion of their crafting ingredients — a powerful tool for recovering rare materials from unwanted equipment.
 
@@ -1931,7 +1938,8 @@ Metal chunks are placed in your [[Inventory]] when mined with a [[Mining Tools|P
 **Tips**
 
 * _Always bring a [[Mining Tools|Pickaxe]] strong enough to mine the ores of the layer you are exploring — deeper metals require better tools._ ⏳
-* _Platinum is extremely rare and only found in the deepest caverns._ ⏳
+* _Despite being a Tier 1 resource, Copper's ductility ensures its continued use in complex apparatuses across all Tiers._
+* _Platinum is extremely rare and only found in the deepest caverns._
   `
   },
   // ── Gems ─────────────────────────────────────────────────────
@@ -2612,7 +2620,7 @@ _Some specific gear pieces may deviate from these rules._ ⏳
 
 * Mechanics to be defined
 * Found on looted gear in chests and monster drops
-* Craftable at specific crafting stations ⏳
+* Craftable at specific [[Crafting Stations|crafting stations]] ⏳
 
 **Tips**
 
@@ -2698,7 +2706,7 @@ A traduire en anglais : La quantité affichée sur un slot de recette indique le
   },
   {
     title: 'Crafting Stations',
-    category: ['Activities', 'Crafting'],
+    category: ['Crafting', 'Activities'],
     content: `
 **Description**
 
@@ -2741,11 +2749,11 @@ Crafting stations are required to craft higher-tier stations, forming a progress
   },
   {
     title: 'Crafting Tree',
-    category: ['Activities', 'Crafting', 'Crafting Stations'],
+    category: ['Crafting', 'Activities', 'Crafting Stations'],
     content: `
 **Description**
 
-The crafting tree shows the order in which crafting stations must be built. Each station unlocks the next tier of crafting possibilities.
+The crafting tree shows the order in which [[Crafting Stations]] must be built. Each station unlocks the next tier of crafting possibilities.
 
 * [[By Hand]]
   * [[item:tableWood]] {{item:tableWood:star|star}}
@@ -2902,7 +2910,30 @@ A small set of essential items can be crafted anywhere, without a workstation ne
   {
     title: 'Smelting',
     category: ['Crafting', 'Crafting Stations'],
-    content: ''
+    content: `
+**Furnace Acquisition**
+
+* Tier: {{item:furnace:star|star}}
+* Crafting Station: {{recipe:furnace|station}}
+* Crafting Materials: [[item:gel]], [[item:logOak]], [[item:blockStone]]
+
+**Furnace Acquisition**
+
+* Tier: {{item:blastFurnace:star|star}}
+* Crafting Station: {{recipe:blastFurnace|station}}
+* Crafting Materials: [[item:gel]], [[item:logOak]], [[item:blockHardstone]]
+
+**Metal Bars**
+
+| Chunk | Chunk Tier | Crafting Station | Bar | Bar Tier |
+|---|---|---|---|---|
+<<metalBarsRow|chunkCopper|barCopper>>
+<<metalBarsRow|chunkIron|barIron>>
+<<metalBarsRow|chunkSilver|barSilver>>
+<<metalBarsRow|chunkGold|barGold>>
+<<metalBarsRow|chunkCobalt|barCobalt>>
+<<metalBarsRow|chunkPlatinum|barPlatinum>>
+    `
   },
   {
     title: 'Forging',
@@ -2930,7 +2961,18 @@ A small set of essential items can be crafted anywhere, without a workstation ne
   {
     title: 'Stonecutting',
     category: ['Crafting', 'Crafting Stations'],
-    content: ''
+    content: `
+Le Stonecutter is a [[Crafting Stations|Crafting Station]] qui permet de couper, polir, réduire en poudre différents types de matériaux durs et tendres. Toutes ces opérations sont regrouppées sous le terme de 'Stonecutting'.
+
+**Stonecutter Acquisition**
+
+* Tier: {{item:stonecutter:star|star}}
+* Crafting Station: {{recipe:stonecutter|station}}
+* Crafting Materials: {{recipe:stonecutter|material}}
+
+**Tips**
+* Dire qu'il est important de le construire dès que possible car il permet de fabriquer un [[item:furnace]] qui est le point de départ de toute la [[Metals||métallurgie]].
+    `
   },
   {
     title: 'Jewelry',
@@ -2945,7 +2987,16 @@ A small set of essential items can be crafted anywhere, without a workstation ne
   {
     title: 'Cooking',
     category: ['Crafting', 'Crafting Stations'],
-    content: ''
+    content: `
+
+
+**Cooking Pot Acquisition**
+
+* Tier: {{item:cookingPot:star|star}}
+* Crafting Stations: [[item:furnace]], [[item:anvilIron]]
+* Crafting Materials: [[item:gel]], [[item:logOak]], [[item:chunkCopper]], [[item:chunkIron]]
+* Requires multiple crafting stages
+    `
   },
   {
     title: 'Decomposer',
@@ -4997,9 +5048,6 @@ const resolvePath = (type, code, segments, NODES, ITEMS, MONSTERS) => {
     obj = ITEMS[code]
   } else if (type === 'monster') {
     obj = MONSTERS[code]
-  } else if (type === 'recipe') {
-    // ⏳ à implémenter lors de la conception de craftOverlay
-    return {value: null, tail: [], error: '⏳ recipe non implémenté'}
   } else {
     return {value: null, tail: [], error: `type inconnu '${type}'`}
   }
@@ -5144,7 +5192,7 @@ const formatValue = (resolved, format, entryTitle, path) => {
 const resolveDynamic = (entry, NODES, ITEMS, MONSTERS) => {
   let errors = 0
   entry.content = entry.content.replace(
-    /\{\{(node|item|monster|recipe):([^:}]+)((?::[^|}]+)*?)(?:\|([^}]*))?\}\}/g,
+    /\{\{(node|item|monster):([^:}]+)((?::[^|}]+)*?)(?:\|([^}]*))?\}\}/g,
     (match, type, code, pathStr, format) => {
       const segments = pathStr ? pathStr.slice(1).split(':') : []
       const resolved = resolvePath(type, code, segments, NODES, ITEMS, MONSTERS)
@@ -5154,6 +5202,45 @@ const resolveDynamic = (entry, NODES, ITEMS, MONSTERS) => {
     }
   )
   return errors
+}
+
+const resolveRecipes = (entry, RECIPES) => {
+  let errors = 0
+  entry.content = entry.content.replace(
+    /\{\{recipe:([^|}\s]+)\|(\w+)\}\}/g,
+    (match, code, format) => {
+      let recipe = null
+      for (const r of RECIPES) {
+        if (r.result.item.code === code) { recipe = r; break }
+      }
+      if (!recipe) {
+        console.error(`[help] '${entry.title}' : recipe pour item '${code}' introuvable`)
+        errors++
+        return `⚠️ {{recipe:${code}|${format}}}`
+      }
+      const result = formatRecipe(recipe, format, entry.title)
+      if (result === null) { errors++; return `⚠️ {{recipe:${code}|${format}}}` }
+      return result
+    }
+  )
+  return errors
+}
+
+const formatRecipe = (recipe, format, entryTitle) => {
+  switch (format) {
+    case 'station': {
+      const station = recipe.station
+      if (!station?.code || !station?.help) {
+        console.error(`[help] '${entryTitle}' : recipe '${recipe.result.item.code}' — station invalide`)
+        return null
+      }
+      if (station.help === entryTitle) return station.name
+      return `[[${station.help}|${station.name}]]`
+    }
+    default:
+      console.error(`[help] '${entryTitle}' : format recipe inconnu '${format}'`)
+      return null
+  }
 }
 
 // l'ordre est **très important**
@@ -5188,7 +5275,7 @@ const renderMarkdown = (entry) => {
   return errors
 }
 
-export const hydrateHelp = (NODES, ITEMS, MONSTERS = {}) => {
+export const hydrateHelp = (NODES, ITEMS, RECIPES, MONSTERS = {}) => {
   let count = 0
   let errors = 0
 
@@ -5199,6 +5286,7 @@ export const hydrateHelp = (NODES, ITEMS, MONSTERS = {}) => {
     errors += resolveMonsterLinks(entry, MONSTERS)
     // Résolution des données dynamiques {{...}}
     errors += resolveDynamic(entry, NODES, ITEMS, MONSTERS)
+    errors += resolveRecipes(entry, RECIPES)
     // Conversion Markdown → HTML (entry.html = html généré)
     errors += renderMarkdown(entry)
     count++

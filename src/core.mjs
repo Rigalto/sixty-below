@@ -1,5 +1,5 @@
 import {TIME_BUDGET, MICROTASK_FN_NAME_TO_KEY, STATE, OVERLAYS} from './constant.mjs'
-import {NODES, NODES_LOOKUP, ITEMS, TREE_IMAGES, PLANT_KIND, PLANT_TYPE} from '../../assets/data/data.mjs'
+import {NODES, NODES_LOOKUP, ITEMS, RECIPES, TREE_IMAGES, PLANT_KIND, PLANT_TYPE} from '../../assets/data/data.mjs'
 import {HELP_TITLES, hydrateHelp} from '../../assets/data/data-help.mjs'
 import {loadAssets, resolveAssetData} from './assets.mjs'
 import {timeManager, taskScheduler, microTasker, eventBus, seededRNG, parseLootCount, parseLootBuffs, buildLootHelpRow} from './utils.mjs'
@@ -184,7 +184,7 @@ class GameCore {
  * - Stocke le HTML final dans entry.html
  */
   #hydrateHelp () {
-    const {count, errors} = hydrateHelp(NODES, ITEMS)
+    const {count, errors} = hydrateHelp(NODES, ITEMS, RECIPES)
     console.log(`   🔹 Help hydratée : ${count} fiches, ${errors} erreur(s)`)
   }
 

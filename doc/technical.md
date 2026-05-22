@@ -148,12 +148,14 @@ Itère sur `NODES_LOOKUP`, `ITEMS` et `TREE_IMAGES`, remplace les strings `image
 par des objets `{imageIndex, x, y, w, h}` directement utilisables pour le rendu.
 
 #### `hydrateHelp` — pipeline de résolution
-| Fonction | Syntaxe traitée | Statut |
+| Fonction | Syntaxe traitée |
 | :--- | :--- | :--- |
-| `resolveNodeLinks(entry, NODES)` | `[[node:code]]`, `[[node:code\|texte]]` | ✓ |
-| `resolveItemLinks(entry, ITEMS)` | `[[item:code]]`, `[[item:code\|texte]]` | ✓ |
-| `resolveMonsterLinks(entry, MONSTERS)` | `[[monster:code]]`, `[[monster:code\|texte]]` | ✓ |
-| `renderMarkdown(entry)` | `**xx**`, `__xx__`, `_xx_` | ✓ |
+| `resolveNodeLinks(entry, NODES)` | `[[node:code]]`, `[[node:code\|texte]]` |
+| `resolveItemLinks(entry, ITEMS)` | `[[item:code]]`, `[[item:code\|texte]]` |
+| `resolveMonsterLinks(entry, MONSTERS)` | `[[monster:code]]`, `[[monster:code\|texte]]` |
+| `resolveDynamic(entry, NODES, ITEMS, MONSTERS)` | `{{node:...}}`, `{{item:...}}`, `{{monster:...}}` |
+| `resolveRecipes(entry, RECIPES)` | `{{recipe:...}}` |
+| `renderMarkdown(entry)` | `**xx**`, `__xx__`, `_xx_`, listes, liens, tables, paragraphes |
 
 ---
 
