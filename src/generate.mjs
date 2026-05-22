@@ -4503,7 +4503,7 @@ class WorldCarver {
     if (sPlacedLeft !== undefined) smallFurniture.left = seededRNG.randomGetBool()
 
     // 4.2 Furnitures du toit ──────────────────────────────────
-    const ROOF_ITEMS = ['tableWood', 'blastFurnace', 'sawmill', 'anvilPlatinum', 'grindstone', 'loom', 'tanningRack', 'jewelerBench', 'alchemyTable', 'cookingPot']
+    const ROOF_ITEMS = ['tableWood', 'blastFurnace', 'sawmill', 'forge', 'grindstone', 'loom', 'tanningRack', 'jewelerBench', 'alchemyTable', 'cookingPot']
 
     // Mélange de la liste (Fisher-Yates)
     const shuffled = shuffleArray([...ROOF_ITEMS])
@@ -4527,7 +4527,7 @@ class WorldCarver {
     }
 
     // 4.3 Furnitures du sol ───────────────────────────────────
-    const GROUND_ITEMS = ['tableWood', 'blastFurnace', 'sawmill', 'anvilPlatinum', 'grindstone', 'loom', 'tanningRack', 'jewelerBench', 'alchemyTable', 'cookingPot']
+    const GROUND_ITEMS = ['tableWood', 'blastFurnace', 'sawmill', 'forge', 'grindstone', 'loom', 'tanningRack', 'jewelerBench', 'alchemyTable', 'cookingPot']
 
     const shuffledGround = shuffleArray([...GROUND_ITEMS])
     let gx = x0 + 1

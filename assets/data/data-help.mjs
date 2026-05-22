@@ -60,6 +60,7 @@
  *
  *   Formats disponibles :
  *   |station|     → affiche la station de travail utilisée sous forme de lien [[item:station]]
+ *   |ingredients| → affiche les ingrédients d'une recette séparés par des virgules
  *
  * ── Templates ───────────────────────────────────────────────────
  *   <<templateName|param1|param2>>   → inclusion d'un template
@@ -110,6 +111,8 @@ Mining drops: {{node:{3}:mining[:items[0]:item|link}}
   lootTable: '| Item | Tier | Amount | Conditions | Modifiers |\n|---|---|---|---|---|\n{{node:{1}:{2}:items[*]:helpRow|rows}}\n\n_All modifiers are additive and stack with each other._',
   miningDrop: '{{node:{1}:mining:items[0]:item|link}} {{node:{1}:mining:items[0]:item:star|star}}',
 
+  // pour ajouter son tier à droite de l'item
+  itemStar: '[[item:{1}]] {{item:{1}:star|star}}',
   // pour renseigner une cellule de table avec un node et son tier en dessous
   cellNodeStar: '[[node:{1}]]<br>{{node:{1}:star|star}}',
   // pour renseigner une cellule de table avec un item et son tier en dessous
@@ -1934,7 +1937,7 @@ The table below details the [[Metal Fittings]] available for each material, incl
 | **Copper** | - | - | yes | yes | yes | - | yes |
 | **Iron** | yes | - | yes | yes | yes | yes | yes |
 | **Silver** | - | - | yes | - | - | yes | yes |
-| **Gold** | - | - | - | yes | yes | yes | yes |
+| **Gold** | - | - | - | yes | yes | yes | - |
 | **Cobalt** | yes | yes | - | yes | yes | yes | yes |
 | **Platinum** | - | yes | - | - | yes | yes | yes |
 
@@ -1969,18 +1972,18 @@ The table below details the [[Metal Fittings]] available for each material, incl
 
 **Crafting Stations**
 
-* [[item:anvilIron]] : Copper, Iron, Silver and Gold
-* [[item:anvilPlatinum]] : Cobalt and Platinum
+* [[item:anvil]] : Copper, Iron, Silver and Gold
+* [[item:forge]] : Cobalt and Platinum
 
 **Fasteners**
 
 | Metal | Nail | Rivet | Chain | Wire |
 |---|---|---|---|---|
-| **Copper** | - | - | yes | yes |
-| **Iron** | yes | - | yes | yes |
+| **Copper** | - | - | yes | <<cellItemStar|wireCopper>> |
+| **Iron** | yes | - | yes | <<cellItemStar|wireIron>> |
 | **Silver** | - | - | yes | - |
-| **Gold** | - | - | - | yes |
-| **Cobalt** | yes | yes | - | yes |
+| **Gold** | - | - | - | <<cellItemStar|wireGold>> |
+| **Cobalt** | yes | yes | - | <<cellItemStar|wireCobalt>> |
 | **Platinum** | - | yes | - | - |
 
 **Parts**
@@ -1990,7 +1993,7 @@ The table below details the [[Metal Fittings]] available for each material, incl
 | **Copper** | yes | - | yes |
 | **Iron** | yes | yes | yes |
 | **Silver** | - | yes | yes |
-| **Gold** | yes | yes | yes |
+| **Gold** | yes | yes | - |
 | **Cobalt** | yes | yes | yes |
 | **Platinum** | yes | yes | yes |
     `
@@ -2770,34 +2773,34 @@ Crafting stations are required to craft higher-tier stations, forming a progress
 **Starting point**
 
 * [[By Hand]] — your bare hands; always available, and the entry point to the entire crafting chain
-* [[item:tableWood]] ⭐ — crafted by hand, first item of the crafting chain
+* <<itemStar|tableWood>> — crafted by hand, first item of the crafting chain
 
 **Woodworking**
 
-* [[item:workbench]] ⭐ and [[item:sawmill]] ⭐⭐⭐
+* <<itemStar|workbench>> and <<itemStar|sawmill>>
 
 **Metalworking**
 
-* [[Smelting]] — [[item:furnace]] ⭐⭐ and [[item:blastFurnace]] ⭐⭐⭐⭐
-* [[Forging]] — [[item:anvilIron]] ⭐⭐ and [[item:anvilPlatinum]] ⭐⭐⭐⭐
-* [[Sharpening]] — [[item:grindstone]] ⭐⭐⭐
+* [[Smelting]] — <<itemStar|furnace>> and <<itemStar|blastFurnace>>
+* [[Forging]] — <<itemStar|anvil>> and <<itemStar|forge>>
+* [[Sharpening]] — <<itemStar|grindstone>>
 
 **Textiles**
 
-* [[Weaving]] — [[item:loom]] ⭐⭐
-* [[Leatherworking]] — [[item:tanningRack]] ⭐⭐⭐
+* [[Weaving]] — <<itemStar|loom>>
+* [[Leatherworking]] — <<itemStar|tanningRack>>
 
 **Other crafts**
 
-* [[Stonecutting]] — [[item:stonecutter]] ⭐
-* [[Jewelry]] — [[item:jewelerBench]] ⭐⭐⭐
-* [[Alchemy]] — [[item:alchemyTable]] ⭐⭐
-* [[Cooking]] — [[item:cookingPot]] ⭐⭐
+* [[Stonecutting]] — <<itemStar|stonecutter>>
+* [[Jewelry]] — <<itemStar|jewelerBench>>
+* [[Alchemy]] — <<itemStar|alchemyTable>>
+* [[Cooking]] — <<itemStar|cookingPot>>
 
-**Ancient stations** ⏳
+**Ancient stations**
 
-* [[Decomposer]] — found in [[Lost Temple]] ⭐⭐⭐⭐⭐
-* [[Transmutator]] — found in [[Ancient House]] ⭐⭐⭐⭐⭐
+* <<itemStar|decomposer>> — found in [[Lost Temple]]
+* <<itemStar|transmutator>> — found in [[Ancient House]]
   `
   },
   {
@@ -2809,23 +2812,23 @@ Crafting stations are required to craft higher-tier stations, forming a progress
 The crafting tree shows the order in which [[Crafting Stations]] must be built. Each station unlocks the next tier of crafting possibilities.
 
 * [[By Hand]]
-  * [[item:tableWood]] {{item:tableWood:star|star}}
-    * [[item:workbench]] {{item:workbench:star|star}}
-      * [[item:stonecutter]] {{item:stonecutter:star|star}}
-        * [[item:furnace]] {{item:furnace:star|star}}
-          * [[item:cookingPot]] {{item:cookingPot:star|star}}
-          * [[item:blastFurnace]] {{item:blastFurnace:star|star}}
-      * [[item:anvilIron]] {{item:anvilIron:star|star}}
-        * [[item:grindstone]] {{item:grindstone:star|star}}
-        * [[item:jewelerBench]] {{item:jewelerBench:star|star}}
-        * [[item:anvilPlatinum]] {{item:anvilPlatinum:star|star}}
-      * [[item:alchemyTable]] {{item:alchemyTable:star|star}}
-      * [[item:loom]] {{item:loom:star|star}}
-        * [[item:tanningRack]] {{item:tanningRack:star|star}}
-      * [[item:sawmill]] {{item:sawmill:star|star}}
+  * <<itemStar|tableWood>>
+    * <<itemStar|workbench>>
+      * <<itemStar|stonecutter>>
+        * <<itemStar|furnace>>
+          * <<itemStar|cookingPot>>
+          * <<itemStar|blastFurnace>>
+      * <<itemStar|anvil>>
+        * <<itemStar|grindstone>>
+        * <<itemStar|jewelerBench>>
+        * <<itemStar|forge>>
+      * <<itemStar|alchemyTable>>
+      * <<itemStar|loom>>
+        * <<itemStar|tanningRack>>
+      * <<itemStar|sawmill>>
 * Found in the world
-  * [[item:decomposer]] {{item:decomposer:star|star}} — [[Lost Temple]]
-  * [[item:transmutator]] {{item:transmutator:star|star}} — [[Ancient House]]
+  * <<itemStar|decomposer>> — [[Lost Temple]]
+  * <<itemStar|transmutator>> — [[Ancient House]]
   `
   },
   {
@@ -3021,7 +3024,7 @@ Le Stonecutter is a [[Crafting Stations|Crafting Station]] qui permet de couper,
 
 * Tier: {{item:stonecutter:star|star}}
 * Crafting Station: {{recipe:stonecutter|station}}
-* Crafting Materials: {{recipe:stonecutter|material}}
+* Crafting Materials: {{recipe:stonecutter|ingredients}}
 
 **Tips**
 * Dire qu'il est important de le construire dès que possible car il permet de fabriquer un [[item:furnace]] qui est le point de départ de toute la [[Metals||métallurgie]].
@@ -3046,7 +3049,7 @@ Le Stonecutter is a [[Crafting Stations|Crafting Station]] qui permet de couper,
 **Cooking Pot Acquisition**
 
 * Tier: {{item:cookingPot:star|star}}
-* Crafting Stations: [[item:furnace]], [[item:anvilIron]]
+* Crafting Stations: [[item:furnace]], [[item:anvil]]
 * Crafting Materials: [[item:gel]], [[item:logOak]], [[item:chunkCopper]], [[item:chunkIron]]
 * Requires multiple crafting stages
     `
@@ -3305,6 +3308,18 @@ Used to craft [[item:torch]].
     `
   },
 
+  // ── Leather ────────────────────────────────────────────────
+  {
+    title: 'Leather',
+    category: ['Buff'],
+    content: `
+  **Leather Types**
+
+  * Velin
+  * Leather
+  * Hardened Leather (renforc& avec des Copper Wire)
+    `
+  },
   // ── Mechanics ────────────────────────────────────────────────
 
   // ── Food ─────────────────────────────────────────────────────
@@ -5289,6 +5304,18 @@ const formatRecipe = (recipe, format, entryTitle) => {
       }
       if (station.help === entryTitle) return station.name
       return `[[${station.help}|${station.name}]]`
+    }
+    case 'ingredients': {
+      const parts = []
+      for (const ing of recipe.ingredients) {
+        const item = ing.item
+        if (!item?.help || !item?.name) {
+          console.error(`[help] '${entryTitle}' : recipe '${recipe.result.item.code}' — ingrédient invalide`)
+          return null
+        }
+        parts.push(item.help === entryTitle ? item.name : `[[${item.help}|${item.name}]]`)
+      }
+      return parts.join(', ')
     }
     default:
       console.error(`[help] '${entryTitle}' : format recipe inconnu '${format}'`)

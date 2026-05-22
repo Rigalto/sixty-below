@@ -344,15 +344,25 @@ export const ITEMS = {
   workbench: {name: 'Workbench', type: ITEM_TYPE.FURNITURE | ITEM_TYPE.PLACABLE, stype: 'station', star: 1, furnitureSet: 'wood', surface: true, image: 'furniture_32_32-3-0', placed: 'fuws_48_32-2-0', help: 'Woodworking', tooltip: 'Crafting station for many essential items'},
   sawmill: {name: 'Sawmill', type: ITEM_TYPE.FURNITURE | ITEM_TYPE.PLACABLE, stype: 'station', star: 3, image: 'furniture_32_32-0-0', placed: 'fuws_48_48-0-1', help: 'Woodworking', tooltip: ' Crafting station for advanced Wood and Furniture crafting'},
 
-  anvilIron: {name: 'Iron Anvil', type: ITEM_TYPE.FURNITURE | ITEM_TYPE.PLACABLE, stype: 'station', star: 2, image: 'furniture_32_32-8-1', placed: 'fuws_32_32-1-0', help: 'Forging', tooltip: 'Crafting station used to craft metal bars into tools, weapons, armor, and other items'},
-  anvilPlatinum: {name: 'Platinum Anvil', type: ITEM_TYPE.FURNITURE | ITEM_TYPE.PLACABLE, stype: 'station', star: 4, image: 'furniture_32_32-8-2', placed: 'fuws_32_32-2-0', help: 'Forging', tooltip: 'Crafting stations used to craft metal bars into tools, weapons, armor, and other items'},
+  anvil: {name: 'Anvil', type: ITEM_TYPE.FURNITURE | ITEM_TYPE.PLACABLE, stype: 'station', star: 2, image: 'furniture_32_32-8-1', placed: 'fuws_32_32-1-0', help: 'Forging', tooltip: 'Crafting station used to craft metal bars into tools, weapons, armor, and other items'},
+  forge: {name: 'Forge', type: ITEM_TYPE.FURNITURE | ITEM_TYPE.PLACABLE, stype: 'station', star: 4, image: 'furniture_32_32-8-2', placed: 'fuws_32_32-2-0', help: 'Forging', tooltip: 'Crafting stations used to craft metal bars into tools, weapons, armor, and other items'},
 
   furnace: {name: 'Furnace', type: ITEM_TYPE.FURNITURE | ITEM_TYPE.PLACABLE, stype: 'station', star: 2, image: 'furniture_32_32-6-0', placed: 'fuws_48_48-0-0', help: 'Smelting', tooltip: 'Crafting station for metal smelting'},
   blastFurnace: {name: 'Blast Furnace', type: ITEM_TYPE.FURNITURE | ITEM_TYPE.PLACABLE, stype: 'station', star: 4, image: 'furniture_32_32-5-0', placed: 'fuws_48_48-1-0', help: 'Smelting', tooltip: 'Crafting station for strong metal smelting'},
+
+  // Metal Fittings
+  wireCopper: {name: 'Copper Wire', type: 0, stype: 'fitting', star: 1, image: 'crafting_32_32-2-0', help: 'Metal Fittings', tooltip: '???'},
+  wireIron: {name: 'Iron Wire', type: 0, stype: 'fitting', star: 2, image: 'crafting_32_32-2-0', help: 'Metal Fittings', tooltip: '???'},
+  wireGold: {name: 'Gold Wire', type: 0, stype: 'fitting', star: 3, image: 'crafting_32_32-2-0', help: 'Metal Fittings', tooltip: '???'},
+  wireCobalt: {name: 'Cobalt Wire', type: 0, stype: 'fitting', star: 4, image: 'crafting_32_32-2-0', help: 'Metal Fittings', tooltip: '???'},
+
   grindstone: {name: 'Grindstone', type: ITEM_TYPE.FURNITURE | ITEM_TYPE.PLACABLE, stype: 'station', star: 3, image: 'furniture_32_32-1-0', placed: 'fuws_48_32-0-0', help: 'Sharpening', tooltip: 'Crafting station for sharpenig tools and weapons'},
 
   loom: {name: 'Loom', type: ITEM_TYPE.FURNITURE | ITEM_TYPE.PLACABLE, stype: 'station', star: 2, image: 'furniture_32_32-1-0', placed: 'fuws_48_32-0-0', help: 'Weaving', tooltip: 'Crafting station for cloth'},
+
+  // Leatherworking
   tanningRack: {name: 'Tanning Rack', type: ITEM_TYPE.FURNITURE | ITEM_TYPE.PLACABLE, stype: 'station', star: 3, image: 'furniture_32_32-1-0', placed: 'fuws_48_32-0-0', help: 'Leatherworking', tooltip: 'Crafting station for leather'},
+  leather: {name: 'Leather', type: 0, stype: 'leather', star: 1, image: 'crafting_32_32-2-0', help: 'Leatherworking', tooltip: '???'},
 
   stonecutter: {name: 'Stonecutter', type: ITEM_TYPE.FURNITURE | ITEM_TYPE.PLACABLE, stype: 'station', star: 2, image: 'furniture_32_32-2-0', placed: 'fuws_48_32-1-0', help: 'Stonecutting', tooltip: '???', surface: true},
   jewelerBench: {name: 'Jeweler\'s Bench', type: ITEM_TYPE.FURNITURE | ITEM_TYPE.PLACABLE, stype: 'station', star: 3, surface: true, image: 'furniture_32_32-7-0', placed: 'fuws_48_48-2-0', help: 'Jewelry', tooltip: 'Crafting station for jewels and accessories'},
@@ -525,7 +535,7 @@ export const RECIPES = [
   {result: {item: 'tableWood', count: 1}, station: 'byHand', ingredients: [{item: 'logOak', count: 8}]},
   {result: {item: 'workbench', count: 1}, station: 'tableWood', ingredients: [{item: 'logOak', count: 10}]},
   {result: {item: 'stonecutter', count: 1}, station: 'workbench', ingredients: [{item: 'blockSandstone', count: 10}, {item: 'logOak', count: 2}, {item: 'blockClay', count: 2}, {item: 'barCopper', count: 1}]},
-  {result: {item: 'anvilIron', count: 1}, station: 'workbench', ingredients: [{item: 'barIron', count: 5}, {item: 'logOak', count: 2}]},
+  {result: {item: 'anvil', count: 1}, station: 'workbench', ingredients: [{item: 'barIron', count: 5}, {item: 'logOak', count: 2}]},
   {result: {item: 'sawmill', count: 1}, station: 'workbench', ingredients: [{item: 'barIron', count: 2}, {item: 'chain', count: 1}, {item: 'rawRuby', count: 1}]},
   {result: {item: 'loom', count: 1}, station: 'workbench', ingredients: [{item: 'logOak', count: 12}, {item: 'barIron', count: 2}, {item: 'silk', count: 2}, {item: 'barCopper', count: 1}]},
   {result: {item: 'tanningRack', count: 1}, station: 'loom', ingredients: [{item: 'silk', count: 12}, {item: 'logMahogany', count: 10}, {item: 'barCopper', count: 2}, {item: 'barSilver', count: 2}]},
@@ -533,10 +543,8 @@ export const RECIPES = [
   {result: {item: 'furnace', count: 1}, station: 'stonecutter', ingredients: [{item: 'blockStone', count: 20}, {item: 'logOak', count: 4}, {item: 'torch', count: 3}]},
   {result: {item: 'blastFurnace', count: 1}, station: 'furnace', ingredients: [{item: 'blockHardstone', count: 50}, {item: 'barCobalt', count: 21}, {item: 'blockLimestone', count: 12}, {item: 'logMahogany', count: 10}, {item: 'torch', count: 9}]},
 
-  {result: {item: 'cookingPot', count: 1}, station: 'anvilIron', ingredients: [{item: 'barCopper', count: 2}, {item: 'barIron', count: 8}, {item: 'logOak', count: 4}, {item: 'torch', count: 2}]},
-
-  // {output: 'loom', station: 'sawmill', recipe: [{item: 'woodlog', count: 12}, {item: 'brfe', count: 1}]},
-  // {output: 'anvilpt', station: 'anvilfe', recipe: [{item: 'brpt', count: 10}]},
+  {result: {item: 'cookingPot', count: 1}, station: 'anvil', ingredients: [{item: 'barCopper', count: 2}, {item: 'barIron', count: 8}, {item: 'logOak', count: 4}, {item: 'torch', count: 2}]},
+  {result: {item: 'forge', count: 1}, station: 'anvil', ingredients: [{item: 'barCobalt', count: 12}, {item: 'barIron', count: 6}, {item: 'logMahogany', count: 4}, {item: 'leather', count: 2}]},
 
   // torches
   {result: {item: 'torch', count: 3}, station: 'byHand', ingredients: [{item: 'gel', count: 1}, {item: 'logOak', count: 1}]},
@@ -554,7 +562,13 @@ export const RECIPES = [
   {result: {item: 'barSilver', count: 1}, station: 'furnace', ingredients: [{item: 'chunkSilver', count: 4}, {item: 'logMahogany', count: 1}]},
   {result: {item: 'barGold', count: 1}, station: 'furnace', ingredients: [{item: 'chunkGold', count: 4}, {item: 'logMahogany', count: 1}]},
   {result: {item: 'barCobalt', count: 1}, station: 'furnace', ingredients: [{item: 'chunkCobalt', count: 5}, {item: 'logOak', count: 1}, {item: 'logMahogany', count: 1}]},
-  {result: {item: 'barPlatinum', count: 1}, station: 'blastFurnace', ingredients: [{item: 'chunkPlatinum', count: 5}, {item: 'logOak', count: 1}, {item: 'logMahogany', count: 1}]}
+  {result: {item: 'barPlatinum', count: 1}, station: 'blastFurnace', ingredients: [{item: 'chunkPlatinum', count: 5}, {item: 'logOak', count: 1}, {item: 'logMahogany', count: 1}]},
+
+  // Metal fittings
+  {result: {item: 'wireCopper', count: 24}, station: 'anvil', ingredients: [{item: 'chunkCopper', count: 1}]},
+  {result: {item: 'wireIron', count: 22}, station: 'anvil', ingredients: [{item: 'chunkIron', count: 1}]},
+  {result: {item: 'wireGold', count: 20}, station: 'anvil', ingredients: [{item: 'chunkGold', count: 1}]},
+  {result: {item: 'wireCobalt', count: 18}, station: 'forge', ingredients: [{item: 'chunkCobalt', count: 1}]}
 ]
 
 /* ============================================================================
@@ -791,6 +805,44 @@ for (const key in ITEMS) {
   const itemDesc = ITEMS[key]
   const stars = '★'.repeat(Math.min(5, Math.max(0, itemDesc.star ?? 0)))
   itemDesc.hoverTitle = `${itemDesc.name}\nTier: ${stars}\n${itemDesc.tooltip}\nType: ${itemTypeToString(itemDesc.type, itemDesc.armor)}`
+}
+
+// — 9.x. Détection des cycles dans la chaîne de craft ────────────────────
+
+const _recipeByResult = new Map()
+for (const recipe of RECIPES) {
+  _recipeByResult.set(recipe.result.item.code, recipe)
+}
+
+const _verified = new Set() // items confirmés sans cycle
+
+const _checkCycle = (code, path) => {
+  if (_verified.has(code)) return false // déjà validé — court-circuit
+
+  if (path.has(code)) {
+    console.error(`[data.mjs] RECIPES : cycle détecté : ${[...path, code].join(' → ')}`)
+    return true
+  }
+
+  const recipe = _recipeByResult.get(code)
+  if (!recipe) { // item non craftable — feuille du graphe
+    _verified.add(code)
+    return false
+  }
+
+  path.add(code)
+  let hasCycle = false
+  for (const ing of recipe.ingredients) {
+    if (_checkCycle(ing.item.code, path)) hasCycle = true
+  }
+  path.delete(code)
+
+  if (!hasCycle) _verified.add(code)
+  return hasCycle
+}
+
+for (const recipe of RECIPES) {
+  _checkCycle(recipe.result.item.code, new Set())
 }
 
 /* ============================================================================
