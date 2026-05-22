@@ -60,6 +60,8 @@
  *
  *   Formats disponibles :
  *   |station|     → affiche la station de travail utilisée sous forme de lien [[item:station]]
+ *   |allStations| → affiche toutes les stations de travail utilisées sous forme de lien [[item:station]]
+ *                   pour faire l'item et tous ses précurseurs
  *   |ingredients| → affiche les ingrédients d'une recette séparés par des virgules
  *
  * ── Templates ───────────────────────────────────────────────────
@@ -2970,13 +2972,13 @@ A small set of essential items can be crafted anywhere, without a workstation ne
 **Furnace Acquisition**
 
 * Tier: {{item:furnace:star|star}}
-* Crafting Station: {{recipe:furnace|station}}
+ Crafting Station: {{recipe:furnace|allStations}}
 * Crafting Materials: [[item:gel]], [[item:logOak]], [[item:blockStone]]
 
-**Furnace Acquisition**
+**Blast Furnace Acquisition**
 
 * Tier: {{item:blastFurnace:star|star}}
-* Crafting Station: {{recipe:blastFurnace|station}}
+* Crafting Station: {{recipe:blastFurnace|allStations}}
 * Crafting Materials: [[item:gel]], [[item:logOak]], [[item:blockHardstone]]
 
 **Metal Bars**
@@ -3049,7 +3051,7 @@ Le Stonecutter is a [[Crafting Stations|Crafting Station]] qui permet de couper,
 **Cooking Pot Acquisition**
 
 * Tier: {{item:cookingPot:star|star}}
-* Crafting Stations: [[item:furnace]], [[item:anvil]]
+* Crafting Stations: {{recipe:cookingPot|allStations}}
 * Crafting Materials: [[item:gel]], [[item:logOak]], [[item:chunkCopper]], [[item:chunkIron]]
 * Requires multiple crafting stages
     `
@@ -5272,7 +5274,7 @@ const resolveDynamic = (entry, NODES, ITEMS, MONSTERS) => {
   return errors
 }
 
-const resolveRecipes = (entry, RECIPES) => {
+const resolveRecipes = (entry, RECIPES, ITEMS, recipeByResult) => {
   let errors = 0
   entry.content = entry.content.replace(
     /\{\{recipe:([^|}\s]+)\|(\w+)\}\}/g,
@@ -5286,7 +5288,7 @@ const resolveRecipes = (entry, RECIPES) => {
         errors++
         return `⚠️ {{recipe:${code}|${format}}}`
       }
-      const result = formatRecipe(recipe, format, entry.title)
+      const result = formatRecipe(recipe, format, entry.title, ITEMS, recipeByResult)
       if (result === null) { errors++; return `⚠️ {{recipe:${code}|${format}}}` }
       return result
     }
@@ -5294,7 +5296,7 @@ const resolveRecipes = (entry, RECIPES) => {
   return errors
 }
 
-const formatRecipe = (recipe, format, entryTitle) => {
+const formatRecipe = (recipe, format, entryTitle, ITEMS, recipeByResult) => {
   switch (format) {
     case 'station': {
       const station = recipe.station
@@ -5313,6 +5315,30 @@ const formatRecipe = (recipe, format, entryTitle) => {
           console.error(`[help] '${entryTitle}' : recipe '${recipe.result.item.code}' — ingrédient invalide`)
           return null
         }
+        parts.push(item.help === entryTitle ? item.name : `[[${item.help}|${item.name}]]`)
+      }
+      return parts.join(', ')
+    }
+    case 'allStations': {
+      const stationCodes = new Set()
+      const visited = new Set([recipe.result.item.code])
+      const queue = [recipe]
+
+      for (let i = 0; i < queue.length; i++) {
+        const r = queue[i]
+        stationCodes.add(r.station.code)
+        for (const ing of r.ingredients) {
+          const code = ing.item.code
+          if (visited.has(code)) continue
+          visited.add(code)
+          const sub = recipeByResult.get(code)
+          if (sub) queue.push(sub)
+        }
+      }
+
+      const parts = []
+      for (const code of stationCodes) {
+        const item = ITEMS[code]
         parts.push(item.help === entryTitle ? item.name : `[[${item.help}|${item.name}]]`)
       }
       return parts.join(', ')
@@ -5359,6 +5385,11 @@ export const hydrateHelp = (NODES, ITEMS, RECIPES, MONSTERS = {}) => {
   let count = 0
   let errors = 0
 
+  const recipeByResult = new Map()
+  for (const recipe of RECIPES) {
+    recipeByResult.set(recipe.result.item.code, recipe)
+  }
+
   for (const entry of HELP) {
     // liens
     errors += resolveNodeLinks(entry, NODES)
@@ -5366,7 +5397,7 @@ export const hydrateHelp = (NODES, ITEMS, RECIPES, MONSTERS = {}) => {
     errors += resolveMonsterLinks(entry, MONSTERS)
     // Résolution des données dynamiques {{...}}
     errors += resolveDynamic(entry, NODES, ITEMS, MONSTERS)
-    errors += resolveRecipes(entry, RECIPES)
+    errors += resolveRecipes(entry, RECIPES, ITEMS, recipeByResult)
     // Conversion Markdown → HTML (entry.html = html généré)
     errors += renderMarkdown(entry)
     count++
