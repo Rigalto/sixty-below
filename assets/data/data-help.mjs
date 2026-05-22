@@ -108,7 +108,12 @@ Mining drops: {{node:{3}:mining[:items[0]:item|link}}
   lootTableHeader: '| Item | Tier | Amount | Conditions | Modifiers |\n|---|---|---|---|---|',
   additiveNote: '_All modifiers are additive and stack with each other._',
   lootTable: '| Item | Tier | Amount | Conditions | Modifiers |\n|---|---|---|---|---|\n{{node:{1}:{2}:items[*]:helpRow|rows}}\n\n_All modifiers are additive and stack with each other._',
-  miningDrop: '{{node:{1}:mining:items[0]:item|link}} {{node:{1}:mining:items[0]:item:star|star}}'
+  miningDrop: '{{node:{1}:mining:items[0]:item|link}} {{node:{1}:mining:items[0]:item:star|star}}',
+
+  // pour renseigner une cellule de table avec un node et son tier en dessous
+  cellNodeStar: '[[node:{1}]]<br>{{node:{1}:star|star}}',
+  // pour renseigner une cellule de table avec un item et son tier en dessous
+  cellItemStar: '[[item:{1}]]<br>{{item:{1}:star|star}}'
 }
 
 /* ====================================================================================================
@@ -1868,7 +1873,7 @@ Slate is a hard metamorphic substrat found in the deepest parts of [[Jungle]] bi
   },
 
   // ── Metallic Ores / Chunks / Bars ────────────────────────────
-  //    Copper, Iron, Silver, Gold, Cobalt, Platinum
+  //    Metals, Metal Fittings (Copper, Iron, Silver, Gold, Cobalt, Platinum)
   {
     title: 'Metals',
     category: ['Crafting'],
@@ -1920,9 +1925,19 @@ Metal chunks are placed in your [[Inventory]] when mined with a [[Mining Tools|P
 <<metalBarsRow|chunkCobalt|barCobalt>>
 <<metalBarsRow|chunkPlatinum|barPlatinum>>
 
-**Metal Bars Recipes** ⏳
+**Metal Fittings**
 
-* {{recipe:shellPowder}}
+The table below details the [[Metal Fittings]] available for each material, including _Fasteners_ (Nail, Rivet, Chain, Wire) and _Parts_ (Plate, Rod, Strip).
+
+| Metal | Nail | Rivet | Chain | Wire | Plate | Rod | Strip |
+|---|---|---|---|---|---|---|---|
+| **Copper** | - | - | yes | yes | yes | - | yes |
+| **Iron** | yes | - | yes | yes | yes | yes | yes |
+| **Silver** | - | - | yes | - | - | yes | yes |
+| **Gold** | - | - | - | yes | yes | yes | yes |
+| **Cobalt** | yes | yes | - | yes | yes | yes | yes |
+| **Platinum** | - | yes | - | - | yes | yes | yes |
+
 
 **Usages**
 
@@ -1941,6 +1956,44 @@ Metal chunks are placed in your [[Inventory]] when mined with a [[Mining Tools|P
 * _Despite being a Tier 1 resource, Copper's ductility ensures its continued use in complex apparatuses across all Tiers._
 * _Platinum is extremely rare and only found in the deepest caverns._
   `
+  },
+  {
+    title: 'Metal Fittings',
+    category: ['Forging'],
+    content: `
+**Description**
+
+TODO
+
+The table below details the [[Metal Fittings]] available for each material, including _Fasteners_ (Nail, Rivet, Chain, Wire) and _Parts_ (Plate, Rod, Strip).
+
+**Crafting Stations**
+
+* [[item:anvilIron]] : Copper, Iron, Silver and Gold
+* [[item:anvilPlatinum]] : Cobalt and Platinum
+
+**Fasteners**
+
+| Metal | Nail | Rivet | Chain | Wire |
+|---|---|---|---|---|
+| **Copper** | - | - | yes | yes |
+| **Iron** | yes | - | yes | yes |
+| **Silver** | - | - | yes | - |
+| **Gold** | - | - | - | yes |
+| **Cobalt** | yes | yes | - | yes |
+| **Platinum** | - | yes | - | - |
+
+**Parts**
+
+| Metal | Plate | Rod | Strip |
+|---|---|---|---|
+| **Copper** | yes | - | yes |
+| **Iron** | yes | yes | yes |
+| **Silver** | - | yes | yes |
+| **Gold** | yes | yes | yes |
+| **Cobalt** | yes | yes | yes |
+| **Platinum** | yes | yes | yes |
+    `
   },
   // ── Gems ─────────────────────────────────────────────────────
   //    Gems, Geode Stones
@@ -2027,11 +2080,11 @@ Native solid layers of each biome, from surface to bedrock.
 
 | Type | Layer | Forest | Desert | Jungle |
 |---|---|---|---|---|
-| Natural | [[Surface]] | [[node:grassForest]]<br>{{node:grassForest:star|star}} | — | [[node:grassJungle]]<br>{{node:grassJungle:star|star}} |
-| Topsoil | [[Surface]] | [[node:dirt]]<br>{{node:dirt:star|star}} | [[node:sand]]<br>{{node:sand:star|star}} | [[node:silt]]<br>{{node:silt:star|star}} |
-| Substrat | [[Surface]] | [[node:clay]]<br>{{node:clay:star|star}} | [[node:sandstone]]<br>{{node:sandstone:star|star}} | [[node:mud]]<br>{{node:mud:star|star}} |
-| Substrat | [[Underground]] | [[node:stone]]<br>{{node:stone:star|star}} | [[node:ash]]<br>{{node:ash:star|star}} | [[node:limestone]]<br>{{node:limestone:star|star}} |
-| Substrat | [[Caverns]] | [[node:hardstone]]<br>{{node:hardstone:star|star}} | [[node:hellstone]]<br>{{node:hellstone:star|star}} | [[node:slate]]<br>{{node:slate:star|star}} |
+| Natural | [[Surface]] | <<cellNodeStar|grassForest>> | — | <<cellNodeStar|grassJungle>> |
+| Topsoil | [[Surface]] | <<cellNodeStar|dirt>> | <<cellNodeStar|sand>> | <<cellNodeStar|silt>> |
+| Substrat | [[Surface]] | <<cellNodeStar|clay>> | <<cellNodeStar|sandstone>> | <<cellNodeStar|mud>> |
+| Substrat | [[Underground]] | <<cellNodeStar|stone>> | <<cellNodeStar|ash>> | <<cellNodeStar|limestone>> |
+| Substrat | [[Caverns]] | <<cellNodeStar|hardstone>> | <<cellNodeStar|hellstone>> | <<cellNodeStar|slate>> |
 
 <hr>
 
