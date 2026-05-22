@@ -2008,7 +2008,7 @@ The table below details the [[Metal Fittings]] available for each material, incl
     content: `
 **Description**
 
-Gems are rare crafting materials found deep underground. Each gem exists in three forms : gem deposits (placed in the World), raw gem (dropped when mined) and cut gem (shaped at a [[Stonecutting|Stonecutter]]).
+Gems are rare crafting materials found deep underground. Each gem exists in three forms : gem deposits (placed in the World), raw gem (dropped when mined) and cut gem (shaped at a [[item:stoneBench]]).
 
 **Forms & Transformation**
 
@@ -2016,7 +2016,7 @@ Gems are rare crafting materials found deep underground. Each gem exists in thre
 |---|---|---|
 | Gem Deposit | Gem veins placed in the World | Not directly usable |
 | Raw Gem | Dropped when [[Mining]] deposits | Crafting ingredient |
-| Cut Gem | Cut raw gems at a [[Stonecutting|Stonecutter]] | Crafting ingredient |
+| Cut Gem | Cut raw gems at a [[item:stoneBench]] | Crafting ingredient |
 
 **Gem Deposits**
 
@@ -2308,7 +2308,7 @@ Shell is a sedimentary material formed from ancient marine organisms. It is foun
 * Basic ingredient for furntiure and construction
 * Decorative ingredient for tools and weapons
 * Secondary ingredient for accessories
-* Can be grinded at a [[Stonecutting|Stonecutter]] in [[item:shellPowder]] {{item:shellPowder:star|star}}
+* Can be grinded at a [[item:stoneBench]] in [[item:shellPowder]] {{item:shellPowder:star|star}}
 * [[item:shellPowder]] is used in potions
 
 **Recipes** ⏳
@@ -2785,7 +2785,6 @@ Crafting stations are required to craft higher-tier stations, forming a progress
 
 * [[Smelting]] — <<itemStar|furnace>> and <<itemStar|blastFurnace>>
 * [[Forging]] — <<itemStar|anvil>> and <<itemStar|forge>>
-* [[Sharpening]] — <<itemStar|grindstone>>
 
 **Textiles**
 
@@ -2794,7 +2793,7 @@ Crafting stations are required to craft higher-tier stations, forming a progress
 
 **Other crafts**
 
-* [[Stonecutting]] — <<itemStar|stonecutter>>
+* [[Stoneworking]] — <<itemStar|stoneBench>>
 * [[Jewelry]] — <<itemStar|jewelerBench>>
 * [[Alchemy]] — <<itemStar|alchemyTable>>
 * [[Cooking]] — <<itemStar|cookingPot>>
@@ -2811,17 +2810,16 @@ Crafting stations are required to craft higher-tier stations, forming a progress
     content: `
 **Description**
 
-The crafting tree shows the order in which [[Crafting Stations]] must be built. Each station unlocks the next tier of crafting possibilities.
+The crafting tree shows which station is used to craft each station. The indentation reflects the crafting dependency, not the unlock order.
 
 * [[By Hand]]
   * <<itemStar|tableWood>>
     * <<itemStar|workbench>>
-      * <<itemStar|stonecutter>>
-        * <<itemStar|furnace>>
-          * <<itemStar|cookingPot>>
-          * <<itemStar|blastFurnace>>
+      * <<itemStar|furnace>>
+        * <<itemStar|cookingPot>>
+        * <<itemStar|blastFurnace>>
       * <<itemStar|anvil>>
-        * <<itemStar|grindstone>>
+        * <<itemStar|stoneBench>>
         * <<itemStar|jewelerBench>>
         * <<itemStar|forge>>
       * <<itemStar|alchemyTable>>
@@ -2831,6 +2829,25 @@ The crafting tree shows the order in which [[Crafting Stations]] must be built. 
 * Found in the world
   * <<itemStar|decomposer>> — [[Lost Temple]]
   * <<itemStar|transmutator>> — [[Ancient House]]
+
+**Unlock Order**
+
+The unlock order shows when each station becomes buildable during a playthrough — taking into account both the station required to craft it and the materials it needs. A station deeper in the crafting tree is not necessarily harder to unlock than one at a shallower level.
+
+* <<itemStar|tableWood>>: {{recipe:tableWood|allStations}}
+  * <<itemStar|workbench>>: {{recipe:workbench|allStations}}
+    * <<itemStar|furnace>>: {{recipe:furnace|allStations}}
+      * <<itemStar|anvil>>: {{recipe:anvil|allStations}}
+        * <<itemStar|cookingPot>>: {{recipe:cookingPot|allStations}}
+        * <<itemStar|stoneBench>> {{recipe:stoneBench|allStations}}
+        * <<itemStar|jewelerBench>> ⏳
+      * <<itemStar|alchemyTable>>: {{recipe:alchemyTable|allStations}}
+      * <<itemStar|loom>>: {{recipe:loom|allStations}}
+        * <<itemStar|tanningRack>>: {{recipe:tanningRack|allStations}}
+          * <<itemStar|forge>>: {{recipe:forge|allStations}}, [[item:tanningRack]]
+        * <<itemStar|sawmill>>: {{recipe:tanningRack|allStations}}
+          * <<itemStar|blastFurnace>>: {{recipe:blastFurnace|allStations}}, [[item:sawmill]]
+
   `
   },
   {
@@ -2954,7 +2971,7 @@ A small set of essential items can be crafted anywhere, without a workstation ne
   },
 
   // ── Crafting Stations ────────────────────────────────────────
-  //    Wooden Table, Woodworking, Smelting, Forging, Sharpening, Leatherworking, Weaving
+  //    Wooden Table, Woodworking, Smelting, Forging, Leatherworking, Weaving
   {
     title: 'Wooden Table',
     category: ['Crafting', 'Crafting Stations'],
@@ -2999,11 +3016,6 @@ A small set of essential items can be crafted anywhere, without a workstation ne
     content: ''
   },
   {
-    title: 'Sharpening',
-    category: ['Crafting', 'Crafting Stations'],
-    content: ''
-  },
-  {
     title: 'Leatherworking',
     category: ['Crafting', 'Crafting Stations'],
     content: ''
@@ -3014,22 +3026,21 @@ A small set of essential items can be crafted anywhere, without a workstation ne
     content: ''
   },
 
-  //    Stonecutting, Jewelry, Alchemy, Cooking, Decomposer, Transmutator
+  //    Stoneworking, Jewelry, Alchemy, Cooking, Decomposer, Transmutator
 
   {
-    title: 'Stonecutting',
+    title: 'Stoneworking',
     category: ['Crafting', 'Crafting Stations'],
     content: `
-Le Stonecutter is a [[Crafting Stations|Crafting Station]] qui permet de couper, polir, réduire en poudre différents types de matériaux durs et tendres. Toutes ces opérations sont regrouppées sous le terme de 'Stonecutting'.
+Le [[item:stoneBench]] is a [[Crafting Stations|Crafting Station]] qui permet de couper, polir, réduire en poudre différents types de matériaux durs et tendres.
 
-**Stonecutter Acquisition**
+**Stone Bench Acquisition**
 
-* Tier: {{item:stonecutter:star|star}}
-* Crafting Station: {{recipe:stonecutter|station}}
-* Crafting Materials: {{recipe:stonecutter|ingredients}}
+* Tier: {{item:stoneBench:star|star}}
+* Crafting Station: {{recipe:stoneBench|allStations}}
+* Crafting Materials: {{recipe:stoneBench|ingredients}}
 
 **Tips**
-* Dire qu'il est important de le construire dès que possible car il permet de fabriquer un [[item:furnace]] qui est le point de départ de toute la [[Metals||métallurgie]].
     `
   },
   {

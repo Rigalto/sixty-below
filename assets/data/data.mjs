@@ -215,10 +215,14 @@ export const ITEMS = {
   barPlatinum: {name: 'Platinum Bar', type: ITEM_TYPE.MATERIAL | ITEM_TYPE.CRAFTABLE, star: 5, stype: 'bar', image: 'blocks_16_16-0-0', help: 'Metals', tooltip: 'Crafting material used to craft tools, weapons, armor, and other items'},
 
   // Gems
-  rawTopaz: {name: 'Raw Topaz', type: ITEM_TYPE.MATERIAL, star: 2, stype: 'gem', image: 'blocks_16_16-0-0', help: 'Gems', tooltip: 'Valuable crafting materials to be cut at a Stonecutter'},
-  rawRuby: {name: 'Raw Ruby', type: ITEM_TYPE.MATERIAL, star: 3, stype: 'gem', image: 'blocks_16_16-0-0', help: 'Gems', tooltip: 'Valuable crafting materials to be cut at a Stonecutter'},
-  rawEmerald: {name: 'Raw Emerald', type: ITEM_TYPE.MATERIAL, star: 4, stype: 'gem', image: 'blocks_16_16-0-0', help: 'Gems', tooltip: 'Valuable crafting materials to be cut at a Stonecutter'},
-  rawSapphire: {name: 'Raw Sapphire', type: ITEM_TYPE.MATERIAL, star: 5, stype: 'gem', image: 'blocks_16_16-0-0', help: 'Gems', tooltip: 'Valuable crafting materials to be cut at a Stonecutter'},
+  rawTopaz: {name: 'Raw Topaz', type: 0, star: 2, stype: 'gem', image: 'blocks_16_16-0-0', help: 'Gems', tooltip: 'Valuable crafting materials to be cut at a Stone Bench'},
+  rawRuby: {name: 'Raw Ruby', type: 0, star: 3, stype: 'gem', image: 'blocks_16_16-0-0', help: 'Gems', tooltip: 'Valuable crafting materials to be cut at a Stone Bench'},
+  rawEmerald: {name: 'Raw Emerald', type: 0, star: 4, stype: 'gem', image: 'blocks_16_16-0-0', help: 'Gems', tooltip: 'Valuable crafting materials to be cut at a Stone Bench'},
+  rawSapphire: {name: 'Raw Sapphire', type: 0, star: 5, stype: 'gem', image: 'blocks_16_16-0-0', help: 'Gems', tooltip: 'Valuable crafting materials to be cut at a Stone Bench'},
+  cutTopaz: {name: 'Cut Topaz', type: 0, star: 2, stype: 'gem', image: 'blocks_16_16-0-0', help: 'Gems', tooltip: 'Enhances weapons, gears and accessories'},
+  cutRuby: {name: 'Cut Ruby', type: 0, star: 3, stype: 'gem', image: 'blocks_16_16-0-0', help: 'Gems', tooltip: 'Enhances weapons, gears and accessories'},
+  cutEmerald: {name: 'Cut Emerald', type: 0, star: 4, stype: 'gem', image: 'blocks_16_16-0-0', help: 'Gems', tooltip: 'Enhances weapons, gears and accessories'},
+  cutSapphire: {name: 'Cut Sapphire', type: 0, star: 5, stype: 'gem', image: 'blocks_16_16-0-0', help: 'Gems', tooltip: 'Enhances weapons, gears and accessories'},
 
   // Rock - Geode Stones
   blockGranite: {name: 'Granite Block', type: ITEM_TYPE.MATERIAL, star: 4, stype: 'stone', image: 'blocks_16_16-0-0', help: 'Geode Stones', tooltip: 'Prized crafting materials found in crystalline structures'},
@@ -356,7 +360,7 @@ export const ITEMS = {
   wireGold: {name: 'Gold Wire', type: 0, stype: 'fitting', star: 3, image: 'crafting_32_32-2-0', help: 'Metal Fittings', tooltip: '???'},
   wireCobalt: {name: 'Cobalt Wire', type: 0, stype: 'fitting', star: 4, image: 'crafting_32_32-2-0', help: 'Metal Fittings', tooltip: '???'},
 
-  grindstone: {name: 'Grindstone', type: ITEM_TYPE.FURNITURE | ITEM_TYPE.PLACABLE, stype: 'station', star: 3, image: 'furniture_32_32-1-0', placed: 'fuws_48_32-0-0', help: 'Sharpening', tooltip: 'Crafting station for sharpenig tools and weapons'},
+  stoneBench: {name: 'Stone Bench', type: ITEM_TYPE.FURNITURE | ITEM_TYPE.PLACABLE, stype: 'station', star: 3, image: 'furniture_32_32-1-0', placed: 'fuws_48_32-0-0', help: 'Stoneworking', tooltip: 'Crafting station for sharpenig tools and weapons'},
 
   loom: {name: 'Loom', type: ITEM_TYPE.FURNITURE | ITEM_TYPE.PLACABLE, stype: 'station', star: 2, image: 'furniture_32_32-1-0', placed: 'fuws_48_32-0-0', help: 'Weaving', tooltip: 'Crafting station for cloth'},
 
@@ -364,7 +368,6 @@ export const ITEMS = {
   tanningRack: {name: 'Tanning Rack', type: ITEM_TYPE.FURNITURE | ITEM_TYPE.PLACABLE, stype: 'station', star: 3, image: 'furniture_32_32-1-0', placed: 'fuws_48_32-0-0', help: 'Leatherworking', tooltip: 'Crafting station for leather'},
   leather: {name: 'Leather', type: 0, stype: 'leather', star: 1, image: 'crafting_32_32-2-0', help: 'Leatherworking', tooltip: '???'},
 
-  stonecutter: {name: 'Stonecutter', type: ITEM_TYPE.FURNITURE | ITEM_TYPE.PLACABLE, stype: 'station', star: 2, image: 'furniture_32_32-2-0', placed: 'fuws_48_32-1-0', help: 'Stonecutting', tooltip: '???', surface: true},
   jewelerBench: {name: 'Jeweler\'s Bench', type: ITEM_TYPE.FURNITURE | ITEM_TYPE.PLACABLE, stype: 'station', star: 3, surface: true, image: 'furniture_32_32-7-0', placed: 'fuws_48_48-2-0', help: 'Jewelry', tooltip: 'Crafting station for jewels and accessories'},
   alchemyTable: {name: 'Alchemy Table', type: ITEM_TYPE.FURNITURE | ITEM_TYPE.PLACABLE, stype: 'station', star: 2, image: 'furniture_32_32-8-0', placed: 'fuws_48_48-2-1', help: 'Alchemy', tooltip: 'Crafting station for potions'},
   cookingPot: {name: 'Cooking Pot', type: ITEM_TYPE.FURNITURE | ITEM_TYPE.PLACABLE, stype: 'station', star: 2, image: 'furniture_32_32-9-0', placed: 'fuws_32_32-7-2', help: 'Cooking', tooltip: 'Crafting station for food'},
@@ -520,7 +523,10 @@ export const ITEMS = {
   // Armors ITEM_TYPE.ARMOR, stype: 'tableware', armor: 'head'
   headWood: {name: 'Wood Helmet', type: ITEM_TYPE.ARMOR | ITEM_TYPE.CRAFTING, stype: 'head', armor: 'head', star: 1, image: 'tools_32_32-10-7', placedright: 'heads_26_22-1-0', placedleft: 'heads_26_22-1-1', defense: 1, help: 'Armors', tooltip: 'Provides sturdy protection', set: 'wood'},
   bodyWood: {name: 'Wood Chainmail', type: ITEM_TYPE.ARMOR | ITEM_TYPE.CRAFTING, stype: 'body', armor: 'body', star: 1, image: 'tools_32_32-11-7', placedright: 'bodies_26_18-1-0', placedleft: 'bodies_26_18-1-1', defense: 1, help: 'Armors', tooltip: 'Provides sturdy protection', set: 'wood'},
-  footWood: {name: 'Wood Greaves', type: ITEM_TYPE.ARMOR | ITEM_TYPE.CRAFTING, stype: 'foot', armor: 'foot', star: 1, image: 'tools_32_32-12-7', placedright: 'feet_26_12-1-0', placedleft: 'feet_26_12-1-1', defense: 0, help: 'Armors', tooltip: 'Provides sturdy protection', set: 'wood'}
+  footWood: {name: 'Wood Greaves', type: ITEM_TYPE.ARMOR | ITEM_TYPE.CRAFTING, stype: 'foot', armor: 'foot', star: 1, image: 'tools_32_32-12-7', placedright: 'feet_26_12-1-0', placedleft: 'feet_26_12-1-1', defense: 0, help: 'Armors', tooltip: 'Provides sturdy protection', set: 'wood'},
+
+  // Monster drops
+  antlionMandible: {name: 'Antlion Mandible', type: 0, stype: 'monster', star: 2, image: 'tools_32_32-12-7', help: 'Antlion Pit', tooltip: 'Component for cutting tools'}
 }
 
 /* ============================================================================
@@ -528,23 +534,29 @@ export const ITEMS = {
    ============================================================================ */
 
 export const RECIPES = [
-  // Accesories
+  // Accessories
   {result: {item: 'triskelAncient', count: 1}, station: 'alchemyTable', ingredients: [{item: 'triskelCopper', count: 1}, {item: 'triskelSilver', count: 1}, {item: 'triskelGold', count: 1}]},
+
+  // Gems
+  {result: {item: 'cutTopaz', count: 2}, station: 'stoneBench', ingredients: [{item: 'rawTopaz', count: 1}]},
+  {result: {item: 'cutRuby', count: 2}, station: 'stoneBench', ingredients: [{item: 'rawRuby', count: 1}]},
+  {result: {item: 'cutEmerald', count: 2}, station: 'stoneBench', ingredients: [{item: 'rawEmerald', count: 1}]},
+  {result: {item: 'cutSapphire', count: 2}, station: 'stoneBench', ingredients: [{item: 'rawSapphire', count: 1}]},
 
   // Crafting Stations
   {result: {item: 'tableWood', count: 1}, station: 'byHand', ingredients: [{item: 'logOak', count: 8}]},
   {result: {item: 'workbench', count: 1}, station: 'tableWood', ingredients: [{item: 'logOak', count: 10}]},
-  {result: {item: 'stonecutter', count: 1}, station: 'workbench', ingredients: [{item: 'blockSandstone', count: 10}, {item: 'logOak', count: 2}, {item: 'blockClay', count: 2}, {item: 'barCopper', count: 1}]},
   {result: {item: 'anvil', count: 1}, station: 'workbench', ingredients: [{item: 'barIron', count: 5}, {item: 'logOak', count: 2}]},
-  {result: {item: 'sawmill', count: 1}, station: 'workbench', ingredients: [{item: 'barIron', count: 2}, {item: 'chain', count: 1}, {item: 'rawRuby', count: 1}]},
+  {result: {item: 'sawmill', count: 1}, station: 'workbench', ingredients: [{item: 'barIron', count: 2}, {item: 'chain', count: 1}, {item: 'cutRuby', count: 1}]},
   {result: {item: 'loom', count: 1}, station: 'workbench', ingredients: [{item: 'logOak', count: 12}, {item: 'barIron', count: 2}, {item: 'silk', count: 2}, {item: 'barCopper', count: 1}]},
   {result: {item: 'tanningRack', count: 1}, station: 'loom', ingredients: [{item: 'silk', count: 12}, {item: 'logMahogany', count: 10}, {item: 'barCopper', count: 2}, {item: 'barSilver', count: 2}]},
   {result: {item: 'alchemyTable', count: 1}, station: 'workbench', ingredients: [{item: 'logMahogany', count: 6}, {item: 'logOak', count: 6}, {item: 'barCopper', count: 5}, {item: 'bottle', count: 10}, {item: 'torch', count: 2}, {item: 'sunflowerOil', count: 1}]},
-  {result: {item: 'furnace', count: 1}, station: 'stonecutter', ingredients: [{item: 'blockStone', count: 20}, {item: 'logOak', count: 4}, {item: 'torch', count: 3}]},
+  {result: {item: 'furnace', count: 1}, station: 'workbench', ingredients: [{item: 'blockStone', count: 20}, {item: 'logOak', count: 4}, {item: 'torch', count: 3}]},
   {result: {item: 'blastFurnace', count: 1}, station: 'furnace', ingredients: [{item: 'blockHardstone', count: 50}, {item: 'barCobalt', count: 21}, {item: 'blockLimestone', count: 12}, {item: 'logMahogany', count: 10}, {item: 'torch', count: 9}]},
 
   {result: {item: 'cookingPot', count: 1}, station: 'anvil', ingredients: [{item: 'barCopper', count: 2}, {item: 'barIron', count: 8}, {item: 'logOak', count: 4}, {item: 'torch', count: 2}]},
   {result: {item: 'forge', count: 1}, station: 'anvil', ingredients: [{item: 'barCobalt', count: 12}, {item: 'barIron', count: 6}, {item: 'logMahogany', count: 4}, {item: 'leather', count: 2}]},
+  {result: {item: 'stoneBench', count: 1}, station: 'anvil', ingredients: [{item: 'blockSandstone', count: 12}, {item: 'blockAsh', count: 8}, {item: 'barIron', count: 8}, {item: 'logMahogany', count: 6}, {item: 'shell', count: 3}]},
 
   // torches
   {result: {item: 'torch', count: 3}, station: 'byHand', ingredients: [{item: 'gel', count: 1}, {item: 'logOak', count: 1}]},
@@ -569,6 +581,7 @@ export const RECIPES = [
   {result: {item: 'wireIron', count: 22}, station: 'anvil', ingredients: [{item: 'chunkIron', count: 1}]},
   {result: {item: 'wireGold', count: 20}, station: 'anvil', ingredients: [{item: 'chunkGold', count: 1}]},
   {result: {item: 'wireCobalt', count: 18}, station: 'forge', ingredients: [{item: 'chunkCobalt', count: 1}]}
+
 ]
 
 /* ============================================================================
