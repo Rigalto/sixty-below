@@ -3,6 +3,7 @@ import {eventBus} from './utils.mjs'
 import {createOverlayHeader} from './ui.mjs'
 import {database} from './database.mjs'
 import {ITEM_TYPE, RECIPES, CRAFT_RESULT_TYPES, CRAFT_STATIONS, CRAFT_INGREDIENTS} from '../assets/data/data.mjs'
+import {inventoryManager} from './inventory.mjs'
 
 // ── CSS ──────────────────────────────────────────────────────────────────────
 
@@ -265,6 +266,14 @@ craftStyle.textContent = /* css */`
   cursor: pointer;
 }
 
+#ui-craft-panel inventory-slot.cr-slot-ok {
+  background-color: var(--slot-bg-armor);
+}
+
+#ui-craft-panel inventory-slot.cr-slot-ko {
+  background-color: var(--slot-bg-default);
+}
+
 #ui-craft-panel .cr-craft-label {
   font-size: 12px;
   color: var(--ov-text-muted);
@@ -351,6 +360,9 @@ class CraftOverlay {
   #btnHelp
   #craftCount
   #btnCraft
+  // disponibilité des ingrédients
+  #availableMap
+  #ingredientQtyEls = [] // [{el, code, ingCount}]
 
   constructor () {
     // 1. Création du Conteneur Principal
@@ -534,6 +546,7 @@ class CraftOverlay {
       this.#filterInput.value = '' // non mémorisé — reset à chaque ouverture
       this.#filterMode.style.display = ''
       this.#filterValue.style.display = ''
+      this.#buildAvailableMap()
       this.#applyFilter()
     })
 
@@ -591,7 +604,13 @@ class CraftOverlay {
       const runs = Math.max(1, parseInt(this.#craftCount.value, 10) || 1)
       const total = runs * this.#selectedRecipe.result.count
       this.#btnCraft.textContent = `Craft × ${total}`
-      // TODO tenir compte des disponibilités
+      this.#updateIngredientQtys()
+    })
+
+    this.#btnCraft.addEventListener('click', () => {
+      // ... exécution recette ...
+      this.#buildAvailableMap() // ← après consommation des ingrédients
+      this.#applyFilter() // ← pour rafraîchir les couleurs
     })
   }
 
@@ -670,6 +689,7 @@ class CraftOverlay {
   }
 
   #clearDetail () {
+    this.#ingredientQtyEls = []
     this.#detailZone.innerHTML = ''
     const msg = document.createElement('p')
     msg.className = 'cr-empty'
@@ -807,6 +827,8 @@ class CraftOverlay {
       }
       slot.setAttribute('item', ing.item.code)
       slot.title = ing.item.hoverTitle
+      const available = this.#availableMap[ing.item.code] ?? 0
+      slot.classList.add(available >= ing.count ? 'cr-slot-ok' : 'cr-slot-ko')
 
       const name = document.createElement('div')
       name.className = 'cr-detail-name'
@@ -814,7 +836,9 @@ class CraftOverlay {
 
       const qty = document.createElement('div')
       qty.className = 'cr-detail-qty'
-      qty.textContent = `× ${ing.count}`
+      const runs = parseInt(this.#craftCount.value, 10) || 1
+      qty.textContent = `${available} / ${runs * ing.count}`
+      this.#ingredientQtyEls.push({el: qty, code: ing.item.code, ingCount: ing.count})
 
       row.appendChild(slot)
       row.appendChild(name)
@@ -830,6 +854,23 @@ class CraftOverlay {
     this.#filterMode.style.display = 'none'
     this.#filterValue.style.display = 'none'
     this.#applyFilter()
+  }
+
+  #buildAvailableMap () {
+    this.#availableMap = {}
+    inventoryManager.fillMaterialsFromPlayer(this.#availableMap)
+    // TODO furnitureManager — containers proches
+    // const nearbyIds = furnitureManager.getNearbyContainerIds('craft-range')
+    // for (const id of nearbyIds) {
+    //   inventoryManager.fillMaterialsFromContainer(this.#availableMap, id)
+    // }
+  }
+
+  #updateIngredientQtys () {
+    const runs = parseInt(this.#craftCount.value, 10) || 1
+    for (const {el, code, ingCount} of this.#ingredientQtyEls) {
+      el.textContent = `${(this.#availableMap[code] ?? 0)} / ${runs * ingCount}`
+    }
   }
 }
 export const craftOverlay = new CraftOverlay()
