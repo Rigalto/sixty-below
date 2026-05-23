@@ -303,24 +303,29 @@ craftStyle.textContent = /* css */`
 
 #ui-craft-panel .cr-craft-btn {
   padding: 6px 14px;
-  background-color: #2a5a2a;
-  border: 1px solid #3a7a3a;
+  background-color: var(--ov-btn-bg);   /* ← neutre par défaut */
+  border: 1px solid var(--ov-border-sub);
   border-radius: 3px;
   color: var(--ov-text);
   font-size: 13px;
   font-weight: 700;
-  cursor: pointer;
+  cursor: default;
   white-space: nowrap;
   flex-shrink: 0;
 }
 
-#ui-craft-panel .cr-craft-btn:hover:not(:disabled) {
+#ui-craft-panel .cr-craft-btn:not(:disabled) {
+  background-color: #2a5a2a;           /* ← vert quand actif */
+  border-color: #3a7a3a;
+  cursor: pointer;
+}
+
+#ui-craft-panel .cr-craft-btn:not(:disabled):hover {
   background-color: #3a7a3a;
 }
 
 #ui-craft-panel .cr-craft-btn:disabled {
-  opacity: 0.4;
-  cursor: default;
+  opacity: 0.5;
 }
 
 #ui-craft-panel .cr-section-sublabel {
@@ -372,6 +377,8 @@ class CraftOverlay {
   #availableMap
   #ingredientQtyEls = [] // [{el, code, ingCount}]
   #craftCountHint
+  #isCraftable = false
+  #craftMax = 0
   // disponibilité des Crafting Stations
   #nearbyStations = new Set()
 
@@ -624,6 +631,7 @@ class CraftOverlay {
       this.#craftCount.value = String(runs)
       this.#btnCraft.textContent = `Craft × ${runs * this.#selectedRecipe.result.count}`
       this.#updateIngredientQtys()
+      this.#updateCraftButton()
     })
 
     this.#btnCraft.addEventListener('click', () => {
@@ -704,14 +712,14 @@ class CraftOverlay {
 
     this.#craftCount.value = '1'
     this.#updateCraftInput()
+    this.#updateCraftButton()
     const runs = parseInt(this.#craftCount.value, 10) || 1
     this.#btnCraft.textContent = `Craft × ${runs * recipe.result.count}`
-
-    this.#btnCraft.disabled = false
   }
 
   #clearDetail () {
     this.#ingredientQtyEls = []
+    this.#isCraftable = false
     this.#detailZone.innerHTML = ''
     const msg = document.createElement('p')
     msg.className = 'cr-empty'
@@ -733,6 +741,7 @@ class CraftOverlay {
     }
 
     const isCraftable = stationNearby && ingredientsOk
+    this.#isCraftable = isCraftable
 
     this.#detailZone.innerHTML = ''
     this.#detailZone.appendChild(this.#buildResultSection(recipe, isCraftable))
@@ -922,6 +931,7 @@ class CraftOverlay {
     }
     if (max === Infinity) max = 0
 
+    this.#craftMax = max
     if (max === 0) {
       this.#craftCount.disabled = true
       this.#craftCount.value = '1'
@@ -944,6 +954,23 @@ class CraftOverlay {
 
     // Simulation pour tests :
     for (const code of ['byHand', 'furnace', 'workbench']) this.#nearbyStations.add(code)
+  }
+
+  #updateCraftButton () {
+    if (!this.#selectedRecipe || !this.#isCraftable || this.#craftMax === 0) {
+      this.#btnCraft.disabled = true
+      return
+    }
+
+    const runs = parseInt(this.#craftCount.value, 10) || 1
+    const items = [{code: this.#selectedRecipe.result.item.code, count: runs * this.#selectedRecipe.result.count}]
+    if (this.#selectedRecipe.returned) {
+      for (const ret of this.#selectedRecipe.returned) {
+        items.push({code: ret.item.code, count: runs * ret.count})
+      }
+    }
+
+    this.#btnCraft.disabled = !inventoryManager.canReceiveFromCraft(items)
   }
 }
 export const craftOverlay = new CraftOverlay()

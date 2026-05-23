@@ -928,6 +928,41 @@ class InventoryManager {
       obj[slot.item] = (obj[slot.item] ?? 0) + slot.count
     }
   }
+
+  /**
+   * Vérifie si le bag peut accueillir une liste d'items (résultat de craft).
+   * Simule sans modifier l'inventaire.
+   * @param {Array<{code: string, count: number}>} items
+   * @returns {boolean}
+   */
+  canReceiveFromCraft (items) {
+    let freeSlots = 0
+    for (const slot of this.#bag) {
+      if (!slot.locked && slot.item === '') freeSlots++
+    }
+
+    for (const {code} of items) {
+      let canStack = false
+
+      for (const slot of this.#bag) {
+        if (!slot.locked && slot.item === code && slot.prefix === '') { canStack = true; break }
+      }
+
+      if (!canStack) {
+        for (const slot of this.#hotbar) {
+          if (!slot.locked && slot.item === code && slot.prefix === '') { canStack = true; break }
+        }
+      }
+
+      if (canStack) continue
+
+      if (freeSlots > 0) { freeSlots--; continue }
+
+      return false
+    }
+
+    return true
+  }
 }
 export const inventoryManager = new InventoryManager()
 

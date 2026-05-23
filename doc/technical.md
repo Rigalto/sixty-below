@@ -1186,6 +1186,7 @@ Autorité unique sur l'état mémoire de l'inventaire. Aucune logique DOM.
 | `decrementBagSlotCount` | `(slotIndex: number) → object` | Décrémente le count d'un slot bag. Vide si count=0. Retourne le slot. |
 | `decrementHotbarSlotCount` | `(slotIndex: number) → object` | Décrémente le count d'un slot hotbar. Vide si count=0. Retourne le slot. |
 | `splitSlot` | `(srcSlot: object, count: number) → object\|null` | Sépare une pile — premier slot libre bag uniquement. Retourne le slot destination ou null si bag plein. |
+| `canReceiveFromCraft` | `(items: Array<{code, count}>) → boolean` | Simule sans modifier l'inventaire : vérifie si les items peuvent être stockés (stacking bag/hotbar ou slot libre bag). |
 
 #### Déplacements intra-container
 
