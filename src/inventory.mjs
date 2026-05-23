@@ -963,6 +963,17 @@ class InventoryManager {
 
     return true
   }
+
+  /**
+   * Ajoute les items résultats d'un craft dans l'inventaire.
+   * Même paramètre que canReceiveFromCraft — appeler uniquement après validation.
+   * @param {Array<{code: string, count: number}>} items
+   */
+  craftReceive (items) {
+    for (const {code, count} of items) {
+      this.loot(code, count, '')
+    }
+  }
 }
 export const inventoryManager = new InventoryManager()
 
