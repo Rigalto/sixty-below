@@ -63,6 +63,8 @@
  *   |allStations| → affiche toutes les stations de travail utilisées sous forme de lien [[item:station]]
  *                   pour faire l'item et tous ses précurseurs
  *   |ingredients| → affiche les ingrédients d'une recette séparés par des virgules
+ *   |allIngredients| → affiche tous les ingrédients utilisés sous forme de lien [[item:ingredient]]
+ *                   pour faire l'item et tous ses précurseurs (les composants intermédiaires ne sont pas listés)
  *
  * ── Templates ───────────────────────────────────────────────────
  *   <<templateName|param1|param2>>   → inclusion d'un template
@@ -1262,18 +1264,13 @@ Water is the most common liquid in the world. It fills surface lakes, undergroun
 
 **Collection** ⏳
 
-* [[item:bottle]] — small quantity
-* [[item:bucket]] — large quantity
-
-**Recipes** ⏳
-
-* {{recipe:waterBottle}}
-* {{recipe:waterBucket}}
+* <<itemStar|bottle>> — small quantity
+* <<itemStar|bucket>> — large quantity
 
 **Tips**
 
 * _Water puddles form naturally in tunnels and caverns._
-* _Removing the solid tile bordering a lake will cause the water to flow._ ⏳
+* _Removing the solid tile bordering a lake or a puddle will cause the water to flow._ ⏳
   `
   },
   {
@@ -1290,13 +1287,8 @@ Honey is a viscous golden liquid produced by [[Bees]] in [[Hive]]s. It is harder
 
 **Collection** ⏳
 
-* [[item:bottle]] — small quantity
-* [[item:bucket]] — large quantity
-
-**Recipes** ⏳
-
-* {{recipe:honeyBottle}}
-* {{recipe:honeyBucket}}
+* <<itemStar|bottle>> — small quantity
+* <<itemStar|bucket>> — large quantity
 
 **Tips**
 
@@ -1320,18 +1312,13 @@ Sap is a rare green liquid found exclusively in [[Jungle]] biomes. It fills Sap 
 
 **Collection** ⏳
 
-* [[item:bottle]] — small quantity
-* [[item:bucket]] — large quantity
-
-**Recipes** ⏳
-
-* {{recipe:sapBottle}}
-* {{recipe:sapBucket}}
+* <<itemStar|bottle>> — small quantity
+* <<itemStar|bucket>> — large quantity
 
 **Tips**
 
-* _Sap Pockets are sealed by [[Sandstone]] borders — removing them releases the sap._ ⏳
-* _Sap is even more viscous than [[Honey]] — movement is severely impaired._ ⏳
+* _Sap Pockets are sealed by [[node:sandstone]] borders — removing them releases the sap._ ⏳
+* _Sap is even more viscous than [[node:honey]] — movement is severely impaired._ ⏳
   `
   },
   {
@@ -2847,7 +2834,6 @@ The unlock order shows when each station becomes buildable during a playthrough 
           * <<itemStar|forge>>: {{recipe:forge|allStations}}, [[item:tanningRack]]
         * <<itemStar|sawmill>>: {{recipe:tanningRack|allStations}}
           * <<itemStar|blastFurnace>>: {{recipe:blastFurnace|allStations}}, [[item:sawmill]]
-
   `
   },
   {
@@ -2986,17 +2972,23 @@ A small set of essential items can be crafted anywhere, without a workstation ne
     title: 'Smelting',
     category: ['Crafting', 'Crafting Stations'],
     content: `
+**Description**
+
+⏳
+
 **Furnace Acquisition**
 
 * Tier: {{item:furnace:star|star}}
- Crafting Station: {{recipe:furnace|allStations}}
-* Crafting Materials: [[item:gel]], [[item:logOak]], [[item:blockStone]]
+* Crafting Station: {{recipe:furnace|allStations}}
+* Crafting Materials: {{recipe:furnace|allIngredients}}
+* Requires multiple crafting stages
 
 **Blast Furnace Acquisition**
 
 * Tier: {{item:blastFurnace:star|star}}
 * Crafting Station: {{recipe:blastFurnace|allStations}}
-* Crafting Materials: [[item:gel]], [[item:logOak]], [[item:blockHardstone]]
+* Crafting Materials: {{recipe:blastFurnace|allIngredients}}
+* Requires multiple crafting stages
 
 **Metal Bars**
 
@@ -3038,7 +3030,8 @@ Le [[item:stoneBench]] is a [[Crafting Stations|Crafting Station]] qui permet de
 
 * Tier: {{item:stoneBench:star|star}}
 * Crafting Station: {{recipe:stoneBench|allStations}}
-* Crafting Materials: {{recipe:stoneBench|ingredients}}
+* Crafting Materials: {{recipe:stoneBench|allIngredients}}
+* Requires multiple crafting stages
 
 **Tips**
     `
@@ -3063,7 +3056,7 @@ Le [[item:stoneBench]] is a [[Crafting Stations|Crafting Station]] qui permet de
 
 * Tier: {{item:cookingPot:star|star}}
 * Crafting Stations: {{recipe:cookingPot|allStations}}
-* Crafting Materials: [[item:gel]], [[item:logOak]], [[item:chunkCopper]], [[item:chunkIron]]
+* Crafting Materials: {{recipe:cookingPot|allIngredients}}
 * Requires multiple crafting stages
     `
   },
@@ -3137,24 +3130,26 @@ Tableware is a category of [[Furnitures]] that serve as containers for food and 
 **Food Containers**
 
 Empty containers used as crafting ingredients in cooking and potion recipes. They are returned to the player's inventory upon consuming the food or potion.
-* [[item:bowl]] ({{item:bowl:star|star}}) — soups and stews
-* [[item:mug]] ({{item:mug:star|star}}) — ales and drinks
-* [[item:plate]] ({{item:plate:star|star}}) — solid food dishes
-* [[item:trencher]] ({{item:trencher:star|star}}) — rustic wooden plate for simple meals
+* <<itemStar|bowl>> — soups and stews
+* <<itemStar|mug>> — ales and drinks
+* <<itemStar|plate>> — solid food dishes
+* <<itemStar|trencher>> — rustic wooden plate for simple meals
 
 **Small Liquid Containers**
 
 Filled directly from a liquid source in the world. Used as crafting ingredients in cooking and potion recipes.
-* [[item:bottle]] ({{item:bottle:star|star}}) — empty bottle, filled by clicking on a liquid tile
-  * [[item:water]] — [[node:water|Bottled Water]] — healing item and potion ingredient
-  * [[item:honey]] — [[node:honey|Bottled Honey]] — healing item and buff
-  * [[item:sap]] — [[node:sap|Bottled Sap]] — buff
-* _Bottles are returned upon consuming the recipe result._ ⏳
+
+* <<itemStar|bottle>> — empty bottle, filled by clicking on a liquid tile
+  * [[item:water]] — [[node:water]] — healing item and potion ingredient
+  * [[item:honey]] — [[node:honey]] — healing item and buff
+  * [[item:sap]] — [[node:sap]] — buff
+
+_[[Bottles]] are returned upon consuming the recipe result._ ⏳
 
 **Large Liquid Containers**
 
 Filled directly from a liquid source in the world. Used as tools to transport and pour liquids — the empty bucket is recovered after pouring.
-* [[item:bucket]] ({{item:bucket:star|star}}) — empty bucket ⏳
+* <<itemStar|bucket>> — empty bucket ⏳
   * [[item:bucketWater]] — Water Bucket — pour water into the world ⏳
   * [[item:bucketHoney]] — Honey Bucket — pour honey into the world ⏳
   * [[item:bucketSap]] — Sap Bucket — pour sap into the world ⏳
@@ -3167,24 +3162,100 @@ Filled directly from a liquid source in the world. Used as tools to transport an
 **Tips**
 
 * _Tableware can be placed on any flat-surfaced furniture as decoration._
-* _Bottles are the primary ingredient for all potions — stock up early._ ⏳
-* _Buckets allow precise liquid manipulation — essential for creating [[Obsidian]]._ ⏳
+* _[[Bottles]] are the primary ingredient for all potions — stock up early._ ⏳
+* _[[Buckets]] allow precise liquid manipulation — essential for creating [[node:obsidian]]._ ⏳
 * _An empty bucket worn on the head provides a surprisingly effective rudimentary helmet._ ⏳
-* _Place a bucket of liquid near your [[Cooking|Cooking Pot]] or [[Alchemy|Alchemy Table]] to keep a ready supply of water, honey or sap within reach._ ⏳
+* _Place a bucket of liquid near your [[item:cookingPot]] or [[item:alchemyTable]] to keep a ready supply of water, honey or sap within reach._ ⏳
   `
   },
   {
     title: 'Bottles',
-    category: ['Tree'],
+    category: ['Liquid'],
     content: `
-    * _See [[Tableware]] for the full list of containers._
+**Description**
+
+Parler d'abord du Glass, puis des Bottles. Analyser s'il faut séparer Bottles et Glass dans l'aide.
+⏳
+
+**Bottle Types**
+
+* <<itemStar|bottle>> — empty bottle
+* <<itemStar|water>> — when full of [[node:water]]
+* <<itemStar|honey>> — when full of [[node:honey]]
+* <<itemStar|sap>> — when full of [[node:sap]]
+
+
+**Bottle Crafting**
+
+* Tier: {{item:bottle:star|star}}
+* Crafting Station: {{recipe:bottle|station}}
+* Crafting Materials: {{recipe:bottle|ingredients}}
+
+**Glass Crafting**
+
+* Tier: {{item:glass:star|star}}
+* Crafting Station: {{recipe:glass|station}}
+* Crafting Materials: {{recipe:glass|ingredients}}
+
+**How to fill**
+
+⏳
+
+**How to empty**
+
+⏳
+
+**Bottle Usages**
+
+⏳
+
+**Glass Usages**
+
+⏳
+
+**Tips**
+* Parler des [[item:bucket]]s.
+* _See [[Tableware]] for the full list of containers._
     `
   },
   {
     title: 'Buckets',
-    category: ['Tree'],
+    category: ['Liquid'],
     content: `
-    * _See [[Tableware]] for the full list of containers._
+
+    **Description**
+
+⏳
+
+**Bucket Types**
+
+* <<itemStar|bucket>> — empty bucket
+* <<itemStar|bucketWater>> — when full of [[node:water]]
+* <<itemStar|bucketHoney>> — when full of [[node:honey]]
+* <<itemStar|bucketSap>> — when full of [[node:sap]]
+
+
+**Bucket Crafting**
+
+* Tier: {{item:bucket:star|star}}
+* Crafting Station: {{recipe:bucket|station}}
+* Crafting Materials: {{recipe:bucket|ingredients}}
+
+**How to fill**
+
+⏳
+
+**How to empty**
+
+⏳
+
+**Usages**
+
+⏳
+
+**Tips**
+* Parler des [[item:bucket]]s.
+* _See [[Tableware]] for the full list of containers._
     `
   },
 
@@ -5350,6 +5421,32 @@ const formatRecipe = (recipe, format, entryTitle, ITEMS, recipeByResult) => {
       const parts = []
       for (const code of stationCodes) {
         const item = ITEMS[code]
+        parts.push(item.help === entryTitle ? item.name : `[[${item.help}|${item.name}]]`)
+      }
+      return parts.join(', ')
+    }
+    case 'allIngredients': {
+      const leaves = new Map()
+      const visited = new Set([recipe.result.item.code])
+      const queue = [recipe]
+
+      for (let i = 0; i < queue.length; i++) {
+        const r = queue[i]
+        for (const ing of r.ingredients) {
+          const code = ing.item.code
+          if (visited.has(code)) continue
+          visited.add(code)
+          const sub = recipeByResult.get(code)
+          if (sub) {
+            queue.push(sub)
+          } else {
+            leaves.set(code, ing.item)
+          }
+        }
+      }
+
+      const parts = []
+      for (const item of leaves.values()) {
         parts.push(item.help === entryTitle ? item.name : `[[${item.help}|${item.name}]]`)
       }
       return parts.join(', ')

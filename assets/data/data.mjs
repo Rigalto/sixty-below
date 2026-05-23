@@ -387,16 +387,17 @@ export const ITEMS = {
   trencher: {name: 'Wooden Trencher', type: ITEM_TYPE.FURNITURE | ITEM_TYPE.PLACABLE | ITEM_TYPE.MATERIAL | ITEM_TYPE.CRAFTABLE, stype: 'tableware', star: 1, image: 'furniture_32_32-9-7', placed: 'fuws_16_16-1-0', help: 'Tableware', tooltip: 'A rustic wooden plate, perfect for simple meals'},
 
   // Liquid containers (small capacity)
-  bottle: {name: 'Bottle', type: ITEM_TYPE.FURNITURE | ITEM_TYPE.PLACABLE | ITEM_TYPE.TOOL | ITEM_TYPE.MATERIAL | ITEM_TYPE.CRAFTABLE, stype: 'tableware', star: 1, furnitureSet: 'glass', image: 'furniture_32_32-10-2', placed: 'fuws_32_32-0-0', help: 'Bottles', tooltip: 'Crafting container for potions and food'},
-  water: {name: 'Bottled Water', type: ITEM_TYPE.FURNITURE | ITEM_TYPE.PLACABLE | ITEM_TYPE.POTION | ITEM_TYPE.MATERIAL | ITEM_TYPE.USABLE, stype: 'tableware', star: 1, image: 'potions_32_32-0-5', placed: 'fuws_32_32-4-0', heal: 20, sickness: 40, help: 'Bottles', tooltip: 'Healing item and Crafting Material for potions'},
-  honey: {name: 'Bottled Honey', type: ITEM_TYPE.FURNITURE | ITEM_TYPE.PLACABLE | ITEM_TYPE.POTION | ITEM_TYPE.MATERIAL | ITEM_TYPE.USABLE, stype: 'tableware', star: 1, image: 'potions_32_32-1-5', placed: 'fuws_32_32-4-0', heal: 80, sickness: 60, timedbuff: 'honey', time: 15, help: 'Bottles', tooltip: 'Healing item'},
-  sap: {name: 'Bottled Sap', type: ITEM_TYPE.FURNITURE | ITEM_TYPE.PLACABLE | ITEM_TYPE.POTION | ITEM_TYPE.MATERIAL | ITEM_TYPE.USABLE, stype: 'tableware', star: 1, image: 'potions_32_32-1-5', placed: 'fuws_32_32-4-0', heal: 80, sickness: 60, timedbuff: 'honey', time: 15, help: 'Bottles', tooltip: 'Healing item'},
+  glass: {name: 'Glass', type: 0, stype: 'tableware', star: 1, image: 'crafting_32_32-3-5', help: 'Bottles', tooltip: 'Used to make Bottles or decorative furniture'},
+  bottle: {name: 'Bottle', type: ITEM_TYPE.FURNITURE | ITEM_TYPE.PLACABLE | ITEM_TYPE.TOOL, stype: 'tableware', star: 1, furnitureSet: 'glass', image: 'furniture_32_32-10-2', placed: 'fuws_32_32-0-0', help: 'Bottles', tooltip: 'Crafting container for potions and food'},
+  water: {name: 'Bottled Water', type: ITEM_TYPE.FURNITURE | ITEM_TYPE.PLACABLE | ITEM_TYPE.POTION | ITEM_TYPE.USABLE, stype: 'tableware', star: 1, image: 'potions_32_32-0-5', placed: 'fuws_32_32-4-0', heal: 20, sickness: 40, help: 'Bottles', tooltip: 'Healing item and Crafting Material for potions'},
+  honey: {name: 'Bottled Honey', type: ITEM_TYPE.FURNITURE | ITEM_TYPE.PLACABLE | ITEM_TYPE.POTION | ITEM_TYPE.USABLE, stype: 'tableware', star: 1, image: 'potions_32_32-1-5', placed: 'fuws_32_32-4-0', heal: 80, sickness: 60, timedbuff: 'honey', time: 15, help: 'Bottles', tooltip: 'Healing item'},
+  sap: {name: 'Bottled Sap', type: ITEM_TYPE.FURNITURE | ITEM_TYPE.PLACABLE | ITEM_TYPE.POTION | ITEM_TYPE.USABLE, stype: 'tableware', star: 1, image: 'potions_32_32-1-5', placed: 'fuws_32_32-4-0', heal: 80, sickness: 60, timedbuff: 'honey', time: 15, help: 'Bottles', tooltip: 'Healing item'},
 
   // Liquid containers (large capacity)
-  bucket: {name: 'Empty Bucket', type: ITEM_TYPE.FURNITURE | ITEM_TYPE.PLACABLE | ITEM_TYPE.TOOL | ITEM_TYPE.CRAFTABLE | ITEM_TYPE.ARMOR, stype: 'tableware', armor: 'head', sell: 500, star: 2, image: 'furniture_32_32-10-0', placed: 'fuws_32_32-5-0', help: 'Buckets', tooltip: 'Used to scoop up a small amount of water, honey or lava', placedright: 'heads_26_22-0-2', placedleft: 'heads_26_22-0-3', defense: 1, set: 'bucket'},
-  bucketWater: {name: 'Water Bucket', type: ITEM_TYPE.FURNITURE | ITEM_TYPE.PLACABLE | ITEM_TYPE.TOOL | ITEM_TYPE.MATERIAL, stype: 'tableware', star: 2, image: 'furniture_32_32-11-0', placed: 'fuws_32_32-6-0', help: 'Buckets', tooltip: 'Amount of water. Can be poured ou'},
-  bucketHoney: {name: 'Honey Bucket', type: ITEM_TYPE.FURNITURE | ITEM_TYPE.PLACABLE | ITEM_TYPE.TOOL | ITEM_TYPE.MATERIAL, stype: 'tableware', star: 2, image: 'furniture_32_32-12-0', placed: 'fuws_32_32-7-0', help: 'Buckets', tooltip: 'Amount of honey. Can be poured ou'},
-  bucketSap: {name: 'Sap Bucket', type: ITEM_TYPE.FURNITURE | ITEM_TYPE.PLACABLE | ITEM_TYPE.TOOL | ITEM_TYPE.MATERIAL, stype: 'tableware', star: 2, image: 'furniture_32_32-13-0', placed: 'fuws_32_32-0-3', help: 'Buckets', tooltip: 'Amount of lava. Can be poured ou'},
+  bucket: {name: 'Empty Bucket', type: ITEM_TYPE.FURNITURE | ITEM_TYPE.PLACABLE | ITEM_TYPE.TOOL | ITEM_TYPE.ARMOR, stype: 'tableware', armor: 'head', star: 1, image: 'furniture_32_32-10-0', placed: 'fuws_32_32-5-0', help: 'Buckets', tooltip: 'Used to scoop up a small amount of water, honey or sap', placedright: 'heads_26_22-0-2', placedleft: 'heads_26_22-0-3', defense: 1},
+  bucketWater: {name: 'Water Bucket', type: ITEM_TYPE.FURNITURE | ITEM_TYPE.PLACABLE | ITEM_TYPE.TOOL, stype: 'tableware', star: 1, image: 'furniture_32_32-11-0', placed: 'fuws_32_32-6-0', help: 'Buckets', tooltip: 'Amount of water. Can be poured out'},
+  bucketHoney: {name: 'Honey Bucket', type: ITEM_TYPE.FURNITURE | ITEM_TYPE.PLACABLE | ITEM_TYPE.TOOL, stype: 'tableware', star: 1, image: 'furniture_32_32-12-0', placed: 'fuws_32_32-7-0', help: 'Buckets', tooltip: 'Amount of honey. Can be poured out'},
+  bucketSap: {name: 'Sap Bucket', type: ITEM_TYPE.FURNITURE | ITEM_TYPE.PLACABLE | ITEM_TYPE.TOOL, stype: 'tableware', star: 1, image: 'furniture_32_32-13-0', placed: 'fuws_32_32-0-3', help: 'Buckets', tooltip: 'Amount of lava. Can be poured out'},
 
   // Trees
   coconut: {name: 'Coconut', type: ITEM_TYPE.MATERIAL, stype: 'tree', star: 1, image: 'potions_32_32-1-5', placed: 'fuws_32_32-4-0', help: 'Coconut', tooltip: '???'},
@@ -538,10 +539,10 @@ export const RECIPES = [
   {result: {item: 'triskelAncient', count: 1}, station: 'alchemyTable', ingredients: [{item: 'triskelCopper', count: 1}, {item: 'triskelSilver', count: 1}, {item: 'triskelGold', count: 1}]},
 
   // Gems
-  {result: {item: 'cutTopaz', count: 2}, station: 'stoneBench', ingredients: [{item: 'rawTopaz', count: 1}]},
+  {result: {item: 'cutTopaz', count: 3}, station: 'stoneBench', ingredients: [{item: 'rawTopaz', count: 1}]},
   {result: {item: 'cutRuby', count: 2}, station: 'stoneBench', ingredients: [{item: 'rawRuby', count: 1}]},
   {result: {item: 'cutEmerald', count: 2}, station: 'stoneBench', ingredients: [{item: 'rawEmerald', count: 1}]},
-  {result: {item: 'cutSapphire', count: 2}, station: 'stoneBench', ingredients: [{item: 'rawSapphire', count: 1}]},
+  {result: {item: 'cutSapphire', count: 1}, station: 'stoneBench', ingredients: [{item: 'rawSapphire', count: 1}]},
 
   // Crafting Stations
   {result: {item: 'tableWood', count: 1}, station: 'byHand', ingredients: [{item: 'logOak', count: 8}]},
@@ -557,6 +558,11 @@ export const RECIPES = [
   {result: {item: 'cookingPot', count: 1}, station: 'anvil', ingredients: [{item: 'barCopper', count: 2}, {item: 'barIron', count: 8}, {item: 'logOak', count: 4}, {item: 'torch', count: 2}]},
   {result: {item: 'forge', count: 1}, station: 'anvil', ingredients: [{item: 'barCobalt', count: 12}, {item: 'barIron', count: 6}, {item: 'logMahogany', count: 4}, {item: 'leather', count: 2}]},
   {result: {item: 'stoneBench', count: 1}, station: 'anvil', ingredients: [{item: 'blockSandstone', count: 12}, {item: 'blockAsh', count: 8}, {item: 'barIron', count: 8}, {item: 'logMahogany', count: 6}, {item: 'shell', count: 3}]},
+
+  // containers
+  {result: {item: 'glass', count: 1}, station: 'furnace', ingredients: [{item: 'blockSand', count: 2}]},
+  {result: {item: 'bottle', count: 2}, station: 'furnace', ingredients: [{item: 'glass', count: 1}]},
+  {result: {item: 'bucket', count: 2}, station: 'furnace', ingredients: [{item: 'logOak', count: 1}, {item: 'barCopper', count: 1}]},
 
   // torches
   {result: {item: 'torch', count: 3}, station: 'byHand', ingredients: [{item: 'gel', count: 1}, {item: 'logOak', count: 1}]},
