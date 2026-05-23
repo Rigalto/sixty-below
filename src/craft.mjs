@@ -16,7 +16,7 @@ craftStyle.textContent = /* css */`
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  width: 968px;
+  width: 1000px;
   height: 600px;
   background-color: var(--ov-bg-main);
   border: 1px solid var(--ov-border);
@@ -62,8 +62,8 @@ craftStyle.textContent = /* css */`
 }
 
 #ui-craft-panel .cr-right {
-  width: 270px;
-  min-width: 270px;
+  width: 302px;
+  min-width: 302px;
   display: flex;
   flex-direction: column;
   overflow: hidden;
@@ -329,6 +329,14 @@ craftStyle.textContent = /* css */`
   font-style: italic;
   margin: 4px 0 3px 8px;
 }
+
+#ui-craft-panel .cr-craft-hint {
+  font-size: 11px;
+  color: var(--ov-text-muted);
+  flex-shrink: 0;
+  margin-left: 4px;
+  margin-right: 14px;
+}
 `
 document.head.appendChild(craftStyle)
 
@@ -363,6 +371,7 @@ class CraftOverlay {
   // disponibilité des ingrédients
   #availableMap
   #ingredientQtyEls = [] // [{el, code, ingCount}]
+  #craftCountHint
 
   constructor () {
     // 1. Création du Conteneur Principal
@@ -532,6 +541,10 @@ class CraftOverlay {
     this.#craftCount.disabled = true
     this.#craftZone.appendChild(this.#craftCount)
 
+    this.#craftCountHint = document.createElement('span')
+    this.#craftCountHint.className = 'cr-craft-hint'
+    this.#craftZone.appendChild(this.#craftCountHint)
+
     this.#btnCraft = document.createElement('button')
     this.#btnCraft.className = 'cr-craft-btn'
     this.#btnCraft.textContent = 'Craft'
@@ -601,9 +614,12 @@ class CraftOverlay {
 
     this.#craftCount.addEventListener('input', () => {
       if (!this.#selectedRecipe) return
-      const runs = Math.max(1, parseInt(this.#craftCount.value, 10) || 1)
-      const total = runs * this.#selectedRecipe.result.count
-      this.#btnCraft.textContent = `Craft × ${total}`
+      const max = parseInt(this.#craftCount.max, 10) || 1
+      let runs = parseInt(this.#craftCount.value, 10) || 1
+      if (runs < 1) runs = 1
+      if (runs > max) runs = max
+      this.#craftCount.value = String(runs)
+      this.#btnCraft.textContent = `Craft × ${runs * this.#selectedRecipe.result.count}`
       this.#updateIngredientQtys()
     })
 
@@ -682,10 +698,13 @@ class CraftOverlay {
     this.#selectedRecipe = recipe
     slot.classList.add('selected')
     this.#showDetail(recipe)
-    this.#craftCount.disabled = false
+
     this.#craftCount.value = '1'
+    this.#updateCraftInput()
+    const runs = parseInt(this.#craftCount.value, 10) || 1
+    this.#btnCraft.textContent = `Craft × ${runs * recipe.result.count}`
+
     this.#btnCraft.disabled = false
-    this.#btnCraft.textContent = `Craft × ${recipe.result.count}`
   }
 
   #clearDetail () {
@@ -871,6 +890,30 @@ class CraftOverlay {
     for (const {el, code, ingCount} of this.#ingredientQtyEls) {
       el.textContent = `${(this.#availableMap[code] ?? 0)} / ${runs * ingCount}`
     }
+  }
+
+  #updateCraftInput () {
+    if (!this.#selectedRecipe) return
+
+    let max = Infinity
+    for (const ing of this.#selectedRecipe.ingredients) {
+      const possible = Math.floor((this.#availableMap[ing.item.code] ?? 0) / ing.count)
+      if (possible < max) max = possible
+    }
+    if (max === Infinity) max = 0
+
+    if (max === 0) {
+      this.#craftCount.disabled = true
+      this.#craftCount.value = '1'
+      this.#craftCountHint.textContent = ''
+    } else {
+      this.#craftCount.disabled = false
+      this.#craftCount.max = max
+      this.#craftCount.value = String(Math.min(parseInt(this.#craftCount.value, 10) || 1, max))
+      this.#craftCountHint.textContent = `(1 – ${max})`
+    }
+
+    this.#updateIngredientQtys()
   }
 }
 export const craftOverlay = new CraftOverlay()
