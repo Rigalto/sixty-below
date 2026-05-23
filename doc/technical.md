@@ -1215,6 +1215,14 @@ Autorité unique sur l'état mémoire de l'inventaire. Aucune logique DOM.
 | :--- | :--- | :--- |
 | `save` | `() → void` | Passe les slots dirty au `SaveManager`. À appeler à la fermeture de l'overlay. |
 
+#### Gestion du craft
+
+| Méthode | Signature | Description |
+| :--- | :--- | :--- |
+| `fillMaterialsFromPlayer` | `(obj: object) → void` | Accumule les items MATERIAL du bag et de la hotbar dans l'accumulateur `{itemCode: count}`. |
+| `fillMaterialsFromContainer` | `(obj: object, furnitureId: string) → void` | Accumule les items MATERIAL d'un container furniture dans l'accumulateur. No-op si furnitureId inconnu. |
+
+
 **Structure slot mémoire :** `{key, container, furnitureId, item, count, prefix, slot, locked, deleted}`
 **`#dirtyKeys` :** `Set<slot>` — références directes aux slots modifiés depuis la dernière sauvegarde.
 

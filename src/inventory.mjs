@@ -894,10 +894,44 @@ class InventoryManager {
     saveManager.queueStaticUpdate(updates)
     this.#dirtyKeys.clear()
   }
+
+  // ─── Gestion du craft ────────────────────────────────────────
+
+  /**
+   * Accumule les items MATERIAL du bag et de la hotbar dans l'objet passé.
+   * @param {object} obj — accumulateur {itemCode: count}
+   */
+  fillMaterialsFromPlayer (obj) {
+    for (const slot of this.#bag) {
+      if (slot.item === '') continue
+      if (!(ITEMS[slot.item].type & ITEM_TYPE.MATERIAL)) continue
+      obj[slot.item] = (obj[slot.item] ?? 0) + slot.count
+    }
+    for (const slot of this.#hotbar) {
+      if (slot.item === '') continue
+      if (!(ITEMS[slot.item].type & ITEM_TYPE.MATERIAL)) continue
+      obj[slot.item] = (obj[slot.item] ?? 0) + slot.count
+    }
+  }
+
+  /**
+   * Accumule les items MATERIAL d'un container dans l'objet passé.
+   * @param {object} obj        — accumulateur {itemCode: count}
+   * @param {string} furnitureId
+   */
+  fillMaterialsFromContainer (obj, furnitureId) {
+    const slots = this.#containers.get(furnitureId)
+    if (!slots) return
+    for (const slot of slots) {
+      if (slot.item === '') continue
+      if (!(ITEMS[slot.item].type & ITEM_TYPE.MATERIAL)) continue
+      obj[slot.item] = (obj[slot.item] ?? 0) + slot.count
+    }
+  }
 }
 export const inventoryManager = new InventoryManager()
 
-// ── CSS ──────────────────────────────────────────────────────────────────────
+// ── CSS ────────────────────────────────────────────────────────
 
 // injection des classes HTML utilisées par l'inventory Overlay
 const inventorySlotStyle = document.createElement('style')
