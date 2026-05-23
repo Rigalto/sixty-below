@@ -372,6 +372,8 @@ class CraftOverlay {
   #availableMap
   #ingredientQtyEls = [] // [{el, code, ingCount}]
   #craftCountHint
+  // disponibilité des Crafting Stations
+  #nearbyStations = new Set()
 
   constructor () {
     // 1. Création du Conteneur Principal
@@ -559,6 +561,7 @@ class CraftOverlay {
       this.#filterInput.value = '' // non mémorisé — reset à chaque ouverture
       this.#filterMode.style.display = ''
       this.#filterValue.style.display = ''
+      this.#loadNearbyStations()
       this.#buildAvailableMap()
       this.#applyFilter()
     })
@@ -808,6 +811,8 @@ class CraftOverlay {
       slot.classList.add('cr-clickable')
       slot.addEventListener('click', () => this.#onDetailSlotClick(recipe.station.name))
     }
+    const isNearby = this.#nearbyStations.has(recipe.station.code)
+    slot.classList.add(isNearby ? 'cr-slot-ok' : 'cr-slot-ko')
 
     slot.setAttribute('item', recipe.station.code)
     slot.title = recipe.station.hoverTitle
@@ -914,6 +919,16 @@ class CraftOverlay {
     }
 
     this.#updateIngredientQtys()
+  }
+
+  #loadNearbyStations () {
+    this.#nearbyStations = new Set()
+    // TODO furnitureManager
+    // const ids = furnitureManager.getNearbyCraftingStations()
+    // for (const code of ids) this.#nearbyStations.add(code)
+
+    // Simulation pour tests :
+    for (const code of ['byHand', 'furnace', 'workbench']) this.#nearbyStations.add(code)
   }
 }
 export const craftOverlay = new CraftOverlay()
