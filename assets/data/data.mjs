@@ -532,7 +532,8 @@ export const ITEMS = {
   // Food
   flour: {name: 'Flour', type: 0, stype: 'food', star: 1, image: 'tools_32_32-12-7', help: 'Food', tooltip: 'Component for daw'},
   daw: {name: 'Daw', type: 0, stype: 'food', star: 1, image: 'tools_32_32-12-7', help: 'Food', tooltip: 'To cook for bread and pies'},
-  bread: {name: 'Bread', type: 0, stype: 'food', star: 1, image: 'tools_32_32-12-7', help: 'Food', tooltip: 'Restaure health when eated'}
+  bread: {name: 'Bread', type: ITEM_TYPE.FOOD, stype: 'food', star: 1, image: 'tools_32_32-12-7', help: 'Food', tooltip: 'Restaure health when eated'},
+  croissant: {name: 'Croissant', type: ITEM_TYPE.FOOD, stype: 'food', star: 1, image: 'tools_32_32-12-7', help: 'Food', tooltip: 'Restaure health when eated'}
 }
 
 /* ============================================================================
@@ -596,12 +597,10 @@ export const RECIPES = [
   // Food - Tier 1-3
   {result: {item: 'daw', count: 4}, station: 'byHand', ingredients: [{item: 'flour', count: 1}, {item: 'water', count: 1}], returned: [{item: 'bottle', count: 1}]},
   {result: {item: 'bread', count: 1}, station: 'furnace', ingredients: [{item: 'daw', count: 1}]},
-  {result: {item: 'bread', count: 2}, station: 'furnace', ingredients: [{item: 'daw', count: 1}, {item: 'sunflowerOil', count: 1}]}
-  // {output: 'croissant', station: 'furnace', recipe: [{item: 'flour', count: 1}, {item: 'oil', count: 1}], built: 2},
-  // {output: 'bread', station: 'furnace', recipe: [{item: 'flour', count: 1}, {item: 'water', count: 1}], built: 2, bonus: [{item: 'bottle', count: 1}]},
+  {result: {item: 'croissant', count: 2}, station: 'furnace', ingredients: [{item: 'daw', count: 1}, {item: 'sunflowerOil', count: 1}]}
   // {output: 'clafoutis', station: 'furnace', recipe: [{item: 'flour', count: 1}, {item: 'milk', count: 1}, {item: 'cherry', count: 1}], bonus: [{item: 'cherryseed', count: 1}], built: 2},
   // {output: 'jelly', station: 'cook', recipe: [{item: 'trawberry', count: 1}, {item: 'gel', count: 2}]},
-  // {output: 'trawberrypie', station: 'cook', recipe: [{item: 'flour', count: 1}, {item: 'milk', count: 1}, {item: 'trawberry', count: 1}, {item: 'gel', count: 1}, {item: 'lemon', count: 1}]},
+  // {output: 'trawberrypie', station: 'cook', recipe: [{item: 'flour', count: 1}, {item: 'milk', count: 1}, {item: 'trawberry', count: 1}, {item: 'gel', count: 1}, {item: 'lemon', count: 1}]}
 ]
 
 /* ============================================================================

@@ -313,6 +313,13 @@ craftStyle.textContent = /* css */`
   opacity: 0.4;
   cursor: default;
 }
+
+#ui-craft-panel .cr-section-sublabel {
+  font-size: 11px;
+  color: var(--ov-text-muted);
+  font-style: italic;
+  margin: 4px 0 3px 8px;
+}
 `
 document.head.appendChild(craftStyle)
 
@@ -709,6 +716,38 @@ class CraftOverlay {
     }
 
     section.appendChild(row)
+
+    if (recipe.returned?.length > 0) {
+      const retLabel = document.createElement('div')
+      retLabel.className = 'cr-section-sublabel'
+      retLabel.textContent = 'Also returns'
+      section.appendChild(retLabel)
+
+      for (const ret of recipe.returned) {
+        const retRow = document.createElement('div')
+        retRow.className = 'cr-detail-row'
+
+        const retSlot = document.createElement('inventory-slot')
+        retSlot.classList.add('cr-detail-slot')
+        retSlot.setAttribute('item', ret.item.code)
+        retSlot.title = ret.item.hoverTitle
+
+        const retName = document.createElement('div')
+        retName.className = 'cr-detail-name'
+        retName.textContent = ret.item.name
+
+        retRow.appendChild(retSlot)
+        retRow.appendChild(retName)
+
+        if (ret.count > 1) {
+          const retQty = document.createElement('div')
+          retQty.className = 'cr-detail-qty'
+          retQty.textContent = `× ${ret.count}`
+          retRow.appendChild(retQty)
+        }
+        section.appendChild(retRow)
+      }
+    }
     return section
   }
 
