@@ -115,6 +115,24 @@ fs.writeFileSync('docs/help-rendered.html', htmlHelp.join('\n'))
 
 ### Invasion d'aliens (événement runtime)
 
+### Bucket Capacity
+
+Ajouter une capacity (12) aux buckets :
+* quand on le remplit, capacity = 12
+* à chaque utilisation en tant qu'outil (bucket en main, clic sur une tuile vide du monde), capacity--
+* à chaque fois qu'une bouteille est remplie (bouteille vide en main, clic sur un bucket placed), capacity--
+* quand capacity devient 0 => empty bucket
+* affichage de la capacity dans l'inventaire, en 'title' sur les slots
+* lors des manipulations de l'inventaire, il faut également recopier capacity, uniquement s'il existe
+
+### Gold Bucket
+
+La Sap corrode le Copper. Il doit donc être remplacer par du Gold.
+* ajout d'un item 'Gold BUcket'
+* modification du tooltip du 'Bucket'
+* à chaque utilisation du bucket en tant qu'outil (bucket en main, clic sur une tuile vide du monde), si 'Bucket' alors Ssap interdite, si 'Gold Bucket' alors seul Sap autorisée
+* quand capacity devient 0 => empty Gold Bucket
+
 ---
 
 ## À faire — Combat (`combat.mjs`)
