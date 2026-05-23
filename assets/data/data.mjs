@@ -527,7 +527,12 @@ export const ITEMS = {
   footWood: {name: 'Wood Greaves', type: ITEM_TYPE.ARMOR | ITEM_TYPE.CRAFTING, stype: 'foot', armor: 'foot', star: 1, image: 'tools_32_32-12-7', placedright: 'feet_26_12-1-0', placedleft: 'feet_26_12-1-1', defense: 0, help: 'Armors', tooltip: 'Provides sturdy protection', set: 'wood'},
 
   // Monster drops
-  antlionMandible: {name: 'Antlion Mandible', type: 0, stype: 'monster', star: 2, image: 'tools_32_32-12-7', help: 'Antlion Pit', tooltip: 'Component for cutting tools'}
+  antlionMandible: {name: 'Antlion Mandible', type: 0, stype: 'monster', star: 2, image: 'tools_32_32-12-7', help: 'Antlion Pit', tooltip: 'Component for cutting tools'},
+
+  // Food
+  flour: {name: 'Flour', type: 0, stype: 'food', star: 1, image: 'tools_32_32-12-7', help: 'Food', tooltip: 'Component for daw'},
+  daw: {name: 'Daw', type: 0, stype: 'food', star: 1, image: 'tools_32_32-12-7', help: 'Food', tooltip: 'To cook for bread and pies'},
+  bread: {name: 'Bread', type: 0, stype: 'food', star: 1, image: 'tools_32_32-12-7', help: 'Food', tooltip: 'Restaure health when eated'}
 }
 
 /* ============================================================================
@@ -586,8 +591,17 @@ export const RECIPES = [
   {result: {item: 'wireCopper', count: 24}, station: 'anvil', ingredients: [{item: 'chunkCopper', count: 1}]},
   {result: {item: 'wireIron', count: 22}, station: 'anvil', ingredients: [{item: 'chunkIron', count: 1}]},
   {result: {item: 'wireGold', count: 20}, station: 'anvil', ingredients: [{item: 'chunkGold', count: 1}]},
-  {result: {item: 'wireCobalt', count: 18}, station: 'forge', ingredients: [{item: 'chunkCobalt', count: 1}]}
+  {result: {item: 'wireCobalt', count: 18}, station: 'forge', ingredients: [{item: 'chunkCobalt', count: 1}]},
 
+  // Food - Tier 1-3
+  {result: {item: 'daw', count: 4}, station: 'byHand', ingredients: [{item: 'flour', count: 1}, {item: 'water', count: 1}], returned: [{item: 'bottle', count: 1}]},
+  {result: {item: 'bread', count: 1}, station: 'furnace', ingredients: [{item: 'daw', count: 1}]},
+  {result: {item: 'bread', count: 2}, station: 'furnace', ingredients: [{item: 'daw', count: 1}, {item: 'sunflowerOil', count: 1}]}
+  // {output: 'croissant', station: 'furnace', recipe: [{item: 'flour', count: 1}, {item: 'oil', count: 1}], built: 2},
+  // {output: 'bread', station: 'furnace', recipe: [{item: 'flour', count: 1}, {item: 'water', count: 1}], built: 2, bonus: [{item: 'bottle', count: 1}]},
+  // {output: 'clafoutis', station: 'furnace', recipe: [{item: 'flour', count: 1}, {item: 'milk', count: 1}, {item: 'cherry', count: 1}], bonus: [{item: 'cherryseed', count: 1}], built: 2},
+  // {output: 'jelly', station: 'cook', recipe: [{item: 'trawberry', count: 1}, {item: 'gel', count: 2}]},
+  // {output: 'trawberrypie', station: 'cook', recipe: [{item: 'flour', count: 1}, {item: 'milk', count: 1}, {item: 'trawberry', count: 1}, {item: 'gel', count: 1}, {item: 'lemon', count: 1}]},
 ]
 
 /* ============================================================================
@@ -816,6 +830,16 @@ for (const key in RECIPES) {
   }
   if (maxIngStar !== recipe.result.item.star) {
     console.error(`[data.mjs] RECIPES '${recipe.result.item.name}' : star mismatch — max ingredient star=${maxIngStar}, result star=${recipe.result.item.star}`)
+  }
+  // returned (optionnel)
+  if (recipe.returned) {
+    for (const ret of recipe.returned) {
+      if (!ITEMS[ret.item]) {
+        console.error(`[data.mjs] RECIPES '${recipe.result.item.name}' : returned item inconnu '${ret.item}'`)
+      } else {
+        ret.item = ITEMS[ret.item]
+      }
+    }
   }
 }
 
