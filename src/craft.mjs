@@ -721,12 +721,26 @@ class CraftOverlay {
 
   #showDetail (recipe) {
     this.#detailZone.innerHTML = ''
-    this.#detailZone.appendChild(this.#buildResultSection(recipe))
-    this.#detailZone.appendChild(this.#buildStationSection(recipe))
+
+    const stationNearby = this.#nearbyStations.has(recipe.station.code)
+
+    let ingredientsOk = true
+    for (const ing of recipe.ingredients) {
+      if ((this.#availableMap[ing.item.code] ?? 0) < ing.count) {
+        ingredientsOk = false
+        break
+      }
+    }
+
+    const isCraftable = stationNearby && ingredientsOk
+
+    this.#detailZone.innerHTML = ''
+    this.#detailZone.appendChild(this.#buildResultSection(recipe, isCraftable))
+    this.#detailZone.appendChild(this.#buildStationSection(recipe, stationNearby))
     this.#detailZone.appendChild(this.#buildIngredientsSection(recipe))
   }
 
-  #buildResultSection (recipe) {
+  #buildResultSection (recipe, isCraftable) {
     const section = document.createElement('div')
     section.className = 'cr-section'
 
@@ -742,6 +756,7 @@ class CraftOverlay {
     slot.classList.add('cr-detail-slot')
     slot.setAttribute('item', recipe.result.item.code)
     slot.title = recipe.result.item.hoverTitle
+    slot.classList.add(isCraftable ? 'cr-slot-ok' : 'cr-slot-ko')
 
     const name = document.createElement('div')
     name.className = 'cr-detail-name'
@@ -773,6 +788,7 @@ class CraftOverlay {
         retSlot.classList.add('cr-detail-slot')
         retSlot.setAttribute('item', ret.item.code)
         retSlot.title = ret.item.hoverTitle
+        retSlot.classList.add(isCraftable ? 'cr-slot-ok' : 'cr-slot-ko')
 
         const retName = document.createElement('div')
         retName.className = 'cr-detail-name'
@@ -793,7 +809,7 @@ class CraftOverlay {
     return section
   }
 
-  #buildStationSection (recipe) {
+  #buildStationSection (recipe, stationNearby) {
     const section = document.createElement('div')
     section.className = 'cr-section'
 
@@ -811,8 +827,7 @@ class CraftOverlay {
       slot.classList.add('cr-clickable')
       slot.addEventListener('click', () => this.#onDetailSlotClick(recipe.station.name))
     }
-    const isNearby = this.#nearbyStations.has(recipe.station.code)
-    slot.classList.add(isNearby ? 'cr-slot-ok' : 'cr-slot-ko')
+    slot.classList.add(stationNearby ? 'cr-slot-ok' : 'cr-slot-ko')
 
     slot.setAttribute('item', recipe.station.code)
     slot.title = recipe.station.hoverTitle
