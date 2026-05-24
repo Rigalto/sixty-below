@@ -2,7 +2,6 @@ import {eventBus} from './utils.mjs'
 import {OVERLAYS} from './constant.mjs'
 import {createOverlayHeader} from './ui.mjs'
 
-
 class CombatOverlay {
   #container
 
