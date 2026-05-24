@@ -207,6 +207,27 @@ class InventoryManager {
     return this.#containers.get(furnitureId)[index]
   }
 
+  /**
+   * Scanne l'inventaire et retourne la liste des itemIds donnant des buffs passifs.
+   * Armor + accessoires équipés + trinkets présents dans le bag.
+   * @returns {Array<string>}
+   */
+  getStaticBuffs () {
+    const buffs = []
+
+    for (let i = 0; i < ARMOR_CAPACITY; i++) {
+      if (this.#armor[i].item !== '') buffs.push(this.#armor[i].item)
+    }
+    for (let i = 0; i < ACCESSORY_CAPACITY; i++) {
+      if (this.#accessories[i].item !== '') buffs.push(this.#accessories[i].item)
+    }
+    for (const slot of this.#bag) {
+      if (slot.item !== '' && (ITEMS[slot.item].type & ITEM_TYPE.TRINKET)) buffs.push(slot.item)
+    }
+
+    return buffs
+  }
+
   // ─── Fonctions privées utiitaires ──────────────────────────────────
 
   /**

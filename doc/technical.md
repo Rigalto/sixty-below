@@ -1174,6 +1174,7 @@ Autorité unique sur l'état mémoire de l'inventaire. Aucune logique DOM.
 | `getSlot` | `(container: string, index: number) → object` | Retourne la référence mémoire d'un slot joueur. |
 | `getContainerSlot` | `(furnitureId: string, index: number) → object` | Retourne la référence mémoire d'un slot container-furniture. |
 | `getContainer` | `(furnitureId: string) → Array\|undefined` | Retourne le tableau de slots d'un container chargé. |
+| `getStaticBuffs` | `() → Array<string>` | Retourne les itemIds donnant des buffs passifs : armor + accessoires équipés + trinkets du bag. |
 
 #### Modifications
 
