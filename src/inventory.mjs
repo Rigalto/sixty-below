@@ -1864,6 +1864,8 @@ class InventoryOverlay {
         if (!this.#btnUse.disabled) this.#onUseClick()
       } else if (key === 'Delete') {
         if (!this.#btnTrash.disabled) this.#onTrashClick()
+      } else if (key === 'Tab') {
+        if (!this.#btnTransfer.disabled) this.#onTransferClick()
       }
     })
 
