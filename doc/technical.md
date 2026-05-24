@@ -264,17 +264,18 @@ Cette section définit les événements officiels. Tout nouvel événement doit 
 | E | `hotbar/changed` | `Array` | Contenu hotbar mis à jour. Les huit slots sont en payload. |
 
 #### Craft (`CraftOverlay`)
-*En prévision*
-| Event Name | Payload Structure | Description |
-| :--- | :--- | :--- |
-| `craft/open`| - | Affichage du panel d'artisanat. |
-| `craft/close`| - | Disparition du panel d'artisanat. |
-| `craft/keydown` | `string` (e.key) | Forwarding clavier vers l'overlay craft quand il est au sommet de la pile. |
-| `craft/item` | `string` (itemId) | Navigue vers la recette d'un item craftable ou d'un ingrédient. |
-| `craft/performed` | `{recipe: object, runs: number}` | Émis après chaque craft réussi. |
-| `hotbar/changed`| `{Array<{container, furnitureId, slot, item, count, prefix, locked, deleted, key}>}` | Modification d'au moins un slot de la Hotbar. Les huit slots sont en payload |
-| `inventory/static-buffs`| `Array<string>` (List of buffs) | Émis à la fermeture de l'inventaire. |
-| `help/topic` | `string` (topic title) | Navigue vers une fiche d'aide spécifique. Émis par n'importe quel composant. |
+
+| Dir. | Event | Payload | Description |
+| :---: | :--- | :--- | :--- |
+| E | `craft/open` | — | Affiche l'overlay, charge les stations proches, construit la map de disponibilité, applique les filtres. |
+| E | `craft/close` | — | Cache l'overlay. |
+| E | `craft/keydown` | `string` (e.key) | Forwarding clavier vers l'overlay quand il est au sommet de la pile. |
+| E | `craft/item` | `string` (itemId) | Place le nom de l'item dans le filtre textuel et déclenche le filtrage. |
+| S | `craft/performed` | `{recipe: object, runs: number}` | Émis après chaque craft réussi. |
+| S | `inventory/static-buffs` | `Array<string>` | Armor + accessoires + trinkets du bag après craft. |
+| S | `hotbar/changed` | `Array` | Contenu de la hotbar après craft. |
+| S | `overlay/open-request` | `string` (overlayId) | Demande d'ouverture de l'overlay d'aide. |
+| S | `help/topic` | `string` (topic) | Navigation vers la fiche d'aide de l'item résultat sélectionné. |
 
 #### Help (`HelpOverlay`)
 
@@ -1301,8 +1302,16 @@ Interface DOM de l'inventaire. Aucune logique métier — délègue à `inventor
 | `debug/command` | — | Déclenche le prompt de debug. |
 | `overlay/open-request` | `string` (overlayId) | Demande d'ouverture d'un autre overlay. |
 
-#### Méthode publique
+#### Méthode publique (debug uniquement)
 
 | Méthode | Signature | Description |
 | :--- | :--- | :--- |
 | `refreshBag` | `() → void` | Rafraîchit les slots DOM du bag et de la hotbar. À appeler après toute modification externe (debug). |
+
+### Class `CraftOverlay` (Singleton : `craftOverlay`, `craft.mjs`)
+
+Interface DOM du panel de craft. Aucune logique métier — délègue à `inventoryManager` pour la disponibilité des ingrédients et l'exécution des crafts.
+
+Permet de parcourir et filtrer les recettes (par texte, type d'item résultat, station ou ingrédient), de visualiser le détail d'une recette (ingrédients, station, résultat, items retournés) avec les indicateurs de disponibilité, et d'exécuter le craft si toutes les conditions sont réunies (ingrédients disponibles, station à portée, place dans le bag).
+
+L'état des filtres est persisté en base de données entre les sessions.
