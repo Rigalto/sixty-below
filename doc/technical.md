@@ -248,8 +248,8 @@ Cette section définit les événements officiels. Tout nouvel événement doit 
 | `craft/close`| - | Disparition du panel d'artisanat. |
 | `craft/keydown` | `string` (e.key) | Forwarding clavier vers l'overlay craft quand il est au sommet de la pile. |
 | `craft/item` | `string` (itemId) | Navigue vers la recette d'un item craftable ou d'un ingrédient. |
+| `craft/performed` | `{recipe: object, runs: number}` | Émis après chaque craft réussi. |
 
-#### Help (`HelpOverlay`)
 | Event Name | Payload Structure | Description |
 | :--- | :--- | :--- |
 | `help/open`| - | Affichage du panel d'aide. |

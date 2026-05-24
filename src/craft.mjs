@@ -1,4 +1,4 @@
-import {OVERLAYS, PATH_HELP, SVG_ICON} from './constant.mjs'
+import {OVERLAYS, PATH_HELP, SVG_ICON, PATH_WARNING} from './constant.mjs'
 import {eventBus} from './utils.mjs'
 import {createOverlayHeader} from './ui.mjs'
 import {database} from './database.mjs'
@@ -342,6 +342,22 @@ craftStyle.textContent = /* css */`
   margin-left: 4px;
   margin-right: 14px;
 }
+
+#ui-craft-panel .cr-save-warning {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 4px;
+  font-size: 12px;
+  color: #e67e22;
+}
+
+#ui-craft-panel .cr-warning-icon {
+  width: 16px;
+  height: 16px;
+  flex-shrink: 0;
+  color: #e67e22;
+}
 `
 document.head.appendChild(craftStyle)
 
@@ -635,9 +651,38 @@ class CraftOverlay {
     })
 
     this.#btnCraft.addEventListener('click', () => {
-      // ... exécution recette ...
-      this.#buildAvailableMap() // ← après consommation des ingrédients
-      this.#applyFilter() // ← pour rafraîchir les couleurs
+      if (!this.#selectedRecipe || this.#btnCraft.disabled) return
+
+      const runs = parseInt(this.#craftCount.value, 10) || 1
+
+      // ── Consommer les ingrédients ─────────────────────────────
+      for (const ing of this.#selectedRecipe.ingredients) {
+        const remaining = inventoryManager.removeFromPlayer(ing.item.code, ing.count * runs)
+
+        if (remaining > 0) {
+          // TODO furnitureManager — containers proches
+          // for (const id of furnitureManager.getNearbyContainerIds()) {
+          //   if (remaining === 0) break
+          //   remaining = inventoryManager.removeFromContainer(id, ing.item.code, remaining)
+          // }
+          if (remaining > 0) {
+            console.error(`[CraftOverlay] ingrédient non consommé : ${remaining} × ${ing.item.code}`)
+          }
+        }
+      }
+
+      // ── Ajouter les résultats ─────────────────────────────────
+      inventoryManager.craftReceive(this.#buildCraftItems(runs))
+
+      // ── Sauvegarder et notifier ───────────────────────────────
+      inventoryManager.save()
+      eventBus.emit('craft/performed', {recipe: this.#selectedRecipe, runs})
+
+      // ── Rafraîchir l'UI ───────────────────────────────────────
+      this.#buildAvailableMap()
+      this.#updateCraftInput()
+      this.#updateCraftButton()
+      this.#updateIngredientQtys()
     })
   }
 
@@ -725,6 +770,13 @@ class CraftOverlay {
     msg.className = 'cr-empty'
     msg.textContent = 'Select a recipe to see details.'
     this.#detailZone.appendChild(msg)
+
+    const warning = document.createElement('div')
+    warning.className = 'cr-save-warning'
+    warning.title = 'No auto-save during editing.'
+    warning.innerHTML = SVG_ICON(PATH_WARNING, 'class="cr-warning-icon"') +
+                        'Changes are only saved when the panel is closed.'
+    this.#detailZone.appendChild(warning)
   }
 
   #showDetail (recipe) {
@@ -963,14 +1015,18 @@ class CraftOverlay {
     }
 
     const runs = parseInt(this.#craftCount.value, 10) || 1
+    const items = this.#buildCraftItems(runs)
+    this.#btnCraft.disabled = !inventoryManager.canReceiveFromCraft(items)
+  }
+
+  #buildCraftItems (runs) {
     const items = [{code: this.#selectedRecipe.result.item.code, count: runs * this.#selectedRecipe.result.count}]
     if (this.#selectedRecipe.returned) {
       for (const ret of this.#selectedRecipe.returned) {
         items.push({code: ret.item.code, count: runs * ret.count})
       }
     }
-
-    this.#btnCraft.disabled = !inventoryManager.canReceiveFromCraft(items)
+    return items
   }
 }
 export const craftOverlay = new CraftOverlay()
