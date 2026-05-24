@@ -974,6 +974,64 @@ class InventoryManager {
       this.loot(code, count, '')
     }
   }
+
+  /**
+   * Retire count items du bag puis de la hotbar.
+   * @param {string} itemCode
+   * @param {number} count
+   * @returns {number} — restant non retiré (0 si tout consommé)
+   */
+  removeFromPlayer (itemCode, count) {
+    let remaining = count
+
+    for (const slot of this.#bag) {
+      if (remaining === 0) break
+      if (slot.item !== itemCode) continue
+      const removed = Math.min(slot.count, remaining)
+      slot.count -= removed
+      remaining -= removed
+      if (slot.count === 0) { slot.item = ''; slot.prefix = '' }
+      this.#dirtyKeys.add(slot)
+    }
+
+    for (const slot of this.#hotbar) {
+      if (remaining === 0) break
+      if (slot.item !== itemCode) continue
+      const removed = Math.min(slot.count, remaining)
+      slot.count -= removed
+      remaining -= removed
+      if (slot.count === 0) { slot.item = ''; slot.prefix = '' }
+      this.#dirtyKeys.add(slot)
+    }
+
+    return remaining
+  }
+
+  /**
+   * Retire count items d'un container furniture.
+   * @param {string} furnitureId
+   * @param {string} itemCode
+   * @param {number} count
+   * @returns {number} — restant non retiré
+   */
+  removeFromContainer (furnitureId, itemCode, count) {
+    const slots = this.#containers.get(furnitureId)
+    if (!slots) return count
+
+    let remaining = count
+
+    for (const slot of slots) {
+      if (remaining === 0) break
+      if (slot.item !== itemCode) continue
+      const removed = Math.min(slot.count, remaining)
+      slot.count -= removed
+      remaining -= removed
+      if (slot.count === 0) { slot.item = ''; slot.prefix = '' }
+      this.#dirtyKeys.add(slot)
+    }
+
+    return remaining
+  }
 }
 export const inventoryManager = new InventoryManager()
 

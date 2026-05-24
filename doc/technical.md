@@ -1188,6 +1188,8 @@ Autorité unique sur l'état mémoire de l'inventaire. Aucune logique DOM.
 | `splitSlot` | `(srcSlot: object, count: number) → object\|null` | Sépare une pile — premier slot libre bag uniquement. Retourne le slot destination ou null si bag plein. |
 | `canReceiveFromCraft` | `(items: Array<{code, count}>) → boolean` | Simule sans modifier l'inventaire : vérifie si les items peuvent être stockés (stacking bag/hotbar ou slot libre bag). |
 | `craftReceive` | `(items: Array<{code, count}>) → void` | Ajoute les items résultats dans l'inventaire via `loot`. À appeler uniquement après `canReceiveFromCraft`. |
+| `removeFromPlayer`    | `(itemCode: string, count: number) → number`              | Retire count items du bag puis de la hotbar. Retourne le restant non consommé. |
+| `removeFromContainer` | `(furnitureId: string, itemCode: string, count: number) → number` | Retire count items d'un container furniture. Retourne le restant. |
 
 #### Déplacements intra-container
 
