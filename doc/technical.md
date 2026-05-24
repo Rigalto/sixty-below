@@ -203,15 +203,24 @@ Cette section définit les événements officiels. Tout nouvel événement doit 
 | `time/first-loop` | `{ day, hour, minute, tslot, weather, nextWeather, skyColor, moonPhase, isDay }` | Émis une seule fois au démarrage du rendu. |
 | `time/sky-color-changed`| `string` (Hex Color) | Émis uniquement si la couleur change. |
 
+
+#### Core / Loop (`GameCOre`)
+*En prévision - incomplet*
+| Dir. | Event Name | Payload Structure | Description |
+| :---: | :--- | :--- | :--- |
+| S | `debug/frame-sample`| `{updateTime, renderTime, microTime}` | Temps exécution dans la loop pour les 3 budgets. |
+| S | `debug/buff-manager` | _(none)_ | Affiche sur la console le contenu de `#values` et `#fns`. |
+
 #### Core / State (`KeyboardManager`)
-| Event Name | Payload Structure | Description |
-| :--- | :--- | :--- |
-| `state/changed` | `{ state, oldState }` | Émis lorsque l'`KeyboardManager` change l'état global du jeu (Exploration <-> Information/Combat). |
-| `inventory/keydown` | `string` (e.key) | Forwarding clavier vers l'overlay inventaire quand il est au sommet de la pile. |
-| `craft/keydown` | `string` (e.key) | Forwarding clavier vers l'overlay craft quand il est au sommet de la pile. |
-| `help/keydown` | `string` (e.key) | Forwarding clavier vers l'overlay aide quand il est au sommet de la pile. |
-| `combat/keydown` | `string` (e.key) | Forwarding clavier vers l'overlay combat quand il est au sommet de la pile. |
-| `map/keydown` | `string` (e.key) | Forwarding clavier vers l'overlay carte quand il est au sommet de la pile. |
+
+| Dir. | Event Name | Payload Structure | Description |
+| :---: | :--- | :--- | :--- |
+| S | `state/changed` | `{ state, oldState }` | Émis lorsque le `KeyboardManager` change l'état global du jeu (Exploration <-> Information/Combat). |
+| S | `inventory/keydown` | `string` (e.key) | Forwarding clavier vers l'overlay inventaire quand il est au sommet de la pile. |
+| S | `craft/keydown` | `string` (e.key) | Forwarding clavier vers l'overlay craft quand il est au sommet de la pile. |
+| S | `help/keydown` | `string` (e.key) | Forwarding clavier vers l'overlay aide quand il est au sommet de la pile. |
+| S | `combat/keydown` | `string` (e.key) | Forwarding clavier vers l'overlay combat quand il est au sommet de la pile. |
+| S | `map/keydown` | `string` (e.key) | Forwarding clavier vers l'overlay carte quand il est au sommet de la pile. |
 
 #### UI / Interface (Common)
 | Event Name | Payload Structure | Description |
@@ -222,23 +231,37 @@ Cette section définit les événements officiels. Tout nouvel événement doit 
 #### Player (`PlayerManager`)
 *En prévision*
 | Event Name | Payload Structure | Description |
-| :--- | :--- | :--- |
+| :---: | :--- | :--- | :--- |
 | `player/teleport` | `{x: number, y: number}` | Téléporte le joueur aux coordonnées tuiles données. |
 
-#### Inventory (`InventoryManager`, `InventoryOverlay`)
-*En prévision*
-| Event Name | Payload Structure | Description |
+#### Rendering (`Camera`, `SkyRenderer`)
+
+| Dir. | Event Name | Payload Structure | Description |
 | :--- | :--- | :--- |
-| `inventory/open`| - | Affichage du panel d'inventaire. |
-| `inventory/close`| - | Disparition du panel d'inventaire. |
-| `inventory/keydown` | `string` (e.key) | Forwarding clavier vers l'overlay inventaire quand il est au sommet de la pile. |
-| `inventory/static-buffs`| `Array<string>` (List of buffs) | Émis à la fermeture de l'inventaire. |
+| E | `render/set-zoom` | `zoomLevel: number` | Modifie le niveau de zoom (1.0-2.0). |
+| E | `time/sky-color-changed`| `string` (Hex Color) | Émis uniquement si la couleur change. |
+
+#### Inventory (`InventoryManager`, `InventoryOverlay`)
+
+| Dir. | Event | Payload | Description |
+| :---: | :--- | :--- | :--- |
+| E | `inventory/open` | — | Affiche l'overlay, peuple les slots. |
+| E | `inventory/close` | — | Cache l'overlay, sauvegarde, émet les buffs. |
+| E | `inventory/keydown` | `string` (e.key) | Raccourcis clavier (L, Space, Delete). |
+| E | `craft/performed` | `{recipe, runs}` | Rafraîchit bag, hotbar et container si ouvert. |
+| S | `inventory/static-buffs` | `Array<string>` | Armor + accessoires + trinkets bag. |
+| S | `hotbar/changed` | `Array` | Contenu hotbar mis à jour. Les huit slots sont en payload. |
+| S | `item/used` | `string` (itemId) | Clic sur Use. |
+| S | `craft/item` | `string` (itemId) | Navigation vers une recette. |
+| S | `help/topic` | `string` (topic) | Navigation vers une fiche d'aide. |
+| S | `debug/command` | — | Prompt de debug. |
+| S | `overlay/open-request` | `string` (overlayId) | Demande d'ouverture d'un overlay. |
 
 #### Hotbar (`HotbarManager`)
 *En prévision*
-| Event Name | Payload Structure | Description |
-| :--- | :--- | :--- |
-| `hotbar/changed`| `{Array<{container, furnitureId, slot, item, count, prefix, locked, deleted, key}>}` | Modification d'au moins un slot de la Hotbar. Les huit slots sont en payload |
+| Dir. | Event Name | Payload Structure | Description |
+| :---: | :--- | :--- | :--- |
+| E | `hotbar/changed` | `Array` | Contenu hotbar mis à jour. Les huit slots sont en payload. |
 
 #### Craft (`CraftOverlay`)
 *En prévision*
@@ -249,39 +272,52 @@ Cette section définit les événements officiels. Tout nouvel événement doit 
 | `craft/keydown` | `string` (e.key) | Forwarding clavier vers l'overlay craft quand il est au sommet de la pile. |
 | `craft/item` | `string` (itemId) | Navigue vers la recette d'un item craftable ou d'un ingrédient. |
 | `craft/performed` | `{recipe: object, runs: number}` | Émis après chaque craft réussi. |
-
-| Event Name | Payload Structure | Description |
-| :--- | :--- | :--- |
-| `help/open`| - | Affichage du panel d'aide. |
-| `help/close`| - | Disparition du panel d'aide. |
-| `help/keydown` | `string` (e.key) | Forwarding clavier vers l'overlay aide quand il est au sommet de la pile. |
+| `hotbar/changed`| `{Array<{container, furnitureId, slot, item, count, prefix, locked, deleted, key}>}` | Modification d'au moins un slot de la Hotbar. Les huit slots sont en payload |
+| `inventory/static-buffs`| `Array<string>` (List of buffs) | Émis à la fermeture de l'inventaire. |
 | `help/topic` | `string` (topic title) | Navigue vers une fiche d'aide spécifique. Émis par n'importe quel composant. |
 
+#### Help (`HelpOverlay`)
+
+| Dir. | Event Name | Payload Structure | Description |
+| :---: | :--- | :--- | :--- |
+| E | `help/open`| - | Affichage du panel d'aide. |
+| E | `help/close`| - | Disparition du panel d'aide. |
+| E | `help/keydown` | `string` (e.key) | Forwarding clavier vers l'overlay aide quand il est au sommet de la pile. |
+| E | `help/topic` | `string` (topic title) | Navigue vers une fiche d'aide spécifique. Émis par n'importe quel composant. |
+
 #### Combat (`CombatOverlay`)
-| Event Name | Payload Structure | Description |
-| :--- | :--- | :--- |
-| `combat/open`| - | Affichage du panel de combat. |
-| `combat/close`| - | Disparition du panel de combat. |
-| `combat/keydown` | `string` (e.key) | Forwarding clavier vers l'overlay combat quand il est au sommet de la pile. |
+*En prévision*
+| Dir. | Event Name | Payload Structure | Description |
+| :---: | :--- | :--- | :--- |
+| E | `combat/open`| - | Affichage du panel de combat. |
+| E | `combat/close`| - | Disparition du panel de combat. |
+| E | `combat/keydown` | `string` (e.key) | Forwarding clavier vers l'overlay combat quand il est au sommet de la pile. |
 
 #### Buffs Widget (`BuffManager`)
-*En prévision*
-| Event Name | Payload Structure | Description |
-| :--- | :--- | :--- |
-| `buff/display-next-weather` | `boolean` | Active/Désactive la prévision météo. |
-| `buff/display-coords` | `boolean` | Active/Désactive l'affichage des coordonnées. |
-| `buff/display-time-precision` | `integer` | précision 0 => 1heure, 1 => 15 minutes, 2 => 5 minutes |
-| `buff/display-moon-detail` | `boolean` | affiche 4 (false) ou 8 (true) phases lunaires |
 
-#### Debug (`WorldMapDebug`, `RealtimeDebugWidget`)
-| Event Name | Payload Structure | Description |
-| :--- | :--- | :--- |
-| `map/open`| - | Affichage de la carte au 1/16e. |
-| `map/close`| - | Disparition de la carte au 1/16e. |
-| `map/keydown` | `string` (e.key) | Forwarding clavier vers l'overlay carte quand il est au sommet de la pile. |
-| `debug/frame-sample`| `{updateTime, renderTime, microTime}` | Temps exécution dans la loop pour les 3 budgets. |
-| `debug/buff-manager` | _(none)_ | Affiche sur la console le contenu de `#values` et `#fns`. |
-| `debug/command` | — | Déclenche le prompt de debug. Émis par le bouton debug de l'`InventoryOverlay`. |
+| Dir. | Event Name | Payload Structure | Description |
+| :---: | :--- | :--- | :--- |
+| E | `time/first-loop` | `{ day, hour, minute, tslot, weather, nextWeather, skyColor, moonPhase, isDay }` | Émis une seule fois au démarrage du rendu. |
+| E | `time/timeslot` | `{ tslot, isDay }` | Émis toutes les 3h (changement de slot). |
+| E | `time/daily` | `{ day, weather, nextWeather, moonPhase }` | Émis à minuit (changement de jour). |
+| E | `debug/buff-manager` | _(none)_ | Affiche sur la console le contenu de `#values` et `#fns`. |
+| S | `buff/display-next-weather` | `boolean` | Active/Désactive la prévision météo. |
+| S | `buff/display-coords` | `boolean` | Active/Désactive l'affichage des coordonnées. |
+| S | `buff/display-time-precision` | `integer` | précision 0 => 1heure, 1 => 15 minutes, 2 => 5 minutes |
+| S | `buff/display-moon-detail` | `boolean` | affiche 4 (false) ou 8 (true) phases lunaires |
+
+#### Debug (`WorldMapDebug`, `RealtimeDebugWidget`, `BuffManager`)
+
+| Dir. | Event Name | Payload Structure | Description |
+| :---: | :--- | :--- | :--- |
+| E | `map/open`| - | Affichage de la carte au 1/16e. |
+| E | `map/close`| - | Disparition de la carte au 1/16e. |
+| E | `map/keydown` | `string` (e.key) | Forwarding clavier vers l'overlay carte quand il est au sommet de la pile. |
+| E | `debug/frame-sample`| `{updateTime, renderTime, microTime}` | Temps exécution dans la loop pour les 3 budgets. |
+| E | `debug/buff-manager` | _(none)_ | Affiche sur la console le contenu de `#values` et `#fns`. |
+| E | `debug/command` | — | Déclenche le prompt de debug. Émis par le bouton debug de l'`InventoryOverlay`. |
+| S | `player/teleport` | `{x: number, y: number}` | Commande `tp`. Téléporte le joueur aux coordonnées tuiles données. |
+| S | any | - | Commande `emit`. L'identifiant de l'eventBus est en paramètre de la commande. |
 
 
 ---

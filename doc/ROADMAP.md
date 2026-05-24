@@ -11,6 +11,7 @@
 - Ajout de l'aide pour les recettes (Markdown `{{recipes:...}}`)
 - Ajout d'un mock-up de l'interface de combat : `CombatOverlay` avec juste deux boutons : `Win` et `Lost`
 - continuer la correction et l'ajout de fiches d'aide (`HELP`) et d'items (`ITEMS`)
+- Documentation avec E/S des eventBus (reste à faire : `core.mjs`, `craft.mjs`, `ui.mjs`, `utils.mjs` (TimeMmanager))
 
 ---
 

@@ -677,6 +677,8 @@ class CraftOverlay {
       // ── Sauvegarder et notifier ───────────────────────────────
       inventoryManager.save()
       eventBus.emit('craft/performed', {recipe: this.#selectedRecipe, runs})
+      eventBus.emit('inventory/static-buffs', inventoryManager.getStaticBuffs())
+      eventBus.emit('hotbar/changed', inventoryManager.hotbar)
 
       // ── Rafraîchir l'UI ───────────────────────────────────────
       this.#buildAvailableMap()

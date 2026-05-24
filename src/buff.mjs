@@ -102,6 +102,13 @@ class BuffManager {
     // this.#values.set('buff2', 0)
     this.#values.set('dyn1', 100)
     this.timestamps.set('dyn1', timeManager.timestamp + 124000)
+
+    // DEBUG - TODO
+    // Les quatre lignes ci-dessous simulent le traitement du buffManager
+    eventBus.emit('buff/display-next-weather', true)
+    eventBus.emit('buff/display-moon-detail', true)
+    eventBus.emit('buff/display-time-precision', 3) // DEBUG => toutes les secondes
+    eventBus.emit('buff/display-coords', true)
   }
 
   onDaily ({weather, moonPhase}) {
