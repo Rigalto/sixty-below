@@ -143,6 +143,7 @@ La Sap corrode le Copper. Il doit donc être remplacer par du Gold.
 - Challenges (sous-buts en combat)
 - Boss avec mécaniques spécifiques
 - Pièges dans Pyramid et structures anciennes
+- Idée : boss 'Chimera' dont les sorts sont tirés aléatoirement parmi les sorts de trois autres monstres (tirage slot à clot)
 
 ---
 
