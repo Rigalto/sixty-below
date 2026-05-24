@@ -1845,6 +1845,13 @@ class InventoryOverlay {
         if (!this.#btnTrash.disabled) this.#onTrashClick()
       }
     })
+
+    // le Craft Panel a exécuté une recette, il faut tout ré-afficher
+    eventBus.on('craft/performed', () => {
+      if (this.#container.style.display === 'none') return
+      this.refreshBag()
+      this.#refreshContainer()
+    })
   }
 
   // /////////// //
@@ -2093,6 +2100,19 @@ class InventoryOverlay {
     const bag = inventoryManager.bag
     for (let i = 0; i < BAG_CAPACITY; i++) {
       this.#updateSlotDOM(this.#bagSlots[i], bag[i])
+    }
+  }
+
+  /**
+   * Rafraîchit les slots DOM du container actuellement sélectionné.
+   * Sans effet si aucun container n'est sélectionné ou s'il n'est pas chargé.
+   */
+  #refreshContainer () {
+    if (!this.#selectedFurnitureId) return
+    const slots = inventoryManager.getContainer(this.#selectedFurnitureId)
+    if (!slots) return
+    for (let i = 0; i < slots.length; i++) {
+      this.#updateSlotDOM(this.#containerSlots[i], slots[i])
     }
   }
 
