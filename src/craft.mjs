@@ -734,6 +734,7 @@ class CraftOverlay {
       slot.setAttribute('count', recipe.result.count)
       slot.title = recipe.result.item.hoverTitle
       slot._recipe = recipe
+      if (this.#isRecipeFeasible(recipe)) slot.classList.add('cr-slot-ok')
 
       slot.addEventListener('click', () => this.#onSlotClick(slot, recipe))
       this.#craftSlots.push(slot)
@@ -1029,6 +1030,13 @@ class CraftOverlay {
       }
     }
     return items
+  }
+
+  #isRecipeFeasible (recipe) {
+    for (const ing of recipe.ingredients) {
+      if ((this.#availableMap[ing.item.code] ?? 0) < ing.count) return false
+    }
+    return true
   }
 }
 export const craftOverlay = new CraftOverlay()
