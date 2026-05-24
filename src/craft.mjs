@@ -520,7 +520,7 @@ class CraftOverlay {
 
     if (mode === 'type') {
       allLabel = '— All types —'
-      entries = CRAFT_RESULT_TYPES.map(({label, mask}) => ({value: String(mask), label}))
+      entries = CRAFT_RESULT_TYPES.map(label => ({value: label, label}))
     } else if (mode === 'station') {
       allLabel = '— All Crafting Stations —'
       entries = CRAFT_STATIONS.map(item => ({value: item.code, label: item.name}))
@@ -703,8 +703,7 @@ class CraftOverlay {
       if (!val) {
         recipes = RECIPES
       } else if (mode === 'type') {
-        const mask = parseInt(val, 10)
-        recipes = RECIPES.filter(r => r.result.item.type & mask)
+        recipes = RECIPES.filter(r => r.result.item.craftFilterLabels.has(val))
       } else if (mode === 'station') {
         recipes = RECIPES.filter(r => r.station.code === val)
       } else {

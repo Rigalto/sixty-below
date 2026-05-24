@@ -988,20 +988,45 @@ for (const mask of Object.values(ITEM_TYPE)) {
   if (label) _allDisplayTypes.push({label, mask})
 }
 
-let _resultTypeBits = 0
+// Types qui combinent avec stype, et leur préfixe court
+const STYPE_SUBDIVIDED = new Map([
+  [ITEM_TYPE.MATERIAL, 'Material'],
+  [ITEM_TYPE.FURNITURE, 'Furniture']
+])
+
+const _allFilterLabels = new Set() // ← avant la boucle
+
+for (const recipe of RECIPES) {
+  const item = recipe.result.item
+  const labels = new Set()
+
+  for (const {label, mask} of _allDisplayTypes) {
+    if (!(item.type & mask)) continue
+    const prefix = STYPE_SUBDIVIDED.get(mask)
+    const computed = (prefix && item.stype) ? `${prefix} - ${capitalize(item.stype)}` : label
+    labels.add(computed)
+    _allFilterLabels.add(computed)
+  }
+
+  item.craftFilterLabels = labels
+}
+
+export const CRAFT_RESULT_TYPES = [..._allFilterLabels].sort()
+
+// let _resultTypeBits = 0
 const _stationSet = new Set()
 const _ingredientSet = new Set()
 
 for (const key in RECIPES) {
   const recipe = RECIPES[key]
-  _resultTypeBits |= recipe.result.item.type
+  // _resultTypeBits |= recipe.result.item.type
   _stationSet.add(recipe.station)
   for (const ing of recipe.ingredients) {
     _ingredientSet.add(ing.item)
   }
 }
 
-export const CRAFT_RESULT_TYPES = _allDisplayTypes.filter(({mask}) => _resultTypeBits & mask)
+// export const CRAFT_RESULT_TYPES = _allDisplayTypes.filter(({mask}) => _resultTypeBits & mask)
 export const CRAFT_STATIONS = [..._stationSet].sort((a, b) => a.name.localeCompare(b.name))
 export const CRAFT_INGREDIENTS = [..._ingredientSet].sort((a, b) => a.name.localeCompare(b.name))
 
