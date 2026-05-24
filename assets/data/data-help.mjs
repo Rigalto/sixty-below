@@ -2730,13 +2730,20 @@ Biome: [[Jungle]]
   },
 
   // ── Activities Fighting ──────────────────────────────────────
-  //    Armors
+  //    Armors, Armor Sets
   {
     title: 'Armors',
     category: ['Armor'],
     content: `
-    Three slots: Head, Torso, Feet
+    Three slots: Head, Body, Foot
     Armor prefixes :
+    [[Armor Sets]] :
+    `
+  },
+  {
+    title: 'Armor Sets',
+    category: ['Armor'],
+    content: `
     `
   },
 
@@ -2746,6 +2753,97 @@ Biome: [[Jungle]]
     title: 'Crafting',
     category: ['Activities', 'Crafting', 'Crafting Stations'],
     content: `
+**Description**
+
+Crafting transforms raw materials into tools, weapons, furniture and consumables.
+Every craft requires a set of ingredients (**Crafting Materials**), a [[Crafting Stations|crafting station]], and enough room in your [[Inventory|bag]] to receive the result.
+
+<hr>
+
+**The Craft Panel — overview**
+
+Open the panel with **[K]**. It is divided into two zones.
+
+* _Left_ — filter bar and recipe grid
+* _Right_ — selected recipe detail and craft execution
+
+<hr>
+
+**Filtering recipes**
+
+* **Text search** — type any part of a result item name. The dropdowns disappear while text is entered. Clear with ✕.
+* **Filter by result type** — select a category (Weapon, Tool, Material — Chunk, Furniture — Torch…)
+* **Filter by crafting station** — show only recipes requiring a given station.
+* **Filter by ingredient** — show only recipes that consume a given Crafting Material.
+
+The last used filter is remembered between sessions.
+
+<hr>
+
+**Recipe grid**
+
+Each slot shows the result item of one recipe.
+
+* _Green background_ — you have all the required ingredients in your [[Inventory|bag]] or hotbar.
+* _Blue background_ — at least one ingredient is missing or insufficient.
+
+* _Number on the slot_ — shown when the recipe produces more than one item per run. This quantity is multiplied by the number of runs chosen at execution time.
+
+<hr>
+
+**Recipe detail**
+
+Click any slot to see its full recipe on the right.
+
+**Result** — the item produced. A quantity _× N_ appears only when the recipe produces more than one item per run.
+If the recipe also **returns** items (containers, empty vessels…), they appear below the result.
+
+**Crafting Station** — the Crafting Station required.
+* _Green background_ — the Crafting Station is within range.
+* _Blue background_ — the Crafting Station is not nearby.
+
+**Ingredients** — each ingredient shows _available / needed_ for the current number of runs.
+* _Green background_ — quantity is sufficient.
+* _Blue background_ — quantity is insufficient.
+
+**Ingredient sources** — ingredients are drawn from your [[Inventory|bag]], your [[Hotbar]], and any chest, cabinet or closet within range. The crafting station must also be within range. The effective range can be extended by certain [[Crafting Buffs]].
+
+_Tip : clicking a green-bordered ingredient or station icon copies its name into the text filter, showing you the recipe that produces it — useful for tracing a crafting chain._
+
+<hr>
+
+**Executing a craft**
+
+At the bottom right of the panel:
+
+* **? button** — opens the [[Help Panel]]. If a recipe is selected, navigates directly to the help topic of the result item. Otherwise opens the Help Panel on its default page.
+* **Runs** — number of times to execute the recipe. The range _(1 – N)_ shows the maximum possible given your current stock. The field is locked if no ingredients are available.
+* **Craft × N** — the button shows the total number of items produced _(runs × yield)_. It turns green and becomes clickable only when all ingredients are available, the station is nearby, and the bag has room for the result.
+
+After a successful craft, the ingredient counts and grid colours update automatically.
+
+⚠ Changes are only saved when the panel is closed.
+
+<hr>
+
+**Crafting Buffs**
+
+Certain buffs modify crafting behaviour. ⏳
+
+* ⏳ _Artisan's Luck_ — chance to produce one extra item per run
+* ⏳ _Frugal Hands_ — chance to not consume one or more ingredients
+* ⏳ _[[Luck Buffs]]_ — small chance to not consume one or more ingredients and small chance to produce one extra item per run
+* ⏳ _Extended Reach_ — increases the range within which bags, chests, cabinets, closets and crafting stations are accessible
+
+See [[Crafting Buffs]] for more details.
+
+<hr>
+
+**See also**
+
+* [[Crafting Stations]] — list of all workbenches and their unlock order
+* [[Crafting Tree]] — dependency tree between stations
+* [[Inventory]] — managing your bag and hotbar
 A traduire en anglais : La quantité affichée sur un slot de recette indique le nombre d'items produits par une exécution de la recette — indépendamment du nombre de fois où on choisit de l'exécuter.
     `
   },
@@ -2816,6 +2914,8 @@ The crafting tree shows which station is used to craft each station. The indenta
 * Found in the world
   * <<itemStar|decomposer>> — [[Lost Temple]]
   * <<itemStar|transmutator>> — [[Ancient House]]
+
+<hr>
 
 **Unlock Order**
 
@@ -4666,7 +4766,7 @@ Once you have basic tools and a shelter, you can start exploring:
     category: ['Gameplay'],
     content: `
 **The Help Panel** gives you access to all the game's reference topics at any time.
-Press **[H]** or click the 📜 button in the [[Control Panel]] to open it.
+Press **[H]** or click the Help button in the [[Control Panel]] to open it.
 
 **Left column — navigation**
 
@@ -4724,8 +4824,79 @@ Note : Always Present
     title: 'Inventory',
     category: ['Gameplay'],
     content: `
-        Ne pas oublier de dire que, si un slot avec item est sélectionné, que l'item est craftable ou un Crafting Material, l'ouverture du Craft Panel se fera avec cet item de sélectionné.
-        De même pour l'aide, qui s'ouvrira sur l'aide de l'item sélectionné, s'il y en a un.
+**The Inventory Panel** is where you manage everything you carry — tools, materials, equipment and consumables.
+
+Press **(I)** or **(Escape)** to open and close it.
+
+_Changes are only saved when the panel is closed._
+
+<hr>
+
+**Layout**
+
+* **Hotbar** (left column, 8 slots) — quick-access slots, usable directly during exploration
+* **Bag** (8x8 grid) — main storage, 64 slots
+* **Armor** (3 slots) — Head, Body and Foot equipment
+* **Accessories** (5 slots) — passive equipment worn at all times
+* **Chest** (right panel) — contents of nearest containers in range
+
+_If all three armor pieces belong to the same [[Armor Sets|Armor Set], their slots turn bright green — a visual indicator that the full set bonus is active._
+
+<hr>
+
+**Moving items**
+
+Drag an item from one slot to another to move it.
+
+* Dropping on an **empty slot** moves the item there
+* Dropping on a **slot with the same item** stacks them (adds counts)
+* Dropping on a **slot with a different item** swaps the two
+
+_Armor slots only accept the correct piece type (Head, Body or Foot)._⏳
+
+_Accessory slots only accept accessories. If the destination is occupied, the displaced item returns to the bag._
+
+<hr>
+
+**Action buttons** (center column)
+
+| Button | Shortcut | Description |
+| --- | --- | --- |
+| Use | [Space] | Uses one unit of the selected item |
+| Lock / Unlock | [L] | Prevents a slot from being modified |
+| Split | — | Splits a stack into two - Enter the size of the new stack |
+| Transfer | [Tab] | Moves selected bag item to chest, or chest item to bag |
+| Trash | [Del] | Sends item to the trash |
+| Restore | — | Recovers the last trashed item into the bag |
+| Craft | [K]] | Opens [[Crafting]] for the selected item |
+| Help | [H] | Opens help for the selected item |
+
+* _Most action buttons are only active when a slot is selected._
+* _Locked slots cannot be trashed, used or moved._
+* _Some unique items cannot be trashed._
+* _The trash is cleared when the panel is closed — restore any trashed item before closing._
+
+<hr>
+
+**Containers** (chest panel)
+
+When a [[Housing|chest, closet or cabinet]] is within range, its contents appear in the right panel.⏳
+
+* Use the dropdown to select which container to browse
+* Use the Rename button to rename the selected container
+* Drag items between the bag and the chest freely
+* Use the Arrow button to quickly move the selected item
+
+_If no container is in range, the chest panel is inactive._
+
+<hr>
+
+**Tips**
+
+* Lock your most important tools so they cannot be accidentally trashed or moved
+* Use the hotbar for items you need fast — [[Hotbar|read more]]
+* Accessories and armor give passive bonuses as long as they are equipped
+* Trinkets give bonuses simply by being present in your bag — no need to equip them
     `
   },
 
