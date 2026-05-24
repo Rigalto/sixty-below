@@ -2,7 +2,7 @@ import {OVERLAYS, PATH_HELP, SVG_ICON, PATH_WARNING} from './constant.mjs'
 import {eventBus} from './utils.mjs'
 import {createOverlayHeader} from './ui.mjs'
 import {database} from './database.mjs'
-import {ITEM_TYPE, RECIPES, CRAFT_RESULT_TYPES, CRAFT_STATIONS, CRAFT_INGREDIENTS} from '../assets/data/data.mjs'
+import {ITEM_TYPE, ITEMS, RECIPES, CRAFT_RESULT_TYPES, CRAFT_STATIONS, CRAFT_INGREDIENTS} from '../assets/data/data.mjs'
 import {inventoryManager} from './inventory.mjs'
 
 // ── CSS ──────────────────────────────────────────────────────────────────────
@@ -593,8 +593,10 @@ class CraftOverlay {
       this.#container.style.display = 'none'
     })
 
-    eventBus.on('craft/item', () => {
-      // TODO
+    eventBus.on('craft/item', itemId => {
+      const item = ITEMS[itemId]
+      if (!item) return
+      this.#onDetailSlotClick(item.name)
     })
 
     // ── Filtre texte ─────────────────────────────────────────────
@@ -899,8 +901,6 @@ class CraftOverlay {
     name.className = 'cr-detail-name'
     name.style.flex = '1'
     name.textContent = recipe.station.name
-
-    // TODO proximity badge — disponibilité des stations (FurnitureManager)
 
     row.appendChild(slot)
     row.appendChild(name)
