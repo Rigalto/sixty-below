@@ -11,6 +11,7 @@ import {buffManager} from './buff.mjs'
 import {creationDialogOverlay, seedWidget} from './ui.mjs'
 import {helpOverlay} from './help.mjs'
 import {inventoryManager} from './inventory.mjs'
+import {furnitureManager} from './housing.mjs'
 import {craftOverlay} from './craft.mjs'
 import './ui-debug.mjs'
 import './combat.mjs'
@@ -260,9 +261,9 @@ class GameCore {
     // await FaunaManager.init(...)
     // await PlayerManager.init(...)
 
-    // 5.1 Objectstore Inventory => à remplacer par await inventoryManager.init(plantRecords)
-    const itemsToDelete = []
+    // 5.1 Objectstore Inventory
     const inventoryRecords = await database.readAllFromObjectStore('inventory')
+    const itemsToDelete = []
     inventoryManager.init()
 
     for (const record of inventoryRecords) {
@@ -277,7 +278,23 @@ class GameCore {
     }
     inventoryManager.initCheck() // vérification de l'intégrité des slots (appel optionnel)
 
-    // 5.2 Objectstore Plant => à remplacer par await plantManager.init(plantRecords)
+    // 5.2 Objectstore Furniture
+    const furnitureRecords = await database.readAllFromObjectStore('furniture')
+    const furnituresToDelete = []
+    const activeFurnitures = []
+    for (const record of furnitureRecords) {
+      if (record.deleted) {
+        furnituresToDelete.push(record.key)
+      } else {
+        activeFurnitures.push(record)
+      }
+    }
+    if (furnituresToDelete.length > 0) {
+      await database.deleteMultipleRecords('furniture', furnituresToDelete)
+    }
+    furnitureManager.init(activeFurnitures)
+
+    // 5.3 Objectstore Plant => à remplacer par await plantManager.init(plantRecords)
     console.log(PLANT_KIND, PLANT_TYPE) // pour éviter une erreur dans VSCode
     // const PLANT_SYSTEM_MAP = new Map([
     //   [PLANT_KIND.NATURAL * 100 + PLANT_TYPE.NONE, naturalSystem],
