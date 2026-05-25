@@ -1,4 +1,5 @@
 // housing.mjs
+import {eventBus} from './utils.mjs'
 // import {saveManager} from './persistence.mjs'
 
 /* ====================================================================================================
@@ -44,64 +45,46 @@ class FurnitureManager {
   #byId
   /** @type {Map<number, Set<object>>} */
   #byChunk
+  /** @type {Set<object>>} */
+  #displayed
 
   constructor () {
     this.#list = []
     this.#byId = new Map()
     this.#byChunk = new Map()
+    this.#displayed = new Set()
+    this.onPreloadChunksChanged = this.onPreloadChunksChanged.bind(this)
+    eventBus.on('camera/preload-chunks-changed', this.onPreloadChunksChanged)
   }
 
   // ─── Helpers chunk ───────────────────────────────────────────────────────────
 
   /**
-   * Enregistre un furniture dans tous les chunks qu'il occupe.
+   * Inscrit un furniture dans #byChunk sur son chunk haut-gauche uniquement.
+   * La zone preload Camera (1 ring autour du display) garantit la couverture des
+   * furnitures chevauchant deux chunks.
    * @param {object} furniture
    */
   #addToChunks (furniture) {
-    const tileX = furniture.index & 0x3FF
-    const tileY = furniture.index >> 10
-    const cxMin = tileX >> 4
-    const cyMin = tileY >> 4
-    const cxMax = (tileX + furniture.w - 1) >> 4
-    const cyMax = (tileY + furniture.h - 1) >> 4
-
-    for (let cy = cyMin; cy <= cyMax; cy++) {
-      const rowKey = cy << 6
-      for (let cx = cxMin; cx <= cxMax; cx++) {
-        const key = rowKey | cx
-        let set = this.#byChunk.get(key)
-        if (set === undefined) {
-          set = new Set()
-          this.#byChunk.set(key, set)
-        }
-        set.add(furniture)
-      }
+    const key = ((furniture.index >> 14) << 6) | ((furniture.index & 0x3FF) >> 4)
+    let set = this.#byChunk.get(key)
+    if (set === undefined) {
+      set = new Set()
+      this.#byChunk.set(key, set)
     }
+    set.add(furniture)
   }
 
   /**
-   * Retire un furniture de tous les chunks qu'il occupe.
-   * Supprime l'entrée Map si le Set résultant est vide.
+   * Retire un furniture de #byChunk. Supprime l'entrée Map si le Set devient vide.
    * @param {object} furniture
    */
   #removeFromChunks (furniture) {
-    const tileX = furniture.index & 0x3FF
-    const tileY = furniture.index >> 10
-    const cxMin = tileX >> 4
-    const cyMin = tileY >> 4
-    const cxMax = (tileX + furniture.w - 1) >> 4
-    const cyMax = (tileY + furniture.h - 1) >> 4
-
-    for (let cy = cyMin; cy <= cyMax; cy++) {
-      const rowKey = cy << 6
-      for (let cx = cxMin; cx <= cxMax; cx++) {
-        const key = rowKey | cx
-        const set = this.#byChunk.get(key)
-        if (set === undefined) continue
-        set.delete(furniture)
-        if (set.size === 0) this.#byChunk.delete(key)
-      }
-    }
+    const key = ((furniture.index >> 14) << 6) | ((furniture.index & 0x3FF) >> 4)
+    const set = this.#byChunk.get(key)
+    if (set === undefined) return
+    set.delete(furniture)
+    if (set.size === 0) this.#byChunk.delete(key)
   }
 
   getFurnitureById (furnitureId) {
@@ -127,6 +110,26 @@ class FurnitureManager {
       this.#addToChunks(record)
     }
     console.log('FurnitureManager.init', {list: this.#list, byId: this.#byId, byChunk: this.#byChunk})
+  }
+
+  // ─── Visualisation ──────────────────────────────────────────────────────────
+
+  /**
+   * Reconstruit #displayed à partir des chunks preload de la Camera.
+   * Appelé via eventBus 'camera/preload-chunks-changed'.
+   * Lié dans le constructeur — référence stable pour off().
+   * @param {Set<number>} preloadChunks
+   */
+  onPreloadChunksChanged (preloadChunks) {
+    this.#displayed.clear()
+    for (const chunkKey of preloadChunks) {
+      const set = this.#byChunk.get(chunkKey)
+      if (set === undefined) continue
+      for (const furniture of set) {
+        this.#displayed.add(furniture)
+      }
+    }
+    console.log('FurnitureManager.onPreloadChunksChanged', {displayed: this.#displayed})
   }
 }
 export const furnitureManager = new FurnitureManager()

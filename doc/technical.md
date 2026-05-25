@@ -240,6 +240,13 @@ Cette section définit les événements officiels. Tout nouvel événement doit 
 | :--- | :--- | :--- |
 | E | `render/set-zoom` | `zoomLevel: number` | Modifie le niveau de zoom (1.0-2.0). |
 | E | `time/sky-color-changed`| `string` (Hex Color) | Émis uniquement si la couleur change. |
+| S | `camera/preload-chunks-changed` | `Set<number>` | Émis à chaque changement de `preloadChunks`. |
+
+#### Furniture (`FurnitureManager`)
+
+| Dir. | Event | Payload | Description |
+| :---: | :--- | :--- | :--- |
+| E | `camera/preload-chunks-changed` | `Set<number>` | Émis à chaque changement de `preloadChunks`. |
 
 #### Inventory (`InventoryManager`, `InventoryOverlay`)
 
