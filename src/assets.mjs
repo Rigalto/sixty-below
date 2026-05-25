@@ -8,6 +8,25 @@
    ========================================= */
 
 export const IMAGE_FILES = [
+
+  // TILES //
+  // ///// //
+
+  // Tuiles de terrain / substrat, topsoil, web
+  'assets/sprites/substrat_16_16.png', // à renommer tile-substrat_16_16.png
+
+  // ITEMS //
+  // ///// //
+
+  // Items minés / substrat, topsoil, web, ore, gem, rock
+  'assets/sprites/mined_32_32.png',
+
+  // PLACED //
+  // ////// //
+
+  // supprimer ci-dessous
+  // ////////////////////
+
   // TILES //
   // ////////
   // Tuiles de copper / iron / silver / gold / cobalt / platine

@@ -298,6 +298,17 @@ const DEBUG_PACKS = {
   starter: [
     {item: 'pickaxeCopper', count: 1},
     {item: 'axeCopper', count: 1}
+  ],
+  substrat: [
+    {item: 'blockClay', count: 6},
+    {item: 'blockStone', count: 6},
+    {item: 'blockHardstone', count: 6},
+    {item: 'blockSandstone', count: 6},
+    {item: 'blockAsh', count: 6},
+    {item: 'blockHellstone', count: 6},
+    {item: 'blockMud', count: 6},
+    {item: 'blockLimestone', count: 6},
+    {item: 'blockSlate', count: 6}
   ]
 }
 

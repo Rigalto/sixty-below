@@ -185,13 +185,13 @@ export const ITEMS = {
   blockHumus: {name: 'Humus Block', type: 0, star: 2, stype: 'block', image: 'blocks_16_16-0-0', help: 'Humus', tooltip: '???'},
 
   // Forest Substrat Blocks
-  blockClay: {name: 'Clay Block', type: 0, star: 1, stype: 'block', image: 'blocks_16_16-0-0', help: 'Clay', tooltip: '???'},
-  blockStone: {name: 'Stone Block', type: 0, star: 2, stype: 'block', image: 'blocks_16_16-0-0', help: 'Stone', tooltip: '???'},
-  blockHardstone: {name: 'Hardstone Block', type: 0, star: 4, stype: 'block', image: 'blocks_16_16-0-0', help: 'Hardstone', tooltip: '???'},
+  blockClay: {name: 'Clay Block', type: 0, star: 1, stype: 'block', image: 'mined_32_32-0-0', help: 'Clay', tooltip: '???'},
+  blockStone: {name: 'Stone Block', type: 0, star: 2, stype: 'block', image: 'mined_32_32-1-0', help: 'Stone', tooltip: '???'},
+  blockHardstone: {name: 'Hardstone Block', type: 0, star: 4, stype: 'block', image: 'mined_32_32-2-0', help: 'Hardstone', tooltip: '???'},
   // Desert Substrat Blocks
-  blockSandstone: {name: 'Sandstone Block', type: 0, star: 2, stype: 'block', image: 'blocks_16_16-0-0', help: 'Sandstone', tooltip: '???'},
-  blockAsh: {name: 'Ash Block', type: 0, star: 3, stype: 'block', image: 'blocks_16_16-0-0', help: 'Ash', tooltip: '???'},
-  blockHellstone: {name: 'Hellstone Block', type: 0, star: 5, stype: 'block', image: 'blocks_16_16-0-0', help: 'Hellstone', tooltip: '???'},
+  blockSandstone: {name: 'Sandstone Block', type: 0, star: 2, stype: 'block', image: 'mined_32_32-3-0', help: 'Sandstone', tooltip: '???'},
+  blockAsh: {name: 'Ash Block', type: 0, star: 3, stype: 'block', image: 'mined_32_32-4-0', help: 'Ash', tooltip: '???'},
+  blockHellstone: {name: 'Hellstone Block', type: 0, star: 5, stype: 'block', image: 'mined_32_32-5-0', help: 'Hellstone', tooltip: '???'},
   // Jungle Substrat Blocks
   blockMud: {name: 'Mud Block', type: 0, star: 2, stype: 'block', image: 'blocks_16_16-0-0', help: 'Mud', tooltip: '???'},
   blockLimestone: {name: 'Limestone Block', type: 0, star: 4, stype: 'block', image: 'blocks_16_16-0-0', help: 'Limestone', tooltip: '???'},
