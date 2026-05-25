@@ -318,7 +318,7 @@ const DEBUG_PACKS = {
   ],
   ore: [
     {item: 'chunkCopper', count: 22},
-    {item: 'chunkIraon', count: 22},
+    {item: 'chunkIron', count: 22},
     {item: 'chunkSilver', count: 22},
     {item: 'chunkGold', count: 22},
     {item: 'chunkCobalt', count: 22},
@@ -326,7 +326,7 @@ const DEBUG_PACKS = {
   ],
   bar: [
     {item: 'barCopper', count: 18},
-    {item: 'barIraon', count: 18},
+    {item: 'barIron', count: 18},
     {item: 'barSilver', count: 18},
     {item: 'barGold', count: 18},
     {item: 'barCobalt', count: 18},
