@@ -49,27 +49,27 @@ export const NODES = {
   GRASSMUSHROOM: {code: 32, name: 'Mushroom Grass', type: NODE_TYPE.NATURAL, star: 3, solid: true, color: '#4cad1fff', image: 'grass_16_16+2', mining: {speed: 500, items: [{item: 'blockHumus', count: 1}, {item: 'slug', count: 0.05, lucky: 200, rainy: 100}]}, foraging: {speed: 500, items: [{item: 'slug', count: 0.15, lucky: 2, rainy: 10}]}, help: 'Mushroom Grass'},
   GRASSFERN: {code: 33, name: 'Fern Grass', type: NODE_TYPE.NATURAL, star: 4, solid: true, color: '#56ba27', image: 'grass_16_16+3', speed: 500, mining: {speed: 500, items: [{item: 'blockHumus', count: 4, lucky: 5}, {item: 'fernLeaf', count: 0.2, lucky: 75}], foraging: [{item: 'fernLeaf', count: 0.6, lucky: 1.5}, {item: 'frog', count: 0.2, lucky: 50}, {item: 'fernSpore', count: 0.1, lucky: 50}]}, help: 'Fern Grass'},
   GRASSMOSS: {code: 34, name: 'Moss Grass', type: NODE_TYPE.NATURAL, star: 4, solid: true, color: '#b73ed6ff', image: 'grass_16_16+4', mining: {speed: 500, items: [{item: 'blockSilt', count: 1, lucky: 2.5}], foraging: [{item: 'moss', count: 1, lucky: 1.4}]}, help: 'Moss Grass'},
-  WEB: {code: 35, name: 'Cobweb', type: NODE_TYPE.WEB, star: 1, solid: false, color: '#788696', image: 'substrat_16_16+9', speed: 1900, mining: {speed: 500, items: [{item: 'silk', count: 1}, {item: 'eggSpider', count: '1-3-0.08'}]}, help: 'Cobweb'},
+  WEB: {code: 35, name: 'Cobweb', type: NODE_TYPE.WEB, star: 1, solid: false, color: '#788696', image: 'substrat_16_16+10', speed: 1900, mining: {speed: 500, items: [{item: 'silk', count: 1}, {item: 'eggSpider', count: '1-3-0.08'}]}, help: 'Cobweb'},
 
   // ── Topsoil (terrain nourricier, propice aux plantes) ────────────────────────
-  DIRT: {code: 40, name: 'Dirt', type: NODE_TYPE.TOPSOIL, stype: 'block', star: 1, solid: true, color: '#835537', image: 'substrat_16_16+1', mining: {speed: 1000, items: [{item: 'blockDirt', count: 1}, {item: 'worm', count: 0.15, lucky: 1.2, rainy: 1.7}]}, help: 'Dirt'},
-  SAND: {code: 41, name: 'Sand', type: NODE_TYPE.TOPSOIL, stype: 'block', star: 1, solid: true, color: '#fee267', image: 'substrat_16_16+5', mining: {speed: 500, items: [{item: 'blockSand', count: 1}]}, viscosity: 500, help: 'Sand'},
-  SILT: {code: 42, name: 'Silt', type: NODE_TYPE.TOPSOIL, stype: 'block', star: 2, solid: true, color: '#4f5b6c', image: 'substrat_16_16+7', mining: {speed: 1000, items: [{item: 'blockSilt', count: 1}]}, help: 'Silt'},
-  HUMUS: {code: 43, name: 'Humus', type: NODE_TYPE.TOPSOIL, stype: 'block', star: 2, solid: true, color: '#036632', image: 'substrat_16_16+6', mining: {speed: 1000, items: [{item: 'blockHumus', count: 1}]}, help: 'Humus'},
+  DIRT: {code: 40, name: 'Dirt', type: NODE_TYPE.TOPSOIL, stype: 'block', star: 1, solid: true, color: '#835537', image: 'substrat_16_16+11', mining: {speed: 1000, items: [{item: 'blockDirt', count: 1}, {item: 'worm', count: 0.15, lucky: 1.2, rainy: 1.7}]}, help: 'Dirt'},
+  SAND: {code: 41, name: 'Sand', type: NODE_TYPE.TOPSOIL, stype: 'block', star: 1, solid: true, color: '#fee267', image: 'substrat_16_16+12', mining: {speed: 500, items: [{item: 'blockSand', count: 1}]}, viscosity: 500, help: 'Sand'},
+  SILT: {code: 42, name: 'Silt', type: NODE_TYPE.TOPSOIL, stype: 'block', star: 2, solid: true, color: '#4f5b6c', image: 'substrat_16_16+13', mining: {speed: 1000, items: [{item: 'blockSilt', count: 1}]}, help: 'Silt'},
+  HUMUS: {code: 43, name: 'Humus', type: NODE_TYPE.TOPSOIL, stype: 'block', star: 2, solid: true, color: '#036632', image: 'substrat_16_16+14', mining: {speed: 1000, items: [{item: 'blockHumus', count: 1}]}, help: 'Humus'},
 
   // ── Substrat (roche de base, peu propice aux plantes) ────────────────────────
   // Forest
-  CLAY: {code: 50, name: 'Clay', type: NODE_TYPE.SUBSTRAT, stype: 'block', star: 1, solid: true, color: '#af784d', image: 'substrat_16_16+3', mining: {speed: 1000, items: [{item: 'blockClay', count: 1}]}, help: 'Clay'},
+  CLAY: {code: 50, name: 'Clay', type: NODE_TYPE.SUBSTRAT, stype: 'block', star: 1, solid: true, color: '#af784d', image: 'substrat_16_16+1', mining: {speed: 1000, items: [{item: 'blockClay', count: 1}]}, help: 'Clay'},
   STONE: {code: 51, name: 'Stone', type: NODE_TYPE.SUBSTRAT, stype: 'block', star: 2, solid: true, color: '#a4937f', image: 'substrat_16_16+2', mining: {speed: 1200, items: [{item: 'blockStone', count: 1}]}, help: 'Stone'},
-  HARDSTONE: {code: 52, name: 'Hardstone', type: NODE_TYPE.SUBSTRAT, stype: 'block', star: 4, solid: true, color: '#5a5060', image: 'substrat_16_16+0', mining: {speed: 1800, items: [{item: 'blockHardstone', count: 1}]}, help: 'Hardstone'},
+  HARDSTONE: {code: 52, name: 'Hardstone', type: NODE_TYPE.SUBSTRAT, stype: 'block', star: 4, solid: true, color: '#5a5060', image: 'substrat_16_16+3', mining: {speed: 1800, items: [{item: 'blockHardstone', count: 1}]}, help: 'Hardstone'},
   // Desert
-  SANDSTONE: {code: 53, name: 'Sandstone', type: NODE_TYPE.SUBSTRAT, stype: 'block', star: 2, solid: true, color: '#b87141', image: 'rock_16_16+5', mining: {speed: 1200, items: [{item: 'blockSandstone', count: 1}]}, help: 'Sandstone'},
-  ASH: {code: 54, name: 'Ash', type: NODE_TYPE.SUBSTRAT, stype: 'block', star: 3, solid: true, color: '#1b283b', image: 'substrat_16_16+8', speed: 1400, mining: {speed: 1400, items: [{item: 'blockAsh', count: 1}]}, help: 'Ash'},
-  HELLSTONE: {code: 55, name: 'Hellstone', type: NODE_TYPE.SUBSTRAT, stype: 'block', star: 5, solid: true, color: '#a14c5a', image: 'rock_16_16+4', mining: {speed: 2200, items: [{item: 'blockHellstone', count: 1}]}, help: 'Hellstone'},
+  SANDSTONE: {code: 53, name: 'Sandstone', type: NODE_TYPE.SUBSTRAT, stype: 'block', star: 2, solid: true, color: '#b87141', image: 'rock_16_16+4', mining: {speed: 1200, items: [{item: 'blockSandstone', count: 1}]}, help: 'Sandstone'},
+  ASH: {code: 54, name: 'Ash', type: NODE_TYPE.SUBSTRAT, stype: 'block', star: 3, solid: true, color: '#1b283b', image: 'substrat_16_16+5', speed: 1400, mining: {speed: 1400, items: [{item: 'blockAsh', count: 1}]}, help: 'Ash'},
+  HELLSTONE: {code: 55, name: 'Hellstone', type: NODE_TYPE.SUBSTRAT, stype: 'block', star: 5, solid: true, color: '#a14c5a', image: 'rock_16_16+6', mining: {speed: 2200, items: [{item: 'blockHellstone', count: 1}]}, help: 'Hellstone'},
   // Jungle
-  MUD: {code: 56, name: 'Mud', type: NODE_TYPE.SUBSTRAT, stype: 'block', star: 2, solid: true, color: '#853a51', image: 'substrat_16_16+4', mining: {speed: 1000, items: [{item: 'blockMud', count: 1}]}, help: 'Mud'},
-  LIMESTONE: {code: 57, name: 'Limestone', type: NODE_TYPE.SUBSTRAT, stype: 'block', star: 4, solid: true, color: '#c8c0a0', image: 'substrat_16_16+0', mining: {speed: 1400, items: [{item: 'blockLimestone', count: 1}]}, help: 'Limestone'},
-  SLATE: {code: 58, name: 'Slate', type: NODE_TYPE.SUBSTRAT, stype: 'block', star: 5, solid: true, color: '#2a3a4a', image: 'substrat_16_16+0', mining: {speed: 1600, items: [{item: 'blockSlate', count: 1}]}, help: 'Slate'},
+  MUD: {code: 56, name: 'Mud', type: NODE_TYPE.SUBSTRAT, stype: 'block', star: 2, solid: true, color: '#853a51', image: 'substrat_16_16+7', mining: {speed: 1000, items: [{item: 'blockMud', count: 1}]}, help: 'Mud'},
+  LIMESTONE: {code: 57, name: 'Limestone', type: NODE_TYPE.SUBSTRAT, stype: 'block', star: 4, solid: true, color: '#c8c0a0', image: 'substrat_16_16+8', mining: {speed: 1400, items: [{item: 'blockLimestone', count: 1}]}, help: 'Limestone'},
+  SLATE: {code: 58, name: 'Slate', type: NODE_TYPE.SUBSTRAT, stype: 'block', star: 5, solid: true, color: '#2a3a4a', image: 'substrat_16_16+9', mining: {speed: 1600, items: [{item: 'blockSlate', count: 1}]}, help: 'Slate'},
 
   // ── Ore (gisement de minerais) ────────────────────────
   COPPER: {code: 70, name: 'Copper Ore', type: NODE_TYPE.ORE, star: 1, solid: true, color: '#fe602f', image: 'ore_16_16+0', speed: 1000, mining: {speed: 1000, items: [{item: 'chunkCopper', count: 1}]}, help: 'Metals'},
