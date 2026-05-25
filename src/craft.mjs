@@ -695,7 +695,9 @@ class CraftOverlay {
     let recipes
 
     if (text.length > 0) {
-      recipes = RECIPES.filter(r => r.result.item.name.toLowerCase().includes(text))
+      recipes = RECIPES.filter(r =>
+        r.result.item.name.toLowerCase().includes(text) || r.ingredients.some(ing => ing.item.name.toLowerCase().includes(text))
+      )
     } else {
       const mode = this.#filterMode.value
       const val = this.#filterValue.value
