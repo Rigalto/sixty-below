@@ -6449,7 +6449,7 @@ class FurnitureGenerator {
     const stype = ITEMS[code].stype
     const {w, h} = this.getFurnitureSize(code)
     const id = uniqueIdGenerator.getUniqueId()
-    const furniture = {id, index, code, stype, w, h}
+    const furniture = {id, index, code, stype, w, h, delted: false}
     if (CONTAINER_STYPES.has(stype)) {
       this.#createEmptySlots(stype, CONTAINER_CAPACITY[stype], id)
       furniture.name = `C-${id}`
