@@ -1,0 +1,89 @@
+GIMP Palette
+Name: Sixty-Below
+Columns: 10
+#
+254  58  47	Orange
+254  96  47	Orange
+253 132  49	Orange
+255 170  51	Orange
+255 203  50	Orange
+254 194   0	Jaune
+255 208  54	Jaune
+254 226 103	Jaune
+255 241 152	Jaune
+254 254 202	Jaune
+204   0  48	Rouge
+221  39  80	Rouge
+231  83 112	Rouge
+242 122 147	Rouge
+254 166 177	Rouge
+239   1 124	Rose
+255  44 152	Rose
+255  89 175	Rose
+254 132 196	Rose
+254 177 221	Rose
+  0   0 153	Bleu
+ 15  51 180	Bleu
+ 25 102 204	Bleu
+ 39 151 234	Bleu
+ 51 204 255	Bleu
+  2 203 254	Bleu ciel
+ 53 215 255	Bleu ciel
+106 226 255	Bleu ciel
+160 236 254	Bleu ciel
+211 247 255	Bleu ciel
+100  31 151	Violet
+134  61 185	Violet
+171  97 214	Violet
+214 147 255	Violet
+226 179 255 Violet
+ 16 139  17	Vert Forêt
+ 51 204  51	Vert Forêt
+124 252  12	Vert Forêt
+173 255  52	Vert Forêt
+223 255 158	Vert Forêt
+ 74  70  15	Olive
+ 87  87  30	Olive
+123 121  65	Olive
+157 158  94	Olive
+193 193 134	Olive
+ 17 102  57	Vert Jungle
+ 37 135  77	Vert Jungle
+ 78 166 102	Vert Jungle
+115 200 130	Vert Jungle
+156 231 160	Vert Jungle
+ 39  17  13	Brun Oak
+ 83  52  35	Brun Oak
+131  85  55	Brun Oak
+175 120  77	Brun Oak
+219 155  99	Brun Oak
+ 98  37  72	Brun Mahogany
+133  58  81	Brun Mahogany
+161  76  90	Brun Mahogany
+223 110 120	Brun Mahogany
+224 172 173	Brun Mahogany
+125 111  95	Gris chaud
+164 147 127	Gris chaud
+202 185 158	Gris chaud
+230 221 196	Gris chaud
+255 252 235	Gris chaud
+ 27  40  59	Gris Froid
+ 79  91 108	Gris Froid
+120 134 150	Gris Froid
+164 180 193	Gris Froid
+211 225 237	Gris Froid
+  0   0   0	Black
+255 255 255	White
+255   0   0	Sans titre
+255 128   0	Sans titre
+255 255   0	Sans titre
+128 255   0	Sans titre
+  0 255   0	Sans titre
+  0 255 128	Sans titre
+  0 255 255	Sans titre
+  0 128 255	Sans titre
+  0   0 255	Sans titre
+128   0 255	Sans titre
+255   0 255	Sans titre
+255   0 128	Sans titre
+ 48   6   6	Void
