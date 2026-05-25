@@ -72,12 +72,12 @@ export const NODES = {
   SLATE: {code: 58, name: 'Slate', type: NODE_TYPE.SUBSTRAT, stype: 'block', star: 5, solid: true, color: '#2797ea', image: 'substrat_16_16+9', mining: {speed: 1600, items: [{item: 'blockSlate', count: 1}]}, help: 'Slate'},
 
   // ── Ore (gisement de minerais) ────────────────────────
-  COPPER: {code: 70, name: 'Copper Ore', type: NODE_TYPE.ORE, star: 1, solid: true, color: '#fe602f', image: 'ore_16_16+0', speed: 1000, mining: {speed: 1000, items: [{item: 'chunkCopper', count: 1}]}, help: 'Metals'},
-  IRON: {code: 71, name: 'Iron Ore', type: NODE_TYPE.ORE, star: 2, solid: true, color: '#af784d', image: 'ore_16_16+1', speed: 1100, mining: {speed: 1100, items: [{item: 'chunkIron', count: 1}]}, help: 'Metals'},
-  SILVER: {code: 72, name: 'Silver Ore', type: NODE_TYPE.ORE, star: 3, solid: true, color: '#788696', image: 'ore_16_16+2', mining: {speed: 1200, items: [{item: 'chunkSilver', count: 1}]}, help: 'Metals'},
-  GOLD: {code: 73, name: 'Gold Ore', type: NODE_TYPE.ORE, star: 3, solid: true, color: '#ffaa33', image: 'ore_16_16+3', mining: {speed: 1400, items: [{item: 'chunkGold', count: 1}]}, help: 'Metals'},
-  COBALT: {code: 74, name: 'Cobalt Ore', type: NODE_TYPE.ORE, star: 4, solid: true, color: '#2797ea', image: 'ore_16_16+4', mining: {speed: 1600, items: [{item: 'chunkCobalt', count: 1}]}, help: 'Metals'},
-  PLATINUM: {code: 75, name: 'Platinum Ore', type: NODE_TYPE.ORE, star: 5, solid: true, color: '#25874d', image: 'ore_16_16+5', mining: {speed: 1800, items: [{item: 'chunkPlatinum', count: 1}]}, help: 'Metals'},
+  COPPER: {code: 70, name: 'Copper Ore', type: NODE_TYPE.ORE, star: 1, solid: true, color: '#fe602f', image: 'mineral_16_16+0', speed: 1000, mining: {speed: 1000, items: [{item: 'chunkCopper', count: 1}]}, help: 'Metals'},
+  IRON: {code: 71, name: 'Iron Ore', type: NODE_TYPE.ORE, star: 2, solid: true, color: '#db9b63', image: 'mineral_16_16+1', speed: 1100, mining: {speed: 1100, items: [{item: 'chunkIron', count: 1}]}, help: 'Metals'},
+  SILVER: {code: 72, name: 'Silver Ore', type: NODE_TYPE.ORE, star: 3, solid: true, color: '#788696', image: 'mineral_16_16+2', mining: {speed: 1200, items: [{item: 'chunkSilver', count: 1}]}, help: 'Metals'},
+  GOLD: {code: 73, name: 'Gold Ore', type: NODE_TYPE.ORE, star: 3, solid: true, color: '#ffaa33', image: 'mineral_16_16+3', mining: {speed: 1400, items: [{item: 'chunkGold', count: 1}]}, help: 'Metals'},
+  COBALT: {code: 74, name: 'Cobalt Ore', type: NODE_TYPE.ORE, star: 4, solid: true, color: '#2797ea', image: 'mineral_16_16+4', mining: {speed: 1600, items: [{item: 'chunkCobalt', count: 1}]}, help: 'Metals'},
+  PLATINUM: {code: 75, name: 'Platinum Ore', type: NODE_TYPE.ORE, star: 5, solid: true, color: '#25874d', image: 'mineral_16_16+5', mining: {speed: 1800, items: [{item: 'chunkPlatinum', count: 1}]}, help: 'Metals'},
 
   // ── Gem (gisement de pierres précieuses) ────────────────────────
   TOPAZ: {code: 80, name: 'Topaz Deposit', type: NODE_TYPE.GEM, star: 2, solid: true, color: '#788696', image: 'gem_16_16+0', mining: {speed: 900, items: [{item: 'rawTopaz', count: 1}]}, help: 'Gems'},
@@ -179,10 +179,10 @@ export const itemTypeToString = (type, armorSlot = null) => {
 export const ITEMS = {
 
   // Topsoil Blocks
-  blockDirt: {name: 'Dirt Block', type: 0, star: 1, stype: 'block', image: 'blocks_16_16-0-0', help: 'Dirt', tooltip: '???'},
-  blockSand: {name: 'Sand Block', type: 0, star: 1, stype: 'block', image: 'blocks_16_16-0-0', help: 'Sand', tooltip: '???'},
-  blockSilt: {name: 'Silt Block', type: 0, star: 2, stype: 'block', image: 'blocks_16_16-0-0', help: 'Silt', tooltip: '???'},
-  blockHumus: {name: 'Humus Block', type: 0, star: 2, stype: 'block', image: 'blocks_16_16-0-0', help: 'Humus', tooltip: '???'},
+  blockDirt: {name: 'Dirt Block', type: 0, star: 1, stype: 'block', image: 'mined_32_32-3-1', help: 'Dirt', tooltip: '???'},
+  blockSand: {name: 'Sand Block', type: 0, star: 1, stype: 'block', image: 'mined_32_32-4-1', help: 'Sand', tooltip: '???'},
+  blockSilt: {name: 'Silt Block', type: 0, star: 2, stype: 'block', image: 'mined_32_32-5-1', help: 'Silt', tooltip: '???'},
+  blockHumus: {name: 'Humus Block', type: 0, star: 2, stype: 'block', image: 'mined_32_32-0-2', help: 'Humus', tooltip: '???'},
 
   // Forest Substrat Blocks
   blockClay: {name: 'Clay Block', type: 0, star: 1, stype: 'block', image: 'mined_32_32-0-0', help: 'Clay', tooltip: '???'},
@@ -193,9 +193,9 @@ export const ITEMS = {
   blockAsh: {name: 'Ash Block', type: 0, star: 3, stype: 'block', image: 'mined_32_32-4-0', help: 'Ash', tooltip: '???'},
   blockHellstone: {name: 'Hellstone Block', type: 0, star: 5, stype: 'block', image: 'mined_32_32-5-0', help: 'Hellstone', tooltip: '???'},
   // Jungle Substrat Blocks
-  blockMud: {name: 'Mud Block', type: 0, star: 2, stype: 'block', image: 'blocks_16_16-0-0', help: 'Mud', tooltip: '???'},
-  blockLimestone: {name: 'Limestone Block', type: 0, star: 4, stype: 'block', image: 'blocks_16_16-0-0', help: 'Limestone', tooltip: '???'},
-  blockSlate: {name: 'Slate Block', type: 0, star: 5, stype: 'block', image: 'blocks_16_16-0-0', help: 'Slate', tooltip: '???'},
+  blockMud: {name: 'Mud Block', type: 0, star: 2, stype: 'block', image: 'mined_32_32-0-1', help: 'Mud', tooltip: '???'},
+  blockLimestone: {name: 'Limestone Block', type: 0, star: 4, stype: 'block', image: 'mined_32_32-1-1', help: 'Limestone', tooltip: '???'},
+  blockSlate: {name: 'Slate Block', type: 0, star: 5, stype: 'block', image: 'mined_32_32-2-1', help: 'Slate', tooltip: '???'},
 
   // Chunks
   chunkCopper: {name: 'Copper Chunk', type: ITEM_TYPE.MATERIAL, star: 1, stype: 'chunk', image: 'blocks_16_16-0-0', help: 'Metals', tooltip: 'Primary crafting materials crafted into bars at a Furnace'},
@@ -238,7 +238,7 @@ export const ITEMS = {
   shellPowder: {name: 'Shell Powder', type: ITEM_TYPE.MATERIAL | ITEM_TYPE.CRAFTABLE, star: 1, stype: 'shell', image: 'blocks_16_16-0-0', help: 'Shell', tooltip: '???'},
 
   // Cobweb
-  silk: {name: 'Silk', type: ITEM_TYPE.MATERIAL, star: 1, stype: 'cobweb', image: 'blocks_16_16-0-0', help: 'Cobweb', tooltip: '???'},
+  silk: {name: 'Silk', type: ITEM_TYPE.MATERIAL, star: 1, stype: 'cobweb', image: 'mined_32_32-2-1', help: 'Cobweb', tooltip: '???'},
   fabric: {name: 'Fabric', type: ITEM_TYPE.MATERIAL | ITEM_TYPE.CRAFTABLE, star: 1, stype: 'cobweb', image: 'blocks_16_16-0-0', help: 'Cobweb', tooltip: '???'},
   eggSpider: {name: 'Spider Egg', type: ITEM_TYPE.MATERIAL, star: 1, stype: 'egg', image: 'blocks_16_16-0-0', help: 'Eggs', tooltip: '???'},
 

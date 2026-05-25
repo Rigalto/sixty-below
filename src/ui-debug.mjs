@@ -309,6 +309,38 @@ const DEBUG_PACKS = {
     {item: 'blockMud', count: 6},
     {item: 'blockLimestone', count: 6},
     {item: 'blockSlate', count: 6}
+  ],
+  topsoil: [
+    {item: 'blockDirt', count: 7},
+    {item: 'blockSand', count: 7},
+    {item: 'blockSilt', count: 7},
+    {item: 'blockHumus', count: 7}
+  ],
+  ore: [
+    {item: 'chunkCopper', count: 22},
+    {item: 'chunkIraon', count: 22},
+    {item: 'chunkSilver', count: 22},
+    {item: 'chunkGold', count: 22},
+    {item: 'chunkCobalt', count: 22},
+    {item: 'chunkPlatinum', count: 22}
+  ],
+  bar: [
+    {item: 'barCopper', count: 18},
+    {item: 'barIraon', count: 18},
+    {item: 'barSilver', count: 18},
+    {item: 'barGold', count: 18},
+    {item: 'barCobalt', count: 18},
+    {item: 'barPlatinum', count: 18}
+  ],
+  gem: [
+    {item: 'rawTopaz', count: 8},
+    {item: 'rawRuby', count: 8},
+    {item: 'rawEmerald', count: 8},
+    {item: 'rawSapphire', count: 8},
+    {item: 'cutTopaz', count: 5},
+    {item: 'cutRuby', count: 5},
+    {item: 'cutEmerald', count: 5},
+    {item: 'cutSapphire', count: 5}
   ]
 }
 

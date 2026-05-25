@@ -13,7 +13,9 @@ export const IMAGE_FILES = [
   // ///// //
 
   // Tuiles de terrain / substrat, topsoil, web
-  'assets/sprites/substrat_16_16.png', // à renommer tile-substrat_16_16.png
+  'assets/sprites/substrat_16_16.png',
+  // Tuiles de mineral / ore, deposit, rock
+  'assets/sprites/mineral_16_16.png',
 
   // ITEMS //
   // ///// //
