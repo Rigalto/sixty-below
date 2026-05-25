@@ -274,7 +274,7 @@ class GameCore {
       inventoryManager.initSlot(record)
     }
     if (itemsToDelete.length > 0) {
-      await database.deleteMultipleRecords('plant', itemsToDelete)
+      await database.deleteMultipleRecords('inventory', itemsToDelete)
     }
     inventoryManager.initCheck() // vérification de l'intégrité des slots (appel optionnel)
 
