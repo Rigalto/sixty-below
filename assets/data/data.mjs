@@ -355,10 +355,17 @@ export const ITEMS = {
   blastFurnace: {name: 'Blast Furnace', type: ITEM_TYPE.FURNITURE | ITEM_TYPE.PLACABLE, stype: 'station', star: 4, image: 'furniture_32_32-5-0', placed: 'fuws_48_48-1-0', help: 'Smelting', tooltip: 'Crafting station for strong metal smelting'},
 
   // Metal Fittings
-  wireCopper: {name: 'Copper Wire', type: 0, stype: 'fitting', star: 1, image: 'crafting_32_32-2-0', help: 'Metal Fittings', tooltip: '???'},
-  wireIron: {name: 'Iron Wire', type: 0, stype: 'fitting', star: 2, image: 'crafting_32_32-2-0', help: 'Metal Fittings', tooltip: '???'},
-  wireGold: {name: 'Gold Wire', type: 0, stype: 'fitting', star: 3, image: 'crafting_32_32-2-0', help: 'Metal Fittings', tooltip: '???'},
-  wireCobalt: {name: 'Cobalt Wire', type: 0, stype: 'fitting', star: 4, image: 'crafting_32_32-2-0', help: 'Metal Fittings', tooltip: '???'},
+  nailIron: {name: 'Iron Nail', type: 0, stype: 'fitting', star: 2, image: 'crafting_32_32-2-0', help: 'Metal Fittings', tooltip: 'Fastener used to built or repair a lot of items'},
+  nailCobalt: {name: 'Cobalt Nail', type: 0, stype: 'fitting', star: 4, image: 'crafting_32_32-2-0', help: 'Metal Fittings', tooltip: 'Fastener used to built or repair a lot of items'},
+  rivetCobalt: {name: 'Cobalt Rivet', type: 0, stype: 'fitting', star: 4, image: 'crafting_32_32-2-0', help: 'Metal Fittings', tooltip: 'Strong fastener used to built a lot of high tier items'},
+  rivetPlatinum: {name: 'Platinum Rivet', type: 0, stype: 'fitting', star: 5, image: 'crafting_32_32-2-0', help: 'Metal Fittings', tooltip: 'Strong fastener used to built a lot of high tier items'},
+  chainCopper: {name: 'Copper Chain', type: 0, stype: 'fitting', star: 1, image: 'crafting_32_32-2-0', help: 'Metal Fittings', tooltip: 'Fastener used to built a lot of sensitive items'},
+  chainIron: {name: 'Copper Chain', type: 0, stype: 'fitting', star: 2, image: 'crafting_32_32-2-0', help: 'Metal Fittings', tooltip: 'Fastener used to built a lot of sensitive items'},
+  chainSilver: {name: 'Copper Chain', type: 0, stype: 'fitting', star: 3, image: 'crafting_32_32-2-0', help: 'Metal Fittings', tooltip: 'Fastener used to built a lot of sensitive items'},
+  wireCopper: {name: 'Copper Wire', type: 0, stype: 'fitting', star: 1, image: 'crafting_32_32-2-0', help: 'Metal Fittings', tooltip: 'Fastener used to built a lot of sensitive items'},
+  wireIron: {name: 'Iron Wire', type: 0, stype: 'fitting', star: 2, image: 'crafting_32_32-2-0', help: 'Metal Fittings', tooltip: 'Fastener used to built a lot of items'},
+  wireGold: {name: 'Gold Wire', type: 0, stype: 'fitting', star: 3, image: 'crafting_32_32-2-0', help: 'Metal Fittings', tooltip: 'Fastener used to built a lot of items'},
+  wireCobalt: {name: 'Cobalt Wire', type: 0, stype: 'fitting', star: 4, image: 'crafting_32_32-2-0', help: 'Metal Fittings', tooltip: 'Fastener used to built a lot of items'},
 
   stoneBench: {name: 'Stone Bench', type: ITEM_TYPE.FURNITURE | ITEM_TYPE.PLACABLE, stype: 'station', star: 3, image: 'furniture_32_32-1-0', placed: 'fuws_48_32-0-0', help: 'Stoneworking', tooltip: 'Crafting station for sharpenig tools and weapons'},
 
@@ -589,10 +596,20 @@ export const RECIPES = [
   {result: {item: 'barPlatinum', count: 1}, station: 'blastFurnace', ingredients: [{item: 'chunkPlatinum', count: 5}, {item: 'logOak', count: 1}, {item: 'logMahogany', count: 1}]},
 
   // Metal fittings
-  {result: {item: 'wireCopper', count: 24}, station: 'anvil', ingredients: [{item: 'chunkCopper', count: 1}]},
-  {result: {item: 'wireIron', count: 22}, station: 'anvil', ingredients: [{item: 'chunkIron', count: 1}]},
-  {result: {item: 'wireGold', count: 20}, station: 'anvil', ingredients: [{item: 'chunkGold', count: 1}]},
-  {result: {item: 'wireCobalt', count: 18}, station: 'forge', ingredients: [{item: 'chunkCobalt', count: 1}]},
+  {result: {item: 'nailIron', count: 32}, station: 'anvil', ingredients: [{item: 'barIron', count: 1}]},
+  {result: {item: 'nailCobalt', count: 30}, station: 'forge', ingredients: [{item: 'barCobalt', count: 1}]},
+  {result: {item: 'rivetCobalt', count: 28}, station: 'forge', ingredients: [{item: 'barCobalt', count: 1}]},
+  {result: {item: 'rivetPlatinum', count: 26}, station: 'forge', ingredients: [{item: 'barPlatinum', count: 1}]},
+  {result: {item: 'chainCopper', count: 12}, station: 'anvil', ingredients: [{item: 'barCopper', count: 1}]},
+  {result: {item: 'chainIron', count: 11}, station: 'anvil', ingredients: [{item: 'barIron', count: 1}]},
+  {result: {item: 'chainSilver', count: 10}, station: 'anvil', ingredients: [{item: 'barSilver', count: 1}]},
+  {result: {item: 'wireCopper', count: 24}, station: 'anvil', ingredients: [{item: 'barCopper', count: 1}]},
+  {result: {item: 'wireCopper', count: 24}, station: 'anvil', ingredients: [{item: 'barCopper', count: 1}]},
+  {result: {item: 'wireCopper', count: 24}, station: 'anvil', ingredients: [{item: 'barCopper', count: 1}]},
+  {result: {item: 'wireCopper', count: 24}, station: 'anvil', ingredients: [{item: 'barCopper', count: 1}]},
+  {result: {item: 'wireIron', count: 22}, station: 'anvil', ingredients: [{item: 'barIron', count: 1}]},
+  {result: {item: 'wireGold', count: 20}, station: 'anvil', ingredients: [{item: 'barGold', count: 1}]},
+  {result: {item: 'wireCobalt', count: 18}, station: 'forge', ingredients: [{item: 'barCobalt', count: 1}]},
 
   // Food - Tier 1-3
   {result: {item: 'daw', count: 4}, station: 'byHand', ingredients: [{item: 'flour', count: 1}, {item: 'water', count: 1}], returned: [{item: 'bottle', count: 1}]},

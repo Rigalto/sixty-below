@@ -1923,12 +1923,12 @@ The table below details the [[Metal Fittings]] available for each material, incl
 
 | Metal | Nail | Rivet | Chain | Wire | Plate | Rod | Strip |
 |---|---|---|---|---|---|---|---|
-| **Copper** | - | - | yes | yes | yes | - | yes |
-| **Iron** | yes | - | yes | yes | yes | yes | yes |
-| **Silver** | - | - | yes | - | - | yes | yes |
-| **Gold** | - | - | - | yes | yes | yes | - |
-| **Cobalt** | yes | yes | - | yes | yes | yes | yes |
-| **Platinum** | - | yes | - | - | yes | yes | yes |
+| **Copper** | - | - | ✅ | ✅ | ✅ | - | ✅ |
+| **Iron** | ✅ | - | ✅ | ✅ | ✅ | ✅ | ✅ |
+| **Silver** | - | - | ✅ | - | - | ✅ | ✅ |
+| **Gold** | - | - | - | ✅ | ✅ | ✅ | - |
+| **Cobalt** | ✅ | ✅ | - | ✅ | ✅ | ✅ | ✅ |
+| **Platinum** | - | ✅ | - | - | ✅ | ✅ | ✅ |
 
 
 **Usages**
@@ -1968,12 +1968,12 @@ The table below details the [[Metal Fittings]] available for each material, incl
 
 | Metal | Nail | Rivet | Chain | Wire |
 |---|---|---|---|---|
-| **Copper** | - | - | yes | <<cellItemStar|wireCopper>> |
-| **Iron** | yes | - | yes | <<cellItemStar|wireIron>> |
-| **Silver** | - | - | yes | - |
+| **Copper** | - | - | <<cellItemStar|chainCopper>> | <<cellItemStar|wireCopper>> |
+| **Iron** | <<cellItemStar|nailIron>> | - | <<cellItemStar|chainIron>> | <<cellItemStar|wireIron>> |
+| **Silver** | - | - | <<cellItemStar|chainSilver>> | - |
 | **Gold** | - | - | - | <<cellItemStar|wireGold>> |
-| **Cobalt** | yes | yes | - | <<cellItemStar|wireCobalt>> |
-| **Platinum** | - | yes | - | - |
+| **Cobalt** | <<cellItemStar|nailCobalt>> | <<cellItemStar|rivetCobalt>> | - | <<cellItemStar|wireCobalt>> |
+| **Platinum** | - | <<cellItemStar|rivetPlatinum>> | - | - |
 
 **Parts**
 
