@@ -92,7 +92,7 @@ export const NODES = {
   OBSIDIAN: {code: 92, name: 'Obsidian', type: NODE_TYPE.ROCK, star: 5, solid: true, color: '#73c882', image: 'rock_16_16+3', mining: {speed: 2000, items: [{item: 'blockObsidian', count: 1}]}, help: 'Obsidian'},
   METEORITE: {code: 93, name: 'Meteorite', type: NODE_TYPE.ROCK, stype: 'block', star: 5, solid: true, color: '#7d6f5f', image: 'rock_16_16+2', mining: {speed: 2000, items: [{item: 'blockMeteorite', count: 1}]}, help: 'Meteorite'}, // SURFACE
   HIVE: {code: 94, name: 'Hive', type: NODE_TYPE.ROCK, stype: 'block', star: 3, solid: true, color: '#fd8431', image: 'rock_16_16+6', mining: {speed: 1200, items: [{item: 'blockHive', count: 1}]}, help: 'Hive'},
-  SHELL: {code: 95, name: 'Shell', type: NODE_TYPE.ROCK, stype: 'block', star: 2, solid: true, color: '#e9e3e0ff', image: 'rock_16_16+7', mining: {speed: 1800, items: [{item: 'blockShell', count: 4}]}, help: 'Shell'},
+  SHELL: {code: 95, name: 'Shell', type: NODE_TYPE.ROCK, stype: 'block', star: 2, solid: true, color: '#e9e3e0ff', image: 'rock_16_16+7', mining: {speed: 1800, items: [{item: 'shell', count: 4}]}, help: 'Shell'},
 
   // ── HOUSING (murs des maisons) ────────────────────────
 
@@ -198,8 +198,8 @@ export const ITEMS = {
   blockSlate: {name: 'Slate Block', type: 0, star: 5, stype: 'block', image: 'mined_32_32-2-1', help: 'Slate', tooltip: '???'},
 
   // Chunks
-  chunkCopper: {name: 'Copper Chunk', type: ITEM_TYPE.MATERIAL, star: 1, stype: 'chunk', image: 'mined_32_32-2-2', help: 'Metals', tooltip: 'Primary crafting materials crafted into bars at a Furnace'},
-  chunkIron: {name: 'Iron Chunk', type: ITEM_TYPE.MATERIAL, star: 2, stype: 'chunk', image: 'mined_32_32-3-2', help: 'Metals', tooltip: 'Primary crafting materials crafted into bars at a Furnace'},
+  chunkCopper: {name: 'Copper Chunk', type: ITEM_TYPE.MATERIAL, star: 1, stype: 'chunk', image: 'mined_32_32-3-2', help: 'Metals', tooltip: 'Primary crafting materials crafted into bars at a Furnace'},
+  chunkIron: {name: 'Iron Chunk', type: ITEM_TYPE.MATERIAL, star: 2, stype: 'chunk', image: 'mined_32_32-4-2', help: 'Metals', tooltip: 'Primary crafting materials crafted into bars at a Furnace'},
   chunkSilver: {name: 'Silver Chunk', type: ITEM_TYPE.MATERIAL, star: 3, stype: 'chunk', image: 'blocks_16_16-0-0', help: 'Metals', tooltip: 'Primary crafting materials crafted into bars at a Furnace'},
   chunkGold: {name: 'Gold Chunk', type: ITEM_TYPE.MATERIAL, star: 3, stype: 'chunk', image: 'blocks_16_16-0-0', help: 'Metals', tooltip: 'Primary crafting materials crafted into bars at a Furnace'},
   chunkCobalt: {name: 'Cobalt Chunk', type: ITEM_TYPE.MATERIAL, star: 4, stype: 'chunk', image: 'blocks_16_16-0-0', help: 'Metals', tooltip: 'Primary crafting materials crafted into bars at a Furnace'},
@@ -225,17 +225,16 @@ export const ITEMS = {
   cutSapphire: {name: 'Cut Sapphire', type: 0, star: 5, stype: 'gem', image: 'blocks_16_16-0-0', help: 'Gems', tooltip: 'Enhances weapons, gears and accessories'},
 
   // Rock - Geode Stones
-  blockGranite: {name: 'Granite Block', type: ITEM_TYPE.MATERIAL, star: 4, stype: 'stone', image: 'blocks_16_16-0-0', help: 'Geode Stones', tooltip: 'Prized crafting materials found in crystalline structures'},
-  blockMarble: {name: 'Marble Block', type: ITEM_TYPE.MATERIAL, star: 4, stype: 'stone', image: 'blocks_16_16-0-0', help: 'Geode Stones', tooltip: 'Prized crafting materials found in crystalline structures'},
+  blockGranite: {name: 'Granite Block', type: ITEM_TYPE.MATERIAL, star: 4, stype: 'block', image: 'blocks_16_16-0-0', help: 'Geode Stones', tooltip: 'Prized crafting materials found in crystalline structures'},
+  blockMarble: {name: 'Marble Block', type: ITEM_TYPE.MATERIAL, star: 4, stype: 'block', image: 'blocks_16_16-0-0', help: 'Geode Stones', tooltip: 'Prized crafting materials found in crystalline structures'},
   // Rock - Others
-  blockObsidian: {name: 'Obsidian Block', type: ITEM_TYPE.MATERIAL, star: 5, stype: 'stone', image: 'blocks_16_16-0-0', help: 'Obsidian', tooltip: 'Hardest material'},
-  blockMeteorite: {name: 'Meteorite Block', type: ITEM_TYPE.MATERIAL, star: 5, stype: 'stone', image: 'blocks_16_16-0-0', help: 'Meteorite', tooltip: 'Falling from space, hard to use'},
-  blockHive: {name: 'Hive Block', type: ITEM_TYPE.MATERIAL, star: 3, stype: 'stone', image: 'blocks_16_16-0-0', help: 'Hive', tooltip: 'Hexagonal alveoles build by Bees'},
-  blockShell: {name: 'Shell Block', type: ITEM_TYPE.MATERIAL, star: 2, stype: 'stone', image: 'blocks_16_16-0-0', help: 'Shell', tooltip: 'Easy to moudre'},
+  blockObsidian: {name: 'Obsidian Block', type: ITEM_TYPE.MATERIAL, star: 5, stype: 'block', image: 'blocks_16_16-0-0', help: 'Obsidian', tooltip: 'Hardest material'},
+  blockMeteorite: {name: 'Meteorite Block', type: ITEM_TYPE.MATERIAL, star: 5, stype: 'block', image: 'blocks_16_16-0-0', help: 'Meteorite', tooltip: 'Falling from space, hard to use'},
+  blockHive: {name: 'Hive Block', type: ITEM_TYPE.MATERIAL, star: 3, stype: 'block', image: 'blocks_16_16-0-0', help: 'Hive', tooltip: 'Hexagonal alveoles build by Bees'},
 
   // Shell
-  shell: {name: 'Shell', type: ITEM_TYPE.MATERIAL, star: 1, stype: 'shell', image: 'blocks_16_16-0-0', help: 'Shell', tooltip: '???'},
-  shellPowder: {name: 'Shell Powder', type: ITEM_TYPE.MATERIAL | ITEM_TYPE.CRAFTABLE, star: 1, stype: 'shell', image: 'blocks_16_16-0-0', help: 'Shell', tooltip: '???'},
+  shell: {name: 'Shell', type: ITEM_TYPE.MATERIAL, star: 3, stype: 'block', image: 'mined_32_32-2-2', help: 'Shell', tooltip: 'Can be easily powdered'},
+  shellPowder: {name: 'Shell Powder', type: ITEM_TYPE.MATERIAL | ITEM_TYPE.CRAFTABLE, star: 3, stype: 'powder', image: 'blocks_16_16-0-0', help: 'Shell', tooltip: '???'},
 
   // Cobweb
   silk: {name: 'Silk', type: ITEM_TYPE.MATERIAL, star: 1, stype: 'cobweb', image: 'mined_32_32-2-1', help: 'Cobweb', tooltip: '???'},
@@ -594,6 +593,7 @@ export const RECIPES = [
   {result: {item: 'barGold', count: 1}, station: 'furnace', ingredients: [{item: 'chunkGold', count: 4}, {item: 'logMahogany', count: 1}]},
   {result: {item: 'barCobalt', count: 1}, station: 'furnace', ingredients: [{item: 'chunkCobalt', count: 5}, {item: 'logOak', count: 1}, {item: 'logMahogany', count: 1}]},
   {result: {item: 'barPlatinum', count: 1}, station: 'blastFurnace', ingredients: [{item: 'chunkPlatinum', count: 5}, {item: 'logOak', count: 1}, {item: 'logMahogany', count: 1}]},
+  {result: {item: 'shell', count: 1}, station: 'stoneBench', ingredients: [{item: 'shellPowder', count: 1}]},
 
   // Metal fittings
   {result: {item: 'nailIron', count: 32}, station: 'anvil', ingredients: [{item: 'barIron', count: 1}]},
