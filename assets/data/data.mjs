@@ -200,10 +200,10 @@ export const ITEMS = {
   // Chunks
   chunkCopper: {name: 'Copper Chunk', type: ITEM_TYPE.MATERIAL, star: 1, stype: 'chunk', image: 'mined_32_32-3-2', help: 'Metals', tooltip: 'Primary crafting materials crafted into bars at a Furnace'},
   chunkIron: {name: 'Iron Chunk', type: ITEM_TYPE.MATERIAL, star: 2, stype: 'chunk', image: 'mined_32_32-4-2', help: 'Metals', tooltip: 'Primary crafting materials crafted into bars at a Furnace'},
-  chunkSilver: {name: 'Silver Chunk', type: ITEM_TYPE.MATERIAL, star: 3, stype: 'chunk', image: 'blocks_16_16-0-0', help: 'Metals', tooltip: 'Primary crafting materials crafted into bars at a Furnace'},
-  chunkGold: {name: 'Gold Chunk', type: ITEM_TYPE.MATERIAL, star: 3, stype: 'chunk', image: 'blocks_16_16-0-0', help: 'Metals', tooltip: 'Primary crafting materials crafted into bars at a Furnace'},
-  chunkCobalt: {name: 'Cobalt Chunk', type: ITEM_TYPE.MATERIAL, star: 4, stype: 'chunk', image: 'blocks_16_16-0-0', help: 'Metals', tooltip: 'Primary crafting materials crafted into bars at a Furnace'},
-  chunkPlatinum: {name: 'Platinum Chunk', type: ITEM_TYPE.MATERIAL, star: 5, stype: 'chunk', image: 'blocks_16_16-0-0', help: 'Metals', tooltip: 'Primary crafting materials crafted into bars at a Furnace'},
+  chunkSilver: {name: 'Silver Chunk', type: ITEM_TYPE.MATERIAL, star: 3, stype: 'chunk', image: 'mined_32_32-5-2', help: 'Metals', tooltip: 'Primary crafting materials crafted into bars at a Furnace'},
+  chunkGold: {name: 'Gold Chunk', type: ITEM_TYPE.MATERIAL, star: 3, stype: 'chunk', image: 'mined_32_32-0-3', help: 'Metals', tooltip: 'Primary crafting materials crafted into bars at a Furnace'},
+  chunkCobalt: {name: 'Cobalt Chunk', type: ITEM_TYPE.MATERIAL, star: 4, stype: 'chunk', image: 'mined_32_32-1-3', help: 'Metals', tooltip: 'Primary crafting materials crafted into bars at a Furnace'},
+  chunkPlatinum: {name: 'Platinum Chunk', type: ITEM_TYPE.MATERIAL, star: 5, stype: 'chunk', image: 'mined_32_32-2-3', help: 'Metals', tooltip: 'Primary crafting materials crafted into bars at a Furnace'},
 
   // Bars
   barCopper: {name: 'Copper Bar', type: ITEM_TYPE.MATERIAL | ITEM_TYPE.CRAFTABLE, star: 1, stype: 'bar', image: 'blocks_16_16-0-0', help: 'Metals', tooltip: 'Crafting material used to craft tools, weapons, armor, and other items'},
@@ -215,10 +215,10 @@ export const ITEMS = {
   barPlatinum: {name: 'Platinum Bar', type: ITEM_TYPE.MATERIAL | ITEM_TYPE.CRAFTABLE, star: 5, stype: 'bar', image: 'blocks_16_16-0-0', help: 'Metals', tooltip: 'Crafting material used to craft tools, weapons, armor, and other items'},
 
   // Gems
-  rawTopaz: {name: 'Raw Topaz', type: 0, star: 2, stype: 'gem', image: 'blocks_16_16-0-0', help: 'Gems', tooltip: 'Valuable crafting materials to be cut at a Stone Bench'},
-  rawRuby: {name: 'Raw Ruby', type: 0, star: 3, stype: 'gem', image: 'blocks_16_16-0-0', help: 'Gems', tooltip: 'Valuable crafting materials to be cut at a Stone Bench'},
-  rawEmerald: {name: 'Raw Emerald', type: 0, star: 4, stype: 'gem', image: 'blocks_16_16-0-0', help: 'Gems', tooltip: 'Valuable crafting materials to be cut at a Stone Bench'},
-  rawSapphire: {name: 'Raw Sapphire', type: 0, star: 5, stype: 'gem', image: 'blocks_16_16-0-0', help: 'Gems', tooltip: 'Valuable crafting materials to be cut at a Stone Bench'},
+  rawTopaz: {name: 'Raw Topaz', type: 0, star: 2, stype: 'gem', image: 'mined_32_32-3-3', help: 'Gems', tooltip: 'Valuable crafting materials to be cut at a Stone Bench'},
+  rawRuby: {name: 'Raw Ruby', type: 0, star: 3, stype: 'gem', image: 'mined_32_32-4-3', help: 'Gems', tooltip: 'Valuable crafting materials to be cut at a Stone Bench'},
+  rawEmerald: {name: 'Raw Emerald', type: 0, star: 4, stype: 'gem', image: 'mined_32_32-5-3', help: 'Gems', tooltip: 'Valuable crafting materials to be cut at a Stone Bench'},
+  rawSapphire: {name: 'Raw Sapphire', type: 0, star: 5, stype: 'gem', image: 'mined_32_32-0-4', help: 'Gems', tooltip: 'Valuable crafting materials to be cut at a Stone Bench'},
   cutTopaz: {name: 'Cut Topaz', type: 0, star: 2, stype: 'gem', image: 'blocks_16_16-0-0', help: 'Gems', tooltip: 'Enhances weapons, gears and accessories'},
   cutRuby: {name: 'Cut Ruby', type: 0, star: 3, stype: 'gem', image: 'blocks_16_16-0-0', help: 'Gems', tooltip: 'Enhances weapons, gears and accessories'},
   cutEmerald: {name: 'Cut Emerald', type: 0, star: 4, stype: 'gem', image: 'blocks_16_16-0-0', help: 'Gems', tooltip: 'Enhances weapons, gears and accessories'},
