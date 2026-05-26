@@ -102,12 +102,13 @@ Un seul fichier centralise toutes les tables pour éviter les dépendances circu
 | Export         | Type   | Description                                                        |
 |----------------|--------|--------------------------------------------------------------------|
 | `NODES`        | object | Index par nom symbolique. `NODES.CLAY` → objet node complet.       |
-| `NODES_LOOKUP` | Array  | Lookup par code numérique (hot path). `NODES_LOOKUP[14]` → node.  |
-| `ITEMS`        | object | Index par id string. `ITEMS.bkston` → objet item complet.         |
+| `NODES_LOOKUP` | Array  | Lookup par code numérique (hot path). `NODES_LOOKUP[14]` → node.   |
+| `ITEMS`        | object | Index par id string. `ITEMS.bkston` → objet item complet.          |
 | `PLANTS`       | object | Index par id string.                                               |
-| `RECIPES`      | object | Index par id string.                                               |
+| `RECIPES`      | object | Pas d'index.                                                       |
 
 Note : les 'furnitures' sont des items possédant le type 'ITEM_TYPE.FURNITURE'.
+Note : les 'Crafting Stations' sont des 'furnitures' possédant le stype 'station'.
 
 ### Conventions d'accès
 
@@ -241,6 +242,16 @@ Cette section définit les événements officiels. Tout nouvel événement doit 
 | E | `render/set-zoom` | `zoomLevel: number` | Modifie le niveau de zoom (1.0-2.0). |
 | E | `time/sky-color-changed`| `string` (Hex Color) | Émis uniquement si la couleur change. |
 | S | `camera/preload-chunks-changed` | `Set<number>` | Émis à chaque changement de `preloadChunks`. |
+
+### Contrat des systèmes occupants
+
+Tout système qui occupe des tuiles dans le monde expose les méthodes suivantes :
+
+| Méthode | Signature | Description |
+| :--- | :--- | :--- |
+| `isTileOccupied` | `(index: number) → boolean` | Tuile couverte par une entité du système. |
+| `isFloorTile` | `(index: number) → boolean` | Tuile directement sous une entité — interdit au mining, sol pour les plantes... |
+| `isSurfaceTop` | `(index: number) → boolean` | Tuile sur laquelle on peut poser un objet (dessus d'un 'furniture' de type `surface`). |
 
 #### Furniture (`FurnitureManager`)
 
@@ -1322,3 +1333,15 @@ Interface DOM du panel de craft. Aucune logique métier — délègue à `invent
 Permet de parcourir et filtrer les recettes (par texte, type d'item résultat, station ou ingrédient), de visualiser le détail d'une recette (ingrédients, station, résultat, items retournés) avec les indicateurs de disponibilité, et d'exécuter le craft si toutes les conditions sont réunies (ingrédients disponibles, station à portée, place dans le bag).
 
 L'état des filtres est persisté en base de données entre les sessions.
+
+---
+
+### Class `FurnitureManager` (Singleton : `furnitureManager`, `housing.mjs`)
+
+#### Contrat des systèmes occupants — implémentation FurnitureManager
+
+| Méthode | Signature | Structure interne |
+| :--- | :--- | :--- |
+| `isTileOccupied` | `(index: number) → boolean` | `#occupiedTiles: Set<number>` — rectangle w×h complet |
+| `isFloorTile` | `(index: number) → boolean` | `#floorTiles: Set<number>` — ligne tileY+h |
+| `isSurfaceTop` | `(index: number) → boolean` | `#surfaceTops: Set<number>` — ligne tileY si `ITEMS[code].surface` |
