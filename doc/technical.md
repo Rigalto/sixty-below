@@ -1335,13 +1335,39 @@ L'état des filtres est persisté en base de données entre les sessions.
 
 ### Class `FurnitureManager` (Singleton : `furnitureManager`, `housing.mjs`)
 
+#### Structure DB (objectStore `furniture`)
+
+| Champ | Type | Description |
+| :--- | :--- | :--- |
+| `key` | `number` | Clé autoincrement — assignée par IndexedDB à la première sauvegarde |
+| `id` | `string` | Identifiant unique (uniqueIdGenerator) — stable sur toute la durée de vie du meuble |
+| `index` | `number` | Position du coin haut-gauche encodée `(y << 10) \| x`, en tuiles |
+| `w` | `number` | Largeur en tuiles |
+| `h` | `number` | Hauteur en tuiles |
+| `code` | `string` | itemId dans ITEMS |
+| `stype` | `string` | Sous-type fonctionnel : `station`, `chest`, `door`, `chair`, `toilet`, `fireplace`... |
+| `deleted` | `boolean` | Marqueur de suppression — `true` = purgé au prochain startSession, jamais supprimé en temps réel |
+
+Champs optionnels selon `stype` :
+
+| Champ | Type | Stypes concernés | Description |
+| :--- | :--- | :--- | :--- |
+| `left` | `boolean` | `door`, `chair`, `toilet`... | `true` = orienté à gauche. Absent pour les meubles symétriques |
+| `closed` | `boolean` | `door` | `true` = porte fermé, si `false` = porte ouverte à droite ou à gauche selon `left` |
+| `lit` | `boolean` | `fireplace`, `campfire`... | `true` = allumé. Absent pour les meubles non activables |
+| `name` | `string` | `chest`, `cabinet`, `closet`... | Nom personnalisé du container. Absent si non renommé |
 
 #### Placements
 
 | Méthode | Signature | Structure interne |
 | :--- | :--- | :--- |
-| `add` | `(code: string, clickIndex: number) → object` | Crée et enregistre un furniture. `clickIndex` = coin bas-gauche (convention joueur). Retourne le record créé. |
+| `place` | `(code: string, clickIndex: number) → object` | Crée et enregistre un furniture. `clickIndex` = coin bas-gauche (convention joueur). Retourne le record créé. |
 
+#### Accès
+
+| Méthode | Signature | Structure interne |
+| :--- | :--- | :--- |
+| `getFurnitureById` | `(furnitureId: string) → object` | Retourne le furniture placé à partir de son identifiant. |
 
 #### Contrat des systèmes occupants — implémentation FurnitureManager
 

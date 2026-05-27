@@ -1,6 +1,7 @@
 // housing.mjs
-import {eventBus} from './utils.mjs'
-// import {saveManager} from './persistence.mjs'
+import {eventBus, uniqueIdGenerator} from './utils.mjs'
+import {saveManager} from './persistence.mjs'
+import {camera} from './render.mjs'
 import {ITEMS} from '../../assets/data/data.mjs'
 
 /* ====================================================================================================
@@ -201,7 +202,7 @@ class FurnitureManager {
    */
   isSurfaceTop (index) { return this.#surfaceTops.has(index) }
 
-  // ─── Visualisation ──────────────────────────────────────────────────────────
+  // ─── Visualisation ───────────────────────────────────────────────────────────
 
   /**
    * Reconstruit #displayed à partir des chunks preload de la Camera.
@@ -219,6 +220,63 @@ class FurnitureManager {
       }
     }
     console.log('FurnitureManager.onPreloadChunksChanged', {displayed: this.#displayed})
+  }
+
+  // ─── Placement ───────────────────────────────────────────────────────────────
+
+  /**
+   * Pose un meuble dans le monde à partir d'un clic joueur (coin bas-gauche).
+   * L'appelant est responsable de la validation des conditions et du retrait inventaire.
+   * Enregistrement persisté via saveManager dans la même passe que le retrait inventaire.
+   * @param {string} code        — itemId dans ITEMS
+   * @param {number} clickIndex  — coin bas-gauche cliqué (y << 10) | x
+   * @returns {object} record créé
+   */
+  place (code, clickIndex) {
+    const item = ITEMS[code]
+    const placedImage = item.placed ?? item.placedLeft
+    const w = placedImage.sw / 16
+    const h = placedImage.sh / 16
+
+    const record = {
+      id: uniqueIdGenerator.getUniqueId(),
+      index: clickIndex - ((h - 1) << 10),
+      code,
+      stype: item.stype,
+      w,
+      h,
+      deleted: false
+    }
+
+    // État initial selon stype — liste à compléter au fur et à mesure
+    switch (item.stype) {
+      case 'door':
+        // redesign potentiel
+        record.left = true
+        record.closed = true
+        break
+      case 'chair':
+      case 'toilet':
+      case 'bed':
+        record.left = true
+        break
+      case 'fireplace':
+      case 'campfire':
+        record.lit = false
+        break
+    }
+
+    this.#list.push(record)
+    this.#byId.set(record.id, record)
+    this.#addToChunks(record)
+    this.#addToOccupancy(record)
+
+    const chunkKey = ((record.index >> 14) << 6) | ((record.index & 0x3FF) >> 4)
+    if (camera.preloadChunks.has(chunkKey)) this.#displayed.add(record)
+
+    saveManager.queueStaticUpdate({storeName: 'furniture', record})
+
+    return record
   }
 }
 export const furnitureManager = new FurnitureManager()
