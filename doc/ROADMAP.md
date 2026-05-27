@@ -108,7 +108,9 @@ fs.writeFileSync('docs/help-rendered.html', htmlHelp.join('\n'))
 
 ### Housing
 - Construction shelter (protection nocturne)
-- Placement furniture (crafting stations, coffres, lits, torches...)
+- Furniture :
+  - Tests
+  - Ajout de l'affichage
 - Machines ancestrales inamovibles (Lost Temple, Ancient House)
 
 ### Artisanat

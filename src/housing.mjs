@@ -215,7 +215,7 @@ class FurnitureManager {
   getFurnituresInRange (buffId, stypes) {
     // const {x: cx, y: cy} = playerManager.getCenterTile()  // TODO PlayerManager
     // const {w: rw, h: rh} = buffManager.getRangeValue(buffId)  // TODO BuffManager
-    const cx = 512; const cy = 200 // DEBUG
+    const cx = 206; const cy = 405 // DEBUG
     const rw = 10; const rh = 8 // DEBUG
 
     const x0 = cx - rw; const x1 = cx + rw
@@ -239,7 +239,7 @@ class FurnitureManager {
   getNearbyContainers () {
     // const {x: cx, y: cy} = playerManager.getCenterTile()  // TODO PlayerManager
     // const {w: rw, h: rh} = buffManager.getBuff('range-chest')  // TODO dans BuffManager
-    const cx = 512; const cy = 200 // DEBUG
+    const cx = 206; const cy = 405 // DEBUG
     const rw = 10; const rh = 8 // DEBUG
 
     const x0 = cx - rw; const x1 = cx + rw
@@ -320,6 +320,15 @@ class FurnitureManager {
    * @param {Set<number>} preloadChunks
    */
   onPreloadChunksChanged (preloadChunks) {
+    // DEBUG — 42 preloadChunks centrés sur tile (206, 405) ↔ coffre de test
+    const dbgCx = 206 >> 4; const dbgCy = 405 >> 4
+    const dbgChunks = new Set()
+    for (let dy = -2; dy <= 3; dy++) {
+      for (let dx = -3; dx <= 3; dx++) { dbgChunks.add(((dbgCy + dy) << 6) | (dbgCx + dx)) }
+    }
+    preloadChunks = dbgChunks
+    // FIN DEBUG
+
     this.#displayed.clear()
     for (const chunkKey of preloadChunks) {
       const set = this.#byChunk.get(chunkKey)

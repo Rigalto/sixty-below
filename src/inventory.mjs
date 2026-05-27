@@ -1514,6 +1514,9 @@ class InventoryOverlay {
   #btnTransfer // icône de transfert bag <-> Chest
   #btnTrash // icôns de placement du slot sélectionné dans la poubelle
   #btnRestore // icône de récupération du contenu de la poubelle
+  #chestSelect = null // <select> du panel container
+  #btnRename = null // bouton renommage
+  #chestIcon = null // icône du container sélectionné
 
   #dragSource = null // départ du drag & drop
   #ghost = null // div fantôme qui suit la souris pendant le drag & drop
@@ -1528,8 +1531,6 @@ class InventoryOverlay {
 
   #selectedSlot = null // référence au DOM element inventory-slot sélectionné
   #selectedFurnitureId // identifiant du coffre sélectionné
-
-  // Remplace le constructor entier de InventoryOverlay
 
   constructor () {
   // 1. Conteneur Principal — dimensions calculées
@@ -1789,6 +1790,10 @@ class InventoryOverlay {
     row.appendChild(select)
     row.appendChild(btnRename)
 
+    this.#chestIcon = icon
+    this.#chestSelect = select
+    this.#btnRename = btnRename
+
     // Ligne 2 : formulaire de renommage (caché par défaut)
     const renameForm = document.createElement('div')
     renameForm.className = 'inv-chest-rename-form hidden'
@@ -1875,6 +1880,10 @@ class InventoryOverlay {
       this.refreshBag()
       this.#refreshContainer()
     })
+
+    // gestion de la sélection d'un coffre
+    this.onChestSelectChange = this.onChestSelectChange.bind(this)
+    this.#chestSelect.addEventListener('change', this.onChestSelectChange)
   }
 
   // /////////// //
@@ -2099,10 +2108,8 @@ class InventoryOverlay {
     for (let i = 0; i < 64; i++) {
       this.#updateSlotDOM(this.#containerSlots[i], emptySlot)
     }
-    // TODO : peupler le dropdown des coffres dans le range
-    // for (const id of furnitureManager.getNearbyContainerIds()) {
-    //   ...
-    // }
+    // peuplement du dropdown des coffres dans le range
+    this.#populateContainerSelect()
   }
 
   /**
@@ -2363,6 +2370,61 @@ class InventoryOverlay {
       this.#updateSlotDOM(this.#bagSlots[dest.slot], dest)
     }
     this.#updateActionButtons()
+  }
+
+  // ////////////////// //
+  // GESTION DES CHESTS //
+  // ////////////////// //
+
+  /**
+   * Peuple le dropdown avec les containers proches du joueur.
+   * Sélectionne le premier par défaut. Vide et désactive si aucun container dans le range.
+   */
+  #populateContainerSelect () {
+    const containers = furnitureManager.getNearbyContainers()
+    this.#chestSelect.length = 0
+
+    if (containers.length === 0) {
+      this.#selectedFurnitureId = null
+      this.#btnRename.disabled = true
+      return
+    }
+
+    for (const furniture of containers) {
+      const option = document.createElement('option')
+      option.value = furniture.id
+      option.textContent = furniture.name
+      this.#chestSelect.appendChild(option)
+    }
+
+    this.#btnRename.disabled = false
+    this.#updateContainerSelection(containers[0])
+  }
+
+  /**
+   * Met à jour l'icône et l'état de sélection pour le furniture container donné.
+   * @param {object} furniture
+   */
+  #updateContainerSelection (furniture) {
+    this.#selectedFurnitureId = furniture.id
+    const img = ITEMS[furniture.code].image
+    Object.assign(this.#chestIcon.style, {
+      backgroundImage: `url(assets/sprites/${img.file}.png)`,
+      backgroundPosition: `-${img.sx}px -${img.sy}px`,
+      backgroundRepeat: 'no-repeat',
+      backgroundSize: 'auto'
+    })
+    this.#chestIcon.title = ITEMS[furniture.code].name
+  }
+
+  /**
+   * Réagit au changement de sélection dans le dropdown containers.
+   * Lié dans le constructeur.
+   */
+  onChestSelectChange () {
+    const furniture = furnitureManager.getFurnitureById(this.#chestSelect.value)
+    if (furniture === undefined) return
+    this.#updateContainerSelection(furniture)
   }
 }
 export const inventoryOverlay = new InventoryOverlay()
