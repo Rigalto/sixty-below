@@ -45,7 +45,9 @@
 - `BuffManager` :
   - récupération des timer buffs dans la fonction `init`, lancement `TaskScheduler`
   - traitement de chaque `eventBus` qui impacte un ou plusieurs buff
-  - implémenter les buffs composés à chaque fois que l'un d'entre eux est défini (`#fns`)
+  - implémenter les buffs composés à chaque fois que l'un d'entre eux est défini (`#fns`) :
+    - `range-chest`
+    - `range-station`
   - vérifier que l'affichage des anciens buffs après création du monde pendant une seconde max est acceptable
 
 ---
@@ -53,7 +55,7 @@
 ## À faire — Data (`data.mjs`)
 
 - Table MONSTERS : attributs complets (spawn, comportement, drops, conditions d'apparition)
-- Compléter les items : Oak Root, Mahogany Root, Mycelium, Taproot, Shell
+- Compléter les items : Oak Root, Mahogany Root, Mycelium, Taproot
 - Recettes utilisant les nouveaux matériaux (marbre, granite, obsidian, shell...)
 - Machines ancestrales : Décomposeur (rendement 80%) et Transmutateur — comme Furniture spécial
 
@@ -85,6 +87,7 @@ fs.writeFileSync('docs/help-rendered.html', htmlHelp.join('\n'))
 - Caméra centrée joueur, zoom
 - Minage (vitesse selon `speed` du node, drops)
 - Cycle jour/nuit, météo, phases de lune
+- implémenter playerManager.getCenterTile() // renvoie l'index de la tuile située au milieu du player (pour les Ranges)
 
 ### Faune & Critters
 - Spawning par biome/layer (table MONSTERS)
@@ -187,7 +190,6 @@ La Sap corrode le Copper. Il doit donc être remplacer par du Gold.
 
 ## À faire — UI (`ui.mjs`)
 
-- Panel craft
 - Panel combat (overlay tactique)
 
 ---
@@ -195,7 +197,7 @@ La Sap corrode le Copper. Il doit donc être remplacer par du Gold.
 ## Connu mais différé
 
 - Nettoyage `ROADMAP.md` : supprimer les entrées au fur et à mesure
-- Sprites manquants : HARDSTONE, LIMESTONE, SLATE, GRASSFERN, GRASSMUSHROOM
+- Sprites manquants : GRASSFERN, GRASSMUSHROOM
 ---
 
 ## Terminé

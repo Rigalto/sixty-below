@@ -1362,12 +1362,14 @@ Champs optionnels selon `stype` :
 | Méthode | Signature | Structure interne |
 | :--- | :--- | :--- |
 | `place` | `(code: string, clickIndex: number) → object` | Crée et enregistre un furniture. `clickIndex` = coin bas-gauche (convention joueur). Retourne le record créé. |
+| `unplace` | `(furnitureId: string) → object\|undefined` | Retire un furniture du monde. `deleted=true` en DB, retrait immédiat des structures mémoire. Retourne le record (l'appelant gère la réinsertion inventaire). `undefined` si introuvable. |
 
 #### Accès
 
 | Méthode | Signature | Structure interne |
 | :--- | :--- | :--- |
 | `getFurnitureById` | `(furnitureId: string) → object` | Retourne le furniture placé à partir de son identifiant. |
+| `getFurnitureAt` | `(tileIndex: number) → object\|null` | Early-exit via `#occupiedTiles`, puis scan de 1 à 4 chunks via `#byChunk` (1 chunk dans ~76% des cas). |
 
 #### Contrat des systèmes occupants — implémentation FurnitureManager
 

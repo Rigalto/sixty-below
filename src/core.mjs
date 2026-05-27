@@ -1,5 +1,5 @@
 import {TIME_BUDGET, MICROTASK_FN_NAME_TO_KEY, STATE, OVERLAYS} from './constant.mjs'
-import {NODES, NODES_LOOKUP, ITEMS, RECIPES, TREE_IMAGES, PLANT_KIND, PLANT_TYPE} from '../../assets/data/data.mjs'
+import {NODES, NODES_LOOKUP, MAX_FURNITURE_W, MAX_FURNITURE_H, ITEMS, RECIPES, TREE_IMAGES, PLANT_KIND, PLANT_TYPE} from '../../assets/data/data.mjs'
 import {HELP_TITLES, hydrateHelp} from '../../assets/data/data-help.mjs'
 import {loadAssets, resolveAssetData} from './assets.mjs'
 import {timeManager, taskScheduler, microTasker, eventBus, seededRNG, parseLootCount, parseLootBuffs, buildLootHelpRow} from './utils.mjs'
@@ -153,6 +153,13 @@ class GameCore {
       if (!HELP_TITLES.has(item.help)) {
         console.error(`[core] ITEMS.${key} : help topic inconnu '${item.help}'`)
         errors++
+      }
+
+      const placedImage = item.placed ?? item.placedLeft
+      if (placedImage) {
+        if (placedImage.sw / 16 > MAX_FURNITURE_W || placedImage.sh / 16 > MAX_FURNITURE_H) {
+          console.error(`[hydrateItems] ITEMS.${key} : dimensions ${placedImage.sw / 16}×${placedImage.sh / 16} dépassent MAX_FURNITURE_W/H (${MAX_FURNITURE_W}×${MAX_FURNITURE_H}) — mettre à jour les constantes`)
+        }
       }
       count++
     }

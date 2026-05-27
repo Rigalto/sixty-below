@@ -197,6 +197,13 @@ export const ARMOR_SLOTS = ['head', 'body', 'foot']
 export const ARMOR_SLOT_LABELS = ['Head', 'Body', 'Foot']
 
 /* =========================================
+   DEFINITION DES ITEMS
+   ========================================= */
+
+export const MAX_FURNITURE_W = 3 // largeur max d'un furniture, en tuiles
+export const MAX_FURNITURE_H = 3 // hauteur max d'un furniture, en tuiles
+
+/* =========================================
    DEFINITION DES ICONES
    ========================================= */
 

@@ -133,6 +133,9 @@ export const ITEM_TYPE = {
   FURNITURE: 0x1, TOOL: 0x2, MATERIAL: 0x4, FOOD: 0x08, BLOCK: 0x10, WALL: 0x20, MECHANISM: 0x40, AMMUNITION: 0x80, CHUNK: 0x100, ARMOR: 0x200, BAR: 0x400, WEAPON: 0x800, TRINKET: 0x1000, ACCESSORY: 0x2000, GEM: 0x4000, POTION: 0x8000, SEMABLE: 0x10000, BAG: 0x20000, BAIT: 0x40000, USABLE: 0x80000, PLACABLE: 0x100000, UNIQUE: 0x200000, UNDISPOSABLE: 0x400000, NONE: 0, CRAFTABLE: 0x800000
 }
 
+export const MAX_FURNITURE_W = 3 // tuiles — vérification taille réelle dans GameCore.#hydrateItems()
+export const MAX_FURNITURE_H = 3 // tuiles — idem
+
 // MATERIAL et CRAFTABLE sont ajoutés automatiquement en post-traitement
 // en fonction des recettes.
 

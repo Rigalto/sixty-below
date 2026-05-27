@@ -1,8 +1,10 @@
 // housing.mjs
-import {eventBus, uniqueIdGenerator} from './utils.mjs'
+import {eventBus} from './utils.mjs'
+import {uniqueIdGenerator} from './database.mjs'
+import {CONTAINER_STYPES} from './constant.mjs'
 import {saveManager} from './persistence.mjs'
 import {camera} from './render.mjs'
-import {ITEMS} from '../../assets/data/data.mjs'
+import {MAX_FURNITURE_W, MAX_FURNITURE_H, ITEMS} from '../../assets/data/data.mjs'
 
 /* ====================================================================================================
    FURNITURE MANAGER
@@ -202,6 +204,113 @@ class FurnitureManager {
    */
   isSurfaceTop (index) { return this.#surfaceTops.has(index) }
 
+  /**
+   * Retourne les furnitures de #displayed dans le rectangle centré joueur défini par buffId.
+   * Centre joueur et range récupérés depuis playerManager et buffManager (commentés — DEBUG).
+   * Le range 24×20 tuiles couvrirait 9 this.#byChunk.get — moins efficace que le scan direct.
+   * @param {string}   buffId  — identifiant du buff composite définissant le range
+   * @param {Set<string>} stypes — sous-types acceptés
+   * @returns {Array<object>}
+   */
+  getFurnituresInRange (buffId, stypes) {
+    // const {x: cx, y: cy} = playerManager.getCenterTile()  // TODO PlayerManager
+    // const {w: rw, h: rh} = buffManager.getRangeValue(buffId)  // TODO BuffManager
+    const cx = 512; const cy = 200 // DEBUG
+    const rw = 10; const rh = 8 // DEBUG
+
+    const x0 = cx - rw; const x1 = cx + rw
+    const y0 = cy - rh; const y1 = cy + rh
+
+    const result = []
+    for (const furniture of this.#displayed) {
+      if (!stypes.has(furniture.stype)) continue
+      const fx = furniture.index & 0x3FF
+      const fy = furniture.index >> 10
+      if (fx >= x0 && fx <= x1 && fy >= y0 && fy <= y1) { result.push(furniture) }
+    }
+    return result
+  }
+
+  /**
+   * Retourne les containers (chest, closet, cabinet...) dans le range 'range-chest' autour du joueur.
+   * Le range 24×20 tuiles couvrirait 9 this.#byChunk.get — moins efficace que le scan direct.
+   * @returns {Array<object>}
+   */
+  getNearbyContainers () {
+    // const {x: cx, y: cy} = playerManager.getCenterTile()  // TODO PlayerManager
+    // const {w: rw, h: rh} = buffManager.getBuff('range-chest')  // TODO dans BuffManager
+    const cx = 512; const cy = 200 // DEBUG
+    const rw = 10; const rh = 8 // DEBUG
+
+    const x0 = cx - rw; const x1 = cx + rw
+    const y0 = cy - rh; const y1 = cy + rh
+
+    const result = []
+    for (const furniture of this.#displayed) {
+      if (!CONTAINER_STYPES.has(furniture.stype)) continue
+      const fx = furniture.index & 0x3FF
+      const fy = furniture.index >> 10
+      if (fx >= x0 && fx <= x1 && fy >= y0 && fy <= y1) result.push(furniture)
+    }
+    return result
+  }
+
+  /**
+   * Retourne les crafting stations dans le range 'range-station' autour du joueur.
+   * Le range 24×20 tuiles couvrirait 9 this.#byChunk.get — moins efficace que le scan direct.
+   * @returns {Array<object>}
+   */
+  getNearbyCraftingStations () {
+    // const {x: cx, y: cy} = playerManager.getCenterTile()  // TODO PlayerManager
+    // const {w: rw, h: rh} = buffManager.getRangeValue('range-station')  // TODO BuffManager
+    const cx = 512; const cy = 200 // DEBUG
+    const rw = 10; const rh = 8 // DEBUG
+
+    const x0 = cx - rw; const x1 = cx + rw
+    const y0 = cy - rh; const y1 = cy + rh
+
+    const result = []
+    for (const furniture of this.#displayed) {
+      if (furniture.stype !== 'station') continue
+      const fx = furniture.index & 0x3FF
+      const fy = furniture.index >> 10
+      if (fx >= x0 && fx <= x1 && fy >= y0 && fy <= y1) result.push(furniture)
+    }
+    return result
+  }
+
+  /**
+   * Retourne le furniture situé sur la tuile cliquée, ou null si aucun.
+   * Early-exit via #occupiedTiles (O(1)), puis recherche dans 1 à 4 chunks via #byChunk.
+   * Le chunk courant seul est testé quand px >= MAX_FURNITURE_W-1 et py >= MAX_FURNITURE_H-1
+   * (~76% des cas pour des meubles de 3×3 max).
+   * @param {number} tileIndex — (y << 10) | x
+   * @returns {object|null}
+   */
+  getFurnitureAt (tileIndex) {
+    if (!this.#occupiedTiles.has(tileIndex)) return null
+
+    const tx = tileIndex & 0x3FF
+    const ty = tileIndex >> 10
+    const cx = tx >> 4
+    const cy = ty >> 4
+    const cxMin = (tx & 0xF) < MAX_FURNITURE_W ? cx - 1 : cx
+    const cyMin = (ty & 0xF) < MAX_FURNITURE_H ? cy - 1 : cy
+
+    for (let cky = cyMin; cky <= cy; cky++) {
+      const rowKey = cky << 6
+      for (let ckx = cxMin; ckx <= cx; ckx++) {
+        const set = this.#byChunk.get(rowKey | ckx)
+        if (set === undefined) continue
+        for (const furniture of set) {
+          const fx = furniture.index & 0x3FF
+          const fy = furniture.index >> 10
+          if (tx >= fx && tx < fx + furniture.w && ty >= fy && ty < fy + furniture.h) return furniture
+        }
+      }
+    }
+    return null
+  }
   // ─── Visualisation ───────────────────────────────────────────────────────────
 
   /**
@@ -273,6 +382,36 @@ class FurnitureManager {
 
     const chunkKey = ((record.index >> 14) << 6) | ((record.index & 0x3FF) >> 4)
     if (camera.preloadChunks.has(chunkKey)) this.#displayed.add(record)
+
+    saveManager.queueStaticUpdate({storeName: 'furniture', record})
+
+    return record
+  }
+
+  /**
+   * Retire un meuble du monde et le marque deleted=true en DB.
+   * Retrait immédiat de toutes les structures mémoire.
+   * L'appelant est responsable de la réinsertion en inventaire.
+   * @param {string} furnitureId
+   * @returns {object|undefined} — record retiré, undefined si introuvable
+   */
+  unplace (furnitureId) {
+    const record = this.#byId.get(furnitureId)
+    if (record === undefined) return undefined
+
+    record.deleted = true
+
+    const listIndex = this.#list.indexOf(record)
+    if (listIndex !== -1) {
+      // suppression optimisée
+      this.#list[listIndex] = this.#list[this.#list.length - 1]
+      this.#list.length--
+    }
+
+    this.#byId.delete(furnitureId)
+    this.#removeFromChunks(record)
+    this.#removeFromOccupancy(record)
+    this.#displayed.delete(record)
 
     saveManager.queueStaticUpdate({storeName: 'furniture', record})
 

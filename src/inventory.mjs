@@ -2083,10 +2083,6 @@ class InventoryOverlay {
     this.#container.style.display = 'flex'
     // récupération des slots de la hotbar et du bag
     this.refreshBag()
-    // const hotbar = inventoryManager.hotbar
-    // for (let i = 0; i < hotbar.length; i++) {
-    //   this.#updateSlotDOM(this.#hotbarSlots[i], hotbar[i])
-    // }
     // récupération des slots de Armor
     const armor = inventoryManager.armor
     for (let i = 0; i < armor.length; i++) {
@@ -2098,17 +2094,15 @@ class InventoryOverlay {
     for (let i = 0; i < accessory.length; i++) {
       this.#updateSlotDOM(this.#accessorySlots[i], accessory[i])
     }
-    // récupération des slots de Bag
-    // const bag = inventoryManager.bag
-    // for (let i = 0; i < bag.length; i++) {
-    //   this.#updateSlotDOM(this.#bagSlots[i], bag[i])
-    // }
     // initialisation des slots de Container
     const emptySlot = {item: '', count: 0, locked: false, container: 'container'}
     for (let i = 0; i < 64; i++) {
       this.#updateSlotDOM(this.#containerSlots[i], emptySlot)
     }
     // TODO : peupler le dropdown des coffres dans le range
+    // for (const id of furnitureManager.getNearbyContainerIds()) {
+    //   ...
+    // }
   }
 
   /**
