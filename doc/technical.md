@@ -54,9 +54,6 @@ Aucune dépendance externe autorisée. Aucune donnée métier.
 | `CANVAS_WIDTH`     | number  | 1024      | Largeur canvas en px                     |
 | `CANVAS_HEIGHT`    | number  | 768       | Hauteur canvas en px                     |
 | `SEA_LEVEL`        | number  | 56        | Niveau de la mer en tuiles               |
-| `WORLD_WIDTH_SHIFT`| number  | 11        | `2^11 = 1024` — shift pour index ligne   |
-| `CHUNK_SHIFT`      | number  | 4         | `2^4 = 16` — shift pour coordonnées chunk|
-| `CHUNK_MASK`       | number  | `0b1111`  | Masque position locale dans un chunk     |
 | `MICROTASK`        | object  | —         | Config priorité/capacité des microtâches |
 | `DB_CONFIG`        | object  | —         | Config IndexedDB (NAME, VERSION, DEBUG)  |
 
@@ -1337,6 +1334,14 @@ L'état des filtres est persisté en base de données entre les sessions.
 ---
 
 ### Class `FurnitureManager` (Singleton : `furnitureManager`, `housing.mjs`)
+
+
+#### Placements
+
+| Méthode | Signature | Structure interne |
+| :--- | :--- | :--- |
+| `add` | `(code: string, clickIndex: number) → object` | Crée et enregistre un furniture. `clickIndex` = coin bas-gauche (convention joueur). Retourne le record créé. |
+
 
 #### Contrat des systèmes occupants — implémentation FurnitureManager
 

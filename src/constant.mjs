@@ -85,14 +85,8 @@ export const TOPSOIL_Y_CAVERNS_MID = 375
    3. BITWISE OPERATIONS & OPTIMIZATIONS
    ========================================= */
 // Optimisations pour éviter les multiplications/divisions
-// Exemple: y * 2048 devient y << WORLD_WIDTH_SHIFT
-
-export const WORLD_WIDTH_SHIFT = 11 // 2^11 = 2048
-export const CHUNK_SHIFT = 4 // 2^4 = 16
-
-// Masque pour obtenir la position locale dans un chunk (0-15)
-// Exemple: x % 16 devient x & CHUNK_MASK
-export const CHUNK_MASK = 0b1111 // 15
+// Pas de constantes, on écrira en dur :
+//    const index = y << 10 | x
 
 /* =========================================
    4. TILE PROPERTIES (BITMASKS)
@@ -100,14 +94,7 @@ export const CHUNK_MASK = 0b1111 // 15
 // Encodage des propriétés des tuiles sur les bits supérieurs si nécessaire
 // ou usage pour les collisions
 
-export const COLLISION_MASK = {
-  NONE: 0,
-  SOLID: 1 << 0, // 1: Bloque le mouvement
-  PLATFORM: 1 << 1, // 2: Traversable par le bas
-  LIQUID: 1 << 2, // 4: Ralentit, nage
-  DAMAGE: 1 << 3, // 8: Lave, pics
-  SLOW: 1 << 4 // 16: Ralentit (Toile d'araignée)
-}
+// à concevoir
 
 /* =========================================
    5. TIME & CALENDAR
@@ -116,7 +103,6 @@ export const COLLISION_MASK = {
 // 24 min réelles = 1 jour monde (24h)
 export const REAL_MS_PER_GAME_MIN = 1000 // 1 sec réelle = 1 min jeu
 export const GAME_MIN_PER_REAL_MS = 1 / REAL_MS_PER_GAME_MIN
-
 export const DAY_DURATION_GAME_MIN = 24 * 60 // 1440 minutes jeu
 
 /* =========================================

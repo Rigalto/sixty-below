@@ -1,4 +1,4 @@
-import {SKY_COLORS, WEATHER_TYPE} from './constant.mjs'
+import {SKY_COLORS, WEATHER_TYPE, REAL_MS_PER_GAME_MIN, DAY_DURATION_GAME_MIN} from './constant.mjs'
 
 /* ====================================================================================================
    EVENT BUS
@@ -540,10 +540,6 @@ export const taskScheduler = new TaskScheduler()
    TIME MANAGER
    ==================================================================================================== */
 
-// Constantes de conversion
-const REAL_MS_PER_GAME_MINUTE = 1000 // 1000ms réelles = 1 minute dans le jeu
-const GAME_MINUTES_PER_DAY = 1440 // 24h * 60min
-
 export class TimeManager {
   // Déclaration des champs privés
   #minute5Cache
@@ -611,10 +607,10 @@ export class TimeManager {
     const isFirstLoop = this.#isFirstLoop
 
     // CONVERSION : Playtime (ms) -> Calendrier Monde
-    const totalGameMinutes = Math.floor(this.timestamp / REAL_MS_PER_GAME_MINUTE)
+    const totalGameMinutes = Math.floor(this.timestamp / REAL_MS_PER_GAME_MIN)
 
-    const day = Math.floor(totalGameMinutes / GAME_MINUTES_PER_DAY)
-    const dayTimeMinutes = totalGameMinutes % GAME_MINUTES_PER_DAY // 0 - 1439
+    const day = Math.floor(totalGameMinutes / DAY_DURATION_GAME_MIN)
+    const dayTimeMinutes = totalGameMinutes % DAY_DURATION_GAME_MIN // 0 - 1439
     const hour = Math.floor(dayTimeMinutes / 60)
     const minute = dayTimeMinutes % 60
 
