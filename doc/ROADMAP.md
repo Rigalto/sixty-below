@@ -15,6 +15,13 @@
 
 ---
 
+## Dette technique
+
+- Vérifier que la convention pour les variables privée est prise en compte partout
+- Vérifier que les en-têtes des fonctions sont présents et à jour (prise en compte des modifications de conception)
+
+---
+
 ## À faire — Bugs connus
 - Dans le control panel, le survol de l'heure doit donner la période du jour (dawn...)
 - Il n'y a pas assez de Cactus dans le monde => sans doute pas assez de SAND sur le sol souterrain.
