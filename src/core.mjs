@@ -157,7 +157,7 @@ class GameCore {
       count++
     }
 
-    console.log(`   🔹 Items hydratés : ${count}, ${errors} erreur(s)`)
+    console.log(`   🔹 Items hydratés : ${count}, ${errors} erreur(s)`, ITEMS)
   }
 
   /**
