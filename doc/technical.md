@@ -579,12 +579,13 @@ Proxy universel : toutes les opérations d'une session transitent par cette clas
 | `getRecordByKey`       | `(storeName, key): Promise`            | Lecture par clé primaire                                      |
 | `readAllFromObjectStore` | `(storeName): Promise<Array>`        | Lecture complète d'un store                                   |
 | `addMultipleRecords`   | `(storeName, items): Promise`          | Insertion en masse                                            |
-| `clearObjectStore`     | `(storeName): Promise`                 | Vide un store                                                 |
-| `clearAllObjectStores` | `(): Promise`                          | Reset complet (nouveau monde)                                 |
-| `openTransaction`      | `(storeName, mode): IDBTransaction`    | Transaction manuelle                                          |
-| `batchUpdate`          | `(operations): Promise`                | Lot d'opérations mixtes en une transaction                    |
-| `backupDatabase`       | `(): Promise`                          | Export JSON (debug)                                           |
-| `restoreDatabase`      | `(file): Promise`                      | Import JSON (debug)                                           |
+| `clearObjectStore`     | `(storeName): Promise`                 | Vide un store |
+| `clearAllObjectStores` | `(): Promise`                          | Reset complet (nouveau monde) |
+| `openTransaction`      | `(storeName, mode): IDBTransaction`    | Transaction manuelle |
+| `batchUpdate`          | `(operations): Promise`                | Lot d'opérations mixtes en une transaction |
+| `backupDatabase`       | `(): Promise`                          | Export JSON (debug) |
+| `restoreDatabase`      | `(file): Promise`                      | Import JSON (debug) |
+| `putAchievement` | `(record: {code: string, count: number}) → Promise<object>` | `put()` inconditionnel sur le store `achievements`. `code` est le keyPath — obligatoire. |
 
 ---
 
