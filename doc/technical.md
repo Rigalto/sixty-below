@@ -226,6 +226,12 @@ Cette section définit les événements officiels. Tout nouvel événement doit 
 | `overlay/close` | `string` (Overlay ID) | Demande générique de fermeture émise par le bouton 'X' d'un overlay. Traitée par `KeyboardManager`. |
 | `overlay/open-request`| `string` (Overlay ID) | Demande générique d'ouverture d'un overlay. Traitée par `KeyboardManager`. |
 
+#### Control Panel / Barre d'actions (`MenuBarWidget`)
+
+| Dir. | Event Name | Payload Structure | Description |
+| :---: | :--- | :--- | :--- |
+| E | `overlay/open-request`| `string` (Overlay ID) | Demande d'ouverture d'un overlay. Traitée par `KeyboardManager`. |
+
 #### Player (`PlayerManager`)
 *En prévision*
 | Event Name | Payload Structure | Description |
