@@ -2407,6 +2407,7 @@ class InventoryOverlay {
    */
   #updateContainerSelection (furniture) {
     this.#selectedFurnitureId = furniture.id
+    // Modification de l'icône de coffre
     const img = ITEMS[furniture.code].image
     Object.assign(this.#chestIcon.style, {
       backgroundImage: `url(assets/sprites/${img.file}.png)`,
@@ -2415,6 +2416,14 @@ class InventoryOverlay {
       backgroundSize: 'auto'
     })
     this.#chestIcon.title = ITEMS[furniture.code].name
+    // modification des slots du coffre
+    const capacity = CONTAINER_CAPACITY[furniture.stype]
+    for (let i = 0; i < this.#containerSlots.length; i++) {
+      this.#containerSlots[i].classList.toggle('inactive', i >= capacity)
+      if (i < capacity) {
+        this.#updateSlotDOM(this.#containerSlots[i], inventoryManager.getContainerSlot(furniture.id, i))
+      }
+    }
   }
 
   /**

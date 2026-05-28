@@ -6767,7 +6767,7 @@ class FurnitureGenerator {
       const cx = seededRNG.randomGetMinMax(2, WORLD_WIDTH - 3)
       if (guardedX.has(cx)) continue
 
-      const y = surfaceLine[cx]
+      let y = surfaceLine[cx]
       const tileCode = worldBuffer.read(cx, y)
       if (tileCode === SEA || tileCode === WATER) continue
 
@@ -6783,7 +6783,14 @@ class FurnitureGenerator {
       }
 
       const goLeft = canLeft && (!canRight || seededRNG.randomGetBool())
-      const chestX = goLeft ? cx - 1 : cx
+      let chestX = goLeft ? cx - 1 : cx
+
+      // DEBUG
+      if (placed === 0) {
+        chestX = 206
+        y = 407
+      }
+      // FIN DEBUG
 
       const chest = this.addFurnitureAt(((y - 1) << 10) | chestX, CHEST_TYPE[biome])
       this.fillChest(chest)

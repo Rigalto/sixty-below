@@ -480,17 +480,28 @@ export const TEMPLE_RUIN_COLUMNS = [
 export const TEMPLE_RUIN_WALL_INDEXES = TEMPLE_RUIN_WALL.map(({dx, dy}) => (dy << 10) | dx)
 export const TEMPLE_RUIN_COLUMNS_INDEXES = TEMPLE_RUIN_COLUMNS.map(({dx, dy}) => (dy << 10) | dx)
 
+/**
+ * Loot Table utilities — parseLootEntry / rollLoot
+ *
+ * Format d'une entrée : 'itemId:weight:count'
+ *   count peut être :
+ *     '3'       → fixe
+ *     '1.40'    → fixe + 40% d'un item supplémentaire
+ *     '5-8'     → range uniforme
+ *     '5-8.40'  → range + 40% d'un item supplémentaire
+ *
+ **/
 export const CHEST_CONTENT = {
-  copperChest: ['copperChunk:80:5-8'],
-  silverChest: ['copperChunk:80:5-8'],
-  goldChest: ['copperChunk:80:5-8'],
-  woodChest: ['copperChunk:80:5-8'],
-  mahoganyChest: ['copperChunk:80:5-8'],
-  sandstoneChest: ['copperChunk:80:5-8'],
-  oceanChest: ['copperChunk:80:5-8'],
-  forestChest: ['copperChunk:80:5-8'],
-  desertChest: ['copperChunk:80:5-8'],
-  jungleChest: ['copperChunk:80:5-8']
+  copperChest: ['chunkCopper:80:5-8'],
+  silverChest: ['chunkCopper:80:5-8'],
+  goldChest: ['chunkCopper:80:5-8'],
+  oceanChest: ['chunkCopper:80:5-8', 'coral:60:3-6'],
+  woodChest: ['chunkCopper:80:5-8', 'chunkIron:50:4-7', 'chunkSilver:10:3-5', 'chunkGold:5:2-4', 'logOak:75:8-12'],
+  mahoganyChest: ['chunkCopper:80:5-8', 'chunkIron:50:4-7', 'chunkSilver:10:3-5', 'chunkGold:5:2-4', 'logOak:75:4-6', 'logMahogany:75:4-6'],
+  sandstoneChest: ['chunkCopper:80:5-8', 'chunkIron:50:4-7', 'chunkSilver:10:3-5', 'chunkGold:5:2-4', 'logMahogany:75:8-12'],
+  forestChest: ['chunkCopper:80:5-8'],
+  desertChest: ['chunkCopper:80:5-8'],
+  jungleChest: ['chunkCopper:80:5-8']
 }
 
 for (const type in CHEST_CONTENT) {
