@@ -689,6 +689,9 @@ class CraftOverlay {
       this.#updateCraftInput()
       this.#updateCraftButton()
       this.#updateIngredientQtys()
+
+      // ── Prévenir le joueur ────────────────────────────────────
+      window.alert(`Crafted: ${runs * this.#selectedRecipe.result.count} x ${this.#selectedRecipe.result.item.name}`)
     })
   }
 
