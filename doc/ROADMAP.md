@@ -16,10 +16,11 @@
 
 ## Dette technique
 
-- Vérifier que la convention pour les variables privées est prise en compte partout
+- Vérifier que la convention pour les variables privées est prise en compte partout :
   - fait pour `inventory.mjs`, `craft.mjs`
-- Vérifier que les en-têtes des fonctions sont présents et à jour (prise en compte des modifications de conception)
+- Vérifier que les en-têtes des fonctions sont présents et à jour (prise en compte des modifications de conception) :
   - fait pour `inventory.mjs`, `craft.mjs`
+- Remplacer les styles inline par des règles CSS injectées dans le DOM.
 
 ---
 
