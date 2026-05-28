@@ -1,4 +1,4 @@
-// InventoryManager — inventory.mjs
+// inventory.mjs — InventoryManager · InventorySlot · InventoryOverlay
 
 import {OVERLAYS, BAG_CAPACITY, HOTBAR_CAPACITY, ARMOR_CAPACITY, ARMOR_SLOT_LABELS, ACCESSORY_CAPACITY, CONTAINER_STYPES, CONTAINER_CAPACITY, ARMOR_SLOTS, PATH_RENAME, PATH_LOCKED, PATH_UNLOCKED, PATH_CRAFT, SVG_ICON, PATH_HELP, PATH_DEBUG, PATH_SPLIT, PATH_TRASH_DOWN, PATH_TRASH_UP, PATH_USE, PATH_WARNING, PATH_ARROW_RIGHT} from './constant.mjs'
 import {eventBus, capitalize} from './utils.mjs'
@@ -7,95 +7,37 @@ import {ITEMS, ITEM_TYPE} from '../../assets/data/data.mjs'
 import {saveManager} from './persistence.mjs'
 import {furnitureManager} from './housing.mjs'
 
-/**
- * @file inventory.mjs
- * @description Gestion de l'inventaire du joueur et des containers du monde.
- *
- * ── Structure DB (objectStore 'inventory') ──────────────────────────────────
- *
- * Chaque slot est un enregistrement permanent en base (tous les slots
- * présents, y compris vides). Un seul type d'opération DB : toujours un update.
- *
- * {
- *   key:         number,   // clé DB autoincrement — lien entre slot et enregistrement
- *   container:   string,   // 'bag' | 'hotbar' | 'armor' | 'accessory' | 'chest' | 'closet' | 'cabinet'
- *   furnitureId: string,   // identifiant du furniture (uniquement chest/closet/cabinet), '' sinon
- *   item:        string,   // itemId — '' si vide
- *   count:       number,   // 0 si vide
- *   prefix:      string,   // modificateur — '' si aucun
- *   slot:        number,   // position dans le container (index linéaire, 0..63)
- *   locked:      boolean,  // slot verrouillé — aucun mouvement possible
- *   deleted:     boolean,  // true = furniture retiré du monde — destruction au startSession
- * }
- *
- * Capacités des containers
- *   bag      : 64 slots (8×8)
- *   hotbar   : 8 slots
- *   armor    : 3 slots (HEAD=0, CHEST=1, FEET=2)
- *   accessory: 5 slots
- *   chest/closet/cabinet : (56/64/48), défini dans ITEMS
- *
- * Pose d'un furniture container → insert de N slots vides (deleted=false)
- *   Attention, les 'key' ne sont disponibles qu'après la sauvegarde qui est asynchrone
- * Retrait d'un furniture container (vide obligatoire) → update deleted=true sur tous ses slots
- * Purge des deleted=true → au startSession (comme plants, buffs)
- *
- * ── Données en mémoire ──────────────────────────────────────────────────────
- *
- * InventoryManager maintient en mémoire :
- *   #bag[]         — 64 slots du joueur
- *   #hotbar[]      — 8 slots hotbar
- *   #armor[]       — 3 slots armure (HEAD, CHEST, FEET)
- *   #accessories[] — 5 slots accessoires
- *   #containers    — Map<furnitureId, slots[]> — containers du monde chargés
- *   #trash         — dernier slot jeté à la poubelle (annulation possible)
- *   #dirtyKeys     — Set<key> — clés DB des slots modifiés depuis l'ouverture
- *
- * ── Stackabilité ────────────────────────────────────────────────────────────
- *
- * Deux slots sont stackables si et seulement si :
- *   item === item && prefix === prefix
- *   les deux slots ne doivent pas être locked
- *
- * ── Sauvegarde (à la fermeture) ─────────────────────────────────────────────
- *
- * Seuls les slots dont la key est dans #dirtyKeys sont sauvegardés.
- * Nécessite une conversion slot en mémoire => slots en database
- * #dirtyKeys est vidé à l'ouverture du panel.
- *
- * À la fermeture, trois eventBus sont émis :
- *   'inventory/closed'        — signal général de fermeture
- *   'inventory/static-buffs'  — payload: {trinkets: itemId[], accessories: itemId[], armor: [{itemId, prefix}]
- *   'hotbar/changed'          — payload: slots[] hotbar mise à jour
- *
- * ── Actions disponibles ─────────────────────────────────────────────────────
- *
- * Manipulation items :
- *   - Déplacer un slot vers un autre slot (bag ↔ bag, bag ↔ coffre, coffre ↔ coffre, bag ↔ hotbar, bag ↔ armor, bag ↔ accesories, accesories ↔ accesories, hotbar ↔ hotbar)
- *   - Stack / destack items identiques (même item, même prefix)
- *   - Verrouiller / déverrouiller un slot
- *   - Jeter un item à la poubelle (1 action annulable jusqu'à fermeture)
- *   - Utiliser un item (bit USABLE dans item.type, switch sur item.stype)
- *
- * Gear :
- *   - Équiper / déséquiper armure (3 slots HEAD/CHEST/FEET)
- *   - Détection set complet via champ 'set' dans ITEMS
- *   - Équiper / déséquiper accessoires (5 slots)
- *
- * Containers :
- *   - Sélectionner un container via dropdown (si plusieurs dans le range)
- *   - Renommer un container
- *   - Transfert bag → container / container → bag
- *
- * Debug :
- *   - Icône cheat → window.prompt (commandes de test)
- *
- * ── Autres API ─────────────────────────────────────────────────────
- *
- * - Renvoyer 'true' si tous les slots d'un coffre sont vides
- * - Ajout d'un item dans le bag/hotbar (suite à un loot), stack si item identique, ajout dans le premier slot libre sinon (décision à prendre : que faire quand l'inventaire n'a plus de slots libre ?)
- *
- */
+/* ====================================================================================================
+   INVENTORY MANAGER
+   ====================================================================================================
+
+   Autorité unique sur l'inventaire joueur et les containers du monde. Aucune logique DOM.
+   Singleton : inventoryManager.
+
+   Responsabilités :
+     - Slots joueur : bag (64), hotbar (8), armor (3), accessories (5)
+     - Containers furniture proches : Map<furnitureId, slots[]>
+     - Tous les transferts entre containers (swap, stack, loot, craft)
+     - Poubelle avec annulation (une entrée, effacée à la fermeture)
+     - Persistance différée via SaveManager (#dirtyKeys)
+
+   Interactions :
+     furnitureManager  — fournit les containers proches (getNearbyContainers)
+     saveManager       — persistance des slots modifiés (queueStaticUpdate)
+     eventBus          — aucun abonnement direct ; notifié via les Overlays
+
+   Structure DB (objectStore 'inventory') :
+     Chaque slot est un enregistrement permanent (y compris vides).
+     Seule opération DB : update. Jamais d'insert ou delete en temps réel.
+     {key, container, furnitureId, item, count, prefix, slot, locked, deleted}
+
+   Capacités :
+     bag: 64 · hotbar: 8 · armor: 3 · accessory: 5
+     chest: 56 · closet: 64 · cabinet: 48
+
+   Sauvegarde :
+     Seuls les slots dans #dirtyKeys sont écrits. Déclenchée à la fermeture de l'overlay.
+   ==================================================================================================== */
 
 class InventoryManager {
   // Joueur
@@ -113,9 +55,10 @@ class InventoryManager {
   // Persistance
   #dirtyKeys = new Set() // Set<number> — clés DB des slots modifiés
 
-  // constructor () {
-  // }
-
+  /**
+   * Réinitialise toutes les structures mémoire.
+   * À appeler au startSession avant les appels à initSlot.
+   */
   init () {
     // Tableaux vides
     this.#bag.length = 0
@@ -128,10 +71,9 @@ class InventoryManager {
   }
 
   /**
-   * Initialise les tableaux fixes depuis les enregistrements DB chargés au
-   * démarrage de session. À appeler une seule fois après le chargement DB.
-   *
-   * @param {Array<object>} dbSlots — tous les slots du joueur (bag/hotbar/armor/accessory)
+   * Route un enregistrement DB vers le tableau mémoire correspondant.
+   * À appeler pour chaque slot au startSession, après init().
+   * @param {object} dbSlot — enregistrement DB individuel (bag/hotbar/armor/accessory)
    */
   initSlot (dbSlot) {
     const {container, slot, furnitureId} = dbSlot
@@ -153,7 +95,10 @@ class InventoryManager {
     }
   }
 
-  // Vérification d'intégrité
+  /**
+   * Vérifie la cohérence des capacités après le chargement complet via initSlot.
+   * Émet console.error pour chaque capacité incorrecte.
+   */
   initCheck () {
     if (this.#bag.length !== BAG_CAPACITY) console.error(new Error(`[InventoryManager] bag: ${this.#bag.length} slots, attendu ${BAG_CAPACITY}`))
     if (this.#hotbar.length !== HOTBAR_CAPACITY) console.error(new Error(`[InventoryManager] hotbar: ${this.#hotbar.length} slots, attendu ${HOTBAR_CAPACITY}`))
@@ -166,6 +111,8 @@ class InventoryManager {
   }
 
   // ─── Accesseurs (lecture seule pour l'Overlay) ───────────────
+  // Retournent les références directes aux tableaux internes.
+  // Ne pas muter depuis l'extérieur — passer par les méthodes dédiées.
 
   get bag () { return this.#bag }
   get hotbar () { return this.#hotbar }
@@ -173,12 +120,11 @@ class InventoryManager {
   get accessories () { return this.#accessories }
 
   /**
+   * Retourne le tableau de slots d'un container furniture, ou undefined s'il n'est pas chargé.
    * @param {string} furnitureId
    * @returns {Array|undefined}
    */
-  getContainer (furnitureId) {
-    return this.#containers.get(furnitureId)
-  }
+  getContainer (furnitureId) { return this.#containers.get(furnitureId) }
 
   /**
    * Retourne la référence mémoire d'un slot joueur.
@@ -186,9 +132,7 @@ class InventoryManager {
    * @param {number} index
    * @returns {object}
    */
-  getSlot (container, index) {
-    return this.#resolveContainer(container)[index]
-  }
+  getSlot (container, index) { return this.#resolveContainer(container)[index] }
 
   /**
    * Retourne la référence mémoire d'un slot container-furniture.
@@ -196,9 +140,7 @@ class InventoryManager {
    * @param {number} index
    * @returns {object}
    */
-  getContainerSlot (furnitureId, index) {
-    return this.#containers.get(furnitureId)[index]
-  }
+  getContainerSlot (furnitureId, index) { return this.#containers.get(furnitureId)[index] }
 
   /**
    * Scanne l'inventaire et retourne la liste des itemIds donnant des buffs passifs.
@@ -1049,7 +991,9 @@ class InventoryManager {
 }
 export const inventoryManager = new InventoryManager()
 
-// ── CSS ────────────────────────────────────────────────────────
+/* ====================================================================================================
+   CSS
+   ==================================================================================================== */
 
 // injection des classes HTML utilisées par l'inventory Overlay
 const inventorySlotStyle = document.createElement('style')
@@ -1407,13 +1351,39 @@ inventory-slot .hidden {
 `
 document.head.appendChild(inventorySlotStyle)
 
-// ── Classe ───────────────────────────────────────────────────────────────────
+/* ====================================================================================================
+   INVENTORY SLOT (Custom Element)
+   ====================================================================================================
+
+   Web Component <inventory-slot> — représente visuellement un slot d'inventaire.
+   Réactif aux attributs : item, count, locked, usable.
+
+   Attributs :
+     item     — itemId dans ITEMS ; '' = slot vide
+     count    — quantité (number as string)
+     locked   — attribut booléen (présent/absent)
+     usable   — plafond pour l'affichage 'count/usable' (optionnel)
+
+   Interactions :
+     Lit ITEMS pour récupérer l'image sprite à afficher.
+     Aucune écriture — lecture seule de l'état métier.
+     Le DOM interne est construit dans connectedCallback (pas dans le constructeur)
+     pour garantir que l'élément est dans le DOM avant toute manipulation.
+   ==================================================================================================== */
 
 class InventorySlot extends HTMLElement {
+  /**
+   * Attributs observés par le Web Component.
+   * Toute modification déclenche attributeChangedCallback.
+   */
   static get observedAttributes () {
     return ['item', 'count', 'locked', 'usable']
   }
 
+  /**
+   * Lifecycle Web Component — appelé à l'insertion dans le DOM.
+   * Construit le HTML interne, récupère les références et rejoue les attributs déjà posés.
+   */
   connectedCallback () {
     const key = this.getAttribute('key')
     const location = this.getAttribute('location')
@@ -1435,26 +1405,37 @@ class InventorySlot extends HTMLElement {
 
     // Rejouer les attributs posés avant la connexion
     const item = this.getAttribute('item')
-    if (item) this._itemChanged(item)
+    if (item) this.#itemChanged(item)
 
     const count = this.getAttribute('count')
-    if (count !== null) this._countChanged(count)
+    if (count !== null) this.#countChanged(count)
 
-    if (this.hasAttribute('locked')) this._lockedChanged('')
+    if (this.hasAttribute('locked')) this.#lockedChanged('')
 
     const usable = this.getAttribute('usable')
-    if (usable !== null) this._usableChanged(usable)
+    if (usable !== null) this.#usableChanged(usable)
   }
 
+  /**
+   * Lifecycle Web Component — appelé à chaque changement d'attribut observé.
+   * Délègue au handler correspondant. Sans effet si la valeur n'a pas changé.
+   * @param {string}      name
+   * @param {string|null} oldValue
+   * @param {string|null} newValue
+   */
   attributeChangedCallback (name, oldValue, newValue) {
     if (oldValue === newValue) return
-    if (name === 'item') this._itemChanged(newValue)
-    else if (name === 'count') this._countChanged(newValue)
-    else if (name === 'locked') this._lockedChanged(newValue)
-    else if (name === 'usable') this._usableChanged(newValue)
+    if (name === 'item') this.#itemChanged(newValue)
+    else if (name === 'count') this.#countChanged(newValue)
+    else if (name === 'locked') this.#lockedChanged(newValue)
+    else if (name === 'usable') this.#usableChanged(newValue)
   }
 
-  _itemChanged (value) {
+  /**
+   * Met à jour l'image du slot depuis ITEMS. Masque l'image si l'item est vide.
+   * @param {string|null} value — itemId ou '' ou null
+   */
+  #itemChanged (value) {
     if (!this._elImage) return
     if (value === null || value === '') {
       this._elImage.classList.add('hidden')
@@ -1469,19 +1450,32 @@ class InventorySlot extends HTMLElement {
     this._elImage.style.height = `${sh}px`
   }
 
-  _countChanged (value) {
+  /**
+   * Met à jour le compteur interne et rafraîchit l'affichage.
+   * @param {string|null} value — valeur de l'attribut count
+   */
+  #countChanged (value) {
     if (!this._elCount) return
     this._count = value !== null ? parseInt(value, 10) : 0
-    this._formatCount()
+    this.#formatCount()
   }
 
-  _usableChanged (value) {
+  /**
+   * Met à jour le plafond 'usable' et rafraîchit l'affichage (format count/usable).
+   * @param {string|null} value — valeur de l'attribut usable, null si absent
+   */
+  #usableChanged (value) {
     if (!this._elCount) return
     this._usable = value !== null ? parseInt(value, 10) : null
-    this._formatCount()
+    this.#formatCount()
   }
 
-  _formatCount () {
+  /**
+   * Rafraîchit le texte du compteur.
+   * Affiche count seul si usable est null, 'count/usable' sinon.
+   * Masque le texte si count <= 1 et usable est null.
+   */
+  #formatCount () {
     if (this._usable === null) {
       this._elCount.textContent = this._count > 1 ? String(this._count) : ''
     } else {
@@ -1489,14 +1483,42 @@ class InventorySlot extends HTMLElement {
     }
   }
 
-  _lockedChanged (value) {
+  /**
+   * Affiche ou masque l'icône de verrou selon la présence de l'attribut.
+   * @param {string|null} value — '' si attribut présent, null si absent
+   */
+  #lockedChanged (value) {
     if (!this._elLock) return
     // value === null si absent, '' si présent
     this._elLock.classList.toggle('hidden', value === null)
   }
 }
-
 customElements.define('inventory-slot', InventorySlot)
+
+/* ====================================================================================================
+   INVENTORY OVERLAY
+   ====================================================================================================
+
+   Panel d'inventaire joueur (bag, hotbar, armor, accessories) + panel coffre (containers proches).
+   Singleton : inventoryOverlay.
+
+   Responsabilités :
+     - Affichage et mise à jour des slots depuis inventoryManager
+     - Drag & drop entre tous les containers (bag ↔ hotbar ↔ chest ↔ armor ↔ accessory)
+     - Actions sur slot sélectionné : use, lock, split, transfer, trash, restore
+     - Sélection, affichage et renommage des containers proches via furnitureManager
+
+   Interactions :
+     inventoryManager  — source de vérité pour tous les slots ; toutes les mutations passent par lui
+     furnitureManager  — liste des containers proches (getNearbyContainers, getFurnitureById, rename)
+     eventBus          — écoute : inventory/open, inventory/close, inventory/keydown, craft/performed
+                       — émet  : inventory/static-buffs, hotbar/changed, overlay/open-request,
+                                 craft/item, help/topic, item/used, debug/command
+
+   Ouverture/fermeture :
+     À l'ouverture : peuplement complet depuis inventoryManager + dropdown containers.
+     À la fermeture : sauvegarde via inventoryManager.save() + émission des buffs statiques.
+   ==================================================================================================== */
 
 class InventoryOverlay {
   #container = null
@@ -1538,7 +1560,7 @@ class InventoryOverlay {
     this.#container.appendChild(createOverlayHeader('🎒 Inventory [I]', 'inventory'))
 
     // 3. Contents
-    this.buildContent()
+    this.#buildContent()
 
     // 4. Assemblage final
     this.#container.appendChild(this.#content)
@@ -1549,7 +1571,11 @@ class InventoryOverlay {
     this.#initDragAndDrop()
   }
 
-  buildContent () {
+  /**
+   * Construit et assemble le contenu principal du panel (grilles, actions, coffre).
+   * Stocke les références DOM dans les champs privés correspondants.
+   */
+  #buildContent () {
   // Zone de contenu — grille principale
     this.#content = document.createElement('div')
     this.#content.className = 'inv-content'
@@ -1605,6 +1631,10 @@ class InventoryOverlay {
     this.#content.appendChild(chestWrap)
   }
 
+  /**
+   * Construit la grille hotbar (8 slots) et peuple #hotbarSlots.
+   * @returns {HTMLElement}
+   */
   buildHotbar () {
     const grid = document.createElement('div')
     grid.className = 'inv-hotbar-grid inv-panel'
@@ -1621,6 +1651,10 @@ class InventoryOverlay {
     return grid
   }
 
+  /**
+   * Construit la grille bag (64 slots) et peuple #bagSlots.
+   * @returns {HTMLElement}
+   */
   buildBag () {
     const grid = document.createElement('div')
     grid.className = 'inv-bag-grid inv-panel'
@@ -1635,6 +1669,10 @@ class InventoryOverlay {
     return grid
   }
 
+  /**
+   * Construit la grille armor (3 slots) et peuple #armorSlots.
+   * @returns {HTMLElement}
+   */
   buildArmor () {
     const grid = document.createElement('div')
     grid.className = 'inv-armor-grid inv-panel'
@@ -1650,6 +1688,10 @@ class InventoryOverlay {
     return grid
   }
 
+  /**
+   * Construit la grille accessory (5 slots) et peuple #accessorySlots.
+   * @returns {HTMLElement}
+   */
   buildAccessory () {
     const grid = document.createElement('div')
     grid.className = 'inv-accessory-grid inv-panel'
@@ -1665,6 +1707,11 @@ class InventoryOverlay {
     return grid
   }
 
+  /**
+   * Construit la colonne d'actions (use, lock, split, transfer, trash, restore, craft, help, debug).
+   * Stocke les références boutons dans les champs privés.
+   * @returns {HTMLElement}
+   */
   buildActions () {
     const col = document.createElement('div')
     col.className = 'inv-actions inv-panel'
@@ -1760,6 +1807,11 @@ class InventoryOverlay {
     return col
   }
 
+  /**
+   * Construit l'en-tête du panel coffre : icône, dropdown, bouton rename, formulaire de renommage.
+   * Stocke les références DOM dans #chestIcon, #chestSelect, #btnRename, #renameForm, #renameInput, #btnConfirm, #btnCancel.
+   * @returns {HTMLElement}
+   */
   buildChestHeader () {
     const header = document.createElement('div')
     header.className = 'inv-chest-header-content inv-panel'
@@ -1830,6 +1882,10 @@ class InventoryOverlay {
     return header
   }
 
+  /**
+   * Construit la grille du coffre (64 slots, tous inactifs par défaut) et peuple #containerSlots.
+   * @returns {HTMLElement}
+   */
   buildChest () {
     const grid = document.createElement('div')
     grid.className = 'inv-chest-grid inv-panel'
@@ -1845,6 +1901,10 @@ class InventoryOverlay {
     return grid
   }
 
+  /**
+   * Abonne les handlers eventBus et DOM.
+   * Bind et enregistre les handlers nommés (chestSelect, rename).
+   */
   #initEvents () {
     // Abonnement au Bus
     eventBus.on('inventory/open', () => {
@@ -1900,6 +1960,10 @@ class InventoryOverlay {
   // DRAG & DROP //
   // /////////// //
 
+  /**
+   * Initialise le drag & drop sur #content.
+   * Mousedown démarre le drag, mouseup l'applique via le switch de déplacement.
+   */
   #initDragAndDrop () {
     this.#content.addEventListener('mousedown', (e) => {
       const slot = e.target.closest('inventory-slot')
@@ -2016,6 +2080,9 @@ class InventoryOverlay {
     })
   }
 
+  /**
+   * Met à jour la classe 'slot-armor-set' sur les slots armure si les trois pièces forment un set complet.
+   */
   #updateArmorSet () {
     const slots = inventoryManager.armor
     let setName = null
@@ -2033,17 +2100,26 @@ class InventoryOverlay {
     }
   }
 
+  /**
+   * Attache les handlers window (mousemove, mouseup) à l'ouverture du panel.
+   */
   #attachWindowHandlers () {
     window.addEventListener('mousemove', this.#onWindowMouseMove)
     window.addEventListener('mouseup', this.#onWindowMouseUp)
   }
 
+  /**
+   * Détache les handlers window à la fermeture du panel.
+   */
   #detachWindowHandlers () {
     window.removeEventListener('mousemove', this.#onWindowMouseMove)
     window.removeEventListener('mouseup', this.#onWindowMouseUp)
   }
 
-  // Champs privés — références liées
+  /**
+   * Handler mousemove window — crée ou déplace le ghost si un drag est en cours.
+   * Déclenche la création après un seuil de 10px pour éviter les drags accidentels.
+   */
   #onWindowMouseMove = (e) => {
     if (this.#dragSource === null) return
     if (this.#ghost === null) {
@@ -2057,11 +2133,20 @@ class InventoryOverlay {
     this.#moveGhost(e.clientX, e.clientY)
   }
 
+  /**
+   * Handler mouseup window — annule le drag et supprime le ghost.
+   */
   #onWindowMouseUp = () => {
     this.#removeGhost()
     this.#dragSource = null
   }
 
+  /**
+   * Crée l'élément ghost (copie visuelle du slot) et l'ancre à la position souris.
+   * @param {HTMLElement} slot
+   * @param {number}      x
+   * @param {number}      y
+   */
   #createGhost (slot, x, y) {
     const ghost = document.createElement('div')
     ghost.className = 'inv-drag-ghost'
@@ -2078,12 +2163,22 @@ class InventoryOverlay {
     this.#moveGhost(x, y)
   }
 
+  /**
+   * Déplace le ghost à la position souris.
+   * Sans effet si aucun ghost actif.
+   * @param {number} x
+   * @param {number} y
+   */
   #moveGhost (x, y) {
     if (this.#ghost === null) return
     this.#ghost.style.left = `${x}px`
     this.#ghost.style.top = `${y}px`
   }
 
+  /**
+   * Supprime le ghost du DOM.
+   * Sans effet si aucun ghost actif.
+   */
   #removeGhost () {
     if (this.#ghost === null) return
     this.#ghost.remove()
@@ -2094,6 +2189,10 @@ class InventoryOverlay {
   // OUVERTURE / FERMETURE DU PANEL //
   // ////////////////////////////// //
 
+  /**
+   * Ouvre le panel, attache les handlers window, peuple tous les slots depuis inventoryManager.
+   * Réinitialise la sélection et le formulaire de renommage.
+   */
   #onOpen () {
     this.#attachWindowHandlers()
 
@@ -2193,6 +2292,9 @@ class InventoryOverlay {
     return capitalize(container)
   }
 
+  /**
+   * Ferme le panel, détache les handlers window, sauvegarde et émet les événements de mise à jour.
+   */
   #onClose () {
     this.#detachWindowHandlers()
 
@@ -2212,6 +2314,10 @@ class InventoryOverlay {
   // SELECTION / DESELECTION D'UN SLOT //
   // ///////////////////////////////// //
 
+  /**
+   * Gère le clic sur un slot : sélectionne ou désélectionne, met à jour les boutons d'action.
+   * @param {HTMLElement} slot
+   */
   #onSlotClick (slot) {
     if (this.#selectedSlot === slot) {
     // Désélection
@@ -2230,6 +2336,9 @@ class InventoryOverlay {
     this.#updateActionButtons()
   }
 
+  /**
+   * Met à jour l'état actif/inactif de tous les boutons d'action selon le slot sélectionné.
+   */
   #updateActionButtons () {
     const slot = this.#selectedSlot
     const item = slot?.getAttribute('item') ?? ''
@@ -2270,6 +2379,10 @@ class InventoryOverlay {
   // VERROUILLAGE / DEVERROUILLAGE D'UN SLOT //
   // /////////////////////////////////////// //
 
+  /**
+   * Met à jour l'état et le titre du bouton lock selon le slot sélectionné.
+   * @param {HTMLElement|null} slot
+   */
   #updateLockBtn (slot) {
     if (slot === null) {
       this.#btnLock.disabled = true
@@ -2283,6 +2396,9 @@ class InventoryOverlay {
     this.#btnLock.title = isLocked ? 'Unlock slot [L]' : 'Lock slot [L]'
   }
 
+  /**
+   * Bascule le verrou du slot sélectionné et met à jour l'UI.
+   */
   #onLockClick () {
     const [container, index] = this.#selectedSlot.getAttribute('location').split('|')
     const slot = CONTAINER_STYPES.has(container)
@@ -2297,6 +2413,10 @@ class InventoryOverlay {
   // GESTION DE LA POUBELLE //
   // ////////////////////// //
 
+  /**
+   * Envoie le slot sélectionné à la poubelle et met à jour l'UI.
+   * Restreint au bag uniquement.
+   */
   #onTrashClick () {
     const [container, index] = this.#selectedSlot.getAttribute('location').split('|')
     if (container !== 'bag') return // précaution - ne devrait jamais arriver
@@ -2308,6 +2428,9 @@ class InventoryOverlay {
     this.#updateActionButtons()
   }
 
+  /**
+   * Restaure le dernier slot mis à la poubelle dans le bag.
+   */
   #onRestoreClick () {
     inventoryManager.restoreTrash()
     this.refreshBag()
@@ -2319,6 +2442,9 @@ class InventoryOverlay {
   // UTILISATION D'UN ITEM //
   // ///////////////////// //
 
+  /**
+   * Décrémente le count du slot sélectionné (bag uniquement) et émet 'item/used'.
+   */
   #onUseClick () {
     const [container, index] = this.#selectedSlot.getAttribute('location').split('|')
     if (container !== 'bag') return // précaution - ne devrait jamais arriver
@@ -2336,6 +2462,9 @@ class InventoryOverlay {
   // SEPARATION D'UN ITEM //
   // ///////////////////// //
 
+  /**
+   * Ouvre un prompt pour séparer une pile en deux. Dépose la nouvelle pile dans le premier slot libre du bag.
+   */
   #onSplitClick () {
     const count = parseInt(this.#selectedSlot.getAttribute('count'), 10)
     const itemName = ITEMS[this.#selectedSlot.getAttribute('item')].name
@@ -2365,6 +2494,9 @@ class InventoryOverlay {
   // TRANSFER BAG <-> CHEST //
   // ////////////////////// //
 
+  /**
+   * Transfère le slot sélectionné bag → coffre ou coffre → bag via stack ou premier slot libre.
+   */
   #onTransferClick () {
     const [container, index] = this.#selectedSlot.getAttribute('location').split('|')
     const i = parseInt(index, 10)
@@ -2438,7 +2570,7 @@ class InventoryOverlay {
 
   /**
    * Réagit au changement de sélection dans le dropdown containers.
-   * Lié dans le constructeur.
+   * Lié dans #initEvents.
    */
   onChestSelectChange () {
     const furniture = furnitureManager.getFurnitureById(this.#chestSelect.value)

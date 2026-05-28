@@ -1,3 +1,5 @@
+// inventory.mjs — CraftOverlay
+
 import {OVERLAYS, PATH_HELP, SVG_ICON, PATH_WARNING} from './constant.mjs'
 import {eventBus} from './utils.mjs'
 import {createOverlayHeader} from './ui.mjs'
@@ -367,6 +369,33 @@ const FILTER_KEY_MAP = {
   station: 'craftfilterstation',
   ingredient: 'craftfiltermaterial'
 }
+
+/* ====================================================================================================
+   CRAFT OVERLAY
+   ====================================================================================================
+
+   Panel de craft : filtrage des recettes, détail ingrédients/station, exécution du craft.
+   Singleton : craftOverlay.
+
+   Responsabilités :
+     - Filtrage de RECIPES par type de résultat, station ou ingrédient (+ recherche texte)
+     - Calcul de la disponibilité des ingrédients depuis bag/hotbar + containers proches
+     - Détection des crafting stations à portée via furnitureManager
+     - Exécution du craft : consommation des ingrédients (player puis containers), ajout du résultat
+
+   Interactions :
+     inventoryManager  — fillMaterialsFromPlayer, fillMaterialsFromContainer, removeFromPlayer,
+                         removeFromContainer, craftReceive, canReceiveFromCraft, save
+     furnitureManager  — getNearbyContainers, getNearbyCraftingStations
+     database          — persistance des filtres actifs (craftfiltermode, craftfiltertype...)
+     eventBus          — écoute : craft/open, craft/close, craft/item
+                       — émet  : craft/performed, inventory/static-buffs, hotbar/changed,
+                                 overlay/open-request, help/topic
+
+   Disponibilité des ingrédients :
+     Reconstruite à l'ouverture et après chaque craft via #buildAvailableMap.
+     Sources : bag + hotbar joueur, puis tous les containers dans le range 'range-chest'.
+   ==================================================================================================== */
 
 class CraftOverlay {
   #container = null

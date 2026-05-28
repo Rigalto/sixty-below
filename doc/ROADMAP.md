@@ -19,7 +19,7 @@
 - Vérifier que la convention pour les variables privées est prise en compte partout
   - fait pour `inventory.mjs`, `craft.mjs`
 - Vérifier que les en-têtes des fonctions sont présents et à jour (prise en compte des modifications de conception)
-  - fait pour `CraftOverlay`
+  - fait pour `CraftOverlay`, `InventoryOverlay`
 
 ---
 
