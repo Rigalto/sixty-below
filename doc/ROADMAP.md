@@ -7,8 +7,9 @@
 
 ## En cours
 
-- `CraftOverlay` : prise en compte de coffres dans le range
-- Implémentation du `SuccessOverlay` et `SuccessManager`
+
+- Implémentation du `AchievementOverlay` et `AchievementManager`
+  - Ajouter l'icône succès dans le Control Panel (section 'icônes d'action'), raccourci `U`
 - continuer la correction et l'ajout de fiches d'aide (`HELP`) et d'items (`ITEMS`)
 - Documentation avec E/S des eventBus (reste à faire : `core.mjs`, `craft.mjs`, `ui.mjs`, `utils.mjs` (TimeMmanager))
 

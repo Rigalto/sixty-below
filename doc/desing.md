@@ -834,7 +834,64 @@ Les modules communiquent via l'`EventBus` (couplage faible).
 * Écoute les événements granulaires du `BuffManager` (`buff/moon`, `buff/weather`, `buff/coords`).
 * **Abonnement dynamique :** le widget ne s'abonne à `player/move` (fréquent) **que si** le buff `buff/coords-display` est actif. Désabonnement immédiat si le buff est perdu.
 
-### 8.4 Système Écosystème [`ecosystem.mjs`]
+---
+
+### 8.4 Système de succès (Achievements)
+
+Permet au joueur de mesurer sa progression dans un jeu bac à sable sans objectif imposé.
+
+#### Principe
+
+Les actions du jeu (minage, craft, cueillette, combat...) sont comptabilisées par identifiant
+(nodeCode, itemCode ou monsterCode). Des points sont attribués au franchissement de seuils.
+
+#### Structure des points
+
+Chaque entrée suivie dispose de **3 seuils** et rapporte toujours **8 points** (5 + 2 + 1) :
+- Franchissement du seuil 1 → +5 pts
+- Franchissement du seuil 2 → +2 pts
+- Franchissement du seuil 3 → +1 pt
+
+Les seuils sont identiques pour tous les membres d'une même catégorie.
+
+#### Catégories
+
+Les entrées sont regroupées en catégories (ex : 'mining-ore', 'crafting-platform').
+Chaque catégorie offre un **bonus de complétude** selon le minimum des points de ses membres :
+- Tous les membres ≥ 5 pts → +5 pts de catégorie
+- Tous les membres ≥ 7 pts → +2 pts supplémentaires
+- Tous les membres = 8 pts → +1 pt supplémentaire
+
+Le bonus de complétude suit donc la même structure 5+2+1 = 8 pts.
+
+#### Points maximum
+
+`(nb_membres × 8) + 8` par catégorie. Total global calculé depuis la constante au démarrage.
+
+#### Overlay
+
+Raccourci `U`. Affiche :
+- En-tête : points actuels / points maximum
+- Liste des catégories : label | pts / max (cliquable)
+- Catégorie ouverte : chaque membre avec compteur actuel et prochain seuil
+
+#### Déclenchement
+
+Événements EventBus découplés des actions métier. Chaque système émet un event
+(`mine/node`, `craft/performed`, `forage/herb`, `monster/killed`...).
+AchievementManager s'y abonne et appelle `increment(code, count)`.
+
+#### Compteur multi-source
+
+Un item obtenu par plusieurs méthodes (ex : baits récupérés en secouant un arbre
+ou en forageant un node) est comptabilisé dans un seul et même compteur,
+sans distinction de la méthode d'acquisition.
+L'item est classé dans la catégorie correspondant à sa méthode d'obtention la plus naturelle
+(celle par laquelle le joueur en récolte le plus grand nombre en jeu normal).
+
+---
+
+### 8.5 Système Écosystème [`ecosystem.mjs`]
 * Gère la simulation temps réel des entités naturelles : croissance des plantes,
   production de HONEY, reconstruction des ruches, croissance des toiles d'araignées, chute de météroites.
 * Chaque système est déclenché par le `TaskScheduler` (timer global, décorrélé des chunks).

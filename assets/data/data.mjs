@@ -723,6 +723,10 @@ export const TREE_IMAGES = {
    6. MONSTERS
    ============================================================================ */
 
+export const MONSTERS = {
+
+}
+
 /* ============================================================================
    7. MISCELLANEOUS
    ============================================================================ */
@@ -856,11 +860,35 @@ for (const key in RECIPES) {
   }
 }
 
+// — 8.6. Résolution MONSTERS
+
+// — 8.7. Validations transverses  ────────────────────
+
 // obligatoirement après l'ajout des types MATERIAL et CRAFTABLE
 for (const key in ITEMS) {
   const itemDesc = ITEMS[key]
   const stars = '★'.repeat(Math.min(5, Math.max(0, itemDesc.star ?? 0)))
   itemDesc.hoverTitle = `${itemDesc.name}\nTier: ${stars}\n${itemDesc.tooltip}\nType: ${itemTypeToString(itemDesc.type, itemDesc.armor)}`
+}
+
+// obligatoirement après l'ajout des 'code' dans ITEMS et MONSTERS
+{
+  const allCodes = new Set()
+  for (const key in NODES) {
+    const {code} = NODES[key]
+    if (allCodes.has(code)) console.error(`[data.mjs] code node dupliqué : ${code} (NODES.${key})`)
+    allCodes.add(code)
+  }
+  for (const key in ITEMS) {
+    const {code} = ITEMS[key]
+    if (allCodes.has(code)) console.error(`[data.mjs] code item dupliqué : '${code}' (ITEMS.${key})`)
+    allCodes.add(code)
+  }
+  for (const key in MONSTERS) {
+    const {code} = MONSTERS[key]
+    if (allCodes.has(code)) console.error(`[data.mjs] code monster dupliqué : '${code}' (MONSTERS.${key})`)
+    allCodes.add(code)
+  }
 }
 
 // — 9.x. Détection des cycles dans la chaîne de craft ────────────────────

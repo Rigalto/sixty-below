@@ -4756,6 +4756,7 @@ Once you have basic tools and a shelter, you can start exploring:
   * [[Inventory]] **[I]** — bag, hotbar, armor and accessories
   * [[Crafting]] **[K]** — browse recipes, inspect ingredients, craft items
   * [[Help Panel]] **[H]** — all reference topics, searchable
+  * [[Achivements Panel]] **[U]** — to track your progress
   * [[Combat|Combat Panel]] — tactical combat, automatic opening, close when combat is done (win or lost)
   `
   },
@@ -4802,6 +4803,7 @@ In the right part of the screen, shows:
 * Icon actions
   * Open/close [[Inventory|Inventory Panel]]
   * Open/close [[Crafting|Crafting Panel]]
+  * Open/close [[Achievements Panel]]
   * Open/close [[Help Panel]]
   * Creation of a [[World Creation|new world]]
   * Ambient sound and Music controls⏳
@@ -5135,7 +5137,40 @@ It does not need to be equipped — carrying it in your [[Inventory]] is enough.
 * _Plan activities around beneficial moon phases._
 * _Use [[item:clockCopper|Clocks]], [[item:bottledFrog]] and [[item:sextant]] for precise environment tracking._
   `
+  },
+
+  // ── Gameplay ─────────────────────────────────────────────────
+  //    Achievements, Achievements Overlay
+  {
+    title: 'Achievements',
+    category: ['Gameplay'],
+    content: `
+**Description**
+A écrire.
+
+Ne pas oublier de mettre quelque part :
+
+
+* Un lien vers [[Achievements Panel]]
+
+Ingredients obtained through multiple methods (e.g. baits from tree-shaking or foraging)
+are tracked in a single counter regardless of how they were acquired.
+Each item is listed under its most natural collection method.
+  `
+  },
+  {
+    title: 'Achievements Panel',
+    category: ['Gameplay'],
+    content: `
+**Description**
+A écrire.
+
+Shortcut: [U]
+
+Mettre un lien vers [[Achievements]]
+  `
   }
+
 ]
 
 /* ====================================================================================================

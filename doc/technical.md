@@ -1384,3 +1384,48 @@ Champs optionnels selon `stype` :
 | Méthode | Signature | Structure interne |
 | :--- | :--- | :--- |
 | `rename` | `(furnitureId: string, name: string) → void` | Met à jour `name` sur le record et persiste via saveManager. |
+
+## 16. Système de succès
+
+### `assets/data/data-achievements.mjs`
+
+Constante de définition des catégories. Importée par AchievementManager uniquement.
+
+```js
+export const ACHIEVEMENT_CATEGORIES = [
+  {
+    id:         string,   // identifiant machine
+    label:      string,   // libellé affiché dans l'overlay
+    thresholds: number[], // [seuil1, seuil2, seuil3] — communs à tous les membres
+    items:      string[]  // codes (nodeCode | itemCode | monsterCode)
+  },
+  ...
+]
+```
+
+Points toujours [5, 2, 1] — codés en dur dans AchievementManager.
+
+### DB — objectStore `achievements`
+
+| Champ | Type | Description |
+| :--- | :--- | :--- |
+| `code` | `string` | Clé primaire (keyPath) — nodeCode, itemCode ou monsterCode |
+| `count` | `number` | Compteur cumulé depuis la création du monde |
+
+Pas d'autoincrement. Opération unique : `put()`. Points non persistés — recalculés au chargement.
+Persistance découplée du save synchrone.
+
+### Unicité des codes — `data.mjs` section 8.3
+
+Vérification au boot que les champs `.code` sont uniques à travers NODES (numérique),
+ITEMS (string) et MONSTERS (string). Garantit qu'un code identifie sans ambiguïté
+la table source sans test à l'exécution.
+
+### Class `AchievementManager` (Singleton : `achievementManager`, `achievements.mjs`)
+
+*À documenter à l'implémentation.*
+
+### Class `AchievementOverlay` (Singleton : `achievementOverlay`, `achievements.mjs`)
+
+Raccourci : `U`.
+*À documenter à l'implémentation.*
