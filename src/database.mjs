@@ -74,6 +74,8 @@ class DataBase {
       if (!existingStoreNames.includes(storeName)) {
         if (storeName === 'gamestate') {
           this.db.createObjectStore(storeName, {keyPath: 'key'})
+        } else if (storeName === 'achievements') {
+          this.db.createObjectStore(storeName, {keyPath: 'code'})
         } else {
           this.db.createObjectStore(storeName, {keyPath: 'key', autoIncrement: true})
         }

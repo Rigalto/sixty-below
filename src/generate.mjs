@@ -463,6 +463,7 @@ class WorldGenerator {
     // await database.addMultipleRecords('trees', this.treeSpots)
 
     await database.clearObjectStore('gamestate')
+    await database.clearObjectStore('achievements')
     await database.batchSetGameState([
       {key: 'player', value: '8192|1280|1'},
       {key: 'spawn', value: '8192|1280'},

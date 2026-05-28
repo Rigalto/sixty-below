@@ -602,6 +602,7 @@ Configuration dans `constant.mjs` → `DB_CONFIG` : `NAME`, `VERSION`, `DEBUG`, 
 | `monster` | `key` | oui | Enemies, Critters, Bosses |
 | `furniture` | `key` | oui | Furniture (Housing), Crafting Station |
 | `liquid` | `key` | oui | Liquid bodies générés : `{index, nodeCode}` — `index` = index monde d'une tuile du body, `nodeCode` = code du liquide (HONEY, WATER, SAP...) |
+| `achievements` | `code` | non | Compteurs de succès : `{code, count}` |
 
 **Règles :**
 - `updateObjectStore()` synchronise automatiquement les stores à chaque montée de version — ajouter un store = l'ajouter à `DB_CONFIG.STORES` et incrémenter `VERSION`.
