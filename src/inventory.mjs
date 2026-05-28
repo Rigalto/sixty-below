@@ -2012,7 +2012,6 @@ class InventoryOverlay {
         }
       }
 
-      // console.log('drag', this.#dragSource.getAttribute('location'), '→', slot.getAttribute('location'))
       this.#dragSource = null
     })
   }
