@@ -1,3 +1,5 @@
+// ui-debug.mjs — RealtimeDebugWidget - WorldMapDebug - InventoryDebug
+
 import {MICROTASK, WORLD_WIDTH, WORLD_HEIGHT, OVERLAYS, UI_LAYOUT, SKY_COLORS} from './constant.mjs'
 import {hexToRgb, ITEMS, NODES_LOOKUP} from '../../assets/data/data.mjs'
 import {eventBus, microTasker, taskScheduler} from './utils.mjs'

@@ -1,3 +1,5 @@
+// render.mjs — Camera - WorldRenderer - SkyRenderer - LightRenderer
+
 import {WORLD_WIDTH, WORLD_HEIGHT, CANVAS_WIDTH, CANVAS_HEIGHT, OVERLAYS, MICROTASK} from './constant.mjs'
 import {NODES_LOOKUP} from '../../assets/data/data.mjs'
 import {eventBus, microTasker, taskScheduler} from './utils.mjs'

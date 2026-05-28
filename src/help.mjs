@@ -1,3 +1,5 @@
+// help.mjs — HelpOverlay
+
 // src/help.mjs
 import {OVERLAYS} from './constant.mjs'
 import {eventBus} from './utils.mjs'

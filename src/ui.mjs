@@ -1,7 +1,4 @@
-/**
- * @file ui.mjs
- * @description Layer 2 - Gestion de l'Interface Utilisateur (DOM & Canvas Overlays).
- */
+// ui.mjs — MenuBarWIdget - CreationDialogOverlay - EnvironementWidget - ModalBlocker - SeedWidget
 
 import {eventBus, seededRNG} from './utils.mjs'
 import {gameCore} from './core.mjs'

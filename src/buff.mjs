@@ -1,12 +1,10 @@
+// buff.mjs — BuffManager - BuffWidget
+
 import {eventBus, timeManager} from './utils.mjs'
 import {UI_LAYOUT} from './constant.mjs'
 // import {timeManager, taskScheduler, microTasker, eventBus} from './utils.mjs'
 
 /**
- * @file buff.mjs
- * @description Gestion centralisée des buffs du joueur.
- * Layer : 4. Dépendances autorisées : constant.mjs, utils.mjs, eventBus.
- *
  * ── Principes ───────────────────────────────────────────────────────────────
  *
  * Un buff est une valeur (numérique ou booléenne) qui modifie le comportement

@@ -1,8 +1,4 @@
-/**
- * @file constant.mjs
- * @description Layer 0 - Constantes globales, Enums et Bitmasks.
- * Aucune dépendance externe autorisée.
- */
+// constant.mjs
 
 /* =========================================
    1. SYSTEM & PERFORMANCE

@@ -1,3 +1,5 @@
+// utils.mjs — EventBus - MicroTasker - TaskScheduler - TimeManager - SeededRNG
+
 import {SKY_COLORS, WEATHER_TYPE, REAL_MS_PER_GAME_MIN, DAY_DURATION_GAME_MIN} from './constant.mjs'
 
 /* ====================================================================================================

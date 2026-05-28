@@ -1,10 +1,4 @@
-/**
- * @file data.mjs
- * @description Données métier : tuiles, items, plantes, recettes.
- * Layer : 3.
- * Seul fichier autorisé à être importé : constant.mjs.
- * Post-traitements exécutés au premier import (top-level).
- */
+// data.mjs
 
 /* ============================================================================
    1. ENUMS MÉTIER

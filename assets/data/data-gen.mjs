@@ -1,9 +1,4 @@
-/**
- * @file data-gen.mjs
- * @description Données de génération procédurale.
- * Layer : 3. Dépendances autorisées : data.mjs, constant.mjs.
- * Point d'entrée unique pour generate.mjs — re-exporte tout ce dont il a besoin.
- */
+// data-gen.mjs
 
 import {NODES, BIOME_TYPE} from './data.mjs'
 import {parseLootEntry} from '../../src/utils.mjs'

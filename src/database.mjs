@@ -1,7 +1,4 @@
-/**
- * @file database.mjs
- * @description Layer 1 - Wrapper IndexedDB pour la persistance locale.
- */
+// database.mjs — DataBase
 
 import {DB_CONFIG} from './constant.mjs'
 

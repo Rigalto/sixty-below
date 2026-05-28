@@ -1,10 +1,8 @@
-/**
- * @file data-help.mjs
- * @description Aide en ligne du jeu Sixty-Below.
- * Contenu rédigé en Markdown enrichi — voir syntaxe ci-dessous.
- *
+// data-help.mjs
+
+/*
  * ═══════════════════════════════════════════════════════════════
- * SYNTAXE
+ * SYNTAXE DU Markdown enrichi
  * ═══════════════════════════════════════════════════════════════
  *
  *

@@ -1,4 +1,5 @@
-// housing.mjs
+// housing.mjs — FurnitureManager - HousingManager
+
 import {eventBus} from './utils.mjs'
 import {uniqueIdGenerator} from './database.mjs'
 import {CONTAINER_STYPES} from './constant.mjs'

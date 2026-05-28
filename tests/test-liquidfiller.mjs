@@ -1,6 +1,7 @@
+// test-liquidfiller.mjs
+
 /**
- * @file test-liquidfiller.mjs
- * @description Tests unitaires pour LiquidFiller
+ * Tests unitaires pour LiquidFiller
  *
  * Convention monde de test :
  *   - DEEPSEA sur x=0 et x=1023, toutes hauteurs (ghost cells gauche/droite)

@@ -1,7 +1,4 @@
-/**
- * @file assets.mjs
- * @description Gestionnaire central des ressources (Images, Audio) et parsing des références.
- */
+// assets.mjs
 
 /* =========================================
    1. LISTES DES FICHIERS

@@ -1,3 +1,5 @@
+// world.mjs — ChunkManager
+
 import {WORLD_WIDTH, WORLD_HEIGHT} from './constant.mjs'
 
 if ((WORLD_WIDTH !== 1024) || (WORLD_HEIGHT !== 512)) console.error('Constantes WORLD_WIDTH ou WORLD_HEIGHT incorrectes')
