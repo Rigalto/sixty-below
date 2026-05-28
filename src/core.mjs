@@ -1,7 +1,7 @@
 // inventory.mjs — GameCore - KeyboardManager - MouseManager
 
 import {TIME_BUDGET, MICROTASK_FN_NAME_TO_KEY, STATE, OVERLAYS} from './constant.mjs'
-import {NODES, NODES_LOOKUP, MAX_FURNITURE_W, MAX_FURNITURE_H, ITEMS, RECIPES, TREE_IMAGES, PLANT_KIND, PLANT_TYPE} from '../../assets/data/data.mjs'
+import {NODES, NODES_LOOKUP, MAX_FURNITURE_W, MAX_FURNITURE_H, ITEMS, RECIPES, MONSTERS, TREE_IMAGES, PLANT_KIND, PLANT_TYPE} from '../../assets/data/data.mjs'
 import {HELP_TITLES, hydrateHelp} from '../../assets/data/data-help.mjs'
 import {loadAssets, resolveAssetData} from './assets.mjs'
 import {timeManager, taskScheduler, microTasker, eventBus, seededRNG, parseLootCount, parseLootBuffs, buildLootHelpRow} from './utils.mjs'
@@ -16,6 +16,7 @@ import {inventoryManager} from './inventory.mjs'
 import {furnitureManager} from './housing.mjs'
 import {craftOverlay} from './craft.mjs'
 import {achievementManager} from './achievement.mjs'
+import {ACHIEVEMENT_CATEGORIES} from '../assets/data/data-achievement.mjs'
 import './ui-debug.mjs'
 import './combat.mjs'
 
@@ -82,6 +83,7 @@ class GameCore {
     this.#hydrateItems()
     this.#hydrateTreeImages()
     this.#hydrateHelp()
+    this.#hydrateAchievements()
     // this._hydrateBuffs() ...
 
     // 3. Liens avec le DOM
@@ -197,6 +199,22 @@ class GameCore {
   #hydrateHelp () {
     const {count, errors} = hydrateHelp(NODES, ITEMS, RECIPES)
     console.log(`   🔹 Help hydratée : ${count} fiches, ${errors} erreur(s)`)
+  }
+
+  /**
+ * Vérifie que tous les codes référencés dans ACHIEVEMENT_CATEGORIES
+ * existent dans ITEMS, NODES ou MONSTERS.
+ * Appelé au boot, après #hydrateItems().
+ */
+  #hydrateAchievements () {
+    for (const category of ACHIEVEMENT_CATEGORIES) {
+      for (const code of category.items) {
+        if (ITEMS[code] === undefined &&
+          MONSTERS[code] === undefined) {
+          console.error(`[hydrateAchievements] '${category.id}' : code inconnu '${code}'`)
+        }
+      }
+    }
   }
 
   /* =========================================

@@ -2,6 +2,9 @@
 
 import {eventBus} from './utils.mjs'
 import {database} from './database.mjs'
+import {ACHIEVEMENT_CATEGORIES} from '../../assets/data/data-achievement.mjs'
+
+console.log('ACHIEVEMENT_CATEGORIES', ACHIEVEMENT_CATEGORIES)
 
 class AchievementManager {
   #counts = new Map() // Map<code, count> — chargé depuis DB au startSession

@@ -590,7 +590,7 @@ export const RECIPES = [
   {result: {item: 'barGold', count: 1}, station: 'furnace', ingredients: [{item: 'chunkGold', count: 4}, {item: 'logMahogany', count: 1}]},
   {result: {item: 'barCobalt', count: 1}, station: 'furnace', ingredients: [{item: 'chunkCobalt', count: 5}, {item: 'logOak', count: 1}, {item: 'logMahogany', count: 1}]},
   {result: {item: 'barPlatinum', count: 1}, station: 'blastFurnace', ingredients: [{item: 'chunkPlatinum', count: 5}, {item: 'logOak', count: 1}, {item: 'logMahogany', count: 1}]},
-  {result: {item: 'shell', count: 1}, station: 'stoneBench', ingredients: [{item: 'shellPowder', count: 1}]},
+  {result: {item: 'shellPowder', count: 1}, station: 'stoneBench', ingredients: [{item: 'shell', count: 1}]},
 
   // Metal fittings
   {result: {item: 'nailIron', count: 32}, station: 'anvil', ingredients: [{item: 'barIron', count: 1}]},
