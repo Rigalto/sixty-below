@@ -2,7 +2,44 @@
 
 import {eventBus, seededRNG} from './utils.mjs'
 import {gameCore} from './core.mjs'
-import {WEATHER_TYPE, MOON_PHASE, MOON_PHASE_BLURRED, STATE, OVERLAYS, UI_LAYOUT} from './constant.mjs'
+import {WEATHER_TYPE, MOON_PHASE, MOON_PHASE_BLURRED, STATE, OVERLAYS, UI_LAYOUT, PATH_INVENTORY, PATH_CRAFT, PATH_TROPHY, PATH_HELP, PATH_NEW_WORLD, PATH_DEBUG, SVG_ICON} from './constant.mjs'
+
+// ── Styles MenuBarWidget ─────────────────────────────────────────────────────
+const menuBarStyle = document.createElement('style')
+menuBarStyle.textContent = /* css */`
+  #menu-bar-root {
+    position: relative;
+    width: 100%;
+    margin-bottom: 10px;
+    background-color: rgba(20, 20, 25, 0.9);
+    border: 1px solid #444;
+    border-radius: 6px;
+    padding: 8px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.5);
+    display: flex;
+    flex-direction: row;
+    gap: 5px;
+    order: ${UI_LAYOUT.MENU_BAR};
+  }
+#menu-bar-root .menu-bar-btn {
+  flex: 1;
+  background-color: transparent;
+  border: 1px solid #444;
+  border-radius: 4px;
+  color: #bdc3c7;
+  cursor: pointer;
+  padding: 6px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+#menu-bar-root .menu-bar-btn svg            { width: 100%; height: 100%; }
+#menu-bar-root .menu-bar-btn:hover          { border-color: #bdc3c7; color: #ffffff; }
+#menu-bar-root .menu-bar-btn-meta           { background-color: #442222; border-color: #663333; }
+#menu-bar-root .menu-bar-btn-meta:hover     { border-color: #cc4444; }
+`
+document.head.appendChild(menuBarStyle)
 
 /* ====================================================================================================
    AFFICHAGE BOUTONS D'ACTION
@@ -10,120 +47,108 @@ import {WEATHER_TYPE, MOON_PHASE, MOON_PHASE_BLURRED, STATE, OVERLAYS, UI_LAYOUT
 
 // MenuBarWidget → nom joueur 'Control Panel'
 class MenuBarWidget {
+  #container = null // div englobant le widget
+  #btnInventory = null // bouton ouverture inventaire
+  #btnCraft = null // bouton ouverture craft
+  #btnAchievement = null // bouton ouverture succès
+  #btnHelp = null // bouton ouverture aide
+  #btnNewWorld = null // bouton nouveau monde (meta)
+  #btnSnapshot = null // bouton snapshot debug (meta)
+
   constructor () {
-    this.container = null
-    this.dom = {
-      btnInventory: null,
-      btnCraft: null,
-      btnHelp: null,
-      btnNewWorld: null,
-      btnSnapshot: null
-    }
     this.#initDOM()
     this.#bindEvents()
   }
 
+  /**
+   * Construit le DOM du conteneur et des boutons, et l'injecte dans #right-sidebar.
+   */
   #initDOM () {
     // 1. Conteneur Principal
-    this.container = document.createElement('div')
-    this.container.id = 'menu-bar-root'
-
-    Object.assign(this.container.style, {
-      position: 'relative',
-      width: '100%',
-      order: UI_LAYOUT.MENU_BAR,
-      marginBottom: '10px',
-      backgroundColor: 'rgba(20, 20, 25, 0.9)',
-      border: '1px solid #444',
-      borderRadius: '6px',
-      padding: '8px',
-      boxShadow: '0 2px 10px rgba(0,0,0,0.5)',
-      display: 'flex', // Flexbox
-      flexDirection: 'row', // MODIFIÉ : Une seule ligne horizontale
-      gap: '5px' // Espace uniforme entre les 5 boutons
-    })
-
-    // Helper pour créer les boutons (DRY)
-    const createBtn = (id, text, title, isMeta = false) => {
-      const btn = document.createElement('button')
-      btn.id = id
-      btn.textContent = text
-      btn.title = title
-      Object.assign(btn.style, {
-        flex: '1', // Chaque bouton prendra 20% de la largeur
-        backgroundColor: isMeta ? '#442222' : '#333',
-        color: '#ddd',
-        border: '1px solid #555',
-        borderRadius: '4px',
-        padding: '6px 0', // Un peu plus de padding pour les cibles tactiles/souris
-        cursor: 'pointer',
-        fontSize: '18px', // MODIFIÉ : Taille augmentée pour la lisibilité des icônes
-        lineHeight: '1.2',
-        fontFamily: '"Segoe UI Emoji", "Apple Color Emoji", sans-serif' // Assure le rendu des émojis
-      })
-
-      btn.onmouseenter = () => { btn.style.backgroundColor = isMeta ? '#663333' : '#555' }
-      btn.onmouseleave = () => { btn.style.backgroundColor = isMeta ? '#442222' : '#333' }
-      return btn
-    }
+    this.#container = document.createElement('div')
+    this.#container.id = 'menu-bar-root'
 
     // Création des boutons
-    const btnInv = createBtn('btn-inv', '🎒', 'Open Inventory [I]')
-    const btnCraft = createBtn('btn-craft', '⚒️', 'Open Crafting [C]')
-    const btnHelp = createBtn('btn-help', '📜', 'Help [H]')
-
-    const btnNew = createBtn('btn-new', '🌱', 'Generate New World', true)
-    const btnSnap = createBtn('btn-snap', '🖼️', 'Debug: Copy Snapshot', true)
+    const btnInv = this.#createBtn('btn-inv', PATH_INVENTORY, 'Open Inventory [I]')
+    const btnCraft = this.#createBtn('btn-craft', PATH_CRAFT, 'Open Crafting [C]')
+    const btnAchievement = this.#createBtn('btn-achievement', PATH_TROPHY, 'Achievements [U]')
+    const btnHelp = this.#createBtn('btn-help', PATH_HELP, 'Help [H]')
+    const btnNew = this.#createBtn('btn-new', PATH_NEW_WORLD, 'Generate New World', true)
+    const btnSnap = this.#createBtn('btn-snap', PATH_DEBUG, 'Debug: Copy Snapshot', true)
 
     // Assemblage dans le conteneur
-    this.container.appendChild(btnInv)
-    this.container.appendChild(btnCraft)
-    this.container.appendChild(btnHelp)
-    this.container.appendChild(btnNew)
-    this.container.appendChild(btnSnap)
+    this.#container.appendChild(btnInv)
+    this.#container.appendChild(btnCraft)
+    this.#container.appendChild(btnAchievement)
+    this.#container.appendChild(btnHelp)
+    this.#container.appendChild(btnNew)
+    this.#container.appendChild(btnSnap)
 
     // Injection DOM
     const overlayPanel = document.getElementById('right-sidebar')
     if (overlayPanel) {
-      overlayPanel.appendChild(this.container)
+      overlayPanel.appendChild(this.#container)
     } else {
       console.warn('MenuBarWidget: #right-sidebar missing')
     }
 
     // Cache refs
-    this.dom.btnInventory = btnInv
-    this.dom.btnCraft = btnCraft
-    this.dom.btnHelp = btnHelp
-    this.dom.btnNewWorld = btnNew
-    this.dom.btnSnapshot = btnSnap
+    this.#btnInventory = btnInv
+    this.#btnCraft = btnCraft
+    this.#btnAchievement = btnAchievement
+    this.#btnHelp = btnHelp
+    this.#btnNewWorld = btnNew
+    this.#btnSnapshot = btnSnap
   }
 
+  /**
+   * Crée un bouton icône SVG pour la barre de menu.
+   * @param {string}  id     — identifiant DOM
+   * @param {string}  path   — chemin SVG (constante PATH_*)
+   * @param {string}  title  — tooltip
+   * @param {boolean} isMeta — true = style destructif (rouge)
+   * @returns {HTMLButtonElement}
+   */
+  #createBtn (id, path, title, isMeta = false) {
+    const btn = document.createElement('button')
+    btn.id = id
+    btn.innerHTML = SVG_ICON(path, 'class="menu-btn-icon"')
+    btn.title = title
+    btn.className = isMeta ? 'menu-bar-btn menu-bar-btn-meta' : 'menu-bar-btn'
+    return btn
+  }
+
+  /**
+   * Lie les handlers de clic sur les boutons.
+   */
   #bindEvents () {
-    this.dom.btnInventory.addEventListener('click', this.#onInventoryClick.bind(this))
-    this.dom.btnCraft.addEventListener('click', this.#onCraftClick.bind(this))
-    this.dom.btnHelp.addEventListener('click', this.#onHelpClick.bind(this))
-    this.dom.btnNewWorld.addEventListener('click', this.#onNewWorldClick.bind(this))
-    this.dom.btnSnapshot.addEventListener('click', this.#onSnapshotClick.bind(this))
+    this.#btnInventory.addEventListener('click', this.#onInventoryClick.bind(this))
+    this.#btnCraft.addEventListener('click', this.#onCraftClick.bind(this))
+    this.#btnAchievement.addEventListener('click', this.#onAchievementClick.bind(this))
+    this.#btnHelp.addEventListener('click', this.#onHelpClick.bind(this))
+    this.#btnNewWorld.addEventListener('click', this.#onNewWorldClick.bind(this))
+    this.#btnSnapshot.addEventListener('click', this.#onSnapshotClick.bind(this))
   }
 
-  // --- Handlers ---
+  /**
+   * Émet une demande d'ouverture d'overlay.
+   * Un handler par overlay.
+   */
+  #onInventoryClick () { eventBus.emit('overlay/open-request', 'inventory') }
 
-  #onInventoryClick () {
-    eventBus.emit('overlay/open-request', 'inventory')
-  }
+  #onCraftClick () { eventBus.emit('overlay/open-request', 'craft') }
 
-  #onCraftClick () {
-    eventBus.emit('overlay/open-request', 'craft')
-  }
+  #onAchievementClick () { eventBus.emit('overlay/open-request', 'achievement') }
 
-  #onHelpClick () {
-    eventBus.emit('overlay/open-request', 'help')
-  }
+  #onHelpClick () { eventBus.emit('overlay/open-request', 'help') }
 
-  #onNewWorldClick () {
-    eventBus.emit('overlay/open-request', 'creation')
-  }
+  #onNewWorldClick () { eventBus.emit('overlay/open-request', 'creation') }
 
+  /**
+   * Copie un snapshot du canvas principal dans le presse-papier.
+   * Flash visuel sur le bouton en cas de succès.
+   * Nécessite HTTPS ou localhost.
+   */
   async #onSnapshotClick () {
     // Méthode Debug : Copie le canvas principal dans le presse-papier
     try {
@@ -145,10 +170,10 @@ class MenuBarWidget {
       console.log('Debug: Snapshot copied to clipboard!')
 
       // Feedback visuel rapide (Flash bouton)
-      const originalColor = this.dom.btnSnapshot.style.backgroundColor
-      this.dom.btnSnapshot.style.backgroundColor = '#228822'
+      const originalColor = this.#btnSnapshot.style.backgroundColor
+      this.#btnSnapshot.style.backgroundColor = '#228822'
       setTimeout(() => {
-        this.dom.btnSnapshot.style.backgroundColor = originalColor
+        this.#btnSnapshot.style.backgroundColor = originalColor
       }, 200)
     } catch (e) {
       console.error('Debug Snapshot Failed:', e)
