@@ -4756,7 +4756,7 @@ Once you have basic tools and a shelter, you can start exploring:
   * [[Inventory]] **[I]** — bag, hotbar, armor and accessories
   * [[Crafting]] **[K]** — browse recipes, inspect ingredients, craft items
   * [[Help Panel]] **[H]** — all reference topics, searchable
-  * [[Achivements Panel]] **[U]** — to track your progress
+  * [[Achievements Panel]] **[U]** — to track your progress
   * [[Combat|Combat Panel]] — tactical combat, automatic opening, close when combat is done (win or lost)
   `
   },
