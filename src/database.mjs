@@ -513,6 +513,18 @@ class DataBase {
       transaction.onerror = () => reject(new Error('Batch game state update failed'))
     })
   }
+
+  /**
+   * Insère ou remplace un enregistrement dans le store 'achievements'.
+   * Fire and forget — aucun await attendu.
+   * @param {{code: string, count: number}} record — 'code' obligatoire (keyPath)
+   */
+  putAchievement (record) {
+    if (!this.db) { console.error(new Error('putAchievement: database not initialized')); return }
+    const transaction = this.db.transaction('achievements', 'readwrite')
+    const request = transaction.objectStore('achievements').put(record)
+    request.onerror = (e) => console.error(new Error(`putAchievement failed: ${e.target.error}`))
+  }
 }
 export const database = new DataBase()
 
