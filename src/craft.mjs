@@ -420,6 +420,13 @@ class CraftOverlay {
     this.#initEvents()
   }
 
+  /**
+   * Restaure les filtres mémorisés depuis la DB au démarrage de session.
+   * @param {string} mode          — 'type' | 'station' | 'ingredient'
+   * @param {string} filterType
+   * @param {string} filterStation
+   * @param {string} filterMaterial
+   */
   init (mode, filterType, filterStation, filterMaterial) {
     this.#savedFilterValues.type = filterType ?? ''
     this.#savedFilterValues.station = filterStation ?? ''
@@ -429,6 +436,10 @@ class CraftOverlay {
     this.#filterValue.value = this.#savedFilterValues[this.#filterMode.value]
   }
 
+  /**
+   * Construit l'arborescence DOM du panel et retourne l'élément racine.
+   * @returns {HTMLElement}
+   */
   #initDOM () {
     const body = document.createElement('div')
     body.className = 'cr-body'
@@ -465,6 +476,9 @@ class CraftOverlay {
     return body
   }
 
+  /**
+   * Construit la zone de filtrage : input texte, bouton reset, select mode, select valeur.
+   */
   #buildFilterZone () {
     // ── Ligne 1 : input texte + icônes ──────────────────────────
     const searchRow = document.createElement('div')
@@ -505,6 +519,12 @@ class CraftOverlay {
     this.#populateFilterValue()
   }
 
+  /**
+   * Crée un bouton icône générique pour la barre de filtrage.
+   * @param {string} icon    — caractère ou texte affiché
+   * @param {string} title   — tooltip
+   * @returns {HTMLButtonElement}
+   */
   #makeIconBtn (icon, title) {
     const btn = document.createElement('button')
     btn.textContent = icon
@@ -513,6 +533,10 @@ class CraftOverlay {
     return btn
   }
 
+  /**
+   * Repeuple #filterValue selon le mode actif (type / station / ingredient).
+   * Appelé à l'init et à chaque changement de #filterMode.
+   */
   #populateFilterValue () {
     this.#filterValue.innerHTML = ''
 
@@ -543,6 +567,9 @@ class CraftOverlay {
     }
   }
 
+  /**
+   * Construit la zone basse droite : bouton help, input runs, hint, bouton craft.
+   */
   #buildCraftZone () {
     this.#btnHelp = document.createElement('button')
     this.#btnHelp.className = 'cr-action-btn'
@@ -578,6 +605,10 @@ class CraftOverlay {
     this.#craftZone.appendChild(this.#btnCraft)
   }
 
+  /**
+   * Abonne les handlers DOM et eventBus.
+   * Séparé du constructeur pour lisibilité.
+   */
   #initEvents () {
     // Abonnement au Bus
     eventBus.on('craft/open', () => {
@@ -695,6 +726,10 @@ class CraftOverlay {
     })
   }
 
+  /**
+   * Filtre RECIPES selon le texte libre ou les selects et reconstruit la grille.
+   * La recherche texte porte sur le nom du résultat et des ingrédients.
+   */
   #applyFilter () {
     const text = this.#filterInput.value.trim().toLowerCase()
     let recipes
@@ -721,6 +756,11 @@ class CraftOverlay {
     this.#rebuildGrid(recipes)
   }
 
+  /**
+   * Vide et reconstruit la grille de slots à partir d'une liste de recettes.
+   * Réinitialise la sélection et le panneau de détail.
+   * @param {Array<object>} recipes
+   */
   #rebuildGrid (recipes) {
     while (this.#gridZone.firstChild) {
       this.#gridZone.removeChild(this.#gridZone.firstChild)
@@ -748,6 +788,13 @@ class CraftOverlay {
     }
   }
 
+  /**
+   * Gère le clic sur un slot de la grille.
+   * Premier clic : sélectionne et affiche le détail.
+   * Second clic sur le même slot : désélectionne.
+   * @param {HTMLElement} slot
+   * @param {object}      recipe
+   */
   #onSlotClick (slot, recipe) {
     if (this.#selectedSlot === slot) { // ← second clic : désélection
       slot.classList.remove('selected')
@@ -773,6 +820,10 @@ class CraftOverlay {
     this.#btnCraft.textContent = `Craft × ${runs * recipe.result.count}`
   }
 
+  /**
+   * Vide le panneau de détail et affiche le message d'invite initial.
+   * Réinitialise #ingredientQtyEls et #isCraftable.
+   */
   #clearDetail () {
     this.#ingredientQtyEls = []
     this.#isCraftable = false
@@ -790,6 +841,11 @@ class CraftOverlay {
     this.#detailZone.appendChild(warning)
   }
 
+  /**
+   * Affiche le détail complet d'une recette : résultat, station, ingrédients.
+   * Met à jour #isCraftable selon la disponibilité des ingrédients et de la station.
+   * @param {object} recipe
+   */
   #showDetail (recipe) {
     this.#detailZone.innerHTML = ''
 
@@ -812,6 +868,13 @@ class CraftOverlay {
     this.#detailZone.appendChild(this.#buildIngredientsSection(recipe))
   }
 
+  /**
+   * Construit la section 'Result' du panneau de détail.
+   * Inclut les items retournés (returned) si présents.
+   * @param {object}  recipe
+   * @param {boolean} isCraftable
+   * @returns {HTMLElement}
+   */
   #buildResultSection (recipe, isCraftable) {
     const section = document.createElement('div')
     section.className = 'cr-section'
@@ -881,6 +944,12 @@ class CraftOverlay {
     return section
   }
 
+  /**
+   * Construit la section 'Crafting Station' du panneau de détail.
+   * @param {object}  recipe
+   * @param {boolean} stationNearby
+   * @returns {HTMLElement}
+   */
   #buildStationSection (recipe, stationNearby) {
     const section = document.createElement('div')
     section.className = 'cr-section'
@@ -915,6 +984,12 @@ class CraftOverlay {
     return section
   }
 
+  /**
+   * Construit la section 'Ingredients' du panneau de détail.
+   * Peuple #ingredientQtyEls pour les mises à jour dynamiques des quantités.
+   * @param {object} recipe
+   * @returns {HTMLElement}
+   */
   #buildIngredientsSection (recipe) {
     const section = document.createElement('div')
     section.className = 'cr-section'
@@ -958,6 +1033,11 @@ class CraftOverlay {
     return section
   }
 
+  /**
+   * Copie le nom dans le filtre texte et masque les selects.
+   * Utilisé au clic sur un ingrédient ou une station pour chercher sa recette.
+   * @param {string} name
+   */
   #onDetailSlotClick (name) {
     this.#filterInput.value = name
     this.#filterMode.style.display = 'none'
@@ -965,6 +1045,10 @@ class CraftOverlay {
     this.#applyFilter()
   }
 
+  /**
+   * Reconstruit #availableMap depuis le bag/hotbar joueur et les containers proches.
+   * À appeler à l'ouverture du panel et après chaque craft.
+   */
   #buildAvailableMap () {
     this.#availableMap = {}
     inventoryManager.fillMaterialsFromPlayer(this.#availableMap)
@@ -974,6 +1058,10 @@ class CraftOverlay {
     }
   }
 
+  /**
+   * Met à jour l'affichage des quantités disponibles/requises pour chaque ingrédient.
+   * Appelé après chaque changement du nombre de runs ou du #availableMap.
+   */
   #updateIngredientQtys () {
     const runs = parseInt(this.#craftCount.value, 10) || 1
     for (const {el, code, ingCount} of this.#ingredientQtyEls) {
@@ -981,6 +1069,10 @@ class CraftOverlay {
     }
   }
 
+  /**
+   * Recalcule le nombre max de runs possible et met à jour #craftCount et #craftCountHint.
+   * Appelle #updateIngredientQtys en fin de traitement.
+   */
   #updateCraftInput () {
     if (!this.#selectedRecipe) return
 
@@ -1006,6 +1098,11 @@ class CraftOverlay {
     this.#updateIngredientQtys()
   }
 
+  /**
+   * Peuple #nearbyStations depuis furnitureManager.
+   * 'byHand' est toujours ajouté (craft sans station physique).
+   * DEBUG : 'furnace' et 'workbench' ajoutés en dur jusqu'à implémentation complète.
+   */
   #loadNearbyStations () {
     this.#nearbyStations = new Set()
     this.#nearbyStations.add('byHand') // toujours disponible sans station physique
@@ -1015,6 +1112,9 @@ class CraftOverlay {
     for (const furniture of stations) this.#nearbyStations.add(furniture.code)
   }
 
+  /**
+   * Active ou désactive #btnCraft selon craftabilité, runs disponibles et place en bag.
+   */
   #updateCraftButton () {
     if (!this.#selectedRecipe || !this.#isCraftable || this.#craftMax === 0) {
       this.#btnCraft.disabled = true
@@ -1026,6 +1126,12 @@ class CraftOverlay {
     this.#btnCraft.disabled = !inventoryManager.canReceiveFromCraft(items)
   }
 
+  /**
+   * Construit la liste des items produits par le craft pour runs exécutions.
+   * Inclut le résultat principal et les items retournés.
+   * @param {number} runs
+   * @returns {Array<{code: string, count: number}>}
+   */
   #buildCraftItems (runs) {
     const items = [{code: this.#selectedRecipe.result.item.code, count: runs * this.#selectedRecipe.result.count}]
     if (this.#selectedRecipe.returned) {
@@ -1036,6 +1142,12 @@ class CraftOverlay {
     return items
   }
 
+  /**
+   * Retourne true si tous les ingrédients de la recette sont disponibles en quantité suffisante.
+   * Utilisé pour colorer les slots de la grille (cr-slot-ok / cr-slot-ko).
+   * @param {object} recipe
+   * @returns {boolean}
+   */
   #isRecipeFeasible (recipe) {
     for (const ing of recipe.ingredients) {
       if ((this.#availableMap[ing.item.code] ?? 0) < ing.count) return false
