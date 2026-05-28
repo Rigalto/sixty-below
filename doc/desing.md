@@ -881,6 +881,9 @@ Raccourci `U`. Affiche :
 (`mine/node`, `craft/performed`, `forage/herb`, `monster/killed`...).
 AchievementManager s'y abonne et appelle `increment(code, count)`.
 
+**Craft** : le compteur est incrémenté du nombre de **runs** exécutés,
+indépendamment du nombre d'items produits par run.
+
 #### Compteur multi-source
 
 Un item obtenu par plusieurs méthodes (ex : baits récupérés en secouant un arbre

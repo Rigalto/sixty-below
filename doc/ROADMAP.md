@@ -7,7 +7,6 @@
 
 ## En cours
 
-
 - Implémentation du `AchievementOverlay` et `AchievementManager`
   - Ajouter l'icône succès dans le Control Panel (section 'icônes d'action'), raccourci `U`
 - continuer la correction et l'ajout de fiches d'aide (`HELP`) et d'items (`ITEMS`)
