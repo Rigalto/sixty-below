@@ -426,6 +426,20 @@ class FurnitureManager {
 
     return record
   }
+
+  // ─── Placement ───────────────────────────────────────────────────────────────
+
+  /**
+   * Renomme un furniture container et persiste la modification.
+   * @param {string} furnitureId
+   * @param {string} name
+   */
+  rename (furnitureId, name) {
+    const record = this.#byId.get(furnitureId)
+    if (record === undefined) return
+    record.name = name
+    saveManager.queueStaticUpdate({storeName: 'furniture', record})
+  }
 }
 export const furnitureManager = new FurnitureManager()
 

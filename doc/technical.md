@@ -1378,3 +1378,9 @@ Champs optionnels selon `stype` :
 | `isTileOccupied` | `(index: number) → boolean` | `#occupiedTiles: Set<number>` — rectangle w×h complet |
 | `isFloorTile` | `(index: number) → boolean` | `#floorTiles: Set<number>` — ligne tileY+h |
 | `isSurfaceTop` | `(index: number) → boolean` | `#surfaceTops: Set<number>` — ligne tileY si `ITEMS[code].surface` |
+
+#### Actions
+
+| Méthode | Signature | Structure interne |
+| :--- | :--- | :--- |
+| `rename` | `(furnitureId: string, name: string) → void` | Met à jour `name` sur le record et persiste via saveManager. |
