@@ -4,6 +4,7 @@ import {createOverlayHeader} from './ui.mjs'
 import {database} from './database.mjs'
 import {ITEM_TYPE, ITEMS, RECIPES, CRAFT_RESULT_TYPES, CRAFT_STATIONS, CRAFT_INGREDIENTS} from '../assets/data/data.mjs'
 import {inventoryManager} from './inventory.mjs'
+import {furnitureManager} from './housing.mjs'
 
 // ── CSS ──────────────────────────────────────────────────────────────────────
 
@@ -658,15 +659,16 @@ class CraftOverlay {
       const runs = parseInt(this.#craftCount.value, 10) || 1
 
       // ── Consommer les ingrédients ─────────────────────────────
+      const containers = furnitureManager.getNearbyContainers()
       for (const ing of this.#selectedRecipe.ingredients) {
-        const remaining = inventoryManager.removeFromPlayer(ing.item.code, ing.count * runs)
-
+        // consommation depuis 'bag' et 'hotbar'
+        let remaining = inventoryManager.removeFromPlayer(ing.item.code, ing.count * runs)
         if (remaining > 0) {
-          // TODO furnitureManager — containers proches
-          // for (const id of furnitureManager.getNearbyContainerIds()) {
-          //   if (remaining === 0) break
-          //   remaining = inventoryManager.removeFromContainer(id, ing.item.code, remaining)
-          // }
+          // consommation depuis containers dans le range
+          for (const furniture of containers) {
+            if (remaining === 0) break
+            remaining = inventoryManager.removeFromContainer(furniture.id, ing.item.code, remaining)
+          }
           if (remaining > 0) {
             console.error(`[CraftOverlay] ingrédient non consommé : ${remaining} × ${ing.item.code}`)
           }
@@ -963,11 +965,10 @@ class CraftOverlay {
   #buildAvailableMap () {
     this.#availableMap = {}
     inventoryManager.fillMaterialsFromPlayer(this.#availableMap)
-    // TODO furnitureManager — containers proches
-    // const nearbyIds = furnitureManager.getNearbyContainerIds('craft-range')
-    // for (const id of nearbyIds) {
-    //   inventoryManager.fillMaterialsFromContainer(this.#availableMap, id)
-    // }
+    const containers = furnitureManager.getNearbyContainers()
+    for (const furniture of containers) {
+      inventoryManager.fillMaterialsFromContainer(this.#availableMap, furniture.id)
+    }
   }
 
   #updateIngredientQtys () {
@@ -1004,12 +1005,11 @@ class CraftOverlay {
 
   #loadNearbyStations () {
     this.#nearbyStations = new Set()
-    // TODO furnitureManager
-    // const ids = furnitureManager.getNearbyCraftingStations()
-    // for (const code of ids) this.#nearbyStations.add(code)
-
-    // Simulation pour tests :
-    for (const code of ['byHand', 'furnace', 'workbench']) this.#nearbyStations.add(code)
+    this.#nearbyStations.add('byHand') // toujours disponible sans station physique
+    this.#nearbyStations.add('furnace') // DEBUG
+    this.#nearbyStations.add('workbench') // DEBUG
+    const stations = furnitureManager.getNearbyCraftingStations()
+    for (const furniture of stations) this.#nearbyStations.add(furniture.code)
   }
 
   #updateCraftButton () {
