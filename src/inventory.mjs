@@ -99,29 +99,22 @@ import {furnitureManager} from './housing.mjs'
 
 class InventoryManager {
   // Joueur
-  #bag // Array(64)  — slots fixes, index = numéro de slot
-  #hotbar // Array(8)   — slots fixes
-  #armor // Array(3)   — HEAD=0, CHEST=1, FEET=2
-  #accessories // Array(5)   — slots fixes
+  #bag = [] // Array(64)  — slots fixes, index = numéro de slot
+  #hotbar = [] // Array(8)   — slots fixes
+  #armor = [] // Array(3)   — HEAD=0, CHEST=1, FEET=2
+  #accessories = [] // Array(5)   — slots fixes
 
   // Coffres du monde (chargés à l'ouverture de l'overlay)
-  #containers // Map<furnitureId, Array(capacity)>
+  #containers = new Map() // Map<furnitureId, Array(capacity)>
 
   // Poubelle
-  #trash // {item, count, prefix} | null — annulable jusqu'à fermeture
+  #trash = null // {item, count, prefix} | null — annulable jusqu'à fermeture
 
   // Persistance
-  #dirtyKeys // Set<number> — clés DB des slots modifiés
+  #dirtyKeys = new Set() // Set<number> — clés DB des slots modifiés
 
-  constructor () {
-    this.#bag = []
-    this.#hotbar = []
-    this.#armor = []
-    this.#accessories = []
-    this.#containers = new Map()
-    this.#trash = null
-    this.#dirtyKeys = new Set() // Set<slot> — références directes aux slots modifiés
-  }
+  // constructor () {
+  // }
 
   init () {
     // Tableaux vides
@@ -1506,22 +1499,26 @@ class InventorySlot extends HTMLElement {
 customElements.define('inventory-slot', InventorySlot)
 
 class InventoryOverlay {
-  #container
-  #content
-  #btnUse // icône d'utilisation du slot sélectionné
-  #btnLock // icône de verrouillage/déverouillage du slot sélectionné
-  #btnSplit // icône de séparatin d'une pile
-  #btnTransfer // icône de transfert bag <-> Chest
-  #btnTrash // icôns de placement du slot sélectionné dans la poubelle
-  #btnRestore // icône de récupération du contenu de la poubelle
+  #container = null
+  #content = null
+  #btnUse = null // icône d'utilisation du slot sélectionné
+  #btnLock = null // icône de verrouillage/déverouillage du slot sélectionné
+  #btnSplit = null // icône de séparatin d'une pile
+  #btnTransfer = null // icône de transfert bag <-> Chest
+  #btnTrash = null // icôns de placement du slot sélectionné dans la poubelle
+  #btnRestore = null // icône de récupération du contenu de la poubelle
   #chestSelect = null // <select> du panel container
   #btnRename = null // bouton renommage
   #chestIcon = null // icône du container sélectionné
+  #renameForm = null // formulaire de renommage
+  #renameInput = null // champ texte
+  #btnConfirm = null // bouton confirmation rename
+  #btnCancel = null // bouton annulation rename
 
   #dragSource = null // départ du drag & drop
   #ghost = null // div fantôme qui suit la souris pendant le drag & drop
-  #dragStartX // position initiale de la souris
-  #dragStartY // position initiale de la souris
+  #dragStartX // position initiale de la sourisn - umber — toujours écrit avec #dragSource
+  #dragStartY // position initiale de la sourisn - umber — toujours écrit avec #dragSource
 
   #hotbarSlots = [] // Array(8) — refs DOM des inventory-slot
   #bagSlots = [] // Array(64) — refs DOM des inventory-slot
@@ -1530,7 +1527,7 @@ class InventoryOverlay {
   #containerSlots = [] // Array(64) — refs DOM des inventory-slot
 
   #selectedSlot = null // référence au DOM element inventory-slot sélectionné
-  #selectedFurnitureId // identifiant du coffre sélectionné
+  #selectedFurnitureId = null // furnitureId du container actif, null si aucun
 
   constructor () {
   // 1. Conteneur Principal — dimensions calculées
@@ -1817,6 +1814,11 @@ class InventoryOverlay {
     btnCancel.textContent = '✕'
     btnCancel.title = 'Cancel'
 
+    this.#renameForm = renameForm
+    this.#renameInput = input
+    this.#btnConfirm = btnConfirm
+    this.#btnCancel = btnCancel
+
     renameForm.appendChild(label)
     renameForm.appendChild(input)
     renameForm.appendChild(btnConfirm)
@@ -1884,6 +1886,14 @@ class InventoryOverlay {
     // gestion de la sélection d'un coffre
     this.onChestSelectChange = this.onChestSelectChange.bind(this)
     this.#chestSelect.addEventListener('change', this.onChestSelectChange)
+
+    // gestion du renommage d'un coffre
+    this.onRenameClick = this.onRenameClick.bind(this)
+    this.onRenameConfirm = this.onRenameConfirm.bind(this)
+    this.onRenameCancel = this.onRenameCancel.bind(this)
+    this.#btnRename.addEventListener('click', this.onRenameClick)
+    this.#btnConfirm.addEventListener('click', this.onRenameConfirm)
+    this.#btnCancel.addEventListener('click', this.onRenameCancel)
   }
 
   // /////////// //
@@ -2110,6 +2120,7 @@ class InventoryOverlay {
     }
     // peuplement du dropdown des coffres dans le range
     this.#populateContainerSelect()
+    this.#renameForm.classList.add('hidden')
   }
 
   /**
@@ -2434,6 +2445,38 @@ class InventoryOverlay {
     const furniture = furnitureManager.getFurnitureById(this.#chestSelect.value)
     if (furniture === undefined) return
     this.#updateContainerSelection(furniture)
+  }
+
+  // //////////////////// //
+  // RENOMMAGE DES CHESTS //
+  // //////////////////// //
+
+  /**
+   * Ouvre le formulaire de renommage du container sélectionné.
+   * Pré-remplit le champ avec le nom courant.
+   */
+  onRenameClick () {
+    this.#renameInput.value = this.#chestSelect.selectedOptions[0].textContent
+    this.#renameForm.classList.remove('hidden')
+  }
+
+  /**
+   * Valide le renommage : met à jour FurnitureManager, le dropdown et ferme le formulaire.
+   * Sans effet si le champ est vide.
+   */
+  onRenameConfirm () {
+    const name = this.#renameInput.value.trim()
+    if (name === '') return
+    furnitureManager.rename(this.#selectedFurnitureId, name)
+    this.#chestSelect.selectedOptions[0].textContent = name
+    this.#renameForm.classList.add('hidden')
+  }
+
+  /**
+   * Annule le renommage et restaure la ligne principale.
+   */
+  onRenameCancel () {
+    this.#renameForm.classList.add('hidden')
   }
 }
 export const inventoryOverlay = new InventoryOverlay()

@@ -7,9 +7,8 @@
 
 ## En cours
 
-- conception de `CraftOverlay` et du tableau des recettes (`RECIPES`)
-- Ajout de l'aide pour les recettes (Markdown `{{recipes:...}}`)
-- Ajout d'un mock-up de l'interface de combat : `CombatOverlay` avec juste deux boutons : `Win` et `Lost`
+- `CraftOverlay` : prise en compte de coffres dans le range
+- Implémentation du `SuccessOverlay` et `SuccessManager`
 - continuer la correction et l'ajout de fiches d'aide (`HELP`) et d'items (`ITEMS`)
 - Documentation avec E/S des eventBus (reste à faire : `core.mjs`, `craft.mjs`, `ui.mjs`, `utils.mjs` (TimeMmanager))
 
@@ -18,6 +17,7 @@
 ## Dette technique
 
 - Vérifier que la convention pour les variables privée est prise en compte partout
+  - fait pour `inventory.mjs`
 - Vérifier que les en-têtes des fonctions sont présents et à jour (prise en compte des modifications de conception)
 
 ---
@@ -35,7 +35,6 @@
 
 - Mettre les bonnes icônes dans le haut du Control Panel
 - Mettre les bonnes icônes dans le titre des Overlays
-- Dans les slots de l'inventaire, donner les informations sur l'item contenu, quand il existe.
 - Dans l'overlay de création d'un monde, ajouter, sous le champ d'introduction de la Seed, une ligne : 'Current World Seed: xxxxx', ou xxxxx est la seed du monde qui va être écrasé. On peut cliquer sur les xxxxx et la graine est alors copiée dans le champ `input`. Il faudra ajouter cela à la fiche d'aide (pas encore créée).
 
 ---
@@ -108,7 +107,7 @@ fs.writeFileSync('docs/help-rendered.html', htmlHelp.join('\n'))
 
 ### Housing
 - Construction shelter (protection nocturne)
-- Furniture :
+- Furniture (`FurnitureManager`) :
   - Tests
   - Ajout de l'affichage
 - Machines ancestrales inamovibles (Lost Temple, Ancient House)
@@ -157,14 +156,6 @@ La Sap corrode le Copper. Il doit donc être remplacer par du Gold.
 - Boss avec mécaniques spécifiques
 - Pièges dans Pyramid et structures anciennes
 - Idée : boss 'Chimera' dont les sorts sont tirés aléatoirement parmi les sorts de trois autres monstres (tirage slot à clot)
-
----
-
-## À faire — Inventory Panel (`inventory.mjs`)
-
-- chargement des containers (chest, cabinet, closet) à proximité
-- changement du nom du container actif
-- vérification actions relatives à la partie 'chest' (écrites, mais non testées)
 
 ---
 
@@ -307,12 +298,23 @@ La Sap corrode le Copper. Il doit donc être remplacer par du Gold.
   - Utilisation du contenu d'un slot
   - Séparation d'une pile d'items en deux
   - Gestion de la poubelle
+  - Affichage du contenu des coffres à proximité
+  - Renommage du coffre sélectionné
+- Craft Panel (`CraftOverlay`)
+  - Zone de filtrage (textuel, par Crafting Station, par type, par Crafting Material)
+  - Mémorisation en database des critères de filtrage (pas le filtre textuel)
+  - Affichage liste des recettes (couleur du fond pour recette réalisable avec les ingrédients)
+  - Affichage de la recette en cours (indication disponibilité)
+  - Panneau de craft (nombre de runs, réalisation du craft)
+  - Affichage du Help Panel contextuel
+  - Gestion du craft (suppression des Crafting Material, ajout du 'résultat' et des 'returned')
 
 ### Gameplay - gestion des items/buffs/recettes
 
 - Gestion de l'inventaire (`InventoryManager`)
 - Gestion des buffs (`BuffManager`)
 - Affichage des buffs (`BuffWidget`)
+- Gestion des meubles placés dans le monde (`FurnitureManager`) / Affichage manquant
 
 ### Rendu (partiel)
 - `WorldRenderer` — rendu tuiles par chunks avec cache OffscreenCanvas
