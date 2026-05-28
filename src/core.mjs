@@ -15,6 +15,7 @@ import {helpOverlay} from './help.mjs'
 import {inventoryManager} from './inventory.mjs'
 import {furnitureManager} from './housing.mjs'
 import {craftOverlay} from './craft.mjs'
+import {achievementManager} from './achievement.mjs'
 import './ui-debug.mjs'
 import './combat.mjs'
 
@@ -303,7 +304,11 @@ class GameCore {
     }
     furnitureManager.init(activeFurnitures)
 
-    // 5.3 Objectstore Plant => à remplacer par await plantManager.init(plantRecords)
+    // 5.3 Objectstore Achievements
+    const achievementRecords = await database.readAllFromObjectStore('achievements')
+    achievementManager.init(achievementRecords)
+
+    // 5.4 Objectstore Plant => à remplacer par await plantManager.init(plantRecords)
     console.log(PLANT_KIND, PLANT_TYPE) // pour éviter une erreur dans VSCode
     // const PLANT_SYSTEM_MAP = new Map([
     //   [PLANT_KIND.NATURAL * 100 + PLANT_TYPE.NONE, naturalSystem],
