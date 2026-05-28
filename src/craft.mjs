@@ -368,31 +368,31 @@ const FILTER_KEY_MAP = {
 }
 
 class CraftOverlay {
-  #container
-  #header
+  #container = null
+  #header = null
   // les quatre grandes zones
-  #filterZone
-  #gridZone
-  #detailZone
-  #craftZone
+  #filterZone = null
+  #gridZone = null
+  #detailZone = null
+  #craftZone = null
   // zone #filterZone
-  #filterInput
-  #filterMode // select 1 — type | station | ingredient
-  #filterValue // select 2 — dépend de filterMode
+  #filterInput = null
+  #filterMode = null // select 1 — type | station | ingredient
+  #filterValue = null // select 2 — dépend de filterMode
   #savedFilterValues = {type: '', station: '', ingredient: ''}
-  #btnReset
+  #btnReset = null
   // zone #gridZone
   #craftSlots = [] // inventory-slot elements de la grille
   #selectedSlot = null
   #selectedRecipe = null
   // zone craftZone
-  #btnHelp
-  #craftCount
-  #btnCraft
+  #btnHelp = null
+  #craftCount = null
+  #btnCraft = null
   // disponibilité des ingrédients
-  #availableMap
+  #availableMap = null
   #ingredientQtyEls = [] // [{el, code, ingCount}]
-  #craftCountHint
+  #craftCountHint = null
   #isCraftable = false
   #craftMax = 0
   // disponibilité des Crafting Stations
