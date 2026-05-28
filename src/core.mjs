@@ -597,7 +597,9 @@ const OVERLAY_MAP = {
   k: 'craft',
   K: 'craft',
   h: 'help',
-  H: 'help'
+  H: 'help',
+  u: 'achievement',
+  U: 'achievement'
 }
 
 class KeyboardManager {

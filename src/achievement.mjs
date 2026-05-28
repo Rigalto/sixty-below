@@ -2,6 +2,8 @@
 
 import {eventBus} from './utils.mjs'
 import {database} from './database.mjs'
+import {OVERLAYS} from './constant.mjs'
+import {createOverlayHeader} from './ui.mjs'
 import {ACHIEVEMENT_CATEGORIES} from '../../assets/data/data-achievement.mjs'
 
 console.log('ACHIEVEMENT_CATEGORIES', ACHIEVEMENT_CATEGORIES)
@@ -149,5 +151,52 @@ class AchievementManager {
 export const achievementManager = new AchievementManager()
 
 class AchievementOverlay {
+  #container = null // div principale du panel
+
+  constructor () {
+    this.#container = document.createElement('div')
+    this.#container.id = 'ui-achievement-panel'
+    Object.assign(this.#container.style, {
+      position: 'fixed',
+      top: '50%',
+      left: '50%',
+      transform: 'translate(-50%, -50%)',
+      width: '600px',
+      height: '500px',
+      backgroundColor: '#2f3136',
+      border: '1px solid #202225',
+      boxShadow: '0 10px 30px rgba(0,0,0,0.8)',
+      borderRadius: '4px',
+      zIndex: OVERLAYS.achievement.zIndex,
+      display: 'none',
+      flexDirection: 'column',
+      fontFamily: 'Segoe UI, Roboto, sans-serif',
+      color: '#ffffff',
+      userSelect: 'none'
+    })
+
+    this.#container.appendChild(createOverlayHeader('🏆 Achievements [U]', 'achievement'))
+    document.body.appendChild(this.#container)
+    this.#initEvents()
+  }
+
+  #initEvents () {
+    this.onOpen = this.onOpen.bind(this)
+    this.onClose = this.onClose.bind(this)
+    eventBus.on('achievement/open', this.onOpen)
+    eventBus.on('achievement/close', this.onClose)
+  }
+
+  /**
+   * Affiche l'overlay.
+   * Lié dans #initEvents.
+   */
+  onOpen () { this.#container.style.display = 'flex' }
+
+  /**
+   * Cache l'overlay.
+   * Lié dans #initEvents.
+   */
+  onClose () { this.#container.style.display = 'none' }
 }
 export const achievementOverlay = new AchievementOverlay()

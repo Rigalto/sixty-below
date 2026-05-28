@@ -788,7 +788,8 @@ La zone centrale est composée de `<canvas>` superposés (z-index CSS) :
 | 20 | `LightRenderer` | Occlusion et sources de lumière locales. |
 | 30 | Voile sombre (`ModalBlocker`) | Apparaît dès qu'un overlay est actif. |
 | 40–70 | Overlays DOM | Inventaire (40), Craft (50), Aide (60), Carte (70). |
-| 100 | Combat | Overlay tactique. |
+| 90 | Combat | Overlay tactique. |
+| 100 | Succès | Au-dessus des overlays modifiant les points de succès. |
 | 110 | Creation | Overlay création de monde. |
 | 150 | Dialog | Modaux. |
 | 200 | System | Priorité absolue. |

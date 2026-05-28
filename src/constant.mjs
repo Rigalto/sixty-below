@@ -32,7 +32,8 @@ export const OVERLAYS = {
   craft: {state: STATE.INFORMATION, zIndex: 50},
   help: {state: STATE.INFORMATION, zIndex: 60},
   map: {state: STATE.INFORMATION, zIndex: 70},
-  combat: {state: STATE.COMBAT, zIndex: 100},
+  combat: {state: STATE.COMBAT, zIndex: 90},
+  achievement: {state: STATE.INFORMATION, zIndex: 100},
   creation: {state: STATE.CREATION, zIndex: 110},
   dialog: {state: null, zIndex: 150},
   system: {state: null, zIndex: 200}
@@ -226,6 +227,7 @@ export const PATH_MUSIC_OFF = 'M19.8 4.52v2.47l-7.09 2.24 1.72 1.34L19.8 8.88v5.
 export const PATH_AMBIENT_ON = 'M4 10a3 3 0 0 1 3-3h4l4.59-4.59a2 2 0 0 1 3.41 1.41v16.34a2 2 0 0 1-3.41 1.41l-4.59-4.59h-4a3 3 0 0 1-3-3zM6 14a1 1 0 0 0 1 1h5l5 5v-16l-5 5h-5a1 1 0 0 0-1 1z'
 export const PATH_AMBIENT_OFF = 'M1.29 2.71a1 1 0 0 1 1.42-1.42l20 20a1 1 0 0 1-1.42 1.42zM11 7l4.59-4.59a2 2 0 0 1 3.41 1.41v11.17l-2-2v-9l-4.5 4.5zM4 10a3 3 0 0 1 0.5-1.5l1.5 1.5v4a1 1 0 0 0 1 1h4l6.8 6.8a2 2 0 0 1-2 0l-4.8-4.8h-4a3 3 0 0 1-3-3z'
 export const PATH_WARNING = 'M2.23 23a2 2 0 0 1-1.75-2.98l9.77-17.48a2 2 0 0 1 3.49 0l9.77 17.48a2 2 0 0 1-1.75 2.98zM2.5 21h19l-9.5-17zM11 10.5a1 1 0 0 1 2 0v4a1 1 0 0 1-2 0zM11 17.5a1 1 0 0 1 2 0 1 1 0 0 1-2 0z'
+export const PATH_TROPHY = 'M18 1a1 1 0 0 1 1 1 7 15 0 0 1-14 0 1 1 0 0 1 1-1zM7 3a5 12 0 0 0 10 0zM11 16h2v5h3a1.5 1.5 0 0 1 1.5 1.5 0.5 0.5 0 0 1-0.5 0.5h-10a0.5 0.5 0 0 1-0.5-0.5 1.5 1.5 0 0 1 1.5-1.5h3zM18 4h5a1 1 0 0 1 1 1v3a8 5 0 0 1-8 5v-2a6 3 0 0 0 6-3v-2h-4zM6 6h-4v2a6 3 0 0 0 6 3v2a8 5 0 0 1-8-5v-3a1 1 0 0 1 1-1h5z'
 
 export const SVG_ICON = (icon, config = '') => `<svg viewBox="0 0 24 24" ${config}><path fill="currentColor" d="${icon}"/></svg>`
 

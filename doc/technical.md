@@ -301,11 +301,18 @@ Tout système qui occupe des tuiles dans le monde expose les méthodes suivantes
 | E | `help/keydown` | `string` (e.key) | Forwarding clavier vers l'overlay aide quand il est au sommet de la pile. |
 | E | `help/topic` | `string` (topic title) | Navigue vers une fiche d'aide spécifique. Émis par n'importe quel composant. |
 
-#### Help (`AchievementOverlay`)
+#### Achievements (`AchievementManager`)
 
 | Dir. | Event Name | Payload Structure | Description |
 | :---: | :--- | :--- | :--- |
 | E | `craft/performed` | `{recipe, runs}` | Incrémentation des compteurs. |
+
+#### Achievements (`AchievementOverlay`)
+
+| Dir. | Event | Payload | Description |
+| :---: | :--- | :--- | :--- |
+| E | `achievement/open` | — | Affiche l'overlay. |
+| E | `achievement/close` | — | Cache l'overlay. |
 
 #### Combat (`CombatOverlay`)
 *En prévision*
