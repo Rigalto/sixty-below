@@ -177,7 +177,7 @@ achievementStyle.textContent = /* css */`
   flex-direction: column;
   padding: 0;
   gap: 12px;
-  overflow-y: auto;
+  overflow: hidden;
   background-color: var(--ov-bg-main);
 }
 #ui-achievement-panel .ach-summary {
@@ -191,7 +191,10 @@ achievementStyle.textContent = /* css */`
 }
 
 #ui-achievement-panel .ach-list {
+  flex: 1;
   padding: 0 16px 16px 16px;
+  min-height: 0;      /* indispensable pour qu'un enfant flex puisse scroller */
+  overflow-y: auto;
   display: flex;
   flex-direction: column;
   gap: 8px;
