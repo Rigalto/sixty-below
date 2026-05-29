@@ -352,14 +352,14 @@ craftStyle.textContent = /* css */`
   gap: 6px;
   padding: 8px 4px;
   font-size: 12px;
-  color: #e67e22;
+  color: var(--ov-text-orange);
 }
 
 #ui-craft-panel .cr-warning-icon {
   width: 16px;
   height: 16px;
   flex-shrink: 0;
-  color: #e67e22;
+  color: var(--ov-text-orange);
 }
 `
 document.head.appendChild(craftStyle)

@@ -1326,7 +1326,7 @@ inventory-slot .hidden {
   top: 52px;  /* hauteur du inv-chest-header-content fermé + gap */
   left: 8px;
   font-size: 20px;
-  color: #e67e22;
+  color: var(--ov-text-orange);
   cursor: default;
   z-index: 0;
 }
