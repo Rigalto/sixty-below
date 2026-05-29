@@ -506,12 +506,10 @@ class GameCore {
     // ctx.restore() DOIT rester après le dernier manager de la chaîne — il annule le save() de worldRenderer.
     // lightRenderer opère sur son propre canvas séparé : il se place après restore(), hors de la chaîne.
     const ctx = worldRenderer.render()
-    playerManager.render(ctx)
-
     // plantManager.render(ctx)
     // furnitureManager.render(ctx)
     // monsterManager.render(ctx)
-    // playerManager.render(ctx)
+    playerManager.render(ctx)
     ctx.restore() // clôt le save() de worldRenderer.render() — NE PAS déplacer ni supprimer
     // lightRenderer.render()
 

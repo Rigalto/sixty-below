@@ -49,13 +49,24 @@ class PlayerManager {
   }
 
   /**
+   * Retourne la tuile occupée par le centre de la hitbox en coordonnées tuile.
+   * @returns {{x: number, y: number}}
+   */
+  getCenterTile () {
+    return {
+      x: (this.#x + (PLAYER.w >> 1)) >> 4,
+      y: (this.#y + (PLAYER.h >> 1)) >> 4
+    }
+  }
+
+  /**
    * Retourne le centre de la hitbox en pixels monde.
    * Utilisé par camera.update() pour centrer la vue sur le joueur.
    * @returns {[number, number]}
    */
-//   getPosition () {
-//     return [this.#x + (PLAYER.w >> 1), this.#y + (PLAYER.h >> 1)]
-//   }
+  //   getPosition () {
+  //     return [this.#x + (PLAYER.w >> 1), this.#y + (PLAYER.h >> 1)]
+  //   }
 
   /**
    * Dessine la hitbox du joueur (placeholder — remplacé par les sprites).

@@ -1462,6 +1462,7 @@ Position interne : coin haut-gauche de la hitbox en pixels monde.
 |--------------|----------------------------------|--------------------------------------------------------------|
 | `init`       | `(playerRecord: string): {x, y}` | Parse `'x|y|direction'`, positionne le joueur, retourne le centre hitbox. |
 | `update`     | `(dt, directions): {x, y}`       | Déplace selon bitmask, retourne le centre hitbox. Sans collision (provisoire). |
+| `getCenterTile` | `(): {x, y}` | Retourne la tuile du centre de la hitbox en coordonnées tuile. |
 | `getPosition`| `(): [number, number]`           | Centre de la hitbox.             |
 | `render`     | `(ctx): void`                    | Dessine la hitbox (placeholder red). ctx déjà transformé.   |
 
