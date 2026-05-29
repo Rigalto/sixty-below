@@ -1054,6 +1054,7 @@ Responsable uniquement des mathématiques de projection et du culling.
 
 | Méthode/Propriété     | Description                                              |
 |-----------------------|----------------------------------------------------------|
+| `update({x, y}, speed?): void` | Mise à jour pour centrer sur la position en paramètre |
 | `worldToCanvas(wx, wy)` | Conversion pixel monde → pixel canvas                 |
 | `canvasToWorld(cx, cy)` | Conversion pixel canvas → pixel monde                 |
 | `displayChunks`       | `Array` — chunks visibles (cible du render)              |
@@ -1450,3 +1451,18 @@ la table source sans test à l'exécution.
 
 Raccourci : `U`.
 *À documenter à l'implémentation.*
+
+## 17. Player
+
+### Class `PlayerManager` (Singleton : `playerManager`, `player.mjs`)
+
+Position interne : coin haut-gauche de la hitbox en pixels monde.
+
+| Méthode      | Signature                        | Description                                                  |
+|--------------|----------------------------------|--------------------------------------------------------------|
+| `init`       | `(playerRecord: string): {x, y}` | Parse `'x|y|direction'`, positionne le joueur, retourne le centre hitbox. |
+| `update`     | `(dt, directions): {x, y}`       | Déplace selon bitmask, retourne le centre hitbox. Sans collision (provisoire). |
+| `getPosition`| `(): [number, number]`           | Centre de la hitbox.             |
+| `render`     | `(ctx): void`                    | Dessine la hitbox (placeholder red). ctx déjà transformé.   |
+
+Hitbox : `PLAYER.w × PLAYER.h` (cf. `constant.mjs`).

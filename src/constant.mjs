@@ -202,6 +202,16 @@ export const MAX_FURNITURE_W = 3 // largeur max d'un furniture, en tuiles
 export const MAX_FURNITURE_H = 3 // hauteur max d'un furniture, en tuiles
 
 /* =========================================
+      DEFINITION DU PLAYER
+      ========================================= */
+
+export const PLAYER = {
+  w: 26, // px — largeur hitbox
+  h: 46, // px — hauteur hitbox
+  speed: 0.3 // px/ms — vitesse de déplacement de base (sans buff)
+}
+
+/* =========================================
    DEFINITION DES ICONES
    ========================================= */
 

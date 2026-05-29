@@ -16,6 +16,7 @@ import {inventoryManager} from './inventory.mjs'
 import {furnitureManager} from './housing.mjs'
 import {craftOverlay} from './craft.mjs'
 import {achievementManager} from './achievement.mjs'
+import {playerManager} from './player.mjs'
 import {ACHIEVEMENT_CATEGORIES} from '../assets/data/data-achievement.mjs'
 import './ui-debug.mjs'
 import './combat.mjs'
@@ -263,11 +264,10 @@ class GameCore {
     const mockSavedChunks = await database.readAllFromObjectStore('world_chunks')
     chunkManager.init(mockSavedChunks)
 
-    const [playerX, playerY, playerDirection] = state.player.split('|')
-    this.playerX = parseInt(playerX, 10)
-    this.playerY = parseInt(playerY, 10)
-    this.playerDirection = playerDirection
-    camera.init(this.playerX, this.playerY)
+    // position et direction du joueur
+    const position = playerManager.init(state.player)
+    camera.init(position)
+
     // Puis initialisaton du rendering du monde
     worldRenderer.init()
     // Lancement de la sauvegarde périodique (toutes les deux secondes)
@@ -287,7 +287,6 @@ class GameCore {
     craftOverlay.init(state.craftfiltermode, state.craftfiltertype, state.craftfilterstation, state.craftfiltermaterial)
     // C'est ici qu'on initialise les managers
     // await FaunaManager.init(...)
-    // await PlayerManager.init(...)
 
     // 5.1 Objectstore Inventory
     const inventoryRecords = await database.readAllFromObjectStore('inventory')
@@ -433,28 +432,33 @@ class GameCore {
     // 2.B. TaskScheduler (Vérifie si des tâches longues sont dues)
     taskScheduler.update(gameTimestamp)
 
-    // 2.C Mouvements du joueur (touches flèches et ZQSD)
-    if (keyboardManager.directions !== 0) {
-      // console.log('player.move(', keyboardManager.directions, ')')
-      // player.move(keyboardManager.directions)
-    }
+    // 2.C Mouvements et caméra — déléguée à PlayerManager
+    const player = playerManager.update(dt, keyboardManager.directions)
+    camera.update(player)
+
+    // DEBUT MOCKUP
+    // if (keyboardManager.directions !== 0) {
+    // console.log('player.move(', keyboardManager.directions, ')')
+    // player.move(keyboardManager.directions)
+    // }
     // MOCK-UP va-et-vient du player
-    const speed = 0.3 // Pixels par ms
+    // const speed = 0.3 // Pixels par ms
 
     // Application du mouvement
-    this.playerX += speed * this.playerDirection * dt
+    // this.playerX += speed * this.playerDirection * dt
 
     // Gestion des bornes et rebond
-    if (this.playerX >= 9700) {
-      this.playerX = 9700
-      this.playerDirection = -1 // Demi-tour gauche
-    } else if (this.playerX <= 6700) {
-      this.playerX = 6700
-      this.playerDirection = 1 // Demi-tour droite
-    }
+    // if (this.playerX >= 9700) {
+    //   this.playerX = 9700
+    //   this.playerDirection = -1 // Demi-tour gauche
+    // } else if (this.playerX <= 6700) {
+    //   this.playerX = 6700
+    //   this.playerDirection = 1 // Demi-tour droite
+    // }
 
     // Mise à jour Caméra
-    camera.update(this.playerX, this.playerY)
+    // camera.update(this.playerX, this.playerY)
+    // FIN MOCKUP
 
     // 2.D Affiche des informations concernant la tuile sous la souris
     // const hoverPosition = mouseManager.mouse
@@ -502,6 +506,8 @@ class GameCore {
     // ctx.restore() DOIT rester après le dernier manager de la chaîne — il annule le save() de worldRenderer.
     // lightRenderer opère sur son propre canvas séparé : il se place après restore(), hors de la chaîne.
     const ctx = worldRenderer.render()
+    playerManager.render(ctx)
+
     // plantManager.render(ctx)
     // furnitureManager.render(ctx)
     // monsterManager.render(ctx)

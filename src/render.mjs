@@ -19,6 +19,8 @@ const VIEWPORT_HALF_H = VIEWPORT_HEIGHT >> 1
 const CHUNK_PIXEL_SIZE = 256 // (>> 8)
 // Nombre de chunks sur la largeur du monde (1024 / 16)
 const WORLD_CHUNKS_X = 64 // (>> 6)
+const WORLD_PX_W = WORLD_WIDTH << 4 // 16384
+const WORLD_PX_H = WORLD_HEIGHT << 4 // 8192
 
 /**
  * Fonction utilitaire d'interpolation linéaire
@@ -28,6 +30,8 @@ const lerp = (start, end, amt) => (1 - amt) * start + amt * end
 /* ====================================================================================================
    CAMERA (VIEWPORT)
    ==================================================================================================== */
+
+const CAMERA_LERP = 0.1 // facteur de lissage du suivi caméra
 
 class Camera {
   constructor () {
@@ -58,10 +62,10 @@ class Camera {
   /**
    * Force la position de la caméra instantanément
    */
-  init (targetX, targetY) {
+  init ({x, y}) {
     // Utilisation des dimensions LOGIQUES
-    const camX = targetX - this.logicalHalfW
-    const camY = targetY - this.logicalHalfH
+    const camX = x - this.logicalHalfW
+    const camY = y - this.logicalHalfH
 
     // Clamp avec les dimensions LOGIQUES
     const maxX = (WORLD_WIDTH << 4) - this.logicalWidth
@@ -111,29 +115,30 @@ class Camera {
   }
 
   /**
-   * Met à jour la position (Appelé par GameCore::Update)
-   * @param {number} targetX - Position X cible (Joueur)
-   * @param {number} targetY - Position Y cible (Joueur)
-   * @param {number} speed - Facteur LERP (ex: 0.1)
+   * Met à jour la position de la caméra vers la cible (centre joueur).
+   * Applique un lissage LERP et détecte les changements de chunk.
+   * @param {{x: number, y: number}} target - Centre de la hitbox joueur en pixels monde
    */
-  update (targetX, targetY, speed = 0.1) {
+  update ({x, y}) {
     // 1. Calcul Cible Clampée
-    const maxX = (WORLD_WIDTH << 4) - this.logicalWidth
-    const maxY = (WORLD_HEIGHT << 4) - this.logicalHeight
+    const maxX = WORLD_PX_W - this.logicalWidth
+    const maxY = WORLD_PX_H - this.logicalHeight
 
-    let destX = targetX - this.logicalHalfW
-    let destY = targetY - this.logicalHalfH
+    let destX = x - this.logicalHalfW
+    let destY = y - this.logicalHalfH
 
-    destX = Math.max(0, Math.min(destX, maxX))
-    destY = Math.max(0, Math.min(destY, maxY))
+    if (destX < 0) { destX = 0 }
+    if (destX > maxX) { destX = maxX }
+    if (destY < 0) { destY = 0 }
+    if (destY > maxY) { destY = maxY }
 
     // 2. Lissage (Lerp)
     // On utilise Math.floor pour éviter le flou de rendu sub-pixel
     if (Math.abs(destX - this.x) > 0.5) {
-      this.x = Math.floor(lerp(this.x, destX, speed))
+      this.x = Math.floor(lerp(this.x, destX, CAMERA_LERP))
     }
     if (Math.abs(destY - this.y) > 0.5) {
-      this.y = Math.floor(lerp(this.y, destY, speed))
+      this.y = Math.floor(lerp(this.y, destY, CAMERA_LERP))
     }
 
     // 3. Détection de changement de Chunk
@@ -142,7 +147,7 @@ class Camera {
     const cy = this.y >> 8 // / 256
 
     // Index flat unique
-    const chunkIndex = cx + (cy * WORLD_CHUNKS_X)
+    const chunkIndex = cx + (cy << 6) // * 64
 
     if (this.currentChunkIndex !== chunkIndex) {
       this.currentChunkIndex = chunkIndex
