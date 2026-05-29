@@ -315,7 +315,7 @@ class AchievementOverlay {
   #getPtsColor (pts, completionPts) {
     if (completionPts === 8) return 'var(--slot-bg-armor)' // vert
     if (completionPts === 7) return 'var(--ov-text-orange)' // orange
-    if (completionPts === 5) return '--slot-bg-accessory' // violet
+    if (completionPts === 5) return 'var(--slot-bg-accessory)' // violet
     if (pts > 0) return 'var(--slot-bg-default)' // bleu
     return 'var(--ov-text-muted)' // gris
   }
