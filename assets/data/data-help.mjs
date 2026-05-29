@@ -5167,6 +5167,19 @@ A écrire.
 
 Shortcut: [U]
 
+**Category colors**
+
+The score shown for each category reflects its completion bonus level:
+
+| Color | Meaning |
+|---|---|
+| Grey | No progress yet |
+| Blue | At least one item started |
+| Violet | All items have reached the first threshold |
+| Orange | All items have reached the second threshold |
+| Green | Category fully completed |
+
+
 Mettre un lien vers [[Achievements]]
   `
   }
