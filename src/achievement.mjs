@@ -4,6 +4,7 @@ import {eventBus} from './utils.mjs'
 import {database} from './database.mjs'
 import {OVERLAYS} from './constant.mjs'
 import {createOverlayHeader} from './ui.mjs'
+import {ITEMS, MONSTERS} from '../../assets/data/data.mjs'
 import {ACHIEVEMENT_CATEGORIES} from '../../assets/data/data-achievement.mjs'
 
 console.log('ACHIEVEMENT_CATEGORIES', ACHIEVEMENT_CATEGORIES)
@@ -217,14 +218,30 @@ achievementStyle.textContent = /* css */`
 #ui-achievement-panel .ach-category-pts   { font-size: 13px; font-weight: bold; }
 
 #ui-achievement-panel .ach-detail {
-  padding: 12px 16px;
+  padding: 8px 12px;
   background-color: var(--ov-bg-deep);
   border: 1px solid var(--ov-border-sub);
   border-radius: 4px;
-  color: var(--ov-text-muted);
-  font-size: 13px;
   margin-left: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
 }
+
+#ui-achievement-panel .ach-detail-row  {
+  display: grid;
+  grid-template-columns: 1fr 300px 20px;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+}
+#ui-achievement-panel .ach-detail-name  { color: var(--ov-text); }
+#ui-achievement-panel .ach-detail-count {
+  text-align: center;
+  color: var(--ov-text-muted);
+  white-space: nowrap;
+}
+#ui-achievement-panel .ach-detail-pts   {text-align: right; font-weight: bold; }
 `
 document.head.appendChild(achievementStyle)
 
@@ -339,7 +356,7 @@ class AchievementOverlay {
   #getPtsColor (pts, completionPts) {
     if (completionPts === 8) return 'var(--slot-bg-armor)' // vert
     if (completionPts === 7) return 'var(--ov-text-orange)' // orange
-    if (completionPts === 5) return 'var(--slot-bg-accessory)' // violet
+    if (completionPts === 5) return 'yellow' // yellow
     if (pts > 0) return 'var(--slot-bg-default)' // bleu
     return 'var(--ov-text-muted)' // gris
   }
@@ -358,7 +375,40 @@ class AchievementOverlay {
     this.#openRow = null
     if (isSame) return
     row.insertAdjacentElement('afterend', this.#detailEl)
+    this.#buildDetailContent(achievementManager.getCategoryDetail(row.dataset.id))
     this.#openRow = row
+  }
+
+  /**
+   * Peuple #detailEl avec les items d'une catégorie.
+   * @param {{items: Array<object>, completionPts: number}} detail
+   */
+  #buildDetailContent (detail) {
+    this.#detailEl.innerHTML = ''
+    for (const item of detail.items) {
+      const row = document.createElement('div')
+      row.className = 'ach-detail-row'
+
+      const name = document.createElement('span')
+      name.className = 'ach-detail-name'
+      name.textContent = ITEMS[item.code]?.name ?? MONSTERS[item.code]?.name ?? item.code
+
+      const count = document.createElement('span')
+      count.className = 'ach-detail-count'
+      count.textContent = item.nextThreshold === null
+        ? `${item.count} / ✓`
+        : `${item.count} / ${item.nextThreshold}`
+
+      const pts = document.createElement('span')
+      pts.className = 'ach-detail-pts'
+      pts.textContent = String(item.pts)
+      pts.style.color = this.#getPtsColor(item.pts, item.pts)
+
+      row.appendChild(name)
+      row.appendChild(count)
+      row.appendChild(pts)
+      this.#detailEl.appendChild(row)
+    }
   }
 }
 export const achievementOverlay = new AchievementOverlay()

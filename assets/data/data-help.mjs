@@ -5175,7 +5175,7 @@ The score shown for each category reflects its completion bonus level:
 |---|---|
 | Grey | No progress yet |
 | Blue | At least one item started |
-| Violet | All items have reached the first threshold |
+| Yellow | All items have reached the first threshold |
 | Orange | All items have reached the second threshold |
 | Green | Category fully completed |
 
