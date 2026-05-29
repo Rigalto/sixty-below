@@ -212,6 +212,16 @@ achievementStyle.textContent = /* css */`
 }
 #ui-achievement-panel .ach-category-label { color: var(--ov-text); font-size: 14px; }
 #ui-achievement-panel .ach-category-pts   { font-size: 13px; font-weight: bold; }
+
+#ui-achievement-panel .ach-detail {
+  padding: 12px 16px;
+  background-color: var(--ov-bg-deep);
+  border: 1px solid var(--ov-border-sub);
+  border-radius: 4px;
+  color: var(--ov-text-muted);
+  font-size: 13px;
+  margin-left: 24px;
+}
 `
 document.head.appendChild(achievementStyle)
 
@@ -219,6 +229,8 @@ class AchievementOverlay {
   #container = null // div principale du panel
   #summaryEl = null // ligne pts actuels / pts max
   #listEl = null // zone liste des catégories (placeholder)
+  #detailEl = null // div de détail unique, déplacé dans le DOM
+  #openRow = null // ligne de catégorie actuellement ouverte
 
   constructor () {
     this.#container = document.createElement('div')
@@ -246,6 +258,11 @@ class AchievementOverlay {
     content.appendChild(this.#listEl)
 
     this.#container.appendChild(content)
+
+    // création du div utilisé pour afficher le détail d'une catégorie de succès
+    this.#detailEl = document.createElement('div')
+    this.#detailEl.className = 'ach-detail'
+    this.#detailEl.textContent = 'Detail'
   }
 
   /**
@@ -253,10 +270,14 @@ class AchievementOverlay {
    * Bind et enregistre les handlers.
    */
   #initEvents () {
+    // 1. Ouverture/fermeture de l'overlay
     this.onOpen = this.onOpen.bind(this)
     this.onClose = this.onClose.bind(this)
     eventBus.on('achievement/open', this.onOpen)
     eventBus.on('achievement/close', this.onClose)
+    // 2. Clic sur une catégorie pour en voir le détail
+    this.onListClick = this.onListClick.bind(this)
+    this.#listEl.addEventListener('click', this.onListClick)
   }
 
   /**
@@ -318,6 +339,23 @@ class AchievementOverlay {
     if (completionPts === 5) return 'var(--slot-bg-accessory)' // violet
     if (pts > 0) return 'var(--slot-bg-default)' // bleu
     return 'var(--ov-text-muted)' // gris
+  }
+
+  /**
+   * Handler délégué sur #listEl — gère le clic sur toute ligne de catégorie.
+   * Même ligne : ferme le détail. Autre ligne : déplace le détail sous la ligne cliquée.
+   * Lié dans #initEvents.
+   * @param {MouseEvent} e
+   */
+  onListClick (e) {
+    const row = e.target.closest('.ach-category-row')
+    if (row === null) return
+    const isSame = this.#openRow === row
+    this.#detailEl.remove()
+    this.#openRow = null
+    if (isSame) return
+    row.insertAdjacentElement('afterend', this.#detailEl)
+    this.#openRow = row
   }
 }
 export const achievementOverlay = new AchievementOverlay()
