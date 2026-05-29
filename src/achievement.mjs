@@ -109,7 +109,7 @@ class AchievementManager {
       const maxPts = cat.items.length * 8 + 8
       totalPts += catPts
       totalMax += maxPts
-      categories.push({id: cat.id, label: cat.label, pts: catPts, maxPts})
+      categories.push({id: cat.id, label: cat.label, pts: catPts, maxPts, completionPts: this.#computeCompletionPts(minPts)})
     }
 
     return {pts: totalPts, maxPts: totalMax, categories}
@@ -183,15 +183,35 @@ achievementStyle.textContent = /* css */`
 #ui-achievement-panel .ach-summary {
   font-size: 16px;
   font-weight: bold;
-  color: #e67e22;
+  color: var(--ov-text-orange);
   text-align: center;
   background-color: var(--ov-bg-deep);
   padding: 24px;
   border-radius: 4px;
 }
+
 #ui-achievement-panel .ach-list {
-  padding: 16px;
+  padding: 0 16px 16px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
 }
+#ui-achievement-panel .ach-category-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 12px;
+  border-radius: 4px;
+  background-color: var(--ov-bg-side);
+  border: 1px solid var(--ov-border-sub);
+  cursor: pointer;
+}
+#ui-achievement-panel .ach-category-row:hover {
+  background-color: var(--ov-bg-deep);
+  border-color: var(--ov-border);
+}
+#ui-achievement-panel .ach-category-label { color: var(--ov-text); font-size: 14px; }
+#ui-achievement-panel .ach-category-pts   { font-size: 13px; font-weight: bold; }
 `
 document.head.appendChild(achievementStyle)
 
@@ -209,6 +229,9 @@ class AchievementOverlay {
     this.#initEvents()
   }
 
+  /**
+   * Construit l'arborescence DOM du panel.
+   */
   #initDOM () {
     const content = document.createElement('div')
     content.className = 'ach-content'
@@ -225,6 +248,10 @@ class AchievementOverlay {
     this.#container.appendChild(content)
   }
 
+  /**
+   * Abonne les handlers eventBus et DOM.
+   * Bind et enregistre les handlers.
+   */
   #initEvents () {
     this.onOpen = this.onOpen.bind(this)
     this.onClose = this.onClose.bind(this)
@@ -237,9 +264,16 @@ class AchievementOverlay {
    * Lié dans #initEvents.
    */
   onOpen () {
-    const {pts, maxPts} = achievementManager.buildAchievementTable()
-    this.#summaryEl.textContent = `Achievement Points: ${pts} / ${maxPts}`
+    const {pts, maxPts, categories} = achievementManager.buildAchievementTable()
+    // 1. Section résumé
+    const pct = maxPts === 0 ? 0 : Math.round(pts / maxPts * 100)
+    this.#summaryEl.textContent = `Achievement Points: ${pts} / ${maxPts} (${pct}%)`
     this.#container.style.display = 'flex'
+    // 2. Section liste des catégories
+    this.#listEl.innerHTML = ''
+    for (const category of categories) {
+      this.#listEl.appendChild(this.#buildCategoryRow(category))
+    }
   }
 
   /**
@@ -247,5 +281,43 @@ class AchievementOverlay {
    * Lié dans #initEvents.
    */
   onClose () { this.#container.style.display = 'none' }
+
+  /**
+   * Construit une ligne de catégorie pour la liste.
+   * @param {{id: string, label: string, pts: number, maxPts: number}} category
+   * @returns {HTMLElement}
+   */
+  #buildCategoryRow (category) {
+    const row = document.createElement('div')
+    row.className = 'ach-category-row'
+    row.dataset.id = category.id
+
+    const label = document.createElement('span')
+    label.className = 'ach-category-label'
+    label.textContent = category.label
+
+    const pts = document.createElement('span')
+    pts.className = 'ach-category-pts'
+    pts.textContent = `${category.pts} / ${category.maxPts}`
+    pts.style.color = this.#getPtsColor(category.pts, category.completionPts)
+
+    row.appendChild(label)
+    row.appendChild(pts)
+    return row
+  }
+
+  /**
+   * Retourne la couleur selon le bonus de complétude de la catégorie (0/5/7/8).
+   * @param {number} pts
+   * @param {number} completionPts
+   * @returns {string}
+   */
+  #getPtsColor (pts, completionPts) {
+    if (completionPts === 8) return 'var(--slot-bg-armor)' // vert
+    if (completionPts === 7) return 'var(--ov-text-orange)' // orange
+    if (completionPts === 5) return '--slot-bg-accessory' // violet
+    if (pts > 0) return 'var(--slot-bg-default)' // bleu
+    return 'var(--ov-text-muted)' // gris
+  }
 }
 export const achievementOverlay = new AchievementOverlay()

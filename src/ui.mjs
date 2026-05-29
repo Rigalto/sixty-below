@@ -758,17 +758,18 @@ export function createOverlayHeader (titleText, overlayId) {
 
     style.textContent = `
   :root {
-    --ov-bg-main:    #2f3136;
-    --ov-bg-side:    #23272a;
-    --ov-bg-deep:    #1e2128;
-    --ov-bg-input:   #1e2128;
-    --ov-border:     #202225;
-    --ov-border-sub: #4a5568;
-    --ov-accent:     #4a69bd;
-    --ov-text:       #ffffff;
-    --ov-text-sec:   #dcddde;
-    --ov-text-muted: #cbcccd;
-    --ov-btn-bg:     #2c3e50;
+    --ov-bg-main:     #2f3136;
+    --ov-bg-side:     #23272a;
+    --ov-bg-deep:     #1e2128;
+    --ov-bg-input:    #1e2128;
+    --ov-border:      #202225;
+    --ov-border-sub:  #4a5568;
+    --ov-accent:      #4a69bd;
+    --ov-text:        #ffffff;
+    --ov-text-sec:    #dcddde;
+    --ov-text-muted:  #cbcccd;
+    --ov-btn-bg:      #2c3e50;
+    --ov-text-orange: #e67e22;
 
     --slot-bg-default:   #4A90E2;
     --slot-bg-hotbar:    #e1f381;
