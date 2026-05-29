@@ -374,7 +374,7 @@ class WorldRenderer {
 
       // 4. Dessin du carré de couleur
       // TODO: Implémenter l'utilisation des textures
-      if (node) {
+      if (node && node.color !== 'none') {
         ctx.fillStyle = node.color
         ctx.fillRect(x << 4, y << 4, 16, 16)
       }

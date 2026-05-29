@@ -497,12 +497,16 @@ class GameCore {
     // ///////////// //
 
     // 3. Render (Pass-through Context)
+    // worldRenderer.render() appelle ctx.save() + ctx.scale/translate et retourne le ctx transformé.
+    // Chaque manager suivant dessine en coordonnées Monde sur ce même ctx (pas besoin de recalculer la caméra).
+    // ctx.restore() DOIT rester après le dernier manager de la chaîne — il annule le save() de worldRenderer.
+    // lightRenderer opère sur son propre canvas séparé : il se place après restore(), hors de la chaîne.
     const ctx = worldRenderer.render()
     // plantManager.render(ctx)
     // furnitureManager.render(ctx)
     // monsterManager.render(ctx)
     // playerManager.render(ctx)
-    ctx.restore() // 'worldRenderer.render' a fait un ctx.save()
+    ctx.restore() // clôt le save() de worldRenderer.render() — NE PAS déplacer ni supprimer
     // lightRenderer.render()
 
     // 3.1 génère la liste des chunks dont il faut générer les images
