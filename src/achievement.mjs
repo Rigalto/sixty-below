@@ -7,7 +7,44 @@ import {createOverlayHeader} from './ui.mjs'
 import {ITEMS, MONSTERS} from '../../assets/data/data.mjs'
 import {ACHIEVEMENT_CATEGORIES} from '../../assets/data/data-achievement.mjs'
 
-console.log('ACHIEVEMENT_CATEGORIES', ACHIEVEMENT_CATEGORIES)
+/* ====================================================================================================
+   ACHIEVEMENT MANAGER
+   ====================================================================================================
+
+   Autorité unique sur les compteurs de succès. Aucune logique DOM.
+   Singleton : achievementManager.
+
+   Responsabilités :
+     - Chargement des compteurs depuis DB au startSession (init)
+     - Incrémentation des compteurs via un point d'entrée unique (increment)
+     - Persistance fire-and-forget via database.putAchievement
+     - Calcul des points et de la table complète pour AchievementOverlay (buildAchievementTable)
+     - Calcul à la volée du détail d'une catégorie (getCategoryDetail)
+
+   Interactions :
+     database          — putAchievement (fire-and-forget, découplé du save synchrone)
+     eventBus          — écoute les événements d'action du jeu pour incrémenter les compteurs
+     ACHIEVEMENT_CATEGORIES — constante de définition des catégories (data-achievement.mjs)
+
+   Structure DB (objectStore 'achievements') :
+     {code: string, count: number}
+     keyPath : 'code' — pas d'autoincrement. Opération unique : put() (upsert).
+     Points non persistés — recalculés depuis les compteurs au chargement.
+     Réinitialisé à chaque nouveau monde (clearObjectStore dans generate.mjs).
+
+   Données en mémoire :
+     #counts — Map<code, count> — compteurs cumulés depuis la création du monde
+
+   Événements écoutés :
+     'craft/performed'  {recipe, runs} — incrémente de runs (pas du nombre d'items produits)
+     (à venir) 'mine/node', 'forage/herb', 'monster/killed'...
+
+   Calcul des points par item (thresholds [t1, t2, t3]) :
+     count ≥ t3 → 8 pts  |  count ≥ t2 → 7 pts  |  count ≥ t1 → 5 pts  |  sinon → 0 pt
+
+   Calcul du bonus de complétude (min des pts des membres d'une catégorie) :
+     min ≥ 8 → 8 pts  |  min ≥ 7 → 7 pts  |  min ≥ 5 → 5 pts  |  sinon → 0 pt
+   ==================================================================================================== */
 
 class AchievementManager {
   #counts = new Map() // Map<code, count> — chargé depuis DB au startSession
@@ -244,6 +281,43 @@ achievementStyle.textContent = /* css */`
 #ui-achievement-panel .ach-detail-pts   {text-align: right; font-weight: bold; }
 `
 document.head.appendChild(achievementStyle)
+
+/* ====================================================================================================
+   ACHIEVEMENT OVERLAY
+   ====================================================================================================
+
+   Panel d'affichage des succès. Raccourci : [U].
+   Singleton : achievementOverlay.
+
+   Responsabilités :
+     - Affichage du score total et du maximum (résumé en tête, toujours visible)
+     - Liste des catégories avec score coloré selon le niveau de complétude
+     - Détail d'une catégorie au clic : items, compteurs, seuil suivant, points
+     - Gestion de l'expand/collapse via un unique #detailEl déplacé dans le DOM
+
+   Interactions :
+     achievementManager — buildAchievementTable() à l'ouverture, getCategoryDetail() au clic
+     ITEMS              — résolution des noms d'items dans le détail
+     eventBus           — écoute : 'achievement/open', 'achievement/close'
+
+   Structure DOM :
+     #container         — panel principal (#ui-achievement-panel)
+       ├── header        — createOverlayHeader (titre + bouton fermeture)
+       └── .ach-content  — zone scrollable
+             ├── #summaryEl   — .ach-summary  : score total / max (%)
+             └── #listEl      — .ach-list     : liste des catégories
+
+   Détail des catégories :
+     #detailEl — div unique (.ach-detail) inséré après la ligne cliquée via insertAdjacentElement.
+     Déplacé sans recréation pour éviter toute allocation.
+     #openRow  — référence à la ligne actuellement ouverte (null si aucune).
+     Clic sur la ligne ouverte : fermeture. Clic sur une autre : déplacement.
+     Événements gérés par délégation sur #listEl (un seul listener).
+
+   Couleurs des scores (bonus de complétude 0 / 5 / 7 / 8) :
+     0 → gris (--ov-text-muted)    5 → jaune (--slot-bg-accessory)
+     7 → orange (--ov-text-orange) 8 → vert (--slot-bg-armor)
+   ==================================================================================================== */
 
 class AchievementOverlay {
   #container = null // div principale du panel

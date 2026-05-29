@@ -11,36 +11,47 @@ import {MAX_FURNITURE_W, MAX_FURNITURE_H, ITEMS} from '../../assets/data/data.mj
    FURNITURE MANAGER
    ====================================================================================================
 
+   Autorité unique sur les meubles posés dans le monde. Aucune logique DOM.
+   Singleton : furnitureManager.
+
+   Responsabilités :
+     - Liste des furnitures placés dans le monde (#list, copie conforme DB)
+     - Validation et placement d'un meuble (place), retrait (remove), renommage (rename)
+     - Lookup O(1) par id (#byId) et par chunk (#byChunk)
+     - Mise à jour incrémentale des meubles affichés (#displayed) via Camera
+     - Protection des tuiles : occupation, sol, surface empilable (#occupiedTiles, #floorTiles, #surfaceTops)
+     - Recherche spatiale : meubles affichés, containers et stations à portée, meuble sous le curseur
+
+   Interactions :
+     camera            — écoute 'camera/preload-chunks-changed' pour maintenir #displayed
+     saveManager       — persistance via queueStaticUpdate (place, remove, rename)
+     inventoryManager  — appelant de place() et remove() ; gère inventory en amont/aval
+     eventBus          — abonnement unique : 'camera/preload-chunks-changed'
+
    Structure DB (objectStore 'furniture') :
-   {
-     key:          number,   // autoincrement DB
-     id:           string,   // identifiant unique (uniqueIdGenerator)
-     index:        number,   // position coin haut-gauche (y << 10) | x
-     code:         string,   // itemId
-     stype:        string,   // sous-type (station, chest, door, chair...)
-     w:            number,   // largeur en tuiles
-     h:            number,   // hauteur en tuiles
-     deleted:      boolean,  // true = purge au prochain startSession
-   }
+     {key, id, index, code, stype, w, h, deleted}
+     Champs optionnels selon stype : left (boolean), lit (boolean), name (string)
+     Suppression : deleted=true en DB, retrait immédiat des structures mémoire.
+     Purge des deleted=true : au startSession, avant transmission à init().
 
    Structures mémoire :
-     #list    — Array<object>          — copie conforme DB (objets mutés en place)
-     #byId    — Map<string, object>    — id → furniture, lookup O(1)
-     #byChunk — Map<number, Set>       — chunkKey → Set<furniture>, lookup spatial
+     #list          — furniture[]              — copie conforme DB (objets mutés en place)
+     #byId          — Map<furnitureId, furniture> — lookup O(1)
+     #byChunk       — Map<chunkKey, Set<furniture>> — lookup spatial (chunk haut-gauche uniquement)
+     #displayed     — Set<furniture>           — furnitures dans les chunks preload Camera
+     #occupiedTiles — Set<tileIndex>           — tuiles couvertes par un furniture (rectangle w×h)
+     #floorTiles    — Set<tileIndex>           — tuiles directement sous un furniture
+     #surfaceTops   — Set<tileIndex>           — ligne haute des furnitures surface:true
+
+   Contrat des systèmes occupants :
+     isTileOccupied(index)  — tuile couverte par un furniture
+     isFloorTile(index)     — tuile directement sous un furniture (interdit au mining)
+     isSurfaceTop(index)    — tuile haute d'un furniture surface:true (sol pour empilement)
 
    Calcul de chunkKey depuis un index tuile :
      chunkX   = (index & 0x3FF) >> 4
-     chunkY   = index >> 14              // (index >> 10) >> 4
-     chunkKey = (chunkY << 6) | chunkX  // chunkY × 64 + chunkX
-
-   Un furniture couvrant w×h tuiles peut chevaucher jusqu'à 2×2 chunks.
-   Il est enregistré dans chaque chunk qu'il occupe.
-
-   Mise à jour des meubles affichés :
-     Pilotée par un événement issus de la classe 'Camera' (à définir).
-
-   Suppression d'un furniture :
-     deleted=true en DB + retrait immédiat de #list, #byId, #byChunk, #displayed.
+     chunkY   = index >> 14
+     chunkKey = (chunkY << 6) | chunkX
    ==================================================================================================== */
 
 class FurnitureManager {
