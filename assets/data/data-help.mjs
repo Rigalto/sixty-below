@@ -4752,7 +4752,7 @@ Once you have basic tools and a shelter, you can start exploring:
   * _Environment widget_ — [[Day & Night Cycle||day, time], [[Weather]], [[Moon Phases]], player coordinates
   * _Health gauge_
   * _Active [[Buff Panel||buffs/debuffs]]_
-* **Overlays** — pause exploration and open a full-screen panel. Press the same key again or click ✕ to close.
+* **Panels** — pause exploration and open a full-screen panel. Press the same key again or click ✕ to close.
   * [[Inventory]] **[I]** — bag, hotbar, armor and accessories
   * [[Crafting]] **[K]** — browse recipes, inspect ingredients, craft items
   * [[Help Panel]] **[H]** — all reference topics, searchable
@@ -4801,10 +4801,10 @@ Press **[H]** or click the Help button in the [[Control Panel]] to open it.
 In the right part of the screen, shows:
 
 * Icon actions
-  * Open/close [[Inventory|Inventory Panel]]
-  * Open/close [[Crafting|Crafting Panel]]
-  * Open/close [[Achievements Panel]]
-  * Open/close [[Help Panel]]
+  * Open [[Inventory|Inventory Panel]] [I]
+  * Open [[Crafting|Crafting Panel]] [K]
+  * Open [[Achievements Panel]] [U]
+  * Open [[Help Panel]] [H]
   * Creation of a [[World Creation|new world]]
   * Ambient sound and Music controls⏳
 * Environmental informations
@@ -5140,22 +5140,51 @@ It does not need to be equipped — carrying it in your [[Inventory]] is enough.
   },
 
   // ── Gameplay ─────────────────────────────────────────────────
-  //    Achievements, Achievements Overlay
+  //    Achievements, Achievements Panel
   {
     title: 'Achievements',
     category: ['Gameplay'],
     content: `
 **Description**
-A écrire.
 
-Ne pas oublier de mettre quelque part :
+The Achievements system tracks your progress across all activities in Sixty-Below — mining, crafting, foraging, combat, and more. Points are awarded as you reach milestones, giving a sense of progression in the sandbox.
 
+**How points are earned**
 
-* Un lien vers [[Achievements Panel]]
+Each tracked item or activity has three thresholds. Reaching each threshold earns a fixed number of points:
 
-Ingredients obtained through multiple methods (e.g. baits from tree-shaking or foraging)
-are tracked in a single counter regardless of how they were acquired.
-Each item is listed under its most natural collection method.
+| Threshold | Points earned | Running total |
+| --- | --- | --- |
+| 1st | +5 pts | 5 pts |
+| 2nd | +2 pts | 7 pts |
+| 3rd | +1 pt | 8 pts |
+
+The maximum score per item is **8 points**.
+
+**Categories**
+
+Items are grouped into categories (e.g. Mining — Ores, Crafting — Bars). All items within a category share the same thresholds.
+
+Each category also offers a **completion bonus** of up to 8 points, based on the minimum score of its members:
+
+| Minimum score across all members | Completion bonus |
+| --- | --- |
+| All members ≥ 5 pts | 5 pts |
+| All members ≥ 7 pts | 7 pts |
+| All members = 8 pts | 8 pts |
+
+**Multi-source items**
+
+Some items can be obtained in multiple ways (e.g. baits from tree-shaking or foraging). They are tracked in a single counter, listed under their most natural collection method.
+
+**Crafting**
+
+Crafting achievements count the number of **runs** executed, not the number of items produced per run. This keeps thresholds consistent across all recipes regardless of yield.
+
+**Tips**
+
+* _Open the [[Achievements Panel]] with **[U]** to track your progress at any time._
+* _Completion bonuses reward consistent progress — advancing all items in a category is more rewarding than maxing out a single one._
   `
   },
   {
@@ -5163,24 +5192,40 @@ Each item is listed under its most natural collection method.
     category: ['Gameplay'],
     content: `
 **Description**
-A écrire.
 
-Shortcut: [U]
+Displays your current achievement score and lets you browse progress by category.
 
-**Category colors**
+Press **[U]** or click the trophy icon in the [[Control Panel]] to open it.
 
-The score shown for each category reflects its completion bonus level:
+**Summary**
 
-| Color | Meaning |
-|---|---|
+The header shows your total achievement points, the maximum possible score, and a percentage indicator.
+
+**Category list**
+
+Each row shows a category label and its current score out of the maximum. The score color reflects the category completion bonus level:
+
+| Color | Completion level |
+| --- | --- |
 | Grey | No progress yet |
 | Blue | At least one item started |
-| Yellow | All items have reached the first threshold |
-| Orange | All items have reached the second threshold |
+| Yellow | All items past the first threshold |
+| Orange | All items past the second threshold |
 | Green | Category fully completed |
 
+**Category detail**
 
-Mettre un lien vers [[Achievements]]
+Click a category row to expand its detail. Each line shows:
+
+* The item name
+* Current count / next threshold (✓ when maxed)
+* Points earned (0, 5, 7 or 8), using the same color convention
+
+Click the same row again to collapse. Only one category can be expanded at a time.
+
+**Tips**
+
+* _See [[Achievements]] for a full explanation of how points are calculated._
   `
   }
 
@@ -5542,7 +5587,7 @@ const formatValue = (resolved, format, entryTitle, path) => {
     }
 
     case 'loot':
-      // ⏳ à implémenter lors de la conception de craftOverlay
+      // ⏳ à implémenter lors de la conception de combatOverlay
       return '⏳ loot'
 
     case 'optional':
