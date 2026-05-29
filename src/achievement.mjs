@@ -150,34 +150,79 @@ class AchievementManager {
 }
 export const achievementManager = new AchievementManager()
 
+// ── Styles AchievementOverlay ────────────────────────────────────────────────
+const achievementStyle = document.createElement('style')
+achievementStyle.textContent = /* css */`
+#ui-achievement-panel {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 600px;
+  height: 500px;
+  background-color: var(--ov-bg-side);
+  border: 1px solid var(--ov-border);
+  box-shadow: 0 10px 30px rgba(0,0,0,0.8);
+  border-radius: 4px;
+  z-index: ${OVERLAYS.achievement.zIndex};
+  display: none;
+  flex-direction: column;
+  font-family: Segoe UI, Roboto, sans-serif;
+  color: #ffffff;
+  user-select: none;
+}
+#ui-achievement-panel .ach-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  padding: 0;
+  gap: 12px;
+  overflow-y: auto;
+  background-color: var(--ov-bg-main);
+}
+#ui-achievement-panel .ach-summary {
+  font-size: 16px;
+  font-weight: bold;
+  color: #e67e22;
+  text-align: center;
+  background-color: var(--ov-bg-deep);
+  padding: 24px;
+  border-radius: 4px;
+}
+#ui-achievement-panel .ach-list {
+  padding: 16px;
+}
+`
+document.head.appendChild(achievementStyle)
+
 class AchievementOverlay {
   #container = null // div principale du panel
+  #summaryEl = null // ligne pts actuels / pts max
+  #listEl = null // zone liste des catégories (placeholder)
 
   constructor () {
     this.#container = document.createElement('div')
     this.#container.id = 'ui-achievement-panel'
-    Object.assign(this.#container.style, {
-      position: 'fixed',
-      top: '50%',
-      left: '50%',
-      transform: 'translate(-50%, -50%)',
-      width: '600px',
-      height: '500px',
-      backgroundColor: '#2f3136',
-      border: '1px solid #202225',
-      boxShadow: '0 10px 30px rgba(0,0,0,0.8)',
-      borderRadius: '4px',
-      zIndex: OVERLAYS.achievement.zIndex,
-      display: 'none',
-      flexDirection: 'column',
-      fontFamily: 'Segoe UI, Roboto, sans-serif',
-      color: '#ffffff',
-      userSelect: 'none'
-    })
-
     this.#container.appendChild(createOverlayHeader('🏆 Achievements [U]', 'achievement'))
+    this.#initDOM()
     document.body.appendChild(this.#container)
     this.#initEvents()
+  }
+
+  #initDOM () {
+    const content = document.createElement('div')
+    content.className = 'ach-content'
+
+    this.#summaryEl = document.createElement('div')
+    this.#summaryEl.className = 'ach-summary'
+    content.appendChild(this.#summaryEl)
+
+    this.#listEl = document.createElement('div')
+    this.#listEl.className = 'ach-list'
+    this.#listEl.textContent = 'Categories List'
+    content.appendChild(this.#listEl)
+
+    this.#container.appendChild(content)
   }
 
   #initEvents () {
@@ -191,7 +236,11 @@ class AchievementOverlay {
    * Affiche l'overlay.
    * Lié dans #initEvents.
    */
-  onOpen () { this.#container.style.display = 'flex' }
+  onOpen () {
+    const {pts, maxPts} = achievementManager.buildAchievementTable()
+    this.#summaryEl.textContent = `Achievement Points: ${pts} / ${maxPts}`
+    this.#container.style.display = 'flex'
+  }
 
   /**
    * Cache l'overlay.
