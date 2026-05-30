@@ -70,6 +70,24 @@ menuBarStyle.textContent = /* css */`
   z-index: ${OVERLAYS.backdrop.zIndex};
   display: none;
 }
+
+/* SeedWidget */
+
+#seed-widget-root {
+  order: ${UI_LAYOUT.WORLD_KEY};
+  padding: 2px 6px;
+  font-size: 18px;
+  color: #000;
+  font-family: monospace;
+  user-select: none;
+}
+
+#seed-widget-root span {
+  color: #000;
+  user-select: text;
+  cursor: text;
+  text-shadow: 0 0 4px #ffffff;
+}
 `
 document.head.appendChild(menuBarStyle)
 
@@ -949,32 +967,28 @@ export function createOverlayHeader (titleText, overlayId) {
 }
 
 /* ====================================================================================================
-   AFFICHAGE DE LA CLEF DU MONDE
+   SEED WIDGET
+   ====================================================================================================
+
+   Singleton : seedWidget.
+
+   Affiche la seed du monde courant dans le Control Panel.
+   Lecture seule — sélectionnable au double-clic pour copier.
+
+   Interactions :
+     core.mjs — init(seed) appelé depuis startSession()
+
    ==================================================================================================== */
 
 class SeedWidget {
-  #span
+  #span = null // affiche la seed
 
   constructor () {
     const container = document.createElement('div')
-    Object.assign(container.style, {
-      order: UI_LAYOUT.WORLD_KEY,
-      padding: '2px 6px',
-      fontSize: '18px',
-      color: '#000',
-      fontFamily: 'monospace',
-      userSelect: 'none'
-    })
-
+    container.id = 'seed-widget-root'
     container.textContent = 'World Seed: '
 
     this.#span = document.createElement('span')
-    Object.assign(this.#span.style, {
-      color: '#000',
-      userSelect: 'text',
-      cursor: 'text',
-      textShadow: '0 0 4px #ffffff'
-    })
     this.#span.title = 'Double-click to select, Ctrl-C to copy'
     container.appendChild(this.#span)
 
@@ -986,9 +1000,13 @@ class SeedWidget {
     }
   }
 
+  /**
+   * Affiche la seed du monde dans le widget.
+   * Appelé par GameCore.startSession().
+   * @param {string} seed
+   */
   init (seed) {
     this.#span.textContent = seed
   }
 }
-
 export const seedWidget = new SeedWidget()
