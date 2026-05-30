@@ -1,6 +1,6 @@
 // inventory.mjs — GameCore - KeyboardManager - MouseManager
 
-import {TIME_BUDGET, MICROTASK_FN_NAME_TO_KEY, STATE, OVERLAYS} from './constant.mjs'
+import {TIME_BUDGET, MICROTASK_FN_NAME_TO_KEY, STATE, OVERLAYS, MICROTASK} from './constant.mjs'
 import {NODES, NODES_LOOKUP, MAX_FURNITURE_W, MAX_FURNITURE_H, ITEMS, RECIPES, MONSTERS, TREE_IMAGES, PLANT_KIND, PLANT_TYPE} from '../../assets/data/data.mjs'
 import {HELP_TITLES, hydrateHelp} from '../../assets/data/data-help.mjs'
 import {loadAssets, resolveAssetData} from './assets.mjs'
@@ -10,7 +10,7 @@ import {chunkManager} from './world.mjs'
 import {saveManager} from './persistence.mjs'
 import {camera, worldRenderer} from './render.mjs'
 import {buffManager} from './buff.mjs'
-import {creationDialogOverlay, seedWidget} from './ui.mjs'
+import {creationDialogOverlay, seedWidget, tileHoverWidget} from './ui.mjs'
 import {helpOverlay} from './help.mjs'
 import {inventoryManager} from './inventory.mjs'
 import {furnitureManager} from './housing.mjs'
@@ -249,7 +249,7 @@ class GameCore {
     timeManager.init(state.timestamp, state.weather, state.nextWeather)
 
     // 4. Initialisation des systèmes (Layer 1)
-    this.previousTileCoords = undefined
+    this.previousTileIndex = undefined
 
     // Init RNG en mode aléatoire (Math.random()) pour la session de jeu
     seededRNG.init()
@@ -436,6 +436,11 @@ class GameCore {
     const player = playerManager.update(dt, keyboardManager.directions)
     camera.update(player)
 
+    // 2.D Tuile sous la souris — disponible pour tous les systèmes de la frame
+    const tileIndex = camera.canvasToTile(mouseManager.mouse.x, mouseManager.mouse.y)
+    const tileCode = tileIndex !== null ? chunkManager.getTileAt(tileIndex) : null
+    const tileNode = tileCode !== null ? NODES_LOOKUP[tileCode] : null
+
     // DEBUT MOCKUP
     // if (keyboardManager.directions !== 0) {
     // console.log('player.move(', keyboardManager.directions, ')')
@@ -460,35 +465,40 @@ class GameCore {
     // camera.update(this.playerX, this.playerY)
     // FIN MOCKUP
 
-    // 2.D Affiche des informations concernant la tuile sous la souris
-    // const hoverPosition = mouseManager.mouse
-    // const tileCoords = camera.cavasToTiles(hoverPosition)
-    // if (this.previousTileCoords !== tileCoords) {
-    //   this.previousTileCoords = tileCoords
-    //   eventBus.emit('mouse/hover', tileCoords)
-    // }
+    // 2.E Affiche des informations concernant la tuile sous la souris
+    if (tileIndex !== null && tileIndex !== this.previousTileIndex) {
+      this.previousTileIndex = tileIndex
+      eventBus.emit('world/tile-hover', tileNode)
+      const {priority, capacity} = MICROTASK.UI_TILE_HOVER
+      microTasker.enqueueOnce(tileHoverWidget.onTileHoverDetail, priority, capacity, tileNode)
+    }
 
-    // 2.E Gestion du clic gauche la souris
+    // 2.F Gestion du clic gauche la souris
     const leftClick = mouseManager.consumeLeftClick() // "Read-and-Reset"
     if (leftClick) {
       //
     }
 
-    // 2.F Gestion du clic droit la souris
+    // 2.G Gestion du clic droit la souris
     const rightClick = mouseManager.consumeRightClick() // "Read-and-Reset"
     if (rightClick) {
       //
     }
 
     // DEBUG
-    this.mockupDiv.textContent = `Mouse: ${mouseManager.mouse.x}, ${mouseManager.mouse.y}`
+    this.mockupDiv.textContent = `Mouse: ${mouseManager.mouse.x}, ${mouseManager.mouse.y}, ${tileIndex}, ${tileCode}`
     if (leftClick) { console.log('leftClick', mouseManager.mouse) }
     if (rightClick) { console.log('rightClick', mouseManager.mouse) }
 
-    // 2.G. Suite
-    // player.update(dt)
+    // 2.H. Suite
     // flore.update(dt)
+
+    // 2.I. Suite
     // faune.update(dt)
+
+    // 3.1 génère la liste des chunks dont il faut générer les images
+    // Les images seront générées par une micro-tâche
+    worldRenderer.update()
 
     const durationUpdate = performance.now() - executionStart
     if (durationUpdate > TIME_BUDGET.UPDATE) {
@@ -512,10 +522,6 @@ class GameCore {
     playerManager.render(ctx)
     ctx.restore() // clôt le save() de worldRenderer.render() — NE PAS déplacer ni supprimer
     // lightRenderer.render()
-
-    // 3.1 génère la liste des chunks dont il faut générer les images
-    // Les images seront générées par une micro-tâche
-    worldRenderer.update()
 
     const durationRender = performance.now() - executionStart - durationUpdate
     if (durationRender > TIME_BUDGET.RENDER) {

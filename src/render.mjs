@@ -3,6 +3,7 @@
 import {WORLD_WIDTH, WORLD_HEIGHT, CANVAS_WIDTH, CANVAS_HEIGHT, OVERLAYS, MICROTASK} from './constant.mjs'
 import {NODES_LOOKUP} from '../../assets/data/data.mjs'
 import {eventBus, microTasker, taskScheduler} from './utils.mjs'
+import {IMAGE_CACHE} from './assets.mjs'
 import {chunkManager} from './world.mjs'
 
 if (WORLD_WIDTH !== 1024 || WORLD_HEIGHT !== 512 || CANVAS_WIDTH !== 1024 || CANVAS_HEIGHT !== 768) {
@@ -115,6 +116,20 @@ class Camera {
   }
 
   /**
+ * Convertit une coordonnée canvas en index de tuile monde.
+ * Retourne null si cx est null (souris hors canvas).
+ * @param {number|null} cx - pixel canvas X
+ * @param {number|null} cy - pixel canvas Y
+ * @returns {number|null} index tuile (y << 10 | x)
+ */
+  canvasToTile (cx, cy) {
+    if (cx === null) return null
+    const wx = ((cx / this.zoom) + this.x) | 0
+    const wy = ((cy / this.zoom) + this.y) | 0
+    return ((wy >> 4) << 10) | (wx >> 4)
+  }
+
+  /**
    * Met à jour la position de la caméra vers la cible (centre joueur).
    * Applique un lissage LERP et détecte les changements de chunk.
    * @param {{x: number, y: number}} target - Centre de la hitbox joueur en pixels monde
@@ -134,12 +149,8 @@ class Camera {
 
     // 2. Lissage (Lerp)
     // On utilise Math.floor pour éviter le flou de rendu sub-pixel
-    if (Math.abs(destX - this.x) > 0.5) {
-      this.x = Math.floor(lerp(this.x, destX, CAMERA_LERP))
-    }
-    if (Math.abs(destY - this.y) > 0.5) {
-      this.y = Math.floor(lerp(this.y, destY, CAMERA_LERP))
-    }
+    if (Math.abs(destX - this.x) > 0.5) { this.x = lerp(this.x, destX, CAMERA_LERP) | 0 }
+    if (Math.abs(destY - this.y) > 0.5) { this.y = lerp(this.y, destY, CAMERA_LERP) | 0 }
 
     // 3. Détection de changement de Chunk
     // Coordonnée chunk du coin haut-gauche de la caméra
@@ -352,40 +363,135 @@ class WorldRenderer {
   }
 
   /**
-   * Fonction de dessin (Placeholder)
-   * Sera plus tard remplie par la logique de lecture des tuiles
+   * Génère l'image d'un chunk dans son OffscreenCanvas.
+   * Pour chaque tuile : aplat couleur, puis border blending (bandeaux voisins + image autotile),
+   * ou image statique sans blending.
+   * Les tuiles ETERNAL (image=null) sont rendues en aplat couleur uniquement — pas de blending.
+   * @param {number} chunkIndex
+   * @param {OffscreenCanvas} canvas
    */
   #drawChunkToCanvas (chunkIndex, canvas) {
     const ctx = canvas.getContext('2d')
-
-    // 1. Nettoyage impératif (le canvas peut venir du canvasPool et contenir une vieille image)
     ctx.clearRect(0, 0, canvas.width, canvas.height)
 
-    // 2. Récupération des données locales du chunk (Uint8Array de 256 octets)
-    const chunkData = chunkManager.getChunkData(chunkIndex)
+    const chunkX = (chunkIndex & 0x3F) << 4 // tuile X coin haut-gauche
+    const chunkY = (chunkIndex >> 6) << 4 // tuile Y coin haut-gauche
+    let rowIdx = (chunkY << 10) | chunkX // index monde première tuile du chunk
+    let py = 0
 
-    // 3. Boucle de rendu (16x16)
-    // chunkData est un tableau plat de 0 à 255 correspondant exactement à notre tile 16x16
-    for (let i = 0; i < 256; i++) {
-      // ID de la tuile
-      const tileId = chunkData[i]
+    for (let row = 0; row < 16; row++) {
+      let px = 0
+      for (let col = 0; col < 16; col++) {
+        const idx = rowIdx + col
+        const tileId = chunkManager.getTileAt(idx)
+        const node = NODES_LOOKUP[tileId]
 
-      // Coordonnées locales dans le chunk (Optimisation bitwise)
-      const x = i & 0xF // i % 16
-      const y = i >> 4 // i / 16
+        if (!node || node.color === 'none') { px += 16; continue }
 
-      // Lookup des propriétés
-      const node = NODES_LOOKUP[tileId]
+        const img = node.image
 
-      // 4. Dessin du carré de couleur
-      // TODO: Implémenter l'utilisation des textures
-      if (node && node.color !== 'none') {
+        // ── Cas 1 : ETERNAL ou image statique → aplat + drawImage sans blending ──
+        if (!img || !img.isAutoTile) {
+          ctx.fillStyle = node.color
+          ctx.fillRect(px, py, 16, 16)
+          if (img) {
+            ctx.drawImage(IMAGE_CACHE[img.imgIndex], img.sx, img.sy, img.sw, img.sh, px, py, 16, 16)
+          }
+          px += 16
+          continue
+        }
+
+        // ── Cas 2 : autotile → calcul variant + border blending ──
+        const top = chunkManager.getTileAt(idx - 1024)
+        const right = chunkManager.getTileAt(idx + 1)
+        const bottom = chunkManager.getTileAt(idx + 1024)
+        const left = chunkManager.getTileAt(idx - 1)
+
+        let variant = 0
+        if (top !== tileId) variant |= 1
+        if (right !== tileId) variant |= 2
+        if (bottom !== tileId) variant |= 4
+        if (left !== tileId) variant |= 8
+
+        // Aplat couleur de base
         ctx.fillStyle = node.color
-        ctx.fillRect(x << 4, y << 4, 16, 16)
+        ctx.fillRect(px, py, 16, 16)
+
+        // Bandeaux voisins (ordre top→right→bottom→left, le dernier l'emporte aux coins)
+        if (variant & 1) {
+          const topNode = NODES_LOOKUP[top]
+          if (topNode && topNode.color !== 'none') {
+            ctx.fillStyle = topNode.color
+            ctx.fillRect(px, py, 16, 2)
+          }
+        }
+        if (variant & 2) {
+          const rightNode = NODES_LOOKUP[right]
+          if (rightNode && rightNode.color !== 'none') {
+            ctx.fillStyle = rightNode.color
+            ctx.fillRect(px + 14, py, 2, 16)
+          }
+        }
+        if (variant & 4) {
+          const bottomNode = NODES_LOOKUP[bottom]
+          if (bottomNode && bottomNode.color !== 'none') {
+            ctx.fillStyle = bottomNode.color
+            ctx.fillRect(px, py + 14, 16, 2)
+          }
+        }
+        if (variant & 8) {
+          const leftNode = NODES_LOOKUP[left]
+          if (leftNode && leftNode.color !== 'none') {
+            ctx.fillStyle = leftNode.color
+            ctx.fillRect(px, py, 2, 16)
+          }
+        }
+
+        // Image autotile — colonne = variant, ligne = sy pré-calculé
+        ctx.drawImage(IMAGE_CACHE[img.imgIndex], variant * img.sw, img.sy, img.sw, img.sh, px, py, 16, 16)
+
+        px += 16
       }
+      rowIdx += 1024
+      py += 16
     }
-    console.log(`[Render] Generating image for Chunk ${chunkIndex}`)
   }
+
+  // /**
+  //  * Fonction de dessin (Placeholder)
+  //  * Sera plus tard remplie par la logique de lecture des tuiles
+  //  */
+  // #drawChunkToCanvas (chunkIndex, canvas) {
+  //   const ctx = canvas.getContext('2d')
+
+  //   // 1. Nettoyage impératif (le canvas peut venir du canvasPool et contenir une vieille image)
+  //   ctx.clearRect(0, 0, canvas.width, canvas.height)
+
+  //   // 2. Récupération des données locales du chunk (Uint8Array de 256 octets)
+  //   const chunkData = chunkManager.getChunkData(chunkIndex)
+
+  //   // 3. Boucle de rendu (16x16)
+  //   // chunkData est un tableau plat de 0 à 255 correspondant exactement à notre tile 16x16
+  //   for (let i = 0; i < 256; i++) {
+  //     // ID de la tuile
+  //     const tileId = chunkData[i]
+
+  //     // Coordonnées locales dans le chunk (Optimisation bitwise)
+  //     const x = i & 0xF // i % 16
+  //     const y = i >> 4 // i / 16
+
+  //     // Lookup des propriétés
+  //     const node = NODES_LOOKUP[tileId]
+
+  //     // 4. Dessin du carré de couleur
+  //     // TODO: Implémenter l'utilisation des textures
+  //     if (node && node.color !== 'none') {
+  //       ctx.fillStyle = node.color
+  //       ctx.fillRect(x << 4, y << 4, 16, 16)
+  //     }
+  //   }
+  //   console.log(`[Render] Generating image for Chunk ${chunkIndex}`)
+  // }
 
   /**
    * PHASE UPDATE

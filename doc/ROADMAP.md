@@ -21,10 +21,12 @@
   - fait pour `inventory.mjs`, `craft.mjs`, `achievement.mjs`, `MenuBarWidget` (`ui.mjs`)
 - Remplacer les styles inline par des règles CSS injectées dans le DOM.
   - fait pour `inventory.mjs`, `craft.mjs`, `achievement.mjs`, `MenuBarWidget` (`ui.mjs`)
+- Uniformiser l'apparence des widgets (control panel) avec des classes et du CSS
 
 ---
 
 ## À faire — Bugs connus
+- bound bound processSave : double 'bind' pour cette fonction
 - Dans le control panel, le survol de l'heure doit donner la période du jour (dawn...)
 - Il n'y a pas assez de Cactus dans le monde => sans doute pas assez de SAND sur le sol souterrain.
 - Il n'y a pas assez de Bamboo dans le monde => sans doute pas assez de SILT sur le sol souterrain.
@@ -35,9 +37,9 @@
 
 ## À faire — Amélioration
 
-- Mettre les bonnes icônes dans le haut du Control Panel
 - Mettre les bonnes icônes dans le titre des Overlays
 - Dans l'overlay de création d'un monde, ajouter, sous le champ d'introduction de la Seed, une ligne : 'Current World Seed: xxxxx', ou xxxxx est la seed du monde qui va être écrasé. On peut cliquer sur les xxxxx et la graine est alors copiée dans le champ `input`. Il faudra ajouter cela à la fiche d'aide (pas encore créée).
+- Remplacer le `new Uint8Array(256)` de `getChunkData` par un buffer statique réutilisable pré-alloué — quand la fonction sera à nouveau nécessaire (sauvegarde, génération). Si elle n'est pas utilisée : la supprimer (code mort).
 
 ---
 

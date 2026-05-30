@@ -44,6 +44,7 @@ export const UI_LAYOUT = {
   ENVIRONMENT: 20,
   LIFE: 30,
   BUFF: 40,
+  TILE_HOVER: 50,
   WORLD_KEY: 80,
   DEBUG_REALTIME: 90
 }
@@ -284,7 +285,8 @@ export const SVG_ICON = (icon, config = '') => `<svg viewBox="0 0 24 24" ${confi
 
 export const MICROTASK = {
   RENDER_CHUNK_QUEUE: {priority: 30, capacity: 12, taskName: 'processRenderQueue'}, // génère les images des dirty chunks
-  UI_ENV_UPDATE: {priority: 20, capacity: 2, taskName: 'updateClockInOverlay'}, // affiche l'overlay time/weather/Moon/Location
+  UI_ENV_UPDATE: {priority: 20, capacity: 2, taskName: 'updateClockInOverlay'}, // affiche le widget time/weather/Moon/Location
+  UI_TILE_HOVER: {priority: 20, capacity: 10, taskName: 'onTileHoverDetail'}, // affiche le widget tuile survolée
   PROCESS_SAVE: {priority: 15, capacity: 12, taskName: 'processSave'}, // sauvegarde en database des chunks et autres records
   RENDER_DEBUG_OVERLAY: {priority: 10, capacity: 2, taskName: 'renderDebugOverlay'}, // affichage des informations de débug (temps exéec et taille files)
   PRUNE_CACHE: {priority: 8, capacity: 2, taskName: 'pruneCache'} // supprime les images des chunks distants

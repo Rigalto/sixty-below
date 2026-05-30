@@ -92,6 +92,8 @@ class ChunkManager {
     }
   }
 
+  getTileAt (index) { return this.#data[index] }
+
   getTile (x, y) { return this.#data[(y << 10) | x] }
 
   setTile (x, y, code) {

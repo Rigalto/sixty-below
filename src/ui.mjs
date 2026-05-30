@@ -1,4 +1,4 @@
-// ui.mjs — MenuBarWIdget - CreationDialogOverlay - EnvironementWidget - ModalBlocker - SeedWidget
+// ui.mjs — MenuBarWIdget - CreationDialogOverlay - EnvironementWidget - TileHoverWidget - ModalBlocker - SeedWidget
 
 import {eventBus, seededRNG} from './utils.mjs'
 import {gameCore} from './core.mjs'
@@ -38,6 +38,23 @@ menuBarStyle.textContent = /* css */`
 #menu-bar-root .menu-bar-btn:hover          { border-color: #bdc3c7; color: #ffffff; }
 #menu-bar-root .menu-bar-btn-meta           { background-color: #442222; border-color: #663333; }
 #menu-bar-root .menu-bar-btn-meta:hover     { border-color: #cc4444; }
+
+#tile-hover-root {
+  position: relative;
+  width: 100%;
+  order: ${UI_LAYOUT.TILE_HOVER};
+  margin-bottom: 10px;
+  background-color: rgba(20, 20, 25, 0.9);
+  border: 1px solid #444;
+  border-radius: 6px;
+  padding: 8px;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.5);
+  font-family: Segoe UI, Roboto, monospace;
+  font-size: 18px;
+  font-weight: bold;
+  color: #ffffff;
+  user-select: none;
+}
 `
 document.head.appendChild(menuBarStyle)
 
@@ -699,6 +716,76 @@ class EnvironmentWidget {
 }
 // Instanciation immédiate (Singleton autonome)
 export const environmentWidget = new EnvironmentWidget()
+
+/* ====================================================================================================
+   AFFICHAGE TUILE SOUS LA SOURIS
+   ==================================================================================================== */
+
+class TileHoverWidget {
+  #spanTile = null // span nom de la tuile
+  #spanDetail = null // span plante / furniture sous la souris
+
+  constructor () {
+    this.#initDOM()
+    this.#bindEvents()
+  }
+
+  /**
+   * Construit le DOM du widget et l'injecte dans #right-sidebar.
+   */
+  #initDOM () {
+    const container = document.createElement('div')
+    container.id = 'tile-hover-root'
+    this.#spanTile = document.createElement('span')
+    this.#spanTile.id = 'tile-hover-tile'
+    this.#spanTile.textContent = '—'
+
+    this.#spanDetail = document.createElement('span')
+    this.#spanDetail.id = 'tile-hover-detail'
+    this.#spanDetail.textContent = '—'
+
+    container.appendChild(this.#spanTile)
+    container.appendChild(this.#spanDetail)
+
+    const sidebar = document.getElementById('right-sidebar')
+    if (sidebar) {
+      sidebar.appendChild(container)
+    } else {
+      console.error('TileHoverWidget: #right-sidebar introuvable')
+    }
+  }
+
+  /**
+   * Abonnement aux événements.
+   */
+  #bindEvents () {
+    this.onTileHoverDetail = this.onTileHoverDetail.bind(this)
+    eventBus.on('world/tile-hover', this.#onTileHover.bind(this))
+  }
+
+  /**
+   * Mise à jour synchrone du nom de tuile. Appelé depuis la loop via eventBus.
+   * @param {object|null} node
+   */
+  #onTileHover (node) {
+    this.#spanTile.textContent = node ? node.name : '—'
+  }
+
+  /**
+   * Microtask : interroge plantManager / furnitureManager et met à jour le span détail.
+   * Bindée au constructor — enfilée via microTasker.enqueueOnce().
+   * @param {object|null} node
+   */
+  onTileHoverDetail (node) {
+    let text = ''
+    this.count = this.count === undefined ? 1 : this.count + 1
+    // TODO: interroger plantManager et furnitureManager quand implémentés
+    text += ` / ${this.count}`
+
+    this.#spanDetail.textContent = text
+  }
+}
+export const tileHoverWidget = new TileHoverWidget()
 
 /* ====================================================================================================
    AFFICHAGE VOILE SOMBRE

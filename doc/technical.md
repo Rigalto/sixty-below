@@ -206,6 +206,7 @@ Cette section définit les événements officiels. Tout nouvel événement doit 
 *En prévision - incomplet*
 | Dir. | Event Name | Payload Structure | Description |
 | :---: | :--- | :--- | :--- |
+| S | `world/tile-hover`| `object` NODE | Le node est survolé par la souris, pas envoyé si la souris ne change pas de node. |
 | S | `debug/frame-sample`| `{updateTime, renderTime, microTime}` | Temps exécution dans la loop pour les 3 budgets. |
 | S | `debug/buff-manager` | _(none)_ | Affiche sur la console le contenu de `#values` et `#fns`. |
 
@@ -231,6 +232,12 @@ Cette section définit les événements officiels. Tout nouvel événement doit 
 | Dir. | Event Name | Payload Structure | Description |
 | :---: | :--- | :--- | :--- |
 | E | `overlay/open-request`| `string` (Overlay ID) | Demande d'ouverture d'un overlay. Traitée par `KeyboardManager`. |
+
+#### Control Panel / Tuile survolée (`TileHoverWidget`)
+
+| Dir. | Event Name | Payload Structure | Description |
+| :---: | :--- | :--- | :--- |
+| E | `world/tile-hover`| `object` NODE | Le node est survolé par la souris. |
 
 #### Player (`PlayerManager`)
 *En prévision*
@@ -1057,6 +1064,7 @@ Responsable uniquement des mathématiques de projection et du culling.
 | `update({x, y}, speed?): void` | Mise à jour pour centrer sur la position en paramètre |
 | `worldToCanvas(wx, wy)` | Conversion pixel monde → pixel canvas                 |
 | `canvasToWorld(cx, cy)` | Conversion pixel canvas → pixel monde                 |
+| `canvasToTile(cx, cy): number` | Convertit pixel canvas → index tuile monde. Retourne `null` si cx est `null`. |
 | `displayChunks`       | `Array` — chunks visibles (cible du render)              |
 | `preloadChunks`       | `Set` — chunks en bordure (cible du cache)               |
 | `unpurgeableChunks`   | `Set` — chunks à garder en RAM pendant la purge          |
