@@ -281,7 +281,7 @@ class GameCore {
     // geodeSystem.init(JSON.parse(state.geodecaves)) // TODO
 
     // 5. Initialisation des systèmes (Layer 2)
-    creationDialogOverlay.init(state.worldkey)
+    creationDialogOverlay.init(state.randomkey)
 
     helpOverlay.init(state.helptopic)
     craftOverlay.init(state.craftfiltermode, state.craftfiltertype, state.craftfilterstation, state.craftfiltermaterial)
