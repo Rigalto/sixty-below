@@ -239,6 +239,12 @@ Cette section définit les événements officiels. Tout nouvel événement doit 
 | :---: | :--- | :--- | :--- |
 | E | `world/tile-hover`| `object` NODE | Le node est survolé par la souris. |
 
+#### Voile transparent (`ModalBlocker`)
+
+| Dir. | Event Name | Payload Structure | Description |
+| :---: | :--- | :--- | :--- |
+| E | `state/changed` | `{ state, oldState }` | Émis lorsque le `KeyboardManager` change l'état global du jeu (Exploration <-> Information/Combat). |
+
 #### Player (`PlayerManager`)
 *En prévision*
 | Event Name | Payload Structure | Description |

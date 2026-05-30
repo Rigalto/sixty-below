@@ -8,6 +8,9 @@
 ## En cours
 
 - implémentation de l'affichage des tuiles
+- ajouter la position courante du joueur dans le control panel
+- ajouter l'affichage du furniture sous la souris (`TileHoverWidget`)
+- Sauvegarde de la position du joueur en database
 - continuer la correction et l'ajout de fiches d'aide (`HELP`) et d'items (`ITEMS`)
 - Documentation avec E/S des eventBus (reste à faire : `core.mjs`, `ui.mjs`, `utils.mjs` (TimeMmanager))
 

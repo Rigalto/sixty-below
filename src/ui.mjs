@@ -39,6 +39,8 @@ menuBarStyle.textContent = /* css */`
 #menu-bar-root .menu-bar-btn-meta           { background-color: #442222; border-color: #663333; }
 #menu-bar-root .menu-bar-btn-meta:hover     { border-color: #cc4444; }
 
+/* TileHoverWidget */
+
 #tile-hover-root {
   position: relative;
   width: 100%;
@@ -54,6 +56,19 @@ menuBarStyle.textContent = /* css */`
   font-weight: bold;
   color: #ffffff;
   user-select: none;
+}
+
+/* ModalBlocker */
+
+#ui-modal-backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: rgba(0, 0, 0, 0.6);
+  z-index: ${OVERLAYS.backdrop.zIndex};
+  display: none;
 }
 `
 document.head.appendChild(menuBarStyle)
@@ -718,7 +733,23 @@ class EnvironmentWidget {
 export const environmentWidget = new EnvironmentWidget()
 
 /* ====================================================================================================
-   AFFICHAGE TUILE SOUS LA SOURIS
+   TILE HOVER WIDGET
+   ====================================================================================================
+
+   Singleton : tileHoverWidget.
+
+   Widget du Control Panel affichant la tuile sous la souris et les entités qu'elle contient.
+   Toujours présent, deux spans inline mis à jour indépendamment.
+
+   Responsabilités :
+     - Afficher le nom de la tuile survolée (#spanTile) — mise à jour synchrone via eventBus
+     - Afficher les entités présentes (#spanDetail) — mise à jour asynchrone via microtask
+
+   Interactions :
+     eventBus    — écoute : world/tile-hover (node|null) → met à jour #spanTile
+     microTasker — onTileHoverDetail(node) enfilée via enqueueOnce() par la loop
+                   → interroge plantManager / furnitureManager (TODO) → met à jour #spanDetail
+
    ==================================================================================================== */
 
 class TileHoverWidget {
@@ -773,7 +804,7 @@ class TileHoverWidget {
 
   /**
    * Microtask : interroge plantManager / furnitureManager et met à jour le span détail.
-   * Bindée au constructor — enfilée via microTasker.enqueueOnce().
+   * Bindée dans #bindEvents — enfilée via microTasker.enqueueOnce() dans la loop.
    * @param {object|null} node
    */
   onTileHoverDetail (node) {
@@ -788,7 +819,17 @@ class TileHoverWidget {
 export const tileHoverWidget = new TileHoverWidget()
 
 /* ====================================================================================================
-   AFFICHAGE VOILE SOMBRE
+   MODAL BLOCKER
+   ====================================================================================================
+
+   Singleton : modalBlocker.
+
+   Voile semi-transparent affiché par-dessus le monde dès que le jeu quitte l'état EXPLORATION.
+   Aucune interaction utilisateur — pointer-events traversants.
+
+   Interactions :
+     eventBus  — écoute : state/changed ({state}) → affiche ou masque le voile
+
    ==================================================================================================== */
 
 class ModalBlocker {
@@ -797,22 +838,11 @@ class ModalBlocker {
   constructor () {
     this.#element = document.createElement('div')
     this.#element.id = 'ui-modal-backdrop'
-
-    // Styles critiques (CSS-in-JS pour éviter une feuille de style externe)
-    Object.assign(this.#element.style, {
-      position: 'fixed',
-      top: '0',
-      left: '0',
-      width: '100vw',
-      height: '100vh',
-      backgroundColor: 'rgba(0, 0, 0, 0.6)', // Noir à 60% d'opacité
-      zIndex: OVERLAYS.backdrop.zIndex,
-      display: 'none'
-    })
     document.body.appendChild(this.#element)
 
     // Abonnement au changement d'état
-    eventBus.on('state/changed', this.onStateChanged.bind(this))
+    this.onStateChanged = this.onStateChanged.bind(this)
+    eventBus.on('state/changed', this.onStateChanged)
   }
 
   /**
