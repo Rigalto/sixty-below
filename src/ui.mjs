@@ -4,9 +4,15 @@ import {eventBus, seededRNG} from './utils.mjs'
 import {gameCore} from './core.mjs'
 import {WEATHER_TYPE, MOON_PHASE, MOON_PHASE_BLURRED, STATE, OVERLAYS, UI_LAYOUT, PATH_INVENTORY, PATH_CRAFT, PATH_TROPHY, PATH_HELP, PATH_NEW_WORLD, PATH_DEBUG, SVG_ICON} from './constant.mjs'
 
+/* ====================================================================================================
+   STYLES POUR TOUS LES WIDGETS
+   ==================================================================================================== */
+
 // ── Styles MenuBarWidget ─────────────────────────────────────────────────────
-const menuBarStyle = document.createElement('style')
-menuBarStyle.textContent = /* css */`
+const widgetStyle = document.createElement('style')
+widgetStyle.textContent = /* css */`
+/* MenuBarWidget */
+
   #menu-bar-root {
     position: relative;
     width: 100%;
@@ -89,13 +95,27 @@ menuBarStyle.textContent = /* css */`
   text-shadow: 0 0 4px #ffffff;
 }
 `
-document.head.appendChild(menuBarStyle)
+document.head.appendChild(widgetStyle)
 
 /* ====================================================================================================
-   AFFICHAGE BOUTONS D'ACTION
+   MENU BAR WIDGET
+   ====================================================================================================
+
+   Singleton : menuBarWidget.
+
+   Barre d'actions du Control Panel — boutons d'ouverture des overlays et actions meta.
+   Toujours présent.
+
+   Responsabilités :
+     - Ouvrir les overlays Inventaire, Craft, Succès, Aide, Création de monde
+     - Copier un snapshot du canvas principal dans le presse-papier (debug)
+
+   Interactions :
+     eventBus  — émet : overlay/open-request ('inventory' | 'craft' | 'achievement' | 'help' | 'creation')
+     Clipboard API — écriture presse-papier (HTTPS ou localhost requis)
+
    ==================================================================================================== */
 
-// MenuBarWidget → nom joueur 'Control Panel'
 class MenuBarWidget {
   #container = null // div englobant le widget
   #btnInventory = null // bouton ouverture inventaire
@@ -231,7 +251,6 @@ class MenuBarWidget {
     }
   }
 }
-
 export const menuBarWidget = new MenuBarWidget()
 
 /* ====================================================================================================
