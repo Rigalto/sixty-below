@@ -12,7 +12,7 @@
 - ajouter l'affichage du furniture sous la souris (`TileHoverWidget`)
 - Sauvegarde de la position du joueur en database
 - continuer la correction et l'ajout de fiches d'aide (`HELP`) et d'items (`ITEMS`)
-- Documentation avec E/S des eventBus (reste à faire : `core.mjs`, `ui.mjs`, `utils.mjs` (TimeMmanager))
+- Documentation avec E/S des eventBus (reste à faire : `core.mjs`, `ui.mjs` (reste seulement `EnvironmentWidget`), `utils.mjs` (TimeMmanager))
 
 ---
 

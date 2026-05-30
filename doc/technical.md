@@ -233,6 +233,16 @@ Cette section définit les événements officiels. Tout nouvel événement doit 
 | :---: | :--- | :--- | :--- |
 | E | `overlay/open-request`| `string` (Overlay ID) | Demande d'ouverture d'un overlay. Traitée par `KeyboardManager`. |
 
+
+#### Control Panel / Dialogue de création (`CreationDialogOverlay`)
+
+| Dir. | Event Name | Payload Structure | Description |
+| :---: | :--- | :--- | :--- |
+| E | `creation/open`  | — | Affiche le dialogue modal. |
+| E | `creation/close` | — | Cache le dialogue modal. |
+| S | `overlay/close`  | `string` ('creation') | Demande générique de fermeture d'un overlay. Traitée par `KeyboardManager`. |
+
+
 #### Control Panel / Tuile survolée (`TileHoverWidget`)
 
 | Dir. | Event Name | Payload Structure | Description |

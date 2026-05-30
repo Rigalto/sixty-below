@@ -2,7 +2,7 @@
 
 import {eventBus, seededRNG} from './utils.mjs'
 import {gameCore} from './core.mjs'
-import {WEATHER_TYPE, MOON_PHASE, MOON_PHASE_BLURRED, STATE, OVERLAYS, UI_LAYOUT, PATH_INVENTORY, PATH_CRAFT, PATH_TROPHY, PATH_HELP, PATH_NEW_WORLD, PATH_DEBUG, SVG_ICON} from './constant.mjs'
+import {WEATHER_TYPE, MOON_PHASE, MOON_PHASE_BLURRED, STATE, OVERLAYS, UI_LAYOUT, PATH_INVENTORY, PATH_CRAFT, PATH_TROPHY, PATH_HELP, PATH_NEW_WORLD, PATH_SAVE, PATH_RESTORE, PATH_DEBUG, SVG_ICON} from './constant.mjs'
 
 /* ====================================================================================================
    STYLES POUR TOUS LES WIDGETS
@@ -44,6 +44,118 @@ widgetStyle.textContent = /* css */`
 #menu-bar-root .menu-bar-btn:hover          { border-color: #bdc3c7; color: #ffffff; }
 #menu-bar-root .menu-bar-btn-meta           { background-color: #442222; border-color: #663333; }
 #menu-bar-root .menu-bar-btn-meta:hover     { border-color: #cc4444; }
+
+/* CreationDialogOverlay */
+
+#creation-dialog {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 400px;
+  background-color: #222;
+  border: 2px solid #555;
+  border-radius: 8px;
+  padding: 0;
+  display: none;
+  flex-direction: column;
+  gap: 0;
+  z-index: ${OVERLAYS.dialog.zIndex};
+  box-shadow: 0 10px 25px rgba(0,0,0,0.8);
+  color: #eee;
+  font-family: Segoe UI, sans-serif;
+}
+#creation-content {
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+#creation-seed-container {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+#creation-seed-container label {
+  font-size: 12px;
+  color: #aaa;
+}
+#creation-seed-container input {
+  padding: 8px;
+  background-color: #111;
+  border: 1px solid #444;
+  color: #fff;
+  border-radius: 4px;
+  font-family: monospace;
+}
+
+#creation-progress {
+  position: relative;
+  height: 36px;
+  background-color: #111;
+  border: 1px solid #444;
+  border-radius: 4px;
+  display: none;
+  overflow: hidden;
+}
+#creation-progress .bar {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 100%;
+  width: 0%;
+  background-color: #388e3c;
+  transition: width 0.1s ease;
+  border-radius: 4px;
+}
+#creation-progress .topic {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  color: #fff;
+  text-shadow: 0 0 4px #000, 0 0 4px #000;
+  font-family: monospace;
+  pointer-events: none;
+}
+
+#creation-content button {
+  padding: 10px;
+  background-color: #333;
+  color: #888;
+  border: 1px solid #444;
+  border-radius: 4px;
+  cursor: not-allowed;
+  text-align: left;
+  font-size: 14px;
+  font-weight: bold;
+  transition: background-color 0.2s;
+  display: flex;
+  align-items: center;
+}
+#creation-content button span {
+  margin-right: 8px;
+}
+#creation-content button.active {
+  background-color: #388e3c;
+  color: #fff;
+  border-color: #2e7d32;
+  cursor: pointer;
+}
+#creation-content button.active:hover {
+  background-color: #4caf50;
+}
+#creation-content button .creation-btn-icon {
+  width: 18px;
+  height: 18px;
+  flex-shrink: 0;
+  margin-right: 8px;
+}
 
 /* TileHoverWidget */
 
@@ -254,94 +366,78 @@ class MenuBarWidget {
 export const menuBarWidget = new MenuBarWidget()
 
 /* ====================================================================================================
-   DIALOGUE DE LANCEMENT DE LA CREATION D'UN NOUVEAU MONDE
+   CREATION DIALOG OVERLAY
+   ====================================================================================================
+
+   Singleton : creationDialogOverlay.
+
+   Dialog modal de gestion du monde — saisie de seed, génération, backup et restore (à venir).
+   Injecté dans document.body (z-index élevé, hors flux sidebar).
+
+   Responsabilités :
+     - Saisir et valider la seed avant génération
+     - import dynamique (chargement différé — le module n'est chargé qu'à la première génération)
+     - Orchestrer la séquence : stopSession → generate → startSession
+     - Afficher la progression de la génération via barre de progression
+
+   Interactions :
+     eventBus        — écoute : creation/open, creation/close
+                     — émet   : overlay/close ('creation')
+     window          — écoute : world-generation-progress → onProgress
+     gameCore        — stopSession(), startSession()
+     worldGenerator  — generate(seed)
+     core.mjs        — init(seed) appelé depuis startSession()
+
    ==================================================================================================== */
 
 class CreationDialogOverlay {
-  constructor () {
-    this.container = null
-    this.dom = {
-      seedInput: null,
-      btnGenerate: null,
-      btnBackup: null,
-      btnRestore: null,
-      btnClose: null
-    }
+  #container = null
+  #seedInput = null
+  #btnGenerate = null
+  #btnBackup = null
+  #btnRestore = null
+  #btnClose = null
+  #progressContainer = null
+  #progressBar = null
+  #progressTopic = null
 
-    this.open = this.open.bind(this)
-    this.close = this.close.bind(this)
-    this.onGenerateClick = this.onGenerateClick.bind(this)
+  constructor () {
     this.#initDOM()
     this.#bindEvents()
 
     this.currentSeed = 1234
   }
 
+  /**
+   * Construit le DOM du dialog et l'injecte dans document.body.
+   */
   #initDOM () {
     // 1. Conteneur Modal (Centré)
-    this.container = document.createElement('div')
-    this.container.id = 'creation-dialog'
-
-    Object.assign(this.container.style, {
-      position: 'absolute',
-      top: '50%',
-      left: '50%',
-      transform: 'translate(-50%, -50%)',
-      width: '400px',
-      backgroundColor: '#222',
-      border: '2px solid #555',
-      borderRadius: '8px',
-      padding: '0',
-      display: 'none',
-      flexDirection: 'column',
-      gap: '0',
-      zIndex: OVERLAYS.dialog.zIndex,
-      boxShadow: '0 10px 25px rgba(0,0,0,0.8)',
-      color: '#eee',
-      fontFamily: 'Segoe UI, sans-serif'
-    })
+    this.#container = document.createElement('div')
+    this.#container.id = 'creation-dialog'
 
     // 2. Header
-    this.container.appendChild(createOverlayHeader('🌱 World Management', 'creation'))
+    this.#container.appendChild(createOverlayHeader('🌱 World Management', 'creation'))
 
     // 3. Wrapper de Contenu (pour préserver l'espacement interne)
     const content = document.createElement('div')
-    Object.assign(content.style, {
-      padding: '20px',
-      display: 'flex',
-      flexDirection: 'column',
-      gap: '15px'
-    })
-    this.container.appendChild(content)
+    content.id = 'creation-content'
+    this.#container.appendChild(content)
 
     // 4. Zone Seed (Input Numérique)
     const seedContainer = document.createElement('div')
-    Object.assign(seedContainer.style, {display: 'flex', flexDirection: 'column', gap: '5px'})
+    seedContainer.id = 'creation-seed-container'
 
     const seedLabel = document.createElement('label')
     seedLabel.textContent = 'World Seed (1 - 99999):'
-    seedLabel.style.fontSize = '12px'
-    seedLabel.style.color = '#aaa'
 
     const seedInput = document.createElement('input')
     seedInput.type = 'number'
     seedInput.min = '1'
     seedInput.max = '99999'
     seedInput.placeholder = 'Random'
-    Object.assign(seedInput.style, {
-      padding: '8px',
-      backgroundColor: '#111',
-      border: '1px solid #444',
-      color: '#fff',
-      borderRadius: '4px',
-      fontFamily: 'monospace'
-    })
-
     seedInput.addEventListener('input', function () {
       if (this.value !== '' && this.value > 99999) this.value = (this.value / 10) | 0
-
-      // if (this.value < 1) this.value = 1
-      // if (this.value > 99999) this.value = (this.value / 10) | 0
     })
 
     seedContainer.appendChild(seedLabel)
@@ -349,79 +445,21 @@ class CreationDialogOverlay {
 
     // 5. Bargraph de progression — masqué par défaut
     const progressContainer = document.createElement('div')
-    Object.assign(progressContainer.style, {
-      position: 'relative',
-      height: '36px',
-      backgroundColor: '#111',
-      border: '1px solid #444',
-      borderRadius: '4px',
-      display: 'none',
-      overflow: 'hidden'
-    })
+    progressContainer.id = 'creation-progress'
 
     const progressBar = document.createElement('div')
-    Object.assign(progressBar.style, {
-      position: 'absolute',
-      top: '0',
-      left: '0',
-      height: '100%',
-      width: '0%',
-      backgroundColor: '#388e3c',
-      transition: 'width 0.1s ease',
-      borderRadius: '4px'
-    })
+    progressBar.className = 'bar'
 
     const progressTopic = document.createElement('div')
-    Object.assign(progressTopic.style, {
-      position: 'absolute',
-      top: '0',
-      left: '0',
-      width: '100%',
-      height: '100%',
-      display: 'flex',
-      alignItems: 'center',
-      justifyContent: 'center',
-      fontSize: '12px',
-      color: '#fff',
-      textShadow: '0 0 4px #000, 0 0 4px #000',
-      fontFamily: 'monospace',
-      pointerEvents: 'none'
-    })
+    progressTopic.className = 'topic'
 
     progressContainer.appendChild(progressBar)
     progressContainer.appendChild(progressTopic)
     content.appendChild(progressContainer)
 
-    // 6. Boutons d'action
-    const createBtn = (text, icon, isActive) => {
-      const btn = document.createElement('button')
-      // Layout icône + texte
-      btn.innerHTML = `<span style="margin-right:8px;">${icon}</span>${text}`
-
-      Object.assign(btn.style, {
-        padding: '10px',
-        backgroundColor: isActive ? '#388e3c' : '#333',
-        color: isActive ? '#fff' : '#888',
-        border: '1px solid ' + (isActive ? '#2e7d32' : '#444'),
-        borderRadius: '4px',
-        cursor: isActive ? 'pointer' : 'not-allowed',
-        textAlign: 'left',
-        fontSize: '14px',
-        fontWeight: 'bold',
-        transition: 'background-color 0.2s'
-      })
-
-      if (isActive) {
-        btn.onmouseenter = () => { btn.style.backgroundColor = '#4caf50' }
-        btn.onmouseleave = () => { btn.style.backgroundColor = '#388e3c' }
-      }
-
-      return btn
-    }
-
-    const btnGenerate = createBtn('GENERATE NEW WORLD', '🌱', true)
-    const btnBackup = createBtn('BACKUP WORLD (Coming Soon)', '💾', false)
-    const btnRestore = createBtn('RESTORE WORLD (Coming Soon)', '📥', false)
+    const btnGenerate = this.#createBtn('GENERATE NEW WORLD', PATH_NEW_WORLD, true)
+    const btnBackup = this.#createBtn('BACKUP WORLD (Coming Soon)', PATH_SAVE, false)
+    const btnRestore = this.#createBtn('RESTORE WORLD (Coming Soon)', PATH_RESTORE, false)
 
     // Assemblage
     content.appendChild(seedContainer)
@@ -430,31 +468,51 @@ class CreationDialogOverlay {
     content.appendChild(btnRestore)
 
     // Injection dans le body (car z-index élevé, sort du flux sidebar)
-    document.body.appendChild(this.container)
+    document.body.appendChild(this.#container)
 
     // Cache Refs
-    this.dom.seedInput = seedInput
-    this.dom.btnGenerate = btnGenerate
-    this.dom.btnBackup = btnBackup
-    this.dom.btnRestore = btnRestore
-    this.dom.progressContainer = progressContainer
-    this.dom.progressBar = progressBar
-    this.dom.progressTopic = progressTopic
+    this.#seedInput = seedInput
+    this.#btnGenerate = btnGenerate
+    this.#btnBackup = btnBackup
+    this.#btnRestore = btnRestore
+    this.#progressContainer = progressContainer
+    this.#progressBar = progressBar
+    this.#progressTopic = progressTopic
   }
 
+  /**
+   * Crée un bouton texte + icône pour le dialog de création.
+   * @param {string}  text     — libellé du bouton
+   * @param {string}  icon     — chemin SVG (constante PATH_*)
+   * @param {boolean} isActive — true = style actif (vert, cliquable)
+   * @returns {HTMLButtonElement}
+   */
+  #createBtn (text, path, isActive = false) {
+    const btn = document.createElement('button')
+    btn.innerHTML = `${SVG_ICON(path, 'class="creation-btn-icon"')}${text}`
+    if (isActive) btn.classList.add('active')
+    return btn
+  }
+
+  /**
+   * Lie les handlers UI et les événements eventBus / window.
+   */
   #bindEvents () {
     // Actions UI
-    this.dom.btnGenerate.addEventListener('click', this.onGenerateClick)
+    this.onGenerateClick = this.onGenerateClick.bind(this)
+    this.#btnGenerate.addEventListener('click', this.onGenerateClick)
 
-    this.dom.seedInput.addEventListener('keydown', (e) => {
+    this.#seedInput.addEventListener('keydown', (e) => {
       if (e.key === 'Enter') this.onGenerateClick()
     })
 
     // Écoute pour affichage/masquage
+    this.open = this.open.bind(this)
     eventBus.on('creation/open', () => {
       this.open()
     })
 
+    this.close = this.close.bind(this)
     eventBus.on('creation/close', () => {
       this.close()
     })
@@ -462,25 +520,40 @@ class CreationDialogOverlay {
     // Affichage de la progression de la création du monde
     this.onProgress = this.onProgress.bind(this)
     window.addEventListener('world-generation-progress', this.onProgress)
-
-    // Les boutons grisés ne font rien (pas d'event listener)
   }
 
+  /**
+   * Mémorise la seed du monde courant pour la pré-remplir à l'ouverture.
+   * Appelé par GameCore.startSession().
+   * @param {number} seed
+   */
   init (seed) { this.currentSeed = seed }
 
-  // --- Logic ---
+  /**
+   * Affiche le dialog et pré-remplit le champ seed.
+   * Appelé via eventBus 'creation/open'.
+   */
   open () {
-    this.container.style.display = 'flex'
-    this.dom.seedInput.value = this.currentSeed
-    this.dom.seedInput.focus()
+    this.#container.style.display = 'flex'
+    this.#seedInput.value = this.currentSeed
+    this.#seedInput.focus()
   }
 
+  /**
+   * Masque le dialog.
+   * Appelé via eventBus 'creation/close'.
+   */
   close () {
-    this.container.style.display = 'none'
+    this.#container.style.display = 'none'
   }
 
+  /**
+   * Lance la génération d'un nouveau monde avec la seed saisie.
+   * Arrête la session courante, génère, puis relance la session.
+   * Bindée dans #bindEvents — appelée au clic et à la touche Entrée.
+   */
   async onGenerateClick () {
-    const seed = parseInt(this.dom.seedInput.value.trim(), 10) || seededRNG.randomGetMinMax(1, 99999)
+    const seed = parseInt(this.#seedInput.value.trim(), 10) || seededRNG.randomGetMinMax(1, 99999)
     console.log(`[CreationDialog]: Request generation with seed [${seed}]`)
     this.state = STATE.CREATION
     this.#showProgress()
@@ -499,23 +572,34 @@ class CreationDialogOverlay {
     }
   }
 
+  /**
+   * Met à jour la barre de progression pendant la génération du monde.
+   * Bindée dans #bindEvents — écoutée sur 'world-generation-progress'.
+   * @param {CustomEvent} e - detail : { passed, total, topic }
+   */
   onProgress (e) {
     const {passed, total, topic} = e.detail
     const pct = Math.round(passed / total * 100)
-    this.dom.progressBar.style.width = `${pct}%`
-    this.dom.progressTopic.textContent = `${topic} (${pct}%)`
+    this.#progressBar.style.width = `${pct}%`
+    this.#progressTopic.textContent = `${topic} (${pct}%)`
   }
 
+  /**
+   * Masque le bouton Generate et affiche la barre de progression.
+   */
   #showProgress () {
-    this.dom.btnGenerate.style.display = 'none'
-    this.dom.progressBar.style.width = '0%'
-    this.dom.progressTopic.textContent = '0%'
-    this.dom.progressContainer.style.display = 'block'
+    this.#btnGenerate.style.display = 'none'
+    this.#progressBar.style.width = '0%'
+    this.#progressTopic.textContent = '0%'
+    this.#progressContainer.style.display = 'block'
   }
 
+  /**
+   * Masque la barre de progression et réaffiche le bouton Generate.
+   */
   #hideProgress () {
-    this.dom.progressContainer.style.display = 'none'
-    this.dom.btnGenerate.style.display = 'block'
+    this.#progressContainer.style.display = 'none'
+    this.#btnGenerate.style.display = 'block'
   }
 }
 export const creationDialogOverlay = new CreationDialogOverlay()
