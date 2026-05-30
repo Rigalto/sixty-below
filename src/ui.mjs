@@ -724,7 +724,7 @@ class EnvironmentWidget {
     eventBus.on('time/first-loop', this.#firstloopEnvironment.bind(this))
 
     // Buff de précision d'affichage du temps (estimation : 10µs, microtask inutile)
-    eventBus.on('buff/display-time-precision', this.#toggleTimePrecision.bind(this))
+    eventBus.on('.', this.#toggleTimePrecision.bind(this))
     // (estimation : 50µs, microtask inutile)
     eventBus.on('buff/display-moon-detail', this.#toggleMoonDetail.bind(this))
     // (estimation : 10µs, microtask inutile)

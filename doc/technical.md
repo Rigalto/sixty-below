@@ -242,12 +242,20 @@ Cette section définit les événements officiels. Tout nouvel événement doit 
 | E | `creation/close` | — | Cache le dialogue modal. |
 | S | `overlay/close`  | `string` ('creation') | Demande générique de fermeture d'un overlay. Traitée par `KeyboardManager`. |
 
-
 #### Control Panel / Tuile survolée (`TileHoverWidget`)
 
 | Dir. | Event Name | Payload Structure | Description |
 | :---: | :--- | :--- | :--- |
 | E | `world/tile-hover`| `object` NODE | Le node est survolé par la souris. |
+
+#### Control Panel / Informations d'environement (`EnvironmentWidget`)
+
+| Dir. | Event Name | Payload Structure | Description |
+| :---: | :--- | :--- | :--- |
+| E | `time/first-loop` | `{ day, hour, minute, tslot, weather, nextWeather, skyColor, moonPhase, isDay }` | Émis une seule fois au démarrage du rendu. |
+| E | `time/clock` | `{ day, hour, minute }` | Émis chaque minute-jeu. |
+| E | `time/daily` | `{ day, weather, nextWeather, moonPhase }` | Émis à minuit (changement de jour). |
+| E | `time/timeslot` | `{ tslot, isDay }` | Émis toutes les 3h (changement de slot). |
 
 #### Voile transparent (`ModalBlocker`)
 
