@@ -4,7 +4,7 @@ import {eventBus, seededRNG} from './utils.mjs'
 import {gameCore} from './core.mjs'
 import {buffManager} from './buff.mjs'
 import {playerManager} from './player.mjs'
-import {WEATHER_TYPE, MOON_PHASE, MOON_PHASE_BLURRED, STATE, OVERLAYS, UI_LAYOUT, PATH_INVENTORY, PATH_CRAFT, PATH_TROPHY, PATH_HELP, PATH_NEW_WORLD, PATH_SAVE, PATH_RESTORE, PATH_DEBUG, SVG_ICON} from './constant.mjs'
+import {WEATHER_TYPE, MOON_PHASE, MOON_PHASE_BLURRED, STATE, OVERLAYS, UI_LAYOUT, PATH_INVENTORY, PATH_CRAFT, PATH_TROPHY, PATH_HELP, PATH_NEW_WORLD, PATH_SAVE, PATH_RESTORE, PATH_DEBUG, SVG_ICON, PLAYER} from './constant.mjs'
 
 /* ====================================================================================================
    STYLES POUR TOUS LES WIDGETS
@@ -971,7 +971,9 @@ class EnvironmentWidget {
    * À appeler à chaque changement de movement-speed (tuiles, armure, accessoires).
    */
   #updateSpeed () {
-    this.#speed.textContent = `Speed: ${buffManager.getBuff('movement-speed')}%`
+    const buff = buffManager.getBuff('movement-speed')
+    this.#speed.textContent = `Speed: ${buff}%`
+    this.#speed.title = `Speed: ${PLAYER.speed * 5 / 8 * buff} tiles/s`
   }
 }
 export const environmentWidget = new EnvironmentWidget()
