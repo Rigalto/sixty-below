@@ -518,11 +518,12 @@ export const ITEMS = {
   // ultracampfire: {name: 'Ultra Bright Campfire', type: ITEM_TYPE.FURNITURE | ITEM_TYPE.LIGHT, stype: 'onoff', cozy: true, sell: 1500, star: 4, image: 'furniture_32_32-13-3', placed: 'fuws_48_32-0-2', placedleft: 'fuws_48_32-1-2', help: 'Furniture', tooltip: 'Provides Cozy Buff when lit'},
 
   // Trinkets
-  clockCopper: {name: 'Copper Clock', type: ITEM_TYPE.TRINKET | ITEM_TYPE.CRAFTABLE, stype: 'trinket', star: 2, image: 'furniture_32_32-3-8', help: 'Clocks', tooltip: 'When in Inventory, increases Time accuracy', buff: [{buff: 'displayTimePrecision', value: 1, op: 'max'}]},
-  clockSilver: {name: 'Silver Clock', type: ITEM_TYPE.TRINKET | ITEM_TYPE.CRAFTABLE, stype: 'trinket', star: 3, image: 'furniture_32_32-3-8', help: 'Clocks', tooltip: 'When in Inventory, increases Time accuracy', buff: [{buff: 'displayTimePrecision', value: 2, op: 'max'}]},
-  clockGold: {name: 'Gold Clock', type: ITEM_TYPE.TRINKET | ITEM_TYPE.CRAFTABLE, stype: 'trinket', star: 4, image: 'furniture_32_32-3-8', help: 'Clocks', tooltip: 'When in Inventory, increases Time accuracy', buff: [{buff: 'displayTimePrecision', value: 3, op: 'max'}]},
-  bottledFrog: {name: 'Bottled Frog', type: ITEM_TYPE.TRINKET | ITEM_TYPE.CRAFTABLE, stype: 'trinket', star: 3, image: 'furniture_32_32-3-8', help: 'Bottled Frog', tooltip: 'When in Inventory, give weather forecasts', buff: [{buff: 'displayNextWeather', value: true}]},
-  sextant: {name: 'Sextant', type: ITEM_TYPE.TRINKET | ITEM_TYPE.CRAFTABLE, stype: 'trinket', star: 3, image: 'furniture_32_32-3-8', help: 'Sextant', tooltip: 'When in Inventory, increases Moon Phases accuracy', buff: [{buff: 'displayMoonDetail', value: true}]},
+  clockCopper: {name: 'Copper Clock', type: ITEM_TYPE.TRINKET, stype: 'trinket', star: 2, image: 'furniture_32_32-3-8', help: 'Clocks', tooltip: 'When in Inventory, increases Time accuracy', buff: [{buff: 'displayTimePrecision', value: 1, op: 'max'}]},
+  clockSilver: {name: 'Silver Clock', type: ITEM_TYPE.TRINKET, stype: 'trinket', star: 3, image: 'furniture_32_32-3-8', help: 'Clocks', tooltip: 'When in Inventory, increases Time accuracy', buff: [{buff: 'displayTimePrecision', value: 2, op: 'max'}]},
+  clockGold: {name: 'Gold Clock', type: ITEM_TYPE.TRINKET, stype: 'trinket', star: 4, image: 'furniture_32_32-3-8', help: 'Clocks', tooltip: 'When in Inventory, increases Time accuracy', buff: [{buff: 'displayTimePrecision', value: 3, op: 'max'}]},
+  bottledFrog: {name: 'Bottled Frog', type: ITEM_TYPE.TRINKET, stype: 'trinket', star: 3, image: 'furniture_32_32-3-8', help: 'Bottled Frog', tooltip: 'When in Inventory, give weather forecasts', buff: [{buff: 'displayNextWeather', value: true}]},
+  sextant: {name: 'Sextant', type: ITEM_TYPE.TRINKET, stype: 'trinket', star: 3, image: 'furniture_32_32-3-8', help: 'Sextant', tooltip: 'When in Inventory, increases Moon Phases accuracy', buff: [{buff: 'displayMoonDetail', value: true}]},
+  ruler: {name: 'Ruler', type: ITEM_TYPE.TRINKET, stype: 'trinket', star: 3, image: 'furniture_32_32-3-8', help: 'Ruler', tooltip: 'When in Inventory, display your position', buff: [{buff: 'displayCoords', value: true}]},
 
   // Armors ITEM_TYPE.ARMOR, stype: 'tableware', armor: 'head'
   headWood: {name: 'Wood Helmet', type: ITEM_TYPE.ARMOR | ITEM_TYPE.CRAFTING, stype: 'head', armor: 'head', star: 1, image: 'tools_32_32-10-7', placedright: 'heads_26_22-1-0', placedleft: 'heads_26_22-1-1', defense: 1, help: 'Armors', tooltip: 'Provides sturdy protection', set: 'wood'},
