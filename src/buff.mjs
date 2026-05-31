@@ -1,6 +1,6 @@
 // buff.mjs — BuffManager - BuffWidget
 
-import {ITEMS, TRINKET_BUFF_TABLE} from './data.mjs'
+import {ITEMS, TRINKET_BUFF_TABLE} from '../../assets/data/data.mjs'
 import {eventBus, timeManager} from './utils.mjs'
 import {UI_LAYOUT} from './constant.mjs'
 // import {timeManager, taskScheduler, microTasker} from './utils.mjs'
@@ -84,10 +84,8 @@ class BuffManager {
   }
 
   initTrinket () {
-    for (const key in TRINKET_BUFF_TABLE) {
-      this.#trinketA[key] = 0
-      this.#trinketB[key] = 0
-    }
+    this.#resetBuffer(this.#trinketA, TRINKET_BUFF_TABLE)
+    this.#resetBuffer(this.#trinketB, TRINKET_BUFF_TABLE)
     this.#currentTrinket = this.#trinketA
     this.#nextTrinket = this.#trinketB
   }
@@ -118,24 +116,15 @@ class BuffManager {
     this.onDebug = this.onDebug.bind(this)
     eventBus.on('debug/buff-manager', this.onDebug)
 
-    this.#trinketA.clear()
-    this.#trinketB.clear()
     this.initTrinket()
-    this.onTrinketsBuffs = this.onTrinketsBuffs.bind(this)
-    eventBus.on('inventory/static-buffs', this.onTrinketsBuffs)
+    this.onStaticBuffs = this.onStaticBuffs.bind(this)
+    eventBus.on('inventory/static-buffs', this.onStaticBuffs)
 
     // debug
     // this.#values.set('buff1', 50)
     // this.#values.set('buff2', 0)
     this.#values.set('dyn1', 100)
     this.timestamps.set('dyn1', timeManager.timestamp + 124000)
-
-    // DEBUG - TODO
-    // Les quatre lignes ci-dessous simulent le traitement du buffManager
-    eventBus.emit('buff/display-next-weather', true)
-    eventBus.emit('buff/display-moon-detail', true)
-    eventBus.emit('buff/display-time-precision', 3) // DEBUG => toutes les secondes
-    eventBus.emit('buff/display-coords', true)
   }
 
   onDaily ({weather, moonPhase}) {

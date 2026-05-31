@@ -258,6 +258,7 @@ Cette section définit les événements officiels. Tout nouvel événement doit 
 | E | `time/timeslot` | `{ tslot, isDay }` | Émis toutes les 3h (changement de slot). |
 | E | `buff/trinket-changed` | `Set<string>` | Émis par `buffManager` quand un buff trinket change. Payload = buffIds modifiés. |
 
+
 #### Voile transparent (`ModalBlocker`)
 
 | Dir. | Event Name | Payload Structure | Description |
@@ -358,10 +359,6 @@ Cette section définit les événements officiels. Tout nouvel événement doit 
 | E | `time/timeslot` | `{ tslot, isDay }` | Émis toutes les 3h (changement de slot). |
 | E | `time/daily` | `{ day, weather, nextWeather, moonPhase }` | Émis à minuit (changement de jour). |
 | E | `debug/buff-manager` | _(none)_ | Affiche sur la console le contenu de `#values` et `#fns`. |
-| S | `buff/display-next-weather` | `boolean` | Active/Désactive la prévision météo. |
-| S | `buff/display-coords` | `boolean` | Active/Désactive l'affichage des coordonnées. |
-| S | `buff/display-time-precision` | `integer` | précision 0 => 1heure, 1 => 15 minutes, 2 => 5 minutes |
-| S | `buff/display-moon-detail` | `boolean` | affiche 4 (false) ou 8 (true) phases lunaires |
 | S | `buff/trinket-changed` | `Set<string>` | Émis par `buffManager` quand un buff trinket change. Payload = buffIds modifiés. |
 
 #### Debug (`WorldMapDebug`, `RealtimeDebugWidget`, `BuffManager`)

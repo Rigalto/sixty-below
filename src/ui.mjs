@@ -2,6 +2,7 @@
 
 import {eventBus, seededRNG} from './utils.mjs'
 import {gameCore} from './core.mjs'
+import {buffManager} from './buff.mjs'
 import {WEATHER_TYPE, MOON_PHASE, MOON_PHASE_BLURRED, STATE, OVERLAYS, UI_LAYOUT, PATH_INVENTORY, PATH_CRAFT, PATH_TROPHY, PATH_HELP, PATH_NEW_WORLD, PATH_SAVE, PATH_RESTORE, PATH_DEBUG, SVG_ICON} from './constant.mjs'
 
 /* ====================================================================================================
@@ -723,16 +724,11 @@ class EnvironmentWidget {
     // Init Global -> Tout mettre à jour (estimation : 150µs, microtask inutile car acceptable lors de l'init)
     eventBus.on('time/first-loop', this.#firstloopEnvironment.bind(this))
 
-    // Buff de précision d'affichage du temps (estimation : 10µs, microtask inutile)
-    eventBus.on('.', this.#toggleTimePrecision.bind(this))
-    // (estimation : 50µs, microtask inutile)
-    eventBus.on('buff/display-moon-detail', this.#toggleMoonDetail.bind(this))
-    // (estimation : 10µs, microtask inutile)
-    eventBus.on('buff/display-next-weather', this.#toggleNextWeather.bind(this))
-    // (estimation : 50µs, microtask inutile)
-    eventBus.on('buff/display-coords', this.#toggleCoords.bind(this))
     // (estimation : 50µs, microtask inutile)
     eventBus.on('time/timeslot', this.#updateTimeslot.bind(this))
+
+    this.onTrinketChanged = this.onTrinketChanged.bind(this)
+    eventBus.on('buff/trinket-changed', this.onTrinketChanged.bind(this))
 
     // TODO: Future: player/move -> Coords
     // eventBus.on('player/move', (pos) => this.#updateCoords(pos))
@@ -817,6 +813,17 @@ class EnvironmentWidget {
 
     // Mise à jour du cache pour le prochain appel via buff
     this.lastState.moonPhase = moonPhase
+  }
+
+  /**
+   * Dispatche les changements de buffs trinkets vers les toggles correspondants.
+   * @param {Set<string>} changedKeys - buffIds modifiés émis par buffManager
+   */
+  onTrinketChanged (changedKeys) {
+    if (changedKeys.has('displayTimePrecision')) this.#toggleTimePrecision(buffManager.getBuff('displayTimePrecision'))
+    if (changedKeys.has('displayMoonDetail')) this.#toggleMoonDetail(buffManager.getBuff('displayMoonDetail'))
+    if (changedKeys.has('displayNextWeather')) this.#toggleNextWeather(buffManager.getBuff('displayNextWeather'))
+    if (changedKeys.has('displayCoords')) this.#toggleCoords(buffManager.getBuff('displayCoords'))
   }
 
   #toggleNextWeather (active) {

@@ -29,6 +29,7 @@
 ---
 
 ## À faire — Bugs connus
+- lors de la génération du monde, le player est mal positionné
 - bound bound processSave : double 'bind' pour cette fonction
 - Dans le control panel, le survol de l'heure doit donner la période du jour (dawn...)
 - Il n'y a pas assez de Cactus dans le monde => sans doute pas assez de SAND sur le sol souterrain.
