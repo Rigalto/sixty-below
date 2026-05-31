@@ -303,7 +303,7 @@ class GameCore {
     if (itemsToDelete.length > 0) {
       await database.deleteMultipleRecords('inventory', itemsToDelete)
     }
-    inventoryManager.initCheck() // vérification de l'intégrité des slots (appel optionnel)
+    inventoryManager.initDone() // vérification de l'intégrité des slots (appel optionnel)
 
     // 5.2 Objectstore Furniture
     const furnitureRecords = await database.readAllFromObjectStore('furniture')

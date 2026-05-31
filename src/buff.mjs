@@ -1,8 +1,9 @@
 // buff.mjs — BuffManager - BuffWidget
 
+import {ITEMS, TRINKET_BUFF_TABLE} from './data.mjs'
 import {eventBus, timeManager} from './utils.mjs'
 import {UI_LAYOUT} from './constant.mjs'
-// import {timeManager, taskScheduler, microTasker, eventBus} from './utils.mjs'
+// import {timeManager, taskScheduler, microTasker} from './utils.mjs'
 
 /**
  * ── Principes ───────────────────────────────────────────────────────────────
@@ -66,8 +67,30 @@ class BuffManager {
   #values = new Map() // valeurs brutes : rainy, lucky, armorHelmetMiningSpeed...
   #fns = new Map() // fonctions pur buffs composés : mining-speed, movement-speed...
   timestamps = new Map() // buffId → expiration (timed uniquement)
+
+  #trinketA = null // buffer A — buffs trinkets courants ou prochains
+  #trinketB = null // buffer B — alterné avec A à chaque mise à jour
+  #currentTrinket = null // pointe vers le buffer courant (valeurs en vigueur)
+  #nextTrinket = null // pointe vers le buffer en cours de calcul
+
   #currentWeather
   #currentTimeslot
+
+  constructor () {
+    // Initialisation des buffers trinkets
+    this.#trinketA = {}
+    this.#trinketB = {}
+    this.initTrinket()
+  }
+
+  initTrinket () {
+    for (const key in TRINKET_BUFF_TABLE) {
+      this.#trinketA[key] = 0
+      this.#trinketB[key] = 0
+    }
+    this.#currentTrinket = this.#trinketA
+    this.#nextTrinket = this.#trinketB
+  }
 
   init () {
     // Initialisation des buffs de lune à false
@@ -94,6 +117,12 @@ class BuffManager {
 
     this.onDebug = this.onDebug.bind(this)
     eventBus.on('debug/buff-manager', this.onDebug)
+
+    this.#trinketA.clear()
+    this.#trinketB.clear()
+    this.initTrinket()
+    this.onTrinketsBuffs = this.onTrinketsBuffs.bind(this)
+    eventBus.on('inventory/static-buffs', this.onTrinketsBuffs)
 
     // debug
     // this.#values.set('buff1', 50)
@@ -151,7 +180,7 @@ class BuffManager {
    * @returns {number}
    */
   getBuff (name) {
-    return this.#values.get(name) ?? this.#fns.get(name)?.() ?? 0
+    return this.#values.get(name) ?? this.#fns.get(name)?.() ?? this.#currentTrinket[name] ?? 0
   }
 
   /**
@@ -163,9 +192,74 @@ class BuffManager {
   getBuffs (names) {
     const result = {}
     for (const name of names) {
-      result[name] = this.#values.get(name) ?? this.#fns.get(name)?.() ?? 0
+      result[name] = this.#values.get(name) ?? this.#fns.get(name)?.() ?? this.#currentTrinket[name] ?? 0
     }
     return result
+  }
+
+  /**
+   * Handler 'inventory/static-buffs' — dispatche vers chaque sous-handler.
+   * Bindé dans constructor.
+   * @param {{armor: string[], accessories: string[], trinkets: string[]}} payload
+   */
+  onStaticBuffs ({armor, accessories, trinkets}) {
+    // this.#onArmorBuffs(armor)               // TODO
+    // this.#onAccessoriesBuffs(accessories)   // TODO
+    this.onTrinketsBuffs(trinkets)
+  }
+
+  /**
+   * Recalcule les buffs trinkets, détecte les changements et émet buff/trinket-changed.
+   * Bindé dans init() — écoute 'inventory/static-buffs'.
+   * @param {{trinkets: string[]}} payload
+   */
+  onTrinketsBuffs (trinkets) {
+    this.#resetBuffer(this.#nextTrinket, TRINKET_BUFF_TABLE)
+    this.#applyItems(trinkets, TRINKET_BUFF_TABLE, this.#nextTrinket)
+    const changed = this.#computeChanged(TRINKET_BUFF_TABLE, this.#currentTrinket, this.#nextTrinket)
+    ;[this.#currentTrinket, this.#nextTrinket] = [this.#nextTrinket, this.#currentTrinket]
+    if (changed.size > 0) eventBus.emit('buff/trinket-changed', changed)
+  }
+
+  /**
+   * Remet à 0 toutes les entrées d'un buffer.
+   * @param {object} buffer - {buffId: value}
+   * @param {object} table  - {buffId: op}
+   */
+  #resetBuffer (buffer, table) {
+    for (const key in table) { buffer[key] = 0 }
+  }
+
+  /**
+   * Applique les buffs des items dans buffer selon leur op (sum / max / or / direct).
+   * @param {string[]} itemIds
+   * @param {object}   table  - {buffId: op}
+   * @param {object}   buffer - {buffId: value}
+   */
+  #applyItems (itemIds, table, buffer) {
+    for (const itemId of itemIds) {
+      const item = ITEMS[itemId]
+      if (!item?.buff) continue
+      for (const {buff, value} of item.buff) {
+        const op = table[buff]
+        if (op === 'sum') { buffer[buff] += value } else if (op === 'max') { if (value > buffer[buff]) buffer[buff] = value } else if (op === 'or') { if (value) buffer[buff] = value } else { buffer[buff] = value }
+      }
+    }
+  }
+
+  /**
+   * Retourne les buffIds dont la valeur diffère entre current et next.
+   * @param {object} table
+   * @param {object} current
+   * @param {object} next
+   * @returns {Set<string>}
+   */
+  #computeChanged (table, current, next) {
+    const changed = new Set()
+    for (const key in table) {
+      if (current[key] !== next[key]) changed.add(key)
+    }
+    return changed
   }
 }
 

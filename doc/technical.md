@@ -256,6 +256,7 @@ Cette section définit les événements officiels. Tout nouvel événement doit 
 | E | `time/clock` | `{ day, hour, minute }` | Émis chaque minute-jeu. |
 | E | `time/daily` | `{ day, weather, nextWeather, moonPhase }` | Émis à minuit (changement de jour). |
 | E | `time/timeslot` | `{ tslot, isDay }` | Émis toutes les 3h (changement de slot). |
+| E | `buff/trinket-changed` | `Set<string>` | Émis par `buffManager` quand un buff trinket change. Payload = buffIds modifiés. |
 
 #### Voile transparent (`ModalBlocker`)
 
@@ -361,6 +362,7 @@ Cette section définit les événements officiels. Tout nouvel événement doit 
 | S | `buff/display-coords` | `boolean` | Active/Désactive l'affichage des coordonnées. |
 | S | `buff/display-time-precision` | `integer` | précision 0 => 1heure, 1 => 15 minutes, 2 => 5 minutes |
 | S | `buff/display-moon-detail` | `boolean` | affiche 4 (false) ou 8 (true) phases lunaires |
+| S | `buff/trinket-changed` | `Set<string>` | Émis par `buffManager` quand un buff trinket change. Payload = buffIds modifiés. |
 
 #### Debug (`WorldMapDebug`, `RealtimeDebugWidget`, `BuffManager`)
 
@@ -1209,6 +1211,8 @@ Gestion centralisée des buffs du joueur. Deux phases obligatoires : `init()` pu
 | `onDaily` | `({moonPhase, weather}) → void` | Handler `time/daily` + `time/first-loop`. Met à jour lune et météo. |
 | `onTimeslot` | `({tslot, isDay}) → void` | Handler `time/timeslot` + `time/first-loop`. Met à jour le cycle circadien. |
 | `onDebug` | `() → void` | Handler `debug/buff-manager`. Affiche `#values` et `#fns` sur la console. |
+| `onStaticBuffs ` | `({armor, accessories, trinkets}) → void` | Handler `inventory/static-buffs`. Prise en compte des buffs  provenant des trinkets, accessoires et armures. |
+| `onTrinketsBuffs` | `(trinkets) → void` | Buffs  provenant des trinkets. Double-buffer, émet `buff/trinket-changed`. |
 
 #### Buffs environnementaux initialisés
 
@@ -1264,8 +1268,7 @@ Autorité unique sur l'état mémoire de l'inventaire. Aucune logique DOM.
 | :--- | :--- | :--- |
 | `init` | `() → void` | Vide les structures. À appeler avant `initSlot`. |
 | `initSlot` | `(dbSlot: object) → void` | Intègre un enregistrement DB dans la structure mémoire correspondante. |
-| `initCheck` | `() → void` | Vérifie l'intégrité des tableaux (taille attendue). Appel optionnel. |
-
+| `initDone`  | `() → void` | Vérifie l'intégrité des tableaux et émet `inventory/static-buffs`. À appeler après tous les `initSlot()`. |
 #### Accesseurs (lecture seule)
 
 | Propriété | Type | Description |

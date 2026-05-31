@@ -103,10 +103,11 @@ class InventoryManager {
   }
 
   /**
-   * Vérifie la cohérence des capacités après le chargement complet via initSlot.
-   * Émet console.error pour chaque capacité incorrecte.
+   * Finalise l'initialisation : vérifie la cohérence des capacités et signale
+   * l'inventaire prêt via 'inventory/static-buffs'.
+   * À appeler après tous les appels à initSlot().
    */
-  initCheck () {
+  initDone () {
     if (this.#bag.length !== BAG_CAPACITY) console.error(new Error(`[InventoryManager] bag: ${this.#bag.length} slots, attendu ${BAG_CAPACITY}`))
     if (this.#hotbar.length !== HOTBAR_CAPACITY) console.error(new Error(`[InventoryManager] hotbar: ${this.#hotbar.length} slots, attendu ${HOTBAR_CAPACITY}`))
     if (this.#armor.length !== ARMOR_CAPACITY) console.error(new Error(`[InventoryManager] armor: ${this.#armor.length} slots, attendu ${ARMOR_CAPACITY}`))
@@ -115,6 +116,8 @@ class InventoryManager {
       const expected = CONTAINER_CAPACITY[slots[0].container]
       if (slots.length !== expected) console.error(new Error(`[InventoryManager] container ${furnitureId}: ${slots.length} slots, attendu ${expected}`))
     }
+    // on prévient le buff manager pour qu'il initialise les buffs statiques
+    eventBus.emit('inventory/static-buffs', this.getStaticBuffs())
   }
 
   // ─── Accesseurs (lecture seule pour l'Overlay) ───────────────
