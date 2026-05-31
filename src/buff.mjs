@@ -81,6 +81,8 @@ class BuffManager {
     this.#trinketA = {}
     this.#trinketB = {}
     this.initTrinket()
+    // définition des buffs compsés
+    this.#fns.set('movement-speed', () => { return 100 })
   }
 
   initTrinket () {

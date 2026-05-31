@@ -1,6 +1,7 @@
 // player.mjs — PlayerManager - LifeManager
 
 import {WORLD_WIDTH, WORLD_HEIGHT, PLAYER} from './constant.mjs'
+import {eventBus} from './utils.mjs'
 
 const WORLD_PX_W = WORLD_WIDTH << 4 // 16384 px
 const WORLD_PX_H = WORLD_HEIGHT << 4 // 8192 px
@@ -9,6 +10,9 @@ class PlayerManager {
   #x = 0 // px monde — coin haut-gauche de la hitbox
   #y = 0 // px monde — coin haut-gauche de la hitbox
   #direction = 1 // direction dans laquelle regarde le player (0 à gauche et 1 à droite)
+
+  #lastTileX = -1 // tuile X au dernier emit player/move
+  #lastTileY = -1 // tuile Y au dernier emit player/move
 
   /**
  * Initialise la position depuis le record gamestate.
@@ -45,6 +49,14 @@ class PlayerManager {
       if (this.#y < 0) { this.#y = 0 }
       if (this.#y > WORLD_PX_H - PLAYER.h) { this.#y = WORLD_PX_H - PLAYER.h }
     }
+    // affichage de la position du joueur dans le Control Panel (EnvironmentWidget)
+    const feet = this.getFeetTile()
+    if (feet.x !== this.#lastTileX || feet.y !== this.#lastTileY) {
+      this.#lastTileX = feet.x
+      this.#lastTileY = feet.y
+      eventBus.emit('player/move', feet)
+    }
+
     return {x: this.#x + (PLAYER.w >> 1), y: this.#y + (PLAYER.h >> 1)}
   }
 
@@ -60,8 +72,18 @@ class PlayerManager {
   }
 
   /**
+   * Retourne la tuile sous les pieds du joueur (bas-centre de la hitbox).
+   * @returns {{x: number, y: number}}
+   */
+  getFeetTile () {
+    return {
+      x: (this.#x + (PLAYER.w >> 1)) >> 4,
+      y: (this.#y + PLAYER.h) >> 4
+    }
+  }
+
+  /**
    * Retourne le centre de la hitbox en pixels monde.
-   * Utilisé par camera.update() pour centrer la vue sur le joueur.
    * @returns {[number, number]}
    */
   //   getPosition () {

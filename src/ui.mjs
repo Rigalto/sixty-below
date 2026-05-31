@@ -3,6 +3,7 @@
 import {eventBus, seededRNG} from './utils.mjs'
 import {gameCore} from './core.mjs'
 import {buffManager} from './buff.mjs'
+import {playerManager} from './player.mjs'
 import {WEATHER_TYPE, MOON_PHASE, MOON_PHASE_BLURRED, STATE, OVERLAYS, UI_LAYOUT, PATH_INVENTORY, PATH_CRAFT, PATH_TROPHY, PATH_HELP, PATH_NEW_WORLD, PATH_SAVE, PATH_RESTORE, PATH_DEBUG, SVG_ICON} from './constant.mjs'
 
 /* ====================================================================================================
@@ -187,13 +188,22 @@ widgetStyle.textContent = /* css */`
   margin-bottom: 4px;
 }
 #env-overlay-root .day,
-#env-overlay-root .time  { font-size: 1.4em; font-weight: bold; letter-spacing: 1px; }
-#env-overlay-root .weather-row   { display: flex; justify-content: space-between; align-items: center; font-size: 24px; }
+#env-overlay-root .time { font-size: 1.4em; font-weight: bold; letter-spacing: 1px; }
+#env-overlay-root .weather-row { display: flex; justify-content: space-between; align-items: center; font-size: 24px; }
 #env-overlay-root .weather-group { display: flex; gap: 5px; }
 #env-overlay-root .weather-now,
-#env-overlay-root .moon          { cursor: help; }
-#env-overlay-root .weather-next  { display: none; }
-#env-overlay-root .coords        { font-size: 0.8em; color: #888; font-family: monospace; margin-top: 2px; }
+#env-overlay-root .moon { cursor: help; }
+#env-overlay-root .weather-next { display: none; }
+#env-overlay-root .bottom-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-family: monospace;
+  margin-top: 2px;
+  font-size: 18px;
+  font-weight: bold;
+}
+#env-overlay-root .speed { margin-left: auto; }
 
 /* TileHoverWidget */
 
@@ -674,7 +684,7 @@ class EnvironmentWidget {
   #weatherNext = null
   #moon = null
   #coords = null
-  #boundUpdateCoords = null
+  #speed = null
 
   #lastMinuteStr = ''
   #lastWeatherCode = -1
@@ -726,12 +736,19 @@ class EnvironmentWidget {
     weatherRow.appendChild(weatherGroup)
     weatherRow.appendChild(this.#moon)
 
-    this.#coords = document.createElement('div')
+    const bottomRow = document.createElement('div')
+    bottomRow.className = 'bottom-row'
+    this.#coords = document.createElement('span')
     this.#coords.className = 'coords'
+    this.#speed = document.createElement('span')
+    this.#speed.className = 'speed'
+    bottomRow.appendChild(this.#coords)
+    bottomRow.appendChild(this.#speed)
+    this.#container.appendChild(bottomRow)
 
     this.#container.appendChild(header)
     this.#container.appendChild(weatherRow)
-    this.#container.appendChild(this.#coords)
+    this.#container.appendChild(bottomRow)
 
     const overlayPanel = document.getElementById('right-sidebar')
     if (overlayPanel) {
@@ -880,6 +897,7 @@ class EnvironmentWidget {
     if (changedKeys.has('displayMoonDetail')) this.#applyMoonDetail(buffManager.getBuff('displayMoonDetail'))
     if (changedKeys.has('displayNextWeather')) this.#applyNextWeather(buffManager.getBuff('displayNextWeather'))
     if (changedKeys.has('displayCoords')) this.#applyCoords(buffManager.getBuff('displayCoords'))
+    if (changedKeys.has('displaySpeed')) this.#applySpeed(buffManager.getBuff('displaySpeed'))
   }
 
   /**
@@ -921,10 +939,11 @@ class EnvironmentWidget {
 
     if (isActive) {
       // Abonnement uniquement si nécessaire [Design 8.3]
-      eventBus.on('player/move', this.#boundUpdateCoords)
+      eventBus.on('player/move', this.updateCoords)
+      this.updateCoords(playerManager.getFeetTile())
     } else {
       // Désabonnement immédiat pour économiser le CPU
-      eventBus.off('player/move', this.#boundUpdateCoords)
+      eventBus.off('player/move', this.updateCoords)
     }
   }
 
@@ -935,6 +954,24 @@ class EnvironmentWidget {
    */
   updateCoords ({x, y}) { // les coordonnées sont en tuiles (integer)
     this.#coords.textContent = `X: ${x} | Y: ${y}`
+  }
+
+  /**
+   * Affiche ou masque le bonus de vitesse.
+   * Met à jour la valeur affichée lors de l'activation.
+   * @param {number|boolean} isActive
+   */
+  #applySpeed (isActive) {
+    this.#speed.style.display = isActive ? 'inline' : 'none'
+    if (isActive) this.#updateSpeed()
+  }
+
+  /**
+   * Met à jour l'affichage du bonus de vitesse depuis le buff composé.
+   * À appeler à chaque changement de movement-speed (tuiles, armure, accessoires).
+   */
+  #updateSpeed () {
+    this.#speed.textContent = `Speed: ${buffManager.getBuff('movement-speed')}%`
   }
 }
 export const environmentWidget = new EnvironmentWidget()

@@ -524,6 +524,7 @@ export const ITEMS = {
   bottledFrog: {name: 'Bottled Frog', type: ITEM_TYPE.TRINKET, stype: 'trinket', star: 3, image: 'furniture_32_32-3-8', help: 'Bottled Frog', tooltip: 'When in Inventory, give weather forecasts', buff: [{buff: 'displayNextWeather', value: true}]},
   sextant: {name: 'Sextant', type: ITEM_TYPE.TRINKET, stype: 'trinket', star: 3, image: 'furniture_32_32-3-8', help: 'Sextant', tooltip: 'When in Inventory, increases Moon Phases accuracy', buff: [{buff: 'displayMoonDetail', value: true}]},
   ruler: {name: 'Ruler', type: ITEM_TYPE.TRINKET, stype: 'trinket', star: 3, image: 'furniture_32_32-3-8', help: 'Ruler', tooltip: 'When in Inventory, display your position', buff: [{buff: 'displayCoords', value: true}]},
+  stopwatch: {name: 'Stopwatch', type: ITEM_TYPE.TRINKET, stype: 'trinket', star: 3, image: 'furniture_32_32-3-8', help: 'Stopwatch', tooltip: 'When in Inventory, display your bonus Speed (percent)', buff: [{buff: 'displaySpeed', value: true}]},
 
   // Armors ITEM_TYPE.ARMOR, stype: 'tableware', armor: 'head'
   headWood: {name: 'Wood Helmet', type: ITEM_TYPE.ARMOR | ITEM_TYPE.CRAFTING, stype: 'head', armor: 'head', star: 1, image: 'tools_32_32-10-7', placedright: 'heads_26_22-1-0', placedleft: 'heads_26_22-1-1', defense: 1, help: 'Armors', tooltip: 'Provides sturdy protection', set: 'wood'},

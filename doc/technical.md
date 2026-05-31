@@ -257,7 +257,7 @@ Cette section définit les événements officiels. Tout nouvel événement doit 
 | E | `time/daily` | `{ day, weather, nextWeather, moonPhase }` | Émis à minuit (changement de jour). |
 | E | `time/timeslot` | `{ tslot, isDay }` | Émis toutes les 3h (changement de slot). |
 | E | `buff/trinket-changed` | `Set<string>` | Émis par `buffManager` quand un buff trinket change. Payload = buffIds modifiés. |
-| E | `player/move` | `{x: number, y: number}` | Lorsque le joueur se déplace. |
+| E | `player/move` | `{x: number, y: number}` | Émis quand la tuile sous les pieds du joueur change. Coordonnées en tuiles. |
 
 #### Voile transparent (`ModalBlocker`)
 
@@ -270,7 +270,7 @@ Cette section définit les événements officiels. Tout nouvel événement doit 
 | Dir. | Event Name | Payload Structure | Description |
 | :---: | :--- | :--- | :--- |
 | E | `player/teleport` | `{x: number, y: number}` | Téléporte le joueur aux coordonnées tuiles données. |
-| S | `player/move` | `{x: number, y: number}` | Lorsque le joueur se déplace. |
+| S | `player/move` | `{x: number, y: number}` | Émis quand la tuile sous les pieds du joueur change. Coordonnées en tuiles. |
 
 #### Rendering (`Camera`, `SkyRenderer`)
 
@@ -1498,6 +1498,7 @@ Position interne : coin haut-gauche de la hitbox en pixels monde.
 | `init`       | `(playerRecord: string): {x, y}` | Parse `'x|y|direction'`, positionne le joueur, retourne le centre hitbox. |
 | `update`     | `(dt, directions): {x, y}`       | Déplace selon bitmask, retourne le centre hitbox. Sans collision (provisoire). |
 | `getCenterTile` | `(): {x, y}` | Retourne la tuile du centre de la hitbox en coordonnées tuile. |
+| `getFeetTile` | `(): {x, y}` | Retourne la tuile sous les pieds (bas-centre hitbox). Pour l'affichage des coordonnées. |
 | `getPosition`| `(): [number, number]`           | Centre de la hitbox.             |
 | `render`     | `(ctx): void`                    | Dessine la hitbox (placeholder red). ctx déjà transformé.   |
 

@@ -2385,6 +2385,8 @@ Dire que ce sont des accessoires qui sont actifs dès lors qu'il se trouvent dan
 | [[item:clockGold]] | {{item:clockGold:star|star}} | Improve [[Day & Night Cycle|Time]] accuracy |
 | [[item:bottledFrog]] | {{item:bottledFrog:star|star}} | Improve [[Weather]] accuracy |
 | [[item:sextant]] | {{item:sextant:star|star}} | Improve [[Moon Phases]] accuracy |
+| [[item:ruler]] | {{item:ruler:star|star}} | Display your position in the [[Control Panel]] |
+| [[item:stopwatch]] | {{item:stopwatch:star|star}} | Display your movement speed bonus in the [[Control Panel]] |
     `
   },
   {
@@ -2399,9 +2401,7 @@ Dire que ce sont des accessoires qui sont actifs dès lors qu'il se trouvent dan
     content: `
 **Description**
 
-Clocks are [[Trinkets|Trinket]]s which give [[Day & Night Cycle|time]] more accurately.
-
-⏳
+Clocks are [[Trinkets|Trinket]]s which display [[Day & Night Cycle|time]] more accurately in the [[Control Panel]].
 
 | Clock | Tier | Accuracy |
 |---|---|---|
@@ -2409,11 +2409,11 @@ Clocks are [[Trinkets|Trinket]]s which give [[Day & Night Cycle|time]] more accu
 | [[item:clockSilver]] | {{item:clockSilver:star|star}} | 15 in-game minutes |
 | [[item:clockGold]] | {{item:clockGold:star|star}} | 5 in-game minutes |
 
-_without any clock, the precision is 3 hours._
+_Without any clock, the precision is 3 hours._
 
-Ajouter un paragraphe 'How to use', qui sera générique pour tous les trinkets (template) avec en paramètre l'identifiant du trinket
+Ajouter un paragraphe 'How to use', qui sera générique pour tous les trinkets (template) avec en paramètre l'identifiant du trinket⏳
 
-Ajouter un paragraphe qui donne la recette de fabrication (générique)
+Ajouter un paragraphe qui donne la recette de fabrication (générique)⏳
     `
   },
   {
@@ -4807,17 +4807,75 @@ In the right part of the screen, shows:
   * Open [[Help Panel]] [H]
   * Creation of a [[World Creation|new world]]
   * Ambient sound and Music controls⏳
-* Environmental informations
+* [[Environment Panel]]
   * [[Day & Night Cycle|Day / Hours]]
   * [[Weather]] and [[Moon Phases]]
-  * Player Position⏳
-  * Tile under the mouse⏳
-* [[Buff Panel]]⏳
+  * Player Position
+  * Player Speed
+  * Tile under the mouse
+* [[Buff Panel]]
+* Tile / Furniture / Plant under the mouse
 
-Note : Always Present
+_Note_ : the exct content of environnement panel is controled by trinket in your inventory. See [[Environment Panel]] for details
+
+_The content and accuracy of the [[Environment Panel]] depend on the [[Trinkets]] you carry in your [[Inventory]]. See [[Environment Panel]] for details._
 
 **Tips**
-* _Activer le mode plein écran du navigateur pour voir la totalité de l'écran de jeu (à traduire)_
+* _Use your browser's full-screen mode (F11) to display the complete game area._
+    `
+  },
+  {
+    title: 'Environment Panel',
+    category: ['Gameplay'],
+    content: `
+**Description**
+
+The Environment Panel is the second section of the [[Control Panel]], below the action buttons.
+It provides a continuous read of the world's current state.
+Some information is always visible; other details unlock when you carry specific [[Trinkets]] in your [[Inventory]].
+
+**Always visible**
+
+| Element | Description |
+|---|---|
+| [[Day & Night Cycle|Day]] | Current day number |
+| [[Day & Night Cycle|Time]] | Current in-game time |
+| [[Weather]] | Current weather icon |
+| [[Moon Phases]] | Current moon phase |
+
+**Time accuracy**
+
+By default, time is shown rounded to the nearest 3-hour period.
+Carrying a [[Clocks|Clock]] improves this precision.
+Only the most accurate clock in your inventory applies.
+Grandfather Clocks placed nearby may also improve time accuracy.⏳
+
+| Item | Precision |
+|---|---|
+| (none) | 3 hours |
+| [[item:clockCopper]] | 1 hour |
+| [[item:clockSilver]] | 15 minutes |
+| [[item:clockGold]] | 5 minutes |
+
+**Weather forecast**
+
+Carrying a [[item:bottledFrog]] displays tomorrow's weather alongside the current one.
+
+**Moon phase detail**
+
+By default, 4 icons represent the 8 possible phases.
+Carrying a [[item:sextant]] shows a unique icon for each of the 8 phases.
+
+**Player position**
+
+Carrying a [[item:ruler]] in your [[Inventory]] displays your current tile coordinates (X / Y) at the bottom of the widget.
+
+**Movement speed bonus**
+
+Carrying a [[item:stopwatch]] in your [[Inventory]] displays your current movement speed as a percentage.
+A value of 100% means no modifier is active.
+Speed is affected by terrain, equipment, and [[Buffs]].
+See [[Movement Speed]] for details.
     `
   },
   {
