@@ -55,6 +55,13 @@ class InventoryManager {
   // Persistance
   #dirtyKeys = new Set() // Set<number> — clés DB des slots modifiés
 
+  // items octroyant des buffs
+  #staticBuffs = {
+    armor: new Array(ARMOR_CAPACITY).fill(''), // toujours ARMOR_CAPACITY entrées
+    accessories: new Array(ACCESSORY_CAPACITY).fill(''), // toujours ACCESSORY_CAPACITY entrées
+    trinkets: [] // variable — reset via length = 0
+  }
+
   /**
    * Réinitialise toutes les structures mémoire.
    * À appeler au startSession avant les appels à initSlot.
@@ -148,19 +155,19 @@ class InventoryManager {
    * @returns {Array<string>}
    */
   getStaticBuffs () {
-    const buffs = []
-
     for (let i = 0; i < ARMOR_CAPACITY; i++) {
-      if (this.#armor[i].item !== '') buffs.push(this.#armor[i].item)
+      this.#staticBuffs.armor[i] = this.#armor[i].item
     }
     for (let i = 0; i < ACCESSORY_CAPACITY; i++) {
-      if (this.#accessories[i].item !== '') buffs.push(this.#accessories[i].item)
+      this.#staticBuffs.accessories[i] = this.#accessories[i].item
     }
+    this.#staticBuffs.trinkets.length = 0
     for (const slot of this.#bag) {
-      if (slot.item !== '' && (ITEMS[slot.item].type & ITEM_TYPE.TRINKET)) buffs.push(slot.item)
+      if (slot.item !== '' && (ITEMS[slot.item].type & ITEM_TYPE.TRINKET)) {
+        this.#staticBuffs.trinkets.push(slot.item)
+      }
     }
-
-    return buffs
+    return this.#staticBuffs
   }
 
   // ─── Fonctions privées utiitaires ──────────────────────────────────

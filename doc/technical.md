@@ -277,16 +277,6 @@ Cette section définit les événements officiels. Tout nouvel événement doit 
 | E | `time/sky-color-changed`| `string` (Hex Color) | Émis uniquement si la couleur change. |
 | S | `camera/preload-chunks-changed` | `Set<number>` | Émis à chaque changement de `preloadChunks`. |
 
-### Contrat des systèmes occupants
-
-Tout système qui occupe des tuiles dans le monde expose les méthodes suivantes :
-
-| Méthode | Signature | Description |
-| :--- | :--- | :--- |
-| `isTileOccupied` | `(index: number) → boolean` | Tuile couverte par une entité du système. |
-| `isFloorTile` | `(index: number) → boolean` | Tuile directement sous une entité — interdit au mining, sol pour les plantes... |
-| `isSurfaceTop` | `(index: number) → boolean` | Tuile sur laquelle on peut poser un objet (dessus d'un 'furniture' de type `surface`). |
-
 #### Furniture (`FurnitureManager`)
 
 | Dir. | Event | Payload | Description |
@@ -301,7 +291,7 @@ Tout système qui occupe des tuiles dans le monde expose les méthodes suivantes
 | E | `inventory/close` | — | Cache l'overlay, sauvegarde, émet les buffs. |
 | E | `inventory/keydown` | `string` (e.key) | Raccourcis clavier (L, Space, Delete). |
 | E | `craft/performed` | `{recipe, runs}` | Rafraîchit bag, hotbar et container si ouvert. |
-| S | `inventory/static-buffs` | `Array<string>` | Armor + accessoires + trinkets bag. |
+| S | `inventory/static-buffs` | `{armor: string[3], accessories: string[5], trinkets: string[]}` | Slots armor + accessoires + trinkets bag. Slots vides = `''`. |
 | S | `hotbar/changed` | `Array` | Contenu hotbar mis à jour. Les huit slots sont en payload. |
 | S | `item/used` | `string` (itemId) | Clic sur Use. |
 | S | `craft/item` | `string` (itemId) | Navigation vers une recette. |
@@ -606,6 +596,18 @@ Ne jamais appeler `seededRNG` en mode déterministe depuis la game loop.
 | `parseLootBuffs` | `(arr?: string[]) → {buffs: {required: string[], forbidden: string[], modifiers: {name,value}[]}, buffList: string[]}` | Pré-parse les strings buffs en structure runtime. `buffList` = union dédupliquée des noms. Retourne structures vides si `arr` absent. |
 | `rollLoot` | `(entry: LootEntry) → number` | Tirage pour les coffres. Zéro branche — dispatche via `ROLL_FN[flags]` (8 fonctions). Retourne 0 si weight non atteint. |
 | `rollLootWithBuffs` | `(lootItem, buffValues, yieldBuff?) → number` | Tirage pour les actions (mining, harvesting...). Évalue conditions, cumule modificateurs + yieldBuff, tire un float, applique `intFract`. Zéro allocation, zéro parsing. |
+
+---
+
+### Contrat des systèmes occupants
+
+Tout système qui occupe des tuiles dans le monde expose les méthodes suivantes :
+
+| Méthode | Signature | Description |
+| :--- | :--- | :--- |
+| `isTileOccupied` | `(index: number) → boolean` | Tuile couverte par une entité du système. |
+| `isFloorTile` | `(index: number) → boolean` | Tuile directement sous une entité — interdit au mining, sol pour les plantes... |
+| `isSurfaceTop` | `(index: number) → boolean` | Tuile sur laquelle on peut poser un objet (dessus d'un 'furniture' de type `surface`). |
 
 ---
 
