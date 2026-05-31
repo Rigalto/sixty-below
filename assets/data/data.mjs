@@ -518,11 +518,11 @@ export const ITEMS = {
   // ultracampfire: {name: 'Ultra Bright Campfire', type: ITEM_TYPE.FURNITURE | ITEM_TYPE.LIGHT, stype: 'onoff', cozy: true, sell: 1500, star: 4, image: 'furniture_32_32-13-3', placed: 'fuws_48_32-0-2', placedleft: 'fuws_48_32-1-2', help: 'Furniture', tooltip: 'Provides Cozy Buff when lit'},
 
   // Trinkets
-  clockCopper: {name: 'Copper Clock', type: ITEM_TYPE.TRINKET | ITEM_TYPE.CRAFTABLE, stype: 'trinket', star: 2, image: 'furniture_32_32-3-8', help: 'Clocks', tooltip: 'When in Inventory, increases Time accuracy', buff: [{buff: 'displayTimePrecision', value: 1}]},
-  clockSilver: {name: 'Silver Clock', type: ITEM_TYPE.TRINKET | ITEM_TYPE.CRAFTABLE, stype: 'trinket', star: 3, image: 'furniture_32_32-3-8', help: 'Clocks', tooltip: 'When in Inventory, increases Time accuracy', buff: [{buff: 'displayTimePrecision', value: 2}]},
-  clockGold: {name: 'Gold Clock', type: ITEM_TYPE.TRINKET | ITEM_TYPE.CRAFTABLE, stype: 'trinket', star: 4, image: 'furniture_32_32-3-8', help: 'Clocks', tooltip: 'When in Inventory, increases Time accuracy', buff: [{buff: 'displayTimePrecision', value: 3}]},
-  bottledFrog: {name: 'Bottled Frog', type: ITEM_TYPE.TRINKET | ITEM_TYPE.CRAFTABLE, stype: 'trinket', star: 3, image: 'furniture_32_32-3-8', help: 'Bottled Frog', tooltip: 'When in Inventory, give weather forecasts', buff: [{buff: 'displayNextWeather',   value: true}},
-  sextant: {name: 'Sextant', type: ITEM_TYPE.TRINKET | ITEM_TYPE.CRAFTABLE, stype: 'trinket', star: 3, image: 'furniture_32_32-3-8', help: 'Sextant', tooltip: 'When in Inventory, increases Moon Phases accuracy', buff: [{buff: 'displayMoonDetail',    value: true}]},
+  clockCopper: {name: 'Copper Clock', type: ITEM_TYPE.TRINKET | ITEM_TYPE.CRAFTABLE, stype: 'trinket', star: 2, image: 'furniture_32_32-3-8', help: 'Clocks', tooltip: 'When in Inventory, increases Time accuracy', buff: [{buff: 'displayTimePrecision', value: 1, op: 'max'}]},
+  clockSilver: {name: 'Silver Clock', type: ITEM_TYPE.TRINKET | ITEM_TYPE.CRAFTABLE, stype: 'trinket', star: 3, image: 'furniture_32_32-3-8', help: 'Clocks', tooltip: 'When in Inventory, increases Time accuracy', buff: [{buff: 'displayTimePrecision', value: 2, op: 'max'}]},
+  clockGold: {name: 'Gold Clock', type: ITEM_TYPE.TRINKET | ITEM_TYPE.CRAFTABLE, stype: 'trinket', star: 4, image: 'furniture_32_32-3-8', help: 'Clocks', tooltip: 'When in Inventory, increases Time accuracy', buff: [{buff: 'displayTimePrecision', value: 3, op: 'max'}]},
+  bottledFrog: {name: 'Bottled Frog', type: ITEM_TYPE.TRINKET | ITEM_TYPE.CRAFTABLE, stype: 'trinket', star: 3, image: 'furniture_32_32-3-8', help: 'Bottled Frog', tooltip: 'When in Inventory, give weather forecasts', buff: [{buff: 'displayNextWeather', value: true}]},
+  sextant: {name: 'Sextant', type: ITEM_TYPE.TRINKET | ITEM_TYPE.CRAFTABLE, stype: 'trinket', star: 3, image: 'furniture_32_32-3-8', help: 'Sextant', tooltip: 'When in Inventory, increases Moon Phases accuracy', buff: [{buff: 'displayMoonDetail', value: true}]},
 
   // Armors ITEM_TYPE.ARMOR, stype: 'tableware', armor: 'head'
   headWood: {name: 'Wood Helmet', type: ITEM_TYPE.ARMOR | ITEM_TYPE.CRAFTING, stype: 'head', armor: 'head', star: 1, image: 'tools_32_32-10-7', placedright: 'heads_26_22-1-0', placedleft: 'heads_26_22-1-1', defense: 1, help: 'Armors', tooltip: 'Provides sturdy protection', set: 'wood'},
@@ -770,6 +770,7 @@ for (const key in NODES) {
 
 // — 8.2. Validation des ITEMS
 const REQUIRED_ITEM_FIELDS = ['name', 'type', 'stype', 'star', 'image', 'help', 'tooltip']
+export const TRINKET_BUFF_TABLE = {}
 for (const key in ITEMS) {
   const itemDesc = ITEMS[key]
 
@@ -783,6 +784,19 @@ for (const key in ITEMS) {
   const PLACABLE_FURNITURE = ITEM_TYPE.FURNITURE | ITEM_TYPE.PLACABLE
   if ((itemDesc.type & PLACABLE_FURNITURE) === PLACABLE_FURNITURE && !itemDesc.placed && !itemDesc.placedLeft) {
     console.error(`[data.mjs] ITEMS.${key} : FURNITURE sans attribut 'placed' ni 'placedLeft'`)
+  }
+  // post traitement des buffs
+  if ((itemDesc.type & ITEM_TYPE.TRINKET) && itemDesc.buff) {
+    for (const {buff, op} of itemDesc.buff) {
+      const resolvedOp = op ?? ''
+      if (buff in TRINKET_BUFF_TABLE) {
+        if (TRINKET_BUFF_TABLE[buff] !== resolvedOp) {
+          console.error(`[data.mjs] ITEMS.${key} : op mismatch pour le buff '${buff}' (attendu '${TRINKET_BUFF_TABLE[buff]}', trouvé '${resolvedOp}')`)
+        }
+      } else {
+        TRINKET_BUFF_TABLE[buff] = resolvedOp
+      }
+    }
   }
   // le post traitement des images est effectué par GameCore.#hydrateItems()
 }
