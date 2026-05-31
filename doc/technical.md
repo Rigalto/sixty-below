@@ -257,7 +257,7 @@ Cette section définit les événements officiels. Tout nouvel événement doit 
 | E | `time/daily` | `{ day, weather, nextWeather, moonPhase }` | Émis à minuit (changement de jour). |
 | E | `time/timeslot` | `{ tslot, isDay }` | Émis toutes les 3h (changement de slot). |
 | E | `buff/trinket-changed` | `Set<string>` | Émis par `buffManager` quand un buff trinket change. Payload = buffIds modifiés. |
-
+| E | `player/move` | `{x: number, y: number}` | Lorsque le joueur se déplace. |
 
 #### Voile transparent (`ModalBlocker`)
 
@@ -267,9 +267,10 @@ Cette section définit les événements officiels. Tout nouvel événement doit 
 
 #### Player (`PlayerManager`)
 *En prévision*
-| Event Name | Payload Structure | Description |
+| Dir. | Event Name | Payload Structure | Description |
 | :---: | :--- | :--- | :--- |
-| `player/teleport` | `{x: number, y: number}` | Téléporte le joueur aux coordonnées tuiles données. |
+| E | `player/teleport` | `{x: number, y: number}` | Téléporte le joueur aux coordonnées tuiles données. |
+| S | `player/move` | `{x: number, y: number}` | Lorsque le joueur se déplace. |
 
 #### Rendering (`Camera`, `SkyRenderer`)
 

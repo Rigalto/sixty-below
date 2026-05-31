@@ -158,6 +158,43 @@ widgetStyle.textContent = /* css */`
   margin-right: 8px;
 }
 
+/* EnvironmentWidget */
+
+ #env-overlay-root {
+  position: relative;
+  width: 100%;
+  order: ${UI_LAYOUT.ENVIRONMENT};
+  margin-bottom: 10px;
+  background-color: rgba(20, 20, 25, 0.9);
+  border: 1px solid #444;
+  color: #ffffff;
+  font-family: Segoe UI, Roboto, monospace;
+  font-size: 14px;
+  border-radius: 6px;
+  padding: 8px;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.5);
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  user-select: none;
+}
+ #env-overlay-root .env-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  border-bottom: 1px solid #555;
+  padding-bottom: 4px;
+  margin-bottom: 4px;
+}
+#env-overlay-root .day,
+#env-overlay-root .time  { font-size: 1.4em; font-weight: bold; letter-spacing: 1px; }
+#env-overlay-root .weather-row   { display: flex; justify-content: space-between; align-items: center; font-size: 24px; }
+#env-overlay-root .weather-group { display: flex; gap: 5px; }
+#env-overlay-root .weather-now,
+#env-overlay-root .moon          { cursor: help; }
+#env-overlay-root .weather-next  { display: none; }
+#env-overlay-root .coords        { font-size: 0.8em; color: #888; font-family: monospace; margin-top: 2px; }
+
 /* TileHoverWidget */
 
 #tile-hover-root {
@@ -606,7 +643,25 @@ class CreationDialogOverlay {
 export const creationDialogOverlay = new CreationDialogOverlay()
 
 /* ====================================================================================================
-   AFFICHAGE DATE/HEURE METEO LUNE POSITION
+   ENVIRONMENT WIDGET
+   ====================================================================================================
+
+   Singleton : environmentWidget.
+
+   Affiche dans le Control Panel : jour, heure (fuzzy), météo, lune et coordonnées joueur (optionnel).
+   Toujours présent. Zéro DOM traversal en runtime — toutes les références précalculées à l'init.
+
+   Responsabilités :
+     - Heure avec précision variable selon le trinket Clock équipé (fuzzy time)
+     - Météo courante et prévision du lendemain (affichée si trinket Bottled Frog)
+     - Phase lunaire en 4 ou 8 phases selon le trinket Sextant
+     - Coordonnées tuile du joueur (affichées si trinket GPS) — abonnement dynamique à player/move
+
+   Interactions :
+     eventBus  — écoute : time/first-loop, time/clock, time/daily, time/timeslot
+               — écoute : buff/trinket-changed → dispatche vers #apply*
+               — écoute : player/move (dynamique — uniquement si #coordsActive)
+
    ==================================================================================================== */
 
 const TIMESLOT_NAMES = ['Midnight', 'Dawn', 'Morning', 'Noon', 'Afternoon', 'Dusk', 'Evening', 'Night']
@@ -619,76 +674,64 @@ class EnvironmentWidget {
   #weatherNext = null
   #moon = null
   #coords = null
-  #boundUpdateCoords = null // Référence pour on/off dynamique
+  #boundUpdateCoords = null
+
+  #lastMinuteStr = ''
+  #lastWeatherCode = -1
+  #lastNextWeatherCode = -1
+  #lastMoonPhase = -1
+  #timePrecision = 0 // 0: heure, 1: 15min, 2: 5min
+  #moonDetail = false // true => 8 phases au lieu de 4
+  #coordsActive = false // true => coords visibles
 
   constructor () {
-    // État interne pour éviter les redraws inutiles si la valeur ne change pas visuellement
-    this.lastState = {
-      minuteStr: '',
-      weatherCode: -1,
-      nextWeatherCode: -1,
-      moonPhase: -1
-    }
-
-    // tableau mis à jour sur eventBus (TODO)
-    this.buffs = {
-      // BUFFS - Gameplay
-      timePrecision: 0, // précision de l'heure => 0: Heure, 1: 15min, 2: 5min
-      moonDetail: false, // true => active l'affichage des 8 phases au lieu de 4
-      coords: false // true => active l'affichage des coordonnées
-    }
-
-    // Pré-binding pour performance et désabonnement propre
-    this.#boundUpdateCoords = this.#updateCoords.bind(this)
-
     this.#initDOM()
     this.#bindEvents()
   }
 
+  /**
+   * Construit le DOM du widget et l'injecte dans #right-sidebar.
+   */
   #initDOM () {
     // 1. Création du conteneur principal
     this.#container = document.createElement('div')
     this.#container.id = 'env-overlay-root'
 
-    Object.assign(this.#container.style, {
-      position: 'relative', // MODIFIÉ : Plus d'absolute, suit le flux normal
-      // top et right SUPPRIMÉS
-      width: '100%', // MODIFIÉ : Prend toute la largeur de la colonne
-      order: UI_LAYOUT.ENVIRONMENT,
-      marginBottom: '10px', // AJOUT : Espace avec l'overlay suivant
-      backgroundColor: 'rgba(20, 20, 25, 0.9)',
-      border: '1px solid #444',
-      color: '#ffffff',
-      fontFamily: 'Segoe UI, Roboto, monospace',
-      fontSize: '14px',
-      borderRadius: '6px',
-      padding: '8px',
-      boxShadow: '0 2px 10px rgba(0,0,0,0.5)',
-      display: 'flex',
-      flexDirection: 'column',
-      gap: '6px',
-      userSelect: 'none'
-    })
-
     // 2. Injection du HTML Statique
-    this.#container.innerHTML = `
-      <div style="display:flex; justify-content:space-between; align-items:baseline; border-bottom:1px solid #555; padding-bottom:4px; margin-bottom:4px;">
-        <span id="env-day" style="font-size:1.4em; font-weight:bold; letter-spacing:1px;">DAY ?</span>
-        <span id="env-time" style="font-size:1.4em; font-weight:bold; letter-spacing:1px;">--:--</span>
-      </div>
+    const header = document.createElement('div')
+    header.className = 'env-header'
+    this.#day = document.createElement('span')
+    this.#day.className = 'day'
+    this.#time = document.createElement('span')
+    this.#time.className = 'time'
+    header.appendChild(this.#day)
+    header.appendChild(this.#time)
 
-      <div style="display:flex; justify-content:space-between; align-items:center; font-size: 24px;">
-        <div style="display:flex; gap:5px;">
-          <div id="env-weather-now" title="Weather" style="cursor:help;">[?]</div>
-          <div id="env-weather-next" title="Forecast" style="display:none;">[->?]</div>
-        </div>
-        <div id="env-moon" title="Moon Phase" style="cursor:help;">[M]</div>
-      </div>
+    const weatherRow = document.createElement('div')
+    weatherRow.className = 'weather-row'
+    const weatherGroup = document.createElement('div')
+    weatherGroup.className = 'weather-group'
+    this.#weatherNow = document.createElement('div')
+    this.#weatherNow.className = 'weather-now'
+    this.#weatherNow.title = 'Weather'
+    this.#weatherNext = document.createElement('div')
+    this.#weatherNext.className = 'weather-next'
+    this.#weatherNext.title = 'Forecast'
+    weatherGroup.appendChild(this.#weatherNow)
+    weatherGroup.appendChild(this.#weatherNext)
+    this.#moon = document.createElement('div')
+    this.#moon.className = 'moon'
+    this.#moon.title = 'Moon Phase'
+    // this.#moon.textContent = '[M]'
+    weatherRow.appendChild(weatherGroup)
+    weatherRow.appendChild(this.#moon)
 
-      <div id="env-coords" style="font-size:0.8em; color:#888; font-family:monospace; margin-top:2px;">
-        POS: -- | --
-      </div>
-    `
+    this.#coords = document.createElement('div')
+    this.#coords.className = 'coords'
+
+    this.#container.appendChild(header)
+    this.#container.appendChild(weatherRow)
+    this.#container.appendChild(this.#coords)
 
     const overlayPanel = document.getElementById('right-sidebar')
     if (overlayPanel) {
@@ -697,17 +740,11 @@ class EnvironmentWidget {
       console.error('EnvironmentWidget: #right-sidebar introuvable, fallback sur body')
       document.body.appendChild(this.#container)
     }
-
-    // 3. Mise en cache des références (Hydratation DOM)
-    this.#day = document.getElementById('env-day')
-    this.#time = document.getElementById('env-time')
-    this.#weatherNow = document.getElementById('env-weather-now')
-    this.#weatherNext = document.getElementById('env-weather-next')
-    this.#moon = document.getElementById('env-moon')
-    this.#coords = document.getElementById('env-coords')
   }
 
-  // Mise à jour atomique par type d'événement
+  /**
+   * Abonnement aux événements eventBus.
+   */
   #bindEvents () {
     // Clock -> Time & Day (mesure : 50µs, microtask inutile)
     this.updateClockEnvironment = this.updateClockEnvironment.bind(this)
@@ -728,26 +765,33 @@ class EnvironmentWidget {
     this.onTrinketChanged = this.onTrinketChanged.bind(this)
     eventBus.on('buff/trinket-changed', this.onTrinketChanged.bind(this))
 
-    // TODO: Future: player/move -> Coords
-    // eventBus.on('player/move', (pos) => this.#updateCoords(pos))
+    // player/move (attachement/détachement dynamique) -> Coords
+    this.updateCoords = this.updateCoords.bind(this)
   }
 
   /* =========================================
      UPDATES ATOMIQUES (Performance)
      ========================================= */
 
+  /**
+   * Initialisation complète à la première frame — appelle les trois handlers de mise à jour.
+   * @param {object} data - payload time/first-loop
+   */
   firstloopEnvironment (data) {
     this.updateClockEnvironment(data)
     this.updateEnvironment(data)
     this.updateTimeslot(data)
   }
 
-  // temps d'exécution mesuré à 0.05 ms
+  /**
+   * Met à jour l'heure affichée avec la précision courante (fuzzy time).
+   * Optimisé : ne touche au DOM que si la valeur change.
+   * Temps d'exécution mesuré à 0.05 ms
+   * @param {{hour: number, minute: number}} payload
+   */
   updateClockEnvironment ({hour, minute}) {
-    // 2. Update Time (Fréquent)
-    // Logique de "Fuzzy Time" (Simulée ici, à connecter aux Buffs plus tard)
-    // TODO: Vérifier buff 'clock_precision'
-    const precision = this.buffs.timePrecision // 0: Heure, 1: 15min, 2: 5min
+    // 2. Update Time (Fréquent) - Logique de "Fuzzy Time"
+    const precision = this.#timePrecision // 0: Heure, 1: 15min, 2: 5min
 
     let m = minute
     if (precision === 0) m = 0
@@ -757,39 +801,48 @@ class EnvironmentWidget {
     const timeStr = `${String(hour).padStart(2, '0')}:${String(m).padStart(2, '0')}`
 
     // Optim: On ne touche au DOM que si le texte change
-    if (this.lastState.minuteStr !== timeStr) {
+    if (this.#lastMinuteStr !== timeStr) {
       this.#time.textContent = timeStr
-      this.lastState.minuteStr = timeStr
+      this.#lastMinuteStr = timeStr
     }
   }
 
+  /**
+   * Met à jour le titre de l'heure avec le nom du créneau horaire.
+   * @param {{tslot: number}} payload
+   */
   updateTimeslot ({tslot}) {
     this.#time.title = TIMESLOT_NAMES[tslot]
   }
 
+  /**
+   * Met à jour le jour, la météo courante, la météo suivante et la lune.
+   * Optimisé : chaque section ne touche au DOM que si la valeur change.
+   * @param {{day: number, weather: number, nextWeather: number, moonPhase: number}} payload
+   */
   updateEnvironment ({day, weather, nextWeather, moonPhase}) {
     // 1. Day
     this.#day.textContent = `DAY ${day + 1}`
 
     // 2. Weather Now
-    if (this.lastState.weatherCode !== weather) {
+    if (this.#lastWeatherCode !== weather) {
       const wInfo = WEATHER_TYPE[weather] || {name: 'Unknown', icon: '?'}
 
       // MODIFICATION : Usage direct de l'icône
       this.#weatherNow.textContent = wInfo.icon
       this.#weatherNow.title = wInfo.name
 
-      this.lastState.weatherCode = weather
+      this.#lastWeatherCode = weather
     }
 
     // 3. Weather Next (Affiché seulement si artefact présent - point géré directment dans le handler d'eventBus)
-    if (this.lastState.nextWeatherCode !== nextWeather) {
+    if (this.#lastNextWeatherCode !== nextWeather) {
       const nwInfo = WEATHER_TYPE[nextWeather] || {name: '?', icon: '?'}
       // MODIFICATION : Petite flèche + Icône
       this.#weatherNext.textContent = `➞ ${nwInfo.icon}`
       this.#weatherNext.title = `Tomorrow: ${nwInfo.name}`
 
-      this.lastState.nextWeatherCode = nextWeather
+      this.#lastNextWeatherCode = nextWeather
     }
 
     // 4. Moon Phase (Délégué)
@@ -797,20 +850,25 @@ class EnvironmentWidget {
     this.#updateMoon(moonPhase)
   }
 
+  /**
+   * Met à jour l'affichage de la lune selon le niveau de détail courant.
+   * Appelé par updateEnvironment et #applyMoonDetail.
+   * @param {number} moonPhase
+   */
   #updateMoon (moonPhase) {
     let phaseObj = MOON_PHASE[moonPhase]
 
     // Logique "Fuzzy Moon" (4 phases vs 8 phases)
-    if (!this.buffs.moonDetail) {
+    if (!this.#moonDetail) {
       const phaseIndex = MOON_PHASE_BLURRED[moonPhase]
       phaseObj = MOON_PHASE[phaseIndex]
     }
 
     this.#moon.textContent = phaseObj.icon
-    this.#moon.title = phaseObj.name + (!this.buffs.moonDetail ? ' (Approx)' : '')
+    this.#moon.title = phaseObj.name + (!this.#moonDetail ? ' (Approx)' : '')
 
     // Mise à jour du cache pour le prochain appel via buff
-    this.lastState.moonPhase = moonPhase
+    this.#lastMoonPhase = moonPhase
   }
 
   /**
@@ -824,22 +882,41 @@ class EnvironmentWidget {
     if (changedKeys.has('displayCoords')) this.#applyCoords(buffManager.getBuff('displayCoords'))
   }
 
+  /**
+   * Affiche ou masque la météo du lendemain.
+   * @param {number|boolean} active
+   */
   #applyNextWeather (active) {
     this.#weatherNext.style.display = active ? 'block' : 'none'
   }
 
+  /**
+   * Active ou désactive l'affichage des 8 phases lunaires (vs 4 par défaut).
+   * Redessine immédiatement si une phase est en cache.
+   * @param {number|boolean} active
+   */
   #applyMoonDetail (active) {
-    this.buffs.moonDetail = active
+    this.#moonDetail = active
     // On utilise la valeur en cache pour redessiner avec la nouvelle précision
-    if (this.lastState.moonPhase !== -1) { this.#updateMoon(this.lastState.moonPhase) }
+    if (this.#lastMoonPhase !== -1) { this.#updateMoon(this.#lastMoonPhase) }
   }
 
-  #applyTimePrecision (lvl) { this.buffs.timePrecision = lvl }
+  /**
+   * Définit la précision d'affichage de l'heure.
+   * 0 = heure, 1 = 15min, 2 = 5min.
+   * @param {number} lvl
+   */
+  #applyTimePrecision (lvl) { this.#timePrecision = lvl }
 
+  /**
+   * Active ou désactive l'affichage des coordonnées.
+   * Gère l'abonnement dynamique à player/move pour économiser le CPU.
+   * @param {number|boolean} isActive
+   */
   #applyCoords (isActive) {
-    if (this.buffs.coords === isActive) return // Pas de changement
+    if (this.#coordsActive === isActive) return // Pas de changement
 
-    this.buffs.coords = isActive
+    this.#coordsActive = isActive
     this.#coords.style.display = isActive ? 'block' : 'none'
 
     if (isActive) {
@@ -851,11 +928,15 @@ class EnvironmentWidget {
     }
   }
 
-  #updateCoords ({x, y}) { // les coordonnées sont en tuiles (integer)
+  /**
+   * Met à jour l'affichage des coordonnées tuile du joueur.
+   * Bindée dans constructor — abonnée dynamiquement à player/move par #applyCoords.
+   * @param {{x: number, y: number}} payload — coordonnées en tuiles
+   */
+  updateCoords ({x, y}) { // les coordonnées sont en tuiles (integer)
     this.#coords.textContent = `X: ${x} | Y: ${y}`
   }
 }
-// Instanciation immédiate (Singleton autonome)
 export const environmentWidget = new EnvironmentWidget()
 
 /* ====================================================================================================
