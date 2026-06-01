@@ -4,7 +4,7 @@ import {eventBus, seededRNG} from './utils.mjs'
 import {gameCore} from './core.mjs'
 import {buffManager} from './buff.mjs'
 import {playerManager} from './player.mjs'
-import {WEATHER_TYPE, MOON_PHASE, MOON_PHASE_BLURRED, STATE, OVERLAYS, UI_LAYOUT, PATH_INVENTORY, PATH_CRAFT, PATH_TROPHY, PATH_HELP, PATH_NEW_WORLD, PATH_SAVE, PATH_RESTORE, PATH_DEBUG, SVG_ICON, PLAYER} from './constant.mjs'
+import {WEATHER_TYPE, MOON_PHASE, MOON_PHASE_BLURRED, STATE, OVERLAYS, UI_LAYOUT, PATH_INVENTORY, PATH_CRAFT, PATH_TROPHY, PATH_HELP, PATH_NEW_WORLD, PATH_SAVE, PATH_RESTORE, PATH_DEBUG, PATH_CANCEL, SVG_ICON, PLAYER} from './constant.mjs'
 
 /* ====================================================================================================
    STYLES POUR TOUS LES WIDGETS
@@ -89,6 +89,7 @@ widgetStyle.textContent = /* css */`
   color: #fff;
   border-radius: 4px;
   font-family: monospace;
+  flex: 1;
 }
 
 #creation-progress {
@@ -157,6 +158,37 @@ widgetStyle.textContent = /* css */`
   height: 18px;
   flex-shrink: 0;
   margin-right: 8px;
+}
+
+#creation-seed-container .seed-input-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+#creation-seed-container .seed-clear-btn {
+  flex-shrink: 0;
+  width: 26px;
+  height: 26px;
+  background-color: var(--ov-btn-bg);
+  border: 1px solid var(--ov-border-sub);
+  border-radius: 3px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+}
+#creation-seed-container .seed-clear-btn:hover {
+  background-color: #3a4a6b;
+}
+#creation-seed-container .seed-clear-icon {
+  width: 24px;
+  height: 24px;
+  color: #bdc3c7;
+}
+#creation-seed-container .seed-clear-btn:hover .seed-clear-icon {
+  color: var(--ov-text);
 }
 
 /* EnvironmentWidget */
@@ -448,6 +480,7 @@ class CreationDialogOverlay {
   #progressContainer = null
   #progressBar = null
   #progressTopic = null
+  #clearBtn = null
 
   constructor () {
     this.#initDOM()
@@ -479,6 +512,9 @@ class CreationDialogOverlay {
     const seedLabel = document.createElement('label')
     seedLabel.textContent = 'World Seed (1 - 99999):'
 
+    const inputRow = document.createElement('div')
+    inputRow.className = 'seed-input-row'
+
     const seedInput = document.createElement('input')
     seedInput.type = 'number'
     seedInput.min = '1'
@@ -488,8 +524,16 @@ class CreationDialogOverlay {
       if (this.value !== '' && this.value > 99999) this.value = (this.value / 10) | 0
     })
 
+    this.#clearBtn = document.createElement('button')
+    this.#clearBtn.type = 'button'
+    this.#clearBtn.className = 'seed-clear-btn'
+    this.#clearBtn.innerHTML = SVG_ICON(PATH_CANCEL, 'class="seed-clear-icon"')
+
+    inputRow.appendChild(seedInput)
+    inputRow.appendChild(this.#clearBtn)
+
     seedContainer.appendChild(seedLabel)
-    seedContainer.appendChild(seedInput)
+    seedContainer.appendChild(inputRow)
 
     // 5. Bargraph de progression — masqué par défaut
     const progressContainer = document.createElement('div')
@@ -556,14 +600,13 @@ class CreationDialogOverlay {
 
     // Écoute pour affichage/masquage
     this.open = this.open.bind(this)
-    eventBus.on('creation/open', () => {
-      this.open()
-    })
+    eventBus.on('creation/open', this.open)
 
     this.close = this.close.bind(this)
-    eventBus.on('creation/close', () => {
-      this.close()
-    })
+    eventBus.on('creation/close', this.close)
+
+    this.onClearClick = this.onClearClick.bind(this)
+    this.#clearBtn.addEventListener('click', this.onClearClick)
 
     // Affichage de la progression de la création du monde
     this.onProgress = this.onProgress.bind(this)
@@ -593,6 +636,15 @@ class CreationDialogOverlay {
    */
   close () {
     this.#container.style.display = 'none'
+  }
+
+  /**
+ * Vide le champ seed et redonne le focus à l'input.
+ * Bindée dans #bindEvents.
+ */
+  onClearClick () {
+    this.#seedInput.value = ''
+    this.#seedInput.focus()
   }
 
   /**
