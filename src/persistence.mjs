@@ -79,7 +79,7 @@ class SaveManager {
    */
   processSave () {
     // 1. Re-planification immédiate (Boucle infinie)
-    taskScheduler.enqueue('auto_save', 2000, this.processSave.bind(this), this.priority, this.capacity)
+    taskScheduler.enqueue('auto_save', 2000, this.processSave, this.priority, this.capacity)
 
     const batchPayload = []
 
