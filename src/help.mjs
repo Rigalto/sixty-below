@@ -1,7 +1,7 @@
 // help.mjs — HelpOverlay
 
 // src/help.mjs
-import {OVERLAYS} from './constant.mjs'
+import {OVERLAYS, PATH_CANCEL, PATH_NEXT, PATH_PREVIOUS, SVG_ICON} from './constant.mjs'
 import {eventBus} from './utils.mjs'
 import {database} from './database.mjs'
 import {createOverlayHeader} from './ui.mjs'
@@ -30,7 +30,7 @@ class HelpOverlay {
   constructor () {
     this.#buildDOM()
     this.#injectStyles()
-    this.#initEvents()
+    this.#bindEvents()
   }
 
   init (helpTopic) {
@@ -67,7 +67,8 @@ class HelpOverlay {
     this.#filterInput.placeholder = 'Search…'
     this.#filterInput.className = 'help-search-input'
 
-    const btnReset = this.#makeIconBtn('✕', 'Clear and return to categories')
+    const btnReset = this.#makeIconBtn(PATH_CANCEL, 'Clear and return to categories')
+
     btnReset.id = 'help-btn-reset'
 
     searchRow.appendChild(this.#filterInput)
@@ -91,8 +92,8 @@ class HelpOverlay {
 
     const navRow = document.createElement('div')
     navRow.className = 'help-nav-row'
-    this.#btnBack = this.#makeNavBtn('◀', 'Previous')
-    this.#btnForward = this.#makeNavBtn('▶', 'Next')
+    this.#btnBack = this.#makeNavBtn(PATH_PREVIOUS, 'Previous')
+    this.#btnForward = this.#makeNavBtn(PATH_NEXT, 'Next')
     navRow.appendChild(this.#btnBack)
     navRow.appendChild(this.#btnForward)
     this.#leftPane.appendChild(navRow)
@@ -123,16 +124,29 @@ class HelpOverlay {
 
   // ─── Helpers DOM ───────────────────────────────────────────────
 
-  #makeIconBtn (icon, title) {
+  /**
+   * Crée un bouton icône SVG générique pour la barre de filtrage et de navigation.
+   * @param {string} path  — chemin SVG (constante PATH_*)
+   * @param {string} title — tooltip
+   * @returns {HTMLButtonElement}
+   */
+  #makeIconBtn (path, title) {
     const btn = document.createElement('button')
-    btn.textContent = icon
+    btn.innerHTML = SVG_ICON(path, 'class="help-btn-icon"')
     btn.title = title
     btn.className = 'help-icon-btn'
     return btn
   }
 
-  #makeNavBtn (icon, title) {
-    const btn = this.#makeIconBtn(icon, title)
+  /**
+   * Crée un bouton de navigation (Previous / Next) — désactivé par défaut.
+   * Étend #makeIconBtn avec la classe help-nav-btn et l'état disabled.
+   * @param {string} path  — chemin SVG (constante PATH_*)
+   * @param {string} title — tooltip
+   * @returns {HTMLButtonElement}
+   */
+  #makeNavBtn (path, title) {
+    const btn = this.#makeIconBtn(path, title)
     btn.classList.add('help-nav-btn')
     btn.disabled = true
     return btn
@@ -140,6 +154,10 @@ class HelpOverlay {
 
   // ─── Styles globaux (hover, scrollbar, focus) ─────────────────
 
+  /**
+   * Injecte une balise <style> unique dans document.head.
+   * Idempotente — sans effet si 'help-styles' est déjà présent.
+   */
   #injectStyles () {
     if (document.getElementById('help-styles')) return
 
@@ -237,6 +255,8 @@ class HelpOverlay {
       opacity: 0.35;
       cursor: default;
     }
+
+    #ui-help-panel .help-icon-btn svg { width: 16px; height: 16px; }
 
     #ui-help-panel .help-category-select {
       width: 100%;
@@ -361,7 +381,7 @@ class HelpOverlay {
 
   // ─── Événements ───────────────────────────────────────────────
 
-  #initEvents () {
+  #bindEvents () {
     // Open / Close via eventBus
     eventBus.on('help/open', () => this.#onOpen())
     eventBus.on('help/close', () => { this.#container.style.display = 'none' })
