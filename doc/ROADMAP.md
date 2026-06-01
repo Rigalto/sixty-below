@@ -12,20 +12,19 @@
 - Sauvegarde de la position du joueur en database
 - brancher les vrais meubles à l'inventaire
 - brancher les vrais meubles au craft panel
-- position du joueur lors de la création
 - continuer la correction et l'ajout de fiches d'aide (`HELP`) et d'items (`ITEMS`)
-- Documentation avec E/S des eventBus (reste à faire : `core.mjs`, `ui.mjs` (reste seulement `EnvironmentWidget`), `utils.mjs` (TimeMmanager))
+- Documentation avec E/S des eventBus (reste à faire : `core.mjs`)
 
 ---
 
 ## Dette technique
 
 - Vérifier que la convention pour les variables privées est prise en compte partout :
-  - fait pour `inventory.mjs`, `craft.mjs`, `achievement.mjs`, `ui.mjs`
+  - fait pour `inventory.mjs`, `craft.mjs`, `help.mjs`, `achievement.mjs`, `ui.mjs`
 - Vérifier que les en-têtes des fonctions sont présents et à jour (prise en compte des modifications de conception) :
-  - fait pour `inventory.mjs`, `craft.mjs`, `achievement.mjs`, `ui.mjs`
+  - fait pour `inventory.mjs`, `craft.mjs`, `help.mjs`, `achievement.mjs`, `ui.mjs`
 - Remplacer les styles inline par des règles CSS injectées dans le DOM.
-  - fait pour `inventory.mjs`, `craft.mjs`, `achievement.mjs`, `ui.mjs`
+  - fait pour `inventory.mjs`, `craft.mjs`, `help.mjs`, `achievement.mjs`, `ui.mjs`
 
 ---
 
@@ -35,7 +34,6 @@
 - Les meubles sont mal positionnés en y dans les maisons anciennes
 
 ## À faire — Bugs connus
-- lors de la génération du monde, le player est mal positionné
 - bound bound processSave : double 'bind' pour cette fonction
 - Dans le control panel, le survol de l'heure doit donner la période du jour (dawn...)
 - Il n'y a pas assez de Cactus dans le monde => sans doute pas assez de SAND sur le sol souterrain.
@@ -48,7 +46,7 @@
 ## À faire — Amélioration
 
 - Mettre les bonnes icônes dans le titre des Overlays
-- Dans l'overlay de création d'un monde, ajouter, sous le champ d'introduction de la Seed, une ligne : 'Current World Seed: xxxxx', ou xxxxx est la seed du monde qui va être écrasé. On peut cliquer sur les xxxxx et la graine est alors copiée dans le champ `input`. Il faudra ajouter cela à la fiche d'aide (pas encore créée).
+- Remplacer toutes les icônes Unicode par des icônes SVG ou image png (météo, phases de la lune)
 - Remplacer le `new Uint8Array(256)` de `getChunkData` par un buffer statique réutilisable pré-alloué — quand la fonction sera à nouveau nécessaire (sauvegarde, génération). Si elle n'est pas utilisée : la supprimer (code mort).
 
 ---
@@ -223,7 +221,7 @@ La Sap corrode le Copper. Il doit donc être remplacer par du Gold.
 - `BiomesGenerator` — disposition horizontale des biomes, largeurs des mers
 - `BiomeNaturalizer` — substrats par biome/layer (Perlin + diffusion), frontières horizontales et verticales
 - `ClusterGenerator` — substrats, ores, gemmes, obsidian, topsoil (clusters)
-- `ClusterGenerator.initZoneRects` — pré-calcul des rectangles biome × layer
+- `ClusterGenerator.initZoneRects` — pré-calcul des rectangles biome x layer
 - `ClusterGenerator.addSubstratClusters` — clusters substrat avec intrusions inter-biomes
 - `ClusterGenerator.addOreClusters` — clusters ore/gem
 - `ClusterGenerator.addGemIntrusions` — gemmes hors biome/layer natif
@@ -244,8 +242,8 @@ La Sap corrode le Copper. Il doit donc être remplacer par du Gold.
 - `WorldCarver.digWaterPuddles` — flaques d'eau dans le fond des tunnels et cavernes
 - `WorldCarver.digSapLakes` — lacs de sève ouverts en profondeur, moitié inférieure du fond protégée et TileGuard (JUNGLE uniquemen)
 - `WorldCarver.digSapPockets` — poches des sève en grande profondeur, protégée et TileGuard (JUNGLE uniquemen)
-- `WorldCarver.digHearts` — placement 15 Life Cristals 2×2, under fallback caverns_top
-- `WorldCarver.digTriskels` — placement 3 Tryskels 2×2, 2 en caverns_top fallback caverns_bottom et 1 en caverns_bottom
+- `WorldCarver.digHearts` — placement 15 Life Cristals 2x2, under fallback caverns_top
+- `WorldCarver.digTriskels` — placement 3 Tryskels 2x2, 2 en caverns_top fallback caverns_bottom et 1 en caverns_bottom
 - `WorldCarver.digZigzagTunnels` — tunnels zigzag avec espacement minimal et évitement des lacs
 - `WorldCarver.digSurfaceTunnel` — galeries de surface avec évitement des lacs
 - `WorldCarver.digFossilVein` — Desert + premier et dernier biome, caverns_top avec migration en under/caverns_bottom, veine horizontale SHELL

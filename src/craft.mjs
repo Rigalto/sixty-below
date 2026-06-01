@@ -1,6 +1,6 @@
 // inventory.mjs — CraftOverlay
 
-import {OVERLAYS, PATH_HELP, SVG_ICON, PATH_WARNING} from './constant.mjs'
+import {OVERLAYS, PATH_HELP, PATH_WARNING, PATH_CANCEL, SVG_ICON} from './constant.mjs'
 import {eventBus} from './utils.mjs'
 import {createOverlayHeader} from './ui.mjs'
 import {database} from './database.mjs'
@@ -136,6 +136,10 @@ craftStyle.textContent = /* css */`
   align-items: center;
   justify-content: center;
   padding: 0;
+}
+#ui-craft-panel .cr-icon-btn svg {
+  width: 16px;
+  height: 16px;
 }
 
 #ui-craft-panel .cr-icon-btn:hover {
@@ -518,7 +522,7 @@ class CraftOverlay {
     this.#filterInput.placeholder = 'Search…'
     this.#filterInput.className = 'cr-filter-input'
 
-    this.#btnReset = this.#makeIconBtn('✕', 'Clear')
+    this.#btnReset = this.#buildIconBtn(PATH_CANCEL, 'Clear')
 
     searchRow.appendChild(this.#filterInput)
     searchRow.appendChild(this.#btnReset)
@@ -549,14 +553,14 @@ class CraftOverlay {
   }
 
   /**
-   * Crée un bouton icône générique pour la barre de filtrage.
-   * @param {string} icon    — caractère ou texte affiché
-   * @param {string} title   — tooltip
+   * Crée un bouton icône SVG pour la barre de filtrage.
+   * @param {string} path  — chemin SVG (constante PATH_*)
+   * @param {string} title — tooltip
    * @returns {HTMLButtonElement}
    */
-  #makeIconBtn (icon, title) {
+  #buildIconBtn (path, title) {
     const btn = document.createElement('button')
-    btn.textContent = icon
+    btn.innerHTML = SVG_ICON(path, 'class="icon-svg"')
     btn.title = title
     btn.className = 'cr-icon-btn'
     return btn
@@ -640,119 +644,28 @@ class CraftOverlay {
    */
   #bindEvents () {
     // Abonnement au Bus
-    eventBus.on('craft/open', () => {
-      this.#container.style.display = 'flex'
-      this.#filterInput.value = '' // non mémorisé — reset à chaque ouverture
-      this.#filterMode.style.display = ''
-      this.#filterValue.style.display = ''
-      this.#loadNearbyStations()
-      this.#buildAvailableMap()
-      this.#applyFilter()
-    })
+    this.onOpen = this.onOpen.bind(this)
+    eventBus.on('craft/open', this.onOpen)
 
-    eventBus.on('craft/close', () => {
-      this.#container.style.display = 'none'
-    })
+    this.onClose = this.onClose.bind(this)
+    eventBus.on('craft/close', this.onClose)
 
-    eventBus.on('craft/item', itemId => {
-      const item = ITEMS[itemId]
-      if (!item) return
-      this.#onDetailSlotClick(item.name)
-    })
+    this.onCraftItem = this.onCraftItem.bind(this)
+    eventBus.on('craft/item', this.onCraftItem)
 
     // ── Filtre texte ─────────────────────────────────────────────
-    this.#filterInput.addEventListener('input', () => {
-      const hasText = this.#filterInput.value.length > 0
-      this.#filterMode.style.display = hasText ? 'none' : ''
-      this.#filterValue.style.display = hasText ? 'none' : ''
-      this.#applyFilter()
-    })
-
-    this.#btnReset.addEventListener('click', () => {
-      this.#filterInput.value = ''
-      this.#filterMode.style.display = ''
-      this.#filterValue.style.display = ''
-      this.#applyFilter()
-      this.#filterInput.focus()
-    })
+    this.#filterInput.addEventListener('input', () => this.#onFilterInput())
+    this.#btnReset.addEventListener('click', () => this.#onResetClick())
+    this.#filterValue.addEventListener('change', () => this.#applyFilter())
 
     // ── Menus déroulants ─────────────────────────────────────────
-    this.#filterMode.addEventListener('change', () => {
-      this.#populateFilterValue()
-      this.#filterValue.value = this.#savedFilterValues[this.#filterMode.value]
-      this.#applyFilter()
-      database.setGameState('craftfiltermode', this.#filterMode.value)
-      this.#filterMode.blur()
-    })
+    this.#btnReset.addEventListener('click', () => this.#onResetClick())
+    this.#filterMode.addEventListener('change', () => this.#onFilterModeChange())
 
-    this.#filterValue.addEventListener('change', () => {
-      const mode = this.#filterMode.value
-      this.#savedFilterValues[mode] = this.#filterValue.value
-      this.#applyFilter()
-      database.setGameState(FILTER_KEY_MAP[mode], this.#filterValue.value)
-      this.#filterValue.blur()
-    })
     // ── Lancement du craft ─────────────────────────────────────────
-
-    this.#btnHelp.addEventListener('click', () => {
-      eventBus.emit('overlay/open-request', 'help')
-      if (this.#selectedRecipe !== null) {
-        eventBus.emit('help/topic', this.#selectedRecipe.result.item.help)
-      }
-    })
-
-    this.#craftCount.addEventListener('input', () => {
-      if (!this.#selectedRecipe) return
-      const max = parseInt(this.#craftCount.max, 10) || 1
-      let runs = parseInt(this.#craftCount.value, 10) || 1
-      if (runs < 1) runs = 1
-      if (runs > max) runs = max
-      this.#craftCount.value = String(runs)
-      this.#btnCraft.textContent = `Craft × ${runs * this.#selectedRecipe.result.count}`
-      this.#updateIngredientQtys()
-      this.#updateCraftButton()
-    })
-
-    this.#btnCraft.addEventListener('click', () => {
-      if (!this.#selectedRecipe || this.#btnCraft.disabled) return
-
-      const runs = parseInt(this.#craftCount.value, 10) || 1
-
-      // ── Consommer les ingrédients ─────────────────────────────
-      const containers = furnitureManager.getNearbyContainers()
-      for (const ing of this.#selectedRecipe.ingredients) {
-        // consommation depuis 'bag' et 'hotbar'
-        let remaining = inventoryManager.removeFromPlayer(ing.item.code, ing.count * runs)
-        if (remaining > 0) {
-          // consommation depuis containers dans le range
-          for (const furniture of containers) {
-            if (remaining === 0) break
-            remaining = inventoryManager.removeFromContainer(furniture.id, ing.item.code, remaining)
-          }
-          if (remaining > 0) {
-            console.error(`[CraftOverlay] ingrédient non consommé : ${remaining} × ${ing.item.code}`)
-          }
-        }
-      }
-
-      // ── Ajouter les résultats ─────────────────────────────────
-      inventoryManager.craftReceive(this.#buildCraftItems(runs))
-
-      // ── Sauvegarder et notifier ───────────────────────────────
-      inventoryManager.save()
-      eventBus.emit('craft/performed', {recipe: this.#selectedRecipe, runs})
-      eventBus.emit('inventory/static-buffs', inventoryManager.getStaticBuffs())
-      eventBus.emit('hotbar/changed', inventoryManager.hotbar)
-
-      // ── Rafraîchir l'UI ───────────────────────────────────────
-      this.#buildAvailableMap()
-      this.#updateCraftInput()
-      this.#updateCraftButton()
-      this.#updateIngredientQtys()
-
-      // ── Prévenir le joueur ────────────────────────────────────
-      window.alert(`Crafted: ${runs * this.#selectedRecipe.result.count} x ${this.#selectedRecipe.result.item.name}`)
-    })
+    this.#btnHelp.addEventListener('click', () => this.#onHelpClick())
+    this.#craftCount.addEventListener('input', () => this.#onCraftCountInput())
+    this.#btnCraft.addEventListener('click', () => this.#onCraftClick())
   }
 
   /**
@@ -846,7 +759,7 @@ class CraftOverlay {
     this.#updateCraftInput()
     this.#updateCraftButton()
     const runs = parseInt(this.#craftCount.value, 10) || 1
-    this.#btnCraft.textContent = `Craft × ${runs * recipe.result.count}`
+    this.#btnCraft.textContent = `Craft x ${runs * recipe.result.count}`
   }
 
   /**
@@ -932,7 +845,7 @@ class CraftOverlay {
     if (recipe.result.count > 1) {
       const qty = document.createElement('div')
       qty.className = 'cr-detail-qty'
-      qty.textContent = `× ${recipe.result.count}`
+      qty.textContent = `x ${recipe.result.count}`
       row.appendChild(qty)
     }
 
@@ -964,7 +877,7 @@ class CraftOverlay {
         if (ret.count > 1) {
           const retQty = document.createElement('div')
           retQty.className = 'cr-detail-qty'
-          retQty.textContent = `× ${ret.count}`
+          retQty.textContent = `x ${ret.count}`
           retRow.appendChild(retQty)
         }
         section.appendChild(retRow)
@@ -1182,6 +1095,159 @@ class CraftOverlay {
       if ((this.#availableMap[ing.item.code] ?? 0) < ing.count) return false
     }
     return true
+  }
+
+  // ///////////////// //
+  // HANDLERS EVENTBUS //
+  // ///////////////// //
+
+  /**
+   * Ouvre le panel et reconstruit la disponibilité des ingrédients.
+   * Bindée dans #bindEvents.
+   */
+  onOpen () {
+    this.#container.style.display = 'flex'
+    this.#filterInput.value = '' // non mémorisé — reset à chaque ouverture
+    this.#filterMode.style.display = ''
+    this.#filterValue.style.display = ''
+    this.#loadNearbyStations()
+    this.#buildAvailableMap()
+    this.#applyFilter()
+  }
+
+  /**
+   * Ferme le panel.
+   * Bindée dans #bindEvents.
+   */
+  onClose () {
+    this.#container.style.display = 'none'
+  }
+
+  /**
+   * Navigue vers la recette d'un item.
+   * Bindée dans #bindEvents — écoute 'craft/item'.
+   * @param {string} itemId
+   */
+  onCraftItem (itemId) {
+    const item = ITEMS[itemId]
+    if (!item) return
+    this.#onDetailSlotClick(item.name)
+  }
+
+  // ////////////////// //
+  // HANDLERS EVENT DOM //
+  // ////////////////// //
+
+  /**
+   * Affiche/masque les selects selon la présence de texte et réapplique le filtre.
+   */
+  #onFilterInput (onFilterInput) {
+    const hasText = this.#filterInput.value.length > 0
+    this.#filterMode.style.display = hasText ? 'none' : ''
+    this.#filterValue.style.display = hasText ? 'none' : ''
+    this.#applyFilter()
+  }
+
+  /**
+   * Vide le filtre texte, réaffiche les selects et redonne le focus à l'input.
+   */
+  #onResetClick () {
+    this.#filterInput.value = ''
+    this.#filterMode.style.display = ''
+    this.#filterValue.style.display = ''
+    this.#applyFilter()
+    this.#filterInput.focus()
+  }
+
+  /**
+   * Repeuple #filterValue selon le nouveau mode, restaure la valeur mémorisée et persiste.
+   */
+  #onFilterModeChange () {
+    this.#populateFilterValue()
+    this.#filterValue.value = this.#savedFilterValues[this.#filterMode.value]
+    this.#applyFilter()
+    database.setGameState('craftfiltermode', this.#filterMode.value)
+    this.#filterMode.blur()
+  }
+
+  /**
+   * Mémorise la valeur du filtre courant, réapplique le filtre et persiste.
+   */
+  #onFilterValueChange () {
+    const mode = this.#filterMode.value
+    this.#savedFilterValues[mode] = this.#filterValue.value
+    this.#applyFilter()
+    database.setGameState(FILTER_KEY_MAP[mode], this.#filterValue.value)
+    this.#filterValue.blur()
+  }
+
+  /**
+   * Ouvre le Help Panel sur la fiche de la recette sélectionnée.
+   */
+  #onHelpClick () {
+    eventBus.emit('overlay/open-request', 'help')
+    if (this.#selectedRecipe !== null) {
+      eventBus.emit('help/topic', this.#selectedRecipe.result.item.help)
+    }
+  }
+
+  /**
+   * Valide et clamp le nombre de runs, met à jour le label du bouton Craft et les qtés.
+   */
+  #onCraftCountInput () {
+    if (!this.#selectedRecipe) return
+    const max = parseInt(this.#craftCount.max, 10) || 1
+    let runs = parseInt(this.#craftCount.value, 10) || 1
+    if (runs < 1) runs = 1
+    if (runs > max) runs = max
+    this.#craftCount.value = String(runs)
+    this.#btnCraft.textContent = `Craft x ${runs * this.#selectedRecipe.result.count}`
+    this.#updateIngredientQtys()
+    this.#updateCraftButton()
+  }
+
+  /**
+   * Délègue l'exécution du craft au nombre de runs saisi.
+   */
+  #onCraftClick () {
+    if (!this.#selectedRecipe || this.#btnCraft.disabled) return
+
+    const runs = parseInt(this.#craftCount.value, 10) || 1
+
+    // ── Consommer les ingrédients ─────────────────────────────
+    const containers = furnitureManager.getNearbyContainers()
+    for (const ing of this.#selectedRecipe.ingredients) {
+      // consommation depuis 'bag' et 'hotbar'
+      let remaining = inventoryManager.removeFromPlayer(ing.item.code, ing.count * runs)
+      if (remaining > 0) {
+        // consommation depuis containers dans le range
+        for (const furniture of containers) {
+          if (remaining === 0) break
+          remaining = inventoryManager.removeFromContainer(furniture.id, ing.item.code, remaining)
+        }
+        if (remaining > 0) {
+          console.error(`[CraftOverlay] ingrédient non consommé : ${remaining} x ${ing.item.code}`)
+        }
+      }
+    }
+
+    // ── Ajouter les résultats ─────────────────────────────────
+    inventoryManager.craftReceive(this.#buildCraftItems(runs))
+
+    // ── Sauvegarder et notifier ───────────────────────────────
+    inventoryManager.save()
+    eventBus.emit('craft/performed', {recipe: this.#selectedRecipe, runs})
+    eventBus.emit('inventory/static-buffs', inventoryManager.getStaticBuffs())
+    eventBus.emit('hotbar/changed', inventoryManager.hotbar)
+
+    // ── Rafraîchir l'UI ───────────────────────────────────────
+    this.#buildAvailableMap()
+    this.#updateCraftInput()
+    this.#updateCraftButton()
+    this.#updateIngredientQtys()
+
+    // ── Prévenir le joueur ────────────────────────────────────
+    window.alert(`Crafted: ${runs * this.#selectedRecipe.result.count} x ${this.#selectedRecipe.result.item.name}`)
   }
 }
 export const craftOverlay = new CraftOverlay()

@@ -7,7 +7,7 @@ import {WORLD_WIDTH, WORLD_HEIGHT, SEA_LEVEL, TOPSOIL_Y_SKY_SURFACE, TOPSOIL_Y_S
 // Re-exports pour generate.mjs
 export {WORLD_WIDTH, WORLD_HEIGHT, SEA_LEVEL, TOPSOIL_Y_SKY_SURFACE, TOPSOIL_Y_SURFACE_UNDER, TOPSOIL_Y_UNDER_CAVERNS, TOPSOIL_Y_CAVERNS_MID}
 
-// ── Table d'indirection biome × layer → code de tuile substrat ───────────────
+// ── Table d'indirection biome x layer → code de tuile substrat ───────────────
 // Source de vérité : DESIGN.md
 // Couches : 'sky' | 'surface' | 'under' | 'caverns'
 export const BIOME_TILE_MAP = {

@@ -1,26 +1,49 @@
 // help.mjs — HelpOverlay
 
-// src/help.mjs
 import {OVERLAYS, PATH_CANCEL, PATH_NEXT, PATH_PREVIOUS, SVG_ICON} from './constant.mjs'
 import {eventBus} from './utils.mjs'
 import {database} from './database.mjs'
 import {createOverlayHeader} from './ui.mjs'
 import {HELP, HELP_CATEGORIES} from '../assets/data/data-help.mjs'
 
-// Fiche affichée par défaut (à lire/écrire en DB — placeholder pour l'instant)
-const DEFAULT_TOPIC = 'Surface'
+/* ====================================================================================================
+   HELP OVERLAY
+   ====================================================================================================
+
+   Singleton : helpOverlay.
+
+   Overlay d'aide contextuelle — affiche les fiches du système d'aide en deux panneaux.
+   Panneau gauche : recherche textuelle, filtrage par catégorie, navigation historique, grille de topics.
+   Panneau droit : contenu de la fiche sélectionnée avec liens inter-fiches cliquables.
+
+   Responsabilités :
+     - Filtrage des entrées HELP par texte libre et/ou catégorie
+     - Navigation avec historique (retour/avance) et persistance du topic courant en DB
+     - Rendu du contenu HTML des fiches (Markdown pré-hydraté)
+     - Réception de liens de navigation entrants via eventBus ('help/topic')
+
+   Interactions :
+     database  — persistance du topic courant (clé 'helptopic')
+     eventBus  — écoute : help/open → onOpen
+               — écoute : help/close → onClose
+               — écoute : help/topic (topic: string) → navigateTo
+
+   Styles :
+     Injectés dynamiquement via #injectStyles() — idempotent, balise id='help-styles'.
+
+   ==================================================================================================== */
 
 class HelpOverlay {
-  #container
-  #leftPane
-  #filterInput
-  #categorySelect
-  #btnBack
-  #btnForward
-  #grid
-  #rightPane
-  #rightTitle
-  #currentTopicStored = DEFAULT_TOPIC
+  #container = null
+  #leftPane = null
+  #filterInput = null
+  #categorySelect = null
+  #btnBack = null
+  #btnForward = null
+  #grid = null
+  #rightPane = null
+  #rightTitle = null
+  #currentTopicStored = 'Getting Started'
 
   // Navigation
   #history = [] // Array<string> de titres
@@ -33,12 +56,19 @@ class HelpOverlay {
     this.#bindEvents()
   }
 
+  /**
+   * Mémorise la fiche à afficher à la prochaine ouverture.
+   * @param {string|null} helpTopic
+   */
   init (helpTopic) {
-    this.#currentTopicStored = helpTopic ?? DEFAULT_TOPIC
+    this.#currentTopicStored = helpTopic ?? 'Getting Started'
   }
 
   // ─── Construction DOM ──────────────────────────────────────────
 
+  /**
+   * Construit le conteneur principal et l'injecte dans document.body.
+   */
   #buildDOM () {
     this.#container = document.createElement('div')
     this.#container.id = 'ui-help-panel'
@@ -55,6 +85,10 @@ class HelpOverlay {
     document.body.appendChild(this.#container)
   }
 
+  /**
+   * Construit le panneau gauche : recherche, catégorie, navigation, grille.
+   * @returns {HTMLElement}
+   */
   #buildLeftPane () {
     this.#leftPane = document.createElement('div')
     this.#leftPane.className = 'help-left'
@@ -67,7 +101,7 @@ class HelpOverlay {
     this.#filterInput.placeholder = 'Search…'
     this.#filterInput.className = 'help-search-input'
 
-    const btnReset = this.#makeIconBtn(PATH_CANCEL, 'Clear and return to categories')
+    const btnReset = this.#buildIconBtn(PATH_CANCEL, 'Clear and return to categories')
 
     btnReset.id = 'help-btn-reset'
 
@@ -92,8 +126,8 @@ class HelpOverlay {
 
     const navRow = document.createElement('div')
     navRow.className = 'help-nav-row'
-    this.#btnBack = this.#makeNavBtn(PATH_PREVIOUS, 'Previous')
-    this.#btnForward = this.#makeNavBtn(PATH_NEXT, 'Next')
+    this.#btnBack = this.#buildNavBtn(PATH_PREVIOUS, 'Previous')
+    this.#btnForward = this.#buildNavBtn(PATH_NEXT, 'Next')
     navRow.appendChild(this.#btnBack)
     navRow.appendChild(this.#btnForward)
     this.#leftPane.appendChild(navRow)
@@ -105,6 +139,10 @@ class HelpOverlay {
     return this.#leftPane
   }
 
+  /**
+   * Construit le panneau droit : titre et zone de contenu.
+   * @returns {HTMLElement}
+   */
   #buildRightPane () {
     const wrapper = document.createElement('div')
     wrapper.className = 'help-right'
@@ -125,14 +163,14 @@ class HelpOverlay {
   // ─── Helpers DOM ───────────────────────────────────────────────
 
   /**
-   * Crée un bouton icône SVG générique pour la barre de filtrage et de navigation.
+   * Crée un bouton icône SVG générique.
    * @param {string} path  — chemin SVG (constante PATH_*)
    * @param {string} title — tooltip
    * @returns {HTMLButtonElement}
    */
-  #makeIconBtn (path, title) {
+  #buildIconBtn (path, title) {
     const btn = document.createElement('button')
-    btn.innerHTML = SVG_ICON(path, 'class="help-btn-icon"')
+    btn.innerHTML = SVG_ICON(path, 'class="icon-svg"')
     btn.title = title
     btn.className = 'help-icon-btn'
     return btn
@@ -140,13 +178,12 @@ class HelpOverlay {
 
   /**
    * Crée un bouton de navigation (Previous / Next) — désactivé par défaut.
-   * Étend #makeIconBtn avec la classe help-nav-btn et l'état disabled.
    * @param {string} path  — chemin SVG (constante PATH_*)
    * @param {string} title — tooltip
    * @returns {HTMLButtonElement}
    */
-  #makeNavBtn (path, title) {
-    const btn = this.#makeIconBtn(path, title)
+  #buildNavBtn (path, title) {
+    const btn = this.#buildIconBtn(path, title)
     btn.classList.add('help-nav-btn')
     btn.disabled = true
     return btn
@@ -381,10 +418,16 @@ class HelpOverlay {
 
   // ─── Événements ───────────────────────────────────────────────
 
+  /**
+   * Lie les handlers DOM et eventBus.
+   */
   #bindEvents () {
     // Open / Close via eventBus
-    eventBus.on('help/open', () => this.#onOpen())
-    eventBus.on('help/close', () => { this.#container.style.display = 'none' })
+    this.onOpen = this.onOpen.bind(this)
+    eventBus.on('help/open', this.onOpen)
+
+    this.onClose = this.onClose.bind(this)
+    eventBus.on('help/close', this.onClose)
 
     // Filtre texte — input live
     this.#filterInput.addEventListener('input', () => this.#applyFilter())
@@ -410,16 +453,18 @@ class HelpOverlay {
       const target = e.target.closest('[data-nav]')
       if (!target) return
       const topic = target.dataset.nav
-      this.#navigateTo(topic)
+      this.navigateTo(topic)
     })
 
-    eventBus.on('help/topic', (topic) => {
-      this.#navigateTo(topic)
-    })
+    this.navigateTo = this.navigateTo.bind(this)
+    eventBus.on('help/topic', this.navigateTo)
   }
 
   // ─── Logique filtre ───────────────────────────────────────────
 
+  /**
+   * Filtre la grille selon le texte saisi et/ou la catégorie sélectionnée.
+   */
   #applyFilter () {
     const text = this.#filterInput.value.trim().toLowerCase()
     const isTextMode = text.length > 0
@@ -443,6 +488,10 @@ class HelpOverlay {
 
   // ─── Grille ───────────────────────────────────────────────────
 
+  /**
+   * Vide et reconstruit la grille à partir d'un prédicat de filtrage.
+   * @param {Function} predicate — (entry) => boolean
+   */
   #rebuildGrid (predicate) {
     // Vider la grille
     while (this.#grid.firstChild) {
@@ -463,7 +512,7 @@ class HelpOverlay {
       btn.className = 'help-topic-btn'
       if (entry.title === this.#currentTopic) btn.classList.add('active')
 
-      btn.addEventListener('click', () => this.#navigateTo(entry.title))
+      btn.addEventListener('click', () => this.navigateTo(entry.title))
       this.#grid.appendChild(btn)
     }
   }
@@ -471,14 +520,10 @@ class HelpOverlay {
   // ─── Navigation ───────────────────────────────────────────────
 
   /**
-   * Navigation externe (depuis un lien [[...]] dans une fiche).
+   * Navigation interne — ajoute le titre à l'historique et affiche la fiche.
    * @param {string} title
    */
   navigateTo (title) {
-    this.#navigateTo(title)
-  }
-
-  #navigateTo (title) {
     // Tronque le futur si on navigue depuis un point intermédiaire
     if (this.#historyIndex < this.#history.length - 1) {
       this.#history = this.#history.slice(0, this.#historyIndex + 1)
@@ -489,6 +534,10 @@ class HelpOverlay {
     this.#updateNavButtons()
   }
 
+  /**
+   * Navigue dans l'historique de delta positions (+1 suivant, -1 précédent).
+   * @param {number} delta
+   */
   #navigateHistory (delta) {
     const next = this.#historyIndex + delta
     if (next < 0 || next >= this.#history.length) return
@@ -497,6 +546,11 @@ class HelpOverlay {
     this.#updateNavButtons()
   }
 
+  /**
+   * Affiche la fiche correspondant au titre, met à jour la grille et le titre.
+   * Persiste le topic en DB.
+   * @param {string} title
+   */
   #showTopic (title) {
     this.#currentTopic = title
     this.#currentTopicStored = title
@@ -530,6 +584,9 @@ class HelpOverlay {
     this.#rightPane.scrollTop = 0
   }
 
+  /**
+   * Met à jour l'état disabled des boutons de navigation selon la position dans l'historique.
+   */
   #updateNavButtons () {
     this.#btnBack.disabled = this.#historyIndex <= 0
     this.#btnForward.disabled = this.#historyIndex >= this.#history.length - 1
@@ -537,7 +594,11 @@ class HelpOverlay {
 
   // ─── Ouverture ────────────────────────────────────────────────
 
-  #onOpen () {
+  /**
+   * Réinitialise l'historique, le filtre et affiche la fiche courante.
+   *  Bindée dans #bindEvents.
+   */
+  onOpen () {
     // Réinitialisation de l'historique
     this.#history = []
     this.#historyIndex = -1
@@ -550,8 +611,13 @@ class HelpOverlay {
     this.#container.style.display = 'flex'
 
     // Navigation vers la fiche courante
-    this.#navigateTo(this.#currentTopicStored)
+    this.navigateTo(this.#currentTopicStored)
   }
+
+  /**
+   * Ferme le panneau. Bindée dans #bindEvents.
+   */
+  onClose () { this.#container.style.display = 'none' }
 }
 
 export const helpOverlay = new HelpOverlay()

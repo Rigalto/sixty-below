@@ -4,8 +4,8 @@
 // WorldBuffer est le buffer temporaire utilisé UNIQUEMENT pendant la génération
 // d'un nouveau monde. Il n'est jamais actif pendant une session de jeu normale.
 //
-// Dimensions : 1024 × 512 tuiles — index = (y << 10) | x
-// Chunks     : 64 × 32 = 2048 chunks de 16 × 16 tuiles
+// Dimensions : 1024 x 512 tuiles — index = (y << 10) | x
+// Chunks     : 64 x 32 = 2048 chunks de 16 x 16 tuiles
 
 import {describe, assert} from './kernel.mjs'
 import {worldBuffer} from '../src/generate.mjs'

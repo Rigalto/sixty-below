@@ -1472,7 +1472,7 @@ class ClusterGenerator {
   }
 
   /**
- * Pré-calcule les rectangles biome × layer pour toutes les fonctions de placement.
+ * Pré-calcule les rectangles biome x layer pour toutes les fonctions de placement.
  * Chaque zone biome est aplatie en frontières Y moyennes, ce qui permet
  * à toutes les fonctions downstream de travailler avec de simples rectangles.
  *
@@ -1584,7 +1584,7 @@ class ClusterGenerator {
   }
 
   /**
-   * Parcourt tous les rectangles biome × layer et applique les clusters
+   * Parcourt tous les rectangles biome x layer et applique les clusters
    * de substrat définis dans CLUSTER_SCATTER_MAP.
    * La layer caverns est découpée en deux moitiés verticales (top/bottom).
    * Les frontières sont utilisées brutes — les débordements inter-zones
@@ -1622,7 +1622,7 @@ class ClusterGenerator {
   }
 
   /**
-   * Parcourt tous les rectangles biome × layer (under / caverns_top / caverns_bottom)
+   * Parcourt tous les rectangles biome x layer (under / caverns_top / caverns_bottom)
    * et applique les clusters ore/gem définis dans ORE_GEM_SCATTER_MAP.
    * Les ores écrasent le substrat — VOID/FOG/DEEPSEA/BASALT/LAVA seuls protégés.
    * Pas de clusters en surface (ores absents de cette layer).
@@ -1888,7 +1888,7 @@ class ClusterGenerator {
  * Variante de scatterClusters pour les tuiles TOPSOIL.
  * Les tailles sizeMin/sizeMax sont calculées dynamiquement via #getLinearSizes
  * après tirage du Y — pas de tailles fixes en paramètre.
- * count = max(0, round(surface × percent)) — pas de minimum forcé.
+ * count = max(0, round(surface x percent)) — pas de minimum forcé.
  *
  * @param {number} x0
  * @param {number} y0
@@ -1916,7 +1916,7 @@ class ClusterGenerator {
   }
 
   /**
- * Place les clusters de tuiles TOPSOIL par biome × layer.
+ * Place les clusters de tuiles TOPSOIL par biome x layer.
  * Appelée avant le creusement — les tunnels et cavernes creuseront ensuite dans ces tuiles.
  * Une passe post-creusement distincte (algorithme différent) recouvrira les parois
  * de cavernes et tunnels après leur formation.
@@ -2204,7 +2204,7 @@ class WorldCarver {
   #zoneRects
 
   /**
- * Initialise les rectangles de zones biome × layer pour WorldCarver.
+ * Initialise les rectangles de zones biome x layer pour WorldCarver.
  * Reçoit le résultat de clusterGenerator.initZoneRects() via generate().
  *
  * @param {Array<{biome, x0, x1, ySkySurface, ySurface, yUnder, yCavernsMid, yCaverns, yHell}>} zoneRects
@@ -3474,8 +3474,8 @@ class WorldCarver {
   }
 
   /**
- * Place HEART_COUNT spots de Life Heart (2×2) dans la layer underground.
- * Chaque spot nécessite 16 tuiles solides (carré 4×4 centré sur le coin haut-gauche).
+ * Place HEART_COUNT spots de Life Heart (2x2) dans la layer underground.
+ * Chaque spot nécessite 16 tuiles solides (carré 4x4 centré sur le coin haut-gauche).
  * Fallback automatique en caverns_top si le quota n'est pas atteint en underground.
  * Les spots sont enregistrés dans #exclusions.
  *
@@ -3542,13 +3542,13 @@ class WorldCarver {
   }
 
   /**
- * Place 3 Triskels (2×2) : 2 en caverns_top, 1 en caverns_bottom.
+ * Place 3 Triskels (2x2) : 2 en caverns_top, 1 en caverns_bottom.
  * Les triskels non placés en caverns_top sont reportés en caverns_bottom.
- * Chaque spot nécessite 16 tuiles solides (carré 4×4 centré sur le coin haut-gauche).
+ * Chaque spot nécessite 16 tuiles solides (carré 4x4 centré sur le coin haut-gauche).
  * Les spots sont enregistrés dans #exclusions.
  *
  * @param {Int16Array} underCaverns - Altitudes haute caverne par colonne X
- * @returns {Array<{cx, cy}>} — cx, cy = coin haut-gauche du carré 2×2
+ * @returns {Array<{cx, cy}>} — cx, cy = coin haut-gauche du carré 2x2
  */
   digTriskels (underCaverns) {
     const MAX_ATTEMPTS = 100
@@ -4272,7 +4272,7 @@ class WorldCarver {
 
   /**
  * Creuse un Lost Temple en biome JUNGLE, layer caverns_top.
- * Caverne bruitée à fond plat (19×12) contenant un temple grec en OLYMPITE (15×10).
+ * Caverne bruitée à fond plat (19x12) contenant un temple grec en OLYMPITE (15x10).
  * Intérieur tapissé d'EMERALDWALL. Une seule par monde.
  * Prérequis : initZoneRects(), initExclusions().
  *
@@ -4372,7 +4372,7 @@ class WorldCarver {
 
   /**
  * Creuse une Ancient House en biome DESERT, layer caverns_bottom.
- * Caverne bruitée à fond plat autour de la structure (28×18).
+ * Caverne bruitée à fond plat autour de la structure (28x18).
  * Sol aplani sur 22 tuiles de large.
  * Prérequis : initZoneRects(), initExclusions().
  *
@@ -5561,7 +5561,7 @@ class WorldCarver {
 
   /**
  * Creuse un Graveyard en caverns_bottom, tous biomes.
- * Rectangle d'exclusion : 14×14, cx/cy = coin haut-gauche.
+ * Rectangle d'exclusion : 14x14, cx/cy = coin haut-gauche.
  * Marge X : 18 tuiles de chaque côté.
  *
  * @returns {number} index du coin haut-gauche du graveyard, ou -1 si échec
@@ -5927,7 +5927,7 @@ class WorldCarver {
  * Nombre variable : 1 garanti dans la première zone, probabilité décroissante de 20% par zone.
  *
  * @param {Int16Array} surfaceLine — Y de la première tuile solide par colonne
- * @returns {number[]} index des fourmilières (cy << 10) | cx, coin haut-gauche de la salle VOID 3×2
+ * @returns {number[]} index des fourmilières (cy << 10) | cx, coin haut-gauche de la salle VOID 3x2
  */
   reserveAnthills (surfaceLine) {
     const forestRects = []
@@ -6003,7 +6003,7 @@ class WorldCarver {
   /**
  * Dessine un Ant Hill et ajuste surfaceLine.
  *
- * @param {number}     idx         — index (cy << 10) | cx, coin haut-gauche de la salle VOID 3×2
+ * @param {number}     idx         — index (cy << 10) | cx, coin haut-gauche de la salle VOID 3x2
  */
   #buildOneAnthill (idx) {
     const cx = idx & 0x3FF
@@ -7579,7 +7579,7 @@ class PlantGenerator {
    * Place les spots de Velvetmoss dans les Moss Caves.
    * Tous les spots valides sont enregistrés en base — 80% sont présents au démarrage.
    * Un spot valide est une tuile GRASSMOSS avec VOID au-dessus, à gauche et à droite.
-   * La Velvetmoss occupe 1×1 tuile, s'interconnecte dans les 4 sens.
+   * La Velvetmoss occupe 1x1 tuile, s'interconnecte dans les 4 sens.
    * En temps réel, une mousse pousse tous les 2–3 jours in-game sur un spot libre.
    *
    * @param {Array<{kind, type, index, naturalCode, deleted}>} mossPlants — tuiles GRASSMOSS
@@ -7760,7 +7760,7 @@ class PlantGenerator {
    * Substrat : SAND avec VOID en y-1, y-2, y-3.
    * Nombre constant défini par CACTUS_COUNT.
    * Arrêt après MAX_ATTEMPTS tirages infructueux consécutifs.
-   * Anti-densité : rectangle d'exclusion 5×7 centré sur soilIndex.
+   * Anti-densité : rectangle d'exclusion 5x7 centré sur soilIndex.
    * Anti-coffre : test AABB avec chestRects.
    *
    * @param {Array<{x0, x1, ySkySurface, ySurface, yUnder, yCaverns, biome}>} zoneRects
@@ -7829,7 +7829,7 @@ class PlantGenerator {
 
       consecutiveFailures = 0
 
-      // Remplir le Set d'exclusion 5×7 centré sur soilIndex
+      // Remplir le Set d'exclusion 5x7 centré sur soilIndex
       for (let dx = -2; dx <= 2; dx++) {
         for (let dy = -3; dy <= 3; dy++) {
           guardedCactus.add(((y + dy) << 10) | (cx + dx))
@@ -7921,7 +7921,7 @@ class PlantGenerator {
 
   /**
    * Place les Oleanders dans la layer underground de tous les biomes.
-   * Substrat : STONE avec VOID sur les 2×3 tuiles occupées.
+   * Substrat : STONE avec VOID sur les 2x3 tuiles occupées.
    * Nombre constant défini par OLEANDER_COUNT.
    * Arrêt après MAX_ATTEMPTS tirages infructueux consécutifs.
    * Anti-coffre : test sur chestIndexes pour les deux tuiles support.
@@ -8006,7 +8006,7 @@ class PlantGenerator {
    * Place les Satan's Cube dans les caverns des biomes Forest et Desert.
    * Substrat : toute tuile TOPSOIL ou SUBSTRAT (VALID_SUBSTRATES).
    * Les trois tuiles support doivent être des substrats valides.
-   * VOID requis sur les 3×3 tuiles occupées (y-1 à y-3, x-1 à x+1).
+   * VOID requis sur les 3x3 tuiles occupées (y-1 à y-3, x-1 à x+1).
    * Nombre constant défini par SATANS_CUBE_COUNT.
    * Arrêt après MAX_ATTEMPTS tirages infructueux consécutifs.
    * Anti-coffre : test sur chestIndexes pour les trois tuiles support.
@@ -8052,7 +8052,7 @@ class PlantGenerator {
       if (!VALID_SUBSTRATES.has(worldBuffer.read(cx, y))) { consecutiveFailures++; continue }
       if (!VALID_SUBSTRATES.has(worldBuffer.read(cx + 1, y))) { consecutiveFailures++; continue }
 
-      // Vérifier VOID sur les 3×3 tuiles occupées (y-1 à y-3, x-1 à x+1)
+      // Vérifier VOID sur les 3x3 tuiles occupées (y-1 à y-3, x-1 à x+1)
       let voidOk = true
       for (let dx = -1; dx <= 1 && voidOk; dx++) {
         for (let dy = 1; dy <= 3 && voidOk; dy++) {
@@ -8093,7 +8093,7 @@ class PlantGenerator {
    * Place les Sneakthorns dans les caverns des biomes Forest et Jungle.
    * Substrat : toute tuile TOPSOIL ou SUBSTRAT (13 types, Set local).
    * Les trois tuiles support doivent être des substrats valides.
-   * VOID requis sur les 3×3 tuiles occupées (y-1 à y-3, x-1 à x+1).
+   * VOID requis sur les 3x3 tuiles occupées (y-1 à y-3, x-1 à x+1).
    * Anti-coffre sur 4 tuiles support (cx-2 à cx+1).
    * Nombre constant : SNEAKTHORN_COUNT.
    * Arrêt après MAX_ATTEMPTS échecs consécutifs.
@@ -8176,7 +8176,7 @@ class PlantGenerator {
    * Place les Cursedcrowns dans les caverns des biomes Jungle et Desert.
    * Substrat : toute tuile TOPSOIL ou SUBSTRAT (13 types, Set local).
    * Les trois tuiles support doivent être des substrats valides.
-   * VOID requis sur les 3×3 tuiles occupées (y-1 à y-3, x-1 à x+1).
+   * VOID requis sur les 3x3 tuiles occupées (y-1 à y-3, x-1 à x+1).
    * Anti-coffre sur 4 tuiles support (cx-2 à cx+1).
    * Nombre constant : CURSEDCROWN_COUNT.
    * Arrêt après MAX_ATTEMPTS échecs consécutifs.
@@ -8259,7 +8259,7 @@ class PlantGenerator {
    * Place les Abysshorns dans les caverns top de tous les biomes.
    * Substrat : toute tuile TOPSOIL ou SUBSTRAT (13 types, Set local).
    * Les deux tuiles support doivent être des substrats valides.
-   * VOID requis sur les 2×2 tuiles occupées (y-1, y-2, x et x+1).
+   * VOID requis sur les 2x2 tuiles occupées (y-1, y-2, x et x+1).
    * Anti-coffre sur 3 tuiles support (cx-1 à cx+1).
    * Nombre constant : ABYSSHORN_COUNT.
    * Arrêt après MAX_ATTEMPTS échecs consécutifs.
@@ -8301,7 +8301,7 @@ class PlantGenerator {
       if (!VALID_SUBSTRATES.has(worldBuffer.read(cx, y))) { consecutiveFailures++; continue }
       if (!VALID_SUBSTRATES.has(worldBuffer.read(cx + 1, y))) { consecutiveFailures++; continue }
 
-      // Vérifier VOID sur les 2×2 tuiles occupées
+      // Vérifier VOID sur les 2x2 tuiles occupées
       let voidOk = true
       for (let dx = 0; dx <= 1 && voidOk; dx++) {
         for (let dy = 1; dy <= 2 && voidOk; dy++) {

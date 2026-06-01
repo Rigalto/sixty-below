@@ -164,7 +164,7 @@ class GameCore {
       const placedImage = item.placed ?? item.placedLeft
       if (placedImage) {
         if (placedImage.sw / 16 > MAX_FURNITURE_W || placedImage.sh / 16 > MAX_FURNITURE_H) {
-          console.error(`[hydrateItems] ITEMS.${key} : dimensions ${placedImage.sw / 16}×${placedImage.sh / 16} dépassent MAX_FURNITURE_W/H (${MAX_FURNITURE_W}×${MAX_FURNITURE_H}) — mettre à jour les constantes`)
+          console.error(`[hydrateItems] ITEMS.${key} : dimensions ${placedImage.sw / 16}x${placedImage.sh / 16} dépassent MAX_FURNITURE_W/H (${MAX_FURNITURE_W}x${MAX_FURNITURE_H}) — mettre à jour les constantes`)
         }
       }
       count++

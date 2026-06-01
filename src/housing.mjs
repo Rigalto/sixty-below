@@ -40,7 +40,7 @@ import {MAX_FURNITURE_W, MAX_FURNITURE_H, ITEMS} from '../../assets/data/data.mj
      #byId          — Map<furnitureId, furniture> — lookup O(1)
      #byChunk       — Map<chunkKey, Set<furniture>> — lookup spatial (chunk haut-gauche uniquement)
      #displayed     — Set<furniture>           — furnitures dans les chunks preload Camera
-     #occupiedTiles — Set<tileIndex>           — tuiles couvertes par un furniture (rectangle w×h)
+     #occupiedTiles — Set<tileIndex>           — tuiles couvertes par un furniture (rectangle wxh)
      #floorTiles    — Set<tileIndex>           — tuiles directement sous un furniture
      #surfaceTops   — Set<tileIndex>           — ligne haute des furnitures surface:true
 
@@ -103,7 +103,7 @@ class FurnitureManager {
 
   /**
    * Inscrit un furniture dans les trois Sets d'occupation.
-   * - occupiedTiles : rectangle complet w×h
+   * - occupiedTiles : rectangle complet wxh
    * - floorTiles    : ligne directement sous le furniture (interdite au mining)
    * - surfaceTops   : ligne haute du furniture si surface:true (sol pour empilement)
    * @param {object} furniture
@@ -197,7 +197,7 @@ class FurnitureManager {
   getFurnitureById (furnitureId) { return this.#byId.get(furnitureId) }
 
   /**
-   * Tuile couverte par un furniture (rectangle w×h).
+   * Tuile couverte par un furniture (rectangle wxh).
    * @param {number} index
    * @returns {boolean}
    */
@@ -220,7 +220,7 @@ class FurnitureManager {
   /**
    * Retourne les furnitures de #displayed dans le rectangle centré joueur défini par buffId.
    * Centre joueur et range récupérés depuis playerManager et buffManager (commentés — DEBUG).
-   * Le range 24×20 tuiles couvrirait 9 this.#byChunk.get — moins efficace que le scan direct.
+   * Le range 24x20 tuiles couvrirait 9 this.#byChunk.get — moins efficace que le scan direct.
    * @param {string}   buffId  — identifiant du buff composite définissant le range
    * @param {Set<string>} stypes — sous-types acceptés
    * @returns {Array<object>}
@@ -246,7 +246,7 @@ class FurnitureManager {
 
   /**
    * Retourne les containers (chest, closet, cabinet...) dans le range 'range-chest' autour du joueur.
-   * Le range 24×20 tuiles couvrirait 9 this.#byChunk.get — moins efficace que le scan direct.
+   * Le range 24x20 tuiles couvrirait 9 this.#byChunk.get — moins efficace que le scan direct.
    * @returns {Array<object>}
    */
   getNearbyContainers () {
@@ -270,7 +270,7 @@ class FurnitureManager {
 
   /**
    * Retourne les crafting stations dans le range 'range-station' autour du joueur.
-   * Le range 24×20 tuiles couvrirait 9 this.#byChunk.get — moins efficace que le scan direct.
+   * Le range 24x20 tuiles couvrirait 9 this.#byChunk.get — moins efficace que le scan direct.
    * @returns {Array<object>}
    */
   getNearbyCraftingStations () {
@@ -296,7 +296,7 @@ class FurnitureManager {
    * Retourne le furniture situé sur la tuile cliquée, ou null si aucun.
    * Early-exit via #occupiedTiles (O(1)), puis recherche dans 1 à 4 chunks via #byChunk.
    * Le chunk courant seul est testé quand px >= MAX_FURNITURE_W-1 et py >= MAX_FURNITURE_H-1
-   * (~76% des cas pour des meubles de 3×3 max).
+   * (~76% des cas pour des meubles de 3x3 max).
    * @param {number} tileIndex — (y << 10) | x
    * @returns {object|null}
    */

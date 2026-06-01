@@ -191,16 +191,15 @@ eventBus.on('inventory/open', () => { this.show() })
 Cette section définit les événements officiels. Tout nouvel événement doit être enregistré ici avant implémentation.
 
 #### Time & Environment (`TimeManager`)
-| Event Name | Payload Structure | Description |
-| :--- | :--- | :--- |
-| `time/clock` | `{ day, hour, minute }` | Émis chaque minute-jeu. |
-| `time/every-5-minutes` | `{ day, hour, minute }` | Émis toutes les 5 minutes-jeu. |
-| `time/every-hour` | `{ day, hour, minute, isDay }` | Émis à chaque changement d'heure. |
-| `time/timeslot` | `{ tslot, isDay }` | Émis toutes les 3h (changement de slot). |
-| `time/daily` | `{ day, weather, nextWeather, moonPhase }` | Émis à minuit (changement de jour). |
-| `time/first-loop` | `{ day, hour, minute, tslot, weather, nextWeather, skyColor, moonPhase, isDay }` | Émis une seule fois au démarrage du rendu. |
-| `time/sky-color-changed`| `string` (Hex Color) | Émis uniquement si la couleur change. |
-
+| Dir. | Event Name | Payload Structure | Description |
+| :---: | :--- | :--- | :--- |
+| S | `time/clock` | `{ day, hour, minute }` | Émis chaque minute-jeu. |
+| S | `time/every-5-minutes` | `{ day, hour, minute }` | Émis toutes les 5 minutes-jeu. |
+| S | `time/every-hour` | `{ day, hour, minute, isDay }` | Émis à chaque changement d'heure. |
+| S | `time/timeslot` | `{ tslot, isDay }` | Émis toutes les 3h (changement de slot). |
+| S | `time/daily` | `{ day, weather, nextWeather, moonPhase }` | Émis à minuit (changement de jour). |
+| S | `time/first-loop` | `{ day, hour, minute, tslot, weather, nextWeather, skyColor, moonPhase, isDay }` | Émis une seule fois au démarrage du rendu. |
+| S | `time/sky-color-changed`| `string` (Hex Color) | Émis uniquement si la couleur change. |
 
 #### Core / Loop (`GameCOre`)
 *En prévision - incomplet*
@@ -876,7 +875,7 @@ const cy = chunkIndex >> 6           // Décodage Y chunk
 Buffer temporaire actif **uniquement pendant la génération d'un nouveau monde**.
 N'existe jamais en mémoire pendant une session de jeu normale.
 
-Le buffer est un `Uint8Array` plat 1024 × 512. La valeur `0` est interdite pour
+Le buffer est un `Uint8Array` plat 1024 x 512. La valeur `0` est interdite pour
 un node valide — elle signifie "tuile non initialisée" et facilite la détection
 d'erreurs de génération dans les tests.
 
@@ -927,21 +926,21 @@ puis appliqués en une passe dédiée.
 | Méthode | Signature | Description |
 |---|---|---|
 | `randomWalkCluster` | `(x0, y0, size, code): Array<{x, y, index, code}>` | Cluster 4-connexe par diffusion aléatoire (drunk-walk agrégé). Retourne la liste des tuiles sans modifier le monde. `index = (y << 10) | x`, prêt pour `worldBuffer.writeAt`. Ghost cells exclues (marge de 2 tuiles). |
-| `scatterClusters` | `(x0, y0, x1, y1, percent, code, sizeMin?, sizeMax?): Array<{x, y, index, code}>` | Distribue `max(5, round(surface × percent))` clusters `randomWalkCluster` à des positions aléatoires dans le rectangle. `sizeMin` défaut 5, `sizeMax` défaut 8. Sans effet de bord. |
+| `scatterClusters` | `(x0, y0, x1, y1, percent, code, sizeMin?, sizeMax?): Array<{x, y, index, code}>` | Distribue `max(5, round(surface x percent))` clusters `randomWalkCluster` à des positions aléatoires dans le rectangle. `sizeMin` défaut 5, `sizeMax` défaut 8. Sans effet de bord. |
 | `applyTiles` | `(tiles: Array<{x, y, index, code}>): void` | Écrit les tuiles dans `worldBuffer` via `writeAt`. Ignore les tuiles hors bornes et protège `FOG`, `DEEPSEA`, `BASALT`, `LAVA`, `SKY`, `VOID` contre l'écrasement. — à appeler avant le creusement. |
-| `initZoneRects(biomesDescription, skySurface, surfaceUnder, underCaverns): Array<{biome, x0, x1, ySkySurface, ySurface, yUnder, yCavernsMid, yCaverns, yHell}>` | Initialise `this.zoneRects`. Pré-calcule les rectangles biome × layer (Y moyens aplatis). À appeler une fois dans `generate()` avant tout placement. Renvoie le tableau calculé |
+| `initZoneRects(biomesDescription, skySurface, surfaceUnder, underCaverns): Array<{biome, x0, x1, ySkySurface, ySurface, yUnder, yCavernsMid, yCaverns, yHell}>` | Initialise `this.zoneRects`. Pré-calcule les rectangles biome x layer (Y moyens aplatis). À appeler une fois dans `generate()` avant tout placement. Renvoie le tableau calculé |
 | `getRectAt(x)` | `(x: number): zoneRect` | Retourne le rectangle de zone correspondant à la colonne X en parcourant `this.zoneRects`. Utilisable après apel à `initZoneRects`. |
 | `#getClusterSizes(biome, layer, code)` | Lit `sizeMin/sizeMax` depuis `ORE_GEM_SCATTER_MAP[biome][layer]` pour le code donné. Fallback `{6, 12}`. |
 | `#placeOneCluster(x0, x1, y0, y1, code, sizeMin, sizeMax)` | Place un unique cluster à position aléatoire dans le rectangle. |
 | `#getForeignZones(nativeBiome)` | Retourne les `zoneRects` dont le biome diffère de `nativeBiome`. |
 | `addSubstratClusters` | `(): void` | Parcourt `this.zoneRects` et applique les clusters définis dans `CLUSTER_SCATTER_MAP`. Appelle `scatterClusters` + `applyTiles`. Prérequis : `initZoneRects()`. |
-| `addOreClusters` | `(biomesDescription, surfaceUnder, underCaverns): void` | Parcourt les zones biome × layer (under / caverns_top / caverns_bottom) et applique les clusters ore/gem/rock définis dans `ORE_GEM_SCATTER_MAP`. Pas de clusters en surface. |
+| `addOreClusters` | `(biomesDescription, surfaceUnder, underCaverns): void` | Parcourt les zones biome x layer (under / caverns_top / caverns_bottom) et applique les clusters ore/gem/rock définis dans `ORE_GEM_SCATTER_MAP`. Pas de clusters en surface. |
 | `addOreIntrusions()` | Place des clusters de minerais dans des layers supérieures à leur habitat normal. SILVER en surface ; GOLD en surface et under ; COBALT en under ; PLATINUM en under et caverns_top. Position X libre sur toute la largeur du monde. Prérequis : `initZoneRects()`. |
 | `addGemIntrusions()` | Place des clusters de gemmes et d'obsidian hors de leur biome/layer natif. SAPPHIRE systématique en caverns_top ; TOPAZ/RUBY/EMERALD en biome étranger ; OBSIDIAN dans caverns (hors hell) ; bonus under. Prérequis : `initZoneRects()`. |
 | `projectAndFill` | `({cx, cy, code}: {cx: number, cy: number, code: number}): void` | Projette jusqu'à 100 lignes depuis le centre d'une géode. Pose `GEODE_TARGET_CLUSTER_COUNT` clusters (taille 4–8) de `code` sur la première tuile SUBSTRAT rencontrée. Ignore SKY et ETERNAL. Constantes dans `data-gen.mjs`. |
 | `#getLinearSizes(y, y0, y1)` | Interpolation linéaire des tailles TOPSOIL en fonction de Y. sizeMin [8→3], sizeMax [14→6]. Référence globale : TOPSOIL_Y_SKY_SURFACE → TOPSOIL_Y_CAVERNS_MID. |
-| `scatterTopsoilClusters(x0, y0, x1, y1, percent, code)` | Variante de scatterClusters pour TOPSOIL. Tailles calculées dynamiquement via #getLinearSizes après tirage du Y. count = max(0, round(surface × percent)). |
-| `addTopsoilClusters()` | Place les clusters TOPSOIL par biome × layer (surface / under / caverns_top) avant le creusement. Prérequis : initZoneRects(). |
+| `scatterTopsoilClusters(x0, y0, x1, y1, percent, code)` | Variante de scatterClusters pour TOPSOIL. Tailles calculées dynamiquement via #getLinearSizes après tirage du Y. count = max(0, round(surface x percent)). |
+| `addTopsoilClusters()` | Place les clusters TOPSOIL par biome x layer (surface / under / caverns_top) avant le creusement. Prérequis : initZoneRects(). |
 
 **Algorithme de randomWalkCluster :** frange maintenue en doublon `Set + Array` — déduplication O(1), tirage O(1) par swap-and-pop.
 
@@ -949,7 +948,7 @@ puis appliqués en une passe dédiée.
 
 ### Class `WorldCarver` (Singleton : `worldCarver`)
 
-Génère des tunnels, des cavernes et des mini-biomes. Maintient la liste des zones d'exclusion (`#exclusions`) et des rectangles de zones biome × layer (`#zoneRects`).
+Génère des tunnels, des cavernes et des mini-biomes. Maintient la liste des zones d'exclusion (`#exclusions`) et des rectangles de zones biome x layer (`#zoneRects`).
 
 ---
 
@@ -978,7 +977,7 @@ Génère des tunnels, des cavernes et des mini-biomes. Maintient la liste des zo
 | Méthode | Description |
 |---|---|
 | `digSmallCaverns(surfaceUnder): void` | Disperse `SMALL_CAVERNS_COUNT` petites cavernes (rayon 3–6) et `MEDIUM_CAVERNS_COUNT` moyennes (rayon 6–12) dans les zones underground et cavernes. Deux passes `applyTiles` séparées. |
-| `digSurfaceTunnel(skySurface, lakes): void` | Creuse 20–30 galeries obliques depuis la surface. Évite les lacs (marge `3 × LAKE_RADIUS_X_MAX`). Direction obligatoirement descendante. |
+| `digSurfaceTunnel(skySurface, lakes): void` | Creuse 20–30 galeries obliques depuis la surface. Évite les lacs (marge `3 x LAKE_RADIUS_X_MAX`). Direction obligatoirement descendante. |
 | `digZigzagTunnels(lakes): void` | Creuse 2–3 tunnels zigzag depuis la surface. Espacement minimal `ZIGZAG_MIN_DISTANCE`. Évite les lacs sur le premier tronçon. Au maximum une migration entre tunnels. |
 | `digUndergroundTunnels(surfaceUnder, underCaverns): void` | Creuse `UNDERGROUND_TUNNEL_COUNT` tunnels horizontaux avec un ou deux coudes en zone underground. Rayon 8–10, longueur 30–50, déviation 25°. |
 | `digCavernsTunnels(underCaverns): void` | Creuse `CAVERN_TUNNEL_COUNT` tunnels dans la zone cavernes. Borne basse : `WORLD_HEIGHT - 32`. Rayon 7–10, longueur 40–60, déviation 50°. |
@@ -1020,7 +1019,7 @@ Génère des tunnels, des cavernes et des mini-biomes. Maintient la liste des zo
 |---|---|
 | `digFossilVeins()` | Place `FOSSIL_VEIN_COUNT` veines SHELL horizontales (rayon 2, longueur 16–20, déviation 12°). Biomes : DESERT + premier et dernier rect. Layer : caverns_top (90%), une migration max en under ou caverns_bottom (10%, 50/50). Protection TileGuard par point de chemin (rayon + 2). |
 | `digSandPockets()` | Creuse 1–2 Sand Pockets elliptiques par zone DESERT (radiusX 4–8, radiusY 3–7). Layer : under (60%) ou caverns_top (40%). Intérieur SAND protégé par `tileGuard.addTiles()`. Périphérie inférieure (`y >= cy`) → SANDSTONE via `pocketSet`. |
-| `buildBeach(seaTiles, isLeft, surfaceLine): {beachRect: {x, y, w, h}}` | Crée une plage de sable en bordure de mer. Trouve la tuile SEA la plus proche de la terre sur la première ligne de mer, pose un rectangle bruité (`digNoisyRect`, `PERLIN_OFFSET_BEACH`) de 56×20 tuiles centré à `shoreX ± 12`. Filtre les tuiles SEA/VOID/SKY/WATER. Conserve DIRT/SANDSTONE, convertit SILT/HUMUS en SANDSTONE, pose SAND ailleurs (SANDSTONE sur les bords touchant un liquide/gaz, sauf si SKY au-dessus). Disperse 15–20 tuiles SHELL aléatoires. Retourne `beachRect` (dimensions nominales, `cy = SEA_LEVEL`, `radiusY = 10`) pour le spawn de SHELL et le futur cocotier. |
+| `buildBeach(seaTiles, isLeft, surfaceLine): {beachRect: {x, y, w, h}}` | Crée une plage de sable en bordure de mer. Trouve la tuile SEA la plus proche de la terre sur la première ligne de mer, pose un rectangle bruité (`digNoisyRect`, `PERLIN_OFFSET_BEACH`) de 56x20 tuiles centré à `shoreX ± 12`. Filtre les tuiles SEA/VOID/SKY/WATER. Conserve DIRT/SANDSTONE, convertit SILT/HUMUS en SANDSTONE, pose SAND ailleurs (SANDSTONE sur les bords touchant un liquide/gaz, sauf si SKY au-dessus). Disperse 15–20 tuiles SHELL aléatoires. Retourne `beachRect` (dimensions nominales, `cy = SEA_LEVEL`, `radiusY = 10`) pour le spawn de SHELL et le futur cocotier. |
 | `buildSeaFloorAndWalls(seaTiles): void` | Traite le fond et les bords d'une mer. Passe 1 : sous chaque tuile SEA dont le voisin inférieur est non-SEA, pose SAND en y+1, SAND/SANDSTONE aléatoire (50/50) en y+2, SANDSTONE en y+3 si y+2 est SAND. Convertit en SANDSTONE les SAND situés au-dessus d'une tuile SEA (bord supérieur). Passe 2 : convertit en SANDSTONE les SAND latéraux (gauche/droite) dont la tuile en dessous de la tuile SEA adjacente est SEA. Deux appels `applyTiles` avec `ETERNAL_EXCLUDED`. |
 
 ---
@@ -1029,14 +1028,14 @@ Génère des tunnels, des cavernes et des mini-biomes. Maintient la liste des zo
 
 | Méthode | Description |
 |---|---|
-| `digHearts(surfaceUnder, underCaverns)` | Place 15 spots Life Heart (2×2 VOID) en underground. Vérifie 16 tuiles solides. Fallback caverns_top. Ajoute le furniture 'Life Crystall'. Enregistre dans `#exclusions` + `tileGuard`. Retourne `Array<{cx, cy}>` (coin haut-gauche). |
-| `digTriskels(underCaverns)` | Place 3 Triskels (2×2) : 2 en caverns_top, 1 en caverns_bottom. Fallback caverns_bottom si quota non atteint.. Ajoute les furnitures 'Tryskel'. Enregistre dans `#exclusions` + `tileGuard`. Retourne `Array<{cx, cy}>`. |
+| `digHearts(surfaceUnder, underCaverns)` | Place 15 spots Life Heart (2x2 VOID) en underground. Vérifie 16 tuiles solides. Fallback caverns_top. Ajoute le furniture 'Life Crystall'. Enregistre dans `#exclusions` + `tileGuard`. Retourne `Array<{cx, cy}>` (coin haut-gauche). |
+| `digTriskels(underCaverns)` | Place 3 Triskels (2x2) : 2 en caverns_top, 1 en caverns_bottom. Fallback caverns_bottom si quota non atteint.. Ajoute les furnitures 'Tryskel'. Enregistre dans `#exclusions` + `tileGuard`. Retourne `Array<{cx, cy}>`. |
 | `digPyramid()` | Creuse une Pyramide en KHEPRITE par zone DESERT en layer under. Structure définie par `PYRAMID_WALL_INDEXES` et `PYRAMID_VOID_INDEXES`. Orientation aléatoire (50/50). Protection TileGuard sur les tuiles KHEPRITE. Retourne `{room1: number, room2: number}` — index coin haut-gauche de chaque salle. Prérequis : `initZoneRects()`, `initExclusions()`. |
 | `digRuinedCabin()` | Creuse une Ruined Cabin par monde en biome FOREST, layer under. Structure WOODWALL (murs) + STONEWALL (fond) avec 20% de dégradation aléatoire. Porte de 3 tuiles (gauche ou droite, 50/50). Mobilier : un meuble aléatoire (chairWood/tableWood/toiletWood) + chestAncient posés sur le sol. Retourne `{chestId: string, index: number}` — identifiant et position du coffre pour le système d'événements. Prérequis : `initZoneRects()`, `initExclusions()`. |
-| `digLostTemple()` | Creuse un Lost Temple en OLYMPITE + OLYMPITEWALL (colonnes) par monde en biome JUNGLE, layer caverns_top. Caverne bruitée à fond plat (19×12) via `digNoisyRect` + `#flattenCaveBottom(cx, templateW, flatY)`. Structure 15×10 définie par `TEMPLE_RUIN_WALL_INDEXES` et `TEMPLE_RUIN_COLUMNS_INDEXES`. Intérieur tapissé d'EMERALDWALL. `brokenDecomposer` posé sur le sol. Protection TileGuard sur les tuiles OLYMPITE, colonnes et intérieur. Retourne `{room: number}|null` — index coin haut-gauche de la salle intérieure. Prérequis : `initZoneRects()`, `initExclusions()`. |
-| `digAncientHouse()` | Creuse une Ancient House par monde en biome DESERT, layer caverns_bottom. Caverne bruitée à fond plat (28×18) via `digNoisyRect` + `#flattenCaveBottom`. Structure 18×11 en WOODWALL (murs + toit + étage) + GOLDWALL (fond intérieur). Porte INVISIBLE (3 tuiles, gauche ou droite, 50/50). Étage 6 tuiles (gauche ou droite). Dégradation : une tuile de mur + une tuile de toit retirées. Meubles : toit (`shuffleArray` + `surfaceFurnitures`), sol (idem), tableware sur 80% des surfaces. `brokenTransmutator` posé sur l'étage. Protection TileGuard sur la structure. Retourne `{x0, y0}|null`. Prérequis : `initZoneRects()`, `initExclusions()`. |
+| `digLostTemple()` | Creuse un Lost Temple en OLYMPITE + OLYMPITEWALL (colonnes) par monde en biome JUNGLE, layer caverns_top. Caverne bruitée à fond plat (19x12) via `digNoisyRect` + `#flattenCaveBottom(cx, templateW, flatY)`. Structure 15x10 définie par `TEMPLE_RUIN_WALL_INDEXES` et `TEMPLE_RUIN_COLUMNS_INDEXES`. Intérieur tapissé d'EMERALDWALL. `brokenDecomposer` posé sur le sol. Protection TileGuard sur les tuiles OLYMPITE, colonnes et intérieur. Retourne `{room: number}|null` — index coin haut-gauche de la salle intérieure. Prérequis : `initZoneRects()`, `initExclusions()`. |
+| `digAncientHouse()` | Creuse une Ancient House par monde en biome DESERT, layer caverns_bottom. Caverne bruitée à fond plat (28x18) via `digNoisyRect` + `#flattenCaveBottom`. Structure 18x11 en WOODWALL (murs + toit + étage) + GOLDWALL (fond intérieur). Porte INVISIBLE (3 tuiles, gauche ou droite, 50/50). Étage 6 tuiles (gauche ou droite). Dégradation : une tuile de mur + une tuile de toit retirées. Meubles : toit (`shuffleArray` + `surfaceFurnitures`), sol (idem), tableware sur 80% des surfaces. `brokenTransmutator` posé sur l'étage. Protection TileGuard sur la structure. Retourne `{x0, y0}|null`. Prérequis : `initZoneRects()`, `initExclusions()`. |
 | `digAbandonedMine()` | Creuse une Abandoned Mine par monde, tous biomes, layer caverns_bottom. Tunnel horizontal bruité (~40 tuiles, rayon 3, deltaAngle 8°). COBALT sur 75% des tuiles de plafond, SAPPHIRE sur 15% des tuiles de sol. Étais SANDSTONEWALL verticaux espacés de 7-10 tuiles. Protection TileGuard rayon 5 sur chaque point du path. Robuste aux deux sens de tracé (90° ou -90°). Retourne `{path}|null`. Prérequis : `initZoneRects()`, `initExclusions()`. |
-| `digGraveyards(): number[]` | Creuse 1 ou 2 Graveyards (50/50) en caverns_bottom, tous biomes. Chaque graveyard : rectangle 14×14 STONE/DIRT/VOID avec 2 ou 3 rangées de tunnels (50/50), alignement gauche/droite (50/50), tunnels de 9 ou 12 tuiles (tiré par tunnel). Sol de chaque rangée dimensionné sur max(tw_courant, tw_dessous)+2. Plafond dimensionné sur tw[0]+2. Tombes (furniture, tableau TOMBS) placées par slot de 3 tuiles dans chaque tunnel. Protection `tileGuard.addNoisyRect` adaptée à la hauteur (2 ou 3 rangées). Retourne un tableau des index coin haut-gauche de chaque graveyard placé. `#digOneGraveyard()` : creuse un graveyard individuel, retourne l'index coin haut-gauche ou -1 si échec après MAX_ATTEMPTS. |
+| `digGraveyards(): number[]` | Creuse 1 ou 2 Graveyards (50/50) en caverns_bottom, tous biomes. Chaque graveyard : rectangle 14x14 STONE/DIRT/VOID avec 2 ou 3 rangées de tunnels (50/50), alignement gauche/droite (50/50), tunnels de 9 ou 12 tuiles (tiré par tunnel). Sol de chaque rangée dimensionné sur max(tw_courant, tw_dessous)+2. Plafond dimensionné sur tw[0]+2. Tombes (furniture, tableau TOMBS) placées par slot de 3 tuiles dans chaque tunnel. Protection `tileGuard.addNoisyRect` adaptée à la hauteur (2 ou 3 rangées). Retourne un tableau des index coin haut-gauche de chaque graveyard placé. `#digOneGraveyard()` : creuse un graveyard individuel, retourne l'index coin haut-gauche ou -1 si échec après MAX_ATTEMPTS. |
 
 ---
 
@@ -1045,9 +1044,9 @@ Génère des tunnels, des cavernes et des mini-biomes. Maintient la liste des zo
 | Méthode | Description |
 |---|---|
 | `digAntlionPits(surfaceLine): number[]` | Creuse des Antlion Pits en surface des zones DESERT. Zones désertiques extraites, mélangées (`shuffleArray`), puis sélectionnées avec probabilité décroissante : 100% (1ère), 80% (2ème), 60% (3ème)… Retourne un tableau des index de spawn des antlions placés. |
-| `digAnthills(surfaceLine): number[]` | Creuse des Ant Hills coniques en surface des zones FOREST. Zones mélangées (`shuffleArray`), sélectionnées avec probabilité décroissante de 20% par zone (100% pour la première). Chaque fourmilière : cône ANTDIRT (9×7 tuiles) avec salle de spawn 3×2 VOID centrée, cx/cy positionné sur le point le plus bas des 3 colonnes centrales. Protection `tileGuard.addRect` sur le rectangle d'exclusion (marge 2). Met à jour `surfaceLine` et propage SKY au-dessus des nouvelles tuiles de surface. Retourne un tableau des index coin haut-gauche des salles de spawn (reine fourmi). `#digOneAnthill(rect, surfaceLine)` : creuse une fourmilière individuelle, retourne l'index coin haut-gauche de la salle 3×2 ou -1 si échec après MAX_ATTEMPTS. |
+| `digAnthills(surfaceLine): number[]` | Creuse des Ant Hills coniques en surface des zones FOREST. Zones mélangées (`shuffleArray`), sélectionnées avec probabilité décroissante de 20% par zone (100% pour la première). Chaque fourmilière : cône ANTDIRT (9x7 tuiles) avec salle de spawn 3x2 VOID centrée, cx/cy positionné sur le point le plus bas des 3 colonnes centrales. Protection `tileGuard.addRect` sur le rectangle d'exclusion (marge 2). Met à jour `surfaceLine` et propage SKY au-dessus des nouvelles tuiles de surface. Retourne un tableau des index coin haut-gauche des salles de spawn (reine fourmi). `#digOneAnthill(rect, surfaceLine)` : creuse une fourmilière individuelle, retourne l'index coin haut-gauche de la salle 3x2 ou -1 si échec après MAX_ATTEMPTS. |
 | `reserveTermiteMounds(surfaceLine): number[]` | Réserve les emplacements des Termite Mounds en surface des zones JUNGLE avant le creusement des tunnels. Zones mélangées (`shuffleArray`), probabilité décroissante de 20% par zone. Pose exclusions et `tileGuard.addNoisyRect` (`PERLIN_OFFSET_TERMITE`). Retourne un tableau d'index `(cy << 10) | cx` (coin haut-gauche de la chambre VOID, utilisable pour le spawn de la reine). `#reserveOneTermiteMound(rect, surfaceLine)` : réserve un emplacement individuel, retourne l'index ou -1 si échec. |
-| `buildTermiteMounds(reservations, surfaceLine): void` | Dessine les Termite Mounds après le creusement des tunnels. Pour chaque réservation : rectangle ANTDIRT 4×10 avec chambre VOID 2×2, ajustement de `surfaceLine` et propagation SKY au-dessus des nouvelles tuiles de surface. `#buildOneTermiteMound(idx, surfaceLine)` : dessine une termitière individuelle. |
+| `buildTermiteMounds(reservations, surfaceLine): void` | Dessine les Termite Mounds après le creusement des tunnels. Pour chaque réservation : rectangle ANTDIRT 4x10 avec chambre VOID 2x2, ajustement de `surfaceLine` et propagation SKY au-dessus des nouvelles tuiles de surface. `#buildOneTermiteMound(idx, surfaceLine)` : dessine une termitière individuelle. |
 
 ---
 
@@ -1234,7 +1233,7 @@ Toutes les refs DOM précalculées à l'init. Zéro parcours DOM en runtime.
 
 #### `DISPLAY_BUFFS`
 
-Tableau de définitions `{id, title, x, y}` — coordonnées dans `assets/sprites/buff_32_32.png` (tuiles 32×32px).
+Tableau de définitions `{id, title, x, y}` — coordonnées dans `assets/sprites/buff_32_32.png` (tuiles 32x32px).
 `id === 'armors'` : toujours visible, title dynamique mis à jour à la fermeture de l'inventaire.
 
 #### Comportement `#update` (chaque seconde)
@@ -1432,7 +1431,7 @@ Champs optionnels selon `stype` :
 
 | Méthode | Signature | Structure interne |
 | :--- | :--- | :--- |
-| `isTileOccupied` | `(index: number) → boolean` | `#occupiedTiles: Set<number>` — rectangle w×h complet |
+| `isTileOccupied` | `(index: number) → boolean` | `#occupiedTiles: Set<number>` — rectangle wxh complet |
 | `isFloorTile` | `(index: number) → boolean` | `#floorTiles: Set<number>` — ligne tileY+h |
 | `isSurfaceTop` | `(index: number) → boolean` | `#surfaceTops: Set<number>` — ligne tileY si `ITEMS[code].surface` |
 
@@ -1502,4 +1501,4 @@ Position interne : coin haut-gauche de la hitbox en pixels monde.
 | `getPosition`| `(): [number, number]`           | Centre de la hitbox.             |
 | `render`     | `(ctx): void`                    | Dessine la hitbox (placeholder red). ctx déjà transformé.   |
 
-Hitbox : `PLAYER.w × PLAYER.h` (cf. `constant.mjs`).
+Hitbox : `PLAYER.w x PLAYER.h` (cf. `constant.mjs`).

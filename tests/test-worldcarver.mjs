@@ -11,7 +11,7 @@ import {seededRNG} from '../src/utils.mjs'
 
 // ─── applyTiles — rectangle englobant ────────────────────────────────────────
 
-describe('WorldCarver — applyTiles() : tuile unique → rectangle 1×1', () => {
+describe('WorldCarver — applyTiles() : tuile unique → rectangle 1x1', () => {
   worldBuffer.init()
 
   const tiles = [{x: 10, y: 20, index: (20 << 10) | 10, code: NODES.VOID.code}]

@@ -93,11 +93,11 @@ Deux temporalités strictement séparées :
 
 ### 3.1 Structure du Monde
 
-* **Grille 2D :** 1024 × 512 tuiles. Taille tuile : 16 × 16 px. Dimensions fixes, non paramétrables.
+* **Grille 2D :** 1024 x 512 tuiles. Taille tuile : 16 x 16 px. Dimensions fixes, non paramétrables.
 * **Stockage Runtime :** `Uint8Array` unique (flat array). 1 octet par tuile = référence vers `NODES_LOOKUP`.
 * **Adressage :** `index = (y << 10) | x`. Jamais de clé string `"x_y"`.
 * **Optimisation "Ghost Cells" :** Les bords (x=0, x=1023, y=0, y=511) sont immuables → suppression du bounds checking dans les boucles critiques.
-* **Échelle :** 1 tuile = 50 cm. Monde ≈ 510 m de large × 254 m de haut.
+* **Échelle :** 1 tuile = 50 cm. Monde ≈ 510 m de large x 254 m de haut.
 
 **Classification des entités :**
 
@@ -317,7 +317,7 @@ sont indicatives — les densités exactes sont définies dans `ORE_GEM_SCATTER_
 ### 3.10 Physique (Exploration)
 
 * **Déplacement :** Flèches directionnelles + ZQSD. Caméra centrée joueur. Zoom possible.
-* **Hitbox joueur** : 20×36 px → 2×3 tuiles. Espace minimum praticable : 2 tuiles de large, 3 tuiles de haut.
+* **Hitbox joueur** : 20x36 px → 2x3 tuiles. Espace minimum praticable : 2 tuiles de large, 3 tuiles de haut.
 * **Collision :** AABB (Axis-Aligned Bounding Box) custom.
 * **Liquides :** Algorithme custom paramétrable (viscosité) pour Water, Honey, Sap. Automates cellulaires pour le sable.
 * **AI Faune :** Comportements simples (Suit, Fuit, Erre) sans pathfinding complexe en temps réel.
@@ -769,7 +769,7 @@ A la surface de la plage, se situe un Cocotier. Voir la description de cet arbre
 Découpage horizontal en 3 zones :
 
 * **Gauche :** Hotbar (verticale).
-* **Centre :** Monde (empilement de `<canvas>`). Dimensions : 1024 × 768 px (4 chunks × 3 chunks).
+* **Centre :** Monde (empilement de `<canvas>`). Dimensions : 1024 x 768 px (4 chunks x 3 chunks).
 * **Droite :** Widgets empilés.
   * Boutons d'action : Inventaire, Artisanat, Aide, Zoom, Sons, Nouveau Monde.
   * Environnement : Jour / Heure / Météo / Phase de Lune / Position.
@@ -867,7 +867,7 @@ Le bonus de complétude suit donc la même structure 5+2+1 = 8 pts.
 
 #### Points maximum
 
-`(nb_membres × 8) + 8` par catégorie. Total global calculé depuis la constante au démarrage.
+`(nb_membres x 8) + 8` par catégorie. Total global calculé depuis la constante au démarrage.
 
 #### Overlay
 
@@ -923,7 +923,7 @@ L'item est classé dans la catégorie correspondant à sa méthode d'obtention l
 │   ├── world.mjs            # Layer 4 : ChunkManager, PhysicsSystem, LiquidSimulator
 │   ├── render.mjs           # Layer 4 : WorldRenderer, Camera, SkyRenderer, LightRenderer
 │   ├── generate.mjs         # Layer 4 : Proc-Gen (Dynamic Import)
-│   │                        #   WorldBuffer : TypedArray 1024×512, API read/write (x,y) et (index)
+│   │                        #   WorldBuffer : TypedArray 1024x512, API read/write (x,y) et (index)
 │   │                        #   Algorithmes : Biomes, Ores, Gems, Plants, Hives, Chests, CobWebs…
 │   │                        #   WorldGenerator : orchestration complète
 │   ├── player.mjs           # Layer 4 : PlayerManager, LifeManager

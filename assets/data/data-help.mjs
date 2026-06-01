@@ -915,9 +915,9 @@ The Lost Temple is an ancient Greek-style structure buried deep in the [[Jungle]
 
 * The Minotaur attacks on sight — the chamber cannot be safely entered until it is defeated
 * Three waves :
-  * Wave 1 : 4 × [[monster:harpy]]
-  * Wave 2 : 4 × [[monster:cyclops]]
-  * Wave 3 : 2 × [[monster:harpy]], 2 × [[monster:cyclops]], 1 × [[monster:minotaur]] (boss)
+  * Wave 1 : 4 x [[monster:harpy]]
+  * Wave 2 : 4 x [[monster:cyclops]]
+  * Wave 3 : 2 x [[monster:harpy]], 2 x [[monster:cyclops]], 1 x [[monster:minotaur]] (boss)
 * The Minotaur drops [[item:decomposerPart]] on defeat
 
 **The Decomposer** ⏳
@@ -2793,7 +2793,7 @@ Each slot shows the result item of one recipe.
 
 Click any slot to see its full recipe on the right.
 
-**Result** — the item produced. A quantity _× N_ appears only when the recipe produces more than one item per run.
+**Result** — the item produced. A quantity _x N_ appears only when the recipe produces more than one item per run.
 If the recipe also **returns** items (containers, empty vessels…), they appear below the result.
 
 **Crafting Station** — the Crafting Station required.
@@ -2816,7 +2816,7 @@ At the bottom right of the panel:
 
 * **? button** — opens the [[Help Panel]]. If a recipe is selected, navigates directly to the help topic of the result item. Otherwise opens the Help Panel on its default page.
 * **Runs** — number of times to execute the recipe. The range _(1 – N)_ shows the maximum possible given your current stock. The field is locked if no ingredients are available.
-* **Craft × N** — the button shows the total number of items produced _(runs × yield)_. It turns green and becomes clickable only when all ingredients are available, the station is nearby, and the bag has room for the result.
+* **Craft x N** — the button shows the total number of items produced _(runs x yield)_. It turns green and becomes clickable only when all ingredients are available, the station is nearby, and the bag has room for the result.
 
 After a successful craft, the ingredient counts and grid colours update automatically.
 

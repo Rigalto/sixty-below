@@ -173,7 +173,7 @@ describe('MicroTasker — dequeue() : supprime toutes les occurrences', () => {
 
   assert('taskA est totalement absente de la file', mt.taskQueue.every(t => t.fn !== taskA))
   assert('taskB reste dans la file', mt.taskQueue.some(t => t.fn === taskB))
-  assert('queueSize est 1 après suppression de taskA (×2)', mt.queueSize === 1)
+  assert('queueSize est 1 après suppression de taskA (x2)', mt.queueSize === 1)
 })
 
 describe('MicroTasker — dequeue() : aucune erreur si la fonction est absente', () => {
