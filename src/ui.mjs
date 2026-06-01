@@ -318,14 +318,14 @@ class MenuBarWidget {
   #btnSnapshot = null // bouton snapshot debug (meta)
 
   constructor () {
-    this.#initDOM()
+    this.#buildDOM()
     this.#bindEvents()
   }
 
   /**
    * Construit le DOM du conteneur et des boutons, et l'injecte dans #right-sidebar.
    */
-  #initDOM () {
+  #buildDOM () {
     // 1. Conteneur Principal
     this.#container = document.createElement('div')
     this.#container.id = 'menu-bar-root'
@@ -483,7 +483,7 @@ class CreationDialogOverlay {
   #clearBtn = null
 
   constructor () {
-    this.#initDOM()
+    this.#buildDOM()
     this.#bindEvents()
 
     this.currentSeed = 1234
@@ -492,7 +492,7 @@ class CreationDialogOverlay {
   /**
    * Construit le DOM du dialog et l'injecte dans document.body.
    */
-  #initDOM () {
+  #buildDOM () {
     // 1. Conteneur Modal (Centré)
     this.#container = document.createElement('div')
     this.#container.id = 'creation-dialog'
@@ -747,14 +747,14 @@ class EnvironmentWidget {
   #coordsActive = false // true => coords visibles
 
   constructor () {
-    this.#initDOM()
+    this.#buildDOM()
     this.#bindEvents()
   }
 
   /**
    * Construit le DOM du widget et l'injecte dans #right-sidebar.
    */
-  #initDOM () {
+  #buildDOM () {
     // 1. Création du conteneur principal
     this.#container = document.createElement('div')
     this.#container.id = 'env-overlay-root'
@@ -1055,14 +1055,14 @@ class TileHoverWidget {
   #spanDetail = null // span plante / furniture sous la souris
 
   constructor () {
-    this.#initDOM()
+    this.#buildDOM()
     this.#bindEvents()
   }
 
   /**
    * Construit le DOM du widget et l'injecte dans #right-sidebar.
    */
-  #initDOM () {
+  #buildDOM () {
     const container = document.createElement('div')
     container.id = 'tile-hover-root'
     this.#spanTile = document.createElement('span')

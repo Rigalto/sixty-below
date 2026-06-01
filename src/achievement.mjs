@@ -330,7 +330,7 @@ class AchievementOverlay {
     this.#container = document.createElement('div')
     this.#container.id = 'ui-achievement-panel'
     this.#container.appendChild(createOverlayHeader('🏆 Achievements [U]', 'achievement'))
-    this.#initDOM()
+    this.#buildDOM()
     document.body.appendChild(this.#container)
     this.bindEvents()
   }
@@ -338,7 +338,7 @@ class AchievementOverlay {
   /**
    * Construit l'arborescence DOM du panel.
    */
-  #initDOM () {
+  #buildDOM () {
     const content = document.createElement('div')
     content.className = 'ach-content'
 

@@ -438,7 +438,7 @@ class CraftOverlay {
     this.#header = header
 
     // 3. Zone de contenu (Vide pour l'instant, juste pour remplir)
-    const content = this.#initDOM()
+    const content = this.#buildDOM()
 
     // 4. Assemblage
     this.#container.appendChild(this.#header)
@@ -469,7 +469,7 @@ class CraftOverlay {
    * Construit l'arborescence DOM du panel et retourne l'élément racine.
    * @returns {HTMLElement}
    */
-  #initDOM () {
+  #buildDOM () {
     const body = document.createElement('div')
     body.className = 'cr-body'
 
