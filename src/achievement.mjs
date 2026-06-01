@@ -332,7 +332,7 @@ class AchievementOverlay {
     this.#container.appendChild(createOverlayHeader('🏆 Achievements [U]', 'achievement'))
     this.#initDOM()
     document.body.appendChild(this.#container)
-    this.#initEvents()
+    this.bindEvents()
   }
 
   /**
@@ -363,7 +363,7 @@ class AchievementOverlay {
    * Abonne les handlers eventBus et DOM.
    * Bind et enregistre les handlers.
    */
-  #initEvents () {
+  bindEvents () {
     // 1. Ouverture/fermeture de l'overlay
     this.onOpen = this.onOpen.bind(this)
     this.onClose = this.onClose.bind(this)
@@ -376,7 +376,7 @@ class AchievementOverlay {
 
   /**
    * Affiche l'overlay.
-   * Lié dans #initEvents.
+   * Lié dans bindEvents.
    */
   onOpen () {
     const {pts, maxPts, categories} = achievementManager.buildAchievementTable()
@@ -393,7 +393,7 @@ class AchievementOverlay {
 
   /**
    * Cache l'overlay.
-   * Lié dans #initEvents.
+   * Lié dans bindEvents.
    */
   onClose () { this.#container.style.display = 'none' }
 
@@ -438,7 +438,7 @@ class AchievementOverlay {
   /**
    * Handler délégué sur #listEl — gère le clic sur toute ligne de catégorie.
    * Même ligne : ferme le détail. Autre ligne : déplace le détail sous la ligne cliquée.
-   * Lié dans #initEvents.
+   * Lié dans bindEvents.
    * @param {MouseEvent} e
    */
   onListClick (e) {

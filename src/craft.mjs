@@ -446,7 +446,7 @@ class CraftOverlay {
     document.body.appendChild(this.#container)
 
     // 5. Gestion des événements
-    this.#initEvents()
+    this.#bindEvents()
   }
 
   /**
@@ -638,7 +638,7 @@ class CraftOverlay {
    * Abonne les handlers DOM et eventBus.
    * Séparé du constructeur pour lisibilité.
    */
-  #initEvents () {
+  #bindEvents () {
     // Abonnement au Bus
     eventBus.on('craft/open', () => {
       this.#container.style.display = 'flex'

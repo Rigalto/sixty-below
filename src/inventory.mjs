@@ -1577,7 +1577,7 @@ class InventoryOverlay {
     document.body.appendChild(this.#container)
 
     // 5. Événements
-    this.#initEvents()
+    this.#bindEvents()
     this.#initDragAndDrop()
   }
 
@@ -1915,7 +1915,7 @@ class InventoryOverlay {
    * Abonne les handlers eventBus et DOM.
    * Bind et enregistre les handlers nommés (chestSelect, rename).
    */
-  #initEvents () {
+  #bindEvents () {
     // Abonnement au Bus
     eventBus.on('inventory/open', () => {
       this.#onOpen()
@@ -2580,7 +2580,7 @@ class InventoryOverlay {
 
   /**
    * Réagit au changement de sélection dans le dropdown containers.
-   * Lié dans #initEvents.
+   * Lié dans #bindEvents.
    */
   onChestSelectChange () {
     const furniture = furnitureManager.getFurnitureById(this.#chestSelect.value)
