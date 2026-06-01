@@ -4,7 +4,7 @@ import {seededRNG, shuffleArray, rollLoot} from './utils.mjs'
 import {database, uniqueIdGenerator} from './database.mjs'
 import {WORLD_WIDTH, WORLD_HEIGHT, SEA_LEVEL, TOPSOIL_Y_SKY_SURFACE, TOPSOIL_Y_SURFACE_UNDER, TOPSOIL_Y_UNDER_CAVERNS, TOPSOIL_Y_CAVERNS_MID, BIOME_TILE_MAP, SEA_MAX_JITTER, SEA_MAX_WIDTH, SEA_MAX_HEIGHT, CLUSTER_SCATTER_MAP, ORE_GEM_SCATTER_MAP, PERLIN_OFFSET_NATURALIZER, PERLIN_OFFSET_TUNNEL, PERLIN_OFFSET_SURFACE_TUNNEL, PERLIN_OFFSET_SMALL_TUNNEL, PERLIN_OFFSET_CAVERN, PERLIN_OFFSET_HIVE, PERLIN_OFFSET_HEART, PERLIN_OFFSET_MUSHROOM, PERLIN_OFFSET_COBWEB, PERLIN_OFFSET_FERNS, PERLIN_OFFSET_LAKES, PERLIN_OFFSET_SHELL, PERLIN_OFFSET_TEMPLE, PERLIN_OFFSET_BEACH, SMALL_CAVERNS_COUNT, MEDIUM_CAVERNS_COUNT, UNDERGROUND_TUNNEL_COUNT, CAVERNS_TUNNEL_COUNT, SMALL_TUNNELS_COUNT, HIVE_RADIUS_MIN, HIVE_RADIUS_MAX, COBWEB_CAVE_COUNT_MIN, COBWEB_CAVE_COUNT_MAX, COBWEB_RADIUS_X_MIN, COBWEB_RADIUS_X_MAX, COBWEB_RADIUS_Y_MIN, COBWEB_RADIUS_Y_MAX, COBWEB_CAVE_MAIN_MIN, COBWEB_CAVE_MAIN_MAX, COBWEB_CAVE_SIDE_MIN, COBWEB_CAVE_SIDE_MAX, COBWEB_SCATTER_COUNT, COBWEB_SCATTER_SIZE_MIN, COBWEB_SCATTER_SIZE_MAX, GEODE_CAVE_COUNT_MIN, GEODE_CAVE_COUNT_MAX, GEODE_RADIUS_MIN, GEODE_RADIUS_MAX, GEODE_TARGET_CLUSTER_COUNT, GEODE_CLUSTER_SIZE_MIN, GEODE_CLUSTER_SIZE_MAX, TOPSOIL_SCATTER_MAP, LAKE_RADIUS_X_MIN, LAKE_RADIUS_X_MAX, LAKE_RADIUS_Y_MIN, LAKE_RADIUS_Y_MAX, LAKE_PIT_RADIUS_X_MIN, LAKE_PIT_RADIUS_X_MAX, LAKE_PIT_RADIUS_Y_MIN, LAKE_PIT_RADIUS_Y_MAX, LAKE_CREATION_MAP, UNDERGROUND_LAKE_UNDER_COUNT, UNDERGROUND_LAKE_CAVERNS_COUNT, UNDERGROUND_LAKE_RADIUS_MIN, UNDERGROUND_LAKE_RADIUS_MAX, BLIND_LAKE_COUNT, BLIND_LAKE_RADIUS_MIN, BLIND_LAKE_RADIUS_MAX, SAP_LAKE_UNDER_COUNT, SAP_LAKE_CAVERNS_COUNT, SAP_LAKE_RADIUS_MIN, SAP_LAKE_RADIUS_MAX, SAP_POCKET_COUNT, SAP_POCKET_RADIUS_MIN, SAP_POCKET_RADIUS_MAX, WATER_PUDDLE_COUNT, SAP_PUDDLE_COUNT, PUDDLE_HEIGHT_MIN, PUDDLE_HEIGHT_MAX, FOSSIL_VEIN_COUNT, FERN_CAVE_RADIUS_X_MIN, FERN_CAVE_RADIUS_X_MAX, FERN_CAVE_RADIUS_Y_MIN, FERN_CAVE_RADIUS_Y_MAX, MOSS_CAVE_RADIUS_X_MIN, MOSS_CAVE_RADIUS_X_MAX, MOSS_CAVE_RADIUS_Y_MIN, MOSS_CAVE_RADIUS_Y_MAX, SAND_POCKET_RADIUS_X_MIN, SAND_POCKET_RADIUS_X_MAX, SAND_POCKET_RADIUS_Y_MIN, SAND_POCKET_RADIUS_Y_MAX, MUSHROOM_CAVE_RADIUS_X_MIN, MUSHROOM_CAVE_RADIUS_X_MAX, MUSHROOM_CAVE_RADIUS_Y_MIN, MUSHROOM_CAVE_RADIUS_Y_MAX, PYRAMID_WALL_INDEXES, PYRAMID_VOID_INDEXES, PYRAMID_WIDTH, PYRAMID_HEIGHT, PYRAMID_ROOM1_DELTA, PYRAMID_ROOM2_DELTA, TEMPLE_RUIN_WALL_INDEXES, TEMPLE_RUIN_COLUMNS_INDEXES, CHEST_CONTENT, TREES_INIT_SIZE, GIANT_MUSHROOM_INIT_SIZE} from '../assets/data/data-gen.mjs'
 import {NODES, NODES_LOOKUP, NODE_TYPE, BIOME_TYPE, PLANT_KIND, PLANT_TYPE, ITEMS, TREE_IMAGES, PARSNIP_COUNT, MANDRAKE_COUNT, CACTUS_COUNT, BAMBOO_COUNT, OLEANDER_COUNT, SATANS_CUBE_COUNT, SNEAKTHORN_COUNT, CURSEDCROWN_COUNT, ABYSSHORN_COUNT, INFERNCAP_COUNT} from '../assets/data/data.mjs'
-import {WEATHER_TYPE, WEATHER_TYPE_CODE, BAG_CAPACITY, HOTBAR_CAPACITY, ARMOR_CAPACITY, ACCESSORY_CAPACITY, CONTAINER_CAPACITY, CONTAINER_STYPES} from './constant.mjs'
+import {WEATHER_TYPE, WEATHER_TYPE_CODE, BAG_CAPACITY, HOTBAR_CAPACITY, ARMOR_CAPACITY, ACCESSORY_CAPACITY, CONTAINER_CAPACITY, CONTAINER_STYPES, PLAYER} from './constant.mjs'
 
 /* ====================================================================================================
    WORLD BUFFER (CREATION DU MONDE)
@@ -464,9 +464,12 @@ class WorldGenerator {
 
     await database.clearObjectStore('gamestate')
     await database.clearObjectStore('achievements')
+
+    const {pxX, pxY} = this.#findSpawnPosition()
+
     await database.batchSetGameState([
-      {key: 'player', value: '8192|1280|1'},
-      {key: 'spawn', value: '8192|1280'},
+      {key: 'player', value: `${pxX}|${pxY}|1`},
+      {key: 'spawn', value: `${pxX}|${pxY}`},
       {key: 'randomkey', value: seed},
       {key: 'uniqueidseed', value: 'a'},
       {key: 'timestamp', value: 480 * 1000}, // Day 1 - 8:00
@@ -519,6 +522,43 @@ class WorldGenerator {
     await database.clearObjectStore('buff')
 
     console.log('Temps sauvegarde en base de données', window.performance.now() - start)
+  }
+
+  /**
+ * Trouve la première tuile de surface valide pour le spawn du joueur.
+ * Cherche depuis le centre du monde vers l'extérieur.
+ * Garantit que le joueur ne spawne pas dans un liquide.
+ * @returns {{pxX: number, pxY: number}}
+ */
+  #findSpawnPosition () {
+    const SKY = NODES.SKY.code
+    const INVALID_SURFACE = new Set([NODES.WATER.code, NODES.SEA.code, NODES.ANTDIRT.code])
+
+    const centerX = WORLD_WIDTH >> 1
+
+    const tryAt = (tx) => {
+      if (tx < 1 || tx >= WORLD_WIDTH - 1) return null
+      for (let y = 1; y < WORLD_HEIGHT; y++) {
+        const tile = worldBuffer.read(tx, y)
+        if (tile === SKY) continue // surface pas encore atteinte
+        if (y > 60) return null // trop profond (puits)
+        if (INVALID_SURFACE.has(tile)) return null // surface liquide
+        if (worldBuffer.read(tx + 1, y - 1) !== SKY) return null // côté droit bloqué
+        return {pxX: tx << 4, pxY: (y << 4) - PLAYER.h}
+      }
+      return null
+    }
+
+    const center = tryAt(centerX)
+    if (center) return center
+
+    for (let offset = 1; offset < WORLD_WIDTH >> 1; offset++) {
+      const r = tryAt(centerX + offset) ?? tryAt(centerX - offset)
+      if (r) return r
+    }
+
+    console.error('[generate] #findSpawnPosition : aucune surface valide trouvée')
+    return {pxX: 8192, pxY: 1280}
   }
 }
 export const worldGenerator = new WorldGenerator()
@@ -6770,7 +6810,7 @@ class FurnitureGenerator {
       const cx = seededRNG.randomGetMinMax(2, WORLD_WIDTH - 3)
       if (guardedX.has(cx)) continue
 
-      let y = surfaceLine[cx]
+      const y = surfaceLine[cx]
       const tileCode = worldBuffer.read(cx, y)
       if (tileCode === SEA || tileCode === WATER) continue
 
@@ -6786,14 +6826,7 @@ class FurnitureGenerator {
       }
 
       const goLeft = canLeft && (!canRight || seededRNG.randomGetBool())
-      let chestX = goLeft ? cx - 1 : cx
-
-      // DEBUG
-      if (placed === 0) {
-        chestX = 206
-        y = 407
-      }
-      // FIN DEBUG
+      const chestX = goLeft ? cx - 1 : cx
 
       const chest = this.addFurnitureAt(((y - 1) << 10) | chestX, CHEST_TYPE[biome])
       this.fillChest(chest)
