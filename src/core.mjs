@@ -632,9 +632,11 @@ class KeyboardManager {
     window.addEventListener('keydown', this.onKeyDown)
     window.addEventListener('keyup', this.onKeyUp)
     // écoute les demandes de fermeture  et d'ouverture des overlays
-    eventBus.on('overlay/close', this.onCloseRequest.bind(this))
-    eventBus.on('overlay/open-request', this.onOverlayOpenRequest.bind(this))
-    eventBus.on('overlay/creation-dialog-request', this.onCreationDialogRequest.bind(this))
+    this.onCloseRequest = this.onCloseRequest.bind(this)
+    this.onOverlayOpenRequest = this.onOverlayOpenRequest.bind(this)
+    this.onCreationDialogRequest = this.onCreationDialogRequest.bind(this)
+    eventBus.on('overlay/close', this.onCloseRequest)
+    eventBus.on('overlay/open-request', this.onOverlayOpenRequest)
   }
 
   // "read-once" (lecture unique)
@@ -782,18 +784,6 @@ class KeyboardManager {
 
   onOverlayOpenRequest (overlyId) {
     if (overlyId) this.#openOverlay(overlyId)
-  }
-
-  onCreationDialogRequest () {
-    // Ne doit jamais arriver car le bouton déclenchant l'affichage de
-    // ce dialoque se trouve sous le voile sombre
-    if (this.#overlayStack.length !== 0) { return }
-
-    // 1. Suppression des overlays existant
-    for (const id of this.#overlayStack) {
-      eventBus.emit(`${id}/close`)
-    }
-    this.#overlayStack.length = 0
   }
 }
 export const keyboardManager = new KeyboardManager()

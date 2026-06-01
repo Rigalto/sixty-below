@@ -13,7 +13,6 @@
 - brancher les vrais meubles à l'inventaire
 - brancher les vrais meubles au craft panel
 - continuer la correction et l'ajout de fiches d'aide (`HELP`) et d'items (`ITEMS`)
-- Documentation avec E/S des eventBus (reste à faire : `core.mjs`)
 
 ---
 

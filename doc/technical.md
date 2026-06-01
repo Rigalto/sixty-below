@@ -191,6 +191,7 @@ eventBus.on('inventory/open', () => { this.show() })
 Cette section définit les événements officiels. Tout nouvel événement doit être enregistré ici avant implémentation.
 
 #### Time & Environment (`TimeManager`)
+
 | Dir. | Event Name | Payload Structure | Description |
 | :---: | :--- | :--- | :--- |
 | S | `time/clock` | `{ day, hour, minute }` | Émis chaque minute-jeu. |
@@ -202,7 +203,7 @@ Cette section définit les événements officiels. Tout nouvel événement doit 
 | S | `time/sky-color-changed`| `string` (Hex Color) | Émis uniquement si la couleur change. |
 
 #### Core / Loop (`GameCOre`)
-*En prévision - incomplet*
+
 | Dir. | Event Name | Payload Structure | Description |
 | :---: | :--- | :--- | :--- |
 | S | `world/tile-hover`| `object` NODE | Le node est survolé par la souris, pas envoyé si la souris ne change pas de node. |
@@ -213,12 +214,26 @@ Cette section définit les événements officiels. Tout nouvel événement doit 
 
 | Dir. | Event Name | Payload Structure | Description |
 | :---: | :--- | :--- | :--- |
+| E | `overlay/close` | `string` (Overlay ID) | Demande générique de fermeture émise par le bouton 'X' d'un overlay. |
+| E | `overlay/open-request`| `string` (Overlay ID) | Demande générique d'ouverture d'un overlay. |
 | S | `state/changed` | `{ state, oldState }` | Émis lorsque le `KeyboardManager` change l'état global du jeu (Exploration <-> Information/Combat). |
 | S | `inventory/keydown` | `string` (e.key) | Forwarding clavier vers l'overlay inventaire quand il est au sommet de la pile. |
 | S | `craft/keydown` | `string` (e.key) | Forwarding clavier vers l'overlay craft quand il est au sommet de la pile. |
 | S | `help/keydown` | `string` (e.key) | Forwarding clavier vers l'overlay aide quand il est au sommet de la pile. |
 | S | `combat/keydown` | `string` (e.key) | Forwarding clavier vers l'overlay combat quand il est au sommet de la pile. |
 | S | `map/keydown` | `string` (e.key) | Forwarding clavier vers l'overlay carte quand il est au sommet de la pile. |
+| S | `inventory/open` | — | Ouverture de l'overlay inventaire. |
+| S | `craft/open` | — | Ouverture de l'overlay craft. |
+| S | `help/open` | — | Ouverture de l'overlay aide. |
+| S | `combat/open` | — | Ouverture de l'overlay combat. |
+| S | `map/open` | — | Ouverture de l'overlay carte. |
+| S | `inventory/close` | — | Fermeture de l'overlay inventaire. |
+| S | `craft/close` | — | Fermeture de l'overlay craft. |
+| S | `help/close` | — | Fermeture de l'overlay aide. |
+| S | `combat/close` | — | Fermeture de l'overlay combat. |
+| S | `map/close` | — | Fermeture de l'overlay carte. |
+| S | `hotbar/select-slot` | `number` slotIndex | Sélection d'un slot de la hotbar. |
+
 
 #### UI / Interface (Common)
 | Event Name | Payload Structure | Description |
