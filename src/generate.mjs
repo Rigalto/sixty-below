@@ -143,7 +143,7 @@ class WorldGenerator {
     window.DEBUG_POINTS = [] // DEGUG - à supprimer
 
     // affichage de la progression de la création dans le dialogue modal
-    const STEPS = 36
+    const STEPS = 37
     let step = 0
     const progress = (topic) => {
       step++
@@ -417,6 +417,9 @@ class WorldGenerator {
     plantGenerator.placeAbysshorns(zoneRects, chestIndexes)
     plantGenerator.placeInferncaps(zoneRects, chestIndexes)
     await progress('Caverns Plants')
+
+    clusterGenerator.adjustBorderColumns(surfaceLine)
+    await progress('Polishing')
 
     // 9. Traitements finaux
 
@@ -776,11 +779,11 @@ export class BiomeNaturalizer {
     for (let x = 0; x < WORLD_WIDTH; x++) {
       for (let y = 0; y < WORLD_HEIGHT; y++) {
         let code = 0
-        // 2.1 protection du périmètre (NODE_TYPE.STRONG)
+        // 2.1 protection du périmètre (NODE_TYPE.ETERNAL)
         if ((x === 0) || (x === (WORLD_WIDTH - 1))) {
           code = DEEPSEA
           if (y < SEA_LEVEL) code = FOG
-          if (y > surfaceUnder[x]) code = BASALT
+          if (y >= surfaceUnder[x === 0 ? 1 : WORLD_WIDTH - 2]) code = BASALT
         }
         if (y === 0) code = FOG
         if (y === (WORLD_HEIGHT - 1)) code = LAVA
@@ -789,7 +792,7 @@ export class BiomeNaturalizer {
           code = this.getSubstratCode(x, y, skySurface, surfaceUnder, underCaverns, verticalBoundaries)
           if (y >= hell[x]) code = LAVA
         }
-        worldBuffer.write(x, y, code) // NEW
+        worldBuffer.write(x, y, code)
       }
     }
 
@@ -1960,6 +1963,35 @@ class ClusterGenerator {
       for (const entry of map.caverns_top) {
         this.applyTiles(this.scatterTopsoilClusters(
           rect.x0, rect.yUnder, rect.x1, rect.yCavernsMid, entry.percent, entry.code))
+      }
+    }
+  }
+
+  /**
+ * Ajuste la frontière DEEPSEA/BASALT des colonnes bordures (x=0 et x=1023)
+ * pour l'aligner avec la surface définitive des colonnes adjacentes.
+ * À appeler en toute fin de génération, quand surfaceLine est définitive.
+ * @param {Int16Array} surfaceLine — Y de la première tuile solide par colonne
+ */
+  adjustBorderColumns (surfaceLine) {
+    const DEEPSEA = NODES.DEEPSEA.code
+    const BASALT = NODES.BASALT.code
+
+    for (const [x, neighborX] of [[0, 1], [WORLD_WIDTH - 1, WORLD_WIDTH - 2]]) {
+      const y0 = surfaceLine[neighborX]
+
+      // Descend depuis y0 : DEEPSEA → BASALT
+      let idx = (y0 << 10) | x
+      while (worldBuffer.readAt(idx) === DEEPSEA) {
+        worldBuffer.writeAt(idx, BASALT)
+        idx += 1024
+      }
+
+      // Remonte depuis y0-1 : BASALT → DEEPSEA
+      idx = ((y0 - 1) << 10) | x
+      while (worldBuffer.readAt(idx) === BASALT) {
+        worldBuffer.writeAt(idx, DEEPSEA)
+        idx -= 1024
       }
     }
   }
@@ -6811,7 +6843,7 @@ class FurnitureGenerator {
       if (guardedX.has(cx)) continue
 
       const y = surfaceLine[cx]
-      const tileCode = worldBuffer.read(cx, y)
+      const tileCode = worldBuffer.read(cx, y - 1)
       if (tileCode === SEA || tileCode === WATER) continue
 
       const canRight = !guardedX.has(cx + 1) && surfaceLine[cx + 1] === y
@@ -6827,6 +6859,8 @@ class FurnitureGenerator {
 
       const goLeft = canLeft && (!canRight || seededRNG.randomGetBool())
       const chestX = goLeft ? cx - 1 : cx
+      const checkCode = worldBuffer.read(chestX, y - 1)
+      if (checkCode === SEA || checkCode === WATER) continue
 
       const chest = this.addFurnitureAt(((y - 2) << 10) | chestX, CHEST_TYPE[biome])
       this.fillChest(chest)
