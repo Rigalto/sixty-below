@@ -956,6 +956,7 @@ puis appliqués en une passe dédiée.
 | `#getLinearSizes(y, y0, y1)` | Interpolation linéaire des tailles TOPSOIL en fonction de Y. sizeMin [8→3], sizeMax [14→6]. Référence globale : TOPSOIL_Y_SKY_SURFACE → TOPSOIL_Y_CAVERNS_MID. |
 | `scatterTopsoilClusters(x0, y0, x1, y1, percent, code)` | Variante de scatterClusters pour TOPSOIL. Tailles calculées dynamiquement via #getLinearSizes après tirage du Y. count = max(0, round(surface x percent)). |
 | `addTopsoilClusters()` | Place les clusters TOPSOIL par biome x layer (surface / under / caverns_top) avant le creusement. Prérequis : initZoneRects(). |
+| `adjustBorderColumns(surfaceLine)` | Ajuste la frontière des tuiles DEAPS0EA et BASALT en première et dernière colonne du monde |
 
 **Algorithme de randomWalkCluster :** frange maintenue en doublon `Set + Array` — déduplication O(1), tirage O(1) par swap-and-pop.
 
