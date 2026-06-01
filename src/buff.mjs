@@ -90,6 +90,8 @@ class BuffManager {
     this.#resetBuffer(this.#trinketB, TRINKET_BUFF_TABLE)
     this.#currentTrinket = this.#trinketA
     this.#nextTrinket = this.#trinketB
+    // Force la mise à jour des subscribers — valeurs toutes à 0 après reset
+    eventBus.emit('buff/trinket-changed', new Set(Object.keys(TRINKET_BUFF_TABLE)))
   }
 
   init () {
