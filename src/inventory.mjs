@@ -1917,13 +1917,11 @@ class InventoryOverlay {
    */
   #bindEvents () {
     // Abonnement au Bus
-    eventBus.on('inventory/open', () => {
-      this.#onOpen()
-    })
+    this.onOpen = this.onOpen.bind(this)
+    eventBus.on('inventory/open', this.onOpen)
 
-    eventBus.on('inventory/close', () => {
-      this.#onClose()
-    })
+    this.onClose = this.onClose.bind(this)
+    eventBus.on('inventory/close', this.onClose)
 
     // clic sur un slot
     this.#content.addEventListener('click', (e) => {
@@ -1934,24 +1932,12 @@ class InventoryOverlay {
     })
 
     // raccourcis clavier
-    eventBus.on('inventory/keydown', (key) => {
-      if (key === 'l' || key === 'L') {
-        if (!this.#btnLock.disabled) this.#onLockClick()
-      } else if (key === ' ') {
-        if (!this.#btnUse.disabled) this.#onUseClick()
-      } else if (key === 'Delete') {
-        if (!this.#btnTrash.disabled) this.#onTrashClick()
-      } else if (key === 'Tab') {
-        if (!this.#btnTransfer.disabled) this.#onTransferClick()
-      }
-    })
+    this.onKeyDown = this.onKeyDown.bind(this)
+    eventBus.on('inventory/keydown', this.onKeyDown)
 
     // le Craft Panel a exécuté une recette, il faut tout ré-afficher
-    eventBus.on('craft/performed', () => {
-      if (this.#container.style.display === 'none') return
-      this.refreshBag()
-      this.#refreshContainer()
-    })
+    this.onCraftPerformed = this.onCraftPerformed.bind(this)
+    eventBus.on('craft/performed', this.onCraftPerformed)
 
     // gestion de la sélection d'un coffre
     this.onChestSelectChange = this.onChestSelectChange.bind(this)
@@ -2203,7 +2189,7 @@ class InventoryOverlay {
    * Ouvre le panel, attache les handlers window, peuple tous les slots depuis inventoryManager.
    * Réinitialise la sélection et le formulaire de renommage.
    */
-  #onOpen () {
+  onOpen () {
     this.#attachWindowHandlers()
 
     this.#selectedFurnitureId = null
@@ -2305,7 +2291,7 @@ class InventoryOverlay {
   /**
    * Ferme le panel, détache les handlers window, sauvegarde et émet les événements de mise à jour.
    */
-  #onClose () {
+  onClose () {
     this.#detachWindowHandlers()
 
     this.#container.style.display = 'none'
@@ -2318,6 +2304,31 @@ class InventoryOverlay {
     inventoryManager.save()
     eventBus.emit('inventory/static-buffs', inventoryManager.getStaticBuffs())
     eventBus.emit('hotbar/changed', inventoryManager.hotbar)
+  }
+
+  /**
+   * Traitement des racourcis-clavier
+   * @param {string} key
+   */
+  onKeyDown (key) {
+    if (key === 'l' || key === 'L') {
+      if (!this.#btnLock.disabled) this.#onLockClick()
+    } else if (key === ' ') {
+      if (!this.#btnUse.disabled) this.#onUseClick()
+    } else if (key === 'Delete') {
+      if (!this.#btnTrash.disabled) this.#onTrashClick()
+    } else if (key === 'Tab') {
+      if (!this.#btnTransfer.disabled) this.#onTransferClick()
+    }
+  }
+
+  /**
+   * Une recette a été exécutée : il faut tout ré-afficher.
+   */
+  onCraftPerformed (key) {
+    if (this.#container.style.display === 'none') return
+    this.refreshBag()
+    this.#refreshContainer()
   }
 
   // ///////////////////////////////// //
