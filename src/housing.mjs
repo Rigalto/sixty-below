@@ -5,6 +5,7 @@ import {uniqueIdGenerator} from './database.mjs'
 import {CONTAINER_STYPES} from './constant.mjs'
 import {saveManager} from './persistence.mjs'
 import {camera} from './render.mjs'
+import {IMAGE_CACHE} from './assets.mjs'
 import {MAX_FURNITURE_W, MAX_FURNITURE_H, ITEMS} from '../../assets/data/data.mjs'
 
 /* ====================================================================================================
@@ -332,15 +333,6 @@ class FurnitureManager {
    * @param {Set<number>} preloadChunks
    */
   onPreloadChunksChanged (preloadChunks) {
-    // DEBUG — 42 preloadChunks centrés sur tile (206, 405) ↔ coffre de test
-    const dbgCx = 206 >> 4; const dbgCy = 405 >> 4
-    const dbgChunks = new Set()
-    for (let dy = -2; dy <= 3; dy++) {
-      for (let dx = -3; dx <= 3; dx++) { dbgChunks.add(((dbgCy + dy) << 6) | (dbgCx + dx)) }
-    }
-    preloadChunks = dbgChunks
-    // FIN DEBUG
-
     this.#displayed.clear()
     for (const chunkKey of preloadChunks) {
       const set = this.#byChunk.get(chunkKey)
@@ -350,6 +342,21 @@ class FurnitureManager {
       }
     }
     console.log('FurnitureManager.onPreloadChunksChanged', {displayed: this.#displayed})
+  }
+
+  /**
+   * Dessine les meubles visibles sur le contexte transformé par la caméra.
+   * @param {CanvasRenderingContext2D} ctx - contexte déjà transformé (caméra appliquée)
+   */
+  render (ctx) {
+    for (const furniture of this.#displayed) {
+      const item = ITEMS[furniture.code]
+      const img = furniture.left ? item.placedLeft ?? item.placed : item.placed ?? item.placedLeft
+      if (!img) continue
+      const pxX = (furniture.index & 0x3FF) << 4
+      const pxY = (furniture.index >> 10) << 4
+      ctx.drawImage(IMAGE_CACHE[img.imgIndex], img.sx, img.sy, img.sw, img.sh, pxX, pxY, img.sw, img.sh)
+    }
   }
 
   // ─── Placement ───────────────────────────────────────────────────────────────

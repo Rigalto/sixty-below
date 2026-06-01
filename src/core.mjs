@@ -517,7 +517,7 @@ class GameCore {
     // lightRenderer opère sur son propre canvas séparé : il se place après restore(), hors de la chaîne.
     const ctx = worldRenderer.render()
     // plantManager.render(ctx)
-    // furnitureManager.render(ctx)
+    furnitureManager.render(ctx)
     // monsterManager.render(ctx)
     playerManager.render(ctx)
     ctx.restore() // clôt le save() de worldRenderer.render() — NE PAS déplacer ni supprimer

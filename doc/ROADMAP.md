@@ -7,10 +7,12 @@
 
 ## En cours
 
-- implémentation de l'affichage des tuiles
-- ajouter la position courante du joueur dans le control panel
+- implémentation de l'affichage des tuiles (top soil à faire)
 - ajouter l'affichage du furniture sous la souris (`TileHoverWidget`)
 - Sauvegarde de la position du joueur en database
+- brancher les vrais meubles à l'inventaire
+- brancher les vrais meubles au craft panel
+- position du joueur lors de la création
 - continuer la correction et l'ajout de fiches d'aide (`HELP`) et d'items (`ITEMS`)
 - Documentation avec E/S des eventBus (reste à faire : `core.mjs`, `ui.mjs` (reste seulement `EnvironmentWidget`), `utils.mjs` (TimeMmanager))
 
@@ -26,6 +28,11 @@
   - fait pour `inventory.mjs`, `craft.mjs`, `achievement.mjs`, `ui.mjs`
 
 ---
+
+## À faire — Bugs connus dans génération du monde
+- Les coffres de surface semble une tuile trop basse
+- Les coffres de surface sont posés dans la SEA : on doit annuler la pose dans ce cas
+- Les meubles sont mal positionnés en y dans les maisons anciennes
 
 ## À faire — Bugs connus
 - lors de la génération du monde, le player est mal positionné
@@ -327,3 +334,4 @@ La Sap corrode le Copper. Il doit donc être remplacer par du Gold.
 - `WorldRenderer` — rendu tuiles par chunks avec cache OffscreenCanvas
 - `SkyRenderer` — cycle jour/nuit
 - `Camera` — projection monde/canvas, culling, zoom
+- `FurnitureManager` — affichage des meubles
