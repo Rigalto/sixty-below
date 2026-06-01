@@ -634,7 +634,6 @@ class KeyboardManager {
     // écoute les demandes de fermeture  et d'ouverture des overlays
     this.onCloseRequest = this.onCloseRequest.bind(this)
     this.onOverlayOpenRequest = this.onOverlayOpenRequest.bind(this)
-    this.onCreationDialogRequest = this.onCreationDialogRequest.bind(this)
     eventBus.on('overlay/close', this.onCloseRequest)
     eventBus.on('overlay/open-request', this.onOverlayOpenRequest)
   }

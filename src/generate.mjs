@@ -6828,7 +6828,7 @@ class FurnitureGenerator {
       const goLeft = canLeft && (!canRight || seededRNG.randomGetBool())
       const chestX = goLeft ? cx - 1 : cx
 
-      const chest = this.addFurnitureAt(((y - 1) << 10) | chestX, CHEST_TYPE[biome])
+      const chest = this.addFurnitureAt(((y - 2) << 10) | chestX, CHEST_TYPE[biome])
       this.fillChest(chest)
       placed++
     }
