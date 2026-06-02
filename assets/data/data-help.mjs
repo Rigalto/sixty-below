@@ -2360,7 +2360,7 @@ Managed trough the [[item:noticeBoard]].
   },
 
   // ── Accessories ──────────────────────────────────────────────
-  //    Accessories, Trinkets, Clocks, Sextant , Triskels
+  //    Accessories, Trinkets, Clocks, Sextant , Triskels, Ruler, Stopwatch
 
   {
     title: 'Accessories',
@@ -2440,6 +2440,69 @@ Ajouter un paragraphe qui donne la recette de fabrication (générique)
     category: ['Accessory', 'Buff'],
     content: `
     `
+  },
+  {
+    title: 'Ruler',
+    category: ['Trinkets', 'Exploration'],
+    content: `
+**Ruler**
+
+A small measuring instrument that, when carried in your [[Inventory]], displays your current position in the [[Control Panel]].
+
+**Display**
+
+Your position is shown as tile coordinates:
+
+* **X** — horizontal position, from 0 (left edge) to 1023 (right edge)
+* **Y** — vertical position, from 0 (top) to 511 (bottom)
+
+The world is **1024 x 512 tiles**.
+
+**Tips**
+
+* _The position displayed corresponds to the tile under your feet._
+* _X increases eastward, Y increases downward._
+* _Use the coordinates to mark and share points of interest with other players._
+
+**See also**
+
+* [[Environment Panel]] — overview of all display features
+* [[Trinkets]] — full list of trinkets and their effects
+  `
+  },
+  {
+    title: 'Stopwatch',
+    category: ['Trinkets', 'Exploration'],
+    content: `
+**Stopwatch**
+
+A precision instrument that, when carried in your [[Inventory]], displays your current movement speed in the [[Control Panel]].
+
+**Display**
+
+Speed is shown as a percentage:
+
+* **100%** — base movement speed, no modifier active
+* **> 100%** — movement is faster than normal
+* **< 100%** — movement is slowed
+
+**What affects speed**
+
+* Terrain underfoot — liquids, [[Cobweb|cobwebs]] and certain surfaces slow movement
+* Equipment — some armor and accessories grant speed bonuses or penalties
+* [[Buffs]] — various active effects can modify speed temporarily
+
+**Tips**
+
+* _Speed is updated in real time as you move across different terrain._
+* _Carrying the Stopwatch is the only way to know your exact speed at any moment._
+
+**See also**
+
+* [[Environment Panel]] — overview of all display features
+* [[Movement Speed]] — detailed breakdown of speed modifiers
+* [[Trinkets]] — full list of trinkets and their effects
+  `
   },
 
   // ── Activities ───────────────────────────────────────────────
