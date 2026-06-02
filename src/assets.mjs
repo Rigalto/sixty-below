@@ -17,8 +17,10 @@ export const IMAGE_FILES = [
   // ITEMS //
   // ///// //
 
-  // Items minés / substrat, topsoil, web, ore, gem, rock
+  // Items minés / substrat, topsoil, web, ore, raw gem, rock
   'assets/sprites/mined_32_32.png',
+  // Items raffinés / bar, cut gem, metal fitting, fabric
+  'assets/sprites/refined_32_32.png',
 
   // PLACED //
   // ////// //

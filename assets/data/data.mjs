@@ -190,7 +190,7 @@ export const ITEMS = {
   blockLimestone: {name: 'Limestone Block', type: 0, star: 4, stype: 'block', image: 'mined_32_32-1-1', help: 'Limestone', tooltip: 'Mined block — used in construction and crafting'},
   blockSlate: {name: 'Slate Block', type: 0, star: 5, stype: 'block', image: 'mined_32_32-2-1', help: 'Slate', tooltip: 'Mined block — used in construction and crafting'},
 
-  // Chunks
+  // Chunks [succès]
   chunkCopper: {name: 'Copper Chunk', type: 0, star: 1, stype: 'chunk', image: 'mined_32_32-3-2', help: 'Metals', tooltip: 'Primary crafting materials crafted into bars at a Furnace'},
   chunkIron: {name: 'Iron Chunk', type: 0, star: 2, stype: 'chunk', image: 'mined_32_32-4-2', help: 'Metals', tooltip: 'Primary crafting materials crafted into bars at a Furnace'},
   chunkSilver: {name: 'Silver Chunk', type: 0, star: 3, stype: 'chunk', image: 'mined_32_32-5-2', help: 'Metals', tooltip: 'Primary crafting materials crafted into bars at a Furnace'},
@@ -198,20 +198,21 @@ export const ITEMS = {
   chunkCobalt: {name: 'Cobalt Chunk', type: 0, star: 4, stype: 'chunk', image: 'mined_32_32-1-3', help: 'Metals', tooltip: 'Primary crafting materials crafted into bars at a Furnace'},
   chunkPlatinum: {name: 'Platinum Chunk', type: 0, star: 5, stype: 'chunk', image: 'mined_32_32-2-3', help: 'Metals', tooltip: 'Primary crafting materials crafted into bars at a Furnace'},
 
-  // Bars
-  barCopper: {name: 'Copper Bar', type: 0, star: 1, stype: 'bar', image: 'blocks_16_16-0-0', help: 'Metals', tooltip: 'Crafting material used to craft tools, weapons, armor, and other items'},
-  barIron: {name: 'Iron Bar', type: 0, star: 2, stype: 'bar', image: 'blocks_16_16-0-0', help: 'Metals', tooltip: 'Crafting material used to craft tools, weapons, armor, and other items'},
-  chain: {name: 'Chain', type: 0, star: 2, stype: 'misc', image: 'blocks_16_16-0-0', help: 'Metals', tooltip: '???'},
-  barSilver: {name: 'Silver Bar', type: 0, star: 3, stype: 'bar', image: 'blocks_16_16-0-0', help: 'Metals', tooltip: 'Crafting material used to craft tools, weapons, armor, and other items'},
+  // Bars  [succès]
+  barCopper: {name: 'Copper Bar', type: 0, star: 1, stype: 'bar', image: 'refined_32_32-0-0', help: 'Metals', tooltip: 'Crafting material used to craft tools, weapons, armor, and other items'},
+  barIron: {name: 'Iron Bar', type: 0, star: 2, stype: 'bar', image: 'refined_32_32-1-0', help: 'Metals', tooltip: 'Crafting material used to craft tools, weapons, armor, and other items'},
+  barSilver: {name: 'Silver Bar', type: 0, star: 3, stype: 'bar', image: 'refined_32_32-2-0', help: 'Metals', tooltip: 'Crafting material used to craft tools, weapons, armor, and other items'},
   barGold: {name: 'Gold Bar', type: 0, star: 3, stype: 'bar', image: 'blocks_16_16-0-0', help: 'Metals', tooltip: 'Crafting material used to craft tools, weapons, armor, and other items'},
   barCobalt: {name: 'Cobalt Bar', type: 0, star: 4, stype: 'bar', image: 'blocks_16_16-0-0', help: 'Metals', tooltip: 'Crafting material used to craft tools, weapons, armor, and other items'},
   barPlatinum: {name: 'Platinum Bar', type: 0, star: 5, stype: 'bar', image: 'blocks_16_16-0-0', help: 'Metals', tooltip: 'Crafting material used to craft tools, weapons, armor, and other items'},
 
-  // Gems
+  // Raw Gems [succès]
   rawTopaz: {name: 'Raw Topaz', type: 0, star: 2, stype: 'gem', image: 'mined_32_32-3-3', help: 'Gems', tooltip: 'Valuable crafting materials to be cut at a Stone Bench'},
   rawRuby: {name: 'Raw Ruby', type: 0, star: 3, stype: 'gem', image: 'mined_32_32-4-3', help: 'Gems', tooltip: 'Valuable crafting materials to be cut at a Stone Bench'},
   rawEmerald: {name: 'Raw Emerald', type: 0, star: 4, stype: 'gem', image: 'mined_32_32-5-3', help: 'Gems', tooltip: 'Valuable crafting materials to be cut at a Stone Bench'},
   rawSapphire: {name: 'Raw Sapphire', type: 0, star: 5, stype: 'gem', image: 'mined_32_32-0-4', help: 'Gems', tooltip: 'Valuable crafting materials to be cut at a Stone Bench'},
+
+  // Cut Gems [succès]
   cutTopaz: {name: 'Cut Topaz', type: 0, star: 2, stype: 'gem', image: 'blocks_16_16-0-0', help: 'Gems', tooltip: 'Enhances weapons, gears and accessories'},
   cutRuby: {name: 'Cut Ruby', type: 0, star: 3, stype: 'gem', image: 'blocks_16_16-0-0', help: 'Gems', tooltip: 'Enhances weapons, gears and accessories'},
   cutEmerald: {name: 'Cut Emerald', type: 0, star: 4, stype: 'gem', image: 'blocks_16_16-0-0', help: 'Gems', tooltip: 'Enhances weapons, gears and accessories'},
@@ -351,9 +352,9 @@ export const ITEMS = {
   furnace: {name: 'Furnace', type: ITEM_TYPE.FURNITURE | ITEM_TYPE.PLACABLE, stype: 'station', star: 2, image: 'furniture_32_32-6-0', placed: 'fuws_48_48-0-0', help: 'Smelting', tooltip: 'Crafting station for metal smelting'},
   blastFurnace: {name: 'Blast Furnace', type: ITEM_TYPE.FURNITURE | ITEM_TYPE.PLACABLE, stype: 'station', star: 4, image: 'furniture_32_32-5-0', placed: 'fuws_48_48-1-0', help: 'Smelting', tooltip: 'Crafting station for strong metal smelting'},
 
-  // Metal Fittings
-  nailIron: {name: 'Iron Nail', type: 0, stype: 'fitting', star: 2, image: 'crafting_32_32-2-0', help: 'Metal Fittings', tooltip: 'Fastener used to built or repair a lot of items'},
-  nailCobalt: {name: 'Cobalt Nail', type: 0, stype: 'fitting', star: 4, image: 'crafting_32_32-2-0', help: 'Metal Fittings', tooltip: 'Fastener used to built or repair a lot of items'},
+  // Metal Fittings Fasteners [succès]
+  nailIron: {name: 'Iron Nail', type: 0, stype: 'fitting', star: 2, image: 'refined_32_32-6-0', help: 'Metal Fittings', tooltip: 'Fastener used to built or repair a lot of items'},
+  nailCobalt: {name: 'Cobalt Nail', type: 0, stype: 'fitting', star: 4, image: 'refined_32_32-7-0', help: 'Metal Fittings', tooltip: 'Fastener used to built or repair a lot of items'},
   rivetCobalt: {name: 'Cobalt Rivet', type: 0, stype: 'fitting', star: 4, image: 'crafting_32_32-2-0', help: 'Metal Fittings', tooltip: 'Strong fastener used to built a lot of high tier items'},
   rivetPlatinum: {name: 'Platinum Rivet', type: 0, stype: 'fitting', star: 5, image: 'crafting_32_32-2-0', help: 'Metal Fittings', tooltip: 'Strong fastener used to built a lot of high tier items'},
   chainCopper: {name: 'Copper Chain', type: 0, stype: 'fitting', star: 1, image: 'crafting_32_32-2-0', help: 'Metal Fittings', tooltip: 'Fastener used to built a lot of sensitive items'},
@@ -363,6 +364,8 @@ export const ITEMS = {
   wireIron: {name: 'Iron Wire', type: 0, stype: 'fitting', star: 2, image: 'crafting_32_32-2-0', help: 'Metal Fittings', tooltip: 'Fastener used to built a lot of items'},
   wireGold: {name: 'Gold Wire', type: 0, stype: 'fitting', star: 3, image: 'crafting_32_32-2-0', help: 'Metal Fittings', tooltip: 'Fastener used to built a lot of items'},
   wireCobalt: {name: 'Cobalt Wire', type: 0, stype: 'fitting', star: 4, image: 'crafting_32_32-2-0', help: 'Metal Fittings', tooltip: 'Fastener used to built a lot of items'},
+
+  // Metal Fittings Parts [succès]
   plateCopper: {name: 'Copper Plate', type: 0, stype: 'fitting', star: 1, image: 'crafting_32_32-2-0', help: 'Metal Fittings', tooltip: 'Part used to built a lot of items'},
   plateIron: {name: 'Iron Plate', type: 0, stype: 'fitting', star: 2, image: 'crafting_32_32-2-0', help: 'Metal Fittings', tooltip: 'Part used to built a lot of items'},
   plateGold: {name: 'Gold Plate', type: 0, stype: 'fitting', star: 3, image: 'crafting_32_32-2-0', help: 'Metal Fittings', tooltip: 'Part used to built a lot of items'},
@@ -571,7 +574,7 @@ export const RECIPES = [
   {result: {item: 'tableWood', count: 1}, station: 'byHand', ingredients: [{item: 'logOak', count: 8}]},
   {result: {item: 'workbench', count: 1}, station: 'tableWood', ingredients: [{item: 'logOak', count: 10}]},
   {result: {item: 'anvil', count: 1}, station: 'workbench', ingredients: [{item: 'barIron', count: 5}, {item: 'logOak', count: 2}]},
-  {result: {item: 'sawmill', count: 1}, station: 'workbench', ingredients: [{item: 'barIron', count: 2}, {item: 'chain', count: 1}, {item: 'cutRuby', count: 1}]},
+  {result: {item: 'sawmill', count: 1}, station: 'workbench', ingredients: [{item: 'barIron', count: 2}, {item: 'chainIron', count: 1}, {item: 'cutRuby', count: 1}]},
   {result: {item: 'loom', count: 1}, station: 'workbench', ingredients: [{item: 'logOak', count: 12}, {item: 'barIron', count: 2}, {item: 'silk', count: 2}, {item: 'barCopper', count: 1}]},
   {result: {item: 'tanningRack', count: 1}, station: 'loom', ingredients: [{item: 'silk', count: 12}, {item: 'logMahogany', count: 10}, {item: 'barCopper', count: 2}, {item: 'barSilver', count: 2}]},
   {result: {item: 'alchemyTable', count: 1}, station: 'workbench', ingredients: [{item: 'logMahogany', count: 6}, {item: 'logOak', count: 6}, {item: 'barCopper', count: 5}, {item: 'bottle', count: 10}, {item: 'torch', count: 2}, {item: 'sunflowerOil', count: 1}]},
