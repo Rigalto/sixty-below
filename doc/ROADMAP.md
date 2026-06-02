@@ -28,13 +28,9 @@
 ---
 
 ## À faire — Bugs connus dans génération du monde
-- Les coffres de surface semble une tuile trop basse
-- Les coffres de surface sont posés dans la SEA : on doit annuler la pose dans ce cas
 - Les meubles sont mal positionnés en y dans les maisons anciennes
 
 ## À faire — Bugs connus
-- bound bound processSave : double 'bind' pour cette fonction
-- Dans le control panel, le survol de l'heure doit donner la période du jour (dawn...)
 - Il n'y a pas assez de Cactus dans le monde => sans doute pas assez de SAND sur le sol souterrain.
 - Il n'y a pas assez de Bamboo dans le monde => sans doute pas assez de SILT sur le sol souterrain.
 - Il n'y a pas assez de Oleanders dans le monde => sans doute pas assez de STONE sur le sol souterrain.
@@ -45,7 +41,7 @@
 ## À faire — Amélioration
 
 - Mettre les bonnes icônes dans le titre des Overlays
-- Remplacer toutes les icônes Unicode par des icônes SVG ou image png (météo, phases de la lune)
+- Remplacer toutes les icônes Unicode 'météo' et ''phases de la lune' par des icônes SVG ou image png
 - Remplacer le `new Uint8Array(256)` de `getChunkData` par un buffer statique réutilisable pré-alloué — quand la fonction sera à nouveau nécessaire (sauvegarde, génération). Si elle n'est pas utilisée : la supprimer (code mort).
 
 ---

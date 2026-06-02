@@ -28,14 +28,9 @@ export const IMAGE_FILES = [
 
   // TILES //
   // ////////
-  // Tuiles de copper / iron / silver / gold / cobalt / platine
-  'assets/sprites/ore_16_16.png',
-  // Tuiles de contour / dirt / stone / clay / mud / sand / humus / silt / ash / web / slush
-  'assets/sprites/substrat_16_16.png',
+
   // Tuiles de granite / marble / meteorite / obsidian / hellstone / sandstone / hive
   'assets/sprites/rock_16_16.png',
-  // Tuiles de topaz / rubis / emerald / sapphir
-  'assets/sprites/gem_16_16.png',
   // Tuiles de grass / jungle grass / mushroom grass / ash grass
   'assets/sprites/grass_16_16.png',
   // Tuiles de wood wall / background wall
@@ -125,7 +120,7 @@ export const SOUND_CACHE = {}
 
 /**
  * Analyse le nom de l'atlas pour en déduire la grille.
- * Ex: "ore_16_16" -> cellW=16, cellH=16
+ * Ex: "mineral_16_16" -> cellW=16, cellH=16
  */
 function parseAtlasName (filename) {
   const parts = filename.split('_')

@@ -143,7 +143,7 @@ __Note__ : la création du singleton n'est effectuée qu'une seule fois. La fonc
 Boot Sequence (dans core.mjs) :
 * **1. INSTANTIATION :** Création des Singletons (new Class). Importe tous les modules.
 * **2. LOAD ASSETS :** Appel de [`assets.mjs :: loadAssets`]. Chargement de toutes les images et sons. Construction des index d'atlas.
-* **3. HYDRATION (Linkage) :** Une fois les assets chargés (synchrone), on parcourt `TILE_DB` et `ITEM_DB` (de `constant.mjs`) pour remplacer les chaînes de caractères (ex: "ore_16_16+1") par les données de rendu calculées par assets.mjs (Index image, sx, sy). [`assets.mjs :: loadAssets`]
+* **3. HYDRATION (Linkage) :** Une fois les assets chargés (synchrone), on parcourt `TILE_DB` et `ITEM_DB` (de `constant.mjs`) pour remplacer les chaînes de caractères (ex: "mineral_16_16+1") par les données de rendu calculées par assets.mjs (Index image, sx, sy). [`assets.mjs :: loadAssets`]
 * **4. INIT :** Appelle `eventBus.init()`, `microTasker.init()`, `taskManager.init()`, `ChunkManager.init()`, `combatManager.init()`, `uiManager.init()`... L'ordre peut avoir de l'importance.
     * **Contrainte :** Configuration de l'état interne uniquement. Interdiction d'émettre des événements ou d'appeler d'autres managers (qui peuvent ne pas être prêts).
 * **5. RUN :** Lance la Game Loop.
