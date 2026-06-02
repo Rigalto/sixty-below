@@ -5,6 +5,7 @@ import {uniqueIdGenerator} from './database.mjs'
 import {CONTAINER_STYPES} from './constant.mjs'
 import {saveManager} from './persistence.mjs'
 import {camera} from './render.mjs'
+import {playerManager} from './player.mjs'
 import {IMAGE_CACHE} from './assets.mjs'
 import {MAX_FURNITURE_W, MAX_FURNITURE_H, ITEMS} from '../../assets/data/data.mjs'
 
@@ -250,9 +251,9 @@ class FurnitureManager {
    * @returns {Array<object>}
    */
   getNearbyContainers () {
-    // const {x: cx, y: cy} = playerManager.getCenterTile()  // TODO PlayerManager
+    const {x: cx, y: cy} = playerManager.getCenterTile() // TODO PlayerManager
     // const {w: rw, h: rh} = buffManager.getBuff('range-chest')
-    const cx = 206; const cy = 405 // DEBUG
+
     const rw = 10; const rh = 8 // DEBUG
 
     const x0 = cx - rw; const x1 = cx + rw
