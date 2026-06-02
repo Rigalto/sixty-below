@@ -10,14 +10,15 @@
 - implémentation de l'affichage des tuiles (top soil à faire)
 - ajouter l'affichage du furniture sous la souris (`TileHoverWidget`)
 - Sauvegarde de la position du joueur en database
-- brancher les vrais meubles à l'inventaire
-- brancher les vrais meubles au craft panel
+- brancher les Crafting Stations au craft panel
+- faire les 6 images de ROCK et supprimer le chargement de rock_16_16.png dans assets.mjs
 - continuer la correction et l'ajout de fiches d'aide (`HELP`) et d'items (`ITEMS`)
 
 ---
 
 ## Dette technique
 
+- Mettre les bonnes icônes dans le titre des Overlays
 - Vérifier que la convention pour les variables privées est prise en compte partout :
   - fait pour `inventory.mjs`, `craft.mjs`, `help.mjs`, `achievement.mjs`, `ui.mjs`
 - Vérifier que les en-têtes des fonctions sont présents et à jour (prise en compte des modifications de conception) :
@@ -40,7 +41,6 @@
 
 ## À faire — Amélioration
 
-- Mettre les bonnes icônes dans le titre des Overlays
 - Remplacer toutes les icônes Unicode 'météo' et ''phases de la lune' par des icônes SVG ou image png
 - Remplacer le `new Uint8Array(256)` de `getChunkData` par un buffer statique réutilisable pré-alloué — quand la fonction sera à nouveau nécessaire (sauvegarde, génération). Si elle n'est pas utilisée : la supprimer (code mort).
 
@@ -49,6 +49,7 @@
 ## À faire — Buffs
 
 - `BuffManager` :
+  - implémenter les buffs avec timer
   - récupération des timer buffs dans la fonction `init`, lancement `TaskScheduler`
   - traitement de chaque `eventBus` qui impacte un ou plusieurs buff
   - implémenter les buffs composés à chaque fois que l'un d'entre eux est défini (`#fns`) :
