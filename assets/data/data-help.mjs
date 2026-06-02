@@ -1008,7 +1008,7 @@ Despite the nuisance they represent, cobwebs are one of the most valuable resour
 **Terrain Effect** ⏳
 
 * Cobweb threads are nearly invisible until you are already tangled in them — by then, each step pulls a dozen more filaments across your legs and arms.
-* Walking through [[node:web]] reduces movement speed ({{node:web:buffs:movementSpeed}}%)
+* Walking through [[node:web]] reduces Movement Speed ({{node:web:buffs:movementSpeed}}%)
 * See [[Movement Speed]] for details
 
 **Tips**
@@ -1977,12 +1977,12 @@ The table below details the [[Metal Fittings]] available for each material, incl
 
 | Metal | Plate | Rod | Strip |
 |---|---|---|---|
-| **Copper** | yes | - | yes |
-| **Iron** | yes | yes | yes |
+| **Copper** | <<cellItemStar|plateCopper>> | - | yes |
+| **Iron** | <<cellItemStar|plateIron>> | yes | yes |
 | **Silver** | - | yes | yes |
-| **Gold** | yes | yes | - |
-| **Cobalt** | yes | yes | yes |
-| **Platinum** | yes | yes | yes |
+| **Gold** | <<cellItemStar|plateGold>> | yes | - |
+| **Cobalt** | <<cellItemStar|plateCobalt>> | yes | yes |
+| **Platinum** | <<cellItemStar|platePlatinum>> | yes | yes |
     `
   },
   // ── Gems ─────────────────────────────────────────────────────
@@ -2360,79 +2360,162 @@ Managed trough the [[item:noticeBoard]].
   },
 
   // ── Accessories ──────────────────────────────────────────────
-  //    Accessories, Trinkets, Clocks, Sextant , Triskels, Ruler, Stopwatch
+  //    Accessories, Trinkets, Clocks, Sextant , Triskels, Ruler, Stopwatch, Astrolabe, Chronometer, Astrarium
 
   {
     title: 'Accessories',
-    category: ['Accessory', 'Buff'],
+    category: ['Accessory', 'Buff', 'Trinket'],
     content: `
+**Description**
+
+**How to use**
+
+Unlike [[Trinkets]], Accessories must be placed in a dedicated Accessory slot in your [[Inventory]] to activate their effect. Simply carrying one in your bag is not enough.
     `
   },
   {
     title: 'Trinkets',
-    category: ['Accessory', 'Buff'],
+    category: ['Trinket', 'Buff', 'Accessory'],
     content: `
 **Description**
 
-Dire que ce sont des accessoires qui sont actifs dès lors qu'il se trouvent dans l'[[Inventory]] sans être obligé de les équiper (les placer dans un 'Accessory Slot').
+⏳
+
+**How to use**
+
+Unlike [[Accessories]], Trinkets do not need to be placed in a dedicated slot — carrying one anywhere in your [[Inventory]] is enough to activate its effect.
 
 **Trinket List**
+
+[[Control Panel]] improvements:
 
 | Trinket | Tier | Effect |
 |---|---|---|
 | [[item:clockCopper]] | {{item:clockCopper:star|star}} | Improve [[Day & Night Cycle|Time]] accuracy |
 | [[item:clockSilver]] | {{item:clockSilver:star|star}} | Improve [[Day & Night Cycle|Time]] accuracy |
 | [[item:clockGold]] | {{item:clockGold:star|star}} | Improve [[Day & Night Cycle|Time]] accuracy |
-| [[item:bottledFrog]] | {{item:bottledFrog:star|star}} | Improve [[Weather]] accuracy |
+| [[item:bottledFrog]] | {{item:bottledFrog:star|star}} | Give [[Weather]] forecast |
 | [[item:sextant]] | {{item:sextant:star|star}} | Improve [[Moon Phases]] accuracy |
-| [[item:ruler]] | {{item:ruler:star|star}} | Display your position in the [[Control Panel]] |
-| [[item:stopwatch]] | {{item:stopwatch:star|star}} | Display your movement speed bonus in the [[Control Panel]] |
+| [[item:ruler]] | {{item:ruler:star|star}} | Display your position |
+| [[item:stopwatch]] | {{item:stopwatch:star|star}} | Display your [[Movement Speed]] bonus in the [[Control Panel]] |
+| [[item:astrolabe]] | {{item:astrolabe:star|star}} | Give [[Weather]] forecast and improve [[Moon Phases]] accuracy |
+| [[item:chronometer]] | {{item:chronometer:star|star}} | Display your position and your [[Movement Speed]] bonus |
+| [[item:astrarium]] | {{item:astrarium:star|star}} | Display [[Weather]] forecast, your position and your [[Movement Speed]] bonus. Also improve [[Day & Night Cycle|Time]] and [[Moon Phases]] accuracy |
+
+Grid and Range Display:
+
+To be defined. ⏳
+
     `
   },
   {
     title: 'Bottled Frog',
-    category: ['Accessory'],
-    content: `
-    `
-  },
-  {
-    title: 'Clocks',
-    category: ['Accessory'],
+    category: ['Trinket'],
     content: `
 **Description**
 
-Clocks are [[Trinkets|Trinket]]s which display [[Day & Night Cycle|time]] more accurately in the [[Control Panel]].
+The [[item:bottledFrog]] is a [[Trinkets|Trinket]] that reveals tomorrow's weather forecast in the [[Control Panel]].
+
+Without it, only the current weather is displayed. Carrying the [[item:bottledFrog]] in your [[Inventory]] adds the forecast for the following day alongside it.
+
+See [[Weather]] for the complete weather type table.
+
+**Acquisition**
+
+* Tier: {{item:bottledFrog:star|star}}
+* Crafting Station: {{recipe:bottledFrog|station}}
+* Crafting Materials: {{recipe:bottledFrog|ingredients}}
+
+**Upgrade**
+
+* Combine with a [[item:sextant]] to craft an [[item:astrolabe]] — a single trinket providing both weather forecast and moon detail.
+* The [[item:astrolabe]] can be further combined into an [[item:astrarium]] — the ultimate trinket providing complete environmental awareness.
+
+**Tips**
+
+* _Knowing tomorrow's weather helps planning outdoor activities, fishing trips and combat preparation._
+
+**See also**
+
+* [[Environment Panel]] — overview of all display features
+* [[Weather]] — full weather type table and gameplay effects
+* [[Trinkets]] — full list of trinkets and their effects
+  `
+  },
+  {
+    title: 'Clocks',
+    category: ['Trinket'],
+    content: `
+    **Description**
+
+Clocks are [[Trinkets|Trinkets]] that improve the accuracy of the time display in the [[Control Panel]].
+
+Without any clock, [[Day & Night Cycle|Time]] is shown rounded to the nearest 3-hour period. Each clock tier offers a finer precision. Only the most accurate clock in your [[Inventory]] applies — carrying multiples has no additional effect.
 
 | Clock | Tier | Accuracy |
 |---|---|---|
+| (none) | — | 3 in-game hours |
 | [[item:clockCopper]] | {{item:clockCopper:star|star}} | 1 in-game hour |
 | [[item:clockSilver]] | {{item:clockSilver:star|star}} | 15 in-game minutes |
 | [[item:clockGold]] | {{item:clockGold:star|star}} | 5 in-game minutes |
 
-_Without any clock, the precision is 3 hours._
+**Furniture**
 
-Ajouter un paragraphe 'How to use', qui sera générique pour tous les trinkets (template) avec en paramètre l'identifiant du trinket⏳
+A [[item:grandfatherClock]] placed nearby also improves time precision, without occupying an [[Inventory]] slot.⏳
 
-Ajouter un paragraphe qui donne la recette de fabrication (générique)⏳
+**Acquisition**
+
+* [[item:clockCopper]] — Tier: {{item:clockCopper:star|star}} · Station: {{recipe:clockCopper|station}} · Materials: {{recipe:clockCopper|ingredients}}
+* [[item:clockSilver]] — Tier: {{item:clockSilver:star|star}} · Station: {{recipe:clockSilver|station}} · Materials: {{recipe:clockSilver|ingredients}}
+* [[item:clockGold]] — Tier: {{item:clockGold:star|star}} · Station: {{recipe:clockGold|station}} · Materials: {{recipe:clockGold|ingredients}}
+
+**Upgrade**
+
+* Combine [[item:clockGold]] with an [[item:astrolabe]] and a [[item:chronometer]] to craft an [[item:astrarium]] — the ultimate trinket providing complete environmental awareness.
+
+**Tips**
+
+* _A [[item:grandfatherClock]] at home removes the need to carry a clock at all — provided you stay nearby._
+
+**See also**
+
+* [[Environment Panel]] — overview of all display features
+* [[Day & Night Cycle]] — time periods and their effects
+* [[Trinkets]] — full list of trinkets and their effects
     `
   },
   {
     title: 'Sextant',
-    category: ['Accessory'],
+    category: ['Trinket'],
     content: `
 **Description**
 
-The [[item:sextant]] is a [[Trinkets|Trinket]] which give [[Moon Phases]] more accurately.
-Dire qu'il y a seulement 4 [[Moon Phases]] distingables sans sextant et 8 avec le sextant.
+The [[item:sextant]] is a [[Trinkets|Trinket]] that improves the accuracy of the [[Moon Phases]] display in the [[Control Panel]].
 
-**Tier**
+Without it, only 4 icons are used to represent the full 8-phase cycle — several phases share the same icon. Carrying the [[item:sextant]] in your [[Inventory]] shows a distinct icon for each of the 8 phases.
 
-{{item:flamethrower:star|star}}
+See [[Moon Phases]] for the complete phase table.
 
+**Acquisition**
 
-Ajouter un paragraphe 'How to use', qui sera générique pour tous les trinkets (template) avec en paramètre l'identifiant du trinket
+* Tier: {{item:sextant:star|star}}
+* Crafting Station: {{recipe:sextant|station}}
+* Crafting Materials: {{recipe:sextant|ingredients}}
 
-Ajouter un paragraphe qui donne la recette de fabrication (générique)
+**Upgrade**
+
+* Combine with a [[item:bottledFrog]] to craft an [[item:astrolabe]] — a single trinket providing both moon detail and weather forecast.
+* The [[item:astrolabe]] can be further combined into an [[item:astrarium]] — the ultimate trinket providing complete environmental awareness.
+
+**Tips**
+
+* _Moon phases affect enemy spawn rates, fishing conditions and plant growth — knowing the exact phase helps planning._
+
+**See also**
+
+* [[Environment Panel]] — overview of all display features
+* [[Moon Phases]] — full phase table and gameplay effects
+* [[Trinkets]] — full list of trinkets and their effects
     `
   },
   {
@@ -2443,9 +2526,9 @@ Ajouter un paragraphe qui donne la recette de fabrication (générique)
   },
   {
     title: 'Ruler',
-    category: ['Trinkets', 'Exploration'],
+    category: ['Accessory'],
     content: `
-**Ruler**
+**Description**
 
 A small measuring instrument that, when carried in your [[Inventory]], displays your current position in the [[Control Panel]].
 
@@ -2457,6 +2540,11 @@ Your position is shown as tile coordinates:
 * **Y** — vertical position, from 0 (top) to 511 (bottom)
 
 The world is **1024 x 512 tiles**.
+
+**Upgrade**
+
+* Combine with a [[item:stopwatch]] to craft a [[item:chronometer]] — a single 4★ trinket providing both speed and position display.
+* The [[item:chronometer]] can be further combined into an [[item:astrarium]] — the ultimate trinket providing complete environmental awareness.
 
 **Tips**
 
@@ -2472,17 +2560,17 @@ The world is **1024 x 512 tiles**.
   },
   {
     title: 'Stopwatch',
-    category: ['Trinkets', 'Exploration'],
+    category: ['Trinket'],
     content: `
-**Stopwatch**
+**Description**
 
-A precision instrument that, when carried in your [[Inventory]], displays your current movement speed in the [[Control Panel]].
+A precision instrument that, when carried in your [[Inventory]], displays your current [[Movement Speed]] in the [[Control Panel]].
 
 **Display**
 
 Speed is shown as a percentage:
 
-* **100%** — base movement speed, no modifier active
+* **100%** — base Movement Speed, no modifier active
 * **> 100%** — movement is faster than normal
 * **< 100%** — movement is slowed
 
@@ -2492,15 +2580,149 @@ Speed is shown as a percentage:
 * Equipment — some armor and accessories grant speed bonuses or penalties
 * [[Buffs]] — various active effects can modify speed temporarily
 
+**Upgrade**
+
+* Combine with a [[item:ruler]] to craft a [[item:chronometer]] — a single 4★ trinket providing both speed and position display.
+* The [[item:chronometer]] can be further combined into an [[item:astrarium]] — the ultimate trinket providing complete environmental awareness.
+
 **Tips**
 
 * _Speed is updated in real time as you move across different terrain._
-* _Carrying the Stopwatch is the only way to know your exact speed at any moment._
 
 **See also**
 
 * [[Environment Panel]] — overview of all display features
 * [[Movement Speed]] — detailed breakdown of speed modifiers
+* [[Trinkets]] — full list of trinkets and their effects
+  `
+  },
+  {
+    title: 'Astrolabe',
+    category: ['Trinket'],
+    content: `
+**Description**
+
+An ancient astronomical instrument of extraordinary precision. When carried in your [[Inventory]], it combines the functions of the [[Sextant]] and the [[Bottled Frog]], revealing both moon detail and tomorrow's weather in the [[Control Panel]].
+
+**Effects**
+
+* Shows the exact [[Moon Phases|Moon Phase]] among all 8 possible phases (instead of 4)
+* Displays tomorrow's [[Weather]] forecast alongside the current weather
+
+**Acquisition**
+
+* Tier: {{item:astrolabe:star|star}}
+* Crafting Station: {{recipe:astrolabe|station}}
+* Crafting Materials: {{recipe:astrolabe|ingredients}}
+
+**Upgrade**
+
+* Combine with a [[item:chronometer]] and a [[item:clockGold]] to craft an [[item:astrarium]] — the ultimate trinket providing complete environmental awareness.
+
+**Tips**
+
+* _The Astrolabe frees up an [[Inventory]] slot compared to carrying both the [[Sextant]] and [[Bottled Frog]] separately._
+* _Pair it with a [[Chronometer]] to have complete environmental awareness at a glance._
+
+**See also**
+
+* [[Environment Panel]] — overview of all display features
+* [[Weather]] — full weather type table and gameplay effects
+* [[Moon Phases]] — full phase table and gameplay effects
+* [[Trinkets]] — full list of trinkets and their effects
+  `
+  },
+  {
+    title: 'Chronometer',
+    category: ['Trinket'],
+    content: `
+**Description**
+
+A precision timekeeping instrument originally designed for maritime navigation. When carried in your [[Inventory]], it combines the functions of the [[Ruler]] and the [[Stopwatch]], displaying both your position and [[Movement Speed]] in the [[Control Panel]].
+
+**Effects**
+
+* Displays your current tile coordinates (X / Y)
+* Displays your current [[Movement Speed]] as a percentage
+
+**Acquisition**
+
+* Tier: {{item:chronometer:star|star}}
+* Crafting Station: {{recipe:chronometer|station}}
+* Crafting Materials: {{recipe:chronometer|ingredients}}
+
+**Upgrade**
+
+* Combine with an [[item:astrolabe]] and a [[item:clockGold]] to craft an [[item:astrarium]] — the ultimate trinket providing complete environmental awareness.
+
+**Tips**
+
+* _The Chronometer frees up an inventory slot compared to carrying both the [[Ruler]] and [[Stopwatch]] separately._
+* _Pair it with an [[Astrolabe]] to have complete environmental awareness at a glance._
+
+**See also**
+
+* [[Ruler]] — the position component
+* [[Stopwatch]] — the speed component
+* [[Environment Panel]] — overview of all display features
+* [[Trinkets]] — full list of trinkets and their effects
+  `
+  },
+  {
+    title: 'Astrarium',
+    category: ['Trinket'],
+    content: `
+**Astrarium**
+
+The pinnacle of exploration instruments. When carried in your [[Inventory]], it combines the effects of the [[Astrolabe]], the [[Chronometer]] and the [[item:clockGold]], providing complete environmental awareness in the [[Control Panel]].
+
+**Effects**
+
+* [[Day & Night Cycle|Time]] displayed with 5-minute precision
+* Tomorrow's [[Weather]] forecast alongside the current weather
+* All 8 [[Moon Phases]] shown with distinct icons
+* Current tile coordinates (X / Y)
+* Current [[Movement Speed]] as a percentage
+
+**Acquisition**
+
+* Tier: {{item:astrarium:star|star}}
+* Crafting Station: {{recipe:astrarium|station}}
+* Crafting Materials: {{recipe:astrarium|ingredients}}
+
+<hr>
+
+**Craft Tree**
+
+The Astrarium is the final step of a multi-stage crafting chain.
+
+* <<itemStar|clockCopper>>
+  * <<itemStar|clockSilver>> ← [[item:clockCopper]]
+    * <<itemStar|clockGold>> ← [[item:clockSilver]]
+  * <<itemStar|bottledFrog>>
+  * <<itemStar|sextant>>
+    * <<itemStar|astrolabe>> ← [[item:bottledFrog]] + [[item:sextant]]
+  * <<itemStar|ruler>>
+  * <<itemStar|stopwatch>>
+    * <<itemStar|chronometer>> ← [[item:ruler]] + [[item:stopwatch]]
+      * <<itemStar|astrarium>> ← [[item:clockGold]] + [[item:astrolabe]] + [[item:chronometer]]
+
+All stations and materials required from scratch are listed below
+
+* {{recipe:astrarium|allStations}}
+* {{recipe:astrarium|allIngredients}}
+
+**Tips**
+
+* _The Astrarium frees up to five inventory slots compared to carrying all its component trinkets separately._
+* _It is the only trinket that provides all environment display bonuses simultaneously._
+
+**See also**
+
+* [[Astrolabe]] — the astronomy component
+* [[Chronometer]] — the navigation component
+* [[Clocks]] — the time precision component
+* [[Environment Panel]] — overview of all display features
 * [[Trinkets]] — full list of trinkets and their effects
   `
   },
@@ -3480,7 +3702,7 @@ Used to craft [[item:torch]].
     `
   },
 
-  //    Tables, Platforms, Cabinets, Closets, Bookcases, Sofas
+  //    Tables, Platforms, Cabinets, Closets, Bookcases, Sofas, Grandfather Clock
 
   {
     title: 'Tables',
@@ -3520,6 +3742,14 @@ Used to craft [[item:torch]].
     title: 'Sofas',
     category: ['Furniture'],
     content: `
+    `
+  },
+  {
+    title: 'Grandfather Clock',
+    category: ['Furniture'],
+    content: `
+
+  Parler des [[Clocks]] qui permettent également d'obtenir un temps plus précis, quand elles se trouvent dans l'[[Inventory]].
     `
   },
 
@@ -4271,7 +4501,7 @@ Velvetmoss is a slow-growing, deep-purple moss found exclusively in [[Moss Cave|
 **Terrain Effect** ⏳
 
 * Velvetmoss secretes a thin, permanent moisture that makes every step a negotiation with gravity — the harder you push, the more it slips away from under you.
-* Walking on Velvetmoss reduces movement speed ({{item:velvetmoss:buffs:movementSpeed}}%)
+* Walking on Velvetmoss reduces Movement Speed ({{item:velvetmoss:buffs:movementSpeed}}%)
 * See [[Movement Speed]] for details
 
 **Placement**
@@ -4902,7 +5132,7 @@ Some information is always visible; other details unlock when you carry specific
 | Element | Description |
 |---|---|
 | [[Day & Night Cycle|Day]] | Current day number |
-| [[Day & Night Cycle|Time]] | Current in-game time |
+| [[Day & Night Cycle|Time]] | Current in-game time (hour:minute) |
 | [[Weather]] | Current weather icon |
 | [[Moon Phases]] | Current moon phase |
 
@@ -4922,23 +5152,24 @@ Grandfather Clocks placed nearby may also improve time accuracy.⏳
 
 **Weather forecast**
 
-Carrying a [[item:bottledFrog]] displays tomorrow's weather alongside the current one.
+Carrying a [[item:bottledFrog]] or an [[item:astrolabe]] displays tomorrow's weather alongside the current one.
 
 **Moon phase detail**
 
 By default, 4 icons represent the 8 possible phases.
-Carrying a [[item:sextant]] shows a unique icon for each of the 8 phases.
+Carrying a [[item:sextant]] or a [[item:astrolabe]] shows a unique icon for each of the 8 phases.
 
 **Player position**
 
-Carrying a [[item:ruler]] in your [[Inventory]] displays your current tile coordinates (X / Y) at the bottom of the widget.
+Carrying a [[item:ruler]] or an [[item:chronometer]] in your [[Inventory]] displays your current tile coordinates (X / Y) at the bottom of the panel.
 
-**Movement speed bonus**
+**Movement Speed bonus**
 
-Carrying a [[item:stopwatch]] in your [[Inventory]] displays your current movement speed as a percentage.
-A value of 100% means no modifier is active.
-Speed is affected by terrain, equipment, and [[Buffs]].
-See [[Movement Speed]] for details.
+Carrying a [[item:stopwatch]] or a [[item:chronometer]] in your [[Inventory]] displays your current Movement Speed as a percentage.
+
+* A value of 100% means no modifier is active.
+* Speed is affected by terrain, equipment, and [[Buffs]].
+* See [[Movement Speed]] for details.
     `
   },
   {
@@ -5095,7 +5326,7 @@ Consuming the same type too quickly extends the cooldown before you can benefit 
     content: `
 **Description**
 
-Movement speed determines how fast the player moves through the world. The base speed can be altered by terrain, equipment, and buffs.
+Movement Speed determines how fast the player moves through the world. The base speed can be altered by terrain, equipment, and buffs.
 
 **Terrain Modifiers**
 
@@ -5107,6 +5338,10 @@ Movement speed determines how fast the player moves through the world. The base 
 **Equipment Modifiers** ⏳
 
 **Buff & Debuff Modifiers** ⏳
+
+**Display**
+
+Carrying a [[item:stopwatch]] or a [[item:chronometer]] in your [[Inventory]] displays in the [[Control Panel]] your current Movement Speed as a percentage.
 
 **Tips**
 
@@ -5194,7 +5429,7 @@ The current weather is displayed in the [[Control Panel]], beside the [[Moon Pha
 
 **Forecast**
 
-Carrying a [[item:bottledFrog]] in your [[Inventory]] displays tomorrow's weather in the [[Control Panel]].
+Carrying a [[item:bottledFrog]] or an [[item:astrolabe]] in your [[Inventory]] displays tomorrow's weather in the [[Control Panel]].
 
 **Effects**
 

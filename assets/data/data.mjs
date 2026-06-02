@@ -243,7 +243,7 @@ export const ITEMS = {
   slug: {name: 'Slug', type: ITEM_TYPE.BAIT, star: 1, stype: 'bait', image: 'blocks_16_16-0-0', help: 'Fishing Baits', tooltip: '???'},
   goldSlug: {name: 'Gold Slug', type: ITEM_TYPE.BAIT, star: 1, stype: 'bait', image: 'blocks_16_16-0-0', help: 'Fishing Baits', tooltip: '???'},
   snail: {name: 'Snail', type: ITEM_TYPE.BAIT, star: 1, stype: 'bait', image: 'blocks_16_16-0-0', help: 'Fishing Baits', tooltip: '???'},
-  frog: {name: 'Snail', type: ITEM_TYPE.BAIT | ITEM_TYPE.MATERIAL, star: 1, stype: 'bait', image: 'blocks_16_16-0-0', help: 'Fishing Baits', tooltip: '???'},
+  frog: {name: 'Frog', type: ITEM_TYPE.BAIT | ITEM_TYPE.MATERIAL, star: 1, stype: 'bait', image: 'blocks_16_16-0-0', help: 'Fishing Baits', tooltip: '???'},
 
   // pickaxes
   pickaxeCopper: {name: 'Copper Pickaxe', type: ITEM_TYPE.TOOL | ITEM_TYPE.MATERIAL, stype: 'pickaxe', star: 2, image: 'tools_32_32-4-0', placedright: 'w_42_42-0-0', placedleft: 'w_42_42-0-1', speed: 0, help: 'Mining Tools', tooltip: 'Tools used to remove blocks, converting them to item form'},
@@ -301,12 +301,14 @@ export const ITEMS = {
   chairWood: {name: 'Wooden Chair', type: ITEM_TYPE.FURNITURE | ITEM_TYPE.PLACABLE, stype: 'chair', star: 1, image: 'furniture_32_32-0-5', placedLeft: 'fuws_16_48-1-0', placedRight: 'fuws_16_48-2-0', help: 'Chairs', tooltip: '???', furnitureSet: 'wood', comfort: true},
   toiletWood: {name: 'Wooden Toilet', type: ITEM_TYPE.FURNITURE | ITEM_TYPE.PLACABLE, stype: 'toilet', star: 1, image: 'furniture_32_32-0-5', placed: 'fuws_16_48-2-0', help: 'Toilets', tooltip: '???', furnitureSet: 'wood', comfort: true},
   doorWood: {name: 'Wooden Door', type: ITEM_TYPE.FURNITURE | ITEM_TYPE.PLACABLE, stype: 'door', star: 1, furnitureSet: 'wood', image: 'furniture_32_32-0-6', placed: 'fuws_16_48-0-0', placedLeft: 'fuws_32_48-0-0', placedRight: 'fuws_32_48-0-1', help: 'Doors', tooltip: 'Furniture that prevent enemies from entering an area when closed'},
+  grandfatherClock: {name: 'Grandfather Clock', type: ITEM_TYPE.FURNITURE | ITEM_TYPE.PLACABLE, stype: 'clock', star: 1, furnitureSet: 'wood', image: 'furniture_32_32-0-6', placed: 'fuws_16_48-0-0', help: 'Grandfather Clock', tooltip: 'Furniture that improves time accuracy', buff: [{buff: 'displayTimePrecision', value: 1, op: 'max', range: 'range-chest'}]},
 
   // Glass furniture set
   tableGlass: {name: 'Glass Table', type: ITEM_TYPE.FURNITURE | ITEM_TYPE.PLACABLE, stype: 'table', star: 1, image: 'furniture_32_32-2-0', placed: 'fuws_48_32-1-0', help: 'Tables', tooltip: '???', furnitureSet: 'glass', surface: true},
   chairGlass: {name: 'Glass Chair', type: ITEM_TYPE.FURNITURE | ITEM_TYPE.PLACABLE, stype: 'chair', star: 1, image: 'furniture_32_32-0-5', placedLeft: 'fuws_16_48-1-0', placedRight: 'fuws_16_48-2-0', help: 'Chairs', tooltip: '???', furnitureSet: 'glass', comfort: true},
   toiletGlass: {name: 'Glass Toilet', type: ITEM_TYPE.FURNITURE | ITEM_TYPE.PLACABLE, stype: 'toilet', star: 1, image: 'furniture_32_32-0-5', placed: 'fuws_16_48-2-0', help: 'Toilets', tooltip: '???', furnitureSet: 'glass', comfort: true},
   doorGlass: {name: 'Glass Door', type: ITEM_TYPE.FURNITURE | ITEM_TYPE.PLACABLE, stype: 'door', star: 1, furnitureSet: 'glass', image: 'furniture_32_32-0-6', placed: 'fuws_16_48-0-0', placedLeft: 'fuws_32_48-0-0', placedRight: 'fuws_32_48-0-1', help: 'Doors', tooltip: 'Furniture that prevent enemies from entering an area when closed'},
+  GlassGrandfatherClock: {name: 'Glass Grandfather Clock', type: ITEM_TYPE.FURNITURE | ITEM_TYPE.PLACABLE, stype: 'clock', star: 1, furnitureSet: 'glass', image: 'furniture_32_32-0-6', placed: 'fuws_16_48-0-0', help: 'Grandfather Clock', tooltip: 'Furniture that improves time accuracy', buff: [{buff: 'displayTimePrecision', value: 1, op: 'max', range: 'range-chest'}]},
 
   // chests (56 slots)
   // Sea Chests
@@ -355,12 +357,17 @@ export const ITEMS = {
   rivetCobalt: {name: 'Cobalt Rivet', type: 0, stype: 'fitting', star: 4, image: 'crafting_32_32-2-0', help: 'Metal Fittings', tooltip: 'Strong fastener used to built a lot of high tier items'},
   rivetPlatinum: {name: 'Platinum Rivet', type: 0, stype: 'fitting', star: 5, image: 'crafting_32_32-2-0', help: 'Metal Fittings', tooltip: 'Strong fastener used to built a lot of high tier items'},
   chainCopper: {name: 'Copper Chain', type: 0, stype: 'fitting', star: 1, image: 'crafting_32_32-2-0', help: 'Metal Fittings', tooltip: 'Fastener used to built a lot of sensitive items'},
-  chainIron: {name: 'Copper Chain', type: 0, stype: 'fitting', star: 2, image: 'crafting_32_32-2-0', help: 'Metal Fittings', tooltip: 'Fastener used to built a lot of sensitive items'},
-  chainSilver: {name: 'Copper Chain', type: 0, stype: 'fitting', star: 3, image: 'crafting_32_32-2-0', help: 'Metal Fittings', tooltip: 'Fastener used to built a lot of sensitive items'},
+  chainIron: {name: 'Iron Chain', type: 0, stype: 'fitting', star: 2, image: 'crafting_32_32-2-0', help: 'Metal Fittings', tooltip: 'Fastener used to built a lot of sensitive items'},
+  chainSilver: {name: 'Silver Chain', type: 0, stype: 'fitting', star: 3, image: 'crafting_32_32-2-0', help: 'Metal Fittings', tooltip: 'Fastener used to built a lot of sensitive items'},
   wireCopper: {name: 'Copper Wire', type: 0, stype: 'fitting', star: 1, image: 'crafting_32_32-2-0', help: 'Metal Fittings', tooltip: 'Fastener used to built a lot of sensitive items'},
   wireIron: {name: 'Iron Wire', type: 0, stype: 'fitting', star: 2, image: 'crafting_32_32-2-0', help: 'Metal Fittings', tooltip: 'Fastener used to built a lot of items'},
   wireGold: {name: 'Gold Wire', type: 0, stype: 'fitting', star: 3, image: 'crafting_32_32-2-0', help: 'Metal Fittings', tooltip: 'Fastener used to built a lot of items'},
   wireCobalt: {name: 'Cobalt Wire', type: 0, stype: 'fitting', star: 4, image: 'crafting_32_32-2-0', help: 'Metal Fittings', tooltip: 'Fastener used to built a lot of items'},
+  plateCopper: {name: 'Copper Plate', type: 0, stype: 'fitting', star: 1, image: 'crafting_32_32-2-0', help: 'Metal Fittings', tooltip: 'Part used to built a lot of items'},
+  plateIron: {name: 'Iron Plate', type: 0, stype: 'fitting', star: 2, image: 'crafting_32_32-2-0', help: 'Metal Fittings', tooltip: 'Part used to built a lot of items'},
+  plateGold: {name: 'Gold Plate', type: 0, stype: 'fitting', star: 3, image: 'crafting_32_32-2-0', help: 'Metal Fittings', tooltip: 'Part used to built a lot of items'},
+  plateCobalt: {name: 'Cobalt Plate', type: 0, stype: 'fitting', star: 4, image: 'crafting_32_32-2-0', help: 'Metal Fittings', tooltip: 'Part used to built a lot of items'},
+  platePlatinum: {name: 'Platinum Plate', type: 0, stype: 'fitting', star: 5, image: 'crafting_32_32-2-0', help: 'Metal Fittings', tooltip: 'Part used to built a lot of items'},
 
   stoneBench: {name: 'Stone Bench', type: ITEM_TYPE.FURNITURE | ITEM_TYPE.PLACABLE, stype: 'station', star: 3, image: 'furniture_32_32-1-0', placed: 'fuws_48_32-0-0', help: 'Stoneworking', tooltip: 'Crafting station for sharpenig tools and weapons'},
 
@@ -437,9 +444,9 @@ export const ITEMS = {
   sunflowerSeed: {name: 'Sunflower Seed', type: ITEM_TYPE.MATERIAL | ITEM_TYPE.SEED, stype: 'seed', star: 1, image: 'potions_32_32-1-5', placed: 'fuws_32_32-4-0', help: 'Sunflower', tooltip: '???'},
   sunflowerOil: {name: 'Sunflower Oil', type: ITEM_TYPE.CRAFTABLE, stype: 'seed', star: 1, image: 'potions_32_32-1-5', placed: 'fuws_32_32-4-0', help: 'Sunflower', tooltip: '???'},
 
-  oleander: {name: 'Oleander', type: 0, stype: 'herb', star: 1, image: 'fuws_32_32-4-0', placed: 'fuws_32_32-4-0', help: 'Oleander', tooltip: '???'},
-  oleanderOil: {name: 'Oleander Oil', type: ITEM_TYPE.MATERIAL | ITEM_TYPE.CRAFTABLE, stype: 'seed', star: 1, image: 'potions_32_32-1-5', placed: 'fuws_32_32-4-0', help: 'Oleander', tooltip: '???'},
-  oleanderBulb: {name: 'Oleander Bulb', type: ITEM_TYPE.MATERIAL, stype: 'seed', star: 1, image: 'potions_32_32-1-5', placed: 'fuws_32_32-4-0', help: 'Oleander', tooltip: '???'},
+  oleander: {name: 'Oleander', type: 0, stype: 'herb', star: 3, image: 'fuws_32_32-4-0', placed: 'fuws_32_32-4-0', help: 'Oleander', tooltip: '???'},
+  oleanderOil: {name: 'Oleander Oil', type: ITEM_TYPE.MATERIAL | ITEM_TYPE.CRAFTABLE, stype: 'seed', star: 3, image: 'potions_32_32-1-5', placed: 'fuws_32_32-4-0', help: 'Oleander', tooltip: '???'},
+  oleanderBulb: {name: 'Oleander Bulb', type: ITEM_TYPE.MATERIAL, stype: 'seed', star: 3, image: 'potions_32_32-1-5', placed: 'fuws_32_32-4-0', help: 'Oleander', tooltip: '???'},
 
   ambermirage: {name: 'Ambermirage', type: ITEM_TYPE.MATERIAL, stype: 'herb', star: 1, image: 'potions_32_32-1-5', placed: 'fuws_32_32-4-0', help: 'Ambermirage', tooltip: '???'},
 
@@ -524,6 +531,9 @@ export const ITEMS = {
   sextant: {name: 'Sextant', type: ITEM_TYPE.TRINKET, stype: 'trinket', star: 3, image: 'furniture_32_32-3-8', help: 'Sextant', tooltip: 'When in Inventory, increases Moon Phases accuracy', buff: [{buff: 'displayMoonDetail', value: true}]},
   ruler: {name: 'Ruler', type: ITEM_TYPE.TRINKET, stype: 'trinket', star: 3, image: 'furniture_32_32-3-8', help: 'Ruler', tooltip: 'When in Inventory, display your position', buff: [{buff: 'displayCoords', value: true}]},
   stopwatch: {name: 'Stopwatch', type: ITEM_TYPE.TRINKET, stype: 'trinket', star: 3, image: 'furniture_32_32-3-8', help: 'Stopwatch', tooltip: 'When in Inventory, display your bonus Speed (percent)', buff: [{buff: 'displaySpeed', value: true}]},
+  astrolabe: {name: 'Astrolabe', type: ITEM_TYPE.TRINKET, stype: 'trinket', star: 4, image: 'furniture_32_32-3-8', help: 'Astrolabe', tooltip: 'When in Inventory, give weather forecasts and increases Moon Phases accuracy', buff: [{buff: 'displayNextWeather', value: true}, {buff: 'displayMoonDetail', value: true}]},
+  chronometer: {name: 'Chronometer', type: ITEM_TYPE.TRINKET, stype: 'trinket', star: 4, image: 'furniture_32_32-3-8', help: 'Chronometer', tooltip: 'When in Inventory, display your position and your bonus Speed (percent)', buff: [{buff: 'displaySpeed', value: true}, {buff: 'displayCoords', value: true}]},
+  astrarium: {name: 'Astrarium', type: ITEM_TYPE.TRINKET, stype: 'trinket', star: 5, image: 'furniture_32_32-3-8', help: 'Astrarium', tooltip: 'When in Inventory, adds weather forecast, full moon detail, position and speed, and maximizes time precision', buff: [{buff: 'displaySpeed', value: true}, {buff: 'displayCoords', value: true}, {buff: 'displayNextWeather', value: true}, {buff: 'displayMoonDetail', value: true}, {buff: 'displayTimePrecision', value: 3, op: 'max'}]},
 
   // Armors ITEM_TYPE.ARMOR, stype: 'tableware', armor: 'head'
   headWood: {name: 'Wood Helmet', type: ITEM_TYPE.ARMOR | ITEM_TYPE.CRAFTING, stype: 'head', armor: 'head', star: 1, image: 'tools_32_32-10-7', placedright: 'heads_26_22-1-0', placedleft: 'heads_26_22-1-1', defense: 1, help: 'Armors', tooltip: 'Provides sturdy protection', set: 'wood'},
@@ -605,12 +615,27 @@ export const RECIPES = [
   {result: {item: 'chainIron', count: 11}, station: 'anvil', ingredients: [{item: 'barIron', count: 1}]},
   {result: {item: 'chainSilver', count: 10}, station: 'anvil', ingredients: [{item: 'barSilver', count: 1}]},
   {result: {item: 'wireCopper', count: 24}, station: 'anvil', ingredients: [{item: 'barCopper', count: 1}]},
-  {result: {item: 'wireCopper', count: 24}, station: 'anvil', ingredients: [{item: 'barCopper', count: 1}]},
-  {result: {item: 'wireCopper', count: 24}, station: 'anvil', ingredients: [{item: 'barCopper', count: 1}]},
-  {result: {item: 'wireCopper', count: 24}, station: 'anvil', ingredients: [{item: 'barCopper', count: 1}]},
   {result: {item: 'wireIron', count: 22}, station: 'anvil', ingredients: [{item: 'barIron', count: 1}]},
   {result: {item: 'wireGold', count: 20}, station: 'anvil', ingredients: [{item: 'barGold', count: 1}]},
   {result: {item: 'wireCobalt', count: 18}, station: 'forge', ingredients: [{item: 'barCobalt', count: 1}]},
+  {result: {item: 'plateCopper', count: 8}, station: 'anvil', ingredients: [{item: 'barCopper', count: 1}]},
+  {result: {item: 'plateIron', count: 7}, station: 'anvil', ingredients: [{item: 'barIron', count: 1}]},
+  {result: {item: 'plateIron', count: 7}, station: 'anvil', ingredients: [{item: 'barIron', count: 1}]},
+  {result: {item: 'plateGold', count: 6}, station: 'anvil', ingredients: [{item: 'barGold', count: 1}]},
+  {result: {item: 'plateCobalt', count: 5}, station: 'anvil', ingredients: [{item: 'barCobalt', count: 1}]},
+  {result: {item: 'platePlatinum', count: 4}, station: 'anvil', ingredients: [{item: 'barPlatinum', count: 1}]},
+
+  // Trinkets
+  {result: {item: 'clockCopper', count: 1}, station: 'workbench', ingredients: [{item: 'barCopper', count: 1}, {item: 'chainCopper', count: 1}, {item: 'glass', count: 1}, {item: 'cutTopaz', count: 1}]},
+  {result: {item: 'clockSilver', count: 1}, station: 'jewelerBench', ingredients: [{item: 'clockCopper', count: 1}, {item: 'barSilver', count: 1}, {item: 'chainSilver', count: 1}, {item: 'glass', count: 1}, {item: 'cutRuby', count: 1}]},
+  {result: {item: 'clockGold', count: 1}, station: 'jewelerBench', ingredients: [{item: 'clockSilver', count: 1}, {item: 'barGold', count: 1}, {item: 'wireCobalt', count: 1}, {item: 'glass', count: 1}, {item: 'cutEmerald', count: 1}]},
+  {result: {item: 'ruler', count: 1}, station: 'workbench', ingredients: [{item: 'logOak', count: 1}, {item: 'blockStone', count: 1}, {item: 'plateGold', count: 1}]},
+  {result: {item: 'stopwatch', count: 1}, station: 'jewelerBench', ingredients: [{item: 'clockCopper', count: 1}, {item: 'blockAsh', count: 1}, {item: 'plateGold', count: 1}, {item: 'oleanderOil', count: 2}]},
+  {result: {item: 'chronometer', count: 1}, station: 'jewelerBench', ingredients: [{item: 'ruler', count: 1}, {item: 'stopwatch', count: 1}, {item: 'plateCobalt', count: 1}, {item: 'oleanderOil', count: 2}]},
+  {result: {item: 'bottledFrog', count: 1}, station: 'workbench', ingredients: [{item: 'bottle', count: 1}, {item: 'frog', count: 1}, {item: 'cutRuby', count: 1}]},
+  {result: {item: 'sextant', count: 1}, station: 'workbench', ingredients: [{item: 'logMahogany', count: 1}, {item: 'chainSilver', count: 2}, {item: 'cutRuby', count: 1}, {item: 'oleanderOil', count: 1}]},
+  {result: {item: 'astrolabe', count: 1}, station: 'jewelerBench', ingredients: [{item: 'bottledFrog', count: 1}, {item: 'sextant', count: 1}, {item: 'plateCobalt', count: 1}, {item: 'cutEmerald', count: 1}, {item: 'oleanderOil', count: 1}]},
+  {result: {item: 'astrarium', count: 1}, station: 'jewelerBench', ingredients: [{item: 'clockGold', count: 1}, {item: 'chronometer', count: 1}, {item: 'astrolabe', count: 1}, {item: 'platePlatinum', count: 1}, {item: 'cutSapphire', count: 2}, {item: 'oleanderOil', count: 2}]},
 
   // Food - Tier 1-3
   {result: {item: 'daw', count: 4}, station: 'byHand', ingredients: [{item: 'flour', count: 1}, {item: 'water', count: 1}], returned: [{item: 'bottle', count: 1}]},

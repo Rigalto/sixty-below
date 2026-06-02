@@ -8,6 +8,18 @@ export const ACHIEVEMENT_CATEGORIES = [
     items: ['barCopper', 'barIron', 'barSilver', 'barGold', 'barCobalt', 'barPlatinum']
   },
   {
+    id: 'crafting-fit-fast',
+    label: 'Crafting — Metal Fittings - Fasteners',
+    thresholds: [24, 120, 360],
+    items: ['nailIron', 'nailCobalt', 'rivetCobalt', 'rivetPlatinum', 'chainCopper', 'chainIron', 'chainSilver', 'wireCopper', 'wireIron', 'wireGold', 'wireCobalt']
+  },
+  {
+    id: 'crafting-fit-part',
+    label: 'Crafting — Metal Fittings - Parts',
+    thresholds: [24, 120, 360],
+    items: ['plateCopper', 'plateIron', 'plateIron', 'plateGold', 'plateCobalt', 'platePlatinum']
+  },
+  {
     id: 'crafting-gem',
     label: 'Crafting — Gems',
     thresholds: [10, 80, 160],
@@ -15,7 +27,7 @@ export const ACHIEVEMENT_CATEGORIES = [
   },
   {
     id: 'crafting-trinket-env',
-    label: 'Crafting — Environment Trinket',
+    label: 'Crafting — Trinkets - Environment',
     thresholds: [1, 1, 1],
     items: ['clockCopper', 'clockSilver', 'clockGold', 'bottledFrog', 'sextant', 'ruler', 'stopwatch', 'astrolabe', 'chronometer', 'astrarium']
   },
