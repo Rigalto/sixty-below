@@ -202,9 +202,9 @@ export const ITEMS = {
   barCopper: {name: 'Copper Bar', type: 0, star: 1, stype: 'bar', image: 'refined_32_32-0-0', help: 'Metals', tooltip: 'Crafting material used to craft tools, weapons, armor, and other items'},
   barIron: {name: 'Iron Bar', type: 0, star: 2, stype: 'bar', image: 'refined_32_32-1-0', help: 'Metals', tooltip: 'Crafting material used to craft tools, weapons, armor, and other items'},
   barSilver: {name: 'Silver Bar', type: 0, star: 3, stype: 'bar', image: 'refined_32_32-2-0', help: 'Metals', tooltip: 'Crafting material used to craft tools, weapons, armor, and other items'},
-  barGold: {name: 'Gold Bar', type: 0, star: 3, stype: 'bar', image: 'blocks_16_16-0-0', help: 'Metals', tooltip: 'Crafting material used to craft tools, weapons, armor, and other items'},
-  barCobalt: {name: 'Cobalt Bar', type: 0, star: 4, stype: 'bar', image: 'blocks_16_16-0-0', help: 'Metals', tooltip: 'Crafting material used to craft tools, weapons, armor, and other items'},
-  barPlatinum: {name: 'Platinum Bar', type: 0, star: 5, stype: 'bar', image: 'blocks_16_16-0-0', help: 'Metals', tooltip: 'Crafting material used to craft tools, weapons, armor, and other items'},
+  barGold: {name: 'Gold Bar', type: 0, star: 3, stype: 'bar', image: 'refined_32_32-3-0', help: 'Metals', tooltip: 'Crafting material used to craft tools, weapons, armor, and other items'},
+  barCobalt: {name: 'Cobalt Bar', type: 0, star: 4, stype: 'bar', image: 'refined_32_32-4-0', help: 'Metals', tooltip: 'Crafting material used to craft tools, weapons, armor, and other items'},
+  barPlatinum: {name: 'Platinum Bar', type: 0, star: 5, stype: 'bar', image: 'refined_32_32-5-0', help: 'Metals', tooltip: 'Crafting material used to craft tools, weapons, armor, and other items'},
 
   // Raw Gems [succès]
   rawTopaz: {name: 'Raw Topaz', type: 0, star: 2, stype: 'gem', image: 'mined_32_32-3-3', help: 'Gems', tooltip: 'Valuable crafting materials to be cut at a Stone Bench'},
