@@ -7,6 +7,226 @@ import {createOverlayHeader} from './ui.mjs'
 import {HELP, HELP_CATEGORIES} from '../assets/data/data-help.mjs'
 
 /* ====================================================================================================
+   CSS
+   ==================================================================================================== */
+
+// injection des classes HTML utilisées par toutes les classes du fichier
+const helpStyle = document.createElement('style')
+helpStyle.textContent = /* css */`
+#ui-help-panel {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 1000px;
+  height: 600px;
+  background-color: var(--ov-bg-main);
+  border: 1px solid var(--ov-border);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.8);
+  border-radius: 4px;
+  display: none;
+  flex-direction: column;
+  font-family: Segoe UI, Roboto, sans-serif;
+  color: var(--ov-text);
+  user-select: none;
+}
+
+#ui-help-panel.open {
+  display: flex;
+}
+
+/* ── Corps ── */
+
+#ui-help-panel .help-body {
+  display: flex;
+  flex: 1;
+  overflow: hidden;
+}
+
+/* ── Panneau gauche ── */
+
+#ui-help-panel .help-left {
+  width: 260px;
+  min-width: 260px;
+  background-color: var(--ov-bg-side);
+  border-right: 1px solid var(--ov-border);
+  display: flex;
+  flex-direction: column;
+  padding: 8px;
+  gap: 6px;
+}
+
+#ui-help-panel .help-search-row {
+  display: flex;
+  gap: 4px;
+  align-items: center;
+}
+
+#ui-help-panel .help-search-input {
+  flex: 1;
+  min-width: 0;
+  padding: 4px 6px;
+  background-color: var(--ov-bg-input);
+  border: 1px solid var(--ov-border-sub);
+  border-radius: 3px;
+  color: var(--ov-text);
+  font-size: 13px;
+  outline: none;
+}
+
+#ui-help-panel .help-search-input:focus {
+  border-color: var(--ov-accent);
+}
+
+#ui-help-panel .help-icon-btn {
+  flex-shrink: 0;
+  width: 26px;
+  height: 26px;
+  background-color: var(--ov-btn-bg);
+  border: 1px solid var(--ov-border-sub);
+  border-radius: 3px;
+  color: #bdc3c7;
+  cursor: pointer;
+  font-size: 13px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+}
+
+#ui-help-panel .help-icon-btn:hover:not(:disabled) {
+  background-color: #3a4a6b;
+  color: var(--ov-text);
+}
+
+#ui-help-panel .help-icon-btn:disabled {
+  opacity: 0.35;
+  cursor: default;
+}
+
+#ui-help-panel .help-icon-btn svg { width: 16px; height: 16px; }
+
+#ui-help-panel .help-category-select {
+  width: 100%;
+  padding: 4px 6px;
+  background-color: var(--ov-bg-input);
+  border: 1px solid var(--ov-border-sub);
+  border-radius: 3px;
+  color: var(--ov-text);
+  font-size: 13px;
+  cursor: pointer;
+  outline: none;
+}
+
+#ui-help-panel .help-category-select:focus {
+  border-color: var(--ov-accent);
+}
+
+#ui-help-panel .help-nav-row {
+  display: flex;
+  gap: 4px;
+}
+
+#ui-help-panel .help-nav-btn {
+  flex: 1;
+}
+
+#ui-help-panel .help-grid {
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+  display: flex;
+  flex-wrap: wrap;
+  align-content: flex-start;
+  gap: 4px;
+  padding-right: 2px;
+}
+
+#ui-help-panel .help-grid::-webkit-scrollbar { width: 6px; }
+#ui-help-panel .help-grid::-webkit-scrollbar-track { background: var(--ov-bg-input); border-radius: 3px; }
+#ui-help-panel .help-grid::-webkit-scrollbar-thumb { background: var(--ov-border-sub); border-radius: 3px; }
+#ui-help-panel .help-grid::-webkit-scrollbar-thumb:hover { background: var(--ov-accent); }
+
+#ui-help-panel .help-topic-btn {
+  padding: 3px 8px;
+  background-color: #3a3f44;
+  border: 1px solid var(--ov-border-sub);
+  border-radius: 3px;
+  color: var(--ov-text-sec);
+  font-size: 12px;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background-color 0.15s, color 0.15s;
+}
+
+#ui-help-panel .help-topic-btn:hover,
+#ui-help-panel .help-topic-btn.active {
+  background-color: var(--ov-accent);
+  color: var(--ov-text);
+  border-color: var(--ov-accent);
+}
+
+/* ── Panneau droit ── */
+
+#ui-help-panel .help-right {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+#ui-help-panel .help-right-title {
+  padding: 12px 20px 8px;
+  font-size: 18px;
+  font-weight: bold;
+  color: var(--ov-text);
+  border-bottom: 1px solid var(--ov-border);
+  flex-shrink: 0;
+}
+
+#ui-help-panel .help-right-content {
+  flex: 1;
+  overflow-y: auto;
+  padding: 14px 20px;
+  font-size: 14px;
+  line-height: 1.6;
+  color: var(--ov-text-sec);
+}
+
+/* ── Contenu des fiches ── */
+
+#ui-help-panel .help-link { color: #90cdf4; text-decoration: underline; cursor: pointer; }
+#ui-help-panel .help-link:hover { color: #bee3f8; }
+
+#ui-help-panel .help-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+  margin: 4px 0;
+}
+
+#ui-help-panel .help-table th {
+  background-color: var(--ov-btn-bg);
+  color: var(--ov-text);
+  font-weight: bold;
+  padding: 6px 10px;
+  text-align: left;
+  border-bottom: 2px solid var(--ov-accent);
+}
+
+#ui-help-panel .help-table td {
+  padding: 5px 10px;
+  border-bottom: 1px solid var(--ov-border);
+  color: var(--ov-text-sec);
+}
+
+#ui-help-panel .help-table tr:nth-child(even) td { background-color: var(--ov-bg-deep); }
+#ui-help-panel .help-table tr:nth-child(odd) td  { background-color: #2f3340; }
+#ui-help-panel .help-table tr:hover td           { background-color: #3a4a6b; }
+`
+document.head.appendChild(helpStyle)
+
+/* ====================================================================================================
    HELP OVERLAY
    ====================================================================================================
 
@@ -52,7 +272,6 @@ class HelpOverlay {
 
   constructor () {
     this.#buildDOM()
-    this.#injectStyles()
     this.#bindEvents()
   }
 
@@ -187,233 +406,6 @@ class HelpOverlay {
     btn.classList.add('help-nav-btn')
     btn.disabled = true
     return btn
-  }
-
-  // ─── Styles globaux (hover, scrollbar, focus) ─────────────────
-
-  /**
-   * Injecte une balise <style> unique dans document.head.
-   * Idempotente — sans effet si 'help-styles' est déjà présent.
-   */
-  #injectStyles () {
-    if (document.getElementById('help-styles')) return
-
-    const style = document.createElement('style')
-    style.id = 'help-styles'
-    style.textContent = /* css */`
-
-    #ui-help-panel {
-      position: fixed;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      width: 1000px;
-      height: 600px;
-      background-color: var(--ov-bg-main);
-      border: 1px solid var(--ov-border);
-      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.8);
-      border-radius: 4px;
-      display: none;
-      flex-direction: column;
-      font-family: Segoe UI, Roboto, sans-serif;
-      color: var(--ov-text);
-      user-select: none;
-    }
-
-    #ui-help-panel.open {
-      display: flex;
-    }
-
-    /* ── Corps ── */
-
-    #ui-help-panel .help-body {
-      display: flex;
-      flex: 1;
-      overflow: hidden;
-    }
-
-    /* ── Panneau gauche ── */
-
-    #ui-help-panel .help-left {
-      width: 260px;
-      min-width: 260px;
-      background-color: var(--ov-bg-side);
-      border-right: 1px solid var(--ov-border);
-      display: flex;
-      flex-direction: column;
-      padding: 8px;
-      gap: 6px;
-    }
-
-    #ui-help-panel .help-search-row {
-      display: flex;
-      gap: 4px;
-      align-items: center;
-    }
-
-    #ui-help-panel .help-search-input {
-      flex: 1;
-      min-width: 0;
-      padding: 4px 6px;
-      background-color: var(--ov-bg-input);
-      border: 1px solid var(--ov-border-sub);
-      border-radius: 3px;
-      color: var(--ov-text);
-      font-size: 13px;
-      outline: none;
-    }
-
-    #ui-help-panel .help-search-input:focus {
-      border-color: var(--ov-accent);
-    }
-
-    #ui-help-panel .help-icon-btn {
-      flex-shrink: 0;
-      width: 26px;
-      height: 26px;
-      background-color: var(--ov-btn-bg);
-      border: 1px solid var(--ov-border-sub);
-      border-radius: 3px;
-      color: #bdc3c7;
-      cursor: pointer;
-      font-size: 13px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 0;
-    }
-
-    #ui-help-panel .help-icon-btn:hover:not(:disabled) {
-      background-color: #3a4a6b;
-      color: var(--ov-text);
-    }
-
-    #ui-help-panel .help-icon-btn:disabled {
-      opacity: 0.35;
-      cursor: default;
-    }
-
-    #ui-help-panel .help-icon-btn svg { width: 16px; height: 16px; }
-
-    #ui-help-panel .help-category-select {
-      width: 100%;
-      padding: 4px 6px;
-      background-color: var(--ov-bg-input);
-      border: 1px solid var(--ov-border-sub);
-      border-radius: 3px;
-      color: var(--ov-text);
-      font-size: 13px;
-      cursor: pointer;
-      outline: none;
-    }
-
-    #ui-help-panel .help-category-select:focus {
-      border-color: var(--ov-accent);
-    }
-
-    #ui-help-panel .help-nav-row {
-      display: flex;
-      gap: 4px;
-    }
-
-    #ui-help-panel .help-nav-btn {
-      flex: 1;
-    }
-
-    #ui-help-panel .help-grid {
-      flex: 1;
-      overflow-y: auto;
-      overflow-x: hidden;
-      display: flex;
-      flex-wrap: wrap;
-      align-content: flex-start;
-      gap: 4px;
-      padding-right: 2px;
-    }
-
-    #ui-help-panel .help-grid::-webkit-scrollbar { width: 6px; }
-    #ui-help-panel .help-grid::-webkit-scrollbar-track { background: var(--ov-bg-input); border-radius: 3px; }
-    #ui-help-panel .help-grid::-webkit-scrollbar-thumb { background: var(--ov-border-sub); border-radius: 3px; }
-    #ui-help-panel .help-grid::-webkit-scrollbar-thumb:hover { background: var(--ov-accent); }
-
-    #ui-help-panel .help-topic-btn {
-      padding: 3px 8px;
-      background-color: #3a3f44;
-      border: 1px solid var(--ov-border-sub);
-      border-radius: 3px;
-      color: var(--ov-text-sec);
-      font-size: 12px;
-      cursor: pointer;
-      white-space: nowrap;
-      transition: background-color 0.15s, color 0.15s;
-    }
-
-    #ui-help-panel .help-topic-btn:hover,
-    #ui-help-panel .help-topic-btn.active {
-      background-color: var(--ov-accent);
-      color: var(--ov-text);
-      border-color: var(--ov-accent);
-    }
-
-    /* ── Panneau droit ── */
-
-    #ui-help-panel .help-right {
-      flex: 1;
-      display: flex;
-      flex-direction: column;
-      overflow: hidden;
-    }
-
-    #ui-help-panel .help-right-title {
-      padding: 12px 20px 8px;
-      font-size: 18px;
-      font-weight: bold;
-      color: var(--ov-text);
-      border-bottom: 1px solid var(--ov-border);
-      flex-shrink: 0;
-    }
-
-    #ui-help-panel .help-right-content {
-      flex: 1;
-      overflow-y: auto;
-      padding: 14px 20px;
-      font-size: 14px;
-      line-height: 1.6;
-      color: var(--ov-text-sec);
-    }
-
-    /* ── Contenu des fiches ── */
-
-    #ui-help-panel .help-link { color: #90cdf4; text-decoration: underline; cursor: pointer; }
-    #ui-help-panel .help-link:hover { color: #bee3f8; }
-
-    #ui-help-panel .help-table {
-      width: 100%;
-      border-collapse: collapse;
-      font-size: 13px;
-      margin: 4px 0;
-    }
-
-    #ui-help-panel .help-table th {
-      background-color: var(--ov-btn-bg);
-      color: var(--ov-text);
-      font-weight: bold;
-      padding: 6px 10px;
-      text-align: left;
-      border-bottom: 2px solid var(--ov-accent);
-    }
-
-    #ui-help-panel .help-table td {
-      padding: 5px 10px;
-      border-bottom: 1px solid var(--ov-border);
-      color: var(--ov-text-sec);
-    }
-
-    #ui-help-panel .help-table tr:nth-child(even) td { background-color: var(--ov-bg-deep); }
-    #ui-help-panel .help-table tr:nth-child(odd) td  { background-color: #2f3340; }
-    #ui-help-panel .help-table tr:hover td           { background-color: #3a4a6b; }
-  `
-    document.head.appendChild(style)
   }
 
   // ─── Événements ───────────────────────────────────────────────
