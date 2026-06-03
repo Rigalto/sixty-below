@@ -11,8 +11,8 @@ import {furnitureManager} from './housing.mjs'
    CSS - injection des styles utilisés par toutes les classes du fichier
    ==================================================================================================== */
 
-const inventorySlotStyle = document.createElement('style')
-inventorySlotStyle.textContent = /* css */`
+const inventoryStyle = document.createElement('style')
+inventoryStyle.textContent = /* css */`
 inventory-slot {
   position: relative;
   display: inline-block;
@@ -367,7 +367,7 @@ inventory-slot .hidden {
   opacity: 0.8;
 }
 `
-document.head.appendChild(inventorySlotStyle)
+document.head.appendChild(inventoryStyle)
 
 /* ====================================================================================================
    INVENTORY MANAGER

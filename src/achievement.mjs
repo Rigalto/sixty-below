@@ -8,6 +8,103 @@ import {ITEMS, MONSTERS} from '../../assets/data/data.mjs'
 import {ACHIEVEMENT_CATEGORIES} from '../../assets/data/data-achievement.mjs'
 
 /* ====================================================================================================
+   CSS - injection des styles utilisés par toutes les classes du fichier
+   ==================================================================================================== */
+
+const achievementStyle = document.createElement('style')
+achievementStyle.textContent = /* css */`
+#ui-achievement-panel {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 600px;
+  height: 500px;
+  background-color: var(--ov-bg-side);
+  border: 1px solid var(--ov-border);
+  box-shadow: 0 10px 30px rgba(0,0,0,0.8);
+  border-radius: 4px;
+  z-index: ${OVERLAYS.achievement.zIndex};
+  display: none;
+  flex-direction: column;
+  font-family: Segoe UI, Roboto, sans-serif;
+  color: #ffffff;
+  user-select: none;
+}
+#ui-achievement-panel .ach-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  padding: 0;
+  gap: 12px;
+  overflow: hidden;
+  background-color: var(--ov-bg-main);
+}
+#ui-achievement-panel .ach-summary {
+  font-size: 16px;
+  font-weight: bold;
+  color: var(--ov-text-orange);
+  text-align: center;
+  background-color: var(--ov-bg-deep);
+  padding: 24px;
+  border-radius: 4px;
+}
+
+#ui-achievement-panel .ach-list {
+  flex: 1;
+  padding: 0 16px 16px 16px;
+  min-height: 0;      /* indispensable pour qu'un enfant flex puisse scroller */
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+#ui-achievement-panel .ach-category-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 12px;
+  border-radius: 4px;
+  background-color: var(--ov-bg-side);
+  border: 1px solid var(--ov-border-sub);
+  cursor: pointer;
+}
+#ui-achievement-panel .ach-category-row:hover {
+  background-color: var(--ov-bg-deep);
+  border-color: var(--ov-border);
+}
+#ui-achievement-panel .ach-category-label { color: var(--ov-text); font-size: 14px; }
+#ui-achievement-panel .ach-category-pts   { font-size: 13px; font-weight: bold; }
+
+#ui-achievement-panel .ach-detail {
+  padding: 8px 12px;
+  background-color: var(--ov-bg-deep);
+  border: 1px solid var(--ov-border-sub);
+  border-radius: 4px;
+  margin-left: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+#ui-achievement-panel .ach-detail-row  {
+  display: grid;
+  grid-template-columns: 1fr 300px 20px;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+}
+#ui-achievement-panel .ach-detail-name  { color: var(--ov-text); }
+#ui-achievement-panel .ach-detail-count {
+  text-align: center;
+  color: var(--ov-text-muted);
+  white-space: nowrap;
+}
+#ui-achievement-panel .ach-detail-pts   {text-align: right; font-weight: bold; }
+`
+document.head.appendChild(achievementStyle)
+
+/* ====================================================================================================
    ACHIEVEMENT MANAGER
    ====================================================================================================
 
@@ -187,100 +284,6 @@ class AchievementManager {
   }
 }
 export const achievementManager = new AchievementManager()
-
-// ── Styles AchievementOverlay ────────────────────────────────────────────────
-const achievementStyle = document.createElement('style')
-achievementStyle.textContent = /* css */`
-#ui-achievement-panel {
-  position: fixed;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  width: 600px;
-  height: 500px;
-  background-color: var(--ov-bg-side);
-  border: 1px solid var(--ov-border);
-  box-shadow: 0 10px 30px rgba(0,0,0,0.8);
-  border-radius: 4px;
-  z-index: ${OVERLAYS.achievement.zIndex};
-  display: none;
-  flex-direction: column;
-  font-family: Segoe UI, Roboto, sans-serif;
-  color: #ffffff;
-  user-select: none;
-}
-#ui-achievement-panel .ach-content {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  padding: 0;
-  gap: 12px;
-  overflow: hidden;
-  background-color: var(--ov-bg-main);
-}
-#ui-achievement-panel .ach-summary {
-  font-size: 16px;
-  font-weight: bold;
-  color: var(--ov-text-orange);
-  text-align: center;
-  background-color: var(--ov-bg-deep);
-  padding: 24px;
-  border-radius: 4px;
-}
-
-#ui-achievement-panel .ach-list {
-  flex: 1;
-  padding: 0 16px 16px 16px;
-  min-height: 0;      /* indispensable pour qu'un enfant flex puisse scroller */
-  overflow-y: auto;
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-#ui-achievement-panel .ach-category-row {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 8px 12px;
-  border-radius: 4px;
-  background-color: var(--ov-bg-side);
-  border: 1px solid var(--ov-border-sub);
-  cursor: pointer;
-}
-#ui-achievement-panel .ach-category-row:hover {
-  background-color: var(--ov-bg-deep);
-  border-color: var(--ov-border);
-}
-#ui-achievement-panel .ach-category-label { color: var(--ov-text); font-size: 14px; }
-#ui-achievement-panel .ach-category-pts   { font-size: 13px; font-weight: bold; }
-
-#ui-achievement-panel .ach-detail {
-  padding: 8px 12px;
-  background-color: var(--ov-bg-deep);
-  border: 1px solid var(--ov-border-sub);
-  border-radius: 4px;
-  margin-left: 24px;
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-}
-
-#ui-achievement-panel .ach-detail-row  {
-  display: grid;
-  grid-template-columns: 1fr 300px 20px;
-  align-items: center;
-  gap: 8px;
-  font-size: 12px;
-}
-#ui-achievement-panel .ach-detail-name  { color: var(--ov-text); }
-#ui-achievement-panel .ach-detail-count {
-  text-align: center;
-  color: var(--ov-text-muted);
-  white-space: nowrap;
-}
-#ui-achievement-panel .ach-detail-pts   {text-align: right; font-weight: bold; }
-`
-document.head.appendChild(achievementStyle)
 
 /* ====================================================================================================
    ACHIEVEMENT OVERLAY
