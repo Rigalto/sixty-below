@@ -1027,27 +1027,31 @@ inventory-slot.hotbar {
   color: black;
 }
 
-inventory-slot.armor { background-color: var(--slot-bg-armor); }
-inventory-slot.armor.slot-armor-set { background-color: var(--slot-bg-armor-set); }
-inventory-slot.accessory { background-color: var(--slot-bg-accessory); }
+inventory-slot.armor {
+  background-color: var(--slot-bg-armor);
+  color: black;
+}
+inventory-slot.armor.slot-armor-set {
+  background-color: var(--slot-bg-armor-set);
+}
+inventory-slot.accessory {
+  background-color: var(--slot-bg-accessory);
+  color: black;
+}
 inventory-slot.inactive {
   background-color: var(--slot-bg-inactive);
   cursor: default;
 }
-
 inventory-slot:hover {
-  border-color: #f1a15bff;  /* gris clair — neutre sur tous les fonds */
+  border-color: #f1a15bff;
 }
-
 inventory-slot.inactive:hover {
   border-color: #888;
 }
-
 inventory-slot.selected,
 inventory-slot.selected:hover {
   border-color: #f80;  /* orange prime sur le hover */
 }
-
 inventory-slot .key {
   position: absolute;
   top: 3px;
@@ -1079,8 +1083,7 @@ inventory-slot .count {
   bottom: 2px;
   left: 50%;
   transform: translateX(-50%);
-  font-size: 11px;
-  color: black;
+  font-size: 12px;
   line-height: 1;
   pointer-events: none;
 }
