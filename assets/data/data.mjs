@@ -86,7 +86,7 @@ export const NODES = {
   OBSIDIAN: {code: 92, name: 'Obsidian', type: NODE_TYPE.ROCK, star: 5, solid: true, color: '#73c882', image: 'rock_16_16+3', mining: {speed: 2000, items: [{item: 'blockObsidian', count: 1}]}, help: 'Obsidian'},
   METEORITE: {code: 93, name: 'Meteorite', type: NODE_TYPE.ROCK, stype: 'block', star: 5, solid: true, color: '#7d6f5f', image: 'rock_16_16+2', mining: {speed: 2000, items: [{item: 'blockMeteorite', count: 1}]}, help: 'Meteorite'}, // SURFACE
   HIVE: {code: 94, name: 'Hive', type: NODE_TYPE.ROCK, stype: 'block', star: 3, solid: true, color: '#fd8431', image: 'rock_16_16+6', mining: {speed: 1200, items: [{item: 'blockHive', count: 1}]}, help: 'Hive'},
-  SHELL: {code: 95, name: 'Shell', type: NODE_TYPE.ROCK, stype: 'block', star: 2, solid: true, color: '#e9e3e0ff', image: 'rock_16_16+7', mining: {speed: 1800, items: [{item: 'shell', count: 4}]}, help: 'Shell'},
+  SHELL: {code: 95, name: 'Shell', type: NODE_TYPE.ROCK, stype: 'block', star: 2, solid: true, color: '#e9e3e0ff', image: 'rock_16_16+7', mining: {speed: 1800, items: [{item: 'blockShell', count: 4}]}, help: 'Shell'},
 
   // ── HOUSING (murs des maisons) ────────────────────────
 
@@ -224,10 +224,13 @@ export const ITEMS = {
   // Rock - Others
   blockObsidian: {name: 'Obsidian Block', type: 0, star: 5, stype: 'block', image: 'blocks_16_16-0-0', help: 'Obsidian', tooltip: 'Hardest material'},
   blockMeteorite: {name: 'Meteorite Block', type: 0, star: 5, stype: 'block', image: 'blocks_16_16-0-0', help: 'Meteorite', tooltip: 'Falling from space, hard to use'},
+
+  // Hive
   blockHive: {name: 'Hive Block', type: 0, star: 3, stype: 'block', image: 'blocks_16_16-0-0', help: 'Hive', tooltip: 'Hexagonal alveoles build by Bees'},
+  beeswax: {name: 'Beeswax', type: 0, star: 3, stype: 'wax', image: 'refined_32_32-5-1', help: 'Hive', tooltip: 'Melted down from honeycombs, used as a binding agent'},
 
   // Shell
-  shell: {name: 'Shell', type: 0, star: 3, stype: 'block', image: 'mined_32_32-2-2', help: 'Shell', tooltip: 'Can be easily powdered'},
+  blockShell: {name: 'Shell Block', type: 0, star: 3, stype: 'block', image: 'mined_32_32-2-2', help: 'Shell', tooltip: 'Can be easily powdered'},
   shellPowder: {name: 'Shell Powder', type: 0, star: 3, stype: 'powder', image: 'refined_32_32-4-1', help: 'Shell', tooltip: 'A fine natural abrasive — used in polishing and grinding recipes'},
 
   // Cobweb
@@ -355,8 +358,8 @@ export const ITEMS = {
   // Metal Fittings Fasteners [succès]
   nailIron: {name: 'Iron Nail', type: 0, stype: 'fitting', star: 2, image: 'refined_32_32-6-0', help: 'Metal Fittings', tooltip: 'Fastener used to built or repair a lot of items'},
   nailCobalt: {name: 'Cobalt Nail', type: 0, stype: 'fitting', star: 4, image: 'refined_32_32-7-0', help: 'Metal Fittings', tooltip: 'Fastener used to built or repair a lot of items'},
-  rivetCobalt: {name: 'Cobalt Rivet', type: 0, stype: 'fitting', star: 4, image: 'crafting_32_32-2-0', help: 'Metal Fittings', tooltip: 'Strong fastener used to built a lot of high tier items'},
-  rivetPlatinum: {name: 'Platinum Rivet', type: 0, stype: 'fitting', star: 5, image: 'crafting_32_32-2-0', help: 'Metal Fittings', tooltip: 'Strong fastener used to built a lot of high tier items'},
+  rivetCobalt: {name: 'Cobalt Rivet', type: 0, stype: 'fitting', star: 4, image: 'refined_32_32-6-1', help: 'Metal Fittings', tooltip: 'Strong fastener used to built a lot of high tier items'},
+  rivetPlatinum: {name: 'Platinum Rivet', type: 0, stype: 'fitting', star: 5, image: 'refined_32_32-7-1', help: 'Metal Fittings', tooltip: 'Strong fastener used to built a lot of high tier items'},
   chainCopper: {name: 'Copper Chain', type: 0, stype: 'fitting', star: 1, image: 'crafting_32_32-2-0', help: 'Metal Fittings', tooltip: 'Fastener used to built a lot of sensitive items'},
   chainIron: {name: 'Iron Chain', type: 0, stype: 'fitting', star: 2, image: 'crafting_32_32-2-0', help: 'Metal Fittings', tooltip: 'Fastener used to built a lot of sensitive items'},
   chainSilver: {name: 'Silver Chain', type: 0, stype: 'fitting', star: 3, image: 'crafting_32_32-2-0', help: 'Metal Fittings', tooltip: 'Fastener used to built a lot of sensitive items'},
@@ -583,7 +586,7 @@ export const RECIPES = [
 
   {result: {item: 'cookingPot', count: 1}, station: 'anvil', ingredients: [{item: 'barCopper', count: 2}, {item: 'barIron', count: 8}, {item: 'logOak', count: 4}, {item: 'torch', count: 2}]},
   {result: {item: 'forge', count: 1}, station: 'anvil', ingredients: [{item: 'barCobalt', count: 12}, {item: 'barIron', count: 6}, {item: 'logMahogany', count: 4}, {item: 'leather', count: 2}]},
-  {result: {item: 'stoneBench', count: 1}, station: 'anvil', ingredients: [{item: 'blockSandstone', count: 12}, {item: 'blockAsh', count: 8}, {item: 'barIron', count: 8}, {item: 'logMahogany', count: 6}, {item: 'shell', count: 3}]},
+  {result: {item: 'stoneBench', count: 1}, station: 'anvil', ingredients: [{item: 'blockSandstone', count: 12}, {item: 'blockAsh', count: 8}, {item: 'barIron', count: 8}, {item: 'logMahogany', count: 6}, {item: 'blockShell', count: 3}]},
 
   // containers
   {result: {item: 'glass', count: 1}, station: 'furnace', ingredients: [{item: 'blockSand', count: 2}]},
@@ -607,7 +610,8 @@ export const RECIPES = [
   {result: {item: 'barGold', count: 1}, station: 'furnace', ingredients: [{item: 'chunkGold', count: 4}, {item: 'logMahogany', count: 1}]},
   {result: {item: 'barCobalt', count: 1}, station: 'furnace', ingredients: [{item: 'chunkCobalt', count: 5}, {item: 'logOak', count: 1}, {item: 'logMahogany', count: 1}]},
   {result: {item: 'barPlatinum', count: 1}, station: 'blastFurnace', ingredients: [{item: 'chunkPlatinum', count: 5}, {item: 'logOak', count: 1}, {item: 'logMahogany', count: 1}]},
-  {result: {item: 'shellPowder', count: 3}, station: 'stoneBench', ingredients: [{item: 'shell', count: 1}]},
+  {result: {item: 'shellPowder', count: 3}, station: 'stoneBench', ingredients: [{item: 'blockShell', count: 1}]},
+  {result: {item: 'beeswax', count: 7}, station: 'stoneBench', ingredients: [{item: 'blockHive', count: 2}]},
 
   // Metal fittings
   {result: {item: 'nailIron', count: 32}, station: 'anvil', ingredients: [{item: 'barIron', count: 1}]},

@@ -5,8 +5,13 @@
  * SYNTAXE DU Markdown enrichi
  * ═══════════════════════════════════════════════════════════════
  *
+ * ── Consignes d'écriture ───────────────────────────────────────
  *
- * ── Markdown ────────────────────────────────────────────────────
+ *   Ne pas mettre 'Drops' dans les titres, mais 'Loot'.
+ *   Ne pas mettre dans la section "See Also" une fiche cible déjà linkée dans le texte.
+ *   Ne mettre une balise <hr> que si les sections qu'elles délimitent peuvent se lire seules, indépendamment de celles qui précèdent ou suivent.
+ *
+ * ── Markdown ───────────────────────────────────────────────────
  *   **gras**         _italique_        __souligné__
  *
  *   * puce niveau 1
@@ -50,7 +55,7 @@
  *   |optional|   → chaîne vide si absent, pas de ⚠️
  *   |list|       → liste à puces  (* item\n* item\n...)
  *   |lines|      → valeurs séparées par <br>
- *   |loot|       → table de drops ⏳
+ *   |loot|       → table de loot ⏳
  *
  *  * ── Données dynamiques des recettes ──────────────────────────
  *   Syntaxe générale :
@@ -93,7 +98,7 @@ const HELP_TEMPLATES = {
   miningInfo: `
 **How to mine**
 Use a [[Mining Tools|{1}]] of at least ⭐{2} to mine [[node:{3}]].
-Mining drops: {{node:{3}:mining[:items[0]:item|link}}
+Mining Loot: {{node:{3}:mining[:items[0]:item|link}}
   `,
 
   statTable: `
@@ -589,9 +594,9 @@ Fossil Veins are horizontal deposits of [[node:shell]] embedded in the rock. The
 * [[node:shell]] — horizontal vein
 * Protected by a [[node:sandstone]] border visible on cave walls
 
-**Drops** ⏳
+**Loot** ⏳
 
-* [[item:shell]] — mined from the vein
+* [[item:blockShell]] — mined from the vein
 * [[item:shellPowder]] — crafted from Shell ⏳
 
 **Tips**
@@ -782,11 +787,11 @@ A large underground cave found in [[Jungle]] biomes. Its walls are covered in lu
     content: `
 **Description**
 
-Hives are large circular caverns built by bees deep in [[Jungle]] biomes. Their walls are made of [[node:hive]] blocks and their interior is filled with [[node:honey]], one of the most valuable liquids in the game. The inhabitants defend their home aggressively.
+Hives are large circular caverns built by [[Bees]] deep in [[Jungle]] biomes. Their walls are made of [[node:hive]] blocks and their interior is filled with [[node:honey]], one of the most valuable liquids in the game. The inhabitants defend their home aggressively.
 
 **Main Location**
 
-* [[Caverns]] Top — [[Jungle]], main location
+* [[Caverns]] Top — [[Jungle]]
 
 **Materials**
 
@@ -799,15 +804,19 @@ Hives are large circular caverns built by bees deep in [[Jungle]] biomes. Their 
 
 **Inhabitants** ⏳
 
-* [[monster:bee]] — common
-* [[monster:hornet]] — uncommon
-* [[monster:beeQueen]] — boss
+| Monster | Rarity |
+|---|---|
+| [[monster:bee]] | Common |
+| [[monster:hornet]] | Uncommon |
+| [[monster:beeQueen]] | Boss |
 
 **Loot** ⏳
 
-* [[node:honey]] — abundant, difficult to collect while defended
-* [[node:hive]] — walls
-* Chest — tier 3-4 ⏳
+* [[node:honey]] — forms pools on the floor, abundant but dangerous to collect while [[Bees]] are present
+  * Collected with a [[item:bottle]] in hand → <<itemStar|honey>>
+* [[node:hive]] — makes up the walls and ceiling of the Hive
+  * Mined with an [[item:pickaxeIron]] or better → **<<itemStar|blockHive>>**
+  * [[item:blockHive]] can be smelted in a [[item:cookingPot]] → **<<itemStar|beeswax>>**
 
 **Tips**
 
@@ -1362,13 +1371,13 @@ Grass covers the surface of [[Forest]] biomes. It is the most common natural til
 
 * [[Surface]] — [[Forest]], top layer of solid ground
 
-**Mining Drops** ⏳
+**Mining Loot** ⏳
 
 Mining Tool: [[item:pickaxeCopper]] ({{item:pickaxeCopper:star|star}}) or better
 
 <<lootTable|grassForest|mining>>
 
-**Foraging Drops** ⏳
+**Foraging Loot** ⏳
 
 Harvesting Tool: [[item:sickleCopper]] ({{item:sickleCopper:star|star}}) or better
 
@@ -1395,7 +1404,7 @@ Jungle Grass covers the surface of [[Jungle]] biomes. Denser and more vibrant th
 
 * [[Surface]] — [[Jungle]], top layer of solid ground
 
-**Drops** ⏳
+**Loot** ⏳
 
 * <<miningDrop|grassJungle>>
 
@@ -1420,7 +1429,7 @@ Fern Grass covers the floor of [[Fern Cave]]s. Giant ferns grow from this soft, 
 
 * [[Fern Cave]] floor — [[Underground]], [[Forest]]
 
-**Drops** ⏳
+**Loot** ⏳
 
 * <<miningDrop|grassFern>>
 
@@ -1445,7 +1454,7 @@ Luminous moss that covers the walls and floor of [[Moss Cave]]s. Its soft green 
 
 * [[Moss Cave]] walls and floor — [[Underground]], [[Jungle]]
 
-**Drops** ⏳
+**Loot** ⏳
 
 * {{node:grassMoss:mining:items[0]:item|link}}
 
@@ -1472,7 +1481,7 @@ Mushroom Grass covers the floor of [[Mushroom Cave]]s. [[Giant Mushroom]]s grow 
 
 * [[Mushroom Cave]] floor — [[Caverns]] Top, [[Forest]]
 
-**Drops** ⏳
+**Loot** ⏳
 
 * <<miningDrop|grassMushroom>>
 
@@ -1501,7 +1510,7 @@ Dirt is the primary topsoil of [[Forest]] biomes. It supports surface vegetation
 
 * [[Surface]] and [[Underground]] — [[Forest]], high density
 
-**Drops** ⏳
+**Loot** ⏳
 
 * <<miningDrop|dirt>>
 * {{node:dirt:mining:items[1]:item|link}}
@@ -1528,7 +1537,7 @@ Sand is the primary topsoil of [[Desert]] biomes. It is subject to gravity — u
 * [[Surface]] and [[Underground]] — [[Desert]], high density
 * [[Sand Pocket]]s — [[Underground]], [[Desert]]
 
-**Drops** ⏳
+**Loot** ⏳
 
 * <<miningDrop|sand>>
 
@@ -1554,7 +1563,7 @@ Silt is the primary topsoil of [[Jungle]] biomes. Its fine, damp texture support
 
 * [[Surface]] and [[Underground]] — [[Jungle]], high density
 
-**Drops** ⏳
+**Loot** ⏳
 
 * <<miningDrop|silt>>
 
@@ -1581,7 +1590,7 @@ Humus is a rich organic topsoil found across all biomes, though it is most abund
 * [[Fern Cave]] floor — [[Forest]]
 * [[Mushroom Cave]] floor — [[Forest]]
 
-**Drops** ⏳
+**Loot** ⏳
 
 * <<miningDrop|humus>>
 
@@ -1642,7 +1651,7 @@ Clay is the most common substrat in [[Forest]] biomes. Its soft, workable textur
 
 * [[Surface]] and [[Underground]] — [[Forest]], high density
 
-**Drops** ⏳
+**Loot** ⏳
 
 * <<miningDrop|clay>>
 
@@ -1668,7 +1677,7 @@ Stone is the second most common substrat in [[Forest]] biomes, found deeper than
 * [[Underground]] — [[Forest]], dominant (native substrat)
 * [[Caverns]] Top — [[Forest]], moderate density
 
-**Drops** ⏳
+**Loot** ⏳
 
 * <<miningDrop|stone>>
 
@@ -1693,7 +1702,7 @@ Hardstone is a dense, resistant substrat found in the deepest parts of [[Forest]
 
 * [[Caverns]] — [[Forest]], dominant (native substrat)
 
-**Drops** ⏳
+**Loot** ⏳
 
 * <<miningDrop|hardstone>>
 
@@ -1720,7 +1729,7 @@ Sandstone is the primary substrat of [[Desert]] biomes. It also forms the natura
 * [[Sea]] borders
 * [[Sand Pocket]]: [[Caverns]] — [[Desert]]
 
-**Drops** ⏳
+**Loot** ⏳
 
 * <<miningDrop|sandstone>>
 
@@ -1746,7 +1755,7 @@ Ash is the second most common substrat in [[Forest]] biomes, found deeper than [
 * [[Underground]] — [[Desert]], dominant (native substrat)
 * [[Caverns]] Top — [[Desert]], moderate density
 
-**Drops** ⏳
+**Loot** ⏳
 
 * <<miningDrop|ash>>
 
@@ -1771,7 +1780,7 @@ Hellstone is an extremely hard volcanic substrat found in the deepest parts of [
 
 * [[Caverns]] — [[Desert]], dominant (native substrat)
 
-**Drops** ⏳
+**Loot** ⏳
 
 * <<miningDrop|hellstone>>
 
@@ -1801,7 +1810,7 @@ Mud is the primary substrat of [[Jungle]] biomes. Its soft, damp texture support
 * [[Surface]] and [[Underground]] — [[Jungle]], high density
 * [[Moss Cave]] walls and floor
 
-**Drops** ⏳
+**Loot** ⏳
 
 * <<miningDrop|mud>>
 
@@ -1827,7 +1836,7 @@ Limestone is a sedimentary substrat found as intrusions across [[Jungle]] biome.
 * [[Underground]] — [[Jungle]], dominant (native substrat)
 * [[Caverns]] Top — [[Jungle]], moderate density
 
-**Drops** ⏳
+**Loot** ⏳
 
 * <<miningDrop|limestone>>
 
@@ -1852,7 +1861,7 @@ Slate is a hard metamorphic substrat found in the deepest parts of [[Jungle]] bi
 
 * [[Caverns]] — [[Jungle]], dominant (native substrat)
 
-**Drops** ⏳
+**Loot** ⏳
 
 * <<miningDrop|slate>>
 
@@ -2228,7 +2237,7 @@ Meteorite is an extraterrestrial rock that falls from the sky in rare [[Events]]
 * Impact craters on the [[Surface]] — random [[Events]] ⏳
 * Rare clusters near impact sites ⏳
 
-**Drops** ⏳
+**Loot** ⏳
 
 * {{node:meteorite:mining:items[0]:item|link}}
 
@@ -2253,7 +2262,7 @@ Hive is a biological material that forms the walls of [[Hive]] mini-biomes. It i
 
 * [[Hive]] walls — [[Jungle]], [[Caverns]] Top
 
-**Drops** ⏳
+**Loot** ⏳
 
 * {{node:hive:mining:items[0]:item|link}}
 
@@ -2283,7 +2292,7 @@ Shell is a sedimentary material formed from ancient marine organisms. It is foun
 * [[Fossil Vein]] — [[Desert]], [[Caverns]] Top
 * [[Sea]] borders and floor — slow regeneration ⏳
 
-**Drops** ⏳
+**Loot** ⏳
 
 * [[Mining]] with [[Mining Tools|Pickaxes]] (any tier): {{node:shell:mining:items[0]:item|link}}
 
@@ -2741,6 +2750,33 @@ All stations and materials required from scratch are listed below
     title: 'Mining',
     category: ['Activities', 'Mining'],
     content: `
+**Description**
+
+Mining a node in the world always yields an item for your [[Inventory]]. Some items can then be processed further into a refined material. ⏳ (non, certains node ne sont pas minables - certains node ne disparaissent pas après l'opération de minage - d'autres items peuvent être raremant obtenus en minant certains blocs)
+
+**Resource types**
+
+| Node type | World tile | Collected item | Refined item |
+|---|---|---|---|
+| Ore | [[node:copper]] | [[item:chunkCopper]] | [[item:barCopper]] |
+| Gem | [[node:topaz]] | [[item:rawTopaz]] | [[item:cutTopaz]] |
+| Rock | [[node:granite]] | [[item:blockGranite]] | — |
+| Shell | [[node:shell]] | [[item:blockShell]] | [[item:shellPowder]] |
+| Topsoil | [[node:dirt]] | [[item:blockDirt]] | — |
+| Natural | [[node:grassForest]] | [[item:blockDirt]] | — |
+| Cobweb | [[node:web]] | [[item:silk]] | [[item:fabric]] |
+| Hive | [[node:hive]] | [[item:blockHive]] | [[item:beeswax]] |
+
+
+**Tips**
+
+* _Natural tiles (grass, moss...) drop the same block as the topsoil underneath._
+* _Natural tiles can aslo be [[Foraging|foraged]]._⏳
+
+**See also**
+
+* [[Crafting]] — full crafting system overview
+* [[Foraging]] — full foraging system overview
     `
   },
   {
@@ -3947,7 +3983,7 @@ sickle
 | [[item:oak]] | Any [[Shaking Tools|Hammers]] | [[monster:hornet]] |
 | [[item:mahogany]] | [[Shaking Tools|Iron Hammers]] or better | [[monster:eyelashViper]] |
 
-| Tree | Drops |
+| Tree | Loot |
 | [[item:oak]] | {{item:oak:shaking:items}} |
 | [[item:mahogany]] | {{item:oak:shaking:items}} |
 
@@ -3961,7 +3997,7 @@ sickle
 | [[item:oak]] | Any [[Chopping Tools|Axes]] | [[monster:boar]] |
 | [[item:mahogany]] | [[Chopping Tools|Iron Axes]] or better | [[monster:bulletAnt]] |
 
-| Tree | Drops | Extra Drop |
+| Tree | Loot | Extra Drop |
 | [[item:oak]] | {{item:oak:logging:items}} | [[item:rootOak]] |
 | [[item:mahogany]] | {{item:oak:logging:items}} | [[item:rootMahogany]] |
 
@@ -4007,7 +4043,7 @@ Giant Mushrooms grow in the depths of [[Mushroom Cave|Mushroom Caves]], their bi
 * Chopping removes one section — the mushroom shrinks by one stage
 * When the last section is chopped, the mushroom disappears completely
 
-| Tool | Drops | Extra Drop (last section) | Encounter |
+| Tool | Loot | Extra Drop (last section) | Encounter |
 |---|---|---|---|
 | Any [[Chopping Tools|Axe]] | {{item:giantMushroom:logging:items}} | ⏳ | [[monster:isopod]] |
 
@@ -4039,7 +4075,7 @@ Coconut trees grow on sandy shores — along the ocean coastline and at the edge
 
 * A tree can only be shaken once per in-game day — shaking too frequently weakens the tree. ⏳
 
-| Tool | Drops | Encounter |
+| Tool | Loot | Encounter |
 |---|---|---|
 | Any [[Shaking Tools|Hammer]] | {{item:coconut:shaking:items}} | [[monster:coconutCrab]] |
 
@@ -4089,7 +4125,7 @@ _All times are in-game. See [[Day & Night Cycle]] for reference._
 
 * [[Foraging|Interact to harvest]] — the mushroom disappears on harvest
 
-| Mushroom | Tool | Drops |
+| Mushroom | Tool | Loot |
 |  [[item:bolete]] | Any [[Harvesting Tools|Sickle]] | {{item:bolete:foraging:items}} |
 |  [[item:pinkMycenia]] | [[Harvesting Tools|Iron Sickle]] or better | {{item:pinkMycenia:foraging:items}} |
 
@@ -4150,7 +4186,7 @@ _All times are in-game. See [[Day & Night Cycle]] for reference._
 
 * [[Foraging|Interact to harvest]] — the mushroom disappears on harvest
 * Tool: [[Harvesting Tools|Silver Sickle]] or better ⏳
-* Drops: [[item:mushroomGill]]
+* Loot: [[item:mushroomGill]]
 
 **Usages** ⏳
 
@@ -4193,7 +4229,7 @@ Parsnips are root vegetables found growing on the [[Forest]] floor. Their white 
 
 * [[Foraging|Interact to harvest]] — the plant disappears on harvest
 * Tool: any [[Harvesting Tools|Sickle]]⏳
-* Drops: [[item:parsnip]]
+* Loot: [[item:parsnip]]
 
 **Dangers**
 
@@ -4243,7 +4279,7 @@ Sunflowers grow in forest clearings, thriving where sunlight reaches the ground 
 
 * [[Foraging|Interact to harvest]] — the flower disappears on harvest
 * Tool: any [[Harvesting Tools|Sickle]]⏳
-* Drops: [[item:sunflowerSeed]]
+* Loot: [[item:sunflowerSeed]]
 
 **Dangers**
 
@@ -4292,7 +4328,7 @@ The Ambermirage is a common desert flower that blooms only during the hottest ho
 
 * [[Foraging|Interact to harvest]] — the flower disappears on harvest⏳
 * Tool: any [[Harvesting Tools|Sickle]]⏳
-* Drops: [[item:ambermirage]]⏳
+* Loot: [[item:ambermirage]]⏳
 
 **Dangers**
 
@@ -4336,7 +4372,7 @@ The Bloodmoon is a nocturnal flower found in the [[Jungle]] forests. Its deep cr
 * [[Foraging|Interact to harvest]] the flower — it will regrow next night
 * Tool: any [[Harvesting Tools|Sickle]]⏳
 * The plant is permanently destroyed only by [[Mining]] its supporting tile with a [[Mining Tools|Pickaxe]]
-* Drops: [[item:bloodmoon]], rare chance of [[item:bloodmoonSeed]]
+* Loot: [[item:bloodmoon]], rare chance of [[item:bloodmoonSeed]]
 
 **Planting**
 
@@ -4389,7 +4425,7 @@ Corals are marine organisms found on the sandy floor of the ocean. Four distinct
 
 * [[Foraging|Interact to harvest]] — the coral disappears on harvest
 * Tool: any [[Harvesting Tools|Sickle]] ⏳
-* Drops: [[item:coral]]
+* Loot: [[item:coral]]
 
 **Regrowth**
 
@@ -4444,7 +4480,7 @@ Ferns are ancient plants thriving in the humid darkness of [[Fern Cave|Fern Cave
 
 * [[Foraging|Interact to harvest]] — the fern enters a dormant state and regrows after a few in-game hours
 * Tool: [[Harvesting Tools|Silver Sickle]] ({{item:sickleSilver:star|star}}) or better⏳
-* Drops: [[item:fernLeaf]], rare chance of [[item:fernSpore]]
+* Loot: [[item:fernLeaf]], rare chance of [[item:fernSpore]]
 
 **Planting** ⏳
 
@@ -4489,7 +4525,7 @@ Velvetmoss is a slow-growing, deep-purple moss found exclusively in [[Moss Cave|
 
 * [[Foraging|Interact to harvest]] — the patch disappears on harvest
 * Tool: [[Harvesting Tools|Silver Sickle]] or better ⏳
-* Drops: [[item:velvetmoss]]
+* Loot: [[item:velvetmoss]]
 
 **Regrowth**
 
@@ -4555,7 +4591,7 @@ The Mandrake is a root plant found in the tunnels and underground passages of [[
 
 * [[Foraging|Interact to harvest]] — the plant disappears permanently on harvest
 * Tool: [[Harvesting Tools|Silver Sickle]] or better ⏳
-* Drops: [[item:mandrakeRoot]]
+* Loot: [[item:mandrakeRoot]]
 
 **Dangers**
 
@@ -4597,7 +4633,7 @@ The underground Cactus is a hardy desert plant that has adapted to the complete 
 
 * [[Foraging|Interact to harvest]] — the plant disappears permanently on harvest
 * Tool: [[Harvesting Tools|Silver Sickle]] or better ⏳
-* Drops: [[item:cactus]], [[item:cactusFiber]], [[item:cactusSpine]]
+* Loot: [[item:cactus]], [[item:cactusFiber]], [[item:cactusSpine]]
 
 **Dangers**
 
@@ -4643,7 +4679,7 @@ Underground Bamboo thrives in the humid tunnels and passages of [[Jungle]] biome
 
 * [[Foraging|Interact to harvest]] — the plant disappears permanently on harvest
 * Tool: [[Harvesting Tools|Silver Sickle]] or better ⏳
-* Drops: [[item:bambooShoot]], [[item:bambooStalk]]
+* Loot: [[item:bambooShoot]], [[item:bambooStalk]]
 
 **Dangers**
 
@@ -4687,7 +4723,7 @@ Oleander is a common shrub found in the underground passages of all three biomes
 
 * [[Foraging|Interact to harvest]] — the plant disappears permanently on harvest
 * Tool: [[Harvesting Tools|Silver Sickle]] or better ⏳
-* Drops: [[item:oleander]], [[item:oleanderBulb]]
+* Loot: [[item:oleander]], [[item:oleanderBulb]]
 
 **Dangers**
 
@@ -4737,7 +4773,7 @@ Satan's Cube is one of the strangest organisms found in the deep [[Caverns]]. It
 
 * [[Foraging|Interact to harvest]] — the plant disappears permanently on harvest
 * Tool: [[Harvesting Tools|Gold Sickle]] required ⏳
-* Drops: [[item:satansCube]] ⏳
+* Loot: [[item:satansCube]] ⏳
 
 **Dangers**
 
@@ -4781,7 +4817,7 @@ Sneakthorn is a deep cavern plant that grows in the humid passages shared by [[F
 
 * [[Foraging|Interact to harvest]] — the plant disappears permanently on harvest
 * Tool: [[Harvesting Tools|Gold Sickle]] required ⏳
-* Drops: [[item:sneakthorn]] ⏳
+* Loot: [[item:sneakthorn]] ⏳
 
 **Dangers**
 
@@ -4825,7 +4861,7 @@ Cursedcrown is the most alien plant found in the deep caverns. Its rigid radial 
 
 * [[Foraging|Interact to harvest]] — the plant disappears permanently on harvest
 * Tool: [[Harvesting Tools|Gold Sickle]] required ⏳
-* Drops: [[item:cursedcrown]] ⏳
+* Loot: [[item:cursedcrown]] ⏳
 
 **Dangers**
 
@@ -4869,7 +4905,7 @@ Abysshorn is one of the strangest organisms in the known world. Its fractal stru
 
 * [[Foraging|Interact to harvest]] — the plant disappears permanently on harvest
 * Tool: [[Harvesting Tools|Gold Sickle]] required ⏳
-* Drops: [[item:abysshorn]] ⏳
+* Loot: [[item:abysshorn]] ⏳
 
 **Dangers**
 
@@ -4913,7 +4949,7 @@ Inferncap is the deepest-growing plant in the known world. Found only in the low
 
 * [[Foraging|Interact to harvest]] — the plant disappears permanently on harvest
 * Tool: [[Harvesting Tools|Gold Sickle]] required ⏳
-* Drops: [[item:inferncap]] ⏳
+* Loot: [[item:inferncap]] ⏳
 
 **Dangers**
 
@@ -5305,7 +5341,7 @@ Consuming the same type too quickly extends the cooldown before you can benefit 
 * [[Housing Buffs]] — placement speed, range
 * [[Fishing Buffs]] — better yield, special encounters
 * [[Gardening Buffs]] — better yield,
-* [[Luck Buffs]] — rare drops, special encounters
+* [[Luck Buffs]] — rare loot, special encounters
 * Environmental Buffs — [[Weather|weather]], [[Moon Phases|moon]], [[Day & Night Cycle|time of day]]
   `
   },
@@ -5441,7 +5477,7 @@ Carrying a [[item:bottledFrog]] or an [[item:astrolabe]] in your [[Inventory]] d
 
 **Tips**
 
-* _Plan your activities around the forecast — a Stormy day may unlock rare drops._
+* _Plan your activities around the forecast — a Stormy day may unlock rare loot._
 * _Use [[item:clockCopper|Clocks]], [[item:bottledFrog]] and [[item:sextant]] for precise environment tracking._
   `
   },

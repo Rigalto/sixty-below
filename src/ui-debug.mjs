@@ -343,6 +343,12 @@ const DEBUG_PACKS = {
     {item: 'cutRuby', count: 5},
     {item: 'cutEmerald', count: 5},
     {item: 'cutSapphire', count: 5}
+  ],
+  fitting: [
+    {item: 'nailIron', count: 12},
+    {item: 'nailCobalt', count: 12},
+    {item: 'rivetCobalt', count: 12},
+    {item: 'rivetPlatinum', count: 12}
   ]
 }
 

@@ -267,14 +267,16 @@ Les constantes d'interpolation Y sont dans `constant.mjs` (`TOPSOIL_Y_*`).
 
 Les tuiles et leurs items correspondants ont des noms distincts pour éviter toute ambiguïté :
 
-| Type | Tuile (monde) | Item (inventaire) | Item transformé |
+| Type | Tuile (world) | Item (Inventory, after mining) | Refined Item |
 |---|---|---|---|
 | Ore | `Copper Ore` | `Copper Chunk` | `Copper Bar` (fonte) |
-| Gem | `Topaz Deposit` | `Raw Topaz` | `Topaz` (taille) |
+| Gem | `Topaz Deposit` | `Raw Topaz` | `Cut Topaz` (taille) |
 | Rock | `Granite` | `Granite Block` | — |
+| Shell | `Shell` | `Shell Block` | `Shell Powder` |
 | Topsoil | `Dirt` | `Dirt Block` | — |
 | Natural | `Forest Grass` | `Dirt Block` | — |
 | Cobweb | `Cobweb` | `Silk` | `Fabric` (loom) |
+| Hive | `Hive` | `Hive Block` | `Beeswax` (melted) |
 
 ### 3.7 Minerais (Ore)
 
