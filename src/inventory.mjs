@@ -8,6 +8,368 @@ import {saveManager} from './persistence.mjs'
 import {furnitureManager} from './housing.mjs'
 
 /* ====================================================================================================
+   CSS - injection des styles utilisés par toutes les classes du fichier
+   ==================================================================================================== */
+
+const inventorySlotStyle = document.createElement('style')
+inventorySlotStyle.textContent = /* css */`
+inventory-slot {
+  position: relative;
+  display: inline-block;
+  width: 64px;
+  height: 64px;
+  border-radius: 6px;
+  background-color: var(--slot-bg-default);
+  color: white;
+  border: 3px solid #888;
+  box-sizing: border-box;
+  cursor: pointer;
+  transition: border-color 0.15s;
+}
+
+inventory-slot.hotbar {
+  background-color: var(--slot-bg-hotbar);
+  color: black;
+}
+
+inventory-slot.armor {
+  background-color: var(--slot-bg-armor);
+  color: black;
+}
+inventory-slot.armor.slot-armor-set {
+  background-color: var(--slot-bg-armor-set);
+}
+inventory-slot.accessory {
+  background-color: var(--slot-bg-accessory);
+  color: black;
+}
+inventory-slot.inactive {
+  background-color: var(--slot-bg-inactive);
+  cursor: default;
+}
+inventory-slot:hover {
+  border-color: #f1a15bff;
+}
+inventory-slot.inactive:hover {
+  border-color: #888;
+}
+inventory-slot.selected,
+inventory-slot.selected:hover {
+  border-color: #f80;  /* orange prime sur le hover */
+}
+inventory-slot .key {
+  position: absolute;
+  top: 3px;
+  left: 4px;
+  font-size: 12px;
+  line-height: 1;
+  pointer-events: none;
+}
+
+inventory-slot .lock {
+  position: absolute;
+  top: 2px;
+  right: 3px;
+  font-size: 11px;
+  pointer-events: none;
+}
+
+inventory-slot .image {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  image-rendering: pixelated;
+  pointer-events: none;
+}
+
+inventory-slot .count {
+  position: absolute;
+  bottom: 2px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 12px;
+  line-height: 1;
+  pointer-events: none;
+}
+
+inventory-slot .hidden {
+  display: none;
+}
+
+/* ── Overlay ───────────────────────────────────────── */
+
+#ui-inventory-panel {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+    width: 1274px;
+    height: 682px;
+  background-color: var(--ov-bg-main);
+  border: 1px solid var(--ov-border);
+  box-shadow: 0 10px 30px rgba(0,0,0,0.8);
+  border-radius: 4px;
+  z-index: ${OVERLAYS.inventory.zIndex};
+  display: none;
+  flex-direction: column;
+  font-family: Segoe UI, Roboto, sans-serif;
+  color: #ffffff;
+  user-select: none;
+}
+
+#ui-inventory-panel .inv-content {
+  display: grid;
+  grid-template-columns: 74px 196px 346px 60px 550px;
+  grid-template-rows: 74px 468px 74px;
+  gap: 8px;
+  padding: 8px;
+}
+
+#ui-inventory-panel .inv-hotbar    { grid-column: 1; grid-row: 1 / 4; }
+#ui-inventory-panel .inv-bag       { grid-column: 2 / 4; grid-row: 1 / 3; }
+#ui-inventory-panel .inv-armor     { grid-column: 2; grid-row: 3; }
+#ui-inventory-panel .inv-accessory { grid-column: 3; grid-row: 3; }
+#ui-inventory-panel .inv-chest-header { grid-column: 5; grid-row: 1; }
+#ui-inventory-panel .inv-chest     { grid-column: 5; grid-row: 2 / 4; }
+
+#ui-inventory-panel .inv-actions {
+  grid-column: 4;
+  grid-row: 1 / 4;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  padding: 4px;
+  margin: 12px;
+}
+
+#ui-inventory-panel .inv-panel {
+  background-color: var(--ov-bg-side);
+  border-radius: 4px;
+  padding: 4px;
+}
+
+#ui-inventory-panel .inv-hotbar-grid {
+  display: grid;
+  grid-template-columns: 64px;
+  grid-template-rows: repeat(8, 64px);
+  gap: 4px;
+}
+
+#ui-inventory-panel .inv-armor-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 64px);
+  grid-template-rows: 64px;
+  gap: 4px;
+}
+
+#ui-inventory-panel .inv-accessory-grid {
+  display: grid;
+  grid-template-columns: repeat(5, 64px);
+  grid-template-rows: 64px;
+  gap: 4px;
+}
+
+#ui-inventory-panel .inv-action-btn svg {
+  width: 100%;
+  height: 100%;
+}
+
+#ui-inventory-panel .inv-action-btn {
+  background-color: transparent;
+  border: 1px solid #444;
+  border-radius: 4px;
+  color: #bdc3c7;
+  cursor: pointer;
+  padding: 6px;
+  width: 56px;
+  height: 56px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+#ui-inventory-panel .inv-action-btn:hover {
+  border-color: #bdc3c7;
+  color: #ffffff;
+}
+
+#ui-inventory-panel .inv-action-btn:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+
+#ui-inventory-panel .inv-action-btn:disabled:hover {
+  border-color: #444;
+  color: #bdc3c7;
+}
+
+#ui-inventory-panel .inv-action-btn .lock-closed { display: block; }
+#ui-inventory-panel .inv-action-btn .lock-open { display: none; }
+#ui-inventory-panel .inv-action-btn.unlocking .lock-closed { display: none; }
+#ui-inventory-panel .inv-action-btn.unlocking .lock-open { display: block; }
+
+#ui-inventory-panel .inv-bag-grid,
+#ui-inventory-panel .inv-chest-grid  {
+  display: grid;
+  grid-template-columns: repeat(8, 64px);
+  grid-template-rows: repeat(8, 64px);
+  gap: 4px;
+}
+
+#ui-inventory-panel .inv-chest-grid {
+  display: grid;
+  grid-template-columns: repeat(8, 64px);
+  grid-template-rows: repeat(8, 64px);
+  gap: 4px;
+}
+
+#ui-inventory-panel .inv-chest-header-content {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 4px 8px;
+  background-color: var(--ov-bg-side);
+}
+
+#ui-inventory-panel .inv-chest-row {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 6px;
+}
+
+#ui-inventory-panel .inv-chest-icon {
+  width: 32px;
+  height: 32px;
+  background-color: var(--slot-bg-default);
+  border-radius: 4px;
+  border: 3px solid #666;
+  align-self: flex-start;
+  image-rendering: pixelated;
+}
+
+#ui-inventory-panel .inv-chest-rename-input,
+#ui-inventory-panel .inv-chest-select {
+  flex: 1;
+  background-color: var(--ov-bg-input);
+  color: var(--ov-text);
+  border: 1px solid var(--ov-border-sub);
+  border-radius: 3px;
+  font-size: 13px;
+  padding: 2px 4px;
+}
+
+#ui-inventory-panel .inv-chest-rename-input:focus,
+#ui-inventory-panel .inv-chest-select:focus {
+  border-color: var(--ov-accent);
+}
+
+#ui-inventory-panel .inv-chest-rename {
+  background-color: transparent;
+  color: #bdc3c7;
+  border: none;
+  cursor: pointer;
+  font-size: 16px;
+}
+
+#ui-inventory-panel .inv-chest-rename:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+
+#ui-inventory-panel .inv-chest-rename:hover:not(:disabled) {
+  color: var(--ov-text);
+}
+
+#ui-inventory-panel .inv-chest-rename-form {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 6px;
+}
+
+#ui-inventory-panel .inv-chest-rename-label {
+  font-size: 14px;
+  color: var(--ov-text);
+  white-space: nowrap;
+}
+
+#ui-inventory-panel .inv-chest-rename-confirm,
+#ui-inventory-panel .inv-chest-rename-cancel {
+  width: 26px;
+  height: 26px;
+  background-color: var(--ov-btn-bg);
+  border: 1px solid var(--ov-border-sub);
+  border-radius: 3px;
+  cursor: pointer;
+  font-size: 18px;
+  font-weight: bold;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  flex-shrink: 0;
+}
+
+#ui-inventory-panel .inv-chest-rename-confirm:hover {
+  background-color: #1a3d1a;
+  border-color: #3a7a3a;
+}
+
+#ui-inventory-panel .inv-chest-rename-cancel:hover {
+  background-color: #3d1a1a;
+  border-color: #7a3a3a;
+}
+
+#ui-inventory-panel .inv-chest-rename-confirm {
+  color: #2ecc71;
+}
+
+#ui-inventory-panel .inv-chest-rename-cancel {
+  color: #e74c3c;
+}
+
+#ui-inventory-panel .inv-chest-rename-form.hidden {
+  display: none;
+}
+
+#ui-inventory-panel .inv-chest-header {
+  position: relative;
+}
+
+#ui-inventory-panel .inv-save-warning {
+  position: absolute;
+  top: 52px;  /* hauteur du inv-chest-header-content fermé + gap */
+  left: 8px;
+  font-size: 20px;
+  color: var(--ov-text-orange);
+  cursor: default;
+  z-index: 0;
+}
+
+#ui-inventory-panel .inv-chest-header-content {
+  position: relative;
+  z-index: 1;  /* ← recouvre le texte quand agrandi */
+}
+
+#ui-inventory-panel .inv-action-btn.transfer-left .transfer-icon {
+  transform: scaleX(-1);
+}
+
+.inv-drag-ghost {
+  position: fixed;
+  pointer-events: none;
+  image-rendering: pixelated;
+  transform: translate(-50%, -50%);
+  z-index: 9999;
+  opacity: 0.8;
+}
+`
+document.head.appendChild(inventorySlotStyle)
+
+/* ====================================================================================================
    INVENTORY MANAGER
    ====================================================================================================
 
@@ -1000,369 +1362,6 @@ class InventoryManager {
   }
 }
 export const inventoryManager = new InventoryManager()
-
-/* ====================================================================================================
-   CSS
-   ==================================================================================================== */
-
-// injection des classes HTML utilisées par l'inventory Overlay
-const inventorySlotStyle = document.createElement('style')
-inventorySlotStyle.textContent = /* css */`
-inventory-slot {
-  position: relative;
-  display: inline-block;
-  width: 64px;
-  height: 64px;
-  border-radius: 6px;
-  background-color: var(--slot-bg-default);
-  color: white;
-  border: 3px solid #888;
-  box-sizing: border-box;
-  cursor: pointer;
-  transition: border-color 0.15s;
-}
-
-inventory-slot.hotbar {
-  background-color: var(--slot-bg-hotbar);
-  color: black;
-}
-
-inventory-slot.armor {
-  background-color: var(--slot-bg-armor);
-  color: black;
-}
-inventory-slot.armor.slot-armor-set {
-  background-color: var(--slot-bg-armor-set);
-}
-inventory-slot.accessory {
-  background-color: var(--slot-bg-accessory);
-  color: black;
-}
-inventory-slot.inactive {
-  background-color: var(--slot-bg-inactive);
-  cursor: default;
-}
-inventory-slot:hover {
-  border-color: #f1a15bff;
-}
-inventory-slot.inactive:hover {
-  border-color: #888;
-}
-inventory-slot.selected,
-inventory-slot.selected:hover {
-  border-color: #f80;  /* orange prime sur le hover */
-}
-inventory-slot .key {
-  position: absolute;
-  top: 3px;
-  left: 4px;
-  font-size: 12px;
-  line-height: 1;
-  pointer-events: none;
-}
-
-inventory-slot .lock {
-  position: absolute;
-  top: 2px;
-  right: 3px;
-  font-size: 11px;
-  pointer-events: none;
-}
-
-inventory-slot .image {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  image-rendering: pixelated;
-  pointer-events: none;
-}
-
-inventory-slot .count {
-  position: absolute;
-  bottom: 2px;
-  left: 50%;
-  transform: translateX(-50%);
-  font-size: 12px;
-  line-height: 1;
-  pointer-events: none;
-}
-
-inventory-slot .hidden {
-  display: none;
-}
-
-/* ── Overlay ───────────────────────────────────────── */
-
-#ui-inventory-panel {
-  position: fixed;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-    width: 1274px;
-    height: 682px;
-  background-color: var(--ov-bg-main);
-  border: 1px solid var(--ov-border);
-  box-shadow: 0 10px 30px rgba(0,0,0,0.8);
-  border-radius: 4px;
-  z-index: ${OVERLAYS.inventory.zIndex};
-  display: none;
-  flex-direction: column;
-  font-family: Segoe UI, Roboto, sans-serif;
-  color: #ffffff;
-  user-select: none;
-}
-
-#ui-inventory-panel .inv-content {
-  display: grid;
-  grid-template-columns: 74px 196px 346px 60px 550px;
-  grid-template-rows: 74px 468px 74px;
-  gap: 8px;
-  padding: 8px;
-}
-
-#ui-inventory-panel .inv-hotbar    { grid-column: 1; grid-row: 1 / 4; }
-#ui-inventory-panel .inv-bag       { grid-column: 2 / 4; grid-row: 1 / 3; }
-#ui-inventory-panel .inv-armor     { grid-column: 2; grid-row: 3; }
-#ui-inventory-panel .inv-accessory { grid-column: 3; grid-row: 3; }
-#ui-inventory-panel .inv-chest-header { grid-column: 5; grid-row: 1; }
-#ui-inventory-panel .inv-chest     { grid-column: 5; grid-row: 2 / 4; }
-
-#ui-inventory-panel .inv-actions {
-  grid-column: 4;
-  grid-row: 1 / 4;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 8px;
-  padding: 4px;
-  margin: 12px;
-}
-
-#ui-inventory-panel .inv-panel {
-  background-color: var(--ov-bg-side);
-  border-radius: 4px;
-  padding: 4px;
-}
-
-#ui-inventory-panel .inv-hotbar-grid {
-  display: grid;
-  grid-template-columns: 64px;
-  grid-template-rows: repeat(8, 64px);
-  gap: 4px;
-}
-
-#ui-inventory-panel .inv-armor-grid {
-  display: grid;
-  grid-template-columns: repeat(3, 64px);
-  grid-template-rows: 64px;
-  gap: 4px;
-}
-
-#ui-inventory-panel .inv-accessory-grid {
-  display: grid;
-  grid-template-columns: repeat(5, 64px);
-  grid-template-rows: 64px;
-  gap: 4px;
-}
-
-#ui-inventory-panel .inv-action-btn svg {
-  width: 100%;
-  height: 100%;
-}
-
-#ui-inventory-panel .inv-action-btn {
-  background-color: transparent;
-  border: 1px solid #444;
-  border-radius: 4px;
-  color: #bdc3c7;
-  cursor: pointer;
-  padding: 6px;
-  width: 56px;
-  height: 56px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-#ui-inventory-panel .inv-action-btn:hover {
-  border-color: #bdc3c7;
-  color: #ffffff;
-}
-
-#ui-inventory-panel .inv-action-btn:disabled {
-  opacity: 0.4;
-  cursor: default;
-}
-
-#ui-inventory-panel .inv-action-btn:disabled:hover {
-  border-color: #444;
-  color: #bdc3c7;
-}
-
-#ui-inventory-panel .inv-action-btn .lock-closed { display: block; }
-#ui-inventory-panel .inv-action-btn .lock-open { display: none; }
-#ui-inventory-panel .inv-action-btn.unlocking .lock-closed { display: none; }
-#ui-inventory-panel .inv-action-btn.unlocking .lock-open { display: block; }
-
-#ui-inventory-panel .inv-bag-grid,
-#ui-inventory-panel .inv-chest-grid  {
-  display: grid;
-  grid-template-columns: repeat(8, 64px);
-  grid-template-rows: repeat(8, 64px);
-  gap: 4px;
-}
-
-#ui-inventory-panel .inv-chest-grid {
-  display: grid;
-  grid-template-columns: repeat(8, 64px);
-  grid-template-rows: repeat(8, 64px);
-  gap: 4px;
-}
-
-#ui-inventory-panel .inv-chest-header-content {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-  padding: 4px 8px;
-  background-color: var(--ov-bg-side);
-}
-
-#ui-inventory-panel .inv-chest-row {
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  gap: 6px;
-}
-
-#ui-inventory-panel .inv-chest-icon {
-  width: 32px;
-  height: 32px;
-  background-color: var(--slot-bg-default);
-  border-radius: 4px;
-  border: 3px solid #666;
-  align-self: flex-start;
-  image-rendering: pixelated;
-}
-
-#ui-inventory-panel .inv-chest-rename-input,
-#ui-inventory-panel .inv-chest-select {
-  flex: 1;
-  background-color: var(--ov-bg-input);
-  color: var(--ov-text);
-  border: 1px solid var(--ov-border-sub);
-  border-radius: 3px;
-  font-size: 13px;
-  padding: 2px 4px;
-}
-
-#ui-inventory-panel .inv-chest-rename-input:focus,
-#ui-inventory-panel .inv-chest-select:focus {
-  border-color: var(--ov-accent);
-}
-
-#ui-inventory-panel .inv-chest-rename {
-  background-color: transparent;
-  color: #bdc3c7;
-  border: none;
-  cursor: pointer;
-  font-size: 16px;
-}
-
-#ui-inventory-panel .inv-chest-rename:disabled {
-  opacity: 0.4;
-  cursor: default;
-}
-
-#ui-inventory-panel .inv-chest-rename:hover:not(:disabled) {
-  color: var(--ov-text);
-}
-
-#ui-inventory-panel .inv-chest-rename-form {
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  gap: 6px;
-}
-
-#ui-inventory-panel .inv-chest-rename-label {
-  font-size: 14px;
-  color: var(--ov-text);
-  white-space: nowrap;
-}
-
-#ui-inventory-panel .inv-chest-rename-confirm,
-#ui-inventory-panel .inv-chest-rename-cancel {
-  width: 26px;
-  height: 26px;
-  background-color: var(--ov-btn-bg);
-  border: 1px solid var(--ov-border-sub);
-  border-radius: 3px;
-  cursor: pointer;
-  font-size: 18px;
-  font-weight: bold;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 0;
-  flex-shrink: 0;
-}
-
-#ui-inventory-panel .inv-chest-rename-confirm:hover {
-  background-color: #1a3d1a;
-  border-color: #3a7a3a;
-}
-
-#ui-inventory-panel .inv-chest-rename-cancel:hover {
-  background-color: #3d1a1a;
-  border-color: #7a3a3a;
-}
-
-#ui-inventory-panel .inv-chest-rename-confirm {
-  color: #2ecc71;
-}
-
-#ui-inventory-panel .inv-chest-rename-cancel {
-  color: #e74c3c;
-}
-
-#ui-inventory-panel .inv-chest-rename-form.hidden {
-  display: none;
-}
-
-#ui-inventory-panel .inv-chest-header {
-  position: relative;
-}
-
-#ui-inventory-panel .inv-save-warning {
-  position: absolute;
-  top: 52px;  /* hauteur du inv-chest-header-content fermé + gap */
-  left: 8px;
-  font-size: 20px;
-  color: var(--ov-text-orange);
-  cursor: default;
-  z-index: 0;
-}
-
-#ui-inventory-panel .inv-chest-header-content {
-  position: relative;
-  z-index: 1;  /* ← recouvre le texte quand agrandi */
-}
-
-#ui-inventory-panel .inv-action-btn.transfer-left .transfer-icon {
-  transform: scaleX(-1);
-}
-
-.inv-drag-ghost {
-  position: fixed;
-  pointer-events: none;
-  image-rendering: pixelated;
-  transform: translate(-50%, -50%);
-  z-index: 9999;
-  opacity: 0.8;
-}
-`
-document.head.appendChild(inventorySlotStyle)
 
 /* ====================================================================================================
    INVENTORY SLOT (Custom Element)

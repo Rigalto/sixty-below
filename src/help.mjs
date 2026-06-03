@@ -7,10 +7,9 @@ import {createOverlayHeader} from './ui.mjs'
 import {HELP, HELP_CATEGORIES} from '../assets/data/data-help.mjs'
 
 /* ====================================================================================================
-   CSS
+   CSS - injection des styles utilisés par toutes les classes du fichier
    ==================================================================================================== */
 
-// injection des classes HTML utilisées par toutes les classes du fichier
 const helpStyle = document.createElement('style')
 helpStyle.textContent = /* css */`
 #ui-help-panel {

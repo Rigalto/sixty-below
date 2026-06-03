@@ -8,7 +8,9 @@ import {ITEM_TYPE, ITEMS, RECIPES, CRAFT_RESULT_TYPES, CRAFT_STATIONS, CRAFT_ING
 import {inventoryManager} from './inventory.mjs'
 import {furnitureManager} from './housing.mjs'
 
-// ── CSS ──────────────────────────────────────────────────────────────────────
+/* ====================================================================================================
+   CSS - injection des styles utilisés par toutes les classes du fichier
+   ==================================================================================================== */
 
 const craftStyle = document.createElement('style')
 craftStyle.id = 'craft-styles'

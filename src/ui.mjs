@@ -7,28 +7,78 @@ import {playerManager} from './player.mjs'
 import {WEATHER_TYPE, MOON_PHASE, MOON_PHASE_BLURRED, STATE, OVERLAYS, UI_LAYOUT, PATH_INVENTORY, PATH_CRAFT, PATH_TROPHY, PATH_HELP, PATH_NEW_WORLD, PATH_SAVE, PATH_RESTORE, PATH_DEBUG, PATH_CANCEL, SVG_ICON, PLAYER} from './constant.mjs'
 
 /* ====================================================================================================
-   STYLES POUR TOUS LES WIDGETS
+   CSS - injection des styles utilisés par toutes les classes du fichier
    ==================================================================================================== */
 
-// ── Styles MenuBarWidget ─────────────────────────────────────────────────────
-const widgetStyle = document.createElement('style')
-widgetStyle.textContent = /* css */`
+const uiStyle = document.createElement('style')
+uiStyle.textContent = /* css */`
+/* Overlay header */
+
+:root {
+  --ov-bg-main:     #2f3136;
+  --ov-bg-side:     #23272a;
+  --ov-bg-deep:     #1e2128;
+  --ov-bg-input:    #1e2128;
+  --ov-border:      #202225;
+  --ov-border-sub:  #4a5568;
+  --ov-accent:      #4a69bd;
+  --ov-text:        #ffffff;
+  --ov-text-sec:    #dcddde;
+  --ov-text-muted:  #cbcccd;
+  --ov-btn-bg:      #2c3e50;
+  --ov-text-orange: #e67e22;
+
+  --slot-bg-default:   #205080;
+  --slot-bg-hotbar:    #e1f381;
+  --slot-bg-armor:     #40e040;
+  --slot-bg-armor-set: #80f840;
+  --slot-bg-accessory: #B39DDB;
+  --slot-bg-inactive:  #bbbbbb;
+}
+
+.ui-overlay-header {
+  height: 40px;
+  background: linear-gradient(90deg, #2c3e50 0%, #4a69bd 50%, #2c3e50 100%);
+  border-bottom: 2px solid #1e272e;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  padding: 0 10px;
+  font-size: 16px;
+  font-weight: bold;
+  text-shadow: 1px 1px 2px black;
+  border-top-left-radius: 4px;
+  border-top-right-radius: 4px;
+  color: #ffffff;
+  user-select: none;
+}
+.ui-close-btn {
+  cursor: pointer;
+  font-size: 14px;
+  color: #bdc3c7;
+  position: absolute;
+  right: 10px;
+  transition: color 0.2s;
+}
+.ui-close-btn:hover { color: #ffffff; }
+
 /* MenuBarWidget */
 
-  #menu-bar-root {
-    position: relative;
-    width: 100%;
-    margin-bottom: 10px;
-    background-color: rgba(20, 20, 25, 0.9);
-    border: 1px solid #444;
-    border-radius: 6px;
-    padding: 8px;
-    box-shadow: 0 2px 10px rgba(0,0,0,0.5);
-    display: flex;
-    flex-direction: row;
-    gap: 5px;
-    order: ${UI_LAYOUT.MENU_BAR};
-  }
+#menu-bar-root {
+  position: relative;
+  width: 100%;
+  margin-bottom: 10px;
+  background-color: rgba(20, 20, 25, 0.9);
+  border: 1px solid #444;
+  border-radius: 6px;
+  padding: 8px;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.5);
+  display: flex;
+  flex-direction: row;
+  gap: 5px;
+  order: ${UI_LAYOUT.MENU_BAR};
+}
 #menu-bar-root .menu-bar-btn {
   flex: 1;
   background-color: transparent;
@@ -287,7 +337,7 @@ widgetStyle.textContent = /* css */`
   text-shadow: 0 0 4px #ffffff;
 }
 `
-document.head.appendChild(widgetStyle)
+document.head.appendChild(uiStyle)
 
 /* ====================================================================================================
    MENU BAR WIDGET
@@ -1166,75 +1216,19 @@ export const modalBlocker = new ModalBlocker()
  * @returns {DOM Element} header } - Retourne le conteneur
  */
 export function createOverlayHeader (titleText, overlayId) {
-  // 1. Injection unique du style global pour le :hover (Idempotent)
-  if (!document.getElementById('ui-global-styles')) {
-    const style = document.createElement('style')
-    style.id = 'ui-global-styles'
-
-    style.textContent = `
-  :root {
-    --ov-bg-main:     #2f3136;
-    --ov-bg-side:     #23272a;
-    --ov-bg-deep:     #1e2128;
-    --ov-bg-input:    #1e2128;
-    --ov-border:      #202225;
-    --ov-border-sub:  #4a5568;
-    --ov-accent:      #4a69bd;
-    --ov-text:        #ffffff;
-    --ov-text-sec:    #dcddde;
-    --ov-text-muted:  #cbcccd;
-    --ov-btn-bg:      #2c3e50;
-    --ov-text-orange: #e67e22;
-
-    --slot-bg-default:   #205080;
-    --slot-bg-hotbar:    #e1f381;
-    --slot-bg-armor:     #40e040;
-    --slot-bg-armor-set: #80f840;
-    --slot-bg-accessory: #B39DDB;
-    --slot-bg-inactive:  #bbbbbb;
-  }
-  .ui-close-btn:hover { color: #ffffff !important; }
-  `
-    document.head.appendChild(style)
-  }
-
-  // 2. Conteneur Header
+  // 1. Conteneur Header
   const header = document.createElement('div')
-  Object.assign(header.style, {
-    height: '40px',
-    background: 'linear-gradient(90deg, #2c3e50 0%, #4a69bd 50%, #2c3e50 100%)',
-    borderBottom: '2px solid #1e272e',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center', // Titre centré
-    position: 'relative', // Référence pour le bouton absolu
-    padding: '0 10px',
-    fontSize: '16px',
-    fontWeight: 'bold',
-    textShadow: '1px 1px 2px black',
-    borderTopLeftRadius: '4px',
-    borderTopRightRadius: '4px',
-    color: '#ffffff',
-    userSelect: 'none'
-  })
+  header.className = 'ui-overlay-header'
 
-  // 3. Titre
+  // 2. Titre
   const title = document.createElement('span')
   title.textContent = titleText
   header.appendChild(title)
 
-  // 4. Bouton Fermer
+  // 3. Bouton Fermer
   const closeBtn = document.createElement('span')
   closeBtn.textContent = '✕'
-  closeBtn.className = 'ui-close-btn' // Hook CSS
-  Object.assign(closeBtn.style, {
-    cursor: 'pointer',
-    fontSize: '14px',
-    color: '#bdc3c7',
-    position: 'absolute',
-    right: '10px',
-    transition: 'color 0.2s'
-  })
+  closeBtn.className = 'ui-close-btn'
   closeBtn.addEventListener('click', (e) => {
     // On empêche la propagation (sécurité)
     e.stopPropagation()
