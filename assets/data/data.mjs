@@ -213,10 +213,10 @@ export const ITEMS = {
   rawSapphire: {name: 'Raw Sapphire', type: 0, star: 5, stype: 'gem', image: 'mined_32_32-0-4', help: 'Gems', tooltip: 'Valuable crafting materials to be cut at a Stone Bench'},
 
   // Cut Gems [succès]
-  cutTopaz: {name: 'Cut Topaz', type: 0, star: 2, stype: 'gem', image: 'blocks_16_16-0-0', help: 'Gems', tooltip: 'Enhances weapons, gears and accessories'},
-  cutRuby: {name: 'Cut Ruby', type: 0, star: 3, stype: 'gem', image: 'blocks_16_16-0-0', help: 'Gems', tooltip: 'Enhances weapons, gears and accessories'},
-  cutEmerald: {name: 'Cut Emerald', type: 0, star: 4, stype: 'gem', image: 'blocks_16_16-0-0', help: 'Gems', tooltip: 'Enhances weapons, gears and accessories'},
-  cutSapphire: {name: 'Cut Sapphire', type: 0, star: 5, stype: 'gem', image: 'blocks_16_16-0-0', help: 'Gems', tooltip: 'Enhances weapons, gears and accessories'},
+  cutTopaz: {name: 'Cut Topaz', type: 0, star: 2, stype: 'gem', image: 'refined_32_32-0-1', help: 'Gems', tooltip: 'Enhances weapons, gears and accessories'},
+  cutRuby: {name: 'Cut Ruby', type: 0, star: 3, stype: 'gem', image: 'refined_32_32-1-1', help: 'Gems', tooltip: 'Enhances weapons, gears and accessories'},
+  cutEmerald: {name: 'Cut Emerald', type: 0, star: 4, stype: 'gem', image: 'refined_32_32-2-1', help: 'Gems', tooltip: 'Enhances weapons, gears and accessories'},
+  cutSapphire: {name: 'Cut Sapphire', type: 0, star: 5, stype: 'gem', image: 'refined_32_32-3-1', help: 'Gems', tooltip: 'Enhances weapons, gears and accessories'},
 
   // Rock - Geode Stones
   blockGranite: {name: 'Granite Block', type: 0, star: 4, stype: 'block', image: 'blocks_16_16-0-0', help: 'Geode Stones', tooltip: 'Prized crafting materials found in crystalline structures'},
@@ -228,7 +228,7 @@ export const ITEMS = {
 
   // Shell
   shell: {name: 'Shell', type: 0, star: 3, stype: 'block', image: 'mined_32_32-2-2', help: 'Shell', tooltip: 'Can be easily powdered'},
-  shellPowder: {name: 'Shell Powder', type: 0, star: 3, stype: 'powder', image: 'blocks_16_16-0-0', help: 'Shell', tooltip: 'A fine natural abrasive — used in polishing and grinding recipes'},
+  shellPowder: {name: 'Shell Powder', type: 0, star: 3, stype: 'powder', image: 'refined_32_32-4-1', help: 'Shell', tooltip: 'A fine natural abrasive — used in polishing and grinding recipes'},
 
   // Cobweb
   silk: {name: 'Silk', type: 0, star: 1, stype: 'cobweb', image: 'mined_32_32-2-1', help: 'Cobweb', tooltip: 'Mined from Cobweb, used to craft Fabric'},
@@ -607,7 +607,7 @@ export const RECIPES = [
   {result: {item: 'barGold', count: 1}, station: 'furnace', ingredients: [{item: 'chunkGold', count: 4}, {item: 'logMahogany', count: 1}]},
   {result: {item: 'barCobalt', count: 1}, station: 'furnace', ingredients: [{item: 'chunkCobalt', count: 5}, {item: 'logOak', count: 1}, {item: 'logMahogany', count: 1}]},
   {result: {item: 'barPlatinum', count: 1}, station: 'blastFurnace', ingredients: [{item: 'chunkPlatinum', count: 5}, {item: 'logOak', count: 1}, {item: 'logMahogany', count: 1}]},
-  {result: {item: 'shellPowder', count: 1}, station: 'stoneBench', ingredients: [{item: 'shell', count: 1}]},
+  {result: {item: 'shellPowder', count: 3}, station: 'stoneBench', ingredients: [{item: 'shell', count: 1}]},
 
   // Metal fittings
   {result: {item: 'nailIron', count: 32}, station: 'anvil', ingredients: [{item: 'barIron', count: 1}]},
