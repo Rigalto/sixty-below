@@ -25,8 +25,7 @@
   - fait pour `inventory.mjs`, `craft.mjs`, `help.mjs`, `achievement.mjs`, `ui.mjs`
 - Vérifier que les en-têtes des fonctions sont présents et à jour (prise en compte des modifications de conception) :
   - fait pour `inventory.mjs`, `craft.mjs`, `help.mjs`, `achievement.mjs`, `ui.mjs`
-- Remplacer les styles inline par des règles CSS injectées dans le DOM.
-  - fait pour `inventory.mjs`, `craft.mjs`, `help.mjs`, `achievement.mjs`, `ui.mjs`
+- Dans `buff.mjs`, remplacer les styles inline par des règles CSS injectées dans le DOM.
 
 ---
 
