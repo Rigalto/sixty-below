@@ -13,7 +13,6 @@ import {furnitureManager} from './housing.mjs'
    ==================================================================================================== */
 
 const craftStyle = document.createElement('style')
-craftStyle.id = 'craft-styles'
 craftStyle.textContent = /* css */`
 
 #ui-craft-panel {
