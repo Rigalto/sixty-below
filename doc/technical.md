@@ -1221,6 +1221,7 @@ Gestion centralisée des buffs du joueur. Deux phases obligatoires : `init()` pu
 | `init` | `() → void` | Initialise les buffs environnementaux à `false`/`0`. S'abonne aux eventBus. |
 | `getBuff` | `(name: string) → number` | `#values.get(name) ?? #fns.get(name)?.() ?? 0` |
 | `getBuffs` | `(names: string[]) → Object` | Retourne `{name: value}` pour chaque nom. |
+| `setBuff` | `(name: string[], value)` | Le buff `name` prend pour valeur `value}` |
 | `onDaily` | `({moonPhase, weather}) → void` | Handler `time/daily` + `time/first-loop`. Met à jour lune et météo. |
 | `onTimeslot` | `({tslot, isDay}) → void` | Handler `time/timeslot` + `time/first-loop`. Met à jour le cycle circadien. |
 | `onDebug` | `() → void` | Handler `debug/buff-manager`. Affiche `#values` et `#fns` sur la console. |

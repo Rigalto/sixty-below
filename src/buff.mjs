@@ -82,7 +82,10 @@ class BuffManager {
     this.#trinketB = {}
     this.initTrinket()
     // définition des buffs compsés
-    this.#fns.set('movement-speed', () => { return 100 })
+    this.#fns.set('movement-speed', () => {
+      if (this.#values.get('playerFreeze')) return 0
+      return 100
+    })
   }
 
   initTrinket () {
@@ -188,6 +191,16 @@ class BuffManager {
       result[name] = this.#values.get(name) ?? this.#fns.get(name)?.() ?? this.#currentTrinket[name] ?? 0
     }
     return result
+  }
+
+  /**
+ * Positionne directement un buff élémentaire dans #values.
+ * Réservé aux buffs dont la source est externe à BuffManager (ex: player-freeze).
+ * @param {string} name
+ * @param {number|boolean} value
+ */
+  setBuff (name, value) {
+    this.#values.set(name, value)
   }
 
   /**
