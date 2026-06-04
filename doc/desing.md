@@ -985,4 +985,56 @@ testés unitairement en instanciant directement un `WorldBuffer` sans passer par
 
 ---
 
-*TODO : définir l'implémentation de l'aide en ligne et de l'encyclopédie (automatique + lore).*
+## 10. Téléportation — Conception
+
+**Déclencheurs**
+- Clic sur un téléporteur placé dans le monde (via `FurnitureManager`)
+- Commande debug `tp x,y` dans l'Inventory Panel
+
+Les deux déclencheurs émettent l'eventBus `player/teleport` avec `{x, y}` en pixels monde.
+
+**Déroulé**
+
+`PlayerManager` écoute `player/teleport` et lance immédiatement la phase 1.
+
+| Phase | Durée | Déclenchement |
+|---|---|---|
+| Fade-in | 300 ms | CSS `transition` sur `#teleport-overlay.fading` |
+| Attente chunks | 1000 ms | `taskScheduler.enqueue('teleport-2', 1000, ...)` |
+| Fade-out | 300 ms | `taskScheduler.enqueue('teleport-3', 300, ...)` |
+
+**Phase 1** — `onTeleportPhase1()` :
+- `document.getElementById('teleport-overlay').classList.add('fading')` → CSS gère le fondu en 300 ms
+- Buff `player-freeze` positionné → buff composé `player-movement` retourne 0 → déplacement bloqué
+- `taskScheduler.enqueue('teleport-2', 300, this.onTeleportPhase2, ...)`
+
+**Phase 2** — `onTeleportPhase2()` :
+- `this.#x = target.x` / `this.#y = target.y` → la caméra recalcule, les 42 chunks se régénèrent pendant la seconde d'attente
+- `taskScheduler.enqueue('teleport-3', 1000, this.onTeleportPhase3, ...)`
+
+**Phase 3** — `onTeleportPhase3()` :
+- `classList.remove('fading')` → CSS gère le fondu inverse en 300 ms
+- Buff `player-freeze` supprimé → déplacement restauré
+
+**Le div `#teleport-overlay`**
+Créé dans `render.mjs` lors de l'initialisation du canvas. Positionné au-dessus du canvas, en-dessous des overlays UI. `PlayerManager` le récupère par `getElementById` à la première utilisation et le met en cache.
+
+```css
+#teleport-overlay {
+  position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+  background: black; opacity: 0; pointer-events: none;
+  z-index: [entre canvas et overlays UI];
+  transition: opacity 300ms ease;
+}
+#teleport-overlay.fading { opacity: 1; }
+```
+
+**Comportement avec les overlays**
+Quand l'Inventory est ouvert (`STATE !== EXPLORATION`), la loop fait un `return` avant `taskScheduler.update()` → les phases sont gelées jusqu'à la fermeture. La commande `tp` déclenche donc la téléportation à la fermeture de l'inventaire, sans code supplémentaire.
+
+**Modifications nécessaires** (~10 lignes au total)
+- `render.mjs` — création du div `#teleport-overlay`
+- `player.mjs` — `onTeleport`, `onTeleportPhase1/2/3`, cache `#teleportDiv`, flag `#teleportTarget`, buff `player-freeze`
+- `buff.mjs` — buff composé `player-movement` intègre `player-freeze`
+- `constant.mjs` — constantes `TELEPORT_FADE_MS = 300`, `TELEPORT_WAIT_MS = 1000`
+- `data-help.mjs` — fiche Téléporteur ⏳
