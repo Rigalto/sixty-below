@@ -7,13 +7,12 @@
 
 ## En cours
 
-- implémentation de l'affichage des tuiles (top soil à faire)
+- coder le tp du player (debug)
 - ajouter l'affichage du furniture sous la souris (`TileHoverWidget`)
+- implémentation de l'affichage des tuiles (top soil à faire)
 - Sauvegarde de la position du joueur en database
 - brancher les Crafting Stations au craft panel
-- mémorisation en bd des items sélectionnés dans le craft panel
 - continuer la correction et l'ajout de fiches d'aide (`HELP`) et d'items (`ITEMS`)
-- achievement : traiter l'achievement pour lesquels un seul item peut être crafté : (1, 1, 1) fonctionne-t-il ?
 
 ---
 

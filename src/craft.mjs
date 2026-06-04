@@ -658,11 +658,10 @@ class CraftOverlay {
     // ── Filtre texte ─────────────────────────────────────────────
     this.#filterInput.addEventListener('input', () => this.#onFilterInput())
     this.#btnReset.addEventListener('click', () => this.#onResetClick())
-    this.#filterValue.addEventListener('change', () => this.#applyFilter())
 
     // ── Menus déroulants ─────────────────────────────────────────
-    this.#btnReset.addEventListener('click', () => this.#onResetClick())
     this.#filterMode.addEventListener('change', () => this.#onFilterModeChange())
+    this.#filterValue.addEventListener('change', () => this.#onFilterValueChange())
 
     // ── Lancement du craft ─────────────────────────────────────────
     this.#btnHelp.addEventListener('click', () => this.#onHelpClick())
