@@ -1584,6 +1584,18 @@ Silt is the primary topsoil of [[Jungle]] biomes. Its fine, damp texture support
   `
   },
   {
+    title: 'Ropes',
+    category: ['Fabric'],
+    content: `
+**Description**
+⏳
+
+**Rope Types**
+
+* <<itemStar|ropeLinen>>
+  `
+  },
+  {
     title: 'Humus',
     category: ['Topsoil'],
     content: `
@@ -1991,7 +2003,7 @@ The table below details the [[Metal Fittings]] available for each material, incl
 | **Silver** | - | - | <<cellItemStar|chainSilver>> | - |
 | **Gold** | - | - | - | <<cellItemStar|wireGold>> |
 | **Cobalt** | <<cellItemStar|nailCobalt>> | <<cellItemStar|rivetCobalt>> | - | <<cellItemStar|wireCobalt>> |
-| **Platinum** | - | <<cellItemStar|rivetPlatinum>> | - | - |
+| **Platinum** | - | <<cellItemStar|rivetPlatinum>> | <<cellItemStar|chainPlatinum>> | - |
 
 **Parts**
 

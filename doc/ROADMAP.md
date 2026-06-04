@@ -12,6 +12,7 @@
 - Sauvegarde de la position du joueur en database
 - brancher les Crafting Stations au craft panel
 - continuer la correction et l'ajout de fiches d'aide (`HELP`) et d'items (`ITEMS`)
+- Recettes pour créer Linen Rope et l'utiliser
 
 ---
 

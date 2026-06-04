@@ -235,8 +235,9 @@ export const ITEMS = {
 
   // Cobweb
   silk: {name: 'Silk', type: 0, star: 1, stype: 'cobweb', image: 'mined_32_32-2-1', help: 'Cobweb', tooltip: 'Mined from Cobweb, used to craft Fabric'},
-  fabric: {name: 'Fabric', type: 0, star: 1, stype: 'cobweb', image: 'blocks_16_16-0-0', help: 'Cobweb', tooltip: 'Commeon material used for armors and furniture'},
+  fabric: {name: 'Fabric', type: 0, star: 1, stype: 'cobweb', image: 'blocks_16_16-0-0', help: 'Cobweb', tooltip: 'Common material used for armors and furniture'},
   eggSpider: {name: 'Spider Egg', type: 0, star: 1, stype: 'egg', image: 'blocks_16_16-0-0', help: 'Eggs', tooltip: '???'},
+  ropeLinen: {name: 'Linen Rope', type: 0, star: 4, stype: 'rope', image: 'loom_32_32-0-0', help: 'Ropes', tooltip: '???'},
 
   // A NETTOYER CI-DESSOUS
   // /////////////////////
@@ -362,9 +363,10 @@ export const ITEMS = {
   nailCobalt: {name: 'Cobalt Nail', type: 0, stype: 'fitting', star: 4, image: 'refined_32_32-7-0', help: 'Metal Fittings', tooltip: 'Fastener used to built or repair a lot of items'},
   rivetCobalt: {name: 'Cobalt Rivet', type: 0, stype: 'fitting', star: 4, image: 'refined_32_32-6-1', help: 'Metal Fittings', tooltip: 'Strong fastener used to built a lot of high tier items'},
   rivetPlatinum: {name: 'Platinum Rivet', type: 0, stype: 'fitting', star: 5, image: 'refined_32_32-7-1', help: 'Metal Fittings', tooltip: 'Strong fastener used to built a lot of high tier items'},
-  chainCopper: {name: 'Copper Chain', type: 0, stype: 'fitting', star: 1, image: 'crafting_32_32-2-0', help: 'Metal Fittings', tooltip: 'Fastener used to built a lot of sensitive items'},
-  chainIron: {name: 'Iron Chain', type: 0, stype: 'fitting', star: 2, image: 'crafting_32_32-2-0', help: 'Metal Fittings', tooltip: 'Fastener used to built a lot of sensitive items'},
-  chainSilver: {name: 'Silver Chain', type: 0, stype: 'fitting', star: 3, image: 'crafting_32_32-2-0', help: 'Metal Fittings', tooltip: 'Fastener used to built a lot of sensitive items'},
+  chainCopper: {name: 'Copper Chain', type: 0, stype: 'fitting', star: 1, image: 'refined_32_32-0-2', help: 'Metal Fittings', tooltip: 'Fastener used to built a lot of sensitive items'},
+  chainIron: {name: 'Iron Chain', type: 0, stype: 'fitting', star: 2, image: 'refined_32_32-1-2', help: 'Metal Fittings', tooltip: 'Fastener used to built a lot of sensitive items'},
+  chainSilver: {name: 'Silver Chain', type: 0, stype: 'fitting', star: 3, image: 'refined_32_32-2-2', help: 'Metal Fittings', tooltip: 'Fastener used to built a lot of sensitive items'},
+  chainPlatinum: {name: 'Platinum Chain', type: 0, stype: 'fitting', star: 5, image: 'refined_32_32-3-2', help: 'Metal Fittings', tooltip: 'Fastener used to built a lot of sensitive items'},
   wireCopper: {name: 'Copper Wire', type: 0, stype: 'fitting', star: 1, image: 'crafting_32_32-2-0', help: 'Metal Fittings', tooltip: 'Fastener used to built a lot of sensitive items'},
   wireIron: {name: 'Iron Wire', type: 0, stype: 'fitting', star: 2, image: 'crafting_32_32-2-0', help: 'Metal Fittings', tooltip: 'Fastener used to built a lot of items'},
   wireGold: {name: 'Gold Wire', type: 0, stype: 'fitting', star: 3, image: 'crafting_32_32-2-0', help: 'Metal Fittings', tooltip: 'Fastener used to built a lot of items'},
@@ -634,6 +636,7 @@ export const RECIPES = [
   {result: {item: 'chainCopper', count: 12}, station: 'anvil', ingredients: [{item: 'barCopper', count: 1}]},
   {result: {item: 'chainIron', count: 11}, station: 'anvil', ingredients: [{item: 'barIron', count: 1}]},
   {result: {item: 'chainSilver', count: 10}, station: 'anvil', ingredients: [{item: 'barSilver', count: 1}]},
+  {result: {item: 'chainPlatinum', count: 9}, station: 'anvil', ingredients: [{item: 'barPlatinum', count: 1}]},
   {result: {item: 'wireCopper', count: 24}, station: 'anvil', ingredients: [{item: 'barCopper', count: 1}]},
   {result: {item: 'wireIron', count: 22}, station: 'anvil', ingredients: [{item: 'barIron', count: 1}]},
   {result: {item: 'wireGold', count: 20}, station: 'anvil', ingredients: [{item: 'barGold', count: 1}]},
@@ -655,7 +658,7 @@ export const RECIPES = [
   {result: {item: 'bottledFrog', count: 1}, station: 'workbench', ingredients: [{item: 'bottle', count: 1}, {item: 'frog', count: 1}, {item: 'cutRuby', count: 1}]},
   {result: {item: 'sextant', count: 1}, station: 'workbench', ingredients: [{item: 'logMahogany', count: 1}, {item: 'chainSilver', count: 2}, {item: 'cutRuby', count: 1}, {item: 'oleanderOil', count: 1}]},
   {result: {item: 'astrolabe', count: 1}, station: 'jewelerBench', ingredients: [{item: 'bottledFrog', count: 1}, {item: 'sextant', count: 1}, {item: 'plateCobalt', count: 1}, {item: 'cutEmerald', count: 1}, {item: 'oleanderOil', count: 1}]},
-  {result: {item: 'astrarium', count: 1}, station: 'jewelerBench', ingredients: [{item: 'clockGold', count: 1}, {item: 'chronometer', count: 1}, {item: 'astrolabe', count: 1}, {item: 'platePlatinum', count: 1}, {item: 'cutSapphire', count: 2}, {item: 'oleanderOil', count: 2}]},
+  {result: {item: 'astrarium', count: 1}, station: 'jewelerBench', ingredients: [{item: 'clockGold', count: 1}, {item: 'chronometer', count: 1}, {item: 'astrolabe', count: 1}, {item: 'platePlatinum', count: 1}, {item: 'cutSapphire', count: 2}, {item: 'chainPlatinum', count: 2}]},
 
   // Food - Tier 1-3
   {result: {item: 'daw', count: 4}, station: 'byHand', ingredients: [{item: 'flour', count: 1}, {item: 'water', count: 1}], returned: [{item: 'bottle', count: 1}]},

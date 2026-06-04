@@ -348,7 +348,11 @@ const DEBUG_PACKS = {
     {item: 'nailIron', count: 12},
     {item: 'nailCobalt', count: 12},
     {item: 'rivetCobalt', count: 12},
-    {item: 'rivetPlatinum', count: 12}
+    {item: 'rivetPlatinum', count: 12},
+    {item: 'chainCopper', count: 12},
+    {item: 'chainIron', count: 12},
+    {item: 'chainSilver', count: 12},
+    {item: 'chainPlatinum', count: 12}
   ]
 }
 

@@ -11,7 +11,7 @@ export const ACHIEVEMENT_CATEGORIES = [
     id: 'crafting-fit-fast',
     label: 'Crafting — Metal Fittings - Fasteners',
     thresholds: [24, 120, 360],
-    items: ['nailIron', 'nailCobalt', 'rivetCobalt', 'rivetPlatinum', 'chainCopper', 'chainIron', 'chainSilver', 'wireCopper', 'wireIron', 'wireGold', 'wireCobalt']
+    items: ['nailIron', 'nailCobalt', 'rivetCobalt', 'rivetPlatinum', 'chainCopper', 'chainIron', 'chainSilver', 'chainPlatinum', 'wireCopper', 'wireIron', 'wireGold', 'wireCobalt']
   },
   {
     id: 'crafting-fit-part',
