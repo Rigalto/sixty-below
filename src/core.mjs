@@ -135,7 +135,14 @@ class GameCore {
         console.error(`[core] NODES.${node.name} : help topic inconnu '${node.help}'`)
       }
       // champs de loot
-      if (node.mining) this.#hydrateLootAction(node.mining, 'mining', node.name)
+      if (node.mining) {
+        this.#hydrateLootAction(node.mining, 'mining', node.name)
+        if (node.mining.keep) {
+          const resolved = NODES[node.mining.keep]
+          if (!resolved) console.error(`[hydrateNodes] NODES.${node.name}.mining.keep : node inconnu '${node.mining.keep}'`)
+          else node.mining.keep = resolved
+        }
+      }
       if (node.foraging) this.#hydrateLootAction(node.foraging, 'foraging', node.name)
       if (node.hamming) this.#hydrateLootAction(node.hamming, 'hamming', node.name)
     }
