@@ -646,7 +646,10 @@ commune de la zone N+1 : la progression est continue, sans palier artificiel.
 | **SPHINX** | 4 | ★★★★☆ | Pyramid |
 | **PHARAON** | 4 | ★★★★★ | Pyramid |
 | **Wraith** | 2 | ★★☆☆☆ | Harvesting Mandrake |
-| **GHOST** | 2 | ★★★☆☆ | Ruined Cabin |
+| **Ghost** | 2 | ★★★☆☆ | Ruined Cabin, Graveyard |
+| **Lich** | 5 | ★★★★★ | Graveyard |
+| **skeleton** | 5 | ★★★★★ | Graveyard |
+| **Undead Miner** | 5 | ★★★★★ | Graveyard |
 | **ARTHUR** | 3 | ★★★★☆ | Ruined Cabin |
 | **PHARAON** | 3 | ★★★☆☆ | Lost Temple |
 | **CYCLOPS** | 4 | ★★★★☆ | Lost Temple |

@@ -33,6 +33,7 @@
 - Les meubles sont mal positionnés en y dans les maisons anciennes
 
 ## À faire — Bugs connus
+- Lorsque l'on clique plusieurs fois sur le même topic dans l'aide, il est ajouté plusieurs fois dans l'historique
 - Il n'y a pas assez de Cactus dans le monde => sans doute pas assez de SAND sur le sol souterrain.
 - Il n'y a pas assez de Bamboo dans le monde => sans doute pas assez de SILT sur le sol souterrain.
 - Il n'y a pas assez de Oleanders dans le monde => sans doute pas assez de STONE sur le sol souterrain.

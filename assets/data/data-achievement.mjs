@@ -32,6 +32,12 @@ export const ACHIEVEMENT_CATEGORIES = [
     items: ['clockCopper', 'clockSilver', 'clockGold', 'bottledFrog', 'sextant', 'ruler', 'stopwatch', 'astrolabe', 'chronometer', 'astrarium']
   },
   {
+    id: 'crafting-pickaxe',
+    label: 'Crafting — Pickaxes',
+    thresholds: [1, 1, 1],
+    items: ['pickaxeCopper', 'pickaxeIron', 'pickaxeSilver', 'pickaxeGold', 'pickaxeCobalt', 'pickaxePlatinum', 'pickaxeProspector', 'pickaxeGeologist', 'pickaxeBone']
+  },
+  {
     id: 'mining-ore',
     label: 'Mining — Ores',
     thresholds: [5, 50, 200],

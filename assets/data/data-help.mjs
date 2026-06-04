@@ -80,6 +80,7 @@
  *
  *   ⭐  étoile pleine (tier)
  *   ☆   étoile vide  (tier)
+ *   →    indique le résutalt d'une action
  *
  *   ⏳  Feature non encore implémentée
  *       → Tant qu'il en reste dans le fichier, l'application n'est pas terminée.
@@ -123,7 +124,16 @@ Mining Loot: {{node:{3}:mining[:items[0]:item|link}}
   // pour renseigner une cellule de table avec un node et son tier en dessous
   cellNodeStar: '[[node:{1}]]<br>{{node:{1}:star|star}}',
   // pour renseigner une cellule de table avec un item et son tier en dessous
-  cellItemStar: '[[item:{1}]]<br>{{item:{1}:star|star}}'
+  cellItemStar: '[[item:{1}]]<br>{{item:{1}:star|star}}',
+
+  // Trois puces affichant le tier, la crafting station et les ingrédients pour crafter un item
+  fullRecipe: '* Tier: {{item:{1}:star|star}}\n* Crafting Station: {{recipe:{1}|station}}\n* Crafting Materials: {{recipe:{1}|ingredients}}',
+  // une ligne d'une table affichnt l'item, son tier, la crafting station et les ingrédients
+  fullRecipeRow: '| [[item:{1}]] | {{item:{1}:star|star}} | {{recipe:{1}|station}} | {{recipe:{1}|ingredients}} |',
+
+  // une ligne d'une table présentant un outil : nom, tier, speed bonus, range bonus
+  pickaxeTypeRow: '| [[item:{1}]] | {{item:{1}:star|star}} | {{item:{1}:mining:speed}} | {{item:{1}:mining:range}} | {{item:{1}:mining:tiles}} |'
+
 }
 
 /* ====================================================================================================
@@ -1240,6 +1250,7 @@ Tombstones are found inside the burial tunnels. All tombstones behave identicall
 
 * [[monster:ghost]] — common
 * [[monster:skeleton]] — common
+* [[monster:undeadMiner]] — common
 * [[monster:lich]] — rare boss
 
 **Loot** ⏳
@@ -2283,6 +2294,8 @@ Hive is a biological material that forms the walls of [[Hive]] mini-biomes. It i
 
 Shell is a sedimentary material formed from ancient marine organisms. It is found in [[Fossil Vein]]s and along the shores of the [[Sea]].
 
+Mining it yields [[item:blockShell]], which can be ground into [[item:shellPowder]].
+
 **Tier**
 
 {{node:shell:star|star}}
@@ -2294,7 +2307,7 @@ Shell is a sedimentary material formed from ancient marine organisms. It is foun
 
 **Loot** ⏳
 
-* [[Mining]] with [[Mining Tools|Pickaxes]] (any tier): {{node:shell:mining:items[0]:item|link}}
+* [[Mining]] with an [[item:pickaxeIron]] or better → {{node:shell:mining:items[0]:item|link}}
 
 
 **Main Usages** ⏳
@@ -2302,15 +2315,16 @@ Shell is a sedimentary material formed from ancient marine organisms. It is foun
 * Basic ingredient for furntiure and construction
 * Decorative ingredient for tools and weapons
 * Secondary ingredient for accessories
-* Can be grinded at a [[item:stoneBench]] in [[item:shellPowder]] {{item:shellPowder:star|star}}
+* Can be grinded in [[item:shellPowder]]
 * [[item:shellPowder]] is used in potions
 
-**Recipes** ⏳
+**[[item:shellPowder]] Crafting** ⏳
 
-* {{recipe:shellPowder}}
+<<fullRecipe|shellPowder>>
 
 **Tips**
 
+* Sea shore Shell tiles are in a very sandy environment: don't click twice unless you are prepared to an avalanche
 * _Shell veins are protected by a [[Sandstone]] border — look for exposed Shell on cave walls to locate a vein._⏳
   `
   },
@@ -2429,11 +2443,9 @@ Without it, only the current weather is displayed. Carrying the [[item:bottledFr
 
 See [[Weather]] for the complete weather type table.
 
-**Acquisition**
+**[[item:bottledFrog]] Crafting**
 
-* Tier: {{item:bottledFrog:star|star}}
-* Crafting Station: {{recipe:bottledFrog|station}}
-* Crafting Materials: {{recipe:bottledFrog|ingredients}}
+<<fullRecipe|bottledFrog>>
 
 **Upgrade**
 
@@ -2442,7 +2454,7 @@ See [[Weather]] for the complete weather type table.
 
 **Tips**
 
-* _Knowing tomorrow's weather helps planning outdoor activities, fishing trips and combat preparation._
+* _Knowing tomorrow's weather helps planning outdoor activities, fishing trips and combat preparation._⏳
 
 **See also**
 
@@ -2472,11 +2484,13 @@ Without any clock, [[Day & Night Cycle|Time]] is shown rounded to the nearest 3-
 
 A [[item:grandfatherClock]] placed nearby also improves time precision, without occupying an [[Inventory]] slot.⏳
 
-**Acquisition**
+**Clocks Crafting**
 
-* [[item:clockCopper]] — Tier: {{item:clockCopper:star|star}} · Station: {{recipe:clockCopper|station}} · Materials: {{recipe:clockCopper|ingredients}}
-* [[item:clockSilver]] — Tier: {{item:clockSilver:star|star}} · Station: {{recipe:clockSilver|station}} · Materials: {{recipe:clockSilver|ingredients}}
-* [[item:clockGold]] — Tier: {{item:clockGold:star|star}} · Station: {{recipe:clockGold|station}} · Materials: {{recipe:clockGold|ingredients}}
+| Clock | Tier | Station | Materials |
+|---|---|---|---|
+<<fullRecipeRow|clockCopper>>
+<<fullRecipeRow|clockSilver>>
+<<fullRecipeRow|clockGold>>
 
 **Upgrade**
 
@@ -2505,11 +2519,9 @@ Without it, only 4 icons are used to represent the full 8-phase cycle — severa
 
 See [[Moon Phases]] for the complete phase table.
 
-**Acquisition**
+**[[item:sextant]] Crafting**
 
-* Tier: {{item:sextant:star|star}}
-* Crafting Station: {{recipe:sextant|station}}
-* Crafting Materials: {{recipe:sextant|ingredients}}
+<<fullRecipe|sextant>>
 
 **Upgrade**
 
@@ -2618,11 +2630,9 @@ An ancient astronomical instrument of extraordinary precision. When carried in y
 * Shows the exact [[Moon Phases|Moon Phase]] among all 8 possible phases (instead of 4)
 * Displays tomorrow's [[Weather]] forecast alongside the current weather
 
-**Acquisition**
+**[[item:astrolabe]] Crafting**
 
-* Tier: {{item:astrolabe:star|star}}
-* Crafting Station: {{recipe:astrolabe|station}}
-* Crafting Materials: {{recipe:astrolabe|ingredients}}
+<<fullRecipe|astrolabe>>
 
 **Upgrade**
 
@@ -2654,11 +2664,9 @@ A precision timekeeping instrument originally designed for maritime navigation. 
 * Displays your current tile coordinates (X / Y)
 * Displays your current [[Movement Speed]] as a percentage
 
-**Acquisition**
+**[[item:chronometer]] Crafting**
 
-* Tier: {{item:chronometer:star|star}}
-* Crafting Station: {{recipe:chronometer|station}}
-* Crafting Materials: {{recipe:chronometer|ingredients}}
+<<fullRecipe|chronometer>>
 
 **Upgrade**
 
@@ -2693,11 +2701,9 @@ The pinnacle of exploration instruments. When carried in your [[Inventory]], it 
 * Current tile coordinates (X / Y)
 * Current [[Movement Speed]] as a percentage
 
-**Acquisition**
+**[[item:astrarium]] Crafting**
 
-* Tier: {{item:astrarium:star|star}}
-* Crafting Station: {{recipe:astrarium|station}}
-* Crafting Materials: {{recipe:astrarium|ingredients}}
+<<fullRecipe|astrarium>>
 
 <hr>
 
@@ -2720,6 +2726,8 @@ All stations and materials required from scratch are listed below
 
 * {{recipe:astrarium|allStations}}
 * {{recipe:astrarium|allIngredients}}
+
+<hr>
 
 **Tips**
 
@@ -2783,8 +2791,85 @@ Mining a node in the world always yields an item for your [[Inventory]]. Some it
     title: 'Mining Tools',
     category: ['Tool', 'Mining'],
     content: `
-    Pickaxe
-    `
+**Description**
+
+Mining tools are used to harvest blocks from the world. Their effectiveness depends on two main attributes: **Mining Speed** (how fast a block is mined) and **Mining Range** (how far from the player blocks can be targeted). Higher-tier pickaxes unlock faster speeds, extended range, and the ability to mine multiple contiguous blocks in a single click.
+
+_A block can only be mined if the pickaxe tier is greater than or equal to the block tier._
+
+**Pickaxe Types**
+
+| Pickaxe | Tier | Speed Bonus | Range Bonus | Tiles / click |
+|---|---|---|---|---|
+<<pickaxeTypeRow|pickaxeCopper>>
+<<pickaxeTypeRow|pickaxeIron>>
+<<pickaxeTypeRow|pickaxeSilver>>
+<<pickaxeTypeRow|pickaxeGold>>
+<<pickaxeTypeRow|pickaxeCobalt>>
+<<pickaxeTypeRow|pickaxePlatinum>>
+<<pickaxeTypeRow|pickaxeBone>>
+<<pickaxeTypeRow|pickaxeProspector>>
+<<pickaxeTypeRow|pickaxeGeologist>>
+
+_Tiles / click: only contiguous tiles of the same type are mined in a single click._
+
+**Mining Range**
+
+* Base mining range covers 3 tiles in front of the player, 2 tiles above and 2 tiles below.⏳
+* Higher-tier pickaxes extend this range by one, two or three tiles in all directions (see table above).
+* Equipping a item:stepStool: +4 tiles above
+* Equipping an item:abyssAnchor: +4 tiles below
+* Using a item:builderPotion (5h): +1 tile in each direction
+
+**Mining Speed**
+
+Higher-tier pickaxes provide a mining speed bonus (see table above). Additional bonuses:
+
+* item:miningPotion: +25%
+* item:chisel or item:toolbox (accessory): +25%
+* Food Buff: +5% (Well Fed), +10% (Plenty Satisfied), +15% (Exquisitely Stuffed)⏳
+* Full item:miningArmor set: +80%
+
+**Pickaxes Crafting**
+
+| Pickaxe | Tier | Station | Materials |
+|---|---|---|---|
+<<fullRecipeRow|pickaxeCopper>>
+<<fullRecipeRow|pickaxeIron>>
+<<fullRecipeRow|pickaxeSilver>>
+<<fullRecipeRow|pickaxeGold>>
+<<fullRecipeRow|pickaxeCobalt>>
+<<fullRecipeRow|pickaxePlatinum>>
+<<fullRecipeRow|pickaxeProspector>>
+<<fullRecipeRow|pickaxeGeologist>>
+
+**Loot**
+
+* [[item:pickaxeBone]] cannot be crafted — looted from [[monster:undeadMiner]]s (5% drop chance)⏳
+* [[item:pickaxeBone]] counts toward the 'Crafting — Pickaxes' [[Achievements|Achievement]]
+
+**World Creation**
+
+* One [[item:pickaxeCopper]] is given to the player at [[World Creation]].
+* This starting pickaxe does not grant any [[Achievements|Achievement]] points.
+
+**How to use**
+
+* Open the [[Inventory]] panel (shortcut: [I])
+* Place a pickaxe in the [[Hotbar]]
+* Select it from the Hotbar
+* Click on the block to mine it
+
+**Tips**
+
+* _Use ?? to visualise the tile grid._ ⏳
+* _Use ?? to visualise the current Mining Range._ ⏳
+
+**See also**
+
+* [[Ranges]] — complete overview of all ranges and range buffs
+* [[Foraging]] — collecting resources with a [[Harvesting Tools|Sickle]]
+  `
   },
   {
     title: 'Mineable Blocks',
@@ -2830,8 +2915,9 @@ Mining a node in the world always yields an item for your [[Inventory]]. Some it
 <<mineableRow|Gem|emerald>>
 <<mineableRow|Gem|sapphire>>
 
-**Tips**
-- See also [[Block Directory]]
+**See Also**
+
+* [[Block Directory]]: list of all world tiles
     `
   },
   {
@@ -3593,7 +3679,7 @@ Filled directly from a liquid source in the world. Used as tools to transport an
     content: `
 **Description**
 
-Parler d'abord du Glass, puis des Bottles. Analyser s'il faut séparer Bottles et Glass dans l'aide.
+Parler d'abord du Glass, puis des Bottles.
 ⏳
 
 **Bottle Types**
@@ -3603,18 +3689,13 @@ Parler d'abord du Glass, puis des Bottles. Analyser s'il faut séparer Bottles e
 * <<itemStar|honey>> — when full of [[node:honey]]
 * <<itemStar|sap>> — when full of [[node:sap]]
 
+**[[item:bottle]] Crafting**
 
-**Bottle Crafting**
+<<fullRecipe|bottle>>
 
-* Tier: {{item:bottle:star|star}}
-* Crafting Station: {{recipe:bottle|station}}
-* Crafting Materials: {{recipe:bottle|ingredients}}
+**[[item:glass]] Crafting**
 
-**Glass Crafting**
-
-* Tier: {{item:glass:star|star}}
-* Crafting Station: {{recipe:glass|station}}
-* Crafting Materials: {{recipe:glass|ingredients}}
+<<fullRecipe|glass>>
 
 **How to fill**
 
@@ -3633,8 +3714,12 @@ Parler d'abord du Glass, puis des Bottles. Analyser s'il faut séparer Bottles e
 ⏳
 
 **Tips**
+
 * Parler des [[item:bucket]]s.
-* _See [[Tableware]] for the full list of containers._
+
+**See Also**
+
+* [[Tableware]] for the full list of containers.
     `
   },
   {
@@ -3653,12 +3738,9 @@ Parler d'abord du Glass, puis des Bottles. Analyser s'il faut séparer Bottles e
 * <<itemStar|bucketHoney>> — when full of [[node:honey]]
 * <<itemStar|bucketSap>> — when full of [[node:sap]]
 
+**[[item:bucket]] Crafting**
 
-**Bucket Crafting**
-
-* Tier: {{item:bucket:star|star}}
-* Crafting Station: {{recipe:bucket|station}}
-* Crafting Materials: {{recipe:bucket|ingredients}}
+<<fullRecipe|bucket>>
 
 **How to fill**
 
@@ -5532,7 +5614,14 @@ It does not need to be equipped — carrying it in your [[Inventory]] is enough.
   },
 
   // ── Gameplay ─────────────────────────────────────────────────
-  //    Achievements, Achievements Panel
+  //    Range, Achievements, Achievements Panel
+  {
+    title: 'Ranges',
+    category: ['Gameplay'],
+    content: `
+**Description**
+  `
+  },
   {
     title: 'Achievements',
     category: ['Gameplay'],

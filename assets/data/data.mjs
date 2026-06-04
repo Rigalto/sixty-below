@@ -74,19 +74,19 @@ export const NODES = {
   PLATINUM: {code: 75, name: 'Platinum Ore', type: NODE_TYPE.ORE, star: 5, solid: true, color: '#25874d', image: 'mineral_16_16+6', mining: {speed: 1800, items: [{item: 'chunkPlatinum', count: 1}]}, help: 'Metals'},
 
   // ── Gem (gisement de pierres précieuses) ────────────────────────
-  TOPAZ: {code: 80, name: 'Topaz Deposit', type: NODE_TYPE.GEM, star: 2, solid: true, color: '#788696', image: 'mineral_16_16+7', mining: {speed: 900, items: [{item: 'rawTopaz', count: 1}]}, help: 'Gems'},
-  RUBY: {code: 81, name: 'Ruby Deposit', type: NODE_TYPE.GEM, star: 3, solid: true, color: '#788696', image: 'mineral_16_16+8', mining: {speed: 900, items: [{item: 'rawRuby', count: 1}]}, help: 'Gems'},
-  EMERALD: {code: 82, name: 'Emerald Deposit', type: NODE_TYPE.GEM, star: 4, solid: true, color: '#788696', image: 'mineral_16_16+9', mining: {speed: 900, items: [{item: 'rawEmerald', count: 1}]}, help: 'Gems'},
+  TOPAZ: {code: 80, name: 'Topaz Deposit', type: NODE_TYPE.GEM, star: 2, solid: true, color: '#788696', image: 'mineral_16_16+7', mining: {speed: 900, keep: 'HARDSTONE', items: [{item: 'rawTopaz', count: 1}]}, help: 'Gems'},
+  RUBY: {code: 81, name: 'Ruby Deposit', type: NODE_TYPE.GEM, star: 3, solid: true, color: '#788696', image: 'mineral_16_16+8', mining: {speed: 900, keep: 'HELLSTONE', items: [{item: 'rawRuby', count: 1}]}, help: 'Gems'},
+  EMERALD: {code: 82, name: 'Emerald Deposit', type: NODE_TYPE.GEM, star: 4, solid: true, color: '#788696', image: 'mineral_16_16+9', mining: {speed: 900, keep: 'SLATE', items: [{item: 'rawEmerald', count: 1}]}, help: 'Gems'},
   SAPPHIRE: {code: 83, name: 'Sapphire Deposit', type: NODE_TYPE.GEM, star: 5, solid: true, color: '#788696', image: 'mineral_16_16+10', mining: {speed: 1100, items: [{item: 'rawSapphire', count: 1}]}, help: 'Gems'},
 
   // ── Rock (gisement de pierres précieuses) ────────────────────────
 
-  GRANITE: {code: 90, name: 'Granite', type: NODE_TYPE.ROCK, star: 4, solid: true, color: '#1966cc', image: 'rock_16_16+0', mining: {speed: 1500, items: [{item: 'blockGranite', count: 1}]}, help: 'Geode Stones'}, // UNDERWORLD
-  MARBLE: {code: 91, name: 'Marble', type: NODE_TYPE.ROCK, star: 4, solid: true, color: '#e6ddc4', image: 'rock_16_16+1', mining: {speed: 1500, items: [{item: 'blockMarble', count: 1}]}, help: 'Geode Stones'},
-  OBSIDIAN: {code: 92, name: 'Obsidian', type: NODE_TYPE.ROCK, star: 5, solid: true, color: '#73c882', image: 'rock_16_16+3', mining: {speed: 2000, items: [{item: 'blockObsidian', count: 1}]}, help: 'Obsidian'},
-  METEORITE: {code: 93, name: 'Meteorite', type: NODE_TYPE.ROCK, stype: 'block', star: 5, solid: true, color: '#7d6f5f', image: 'rock_16_16+2', mining: {speed: 2000, items: [{item: 'blockMeteorite', count: 1}]}, help: 'Meteorite'}, // SURFACE
-  HIVE: {code: 94, name: 'Hive', type: NODE_TYPE.ROCK, stype: 'block', star: 3, solid: true, color: '#fd8431', image: 'rock_16_16+6', mining: {speed: 1200, items: [{item: 'blockHive', count: 1}]}, help: 'Hive'},
-  SHELL: {code: 95, name: 'Shell', type: NODE_TYPE.ROCK, stype: 'block', star: 2, solid: true, color: '#e9e3e0ff', image: 'substrat_16_16+15', mining: {speed: 1800, keep: 'SANDSTONE', items: [{item: 'blockShell', count: 4}]}, help: 'Shell'},
+  GRANITE: {code: 90, name: 'Granite', type: NODE_TYPE.ROCK, star: 4, solid: true, color: '#33ccff', image: 'mineral_16_16+11', mining: {speed: 1500, items: [{item: 'blockGranite', count: 1}]}, help: 'Geode Stones'},
+  MARBLE: {code: 91, name: 'Marble', type: NODE_TYPE.ROCK, star: 4, solid: true, color: '#e6ddc4', image: 'mineral_16_16+12', mining: {speed: 1500, items: [{item: 'blockMarble', count: 1}]}, help: 'Geode Stones'},
+  HIVE: {code: 94, name: 'Hive', type: NODE_TYPE.ROCK, stype: 'block', star: 3, solid: true, color: '#ffaa33', image: 'mineral_16_16+13', mining: {speed: 1200, items: [{item: 'blockHive', count: 1}]}, help: 'Hive'},
+  OBSIDIAN: {code: 92, name: 'Obsidian', type: NODE_TYPE.ROCK, star: 5, solid: true, color: '#4ea666', image: 'mineral_16_16+14', mining: {speed: 2000, items: [{item: 'blockObsidian', count: 1}]}, help: 'Obsidian'},
+  METEORITE: {code: 93, name: 'Meteorite', type: NODE_TYPE.ROCK, stype: 'block', star: 5, solid: true, color: '#7d6f5f', image: 'mineral_16_16+15', mining: {speed: 2000, items: [{item: 'blockMeteorite', count: 1}]}, help: 'Meteorite'}, // SURFACE
+  SHELL: {code: 95, name: 'Shell', type: NODE_TYPE.ROCK, stype: 'block', star: 3, solid: true, color: '#fee267', image: 'substrat_16_16+15', mining: {speed: 1800, keep: 'SANDSTONE', items: [{item: 'blockShell', count: 4}]}, help: 'Shell'},
 
   // ── HOUSING (murs des maisons) ────────────────────────
 
@@ -250,16 +250,18 @@ export const ITEMS = {
   frog: {name: 'Frog', type: ITEM_TYPE.BAIT | ITEM_TYPE.MATERIAL, star: 1, stype: 'bait', image: 'blocks_16_16-0-0', help: 'Fishing Baits', tooltip: '???'},
 
   // pickaxes
-  pickaxeCopper: {name: 'Copper Pickaxe', type: ITEM_TYPE.TOOL | ITEM_TYPE.MATERIAL, stype: 'pickaxe', star: 2, image: 'tools_32_32-4-0', placedright: 'w_42_42-0-0', placedleft: 'w_42_42-0-1', speed: 0, help: 'Mining Tools', tooltip: 'Tools used to remove blocks, converting them to item form'},
-  pickaxeIron: {name: 'Iron Pickaxe', type: ITEM_TYPE.TOOL | ITEM_TYPE.MATERIAL, stype: 'pickaxe', star: 3, image: 'tools_32_32-4-0', placedright: 'w_42_42-0-0', placedleft: 'w_42_42-0-1', speed: 0, help: 'Mining Tools', tooltip: 'Tools used to remove blocks, converting them to item form'},
-  pickaxeSilver: {name: 'Silver Pickaxe', type: ITEM_TYPE.TOOL | ITEM_TYPE.MATERIAL, stype: 'pickaxe', star: 4, image: 'tools_32_32-4-0', placedright: 'w_42_42-0-0', placedleft: 'w_42_42-0-1', speed: 0, help: 'Mining Tools', tooltip: 'Tools used to remove blocks, converting them to item form'},
-  pickaxeGold: {name: 'Gold Pickaxe', type: ITEM_TYPE.TOOL | ITEM_TYPE.MATERIAL, stype: 'pickaxe', star: 4, image: 'tools_32_32-4-0', placedright: 'w_42_42-0-0', placedleft: 'w_42_42-0-1', speed: 0, help: 'Mining Tools', tooltip: 'Tools used to remove blocks, converting them to item form'},
-  pickaxeCobalt: {name: 'Cobalt Pickaxe', type: ITEM_TYPE.TOOL | ITEM_TYPE.MATERIAL, stype: 'pickaxe', star: 5, image: 'tools_32_32-4-0', placedright: 'w_42_42-0-0', placedleft: 'w_42_42-0-1', speed: 0, help: 'Mining Tools', tooltip: 'Tools used to remove blocks, converting them to item form'},
-  pickaxePlatinum: {name: 'Platinum Pickaxe', type: ITEM_TYPE.TOOL | ITEM_TYPE.MATERIAL, stype: 'pickaxe', star: 5, image: 'tools_32_32-4-0', placedright: 'w_42_42-0-0', placedleft: 'w_42_42-0-1', speed: 0, help: 'Mining Tools', tooltip: 'Tools used to remove blocks, converting them to item form'},
-  pickaxeBone: {name: 'Bone Pickaxe', type: ITEM_TYPE.TOOL | ITEM_TYPE.MATERIAL, stype: 'pickaxe', star: 4, image: 'tools_32_32-4-0', placedright: 'w_42_42-0-0', placedleft: 'w_42_42-0-1', speed: 0, help: 'Mining Tools', tooltip: 'Tools used to remove blocks, converting them to item form'},
+  pickaxeCopper: {name: 'Copper Pickaxe', type: ITEM_TYPE.TOOL, stype: 'pickaxe', star: 2, image: 'tools_32_32-4-0', placedright: 'w_42_42-0-0', placedleft: 'w_42_42-0-1', help: 'Mining Tools', tooltip: 'Tools used to remove blocks, converting them to item form', mining: {speed: 0, range: 0, tiles: 1}},
+  pickaxeIron: {name: 'Iron Pickaxe', type: ITEM_TYPE.TOOL, stype: 'pickaxe', star: 3, image: 'tools_32_32-4-0', placedright: 'w_42_42-0-0', placedleft: 'w_42_42-0-1', help: 'Mining Tools', tooltip: 'Tools used to remove blocks, converting them to item form', mining: {speed: 25, range: 0, tiles: 1}},
+  pickaxeSilver: {name: 'Silver Pickaxe', type: ITEM_TYPE.TOOL, stype: 'pickaxe', star: 4, image: 'tools_32_32-4-0', placedright: 'w_42_42-0-0', placedleft: 'w_42_42-0-1', help: 'Mining Tools', tooltip: 'Tools used to remove blocks, converting them to item form', mining: {speed: 50, range: 0, tiles: 1}},
+  pickaxeGold: {name: 'Gold Pickaxe', type: ITEM_TYPE.TOOL, stype: 'pickaxe', star: 4, image: 'tools_32_32-4-0', placedright: 'w_42_42-0-0', placedleft: 'w_42_42-0-1', help: 'Mining Tools', tooltip: 'Tools used to remove blocks, converting them to item form', mining: {speed: 75, range: 1, tiles: 1}},
+  pickaxeCobalt: {name: 'Cobalt Pickaxe', type: ITEM_TYPE.TOOL, stype: 'pickaxe', star: 5, image: 'tools_32_32-4-0', placedright: 'w_42_42-0-0', placedleft: 'w_42_42-0-1', help: 'Mining Tools', tooltip: 'Tools used to remove blocks, converting them to item form', mining: {speed: 100, range: 2, tiles: 1}},
+  pickaxePlatinum: {name: 'Platinum Pickaxe', type: ITEM_TYPE.TOOL, stype: 'pickaxe', star: 5, image: 'tools_32_32-4-0', placedright: 'w_42_42-0-0', placedleft: 'w_42_42-0-1', help: 'Mining Tools', tooltip: 'Tools used to remove blocks, converting them to item form', mining: {speed: 125, range: 3, tiles: 1}},
+  pickaxeBone: {name: 'Bone Pickaxe', type: ITEM_TYPE.TOOL, stype: 'pickaxe', star: 4, image: 'tools_32_32-4-0', placedright: 'w_42_42-0-0', placedleft: 'w_42_42-0-1', help: 'Mining Tools', tooltip: 'Tools used to remove blocks, converting them to item form', mining: {speed: 175, range: 1, tiles: 1}},
+  pickaxeProspector: {name: 'Prospector\'s Pickaxe', type: ITEM_TYPE.TOOL, stype: 'pickaxe', star: 5, image: 'tools_32_32-4-0', placedright: 'w_42_42-0-0', placedleft: 'w_42_42-0-1', help: 'Mining Tools', tooltip: 'Tools used to remove multiple blocks, converting them to item form', mining: {speed: 75, range: 0, tiles: 5}},
+  pickaxeGeologist: {name: 'Geologist\'s Pickaxe', type: ITEM_TYPE.TOOL, stype: 'pickaxe', star: 5, image: 'tools_32_32-4-0', placedright: 'w_42_42-0-0', placedleft: 'w_42_42-0-1', help: 'Mining Tools', tooltip: 'Tools used to remove multiple blocks, converting them to item form', mining: {speed: 100, range: 2, tiles: 7}},
 
   // Sickles
-  sickleCopper: {name: 'Copper Sickle', type: ITEM_TYPE.TOOL | ITEM_TYPE.MATERIAL | ITEM_TYPE.CRAFTABLE, stype: 'pickaxe', star: 1, image: 'tools_32_32-4-0', placedright: 'w_42_42-0-0', placedleft: 'w_42_42-0-1', speed: 0, help: 'Harvesting Tools', tooltip: 'Tools used to harvest plants'},
+  sickleCopper: {name: 'Copper Sickle', type: ITEM_TYPE.TOOL | ITEM_TYPE.MATERIAL | ITEM_TYPE.CRAFTABLE, stype: 'pickaxe', star: 1, image: 'tools_32_32-4-0', placedright: 'w_42_42-0-0', placedleft: 'w_42_42-0-1', help: 'Harvesting Tools', tooltip: 'Tools used to harvest plants'},
   sickleSilver: {name: 'Silver Sickle', type: ITEM_TYPE.TOOL | ITEM_TYPE.MATERIAL | ITEM_TYPE.CRAFTABLE, stype: 'pickaxe', star: 3, image: 'tools_32_32-4-0', placedright: 'w_42_42-0-0', placedleft: 'w_42_42-0-1', speed: 0, help: 'Harvesting Tools', tooltip: 'Tools used to harvest plants'},
   sickleGold: {name: 'Gold Sickle', type: ITEM_TYPE.TOOL | ITEM_TYPE.CRAFTABLE, stype: 'pickaxe', star: 5, image: 'tools_32_32-4-0', placedright: 'w_42_42-0-0', placedleft: 'w_42_42-0-1', speed: 0, help: 'Harvesting Tools', tooltip: 'Tools used to harvest plants'},
 
@@ -561,6 +563,17 @@ export const ITEMS = {
    ============================================================================ */
 
 export const RECIPES = [
+
+  // Pickaxes
+  {result: {item: 'pickaxeCopper', count: 1}, station: 'anvil', ingredients: [{item: 'barCopper', count: 8}, {item: 'logOak', count: 4}, {item: 'cutTopaz', count: 1}]},
+  {result: {item: 'pickaxeIron', count: 1}, station: 'anvil', ingredients: [{item: 'pickaxeCopper', count: 1}, {item: 'barIron', count: 10}, {item: 'logOak', count: 3}, {item: 'cutRuby', count: 1}]},
+  {result: {item: 'pickaxeSilver', count: 1}, station: 'anvil', ingredients: [{item: 'pickaxeIron', count: 1}, {item: 'barSilver', count: 10}, {item: 'logOak', count: 4}, {item: 'cutEmerald', count: 1}]},
+  {result: {item: 'pickaxeGold', count: 1}, station: 'anvil', ingredients: [{item: 'pickaxeSilver', count: 1}, {item: 'barGold', count: 12}, {item: 'logMahogany', count: 4}, {item: 'cutEmerald', count: 2}]},
+  {result: {item: 'pickaxeCobalt', count: 1}, station: 'forge', ingredients: [{item: 'pickaxeGold', count: 1}, {item: 'barCobalt', count: 14}, {item: 'logOak', count: 4}, {item: 'cutSapphire', count: 3}]},
+  {result: {item: 'pickaxePlatinum', count: 1}, station: 'forge', ingredients: [{item: 'pickaxeCobalt', count: 1}, {item: 'barPlatinum', count: 16}, {item: 'logMahogany', count: 6}, {item: 'cutSapphire', count: 4}]},
+  {result: {item: 'pickaxeProspector', count: 1}, station: 'forge', ingredients: [{item: 'barPlatinum', count: 1}, {item: 'barPlatinum', count: 16}, {item: 'shellPowder', count: 1}, {item: 'nailIron', count: 5}]},
+  {result: {item: 'pickaxeGeologist', count: 1}, station: 'forge', ingredients: [{item: 'barPlatinum', count: 1}, {item: 'barPlatinum', count: 16}, {item: 'shellPowder', count: 1}, {item: 'nailIron', count: 5}]},
+
   // Accessories
   {result: {item: 'triskelAncient', count: 1}, station: 'alchemyTable', ingredients: [{item: 'triskelCopper', count: 1}, {item: 'triskelSilver', count: 1}, {item: 'triskelGold', count: 1}]},
 
