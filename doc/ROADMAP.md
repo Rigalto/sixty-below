@@ -7,7 +7,6 @@
 
 ## En cours
 
-- coder le tp du player (debug)
 - ajouter l'affichage du furniture sous la souris (`TileHoverWidget`)
 - implémentation de l'affichage des tuiles (top soil à faire)
 - Sauvegarde de la position du joueur en database
