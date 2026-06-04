@@ -27,6 +27,7 @@ export const OVERLAYS = {
   sky: {state: null, zIndex: 0},
   world: {state: null, zIndex: 10},
   light: {state: null, zIndex: 20},
+  teleport: {state: null, zIndex: 25},
   backdrop: {state: null, zIndex: 30},
   inventory: {state: STATE.INFORMATION, zIndex: 40},
   craft: {state: STATE.INFORMATION, zIndex: 50},

@@ -29,6 +29,23 @@ const WORLD_PX_H = WORLD_HEIGHT << 4 // 8192
 const lerp = (start, end, amt) => (1 - amt) * start + amt * end
 
 /* ====================================================================================================
+   CSS - injection des styles utilisés par toutes les classes du fichier
+   ==================================================================================================== */
+
+const renderStyle = document.createElement('style')
+renderStyle.textContent = /* css */`
+/* Animation de la téléportation */
+#teleport-overlay {
+  position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+  background: black; opacity: 0; pointer-events: none;
+  z-index: ${OVERLAYS.teleport.zIndex};
+  /* transition: opacity 300ms ease; */
+}
+#teleport-overlay.fading { opacity: 1; }
+`
+document.head.appendChild(renderStyle)
+
+/* ====================================================================================================
    CAMERA (VIEWPORT)
    ==================================================================================================== */
 
@@ -314,10 +331,15 @@ class WorldRenderer {
     this.ctx = this.canvas.getContext('2d', {alpha: true})
     this.ctx.imageSmoothingEnabled = false
 
+    // 4. Overlay de téléportation
+    const teleport = document.createElement('div')
+    teleport.id = 'teleport-overlay'
+
     // Ajout au DOM
     const container = document.getElementById('canvas-container')
     if (container) {
       container.appendChild(this.canvas)
+      container.appendChild(teleport)
     } else {
       console.error("SkyRenderer: Impossible de trouver '#canvas-container'.")
     }
