@@ -39,7 +39,7 @@ renderStyle.textContent = /* css */`
   position: absolute; top: 0; left: 0; width: 100%; height: 100%;
   background: black; opacity: 0; pointer-events: none;
   z-index: ${OVERLAYS.teleport.zIndex};
-  /* transition: opacity 300ms ease; */
+  transition: opacity 300ms ease;
 }
 #teleport-overlay.fading { opacity: 1; }
 `
@@ -91,6 +91,7 @@ class Camera {
 
     this.x = Math.max(0, Math.min(camX, maxX)) | 0
     this.y = Math.max(0, Math.min(camY, maxY)) | 0
+    this.currentChunkIndex = (this.x >> 8) + ((this.y >> 8) * WORLD_CHUNKS_X)
 
     this.#updateChunkLists()
   }

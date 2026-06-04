@@ -40,6 +40,9 @@ export const OVERLAYS = {
   system: {state: null, zIndex: 200}
 }
 
+export const TELEPORT_FADE_MS = 300
+export const TELEPORT_WAIT_MS = 1000
+
 export const UI_LAYOUT = {
   MENU_BAR: 10,
   ENVIRONMENT: 20,
@@ -290,6 +293,11 @@ export const SVG_ICON = (icon, config = '') => `<svg viewBox="0 0 24 24" ${confi
 
 export const MICROTASK = {
   RENDER_CHUNK_QUEUE: {priority: 30, capacity: 12, taskName: 'processRenderQueue'}, // génère les images des dirty chunks
+
+  TELEPORT_PHASE1: {priority: 22, capacity: 1, taskName: 'onTeleportPhase1'}, // gère la téléportation
+  TELEPORT_PHASE2: {priority: 22, capacity: 5, taskName: 'onTeleportPhase2'}, // gère la téléportation
+  TELEPORT_PHASE3: {priority: 22, capacity: 2, taskName: 'onTeleportPhase3'}, // gère la téléportation
+
   UI_ENV_UPDATE: {priority: 20, capacity: 2, taskName: 'updateClockInOverlay'}, // affiche le widget time/weather/Moon/Location
   UI_TILE_HOVER: {priority: 20, capacity: 10, taskName: 'onTileHoverDetail'}, // affiche le widget tuile survolée
   PROCESS_SAVE: {priority: 15, capacity: 12, taskName: 'processSave'}, // sauvegarde en database des chunks et autres records

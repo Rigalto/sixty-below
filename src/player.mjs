@@ -1,7 +1,9 @@
 // player.mjs — PlayerManager - LifeManager
 
-import {WORLD_WIDTH, WORLD_HEIGHT, PLAYER} from './constant.mjs'
-import {eventBus} from './utils.mjs'
+import {WORLD_WIDTH, WORLD_HEIGHT, PLAYER, MICROTASK, TELEPORT_FADE_MS, TELEPORT_WAIT_MS} from './constant.mjs'
+import {eventBus, taskScheduler} from './utils.mjs'
+import {buffManager} from './buff.mjs'
+import {camera} from './render.mjs'
 
 const WORLD_PX_W = WORLD_WIDTH << 4 // 16384 px
 const WORLD_PX_H = WORLD_HEIGHT << 4 // 8192 px
@@ -13,6 +15,9 @@ class PlayerManager {
 
   #lastTileX = -1 // tuile X au dernier emit player/move
   #lastTileY = -1 // tuile Y au dernier emit player/move
+
+  #teleportDiv = null // div#teleport-overlay — mis en cache à la première téléportation
+  #teleportTarget = null // {x, y} en pixels — cible de la téléportation
 
   /**
  * Initialise la position depuis le record gamestate.
@@ -26,6 +31,13 @@ class PlayerManager {
     this.#x = parseInt(x, 10)
     this.#y = parseInt(y, 10)
     this.#direction = parseInt(direction, 10)
+
+    this.onTeleport = this.onTeleport.bind(this)
+    this.onTeleportPhase1 = this.onTeleportPhase1.bind(this)
+    this.onTeleportPhase2 = this.onTeleportPhase2.bind(this)
+    this.onTeleportPhase3 = this.onTeleportPhase3.bind(this)
+    eventBus.on('player/teleport', this.onTeleport)
+
     return {x: this.#x + (PLAYER.w >> 1), y: this.#y + (PLAYER.h >> 1)}
   }
 
@@ -98,6 +110,60 @@ class PlayerManager {
   render (ctx) {
     ctx.fillStyle = 'rgba(255, 0, 0, 0.5)'
     ctx.fillRect(this.#x, this.#y, PLAYER.w, PLAYER.h)
+  }
+
+  // ///////////// //
+  // TELEPORTATION //
+  // ///////////// //
+
+  /**
+   * Mémorise la cible et planifie la phase 1.
+   * Bindée dans init() — écoute 'player/teleport'.
+   * @param {{x: number, y: number}} payload — coordonnées en tuiles
+   */
+  onTeleport ({x, y}) {
+    this.#teleportTarget = {
+      x: (x << 4) - (PLAYER.w >> 1),
+      y: (y << 4) - PLAYER.h
+    }
+    const {priority, capacity} = MICROTASK.TELEPORT_PHASE1
+    taskScheduler.enqueue('teleport-1', 0, this.onTeleportPhase1, priority, capacity)
+    console.log('<><><><><> Phase 0')
+  }
+
+  /**
+   * Phase 1 : fondu au noir + gel du joueur.
+   * Planifie la phase 2 après TELEPORT_FADE_MS.
+   */
+  onTeleportPhase1 () {
+    if (!this.#teleportDiv) this.#teleportDiv = document.getElementById('teleport-overlay')
+    this.#teleportDiv.classList.add('fading')
+    buffManager.setBuff('playerFreeze', true)
+    const {priority, capacity} = MICROTASK.TELEPORT_PHASE2
+    taskScheduler.enqueue('teleport-2', TELEPORT_FADE_MS, this.onTeleportPhase2, priority, capacity)
+    console.log('<><><><><> Phase 1')
+  }
+
+  /**
+   * Phase 2 : déplacement du joueur. Les chunks recalculent pendant TELEPORT_WAIT_MS.
+   * Planifie la phase 3 après TELEPORT_WAIT_MS.
+   */
+  onTeleportPhase2 () {
+    this.#x = this.#teleportTarget.x
+    this.#y = this.#teleportTarget.y
+    camera.init({x: this.#x + (PLAYER.w >> 1), y: this.#y + (PLAYER.h >> 1)})
+    const {priority, capacity} = MICROTASK.TELEPORT_PHASE3
+    taskScheduler.enqueue('teleport-3', TELEPORT_WAIT_MS, this.onTeleportPhase3, priority, capacity)
+    console.log('<><><><><> Phase 2')
+  }
+
+  /**
+   * Phase 3 : fondu depuis le noir + dégel du joueur.
+   */
+  onTeleportPhase3 () {
+    this.#teleportDiv.classList.remove('fading')
+    buffManager.setBuff('playerFreeze', false)
+    console.log('<><><><><> Phase 3')
   }
 }
 export const playerManager = new PlayerManager()
