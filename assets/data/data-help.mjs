@@ -787,7 +787,7 @@ A large underground cave found in [[Jungle]] biomes. Its walls are covered in lu
     content: `
 **Description**
 
-Hives are large circular caverns built by [[Bees]] deep in [[Jungle]] biomes. Their walls are made of [[node:hive]] blocks and their interior is filled with [[node:honey]], one of the most valuable liquids in the game. The inhabitants defend their home aggressively.
+Hives are large circular caverns built by [[Bees]] deep in [[Jungle]] biomes. Their walls are made of [[node:hive]] blocks, which can be further processed into [[item:beeswax]], and their interior is filled with [[node:honey]], one of the most valuable liquids in the game. The inhabitants defend their home aggressively.
 
 **Main Location**
 
@@ -815,8 +815,8 @@ Hives are large circular caverns built by [[Bees]] deep in [[Jungle]] biomes. Th
 * [[node:honey]] — forms pools on the floor, abundant but dangerous to collect while [[Bees]] are present
   * Collected with a [[item:bottle]] in hand → <<itemStar|honey>>
 * [[node:hive]] — makes up the walls and ceiling of the Hive
-  * Mined with an [[item:pickaxeIron]] or better → **<<itemStar|blockHive>>**
-  * [[item:blockHive]] can be smelted in a [[item:cookingPot]] → **<<itemStar|beeswax>>**
+  * [[Mining|Mined]] with an [[item:pickaxeIron]] or better → **<<itemStar|blockHive>>**
+  * [[item:blockHive]] can be [[Crafting|smelted]] in a [[item:cookingPot]] → **<<itemStar|beeswax>>**
 
 **Tips**
 

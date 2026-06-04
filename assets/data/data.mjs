@@ -86,7 +86,7 @@ export const NODES = {
   OBSIDIAN: {code: 92, name: 'Obsidian', type: NODE_TYPE.ROCK, star: 5, solid: true, color: '#73c882', image: 'rock_16_16+3', mining: {speed: 2000, items: [{item: 'blockObsidian', count: 1}]}, help: 'Obsidian'},
   METEORITE: {code: 93, name: 'Meteorite', type: NODE_TYPE.ROCK, stype: 'block', star: 5, solid: true, color: '#7d6f5f', image: 'rock_16_16+2', mining: {speed: 2000, items: [{item: 'blockMeteorite', count: 1}]}, help: 'Meteorite'}, // SURFACE
   HIVE: {code: 94, name: 'Hive', type: NODE_TYPE.ROCK, stype: 'block', star: 3, solid: true, color: '#fd8431', image: 'rock_16_16+6', mining: {speed: 1200, items: [{item: 'blockHive', count: 1}]}, help: 'Hive'},
-  SHELL: {code: 95, name: 'Shell', type: NODE_TYPE.ROCK, stype: 'block', star: 2, solid: true, color: '#e9e3e0ff', image: 'rock_16_16+7', mining: {speed: 1800, items: [{item: 'blockShell', count: 4}]}, help: 'Shell'},
+  SHELL: {code: 95, name: 'Shell', type: NODE_TYPE.ROCK, stype: 'block', star: 2, solid: true, color: '#e9e3e0ff', image: 'substrat_16_16+15', mining: {speed: 1800, keep: 'SANDSTONE', items: [{item: 'blockShell', count: 4}]}, help: 'Shell'},
 
   // ── HOUSING (murs des maisons) ────────────────────────
 

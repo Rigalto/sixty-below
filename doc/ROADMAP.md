@@ -66,6 +66,7 @@
 - Compléter les items : Oak Root, Mahogany Root, Mycelium, Taproot
 - Recettes utilisant les nouveaux matériaux (marbre, granite, obsidian, shell...)
 - Machines ancestrales : Décomposeur (rendement 80%) et Transmutateur — comme Furniture spécial
+- Hydrater les champs NODES.xxx.mining.keep (node)
 
 ### Utilitaire node.js pour génération du fichier d'aide
 
