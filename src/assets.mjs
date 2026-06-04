@@ -31,8 +31,6 @@ export const IMAGE_FILES = [
   // TILES //
   // ////////
 
-  // Tuiles de granite / marble / meteorite / obsidian / hellstone / sandstone / hive
-  'assets/sprites/rock_16_16.png',
   // Tuiles de grass / jungle grass / mushroom grass / ash grass
   'assets/sprites/grass_16_16.png',
   // Tuiles de wood wall / background wall

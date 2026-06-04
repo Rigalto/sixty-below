@@ -12,7 +12,6 @@
 - Sauvegarde de la position du joueur en database
 - brancher les Crafting Stations au craft panel
 - mémorisation en bd des items sélectionnés dans le craft panel
-- faire les 6 images de ROCK et supprimer le chargement de rock_16_16.png dans assets.mjs
 - continuer la correction et l'ajout de fiches d'aide (`HELP`) et d'items (`ITEMS`)
 - achievement : traiter l'achievement pour lesquels un seul item peut être crafté : (1, 1, 1) fonctionne-t-il ?
 
