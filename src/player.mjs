@@ -1,12 +1,12 @@
 // player.mjs — PlayerManager - LifeManager - HotbarOverlay
 
 import {WORLD_WIDTH, WORLD_HEIGHT, PLAYER, MICROTASK, TELEPORT_FADE_MS, TELEPORT_WAIT_MS, HOTBAR_CAPACITY} from './constant.mjs'
+import {NODES_LOOKUP, ITEMS} from '../../assets/data/data.mjs'
 import {eventBus, taskScheduler} from './utils.mjs'
 import {buffManager} from './buff.mjs'
 import {inventoryManager} from './inventory.mjs'
 import {camera} from './render.mjs'
-
-import {ITEMS} from '../../assets/data/data.mjs'
+import {chunkManager} from './world.mjs'
 
 const WORLD_PX_W = WORLD_WIDTH << 4 // 16384 px
 const WORLD_PX_H = WORLD_HEIGHT << 4 // 8192 px
@@ -129,6 +129,8 @@ document.head.appendChild(playerStyle)
      #resolveVertical(dy)   → number  — applique Δy, gère sol + plafond, retourne Δy réel
    ==================================================================================================== */
 
+const MOVE_STATE = {GROUNDED: 0, JUMPING: 1, FALLING: 2}
+
 class PlayerManager {
   #x = 0 // px monde — coin haut-gauche de la hitbox
   #y = 0 // px monde — coin haut-gauche de la hitbox
@@ -136,6 +138,12 @@ class PlayerManager {
 
   #lastTileX = -1 // tuile X au dernier emit player/move
   #lastTileY = -1 // tuile Y au dernier emit player/move
+
+  #vy = 0 // px/ms — vitesse verticale courante (gravité/chute)
+  #moveState = 0 // 0=GROUNDED 1=JUMPING 2=FALLING
+  #jumpStartY = 0 // px — #y au déclenchement du saut
+  #fallStartY = 0 // px — #y au déclenchement de la chute (fin saut ou décrochage)
+  #prevDirections = 0 // bitmask directions frame précédente (détection front-edge saut)
 
   #teleportDiv = null // div#teleport-overlay — mis en cache à la première téléportation
   #teleportTarget = null // {x, y} en pixels — cible de la téléportation

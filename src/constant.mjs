@@ -213,7 +213,13 @@ export const MAX_FURNITURE_H = 3 // hauteur max d'un furniture, en tuiles
 export const PLAYER = {
   w: 26, // px — largeur hitbox
   h: 46, // px — hauteur hitbox
-  speed: 0.3 // px/ms — vitesse de déplacement de base (sans buff)
+  speed: 0.3, // px/ms — vitesse de déplacement horizontal de base (buffable)
+  GRAVITY: 0.0024, // px/ms² — accélération gravitationnelle
+  FALLING_SPEED_MAX: 0.6, // px/ms — vitesse de chute terminale
+  FALL_DAMAGE_THRESHOLD: 160, // px — hauteur minimale pour déclencher des dégâts de chute
+  FALL_DAMAGE_MULTIPLIER: 0.1, // coefficient (hauteur - seuil) → points de dégâts
+  JUMP_SPEED: 0.28, // px/ms — vitesse ascensionnelle constante pendant le saut
+  JUMP_MAX_Y: 100 // px — hauteur de saut maximale (buffable)
 }
 
 /* =========================================
