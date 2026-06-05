@@ -1,7 +1,7 @@
 // player.mjs — PlayerManager - LifeManager - HotbarOverlay
 
 import {WORLD_WIDTH, WORLD_HEIGHT, PLAYER, MICROTASK, TELEPORT_FADE_MS, TELEPORT_WAIT_MS, HOTBAR_CAPACITY} from './constant.mjs'
-import {NODES_LOOKUP, ITEMS} from '../../assets/data/data.mjs'
+import {NODE_TYPE, NODES_LOOKUP, ITEMS} from '../../assets/data/data.mjs'
 import {eventBus, taskScheduler} from './utils.mjs'
 import {buffManager} from './buff.mjs'
 import {inventoryManager} from './inventory.mjs'
@@ -145,6 +145,9 @@ class PlayerManager {
   #teleportDiv = null // div#teleport-overlay — mis en cache à la première téléportation
   #teleportTarget = null // {x, y} en pixels — cible de la téléportation
 
+  #scanTilesResult = {hasSolid: false, viscosity: 0, hasWeb: false} // résultat de #scanTiles() — déstructurer immédiatement si appels multiples
+  #getHitboxResult = {x: 0, y: 0, w: PLAYER.w, h: PLAYER.h} // résultat de #getHitbox()
+
   /**
  * Initialise la position depuis le record gamestate.
  * Format attendu : 'x|y|direction'
@@ -255,6 +258,17 @@ class PlayerManager {
   }
 
   /**
+   * Retourne la hitbox du joueur (en pixels, coordonnées monde).
+   * Vue sur un objet interne — invalide à l'appel suivant.
+   * @returns {{x: number, y: number, w: number, h: number}}
+   */
+  getHitbox () {
+    this.#getHitboxResult.x = this.#x
+    this.#getHitboxResult.y = this.#y
+    return this.#getHitboxResult
+  }
+
+  /**
    * Retourne le centre de la hitbox en pixels monde.
    * @returns {[number, number]}
    */
@@ -329,6 +343,28 @@ class PlayerManager {
   // /////////////////// //
   // HELPERS DEPLACEMENT //
   // /////////////////// //
+
+  /**
+   * Analyse un tableau de codes tuile et produit l'état environnemental pour la physique.
+   * Résultat épémère — déstructurer immédiatement en cas d'appels multiples.
+   * @param {Uint8Array} tiles - résultat de chunkManager.getTilesInRect()
+   * @returns {{hasSolid: boolean, viscosity: number, hasWeb: boolean}}
+   */
+  scanTiles (tiles) {
+    const r = this.#scanTilesResult
+    r.hasSolid = false
+    r.viscosity = 0
+    r.hasWeb = false
+    for (const code of tiles) {
+      const node = NODES_LOOKUP[code]
+      if (!node) continue
+      const {type} = node
+      if (type & NODE_TYPE.SOLID) r.hasSolid = true
+      if (type & NODE_TYPE.WEB) r.hasWeb = true
+      if (type & NODE_TYPE.LIQUID && node.viscosity > r.viscosity) r.viscosity = node.viscosity
+    }
+    return r
+  }
 }
 export const playerManager = new PlayerManager()
 

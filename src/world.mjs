@@ -18,6 +18,7 @@ class ChunkManager {
   #dirtyRenderChunks // @type {Set<number>} IDs des chunks modifiés visuellement (pour Renderer)
   #dirtySaveChunks // @type {Set<number>} IDs des chunks modifiés (pour Persistence)
   #dbKeys // @type {Array<number>} Index Logique des chunks (0-2047) -> Clé DB (Primary Key)
+  #scratchTiles = new Uint8Array(64) // buffer scratch — réutilisé par getTilesInRect()
 
   constructor () {
     this.#data = new Uint8Array(WORLD_WIDTH * WORLD_HEIGHT)
@@ -95,6 +96,26 @@ class ChunkManager {
   getTileAt (index) { return this.#data[index] }
 
   getTile (x, y) { return this.#data[(y << 10) | x] }
+
+  /**
+   * Retourne les codes des tuiles chevauchant le rectangle pixel donné, même partiellement.
+   * Vue sur un buffer interne — invalide à l'appel suivant.
+   * @param {{x: number, y: number, w: number, h: number}} rect - pixels monde, entiers
+   * @returns {Uint8Array}
+   */
+  getTilesInRect ({x, y, w, h}) {
+    const tx0 = x >> 4
+    const ty0 = y >> 4
+    const tx1 = (x + w - 1) >> 4
+    const ty1 = (y + h - 1) >> 4
+    let n = 0
+    for (let ty = ty0; ty <= ty1; ty++) {
+      for (let tx = tx0; tx <= tx1; tx++) {
+        this.#scratchTiles[n++] = this.#data[(ty << 10) | tx]
+      }
+    }
+    return this.#scratchTiles.subarray(0, n)
+  }
 
   setTile (x, y, code) {
     // if (x === 0 || x === 1023 || y === 0 || y === 511) return

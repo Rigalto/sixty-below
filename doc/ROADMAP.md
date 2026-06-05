@@ -25,6 +25,9 @@
   - fait pour `inventory.mjs`, `craft.mjs`, `help.mjs`, `achievement.mjs`, `ui.mjs`
 - Dans `buff.mjs`, remplacer les styles inline par des règles CSS injectées dans le DOM.
 
+- supprimer les retours de fonctions (dans la boucle chaude) qui renvoie un objet par : soit un accès à des variables de classes (privées ou publiques), soit par un objet pré-alloué.
+  - Les cibles prioritaires : update(), getPosition(), getCenterTile(), getFeetTile()
+
 ---
 
 ## À faire — Bugs connus dans génération du monde

@@ -442,8 +442,8 @@ class GameCore {
 
     // 2.C Mouvements et caméra — déléguée à PlayerManager
     // Version DEBUG
-    playerManager.updateDebug(dt, keyboardManager.directionsArrow)
-    const player = playerManager.update(dt, keyboardManager.directionsGame)
+    // const player = playerManager.update(dt, keyboardManager.directionsGame)
+    const player = playerManager.updateDebug(dt, keyboardManager.directionsArrow)
     camera.update(player)
     // Fin version DEBUG
     // Version Normale
@@ -500,7 +500,7 @@ class GameCore {
     }
 
     // DEBUG
-    this.mockupDiv.textContent = `Mouse: ${mouseManager.mouse.x}, ${mouseManager.mouse.y}, ${tileIndex}, ${tileCode}`
+    this.mockupDiv.innerHTML = `Mouse: ${mouseManager.mouse.x}, ${mouseManager.mouse.y}, ${tileIndex}, ${tileCode}`
     if (leftClick) { console.log('leftClick', mouseManager.mouse) }
     if (rightClick) { console.log('rightClick', mouseManager.mouse) }
 

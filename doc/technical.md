@@ -868,6 +868,7 @@ Maître unique de la donnée monde. Le renderer et la persistence **ne font que 
 |---------------------------|----------------------------------|--------------------------------------------------------------------|
 | `init`                    | `(savedChunks: Array): void`     | Hydrate le buffer depuis la DB. Lève une erreur si count ≠ 2048.  |
 | `getTile`                 | `(x, y): number`                 | Hot path. Pas de bounds checking (Ghost Cells).                    |
+| `getTilesInRect` | `({x, y, w, h}): Uint8Array` | Codes des tuiles chevauchant le rectangle pixel (même partiellement). Vue sur buffer interne — invalide à l'appel suivant. Requiert `w > 0`, `h > 0`. Maximum 64 tuiles. |
 | `setTile`                 | `(x, y, code): void`             | Écriture avec dirty flags (render + save).                         |
 | `setGenTile`              | `(x, y, code): void`             | Écriture rapide sans dirty flags — **génération uniquement**.      |
 | `getChunkData`            | `(chunkIndex): Uint8Array`       | Retourne une copie des 256 octets du chunk.                        |
@@ -1516,9 +1517,11 @@ Position interne : coin haut-gauche de la hitbox en pixels monde.
 | Méthode      | Signature                        | Description                                                  |
 |--------------|----------------------------------|--------------------------------------------------------------|
 | `init`       | `(playerRecord: string): {x, y}` | Parse `'x|y|direction'`, positionne le joueur, retourne le centre hitbox. |
-| `update`     | `(dt, directions): {x, y}`       | Déplace selon bitmask, retourne le centre hitbox. Sans collision (provisoire). |
+| `update`     | `(dt, directions): {x, y}`       | Déplace selon bitmask, retourne le centre hitbox. |
+| `updateDebug` | `(dt, directions): {x, y}`       | Déplace selon bitmask, retourne le centre hitbox. Sans collision (provisoire). |
 | `getCenterTile` | `(): {x, y}` | Retourne la tuile du centre de la hitbox en coordonnées tuile. |
-| `getFeetTile` | `(): {x, y}` | Retourne la tuile sous les pieds (bas-centre hitbox). Pour l'affichage des coordonnées. |
+| `getFeetTile` | `(): {x, y}` | Retourne la tuile sous les pieds (bas-centre hitbox). |
+| `getHitbox` | `(): {x, y, w, h}` | Retourne la hitbox du joueur (pixels). |
 | `getPosition`| `(): [number, number]`           | Centre de la hitbox.             |
 | `render`     | `(ctx): void`                    | Dessine la hitbox (placeholder red). ctx déjà transformé.   |
 
