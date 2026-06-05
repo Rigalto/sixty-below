@@ -324,7 +324,7 @@ Cette section définit les événements officiels. Tout nouvel événement doit 
 | E | `hotbar/changed` | `Array` | Contenu complet de la hotbar. Rafraîchit tous les slots DOM. |
 | E | `hotbar/slot-update` | `{ index: number, slot: object }` | Mise à jour d'un slot individuel (loot, craft…). |
 | E | `hotbar/select-slot` | `number` slotIndex | Sélection clavier émise par `KeyboardManager`. |
-| S | `hotbar/slot-active` | `{ index: number, slot: object, prevIndex: number }` | Émis à chaque changement de slot actif ou de changement du contenu du slot actif. `slot` = slot mémoire brut de `inventoryManager.hotbar[index]`. |
+| S | `hotbar/slot-active` | `{ index: number, slot: object, prevIndex: number }` | Émis à chaque changement de slot actif, ou de contenu du slot actif. `prevIndex === index` indique un changement de contenu ; `prevIndex !== index` indique un changement de sélection. |
 
 #### Craft (`CraftOverlay`)
 
