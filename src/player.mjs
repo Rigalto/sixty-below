@@ -325,6 +325,161 @@ class PlayerManager {
     buffManager.setBuff('playerFreeze', false)
     console.log('<><><><><> Phase 3')
   }
+
+  // /////////////////// //
+  // HELPERS DEPLACEMENT //
+  // /////////////////// //
+
+  /**
+   * Indique si la tuile aux coordonnées tuile (tx, ty) est solide.
+   * Retourne true si hors-monde (bord traité comme mur).
+   * @param {number} tx
+   * @param {number} ty
+   * @returns {boolean}
+   */
+  #isSolid (tx, ty) {
+    const index = chunkManager.getTileAt(tx + (ty << 10))
+    if (index === null) return true
+    const node = NODES_LOOKUP[index]
+    return node !== undefined && node.solid === true
+  }
+
+  /**
+   * Vérifie si une tuile solide obstrue le bas de la hitbox à la position candidate (nx, ny).
+   * Sonde deux tuiles : coin bas-gauche et coin bas-droit (bords rentrés de 1px).
+   * @param {number} nx - #x candidat
+   * @param {number} ny - #y candidat
+   * @returns {boolean}
+   */
+  #checkBottom (nx, ny) {
+    const ty = (ny + PLAYER.h) >> 4
+    const txL = (nx + 1) >> 4
+    const txR = (nx + PLAYER.w - 2) >> 4
+    return this.#isSolid(txL, ty) || this.#isSolid(txR, ty)
+  }
+
+  /**
+   * Vérifie si une tuile solide obstrue le haut de la hitbox à la position candidate (nx, ny).
+   * Sonde deux tuiles : coin haut-gauche et coin haut-droit (bords rentrés de 1px).
+   * @param {number} nx - #x candidat
+   * @param {number} ny - #y candidat
+   * @returns {boolean}
+   */
+  #checkTop (nx, ny) {
+    const ty = ny >> 4
+    const txL = (nx + 1) >> 4
+    const txR = (nx + PLAYER.w - 2) >> 4
+    return this.#isSolid(txL, ty) || this.#isSolid(txR, ty)
+  }
+
+  /**
+   * Vérifie si une tuile solide obstrue le côté gauche de la hitbox à la position candidate (nx, ny).
+   * Sonde les tuiles sur toute la hauteur de la hitbox (bords rentrés de 1px haut et bas).
+   * @param {number} nx - #x candidat
+   * @param {number} ny - #y candidat
+   * @returns {boolean}
+   */
+  #checkLeft (nx, ny) {
+    const tx = nx >> 4
+    const tyT = (ny + 1) >> 4
+    const tyB = (ny + PLAYER.h - 2) >> 4
+    for (let ty = tyT; ty <= tyB; ty++) {
+      if (this.#isSolid(tx, ty)) return true
+    }
+    return false
+  }
+
+  /**
+   * Vérifie si une tuile solide obstrue le côté droit de la hitbox à la position candidate (nx, ny).
+   * Sonde les tuiles sur toute la hauteur de la hitbox (bords rentrés de 1px haut et bas).
+   * @param {number} nx - #x candidat
+   * @param {number} ny - #y candidat
+   * @returns {boolean}
+   */
+  #checkRight (nx, ny) {
+    const tx = (nx + PLAYER.w - 1) >> 4
+    const tyT = (ny + 1) >> 4
+    const tyB = (ny + PLAYER.h - 2) >> 4
+    for (let ty = tyT; ty <= tyB; ty++) {
+      if (this.#isSolid(tx, ty)) return true
+    }
+    return false
+  }
+
+  /**
+   * Applique un déplacement horizontal dx avec résolution de collision.
+   * Step-up : si le mur est surmontable (tuile solide + tuile au-dessus libre), monte d'une tuile.
+   * Blocage : snap contre le bord de la tuile si le mur est infranchissable.
+   * Met à jour #direction selon le signe de dx.
+   * @param {number} dx - déplacement horizontal souhaité en px (peut être négatif)
+   * @returns {number} déplacement horizontal réellement appliqué
+   */
+  #resolveHorizontal (dx) {
+    const nx = this.#x + dx
+    if (dx < 0) {
+      this.#direction = 0
+      if (!this.#checkLeft(nx, this.#y)) {
+        this.#x = nx
+        return dx
+      }
+      // Step-up : tuile du dessus libre ?
+      if (!this.#checkLeft(nx, this.#y - 16)) {
+        this.#x = nx
+        this.#y -= 16
+        return dx
+      }
+      // Blocage : snap bord gauche contre la tuile
+      this.#x = (((this.#x) >> 4) << 4)
+      return 0
+    }
+    if (dx > 0) {
+      this.#direction = 1
+      if (!this.#checkRight(nx, this.#y)) {
+        this.#x = nx
+        return dx
+      }
+      // Step-up : tuile du dessus libre ?
+      if (!this.#checkRight(nx, this.#y - 16)) {
+        this.#x = nx
+        this.#y -= 16
+        return dx
+      }
+      // Blocage : snap bord droit contre la tuile
+      this.#x = (((this.#x + PLAYER.w) >> 4) << 4) - PLAYER.w
+      return 0
+    }
+    return 0
+  }
+
+  /**
+   * Applique un déplacement vertical dy avec résolution de collision sol et plafond.
+   * Sol     : snap sur le dessus de la tuile, retourne false (atterrissage détecté).
+   * Plafond : snap sous la tuile, retourne true (toujours en air).
+   * @param {number} dy - déplacement vertical souhaité en px (positif = descente)
+   * @returns {boolean} true si toujours en l'air après résolution, false si atterrissage
+   */
+  #resolveVertical (dy) {
+    const ny = this.#y + dy
+    if (dy > 0) {
+      if (!this.#checkBottom(this.#x, ny)) {
+        this.#y = ny
+        return true
+      }
+      // Snap sol : coin haut de la tuile sous les pieds
+      this.#y = (((this.#y + PLAYER.h) >> 4) << 4) - PLAYER.h
+      return false
+    }
+    if (dy < 0) {
+      if (!this.#checkTop(this.#x, ny)) {
+        this.#y = ny
+        return true
+      }
+      // Snap plafond : coin bas de la tuile au-dessus
+      this.#y = ((ny >> 4) + 1) << 4
+      return true // toujours en l'air après un plafond
+    }
+    return true
+  }
 }
 export const playerManager = new PlayerManager()
 
