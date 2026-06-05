@@ -22,7 +22,7 @@ playerStyle.textContent = /* css */`
   flex-direction: column;
   align-items: center;
   gap: 6px;
-  padding: 6px 0;
+  padding: 0 0 8px 0;
   width: 100%;
 }
 
