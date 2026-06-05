@@ -39,6 +39,96 @@ playerStyle.textContent = /* css */`
 `
 document.head.appendChild(playerStyle)
 
+/* ====================================================================================================
+   PLAYER MOVEMENT — CONCEPTION
+
+   DEUX MODES DE DÉPLACEMENT
+   ─────────────────────────────────────────────────────────────────────────────
+   A) Touches Flèches (debug) — bitmask `directionsArrow` (UP=1, DOWN=2, LEFT=4, RIGHT=8)
+      Déplacement brut, sans collision, sans gravité.
+      Appelé via playerManager.updateDebug(dt, directionsArrow).
+      Suppression future : remplacer les deux appels dans core.mjs par un seul
+        playerManager.update(dt, directionsArrow | directionsGame)
+
+   B) Touches ZQSD — bitmask `directionsGame` (UP=1, DOWN=2, LEFT=4, RIGHT=8)
+      Déplacement physique complet.
+      Appelé via playerManager.update(dt, directionsGame).
+
+   KeyboardManager expose deux propriétés distinctes :
+     directionsArrow (bits 0-3) — Flèches
+     directionsGame  (bits 0-3) — ZQSD
+
+   ──────────────────────────────────────────────────────────────────────────────────────────
+   DÉPLACEMENT HORIZONTAL (ZQSD gauche/droite)
+   ──────────────────────────────────────────────────────────────────────────────────────────
+   1. Le joueur se déplace en X à vitesse constante (PLAYER.speed × buff movement-speed).
+   2. Détection de collision côté gauche/droit :
+      - On sonde les tuiles qui chevauchent le bord gauche (ou droit) de la hitbox
+        sur toute sa hauteur (plusieurs tuiles possibles selon PLAYER.h).
+      - Si TOUTES les tuiles au bord sont libres → déplacement normal.
+      - Si la tuile touchée est solide et la tuile AU-DESSUS est libre :
+          → Step-up automatique (grimper d'une marche). Le joueur est repositionné en Y
+            pour poser ses pieds sur le dessus de la tuile obstacle. Limité à 1 tuile (16px).
+      - Si la tuile touchée ET la tuile au-dessus sont toutes deux solides :
+          → Blocage : la hitbox est snappée contre le bord de la tuile.
+
+   ──────────────────────────────────────────────────────────────────────────────────────────
+   GRAVITÉ & ÉTATS
+   ──────────────────────────────────────────────────────────────────────────────────────────
+   États exclusifs (enum MOVE_STATE) : GROUNDED | JUMPING | FALLING
+
+   Gravité (états FALLING ou fin de JUMPING) :
+     #vy        += PLAYER.GRAVITY × dt
+     #vy         = min(#vy, PLAYER.FALLING_SPEED_MAX × buff fall-speed)
+     #y         += #vy × dt
+
+   Atterrissage :
+     Collision détectée sous les pieds → snap to top of tile, #vy = 0, état → GROUNDED.
+     Si #vy au moment de l'impact dépasse le seuil de dégâts :
+       fallHeight = #y_impact - #fallStartY
+       Si fallHeight > PLAYER.FALL_DAMAGE_THRESHOLD :
+         fallDmg = (fallHeight - PLAYER.FALL_DAMAGE_THRESHOLD) × PLAYER.FALL_DAMAGE_MULTIPLIER
+         Émis via eventBus 'player/fall-damage' { dmg: fallDmg }
+
+   ──────────────────────────────────────────────────────────────────────────────────────────
+   SAUT (ZQSD haut — KeyW)
+   ──────────────────────────────────────────────────────────────────────────────────────────
+   Conditions d'activation : état = GROUNDED + bit UP pressé sur le front (pas en held).
+   Le front-edge est détecté dans update() en comparant directions courant vs frame précédente.
+
+   Déroulement :
+     État → JUMPING ; #jumpStartY = #y
+     Chaque frame : #y -= PLAYER.JUMP_SPEED × dt   (montée à vitesse constante)
+     Fin de saut si :
+       (a) #y ≤ #jumpStartY - PLAYER.JUMP_MAX_Y × buff jump-height → état → FALLING, #vy = 0
+       (b) Collision plafond → snap under tile, état → FALLING immédiat, #vy = 0
+     Pendant le saut, collisions latérales identiques au déplacement horizontal.
+
+   ──────────────────────────────────────────────────────────────────────────────────────────
+   CONSTANTES (constant.mjs — objet PLAYER)
+   ──────────────────────────────────────────────────────────────────────────────────────────
+     GRAVITY              : 0.0024  px/ms²  — accélération gravitationnelle
+     FALLING_SPEED_MAX    : 0.6     px/ms   — vitesse de chute terminale (buffable)
+     FALL_DAMAGE_THRESHOLD: 160     px      — hauteur minimale pour les dégâts de chute
+     FALL_DAMAGE_MULTIPLIER: 0.1            — coefficient hauteur → dégâts
+     JUMP_SPEED           : 0.28    px/ms   — vitesse ascensionnelle constante
+     JUMP_MAX_Y           : 100     px      — hauteur de saut maximale (buffable)
+
+   ──────────────────────────────────────────────────────────────────────────────────────────
+   COLLISION — HELPERS INTERNES
+   ──────────────────────────────────────────────────────────────────────────────────────────
+   Lecture via chunkManager.getTileAt(index) + NODES_LOOKUP[code].solid.
+   Zéro allocation dans les helpers : boucles sur entiers, pas de tableau temporaire.
+
+     #isSolid(tx, ty)       → boolean — true si la tuile (tx, ty) est solide
+     #checkBottom(nx, ny)   → boolean — tuile solide sous les pieds à la position candidate
+     #checkTop(nx, ny)      → boolean — collision plafond
+     #checkLeft(nx, ny)     → boolean — collision mur gauche
+     #checkRight(nx, ny)    → boolean — collision mur droit
+     #resolveHorizontal(dx) → number  — applique Δx, gère step-up + blocage, retourne Δx réel
+     #resolveVertical(dy)   → number  — applique Δy, gère sol + plafond, retourne Δy réel
+   ==================================================================================================== */
+
 class PlayerManager {
   #x = 0 // px monde — coin haut-gauche de la hitbox
   #y = 0 // px monde — coin haut-gauche de la hitbox
@@ -80,6 +170,37 @@ class PlayerManager {
    * @param {number} directions - bitmask clavier
    */
   update (dt, directions) {
+    if (directions !== 0) {
+      const dist = PLAYER.speed * dt
+      if (directions & 4) { this.#x -= dist }
+      if (directions & 8) { this.#x += dist }
+      if (directions & 1) { this.#y -= dist }
+      if (directions & 2) { this.#y += dist }
+      // Clamp dans les bornes du monde - provisoire
+      if (this.#x < 0) { this.#x = 0 }
+      if (this.#x > WORLD_PX_W - PLAYER.w) { this.#x = WORLD_PX_W - PLAYER.w }
+      if (this.#y < 0) { this.#y = 0 }
+      if (this.#y > WORLD_PX_H - PLAYER.h) { this.#y = WORLD_PX_H - PLAYER.h }
+    }
+    // affichage de la position du joueur dans le Control Panel (EnvironmentWidget)
+    const feet = this.getFeetTile()
+    if (feet.x !== this.#lastTileX || feet.y !== this.#lastTileY) {
+      this.#lastTileX = feet.x
+      this.#lastTileY = feet.y
+      eventBus.emit('player/move', feet)
+    }
+
+    return {x: this.#x + (PLAYER.w >> 1), y: this.#y + (PLAYER.h >> 1)}
+  }
+
+  /**
+   * Déplace le joueur selon le bitmask directions. Sans collision (phase affichage).
+   * directions : UP=1, DOWN=2, LEFT=4, RIGHT=8 (cf. MOVEMENT_MAP dans core.mjs)
+   * Provisoire
+   * @param {number} dt         - delta temps en ms
+   * @param {number} directions - bitmask clavier
+   */
+  updateDebug (dt, directions) {
     if (directions !== 0) {
       const dist = PLAYER.speed * dt
       if (directions & 4) { this.#x -= dist }

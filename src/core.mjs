@@ -441,8 +441,14 @@ class GameCore {
     taskScheduler.update(gameTimestamp)
 
     // 2.C Mouvements et caméra — déléguée à PlayerManager
-    const player = playerManager.update(dt, keyboardManager.directions)
+    // Version DEBUG
+    playerManager.updateDebug(dt, keyboardManager.directionsArrow)
+    const player = playerManager.update(dt, keyboardManager.directionsGame)
     camera.update(player)
+    // Fin version DEBUG
+    // Version Normale
+    // const player = playerManager.update(dt, keyboardManager.directionsArrow | keyboardManager.directionsGame)
+    // fin version Normale
 
     // 2.D Tuile sous la souris — disponible pour tous les systèmes de la frame
     const tileIndex = camera.canvasToTile(mouseManager.mouse.x, mouseManager.mouse.y)
@@ -600,15 +606,18 @@ const HOTBAR_MAP = {
   Numpad0: 9
 }
 
-const MOVEMENT_MAP = {
+const MOVEMENT_MAP_ARROW = {
   ArrowUp: 1,
-  KeyW: 1, // Z (Azerty) / W (Qwerty)
   ArrowDown: 2,
-  KeyS: 2, // S
   ArrowLeft: 4,
+  ArrowRight: 8
+}
+
+const MOVEMENT_MAP_GAME = {
+  KeyW: 1, // Z (Azerty) / W (Qwerty)
+  KeyS: 2,
   KeyA: 4, // Q (Azerty) / A (Qwerty)
-  ArrowRight: 8,
-  KeyD: 8 // D
+  KeyD: 8
 }
 
 const OVERLAY_MAP = {
@@ -631,7 +640,8 @@ class KeyboardManager {
     this.#overlayStack = []
     this.state = STATE.EXPLORATION // il faut pouvoir passer en STATE;CREATION si la base de donnée est vide
     this.debugTrigger = false // affiche dans la console les logs du MicroTasker, du TaskScheduler et de l'EventBus
-    this.directions = 0
+    this.directionsArrow = 0
+    this.directionsGame = 0
 
     this.onKeyDown = this.onKeyDown.bind(this)
     this.onKeyUp = this.onKeyUp.bind(this)
@@ -758,11 +768,10 @@ class KeyboardManager {
     }
 
     // 3. Mouvements (Polling)
-    const moveBit = MOVEMENT_MAP[e.code]
-    if (moveBit) {
-      this.directions |= moveBit
-      return
-    }
+    const arrowBit = MOVEMENT_MAP_ARROW[e.code]
+    if (arrowBit) { this.directionsArrow |= arrowBit; return }
+    const gameBit = MOVEMENT_MAP_GAME[e.code]
+    if (gameBit) { this.directionsGame |= gameBit; return }
 
     // 4. Hotbar (Selection Slot)
     const slotIndex = HOTBAR_MAP[e.code]
@@ -776,11 +785,10 @@ class KeyboardManager {
    * Indispensable pour arrêter le mouvement quand on relâche la touche
    */
   onKeyUp (e) {
-    const moveBit = MOVEMENT_MAP[e.code]
-    if (moveBit) {
-      // Bitwise AND avec l'inverse (NOT) du masque pour éteindre le bit
-      this.directions &= ~moveBit
-    }
+    const arrowBit = MOVEMENT_MAP_ARROW[e.code]
+    if (arrowBit) { this.directionsArrow &= ~arrowBit; return }
+    const gameBit = MOVEMENT_MAP_GAME[e.code]
+    if (gameBit) { this.directionsGame &= ~gameBit }
   }
 
   onCloseRequest (overlyId) {
