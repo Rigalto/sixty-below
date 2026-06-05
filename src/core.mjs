@@ -16,7 +16,7 @@ import {inventoryManager} from './inventory.mjs'
 import {furnitureManager} from './housing.mjs'
 import {craftOverlay} from './craft.mjs'
 import {achievementManager} from './achievement.mjs'
-import {playerManager} from './player.mjs'
+import {playerManager, hotbarOverlay} from './player.mjs'
 import {ACHIEVEMENT_CATEGORIES} from '../assets/data/data-achievement.mjs'
 import './ui-debug.mjs'
 import './combat.mjs'
@@ -290,6 +290,7 @@ class GameCore {
     // 5. Initialisation des systèmes (Layer 2)
     creationDialogOverlay.init(state.randomkey)
 
+    hotbarOverlay.init()
     helpOverlay.init(state.helptopic)
     craftOverlay.init(state.craftfiltermode, state.craftfiltertype, state.craftfilterstation, state.craftfiltermaterial)
     // C'est ici qu'on initialise les managers

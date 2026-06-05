@@ -1,12 +1,43 @@
 // player.mjs — PlayerManager - LifeManager - HotbarOverlay
 
-import {WORLD_WIDTH, WORLD_HEIGHT, PLAYER, MICROTASK, TELEPORT_FADE_MS, TELEPORT_WAIT_MS} from './constant.mjs'
+import {WORLD_WIDTH, WORLD_HEIGHT, PLAYER, MICROTASK, TELEPORT_FADE_MS, TELEPORT_WAIT_MS, HOTBAR_CAPACITY} from './constant.mjs'
 import {eventBus, taskScheduler} from './utils.mjs'
 import {buffManager} from './buff.mjs'
+import {inventoryManager} from './inventory.mjs'
 import {camera} from './render.mjs'
+
+import {ITEMS} from '../../assets/data/data.mjs'
 
 const WORLD_PX_W = WORLD_WIDTH << 4 // 16384 px
 const WORLD_PX_H = WORLD_HEIGHT << 4 // 8192 px
+
+/* ====================================================================================================
+   CSS
+   ==================================================================================================== */
+
+const playerStyle = document.createElement('style')
+playerStyle.textContent = /* css */`
+#hotbar-overlay {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 0;
+  width: 100%;
+}
+
+#hotbar-overlay inventory-slot.hb-slot {
+  background-color: var(--slot-bg-hotbar);
+}
+
+#hotbar-overlay inventory-slot.hb-slot.active {
+  border-color: #fff;
+  border-width: 3px;
+  box-shadow: 0 0 0 2px #f80, inset 0 0 0 1px #f80;
+  outline: none;
+}
+`
+document.head.appendChild(playerStyle)
 
 class PlayerManager {
   #x = 0 // px monde — coin haut-gauche de la hitbox
@@ -199,3 +230,157 @@ export const lifeManager = new LifeManager()
      - Persistance de #activeIndex en base de données
 
    ==================================================================================================== */
+class HotbarOverlay {
+  #container = null // div#hotbar-overlay — racine injectée dans #hotbar
+  #slots = new Array(HOTBAR_CAPACITY) // Array(8) — refs <inventory-slot>
+  #activeIndex = -1 // index du slot actif (-1 = non initialisé)
+
+  constructor () {
+    this.#buildDOM()
+    this.#bindEvents()
+  }
+
+  // ─── Construction DOM ────────────────────────────────────────
+
+  /**
+   * Construit le conteneur et les 8 slots <inventory-slot>, les injecte dans #hotbar.
+   */
+  #buildDOM () {
+    this.#container = document.createElement('div')
+    this.#container.id = 'hotbar-overlay'
+
+    for (let i = 0; i < HOTBAR_CAPACITY; i++) {
+      const slot = document.createElement('inventory-slot')
+      slot.setAttribute('key', String(i + 1))
+      slot.setAttribute('location', `hotbar|${i}`)
+      slot.classList.add('hotbar', 'hb-slot')
+      slot.dataset.index = i
+      this.#container.appendChild(slot)
+      this.#slots[i] = slot
+    }
+
+    document.getElementById('hotbar').appendChild(this.#container)
+  }
+
+  // ─── EventBus ────────────────────────────────────────────────
+
+  /**
+   * Abonne les handlers EventBus.
+   */
+  #bindEvents () {
+    this.onHotbarChanged = this.onHotbarChanged.bind(this)
+    this.onSlotUpdate = this.onSlotUpdate.bind(this)
+    this.onSelectSlot = this.onSelectSlot.bind(this)
+    eventBus.on('hotbar/changed', this.onHotbarChanged)
+    eventBus.on('hotbar/slot-update', this.onSlotUpdate)
+    eventBus.on('hotbar/select-slot', this.onSelectSlot)
+
+    this.#container.addEventListener('click', this.#onClick.bind(this))
+  }
+
+  // ─── Handlers EventBus ───────────────────────────────────────
+
+  /**
+   * Rafraîchit tous les slots DOM depuis le tableau hotbar complet.
+   * @param {Array} hotbar — contenu complet de la hotbar (8 slots)
+   */
+  onHotbarChanged (hotbar) {
+    for (let i = 0; i < HOTBAR_CAPACITY; i++) {
+      this.#updateSlotDOM(this.#slots[i], hotbar[i])
+    }
+  }
+
+  /**
+   * Met à jour un slot DOM individuel suite à une modification ponctuelle.
+   * Ré-émet hotbar/slot-active si le slot modifié est le slot actif.
+   * @param {{index: number, slot: object}} payload
+   */
+  onSlotUpdate ({index, slot}) {
+    this.#updateSlotDOM(this.#slots[index], slot)
+    if (index === this.#activeIndex) {
+      eventBus.emit('hotbar/slot-active', {index, slot, prevIndex: index})
+    }
+  }
+
+  /**
+   * Sélectionne un slot via raccourci clavier (émis par KeyboardManager).
+   * @param {number} index — 0-based
+   */
+  onSelectSlot (index) {
+    this.#applyActiveSlot(index)
+  }
+
+  // ─── Handler DOM ─────────────────────────────────────────────
+
+  /**
+   * Gère le clic sur un slot. Sans effet si le slot cliqué est déjà actif.
+   * @param {MouseEvent} e
+   */
+  #onClick (e) {
+    const el = e.target.closest('inventory-slot')
+    if (el === null) return
+    const index = parseInt(el.dataset.index, 10)
+    if (index === this.#activeIndex) return
+    this.#applyActiveSlot(index)
+  }
+
+  // ─── Logique métier ──────────────────────────────────────────
+
+  /**
+   * Applique la sélection d'un slot : met à jour le rendu et émet hotbar/slot-active.
+   * Sans effet si index identique au slot actif courant.
+   * @param {number} index — 0-based
+   */
+  #applyActiveSlot (index) {
+    if (index === this.#activeIndex) return
+    const prevIndex = this.#activeIndex
+
+    if (prevIndex !== -1) {
+      this.#slots[prevIndex].classList.remove('active')
+    }
+    this.#slots[index].classList.add('active')
+    this.#activeIndex = index
+
+    eventBus.emit('hotbar/slot-active', {
+      index,
+      slot: inventoryManager.hotbar[index],
+      prevIndex
+    })
+  }
+
+  /**
+   * Met à jour les attributs d'un <inventory-slot> DOM depuis un slot mémoire.
+   * @param {HTMLElement} el
+   * @param {object} slot
+   */
+  #updateSlotDOM (el, slot) {
+    el.setAttribute('item', slot.item)
+    el.setAttribute('count', slot.count)
+    el.toggleAttribute('locked', slot.locked)
+    el.setAttribute('title', this.#buildSlotTitle(slot))
+  }
+
+  /**
+   * Construit le titre tooltip d'un slot hotbar.
+   * @param {object} slot — slot mémoire
+   * @returns {string}
+   */
+  #buildSlotTitle (slot) {
+    if (slot.item === '') return 'Slot: Hotbar'
+    const prefix = slot.prefix !== '' ? `${slot.prefix} ` : ''
+    const count = slot.count > 1 ? `${slot.count} ` : ''
+    return `Slot: Hotbar\n${count}${prefix}${ITEMS[slot.item].hoverTitle}`
+  }
+
+  // ─── API publique ─────────────────────────────────────────────
+
+  /**
+   * Initialise l'overlay au démarrage d'une session de jeu.
+   * Sélectionne le slot 0.
+   */
+  init () {
+    this.#activeIndex = -1
+    this.#applyActiveSlot(0)
+  }
+}
+export const hotbarOverlay = new HotbarOverlay()

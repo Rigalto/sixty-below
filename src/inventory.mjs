@@ -480,6 +480,8 @@ class InventoryManager {
     }
     // on prévient le buff manager pour qu'il initialise les buffs statiques
     eventBus.emit('inventory/static-buffs', this.getStaticBuffs())
+    // on prévient la hotbar pour qu'elle initialise les slots
+    eventBus.emit('hotbar/changed', this.hotbar)
   }
 
   // ─── Accesseurs (lecture seule pour l'Overlay) ───────────────
