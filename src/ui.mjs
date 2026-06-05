@@ -29,7 +29,7 @@ uiStyle.textContent = /* css */`
   --ov-text-orange: #e67e22;
 
   --slot-bg-default:   #153050;
-  --slot-bg-hotbar:    #e1f381;
+  --slot-bg-hotbar:    #c8a020;
   --slot-bg-armor:     #40e040;
   --slot-bg-armor-set: #80f840;
   --slot-bg-accessory: #B39DDB;

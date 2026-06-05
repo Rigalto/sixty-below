@@ -310,17 +310,21 @@ Cette section définit les événements officiels. Tout nouvel événement doit 
 | E | `craft/performed` | `{recipe, runs}` | Rafraîchit bag, hotbar et container si ouvert. |
 | S | `inventory/static-buffs` | `{armor: string[3], accessories: string[5], trinkets: string[]}` | Slots armor + accessoires + trinkets bag. Slots vides = `''`. |
 | S | `hotbar/changed` | `Array` | Contenu hotbar mis à jour. Les huit slots sont en payload. |
+| S | `hotbar/slot-update` | `{ index: number, slot: object }` | Émis après toute modification d'un slot hotbar individuel (loot…). |
 | S | `item/used` | `string` (itemId) | Clic sur Use. |
 | S | `craft/item` | `string` (itemId) | Navigation vers une recette. |
 | S | `help/topic` | `string` (topic) | Navigation vers une fiche d'aide. |
 | S | `debug/command` | — | Prompt de debug. |
 | S | `overlay/open-request` | `string` (overlayId) | Demande d'ouverture d'un overlay. |
 
-#### Hotbar (`HotbarManager`)
-*En prévision*
+#### Hotbar (`HotbarOverlay`)
+
 | Dir. | Event Name | Payload Structure | Description |
 | :---: | :--- | :--- | :--- |
-| E | `hotbar/changed` | `Array` | Contenu hotbar mis à jour. Les huit slots sont en payload. |
+| E | `hotbar/changed` | `Array` | Contenu complet de la hotbar. Rafraîchit tous les slots DOM. |
+| E | `hotbar/slot-update` | `{ index: number, slot: object }` | Mise à jour d'un slot individuel (loot, craft…). |
+| E | `hotbar/select-slot` | `number` slotIndex | Sélection clavier émise par `KeyboardManager`. |
+| S | `hotbar/slot-active` | `{ index: number, slot: object, prevIndex: number }` | Émis à chaque changement de slot actif ou de changement du contenu du slot actif. `slot` = slot mémoire brut de `inventoryManager.hotbar[index]`. |
 
 #### Craft (`CraftOverlay`)
 

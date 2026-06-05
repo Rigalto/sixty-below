@@ -931,7 +931,7 @@ L'item est classé dans la catégorie correspondant à sa méthode d'obtention l
 │   │                        #   WorldBuffer : TypedArray 1024x512, API read/write (x,y) et (index)
 │   │                        #   Algorithmes : Biomes, Ores, Gems, Plants, Hives, Chests, CobWebs…
 │   │                        #   WorldGenerator : orchestration complète
-│   ├── player.mjs           # Layer 4 : PlayerManager, LifeManager
+│   ├── player.mjs           # Layer 4 : PlayerManager, LifeManager, HotbarOverlay
 │   ├── action.mjs           # Layer 4 : ActionManager (Mining, Cutting, Fishing…)
 │   ├── buff.mjs             # Layer 4 : BuffManager, StatModifiers
 │   ├── housing.mjs          # Layer 4 : FurnitureManager, HousingManager

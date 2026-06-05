@@ -1,4 +1,4 @@
-// player.mjs — PlayerManager - LifeManager
+// player.mjs — PlayerManager - LifeManager - HotbarOverlay
 
 import {WORLD_WIDTH, WORLD_HEIGHT, PLAYER, MICROTASK, TELEPORT_FADE_MS, TELEPORT_WAIT_MS} from './constant.mjs'
 import {eventBus, taskScheduler} from './utils.mjs'
@@ -171,3 +171,31 @@ export const playerManager = new PlayerManager()
 class LifeManager {
 }
 export const lifeManager = new LifeManager()
+
+/* ====================================================================================================
+   HOTBAR OVERLAY
+   ====================================================================================================
+
+   Affichage permanent des 8 slots de la hotbar joueur dans le div #hotbar (sidebar gauche).
+   Singleton : hotbarOverlay.
+
+   Responsabilités :
+     - Rendu des 8 slots <inventory-slot> depuis inventoryManager.hotbar
+     - Maintien de l'index du slot actif (#activeIndex) et de son rendu visuel distinctif
+     - Sélection du slot actif par clic ou par raccourci clavier ('1'–'8' via hotbar/select-slot)
+     - Émission de hotbar/slot-active à chaque changement de slot actif
+
+   Interactions :
+     inventoryManager  — source de vérité pour le contenu des slots (hotbar)
+     eventBus          — écoute : hotbar/changed, hotbar/slot-update, hotbar/select-slot
+                       — émet  : hotbar/slot-active
+
+   Initialisation :
+     init() appelé par GameCore.startSession(). Sélectionne le slot 0
+     Sur réception de hotbar/changed : peuple les slots DOM, émet hotbar/slot-active.
+
+   Évolutions possibles (non cprévues, non codées) :
+     - Sélection par roulette souris
+     - Persistance de #activeIndex en base de données
+
+   ==================================================================================================== */
