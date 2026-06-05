@@ -668,6 +668,7 @@ class InventoryManager {
       slot.prefix = ''
     }
     this.#dirtyKeys.add(slot)
+    eventBus.emit('hotbar/slot-update', {index: slotIndex, slot})
     return slot
   }
 
@@ -1186,6 +1187,7 @@ class InventoryManager {
       if (slot.locked || slot.item !== item || slot.prefix !== prefix) continue
       slot.count += count
       this.#dirtyKeys.add(slot)
+      eventBus.emit('hotbar/slot-update', {index: slot.slot, slot})
       return
     }
     // Premier libre bag
@@ -1204,6 +1206,7 @@ class InventoryManager {
       slot.count = count
       slot.prefix = prefix
       this.#dirtyKeys.add(slot)
+      eventBus.emit('hotbar/slot-update', {index: slot.slot, slot})
       return
     }
     console.error(new Error(`[InventoryManager] loot impossible, inventaire plein : ${item}`))
