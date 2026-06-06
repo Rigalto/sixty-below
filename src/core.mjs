@@ -442,12 +442,14 @@ class GameCore {
 
     // 2.C Mouvements et caméra — déléguée à PlayerManager
     // Version DEBUG
-    playerManager.update(dt, keyboardManager.directionsGame)
-    const player = playerManager.updateDebug(dt, keyboardManager.directionsArrow)
-    camera.update(player)
+    if (keyboardManager.directionsArrow !== 0) {
+      camera.update(playerManager.updateDebug(dt, keyboardManager.directionsArrow))
+    } else {
+      camera.update(playerManager.update(dt, keyboardManager.directionsGame))
+    }
     // Fin version DEBUG
     // Version Normale
-    // const player = playerManager.update(dt, keyboardManager.directionsArrow | keyboardManager.directionsGame)
+    // camera.update(playerManager.update(dt, keyboardManager.directionsArrow | keyboardManager.directionsGame))
     // fin version Normale
 
     // 2.D Tuile sous la souris — disponible pour tous les systèmes de la frame

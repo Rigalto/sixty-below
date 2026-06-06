@@ -285,6 +285,13 @@ Cette section définit les événements officiels. Tout nouvel événement doit 
 | :---: | :--- | :--- | :--- |
 | E | `player/teleport` | `{x: number, y: number}` | Téléporte le joueur aux coordonnées tuiles données. |
 | S | `player/move` | `{x: number, y: number}` | Émis quand la tuile sous les pieds du joueur change. Coordonnées en tuiles. |
+| S | `life/add` | `{dmg: number}` | Dégâts de chute. dmg < 0. |
+
+#### Player Life (`LifeManager`)
+*En prévision*
+| Dir. | Event Name | Payload Structure | Description |
+| :---: | :--- | :--- | :--- |
+| E | `life/add` | `{deltaLife: number}` | Ajout de points de vie. |
 
 #### Rendering (`Camera`, `SkyRenderer`)
 

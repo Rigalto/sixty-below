@@ -140,7 +140,6 @@ class PlayerManager {
   #moveState = 0 // 0=GROUNDED 1=JUMPING 2=FALLING
   #jumpStartY = 0 // px — #y au déclenchement du saut
   #fallStartY = 0 // px — #y au déclenchement de la chute (fin saut ou décrochage)
-  #prevDirections = 0 // bitmask directions frame précédente (détection front-edge saut)
   #carryY = 0 // retient la partie décimale de la position en y pour ne travailler que sur des integer
 
   #teleportDiv = null // div#teleport-overlay — mis en cache à la première téléportation
@@ -196,15 +195,9 @@ class PlayerManager {
         this.#horizontalMovement(direction, dt)
       }
     }
+    this.#handleJump(dt, directions)
     this.#applyGravity(dt) // application de la gravité
-    // TODO saut
     // TODO platforms
-
-    // Clamp dans les bornes du monde - provisoire car détection des tuiles ETERNAL
-    if (this.#x < 0) { this.#x = 0 }
-    if (this.#x > WORLD_PX_W - PLAYER.w) { this.#x = WORLD_PX_W - PLAYER.w }
-    if (this.#y < 0) { this.#y = 0 }
-    if (this.#y > WORLD_PX_H - PLAYER.h) { this.#y = WORLD_PX_H - PLAYER.h }
 
     // affichage de la position du joueur dans le Control Panel (EnvironmentWidget)
     this.#notifyCurrentPosition()
@@ -237,7 +230,7 @@ class PlayerManager {
         this.#x += dist
         this.#y -= 16
       } else {
-        // pas de stepup possible : on tennte un décalage de un pixel
+        // pas de step up possible : on tennte un décalage de un pixel
         hitbox.x = x0 + direction
         hitbox.y = y0
         const {hasSolid: solidSlide} = this.#scanTiles(chunkManager.getTilesInRect(hitbox))
@@ -252,8 +245,44 @@ class PlayerManager {
     }
   }
 
+  /**
+ * Gère le déclenchement et la progression du saut.
+ * Appelée à chaque frame avant #applyGravity.
+ * @param {number} dt
+ * @param {number} directions - bitmask
+ */
+  #handleJump (dt, directions) {
+  // Déclenchement : joueur au sol + touche haut
+    if (this.#moveState === 0 && (directions & 1)) {
+      this.#moveState = 1 // Jumping
+      this.#jumpStartY = this.#y - PLAYER.JUMP_MAX_Y // * buffManager.getBuff('jump-height') / 100
+      return
+    }
+
+    if (this.#moveState !== 1) return // Jumping
+
+    const newY = this.#y - PLAYER.JUMP_SPEED * dt // vitesse constante
+
+    // Fin du saut : limite atteinte
+    if (newY <= this.#jumpStartY) {
+      this.#moveState = 0 // Grounded
+      return
+    }
+
+    // Fin du saut : collision
+    const hitbox = this.getHitbox()
+    hitbox.y = newY
+    if (this.#scanTiles(chunkManager.getTilesInRect(hitbox)).hasSolid) {
+      this.#moveState = 0
+      return
+    }
+
+    this.#y = newY
+  }
+
   #applyGravity (dt) {
-    //
+    if (this.#moveState === 1) return // JUMPING
+
     const hitbox = this.getHitbox() // objet partagé
     const y0 = hitbox.y
     const h0 = hitbox.h
@@ -289,23 +318,23 @@ class PlayerManager {
     }
 
     if (this.#moveState === 2) { // FALLING
-      const gravity = PLAYER.GRAVITY / 10
+      const gravity = PLAYER.GRAVITY / 5
       const speedBuff = 1
 
       const vy = Math.min(this.#vy + gravity * dt, PLAYER.FALLING_SPEED_MAX)
       let newY = this.#y + vy * dt * speedBuff + this.#carryY
-      // newY = Math.max(0, Math.min(newY, GEOMETRY.WORLD_HEIGHT - PLAYER.HEIGHT - 1)) // reste dans le monde
       this.#carryY = newY % 1 // extraction de la partie décimale
       newY = Math.floor(newY)
 
-      const hitbox = this.getHitbox() // objet partagé
       hitbox.y = newY
       const {hasSolid: solidFull} = this.#scanTiles(chunkManager.getTilesInRect(hitbox))
       // Si on percute le sol, on se contente de descendre d'un pixel.
-      if (solidFull) { newY = this.#y + 1 }
-
-      this.#vy = vy
-      this.#y = newY
+      if (solidFull) {
+        this.#y += 1
+      } else {
+        this.#vy = vy
+        this.#y = newY
+      }
     }
   }
 
@@ -341,7 +370,7 @@ class PlayerManager {
    * @returns {{x: number, y: number}}
    */
   getCenterTile () {
-    this.#getCenterTileResult = (this.#x + (PLAYER.w >> 1)) >> 4
+    this.#getCenterTileResult.x = (this.#x + (PLAYER.w >> 1)) >> 4
     this.#getCenterTileResult.y = (this.#y + (PLAYER.h >> 1)) >> 4
     return this.#getCenterTileResult
   }
@@ -450,6 +479,7 @@ class PlayerManager {
    * @returns {{hasSolid: boolean, viscosity: number, hasWeb: boolean}}
    */
   #scanTiles (tiles) {
+    const SOLID = NODE_TYPE.SOLID | NODE_TYPE.ETERNAL
     const r = this.#scanTilesResult
     r.hasSolid = false
     r.viscosity = 0
@@ -458,7 +488,7 @@ class PlayerManager {
       const node = NODES_LOOKUP[code]
       if (!node) continue
       const {type} = node
-      if (type & NODE_TYPE.SOLID) r.hasSolid = true
+      if (type & SOLID) r.hasSolid = true
       if (type & NODE_TYPE.WEB) r.hasWeb = true
       if (type & NODE_TYPE.LIQUID && node.viscosity > r.viscosity) r.viscosity = node.viscosity
     }

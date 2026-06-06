@@ -82,8 +82,14 @@ class BuffManager {
     this.#trinketB = {}
     this.initTrinket()
     // définition des buffs compsés
+    // 'movement-speed' : vitesse horizontale du joueur, 0 = joueur immobile, 100% = PLAYER.SPEED
+    // ne tient pas compte tuiles environnantes (sous le joueur et sous ses pieds)
     this.#fns.set('movement-speed', () => {
       if (this.#values.get('playerFreeze')) return 0
+      return 100
+    })
+    // 'fall-damage' : calcul des dommages de chute, 0 aucun dommage, 100% = PLAYER.FALL_DAMAGE_MULTIPLIER
+    this.#fns.set('fall-damage', () => {
       return 100
     })
   }
