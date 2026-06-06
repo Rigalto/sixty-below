@@ -185,16 +185,7 @@ class PlayerManager {
    * @returns {{x: number, y: number}} centre de la hitbox en pixels monde
    */
   update (dt, directions) {
-    if (directions !== 0) {
-      // détermination du sens du déplacement horizontal
-      let direction = 0
-      if (directions & 4) { direction -= 1 }
-      if (directions & 8) { direction += 1 }
-      // Si le joueur appuie à la fois à droite et à gauche, le mouvement est nul
-      if (direction !== 0) {
-        this.#horizontalMovement(direction, dt)
-      }
-    }
+    this.#horizontalMovement(directions, dt)
     this.#handleJump(dt, directions)
     this.#applyGravity(dt) // application de la gravité
     // TODO platforms
@@ -211,7 +202,15 @@ class PlayerManager {
    * @param {-1|1} direction - sens du déplacement (-1 gauche, 1 droite)
    * @param {number} dt      - delta temps en ms
    */
-  #horizontalMovement (direction, dt) {
+  #horizontalMovement (directions, dt) {
+    if (directions === 0) return
+    // détermination de la direction horizontale
+    let direction = 0
+    if (directions & 4) { direction -= 1 }
+    if (directions & 8) { direction += 1 }
+    // Si le joueur appuie à la fois à droite et à gauche, le mouvement est nul
+    if (direction === 0) return
+
     const speed = PLAYER.speed
     const dist = speed * dt * direction
     this.#direction = direction < 0 ? 0 : 1
@@ -247,7 +246,6 @@ class PlayerManager {
 
   /**
  * Gère le déclenchement et la progression du saut.
- * Appelée à chaque frame avant #applyGravity.
  * @param {number} dt
  * @param {number} directions - bitmask
  */
@@ -280,6 +278,10 @@ class PlayerManager {
     this.#y = newY
   }
 
+  /**
+ * Gère le déclenchement et la chute due à la gravité.
+ * @param {number} dt
+ */
   #applyGravity (dt) {
     if (this.#moveState === 1) return // JUMPING
 
