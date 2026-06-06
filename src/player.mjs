@@ -151,6 +151,7 @@ class PlayerManager {
   #getHitboxResult = {x: 0, y: 0, w: PLAYER.w, h: PLAYER.h} // résultat de #getHitbox()
   #getFeetTileResult = {x: 0, y: 0} // résultat de getFeetTile()
   #getCenterTileResult = {x: 0, y: 0} // résultat de getCenterTile()
+  #updateResult = {x: 0, y: 0} // résultat de update()
 
   /**
  * Initialise la position depuis le record gamestate.
@@ -193,7 +194,9 @@ class PlayerManager {
     // affichage de la position du joueur dans le Control Panel (EnvironmentWidget)
     this.#notifyCurrentPosition()
 
-    return {x: this.#x + (PLAYER.w >> 1), y: this.#y + (PLAYER.h >> 1)}
+    this.#updateResult.x = this.#x + (PLAYER.w >> 1)
+    this.#updateResult.y = this.#y + (PLAYER.h >> 1)
+    return this.#updateResult
   }
 
   /**
