@@ -442,7 +442,7 @@ class GameCore {
 
     // 2.C Mouvements et caméra — déléguée à PlayerManager
     // Version DEBUG
-    // const player = playerManager.update(dt, keyboardManager.directionsGame)
+    playerManager.update(dt, keyboardManager.directionsGame)
     const player = playerManager.updateDebug(dt, keyboardManager.directionsArrow)
     camera.update(player)
     // Fin version DEBUG

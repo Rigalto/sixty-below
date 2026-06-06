@@ -145,8 +145,12 @@ class PlayerManager {
   #teleportDiv = null // div#teleport-overlay — mis en cache à la première téléportation
   #teleportTarget = null // {x, y} en pixels — cible de la téléportation
 
+  // ci-dessous les variables utilisées pour éviter la création au vol
+  // d'objets, afin de ne pas déclencher le GC
   #scanTilesResult = {hasSolid: false, viscosity: 0, hasWeb: false} // résultat de #scanTiles() — déstructurer immédiatement si appels multiples
   #getHitboxResult = {x: 0, y: 0, w: PLAYER.w, h: PLAYER.h} // résultat de #getHitbox()
+  #getFeetTileResult = {x: 0, y: 0} // résultat de getFeetTile()
+  #getCenterTileResult = {x: 0, y: 0} // résultat de getCenterTile()
 
   /**
  * Initialise la position depuis le record gamestate.
@@ -182,26 +186,73 @@ class PlayerManager {
    */
   update (dt, directions) {
     if (directions !== 0) {
-      const dist = PLAYER.speed * dt
-      if (directions & 4) { this.#x -= dist; this.#direction = 0 }
-      if (directions & 8) { this.#x += dist; this.#direction = 1 }
-      if (directions & 1) { this.#y -= dist }
-      if (directions & 2) { this.#y += dist }
-      // Clamp dans les bornes du monde - provisoire
+      // détermination du sens du déplacement horizontal
+      let direction = 0
+      if (directions & 4) { direction -= 1 }
+      if (directions & 8) { direction += 1 }
+      // Si le joueur appuie à la fois à droite et à gauche, le mouvement est nul
+      if (direction !== 0) {
+        this.#horizontalMovement(direction, dt)
+      }
+      this.#applyGravity() // application de la gravité
+      // TODO saut
+      // TODO platforms
+
+      // Clamp dans les bornes du monde - provisoire car détection des tuiles ETERNAL
       if (this.#x < 0) { this.#x = 0 }
       if (this.#x > WORLD_PX_W - PLAYER.w) { this.#x = WORLD_PX_W - PLAYER.w }
       if (this.#y < 0) { this.#y = 0 }
       if (this.#y > WORLD_PX_H - PLAYER.h) { this.#y = WORLD_PX_H - PLAYER.h }
-    }
-    // affichage de la position du joueur dans le Control Panel (EnvironmentWidget)
-    const feet = this.getFeetTile()
-    if (feet.x !== this.#lastTileX || feet.y !== this.#lastTileY) {
-      this.#lastTileX = feet.x
-      this.#lastTileY = feet.y
-      eventBus.emit('player/move', feet)
+
+      // affichage de la position du joueur dans le Control Panel (EnvironmentWidget)
+      this.#notifyCurrentPosition()
     }
 
     return {x: this.#x + (PLAYER.w >> 1), y: this.#y + (PLAYER.h >> 1)}
+  }
+
+  /**
+   * Déplace le joueur horizontalement avec détection de collision.
+   * Tente dans l'ordre : déplacement complet, step-up d'une tuile, glissement d'un pixel.
+   * @param {-1|1} direction - sens du déplacement (-1 gauche, 1 droite)
+   * @param {number} dt      - delta temps en ms
+   */
+  #horizontalMovement (direction, dt) {
+    const speed = PLAYER.speed
+    const dist = speed * dt * direction
+    this.#direction = direction < 0 ? 0 : 1
+
+    const hitbox = this.getHitbox() // objet partagé
+    const x0 = hitbox.x
+    const y0 = hitbox.y
+    hitbox.x = x0 + dist // hitbox sur position future
+    const {hasSolid: solidFull} = this.#scanTiles(chunkManager.getTilesInRect(hitbox))
+    if (solidFull) {
+      // collision détectée : tentative Set Up
+      hitbox.y = y0 - 16
+      const {hasSolid: solidStep} = this.#scanTiles(chunkManager.getTilesInRect(hitbox))
+      if (!solidStep) {
+        // stepup possible
+        this.#x += dist
+        this.#y -= 16
+      } else {
+        // pas de stepup possible : on tennte un décalage de un pixel
+        hitbox.x = x0 + direction
+        hitbox.y = y0
+        const {hasSolid: solidSlide} = this.#scanTiles(chunkManager.getTilesInRect(hitbox))
+        if (!solidSlide) {
+        // on peut déplacer de un pixel, sinon on reste immobile
+          this.#x += direction
+        }
+      }
+    } else {
+      // pas de collision
+      this.#x += dist
+    }
+  }
+
+  #applyGravity () {
+    //
   }
 
   /**
@@ -218,18 +269,14 @@ class PlayerManager {
       if (directions & 8) { this.#x += dist; this.#direction = 1 }
       if (directions & 1) { this.#y -= dist }
       if (directions & 2) { this.#y += dist }
-      // Clamp dans les bornes du monde - provisoire
+      // Clamp dans les bornes du monde - oblilgatoire puisque pas de détection de collision
       if (this.#x < 0) { this.#x = 0 }
       if (this.#x > WORLD_PX_W - PLAYER.w) { this.#x = WORLD_PX_W - PLAYER.w }
       if (this.#y < 0) { this.#y = 0 }
       if (this.#y > WORLD_PX_H - PLAYER.h) { this.#y = WORLD_PX_H - PLAYER.h }
-    }
-    // affichage de la position du joueur dans le Control Panel (EnvironmentWidget)
-    const feet = this.getFeetTile()
-    if (feet.x !== this.#lastTileX || feet.y !== this.#lastTileY) {
-      this.#lastTileX = feet.x
-      this.#lastTileY = feet.y
-      eventBus.emit('player/move', feet)
+
+      // affichage de la position du joueur dans le Control Panel (EnvironmentWidget)
+      this.#notifyCurrentPosition()
     }
 
     return {x: this.#x + (PLAYER.w >> 1), y: this.#y + (PLAYER.h >> 1)}
@@ -240,10 +287,9 @@ class PlayerManager {
    * @returns {{x: number, y: number}}
    */
   getCenterTile () {
-    return {
-      x: (this.#x + (PLAYER.w >> 1)) >> 4,
-      y: (this.#y + (PLAYER.h >> 1)) >> 4
-    }
+    this.#getCenterTileResult = (this.#x + (PLAYER.w >> 1)) >> 4
+    this.#getCenterTileResult.y = (this.#y + (PLAYER.h >> 1)) >> 4
+    return this.#getCenterTileResult
   }
 
   /**
@@ -251,10 +297,9 @@ class PlayerManager {
    * @returns {{x: number, y: number}}
    */
   getFeetTile () {
-    return {
-      x: (this.#x + (PLAYER.w >> 1)) >> 4,
-      y: (this.#y + PLAYER.h) >> 4
-    }
+    this.#getFeetTileResult.x = (this.#x + (PLAYER.w >> 1)) >> 4
+    this.#getFeetTileResult.y = (this.#y + PLAYER.h) >> 4
+    return this.#getFeetTileResult
   }
 
   /**
@@ -350,7 +395,7 @@ class PlayerManager {
    * @param {Uint8Array} tiles - résultat de chunkManager.getTilesInRect()
    * @returns {{hasSolid: boolean, viscosity: number, hasWeb: boolean}}
    */
-  scanTiles (tiles) {
+  #scanTiles (tiles) {
     const r = this.#scanTilesResult
     r.hasSolid = false
     r.viscosity = 0
@@ -364,6 +409,19 @@ class PlayerManager {
       if (type & NODE_TYPE.LIQUID && node.viscosity > r.viscosity) r.viscosity = node.viscosity
     }
     return r
+  }
+
+  /**
+   * Émet 'player/move' si la tuile sous les pieds a changé depuis le dernier appel.
+   * Sans paramètre ni valeur de retour — effet de bord sur #lastTileX / #lastTileY.
+   */
+  #notifyCurrentPosition () {
+    const feet = this.getFeetTile()
+    if (feet.x !== this.#lastTileX || feet.y !== this.#lastTileY) {
+      this.#lastTileX = feet.x
+      this.#lastTileY = feet.y
+      eventBus.emit('player/move', feet)
+    }
   }
 }
 export const playerManager = new PlayerManager()
