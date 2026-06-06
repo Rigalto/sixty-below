@@ -19,7 +19,6 @@
 
 ## Dette technique
 
-- Mettre les bonnes icônes dans le titre des Overlays
 - Vérifier que la convention pour les variables privées est prise en compte partout :
   - fait pour `inventory.mjs`, `craft.mjs`, `help.mjs`, `achievement.mjs`, `ui.mjs`
 - Vérifier que les en-têtes des fonctions sont présents et à jour (prise en compte des modifications de conception) :

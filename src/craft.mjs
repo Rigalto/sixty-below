@@ -1,6 +1,6 @@
 // inventory.mjs — CraftOverlay
 
-import {OVERLAYS, PATH_HELP, PATH_WARNING, PATH_CANCEL, SVG_ICON} from './constant.mjs'
+import {OVERLAYS, PATH_HELP, PATH_WARNING, PATH_CANCEL, PATH_CRAFT, SVG_ICON} from './constant.mjs'
 import {eventBus} from './utils.mjs'
 import {createOverlayHeader} from './ui.mjs'
 import {database} from './database.mjs'
@@ -439,7 +439,7 @@ class CraftOverlay {
     this.#container.id = 'ui-craft-panel'
 
     // 2. Création du Header via la Factory
-    const header = createOverlayHeader('⚒️ Crafting [K]', 'craft')
+    const header = createOverlayHeader(PATH_CRAFT, 'Crafting [K]', 'craft')
     this.#header = header
 
     // 3. Zone de contenu (Vide pour l'instant, juste pour remplir)

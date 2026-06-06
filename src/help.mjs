@@ -1,6 +1,6 @@
 // help.mjs — HelpOverlay
 
-import {OVERLAYS, PATH_CANCEL, PATH_NEXT, PATH_PREVIOUS, SVG_ICON} from './constant.mjs'
+import {OVERLAYS, PATH_CANCEL, PATH_NEXT, PATH_PREVIOUS, PATH_HELP, SVG_ICON} from './constant.mjs'
 import {eventBus} from './utils.mjs'
 import {database} from './database.mjs'
 import {createOverlayHeader} from './ui.mjs'
@@ -292,7 +292,7 @@ class HelpOverlay {
     this.#container.id = 'ui-help-panel'
     this.#container.style.zIndex = OVERLAYS.help.zIndex // seul style dynamique
 
-    this.#container.appendChild(createOverlayHeader('📜 Help [H]', 'help'))
+    this.#container.appendChild(createOverlayHeader(PATH_HELP, 'Help [H]', 'help'))
 
     const body = document.createElement('div')
     body.className = 'help-body'

@@ -43,6 +43,7 @@ uiStyle.textContent = /* css */`
   display: flex;
   align-items: center;
   justify-content: center;
+  gap: 8px;
   position: relative;
   padding: 0 10px;
   font-size: 16px;
@@ -52,6 +53,11 @@ uiStyle.textContent = /* css */`
   border-top-right-radius: 4px;
   color: #ffffff;
   user-select: none;
+}
+.ov-header-icon {
+  width: 20px;
+  height: 20px;
+  flex-shrink: 0;
 }
 .ui-close-btn {
   cursor: pointer;
@@ -548,7 +554,7 @@ class CreationDialogOverlay {
     this.#container.id = 'creation-dialog'
 
     // 2. Header
-    this.#container.appendChild(createOverlayHeader('🌱 World Management', 'creation'))
+    this.#container.appendChild(createOverlayHeader(PATH_NEW_WORLD, 'World Management', 'creation'))
 
     // 3. Wrapper de Contenu (pour préserver l'espacement interne)
     const content = document.createElement('div')
@@ -1212,20 +1218,27 @@ export const modalBlocker = new ModalBlocker()
 /**
 
  * Crée un header standardisé pour les overlays.
- * @param {string} titleText - Le titre (avec icône)
- * @returns {DOM Element} header } - Retourne le conteneur
+ * @param {string} path      — chemin SVG de l'icône (constante PATH_*)
+ * @param {string} titleText — texte du titre affiché à droite de l'icône
+ * @param {string} overlayId — identifiant overlay pour la fermeture
+ * @returns {HTMLDivElement}
  */
-export function createOverlayHeader (titleText, overlayId) {
+export function createOverlayHeader (path, titleText, overlayId) {
   // 1. Conteneur Header
   const header = document.createElement('div')
   header.className = 'ui-overlay-header'
 
-  // 2. Titre
+  // 2. Icône
+  const icon = document.createElement('span')
+  icon.innerHTML = SVG_ICON(path, 'class="ov-header-icon"')
+  header.appendChild(icon)
+
+  // 3. Titre
   const title = document.createElement('span')
   title.textContent = titleText
   header.appendChild(title)
 
-  // 3. Bouton Fermer
+  // 4. Bouton Fermer
   const closeBtn = document.createElement('span')
   closeBtn.textContent = '✕'
   closeBtn.className = 'ui-close-btn'

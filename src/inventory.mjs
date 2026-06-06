@@ -1,6 +1,6 @@
 // inventory.mjs — InventoryManager · InventorySlot · InventoryOverlay
 
-import {OVERLAYS, BAG_CAPACITY, HOTBAR_CAPACITY, ARMOR_CAPACITY, ARMOR_SLOT_LABELS, ACCESSORY_CAPACITY, CONTAINER_STYPES, CONTAINER_CAPACITY, ARMOR_SLOTS, PATH_RENAME, PATH_LOCKED, PATH_UNLOCKED, PATH_CRAFT, SVG_ICON, PATH_HELP, PATH_DEBUG, PATH_SPLIT, PATH_TRASH_DOWN, PATH_TRASH_UP, PATH_USE, PATH_WARNING, PATH_ARROW_RIGHT} from './constant.mjs'
+import {OVERLAYS, BAG_CAPACITY, HOTBAR_CAPACITY, ARMOR_CAPACITY, ARMOR_SLOT_LABELS, ACCESSORY_CAPACITY, CONTAINER_STYPES, CONTAINER_CAPACITY, ARMOR_SLOTS, PATH_RENAME, PATH_LOCKED, PATH_UNLOCKED, PATH_CRAFT, PATH_HELP, PATH_DEBUG, PATH_SPLIT, PATH_TRASH_DOWN, PATH_TRASH_UP, PATH_USE, PATH_WARNING, PATH_ARROW_RIGHT, PATH_INVENTORY, SVG_ICON} from './constant.mjs'
 import {eventBus, capitalize} from './utils.mjs'
 import {createOverlayHeader} from './ui.mjs'
 import {ITEMS, ITEM_TYPE} from '../../assets/data/data.mjs'
@@ -1574,7 +1574,7 @@ class InventoryOverlay {
     this.#container.id = 'ui-inventory-panel'
 
     // 2. Header
-    this.#container.appendChild(createOverlayHeader('🎒 Inventory [I]', 'inventory'))
+    this.#container.appendChild(createOverlayHeader(PATH_INVENTORY, 'Inventory [I]', 'inventory'))
 
     // 3. Contents
     this.#buildContent()

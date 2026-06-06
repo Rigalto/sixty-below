@@ -2,7 +2,7 @@
 
 import {eventBus} from './utils.mjs'
 import {database} from './database.mjs'
-import {OVERLAYS} from './constant.mjs'
+import {OVERLAYS, PATH_TROPHY} from './constant.mjs'
 import {createOverlayHeader} from './ui.mjs'
 import {ITEMS, MONSTERS} from '../../assets/data/data.mjs'
 import {ACHIEVEMENT_CATEGORIES} from '../../assets/data/data-achievement.mjs'
@@ -332,7 +332,7 @@ class AchievementOverlay {
   constructor () {
     this.#container = document.createElement('div')
     this.#container.id = 'ui-achievement-panel'
-    this.#container.appendChild(createOverlayHeader('🏆 Achievements [U]', 'achievement'))
+    this.#container.appendChild(createOverlayHeader(PATH_TROPHY, 'Achievements [U]', 'achievement'))
     this.#buildDOM()
     document.body.appendChild(this.#container)
     this.bindEvents()

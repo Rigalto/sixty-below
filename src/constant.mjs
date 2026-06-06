@@ -253,6 +253,7 @@ export const PATH_SAVE = 'M2 4a2 2 0 0 1 2-2h13.17a2 2 0 0 1 1.41 0.59l2.83 2.83
 export const PATH_RESTORE = 'M13.6 1a1.6 1.6 0 0 1 1.6 1.6v4.8h3.67a1.6 1.6 0 0 1 1.13 2.73l-6.3 6.3a2.4 2.4 0 0 1-3.39 0l-6.3-6.3a1.6 1.6 0 0 1 1.13-2.73h3.67v-4.8a1.6 1.6 0 0 1 1.6-1.6zM13.2 3h-2.4v6.4h-4.8l6 6 6-6h-4.8zM14 14h8a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-20a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h8v2h-8v5h20v-5h-8zM18 18a1 1 0 0 1 2 0 1 1 0 0 1-2 0z'
 export const PATH_NEXT = 'M6 3.83a2 2 0 0 1 3.41-1.41l8.17 8.17a2 2 0 0 1 0 2.83l-8.17 8.17a2 2 0 0 1-3.41-1.41zM8 4v16l8-8z'
 export const PATH_PREVIOUS = 'M18 3.83a2 2 0 0 0-3.41-1.41l-8.17 8.17a2 2 0 0 0 0 2.83l8.17 8.17a2 2 0 0 0 3.41-1.41zM16 4v16l-8-8z'
+export const PATH_COMBAT = 'M7 17a2 2 0 1 0-2 2h14a2 2 0 1 0-2-2zM11 18v5a1 1 0 1 0 2 0v-5zM11 18v-12l1-1.8 1 1.8v12h2v-13l-2.14-3.57a1 1 0 0 0-1.72 0l-2.14 3.57v13z'
 
 export const SVG_ICON = (icon, config = '') => `<svg viewBox="0 0 24 24" ${config}><path fill="currentColor" d="${icon}"/></svg>`
 

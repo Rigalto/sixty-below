@@ -1,7 +1,7 @@
 // combat.mjs — CombatOverlay
 
 import {eventBus} from './utils.mjs'
-import {OVERLAYS} from './constant.mjs'
+import {OVERLAYS, PATH_COMBAT} from './constant.mjs'
 import {createOverlayHeader} from './ui.mjs'
 
 /* ====================================================================================================
@@ -46,7 +46,7 @@ class CombatOverlay {
   constructor () {
     this.#container = document.createElement('div')
     this.#container.id = 'ui-combat-panel'
-    this.#container.appendChild(createOverlayHeader('⚔️ Combat', 'combat'))
+    this.#container.appendChild(createOverlayHeader(PATH_COMBAT, 'Combat', 'combat'))
     this.#buildDOM()
     document.body.appendChild(this.#container)
     this.#bindEvents()
