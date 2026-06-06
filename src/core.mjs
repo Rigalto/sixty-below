@@ -486,7 +486,7 @@ class GameCore {
       this.previousTileIndex = tileIndex
       eventBus.emit('world/tile-hover', tileNode)
       const {priority, capacity} = MICROTASK.UI_TILE_HOVER
-      microTasker.enqueueOnce(tileHoverWidget.onTileHoverDetail, priority, capacity, tileNode)
+      microTasker.enqueueOnce(tileHoverWidget.onTileHoverDetail, priority, capacity, tileNode, tileIndex)
     }
 
     // 2.F Gestion du clic gauche la souris

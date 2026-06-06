@@ -7,8 +7,12 @@
 
 ## En cours
 
-- ajouter l'affichage du furniture sous la souris (`TileHoverWidget`)
+- Concevoir la classe centralisée pour toutes les plantes et les classes dédiée pour chaque plante
+  - Initialisation par dispatching aux classas dédiées
+  - Affichage par appel de toutes les classes dédiées
+  - recherche en fonction du substrat uniquement pour les classes correspondante
 - implémentation de l'affichage des tuiles (top soil à faire)
+- Ajouter des planches comme refinement des logs
 - Sauvegarde de la position du joueur en database
 - brancher les Crafting Stations au craft panel
 - implémenter les platforms dans le déplacement.
