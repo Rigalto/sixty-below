@@ -1027,8 +1027,8 @@ Despite the nuisance they represent, cobwebs are one of the most valuable resour
 **Terrain Effect** ⏳
 
 * Cobweb threads are nearly invisible until you are already tangled in them — by then, each step pulls a dozen more filaments across your legs and arms.
-* Walking through [[node:web]] reduces Movement Speed ({{node:web:buffs:movementSpeed}}%)
-* See [[Movement Speed]] for details
+* Walking through [[node:web]] reduces [[Movement Buffs|Movement Speed]] ({{node:web:buffs:movementSpeed}}%)
+* See [[Movement Buffs]] for details
 
 **Tips**
 
@@ -2432,10 +2432,10 @@ Unlike [[Accessories]], Trinkets do not need to be placed in a dedicated slot �
 | [[item:bottledFrog]] | {{item:bottledFrog:star|star}} | Give [[Weather]] forecast |
 | [[item:sextant]] | {{item:sextant:star|star}} | Improve [[Moon Phases]] accuracy |
 | [[item:ruler]] | {{item:ruler:star|star}} | Display your position |
-| [[item:stopwatch]] | {{item:stopwatch:star|star}} | Display your [[Movement Speed]] bonus in the [[Control Panel]] |
+| [[item:stopwatch]] | {{item:stopwatch:star|star}} | Display your [[Movement Buffs|Movement Speed Bonus]] in the [[Control Panel]] |
 | [[item:astrolabe]] | {{item:astrolabe:star|star}} | Give [[Weather]] forecast and improve [[Moon Phases]] accuracy |
-| [[item:chronometer]] | {{item:chronometer:star|star}} | Display your position and your [[Movement Speed]] bonus |
-| [[item:astrarium]] | {{item:astrarium:star|star}} | Display [[Weather]] forecast, your position and your [[Movement Speed]] bonus. Also improve [[Day & Night Cycle|Time]] and [[Moon Phases]] accuracy |
+| [[item:chronometer]] | {{item:chronometer:star|star}} | Display your position and your [[Movement Buffs|Movement Speed Bonus]] |
+| [[item:astrarium]] | {{item:astrarium:star|star}} | Display [[Weather]] forecast, your position and your [[Movement Buffs|Movement Speed Bonus]]. Also improve [[Day & Night Cycle|Time]] and [[Moon Phases]] accuracy |
 
 Grid and Range Display:
 
@@ -2597,7 +2597,7 @@ The world is **1024 x 512 tiles**.
     content: `
 **Description**
 
-A precision instrument that, when carried in your [[Inventory]], displays your current [[Movement Speed]] in the [[Control Panel]].
+A precision instrument that, when carried in your [[Inventory]], displays your current [[Movement Buffs|Movement Speed Bonus]] in the [[Control Panel]].
 
 **Display**
 
@@ -2625,7 +2625,7 @@ Speed is shown as a percentage:
 **See also**
 
 * [[Environment Panel]] — overview of all display features
-* [[Movement Speed]] — detailed breakdown of speed modifiers
+* [[Movement Buffs]] — detailed breakdown of movement modifiers
 * [[Trinkets]] — full list of trinkets and their effects
   `
   },
@@ -2669,12 +2669,12 @@ An ancient astronomical instrument of extraordinary precision. When carried in y
     content: `
 **Description**
 
-A precision timekeeping instrument originally designed for maritime navigation. When carried in your [[Inventory]], it combines the functions of the [[Ruler]] and the [[Stopwatch]], displaying both your position and [[Movement Speed]] in the [[Control Panel]].
+A precision timekeeping instrument originally designed for maritime navigation. When carried in your [[Inventory]], it combines the functions of the [[Ruler]] and the [[Stopwatch]], displaying both your position and [[Movement Buffs|Movement Speed Bonus]] in the [[Control Panel]].
 
 **Effects**
 
 * Displays your current tile coordinates (X / Y)
-* Displays your current [[Movement Speed]] as a percentage
+* Displays your current [[Movement Buffs|Movement Speed Bonus]] as a percentage
 
 **[[item:chronometer]] Crafting**
 
@@ -2711,7 +2711,7 @@ The pinnacle of exploration instruments. When carried in your [[Inventory]], it 
 * Tomorrow's [[Weather]] forecast alongside the current weather
 * All 8 [[Moon Phases]] shown with distinct icons
 * Current tile coordinates (X / Y)
-* Current [[Movement Speed]] as a percentage
+* Current [[Movement Buffs|Movement Speed Bonus]] as a percentage
 
 **[[item:astrarium]] Crafting**
 
@@ -4632,7 +4632,7 @@ Velvetmoss is a slow-growing, deep-purple moss found exclusively in [[Moss Cave|
 
 * Velvetmoss secretes a thin, permanent moisture that makes every step a negotiation with gravity — the harder you push, the more it slips away from under you.
 * Walking on Velvetmoss reduces Movement Speed ({{item:velvetmoss:buffs:movementSpeed}}%)
-* See [[Movement Speed]] for details
+* See [[Movement Buffs]] for details
 
 **Placement**
 
@@ -5295,11 +5295,11 @@ Carrying a [[item:ruler]] or an [[item:chronometer]] in your [[Inventory]] displ
 
 **Movement Speed bonus**
 
-Carrying a [[item:stopwatch]] or a [[item:chronometer]] in your [[Inventory]] displays your current Movement Speed as a percentage.
+Carrying a [[item:stopwatch]] or a [[item:chronometer]] in your [[Inventory]] displays your current [[Movement Buffs|Movement Speed Bonus]] as a percentage.
 
 * A value of 100% means no modifier is active.
 * Speed is affected by terrain, equipment, and [[Buffs]].
-* See [[Movement Speed]] for details.
+* See [[Movement Buffs]] for details.
     `
   },
   {
@@ -5383,7 +5383,7 @@ _If no container is in range, the chest panel is inactive._
   },
 
   // ── Gameplay ─────────────────────────────────────────────────
-  //    Buffs, Buff Panel, Movement Speed,  World Creation
+  //    Buffs, Buff Panel, Movement Buffs,  World Creation
 
   {
     title: 'Buffs',
@@ -5430,7 +5430,7 @@ Consuming the same type too quickly extends the cooldown before you can benefit 
 
 * [[Mining Buffs]] — speed, yield, range
 * [[Harvesting Buffs]] — speed, yield, range
-* [[Movement Speed|Movement Buffs]] — speed, jump, friction
+* [[Movement Buffs]] — speed, jump, gravity, friction
 * [[Combat Buffs]] — damage, defense, critical hits
 * [[Housing Buffs]] — placement speed, range
 * [[Fishing Buffs]] — better yield, special encounters
@@ -5451,27 +5451,115 @@ Consuming the same type too quickly extends the cooldown before you can benefit 
   `
   },
   {
-    title: 'Movement Speed',
+    title: 'Movement',
     category: ['Gameplay'],
     content: `
 **Description**
 
-Movement Speed determines how fast the player moves through the world. The base speed can be altered by terrain, equipment, and buffs.
+The player moves using the keyboard. Movement is governed by physics — gravity — and terrain all affect how the player behaves. Several buffs can improve or impair movement.
+
+**Lateral movement**
+
+* Press [Q] / [D] to move horizontally.
+* The player automatically steps up one tile when walking into a low obstacle (step-up).
+* Movement speed is affected by [[Movement Buffs]].
+* Liquids slow movement proportionally to their viscosity.
+* [[node:web]] drastically reduce movement speed.
+
+**Gravity**
+
+* The player falls when no solid tile supports them.
+* Fall speed increases progressively up to a terminal velocity.
+* Falling from a great height deals damage on landing. The greater the fall, the more damage you take.
+* Gravity can be partially offset by [[Movement Buffs]].
+* Fall damages can be reduced by [[Movement Buffs]].
+
+**Jumping**
+
+* Press [Z] to jump. The player can re-jump as soon as they land, even if the key is held.
+* The jump ends early if the player hits a ceiling or solid tile.
+* Jumping is not possible while airborne.
+* Jumping height can be increased by [[Movement Buffs]].
+
+**Platforms**
+
+[[item:platformOak]]s are special furnitures that can be traversed from multiple directions:
+
+| Direction | Behaviour |
+|---|---|
+| From above | Solid — the player lands and stands on the platform |
+| From below | Passable — the player can jump through |
+| From the sides | Passable — the player walks through |
+| Press [S] while standing | The player drops through the platform |
+
+**Keys**
+
+| ZQSD | Arrow Keys | Action |
+|---|---|---|
+| Q | ← | Walk left |
+| D | → | Walk right |
+| Z | ↑ | Jump |
+| S | ↓ | Go through platform |
+
+
+**Tips**
+
+* _Cobwebs block both horizontal and vertical movement — carry a pickaxe to clear them quickly._
+
+**See also**
+
+* [[Buffs]] — complete buff reference
+  `
+  },
+  {
+    title: 'Movement Buffs',
+    category: ['Gameplay'],
+    content: `
+**Description**
+
+Movement Buffs includes all the alterations which impact player [[Movement]].
+All the bonus are additive.
 
 **Terrain Modifiers**
 
 | Terrain | Effect | Location |
 |---|---|---|
-| [[node:web]] | -50% | [[Cobweb Cave]] and [[node:web]] hanging from ceilings of dark corners |
-| [[item:velvetmoss]] | -10% | [[Moss Cave]] floor and walls |
+| [[node:web]] | -50% Movement Speed Bonus | [[Cobweb Cave]] and [[node:web]] hanging from ceilings of dark corners |
+| [[item:velvetmoss]] | -10% Movement Speed Bonus ⏳ | [[Moss Cave]] floor and walls |
+| [[node:sea]] | -20% Movement Speed Bonus ⏳ | Right / Left of the World |
+| [[node:water]] | -20% Movement Speed Bonus ⏳ | Anywhere |
+| [[node:sap]] | -40% Movement Speed Bonus ⏳ | Mainly in [[Sap Pocket]]s |
+| [[node:honey]] | -60% Movement Speed Bonus ⏳ | [[Hive]]s |
 
-**Equipment Modifiers** ⏳
+**Trinket Effects**
 
-**Buff & Debuff Modifiers** ⏳
+Carrying a [[item:stopwatch]], a [[item:chronometer]] or an [[item:astrarium]] in your [[Inventory]] displays in the [[Control Panel]] your current Movement Speed Bonus as a percentage.
 
-**Display**
+**Accessory Modifiers ⏳**
 
-Carrying a [[item:stopwatch]] or a [[item:chronometer]] in your [[Inventory]] displays in the [[Control Panel]] your current Movement Speed as a percentage.
+| Accessory | Movement Speed Bonus | Maximum Jump Height | Gravity | Fall Damage |
+|---|---|---|---|---|
+| ??? | +20% | - | - | - |
+| ??? | +50% | - | - | - |
+| ??? | +80% | - | - | - |
+| ??? | - | +50% | - | - |
+| Umbrella | - | - | -50% | -50% |
+| ?? | - | - | - | -40% |
+| ?? | - | - | - | -90% |
+
+**Gear Modifiers ⏳**
+
+| Gear / Set | Movement Speed Bonus | Maximum Jump Height | Gravity | Fall Damage |
+|---|---|---|---|---|
+
+**Food/Potion Modifiers ⏳**
+
+| Gear / Set | Duration | Movement Speed Bonus | Maximum Jump Height | Gravity | Fall Damage |
+|---|---|---|---|---|---|
+
+**Teleportation**
+
+The player is freeze during all the Teleportation process.
 
 **Tips**
 
