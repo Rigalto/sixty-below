@@ -217,7 +217,7 @@ export const PLAYER = {
   GRAVITY: 0.0024, // px/ms² — accélération gravitationnelle
   FALLING_SPEED_MAX: 0.6, // px/ms — vitesse de chute terminale
   FALL_DAMAGE_THRESHOLD: 160, // px — hauteur minimale pour déclencher des dégâts de chute
-  FALL_DAMAGE_MULTIPLIER: 0.1, // coefficient (hauteur - seuil) → points de dégâts
+  FALL_DAMAGE_MULTIPLIER: 0.1, // coefficient * (hauteur - seuil) → points de dégâts
   JUMP_SPEED: 0.28, // px/ms — vitesse ascensionnelle constante pendant le saut
   JUMP_MAX_Y: 100 // px — hauteur de saut maximale (buffable)
 }

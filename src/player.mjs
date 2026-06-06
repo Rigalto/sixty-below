@@ -141,6 +141,7 @@ class PlayerManager {
   #jumpStartY = 0 // px — #y au déclenchement du saut
   #fallStartY = 0 // px — #y au déclenchement de la chute (fin saut ou décrochage)
   #prevDirections = 0 // bitmask directions frame précédente (détection front-edge saut)
+  #carryY = 0 // retient la partie décimale de la position en y pour ne travailler que sur des integer
 
   #teleportDiv = null // div#teleport-overlay — mis en cache à la première téléportation
   #teleportTarget = null // {x, y} en pixels — cible de la téléportation
@@ -194,19 +195,19 @@ class PlayerManager {
       if (direction !== 0) {
         this.#horizontalMovement(direction, dt)
       }
-      this.#applyGravity() // application de la gravité
-      // TODO saut
-      // TODO platforms
-
-      // Clamp dans les bornes du monde - provisoire car détection des tuiles ETERNAL
-      if (this.#x < 0) { this.#x = 0 }
-      if (this.#x > WORLD_PX_W - PLAYER.w) { this.#x = WORLD_PX_W - PLAYER.w }
-      if (this.#y < 0) { this.#y = 0 }
-      if (this.#y > WORLD_PX_H - PLAYER.h) { this.#y = WORLD_PX_H - PLAYER.h }
-
-      // affichage de la position du joueur dans le Control Panel (EnvironmentWidget)
-      this.#notifyCurrentPosition()
     }
+    this.#applyGravity(dt) // application de la gravité
+    // TODO saut
+    // TODO platforms
+
+    // Clamp dans les bornes du monde - provisoire car détection des tuiles ETERNAL
+    if (this.#x < 0) { this.#x = 0 }
+    if (this.#x > WORLD_PX_W - PLAYER.w) { this.#x = WORLD_PX_W - PLAYER.w }
+    if (this.#y < 0) { this.#y = 0 }
+    if (this.#y > WORLD_PX_H - PLAYER.h) { this.#y = WORLD_PX_H - PLAYER.h }
+
+    // affichage de la position du joueur dans le Control Panel (EnvironmentWidget)
+    this.#notifyCurrentPosition()
 
     return {x: this.#x + (PLAYER.w >> 1), y: this.#y + (PLAYER.h >> 1)}
   }
@@ -251,8 +252,61 @@ class PlayerManager {
     }
   }
 
-  #applyGravity () {
+  #applyGravity (dt) {
     //
+    const hitbox = this.getHitbox() // objet partagé
+    const y0 = hitbox.y
+    const h0 = hitbox.h
+
+    // test de la présence de sol sous les pieds
+    hitbox.y = y0 + h0
+    hitbox.h = 1
+    const {hasSolid: solidBelow} = this.#scanTiles(chunkManager.getTilesInRect(hitbox))
+    hitbox.h = h0 // restauration car objet partagé
+
+    if (solidBelow) {
+      if (this.#moveState === 2) { // FALLING
+        // la descente est arrêtée, on calcule les dommages
+        const deltaY = this.#y - this.#fallStartY
+        if (deltaY > PLAYER.FALL_DAMAGE_THRESHOLD) {
+          const damage = ((deltaY - PLAYER.FALL_DAMAGE_THRESHOLD) * PLAYER.FALL_DAMAGE_MULTIPLIER) | 0
+          if (damage > 0) {
+            eventBus.emit('life/add', -damage)
+            console.log('DAMAGE DE CHUTE', damage)
+          }
+        }
+      }
+      this.#moveState = 0 // GROUNDED
+      return
+    }
+    // le joueur a du vide sous ses pieds
+    if (this.#moveState === 0) { // GROUNDED
+      // Il était précédemment sur le sol, c'est donc le début d'une chute
+      this.#fallStartY = this.#y
+      this.#vy = 0
+      this.#carryY = 0
+      this.#moveState = 2 // FALLING
+    }
+
+    if (this.#moveState === 2) { // FALLING
+      const gravity = PLAYER.GRAVITY / 10
+      const speedBuff = 1
+
+      const vy = Math.min(this.#vy + gravity * dt, PLAYER.FALLING_SPEED_MAX)
+      let newY = this.#y + vy * dt * speedBuff + this.#carryY
+      // newY = Math.max(0, Math.min(newY, GEOMETRY.WORLD_HEIGHT - PLAYER.HEIGHT - 1)) // reste dans le monde
+      this.#carryY = newY % 1 // extraction de la partie décimale
+      newY = Math.floor(newY)
+
+      const hitbox = this.getHitbox() // objet partagé
+      hitbox.y = newY
+      const {hasSolid: solidFull} = this.#scanTiles(chunkManager.getTilesInRect(hitbox))
+      // Si on percute le sol, on se contente de descendre d'un pixel.
+      if (solidFull) { newY = this.#y + 1 }
+
+      this.#vy = vy
+      this.#y = newY
+    }
   }
 
   /**
