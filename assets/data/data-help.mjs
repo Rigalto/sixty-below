@@ -5383,7 +5383,7 @@ _If no container is in range, the chest panel is inactive._
   },
 
   // ── Gameplay ─────────────────────────────────────────────────
-  //    Buffs, Buff Panel, Movement Buffs,  World Creation
+  //    Buffs, Buff Panel, Player Movement, Movement Buffs, Teleporters,  World Creation
 
   {
     title: 'Buffs',
@@ -5451,12 +5451,12 @@ Consuming the same type too quickly extends the cooldown before you can benefit 
   `
   },
   {
-    title: 'Movement',
+    title: 'Player Movement',
     category: ['Gameplay'],
     content: `
 **Description**
 
-The player moves using the keyboard. Movement is governed by physics — gravity — and terrain all affect how the player behaves. Several buffs can improve or impair movement.
+The player moves using the keyboard. Movement is governed by physics — gravity — and terrain, all affect how the player behaves. Several buffs can improve or impair movement.
 
 **Lateral movement**
 
@@ -5492,7 +5492,11 @@ The player moves using the keyboard. Movement is governed by physics — gravity
 | From the sides | Passable — the player walks through |
 | Press [S] while standing | The player drops through the platform |
 
-**Keys**
+**Teleportation**
+
+Placed [[Teleporters]] provide an instant way to travel between two fixed points in the world.
+
+**Controls**
 
 | ZQSD | Arrow Keys | Action |
 |---|---|---|
@@ -5500,7 +5504,6 @@ The player moves using the keyboard. Movement is governed by physics — gravity
 | D | → | Walk right |
 | Z | ↑ | Jump |
 | S | ↓ | Go through platform |
-
 
 **Tips**
 
@@ -5517,7 +5520,7 @@ The player moves using the keyboard. Movement is governed by physics — gravity
     content: `
 **Description**
 
-Movement Buffs includes all the alterations which impact player [[Movement]].
+Movement Buffs includes all the alterations which impact [[Player Movement]].
 All the bonus are additive.
 
 **Terrain Modifiers**
@@ -5566,6 +5569,64 @@ The player is freeze during all the Teleportation process.
 * _Velvetmoss patches are visually distinct — you can plan your path to avoid them if speed matters._ ⏳
 * _Boots with traction bonuses can partially offset terrain penalties._ ⏳
   `
+  },
+  {
+    title: 'Teleporters',
+    category: ['Furniture', 'Gameplay'],
+    content: `
+  **Description**
+
+
+Teleporters are powerful artefacts that allow instant travel across the world in under a second.
+They are crafted and placed in pairs — activating one transports the player directly to its twin. ⏳
+
+**Teleporter Types**
+
+Seven types exist, each identified by its color. A color determines which teleporters form a valid pair.
+
+| Teleporter | Color |
+|---|---|
+| [[item:teleporterYellow]] | Yellow |
+| [[item:teleporterRed]] | Red |
+| [[item:teleporterOrange]] | Orange |
+| [[item:teleporterGreen]] | Green |
+| [[item:teleporterBlue]] | Light Blue |
+| [[item:teleporterNavy]] | Dark Blue |
+| [[item:teleporterPurple]] | Purple |
+
+**How to Use**
+
+* Craft a pair of matching teleporters.
+* Place each teleporter at a different location in the world.⏳
+* Click a teleporter to activate it — you are instantly transported next to its twin.⏳
+
+Activation fails silently in the following cases:
+* The twin teleporter is not placed in the world.
+* There is no room next to the twin for the player to stand.
+
+**Crafting** ⏳
+
+| Teleporter | Tier | Station | Materials |
+|---|---|---|
+<<fullRecipeRow|teleporterYellow>>
+<<fullRecipeRow|teleporterRed>>
+<<fullRecipeRow|teleporterOrange>>
+<<fullRecipeRow|teleporterGreen>>
+<<fullRecipeRow|teleporterBlue>>
+<<fullRecipeRow|teleporterNavy>>
+<<fullRecipeRow|teleporterPurple>>
+
+**Tips**
+
+* _Place one teleporter at your base and one at a dangerous area — instant escape when things go wrong._
+* _Teleporters can be retrieved with a [[Hammers|Hammer]] if you want to move them._ ⏳
+* _Label chest nearby each teleporter to remember where each pair leads._
+* _Seven types means up to seven independent fast-travel networks in a single world._
+
+**See also**
+
+* [[Player Movement]] — standard movement by walking and jumping
+    `
   },
   {
     title: 'World Creation',

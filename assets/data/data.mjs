@@ -345,6 +345,16 @@ export const ITEMS = {
 
   // closet (64 slots)
 
+  // Furniture - Teleporter
+  fallenStar: {name: 'fallen Star', type: 0, stype: 'misc', star: 4, image: 'furniture_32_32-2-0', help: 'Teleporters', tooltip: 'A concentrated burst of energy, fallen from the sky'},
+  teleporterYellow: {name: 'Yellow teleporter', type: ITEM_TYPE.FURNITURE | ITEM_TYPE.PLACABLE, stype: 'teleporter', star: 4, image: 'furniture_32_32-2-0', placed: 'fuws_48_32-1-0', help: 'Teleporters', tooltip: 'Click to teleport instantly to the matching teleporter'},
+  teleporterOrange: {name: 'Orange teleporter', type: ITEM_TYPE.FURNITURE | ITEM_TYPE.PLACABLE, stype: 'teleporter', star: 4, image: 'furniture_32_32-2-0', placed: 'fuws_48_32-1-0', help: 'Teleporters', tooltip: 'Click to teleport instantly to the matching teleporter'},
+  teleporterRed: {name: 'Red teleporter', type: ITEM_TYPE.FURNITURE | ITEM_TYPE.PLACABLE, stype: 'teleporter', star: 4, image: 'furniture_32_32-2-0', placed: 'fuws_48_32-1-0', help: 'Teleporters', tooltip: 'Click to teleport instantly to the matching teleporter'},
+  teleporterGreen: {name: 'Green teleporter', type: ITEM_TYPE.FURNITURE | ITEM_TYPE.PLACABLE, stype: 'teleporter', star: 4, image: 'furniture_32_32-2-0', placed: 'fuws_48_32-1-0', help: 'Teleporters', tooltip: 'Click to teleport instantly to the matching teleporter'},
+  teleporterBlue: {name: 'Blue teleporter', type: ITEM_TYPE.FURNITURE | ITEM_TYPE.PLACABLE, stype: 'teleporter', star: 4, image: 'furniture_32_32-2-0', placed: 'fuws_48_32-1-0', help: 'Teleporters', tooltip: 'Click to teleport instantly to the matching teleporter'},
+  teleporterNavy: {name: 'Navy teleporter', type: ITEM_TYPE.FURNITURE | ITEM_TYPE.PLACABLE, stype: 'teleporter', star: 4, image: 'furniture_32_32-2-0', placed: 'fuws_48_32-1-0', help: 'Teleporters', tooltip: 'Click to teleport instantly to the matching teleporter'},
+  teleporterPurple: {name: 'Purple teleporter', type: ITEM_TYPE.FURNITURE | ITEM_TYPE.PLACABLE, stype: 'teleporter', star: 4, image: 'furniture_32_32-2-0', placed: 'fuws_48_32-1-0', help: 'Teleporters', tooltip: 'Click to teleport instantly to the matching teleporter'},
+
   // crafting station
   tableWood: {name: 'Wooden Table', type: ITEM_TYPE.FURNITURE | ITEM_TYPE.PLACABLE, stype: 'station', star: 1, image: 'furniture_32_32-2-0', placed: 'fuws_48_32-1-0', help: 'Wooden Table', tooltip: 'A precision assembly requires a very flat surface.', furnitureSet: 'wood', surface: true},
 
@@ -575,6 +585,15 @@ export const RECIPES = [
   {result: {item: 'pickaxePlatinum', count: 1}, station: 'forge', ingredients: [{item: 'pickaxeCobalt', count: 1}, {item: 'barPlatinum', count: 16}, {item: 'logMahogany', count: 6}, {item: 'cutSapphire', count: 4}]},
   {result: {item: 'pickaxeProspector', count: 1}, station: 'forge', ingredients: [{item: 'barPlatinum', count: 1}, {item: 'barPlatinum', count: 16}, {item: 'shellPowder', count: 1}, {item: 'nailIron', count: 5}]},
   {result: {item: 'pickaxeGeologist', count: 1}, station: 'forge', ingredients: [{item: 'barPlatinum', count: 1}, {item: 'barPlatinum', count: 16}, {item: 'shellPowder', count: 1}, {item: 'nailIron', count: 5}]},
+
+  // Teleporters
+  {result: {item: 'teleporterYellow', count: 2}, station: 'forge', ingredients: [{item: 'fallenStar', count: 10}]},
+  {result: {item: 'teleporterRed', count: 2}, station: 'forge', ingredients: [{item: 'fallenStar', count: 10}]},
+  {result: {item: 'teleporterOrange', count: 2}, station: 'forge', ingredients: [{item: 'fallenStar', count: 10}]},
+  {result: {item: 'teleporterBlue', count: 2}, station: 'forge', ingredients: [{item: 'fallenStar', count: 10}]},
+  {result: {item: 'teleporterGreen', count: 2}, station: 'forge', ingredients: [{item: 'fallenStar', count: 10}]},
+  {result: {item: 'teleporterNavy', count: 2}, station: 'forge', ingredients: [{item: 'fallenStar', count: 10}]},
+  {result: {item: 'teleporterPurple', count: 2}, station: 'forge', ingredients: [{item: 'fallenStar', count: 10}]},
 
   // Accessories
   {result: {item: 'triskelAncient', count: 1}, station: 'alchemyTable', ingredients: [{item: 'triskelCopper', count: 1}, {item: 'triskelSilver', count: 1}, {item: 'triskelGold', count: 1}]},

@@ -11,6 +11,7 @@
 - implémentation de l'affichage des tuiles (top soil à faire)
 - Sauvegarde de la position du joueur en database
 - brancher les Crafting Stations au craft panel
+- implémenter les platforms dans le déplacement.
 - continuer la correction et l'ajout de fiches d'aide (`HELP`) et d'items (`ITEMS`)
 - Recettes pour créer Linen Rope et l'utiliser
 
