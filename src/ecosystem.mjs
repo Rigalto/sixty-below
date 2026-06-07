@@ -184,6 +184,10 @@ class SunflowerSystem {
     for (const record of this.#list) {
       record.present = seededRNG.randomGetPercent(18)
       if (!record.present) continue
+      if (!blockedTiles.canPlace(record.index) || !blockedTiles.canPlace(record.index + WORLD_WIDTH)) {
+        record.present = false
+        continue
+      }
       addToByTile(this.byTile, record)
       addToByChunk(this.#byChunk, record)
       blockedTiles.blockPlacement(record.index)
