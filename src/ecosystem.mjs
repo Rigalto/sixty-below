@@ -59,6 +59,12 @@ class SunflowerSystem {
     this.#list.length = 0
     this.#byChunk.clear()
     this.#displayed.clear()
+
+    const item = ITEMS.sunflower
+    this.#imgLeft = item.placedLeft
+    this.#imgMid = item.placed
+    this.#imgRight = item.placedRight
+    this.#currentImage = this.#imgLeft
   }
 
   /**
@@ -105,10 +111,9 @@ class SunflowerSystem {
     * @param {CanvasRenderingContext2D} ctx — contexte déjà transformé (caméra appliquée)
     */
   render (ctx) {
+    const img = this.#currentImage
     for (const record of this.#displayed) {
       if (!record.present) continue
-      const img = ITEMS[record.itemId].placed
-      if (!img) continue
       const pxX = (record.index & 0x3FF) << 4
       const pxY = (record.index >> 10) << 4
       ctx.drawImage(IMAGE_CACHE[img.imgIndex], img.sx, img.sy, img.sw, img.sh, pxX, pxY, img.sw, img.sh)
