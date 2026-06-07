@@ -1,4 +1,4 @@
-// utils.mjs — EventBus - MicroTasker - TaskScheduler - TimeManager - SeededRNG
+// utils.mjs — EventBus - MicroTasker - TaskScheduler - TimeManager - BlockedTiles - SeededRNG
 
 import {SKY_COLORS, WEATHER_TYPE, REAL_MS_PER_GAME_MIN, DAY_DURATION_GAME_MIN} from './constant.mjs'
 
@@ -712,6 +712,48 @@ export class TimeManager {
 }
 
 export const timeManager = new TimeManager()
+
+/* ====================================================================================================
+   BLOCKED TILES
+   ====================================================================================================
+
+   Singleton : blockedTiles.
+
+   Registre centralisé des tuiles inaccessibles au placement ou au minage.
+   Cache son implémentation interne derrière une API stable : si Set doit devenir Map
+   (tuile bloquée simultanément pour deux raisons indépendantes), aucun appelant ne change.
+
+   Deux notions sémantiquement distinctes, actuellement disjointes par nature de tuile :
+     Placement bloqué — tuiles VOID/LIQUID occupées par un furniture ou une plante
+     Minage bloqué    — tuiles SOLID protégées (sous un arbre, meuble, mur externe…)
+
+   Visualisation debug (carrés semi-transparents superposés au rendu) : à implémenter.
+
+   ==================================================================================================== */
+
+class BlockedTiles {
+  #blocked = new Set() // Set<tileIndex> — placement et minage partagent la structure (disjoints par type de tuile)
+
+  /** Marque la tuile comme inaccessible au placement (furniture ou plante). @param {number} tileIndex */
+  blockPlacement (tileIndex) { this.#blocked.add(tileIndex) }
+
+  /** Libère la tuile pour le placement. @param {number} tileIndex */
+  unblockPlacement (tileIndex) { this.#blocked.delete(tileIndex) }
+
+  /** @param {number} tileIndex @returns {boolean} true si la tuile peut accueillir un furniture ou une plante */
+  canPlace (tileIndex) { return !this.#blocked.has(tileIndex) }
+
+  /** Marque la tuile comme protégée du minage. @param {number} tileIndex */
+  blockMining (tileIndex) { this.#blocked.add(tileIndex) }
+
+  /** Libère la tuile pour le minage. @param {number} tileIndex */
+  unblockMining (tileIndex) { this.#blocked.delete(tileIndex) }
+
+  /** @param {number} tileIndex @returns {boolean} true si la tuile peut être minée */
+  canMine (tileIndex) { return !this.#blocked.has(tileIndex) }
+}
+
+export const blockedTiles = new BlockedTiles()
 
 /* ====================================================================================================
    SEEDED RNG (Mulberry32)
