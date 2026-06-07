@@ -1,7 +1,8 @@
 // ecosystem.mjs — FloraManager - CobwebSystem - HiveSystem
-// SampleSystem
+// SunflowerSystem - SampleSystem
 
-import {eventBus, seededRNG} from './utils.mjs'
+import {WORLD_WIDTH} from './constant.mjs'
+import {eventBus, seededRNG, blockedTiles} from './utils.mjs'
 import {PLANT_KIND, PLANT_TYPE, ITEMS} from '../../assets/data/data.mjs'
 import {IMAGE_CACHE} from './assets.mjs'
 import {saveManager} from './persistence.mjs'
@@ -138,6 +139,8 @@ class SunflowerSystem {
     if (!record.present) return
     addToByTile(this.byTile, record)
     addToByChunk(this.#byChunk, record)
+    blockedTiles.blockPlacement(record.index)
+    blockedTiles.blockPlacement(record.index + WORLD_WIDTH)
   }
 
   /**
@@ -183,6 +186,8 @@ class SunflowerSystem {
       if (!record.present) continue
       addToByTile(this.byTile, record)
       addToByChunk(this.#byChunk, record)
+      blockedTiles.blockPlacement(record.index)
+      blockedTiles.blockPlacement(record.index + WORLD_WIDTH)
       saveManager.queueStaticUpdate({storeName: 'plant', record})
     }
     buildDisplayed(this.#displayed, this.#byChunk, camera.preloadChunks)
@@ -202,6 +207,8 @@ class SunflowerSystem {
     for (const record of this.#list) {
       if (!record.present) continue
       record.present = false
+      blockedTiles.unblockPlacement(record.index)
+      blockedTiles.unblockPlacement(record.index + WORLD_WIDTH)
       saveManager.queueStaticUpdate({storeName: 'plant', record})
     }
   }
