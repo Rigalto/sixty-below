@@ -6,6 +6,7 @@ import {buffManager} from './buff.mjs'
 import {playerManager} from './player.mjs'
 import {WEATHER_TYPE, MOON_PHASE, MOON_PHASE_BLURRED, STATE, OVERLAYS, UI_LAYOUT, PATH_INVENTORY, PATH_CRAFT, PATH_TROPHY, PATH_HELP, PATH_NEW_WORLD, PATH_SAVE, PATH_RESTORE, PATH_DEBUG, PATH_CANCEL, SVG_ICON, PLAYER} from './constant.mjs'
 import {furnitureManager} from './housing.mjs'
+import {floraManager} from './ecosystem.mjs'
 import {ITEMS} from '../assets/data/data.mjs'
 
 /* ====================================================================================================
@@ -1104,7 +1105,7 @@ export const environmentWidget = new EnvironmentWidget()
    Interactions :
      eventBus    — écoute : world/tile-hover (node|null) → met à jour #spanTile
      microTasker — onTileHoverDetail(node, tileIndex) enfilée via enqueueOnce() par la loop
-                   → interroge furnitureManager (implémenté), plantManager (TODO) → met à jour #spanDetail
+                   → interroge furnitureManager et floraManager → met à jour #spanDetail
 
    ==================================================================================================== */
 
@@ -1159,7 +1160,7 @@ class TileHoverWidget {
   }
 
   /**
-    * Microtask : interroge furnitureManager et met à jour le span détail.
+    * Microtask : interroge furnitureManager, FloraManager et met à jour le span détail.
     * Bindée dans #bindEvents — enfilée via microTasker.enqueueOnce() dans la loop.
     * @param {object|null} node      — nœud de tuile sous la souris
     * @param {number}      tileIndex — index de la tuile (y << 10) | x
@@ -1169,7 +1170,8 @@ class TileHoverWidget {
     const furniture = furnitureManager.getFurnitureAt(tileIndex)
     if (furniture) text += ` / ${ITEMS[furniture.code].name}`
     // TODO: interroger plantManager
-
+    const plant = floraManager.getPlantAt(tileIndex)
+    if (plant) text += ` / ${ITEMS[plant.itemId].name}`
     // mise à jour
     this.#spanDetail.textContent = text
   }

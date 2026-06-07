@@ -5,10 +5,72 @@ import {eventBus, seededRNG} from './utils.mjs'
 import {PLANT_KIND, PLANT_TYPE, ITEMS} from '../../assets/data/data.mjs'
 import {IMAGE_CACHE} from './assets.mjs'
 import {saveManager} from './persistence.mjs'
+import {camera} from './render.mjs'
 
 /* ====================================================================================================
    HELPERS COMMUNS A TOUS LES SYSTEMS
    ==================================================================================================== */
+
+// ── Helpers partagés par tous les systèmes de plantes ────────────────────────
+
+/**
+ * Ajoute un record dans byTile pour toutes les tuiles du rectangle (index, w, h).
+ * @param {Map} byTile  @param {object} record
+ */
+const addToByTile = (byTile, record) => {
+  const px = record.index & 0x3FF
+  const py = record.index >> 10
+  for (let dy = 0; dy < record.h; dy++) {
+    const rowBase = (py + dy) << 10
+    for (let dx = 0; dx < record.w; dx++) byTile.set(rowBase | (px + dx), record)
+  }
+}
+
+/**
+ * Retire un record de byTile pour toutes les tuiles du rectangle (index, w, h).
+ * @param {Map} byTile  @param {object} record
+ */
+const removeFromByTile = (byTile, record) => {
+  const px = record.index & 0x3FF
+  const py = record.index >> 10
+  for (let dy = 0; dy < record.h; dy++) {
+    const rowBase = (py + dy) << 10
+    for (let dx = 0; dx < record.w; dx++) byTile.delete(rowBase | (px + dx))
+  }
+}
+
+/**
+ * Ajoute un record dans byChunk (bucket du chunk du coin haut-gauche de index).
+ * @param {Map} byChunk  @param {object} record
+ */
+const addToByChunk = (byChunk, record) => {
+  const chunkKey = ((record.index >> 14) << 6) | ((record.index & 0x3FF) >> 4)
+  let set = byChunk.get(chunkKey)
+  if (set === undefined) { set = new Set(); byChunk.set(chunkKey, set) }
+  set.add(record)
+}
+
+/**
+ * Retire un record de byChunk.
+ * @param {Map} byChunk  @param {object} record
+ */
+const removeFromByChunk = (byChunk, record) => {
+  const set = byChunk.get(((record.index >> 14) << 6) | ((record.index & 0x3FF) >> 4))
+  if (set !== undefined) set.delete(record)
+}
+
+/**
+ * Reconstruit displayed depuis byChunk et les chunks preload courants de la caméra.
+ * @param {Set} displayed  @param {Map} byChunk  @param {Set<number>} preloadChunks
+ */
+const buildDisplayed = (displayed, byChunk, preloadChunks) => {
+  displayed.clear()
+  for (const chunkKey of preloadChunks) {
+    const set = byChunk.get(chunkKey)
+    if (set === undefined) continue
+    for (const record of set) displayed.add(record)
+  }
+}
 
 /* ====================================================================================================
    SUNFLOWER SYSTEM
@@ -73,23 +135,9 @@ class SunflowerSystem {
    */
   initPlant (record) {
     this.#list.push(record)
-
-    const px = record.index & 0x3FF
-    const py = record.index >> 10
-    for (let dy = 0; dy < record.h; dy++) {
-      const rowBase = (py + dy) << 10
-      for (let dx = 0; dx < record.w; dx++) {
-        this.byTile.set(rowBase | (px + dx), record)
-      }
-    }
-
-    const chunkKey = ((record.index >> 14) << 6) | ((record.index & 0x3FF) >> 4)
-    let set = this.#byChunk.get(chunkKey)
-    if (set === undefined) {
-      set = new Set()
-      this.#byChunk.set(chunkKey, set)
-    }
-    set.add(record)
+    if (!record.present) return
+    addToByTile(this.byTile, record)
+    addToByChunk(this.#byChunk, record)
   }
 
   /**
@@ -97,12 +145,7 @@ class SunflowerSystem {
    * @param {Set<number>} preloadChunks
    */
   onPreloadChunksChanged (preloadChunks) {
-    this.#displayed.clear()
-    for (const chunkKey of preloadChunks) {
-      const set = this.#byChunk.get(chunkKey)
-      if (set === undefined) continue
-      for (const record of set) this.#displayed.add(record)
-    }
+    buildDisplayed(this.#displayed, this.#byChunk, preloadChunks)
     if (this.#displayed.size !== 0) { console.log('SunflowerSystem.onPreloadChunksChanged', this.#displayed.size) }
   }
 
@@ -113,7 +156,6 @@ class SunflowerSystem {
   render (ctx) {
     const img = this.#currentImage
     for (const record of this.#displayed) {
-      if (!record.present) continue
       const pxX = (record.index & 0x3FF) << 4
       const pxY = (record.index >> 10) << 4
       ctx.drawImage(IMAGE_CACHE[img.imgIndex], img.sx, img.sy, img.sw, img.sh, pxX, pxY, img.sw, img.sh)
@@ -138,8 +180,12 @@ class SunflowerSystem {
     this.#currentImage = this.#imgLeft
     for (const record of this.#list) {
       record.present = seededRNG.randomGetPercent(18)
-      if (record.present) saveManager.queueStaticUpdate({storeName: 'plant', record})
+      if (!record.present) continue
+      addToByTile(this.byTile, record)
+      addToByChunk(this.#byChunk, record)
+      saveManager.queueStaticUpdate({storeName: 'plant', record})
     }
+    buildDisplayed(this.#displayed, this.#byChunk, camera.preloadChunks)
   }
 
   /** Liaison EventBus : 'time/every-hour-10' — pivot vers le centre. */
@@ -150,6 +196,9 @@ class SunflowerSystem {
 
   /** Liaison EventBus : 'time/every-hour-17' — disparition. */
   onHour17 () {
+    this.byTile.clear()
+    this.#byChunk.clear()
+    this.#displayed.clear()
     for (const record of this.#list) {
       if (!record.present) continue
       record.present = false
