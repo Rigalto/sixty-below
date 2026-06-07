@@ -1,8 +1,8 @@
 // ecosystem.mjs — FloraManager - CobwebSystem - HiveSystem
 // SunflowerSystem - SampleSystem
 
-import {WORLD_WIDTH} from './constant.mjs'
-import {eventBus, seededRNG, blockedTiles} from './utils.mjs'
+import {WORLD_WIDTH, MICROTASK} from './constant.mjs'
+import {eventBus, seededRNG, blockedTiles, microTasker} from './utils.mjs'
 import {PLANT_KIND, PLANT_TYPE, ITEMS} from '../../assets/data/data.mjs'
 import {IMAGE_CACHE} from './assets.mjs'
 import {saveManager} from './persistence.mjs'
@@ -112,6 +112,8 @@ class SunflowerSystem {
     eventBus.on('time/every-hour-10', this.onHour10)
     eventBus.on('time/every-hour-13', this.onHour13)
     eventBus.on('time/every-hour-17', this.onHour17)
+    this.onSunflowerHour6 = this.onSunflowerHour6.bind(this)
+    this.onSunflowerHour17 = this.onSunflowerHour17.bind(this)
   }
 
   /**
@@ -180,6 +182,15 @@ class SunflowerSystem {
 
   /** Liaison EventBus : 'time/every-hour-6' — apparition, tête à gauche. */
   onHour6 () {
+    const {priority, capacity} = MICROTASK.SUNFLOWER_HOUR6
+    microTasker.enqueueOnce(this.onSunflowerHour6, priority, capacity)
+  }
+
+  /**
+   * Microtâche : peuple byTile, #byChunk et #displayed pour les spots tirés à 18%.
+   * Bloque les tuiles occupées dans blockedTiles.
+   */
+  onSunflowerHour6 () {
     this.#currentImage = this.#imgLeft
     for (const record of this.#list) {
       record.present = seededRNG.randomGetPercent(18)
@@ -205,6 +216,14 @@ class SunflowerSystem {
 
   /** Liaison EventBus : 'time/every-hour-17' — disparition. */
   onHour17 () {
+    const {priority, capacity} = MICROTASK.SUNFLOWER_HOUR17
+    microTasker.enqueueOnce(this.onSunflowerHour17, priority, capacity)
+  }
+
+  /**
+   * Microtâche : libère les tuiles bloquées, vide byTile, #byChunk et #displayed.
+   */
+  onSunflowerHour17 () {
     this.byTile.clear()
     this.#byChunk.clear()
     this.#displayed.clear()

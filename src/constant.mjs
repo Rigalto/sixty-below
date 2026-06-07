@@ -305,8 +305,11 @@ export const MICROTASK = {
   TELEPORT_PHASE2: {priority: 22, capacity: 5, taskName: 'onTeleportPhase2'}, // gère la téléportation
   TELEPORT_PHASE3: {priority: 22, capacity: 2, taskName: 'onTeleportPhase3'}, // gère la téléportation
 
-  UI_ENV_UPDATE: {priority: 20, capacity: 2, taskName: 'updateClockInOverlay'}, // affiche le widget time/weather/Moon/Location
-  UI_TILE_HOVER: {priority: 20, capacity: 10, taskName: 'onTileHoverDetail'}, // affiche le widget tuile survolée
+  SUNFLOWER_HOUR6: {priority: 20, capacity: 2, taskName: 'onSunflowerHour6'}, // gère les sunflower
+  SUNFLOWER_HOUR17: {priority: 20, capacity: 1, taskName: 'onSunflowerHour17'}, // gère les sunflower
+
+  UI_ENV_UPDATE: {priority: 18, capacity: 2, taskName: 'updateClockInOverlay'}, // affiche le widget time/weather/Moon/Location
+  UI_TILE_HOVER: {priority: 18, capacity: 1, taskName: 'onTileHoverDetail'}, // affiche le widget tuile survolée
   PROCESS_SAVE: {priority: 15, capacity: 12, taskName: 'processSave'}, // sauvegarde en database des chunks et autres records
   RENDER_DEBUG_OVERLAY: {priority: 10, capacity: 2, taskName: 'renderDebugOverlay'}, // affichage des informations de débug (temps exéec et taille files)
   PRUNE_CACHE: {priority: 8, capacity: 2, taskName: 'pruneCache'} // supprime les images des chunks distants
