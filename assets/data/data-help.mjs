@@ -4368,7 +4368,7 @@ Sunflowers grow in forest clearings, thriving where sunlight reaches the ground 
 
 **Blooming Hours**
 
-* Appears at dawn and disappears at dusk (in-game time)
+* Appears at dawn (6h) and disappears at dusk (7h) (in-game time)
 
 **Harvest**
 
