@@ -2868,7 +2868,7 @@ Higher-tier pickaxes provide a mining speed bonus (see table above). Additional 
 
 **How to use**
 
-* Open the [[Inventory]] panel (shortcut: [I])
+* Open the [[Inventory]] Panel [I]
 * Place a pickaxe in the [[Hotbar]]
 * Select it from the Hotbar
 * Click on the block to mine it
@@ -3250,7 +3250,7 @@ Certain buffs modify crafting behaviour. ⏳
 
 * ⏳ _Artisan's Luck_ — chance to produce one extra item per run
 * ⏳ _Frugal Hands_ — chance to not consume one or more ingredients
-* ⏳ _[[Luck Buffs]]_ — small chance to not consume one or more ingredients and small chance to produce one extra item per run
+* ⏳ _[[Luck Buff]]_ — small chance to not consume one or more ingredients and small chance to produce one extra item per run
 * ⏳ _Extended Reach_ — increases the range within which bags, chests, cabinets, closets and crafting stations are accessible
 
 See [[Crafting Buffs]] for more details.
@@ -3906,9 +3906,9 @@ Used to craft [[item:torch]].
   // ── Items & Crafting ─────────────────────────────────────────
   // ── Fauna & Critters ─────────────────────────────────────────
   // ── Buffs & Debuffs ──────────────────────────────────────────
-  //    Luck Buffs
+  //    Luck Buff
   {
-    title: 'Luck Buffs',
+    title: 'Luck Buff',
     category: ['Buff'],
     content: `
     `
@@ -4356,6 +4356,8 @@ Parsnips are root vegetables found growing on the [[Forest]] floor. Their white 
 
 Sunflowers grow in forest clearings, thriving where sunlight reaches the ground unobstructed by the canopy. They bloom at dawn and close at dusk, following the arc of the sun throughout the day.
 
+Harvesting a sunflower yields [[item:sunflowerSeed]] — scatter them on bare grassland to help new plants take root, or press them into [[item:sunflowerOil]], a versatile ingredient in cooking and alchemy.
+
 **Tier**
 
 {{item:sunflowerSeed:star|star}}
@@ -4364,7 +4366,7 @@ Sunflowers grow in forest clearings, thriving where sunlight reaches the ground 
 
 * Biome: [[Forest]]
 * Layer: [[Surface]]
-* Grows on [[node:grassForest]] in open clearings, away from [[Oak & Mahogany|Oak]] trees
+* Grows on [[node:grassForest]] in open clearings, away from [[Oak & Mahogany|Oak]] trees⏳
 
 **Blooming Hours**
 
@@ -4373,22 +4375,30 @@ Sunflowers grow in forest clearings, thriving where sunlight reaches the ground 
 **Harvest**
 
 * [[Foraging|Interact to harvest]] — the flower disappears on harvest
-* Tool: any [[Harvesting Tools|Sickle]]⏳
+* Tool: any [[Harvesting Tools|Sickle]]
 * Loot: {{item:sunflower:foraging:items[*]:item|links}}
+* [[item:worm]]s are more abundant during [[Weather|Rainy Weather]]
+* Chance of catching a [[item:worm]] is increased by [[Luck Buff]]
 
 **Dangers**
 
 * Harvesting a Sunflower may disturb a [[monster:hedgehog]] hiding nearby — its spines inflict [[Damage Types|Piercing]] damage and may cause [[Bleeding DOT]]. ⏳
-
-**Planting**
-
-* Place a [[item:sunflowerSeed]] on a [[node:grassForest]] tile to increase the chance of a Sunflower growing the next day (from 18% to 80%). ⏳
 
 **Usages**
 
 * [[item:sunflowerSeed]] — replanting Sunflowers ⏳
 * [[item:sunflowerOil]] — extracted from seeds, essential ingredient for food and ointments ⏳
 * [[item:oleanderOil]] — contains 50% [[item:sunflowerOil]] ⏳
+
+**Planting**
+
+* Place a [[item:sunflowerSeed]] in the [[Hotbar]] ([[Inventory]] Panel [I])
+* Select its slot, then left-click a free [[node:grassForest]] tile — the seed is consumed
+* Seeded spots have a much higher chance of blooming at the next dawn (18% → 80%) ⏳
+
+**[[item:sunflowerOil]] Crafting**
+
+<<fullRecipe|sunflowerOil>>
 
 **Tips**
 
@@ -5225,7 +5235,7 @@ Press **[H]** or click the Help button in the [[Control Panel]] to open it.
 In the right part of the screen, shows:
 
 * Icon actions
-  * Open [[Inventory|Inventory Panel]] [I]
+  * Open [[Inventory]] Panel [I]
   * Open [[Crafting|Crafting Panel]] [K]
   * Open [[Achievements Panel]] [U]
   * Open [[Help Panel]] [H]
@@ -5436,7 +5446,7 @@ Consuming the same type too quickly extends the cooldown before you can benefit 
 * [[Housing Buffs]] — placement speed, range
 * [[Fishing Buffs]] — better yield, special encounters
 * [[Gardening Buffs]] — better yield,
-* [[Luck Buffs]] — rare loot, special encounters
+* [[Luck Buff]] — rare loot, special encounters
 * Environmental Buffs — [[Weather|weather]], [[Moon Phases|moon]], [[Day & Night Cycle|time of day]]
   `
   },

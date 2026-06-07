@@ -462,11 +462,11 @@ export const ITEMS = {
 
   sunflower: {name: 'Sunflower', type: 0, stype: 'herb', star: 1, image: null, placed: 'placed_16_32-2-1', placedLeft: 'placed_16_32-3-1', placedRight: 'placed_16_32-4-1', help: 'Sunflower', tooltip: 'Blooms at dawn and always faces the sun', foraging: {speed: 500, items: [{item: 'sunflowerSeed', count: '3-4'}, {item: 'worm', count: 0.10, buffs: ['lucky:100', 'rainy:200']}]}},
   sunflowerSeed: {name: 'Sunflower Seed', type: ITEM_TYPE.MATERIAL | ITEM_TYPE.SEED, stype: 'seed', star: 1, image: 'potions_32_32-1-5', placed: 'fuws_32_32-4-0', help: 'Sunflower', tooltip: '???'},
-  sunflowerOil: {name: 'Sunflower Oil', type: ITEM_TYPE.CRAFTABLE, stype: 'seed', star: 1, image: 'potions_32_32-1-5', placed: 'fuws_32_32-4-0', help: 'Sunflower', tooltip: '???'},
+  sunflowerOil: {name: 'Sunflower Oil', type: ITEM_TYPE.CRAFTABLE, stype: 'oil', star: 1, image: 'potions_32_32-1-5', placed: 'fuws_32_32-4-0', help: 'Sunflower', tooltip: 'Used in cooking, potions, and as a mechanical lubricant'},
 
   oleander: {name: 'Oleander', type: 0, stype: 'herb', star: 3, image: 'fuws_32_32-4-0', placed: 'fuws_32_32-4-0', help: 'Oleander', tooltip: '???'},
-  oleanderOil: {name: 'Oleander Oil', type: ITEM_TYPE.MATERIAL | ITEM_TYPE.CRAFTABLE, stype: 'seed', star: 3, image: 'potions_32_32-1-5', placed: 'fuws_32_32-4-0', help: 'Oleander', tooltip: '???'},
-  oleanderBulb: {name: 'Oleander Bulb', type: ITEM_TYPE.MATERIAL, stype: 'seed', star: 3, image: 'potions_32_32-1-5', placed: 'fuws_32_32-4-0', help: 'Oleander', tooltip: '???'},
+  oleanderOil: {name: 'Oleander Oil', type: 0, stype: 'oil', star: 3, image: 'potions_32_32-1-5', placed: 'fuws_32_32-4-0', help: 'Oleander', tooltip: 'Used in cooking, potions, and as a mechanical lubricant'},
+  oleanderBulb: {name: 'Oleander Bulb', type: 0, stype: 'vegie', star: 3, image: 'potions_32_32-1-5', placed: 'fuws_32_32-4-0', help: 'Oleander', tooltip: '???'},
 
   ambermirage: {name: 'Ambermirage', type: ITEM_TYPE.MATERIAL, stype: 'herb', star: 1, image: 'potions_32_32-1-5', placed: 'fuws_32_32-4-0', help: 'Ambermirage', tooltip: '???'},
 
@@ -680,6 +680,8 @@ export const RECIPES = [
   {result: {item: 'astrarium', count: 1}, station: 'jewelerBench', ingredients: [{item: 'clockGold', count: 1}, {item: 'chronometer', count: 1}, {item: 'astrolabe', count: 1}, {item: 'platePlatinum', count: 1}, {item: 'cutSapphire', count: 2}, {item: 'chainPlatinum', count: 2}]},
 
   // Food - Tier 1-3
+  {result: {item: 'sunflowerOil', count: 1}, station: 'tableWood', ingredients: [{item: 'sunflowerSeed', count: 1}]},
+  {result: {item: 'oleanderOil', count: 2}, station: 'cookingPot', ingredients: [{item: 'oleander', count: 1}, {item: 'sunflowerOil', count: 1}]},
   {result: {item: 'daw', count: 4}, station: 'byHand', ingredients: [{item: 'flour', count: 1}, {item: 'water', count: 1}], returned: [{item: 'bottle', count: 1}]},
   {result: {item: 'bread', count: 1}, station: 'furnace', ingredients: [{item: 'daw', count: 1}]},
   {result: {item: 'croissant', count: 2}, station: 'furnace', ingredients: [{item: 'daw', count: 1}, {item: 'sunflowerOil', count: 1}]}
