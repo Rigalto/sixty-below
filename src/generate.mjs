@@ -7486,7 +7486,7 @@ class PlantGenerator {
         id: uniqueIdGenerator.getUniqueId(),
         kind: PLANT_KIND.HERB,
         type: PLANT_TYPE.SUNFLOWER,
-        index: soilIndex - W,
+        index: soilIndex - 2 * W,
         soilIndex,
         itemId: 'sunflower',
         w: 1,
