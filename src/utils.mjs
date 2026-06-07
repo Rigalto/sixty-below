@@ -639,6 +639,8 @@ export class TimeManager {
           this.isDay = (hour >= 6 && hour < 21)
           clockData.isDay = this.isDay
           eventBus.emit('time/every-hour', clockData)
+          eventBus.emit(`time/every-hour-${hour}`, clockData)
+          eventBus.emit(`time/every-hour-${hour & 1 ? 'odd' : 'even'}`, clockData)
 
           // 4. CHECK TIME SLOT (3H)
           const tslot = Math.floor(hour / 3)

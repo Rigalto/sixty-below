@@ -298,8 +298,8 @@ export const worldMapDebug = new WorldMapDebug()
 
 const DEBUG_PACKS = {
   starter: [
-    {item: 'pickaxeCopper', count: 1},
-    {item: 'axeCopper', count: 1}
+    {item: 'astrarium', count: 1},
+    {item: 'gel', count: 25}
   ],
   substrat: [
     {item: 'blockClay', count: 6},

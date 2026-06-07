@@ -197,6 +197,9 @@ Cette section définit les événements officiels. Tout nouvel événement doit 
 | S | `time/clock` | `{ day, hour, minute }` | Émis chaque minute-jeu. |
 | S | `time/every-5-minutes` | `{ day, hour, minute }` | Émis toutes les 5 minutes-jeu. |
 | S | `time/every-hour` | `{ day, hour, minute, isDay }` | Émis à chaque changement d'heure. |
+| S | `time/every-hour-X` | `{ day, hour, minute, isDay }` | x : 0-23, émis à chaque passage à l'heure pile. |
+| S | `time/every-hour-even` | `{ day, hour, minute, isDay }` | Émis à chaque passage pile à une heure paire. |
+| S | `time/every-hour-odd` | `{ day, hour, minute, isDay }` | Émis à chaque passage pile à une heure impaire. |
 | S | `time/timeslot` | `{ tslot, isDay }` | Émis toutes les 3h (changement de slot). |
 | S | `time/daily` | `{ day, weather, nextWeather, moonPhase }` | Émis à minuit (changement de jour). |
 | S | `time/first-loop` | `{ day, hour, minute, tslot, weather, nextWeather, skyColor, moonPhase, isDay }` | Émis une seule fois au démarrage du rendu. |

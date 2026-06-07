@@ -1,9 +1,10 @@
 // ecosystem.mjs — FloraManager - CobwebSystem - HiveSystem
 // SampleSystem
 
-import {eventBus} from './utils.mjs'
+import {eventBus, seededRNG} from './utils.mjs'
 import {PLANT_KIND, PLANT_TYPE, ITEMS} from '../../assets/data/data.mjs'
 import {IMAGE_CACHE} from './assets.mjs'
+import {saveManager} from './persistence.mjs'
 
 /* ====================================================================================================
    HELPERS COMMUNS A TOUS LES SYSTEMS
@@ -31,6 +32,24 @@ class SunflowerSystem {
   #list = [] // record[]                — tous les spots (présents ou non)
   #byChunk = new Map() // Map<chunkKey, Set>      — lookup spatial pour onPreloadChunksChanged
   #displayed = new Set() // Set<record>             — spots dans les chunks preload (cible render)
+
+  #imgLeft = null // ITEMS.sunflower.placedLeft  — tête à gauche (6h–10h), mis en cache dans init()
+  #imgMid = null // ITEMS.sunflower.placed      — tête au centre (10h–13h)
+  #imgRight = null // ITEMS.sunflower.placedRight — tête à droite (13h–17h)
+  #currentImage = null // pointeur vers l'image active
+
+  constructor () {
+    this.onFirstLoop = this.onFirstLoop.bind(this)
+    this.onHour6 = this.onHour6.bind(this)
+    this.onHour10 = this.onHour10.bind(this)
+    this.onHour13 = this.onHour13.bind(this)
+    this.onHour17 = this.onHour17.bind(this)
+    eventBus.on('time/first-loop', this.onFirstLoop)
+    eventBus.on('time/every-hour-6', this.onHour6)
+    eventBus.on('time/every-hour-10', this.onHour10)
+    eventBus.on('time/every-hour-13', this.onHour13)
+    eventBus.on('time/every-hour-17', this.onHour17)
+  }
 
   /**
    * Réinitialise toutes les structures.
@@ -103,6 +122,45 @@ class SunflowerSystem {
    */
   getPlantAt (tileIndex) {
     return this.byTile.get(tileIndex) ?? null
+  }
+
+  // ////////////////////////////////////// //
+  // GESTION DU CYCLE DE VIE DES SUNFLOWERS //
+  // ////////////////////////////////////// //
+
+  /** Liaison EventBus : 'time/every-hour-6' — apparition, tête à gauche. */
+  onHour6 () {
+    this.#currentImage = this.#imgLeft
+    for (const record of this.#list) {
+      record.present = seededRNG.randomGetPercent(18)
+      if (record.present) saveManager.queueStaticUpdate({storeName: 'plant', record})
+    }
+  }
+
+  /** Liaison EventBus : 'time/every-hour-10' — pivot vers le centre. */
+  onHour10 () { this.#currentImage = this.#imgMid }
+
+  /** Liaison EventBus : 'time/every-hour-13' — pivot vers la droite. */
+  onHour13 () { this.#currentImage = this.#imgRight }
+
+  /** Liaison EventBus : 'time/every-hour-17' — disparition. */
+  onHour17 () {
+    for (const record of this.#list) {
+      if (!record.present) continue
+      record.present = false
+      saveManager.queueStaticUpdate({storeName: 'plant', record})
+    }
+  }
+
+  /**
+   * Synchronise l'image active et le flag present de tous les spots à l'heure courante.
+   * Liaison EventBus : 'time/first-loop' — émis une seule fois au démarrage du rendu.
+   * @param {{hour: number}} payload
+   */
+  onFirstLoop ({hour}) {
+    if (hour < 10) this.#currentImage = this.#imgLeft
+    else if (hour >= 13) this.#currentImage = this.#imgRight
+    else this.#currentImage = this.#imgMid
   }
 }
 export const sunflowerSystem = new SunflowerSystem()
