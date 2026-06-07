@@ -935,7 +935,7 @@ L'item est classé dans la catégorie correspondant à sa méthode d'obtention l
 │   ├── action.mjs           # Layer 4 : ActionManager (Mining, Cutting, Fishing…)
 │   ├── buff.mjs             # Layer 4 : BuffManager, StatModifiers
 │   ├── housing.mjs          # Layer 4 : FurnitureManager, HousingManager
-│   ├── ecosystem.mjs        # Layer 4 : HiveSystem, PlantSystem, CobwebSystem…
+│   ├── ecosystem.mjs        # Layer 4 : HiveSystem, FloraManager, CobwebSystem…
 │   ├── combat.mjs           # Layer 4 : ArenaCreator, TurnManager, SpellSystem, CombatAI
 │   ├── inventory.mjs        # Layer 4 : InventoryManager, InventorySlot, InventoryOverlay
 │   ├── craft.mjs            # Layer 4 : CraftSystem
