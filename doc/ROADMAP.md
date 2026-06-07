@@ -22,7 +22,7 @@
 ---
 
 ## Dette technique
-
+- Dans les attributs 'mining' et 'foraging' transférer dans 'buffs' ce qui n'y est pas encore.
 - Vérifier que la convention pour les variables privées est prise en compte partout :
   - fait pour `inventory.mjs`, `craft.mjs`, `help.mjs`, `achievement.mjs`, `ui.mjs`
 - Vérifier que les en-têtes des fonctions sont présents et à jour (prise en compte des modifications de conception) :

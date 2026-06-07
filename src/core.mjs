@@ -165,6 +165,8 @@ class GameCore {
       if (item.placedRight) item.placedRight = resolveAssetData(item.placedRight)
       if (item.placedLeft) item.placedLeft = resolveAssetData(item.placedLeft)
 
+      if (item.foraging) this.#hydrateLootAction(item.foraging, 'foraging', item.name)
+
       if (!HELP_TITLES.has(item.help)) {
         console.error(`[core] ITEMS.${key} : help topic inconnu '${item.help}'`)
         errors++
