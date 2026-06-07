@@ -52,9 +52,10 @@
  *   |format|     → valeur brute (défaut si absent)
  *   |star|       → tier affiché en étoiles  ⭐⭐☆☆☆
  *   |link|       → [[obj.help|obj.name]]  (obj doit avoir .help et .name)
+ *   |links|      → tableau : [[obj.help|obj.name]] valeurs séparées par des virgules
  *   |optional|   → chaîne vide si absent, pas de ⚠️
- *   |list|       → liste à puces  (* item\n* item\n...)
- *   |lines|      → valeurs séparées par <br>
+ *   |list|       → tableau : liste à puces  (* item\n* item\n...)
+ *   |lines|      → tableau : valeurs séparées par <br>
  *   |loot|       → table de loot ⏳
  *
  *  * ── Données dynamiques des recettes ──────────────────────────
@@ -4373,7 +4374,7 @@ Sunflowers grow in forest clearings, thriving where sunlight reaches the ground 
 
 * [[Foraging|Interact to harvest]] — the flower disappears on harvest
 * Tool: any [[Harvesting Tools|Sickle]]⏳
-* Loot: [[item:sunflowerSeed]]
+* Loot: {{item:sunflower:foraging:items[*]:item|links}}
 
 **Dangers**
 
@@ -6200,6 +6201,28 @@ const formatValue = (resolved, format, entryTitle, path) => {
         lines.push(`* ${leaf ?? '⚠️'}`)
       }
       return lines.join('\n')
+    }
+
+    case 'links': {
+      if (!isStar) {
+        console.error(`[help] '${entryTitle}' : format 'links' requiert [*] '${path}'`)
+        return `⚠️ ${path}`
+      }
+      const lines = []
+      for (const item of value) {
+        const leaf = tail.length ? tail.reduce((o, s) => o?.[s], item) : item
+
+        if (!leaf.help || !leaf.name) {
+          console.error(`[help] '${entryTitle}' : objet sans .help ou .name '${path}'`)
+          lines.push(`⚠️ ${path}`)
+        }
+        if (leaf.help === entryTitle) {
+          lines.push(leaf.name) // fiche courante → texte seul
+        } else {
+          lines.push(`[[${leaf.help}|${leaf.name}]]`)
+        }
+      }
+      return lines.join(', ')
     }
 
     case 'lines': {
