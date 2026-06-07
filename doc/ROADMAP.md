@@ -13,6 +13,7 @@
   - recherche en fonction du substrat uniquement pour les classes correspondante
 - implémentation de l'affichage des tuiles (top soil à faire)
 - implémenter les graines de Sunflower qui augmentent la probabilité de pop de sunflower.
+- gérer blockedTiles pour les furnitures (mise à jour - les tests sont faits par l'appelant)
 - Ajouter des planches comme refinement des logs
 - Sauvegarde de la position du joueur en database
 - brancher les Crafting Stations au craft panel
@@ -213,7 +214,7 @@ La Sap corrode le Copper. Il doit donc être remplacer par du Gold.
 
 ### Kernel (Layer 0–2)
 - `constant.mjs` — constantes, enums, bitmasks
-- `utils.mjs` — EventBus, MicroTasker, TaskScheduler, TimeManager, seededRNG
+- `utils.mjs` — EventBus, MicroTasker, TaskScheduler, TimeManager, blockedTiles, seededRNG
 - `database.mjs` — Database
 - `core.mjs` — GameLoop, InputManager, KeyboardManager
 
@@ -324,13 +325,21 @@ La Sap corrode le Copper. Il doit donc être remplacer par du Gold.
   - Panneau de craft (nombre de runs, réalisation du craft)
   - Affichage du Help Panel contextuel
   - Gestion du craft (suppression des Crafting Material, ajout du 'résultat' et des 'returned')
+- Achievements Panel (`AchievementOverlay`)
+  - en tête / résumé
+  - liste des catégories
+  - détail d'une catégorie
 
 ### Gameplay - gestion des items/buffs/recettes
 
 - Gestion de l'inventaire (`InventoryManager`)
 - Gestion des buffs (`BuffManager`)
 - Affichage des buffs (`BuffWidget`)
-- Gestion des meubles placés dans le monde (`FurnitureManager`) / Affichage manquant
+- Gestion des meubles placés dans le monde (`FurnitureManager`)
+
+### Environement
+- Point d'entrée pour la flore (`FloraManager`)
+- Sunflower (`SunflowerSystem`) - partiel
 
 ### Rendu (partiel)
 - `WorldRenderer` — rendu tuiles par chunks avec cache OffscreenCanvas
