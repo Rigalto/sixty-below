@@ -12,6 +12,7 @@
   - Affichage par appel de toutes les classes dédiées
   - recherche en fonction du substrat uniquement pour les classes correspondante
 - implémentation de l'affichage des tuiles (top soil à faire)
+- implémenter les graines de Sunflower qui augmentent la probabilité de pop de sunflower.
 - Ajouter des planches comme refinement des logs
 - Sauvegarde de la position du joueur en database
 - brancher les Crafting Stations au craft panel
