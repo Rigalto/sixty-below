@@ -1,7 +1,7 @@
 // inventory.mjs — GameCore - KeyboardManager - MouseManager
 
 import {TIME_BUDGET, MICROTASK_FN_NAME_TO_KEY, STATE, OVERLAYS, MICROTASK} from './constant.mjs'
-import {NODES, NODES_LOOKUP, MAX_FURNITURE_W, MAX_FURNITURE_H, ITEMS, RECIPES, MONSTERS, TREE_IMAGES, PLANT_KIND, PLANT_TYPE} from '../../assets/data/data.mjs'
+import {NODES, NODES_LOOKUP, MAX_FURNITURE_W, MAX_FURNITURE_H, ITEMS, RECIPES, MONSTERS, TREE_IMAGES} from '../../assets/data/data.mjs'
 import {HELP_TITLES, hydrateHelp} from '../../assets/data/data-help.mjs'
 import {loadAssets, resolveAssetData} from './assets.mjs'
 import {timeManager, taskScheduler, microTasker, eventBus, seededRNG, parseLootCount, parseLootBuffs, buildLootHelpRow} from './utils.mjs'
@@ -17,6 +17,7 @@ import {furnitureManager} from './housing.mjs'
 import {craftOverlay} from './craft.mjs'
 import {achievementManager} from './achievement.mjs'
 import {playerManager, hotbarOverlay} from './player.mjs'
+import {floraManager} from './ecosystem.mjs'
 import {ACHIEVEMENT_CATEGORIES} from '../assets/data/data-achievement.mjs'
 import './ui-debug.mjs'
 import './combat.mjs'
@@ -328,57 +329,26 @@ class GameCore {
       await database.deleteMultipleRecords('furniture', furnituresToDelete)
     }
     furnitureManager.init(activeFurnitures)
+    furnitureManager.onPreloadChunksChanged(camera.preloadChunks)
 
     // 5.3 Objectstore Achievements
     const achievementRecords = await database.readAllFromObjectStore('achievements')
     achievementManager.init(achievementRecords)
 
-    // 5.4 Objectstore Plant => à remplacer par await plantManager.init(plantRecords)
-    console.log(PLANT_KIND, PLANT_TYPE) // pour éviter une erreur dans VSCode
-    // const PLANT_SYSTEM_MAP = new Map([
-    //   [PLANT_KIND.NATURAL * 100 + PLANT_TYPE.NONE, naturalSystem],
-    //   [PLANT_KIND.TREE * 100 + PLANT_TYPE.OAK, treeSystem],
-    //   [PLANT_KIND.TREE * 100 + PLANT_TYPE.MAHOGANY, treeSystem],
-    //   [PLANT_KIND.TREE * 100 + PLANT_TYPE.COCONUT, treeSystem],
-    //   [PLANT_KIND.TREE * 100 + PLANT_TYPE.GIANT_MUSHROOM, treeSystem],
-    //   [PLANT_KIND.MUSHROOM * 100 + PLANT_TYPE.BOLETE, mushroomSystem],
-    //   [PLANT_KIND.MUSHROOM * 100 + PLANT_TYPE.PINKMYCENIA, mushroomSystem],
-    //   [PLANT_KIND.MUSHROOM * 100 + PLANT_TYPE.FROSTCAP, capystem],
-    //   [PLANT_KIND.MUSHROOM * 100 + PLANT_TYPE.DAWNCAP, capystem],
-    //   [PLANT_KIND.HERB * 100 + PLANT_TYPE.PLANT_TYPE.OLEANDER, oleanderSystem],
-    //   [PLANT_KIND.HERB * 100 + PLANT_TYPE.BLINKROOT, blinkrootSystem],
-    //   [PLANT_KIND.HERB * 100 + PLANT_TYPE.PARSNIP, parsnipSystem],
-    //   [PLANT_KIND.HERB * 100 + PLANT_TYPE.SUNFLOWER, sunflowerSystem],
-    //   [PLANT_KIND.HERB * 100 + PLANT_TYPE.FIREBLOSSOM, fireblossomSystem],
-    //   [PLANT_KIND.HERB * 100 + PLANT_TYPE.SKORN, skornSystem],
-    //   [PLANT_KIND.HERB * 100 + PLANT_TYPE.AMBERMIRAGE, ambermirageSystem],
-    //   [PLANT_KIND.HERB * 100 + PLANT_TYPE.BLOODMOON, bloodmoonSystem],
-    //   [PLANT_KIND.HERB * 100 + PLANT_TYPE.SHADOWFERN, fernSystem],
-    //   [PLANT_KIND.HERB * 100 + PLANT_TYPE.CRIMSONFROND, fernSystem],
-    //   [PLANT_KIND.HERB * 100 + PLANT_TYPE.GOLDENVEIL, fernSystem],
-    //   [PLANT_KIND.HERB * 100 + PLANT_TYPE.MISTFERN, fernSystem],
-    //   [PLANT_KIND.HERB * 100 + PLANT_TYPE.VELVETMOSS, mossSystem],
-    //   [PLANT_KIND.HERB * 100 + PLANT_TYPE.CORAL_R, coralSystem],
-    //   [PLANT_KIND.HERB * 100 + PLANT_TYPE.CORAL_P, coralSystem],
-    //   [PLANT_KIND.HERB * 100 + PLANT_TYPE.CORAL_Y, coralSystem],
-    //   [PLANT_KIND.HERB * 100 + PLANT_TYPE.CORAL_G, coralSystem],
-    //   [PLANT_KIND.SPREAD * 100 + PLANT_TYPE.NONE, spreadSystem],
-    //   [PLANT_KIND.SEED * 100 + PLANT_TYPE.NONE, seedSystem]
-    // ])
+    // 5.4 Objectstore Plant
+    const plantRecords = await database.readAllFromObjectStore('plant')
+    const plantsToDelete = []
+    floraManager.init()
+    for (const record of plantRecords) {
+      if (record.deleted) { plantsToDelete.push(record.key); continue }
+      floraManager.addPlant(record)
+    }
+    if (plantsToDelete.length > 0) {
+      await database.deleteMultipleRecords('plant', plantsToDelete)
+    }
+    floraManager.onPreloadChunksChanged(camera.preloadChunks)
 
-    // // managers des plantes et suppressions des enregistrements périmés
-    // const plantsToDelete = []
-    // const plantRecords = await database.readAllFromObjectStore('plant')
-    // for (const record of plantRecords) {
-    //   if (record.deleted) {
-    //     plantsToDelete.push(record.key)
-    //     continue
-    //   }
-    //   PLANT_SYSTEM_MAP.get(record.kind * 100 + record.type)?.init(record)
-    // }
-    // if (plantsToDelete.length > 0) {
-    //   await database.deleteMultipleRecords('plant', plantsToDelete)
-    // }
+    // 5.5 TODO Monsters
 
     // 6. Lancement de la boucle
     this.isRunning = true
@@ -532,7 +502,7 @@ class GameCore {
     // ctx.restore() DOIT rester après le dernier manager de la chaîne — il annule le save() de worldRenderer.
     // lightRenderer opère sur son propre canvas séparé : il se place après restore(), hors de la chaîne.
     const ctx = worldRenderer.render()
-    // plantManager.render(ctx)
+    floraManager.render(ctx)
     furnitureManager.render(ctx)
     // monsterManager.render(ctx)
     playerManager.render(ctx)

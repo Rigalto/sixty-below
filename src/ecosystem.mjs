@@ -2,10 +2,110 @@
 // SampleSystem
 
 import {eventBus} from './utils.mjs'
+import {PLANT_KIND, PLANT_TYPE, ITEMS} from '../../assets/data/data.mjs'
+import {IMAGE_CACHE} from './assets.mjs'
 
 /* ====================================================================================================
    HELPERS COMMUNS A TOUS LES SYSTEMS
    ==================================================================================================== */
+
+/* ====================================================================================================
+   SUNFLOWER SYSTEM
+   ====================================================================================================
+
+   Singleton : sunflowerSystem.
+
+   Gère les spots de tournesol sur les tuiles GRASSFOREST de surface.
+   Chaque spot est toujours présent en DB — seul record.present indique si la fleur est visible.
+   Apparition à l'aube, disparition au crépuscule (cycle géré par les événements de temps).
+
+   Structure record :
+     kind HERB · type SUNFLOWER · w 1 · h 2 · soilIndex GRASSFOREST
+     present  — true si la fleur est affichée
+     (pas de bloom / bloomTimestamp — la visibilité est pilotée par l'heure)
+
+   ==================================================================================================== */
+
+class SunflowerSystem {
+  byTile = new Map() // Map<tileIndex, record>  — public : membership O(1) + lookup record
+  #list = [] // record[]                — tous les spots (présents ou non)
+  #byChunk = new Map() // Map<chunkKey, Set>      — lookup spatial pour onPreloadChunksChanged
+  #displayed = new Set() // Set<record>             — spots dans les chunks preload (cible render)
+
+  /**
+   * Réinitialise toutes les structures.
+   */
+  init () {
+    this.byTile.clear()
+    this.#list.length = 0
+    this.#byChunk.clear()
+    this.#displayed.clear()
+  }
+
+  /**
+   * Enregistre un spot et peuple les quatre structures internes.
+   * @param {object} record — record HERB/SUNFLOWER actif (deleted=false garanti)
+   */
+  initPlant (record) {
+    this.#list.push(record)
+
+    const px = record.index & 0x3FF
+    const py = record.index >> 10
+    for (let dy = 0; dy < record.h; dy++) {
+      const rowBase = (py + dy) << 10
+      for (let dx = 0; dx < record.w; dx++) {
+        this.byTile.set(rowBase | (px + dx), record)
+      }
+    }
+
+    const chunkKey = ((record.index >> 14) << 6) | ((record.index & 0x3FF) >> 4)
+    let set = this.#byChunk.get(chunkKey)
+    if (set === undefined) {
+      set = new Set()
+      this.#byChunk.set(chunkKey, set)
+    }
+    set.add(record)
+  }
+
+  /**
+   * Reconstruit #displayed depuis les chunks preload de la caméra.
+   * @param {Set<number>} preloadChunks
+   */
+  onPreloadChunksChanged (preloadChunks) {
+    this.#displayed.clear()
+    for (const chunkKey of preloadChunks) {
+      const set = this.#byChunk.get(chunkKey)
+      if (set === undefined) continue
+      for (const record of set) this.#displayed.add(record)
+    }
+    if (this.#displayed.size !== 0) { console.log('SunflowerSystem.onPreloadChunksChanged', this.#displayed.size) }
+  }
+
+  /**
+    * Dessine les tournesols visibles et présents sur le contexte transformé.
+    * @param {CanvasRenderingContext2D} ctx — contexte déjà transformé (caméra appliquée)
+    */
+  render (ctx) {
+    for (const record of this.#displayed) {
+      if (!record.present) continue
+      const img = ITEMS[record.itemId].placed
+      if (!img) continue
+      const pxX = (record.index & 0x3FF) << 4
+      const pxY = (record.index >> 10) << 4
+      ctx.drawImage(IMAGE_CACHE[img.imgIndex], img.sx, img.sy, img.sw, img.sh, pxX, pxY, img.sw, img.sh)
+    }
+  }
+
+  /**
+   * Retourne le record du tournesol couvrant la tuile donnée, ou null.
+   * @param {number} tileIndex — (y << 10) | x
+   * @returns {object|null}
+   */
+  getPlantAt (tileIndex) {
+    return this.byTile.get(tileIndex) ?? null
+  }
+}
+export const sunflowerSystem = new SunflowerSystem()
 
 /* ====================================================================================================
    FLORA MANAGER
@@ -45,7 +145,7 @@ class FloraManager {
     //   [PLANT_KIND.HERB * 100 + PLANT_TYPE.PLANT_TYPE.OLEANDER, oleanderSystem],
     //   [PLANT_KIND.HERB * 100 + PLANT_TYPE.BLINKROOT, blinkrootSystem],
     //   [PLANT_KIND.HERB * 100 + PLANT_TYPE.PARSNIP, parsnipSystem],
-    //   [PLANT_KIND.HERB * 100 + PLANT_TYPE.SUNFLOWER, sunflowerSystem],
+    [PLANT_KIND.HERB * 100 + PLANT_TYPE.SUNFLOWER, sunflowerSystem]
     //   [PLANT_KIND.HERB * 100 + PLANT_TYPE.FIREBLOSSOM, fireblossomSystem],
     //   [PLANT_KIND.HERB * 100 + PLANT_TYPE.SKORN, skornSystem],
     //   [PLANT_KIND.HERB * 100 + PLANT_TYPE.AMBERMIRAGE, ambermirageSystem],
@@ -63,8 +163,8 @@ class FloraManager {
     //   [PLANT_KIND.SEED * 100 + PLANT_TYPE.NONE, seedSystem]
   ])
 
-  // naturalSystem, treeSystem, mushroomSystem, capystem, oleanderSystem, blinkrootSystem, parsnipSystem, sunflowerSystem, fireblossomSystem, skornSystem, ambermirageSystem, bloodmoonSystem, fernSystem, mossSystem, coralSystem, spreadSystem, seedSystem
-  #allSystems = [] // system[] — dans l'ordre de rendu
+  // naturalSystem, treeSystem, mushroomSystem, capystem, oleanderSystem, blinkrootSystem, parsnipSystem, fireblossomSystem, skornSystem, ambermirageSystem, bloodmoonSystem, fernSystem, mossSystem, coralSystem, spreadSystem, seedSystem
+  #allSystems = [sunflowerSystem] // system[] — dans l'ordre de rendu
 
   constructor () {
     this.onPreloadChunksChanged = this.onPreloadChunksChanged.bind(this)

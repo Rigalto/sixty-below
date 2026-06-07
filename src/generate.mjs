@@ -7480,23 +7480,22 @@ class PlantGenerator {
 
       present = !present && seededRNG.randomGetPercent(18)
 
-      if (present) {
-        guarded.add(x)
+      if (present) guarded.add(x)
 
-        this.#plants.push({
-          id: uniqueIdGenerator.getUniqueId(),
-          kind: PLANT_KIND.HERB,
-          type: PLANT_TYPE.SUNFLOWER,
-          index: soilIndex - 2 * W,
-          soilIndex,
-          itemId: 'sunflower',
-          w: 1,
-          h: 2,
-          x,
-          y: y - 2,
-          deleted: false
-        })
-      }
+      this.#plants.push({
+        id: uniqueIdGenerator.getUniqueId(),
+        kind: PLANT_KIND.HERB,
+        type: PLANT_TYPE.SUNFLOWER,
+        index: soilIndex - 2 * W,
+        soilIndex,
+        itemId: 'sunflower',
+        present,
+        w: 1,
+        h: 2,
+        x,
+        y: y - 2,
+        deleted: false
+      })
     }
   }
 
