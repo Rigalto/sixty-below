@@ -60,6 +60,7 @@ class GameCore {
     this.debugMap = false
     // DEBUG
     this.mockupDiv = mockup()
+    this.timeScale = 1 // ×1 normal — T pour cycler ×1 / ×10 / ×60 (debug)
   }
 
   /* =========================================
@@ -405,7 +406,7 @@ class GameCore {
 
     // 2. UPDATE (SYSTEMS)
     // 2.A. TimeManager (Source de vérité temporelle)
-    const gameTimestamp = timeManager.update(dt) // timestamp depuis création du monde
+    const gameTimestamp = timeManager.update(dt * this.timeScale) // timestamp depuis création du monde
 
     // 2.B. TaskScheduler (Vérifie si des tâches longues sont dues)
     taskScheduler.update(gameTimestamp)
@@ -716,6 +717,10 @@ class KeyboardManager {
 
     // Debug dans la console (Touche ² (AZERTY) ou ` (QWERTY))
     if (e.code === 'Backquote') { this.debugTrigger = true }
+    if (e.code === 'KeyT') {
+      gameCore.timeScale = gameCore.timeScale === 1 ? 10 : gameCore.timeScale === 10 ? 20 : 1
+      console.log(`⏱ x${gameCore.timeScale}`)
+    }
 
     // 1 Overlay
     const overlay = OVERLAY_MAP[e.key]

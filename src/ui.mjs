@@ -394,7 +394,7 @@ class MenuBarWidget {
     const btnAchievement = this.#createBtn('btn-achievement', PATH_TROPHY, 'Achievements [U]')
     const btnHelp = this.#createBtn('btn-help', PATH_HELP, 'Help [H]')
     const btnNew = this.#createBtn('btn-new', PATH_NEW_WORLD, 'Generate New World', true)
-    const btnSnap = this.#createBtn('btn-snap', PATH_DEBUG, 'Debug: Copy Snapshot', true)
+    const btnSnap = this.#createBtn('btn-snap', PATH_DEBUG, 'Debug:\nClick → Copy Snapshot\n² → Log Micro-tasks, Tasks & eventBus\nT → time x1/x10/x20 (cycle)', true)
 
     // Assemblage dans le conteneur
     this.#container.appendChild(btnInv)
