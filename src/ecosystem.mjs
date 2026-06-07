@@ -91,17 +91,19 @@ const buildDisplayed = (displayed, byChunk, preloadChunks) => {
    ==================================================================================================== */
 
 class SunflowerSystem {
-  byTile = new Map() // Map<tileIndex, record>  — public : membership O(1) + lookup record
-  #list = [] // record[]                — tous les spots (présents ou non)
-  #byChunk = new Map() // Map<chunkKey, Set>      — lookup spatial pour onPreloadChunksChanged
-  #displayed = new Set() // Set<record>             — spots dans les chunks preload (cible render)
+  byTile = new Map() // Map<tileIndex, record> — public : membership O(1) + lookup record
+  #list = [] // record[] — tous les spots (présents ou non)
+  #byChunk = new Map() // Map<chunkKey, Set> — lookup spatial pour onPreloadChunksChanged
+  #bySoil = new Map() // Map<soilIndex, record> — plantes présentes : détection minage de la tuile sol
+  #displayed = new Set() // Set<record> — spots dans les chunks preload (cible render)
 
-  #imgLeft = null // ITEMS.sunflower.placedLeft  — tête à gauche (6h–10h), mis en cache dans init()
-  #imgMid = null // ITEMS.sunflower.placed      — tête au centre (10h–13h)
+  #imgLeft = null // ITEMS.sunflower.placedLeft — tête à gauche (6h–10h), mis en cache dans init()
+  #imgMid = null // ITEMS.sunflower.placed — tête au centre (10h–13h)
   #imgRight = null // ITEMS.sunflower.placedRight — tête à droite (13h–17h)
   #currentImage = null // pointeur vers l'image active
 
   constructor () {
+    // eventBus
     this.onFirstLoop = this.onFirstLoop.bind(this)
     this.onHour6 = this.onHour6.bind(this)
     this.onHour10 = this.onHour10.bind(this)
@@ -112,6 +114,7 @@ class SunflowerSystem {
     eventBus.on('time/every-hour-10', this.onHour10)
     eventBus.on('time/every-hour-13', this.onHour13)
     eventBus.on('time/every-hour-17', this.onHour17)
+    // micro-tâches
     this.onSunflowerHour6 = this.onSunflowerHour6.bind(this)
     this.onSunflowerHour17 = this.onSunflowerHour17.bind(this)
   }
@@ -123,9 +126,10 @@ class SunflowerSystem {
     this.byTile.clear()
     this.#list.length = 0
     this.#byChunk.clear()
+    this.#bySoil.clear()
     this.#displayed.clear()
 
-    const item = ITEMS.sunflower
+    const item = ITEMS.sunflower // après hydratation
     this.#imgLeft = item.placedLeft
     this.#imgMid = item.placed
     this.#imgRight = item.placedRight
@@ -141,6 +145,7 @@ class SunflowerSystem {
     if (!record.present) return
     addToByTile(this.byTile, record)
     addToByChunk(this.#byChunk, record)
+    this.#bySoil.set(record.soilIndex, record)
     blockedTiles.blockPlacement(record.index)
     blockedTiles.blockPlacement(record.index + WORLD_WIDTH)
   }
@@ -193,14 +198,15 @@ class SunflowerSystem {
   onSunflowerHour6 () {
     this.#currentImage = this.#imgLeft
     for (const record of this.#list) {
-      record.present = seededRNG.randomGetPercent(18)
-      if (!record.present) continue
-      if (!blockedTiles.canPlace(record.index) || !blockedTiles.canPlace(record.index + WORLD_WIDTH)) {
-        record.present = false
-        continue
-      }
+      // TODO : prendre en compte les graines de sunflower plantées (18 => 80)
+      const present = seededRNG.randomGetPercent(18)
+      if (!present) continue
+      if (!blockedTiles.canPlace(record.index) || !blockedTiles.canPlace(record.index + WORLD_WIDTH)) continue
+
+      record.present = true
       addToByTile(this.byTile, record)
       addToByChunk(this.#byChunk, record)
+      this.#bySoil.set(record.soilIndex, record)
       blockedTiles.blockPlacement(record.index)
       blockedTiles.blockPlacement(record.index + WORLD_WIDTH)
       saveManager.queueStaticUpdate({storeName: 'plant', record})
@@ -227,6 +233,8 @@ class SunflowerSystem {
     this.byTile.clear()
     this.#byChunk.clear()
     this.#displayed.clear()
+    this.#bySoil.clear()
+
     for (const record of this.#list) {
       if (!record.present) continue
       record.present = false
