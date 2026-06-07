@@ -4,7 +4,7 @@ import {TIME_BUDGET, MICROTASK_FN_NAME_TO_KEY, STATE, OVERLAYS, MICROTASK} from 
 import {NODES, NODES_LOOKUP, MAX_FURNITURE_W, MAX_FURNITURE_H, ITEMS, RECIPES, MONSTERS, TREE_IMAGES} from '../../assets/data/data.mjs'
 import {HELP_TITLES, hydrateHelp} from '../../assets/data/data-help.mjs'
 import {loadAssets, resolveAssetData} from './assets.mjs'
-import {timeManager, taskScheduler, microTasker, eventBus, seededRNG, parseLootCount, parseLootBuffs, buildLootHelpRow} from './utils.mjs'
+import {timeManager, taskScheduler, microTasker, eventBus, seededRNG, parseLootCount, parseLootBuffs, buildLootHelpRow, blockedTiles} from './utils.mjs'
 import {database} from './database.mjs'
 import {chunkManager} from './world.mjs'
 import {saveManager} from './persistence.mjs'
@@ -61,6 +61,7 @@ class GameCore {
     // DEBUG
     this.mockupDiv = mockup()
     this.timeScale = 1 // ×1 normal — T pour cycler ×1 / ×10 / ×60 (debug)
+    this.showBlockedTiles = false // true pour afficher les tuiles bloquées
   }
 
   /* =========================================
@@ -509,6 +510,7 @@ class GameCore {
     furnitureManager.render(ctx)
     // monsterManager.render(ctx)
     playerManager.render(ctx)
+    if (this.showBlockedTiles) blockedTiles.render(ctx) // DEBUG
     ctx.restore() // clôt le save() de worldRenderer.render() — NE PAS déplacer ni supprimer
     // lightRenderer.render()
 
@@ -723,6 +725,7 @@ class KeyboardManager {
       gameCore.timeScale = gameCore.timeScale === 1 ? 10 : gameCore.timeScale === 10 ? 20 : 1
       console.log(`⏱ x${gameCore.timeScale}`)
     }
+    if (e.code === 'NumpadAdd') gameCore.showBlockedTiles = true
 
     // 1 Overlay
     const overlay = OVERLAY_MAP[e.key]
@@ -768,6 +771,7 @@ class KeyboardManager {
     if (arrowBit) { this.directionsArrow &= ~arrowBit; return }
     const gameBit = MOVEMENT_MAP_GAME[e.code]
     if (gameBit) { this.directionsGame &= ~gameBit }
+    if (e.code === 'NumpadAdd') gameCore.showBlockedTiles = false
   }
 
   onCloseRequest (overlyId) {

@@ -751,6 +751,22 @@ class BlockedTiles {
 
   /** @param {number} tileIndex @returns {boolean} true si la tuile peut être minée */
   canMine (tileIndex) { return !this.#blocked.has(tileIndex) }
+
+  /**
+ * Visualisation debug : carré rouge semi-transparent sur chaque tuile bloquée.
+ * Permet de détecter les tuiles incorrectement bloquées ou libérées.
+ * @param {CanvasRenderingContext2D} ctx — contexte déjà transformé (caméra appliquée)
+ */
+  render (ctx) {
+    ctx.save()
+    ctx.fillStyle = 'rgba(255, 0, 0, 0.4)'
+    for (const tileIndex of this.#blocked) {
+      const pxX = (tileIndex & 0x3FF) << 4
+      const pxY = (tileIndex >> 10) << 4
+      ctx.fillRect(pxX + 1, pxY + 1, 14, 14)
+    }
+    ctx.restore()
+  }
 }
 
 export const blockedTiles = new BlockedTiles()
