@@ -289,6 +289,8 @@ Cette section définit les événements officiels. Tout nouvel événement doit 
 | E | `player/teleport` | `{x: number, y: number}` | Téléporte le joueur aux coordonnées tuiles données. |
 | S | `player/move` | `{x: number, y: number}` | Émis quand la tuile sous les pieds du joueur change. Coordonnées en tuiles. |
 | S | `life/add` | `{dmg: number}` | Dégâts de chute. dmg < 0. |
+| S | `player/teleportation-begin` | — | Début de téléportation, avant fading. Le joueur est bloqué, ses actions annulées. |
+| S | `player/teleportation-end` | — | Fin de téléportation, avant fading. Le joueur est débloqué. |
 
 #### Player Life (`LifeManager`)
 *En prévision*
