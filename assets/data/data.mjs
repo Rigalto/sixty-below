@@ -662,7 +662,6 @@ export const RECIPES = [
   {result: {item: 'wireCobalt', count: 18}, station: 'forge', ingredients: [{item: 'barCobalt', count: 1}]},
   {result: {item: 'plateCopper', count: 8}, station: 'anvil', ingredients: [{item: 'barCopper', count: 1}]},
   {result: {item: 'plateIron', count: 7}, station: 'anvil', ingredients: [{item: 'barIron', count: 1}]},
-  {result: {item: 'plateIron', count: 7}, station: 'anvil', ingredients: [{item: 'barIron', count: 1}]},
   {result: {item: 'plateGold', count: 6}, station: 'anvil', ingredients: [{item: 'barGold', count: 1}]},
   {result: {item: 'plateCobalt', count: 5}, station: 'anvil', ingredients: [{item: 'barCobalt', count: 1}]},
   {result: {item: 'platePlatinum', count: 4}, station: 'anvil', ingredients: [{item: 'barPlatinum', count: 1}]},
