@@ -1,6 +1,6 @@
 // utils.mjs — EventBus - MicroTasker - TaskScheduler - TimeManager - BlockedTiles - SeededRNG
 
-import {SKY_COLORS, WEATHER_TYPE, REAL_MS_PER_GAME_MIN, DAY_DURATION_GAME_MIN} from './constant.mjs'
+import {WORLD_WIDTH, WORLD_HEIGHT, SKY_COLORS, WEATHER_TYPE, REAL_MS_PER_GAME_MIN, DAY_DURATION_GAME_MIN} from './constant.mjs'
 
 /* ====================================================================================================
    EVENT BUS
@@ -733,6 +733,33 @@ export const timeManager = new TimeManager()
 
 class BlockedTiles {
   #blocked = new Set() // Set<tileIndex> — placement et minage partagent la structure (disjoints par type de tuile)
+
+  /**
+* Réinitialise les tuiles bloquées et peuple la bordure du monde.
+* Appelé en début de session, avant tout autre manager.
+* @param {number[]} eternalTiles — tuiles ETERNAL spéciales issues du gamestate
+*/
+  init (eternalTiles) {
+    this.#blocked.clear()
+
+    for (let x = 0; x < WORLD_WIDTH; x++) {
+      this.blockMining(x)
+      this.blockMining(((WORLD_HEIGHT - 1) << 10) | x)
+      this.blockPlacement(x)
+      this.blockPlacement(((WORLD_HEIGHT - 1) << 10) | x)
+    }
+    for (let y = 1; y < WORLD_HEIGHT - 1; y++) {
+      this.blockMining(y << 10)
+      this.blockMining((y << 10) | (WORLD_WIDTH - 1))
+      this.blockPlacement(y << 10)
+      this.blockPlacement((y << 10) | (WORLD_WIDTH - 1))
+    }
+
+    for (const tileIndex of eternalTiles) {
+      this.blockMining(tileIndex)
+      this.blockPlacement(tileIndex)
+    }
+  }
 
   /** Marque la tuile comme inaccessible au placement (furniture ou plante). @param {number} tileIndex */
   blockPlacement (tileIndex) { this.#blocked.add(tileIndex) }

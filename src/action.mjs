@@ -41,7 +41,6 @@ class MiningManager {
     if (!(tileNode.type & NODE_TYPE.SOLID)) return
     if (!blockedTiles.canMine(tileIndex)) return
     if (buffManager.getBuff('player-freeze')) return
-    if (tileNode.type & NODE_TYPE.ETERNAL) return
     // TODO: test range (playerManager.getFeetTile() vs tileIndex, buff 'mining-range')
 
     const wasEmpty = this.#queue.length === 0

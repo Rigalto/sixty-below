@@ -484,25 +484,26 @@ class WorldGenerator {
       {key: 'moonglowseeds', value: ''},
       {key: 'health', value: 100},
       {key: 'ferncount', value: fernCount},
-      {key: 'hives', value: JSON.stringify(hives)},
-      {key: 'cobwebcaves', value: JSON.stringify(cobwebCaves)},
-      {key: 'lakes', value: JSON.stringify(lakes)},
-      {key: 'geodecaves', value: JSON.stringify(geodeCaves)},
-      {key: 'graveyard', value: JSON.stringify(graveyard)},
-      {key: 'ferns', value: JSON.stringify(fernsCaves)},
-      {key: 'moss', value: JSON.stringify(mossCaves)},
-      {key: 'mushrooms', value: JSON.stringify(mushroomCaves)},
-      {key: 'pyramid', value: JSON.stringify(pyramid)},
-      {key: 'ruinedcabin', value: JSON.stringify(ruinedcabin)},
-      {key: 'losttemple', value: JSON.stringify(lostTemple)},
-      {key: 'ancienthouse', value: JSON.stringify(ancientHouse)},
-      {key: 'leftbeach', value: JSON.stringify(leftBeach)},
-      {key: 'rightbeach', value: JSON.stringify(rightBeach)},
-      {key: 'antlions', value: JSON.stringify(antlions)},
-      {key: 'anthills', value: JSON.stringify(anthills)},
-      {key: 'termites', value: JSON.stringify(termites)},
-      {key: 'hearts', value: JSON.stringify(hearts)},
-      {key: 'triskels', value: JSON.stringify(triskels)},
+      {key: 'hives', value: hives},
+      {key: 'cobwebcaves', value: cobwebCaves},
+      {key: 'lakes', value: lakes},
+      {key: 'geodecaves', value: geodeCaves},
+      {key: 'graveyard', value: graveyard},
+      {key: 'ferns', value: fernsCaves},
+      {key: 'moss', value: mossCaves},
+      {key: 'mushrooms', value: mushroomCaves},
+      {key: 'pyramid', value: pyramid},
+      {key: 'ruinedcabin', value: ruinedcabin},
+      {key: 'losttemple', value: lostTemple},
+      {key: 'ancienthouse', value: ancientHouse},
+      {key: 'leftbeach', value: leftBeach},
+      {key: 'rightbeach', value: rightBeach},
+      {key: 'antlions', value: antlions},
+      {key: 'anthills', value: anthills},
+      {key: 'termites', value: termites},
+      {key: 'hearts', value: hearts},
+      {key: 'triskels', value: triskels},
+      {key: 'eternals', value: this.#collectEternalTiles()},
       {key: 'helptopic', value: 'Getting Started'}
     ])
     // sauvegarde des liquid bodies
@@ -562,6 +563,24 @@ class WorldGenerator {
 
     console.error('[generate] #findSpawnPosition : aucune surface valide trouvée')
     return {pxX: 8192, pxY: 1280}
+  }
+
+  #collectEternalTiles () {
+    const eternalCodes = new Set()
+    for (const node of Object.values(NODES)) {
+      if (node.type & NODE_TYPE.ETERNAL) eternalCodes.add(node.code)
+    }
+
+    const eternals = []
+    const data = worldBuffer.world
+    for (let y = 1; y < WORLD_HEIGHT - 1; y++) {
+      const rowBase = y << 10
+      for (let x = 1; x < WORLD_WIDTH - 1; x++) {
+        const tileIndex = rowBase | x
+        if (eternalCodes.has(data[tileIndex])) eternals.push(tileIndex)
+      }
+    }
+    return eternals
   }
 }
 export const worldGenerator = new WorldGenerator()

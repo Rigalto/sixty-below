@@ -273,6 +273,9 @@ class GameCore {
     taskScheduler.init(state.timestamp)
     timeManager.init(state.timestamp, state.weather, state.nextWeather)
 
+    // Tuiles ETERNAL spéciales (gamestate)
+    blockedTiles.init(state.eternals)
+
     // Injection des tuiles
     const mockSavedChunks = await database.readAllFromObjectStore('world_chunks')
     chunkManager.init(mockSavedChunks)
@@ -288,10 +291,10 @@ class GameCore {
 
     seedWidget.init(state.randomkey)
     buffManager.init()
-    // hiveSystem.init(JSON.parse(state.hives)) // TODO
-    // cobwebSystem.init(JSON.parse(state.cobwebcaves)) // TODO
-    // lakeeSystem.init(JSON.parse(state.lakes)) // TODO
-    // geodeSystem.init(JSON.parse(state.geodecaves)) // TODO
+    // hiveSystem.init(state.hives) // TODO
+    // cobwebSystem.init(state.cobwebcaves) // TODO
+    // lakeeSystem.init(state.lakes) // TODO
+    // geodeSystem.init(state.geodecaves) // TODO
 
     // 5. Initialisation des systèmes (Layer 2)
     creationDialogOverlay.init(state.randomkey)
