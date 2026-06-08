@@ -1,7 +1,7 @@
 // inventory.mjs — GameCore - KeyboardManager - MouseManager
 
 import {TIME_BUDGET, MICROTASK_FN_NAME_TO_KEY, STATE, OVERLAYS, MICROTASK} from './constant.mjs'
-import {NODES, NODES_LOOKUP, MAX_FURNITURE_W, MAX_FURNITURE_H, ITEMS, RECIPES, MONSTERS, TREE_IMAGES} from '../../assets/data/data.mjs'
+import {NODES, NODES_LOOKUP, MAX_FURNITURE_W, MAX_FURNITURE_H, ITEM_TYPE, ITEMS, RECIPES, MONSTERS, TREE_IMAGES} from '../../assets/data/data.mjs'
 import {HELP_TITLES, hydrateHelp} from '../../assets/data/data-help.mjs'
 import {loadAssets, resolveAssetData} from './assets.mjs'
 import {timeManager, taskScheduler, microTasker, eventBus, seededRNG, parseLootCount, parseLootBuffs, buildLootHelpRow, blockedTiles} from './utils.mjs'
@@ -19,6 +19,7 @@ import {achievementManager} from './achievement.mjs'
 import {playerManager, hotbarOverlay} from './player.mjs'
 import {floraManager} from './ecosystem.mjs'
 import {ACHIEVEMENT_CATEGORIES} from '../assets/data/data-achievement.mjs'
+import {miningManager} from './action.mjs'
 import './ui-debug.mjs'
 import './combat.mjs'
 
@@ -431,30 +432,6 @@ class GameCore {
     const tileCode = tileIndex !== null ? chunkManager.getTileAt(tileIndex) : null
     const tileNode = tileCode !== null ? NODES_LOOKUP[tileCode] : null
 
-    // DEBUT MOCKUP
-    // if (keyboardManager.directions !== 0) {
-    // console.log('player.move(', keyboardManager.directions, ')')
-    // player.move(keyboardManager.directions)
-    // }
-    // MOCK-UP va-et-vient du player
-    // const speed = 0.3 // Pixels par ms
-
-    // Application du mouvement
-    // this.playerX += speed * this.playerDirection * dt
-
-    // Gestion des bornes et rebond
-    // if (this.playerX >= 9700) {
-    //   this.playerX = 9700
-    //   this.playerDirection = -1 // Demi-tour gauche
-    // } else if (this.playerX <= 6700) {
-    //   this.playerX = 6700
-    //   this.playerDirection = 1 // Demi-tour droite
-    // }
-
-    // Mise à jour Caméra
-    // camera.update(this.playerX, this.playerY)
-    // FIN MOCKUP
-
     // 2.E Affiche des informations concernant la tuile sous la souris
     if (tileIndex !== null && tileIndex !== this.previousTileIndex) {
       this.previousTileIndex = tileIndex
@@ -465,9 +442,7 @@ class GameCore {
 
     // 2.F Gestion du clic gauche la souris
     const leftClick = mouseManager.consumeLeftClick() // "Read-and-Reset"
-    if (leftClick) {
-      //
-    }
+    if (leftClick) this.#processWorldClick(tileIndex, tileNode)
 
     // 2.G Gestion du clic droit la souris
     const rightClick = mouseManager.consumeRightClick() // "Read-and-Reset"
@@ -540,6 +515,29 @@ class GameCore {
     // On mesure le temps passé dans microTasker
     const durationMicro = performance.now() - executionStart - timeUsed
     eventBus.emit('debug/frame-sample', {updateTime: durationUpdate, renderTime: durationRender, microTime: durationMicro})
+  }
+
+  /**
+   * Aiguillage des actions déclenchées par un clic monde.
+   * Appelée depuis la loop uniquement si un clic monde a été consommé.
+   * @param {number} tileIndex — (y << 10) | x
+   * @param {number} tileCode  — code brut de la tuile
+   * @param {object} tileNode  — NODES_LOOKUP[tileCode]
+   */
+  #processWorldClick (tileIndex, tileNode) {
+    const slot = hotbarOverlay.activeSlot
+    if (!slot.item) return
+
+    const item = ITEMS[slot.item]
+
+    if (item.type & ITEM_TYPE.TOOL) {
+      if (item.stype === 'pickaxe') miningManager.tryMine(tileIndex, tileNode, item, slot.prefix)
+      // else if (item.stype === 'hammer') hammerManager.tryUse(tileIndex, tileNode, item, slot.prefix)
+      // else if (item.stype === 'axe') axeManager.tryChop(tileIndex, tileNode, item, slot.prefix)
+    } else {
+      // if (item.stype === 'seed') seedSystem.tryPlant(tileIndex, tileNode, item, slot.prefix)
+      // else if (item.stype === 'furniture') furnitureSystem.tryPlace(tileIndex, tileNode, item, slot.prefix)
+    }
   }
 
   /* =========================================

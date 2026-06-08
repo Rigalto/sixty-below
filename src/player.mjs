@@ -446,6 +446,7 @@ class PlayerManager {
     if (!this.#teleportDiv) this.#teleportDiv = document.getElementById('teleport-overlay')
     this.#teleportDiv.classList.add('fading')
     buffManager.setBuff('playerFreeze', true)
+    eventBus.emit('teleportation-begin')
     const {priority, capacity} = MICROTASK.TELEPORT_PHASE2
     taskScheduler.enqueue('teleport-2', TELEPORT_FADE_MS, this.onTeleportPhase2, priority, capacity)
     console.log('<><><><><> Phase 1')
@@ -470,6 +471,7 @@ class PlayerManager {
   onTeleportPhase3 () {
     this.#teleportDiv.classList.remove('fading')
     buffManager.setBuff('playerFreeze', false)
+    eventBus.emit('player/teleportation-end')
     console.log('<><><><><> Phase 3')
   }
 
