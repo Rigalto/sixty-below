@@ -698,5 +698,8 @@ class HotbarOverlay {
     this.#activeIndex = -1
     this.#applyActiveSlot(0)
   }
+
+  /** @returns {object} slot actif de la hotbar (item peut être '') */
+  get activeSlot () { return inventoryManager.hotbar[this.#activeIndex] }
 }
 export const hotbarOverlay = new HotbarOverlay()
