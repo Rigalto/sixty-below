@@ -135,9 +135,6 @@ class ChunkManager {
     this.#dirtySaveChunks.add(chunkKey)
   }
 
-  // version spécifique lors de la génération du monde
-  setGenTile (x, y, code) { this.#data[(y << 10) | x] = code }
-
   /**
    * Renvoie les tuiles du chunk dont on donne l'index.
    */

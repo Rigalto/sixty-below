@@ -286,11 +286,11 @@ Cette section définit les événements officiels. Tout nouvel événement doit 
 *En prévision*
 | Dir. | Event Name | Payload Structure | Description |
 | :---: | :--- | :--- | :--- |
-| E | `player/teleport` | `{x: number, y: number}` | Téléporte le joueur aux coordonnées tuiles données. |
 | S | `player/move` | `{x: number, y: number}` | Émis quand la tuile sous les pieds du joueur change. Coordonnées en tuiles. |
 | S | `life/add` | `{dmg: number}` | Dégâts de chute. dmg < 0. |
-| S | `player/teleportation-begin` | — | Début de téléportation, avant fading. Le joueur est bloqué, ses actions annulées. |
-| S | `player/teleportation-end` | — | Fin de téléportation, avant fading. Le joueur est débloqué. |
+| E | `player/teleport` | `{x: number, y: number}` | Téléporte le joueur aux coordonnées tuiles données. |
+| S | `player/teleport-begin` | — | Début de téléportation, avant fading. Le joueur est bloqué, ses actions annulées. |
+| S | `player/teleport-end` | — | Fin de téléportation, avant fading. Le joueur est débloqué. |
 
 #### Player Life (`LifeManager`)
 *En prévision*
@@ -391,6 +391,29 @@ Cette section définit les événements officiels. Tout nouvel événement doit 
 | E | `time/daily` | `{ day, weather, nextWeather, moonPhase }` | Émis à minuit (changement de jour). |
 | E | `debug/buff-manager` | _(none)_ | Affiche sur la console le contenu de `#values` et `#fns`. |
 | S | `buff/trinket-changed` | `Set<string>` | Émis par `buffManager` quand un buff trinket change. Payload = buffIds modifiés. |
+
+#### Buffs Widget (`MiningManager`)
+
+| Dir. | Event Name | Payload Structure | Description |
+| :---: | :--- | :--- | :--- |
+| E | `hotbar/slot-active` | `{ index: number, slot: object, prevIndex: number }` | Émis à chaque changement de slot actif, ou de contenu du slot actif. |
+| E | `player/teleport-begin` | — | Début de téléportation, avant fading. Le joueur est bloqué, ses actions annulées. |
+| S | `world/tile-changed` | `{ tileIndex: number, tileOldCode: number, tileNewCode: number }`| Le code de la tuile a été modifié. |
+
+#### Toutes les plantes (`FloraManager`)
+
+| Dir. | Event Name | Payload Structure | Description |
+| :---: | :--- | :--- | :--- |
+| E | `camera/preload-chunks-changed` | `Set<number>` | Émis à chaque changement de `preloadChunks`. |
+
+#### Sunflower (`SunflowerSystem`)
+
+| Dir. | Event Name | Payload Structure | Description |
+| :---: | :--- | :--- | :--- |
+| E | `time/every-hour-X` | `{ day, hour, minute, isDay }` | x : 0-23, émis à chaque passage à l'heure pile. |
+| E | `time/first-loop` | `{ day, hour, minute, tslot, weather, nextWeather, skyColor, moonPhase, isDay }` | Émis une seule fois au démarrage du rendu. |
+
+
 
 #### Debug (`WorldMapDebug`, `RealtimeDebugWidget`, `BuffManager`)
 
@@ -883,7 +906,6 @@ Maître unique de la donnée monde. Le renderer et la persistence **ne font que 
 | `getTile`                 | `(x, y): number`                 | Hot path. Pas de bounds checking (Ghost Cells).                    |
 | `getTilesInRect` | `({x, y, w, h}): Uint8Array` | Codes des tuiles chevauchant le rectangle pixel (même partiellement). Vue sur buffer interne — invalide à l'appel suivant. Requiert `w > 0`, `h > 0`. Maximum 64 tuiles. |
 | `setTile`                 | `(x, y, code): void`             | Écriture avec dirty flags (render + save).                         |
-| `setGenTile`              | `(x, y, code): void`             | Écriture rapide sans dirty flags — **génération uniquement**.      |
 | `getChunkData`            | `(chunkIndex): Uint8Array`       | Retourne une copie des 256 octets du chunk.                        |
 | `getChunkSaveData`        | `(chunkIndex): {key, index, chunk}` | DTO pour la persistence.                                        |
 | `consumeRenderDirtyChunks`| `(): Set<number> \| null`        | Clone + vide la liste render dirty. Appelé par le Renderer.        |

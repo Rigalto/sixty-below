@@ -659,11 +659,10 @@ class HotbarOverlay {
     this.#slots[index].classList.add('active')
     this.#activeIndex = index
 
-    eventBus.emit('hotbar/slot-active', {
-      index,
-      slot: inventoryManager.hotbar[index],
-      prevIndex
-    })
+    const slot = inventoryManager.hotbar[index]
+    if (slot === undefined) return
+
+    eventBus.emit('hotbar/slot-active', {index, slot, prevIndex})
   }
 
   /**

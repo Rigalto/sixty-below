@@ -301,6 +301,8 @@ export const SVG_ICON = (icon, config = '') => `<svg viewBox="0 0 24 24" ${confi
 export const MICROTASK = {
   RENDER_CHUNK_QUEUE: {priority: 30, capacity: 12, taskName: 'processRenderQueue'}, // génère les images des dirty chunks
 
+  MINE_TILE: {priority: 24, capacity: 6, taskName: 'onMineTile'}, // minage d'une tuile
+
   TELEPORT_PHASE1: {priority: 22, capacity: 1, taskName: 'onTeleportPhase1'}, // gère la téléportation
   TELEPORT_PHASE2: {priority: 22, capacity: 5, taskName: 'onTeleportPhase2'}, // gère la téléportation
   TELEPORT_PHASE3: {priority: 22, capacity: 2, taskName: 'onTeleportPhase3'}, // gère la téléportation
