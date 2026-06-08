@@ -117,20 +117,34 @@ class ChunkManager {
     return this.#scratchTiles.subarray(0, n)
   }
 
+  /**
+ * Modifie la tuile aux coordonnées en paramètre. Marque les chunks render et save comme dirty.
+ * @param {number} x
+ * @param {number} y
+ * @param {number} code
+ */
   setTile (x, y, code) {
     // if (x === 0 || x === 1023 || y === 0 || y === 511) return
 
     const index = (y << 10) | x
     if (this.#data[index] === code) return
-
     this.#data[index] = code
+    // Chunk Key alignée sur 64 de large
+    const chunkKey = ((y >> 4) << 6) | (x >> 4)
+    this.#dirtyRenderChunks.add(chunkKey)
+    this.#dirtySaveChunks.add(chunkKey)
+  }
 
-    const cx = x >> 4
-    const cy = y >> 4
-
-    // Chunk Key alignée sur 64 de large (>> 6)
-    const chunkKey = (cy << 6) | cx
-
+  /**
+ * Modifie la tuile à l'index encodé. Marque les chunks render et save comme dirty.
+ * @param {number} index — (y << 10) | x
+ * @param {number} code
+ */
+  setTileAt (index, code) {
+    if (this.#data[index] === code) return
+    this.#data[index] = code
+    // Chunk Key alignée sur 64 de large
+    const chunkKey = ((index >> 14) << 6) | ((index & 0x3FF) >> 4)
     this.#dirtyRenderChunks.add(chunkKey)
     this.#dirtySaveChunks.add(chunkKey)
   }
