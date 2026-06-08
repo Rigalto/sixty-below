@@ -1,10 +1,11 @@
 // action.mjs — miningManager
 
-import {eventBus, taskScheduler, blockedTiles} from './utils.mjs'
+import {eventBus, taskScheduler, blockedTiles, rollLootWithBuffs} from './utils.mjs'
 import {NODE_TYPE, NODES, ITEM_TYPE, ITEMS} from '../assets/data/data.mjs'
+import {inventoryManager} from './inventory.mjs'
 import {buffManager} from './buff.mjs'
 import {chunkManager} from './world.mjs'
-import {MICROTASK} from './constant.mjs'
+import {WORLD_WIDTH, MICROTASK} from './constant.mjs'
 
 /* ====================================================================================================
    HELPERS COMMUNS A TOUS LES MANAGERS
@@ -43,12 +44,9 @@ class MiningManager {
     if (tileNode.type & NODE_TYPE.ETERNAL) return
     // TODO: test range (playerManager.getFeetTile() vs tileIndex, buff 'mining-range')
 
-    // for (const entry of this.#queue) {
-    //   if (entry.tileIndex === tileIndex) return // déjà en file
-    // }
-
     const wasEmpty = this.#queue.length === 0
     this.#queue.push({tileIndex, tileNode, tool, prefix, speed: 2000})
+    // TODO émettre un bruit spécifique à la pioche
 
     if (wasEmpty) {
       // TODO: début animation outil
@@ -58,42 +56,63 @@ class MiningManager {
   }
 
   /**
+ * Planifie le minage de la prochaine tuile en file, ou termine l'animation si la file est vide.
+ */
+  #scheduleNextTile () {
+    if (this.#queue.length > 0) {
+    // TODO: changement de vitesse animation
+      const {priority, capacity} = MICROTASK.MINE_TILE
+      taskScheduler.enqueue('mine-current', this.#queue[0].speed, this.onMineTile, priority, capacity)
+    } else {
+    // TODO: fin animation outil
+    }
+  }
+
+  /**
    * Callback TaskScheduler : exécute le minage de la tuile en tête de file,
    * puis planifie la suivante si la file n'est pas vide.
    */
   onMineTile () {
+    const VOID = NODES.VOID.code
+    const SKY = NODES.SKY.code
     const entry = this.#queue.shift()
     if (entry === undefined) return // file vidée par une interruption entre-temps
 
     // La tuile a pu changer pendant le minage (sable, météorite, monster...)
     if (chunkManager.getTileAt(entry.tileIndex) !== entry.tileNode.code) {
-      if (this.#queue.length > 0) {
-        // TODO: changement de vitesse animation
-        const {priority, capacity} = MICROTASK.MINE_TILE
-        taskScheduler.enqueue('mine-current', this.#queue[0].speed, this.onMineTile, priority, capacity)
-      } else {
-      // TODO: fin animation outil
-      }
+      this.#scheduleNextTile()
       return
     }
 
-    const x = entry.tileIndex & 0x3FF
-    const y = entry.tileIndex >> 10
-
-    const tileNewCode = NODES.VOID.code
-    // TODO: SKY si tuile en surface
-    // TODO : propagation des SKY vers le bas
-    chunkManager.setTile(x, y, tileNewCode)
-    eventBus.emit('world/tile-changed', {tileIndex: entry.tileIndex, tileOldCode: entry.tileNode.code, tileNewCode})
-    // TODO: loot : entry.tileNode.mining.items → inventoryManager.loot
-
-    if (this.#queue.length > 0) {
-      // TODO: changement de vitesse animation
-      const {priority, capacity} = MICROTASK.MINE_TILE
-      taskScheduler.enqueue('mine-current', this.#queue[0].speed, this.onMineTile, priority, capacity)
-    } else {
-      // TODO: fin animation outil
+    const tileAboveCode = chunkManager.getTileAt(entry.tileIndex - WORLD_WIDTH)
+    const tileNewCode = (tileAboveCode === SKY || tileAboveCode === NODES.FOG.code) ? SKY : VOID
+    // descente en remplaçant les VOID par des SKY
+    if (tileNewCode === SKY) {
+      let idx = entry.tileIndex + WORLD_WIDTH
+      while (chunkManager.getTileAt(idx) === VOID) {
+        chunkManager.setTileAt(idx, SKY)
+        eventBus.emit('world/tile-changed', {tileIndex: idx, tileOldCode: VOID, tileNewCode: SKY})
+        idx += WORLD_WIDTH
+      }
     }
+
+    // TODO : propagation des SKY vers le bas
+    chunkManager.setTileAt(entry.tileIndex, tileNewCode)
+    eventBus.emit('world/tile-changed', {tileIndex: entry.tileIndex, tileOldCode: entry.tileNode.code, tileNewCode})
+    // loot
+    if (entry.tileNode.mining) { // TODO supprimer quand tous les node auront un 'mining'
+      const buffValues = buffManager.getBuffs(entry.tileNode.mining.buffList)
+      for (const lootItem of entry.tileNode.mining.items) {
+        const count = rollLootWithBuffs(lootItem, buffValues)
+        if (count > 0) {
+          const itemCode = lootItem.item.code
+          inventoryManager.loot(itemCode, count, '')
+          eventBus.emit('player/loot-item', {itemCode})
+        }
+      }
+    }
+
+    this.#scheduleNextTile()
   }
 
   /**
