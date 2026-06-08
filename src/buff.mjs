@@ -65,11 +65,33 @@ const TIMESLOT_BUFF_KEYS = ['midnight', 'dawn', 'morning', 'noon', 'afternoon', 
 
 class BuffManager {
   #values = new Map() // valeurs brutes : rainy, lucky, armorHelmetMiningSpeed...
-  #fns = new Map() // fonctions pur buffs composés : mining-speed, movement-speed...
+
+  #fns = new Map([ // fonctions pur buffs composés : mining-speed, movement-speed...
+    // 'movement-speed' : vitesse horizontale du joueur, 0 = joueur immobile, 100% = PLAYER.SPEED
+    // ne tient pas compte tuiles environnantes (sous le joueur et sous ses pieds)
+    ['movement-speed', () => {
+      if (this.#values.get('playerFreeze')) return 0
+      return 100
+    }],
+    ['fall-damage', () => {
+      return 100
+    }],
+    ['mining-range', () => {
+      const x = -2
+      const y = -4
+      const w = 6
+      const h = 8
+      return {x, y, w, h}
+    }],
+    ['mining-speed', () => {
+      return 100
+    }]
+  ])
+
   timestamps = new Map() // buffId → expiration (timed uniquement)
 
-  #trinketA = null // buffer A — buffs trinkets courants ou prochains
-  #trinketB = null // buffer B — alterné avec A à chaque mise à jour
+  #trinketA = {} // buffer A — buffs trinkets courants ou prochains
+  #trinketB = {} // buffer B — alterné avec A à chaque mise à jour
   #currentTrinket = null // pointe vers le buffer courant (valeurs en vigueur)
   #nextTrinket = null // pointe vers le buffer en cours de calcul
 
@@ -78,20 +100,7 @@ class BuffManager {
 
   constructor () {
     // Initialisation des buffers trinkets
-    this.#trinketA = {}
-    this.#trinketB = {}
     this.initTrinket()
-    // définition des buffs compsés
-    // 'movement-speed' : vitesse horizontale du joueur, 0 = joueur immobile, 100% = PLAYER.SPEED
-    // ne tient pas compte tuiles environnantes (sous le joueur et sous ses pieds)
-    this.#fns.set('movement-speed', () => {
-      if (this.#values.get('playerFreeze')) return 0
-      return 100
-    })
-    // 'fall-damage' : calcul des dommages de chute, 0 aucun dommage, 100% = PLAYER.FALL_DAMAGE_MULTIPLIER
-    this.#fns.set('fall-damage', () => {
-      return 100
-    })
   }
 
   initTrinket () {

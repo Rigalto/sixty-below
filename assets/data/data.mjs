@@ -47,45 +47,45 @@ export const NODES = {
 
   // ── Topsoil (terrain nourricier, propice aux plantes) ────────────────────────
   DIRT: {code: 40, name: 'Dirt', type: NODE_TYPE.TOPSOIL | NODE_TYPE.SOLID, stype: 'block', star: 1, color: '#db9b63', image: 'substrat_16_16+11', mining: {speed: 1000, items: [{item: 'blockDirt', count: 1}, {item: 'worm', count: 0.15, lucky: 1.2, rainy: 1.7}]}, help: 'Dirt'},
-  SAND: {code: 41, name: 'Sand', type: NODE_TYPE.TOPSOIL | NODE_TYPE.SOLID, stype: 'block', star: 1, color: '#fff198', image: 'substrat_16_16+12', mining: {speed: 500, items: [{item: 'blockSand', count: 1}]}, viscosity: 500, help: 'Sand'},
+  SAND: {code: 41, name: 'Sand', type: NODE_TYPE.TOPSOIL | NODE_TYPE.SOLID, stype: 'block', star: 1, color: '#fff198', image: 'substrat_16_16+12', mining: {speed: 1000, items: [{item: 'blockSand', count: 1}]}, viscosity: 500, help: 'Sand'},
   SILT: {code: 42, name: 'Silt', type: NODE_TYPE.TOPSOIL | NODE_TYPE.SOLID, stype: 'block', star: 2, color: '#73c882', image: 'substrat_16_16+13', mining: {speed: 1000, items: [{item: 'blockSilt', count: 1}]}, help: 'Silt'},
   HUMUS: {code: 43, name: 'Humus', type: NODE_TYPE.TOPSOIL | NODE_TYPE.SOLID, stype: 'block', star: 2, color: '#e2b3ff', image: 'substrat_16_16+14', mining: {speed: 1000, items: [{item: 'blockHumus', count: 1}]}, help: 'Humus'},
 
   // ── Substrat (roche de base, peu propice aux plantes) ────────────────────────
   // Forest
-  CLAY: {code: 50, name: 'Clay', type: NODE_TYPE.SUBSTRAT | NODE_TYPE.SOLID, stype: 'block', star: 1, color: '#e6ddc4', image: 'substrat_16_16+1', mining: {speed: 1000, items: [{item: 'blockClay', count: 1}]}, help: 'Clay'},
-  STONE: {code: 51, name: 'Stone', type: NODE_TYPE.SUBSTRAT | NODE_TYPE.SOLID, stype: 'block', star: 2, color: '#a4b4c1', image: 'substrat_16_16+2', mining: {speed: 1200, items: [{item: 'blockStone', count: 1}]}, help: 'Stone'},
+  CLAY: {code: 50, name: 'Clay', type: NODE_TYPE.SUBSTRAT | NODE_TYPE.SOLID, stype: 'block', star: 1, color: '#e6ddc4', image: 'substrat_16_16+1', mining: {speed: 1200, items: [{item: 'blockClay', count: 1}]}, help: 'Clay'},
+  STONE: {code: 51, name: 'Stone', type: NODE_TYPE.SUBSTRAT | NODE_TYPE.SOLID, stype: 'block', star: 2, color: '#a4b4c1', image: 'substrat_16_16+2', mining: {speed: 1500, items: [{item: 'blockStone', count: 1}]}, help: 'Stone'},
   HARDSTONE: {code: 52, name: 'Hardstone', type: NODE_TYPE.SUBSTRAT | NODE_TYPE.SOLID, stype: 'block', star: 4, color: '#788696', image: 'substrat_16_16+3', mining: {speed: 1800, items: [{item: 'blockHardstone', count: 1}]}, help: 'Hardstone'},
   // Desert
-  SANDSTONE: {code: 53, name: 'Sandstone', type: NODE_TYPE.SUBSTRAT | NODE_TYPE.SOLID, stype: 'block', star: 2, color: '#fee267', image: 'substrat_16_16+4', mining: {speed: 1200, items: [{item: 'blockSandstone', count: 1}]}, help: 'Sandstone'},
-  ASH: {code: 54, name: 'Ash', type: NODE_TYPE.SUBSTRAT | NODE_TYPE.SOLID, stype: 'block', star: 3, color: '#e0acad', image: 'substrat_16_16+5', speed: 1400, mining: {speed: 1400, items: [{item: 'blockAsh', count: 1}]}, help: 'Ash'},
+  SANDSTONE: {code: 53, name: 'Sandstone', type: NODE_TYPE.SUBSTRAT | NODE_TYPE.SOLID, stype: 'block', star: 2, color: '#fee267', image: 'substrat_16_16+4', mining: {speed: 1400, items: [{item: 'blockSandstone', count: 1}]}, help: 'Sandstone'},
+  ASH: {code: 54, name: 'Ash', type: NODE_TYPE.SUBSTRAT | NODE_TYPE.SOLID, stype: 'block', star: 3, color: '#e0acad', image: 'substrat_16_16+5', speed: 1800, mining: {speed: 1400, items: [{item: 'blockAsh', count: 1}]}, help: 'Ash'},
   HELLSTONE: {code: 55, name: 'Hellstone', type: NODE_TYPE.SUBSTRAT | NODE_TYPE.SOLID, stype: 'block', star: 5, color: '#df6e78', image: 'substrat_16_16+6', mining: {speed: 2200, items: [{item: 'blockHellstone', count: 1}]}, help: 'Hellstone'},
   // Jungle
   MUD: {code: 56, name: 'Mud', type: NODE_TYPE.SUBSTRAT | NODE_TYPE.SOLID, stype: 'block', star: 2, color: '#c1c186', image: 'substrat_16_16+7', mining: {speed: 1000, items: [{item: 'blockMud', count: 1}]}, help: 'Mud'},
-  LIMESTONE: {code: 57, name: 'Limestone', type: NODE_TYPE.SUBSTRAT | NODE_TYPE.SOLID, stype: 'block', star: 4, color: '#dfff9e', image: 'substrat_16_16+8', mining: {speed: 1400, items: [{item: 'blockLimestone', count: 1}]}, help: 'Limestone'},
-  SLATE: {code: 58, name: 'Slate', type: NODE_TYPE.SUBSTRAT | NODE_TYPE.SOLID, stype: 'block', star: 5, color: '#2797ea', image: 'substrat_16_16+9', mining: {speed: 1600, items: [{item: 'blockSlate', count: 1}]}, help: 'Slate'},
+  LIMESTONE: {code: 57, name: 'Limestone', type: NODE_TYPE.SUBSTRAT | NODE_TYPE.SOLID, stype: 'block', star: 4, color: '#dfff9e', image: 'substrat_16_16+8', mining: {speed: 1500, items: [{item: 'blockLimestone', count: 1}]}, help: 'Limestone'},
+  SLATE: {code: 58, name: 'Slate', type: NODE_TYPE.SUBSTRAT | NODE_TYPE.SOLID, stype: 'block', star: 5, color: '#2797ea', image: 'substrat_16_16+9', mining: {speed: 2000, items: [{item: 'blockSlate', count: 1}]}, help: 'Slate'},
 
   // ── Ore (gisement de minerais) ────────────────────────
-  COPPER: {code: 70, name: 'Copper Ore', type: NODE_TYPE.ORE | NODE_TYPE.SOLID, star: 1, color: '#fe602f', image: 'mineral_16_16+1', speed: 1000, mining: {speed: 1000, items: [{item: 'chunkCopper', count: 1}]}, help: 'Metals'},
-  IRON: {code: 71, name: 'Iron Ore', type: NODE_TYPE.ORE | NODE_TYPE.SOLID, star: 2, color: '#db9b63', image: 'mineral_16_16+2', speed: 1100, mining: {speed: 1100, items: [{item: 'chunkIron', count: 1}]}, help: 'Metals'},
-  SILVER: {code: 72, name: 'Silver Ore', type: NODE_TYPE.ORE | NODE_TYPE.SOLID, star: 3, color: '#788696', image: 'mineral_16_16+3', mining: {speed: 1200, items: [{item: 'chunkSilver', count: 1}]}, help: 'Metals'},
-  GOLD: {code: 73, name: 'Gold Ore', type: NODE_TYPE.ORE | NODE_TYPE.SOLID, star: 3, color: '#ffaa33', image: 'mineral_16_16+4', mining: {speed: 1400, items: [{item: 'chunkGold', count: 1}]}, help: 'Metals'},
-  COBALT: {code: 74, name: 'Cobalt Ore', type: NODE_TYPE.ORE | NODE_TYPE.SOLID, star: 4, color: '#2797ea', image: 'mineral_16_16+5', mining: {speed: 1600, items: [{item: 'chunkCobalt', count: 1}]}, help: 'Metals'},
-  PLATINUM: {code: 75, name: 'Platinum Ore', type: NODE_TYPE.ORE | NODE_TYPE.SOLID, star: 5, color: '#25874d', image: 'mineral_16_16+6', mining: {speed: 1800, items: [{item: 'chunkPlatinum', count: 1}]}, help: 'Metals'},
+  COPPER: {code: 70, name: 'Copper Ore', type: NODE_TYPE.ORE | NODE_TYPE.SOLID, star: 1, color: '#fe602f', image: 'mineral_16_16+1', speed: 1000, mining: {speed: 2500, items: [{item: 'chunkCopper', count: 1}]}, help: 'Metals'},
+  IRON: {code: 71, name: 'Iron Ore', type: NODE_TYPE.ORE | NODE_TYPE.SOLID, star: 2, color: '#db9b63', image: 'mineral_16_16+2', speed: 1100, mining: {speed: 2700, items: [{item: 'chunkIron', count: 1}]}, help: 'Metals'},
+  SILVER: {code: 72, name: 'Silver Ore', type: NODE_TYPE.ORE | NODE_TYPE.SOLID, star: 3, color: '#788696', image: 'mineral_16_16+3', mining: {speed: 3000, items: [{item: 'chunkSilver', count: 1}]}, help: 'Metals'},
+  GOLD: {code: 73, name: 'Gold Ore', type: NODE_TYPE.ORE | NODE_TYPE.SOLID, star: 3, color: '#ffaa33', image: 'mineral_16_16+4', mining: {speed: 3400, items: [{item: 'chunkGold', count: 1}]}, help: 'Metals'},
+  COBALT: {code: 74, name: 'Cobalt Ore', type: NODE_TYPE.ORE | NODE_TYPE.SOLID, star: 4, color: '#2797ea', image: 'mineral_16_16+5', mining: {speed: 3800, items: [{item: 'chunkCobalt', count: 1}]}, help: 'Metals'},
+  PLATINUM: {code: 75, name: 'Platinum Ore', type: NODE_TYPE.ORE | NODE_TYPE.SOLID, star: 5, color: '#25874d', image: 'mineral_16_16+6', mining: {speed: 4200, items: [{item: 'chunkPlatinum', count: 1}]}, help: 'Metals'},
 
   // ── Gem (gisement de pierres précieuses) ────────────────────────
-  TOPAZ: {code: 80, name: 'Topaz Deposit', type: NODE_TYPE.GEM | NODE_TYPE.SOLID, star: 2, color: '#788696', image: 'mineral_16_16+7', mining: {speed: 900, keep: 'HARDSTONE', items: [{item: 'rawTopaz', count: 1}]}, help: 'Gems'},
-  RUBY: {code: 81, name: 'Ruby Deposit', type: NODE_TYPE.GEM | NODE_TYPE.SOLID, star: 3, color: '#788696', image: 'mineral_16_16+8', mining: {speed: 900, keep: 'HELLSTONE', items: [{item: 'rawRuby', count: 1}]}, help: 'Gems'},
-  EMERALD: {code: 82, name: 'Emerald Deposit', type: NODE_TYPE.GEM | NODE_TYPE.SOLID, star: 4, color: '#788696', image: 'mineral_16_16+9', mining: {speed: 900, keep: 'SLATE', items: [{item: 'rawEmerald', count: 1}]}, help: 'Gems'},
-  SAPPHIRE: {code: 83, name: 'Sapphire Deposit', type: NODE_TYPE.GEM | NODE_TYPE.SOLID, star: 5, color: '#788696', image: 'mineral_16_16+10', mining: {speed: 1100, items: [{item: 'rawSapphire', count: 1}]}, help: 'Gems'},
+  TOPAZ: {code: 80, name: 'Topaz Deposit', type: NODE_TYPE.GEM | NODE_TYPE.SOLID, star: 2, color: '#788696', image: 'mineral_16_16+7', mining: {speed: 2200, keep: 'HARDSTONE', items: [{item: 'rawTopaz', count: 1}]}, help: 'Gems'},
+  RUBY: {code: 81, name: 'Ruby Deposit', type: NODE_TYPE.GEM | NODE_TYPE.SOLID, star: 3, color: '#788696', image: 'mineral_16_16+8', mining: {speed: 2400, keep: 'HELLSTONE', items: [{item: 'rawRuby', count: 1}]}, help: 'Gems'},
+  EMERALD: {code: 82, name: 'Emerald Deposit', type: NODE_TYPE.GEM | NODE_TYPE.SOLID, star: 4, color: '#788696', image: 'mineral_16_16+9', mining: {speed: 2600, keep: 'SLATE', items: [{item: 'rawEmerald', count: 1}]}, help: 'Gems'},
+  SAPPHIRE: {code: 83, name: 'Sapphire Deposit', type: NODE_TYPE.GEM | NODE_TYPE.SOLID, star: 5, color: '#788696', image: 'mineral_16_16+10', mining: {speed: 3200, items: [{item: 'rawSapphire', count: 1}]}, help: 'Gems'},
 
   // ── Rock (gisement de pierres précieuses) ────────────────────────
 
-  GRANITE: {code: 90, name: 'Granite', type: NODE_TYPE.ROCK | NODE_TYPE.SOLID, star: 4, color: '#33ccff', image: 'mineral_16_16+11', mining: {speed: 1500, items: [{item: 'blockGranite', count: 1}]}, help: 'Geode Stones'},
-  MARBLE: {code: 91, name: 'Marble', type: NODE_TYPE.ROCK | NODE_TYPE.SOLID, star: 4, color: '#e6ddc4', image: 'mineral_16_16+12', mining: {speed: 1500, items: [{item: 'blockMarble', count: 1}]}, help: 'Geode Stones'},
-  HIVE: {code: 94, name: 'Hive', type: NODE_TYPE.ROCK | NODE_TYPE.SOLID, stype: 'block', star: 3, color: '#ffaa33', image: 'mineral_16_16+13', mining: {speed: 1200, items: [{item: 'blockHive', count: 1}]}, help: 'Hive'},
-  OBSIDIAN: {code: 92, name: 'Obsidian', type: NODE_TYPE.ROCK | NODE_TYPE.SOLID, star: 5, color: '#4ea666', image: 'mineral_16_16+14', mining: {speed: 2000, items: [{item: 'blockObsidian', count: 1}]}, help: 'Obsidian'},
-  METEORITE: {code: 93, name: 'Meteorite', type: NODE_TYPE.ROCK | NODE_TYPE.SOLID, stype: 'block', star: 5, color: '#7d6f5f', image: 'mineral_16_16+15', mining: {speed: 2000, items: [{item: 'blockMeteorite', count: 1}]}, help: 'Meteorite'}, // SURFACE
+  GRANITE: {code: 90, name: 'Granite', type: NODE_TYPE.ROCK | NODE_TYPE.SOLID, star: 4, color: '#33ccff', image: 'mineral_16_16+11', mining: {speed: 4000, items: [{item: 'blockGranite', count: 1}]}, help: 'Geode Stones'},
+  MARBLE: {code: 91, name: 'Marble', type: NODE_TYPE.ROCK | NODE_TYPE.SOLID, star: 4, color: '#e6ddc4', image: 'mineral_16_16+12', mining: {speed: 4200, items: [{item: 'blockMarble', count: 1}]}, help: 'Geode Stones'},
+  HIVE: {code: 94, name: 'Hive', type: NODE_TYPE.ROCK | NODE_TYPE.SOLID, stype: 'block', star: 3, color: '#ffaa33', image: 'mineral_16_16+13', mining: {speed: 1800, items: [{item: 'blockHive', count: 1}]}, help: 'Hive'},
+  OBSIDIAN: {code: 92, name: 'Obsidian', type: NODE_TYPE.ROCK | NODE_TYPE.SOLID, star: 5, color: '#4ea666', image: 'mineral_16_16+14', mining: {speed: 6000, items: [{item: 'blockObsidian', count: 1}]}, help: 'Obsidian'},
+  METEORITE: {code: 93, name: 'Meteorite', type: NODE_TYPE.ROCK | NODE_TYPE.SOLID, stype: 'block', star: 5, color: '#7d6f5f', image: 'mineral_16_16+15', mining: {speed: 6500, items: [{item: 'blockMeteorite', count: 1}]}, help: 'Meteorite'}, // SURFACE
   SHELL: {code: 95, name: 'Shell', type: NODE_TYPE.ROCK | NODE_TYPE.SOLID, stype: 'block', star: 3, color: '#fee267', image: 'substrat_16_16+15', mining: {speed: 1800, keep: 'SANDSTONE', items: [{item: 'blockShell', count: 4}]}, help: 'Shell'},
 
   // ── HOUSING (murs des maisons) ────────────────────────

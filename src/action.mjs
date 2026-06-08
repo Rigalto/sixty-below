@@ -39,19 +39,33 @@ class MiningManager {
     console.log('MiningManager.tryMine', {tileIndex, tileNode, tool, prefix})
     if (tool.star < tileNode.star) return
     if (!(tileNode.type & NODE_TYPE.SOLID)) return
-    if (!blockedTiles.canMine(tileIndex)) return
+    if ((tileNode.type & NODE_TYPE.WALL)) return // Hammer
+    if (!blockedTiles.canMine(tileIndex)) return // includes ETERNAL
     if (buffManager.getBuff('player-freeze')) return
     // TODO: test range (playerManager.getFeetTile() vs tileIndex, buff 'mining-range')
 
+    const speed = this.#computeMineSpeed(tileNode, tool)
+
     const wasEmpty = this.#queue.length === 0
-    this.#queue.push({tileIndex, tileNode, tool, prefix, speed: 2000})
+    this.#queue.push({tileIndex, tileNode, tool, prefix, speed})
     // TODO émettre un bruit spécifique à la pioche
 
     if (wasEmpty) {
       // TODO: début animation outil
       const {priority, capacity} = MICROTASK.MINE_TILE
-      taskScheduler.enqueue('mine-current', 2000, this.onMineTile, priority, capacity)
+      taskScheduler.enqueue('mine-current', speed, this.onMineTile, priority, capacity)
     }
+  }
+
+  /**
+   * Calcule le délai de minage en ms pour une tuile et un outil donnés.
+   * @param {object} tileNode — NODES_LOOKUP[tileCode]
+   * @param {object} tool     — ITEMS[slot.item]
+   * @returns {number} délai en ms
+   */
+  #computeMineSpeed (tileNode, tool) {
+    const coefficient = 100 + tool.mining.speed + buffManager.getBuff('mining-speed')
+    return Math.round((coefficient / 100) * tileNode.mining.speed)
   }
 
   /**
