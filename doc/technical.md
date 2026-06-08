@@ -399,6 +399,7 @@ Cette section définit les événements officiels. Tout nouvel événement doit 
 | E | `hotbar/slot-active` | `{ index: number, slot: object, prevIndex: number }` | Émis à chaque changement de slot actif, ou de contenu du slot actif. |
 | E | `player/teleport-begin` | — | Début de téléportation, avant fading. Le joueur est bloqué, ses actions annulées. |
 | S | `world/tile-changed` | `{ tileIndex: number, tileOldCode: number, tileNewCode: number }`| Le code de la tuile a été modifié. |
+| S | `player/loot-item` | `{itemCode: string}` | Émis pour chaque item looté. |
 
 #### Toutes les plantes (`FloraManager`)
 
