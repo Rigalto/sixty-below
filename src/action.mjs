@@ -44,7 +44,6 @@ class MiningManager {
     if (!blockedTiles.canMine(tileIndex)) return // includes ETERNAL
     if (!this.#isInMiningRange(tileIndex)) return
     if (buffManager.getBuff('player-freeze')) return
-    // TODO: test range (playerManager.getFeetTile() vs tileIndex, buff 'mining-range')
 
     const speed = this.#computeMineSpeed(tileNode, tool)
 
@@ -93,9 +92,10 @@ class MiningManager {
  */
   #scheduleNextTile () {
     if (this.#queue.length > 0) {
-    // TODO: changement de vitesse animation
+      const speed = this.#queue[0].speed
+      // TODO: changement de vitesse animation (speed)
       const {priority, capacity} = MICROTASK.MINE_TILE
-      taskScheduler.enqueue('mine-current', this.#queue[0].speed, this.onMineTile, priority, capacity)
+      taskScheduler.enqueue('mine-current', speed, this.onMineTile, priority, capacity)
     } else {
     // TODO: fin animation outil
     }
@@ -129,19 +129,17 @@ class MiningManager {
       }
     }
 
-    // TODO : propagation des SKY vers le bas
+    // Propagation des SKY vers le bas.
     chunkManager.setTileAt(entry.tileIndex, tileNewCode)
     eventBus.emit('world/tile-changed', {tileIndex: entry.tileIndex, tileOldCode: entry.tileNode.code, tileNewCode})
     // loot
-    if (entry.tileNode.mining) { // TODO supprimer quand tous les node auront un 'mining'
-      const buffValues = buffManager.getBuffs(entry.tileNode.mining.buffList)
-      for (const lootItem of entry.tileNode.mining.items) {
-        const count = rollLootWithBuffs(lootItem, buffValues)
-        if (count > 0) {
-          const itemCode = lootItem.item.code
-          inventoryManager.loot(itemCode, count, '')
-          eventBus.emit('player/loot-item', {itemCode})
-        }
+    const buffValues = buffManager.getBuffs(entry.tileNode.mining.buffList)
+    for (const lootItem of entry.tileNode.mining.items) {
+      const count = rollLootWithBuffs(lootItem, buffValues)
+      if (count > 0) {
+        const itemCode = lootItem.item.code
+        inventoryManager.loot(itemCode, count, '')
+        eventBus.emit('player/loot-item', {itemCode})
       }
     }
 
