@@ -176,6 +176,10 @@ class BuffManager {
     for (const [key, value] of this.#values) {
       output += `  ${key}: ${value}\n`
     }
+    output += '--- BuffManager - Trinkets ---\n'
+    for (const [key, value] of Object.entries(this.#currentTrinket)) {
+      output += `  ${key}: ${value}\n`
+    }
     output += '--- BuffManager - Functions ---\n'
     for (const [key] of this.#fns) {
       output += `  ${key}: ${this.#fns.get(key)()}\n`
