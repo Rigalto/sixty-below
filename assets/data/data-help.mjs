@@ -2368,6 +2368,7 @@ Managed trough the [[item:noticeBoard]].
 * [[Cabinets]]
 * [[Chairs]]
 * [[Chests]]
+* [[Clay Pots]]
 * [[Clocks]]
 * [[Closets]]
 * [[Crafting Stations]]
@@ -2438,10 +2439,16 @@ Unlike [[Accessories]], Trinkets do not need to be placed in a dedicated slot �
 | [[item:chronometer]] | {{item:chronometer:star|star}} | Display your position and your [[Movement Buffs|Movement Speed Bonus]] |
 | [[item:astrarium]] | {{item:astrarium:star|star}} | Display [[Weather]] forecast, your position and your [[Movement Buffs|Movement Speed Bonus]]. Also improve [[Day & Night Cycle|Time]] and [[Moon Phases]] accuracy |
 
-Grid and Range Display:
+Surveyor's Tools:
 
-To be defined. ⏳
+_When carrying any of these trinkets in your [[Inventory]], hold [R] to show grids and ranges._
 
+| Trinket | Tier | Effect |
+|---|---|---|
+| [[item:setSquare]] | {{item:setSquare:star|star}} | Displays a red rectangle showing [[Interaction Range]] |
+| [[item:slidingBevel]] | {{item:slidingBevel:star|star}} | Displays an orange rectangle showing the active [[Tool Ranges|Tool Range]] |
+| [[item:draftingCompass]] | {{item:draftingCompass:star|star}} | Display a tile Grid |
+| [[item:theodolite]] | {{item:theodolite:star|star}} | Displays all three — tile grid, [[Interaction Range]] and active [[Tool Ranges|Tool Range]] |
     `
   },
   {
@@ -2756,6 +2763,87 @@ All stations and materials required from scratch are listed below
 * [[Trinkets]] — full list of trinkets and their effects
   `
   },
+  {
+    title: 'Surveyor\'s Tools',
+    category: ['Trinket'],
+    content: `
+**Description**
+
+Surveyor's Tools are [[Trinkets]] that overlay spatial information on the world when [R] is held. They help you visualise your reach and the tile structure around you.
+
+| Trinket | Tier | Overlay |
+|---|---|---|
+| [[item:setSquare]] | {{item:setSquare:star|star}} | [[Interaction Range]] |
+| [[item:slidingBevel]] | {{item:slidingBevel:star|star}} | Active [[Tool Ranges| Tool Range]] |
+| [[item:draftingCompass]] | {{item:draftingCompass:star|star}} | Tile grid |
+| [[item:theodolite]] | {{item:theodolite:star|star}} | All three |
+
+The [[item:theodolite]] provides all three overlays in a single [[Inventory]] slot.
+
+<hr>
+
+**Set Square — Interaction Range**
+
+The [[item:setSquare]] draws a red rectangle showing your [[Interaction Range]]: the area within which you can open [[Chests]], access [[Crafting Stations]], and interact with [[Furnitures]].
+
+_The range can be extended by certain accessories or armors — the overlay updates in real time._
+
+<hr>
+
+**Sliding Bevel — Tool Range**
+
+The [[item:slidingBevel]] draws the action range of the tool currently selected in your [[Hotbar]]. The orange rectangle is directional — it follows the way you face and updates as you switch tools.
+
+* Only visible when an active tool slot is selected.
+* The range can be extended by certain accessories or armors.
+
+<hr>
+
+**Drafting Compass — Tile Grid**
+
+The [[item:draftingCompass]] overlays two grids on the world:
+
+* _Fine black grid_ — one line per tile.
+* _Large yellow grid_ — one line per 16 tiles.
+
+<hr>
+
+**Crafting**
+
+| Trinket | Tier | Station | Materials |
+|---|---|---|---|
+<<fullRecipeRow|setSquare>>
+<<fullRecipeRow|slidingBevel>>
+<<fullRecipeRow|draftingCompass>>
+<<fullRecipeRow|theodolite>>
+
+**See also**
+
+* [[Trinkets]] — full list of trinkets and their effects
+* [[Interaction Range]] — how interaction reach works and how to extend it
+* [[Tool Ranges]] — how tools reach works and how to extend it
+`
+  },
+
+  // ── Ranges ───────────────────────────────────────────────
+  {
+    title: 'Interaction Range',
+    category: ['Gameplay'],
+    content: `
+**Display**
+
+When a [[item:setSquare]] or a [[item:theodolite]] is present in your [[Inventory]], you can press [R] key to display a red rectangle around the interaction Range.
+    `
+  },
+  {
+    title: 'Tool Ranges',
+    category: ['Gameplay', 'Tool'],
+    content: `
+**Display**
+
+When a [[item:slidingBevel]] or a [[item:theodolite]] is present in your [[Inventory]], you can press [R] key to display an orange rectangle around the acctive Tool Range.
+    `
+  },
 
   // ── Activities ───────────────────────────────────────────────
   {
@@ -3056,7 +3144,7 @@ Prefixes enhance weapons, armors and tools, adding special properties beyond the
 | Farshot | +PO (Range) | Mobility |
 | Keen | +ATQ (Attack) | Offensive |
 | Sturdy | +DEF (Defense) | Defensive |
-| Extended | +Tool Range | Utility |
+| Extended | +[[Tool Ranges]] | Utility |
 | Blazing | Inflicts [[Fire DOT]] on hit | DOT |
 | Venomous | Inflicts [[Poison DOT]] on hit | DOT |
 | Serrated | Inflicts [[Bleeding DOT]] on hit | DOT |
