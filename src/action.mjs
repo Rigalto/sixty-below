@@ -42,7 +42,7 @@ class MiningManager {
     if (!(tileNode.type & NODE_TYPE.SOLID) && !(tileNode.type & NODE_TYPE.WEB)) return
     if ((tileNode.type & NODE_TYPE.WALL)) return // Hammer
     if (!blockedTiles.canMine(tileIndex)) return // includes ETERNAL
-    if (!this.#isInMiningRange(tileIndex)) return
+    if (!this.#isInMiningRange(tileIndex, tool)) return
     if (buffManager.getBuff('player-freeze')) return
 
     const speed = this.#computeMineSpeed(tileNode, tool)
@@ -74,17 +74,20 @@ class MiningManager {
  * @param {number} tileIndex — (y << 10) | x
  * @returns {boolean}
  */
-  #isInMiningRange (tileIndex) {
+  #isInMiningRange (tileIndex, tool) {
     const {x: cx, y: cy, direction} = playerManager.getCenterTile()
     const rect = buffManager.getBuff('mining-range')
+    const range = tool.range
+    const ex = rect.x - range
+    const ey = rect.y - range
+    const ew = rect.w + 2 * range
+    const eh = rect.h + 2 * range
     const tileX = tileIndex & 0x3FF
     const tileY = tileIndex >> 10
-    const worldRectY = cy + rect.y
-    const worldRectX = direction === 0
-      ? cx - rect.x - rect.w // miroir : ancien bord droit → nouveau bord gauche
-      : cx + rect.x
-    return tileX >= worldRectX && tileX < worldRectX + rect.w &&
-       tileY >= worldRectY && tileY < worldRectY + rect.h
+    const worldRectY = cy + ey
+    const worldRectX = direction === 0 ? cx - ex - ew + 1 : cx + ex
+    return tileX >= worldRectX && tileX < worldRectX + ew &&
+         tileY >= worldRectY && tileY < worldRectY + eh
   }
 
   /**
