@@ -251,20 +251,20 @@ export const ITEMS = {
   frog: {name: 'Frog', type: ITEM_TYPE.BAIT | ITEM_TYPE.MATERIAL, star: 1, stype: 'bait', image: 'blocks_16_16-0-0', help: 'Fishing Baits', tooltip: '???'},
 
   // pickaxes
-  pickaxeCopper: {name: 'Copper Pickaxe', type: ITEM_TYPE.TOOL, stype: 'pickaxe', star: 2, image: 'tools_32_32-4-0', placedright: 'w_42_42-0-0', placedleft: 'w_42_42-0-1', help: 'Mining Tools', tooltip: 'Tools used to remove blocks, converting them to item form', mining: {speed: 0, range: 0, tiles: 1}},
-  pickaxeIron: {name: 'Iron Pickaxe', type: ITEM_TYPE.TOOL, stype: 'pickaxe', star: 3, image: 'tools_32_32-4-0', placedright: 'w_42_42-0-0', placedleft: 'w_42_42-0-1', help: 'Mining Tools', tooltip: 'Tools used to remove blocks, converting them to item form', mining: {speed: 25, range: 0, tiles: 1}},
-  pickaxeSilver: {name: 'Silver Pickaxe', type: ITEM_TYPE.TOOL, stype: 'pickaxe', star: 4, image: 'tools_32_32-4-0', placedright: 'w_42_42-0-0', placedleft: 'w_42_42-0-1', help: 'Mining Tools', tooltip: 'Tools used to remove blocks, converting them to item form', mining: {speed: 50, range: 0, tiles: 1}},
-  pickaxeGold: {name: 'Gold Pickaxe', type: ITEM_TYPE.TOOL, stype: 'pickaxe', star: 4, image: 'tools_32_32-4-0', placedright: 'w_42_42-0-0', placedleft: 'w_42_42-0-1', help: 'Mining Tools', tooltip: 'Tools used to remove blocks, converting them to item form', mining: {speed: 75, range: 1, tiles: 1}},
-  pickaxeCobalt: {name: 'Cobalt Pickaxe', type: ITEM_TYPE.TOOL, stype: 'pickaxe', star: 5, image: 'tools_32_32-4-0', placedright: 'w_42_42-0-0', placedleft: 'w_42_42-0-1', help: 'Mining Tools', tooltip: 'Tools used to remove blocks, converting them to item form', mining: {speed: 100, range: 2, tiles: 1}},
-  pickaxePlatinum: {name: 'Platinum Pickaxe', type: ITEM_TYPE.TOOL, stype: 'pickaxe', star: 5, image: 'tools_32_32-4-0', placedright: 'w_42_42-0-0', placedleft: 'w_42_42-0-1', help: 'Mining Tools', tooltip: 'Tools used to remove blocks, converting them to item form', mining: {speed: 125, range: 3, tiles: 1}},
-  pickaxeBone: {name: 'Bone Pickaxe', type: ITEM_TYPE.TOOL, stype: 'pickaxe', star: 4, image: 'tools_32_32-4-0', placedright: 'w_42_42-0-0', placedleft: 'w_42_42-0-1', help: 'Mining Tools', tooltip: 'Tools used to remove blocks, converting them to item form', mining: {speed: 175, range: 1, tiles: 1}},
-  pickaxeProspector: {name: 'Prospector\'s Pickaxe', type: ITEM_TYPE.TOOL, stype: 'pickaxe', star: 5, image: 'tools_32_32-4-0', placedright: 'w_42_42-0-0', placedleft: 'w_42_42-0-1', help: 'Mining Tools', tooltip: 'Tools used to remove multiple blocks, converting them to item form', mining: {speed: 75, range: 0, tiles: 5}},
-  pickaxeGeologist: {name: 'Geologist\'s Pickaxe', type: ITEM_TYPE.TOOL, stype: 'pickaxe', star: 5, image: 'tools_32_32-4-0', placedright: 'w_42_42-0-0', placedleft: 'w_42_42-0-1', help: 'Mining Tools', tooltip: 'Tools used to remove multiple blocks, converting them to item form', mining: {speed: 100, range: 2, tiles: 7}},
+  pickaxeCopper: {name: 'Copper Pickaxe', type: ITEM_TYPE.TOOL, stype: 'pickaxe', star: 2, image: 'tools_32_32-4-0', placedright: 'w_42_42-0-0', placedleft: 'w_42_42-0-1', help: 'Mining Tools', tooltip: 'Tools used to remove blocks, converting them to item form', range: 0, mining: {speed: 0, tiles: 1}},
+  pickaxeIron: {name: 'Iron Pickaxe', type: ITEM_TYPE.TOOL, stype: 'pickaxe', star: 3, image: 'tools_32_32-4-0', placedright: 'w_42_42-0-0', placedleft: 'w_42_42-0-1', help: 'Mining Tools', tooltip: 'Tools used to remove blocks, converting them to item form', range: 0, mining: {speed: 25, tiles: 1}},
+  pickaxeSilver: {name: 'Silver Pickaxe', type: ITEM_TYPE.TOOL, stype: 'pickaxe', star: 4, image: 'tools_32_32-4-0', placedright: 'w_42_42-0-0', placedleft: 'w_42_42-0-1', help: 'Mining Tools', tooltip: 'Tools used to remove blocks, converting them to item form', range: 0, mining: {speed: 50, tiles: 1}},
+  pickaxeGold: {name: 'Gold Pickaxe', type: ITEM_TYPE.TOOL, stype: 'pickaxe', star: 4, image: 'tools_32_32-4-0', placedright: 'w_42_42-0-0', placedleft: 'w_42_42-0-1', help: 'Mining Tools', tooltip: 'Tools used to remove blocks, converting them to item form', range: 1, mining: {speed: 75, tiles: 1}},
+  pickaxeCobalt: {name: 'Cobalt Pickaxe', type: ITEM_TYPE.TOOL, stype: 'pickaxe', star: 5, image: 'tools_32_32-4-0', placedright: 'w_42_42-0-0', placedleft: 'w_42_42-0-1', help: 'Mining Tools', tooltip: 'Tools used to remove blocks, converting them to item form', range: 2, mining: {speed: 100, tiles: 1}},
+  pickaxePlatinum: {name: 'Platinum Pickaxe', type: ITEM_TYPE.TOOL, stype: 'pickaxe', star: 5, image: 'tools_32_32-4-0', placedright: 'w_42_42-0-0', placedleft: 'w_42_42-0-1', help: 'Mining Tools', tooltip: 'Tools used to remove blocks, converting them to item form', range: 3, mining: {speed: 125, tiles: 1}},
+  pickaxeBone: {name: 'Bone Pickaxe', type: ITEM_TYPE.TOOL, stype: 'pickaxe', star: 4, image: 'tools_32_32-4-0', placedright: 'w_42_42-0-0', placedleft: 'w_42_42-0-1', help: 'Mining Tools', tooltip: 'Tools used to remove blocks, converting them to item form', range: 1, mining: {speed: 175, tiles: 1}},
+  pickaxeProspector: {name: 'Prospector\'s Pickaxe', type: ITEM_TYPE.TOOL, stype: 'pickaxe', star: 5, image: 'tools_32_32-4-0', placedright: 'w_42_42-0-0', placedleft: 'w_42_42-0-1', help: 'Mining Tools', tooltip: 'Tools used to remove multiple blocks, converting them to item form', range: 0, mining: {speed: 75, tiles: 5}},
+  pickaxeGeologist: {name: 'Geologist\'s Pickaxe', type: ITEM_TYPE.TOOL, stype: 'pickaxe', star: 5, image: 'tools_32_32-4-0', placedright: 'w_42_42-0-0', placedleft: 'w_42_42-0-1', help: 'Mining Tools', tooltip: 'Tools used to remove multiple blocks, converting them to item form', range: 2, mining: {speed: 100, tiles: 7}},
 
   // Sickles
-  sickleCopper: {name: 'Copper Sickle', type: ITEM_TYPE.TOOL | ITEM_TYPE.MATERIAL | ITEM_TYPE.CRAFTABLE, stype: 'pickaxe', star: 1, image: 'tools_32_32-4-0', placedright: 'w_42_42-0-0', placedleft: 'w_42_42-0-1', help: 'Harvesting Tools', tooltip: 'Tools used to harvest plants'},
-  sickleSilver: {name: 'Silver Sickle', type: ITEM_TYPE.TOOL | ITEM_TYPE.MATERIAL | ITEM_TYPE.CRAFTABLE, stype: 'pickaxe', star: 3, image: 'tools_32_32-4-0', placedright: 'w_42_42-0-0', placedleft: 'w_42_42-0-1', speed: 0, help: 'Harvesting Tools', tooltip: 'Tools used to harvest plants'},
-  sickleGold: {name: 'Gold Sickle', type: ITEM_TYPE.TOOL | ITEM_TYPE.CRAFTABLE, stype: 'pickaxe', star: 5, image: 'tools_32_32-4-0', placedright: 'w_42_42-0-0', placedleft: 'w_42_42-0-1', speed: 0, help: 'Harvesting Tools', tooltip: 'Tools used to harvest plants'},
+  sickleCopper: {name: 'Copper Sickle', type: ITEM_TYPE.TOOL | ITEM_TYPE.MATERIAL | ITEM_TYPE.CRAFTABLE, stype: 'pickaxe', star: 1, image: 'tools_32_32-4-0', placedright: 'w_42_42-0-0', placedleft: 'w_42_42-0-1', help: 'Harvesting Tools', tooltip: 'Tools used to harvest plants', range: 0},
+  sickleSilver: {name: 'Silver Sickle', type: ITEM_TYPE.TOOL | ITEM_TYPE.MATERIAL | ITEM_TYPE.CRAFTABLE, stype: 'pickaxe', star: 3, image: 'tools_32_32-4-0', placedright: 'w_42_42-0-0', placedleft: 'w_42_42-0-1', speed: 0, help: 'Harvesting Tools', tooltip: 'Tools used to harvest plants', range: 1},
+  sickleGold: {name: 'Gold Sickle', type: ITEM_TYPE.TOOL | ITEM_TYPE.CRAFTABLE, stype: 'pickaxe', star: 5, image: 'tools_32_32-4-0', placedright: 'w_42_42-0-0', placedleft: 'w_42_42-0-1', speed: 0, help: 'Harvesting Tools', tooltip: 'Tools used to harvest plants', range: 2},
 
   // hammers
   hammerCopper: {name: 'Copper Hammer', type: ITEM_TYPE.TOOL | ITEM_TYPE.MATERIAL, stype: 'hammer', star: 2, image: 'tools_32_32-4-0', placedright: 'w_42_42-0-0', placedleft: 'w_42_42-0-1', speed: 0, help: 'Hammers', tooltip: 'Tools used to remove wall, furniture, workstation, converting them to item form'},
@@ -388,6 +388,8 @@ export const ITEMS = {
   plateGold: {name: 'Gold Plate', type: 0, stype: 'fitting', star: 3, image: 'crafting_32_32-2-0', help: 'Metal Fittings', tooltip: 'Part used to built a lot of items'},
   plateCobalt: {name: 'Cobalt Plate', type: 0, stype: 'fitting', star: 4, image: 'crafting_32_32-2-0', help: 'Metal Fittings', tooltip: 'Part used to built a lot of items'},
   platePlatinum: {name: 'Platinum Plate', type: 0, stype: 'fitting', star: 5, image: 'crafting_32_32-2-0', help: 'Metal Fittings', tooltip: 'Part used to built a lot of items'},
+
+  stripSilver: {name: 'Silver Strip', type: 0, stype: 'fitting', star: 3, image: 'crafting_32_32-2-0', help: 'Metal Fittings', tooltip: 'Part used to built a lot of items'},
 
   stoneBench: {name: 'Stone Bench', type: ITEM_TYPE.FURNITURE | ITEM_TYPE.PLACABLE, stype: 'station', star: 3, image: 'furniture_32_32-1-0', placed: 'fuws_48_32-0-0', help: 'Stoneworking', tooltip: 'Crafting station for sharpenig tools and weapons'},
 
@@ -554,9 +556,10 @@ export const ITEMS = {
   astrolabe: {name: 'Astrolabe', type: ITEM_TYPE.TRINKET, stype: 'trinket', star: 4, image: 'furniture_32_32-3-8', help: 'Astrolabe', tooltip: 'When in Inventory, give weather forecasts and increases Moon Phases accuracy', buff: [{buff: 'displayNextWeather', value: true}, {buff: 'displayMoonDetail', value: true}]},
   chronometer: {name: 'Chronometer', type: ITEM_TYPE.TRINKET, stype: 'trinket', star: 4, image: 'furniture_32_32-3-8', help: 'Chronometer', tooltip: 'When in Inventory, display your position and your bonus Speed (percent)', buff: [{buff: 'displaySpeed', value: true}, {buff: 'displayCoords', value: true}]},
   astrarium: {name: 'Astrarium', type: ITEM_TYPE.TRINKET, stype: 'trinket', star: 5, image: 'furniture_32_32-3-8', help: 'Astrarium', tooltip: 'When in Inventory, adds weather forecast, full moon detail, position and speed, and maximizes time precision', buff: [{buff: 'displaySpeed', value: true}, {buff: 'displayCoords', value: true}, {buff: 'displayNextWeather', value: true}, {buff: 'displayMoonDetail', value: true}, {buff: 'displayTimePrecision', value: 3, op: 'max'}]},
-  setSquare: {name: 'Set Square', type: ITEM_TYPE.TRINKET, stype: 'trinket', star: 3, image: 'furniture_32_32-3-8', help: 'Square', tooltip: 'When in Inventory, press [R] display perception and tool ranges', buff: [{buff: 'showRanges', value: true}]},
+  setSquare: {name: 'Set Square', type: ITEM_TYPE.TRINKET, stype: 'trinket', star: 3, image: 'furniture_32_32-3-8', help: 'Square', tooltip: 'When in Inventory, press [R] display perception range', buff: [{buff: 'showInteractionRange', value: true}]},
+  slidingBevel: {name: 'Sliding Bevel', type: ITEM_TYPE.TRINKET, stype: 'trinket', star: 3, image: 'furniture_32_32-3-8', help: 'Sliding Bevel', tooltip: 'When in Inventory, press [R] display tool range', buff: [{buff: 'showToolRange', value: true}]},
   draftingCompass: {name: 'Drafting Compass', type: ITEM_TYPE.TRINKET, stype: 'trinket', star: 3, image: 'furniture_32_32-3-8', help: 'Drafting Compass', tooltip: 'When in Inventory, press [R] display tiles Grid', buff: [{buff: 'showGrid', value: true}]},
-  theodolite: {name: 'Theodolite', type: ITEM_TYPE.TRINKET, stype: 'trinket', star: 4, image: 'furniture_32_32-3-8', help: 'Theodolite', tooltip: 'When in Inventory, press [R] display tiles Grid & perception and tool ranges', buff: [{buff: 'showRanges', value: true}, {buff: 'showGrid', value: true}]},
+  theodolite: {name: 'Theodolite', type: ITEM_TYPE.TRINKET, stype: 'trinket', star: 4, image: 'furniture_32_32-3-8', help: 'Theodolite', tooltip: 'When in Inventory, press [R] display tiles Grid & perception and tool ranges', buff: [{buff: 'showInteractionRange', value: true}, {buff: 'showToolRange', value: true}, {buff: 'showGrid', value: true}]},
 
   // Armors ITEM_TYPE.ARMOR, stype: 'tableware', armor: 'head'
   headWood: {name: 'Wood Helmet', type: ITEM_TYPE.ARMOR | ITEM_TYPE.CRAFTING, stype: 'head', armor: 'head', star: 1, image: 'tools_32_32-10-7', placedright: 'heads_26_22-1-0', placedleft: 'heads_26_22-1-1', defense: 1, help: 'Armors', tooltip: 'Provides sturdy protection', set: 'wood'},
@@ -668,6 +671,7 @@ export const RECIPES = [
   {result: {item: 'plateGold', count: 6}, station: 'anvil', ingredients: [{item: 'barGold', count: 1}]},
   {result: {item: 'plateCobalt', count: 5}, station: 'anvil', ingredients: [{item: 'barCobalt', count: 1}]},
   {result: {item: 'platePlatinum', count: 4}, station: 'anvil', ingredients: [{item: 'barPlatinum', count: 1}]},
+  {result: {item: 'stripSilver', count: 20}, station: 'anvil', ingredients: [{item: 'barSilver', count: 1}]},
 
   // Trinkets
   {result: {item: 'clockCopper', count: 1}, station: 'workbench', ingredients: [{item: 'barCopper', count: 1}, {item: 'chainCopper', count: 1}, {item: 'glass', count: 1}, {item: 'cutTopaz', count: 1}]},
@@ -681,8 +685,9 @@ export const RECIPES = [
   {result: {item: 'astrolabe', count: 1}, station: 'jewelerBench', ingredients: [{item: 'bottledFrog', count: 1}, {item: 'sextant', count: 1}, {item: 'plateCobalt', count: 1}, {item: 'cutEmerald', count: 1}, {item: 'oleanderOil', count: 1}]},
   {result: {item: 'astrarium', count: 1}, station: 'jewelerBench', ingredients: [{item: 'clockGold', count: 1}, {item: 'chronometer', count: 1}, {item: 'astrolabe', count: 1}, {item: 'platePlatinum', count: 1}, {item: 'cutSapphire', count: 2}, {item: 'chainPlatinum', count: 2}]},
   {result: {item: 'setSquare', count: 1}, station: 'anvil', ingredients: [{item: 'plateIron', count: 1}, {item: 'wireGold', count: 1}, {item: 'shellPowder', count: 1}]},
-  {result: {item: 'draftingCompass', count: 1}, station: 'anvil', ingredients: [{item: 'plateCopper', count: 1}, {item: 'wireGold', count: 2}, {item: 'shellPowder', count: 1}]},
-  {result: {item: 'theodolite', count: 1}, station: 'anvil', ingredients: [{item: 'plateCobalt', count: 1}, {item: 'setSquare', count: 1}, {item: 'draftingCompass', count: 1}, {item: 'blockMarble', count: 1}, {item: 'cutEmerald', count: 2}]},
+  {result: {item: 'slidingBevel', count: 1}, station: 'workbench', ingredients: [{item: 'plateIron', count: 1}, {item: 'wireGold', count: 1}, {item: 'stripSilver', count: 1}]},
+  {result: {item: 'draftingCompass', count: 1}, station: 'jewelerBench', ingredients: [{item: 'plateCopper', count: 1}, {item: 'wireGold', count: 2}, {item: 'shellPowder', count: 1}]},
+  {result: {item: 'theodolite', count: 1}, station: 'forge', ingredients: [{item: 'plateCobalt', count: 1}, {item: 'setSquare', count: 1}, {item: 'draftingCompass', count: 1}, {item: 'blockMarble', count: 1}, {item: 'cutEmerald', count: 2}]},
 
   // Food - Tier 1-3
   {result: {item: 'sunflowerOil', count: 1}, station: 'tableWood', ingredients: [{item: 'sunflowerSeed', count: 1}]},

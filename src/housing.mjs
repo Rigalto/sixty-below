@@ -252,7 +252,7 @@ class FurnitureManager {
    */
   getNearbyContainers () {
     const {x: cx, y: cy} = playerManager.getCenterTile() // TODO PlayerManager
-    // const {w: rw, h: rh} = buffManager.getBuff('range-chest')
+    // const {w: rw, h: rh} = buffManager.getBuff('interaction-range')
 
     const rw = 10; const rh = 8 // DEBUG
 
@@ -276,7 +276,7 @@ class FurnitureManager {
    */
   getNearbyCraftingStations () {
     // const {x: cx, y: cy} = playerManager.getCenterTile()  // TODO PlayerManager
-    // const {w: rw, h: rh} = buffManager.getBuff('range-station')
+    // const {w: rw, h: rh} = buffManager.getBuff('interaction-range')
     const cx = 512; const cy = 200 // DEBUG
     const rw = 10; const rh = 8 // DEBUG
 

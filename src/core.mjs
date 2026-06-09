@@ -63,6 +63,7 @@ class GameCore {
     this.mockupDiv = mockup()
     this.timeScale = 1 // ×1 normal — T pour cycler ×1 / ×10 / ×60 (debug)
     this.showBlockedTiles = false // true pour afficher les tuiles bloquées
+    this.showGrids = false // true pour afficher les tuiles bloquées
   }
 
   /* =========================================
@@ -489,6 +490,12 @@ class GameCore {
     // monsterManager.render(ctx)
     playerManager.render(ctx)
     if (this.showBlockedTiles) blockedTiles.render(ctx) // DEBUG
+    if (this.showGrids) {
+      const buffs = buffManager.getBuffs(['showGrid', 'showInteractionRange', 'showToolRange'])
+      if (buffs.showGrid) this.#showGrid(ctx)
+      if (buffs.showInteractionRange) this.#showInteractionRange(ctx)
+      if (buffs.showToolRange) this.#showToolRange(ctx)
+    }
     ctx.restore() // clôt le save() de worldRenderer.render() — NE PAS déplacer ni supprimer
     // lightRenderer.render()
 
@@ -541,6 +548,114 @@ class GameCore {
       // if (item.stype === 'seed') seedSystem.tryPlant(tileIndex, tileNode, item, slot.prefix)
       // else if (item.stype === 'furniture') furnitureSystem.tryPlace(tileIndex, tileNode, item, slot.prefix)
     }
+  }
+
+  /**
+ * Affiche le rectangle d'action du tool actif, étendu par item.range et le buff 'range'.
+ * @param {CanvasRenderingContext2D} ctx — contexte déjà transformé (caméra appliquée)
+ */
+  #showToolRange (ctx) {
+    const TOOL_RANGE_BUFF = new Map([
+      ['pickaxe', 'mining-range']
+      // ['hammer', 'hammer-range'],
+      // ['axe',    'axe-range'],
+    ])
+    const slot = hotbarOverlay.activeSlot
+    if (!slot.item) return
+    const item = ITEMS[slot.item]
+    if (!(item.type & ITEM_TYPE.TOOL)) return
+
+    const buffName = TOOL_RANGE_BUFF.get(item.stype)
+    if (buffName === undefined) return
+
+    const rect = buffManager.getBuff(buffName)
+    const range = item.range
+    const {x: cx, y: cy, direction} = playerManager.getCenterTile()
+
+    const ex = rect.x - range
+    const ey = rect.y - range
+    const ew = rect.w + 2 * range
+    const eh = rect.h + 2 * range
+
+    const worldX = direction === 0 ? cx - ex - ew : cx + ex
+    const worldY = cy + ey
+
+    ctx.save()
+    ctx.strokeStyle = 'rgba(251, 157, 49, 0.9)'
+    ctx.lineWidth = 3
+    ctx.strokeRect(worldX << 4, worldY << 4, ew << 4, eh << 4)
+    ctx.restore()
+  }
+
+  /**
+ * Affiche le rectangle de l'interaction range centré sur le joueur.
+ * @param {CanvasRenderingContext2D} ctx — contexte déjà transformé (caméra appliquée)
+ */
+  #showInteractionRange (ctx) {
+    const {x: cx, y: cy} = playerManager.getCenterTile()
+    const rect = buffManager.getBuff('interaction-range')
+    const pxX = (cx + rect.x) << 4
+    const pxY = (cy + rect.y) << 4
+    const pxW = rect.w << 4
+    const pxH = rect.h << 4
+    ctx.save()
+    ctx.strokeStyle = 'rgba(248, 8, 8, 0.9)'
+    ctx.lineWidth = 3
+    ctx.strokeRect(pxX, pxY, pxW, pxH)
+    ctx.restore()
+  }
+
+  /**
+ * Affiche la grille des tuiles du monde
+ * @param {CanvasRenderingContext2D} ctx — contexte déjà transformé (caméra appliquée)
+ */
+  #showGrid (ctx) {
+    if (camera.preloadChunks.size === 0) return
+
+    // Bornes de la zone visible en coordonnées chunk
+    let minCX = 63; let maxCX = 0; let minCY = 31; let maxCY = 0
+    for (const key of camera.preloadChunks) {
+      const cx = key & 0x3F
+      const cy = key >> 6
+      if (cx < minCX) minCX = cx
+      if (cx > maxCX) maxCX = cx
+      if (cy < minCY) minCY = cy
+      if (cy > maxCY) maxCY = cy
+    }
+
+    const pxX0 = minCX << 8
+    const pxY0 = minCY << 8
+    const pxX1 = (maxCX + 1) << 8
+    const pxY1 = (maxCY + 1) << 8
+
+    ctx.save()
+
+    // Grille fine — une ligne par tuile (16px)
+    ctx.strokeStyle = 'rgba(0, 0, 0, 0.5)'
+    ctx.lineWidth = 1
+    ctx.beginPath()
+    for (let x = pxX0; x <= pxX1; x += 16) { ctx.moveTo(x, pxY0); ctx.lineTo(x, pxY1) }
+    for (let y = pxY0; y <= pxY1; y += 16) { ctx.moveTo(pxX0, y); ctx.lineTo(pxX1, y) }
+    ctx.stroke()
+
+    // Grille chunks — une ligne par chunk (256px)
+    ctx.strokeStyle = 'rgba(255, 220, 50, 0.8)'
+    ctx.lineWidth = 3
+    ctx.beginPath()
+    for (let cx = minCX; cx <= maxCX + 1; cx++) { const x = cx << 8; ctx.moveTo(x, pxY0); ctx.lineTo(x, pxY1) }
+    for (let cy = minCY; cy <= maxCY + 1; cy++) { const y = cy << 8; ctx.moveTo(pxX0, y); ctx.lineTo(pxX1, y) }
+    ctx.stroke()
+
+    // Index des chunks
+    ctx.fillStyle = 'rgba(255, 220, 50, 0.9)'
+    ctx.font = '20px monospace'
+    for (let cy = minCY; cy <= maxCY; cy++) {
+      for (let cx = minCX; cx <= maxCX; cx++) {
+        ctx.fillText((cy << 6) | cx, (cx << 8) + 4, (cy << 8) + 20)
+      }
+    }
+
+    ctx.restore()
   }
 
   /* =========================================
@@ -727,6 +842,7 @@ class KeyboardManager {
       console.log(`⏱ x${gameCore.timeScale}`)
     }
     if (e.code === 'NumpadAdd') gameCore.showBlockedTiles = true
+    if (e.code === 'KeyR') gameCore.showGrids = true
 
     // 1 Overlay
     const overlay = OVERLAY_MAP[e.key]
@@ -773,6 +889,7 @@ class KeyboardManager {
     const gameBit = MOVEMENT_MAP_GAME[e.code]
     if (gameBit) { this.directionsGame &= ~gameBit }
     if (e.code === 'NumpadAdd') gameCore.showBlockedTiles = false
+    if (e.code === 'KeyR') gameCore.showGrids = false
   }
 
   onCloseRequest (overlyId) {

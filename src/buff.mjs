@@ -83,6 +83,13 @@ class BuffManager {
       const h = 8
       return {x, y, w, h}
     }],
+    ['interaction-range', () => {
+      const x = -10
+      const y = -8
+      const w = 20
+      const h = 16
+      return {x, y, w, h}
+    }],
     ['mining-speed', () => {
       return 100
     }]

@@ -133,7 +133,7 @@ Mining Loot: {{node:{3}:mining[:items[0]:item|link}}
   fullRecipeRow: '| [[item:{1}]] | {{item:{1}:star|star}} | {{recipe:{1}|station}} | {{recipe:{1}|ingredients}} |',
 
   // une ligne d'une table présentant un outil : nom, tier, speed bonus, range bonus
-  pickaxeTypeRow: '| [[item:{1}]] | {{item:{1}:star|star}} | {{item:{1}:mining:speed}} | {{item:{1}:mining:range}} | {{item:{1}:mining:tiles}} |'
+  pickaxeTypeRow: '| [[item:{1}]] | {{item:{1}:star|star}} | {{item:{1}:mining:speed}} | {{item:{1}:range}} | {{item:{1}:mining:tiles}} |'
 
 }
 
@@ -2012,7 +2012,7 @@ The table below details the [[Metal Fittings]] available for each material, incl
 |---|---|---|---|
 | **Copper** | <<cellItemStar|plateCopper>> | - | yes |
 | **Iron** | <<cellItemStar|plateIron>> | yes | yes |
-| **Silver** | - | yes | yes |
+| **Silver** | - | yes | <<cellItemStar|stripSilver>> |
 | **Gold** | <<cellItemStar|plateGold>> | yes | - |
 | **Cobalt** | <<cellItemStar|plateCobalt>> | yes | yes |
 | **Platinum** | <<cellItemStar|platePlatinum>> | yes | yes |
