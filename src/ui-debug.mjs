@@ -299,6 +299,7 @@ export const worldMapDebug = new WorldMapDebug()
 const DEBUG_PACKS = {
   starter: [
     {item: 'astrarium', count: 1},
+    {item: 'theodolite', count: 1},
     {item: 'gel', count: 25}
   ],
   substrat: [

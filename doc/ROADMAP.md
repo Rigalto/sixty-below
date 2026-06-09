@@ -7,10 +7,7 @@
 
 ## En cours
 
-- Concevoir la classe centralisée pour toutes les plantes et les classes dédiée pour chaque plante
-  - Initialisation par dispatching aux classas dédiées
-  - Affichage par appel de toutes les classes dédiées
-  - recherche en fonction du substrat uniquement pour les classes correspondante
+- ajouter le buff range de l'outil dans le mining.
 - implémentation de l'affichage des tuiles (top soil à faire)
 - implémenter les graines de Sunflower qui augmentent la probabilité de pop de sunflower.
 - gérer blockedTiles pour les furnitures (mise à jour - les tests sont faits par l'appelant)

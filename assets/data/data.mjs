@@ -554,6 +554,9 @@ export const ITEMS = {
   astrolabe: {name: 'Astrolabe', type: ITEM_TYPE.TRINKET, stype: 'trinket', star: 4, image: 'furniture_32_32-3-8', help: 'Astrolabe', tooltip: 'When in Inventory, give weather forecasts and increases Moon Phases accuracy', buff: [{buff: 'displayNextWeather', value: true}, {buff: 'displayMoonDetail', value: true}]},
   chronometer: {name: 'Chronometer', type: ITEM_TYPE.TRINKET, stype: 'trinket', star: 4, image: 'furniture_32_32-3-8', help: 'Chronometer', tooltip: 'When in Inventory, display your position and your bonus Speed (percent)', buff: [{buff: 'displaySpeed', value: true}, {buff: 'displayCoords', value: true}]},
   astrarium: {name: 'Astrarium', type: ITEM_TYPE.TRINKET, stype: 'trinket', star: 5, image: 'furniture_32_32-3-8', help: 'Astrarium', tooltip: 'When in Inventory, adds weather forecast, full moon detail, position and speed, and maximizes time precision', buff: [{buff: 'displaySpeed', value: true}, {buff: 'displayCoords', value: true}, {buff: 'displayNextWeather', value: true}, {buff: 'displayMoonDetail', value: true}, {buff: 'displayTimePrecision', value: 3, op: 'max'}]},
+  setSquare: {name: 'Set Square', type: ITEM_TYPE.TRINKET, stype: 'trinket', star: 3, image: 'furniture_32_32-3-8', help: 'Square', tooltip: 'When in Inventory, press [R] display perception and tool ranges', buff: [{buff: 'showRanges', value: true}]},
+  draftingCompass: {name: 'Drafting Compass', type: ITEM_TYPE.TRINKET, stype: 'trinket', star: 3, image: 'furniture_32_32-3-8', help: 'Drafting Compass', tooltip: 'When in Inventory, press [R] display tiles Grid', buff: [{buff: 'showGrid', value: true}]},
+  theodolite: {name: 'Theodolite', type: ITEM_TYPE.TRINKET, stype: 'trinket', star: 4, image: 'furniture_32_32-3-8', help: 'Theodolite', tooltip: 'When in Inventory, press [R] display tiles Grid & perception and tool ranges', buff: [{buff: 'showRanges', value: true}, {buff: 'showGrid', value: true}]},
 
   // Armors ITEM_TYPE.ARMOR, stype: 'tableware', armor: 'head'
   headWood: {name: 'Wood Helmet', type: ITEM_TYPE.ARMOR | ITEM_TYPE.CRAFTING, stype: 'head', armor: 'head', star: 1, image: 'tools_32_32-10-7', placedright: 'heads_26_22-1-0', placedleft: 'heads_26_22-1-1', defense: 1, help: 'Armors', tooltip: 'Provides sturdy protection', set: 'wood'},
@@ -677,6 +680,9 @@ export const RECIPES = [
   {result: {item: 'sextant', count: 1}, station: 'workbench', ingredients: [{item: 'logMahogany', count: 1}, {item: 'chainSilver', count: 2}, {item: 'cutRuby', count: 1}, {item: 'oleanderOil', count: 1}]},
   {result: {item: 'astrolabe', count: 1}, station: 'jewelerBench', ingredients: [{item: 'bottledFrog', count: 1}, {item: 'sextant', count: 1}, {item: 'plateCobalt', count: 1}, {item: 'cutEmerald', count: 1}, {item: 'oleanderOil', count: 1}]},
   {result: {item: 'astrarium', count: 1}, station: 'jewelerBench', ingredients: [{item: 'clockGold', count: 1}, {item: 'chronometer', count: 1}, {item: 'astrolabe', count: 1}, {item: 'platePlatinum', count: 1}, {item: 'cutSapphire', count: 2}, {item: 'chainPlatinum', count: 2}]},
+  {result: {item: 'setSquare', count: 1}, station: 'anvil', ingredients: [{item: 'plateIron', count: 1}, {item: 'wireGold', count: 1}, {item: 'shellPowder', count: 1}]},
+  {result: {item: 'draftingCompass', count: 1}, station: 'anvil', ingredients: [{item: 'plateCopper', count: 1}, {item: 'wireGold', count: 2}, {item: 'shellPowder', count: 1}]},
+  {result: {item: 'theodolite', count: 1}, station: 'anvil', ingredients: [{item: 'plateCobalt', count: 1}, {item: 'setSquare', count: 1}, {item: 'draftingCompass', count: 1}, {item: 'blockMarble', count: 1}, {item: 'cutEmerald', count: 2}]},
 
   // Food - Tier 1-3
   {result: {item: 'sunflowerOil', count: 1}, station: 'tableWood', ingredients: [{item: 'sunflowerSeed', count: 1}]},
