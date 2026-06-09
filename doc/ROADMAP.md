@@ -103,7 +103,6 @@ fs.writeFileSync('docs/help-rendered.html', htmlHelp.join('\n'))
 - Caméra centrée joueur, zoom
 - Minage (vitesse selon `speed` du node, drops)
 - Cycle jour/nuit, météo, phases de lune
-- implémenter playerManager.getCenterTile() // renvoie l'index de la tuile située au milieu du player (pour les Ranges)
 
 ### Faune & Critters
 - Spawning par biome/layer (table MONSTERS)

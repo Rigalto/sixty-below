@@ -150,7 +150,7 @@ class PlayerManager {
   #scanTilesResult = {hasSolid: false, viscosity: 0, hasWeb: false} // résultat de #scanTiles() — déstructurer immédiatement si appels multiples
   #getHitboxResult = {x: 0, y: 0, w: PLAYER.w, h: PLAYER.h} // résultat de #getHitbox()
   #getFeetTileResult = {x: 0, y: 0} // résultat de getFeetTile()
-  #getCenterTileResult = {x: 0, y: 0} // résultat de getCenterTile()
+  #getCenterTileResult = {x: 0, y: 0, direction: 1} // résultat de getCenterTile()
   #updateResult = {x: 0, y: 0} // résultat de update()
 
   /**
@@ -372,11 +372,12 @@ class PlayerManager {
 
   /**
    * Retourne la tuile occupée par le centre de la hitbox en coordonnées tuile.
-   * @returns {{x: number, y: number}}
+   * @returns {{x: number, y: number, position: number}}
    */
   getCenterTile () {
     this.#getCenterTileResult.x = (this.#x + (PLAYER.w >> 1)) >> 4
     this.#getCenterTileResult.y = (this.#y + (PLAYER.h >> 1)) >> 4
+    this.#getCenterTileResult.direction = this.#direction
     return this.#getCenterTileResult
   }
 

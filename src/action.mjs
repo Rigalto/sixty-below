@@ -5,6 +5,7 @@ import {NODE_TYPE, NODES, ITEM_TYPE, ITEMS} from '../assets/data/data.mjs'
 import {inventoryManager} from './inventory.mjs'
 import {buffManager} from './buff.mjs'
 import {chunkManager} from './world.mjs'
+import {playerManager} from './player.mjs'
 import {WORLD_WIDTH, MICROTASK} from './constant.mjs'
 
 /* ====================================================================================================
@@ -38,9 +39,10 @@ class MiningManager {
   tryMine (tileIndex, tileNode, tool, prefix) {
     console.log('MiningManager.tryMine', {tileIndex, tileNode, tool, prefix})
     if (tool.star < tileNode.star) return
-    if (!(tileNode.type & NODE_TYPE.SOLID)) return
+    if (!(tileNode.type & NODE_TYPE.SOLID) && !(tileNode.type & NODE_TYPE.WEB)) return
     if ((tileNode.type & NODE_TYPE.WALL)) return // Hammer
     if (!blockedTiles.canMine(tileIndex)) return // includes ETERNAL
+    if (!this.#isInMiningRange(tileIndex)) return
     if (buffManager.getBuff('player-freeze')) return
     // TODO: test range (playerManager.getFeetTile() vs tileIndex, buff 'mining-range')
 
@@ -66,6 +68,24 @@ class MiningManager {
   #computeMineSpeed (tileNode, tool) {
     const coefficient = 100 + tool.mining.speed + buffManager.getBuff('mining-speed')
     return Math.round((coefficient / 100) * tileNode.mining.speed)
+  }
+
+  /**
+ * Vérifie que la tuile est dans le rectangle de minage relatif au centre du joueur.
+ * @param {number} tileIndex — (y << 10) | x
+ * @returns {boolean}
+ */
+  #isInMiningRange (tileIndex) {
+    const {x: cx, y: cy, direction} = playerManager.getCenterTile()
+    const rect = buffManager.getBuff('mining-range')
+    const tileX = tileIndex & 0x3FF
+    const tileY = tileIndex >> 10
+    const worldRectY = cy + rect.y
+    const worldRectX = direction === 0
+      ? cx - rect.x - rect.w // miroir : ancien bord droit → nouveau bord gauche
+      : cx + rect.x
+    return tileX >= worldRectX && tileX < worldRectX + rect.w &&
+       tileY >= worldRectY && tileY < worldRectY + rect.h
   }
 
   /**
