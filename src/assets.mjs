@@ -56,8 +56,6 @@ export const IMAGE_FILES = [
   'assets/sprites/tools_32_32.png',
   // accessory
   'assets/sprites/accessories_32_32.png',
-  // passive buffs
-  'assets/sprites/passive_32_32.png',
   // furniture / crafting station
   'assets/sprites/furniture_32_32.png',
   // potions / consumables
