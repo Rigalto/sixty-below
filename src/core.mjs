@@ -577,7 +577,7 @@ class GameCore {
     const ew = rect.w + 2 * range
     const eh = rect.h + 2 * range
 
-    const worldX = direction === 0 ? cx - ex - ew : cx + ex
+    const worldX = direction === 0 ? cx - ex - ew + 1 : cx + ex
     const worldY = cy + ey
 
     ctx.save()
