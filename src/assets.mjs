@@ -21,6 +21,10 @@ export const IMAGE_FILES = [
   'assets/sprites/mined_32_32.png',
   // Items raffinés / bar, cut gem, metal fitting, fabric
   'assets/sprites/refined_32_32.png',
+  // trinkets
+  'assets/sprites/trinket_32_32.png',
+  // tools
+  'assets/sprites/tool_32_32.png',
   // provisoire
   'assets/sprites/loom_32_32.png',
 

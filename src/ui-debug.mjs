@@ -354,6 +354,22 @@ const DEBUG_PACKS = {
     {item: 'chainIron', count: 12},
     {item: 'chainSilver', count: 12},
     {item: 'chainPlatinum', count: 12}
+  ],
+  trinket: [
+    {item: 'clockCopper', count: 1},
+    {item: 'clockSilver', count: 1},
+    {item: 'clockGold', count: 1},
+    {item: 'bottledFrog', count: 1},
+    {item: 'sextant', count: 1},
+    {item: 'ruler', count: 1},
+    {item: 'stopwatch', count: 1},
+    {item: 'astrolabe', count: 1},
+    {item: 'chronometer', count: 1},
+    {item: 'astrarium', count: 1},
+    {item: 'setSquare', count: 1},
+    {item: 'slidingBevel', count: 1},
+    {item: 'draftingCompass', count: 1},
+    {item: 'theodolite', count: 1}
   ]
 }
 

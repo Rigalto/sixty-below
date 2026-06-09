@@ -32,6 +32,12 @@ export const ACHIEVEMENT_CATEGORIES = [
     items: ['clockCopper', 'clockSilver', 'clockGold', 'bottledFrog', 'sextant', 'ruler', 'stopwatch', 'astrolabe', 'chronometer', 'astrarium']
   },
   {
+    id: 'crafting-trinket-surv',
+    label: 'Crafting — Trinkets - Surveyor',
+    thresholds: [1, 1, 1],
+    items: ['setSquare', 'slidingBevel', 'draftingCompass', 'theodolite']
+  },
+  {
     id: 'crafting-pickaxe',
     label: 'Crafting — Pickaxes',
     thresholds: [1, 1, 1],
