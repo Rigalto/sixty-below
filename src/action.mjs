@@ -1,6 +1,6 @@
 // action.mjs — miningManager
 
-import {eventBus, taskScheduler, blockedTiles, rollLootWithBuffs} from './utils.mjs'
+import {eventBus, taskScheduler, microTasker, blockedTiles, rollLootWithBuffs} from './utils.mjs'
 import {NODE_TYPE, NODES, ITEM_TYPE, ITEMS} from '../assets/data/data.mjs'
 import {inventoryManager} from './inventory.mjs'
 import {buffManager} from './buff.mjs'
@@ -43,7 +43,7 @@ class MiningManager {
     if ((tileNode.type & NODE_TYPE.WALL)) return // Hammer
     if (!blockedTiles.canMine(tileIndex)) return // includes ETERNAL
     if (!this.#isInMiningRange(tileIndex, tool, prefix)) return
-    if (buffManager.getBuff('player-freeze')) return
+    if (buffManager.getBuff('playerFreeze')) return
 
     const speed = this.#computeMineSpeed(tileNode, tool, prefix)
 
@@ -187,6 +187,11 @@ const PLACING_NODES = new Set([
 ])
 
 class PlacingManager {
+  constructor () {
+    // micro-tâches
+    this.onPlaceTile = this.onPlaceTile.bind(this)
+  }
+
   /**
    * Valide la demande de placement et l'exécute si les conditions sont réunies.
    * Seul point d'entrée pour le placement de blocs depuis core.mjs.
@@ -194,10 +199,66 @@ class PlacingManager {
    * @param {object} tileNode  — NODES_LOOKUP[tileCode]
    * @param {object} item      — ITEMS[slot.item]
    */
-  tryPlace (tileIndex, tileNode, item) {
+  tryPlace (tileIndex, tileNode, item, slotIndex) {
     if (!PLACING_NODES.has(tileNode.code)) return
     console.log('PlacingManager.tryPlace', {tileIndex, tileNode, item})
-    // validations à venir : range, player-freeze, blockedTiles...
+    if (!blockedTiles.canPlace(tileIndex)) return
+    if (!this.#isInPlacingRange(tileIndex)) return
+    if (buffManager.getBuff('playerFreeze')) return
+    const {priority, capacity} = MICROTASK.PLACE_TILE
+    microTasker.enqueue(this.onPlaceTile, priority, capacity, tileIndex, item, slotIndex)
+  }
+
+  /**
+   * Vérifie que la tuile est dans le rectangle d'interaction du joueur.
+   * Utilise mining-range sans expansion outil (les blocs n'ont pas de stat range).
+   * @param {number} tileIndex — (y << 10) | x
+   * @returns {boolean}
+   */
+  #isInPlacingRange (tileIndex) {
+    const {x: cx, y: cy, direction} = playerManager.getCenterTile()
+    const rect = buffManager.getBuff('mining-range')
+    const tileX = tileIndex & 0x3FF
+    const tileY = tileIndex >> 10
+    const worldRectX = direction === 0 ? cx - rect.x - rect.w + 1 : cx + rect.x
+    return tileX >= worldRectX && tileX < worldRectX + rect.w &&
+         tileY >= cy + rect.y && tileY < cy + rect.y + rect.h
+  }
+
+  /**
+   * Callback MicroTasker : exécute la pose du bloc.
+   * Re-vérifie la tuile cible — elle a pu changer entre tryPlace et l'exécution.
+   * @param {number} tileIndex
+   * @param {object} item
+   */
+  onPlaceTile (tileIndex, item, slotIndex) {
+    const VOID = NODES.VOID.code
+    const SKY = NODES.SKY.code
+
+    const tileOldCode = chunkManager.getTileAt(tileIndex)
+    if (!PLACING_NODES.has(tileOldCode)) return
+    if (!blockedTiles.canPlace(tileIndex)) return
+    console.log('PlacingManager.onPlaceTile', {tileIndex, item})
+
+    // placement de la tuile
+    const tileNewCode = item.placedNode.code
+    chunkManager.setTileAt(tileIndex, tileNewCode)
+
+    // consommer inventaire
+    inventoryManager.decrementHotbarSlotCount(slotIndex)
+
+    // on effectue les traitements induits
+    eventBus.emit('world/tile-changed', {tileIndex, tileOldCode, tileNewCode})
+
+    // propagation SKY→VOID vers le bas : les SKY sous le bloc posé perdent leur connexion au ciel
+    if (tileOldCode === SKY) {
+      let idx = tileIndex + WORLD_WIDTH
+      while (chunkManager.getTileAt(idx) === SKY) {
+        chunkManager.setTileAt(idx, VOID)
+        eventBus.emit('world/tile-changed', {tileIndex: idx, tileOldCode: SKY, tileNewCode: VOID})
+        idx += WORLD_WIDTH
+      }
+    }
   }
 }
 export const placingManager = new PlacingManager()

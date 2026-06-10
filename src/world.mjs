@@ -129,10 +129,20 @@ class ChunkManager {
     const index = (y << 10) | x
     if (this.#data[index] === code) return
     this.#data[index] = code
+    const cx = x >> 4
+    const cy = y >> 4
     // Chunk Key alignée sur 64 de large
-    const chunkKey = ((y >> 4) << 6) | (x >> 4)
+    const chunkKey = (cy << 6) | cx
     this.#dirtyRenderChunks.add(chunkKey)
     this.#dirtySaveChunks.add(chunkKey)
+    // Invalider les chunks voisins si la tuile est sur un bord de chunk —
+    // leur auto-tiling dépend de cette tuile comme voisine
+    const localX = x & 0xF
+    const localY = y & 0xF
+    if (localX === 0 && cx > 0) this.#dirtyRenderChunks.add(chunkKey - 1)
+    if (localX === 15 && cx < 63) this.#dirtyRenderChunks.add(chunkKey + 1)
+    if (localY === 0 && cy > 0) this.#dirtyRenderChunks.add(chunkKey - 64)
+    if (localY === 15 && cy < 31) this.#dirtyRenderChunks.add(chunkKey + 64)
   }
 
   /**
@@ -143,10 +153,22 @@ class ChunkManager {
   setTileAt (index, code) {
     if (this.#data[index] === code) return
     this.#data[index] = code
+    const tileX = index & 0x3FF
+    const tileY = index >> 10
+    const cx = tileX >> 4
+    const cy = tileY >> 4
     // Chunk Key alignée sur 64 de large
-    const chunkKey = ((index >> 14) << 6) | ((index & 0x3FF) >> 4)
+    const chunkKey = (cy << 6) | cx
     this.#dirtyRenderChunks.add(chunkKey)
     this.#dirtySaveChunks.add(chunkKey)
+    // Invalider les chunks voisins si la tuile est sur un bord de chunk —
+    // leur auto-tiling dépend de cette tuile comme voisine
+    const localX = tileX & 0xF
+    const localY = tileY & 0xF
+    if (localX === 0 && cx > 0) this.#dirtyRenderChunks.add(chunkKey - 1)
+    if (localX === 15 && cx < 63) this.#dirtyRenderChunks.add(chunkKey + 1)
+    if (localY === 0 && cy > 0) this.#dirtyRenderChunks.add(chunkKey - 64)
+    if (localY === 15 && cy < 31) this.#dirtyRenderChunks.add(chunkKey + 64)
   }
 
   /**

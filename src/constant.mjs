@@ -302,6 +302,7 @@ export const MICROTASK = {
   RENDER_CHUNK_QUEUE: {priority: 30, capacity: 12, taskName: 'processRenderQueue'}, // génère les images des dirty chunks
 
   MINE_TILE: {priority: 24, capacity: 6, taskName: 'onMineTile'}, // minage d'une tuile
+  PLACE_TILE: {priority: 24, capacity: 10, taskName: 'onPlaceTile'}, // pose d'un bloc
 
   TELEPORT_PHASE1: {priority: 22, capacity: 1, taskName: 'onTeleportPhase1'}, // gère la téléportation
   TELEPORT_PHASE2: {priority: 22, capacity: 5, taskName: 'onTeleportPhase2'}, // gère la téléportation

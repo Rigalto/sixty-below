@@ -668,6 +668,7 @@ class InventoryManager {
       slot.prefix = ''
     }
     this.#dirtyKeys.add(slot)
+    this.save()
     eventBus.emit('hotbar/slot-update', {index: slotIndex, slot})
     return slot
   }

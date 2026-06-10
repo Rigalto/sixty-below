@@ -549,7 +549,7 @@ class GameCore {
       // else if (item.stype === 'fishingrod') fishingManager.tryFish(tileIndex, tileNode, item, slot.prefix)
       // else if (item.stype === 'container') fillingManager.tryFill(tileIndex, tileNode, item, slot.prefix)
     } else if (item.type & ITEM_TYPE.PLACABLE) {
-      if (item.type & ITEM_TYPE.BLOCK) placingManager.tryPlace(tileIndex, tileNode, item)
+      if (item.type & ITEM_TYPE.BLOCK) placingManager.tryPlace(tileIndex, tileNode, item, slot.slot)
       // else if (item.type & ITEM_TYPE.SEED) sowingManager.tryPlant(tileIndex, tileNode, item, slot.prefix)
       // else if (item.type & ITEM_TYPE.FURNITURE) furnishingManager.tryPlace(tileIndex, tileNode, item, slot.prefix)
     }

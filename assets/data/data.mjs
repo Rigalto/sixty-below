@@ -170,23 +170,23 @@ export const itemTypeToString = (type, armorSlot = null) => {
 export const ITEMS = {
 
   // Topsoil Blocks
-  blockDirt: {name: 'Dirt Block', type: ITEM_TYPE.BLOCK | ITEM_TYPE.PLACABLE, star: 1, stype: 'block', image: 'mined_32_32-3-1', help: 'Dirt', tooltip: 'Mined block — used in construction and crafting'},
-  blockSand: {name: 'Sand Block', type: ITEM_TYPE.BLOCK | ITEM_TYPE.PLACABLE, star: 1, stype: 'block', image: 'mined_32_32-4-1', help: 'Sand', tooltip: 'Mined block — used in construction and crafting'},
-  blockSilt: {name: 'Silt Block', type: ITEM_TYPE.BLOCK | ITEM_TYPE.PLACABLE, star: 2, stype: 'block', image: 'mined_32_32-5-1', help: 'Silt', tooltip: 'Mined block — used in construction and crafting'},
-  blockHumus: {name: 'Humus Block', type: ITEM_TYPE.BLOCK | ITEM_TYPE.PLACABLE, star: 2, stype: 'block', image: 'mined_32_32-0-2', help: 'Humus', tooltip: 'Mined block — used in construction and crafting'},
+  blockDirt: {name: 'Dirt Block', type: ITEM_TYPE.BLOCK | ITEM_TYPE.PLACABLE, star: 1, stype: 'block', placedNode: 'DIRT', image: 'mined_32_32-3-1', help: 'Dirt', tooltip: 'Mined block — used in construction and crafting'},
+  blockSand: {name: 'Sand Block', type: ITEM_TYPE.BLOCK | ITEM_TYPE.PLACABLE, star: 1, stype: 'block', placedNode: 'SAND', image: 'mined_32_32-4-1', help: 'Sand', tooltip: 'Mined block — used in construction and crafting'},
+  blockSilt: {name: 'Silt Block', type: ITEM_TYPE.BLOCK | ITEM_TYPE.PLACABLE, star: 2, stype: 'block', placedNode: 'SILT', image: 'mined_32_32-5-1', help: 'Silt', tooltip: 'Mined block — used in construction and crafting'},
+  blockHumus: {name: 'Humus Block', type: ITEM_TYPE.BLOCK | ITEM_TYPE.PLACABLE, star: 2, stype: 'block', placedNode: 'HUMUS', image: 'mined_32_32-0-2', help: 'Humus', tooltip: 'Mined block — used in construction and crafting'},
 
   // Forest Substrat Blocks
-  blockClay: {name: 'Clay Block', type: ITEM_TYPE.BLOCK | ITEM_TYPE.PLACABLE, star: 1, stype: 'block', image: 'mined_32_32-0-0', help: 'Clay', tooltip: 'Mined block — used in construction and crafting'},
-  blockStone: {name: 'Stone Block', type: ITEM_TYPE.BLOCK | ITEM_TYPE.PLACABLE, star: 2, stype: 'block', image: 'mined_32_32-1-0', help: 'Stone', tooltip: 'Mined block — used in construction and crafting'},
-  blockHardstone: {name: 'Hardstone Block', type: ITEM_TYPE.BLOCK | ITEM_TYPE.PLACABLE, star: 4, stype: 'block', image: 'mined_32_32-2-0', help: 'Hardstone', tooltip: 'Mined block — used in construction and crafting'},
+  blockClay: {name: 'Clay Block', type: ITEM_TYPE.BLOCK | ITEM_TYPE.PLACABLE, star: 1, stype: 'block', placedNode: 'CLAY', image: 'mined_32_32-0-0', help: 'Clay', tooltip: 'Mined block — used in construction and crafting'},
+  blockStone: {name: 'Stone Block', type: ITEM_TYPE.BLOCK | ITEM_TYPE.PLACABLE, star: 2, stype: 'block', placedNode: 'STONE', image: 'mined_32_32-1-0', help: 'Stone', tooltip: 'Mined block — used in construction and crafting'},
+  blockHardstone: {name: 'Hardstone Block', type: ITEM_TYPE.BLOCK | ITEM_TYPE.PLACABLE, star: 4, stype: 'block', placedNode: 'HARDSTONE', image: 'mined_32_32-2-0', help: 'Hardstone', tooltip: 'Mined block — used in construction and crafting'},
   // Desert Substrat Blocks
-  blockSandstone: {name: 'Sandstone Block', type: ITEM_TYPE.BLOCK | ITEM_TYPE.PLACABLE, star: 2, stype: 'block', image: 'mined_32_32-3-0', help: 'Sandstone', tooltip: 'Mined block — used in construction and crafting'},
-  blockAsh: {name: 'Ash Block', type: ITEM_TYPE.BLOCK | ITEM_TYPE.PLACABLE, star: 3, stype: 'block', image: 'mined_32_32-4-0', help: 'Ash', tooltip: 'Mined block — used in construction and crafting'},
-  blockHellstone: {name: 'Hellstone Block', type: ITEM_TYPE.BLOCK | ITEM_TYPE.PLACABLE, star: 5, stype: 'block', image: 'mined_32_32-5-0', help: 'Hellstone', tooltip: 'Mined block — used in construction and crafting'},
+  blockSandstone: {name: 'Sandstone Block', type: ITEM_TYPE.BLOCK | ITEM_TYPE.PLACABLE, star: 2, stype: 'block', placedNode: 'SANDSTONE', image: 'mined_32_32-3-0', help: 'Sandstone', tooltip: 'Mined block — used in construction and crafting'},
+  blockAsh: {name: 'Ash Block', type: ITEM_TYPE.BLOCK | ITEM_TYPE.PLACABLE, star: 3, stype: 'block', placedNode: 'ASH', image: 'mined_32_32-4-0', help: 'Ash', tooltip: 'Mined block — used in construction and crafting'},
+  blockHellstone: {name: 'Hellstone Block', type: ITEM_TYPE.BLOCK | ITEM_TYPE.PLACABLE, star: 5, stype: 'block', placedNode: 'HELLSTONE', image: 'mined_32_32-5-0', help: 'Hellstone', tooltip: 'Mined block — used in construction and crafting'},
   // Jungle Substrat Blocks
-  blockMud: {name: 'Mud Block', type: ITEM_TYPE.BLOCK | ITEM_TYPE.PLACABLE, star: 2, stype: 'block', image: 'mined_32_32-0-1', help: 'Mud', tooltip: 'Mined block — used in construction and crafting'},
-  blockLimestone: {name: 'Limestone Block', type: ITEM_TYPE.BLOCK | ITEM_TYPE.PLACABLE, star: 4, stype: 'block', image: 'mined_32_32-1-1', help: 'Limestone', tooltip: 'Mined block — used in construction and crafting'},
-  blockSlate: {name: 'Slate Block', type: ITEM_TYPE.BLOCK | ITEM_TYPE.PLACABLE, star: 5, stype: 'block', image: 'mined_32_32-2-1', help: 'Slate', tooltip: 'Mined block — used in construction and crafting'},
+  blockMud: {name: 'Mud Block', type: ITEM_TYPE.BLOCK | ITEM_TYPE.PLACABLE, star: 2, stype: 'block', placedNode: 'MUD', image: 'mined_32_32-0-1', help: 'Mud', tooltip: 'Mined block — used in construction and crafting'},
+  blockLimestone: {name: 'Limestone Block', type: ITEM_TYPE.BLOCK | ITEM_TYPE.PLACABLE, star: 4, stype: 'block', placedNode: 'LIMESTONE', image: 'mined_32_32-1-1', help: 'Limestone', tooltip: 'Mined block — used in construction and crafting'},
+  blockSlate: {name: 'Slate Block', type: ITEM_TYPE.BLOCK | ITEM_TYPE.PLACABLE, star: 5, stype: 'block', placedNode: 'SLATE', image: 'mined_32_32-2-1', help: 'Slate', tooltip: 'Mined block — used in construction and crafting'},
 
   // Chunks [succès]
   chunkCopper: {name: 'Copper Chunk', type: 0, star: 1, stype: 'chunk', image: 'mined_32_32-3-2', help: 'Metals', tooltip: 'Primary crafting materials crafted into bars at a Furnace'},
@@ -217,10 +217,10 @@ export const ITEMS = {
   cutSapphire: {name: 'Cut Sapphire', type: 0, star: 5, stype: 'gem', image: 'refined_32_32-3-1', help: 'Gems', tooltip: 'Enhances weapons, gears and accessories'},
 
   // Rock - Geode Stones
-  blockGranite: {name: 'Granite Block', type: ITEM_TYPE.BLOCK | ITEM_TYPE.PLACABLE, star: 4, stype: 'block', image: 'blocks_16_16-0-0', help: 'Geode Stones', tooltip: 'Prized crafting materials found in crystalline structures'},
-  blockMarble: {name: 'Marble Block', type: ITEM_TYPE.BLOCK | ITEM_TYPE.PLACABLE, star: 4, stype: 'block', image: 'blocks_16_16-0-0', help: 'Geode Stones', tooltip: 'Prized crafting materials found in crystalline structures'},
+  blockGranite: {name: 'Granite Block', type: ITEM_TYPE.BLOCK | ITEM_TYPE.PLACABLE, star: 4, stype: 'block', placedNode: 'GRANITE', image: 'blocks_16_16-0-0', help: 'Geode Stones', tooltip: 'Prized crafting materials found in crystalline structures'},
+  blockMarble: {name: 'Marble Block', type: ITEM_TYPE.BLOCK | ITEM_TYPE.PLACABLE, star: 4, stype: 'block', placedNode: 'MARBLE', image: 'blocks_16_16-0-0', help: 'Geode Stones', tooltip: 'Prized crafting materials found in crystalline structures'},
   // Rock - Others
-  blockObsidian: {name: 'Obsidian Block', type: ITEM_TYPE.BLOCK | ITEM_TYPE.PLACABLE, star: 5, stype: 'block', image: 'blocks_16_16-0-0', help: 'Obsidian', tooltip: 'Hardest material'},
+  blockObsidian: {name: 'Obsidian Block', type: ITEM_TYPE.BLOCK | ITEM_TYPE.PLACABLE, star: 5, stype: 'block', placedNode: 'OBSIDIAN', image: 'blocks_16_16-0-0', help: 'Obsidian', tooltip: 'Hardest material'},
   blockMeteorite: {name: 'Meteorite Block', type: ITEM_TYPE.BLOCK, star: 5, stype: 'block', image: 'blocks_16_16-0-0', help: 'Meteorite', tooltip: 'Falling from space, hard to use'},
 
   // Hive
@@ -877,6 +877,20 @@ for (const key in ITEMS) {
       } else {
         TRINKET_BUFF_TABLE[buff] = resolvedOp
       }
+    }
+  }
+  // post traitement des nodes des blocks posables
+  if ((itemDesc.type & ITEM_TYPE.BLOCK) && (itemDesc.type & ITEM_TYPE.PLACABLE)) {
+    if (itemDesc.placedNode) {
+      const placedNode = NODES[itemDesc.placedNode]
+      if (placedNode) {
+        itemDesc.placedNode = placedNode
+      } else {
+        console.error(`[data.mjs] ITEMS.${key} : placedNode incorrect ${itemDesc.placedNode}`)
+      }
+      //
+    } else {
+      console.error(`[data.mjs] ITEMS.${key} : placedNode manquant`)
     }
   }
   // le post traitement des images est effectué par GameCore.#hydrateItems()

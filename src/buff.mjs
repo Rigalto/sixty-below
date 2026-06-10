@@ -221,7 +221,7 @@ class BuffManager {
 
   /**
  * Positionne directement un buff élémentaire dans #values.
- * Réservé aux buffs dont la source est externe à BuffManager (ex: player-freeze).
+ * Réservé aux buffs dont la source est externe à BuffManager (ex: playerFreeze).
  * @param {string} name
  * @param {number|boolean} value
  */
