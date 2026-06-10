@@ -175,3 +175,29 @@ class MiningManager {
   }
 }
 export const miningManager = new MiningManager()
+
+/* ====================================================================================================
+   PLACEMENT DE BLOCS
+   ==================================================================================================== */
+
+/** Codes de tuiles acceptant le placement d'un bloc. */
+const PLACING_NODES = new Set([
+  NODES.SKY.code, NODES.VOID.code,
+  NODES.SEA.code, NODES.WATER.code, NODES.HONEY.code, NODES.SAP.code
+])
+
+class PlacingManager {
+  /**
+   * Valide la demande de placement et l'exécute si les conditions sont réunies.
+   * Seul point d'entrée pour le placement de blocs depuis core.mjs.
+   * @param {number} tileIndex — (y << 10) | x
+   * @param {object} tileNode  — NODES_LOOKUP[tileCode]
+   * @param {object} item      — ITEMS[slot.item]
+   */
+  tryPlace (tileIndex, tileNode, item) {
+    if (!PLACING_NODES.has(tileNode.code)) return
+    console.log('PlacingManager.tryPlace', {tileIndex, tileNode, item})
+    // validations à venir : range, player-freeze, blockedTiles...
+  }
+}
+export const placingManager = new PlacingManager()

@@ -19,7 +19,7 @@ import {achievementManager} from './achievement.mjs'
 import {playerManager, hotbarOverlay} from './player.mjs'
 import {floraManager} from './ecosystem.mjs'
 import {ACHIEVEMENT_CATEGORIES} from '../assets/data/data-achievement.mjs'
-import {miningManager} from './action.mjs'
+import {miningManager, placingManager} from './action.mjs'
 import './ui-debug.mjs'
 import './combat.mjs'
 
@@ -542,11 +542,16 @@ class GameCore {
 
     if (item.type & ITEM_TYPE.TOOL) {
       if (item.stype === 'pickaxe') miningManager.tryMine(tileIndex, tileNode, item, slot.prefix)
-      // else if (item.stype === 'hammer') hammerManager.tryUse(tileIndex, tileNode, item, slot.prefix)
-      // else if (item.stype === 'axe') axeManager.tryChop(tileIndex, tileNode, item, slot.prefix)
-    } else {
-      // if (item.stype === 'seed') seedSystem.tryPlant(tileIndex, tileNode, item, slot.prefix)
-      // else if (item.stype === 'furniture') furnitureSystem.tryPlace(tileIndex, tileNode, item, slot.prefix)
+      // else if (item.stype === 'hammer') hammingManager.tryUse(tileIndex, tileNode, item, slot.prefix)
+      // else if (item.stype === 'axe') choppingManager.tryChop(tileIndex, tileNode, item, slot.prefix)
+      // else if (item.stype === 'sickle') foragingManager.tryForage(tileIndex, tileNode, item, slot.prefix)
+      // else if (item.stype === 'bugnet') catchingingManager.tryCatch(tileIndex, tileNode, item, slot.prefix)
+      // else if (item.stype === 'fishingrod') fishingManager.tryFish(tileIndex, tileNode, item, slot.prefix)
+      // else if (item.stype === 'container') fillingManager.tryFill(tileIndex, tileNode, item, slot.prefix)
+    } else if (item.type & ITEM_TYPE.PLACABLE) {
+      if (item.type & ITEM_TYPE.BLOCK) placingManager.tryPlace(tileIndex, tileNode, item)
+      // else if (item.type & ITEM_TYPE.SEED) sowingManager.tryPlant(tileIndex, tileNode, item, slot.prefix)
+      // else if (item.type & ITEM_TYPE.FURNITURE) furnishingManager.tryPlace(tileIndex, tileNode, item, slot.prefix)
     }
   }
 
