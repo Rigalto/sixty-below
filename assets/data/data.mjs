@@ -770,6 +770,8 @@ export const SNEAKTHORN_COUNT = 80
 export const CURSEDCROWN_COUNT = 80
 export const ABYSSHORN_COUNT = 80
 export const INFERNCAP_COUNT = 60
+export const SUNFLOWER_OAK_MIN_DIST = 3
+
 
 export const TREE_IMAGES = {
   coconut: [
