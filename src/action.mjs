@@ -39,7 +39,7 @@ class MiningManager {
   tryMine (tileIndex, tileNode, tool, prefix) {
     console.log('MiningManager.tryMine', {tileIndex, tileNode, tool, prefix})
     if (tool.star < tileNode.star) return
-    if (!(tileNode.type & NODE_TYPE.SOLID) && !(tileNode.type & NODE_TYPE.WEB)) return
+    if (!(tileNode.type & (NODE_TYPE.SOLID | NODE_TYPE.WEB))) return
     if ((tileNode.type & NODE_TYPE.WALL)) return // Hammer
     if (!blockedTiles.canMine(tileIndex)) return // includes ETERNAL
     if (!this.#isInMiningRange(tileIndex, tool, prefix)) return
