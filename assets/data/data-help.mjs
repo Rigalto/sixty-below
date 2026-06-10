@@ -2839,6 +2839,11 @@ When a [[item:setSquare]] or a [[item:theodolite]] is present in your [[Inventor
     title: 'Tool Ranges',
     category: ['Gameplay', 'Tool'],
     content: `
+
+**Prefix**
+
+'Extended' [[Gear Prefixes|Prefix]] on a tool extend the range by 2 tiles in each direction.
+
 **Display**
 
 When a [[item:slidingBevel]] or a [[item:theodolite]] is present in your [[Inventory]], you can press [R] key to display an orange rectangle around the acctive Tool Range.
@@ -3166,6 +3171,15 @@ Prefixes enhance weapons, armors and tools, adding special properties beyond the
 | Serrated | ✅ | ✅ | ✅ | | | | |
 
 _Some specific gear pieces may deviate from these rules._ ⏳
+
+**Tool Specific**
+
+* **Quick** : increases tool speed by 20%.
+* **Keen** : increases tool speed by 5%.
+* **Sturdy** : decreases tool speed by 5%.
+* **Extended** : only available on tools. Extends [[Tool Ranges|Tool Range]] by 2 tiles in all directions.
+
+_When a tool is used as a weapon, standard weapon prefix effects apply._
 
 **Obtaining Prefixes** ⏳
 

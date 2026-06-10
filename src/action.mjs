@@ -42,10 +42,10 @@ class MiningManager {
     if (!(tileNode.type & NODE_TYPE.SOLID) && !(tileNode.type & NODE_TYPE.WEB)) return
     if ((tileNode.type & NODE_TYPE.WALL)) return // Hammer
     if (!blockedTiles.canMine(tileIndex)) return // includes ETERNAL
-    if (!this.#isInMiningRange(tileIndex, tool)) return
+    if (!this.#isInMiningRange(tileIndex, tool, prefix)) return
     if (buffManager.getBuff('player-freeze')) return
 
-    const speed = this.#computeMineSpeed(tileNode, tool)
+    const speed = this.#computeMineSpeed(tileNode, tool, prefix)
 
     const wasEmpty = this.#queue.length === 0
     this.#queue.push({tileIndex, tileNode, tool, prefix, speed})
@@ -64,8 +64,11 @@ class MiningManager {
    * @param {object} tool     — ITEMS[slot.item]
    * @returns {number} délai en ms
    */
-  #computeMineSpeed (tileNode, tool) {
-    const coefficient = 100 + tool.mining.speed + buffManager.getBuff('mining-speed')
+  #computeMineSpeed (tileNode, tool, prefix) {
+    let coefficient = 100 + tool.mining.speed + buffManager.getBuff('mining-speed')
+    coefficient += prefix === 'Quick' ? 20 : 0
+    coefficient += prefix === 'Keen' ? 5 : 0
+    coefficient -= prefix === 'Sturdy' ? 5 : 0
     return Math.round((coefficient / 100) * tileNode.mining.speed)
   }
 
@@ -74,10 +77,10 @@ class MiningManager {
  * @param {number} tileIndex — (y << 10) | x
  * @returns {boolean}
  */
-  #isInMiningRange (tileIndex, tool) {
+  #isInMiningRange (tileIndex, tool, prefix) {
     const {x: cx, y: cy, direction} = playerManager.getCenterTile()
     const rect = buffManager.getBuff('mining-range')
-    const range = tool.range
+    const range = tool.range + (prefix === 'Extended' ? 2 : 0)
     const ex = rect.x - range
     const ey = rect.y - range
     const ew = rect.w + 2 * range

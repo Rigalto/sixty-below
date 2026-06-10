@@ -569,7 +569,7 @@ class GameCore {
     if (buffName === undefined) return
 
     const rect = buffManager.getBuff(buffName)
-    const range = item.range
+    const range = item.range + (slot.prefix === 'Extended' ? 2 : 0)
     const {x: cx, y: cy, direction} = playerManager.getCenterTile()
 
     const ex = rect.x - range
