@@ -413,7 +413,7 @@ Cette section définit les événements officiels. Tout nouvel événement doit 
 | :---: | :--- | :--- | :--- |
 | E | `time/every-hour-X` | `{ day, hour, minute, isDay }` | x : 0-23, émis à chaque passage à l'heure pile. |
 | E | `time/first-loop` | `{ day, hour, minute, tslot, weather, nextWeather, skyColor, moonPhase, isDay }` | Émis une seule fois au démarrage du rendu. |
-
+| E | `world/tile-changed` | `{ tileIndex: number, tileOldCode: number, tileNewCode: number }`| Le code de la tuile a été modifié. |
 
 
 #### Debug (`WorldMapDebug`, `RealtimeDebugWidget`, `BuffManager`)

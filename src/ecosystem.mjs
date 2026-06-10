@@ -2,6 +2,8 @@
 // SunflowerSystem - SampleSystem
 
 import {WORLD_WIDTH, MICROTASK} from './constant.mjs'
+import {uniqueIdGenerator} from './database.mjs'
+
 import {eventBus, seededRNG, blockedTiles, microTasker} from './utils.mjs'
 import {NODES, ITEMS, PLANT_KIND, PLANT_TYPE} from '../../assets/data/data.mjs'
 import {IMAGE_CACHE} from './assets.mjs'
@@ -96,6 +98,7 @@ class SunflowerSystem {
   #list = [] // record[] — tous les spots (présents ou non)
   #byChunk = new Map() // Map<chunkKey, Set> — lookup spatial pour onPreloadChunksChanged
   #bySoil = new Map() // Map<soilIndex, record> — plantes présentes : détection minage de la tuile sol
+  #spotsBySoil = new Map() // Map<soilIndex, record> — tous les spots (présents ou non) : suppression O(1)
   #displayed = new Set() // Set<record> — spots dans les chunks preload (cible render)
 
   #imgLeft = null // ITEMS.sunflower.placedLeft — tête à gauche (6h–10h), mis en cache dans init()
@@ -120,6 +123,11 @@ class SunflowerSystem {
     // micro-tâches
     this.onSunflowerHour6 = this.onSunflowerHour6.bind(this)
     this.onSunflowerHour17 = this.onSunflowerHour17.bind(this)
+    this.onSunflowerSpotCheck = this.onSunflowerSpotCheck.bind(this)
+
+    // TODO : quand un oak est planté, invalider et supprimer les spots sunflower
+    // dans le rayon [oakX - SUNFLOWER_OAK_MIN_DIST, oakX + SUNFLOWER_OAK_MIN_DIST].
+    // Nécessite un event 'world/oak-planted' (ou équivalent) émis par TreeSystem.
   }
 
   /**
@@ -145,6 +153,7 @@ class SunflowerSystem {
    */
   initPlant (record) {
     this.#list.push(record)
+    this.#spotsBySoil.set(record.soilIndex, record)
     if (!record.present) return
     addToByTile(this.byTile, record)
     addToByChunk(this.#byChunk, record)
@@ -276,13 +285,110 @@ class SunflowerSystem {
   }
 
   /**
+ * Retire un spot de toutes les structures mémoire et le marque deleted en DB.
+ * Détruit la fleur présente au préalable si nécessaire.
+ * @param {object} record
+ */
+  #removeSpot (record) {
+    this.#destroyPresent(record)
+    const list = this.#list
+    const idx = list.indexOf(record)
+    if (idx !== -1) {
+      list[idx] = list[list.length - 1]
+      list.length--
+    }
+    this.#spotsBySoil.delete(record.soilIndex)
+    record.deleted = true
+    saveManager.queueStaticUpdate({storeName: 'plant', record})
+  }
+
+  /**
+ * Microtâche : vérifie si une tuile devenue GRASSFOREST peut accueillir un nouveau spot.
+ * Conditions : tuiles voisines GRASSFOREST, pas d'oak dans [x-minDist, x+minDist], pas de spot existant.
+ * @param {number} soilIndex
+ */
+  onSunflowerSpotCheck (soilIndex) {
+    const GRASSFOREST = NODES.GRASSFOREST.code
+    const x = soilIndex & 0x3FF
+
+    if (chunkManager.getTileAt(soilIndex) !== GRASSFOREST) return
+    // if (chunkManager.getTileAt(soilIndex - 1) !== GRASSFOREST) return
+    // if (chunkManager.getTileAt(soilIndex + 1) !== GRASSFOREST) return
+    if (this.#spotsBySoil.has(soilIndex)) return
+    // TODO enlever le commentaire que TreeSystem sera écrit et possédera la fonction
+    // Je ne suis pas sûr que les paramètres soient corrects
+    // L'arbre occupe les positions x, x+1, x+2. Les tuiles interdites sont les tuiles
+    // x-2, x-1, x+3 et x+4. Si la position du sunflower est xx, alors il ne doit pas y avoir
+    // d'arbre en x+2, x+1, x-3 et x-4
+    // if (!treeSystem.isOakFreeAt(x-2, x-1, x+3, x+4)) return
+    // La signature isOakAt(...positions) dans TreeSystem fera un simple Set.has() sur chacune des 4 valeurs.
+
+    const y = soilIndex >> 10
+    const index = soilIndex - 2 * WORLD_WIDTH
+    const record = {
+      id: uniqueIdGenerator.getUniqueId(),
+      kind: PLANT_KIND.HERB,
+      type: PLANT_TYPE.SUNFLOWER,
+      index,
+      soilIndex,
+      itemId: 'sunflower',
+      present: false,
+      w: 1,
+      h: 2,
+      x,
+      y: y - 2,
+      deleted: false
+    }
+    this.#list.push(record)
+    this.#spotsBySoil.set(soilIndex, record)
+    saveManager.queueStaticUpdate({storeName: 'plant', record})
+  }
+
+  /**
+ * Liaison EventBus : 'world/tile-changed'.
+ * — Détruit le tournesol présent si une tuile de son corps n'est plus SKY ou si son sol n'est plus GRASSFOREST.
+ * — Supprime le spot si son sol n'est plus GRASSFOREST.
+ * — Enqueue onSpotCheck si une tuile devient GRASSFOREST.
+ * Relit les tuiles réelles avant d'agir.
+ * @param {{tileIndex: number, tileOldCode: number, tileNewCode: number}} payload
+ */
+  onTileChanged ({tileIndex, tileOldCode, tileNewCode}) {
+    const SKY = NODES.SKY.code
+    const GRASSFOREST = NODES.GRASSFOREST.code
+
+    // Cas 1 — tuile du corps
+    const byBodyRecord = this.byTile.get(tileIndex)
+    if (byBodyRecord !== undefined && tileNewCode !== SKY) {
+      if (chunkManager.getTileAt(byBodyRecord.index) !== SKY ||
+        chunkManager.getTileAt(byBodyRecord.index + WORLD_WIDTH) !== SKY) {
+        this.#destroyPresent(byBodyRecord)
+      }
+    }
+
+    // Cas 2 — tuile sol : fleur présente + spot
+    if (tileOldCode === GRASSFOREST) {
+      const record = this.#spotsBySoil.get(tileIndex)
+      if (record !== undefined &&
+        chunkManager.getTileAt(record.soilIndex) !== GRASSFOREST) {
+        this.#removeSpot(record)
+      }
+    }
+
+    // Cas 3 — nouvelle tuile GRASSFOREST : candidat spot
+    if (tileNewCode === GRASSFOREST) {
+      const {priority, capacity} = MICROTASK.SUNFLOWER_SPOT_CHECK
+      microTasker.enqueueOnce(this.onSunflowerSpotCheck, priority, capacity, tileIndex)
+    }
+  }
+
+  /**
  * Liaison EventBus : 'world/tile-changed'.
  * Détruit le tournesol si une tuile de son corps n'est plus SKY,
  * ou si sa tuile sol n'est plus GRASSFOREST.
  * Relit les tuiles réelles avant d'agir — aucune supposition sur l'état courant.
  * @param {{tileIndex: number, tileOldCode: number, tileNewCode: number}} payload
  */
-  onTileChanged ({tileIndex, tileOldCode, tileNewCode}) {
+  onTileChanged_ ({tileIndex, tileOldCode, tileNewCode}) {
     const SKY = NODES.SKY.code
     const GRASSFOREST = NODES.GRASSFOREST.code
 
@@ -303,6 +409,27 @@ class SunflowerSystem {
         this.#destroyPresent(bySoilRecord)
       }
     }
+  }
+
+  /**
+ * DEBUG — Affiche un cercle bleu au centre de chaque spot enregistré dans #list.
+ * Vérifie la cohérence avec #spotsBySoil (même cardinal attendu).
+ * @param {CanvasRenderingContext2D} ctx — contexte déjà transformé (caméra appliquée)
+ */
+  debugRenderSpots (ctx) {
+    ctx.save()
+    ctx.fillStyle = 'rgba(0, 100, 255, 0.7)'
+    for (const record of this.#list) {
+      const cx = ((record.index & 0x3FF) << 4) + 8
+      const cy = ((record.index >> 10) << 4) + 40
+      ctx.beginPath()
+      ctx.arc(cx, cy, 4, 0, 6.2832)
+      ctx.fill()
+    }
+    if (this.#list.length !== this.#spotsBySoil.size) {
+      console.warn(`SunflowerSystem: #list(${this.#list.length}) !== #spotsBySoil(${this.#spotsBySoil.size})`)
+    }
+    ctx.restore()
   }
 }
 export const sunflowerSystem = new SunflowerSystem()

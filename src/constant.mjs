@@ -310,6 +310,7 @@ export const MICROTASK = {
 
   SUNFLOWER_HOUR6: {priority: 20, capacity: 2, taskName: 'onSunflowerHour6'}, // gère les sunflower
   SUNFLOWER_HOUR17: {priority: 20, capacity: 1, taskName: 'onSunflowerHour17'}, // gère les sunflower
+  SUNFLOWER_SPOT_CHECK: {priority: 20, capacity: 10, taskName: 'onSunflowerSpotCheck'}, // suppression d'un spot de sunflower
 
   UI_ENV_UPDATE: {priority: 18, capacity: 2, taskName: 'updateClockInOverlay'}, // affiche le widget time/weather/Moon/Location
   UI_TILE_HOVER: {priority: 18, capacity: 1, taskName: 'onTileHoverDetail'}, // affiche le widget tuile survolée

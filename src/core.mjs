@@ -17,7 +17,7 @@ import {furnitureManager} from './housing.mjs'
 import {craftOverlay} from './craft.mjs'
 import {achievementManager} from './achievement.mjs'
 import {playerManager, hotbarOverlay} from './player.mjs'
-import {floraManager} from './ecosystem.mjs'
+import {floraManager, sunflowerSystem} from './ecosystem.mjs'
 import {ACHIEVEMENT_CATEGORIES} from '../assets/data/data-achievement.mjs'
 import {miningManager, placingManager} from './action.mjs'
 import './ui-debug.mjs'
@@ -489,7 +489,10 @@ class GameCore {
     furnitureManager.render(ctx)
     // monsterManager.render(ctx)
     playerManager.render(ctx)
-    if (this.showBlockedTiles) blockedTiles.render(ctx) // DEBUG
+    if (this.showBlockedTiles) {
+      blockedTiles.render(ctx) // DEBUG
+      sunflowerSystem.debugRenderSpots(ctx)
+    }
     if (this.showGrids) {
       const buffs = buffManager.getBuffs(['showGrid', 'showInteractionRange', 'showToolRange'])
       if (buffs.showGrid) this.#showGrid(ctx)
