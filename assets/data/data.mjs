@@ -120,7 +120,7 @@ export const NODES_LOOKUP = []
 // sa nature (ce qu'il est) : 'FURNITURE', 'WALL', ...
 // les actions qui peuvent être conduite dessus : 'CRAFTING' (à renommer), 'USABLE', 'PLACABLE', 'UNDELETABLE', 'CRAFTABLLE', 'REMOVABLE', 'AMMUNITION'...
 export const ITEM_TYPE = {
-  FURNITURE: 0x1, TOOL: 0x2, MATERIAL: 0x4, FOOD: 0x08, BLOCK: 0x10, WALL: 0x20, MECHANISM: 0x40, AMMUNITION: 0x80, CHUNK: 0x100, ARMOR: 0x200, BAR: 0x400, WEAPON: 0x800, TRINKET: 0x1000, ACCESSORY: 0x2000, GEM: 0x4000, POTION: 0x8000, SEMABLE: 0x10000, BAG: 0x20000, BAIT: 0x40000, USABLE: 0x80000, PLACABLE: 0x100000, UNIQUE: 0x200000, UNDISPOSABLE: 0x400000, NONE: 0, CRAFTABLE: 0x800000
+  NONE: 0, FURNITURE: 0x1, TOOL: 0x2, BAIT: 0x4, FOOD: 0x08, BLOCK: 0x10, WALL: 0x20, MECHANISM: 0x40, AMMUNITION: 0x80, SEED: 0x100, ARMOR: 0x200, BAG: 0x400, WEAPON: 0x800, TRINKET: 0x1000, ACCESSORY: 0x2000, POTION: 0x4000, IMMOVABLE: 0x8000, UNDISPOSABLE: 0x10000, MATERIAL: 0x20000, CRAFTABLE: 0x40000, USABLE: 0x80000, PLACABLE: 0x100000, UNIQUE: 0x200000, FREE1: 0x400000, FREE2: 0x800000
 }
 
 export const MAX_FURNITURE_W = 3 // tuiles — vérification taille réelle dans GameCore.#hydrateItems()
@@ -135,22 +135,20 @@ export const itemTypeToString = (type, armorSlot = null) => {
   const ch = []
   if (type & ITEM_TYPE.FURNITURE) { ch.push('Furniture') }
   if (type & ITEM_TYPE.TOOL) { ch.push('Tool') }
-  if (type & ITEM_TYPE.MATERIAL) { ch.push('Crafting Material') }
   if (type & ITEM_TYPE.FOOD) { ch.push('Food') }
   if (type & ITEM_TYPE.BLOCK) { ch.push('Block') }
+  if (type & ITEM_TYPE.SEED) { ch.push('Seed') }
   if (type & ITEM_TYPE.WALL) { ch.push('Wall') }
   if (type & ITEM_TYPE.MECHANISM) { ch.push('Mechanism') }
   if (type & ITEM_TYPE.AMMUNITION) { ch.push('Ammunition') }
-  if (type & ITEM_TYPE.CHUNK) { ch.push('Ore Chunk') }
   if (type & ITEM_TYPE.ARMOR) { ch.push(armorSlot !== null ? `Armor ${capitalize(armorSlot)}` : 'Armor') }
-  if (type & ITEM_TYPE.BAR) { ch.push('Bar') }
   if (type & ITEM_TYPE.WEAPON) { ch.push('Weapon') }
   if (type & ITEM_TYPE.TRINKET) { ch.push('Trinket') }
   if (type & ITEM_TYPE.ACCESSORY) { ch.push('Accessory') }
-  if (type & ITEM_TYPE.GEM) { ch.push('Gem') }
   if (type & ITEM_TYPE.POTION) { ch.push('Potion') }
   if (type & ITEM_TYPE.BAG) { ch.push('Grab Bag') }
   if (type & ITEM_TYPE.BAIT) { ch.push('Bait') }
+  if (type & ITEM_TYPE.MATERIAL) { ch.push('Crafting Material') }
   return ch.join(', ')
 }
 
@@ -172,23 +170,23 @@ export const itemTypeToString = (type, armorSlot = null) => {
 export const ITEMS = {
 
   // Topsoil Blocks
-  blockDirt: {name: 'Dirt Block', type: 0, star: 1, stype: 'block', image: 'mined_32_32-3-1', help: 'Dirt', tooltip: 'Mined block — used in construction and crafting'},
-  blockSand: {name: 'Sand Block', type: 0, star: 1, stype: 'block', image: 'mined_32_32-4-1', help: 'Sand', tooltip: 'Mined block — used in construction and crafting'},
-  blockSilt: {name: 'Silt Block', type: 0, star: 2, stype: 'block', image: 'mined_32_32-5-1', help: 'Silt', tooltip: 'Mined block — used in construction and crafting'},
-  blockHumus: {name: 'Humus Block', type: 0, star: 2, stype: 'block', image: 'mined_32_32-0-2', help: 'Humus', tooltip: 'Mined block — used in construction and crafting'},
+  blockDirt: {name: 'Dirt Block', type: ITEM_TYPE.BLOCK | ITEM_TYPE.PLACABLE, star: 1, stype: 'block', image: 'mined_32_32-3-1', help: 'Dirt', tooltip: 'Mined block — used in construction and crafting'},
+  blockSand: {name: 'Sand Block', type: ITEM_TYPE.BLOCK | ITEM_TYPE.PLACABLE, star: 1, stype: 'block', image: 'mined_32_32-4-1', help: 'Sand', tooltip: 'Mined block — used in construction and crafting'},
+  blockSilt: {name: 'Silt Block', type: ITEM_TYPE.BLOCK | ITEM_TYPE.PLACABLE, star: 2, stype: 'block', image: 'mined_32_32-5-1', help: 'Silt', tooltip: 'Mined block — used in construction and crafting'},
+  blockHumus: {name: 'Humus Block', type: ITEM_TYPE.BLOCK | ITEM_TYPE.PLACABLE, star: 2, stype: 'block', image: 'mined_32_32-0-2', help: 'Humus', tooltip: 'Mined block — used in construction and crafting'},
 
   // Forest Substrat Blocks
-  blockClay: {name: 'Clay Block', type: 0, star: 1, stype: 'block', image: 'mined_32_32-0-0', help: 'Clay', tooltip: 'Mined block — used in construction and crafting'},
-  blockStone: {name: 'Stone Block', type: 0, star: 2, stype: 'block', image: 'mined_32_32-1-0', help: 'Stone', tooltip: 'Mined block — used in construction and crafting'},
-  blockHardstone: {name: 'Hardstone Block', type: 0, star: 4, stype: 'block', image: 'mined_32_32-2-0', help: 'Hardstone', tooltip: 'Mined block — used in construction and crafting'},
+  blockClay: {name: 'Clay Block', type: ITEM_TYPE.BLOCK | ITEM_TYPE.PLACABLE, star: 1, stype: 'block', image: 'mined_32_32-0-0', help: 'Clay', tooltip: 'Mined block — used in construction and crafting'},
+  blockStone: {name: 'Stone Block', type: ITEM_TYPE.BLOCK | ITEM_TYPE.PLACABLE, star: 2, stype: 'block', image: 'mined_32_32-1-0', help: 'Stone', tooltip: 'Mined block — used in construction and crafting'},
+  blockHardstone: {name: 'Hardstone Block', type: ITEM_TYPE.BLOCK | ITEM_TYPE.PLACABLE, star: 4, stype: 'block', image: 'mined_32_32-2-0', help: 'Hardstone', tooltip: 'Mined block — used in construction and crafting'},
   // Desert Substrat Blocks
-  blockSandstone: {name: 'Sandstone Block', type: 0, star: 2, stype: 'block', image: 'mined_32_32-3-0', help: 'Sandstone', tooltip: 'Mined block — used in construction and crafting'},
-  blockAsh: {name: 'Ash Block', type: 0, star: 3, stype: 'block', image: 'mined_32_32-4-0', help: 'Ash', tooltip: 'Mined block — used in construction and crafting'},
-  blockHellstone: {name: 'Hellstone Block', type: 0, star: 5, stype: 'block', image: 'mined_32_32-5-0', help: 'Hellstone', tooltip: 'Mined block — used in construction and crafting'},
+  blockSandstone: {name: 'Sandstone Block', type: ITEM_TYPE.BLOCK | ITEM_TYPE.PLACABLE, star: 2, stype: 'block', image: 'mined_32_32-3-0', help: 'Sandstone', tooltip: 'Mined block — used in construction and crafting'},
+  blockAsh: {name: 'Ash Block', type: ITEM_TYPE.BLOCK | ITEM_TYPE.PLACABLE, star: 3, stype: 'block', image: 'mined_32_32-4-0', help: 'Ash', tooltip: 'Mined block — used in construction and crafting'},
+  blockHellstone: {name: 'Hellstone Block', type: ITEM_TYPE.BLOCK | ITEM_TYPE.PLACABLE, star: 5, stype: 'block', image: 'mined_32_32-5-0', help: 'Hellstone', tooltip: 'Mined block — used in construction and crafting'},
   // Jungle Substrat Blocks
-  blockMud: {name: 'Mud Block', type: 0, star: 2, stype: 'block', image: 'mined_32_32-0-1', help: 'Mud', tooltip: 'Mined block — used in construction and crafting'},
-  blockLimestone: {name: 'Limestone Block', type: 0, star: 4, stype: 'block', image: 'mined_32_32-1-1', help: 'Limestone', tooltip: 'Mined block — used in construction and crafting'},
-  blockSlate: {name: 'Slate Block', type: 0, star: 5, stype: 'block', image: 'mined_32_32-2-1', help: 'Slate', tooltip: 'Mined block — used in construction and crafting'},
+  blockMud: {name: 'Mud Block', type: ITEM_TYPE.BLOCK | ITEM_TYPE.PLACABLE, star: 2, stype: 'block', image: 'mined_32_32-0-1', help: 'Mud', tooltip: 'Mined block — used in construction and crafting'},
+  blockLimestone: {name: 'Limestone Block', type: ITEM_TYPE.BLOCK | ITEM_TYPE.PLACABLE, star: 4, stype: 'block', image: 'mined_32_32-1-1', help: 'Limestone', tooltip: 'Mined block — used in construction and crafting'},
+  blockSlate: {name: 'Slate Block', type: ITEM_TYPE.BLOCK | ITEM_TYPE.PLACABLE, star: 5, stype: 'block', image: 'mined_32_32-2-1', help: 'Slate', tooltip: 'Mined block — used in construction and crafting'},
 
   // Chunks [succès]
   chunkCopper: {name: 'Copper Chunk', type: 0, star: 1, stype: 'chunk', image: 'mined_32_32-3-2', help: 'Metals', tooltip: 'Primary crafting materials crafted into bars at a Furnace'},
@@ -219,18 +217,18 @@ export const ITEMS = {
   cutSapphire: {name: 'Cut Sapphire', type: 0, star: 5, stype: 'gem', image: 'refined_32_32-3-1', help: 'Gems', tooltip: 'Enhances weapons, gears and accessories'},
 
   // Rock - Geode Stones
-  blockGranite: {name: 'Granite Block', type: 0, star: 4, stype: 'block', image: 'blocks_16_16-0-0', help: 'Geode Stones', tooltip: 'Prized crafting materials found in crystalline structures'},
-  blockMarble: {name: 'Marble Block', type: 0, star: 4, stype: 'block', image: 'blocks_16_16-0-0', help: 'Geode Stones', tooltip: 'Prized crafting materials found in crystalline structures'},
+  blockGranite: {name: 'Granite Block', type: ITEM_TYPE.BLOCK | ITEM_TYPE.PLACABLE, star: 4, stype: 'block', image: 'blocks_16_16-0-0', help: 'Geode Stones', tooltip: 'Prized crafting materials found in crystalline structures'},
+  blockMarble: {name: 'Marble Block', type: ITEM_TYPE.BLOCK | ITEM_TYPE.PLACABLE, star: 4, stype: 'block', image: 'blocks_16_16-0-0', help: 'Geode Stones', tooltip: 'Prized crafting materials found in crystalline structures'},
   // Rock - Others
-  blockObsidian: {name: 'Obsidian Block', type: 0, star: 5, stype: 'block', image: 'blocks_16_16-0-0', help: 'Obsidian', tooltip: 'Hardest material'},
-  blockMeteorite: {name: 'Meteorite Block', type: 0, star: 5, stype: 'block', image: 'blocks_16_16-0-0', help: 'Meteorite', tooltip: 'Falling from space, hard to use'},
+  blockObsidian: {name: 'Obsidian Block', type: ITEM_TYPE.BLOCK | ITEM_TYPE.PLACABLE, star: 5, stype: 'block', image: 'blocks_16_16-0-0', help: 'Obsidian', tooltip: 'Hardest material'},
+  blockMeteorite: {name: 'Meteorite Block', type: ITEM_TYPE.BLOCK, star: 5, stype: 'block', image: 'blocks_16_16-0-0', help: 'Meteorite', tooltip: 'Falling from space, hard to use'},
 
   // Hive
-  blockHive: {name: 'Hive Block', type: 0, star: 3, stype: 'block', image: 'blocks_16_16-0-0', help: 'Hive', tooltip: 'Hexagonal alveoles build by Bees'},
+  blockHive: {name: 'Hive Block', type: ITEM_TYPE.BLOCK, star: 3, stype: 'block', image: 'blocks_16_16-0-0', help: 'Hive', tooltip: 'Hexagonal alveoles build by Bees'},
   beeswax: {name: 'Beeswax', type: 0, star: 3, stype: 'wax', image: 'refined_32_32-5-1', help: 'Hive', tooltip: 'Melted down from honeycombs, used as a binding agent'},
 
   // Shell
-  blockShell: {name: 'Shell Block', type: 0, star: 3, stype: 'block', image: 'mined_32_32-2-2', help: 'Shell', tooltip: 'Can be easily powdered'},
+  blockShell: {name: 'Shell Block', type: ITEM_TYPE.BLOCK, star: 3, stype: 'block', image: 'mined_32_32-2-2', help: 'Shell', tooltip: 'Can be easily powdered'},
   shellPowder: {name: 'Shell Powder', type: 0, star: 3, stype: 'powder', image: 'refined_32_32-4-1', help: 'Shell', tooltip: 'A fine natural abrasive — used in polishing and grinding recipes'},
 
   // Cobweb
@@ -248,7 +246,7 @@ export const ITEMS = {
   slug: {name: 'Slug', type: ITEM_TYPE.BAIT, star: 1, stype: 'bait', image: 'blocks_16_16-0-0', help: 'Fishing Baits', tooltip: '???'},
   goldSlug: {name: 'Gold Slug', type: ITEM_TYPE.BAIT, star: 1, stype: 'bait', image: 'blocks_16_16-0-0', help: 'Fishing Baits', tooltip: '???'},
   snail: {name: 'Snail', type: ITEM_TYPE.BAIT, star: 1, stype: 'bait', image: 'blocks_16_16-0-0', help: 'Fishing Baits', tooltip: '???'},
-  frog: {name: 'Frog', type: ITEM_TYPE.BAIT | ITEM_TYPE.MATERIAL, star: 1, stype: 'bait', image: 'blocks_16_16-0-0', help: 'Fishing Baits', tooltip: '???'},
+  frog: {name: 'Frog', type: ITEM_TYPE.BAIT, star: 1, stype: 'bait', image: 'blocks_16_16-0-0', help: 'Fishing Baits', tooltip: '???'},
 
   // pickaxes
   pickaxeCopper: {name: 'Copper Pickaxe', type: ITEM_TYPE.TOOL, stype: 'pickaxe', star: 2, image: 'tools_32_32-4-0', placedright: 'w_42_42-0-0', placedleft: 'w_42_42-0-1', help: 'Mining Tools', tooltip: 'Tools used to remove blocks, converting them to item form', range: 0, mining: {speed: 0, tiles: 1}},
@@ -262,21 +260,21 @@ export const ITEMS = {
   pickaxeGeologist: {name: 'Geologist\'s Pickaxe', type: ITEM_TYPE.TOOL, stype: 'pickaxe', star: 5, image: 'tools_32_32-4-0', placedright: 'w_42_42-0-0', placedleft: 'w_42_42-0-1', help: 'Mining Tools', tooltip: 'Tools used to remove multiple blocks, converting them to item form', range: 2, mining: {speed: 100, tiles: 7}},
 
   // Sickles
-  sickleCopper: {name: 'Copper Sickle', type: ITEM_TYPE.TOOL | ITEM_TYPE.MATERIAL | ITEM_TYPE.CRAFTABLE, stype: 'pickaxe', star: 1, image: 'tools_32_32-4-0', placedright: 'w_42_42-0-0', placedleft: 'w_42_42-0-1', help: 'Harvesting Tools', tooltip: 'Tools used to harvest plants', range: 0},
-  sickleSilver: {name: 'Silver Sickle', type: ITEM_TYPE.TOOL | ITEM_TYPE.MATERIAL | ITEM_TYPE.CRAFTABLE, stype: 'pickaxe', star: 3, image: 'tools_32_32-4-0', placedright: 'w_42_42-0-0', placedleft: 'w_42_42-0-1', speed: 0, help: 'Harvesting Tools', tooltip: 'Tools used to harvest plants', range: 1},
-  sickleGold: {name: 'Gold Sickle', type: ITEM_TYPE.TOOL | ITEM_TYPE.CRAFTABLE, stype: 'pickaxe', star: 5, image: 'tools_32_32-4-0', placedright: 'w_42_42-0-0', placedleft: 'w_42_42-0-1', speed: 0, help: 'Harvesting Tools', tooltip: 'Tools used to harvest plants', range: 2},
+  sickleCopper: {name: 'Copper Sickle', type: ITEM_TYPE.TOOL, stype: 'pickaxe', star: 1, image: 'tools_32_32-4-0', placedright: 'w_42_42-0-0', placedleft: 'w_42_42-0-1', help: 'Harvesting Tools', tooltip: 'Tools used to harvest plants', range: 0},
+  sickleSilver: {name: 'Silver Sickle', type: ITEM_TYPE.TOOL, stype: 'pickaxe', star: 3, image: 'tools_32_32-4-0', placedright: 'w_42_42-0-0', placedleft: 'w_42_42-0-1', speed: 0, help: 'Harvesting Tools', tooltip: 'Tools used to harvest plants', range: 1},
+  sickleGold: {name: 'Gold Sickle', type: ITEM_TYPE.TOOL, stype: 'pickaxe', star: 5, image: 'tools_32_32-4-0', placedright: 'w_42_42-0-0', placedleft: 'w_42_42-0-1', speed: 0, help: 'Harvesting Tools', tooltip: 'Tools used to harvest plants', range: 2},
 
   // hammers
-  hammerCopper: {name: 'Copper Hammer', type: ITEM_TYPE.TOOL | ITEM_TYPE.MATERIAL, stype: 'hammer', star: 2, image: 'tools_32_32-4-0', placedright: 'w_42_42-0-0', placedleft: 'w_42_42-0-1', speed: 0, help: 'Hammers', tooltip: 'Tools used to remove wall, furniture, workstation, converting them to item form'},
+  hammerCopper: {name: 'Copper Hammer', type: ITEM_TYPE.TOOL, stype: 'hammer', star: 2, image: 'tools_32_32-4-0', placedright: 'w_42_42-0-0', placedleft: 'w_42_42-0-1', speed: 0, help: 'Hammers', tooltip: 'Tools used to remove wall, furniture, workstation, converting them to item form'},
 
   // Axes
-  axeCopper: {name: 'Copper Axe', type: ITEM_TYPE.TOOL | ITEM_TYPE.WEAPON | ITEM_TYPE.MATERIAL, stype: 'axe', star: 2, image: 'tools_32_32-2-0', placedright: 'w_42_42-0-0', placedleft: 'w_42_42-0-1', speed: 0, help: 'Axes', tooltip: 'Basic tools used to chop trees. Can be used as a slow weapon'},
+  axeCopper: {name: 'Copper Axe', type: ITEM_TYPE.TOOL | ITEM_TYPE.WEAPON, stype: 'axe', star: 2, image: 'tools_32_32-2-0', placedright: 'w_42_42-0-0', placedleft: 'w_42_42-0-1', speed: 0, help: 'Axes', tooltip: 'Basic tools used to chop trees. Can be used as a slow weapon'},
 
   // Swords
-  swordCopper: {name: 'Copper Sword', type: ITEM_TYPE.WEAPON | ITEM_TYPE.MATERIAL, stype: 'axe', star: 2, image: 'tools_32_32-4-0', placedright: 'w_42_42-0-0', placedleft: 'w_42_42-0-1', speed: 0, help: 'Swords', tooltip: 'Melee weapon'},
+  swordCopper: {name: 'Copper Sword', type: ITEM_TYPE.WEAPON, stype: 'axe', star: 2, image: 'tools_32_32-4-0', placedright: 'w_42_42-0-0', placedleft: 'w_42_42-0-1', speed: 0, help: 'Swords', tooltip: 'Melee weapon'},
 
   // Bows
-  bowCopper: {name: 'Copper Bow', type: ITEM_TYPE.WEAPON | ITEM_TYPE.MATERIAL, stype: 'bow', star: 2, image: 'tools_32_32-4-0', placedright: 'w_42_42-0-0', placedleft: 'w_42_42-0-1', speed: 0, help: 'Bows', tooltip: 'Range weapon'},
+  bowCopper: {name: 'Copper Bow', type: ITEM_TYPE.WEAPON, stype: 'bow', star: 2, image: 'tools_32_32-4-0', placedright: 'w_42_42-0-0', placedleft: 'w_42_42-0-1', speed: 0, help: 'Bows', tooltip: 'Range weapon'},
 
   // Other Weapons
   flamethrower: {name: 'Flamethrower', type: ITEM_TYPE.WEAPON | ITEM_TYPE.TOOL, stype: 'fire', star: 5, image: 'tools_32_32-4-0', placedright: 'w_42_42-0-0', placedleft: 'w_42_42-0-1', speed: 0, help: 'Flamethrower', tooltip: 'Small Range weapon - Can be used for removing Cobweb'},
@@ -403,19 +401,19 @@ export const ITEMS = {
   alchemyTable: {name: 'Alchemy Table', type: ITEM_TYPE.FURNITURE | ITEM_TYPE.PLACABLE, stype: 'station', star: 2, image: 'furniture_32_32-8-0', placed: 'fuws_48_48-2-1', help: 'Alchemy', tooltip: 'Crafting station for potions'},
   cookingPot: {name: 'Cooking Pot', type: ITEM_TYPE.FURNITURE | ITEM_TYPE.PLACABLE, stype: 'station', star: 2, image: 'furniture_32_32-9-0', placed: 'fuws_32_32-7-2', help: 'Cooking', tooltip: 'Crafting station for food'},
 
-  brokenDecomposer: {name: 'Broken Decomposer', type: ITEM_TYPE.FURNITURE, immovable: true, stype: 'immovable', star: 5, image: null, placed: 'fuws_48_32-0-1', help: 'Lost Temple', tooltip: '????'},
+  brokenDecomposer: {name: 'Broken Decomposer', type: ITEM_TYPE.FURNITURE | ITEM_TYPE.IMMOVABLE, stype: 'immovable', star: 5, image: null, placed: 'fuws_48_32-0-1', help: 'Lost Temple', tooltip: '????'},
   decomposerPart: {name: 'Decomposer Part', type: ITEM_TYPE.TOOL, stype: 'part', star: 5, image: null, placed: 'fuws_48_32-0-1', help: 'Decomposer', tooltip: 'Part used to repair Broken Decomposer'},
-  decomposer: {name: 'Decomposer', type: ITEM_TYPE.FURNITURE, immovable: true, stype: 'station', star: 5, image: null, placed: 'fuws_48_32-0-1', help: 'Decomposer', tooltip: '????'},
-  transmutator: {name: 'Transmutator', type: ITEM_TYPE.FURNITURE, immovable: true, stype: 'station', star: 5, image: null, placed: 'fuws_48_32-0-1', help: 'Transmutator', tooltip: '????'},
+  decomposer: {name: 'Decomposer', type: ITEM_TYPE.FURNITURE | ITEM_TYPE.IMMOVABLE, stype: 'station', star: 5, image: null, placed: 'fuws_48_32-0-1', help: 'Decomposer', tooltip: '????'},
+  transmutator: {name: 'Transmutator', type: ITEM_TYPE.FURNITURE | ITEM_TYPE.IMMOVABLE, stype: 'station', star: 5, image: null, placed: 'fuws_48_32-0-1', help: 'Transmutator', tooltip: '????'},
 
   // housing furniture
   noticeBoard: {name: 'Notice Board', type: ITEM_TYPE.FURNITURE | ITEM_TYPE.PLACABLE, stype: 'housing', star: 3, image: '...', placed: '...', help: 'Housing', tooltip: 'Displays and applies the housing buff of this house'},
 
   // Food containers
-  bowl: {name: 'Bowl', type: ITEM_TYPE.FURNITURE | ITEM_TYPE.PLACABLE | ITEM_TYPE.MATERIAL | ITEM_TYPE.CRAFTABLE, stype: 'tableware', star: 1, onTop: true, image: 'furniture_32_32-6-2', placed: 'fuws_32_32-3-0', help: 'Tableware', tooltip: 'The best soups are made in old bowls'},
-  mug: {name: 'Mug', type: ITEM_TYPE.FURNITURE | ITEM_TYPE.PLACABLE | ITEM_TYPE.MATERIAL | ITEM_TYPE.CRAFTABLE, stype: 'tableware', star: 1, onTop: true, image: 'furniture_32_32-7-7', placed: 'fuws_32_32-1-3', help: 'Tableware', tooltip: 'The best Ale container'},
-  plate: {name: 'Plate', type: ITEM_TYPE.FURNITURE | ITEM_TYPE.PLACABLE | ITEM_TYPE.MATERIAL | ITEM_TYPE.CRAFTABLE, stype: 'tableware', star: 1, onTop: true, image: 'furniture_32_32-8-7', placed: 'fuws_16_16-0-0', help: 'Tableware', tooltip: 'Looks as good as it tastes'},
-  trencher: {name: 'Wooden Trencher', type: ITEM_TYPE.FURNITURE | ITEM_TYPE.PLACABLE | ITEM_TYPE.MATERIAL | ITEM_TYPE.CRAFTABLE, stype: 'tableware', onTop: true, star: 1, image: 'furniture_32_32-9-7', placed: 'fuws_16_16-1-0', help: 'Tableware', tooltip: 'A rustic wooden plate, perfect for simple meals'},
+  bowl: {name: 'Bowl', type: ITEM_TYPE.FURNITURE | ITEM_TYPE.PLACABLE, stype: 'tableware', star: 1, onTop: true, image: 'furniture_32_32-6-2', placed: 'fuws_32_32-3-0', help: 'Tableware', tooltip: 'The best soups are made in old bowls'},
+  mug: {name: 'Mug', type: ITEM_TYPE.FURNITURE | ITEM_TYPE.PLACABLE, stype: 'tableware', star: 1, onTop: true, image: 'furniture_32_32-7-7', placed: 'fuws_32_32-1-3', help: 'Tableware', tooltip: 'The best Ale container'},
+  plate: {name: 'Plate', type: ITEM_TYPE.FURNITURE | ITEM_TYPE.PLACABLE, stype: 'tableware', star: 1, onTop: true, image: 'furniture_32_32-8-7', placed: 'fuws_16_16-0-0', help: 'Tableware', tooltip: 'Looks as good as it tastes'},
+  trencher: {name: 'Wooden Trencher', type: ITEM_TYPE.FURNITURE | ITEM_TYPE.PLACABLE, stype: 'tableware', onTop: true, star: 1, image: 'furniture_32_32-9-7', placed: 'fuws_16_16-1-0', help: 'Tableware', tooltip: 'A rustic wooden plate, perfect for simple meals'},
 
   // Liquid containers (small capacity) - images OK
   glass: {name: 'Glass', type: 0, stype: 'tableware', star: 1, image: 'refined_32_32-4-2', help: 'Bottles', tooltip: 'Used to make Bottles or decorative furniture'},
@@ -437,97 +435,97 @@ export const ITEMS = {
   coconutMilk: {name: 'Coconut Milk', type: ITEM_TYPE.MATERIAL, stype: 'beverage', star: 1, image: 'potions_32_32-1-5', help: 'Coconut', tooltip: '???'},
 
   oak: {name: 'Oak', type: 0, stype: 'tree', star: 1, image: null, help: 'Oak & Mahogany', tooltip: '???'},
-  logOak: {name: 'Wood Log', type: ITEM_TYPE.MATERIAL, stype: 'wood', star: 1, image: 'potions_32_32-1-5', help: 'Oak & Mahogany', tooltip: '???'},
-  rootOak: {name: 'Wood Root', type: ITEM_TYPE.MATERIAL, stype: 'root', star: 1, image: 'potions_32_32-1-5', help: 'Oak & Mahogany', tooltip: '???'},
-  acorn: {name: 'Acorn', type: ITEM_TYPE.MATERIAL, stype: 'seed', star: 1, image: 'potions_32_32-1-5', help: 'Oak & Mahogany', tooltip: '???'},
-  seedForest: {name: 'Forest Grass Seed', type: ITEM_TYPE.PLACABLE, stype: 'seed', star: 1, image: 'potions_32_32-1-5', help: 'Forest Grass', tooltip: 'Plant to change Dirt into Forest Grass'},
-  seedJungle: {name: 'Jungle Grass Seed', type: ITEM_TYPE.PLACABLE, stype: 'seed', star: 1, image: 'potions_32_32-1-5', help: 'Jungle Grass', tooltip: 'Plant to change Silt into Jungle Grass'},
+  logOak: {name: 'Wood Log', type: 0, stype: 'wood', star: 1, image: 'potions_32_32-1-5', help: 'Oak & Mahogany', tooltip: '???'},
+  rootOak: {name: 'Wood Root', type: 0, stype: 'root', star: 1, image: 'potions_32_32-1-5', help: 'Oak & Mahogany', tooltip: '???'},
+  acorn: {name: 'Acorn', type: ITEM_TYPE.SEED | ITEM_TYPE.PLACABLE, stype: 'seed', star: 1, image: 'potions_32_32-1-5', help: 'Oak & Mahogany', tooltip: '???'},
+  seedForest: {name: 'Forest Grass Seed', type: ITEM_TYPE.SEED | ITEM_TYPE.PLACABLE, stype: 'seed', star: 1, image: 'potions_32_32-1-5', help: 'Forest Grass', tooltip: 'Plant to change Dirt into Forest Grass'},
+  seedJungle: {name: 'Jungle Grass Seed', type: ITEM_TYPE.SEED | ITEM_TYPE.PLACABLE, stype: 'seed', star: 1, image: 'potions_32_32-1-5', help: 'Jungle Grass', tooltip: 'Plant to change Silt into Jungle Grass'},
 
   mahogany: {name: 'Mahogany', type: 0, stype: 'tree', star: 2, image: null, help: 'Oak & Mahogany', tooltip: '???'},
-  logMahogany: {name: 'Mahogany Log', type: ITEM_TYPE.MATERIAL, stype: 'wood', star: 2, image: 'potions_32_32-1-5', help: 'Oak & Mahogany', tooltip: '???'},
-  rootMahogany: {name: 'Mahogany Root', type: ITEM_TYPE.MATERIAL, stype: 'root', star: 2, image: 'potions_32_32-1-5', help: 'Oak & Mahogany', tooltip: '???'},
-  samara: {name: 'Samara', type: ITEM_TYPE.MATERIAL, stype: 'seed', star: 2, image: 'potions_32_32-1-5', help: 'Oak & Mahogany', tooltip: '???'},
+  logMahogany: {name: 'Mahogany Log', type: 0, stype: 'wood', star: 2, image: 'potions_32_32-1-5', help: 'Oak & Mahogany', tooltip: '???'},
+  rootMahogany: {name: 'Mahogany Root', type: 0, stype: 'root', star: 2, image: 'potions_32_32-1-5', help: 'Oak & Mahogany', tooltip: '???'},
+  samara: {name: 'Samara', type: ITEM_TYPE.SEED | ITEM_TYPE.PLACABLE, stype: 'seed', star: 2, image: 'potions_32_32-1-5', help: 'Oak & Mahogany', tooltip: '???'},
 
   giantMushroom: {name: 'Giant Mushroom', type: 0, stype: 'tree', star: 1, image: null, help: 'Oak & Mahogany', tooltip: '???'},
 
   // Mushrooms
-  bolete: {name: 'Bolete', type: ITEM_TYPE.MATERIAL, stype: 'mushroom', star: 1, image: 'potions_32_32-1-5', placed: 'fuws_32_32-4-0', help: 'Surface Mushrooms', tooltip: '???'},
-  pinkMycenia: {name: 'Pink Mycenia', type: ITEM_TYPE.MATERIAL, stype: 'mushroom', star: 1, image: 'potions_32_32-1-5', placed: 'fuws_32_32-4-0', help: 'Surface Mushrooms', tooltip: '???'},
+  bolete: {name: 'Bolete', type: 0, stype: 'mushroom', star: 1, image: 'potions_32_32-1-5', placed: 'fuws_32_32-4-0', help: 'Surface Mushrooms', tooltip: '???'},
+  pinkMycenia: {name: 'Pink Mycenia', type: 0, stype: 'mushroom', star: 1, image: 'potions_32_32-1-5', placed: 'fuws_32_32-4-0', help: 'Surface Mushrooms', tooltip: '???'},
   frostcap: {name: 'Frostcap', type: 0, stype: 'mushroom', star: 3, image: null, placed: 'potions_32_32-1-5', help: 'Cave Mushrooms', tooltip: '???'},
   dawncap: {name: 'Dawncap', type: 0, stype: 'mushroom', star: 3, image: null, placed: 'potions_32_32-1-5', help: 'Cave Mushrooms', tooltip: '???'},
-  mushroomGill: {name: 'Mushroom Gill', type: ITEM_TYPE.MATERIAL, stype: 'mushroom', star: 3, image: 'potions_32_32-1-5', help: 'Cave Mushrooms', tooltip: '???'},
+  mushroomGill: {name: 'Mushroom Gill', type: 0, stype: 'mushroom', star: 3, image: 'potions_32_32-1-5', help: 'Cave Mushrooms', tooltip: '???'},
 
   // Herbs
-  parsnip: {name: 'Parsnip', type: ITEM_TYPE.MATERIAL, stype: 'herb', star: 1, image: 'potions_32_32-1-5', placed: 'fuws_32_32-4-0', help: 'Parsnip', tooltip: '???'},
-  parsnipMash: {name: 'Parsnip Mash', type: ITEM_TYPE.FOOD | ITEM_TYPE.CRAFTABLE | ITEM_TYPE.USABLE, stype: 'food', star: 1, image: 'potions_32_32-1-5', help: 'Parsnip', tooltip: '???'},
-  vegetableSoup: {name: 'Vegetable Soup', type: ITEM_TYPE.FOOD | ITEM_TYPE.CRAFTABLE | ITEM_TYPE.USABLE, stype: 'food', star: 2, image: 'potions_32_32-1-5', help: 'Soups', tooltip: '???'},
+  parsnip: {name: 'Parsnip', type: 0, stype: 'herb', star: 1, image: 'potions_32_32-1-5', placed: 'fuws_32_32-4-0', help: 'Parsnip', tooltip: '???'},
+  parsnipMash: {name: 'Parsnip Mash', type: ITEM_TYPE.FOOD | ITEM_TYPE.USABLE, stype: 'food', star: 1, image: 'potions_32_32-1-5', help: 'Parsnip', tooltip: '???'},
+  vegetableSoup: {name: 'Vegetable Soup', type: ITEM_TYPE.FOOD | ITEM_TYPE.USABLE, stype: 'food', star: 2, image: 'potions_32_32-1-5', help: 'Soups', tooltip: '???'},
 
   sunflower: {name: 'Sunflower', type: 0, stype: 'herb', star: 1, image: null, placed: 'placed_16_32-2-1', placedLeft: 'placed_16_32-3-1', placedRight: 'placed_16_32-4-1', help: 'Sunflower', tooltip: 'Blooms at dawn and always faces the sun', foraging: {speed: 500, items: [{item: 'sunflowerSeed', count: '3-4'}, {item: 'worm', count: 0.10, buffs: ['lucky:100', 'rainy:200']}]}},
-  sunflowerSeed: {name: 'Sunflower Seed', type: ITEM_TYPE.MATERIAL | ITEM_TYPE.SEED, stype: 'seed', star: 1, image: 'potions_32_32-1-5', placed: 'fuws_32_32-4-0', help: 'Sunflower', tooltip: '???'},
-  sunflowerOil: {name: 'Sunflower Oil', type: ITEM_TYPE.CRAFTABLE, stype: 'oil', star: 1, image: 'potions_32_32-1-5', placed: 'fuws_32_32-4-0', help: 'Sunflower', tooltip: 'Used in cooking, potions, and as a mechanical lubricant'},
+  sunflowerSeed: {name: 'Sunflower Seed', type: ITEM_TYPE.SEED | ITEM_TYPE.PLACABLE, stype: 'seed', star: 1, image: 'potions_32_32-1-5', placed: 'fuws_32_32-4-0', help: 'Sunflower', tooltip: '???'},
+  sunflowerOil: {name: 'Sunflower Oil', type: 0, stype: 'oil', star: 1, image: 'potions_32_32-1-5', placed: 'fuws_32_32-4-0', help: 'Sunflower', tooltip: 'Used in cooking, potions, and as a mechanical lubricant'},
 
   oleander: {name: 'Oleander', type: 0, stype: 'herb', star: 3, image: 'fuws_32_32-4-0', placed: 'fuws_32_32-4-0', help: 'Oleander', tooltip: '???'},
   oleanderOil: {name: 'Oleander Oil', type: 0, stype: 'oil', star: 3, image: 'potions_32_32-1-5', placed: 'fuws_32_32-4-0', help: 'Oleander', tooltip: 'Used in cooking, potions, and as a mechanical lubricant'},
   oleanderBulb: {name: 'Oleander Bulb', type: 0, stype: 'vegie', star: 3, image: 'potions_32_32-1-5', placed: 'fuws_32_32-4-0', help: 'Oleander', tooltip: '???'},
 
-  ambermirage: {name: 'Ambermirage', type: ITEM_TYPE.MATERIAL, stype: 'herb', star: 1, image: 'potions_32_32-1-5', placed: 'fuws_32_32-4-0', help: 'Ambermirage', tooltip: '???'},
+  ambermirage: {name: 'Ambermirage', type: 0, stype: 'herb', star: 1, image: 'potions_32_32-1-5', placed: 'fuws_32_32-4-0', help: 'Ambermirage', tooltip: '???'},
 
-  bloodmoon: {name: 'Bloodmoon', type: ITEM_TYPE.MATERIAL, stype: 'herb', star: 2, image: 'potions_32_32-1-5', placed: 'fuws_32_32-4-0', help: 'Bloodmoon', tooltip: '???'},
-  bloodmoonSeed: {name: 'Bloodmoon Seed', type: ITEM_TYPE.MATERIAL | ITEM_TYPE.SEED, stype: 'seed', star: 2, image: 'potions_32_32-1-5', placed: 'fuws_32_32-4-0', help: 'Bloodmoon', tooltip: '???'},
+  bloodmoon: {name: 'Bloodmoon', type: 0, stype: 'herb', star: 2, image: 'potions_32_32-1-5', placed: 'fuws_32_32-4-0', help: 'Bloodmoon', tooltip: '???'},
+  bloodmoonSeed: {name: 'Bloodmoon Seed', type: ITEM_TYPE.SEED | ITEM_TYPE.PLACABLE, stype: 'seed', star: 2, image: 'potions_32_32-1-5', placed: 'fuws_32_32-4-0', help: 'Bloodmoon', tooltip: '???'},
 
   fernS: {name: 'Shadowfern', type: 0, stype: 'herb', star: 3, image: null, placed: 'fuws_32_32-2-3', speed: 1900, foraging: {speed: 500, items: [{item: 'fernLeaf', count: 1, rainy: 1.8, windy: 1.8}]}, help: 'Ferns', tooltip: '???'},
   fernC: {name: 'Crimsonfrond', type: 0, stype: 'herb', star: 3, image: null, placed: 'fuws_32_32-2-3', speed: 1900, foraging: {speed: 500, items: [{item: 'fernLeaf', count: 1, rainy: 1.8, windy: 1.8}]}, help: 'Ferns', tooltip: '???'},
   fernG: {name: 'Goldenveil', type: 0, stype: 'herb', star: 3, image: null, placed: 'fuws_32_32-2-3', speed: 1900, foraging: {speed: 500, items: [{item: 'fernLeaf', count: 1, rainy: 1.8, windy: 1.8}]}, help: 'Ferns', tooltip: '???'},
   fernM: {name: 'Mistfern', type: 0, stype: 'herb', star: 3, image: null, placed: 'fuws_32_32-2-3', speed: 1900, foraging: {speed: 500, items: [{item: 'fernLeaf', count: 1, rainy: 1.8, windy: 1.8}]}, help: 'Ferns', tooltip: '???'},
-  fernLeaf: {name: 'Fern Leaf', type: ITEM_TYPE.MATERIAL, stype: 'herb', star: 3, image: 'crafting_32_32-0-1', help: 'Ferns', tooltip: 'Crafting Material for Potions and Furniture'},
-  fernSpore: {name: 'Fern Spore', type: ITEM_TYPE.MATERIAL, stype: 'herb', star: 3, image: 'crafting_32_32-0-1', help: 'Ferns', tooltip: 'Crafting Material for Potions and Furniture'},
+  fernLeaf: {name: 'Fern Leaf', type: 0, stype: 'herb', star: 3, image: 'crafting_32_32-0-1', help: 'Ferns', tooltip: 'Crafting Material for Potions and Furniture'},
+  fernSpore: {name: 'Fern Spore', type: 0, stype: 'herb', star: 3, image: 'crafting_32_32-0-1', help: 'Ferns', tooltip: 'Crafting Material for Potions and Furniture'},
 
-  velvetmoss: {name: 'Velvetmoss', type: ITEM_TYPE.MATERIAL, stype: 'herb', star: 3, image: 'crafting_32_32-0-1', placed: 'fuws_32_32-2-3', speed: 1900, foraging: {speed: 500, items: [{item: 'velvetmoss', count: 1, rainy: 1.8, windy: 1.8}]}, help: 'Velvetmoss', tooltip: '???'},
+  velvetmoss: {name: 'Velvetmoss', type: 0, stype: 'herb', star: 3, image: 'crafting_32_32-0-1', placed: 'fuws_32_32-2-3', speed: 1900, foraging: {speed: 500, items: [{item: 'velvetmoss', count: 1, rainy: 1.8, windy: 1.8}]}, help: 'Velvetmoss', tooltip: '???'},
 
   coralR: {name: 'Sunburst Brain Coral', type: 0, stype: 'herb', star: 2, image: null, placed: 'fuws_32_32-2-3', speed: 1900, foraging: {speed: 500, items: [{item: 'coral', count: 1, rainy: 1.8, windy: 1.8}]}, help: 'Corals', tooltip: 'Crafting Material for Potions and Furniture'},
   coralP: {name: 'Starfire Pillar Coral', type: 0, stype: 'herb', star: 2, image: null, placed: 'fuws_32_32-3-3', speed: 1900, foraging: {speed: 500, items: [{item: 'coral', count: 1, rainy: 1.8, windy: 1.8}]}, help: 'Corals', tooltip: 'Crafting Material for Potions and Furniture'},
   coralY: {name: 'Flickering Torch Coral', type: 0, stype: 'herb', star: 2, image: null, placed: 'fuws_32_32-4-3', speed: 1900, foraging: {speed: 500, items: [{item: 'coral', count: 1, rainy: 1.8, windy: 1.8}]}, help: 'Corals', tooltip: 'Crafting Material for Potions and Furniture'},
   coralG: {name: 'Whispering Fan Coral', type: 0, stype: 'herb', star: 2, image: null, placed: 'fuws_32_32-5-3', speed: 1900, foraging: {speed: 500, items: [{item: 'coral', count: 1, rainy: 1.8, windy: 1.8}]}, help: 'Corals', tooltip: 'Crafting Material for Potions and Furniture'},
-  coral: {name: 'Coral', type: ITEM_TYPE.MATERIAL, stype: 'herb', star: 2, image: 'crafting_32_32-0-1', help: 'Corals', tooltip: 'Crafting Material for Potions and Furniture'},
+  coral: {name: 'Coral', type: 0, stype: 'herb', star: 2, image: 'crafting_32_32-0-1', help: 'Corals', tooltip: 'Crafting Material for Potions and Furniture'},
 
   mandrake: {name: 'Mandrake', type: 0, stype: 'herb', star: 2, image: null, placed: 'fuws_32_32-2-3', speed: 1900, foraging: {speed: 500, items: [{item: 'mandrakeRoot', count: 1, rainy: 1.8, windy: 1.8}]}, help: 'Mandrake', tooltip: 'Harvest to collect Potions and Food ingredients'},
-  mandrakeRoot: {name: 'Mandrake Root', type: ITEM_TYPE.MATERIAL, stype: 'herb', star: 3, image: 'crafting_32_32-0-1', help: 'Mandrake', tooltip: 'Crafting Material for Potions and Food'},
+  mandrakeRoot: {name: 'Mandrake Root', type: 0, stype: 'herb', star: 3, image: 'crafting_32_32-0-1', help: 'Mandrake', tooltip: 'Crafting Material for Potions and Food'},
 
   cactus1: {name: 'Cactus', type: 0, stype: 'herb', star: 2, image: null, placed: 'fuws_32_32-2-3', help: 'Cactus', tooltip: '???'},
   cactus2: {name: 'Cactus', type: 0, stype: 'herb', star: 2, image: null, placed: 'fuws_32_32-2-3', help: 'Cactus', tooltip: '???'},
   cactus3: {name: 'Cactus', type: 0, stype: 'herb', star: 2, image: null, placed: 'fuws_32_32-2-3', help: 'Cactus', tooltip: '???'},
   cactus4: {name: 'Cactus', type: 0, stype: 'herb', star: 2, image: null, placed: 'fuws_32_32-2-3', help: 'Cactus', tooltip: '???'},
-  cactus: {name: 'Cactus', type: ITEM_TYPE.MATERIAL, stype: 'herb', star: 2, image: 'fuws_32_32-2-3', help: 'Cactus', tooltip: '???'},
-  cactusFiber: {name: 'Cactus Fiber', type: ITEM_TYPE.MATERIAL, stype: 'herb', star: 2, image: 'fuws_32_32-2-3', help: 'Cactus', tooltip: '???'},
-  cactusSpine: {name: 'Cactus Spine', type: ITEM_TYPE.MATERIAL, stype: 'herb', star: 2, image: 'fuws_32_32-2-3', help: 'Cactus', tooltip: '???'},
+  cactus: {name: 'Cactus', type: 0, stype: 'herb', star: 2, image: 'fuws_32_32-2-3', help: 'Cactus', tooltip: '???'},
+  cactusFiber: {name: 'Cactus Fiber', type: 0, stype: 'herb', star: 2, image: 'fuws_32_32-2-3', help: 'Cactus', tooltip: '???'},
+  cactusSpine: {name: 'Cactus Spine', type: 0, stype: 'herb', star: 2, image: 'fuws_32_32-2-3', help: 'Cactus', tooltip: '???'},
 
   bamboo: {name: 'Bamboo', type: 0, stype: 'herb', star: 2, image: null, placed: 'fuws_32_32-2-3', help: 'Bamboo', tooltip: '???'},
-  bambooStalk: {name: 'Bamboo Stalk', type: ITEM_TYPE.MATERIAL, stype: 'herb', star: 2, image: 'fuws_32_32-2-3', help: 'Bamboo', tooltip: '???'},
-  bambooShoot: {name: 'Bamboo Shoot', type: ITEM_TYPE.MATERIAL, stype: 'herb', star: 2, image: 'fuws_32_32-2-3', help: 'Bamboo', tooltip: '???'},
+  bambooStalk: {name: 'Bamboo Stalk', type: 0, stype: 'herb', star: 2, image: 'fuws_32_32-2-3', help: 'Bamboo', tooltip: '???'},
+  bambooShoot: {name: 'Bamboo Shoot', type: 0, stype: 'herb', star: 2, image: 'fuws_32_32-2-3', help: 'Bamboo', tooltip: '???'},
 
-  satansCube: {name: 'Satan\'s Cube', type: ITEM_TYPE.MATERIAL, stype: 'herb', star: 4, image: 'fuws_32_32-2-3', placed: 'fuws_32_32-2-3', foraging: {speed: 500, items: [{item: 'satansCube', count: 1, rainy: 1.8, windy: 1.8}]}, help: 'Satan\'s Cube', tooltip: 'Harvest to collect Potions and Food ingredients'},
-  sneakthorn: {name: 'Sneakthorn', type: ITEM_TYPE.MATERIAL, stype: 'herb', star: 4, image: 'fuws_32_32-2-3', placed: 'fuws_32_32-2-3', foraging: {speed: 500, items: [{item: 'sneakthorn', count: 1, rainy: 1.8, windy: 1.8}]}, help: 'Sneakthorn', tooltip: 'Harvest to collect Potions and Food ingredients'},
-  cursedcrown: {name: 'Cursedcrown ', type: ITEM_TYPE.MATERIAL, stype: 'herb', star: 4, image: 'fuws_32_32-2-3', placed: 'fuws_32_32-2-3', foraging: {speed: 500, items: [{item: 'cursedcrown', count: 1, rainy: 1.8, windy: 1.8}]}, help: 'Cursedcrown', tooltip: 'Harvest to collect Potions and Food ingredients'},
-  abysshorn: {name: 'Abysshorn', type: ITEM_TYPE.MATERIAL, stype: 'herb', star: 5, image: 'fuws_32_32-2-3', placed: 'fuws_32_32-2-3', foraging: {speed: 500, items: [{item: 'abysshorn', count: 1, rainy: 1.8, windy: 1.8}]}, help: 'Abysshorn', tooltip: 'Harvest to collect Potions and Food ingredients'},
-  inferncap: {name: 'Inferncap', type: ITEM_TYPE.MATERIAL, stype: 'herb', star: 5, image: 'fuws_32_32-2-3', placed: 'fuws_32_32-2-3', foraging: {speed: 500, items: [{item: 'inferncap', count: 1, rainy: 1.8, windy: 1.8}]}, help: 'Inferncap', tooltip: 'Harvest to collect Potions and Food ingredients'},
+  satansCube: {name: 'Satan\'s Cube', type: 0, stype: 'herb', star: 4, image: 'fuws_32_32-2-3', placed: 'fuws_32_32-2-3', foraging: {speed: 500, items: [{item: 'satansCube', count: 1, rainy: 1.8, windy: 1.8}]}, help: 'Satan\'s Cube', tooltip: 'Harvest to collect Potions and Food ingredients'},
+  sneakthorn: {name: 'Sneakthorn', type: 0, stype: 'herb', star: 4, image: 'fuws_32_32-2-3', placed: 'fuws_32_32-2-3', foraging: {speed: 500, items: [{item: 'sneakthorn', count: 1, rainy: 1.8, windy: 1.8}]}, help: 'Sneakthorn', tooltip: 'Harvest to collect Potions and Food ingredients'},
+  cursedcrown: {name: 'Cursedcrown ', type: 0, stype: 'herb', star: 4, image: 'fuws_32_32-2-3', placed: 'fuws_32_32-2-3', foraging: {speed: 500, items: [{item: 'cursedcrown', count: 1, rainy: 1.8, windy: 1.8}]}, help: 'Cursedcrown', tooltip: 'Harvest to collect Potions and Food ingredients'},
+  abysshorn: {name: 'Abysshorn', type: 0, stype: 'herb', star: 5, image: 'fuws_32_32-2-3', placed: 'fuws_32_32-2-3', foraging: {speed: 500, items: [{item: 'abysshorn', count: 1, rainy: 1.8, windy: 1.8}]}, help: 'Abysshorn', tooltip: 'Harvest to collect Potions and Food ingredients'},
+  inferncap: {name: 'Inferncap', type: 0, stype: 'herb', star: 5, image: 'fuws_32_32-2-3', placed: 'fuws_32_32-2-3', foraging: {speed: 500, items: [{item: 'inferncap', count: 1, rainy: 1.8, windy: 1.8}]}, help: 'Inferncap', tooltip: 'Harvest to collect Potions and Food ingredients'},
 
   // Gardening
-  clayPot1: {name: 'Clay Pot (1x1)', type: ITEM_TYPE.FURNITURE | ITEM_TYPE.PLACABLE | ITEM_TYPE.CRAFTABLE, stype: 'pot', surface: true, onTop: true, star: 1, capacity: 1, image: 'furniture_32_32-0-8', placed: 'fuws_16_16-0-2', placedleft: 'fuws_16_16-1-2', placedright: 'fuws_16_16-2-2', help: 'Clay Pots', tooltip: 'Gardening Container'},
-  clayPot2: {name: 'Clay Pot (2x1)', type: ITEM_TYPE.FURNITURE | ITEM_TYPE.PLACABLE | ITEM_TYPE.CRAFTABLE, stype: 'pot', surface: true, onTop: true, star: 1, capacity: 2, image: 'furniture_32_32-1-8', placed: 'fuws_32_16-0-0', placedleft: 'fuws_32_16-1-0', placedright: 'fuws_32_16-2-0', help: 'Clay Pots', tooltip: 'Gardening Container'},
-  clayPot3: {name: 'Clay Pot (3x1)', type: ITEM_TYPE.FURNITURE | ITEM_TYPE.PLACABLE | ITEM_TYPE.CRAFTABLE, stype: 'pot', surface: true, onTop: true, star: 1, capacity: 3, image: 'furniture_32_32-2-8', placed: 'fuws_48_16-0-0', placedleft: 'fuws_48_16-1-0', placedright: 'fuws_48_16-2-0', help: 'Clay Pots', tooltip: 'Gardening Container'},
-  clayPot4: {name: 'Clay Pot (2x2)', type: ITEM_TYPE.FURNITURE | ITEM_TYPE.PLACABLE | ITEM_TYPE.CRAFTABLE, stype: 'pot', surface: true, onTop: true, star: 1, capacity: 4, image: 'furniture_32_32-3-8', placed: 'fuws_32_32-0-4', placedleft: 'fuws_32_32-1-4', placedright: 'fuws_32_32-2-4', help: 'Clay Pots', tooltip: 'Gardening Container'},
+  clayPot1: {name: 'Clay Pot (1x1)', type: ITEM_TYPE.FURNITURE | ITEM_TYPE.PLACABLE, stype: 'pot', surface: true, onTop: true, star: 1, capacity: 1, image: 'furniture_32_32-0-8', placed: 'fuws_16_16-0-2', placedleft: 'fuws_16_16-1-2', placedright: 'fuws_16_16-2-2', help: 'Clay Pots', tooltip: 'Gardening Container'},
+  clayPot2: {name: 'Clay Pot (2x1)', type: ITEM_TYPE.FURNITURE | ITEM_TYPE.PLACABLE, stype: 'pot', surface: true, onTop: true, star: 1, capacity: 2, image: 'furniture_32_32-1-8', placed: 'fuws_32_16-0-0', placedleft: 'fuws_32_16-1-0', placedright: 'fuws_32_16-2-0', help: 'Clay Pots', tooltip: 'Gardening Container'},
+  clayPot3: {name: 'Clay Pot (3x1)', type: ITEM_TYPE.FURNITURE | ITEM_TYPE.PLACABLE, stype: 'pot', surface: true, onTop: true, star: 1, capacity: 3, image: 'furniture_32_32-2-8', placed: 'fuws_48_16-0-0', placedleft: 'fuws_48_16-1-0', placedright: 'fuws_48_16-2-0', help: 'Clay Pots', tooltip: 'Gardening Container'},
+  clayPot4: {name: 'Clay Pot (2x2)', type: ITEM_TYPE.FURNITURE | ITEM_TYPE.PLACABLE, stype: 'pot', surface: true, onTop: true, star: 1, capacity: 4, image: 'furniture_32_32-3-8', placed: 'fuws_32_32-0-4', placedleft: 'fuws_32_32-1-4', placedright: 'fuws_32_32-2-4', help: 'Clay Pots', tooltip: 'Gardening Container'},
 
   // Accessories
 
   // Torches
   gel: {name: 'Gel', type: ITEM_TYPE.MATERIAL, stype: 'light', star: 1, image: 'crafting_32_32-2-0', help: 'Gel', tooltip: 'Crafting material dropped by most slimes'},
-  torch: {name: 'Torch', type: ITEM_TYPE.FURNITURE | ITEM_TYPE.PLACABLE | ITEM_TYPE.CRAFTABLE | ITEM_TYPE.MATERIAL, stype: 'light', star: 1, floating: true, furnitureSet: 'wood', image: 'furniture_32_32-0-3', placed: 'fuws_16_16-2-0', help: 'Torches', tooltip: 'Illuminates the night and closed spaces'},
+  torch: {name: 'Torch', type: ITEM_TYPE.FURNITURE | ITEM_TYPE.PLACABLE, stype: 'light', star: 1, floating: true, furnitureSet: 'wood', image: 'furniture_32_32-0-3', placed: 'fuws_16_16-2-0', help: 'Torches', tooltip: 'Illuminates the night and closed spaces'},
 
   // Campfires
-  campfire: {name: 'Campfire', type: ITEM_TYPE.FURNITURE | ITEM_TYPE.PLACABLE | ITEM_TYPE.CRAFTABLE, stype: 'light', star: 1, image: 'furniture_32_32-7-3', placed: 'fuws_48_32-2-1', help: 'Campfires', tooltip: 'Provides Cozy Buff when lit'},
+  campfire: {name: 'Campfire', type: ITEM_TYPE.FURNITURE | ITEM_TYPE.PLACABLE, stype: 'light', star: 1, image: 'furniture_32_32-7-3', placed: 'fuws_48_32-2-1', help: 'Campfires', tooltip: 'Provides Cozy Buff when lit'},
 
   // Platforms
-  platformOak: {name: 'Wood Platform', type: ITEM_TYPE.FURNITURE | ITEM_TYPE.PLACABLE | ITEM_TYPE.CRAFTABLE, stype: 'platform', star: 1, furnitureSet: 'wood', image: 'furniture_32_32-6-7', placed: 'fuws_16_16-0-1', placedleft: 's_42_42-0-5', placedright: 's_42_42-0-4', help: 'Platforms', tooltip: 'Can be walked on, but also allow movement through the space they occupy'},
+  platformOak: {name: 'Wood Platform', type: ITEM_TYPE.FURNITURE | ITEM_TYPE.PLACABLE, stype: 'platform', star: 1, furnitureSet: 'wood', image: 'furniture_32_32-6-7', placed: 'fuws_16_16-0-1', placedleft: 's_42_42-0-5', placedright: 's_42_42-0-4', help: 'Platforms', tooltip: 'Can be walked on, but also allow movement through the space they occupy'},
 
   // woodptfm: {name: 'Wood Platform', type: ITEM_TYPE.FURNITURE, stype: 'platform', floating: true, furnitureSet: 'wood', sell: 25, star: 1, image: 'furniture_32_32-6-7', placed: 'fuws_16_16-0-1', placedleft: 's_42_42-0-5', placedright: 's_42_42-0-4', help: 'Platforms', tooltip: 'Can be walked on, but also allow movement through the space they occupy'},
 
@@ -562,9 +560,9 @@ export const ITEMS = {
   theodolite: {name: 'Theodolite', type: ITEM_TYPE.TRINKET, stype: 'trinket', star: 4, image: 'trinket_32_32-3-2', help: 'Surveyor\'s Tools', tooltip: 'When in Inventory, press [R] display tiles Grid & perception and tool ranges', buff: [{buff: 'showInteractionRange', value: true}, {buff: 'showToolRange', value: true}, {buff: 'showGrid', value: true}]},
 
   // Armors ITEM_TYPE.ARMOR, stype: 'tableware', armor: 'head'
-  headWood: {name: 'Wood Helmet', type: ITEM_TYPE.ARMOR | ITEM_TYPE.CRAFTING, stype: 'head', armor: 'head', star: 1, image: 'tools_32_32-10-7', placedright: 'heads_26_22-1-0', placedleft: 'heads_26_22-1-1', defense: 1, help: 'Armors', tooltip: 'Provides sturdy protection', set: 'wood'},
-  bodyWood: {name: 'Wood Chainmail', type: ITEM_TYPE.ARMOR | ITEM_TYPE.CRAFTING, stype: 'body', armor: 'body', star: 1, image: 'tools_32_32-11-7', placedright: 'bodies_26_18-1-0', placedleft: 'bodies_26_18-1-1', defense: 1, help: 'Armors', tooltip: 'Provides sturdy protection', set: 'wood'},
-  footWood: {name: 'Wood Greaves', type: ITEM_TYPE.ARMOR | ITEM_TYPE.CRAFTING, stype: 'foot', armor: 'foot', star: 1, image: 'tools_32_32-12-7', placedright: 'feet_26_12-1-0', placedleft: 'feet_26_12-1-1', defense: 0, help: 'Armors', tooltip: 'Provides sturdy protection', set: 'wood'},
+  headWood: {name: 'Wood Helmet', type: ITEM_TYPE.ARMOR, stype: 'head', armor: 'head', star: 1, image: 'tools_32_32-10-7', placedright: 'heads_26_22-1-0', placedleft: 'heads_26_22-1-1', defense: 1, help: 'Armors', tooltip: 'Provides sturdy protection', set: 'wood'},
+  bodyWood: {name: 'Wood Chainmail', type: ITEM_TYPE.ARMOR, stype: 'body', armor: 'body', star: 1, image: 'tools_32_32-11-7', placedright: 'bodies_26_18-1-0', placedleft: 'bodies_26_18-1-1', defense: 1, help: 'Armors', tooltip: 'Provides sturdy protection', set: 'wood'},
+  footWood: {name: 'Wood Greaves', type: ITEM_TYPE.ARMOR, stype: 'foot', armor: 'foot', star: 1, image: 'tools_32_32-12-7', placedright: 'feet_26_12-1-0', placedleft: 'feet_26_12-1-1', defense: 0, help: 'Armors', tooltip: 'Provides sturdy protection', set: 'wood'},
 
   // Monster drops
   antlionMandible: {name: 'Antlion Mandible', type: 0, stype: 'monster', star: 2, image: 'tools_32_32-12-7', help: 'Antlion Pit', tooltip: 'Component for cutting tools'},
