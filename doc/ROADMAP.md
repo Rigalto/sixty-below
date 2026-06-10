@@ -11,8 +11,8 @@
 - implémentation de l'affichage des tuiles (top soil à faire)
 - implémenter les graines de Sunflower qui augmentent la probabilité de pop de sunflower.
 - gérer blockedTiles pour les furnitures (mise à jour - les tests sont faits par l'appelant)
-- Ajouter des planches comme refinement des logs
 - Sauvegarde de la position du joueur en database
+- Utiliser les wood planks dans des recettes
 - brancher les Crafting Stations au craft panel
 - implémenter les platforms dans le déplacement.
 - continuer la correction et l'ajout de fiches d'aide (`HELP`) et d'items (`ITEMS`)

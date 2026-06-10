@@ -4159,7 +4159,8 @@ _Gardening plants and their details will be added in a future update._ ⏳
 **Description**
 
 Oaks and Mahoganies are the dominant trees of the [[Forest]] and [[Jungle]] biomes respectively. They grow on the surface, providing wood, seeds and shelter for various creatures. Both species share the same growth mechanics and interactions.
-sickle
+
+Chopping trees yields logs, which can then be refined into planks using a [[Workbench]].
 
 **Location**
 
@@ -4180,9 +4181,9 @@ sickle
 | [[item:oak]] | Any [[Shaking Tools|Hammers]] | [[monster:hornet]] |
 | [[item:mahogany]] | [[Shaking Tools|Iron Hammers]] or better | [[monster:eyelashViper]] |
 
-| Tree | Loot |
+| Tree | Shaking Loot |
 | [[item:oak]] | {{item:oak:shaking:items}} |
-| [[item:mahogany]] | {{item:oak:shaking:items}} |
+| [[item:mahogany]] | {{item:mahogany:shaking:items}} |
 
 **Interactions - Logging**
 
@@ -4194,7 +4195,7 @@ sickle
 | [[item:oak]] | Any [[Chopping Tools|Axes]] | [[monster:boar]] |
 | [[item:mahogany]] | [[Chopping Tools|Iron Axes]] or better | [[monster:bulletAnt]] |
 
-| Tree | Loot | Extra Drop |
+| Tree | Logging Loot | Extra Drop |
 | [[item:oak]] | {{item:oak:logging:items}} | [[item:rootOak]] |
 | [[item:mahogany]] | {{item:oak:logging:items}} | [[item:rootMahogany]] |
 
@@ -4203,6 +4204,14 @@ sickle
 * Shaking and logging both yield [[item:acorn]] (Oak) or [[item:samara]] (Mahogany)
 * Place a seed on 3 consecutive horizontal [[node:grassForest]] (acorn) or [[node:grassJungle]] (samara) tiles
 * The tree immediately appears at stage 1 and grows naturally from there
+
+**Refining**
+
+Chop trees to gather logs, then process them into planks at a [[Workbench]].
+
+| Tree | Raw Material | Refined Material |
+|  <<itemStar|oak>> | <<itemStar|logOak>> |  <<itemStar|plankOak>> |
+|  <<itemStar|mahogany>> | <<itemStar|logMahogany>> |  <<itemStar|plankMahogany>> |
 
 **Tips**
 
