@@ -1,7 +1,7 @@
 // render.mjs — Camera - WorldRenderer - SkyRenderer - LightRenderer
 
 import {WORLD_WIDTH, WORLD_HEIGHT, CANVAS_WIDTH, CANVAS_HEIGHT, OVERLAYS, MICROTASK} from './constant.mjs'
-import {NODES_LOOKUP} from '../../assets/data/data.mjs'
+import {NODES, NODE_TYPE, NODES_LOOKUP} from '../../assets/data/data.mjs'
 import {eventBus, microTasker, taskScheduler} from './utils.mjs'
 import {IMAGE_CACHE} from './assets.mjs'
 import {chunkManager} from './world.mjs'
@@ -394,6 +394,8 @@ class WorldRenderer {
    * @param {OffscreenCanvas} canvas
    */
   #drawChunkToCanvas (chunkIndex, canvas) {
+    const SKY = NODES.SKY.code
+    const VOID = NODES.VOID.code
     const ctx = canvas.getContext('2d')
     ctx.clearRect(0, 0, canvas.width, canvas.height)
 
@@ -424,11 +426,27 @@ class WorldRenderer {
           continue
         }
 
-        // ── Cas 2 : autotile → calcul variant + border blending ──
         const top = chunkManager.getTileAt(idx - 1024)
         const right = chunkManager.getTileAt(idx + 1)
-        const bottom = chunkManager.getTileAt(idx + 1024)
         const left = chunkManager.getTileAt(idx - 1)
+
+        // ── Cas 2 : NATURAL → variant 3-bits gauche/haut/droite, pas de bandeaux ──
+        if (node.type & NODE_TYPE.NATURAL) {
+          let variant = 0
+          if (left === SKY || left === VOID) variant |= 1 // 1 - 8
+          if (top === SKY || top === VOID) variant |= 2 // 2 - 1
+          if (right === SKY || right === VOID) variant |= 4 // 4 - 2
+          variant -= 1 // 1-7 => 0-6
+
+          // ctx.fillStyle = node.color
+          // ctx.fillRect(px, py, 16, 16)
+          ctx.drawImage(IMAGE_CACHE[img.imgIndex], variant * img.sw, img.sy, img.sw, img.sh, px, py, 16, 16)
+          px += 16
+          continue
+        }
+
+        // ── Cas 3 : autotile → calcul variant + border blending ──
+        const bottom = chunkManager.getTileAt(idx + 1024)
 
         let variant = 0
         if (top !== tileId) variant |= 1

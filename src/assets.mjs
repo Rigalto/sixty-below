@@ -13,6 +13,8 @@ export const IMAGE_FILES = [
   'assets/sprites/substrat_16_16.png',
   // Tuiles de mineral / ore, deposit, rock
   'assets/sprites/mineral_16_16.png',
+  // Tuiles de natural / grass
+  'assets/sprites/natural_16_16.png',
 
   // ITEMS //
   // ///// //
