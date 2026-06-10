@@ -7,7 +7,7 @@
 
 ## En cours
 
-- ajouter le buff range de l'outil dans le mining.
+- prendre en compte le minage des gem/Shell qui ne passent pas en VOID mais en une tuile de ROCK
 - implémentation de l'affichage des tuiles (top soil à faire)
 - implémenter les graines de Sunflower qui augmentent la probabilité de pop de sunflower.
 - gérer blockedTiles pour les furnitures (mise à jour - les tests sont faits par l'appelant)
@@ -333,9 +333,13 @@ La Sap corrode le Copper. Il doit donc être remplacer par du Gold.
 - Affichage des buffs (`BuffWidget`)
 - Gestion des meubles placés dans le monde (`FurnitureManager`)
 
+### Actions
+- Minage (`MiningManager`) - reste GEM/SHELL à traiter
+- Plaçage des blocs (`PlacingManager`)
+
 ### Environement
 - Point d'entrée pour la flore (`FloraManager`)
-- Sunflower (`SunflowerSystem`) - partiel
+- Sunflower (`SunflowerSystem`) - impacts du changement de tuile traités partiellement
 
 ### Rendu (partiel)
 - `WorldRenderer` — rendu tuiles par chunks avec cache OffscreenCanvas
