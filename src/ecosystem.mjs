@@ -3,9 +3,10 @@
 
 import {WORLD_WIDTH, MICROTASK} from './constant.mjs'
 import {eventBus, seededRNG, blockedTiles, microTasker} from './utils.mjs'
-import {PLANT_KIND, PLANT_TYPE, ITEMS} from '../../assets/data/data.mjs'
+import {NODES, ITEMS, PLANT_KIND, PLANT_TYPE} from '../../assets/data/data.mjs'
 import {IMAGE_CACHE} from './assets.mjs'
 import {saveManager} from './persistence.mjs'
+import {chunkManager} from './world.mjs'
 import {camera} from './render.mjs'
 
 /* ====================================================================================================
@@ -114,6 +115,8 @@ class SunflowerSystem {
     eventBus.on('time/every-hour-10', this.onHour10)
     eventBus.on('time/every-hour-13', this.onHour13)
     eventBus.on('time/every-hour-17', this.onHour17)
+    this.onTileChanged = this.onTileChanged.bind(this)
+    eventBus.on('world/tile-changed', this.onTileChanged)
     // micro-tâches
     this.onSunflowerHour6 = this.onSunflowerHour6.bind(this)
     this.onSunflowerHour17 = this.onSunflowerHour17.bind(this)
@@ -253,6 +256,53 @@ class SunflowerSystem {
     if (hour < 10) this.#currentImage = this.#imgLeft
     else if (hour >= 13) this.#currentImage = this.#imgRight
     else this.#currentImage = this.#imgMid
+  }
+
+  /**
+ * Détruit un tournesol présent sans loot : retire toutes les structures et persiste.
+ * Guard : no-op si record.present est déjà false.
+ * @param {object} record
+ */
+  #destroyPresent (record) {
+    if (!record.present) return
+    record.present = false
+    removeFromByTile(this.byTile, record)
+    removeFromByChunk(this.#byChunk, record)
+    this.#bySoil.delete(record.soilIndex)
+    this.#displayed.delete(record)
+    blockedTiles.unblockPlacement(record.index)
+    blockedTiles.unblockPlacement(record.index + WORLD_WIDTH)
+    saveManager.queueStaticUpdate({storeName: 'plant', record})
+  }
+
+  /**
+ * Liaison EventBus : 'world/tile-changed'.
+ * Détruit le tournesol si une tuile de son corps n'est plus SKY,
+ * ou si sa tuile sol n'est plus GRASSFOREST.
+ * Relit les tuiles réelles avant d'agir — aucune supposition sur l'état courant.
+ * @param {{tileIndex: number, tileOldCode: number, tileNewCode: number}} payload
+ */
+  onTileChanged ({tileIndex, tileOldCode, tileNewCode}) {
+    const SKY = NODES.SKY.code
+    const GRASSFOREST = NODES.GRASSFOREST.code
+
+    // Cas 1 — tuile du corps
+    const byBodyRecord = this.byTile.get(tileIndex)
+    if (byBodyRecord !== undefined && tileNewCode !== SKY) {
+      if (chunkManager.getTileAt(byBodyRecord.index) !== SKY ||
+        chunkManager.getTileAt(byBodyRecord.index + WORLD_WIDTH) !== SKY) {
+        this.#destroyPresent(byBodyRecord)
+      }
+    }
+
+    // Cas 2 — tuile sol
+    if (tileOldCode === GRASSFOREST) {
+      const bySoilRecord = this.#bySoil.get(tileIndex)
+      if (bySoilRecord !== undefined &&
+        chunkManager.getTileAt(bySoilRecord.soilIndex) !== GRASSFOREST) {
+        this.#destroyPresent(bySoilRecord)
+      }
+    }
   }
 }
 export const sunflowerSystem = new SunflowerSystem()
