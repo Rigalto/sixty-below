@@ -108,6 +108,9 @@ export const NODES = {
   MARBLEWALL: {code: 115, name: 'Marble Wall', type: NODE_TYPE.BWALL | NODE_TYPE.GAZ, star: 4, color: '#788696', image: 'wall_16_16+15', hammering: {speed: 1800, items: [{item: 'marblewall', count: 1}]}, help: 'Background Wall'},
   OLYMPITEWALL: {code: 116, name: 'Olympite Column', type: NODE_TYPE.ETERNAL | NODE_TYPE.GAZ | NODE_TYPE.WALL, stype: 'background', star: 6, color: '#C8D8E8', image: 'wall_16_16+15', help: 'Lost Temple'}
 }
+// Overlay bordure SKY — 7 colonnes (skyVariant 1–7), ligne 4 de natural_16_16.
+// Résolu par la moulinette loadAssets au même titre que les images de NODES.
+export const SKY_BORDER_NODE = {image: 'natural_16_16+5'}
 
 /** Lookup par code numérique — hot path render/physics */
 export const NODES_LOOKUP = []

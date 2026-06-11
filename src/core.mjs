@@ -1,7 +1,7 @@
 // inventory.mjs — GameCore - KeyboardManager - MouseManager
 
 import {TIME_BUDGET, MICROTASK_FN_NAME_TO_KEY, STATE, OVERLAYS, MICROTASK} from './constant.mjs'
-import {NODES, NODES_LOOKUP, MAX_FURNITURE_W, MAX_FURNITURE_H, ITEM_TYPE, ITEMS, RECIPES, MONSTERS, TREE_IMAGES} from '../../assets/data/data.mjs'
+import {NODES, NODES_LOOKUP, SKY_BORDER_NODE, MAX_FURNITURE_W, MAX_FURNITURE_H, ITEM_TYPE, ITEMS, RECIPES, MONSTERS, TREE_IMAGES} from '../../assets/data/data.mjs'
 import {HELP_TITLES, hydrateHelp} from '../../assets/data/data-help.mjs'
 import {loadAssets, resolveAssetData} from './assets.mjs'
 import {timeManager, taskScheduler, microTasker, eventBus, seededRNG, parseLootCount, parseLootBuffs, buildLootHelpRow, blockedTiles} from './utils.mjs'
@@ -151,6 +151,8 @@ class GameCore {
       if (node.foraging) this.#hydrateLootAction(node.foraging, 'foraging', node.name)
       if (node.hamming) this.#hydrateLootAction(node.hamming, 'hamming', node.name)
     }
+    SKY_BORDER_NODE.image = resolveAssetData(SKY_BORDER_NODE.image)
+
     console.log(`   🔹 Nodes hydratés : ${count}`, NODES)
   }
 

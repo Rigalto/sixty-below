@@ -1,7 +1,7 @@
 // render.mjs — Camera - WorldRenderer - SkyRenderer - LightRenderer
 
 import {WORLD_WIDTH, WORLD_HEIGHT, CANVAS_WIDTH, CANVAS_HEIGHT, OVERLAYS, MICROTASK} from './constant.mjs'
-import {NODES, NODE_TYPE, NODES_LOOKUP} from '../../assets/data/data.mjs'
+import {NODES, NODE_TYPE, NODES_LOOKUP, SKY_BORDER_NODE} from '../../assets/data/data.mjs'
 import {eventBus, microTasker, taskScheduler} from './utils.mjs'
 import {IMAGE_CACHE} from './assets.mjs'
 import {chunkManager} from './world.mjs'
@@ -396,6 +396,8 @@ class WorldRenderer {
   #drawChunkToCanvas (chunkIndex, canvas) {
     const SKY = NODES.SKY.code
     const VOID = NODES.VOID.code
+    const TOPSOIL_SUBSTRAT = NODE_TYPE.TOPSOIL | NODE_TYPE.SUBSTRAT
+
     const ctx = canvas.getContext('2d')
     ctx.clearRect(0, 0, canvas.width, canvas.height)
 
@@ -411,6 +413,7 @@ class WorldRenderer {
         const tileId = chunkManager.getTileAt(idx)
         const node = NODES_LOOKUP[tileId]
 
+        // on ne trace par les tuiles transparentes
         if (!node || node.color === 'none') { px += 16; continue }
 
         const img = node.image
@@ -454,10 +457,6 @@ class WorldRenderer {
         if (bottom !== tileId) variant |= 4
         if (left !== tileId) variant |= 8
 
-        // Aplat couleur de base
-        ctx.fillStyle = node.color
-        ctx.fillRect(px, py, 16, 16)
-
         // Bandeaux voisins (ordre top→right→bottom→left, le dernier l'emporte aux coins)
         if (variant & 1) {
           const topNode = NODES_LOOKUP[top]
@@ -490,6 +489,17 @@ class WorldRenderer {
 
         // Image autotile — colonne = variant, ligne = sy pré-calculé
         ctx.drawImage(IMAGE_CACHE[img.imgIndex], variant * img.sw, img.sy, img.sw, img.sh, px, py, 16, 16)
+
+        // ── Cas 4 : tuile de surface - ajout d'une bordure ──
+        if (node.type & TOPSOIL_SUBSTRAT) {
+          let skyVariant = 0
+          if (left === SKY) skyVariant |= 1 // 1 - 8
+          if (top === SKY) skyVariant |= 2 // 2 - 1
+          if (right === SKY) skyVariant |= 4 // 4 - 2
+
+          const bi = SKY_BORDER_NODE.image
+          ctx.drawImage(IMAGE_CACHE[bi.imgIndex], (skyVariant - 1) * bi.sw, bi.sy, bi.sw, bi.sh, px, py, 16, 16)
+        }
 
         px += 16
       }
