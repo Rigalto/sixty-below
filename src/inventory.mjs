@@ -1,6 +1,6 @@
 // inventory.mjs — InventoryManager · InventorySlot · InventoryOverlay
 
-import {OVERLAYS, BAG_CAPACITY, HOTBAR_CAPACITY, ARMOR_CAPACITY, ARMOR_SLOT_LABELS, ACCESSORY_CAPACITY, CONTAINER_STYPES, CONTAINER_CAPACITY, ARMOR_SLOTS, PATH_RENAME, PATH_LOCKED, PATH_UNLOCKED, PATH_CRAFT, PATH_HELP, PATH_DEBUG, PATH_SPLIT, PATH_TRASH_DOWN, PATH_TRASH_UP, PATH_USE, PATH_WARNING, PATH_ARROW_RIGHT, PATH_INVENTORY, SVG_ICON} from './constant.mjs'
+import {IS_DEV, OVERLAYS, BAG_CAPACITY, HOTBAR_CAPACITY, ARMOR_CAPACITY, ARMOR_SLOT_LABELS, ACCESSORY_CAPACITY, CONTAINER_STYPES, CONTAINER_CAPACITY, ARMOR_SLOTS, PATH_RENAME, PATH_LOCKED, PATH_UNLOCKED, PATH_CRAFT, PATH_HELP, PATH_DEBUG, PATH_SPLIT, PATH_TRASH_DOWN, PATH_TRASH_UP, PATH_USE, PATH_WARNING, PATH_ARROW_RIGHT, PATH_INVENTORY, SVG_ICON} from './constant.mjs'
 import {eventBus, capitalize} from './utils.mjs'
 import {createOverlayHeader} from './ui.mjs'
 import {ITEMS, ITEM_TYPE} from '../assets/data/data.mjs'
@@ -1819,6 +1819,7 @@ class InventoryOverlay {
     btnDebug.innerHTML = SVG_ICON(PATH_DEBUG, 'class="debug-icon"')
     btnDebug.addEventListener('click', () => { eventBus.emit('debug/command') })
     col.appendChild(btnDebug)
+    if (!IS_DEV) this.btnDebug.style.display = 'none'
 
     return col
   }

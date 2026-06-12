@@ -4,7 +4,7 @@ import {eventBus, seededRNG} from './utils.mjs'
 import {gameCore} from './core.mjs'
 import {buffManager} from './buff.mjs'
 import {playerManager} from './player.mjs'
-import {WEATHER_TYPE, MOON_PHASE, MOON_PHASE_BLURRED, STATE, OVERLAYS, UI_LAYOUT, PATH_INVENTORY, PATH_CRAFT, PATH_TROPHY, PATH_HELP, PATH_NEW_WORLD, PATH_SAVE, PATH_RESTORE, PATH_DEBUG, PATH_CANCEL, SVG_ICON, PLAYER} from './constant.mjs'
+import {IS_DEV, WEATHER_TYPE, MOON_PHASE, MOON_PHASE_BLURRED, STATE, OVERLAYS, UI_LAYOUT, PATH_INVENTORY, PATH_CRAFT, PATH_TROPHY, PATH_HELP, PATH_NEW_WORLD, PATH_SAVE, PATH_RESTORE, PATH_DEBUG, PATH_CANCEL, SVG_ICON, PLAYER} from './constant.mjs'
 import {furnitureManager} from './housing.mjs'
 import {floraManager} from './ecosystem.mjs'
 import {ITEMS} from '../assets/data/data.mjs'
@@ -420,6 +420,7 @@ class MenuBarWidget {
     this.#btnHelp = btnHelp
     this.#btnNewWorld = btnNew
     this.#btnSnapshot = btnSnap
+    if (!IS_DEV) this.#btnSnapshot.style.display = 'none'
   }
 
   /**

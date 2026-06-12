@@ -1,5 +1,10 @@
 // constant.mjs
 
+// Seules les GitHub Pages suppriment le Debug intégré.
+export const IS_DEV = !window.location.hostname.endsWith('.github.io')
+// Seul le serveur local inclut le Debug intégré.
+// export const IS_DEV = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
+
 /* =========================================
    1. SYSTEM & PERFORMANCE
    ========================================= */
