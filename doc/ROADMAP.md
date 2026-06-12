@@ -8,8 +8,6 @@
 ## En cours
 
 - prendre en compte le minage des gem/Shell qui ne passent pas en VOID mais en une tuile de ROCK
-- implémentation de l'affichage des tuiles (top soil à faire)
-- implémenter la ligne noire des tuiles au contact de void
 - implémenter les graines de Sunflower qui augmentent la probabilité de pop de sunflower.
 - gérer blockedTiles pour les furnitures (mise à jour - les tests sont faits par l'appelant)
 - Sauvegarde de la position du joueur en database
@@ -18,7 +16,7 @@
 - implémenter les platforms dans le déplacement.
 - continuer la correction et l'ajout de fiches d'aide (`HELP`) et d'items (`ITEMS`)
 - Recettes pour créer Linen Rope et l'utiliser
-_ POI : seed:1234, mushroomCave: 950,280, fernCave: 500,170, mossCave: 650,120
+_ POI : seed:1234, mushroomCave: 950,280, fernCave: 500,170, mossCave: 650,120, topaz: 520,300
 
 ---
 
