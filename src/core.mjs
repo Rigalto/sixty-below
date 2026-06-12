@@ -270,7 +270,7 @@ class GameCore {
     const state = await database.getAllGameState()
     // ── Détection première session ─────────────────────────────────────────────
     if (!state.randomkey) {
-      eventBus.emit('creation/open')
+      eventBus.emit('overlay/open-request', 'creation')
       return
     }
 
@@ -749,7 +749,7 @@ class KeyboardManager {
 
   constructor () {
     this.#overlayStack = []
-    this.state = STATE.EXPLORATION // il faut pouvoir passer en STATE;CREATION si la base de donnée est vide
+    this.state = STATE.EXPLORATION // il faut pouvoir passer en STATE.CREATION si la base de donnée est vide
     this.debugTrigger = false // affiche dans la console les logs du MicroTasker, du TaskScheduler et de l'EventBus
     this.directionsArrow = 0
     this.directionsGame = 0
