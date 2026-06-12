@@ -1819,7 +1819,7 @@ class InventoryOverlay {
     btnDebug.innerHTML = SVG_ICON(PATH_DEBUG, 'class="debug-icon"')
     btnDebug.addEventListener('click', () => { eventBus.emit('debug/command') })
     col.appendChild(btnDebug)
-    if (!IS_DEV) this.btnDebug.style.display = 'none'
+    if (!IS_DEV) btnDebug.style.display = 'none'
 
     return col
   }
