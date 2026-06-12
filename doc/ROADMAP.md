@@ -216,6 +216,8 @@ La Sap corrode le Copper. Il doit donc être remplacer par du Gold.
 - `utils.mjs` — EventBus, MicroTasker, TaskScheduler, TimeManager, blockedTiles, seededRNG
 - `database.mjs` — Database
 - `core.mjs` — GameLoop, InputManager, KeyboardManager
+- Lancement via GitHub Pages
+- Affichage Overlay Création si la database est vide
 
 ### Données (Layer 3)
 - `data.mjs` — NODES, ITEMS, PLANTS, RECIPES (structure + cross-références)

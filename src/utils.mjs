@@ -756,11 +756,9 @@ class BlockedTiles {
     }
 
     // si pas de monde créé, alors pas de eternalTiles
-    if (eternalTiles !== undefined) {
-      for (const tileIndex of eternalTiles) {
-        this.blockMining(tileIndex)
-        this.blockPlacement(tileIndex)
-      }
+    for (const tileIndex of eternalTiles) {
+      this.blockMining(tileIndex)
+      this.blockPlacement(tileIndex)
     }
   }
 
