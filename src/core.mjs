@@ -19,7 +19,7 @@ import {achievementManager} from './achievement.mjs'
 import {playerManager, hotbarOverlay} from './player.mjs'
 import {floraManager, sunflowerSystem} from './ecosystem.mjs'
 import {ACHIEVEMENT_CATEGORIES} from '../assets/data/data-achievement.mjs'
-import {miningManager, placingManager} from './action.mjs'
+import {miningManager, placingManager, foragingManager} from './action.mjs'
 import './ui-debug.mjs'
 import './combat.mjs'
 
@@ -549,7 +549,7 @@ class GameCore {
       if (item.stype === 'pickaxe') miningManager.tryMine(tileIndex, tileNode, item, slot.prefix)
       // else if (item.stype === 'hammer') hammingManager.tryUse(tileIndex, tileNode, item, slot.prefix)
       // else if (item.stype === 'axe') choppingManager.tryChop(tileIndex, tileNode, item, slot.prefix)
-      // else if (item.stype === 'sickle') foragingManager.tryForage(tileIndex, tileNode, item, slot.prefix)
+      else if (item.stype === 'sickle') foragingManager.tryForage(tileIndex, tileNode, item, slot.prefix)
       // else if (item.stype === 'bugnet') catchingingManager.tryCatch(tileIndex, tileNode, item, slot.prefix)
       // else if (item.stype === 'fishingrod') fishingManager.tryFish(tileIndex, tileNode, item, slot.prefix)
       // else if (item.stype === 'container') fillingManager.tryFill(tileIndex, tileNode, item, slot.prefix)

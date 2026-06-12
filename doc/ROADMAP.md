@@ -7,12 +7,14 @@
 
 ## En cours
 
+- implémentation du foraging
 - implémenter les graines de Sunflower qui augmentent la probabilité de pop de sunflower.
 - gérer blockedTiles pour les furnitures (mise à jour - les tests sont faits par l'appelant)
 - Sauvegarde de la position du joueur en database
 - Utiliser les wood planks dans des recettes
 - brancher les Crafting Stations au craft panel
 - implémenter les platforms dans le déplacement.
+- corriger les icones dans tool_32_32 : dague, épée, bow, hache, pickaxe, hammer, bug net, fishing rod
 - continuer la correction et l'ajout de fiches d'aide (`HELP`) et d'items (`ITEMS`)
 - Recettes pour créer Linen Rope et l'utiliser
 _ POI : seed:1234, mushroomCave: 950,280, fernCave: 500,170, mossCave: 650,120, topaz: 520,300

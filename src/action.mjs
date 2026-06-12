@@ -267,3 +267,29 @@ class PlacingManager {
   }
 }
 export const placingManager = new PlacingManager()
+
+/* ====================================================================================================
+   FORAGING DE PLANTES
+   ==================================================================================================== */
+
+class ForagingManager {
+  constructor () {
+    this.onTeleportBegin = this.onTeleportBegin.bind(this)
+    eventBus.on('player/teleport-begin', this.onTeleportBegin)
+  }
+
+  /**
+   * Valide la demande de foraging et amorce la récolte si les conditions sont réunies.
+   * @param {number} tileIndex — (y << 10) | x
+   * @param {object} tileNode  — NODES_LOOKUP[tileCode]
+   * @param {object} tool      — ITEMS[slot.item]
+   * @param {string} prefix    — slot.prefix
+   */
+  tryForage (tileIndex, tileNode, tool, prefix) {
+    console.log('ForagingManager.tryForage', {tileIndex, tileNode, tool, prefix})
+  }
+
+  /** Liaison EventBus : 'player/teleport-begin'. */
+  onTeleportBegin () {}
+}
+export const foragingManager = new ForagingManager()
