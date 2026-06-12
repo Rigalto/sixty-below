@@ -4160,7 +4160,7 @@ _Gardening plants and their details will be added in a future update._ ⏳
 
 Oaks and Mahoganies are the dominant trees of the [[Forest]] and [[Jungle]] biomes respectively. They grow on the surface, providing wood, seeds and shelter for various creatures. Both species share the same growth mechanics and interactions.
 
-Chopping trees yields logs, which can then be refined into planks using a [[Workbench]].
+Chopping trees yields logs, which can then be refined into planks using a [[Woodworking|Workbench]].
 
 **Location**
 
@@ -4207,7 +4207,7 @@ Chopping trees yields logs, which can then be refined into planks using a [[Work
 
 **Refining**
 
-Chop trees to gather logs, then process them into planks at a [[Workbench]].
+Chop trees to gather logs, then process them into planks at a [[Woodworking|Workbench]].
 
 | Tree | Raw Material | Refined Material |
 |  <<itemStar|oak>> | <<itemStar|logOak>> |  <<itemStar|plankOak>> |

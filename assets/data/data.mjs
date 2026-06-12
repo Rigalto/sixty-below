@@ -57,7 +57,7 @@ export const NODES = {
     color: '#c1c186',
     image: 'natural_16_16+1',
     help: 'Jungle Grass',
-    mining: {speed: 500, items: [{item: 'blockSilt', count: 1}, {item: 'seedJungle', count: 0.15}], foraging: {speed: 500, items: [{item: 'seedJungle', count: 0.15, lucky: 1.5}, {item: 'slug', count: 0.05, lucky: 2, rainy: 10}]}},
+    mining: {speed: 500, items: [{item: 'blockSilt', count: 1}, {item: 'seedJungle', count: 0.15}]},
     foraging: {speed: 2400, items: [{item: 'seedForest', count: 0.2, buffs: ['lucky:3000']}, {item: 'worm', count: 0.05, buffs: ['lucky:900', 'rainy:900']}, {item: 'slug', count: 0.04, buffs: ['lucky:950', 'rainy:850']}, {item: 'goldWorm', count: 0.02, buffs: ['+lucky']}, {item: 'goldSlug', count: 0.01, buffs: ['+lucky']}]}
   },
   GRASSMUSHROOM: {
@@ -79,7 +79,7 @@ export const NODES = {
     color: '#e2b3ff',
     image: 'natural_16_16+3',
     help: 'Fern Grass',
-    mining: {speed: 500, items: [{item: 'blockHumus', count: 4, lucky: 5}, {item: 'fernLeaf', count: 0.2, lucky: 75}], foraging: {speed: 500, items: [{item: 'fernLeaf', count: 0.6, lucky: 1.5}, {item: 'frog', count: 0.2, lucky: 50}, {item: 'fernSpore', count: 0.1, lucky: 50}]}},
+    mining: {speed: 500, items: [{item: 'blockHumus', count: 4, lucky: 5}, {item: 'fernLeaf', count: 0.2, lucky: 75}]},
     foraging: {speed: 2400, items: [{item: 'slug', count: 0.04, buffs: ['lucky:950', 'rainy:850']}, {item: 'goldSlug', count: 0.01, buffs: ['+lucky']}]}
   },
   GRASSMOSS: {
@@ -90,7 +90,7 @@ export const NODES = {
     color: '#c1c186',
     help: 'Moss Grass',
     image: 'natural_16_16+4',
-    mining: {speed: 500, items: [{item: 'blockSilt', count: 1, lucky: 2.5}], foraging: {speed: 500, items: [{item: 'moss', count: 1, lucky: 1.4}]}},
+    mining: {speed: 500, items: [{item: 'blockSilt', count: 1, lucky: 2.5}]},
     foraging: {speed: 2400, items: [{item: 'slug', count: 0.04, buffs: ['lucky:950', 'rainy:850']}, {item: 'goldSlug', count: 0.01, buffs: ['+lucky']}]}
   },
   WEB: {code: 35, name: 'Cobweb', type: NODE_TYPE.WEB | NODE_TYPE.GAZ, star: 1, color: '#788696', image: 'substrat_16_16+10', speed: 1900, mining: {speed: 500, items: [{item: 'silk', count: 1}, {item: 'eggSpider', count: '1-3-0.08'}]}, help: 'Cobweb'},

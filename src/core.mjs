@@ -104,19 +104,21 @@ class GameCore {
   #hydrateLootAction (action, actionName, nodeName) {
     const allNames = new Set()
 
-    for (const lootItem of action.items) {
-      const itemId = lootItem.item
-      lootItem.item = ITEMS[itemId]
-      if (!lootItem.item) {
-        console.error(`[hydrate] ${nodeName}.${actionName} : item inconnu '${itemId}'`)
+    if (action.items !== undefined) {
+      for (const lootItem of action.items) {
+        const itemId = lootItem.item
+        lootItem.item = ITEMS[itemId]
+        if (!lootItem.item) {
+          console.error(`[hydrate] ${nodeName}.${actionName} : item inconnu '${itemId}'`)
+        }
+        lootItem.count = parseLootCount(lootItem.count)
+        const {buffs, buffList} = parseLootBuffs(lootItem.buffs)
+        lootItem.buffs = buffs
+        for (const name of buffList) allNames.add(name)
+        lootItem.helpRow = buildLootHelpRow(lootItem)
       }
-      lootItem.count = parseLootCount(lootItem.count)
-      const {buffs, buffList} = parseLootBuffs(lootItem.buffs)
-      lootItem.buffs = buffs
-      for (const name of buffList) allNames.add(name)
-      lootItem.helpRow = buildLootHelpRow(lootItem)
+      action.buffList = [...allNames, `${actionName}-yield`]
     }
-    action.buffList = [...allNames, `${actionName}-yield`]
   }
 
   /**
