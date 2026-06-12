@@ -249,6 +249,13 @@ class GameCore {
 
     console.log('🚀 Démarrage de la session...')
 
+    // Init RNG en mode aléatoire (Math.random()) pour la session de jeu
+    seededRNG.init()
+
+    // OBLIGATOIRE EN PREMIER POUR QUE LES MANAGERS PUISSENT TRAVAILLER
+    microTasker.init()
+    microTasker.initDebug(MICROTASK_FN_NAME_TO_KEY)
+
     // 1. Nettoyage des enregistrements invalides (system=0)
     // Les entités détruites pendant le jeu sont marquées system=0 plutôt que
     // supprimées (modification plus rapide qu'une suppression en temps réel).
@@ -261,6 +268,11 @@ class GameCore {
     // 2. Chargement massif de l'état (1 seule requête DB)
     // Retourne un objet : {timestamp: 480000, weather: 1, playerPosition: '100|82|1', ...}
     const state = await database.getAllGameState()
+    // ── Détection première session ─────────────────────────────────────────────
+    if (!state.randomkey) {
+      eventBus.emit('creation/open')
+      return
+    }
 
     // 3. Dispatch aux systèmes (Injection de dépendance des données)
     // Valeur par défaut (480000) gérée si state.timestamp est undefined (nouveau jeu)
@@ -269,12 +281,6 @@ class GameCore {
     // 4. Initialisation des systèmes (Layer 1)
     this.previousTileIndex = undefined
 
-    // Init RNG en mode aléatoire (Math.random()) pour la session de jeu
-    seededRNG.init()
-
-    // OBLIGATOIRE EN PREMIER POUR QUE LES MANAGERS PUISSENT TRAVAILLER
-    microTasker.init()
-    microTasker.initDebug(MICROTASK_FN_NAME_TO_KEY)
     taskScheduler.init(state.timestamp)
     timeManager.init(state.timestamp, state.weather, state.nextWeather)
 
