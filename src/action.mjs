@@ -124,7 +124,12 @@ class MiningManager {
     }
 
     const tileAboveCode = chunkManager.getTileAt(entry.tileIndex - WORLD_WIDTH)
-    const tileNewCode = (tileAboveCode === SKY || tileAboveCode === NODES.FOG.code) ? SKY : VOID
+    const keep = entry.tileNode.mining.keep
+
+    const tileNewCode = keep
+      ? keep.code
+      : (tileAboveCode === SKY || tileAboveCode === NODES.FOG.code) ? SKY : VOID
+
     // descente en remplaçant les VOID par des SKY
     if (tileNewCode === SKY) {
       let idx = entry.tileIndex + WORLD_WIDTH

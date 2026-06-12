@@ -7,7 +7,6 @@
 
 ## En cours
 
-- prendre en compte le minage des gem/Shell qui ne passent pas en VOID mais en une tuile de ROCK
 - implémenter les graines de Sunflower qui augmentent la probabilité de pop de sunflower.
 - gérer blockedTiles pour les furnitures (mise à jour - les tests sont faits par l'appelant)
 - Sauvegarde de la position du joueur en database
@@ -36,6 +35,7 @@ _ POI : seed:1234, mushroomCave: 950,280, fernCave: 500,170, mossCave: 650,120, 
 - Les meubles sont mal positionnés en y dans les maisons anciennes
 
 ## À faire — Bugs connus
+- Lorsqu'une tuile est modifiée sans déplacement de la souris, les informations la concernant dans le Control Panel ne sont pas mises à jour
 - Lorsque l'on clique plusieurs fois sur le même topic dans l'aide, il est ajouté plusieurs fois dans l'historique
 - Il n'y a pas assez de Cactus dans le monde => sans doute pas assez de SAND sur le sol souterrain.
 - Il n'y a pas assez de Bamboo dans le monde => sans doute pas assez de SILT sur le sol souterrain.
