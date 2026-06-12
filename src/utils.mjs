@@ -755,9 +755,12 @@ class BlockedTiles {
       this.blockPlacement((y << 10) | (WORLD_WIDTH - 1))
     }
 
-    for (const tileIndex of eternalTiles) {
-      this.blockMining(tileIndex)
-      this.blockPlacement(tileIndex)
+    // si pas de monde créé, alors pas de eternalTiles
+    if (eternalTiles !== undefined) {
+      for (const tileIndex of eternalTiles) {
+        this.blockMining(tileIndex)
+        this.blockPlacement(tileIndex)
+      }
     }
   }
 
