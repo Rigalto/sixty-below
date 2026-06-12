@@ -1462,7 +1462,7 @@ class InventorySlot extends HTMLElement {
     const item = ITEMS[value]
     const {file, sx, sy, sw, sh} = item.image
     this._elImage.classList.remove('hidden')
-    this._elImage.style.backgroundImage = `url('/assets/sprites/${file}.png')`
+    this._elImage.style.backgroundImage = `url('assets/sprites/${file}.png')`
     this._elImage.style.backgroundPosition = `-${sx}px -${sy}px`
     this._elImage.style.width = `${sw}px`
     this._elImage.style.height = `${sh}px`
