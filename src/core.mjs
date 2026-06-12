@@ -1,6 +1,6 @@
 // inventory.mjs — GameCore - KeyboardManager - MouseManager
 
-import {TIME_BUDGET, MICROTASK_FN_NAME_TO_KEY, STATE, OVERLAYS, MICROTASK} from './constant.mjs'
+import {IS_DEV, TIME_BUDGET, MICROTASK_FN_NAME_TO_KEY, STATE, OVERLAYS, MICROTASK} from './constant.mjs'
 import {NODES, NODES_LOOKUP, SKY_BORDER_NODE, MAX_FURNITURE_W, MAX_FURNITURE_H, ITEM_TYPE, ITEMS, RECIPES, MONSTERS, TREE_IMAGES} from '../assets/data/data.mjs'
 import {HELP_TITLES, hydrateHelp} from '../assets/data/data-help.mjs'
 import {loadAssets, resolveAssetData} from './assets.mjs'
@@ -854,12 +854,12 @@ class KeyboardManager {
     if (tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT') return
 
     // Debug dans la console (Touche ² (AZERTY) ou ` (QWERTY))
-    if (e.code === 'Backquote') { this.debugTrigger = true }
-    if (e.code === 'KeyT') {
+    if (IS_DEV && e.code === 'Backquote') { this.debugTrigger = true }
+    if (IS_DEV && e.code === 'KeyT') {
       gameCore.timeScale = gameCore.timeScale === 1 ? 10 : gameCore.timeScale === 10 ? 20 : 1
       console.log(`⏱ x${gameCore.timeScale}`)
     }
-    if (e.code === 'NumpadAdd') gameCore.showBlockedTiles = true
+    if (IS_DEV && e.code === 'NumpadAdd') gameCore.showBlockedTiles = true
     if (e.code === 'KeyR') gameCore.showGrids = true
 
     // 1 Overlay

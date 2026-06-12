@@ -12,14 +12,9 @@
 - gérer blockedTiles pour les furnitures (mise à jour - les tests sont faits par l'appelant)
 - Sauvegarde de la position du joueur en database
 - supprimer les actions de debug accessibles au joueur, quand hébergement sous GitHub :
-  - Rouche ²core.mjs — KeyboardManager
-  - Touche T (timeScale)core.mjs — KeyboardManager
-  - Touche NumpadAddcore.mjs — KeyboardManager
-  - Icône debug inventory panelinventory.mjs ou ui.mjs
-  - Icône snapshot control panelui.mjs — menuBarWidget
   - import './ui-debug.mjs'core.mjs
   - mockup() + #debug-mouse-coordscore.mjs
-  - DB_CONFIG.DEBUGconstant.mjs
+  - DB_CONFIG.DEBUG constant.mjs
 - Implémenter l'attribut 'tiles' du mining (permet de miner plusieurs tuiles en une seule fois)
 - Utiliser les wood planks dans des recettes
 - Supprimer les chunks en mémoire qui sont périmés
