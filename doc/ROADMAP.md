@@ -11,8 +11,9 @@
 - implémenter les graines de Sunflower qui augmentent la probabilité de pop de sunflower.
 - gérer blockedTiles pour les furnitures (mise à jour - les tests sont faits par l'appelant)
 - Sauvegarde de la position du joueur en database
-- supprimer les actions de debug accessibles au joueur, quand hébergement sous GitHub :
-  - import './ui-debug.mjs'core.mjs
+- Supprimer les actions de debug accessibles au joueur, quand hébergement sous GitHub :
+  - affichage après génération du monde
+  - affichage des statistiques sur l'aide en ligne
   - DB_CONFIG.DEBUG constant.mjs
 - Implémenter l'attribut 'tiles' du mining (permet de miner plusieurs tuiles en une seule fois)
 - Utiliser les wood planks dans des recettes
