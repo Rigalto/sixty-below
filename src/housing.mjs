@@ -7,7 +7,7 @@ import {saveManager} from './persistence.mjs'
 import {camera} from './render.mjs'
 import {playerManager} from './player.mjs'
 import {IMAGE_CACHE} from './assets.mjs'
-import {MAX_FURNITURE_W, MAX_FURNITURE_H, ITEMS} from '../../assets/data/data.mjs'
+import {MAX_FURNITURE_W, MAX_FURNITURE_H, ITEMS} from '../assets/data/data.mjs'
 
 /* ====================================================================================================
    FURNITURE MANAGER

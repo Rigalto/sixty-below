@@ -4,8 +4,8 @@ import {eventBus} from './utils.mjs'
 import {database} from './database.mjs'
 import {OVERLAYS, PATH_TROPHY} from './constant.mjs'
 import {createOverlayHeader} from './ui.mjs'
-import {ITEMS, MONSTERS} from '../../assets/data/data.mjs'
-import {ACHIEVEMENT_CATEGORIES} from '../../assets/data/data-achievement.mjs'
+import {ITEMS, MONSTERS} from '../assets/data/data.mjs'
+import {ACHIEVEMENT_CATEGORIES} from '../assets/data/data-achievement.mjs'
 
 /* ====================================================================================================
    CSS - injection des styles utilisés par toutes les classes du fichier

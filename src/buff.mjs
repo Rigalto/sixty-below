@@ -1,6 +1,6 @@
 // buff.mjs — BuffManager - BuffWidget
 
-import {ITEMS, TRINKET_BUFF_TABLE} from '../../assets/data/data.mjs'
+import {ITEMS, TRINKET_BUFF_TABLE} from '../assets/data/data.mjs'
 import {eventBus, timeManager} from './utils.mjs'
 import {UI_LAYOUT} from './constant.mjs'
 // import {timeManager, taskScheduler, microTasker} from './utils.mjs'

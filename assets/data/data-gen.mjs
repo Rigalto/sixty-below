@@ -1,8 +1,8 @@
 // data-gen.mjs
 
 import {NODES, BIOME_TYPE} from './data.mjs'
-import {parseLootEntry} from '../../src/utils.mjs'
-import {WORLD_WIDTH, WORLD_HEIGHT, SEA_LEVEL, TOPSOIL_Y_SKY_SURFACE, TOPSOIL_Y_SURFACE_UNDER, TOPSOIL_Y_UNDER_CAVERNS, TOPSOIL_Y_CAVERNS_MID} from '../../src/constant.mjs'
+import {parseLootEntry} from '../src/utils.mjs'
+import {WORLD_WIDTH, WORLD_HEIGHT, SEA_LEVEL, TOPSOIL_Y_SKY_SURFACE, TOPSOIL_Y_SURFACE_UNDER, TOPSOIL_Y_UNDER_CAVERNS, TOPSOIL_Y_CAVERNS_MID} from '../src/constant.mjs'
 
 // Re-exports pour generate.mjs
 export {WORLD_WIDTH, WORLD_HEIGHT, SEA_LEVEL, TOPSOIL_Y_SKY_SURFACE, TOPSOIL_Y_SURFACE_UNDER, TOPSOIL_Y_UNDER_CAVERNS, TOPSOIL_Y_CAVERNS_MID}

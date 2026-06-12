@@ -5,7 +5,7 @@ import {WORLD_WIDTH, MICROTASK} from './constant.mjs'
 import {uniqueIdGenerator} from './database.mjs'
 
 import {eventBus, seededRNG, blockedTiles, microTasker} from './utils.mjs'
-import {NODES, ITEMS, PLANT_KIND, PLANT_TYPE} from '../../assets/data/data.mjs'
+import {NODES, ITEMS, PLANT_KIND, PLANT_TYPE} from '../assets/data/data.mjs'
 import {IMAGE_CACHE} from './assets.mjs'
 import {saveManager} from './persistence.mjs'
 import {chunkManager} from './world.mjs'

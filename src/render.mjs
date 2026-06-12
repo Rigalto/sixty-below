@@ -1,7 +1,7 @@
 // render.mjs — Camera - WorldRenderer - SkyRenderer - LightRenderer
 
 import {WORLD_WIDTH, WORLD_HEIGHT, CANVAS_WIDTH, CANVAS_HEIGHT, OVERLAYS, MICROTASK} from './constant.mjs'
-import {NODES, NODE_TYPE, NODES_LOOKUP, SKY_BORDER_NODE} from '../../assets/data/data.mjs'
+import {NODES, NODE_TYPE, NODES_LOOKUP, SKY_BORDER_NODE} from '../assets/data/data.mjs'
 import {eventBus, microTasker, taskScheduler} from './utils.mjs'
 import {IMAGE_CACHE} from './assets.mjs'
 import {chunkManager} from './world.mjs'

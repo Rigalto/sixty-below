@@ -1,7 +1,7 @@
 // player.mjs — PlayerManager - LifeManager - HotbarOverlay
 
 import {WORLD_WIDTH, WORLD_HEIGHT, PLAYER, MICROTASK, TELEPORT_FADE_MS, TELEPORT_WAIT_MS, HOTBAR_CAPACITY} from './constant.mjs'
-import {NODE_TYPE, NODES_LOOKUP, ITEMS} from '../../assets/data/data.mjs'
+import {NODE_TYPE, NODES_LOOKUP, ITEMS} from '../assets/data/data.mjs'
 import {eventBus, taskScheduler} from './utils.mjs'
 import {buffManager} from './buff.mjs'
 import {inventoryManager} from './inventory.mjs'
