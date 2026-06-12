@@ -13,7 +13,6 @@
 - Sauvegarde de la position du joueur en database
 - supprimer les actions de debug accessibles au joueur, quand hébergement sous GitHub :
   - import './ui-debug.mjs'core.mjs
-  - mockup() + #debug-mouse-coordscore.mjs
   - DB_CONFIG.DEBUG constant.mjs
 - Implémenter l'attribut 'tiles' du mining (permet de miner plusieurs tuiles en une seule fois)
 - Utiliser les wood planks dans des recettes

@@ -20,12 +20,12 @@ import {playerManager, hotbarOverlay} from './player.mjs'
 import {floraManager, sunflowerSystem} from './ecosystem.mjs'
 import {ACHIEVEMENT_CATEGORIES} from '../assets/data/data-achievement.mjs'
 import {miningManager, placingManager, foragingManager} from './action.mjs'
-import './ui-debug.mjs'
 import './combat.mjs'
 
-const mockup = () => {
+const WITH_DEBUG_HUD = true // passer à false pour désactiver sans toucher IS_DEV
+
+const debugHUD = () => {
   const debugDiv = document.createElement('div')
-  debugDiv.id = 'debug-mouse-coords' // ID pour le cibler plus tard
 
   // Styles pour positionnement et visibilité
   debugDiv.style.position = 'fixed'
@@ -58,9 +58,8 @@ class GameCore {
 
     // Flag pour le déclenchement debug (touche ²)
     this.debugTrigger = false
-    this.debugMap = false
     // DEBUG
-    this.mockupDiv = mockup()
+    if (IS_DEV && WITH_DEBUG_HUD) this.hudDiv = debugHUD()
     this.timeScale = 1 // ×1 normal — T pour cycler ×1 / ×10 / ×60 (debug)
     this.showBlockedTiles = false // true pour afficher les tuiles bloquées
     this.showGrids = false // true pour afficher les tuiles bloquées
@@ -94,6 +93,9 @@ class GameCore {
 
     // 3. Liens avec le DOM
     mouseManager.init()
+
+    // 4. Chargement des classes de débug
+    if (IS_DEV) await import('./ui-debug.mjs')
 
     this.isBooted = true
     console.timeEnd('Engine Boot')
@@ -465,7 +467,9 @@ class GameCore {
     }
 
     // DEBUG
-    this.mockupDiv.innerHTML = `Mouse: ${mouseManager.mouse.x}, ${mouseManager.mouse.y}, ${tileIndex}, ${tileCode}`
+    if (IS_DEV && WITH_DEBUG_HUD) {
+      this.hudDiv.innerHTML = `Mouse: ${mouseManager.mouse.x}, ${mouseManager.mouse.y}, ${tileIndex}, ${tileCode}`
+    }
     if (leftClick) { console.log('leftClick', mouseManager.mouse) }
     if (rightClick) { console.log('rightClick', mouseManager.mouse) }
 
@@ -732,8 +736,7 @@ const MOVEMENT_MAP_GAME = {
 }
 
 const OVERLAY_MAP = {
-  m: 'map',
-  M: 'map',
+  ...(IS_DEV && {m: 'map', M: 'map'}),
   i: 'inventory',
   I: 'inventory',
   k: 'craft',
@@ -824,7 +827,6 @@ class KeyboardManager {
     this.#updateState()
     // On notifie l'overlay pour qu'il s'affiche
     eventBus.emit(`${id}/open`)
-    this.debugLog()
   }
 
   #closeOverlay () {
@@ -833,12 +835,6 @@ class KeyboardManager {
     const id = this.#overlayStack.pop() // Retire le dernier
     this.#updateState()
     eventBus.emit(`${id}/close`)
-    this.debugLog()
-  }
-
-  debugLog () {
-    const mockupDiv = document.getElementById('debug-mouse-coords')
-    mockupDiv.textContent = this.#overlayStack.join('\n')
   }
 
   /**
