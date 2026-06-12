@@ -76,13 +76,6 @@ class BuffManager {
     ['fall-damage', () => {
       return 100
     }],
-    ['mining-range', () => {
-      const x = -2
-      const y = -4
-      const w = 6
-      const h = 8
-      return {x, y, w, h}
-    }],
     ['interaction-range', () => {
       const x = -10
       const y = -8
@@ -90,7 +83,24 @@ class BuffManager {
       const h = 16
       return {x, y, w, h}
     }],
+    ['mining-range', () => {
+      const x = -2
+      const y = -4
+      const w = 6
+      const h = 8
+      return {x, y, w, h}
+    }],
     ['mining-speed', () => {
+      return 100
+    }],
+    ['foraging-range', () => {
+      const x = -2
+      const y = -4
+      const w = 5
+      const h = 7
+      return {x, y, w, h}
+    }],
+    ['foraging-speed', () => {
       return 100
     }]
   ])

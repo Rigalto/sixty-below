@@ -38,15 +38,75 @@ export const NODES = {
   SAP: {code: 23, name: 'Sap', type: NODE_TYPE.LIQUID, star: 0, color: '#008000', image: null, viscosity: 400, help: 'Sap'},
 
   // ── Natural (topsoil en surface recouvert de végétation) ─────────────────────
-  GRASSFOREST: {code: 30, name: 'Forest Grass', type: NODE_TYPE.NATURAL | NODE_TYPE.SOLID, star: 1, color: '#e6ddc4', image: 'natural_16_16+0', mining: {speed: 500, items: [{item: 'blockDirt', count: 1}, {item: 'seedForest', count: 0.2}, {item: 'worm', count: 0.02, buffs: ['rainy:900', 'lucky:100']}]}, foraging: {speed: 500, items: [{item: 'seedForest', count: 0.2, buffs: ['lucky:3000']}, {item: 'worm', count: 0.05, buffs: ['lucky:900', 'rainy:900']}, {item: 'slug', count: 0.04, buffs: ['lucky:950', 'rainy:850']}, {item: 'goldWorm', count: 0.02, buffs: ['+lucky']}, {item: 'goldSlug', count: 0.01, buffs: ['+lucky']}]}, help: 'Forest Grass'},
-  GRASSJUNGLE: {code: 31, name: 'Jungle Grass', type: NODE_TYPE.NATURAL | NODE_TYPE.SOLID, star: 2, color: '#c1c186', image: 'natural_16_16+1', mining: {speed: 500, items: [{item: 'blockSilt', count: 1}, {item: 'seedJungle', count: 0.15}], foraging: {speed: 500, items: [{item: 'seedJungle', count: 0.15, lucky: 1.5}, {item: 'slug', count: 0.05, lucky: 2, rainy: 10}]}}, help: 'Jungle Grass'},
-  GRASSMUSHROOM: {code: 32, name: 'Mushroom Grass', type: NODE_TYPE.NATURAL | NODE_TYPE.SOLID, star: 3, color: '#e2b3ff', image: 'natural_16_16+2', mining: {speed: 500, items: [{item: 'blockHumus', count: 1}, {item: 'slug', count: 0.05, lucky: 200, rainy: 100}]}, foraging: {speed: 500, items: [{item: 'slug', count: 0.15, lucky: 2, rainy: 10}]}, help: 'Mushroom Grass'},
-  GRASSFERN: {code: 33, name: 'Fern Grass', type: NODE_TYPE.NATURAL | NODE_TYPE.SOLID, star: 4, color: '#e2b3ff', image: 'natural_16_16+3', speed: 500, mining: {speed: 500, items: [{item: 'blockHumus', count: 4, lucky: 5}, {item: 'fernLeaf', count: 0.2, lucky: 75}], foraging: {speed: 500, items: [{item: 'fernLeaf', count: 0.6, lucky: 1.5}, {item: 'frog', count: 0.2, lucky: 50}, {item: 'fernSpore', count: 0.1, lucky: 50}]}}, help: 'Fern Grass'},
-  GRASSMOSS: {code: 34, name: 'Moss Grass', type: NODE_TYPE.NATURAL | NODE_TYPE.SOLID, star: 4, color: '#c1c186', image: 'natural_16_16+4', mining: {speed: 500, items: [{item: 'blockSilt', count: 1, lucky: 2.5}], foraging: {speed: 500, items: [{item: 'moss', count: 1, lucky: 1.4}]}}, help: 'Moss Grass'},
+  GRASSFOREST: {
+    code: 30,
+    name: 'Forest Grass',
+    type: NODE_TYPE.NATURAL | NODE_TYPE.SOLID,
+    star: 1,
+    color: '#e6ddc4',
+    image: 'natural_16_16+0',
+    help: 'Forest Grass',
+    mining: {speed: 500, items: [{item: 'blockDirt', count: 1}, {item: 'seedForest', count: 0.2}, {item: 'worm', count: 0.02, buffs: ['rainy:900', 'lucky:100']}]},
+    foraging: {speed: 2400, items: [{item: 'seedForest', count: 0.2, buffs: ['lucky:3000']}, {item: 'worm', count: 0.05, buffs: ['lucky:900', 'rainy:900']}, {item: 'slug', count: 0.04, buffs: ['lucky:950', 'rainy:850']}, {item: 'goldWorm', count: 0.02, buffs: ['+lucky']}, {item: 'goldSlug', count: 0.01, buffs: ['+lucky']}]}
+  },
+  GRASSJUNGLE: {
+    code: 31,
+    name: 'Jungle Grass',
+    type: NODE_TYPE.NATURAL | NODE_TYPE.SOLID,
+    star: 2,
+    color: '#c1c186',
+    image: 'natural_16_16+1',
+    help: 'Jungle Grass',
+    mining: {speed: 500, items: [{item: 'blockSilt', count: 1}, {item: 'seedJungle', count: 0.15}], foraging: {speed: 500, items: [{item: 'seedJungle', count: 0.15, lucky: 1.5}, {item: 'slug', count: 0.05, lucky: 2, rainy: 10}]}},
+    foraging: {speed: 2400, items: [{item: 'seedForest', count: 0.2, buffs: ['lucky:3000']}, {item: 'worm', count: 0.05, buffs: ['lucky:900', 'rainy:900']}, {item: 'slug', count: 0.04, buffs: ['lucky:950', 'rainy:850']}, {item: 'goldWorm', count: 0.02, buffs: ['+lucky']}, {item: 'goldSlug', count: 0.01, buffs: ['+lucky']}]}
+  },
+  GRASSMUSHROOM: {
+    code: 32,
+    name: 'Mushroom Grass',
+    type: NODE_TYPE.NATURAL | NODE_TYPE.SOLID,
+    star: 3,
+    color: '#e2b3ff',
+    image: 'natural_16_16+2',
+    help: 'Mushroom Grass',
+    mining: {speed: 500, items: [{item: 'blockHumus', count: 1}, {item: 'slug', count: 0.05, lucky: 200, rainy: 100}]},
+    foraging: {speed: 2400, items: [{item: 'slug', count: 0.04, buffs: ['lucky:950', 'rainy:850']}, {item: 'goldSlug', count: 0.01, buffs: ['+lucky']}]}
+  },
+  GRASSFERN: {
+    code: 33,
+    name: 'Fern Grass',
+    type: NODE_TYPE.NATURAL | NODE_TYPE.SOLID,
+    star: 4,
+    color: '#e2b3ff',
+    image: 'natural_16_16+3',
+    help: 'Fern Grass',
+    mining: {speed: 500, items: [{item: 'blockHumus', count: 4, lucky: 5}, {item: 'fernLeaf', count: 0.2, lucky: 75}], foraging: {speed: 500, items: [{item: 'fernLeaf', count: 0.6, lucky: 1.5}, {item: 'frog', count: 0.2, lucky: 50}, {item: 'fernSpore', count: 0.1, lucky: 50}]}},
+    foraging: {speed: 2400, items: [{item: 'slug', count: 0.04, buffs: ['lucky:950', 'rainy:850']}, {item: 'goldSlug', count: 0.01, buffs: ['+lucky']}]}
+  },
+  GRASSMOSS: {
+    code: 34,
+    name: 'Moss Grass',
+    type: NODE_TYPE.NATURAL | NODE_TYPE.SOLID,
+    star: 4,
+    color: '#c1c186',
+    help: 'Moss Grass',
+    image: 'natural_16_16+4',
+    mining: {speed: 500, items: [{item: 'blockSilt', count: 1, lucky: 2.5}], foraging: {speed: 500, items: [{item: 'moss', count: 1, lucky: 1.4}]}},
+    foraging: {speed: 2400, items: [{item: 'slug', count: 0.04, buffs: ['lucky:950', 'rainy:850']}, {item: 'goldSlug', count: 0.01, buffs: ['+lucky']}]}
+  },
   WEB: {code: 35, name: 'Cobweb', type: NODE_TYPE.WEB | NODE_TYPE.GAZ, star: 1, color: '#788696', image: 'substrat_16_16+10', speed: 1900, mining: {speed: 500, items: [{item: 'silk', count: 1}, {item: 'eggSpider', count: '1-3-0.08'}]}, help: 'Cobweb'},
 
   // ── Topsoil (terrain nourricier, propice aux plantes) ────────────────────────
-  DIRT: {code: 40, name: 'Dirt', type: NODE_TYPE.TOPSOIL | NODE_TYPE.SOLID, stype: 'block', star: 1, color: '#db9b63', image: 'substrat_16_16+11', mining: {speed: 1000, items: [{item: 'blockDirt', count: 1}, {item: 'worm', count: 0.15, lucky: 1.2, rainy: 1.7}]}, help: 'Dirt'},
+  DIRT: {
+    code: 40,
+    name: 'Dirt',
+    type: NODE_TYPE.TOPSOIL | NODE_TYPE.SOLID,
+    stype: 'block',
+    star: 1,
+    color: '#db9b63',
+    image: 'substrat_16_16+11',
+    mining: {speed: 1000, items: [{item: 'blockDirt', count: 1}, {item: 'worm', count: 0.15, lucky: 1.2, rainy: 1.7}]},
+    help: 'Dirt'
+  },
   SAND: {code: 41, name: 'Sand', type: NODE_TYPE.TOPSOIL | NODE_TYPE.SOLID, stype: 'block', star: 1, color: '#fff198', image: 'substrat_16_16+12', mining: {speed: 1000, items: [{item: 'blockSand', count: 1}]}, viscosity: 500, help: 'Sand'},
   SILT: {code: 42, name: 'Silt', type: NODE_TYPE.TOPSOIL | NODE_TYPE.SOLID, stype: 'block', star: 2, color: '#73c882', image: 'substrat_16_16+13', mining: {speed: 1000, items: [{item: 'blockSilt', count: 1}]}, help: 'Silt'},
   HUMUS: {code: 43, name: 'Humus', type: NODE_TYPE.TOPSOIL | NODE_TYPE.SOLID, stype: 'block', star: 2, color: '#e2b3ff', image: 'substrat_16_16+14', mining: {speed: 1000, items: [{item: 'blockHumus', count: 1}]}, help: 'Humus'},
@@ -263,9 +323,9 @@ export const ITEMS = {
   pickaxeGeologist: {name: 'Geologist\'s Pickaxe', type: ITEM_TYPE.TOOL, stype: 'pickaxe', star: 5, image: 'tools_32_32-4-0', placedright: 'w_42_42-0-0', placedleft: 'w_42_42-0-1', help: 'Mining Tools', tooltip: 'Tools used to remove multiple blocks, converting them to item form', range: 2, mining: {speed: 100, tiles: 7}},
 
   // Sickles
-  sickleCopper: {name: 'Copper Sickle', type: ITEM_TYPE.TOOL, stype: 'sickle', star: 1, image: 'tool_32_32-6-0', placedright: 'w_42_42-0-0', placedleft: 'w_42_42-0-1', help: 'Harvesting Tools', tooltip: 'Tools used to harvest plants', range: 0},
-  sickleSilver: {name: 'Silver Sickle', type: ITEM_TYPE.TOOL, stype: 'sickle', star: 3, image: 'tool_32_32-6-1', placedright: 'w_42_42-0-0', placedleft: 'w_42_42-0-1', speed: 0, help: 'Harvesting Tools', tooltip: 'Tools used to harvest plants', range: 1},
-  sickleGold: {name: 'Gold Sickle', type: ITEM_TYPE.TOOL, stype: 'sickle', star: 5, image: 'tool_32_32-6-2', placedright: 'w_42_42-0-0', placedleft: 'w_42_42-0-1', speed: 0, help: 'Harvesting Tools', tooltip: 'Tools used to harvest plants', range: 2},
+  sickleCopper: {name: 'Copper Sickle', type: ITEM_TYPE.TOOL, stype: 'sickle', star: 1, image: 'tool_32_32-6-0', placedright: 'w_42_42-0-0', placedleft: 'w_42_42-0-1', help: 'Harvesting Tools', tooltip: 'Tools used to harvest plants', range: 0, foraging: {speed: 2400}},
+  sickleSilver: {name: 'Silver Sickle', type: ITEM_TYPE.TOOL, stype: 'sickle', star: 3, image: 'tool_32_32-6-1', placedright: 'w_42_42-0-0', placedleft: 'w_42_42-0-1', speed: 0, help: 'Harvesting Tools', tooltip: 'Tools used to harvest plants', range: 1, foraging: {speed: 1600}},
+  sickleGold: {name: 'Gold Sickle', type: ITEM_TYPE.TOOL, stype: 'sickle', star: 5, image: 'tool_32_32-6-2', placedright: 'w_42_42-0-0', placedleft: 'w_42_42-0-1', speed: 0, help: 'Harvesting Tools', tooltip: 'Tools used to harvest plants', range: 2, foraging: {speed: 800}},
 
   // hammers
   hammerCopper: {name: 'Copper Hammer', type: ITEM_TYPE.TOOL, stype: 'hammer', star: 2, image: 'tools_32_32-4-0', placedright: 'w_42_42-0-0', placedleft: 'w_42_42-0-1', speed: 0, help: 'Hammers', tooltip: 'Tools used to remove wall, furniture, workstation, converting them to item form'},

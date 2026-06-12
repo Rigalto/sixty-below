@@ -7,6 +7,7 @@ import {buffManager} from './buff.mjs'
 import {chunkManager} from './world.mjs'
 import {playerManager} from './player.mjs'
 import {WORLD_WIDTH, MICROTASK} from './constant.mjs'
+import {floraManager} from './ecosystem.mjs'
 
 /* ====================================================================================================
    HELPERS COMMUNS A TOUS LES MANAGERS
@@ -274,22 +275,118 @@ export const placingManager = new PlacingManager()
 
 class ForagingManager {
   constructor () {
+    // eventBus
     this.onTeleportBegin = this.onTeleportBegin.bind(this)
+    this.onSlotActive = this.onSlotActive.bind(this)
     eventBus.on('player/teleport-begin', this.onTeleportBegin)
+    eventBus.on('hotbar/slot-active', this.onSlotActive)
+    // Micro-Tasks
+    this.onForageNatural = this.onForageNatural.bind(this)
+    this.onForagePlant = this.onForagePlant.bind(this)
   }
 
   /**
-   * Valide la demande de foraging et amorce la récolte si les conditions sont réunies.
+   * Valide la demande et déclenche la micro-tâche de foraging appropriée.
+   * Deux branches : tuile NATURAL ou tuile SKY/VOID avec plante sous la souris.
    * @param {number} tileIndex — (y << 10) | x
    * @param {object} tileNode  — NODES_LOOKUP[tileCode]
    * @param {object} tool      — ITEMS[slot.item]
    * @param {string} prefix    — slot.prefix
    */
   tryForage (tileIndex, tileNode, tool, prefix) {
-    console.log('ForagingManager.tryForage', {tileIndex, tileNode, tool, prefix})
+    if (buffManager.getBuff('playerFreeze')) return
+    if (!this.#isInForagingRange(tileIndex, tool, prefix)) return
+
+    // ── Branche 1 : tuile NATURAL (forage du sol) ──
+    if (tileNode.type & NODE_TYPE.NATURAL) {
+      if (tool.star < tileNode.star) return
+      const speed = this.#computeForageSpeed(tileNode, tool, prefix) >> 1
+      taskScheduler.dequeue('forage-plant')
+      const {priority, capacity} = MICROTASK.FORAGE_NATURAL
+      taskScheduler.requeue('forage-natural', speed, this.onForageNatural, priority, capacity, tileIndex, tileNode, tool)
+      return
+    }
+
+    // ── Branche 2 : tuile SKY/VOID — chercher une plante sous la souris ──
+    if (tileNode.code !== NODES.SKY.code && tileNode.code !== NODES.VOID.code) return
+    const plant = floraManager.getPlantAt(tileIndex)
+    if (plant === null) return
+    if (!plant.present) return // OK pour Sunflower, pour les autres ? TODO
+    const plantItem = ITEMS[plant.itemId]
+    if (!plantItem.foraging) return // OK, mais à ajouter dans les specifications, c'est la première fois que l'on fait cela
+    if (tool.star < plantItem.star) return
+    const speed = this.#computeForageSpeed(plant, tool, prefix)
+    taskScheduler.dequeue('forage-natural')
+    const {priority, capacity} = MICROTASK.FORAGE_PLANT
+    taskScheduler.requeue('forage-plant', speed, this.onForagePlant, priority, capacity, plant, tileIndex, tool)
+  }
+
+  /**
+   * Calcule le délai de foraging en ms.
+   * TODO: implémenter la formule complète (tool.foraging.speed + buff foraging-speed + prefix)
+   * @returns {number} délai en ms
+   */
+  #computeForageSpeed (target, tool, prefix) {
+    return 2000
+  }
+
+  /**
+   * Vérifie que la tuile est dans le rectangle de foraging relatif au centre du joueur.
+   * @param {number} tileIndex — (y << 10) | x
+   * @returns {boolean}
+   */
+  #isInForagingRange (tileIndex, tool, prefix) {
+    const {x: cx, y: cy, direction} = playerManager.getCenterTile()
+    const rect = buffManager.getBuff('foraging-range')
+    const range = tool.range + (prefix === 'Extended' ? 2 : 0)
+    const ex = rect.x - range
+    const ey = rect.y - range
+    const ew = rect.w + 2 * range
+    const eh = rect.h + 2 * range
+    const tileX = tileIndex & 0x3FF
+    const tileY = tileIndex >> 10
+    const worldRectX = direction === 0 ? cx - ex - ew + 1 : cx + ex
+    const worldRectY = cy + ey
+    return tileX >= worldRectX && tileX < worldRectX + ew &&
+           tileY >= worldRectY && tileY < worldRectY + eh
+  }
+
+  /**
+   * Callback TaskScheduler : exécute le foraging d'une tuile NATURAL.
+   * @param {number} tileIndex
+   * @param {object} tileNode
+   * @param {object} tool
+   */
+  onForageNatural (tileIndex, tileNode, tool) {
+    console.log('ForagingManager.onForageNatural', {tileIndex, tileNode, tool})
+  }
+
+  /**
+   * Callback TaskScheduler : exécute le foraging d'une plante.
+   * @param {object} plant    — record de la plante
+   * @param {number} tileIndex
+   * @param {object} tool
+   */
+  onForagePlant (plant, tileIndex, tool) {
+    console.log('ForagingManager.onForagePlant', {plant, tileIndex, tool})
+  }
+
+  /** Annule toute tâche de foraging en attente. */
+  #interrupt () {
+    taskScheduler.dequeue('forage-natural')
+    taskScheduler.dequeue('forage-plant')
   }
 
   /** Liaison EventBus : 'player/teleport-begin'. */
-  onTeleportBegin () {}
+  onTeleportBegin () { this.#interrupt() }
+
+  /**
+   * Liaison EventBus : 'hotbar/slot-active' — interrompt si le nouveau slot n'est plus une sickle.
+   * @param {{slot: object}} payload
+   */
+  onSlotActive ({slot}) {
+    if (slot.item && ITEMS[slot.item].type & ITEM_TYPE.TOOL && ITEMS[slot.item].stype === 'sickle') return
+    this.#interrupt()
+  }
 }
 export const foragingManager = new ForagingManager()
