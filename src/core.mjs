@@ -578,7 +578,8 @@ class GameCore {
  */
   #showToolRange (ctx) {
     const TOOL_RANGE_BUFF = new Map([
-      ['pickaxe', 'mining-range']
+      ['pickaxe', 'mining-range'],
+      ['sickle', 'foraging-range'] // ← manquant
       // ['hammer', 'hammer-range'],
       // ['axe',    'axe-range'],
     ])

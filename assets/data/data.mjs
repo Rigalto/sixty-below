@@ -47,7 +47,7 @@ export const NODES = {
     image: 'natural_16_16+0',
     help: 'Forest Grass',
     mining: {speed: 500, items: [{item: 'blockDirt', count: 1}, {item: 'seedForest', count: 0.2}, {item: 'worm', count: 0.02, buffs: ['rainy:900', 'lucky:100']}]},
-    foraging: {speed: 2400, items: [{item: 'seedForest', count: 0.2, buffs: ['lucky:3000']}, {item: 'worm', count: 0.05, buffs: ['lucky:900', 'rainy:900']}, {item: 'slug', count: 0.04, buffs: ['lucky:950', 'rainy:850']}, {item: 'goldWorm', count: 0.02, buffs: ['+lucky']}, {item: 'goldSlug', count: 0.01, buffs: ['+lucky']}]}
+    foraging: {speed: 2400, items: [{item: 'seedForest', count: 0.2, buffs: ['lucky:3000']}, {item: 'worm', count: 0.05, buffs: ['lucky:900', 'rainy:900']}, {item: 'goldWorm', count: 0.02, buffs: ['+lucky']}]}
   },
   GRASSJUNGLE: {
     code: 31,
@@ -57,8 +57,8 @@ export const NODES = {
     color: '#c1c186',
     image: 'natural_16_16+1',
     help: 'Jungle Grass',
-    mining: {speed: 500, items: [{item: 'blockSilt', count: 1}, {item: 'seedJungle', count: 0.15}]},
-    foraging: {speed: 2400, items: [{item: 'seedForest', count: 0.2, buffs: ['lucky:3000']}, {item: 'worm', count: 0.05, buffs: ['lucky:900', 'rainy:900']}, {item: 'slug', count: 0.04, buffs: ['lucky:950', 'rainy:850']}, {item: 'goldWorm', count: 0.02, buffs: ['+lucky']}, {item: 'goldSlug', count: 0.01, buffs: ['+lucky']}]}
+    mining: {speed: 500, items: [{item: 'blockSilt', count: 1}, {item: 'seedJungle', count: 0.15}, {item: 'slug', count: 0.02, buffs: ['rainy:900', 'lucky:100']}]},
+    foraging: {speed: 2400, items: [{item: 'seedJungle', count: 0.2, buffs: ['lucky:3000']}, {item: 'slug', count: 0.04, buffs: ['lucky:950', 'rainy:850']}, {item: 'goldSlug', count: 0.01, buffs: ['+lucky']}]}
   },
   GRASSMUSHROOM: {
     code: 32,
@@ -68,8 +68,8 @@ export const NODES = {
     color: '#e2b3ff',
     image: 'natural_16_16+2',
     help: 'Mushroom Grass',
-    mining: {speed: 500, items: [{item: 'blockHumus', count: 1}, {item: 'slug', count: 0.05, lucky: 200, rainy: 100}]},
-    foraging: {speed: 2400, items: [{item: 'slug', count: 0.04, buffs: ['lucky:950', 'rainy:850']}, {item: 'goldSlug', count: 0.01, buffs: ['+lucky']}]}
+    mining: {speed: 500, items: [{item: 'blockHumus', count: 1}, {item: 'slug', count: 0.05, buffs: ['lucky:200', 'rainy:100']}]},
+    foraging: {speed: 2400, items: [{item: 'mushroomGill', count: 0.24, buffs: ['lucky:100', 'sunny:50', 'rainy:-50']}, {item: 'slug', count: 0.04, buffs: ['lucky:950', 'rainy:850']}, {item: 'goldSlug', count: 0.01, buffs: ['+lucky']}]}
   },
   GRASSFERN: {
     code: 33,
@@ -79,7 +79,7 @@ export const NODES = {
     color: '#e2b3ff',
     image: 'natural_16_16+3',
     help: 'Fern Grass',
-    mining: {speed: 500, items: [{item: 'blockHumus', count: 4, lucky: 5}, {item: 'fernLeaf', count: 0.2, lucky: 75}]},
+    mining: {speed: 500, items: [{item: 'blockHumus', count: 1}, {item: 'fernSpore', count: 0.5, buffs: ['lucky:600']}, {item: 'fernLeaf', count: 0.2, buffs: ['lucky:900']}]},
     foraging: {speed: 2400, items: [{item: 'slug', count: 0.04, buffs: ['lucky:950', 'rainy:850']}, {item: 'goldSlug', count: 0.01, buffs: ['+lucky']}]}
   },
   GRASSMOSS: {
@@ -93,7 +93,7 @@ export const NODES = {
     mining: {speed: 500, items: [{item: 'blockSilt', count: 1, lucky: 2.5}]},
     foraging: {speed: 2400, items: [{item: 'slug', count: 0.04, buffs: ['lucky:950', 'rainy:850']}, {item: 'goldSlug', count: 0.01, buffs: ['+lucky']}]}
   },
-  WEB: {code: 35, name: 'Cobweb', type: NODE_TYPE.WEB | NODE_TYPE.GAZ, star: 1, color: '#788696', image: 'substrat_16_16+10', speed: 1900, mining: {speed: 500, items: [{item: 'silk', count: 1}, {item: 'eggSpider', count: '1-3-0.08'}]}, help: 'Cobweb'},
+  WEB: {code: 35, name: 'Cobweb', type: NODE_TYPE.WEB | NODE_TYPE.GAZ, star: 1, color: '#788696', image: 'substrat_16_16+10', mining: {speed: 500, items: [{item: 'silk', count: 1}, {item: 'eggSpider', count: '1-3-0.08'}]}, help: 'Cobweb'},
 
   // ── Topsoil (terrain nourricier, propice aux plantes) ────────────────────────
   DIRT: {
@@ -118,7 +118,7 @@ export const NODES = {
   HARDSTONE: {code: 52, name: 'Hardstone', type: NODE_TYPE.SUBSTRAT | NODE_TYPE.SOLID, stype: 'block', star: 4, color: '#788696', image: 'substrat_16_16+3', mining: {speed: 1800, items: [{item: 'blockHardstone', count: 1}]}, help: 'Hardstone'},
   // Desert
   SANDSTONE: {code: 53, name: 'Sandstone', type: NODE_TYPE.SUBSTRAT | NODE_TYPE.SOLID, stype: 'block', star: 2, color: '#fee267', image: 'substrat_16_16+4', mining: {speed: 1400, items: [{item: 'blockSandstone', count: 1}]}, help: 'Sandstone'},
-  ASH: {code: 54, name: 'Ash', type: NODE_TYPE.SUBSTRAT | NODE_TYPE.SOLID, stype: 'block', star: 3, color: '#e0acad', image: 'substrat_16_16+5', speed: 1800, mining: {speed: 1400, items: [{item: 'blockAsh', count: 1}]}, help: 'Ash'},
+  ASH: {code: 54, name: 'Ash', type: NODE_TYPE.SUBSTRAT | NODE_TYPE.SOLID, stype: 'block', star: 3, color: '#e0acad', image: 'substrat_16_16+5', mining: {speed: 1400, items: [{item: 'blockAsh', count: 1}]}, help: 'Ash'},
   HELLSTONE: {code: 55, name: 'Hellstone', type: NODE_TYPE.SUBSTRAT | NODE_TYPE.SOLID, stype: 'block', star: 5, color: '#df6e78', image: 'substrat_16_16+6', mining: {speed: 2200, items: [{item: 'blockHellstone', count: 1}]}, help: 'Hellstone'},
   // Jungle
   MUD: {code: 56, name: 'Mud', type: NODE_TYPE.SUBSTRAT | NODE_TYPE.SOLID, stype: 'block', star: 2, color: '#c1c186', image: 'substrat_16_16+7', mining: {speed: 1000, items: [{item: 'blockMud', count: 1}]}, help: 'Mud'},
@@ -126,8 +126,8 @@ export const NODES = {
   SLATE: {code: 58, name: 'Slate', type: NODE_TYPE.SUBSTRAT | NODE_TYPE.SOLID, stype: 'block', star: 5, color: '#2797ea', image: 'substrat_16_16+9', mining: {speed: 2000, items: [{item: 'blockSlate', count: 1}]}, help: 'Slate'},
 
   // ── Ore (gisement de minerais) ────────────────────────
-  COPPER: {code: 70, name: 'Copper Ore', type: NODE_TYPE.ORE | NODE_TYPE.SOLID, star: 1, color: '#fe602f', image: 'mineral_16_16+1', speed: 1000, mining: {speed: 2500, items: [{item: 'chunkCopper', count: 1}]}, help: 'Metals'},
-  IRON: {code: 71, name: 'Iron Ore', type: NODE_TYPE.ORE | NODE_TYPE.SOLID, star: 2, color: '#db9b63', image: 'mineral_16_16+2', speed: 1100, mining: {speed: 2700, items: [{item: 'chunkIron', count: 1}]}, help: 'Metals'},
+  COPPER: {code: 70, name: 'Copper Ore', type: NODE_TYPE.ORE | NODE_TYPE.SOLID, star: 1, color: '#fe602f', image: 'mineral_16_16+1', mining: {speed: 2500, items: [{item: 'chunkCopper', count: 1}]}, help: 'Metals'},
+  IRON: {code: 71, name: 'Iron Ore', type: NODE_TYPE.ORE | NODE_TYPE.SOLID, star: 2, color: '#db9b63', image: 'mineral_16_16+2', mining: {speed: 2700, items: [{item: 'chunkIron', count: 1}]}, help: 'Metals'},
   SILVER: {code: 72, name: 'Silver Ore', type: NODE_TYPE.ORE | NODE_TYPE.SOLID, star: 3, color: '#788696', image: 'mineral_16_16+3', mining: {speed: 3000, items: [{item: 'chunkSilver', count: 1}]}, help: 'Metals'},
   GOLD: {code: 73, name: 'Gold Ore', type: NODE_TYPE.ORE | NODE_TYPE.SOLID, star: 3, color: '#ffaa33', image: 'mineral_16_16+4', mining: {speed: 3400, items: [{item: 'chunkGold', count: 1}]}, help: 'Metals'},
   COBALT: {code: 74, name: 'Cobalt Ore', type: NODE_TYPE.ORE | NODE_TYPE.SOLID, star: 4, color: '#2797ea', image: 'mineral_16_16+5', mining: {speed: 3800, items: [{item: 'chunkCobalt', count: 1}]}, help: 'Metals'},
@@ -323,9 +323,9 @@ export const ITEMS = {
   pickaxeGeologist: {name: 'Geologist\'s Pickaxe', type: ITEM_TYPE.TOOL, stype: 'pickaxe', star: 5, image: 'tools_32_32-4-0', placedright: 'w_42_42-0-0', placedleft: 'w_42_42-0-1', help: 'Mining Tools', tooltip: 'Tools used to remove multiple blocks, converting them to item form', range: 2, mining: {speed: 100, tiles: 7}},
 
   // Sickles
-  sickleCopper: {name: 'Copper Sickle', type: ITEM_TYPE.TOOL, stype: 'sickle', star: 1, image: 'tool_32_32-6-0', placedright: 'w_42_42-0-0', placedleft: 'w_42_42-0-1', help: 'Harvesting Tools', tooltip: 'Tools used to harvest plants', range: 0, foraging: {speed: 2400}},
-  sickleSilver: {name: 'Silver Sickle', type: ITEM_TYPE.TOOL, stype: 'sickle', star: 3, image: 'tool_32_32-6-1', placedright: 'w_42_42-0-0', placedleft: 'w_42_42-0-1', speed: 0, help: 'Harvesting Tools', tooltip: 'Tools used to harvest plants', range: 1, foraging: {speed: 1600}},
-  sickleGold: {name: 'Gold Sickle', type: ITEM_TYPE.TOOL, stype: 'sickle', star: 5, image: 'tool_32_32-6-2', placedright: 'w_42_42-0-0', placedleft: 'w_42_42-0-1', speed: 0, help: 'Harvesting Tools', tooltip: 'Tools used to harvest plants', range: 2, foraging: {speed: 800}},
+  sickleCopper: {name: 'Copper Sickle', type: ITEM_TYPE.TOOL, stype: 'sickle', star: 1, image: 'tool_32_32-6-0', placedright: 'w_42_42-0-0', placedleft: 'w_42_42-0-1', help: 'Foraging Tools', tooltip: 'Tools used to harvest plants', range: 0, foraging: {speed: 0}},
+  sickleSilver: {name: 'Silver Sickle', type: ITEM_TYPE.TOOL, stype: 'sickle', star: 3, image: 'tool_32_32-6-1', placedright: 'w_42_42-0-0', placedleft: 'w_42_42-0-1', speed: 0, help: 'Foraging Tools', tooltip: 'Tools used to harvest plants', range: 1, foraging: {speed: 60}},
+  sickleGold: {name: 'Gold Sickle', type: ITEM_TYPE.TOOL, stype: 'sickle', star: 5, image: 'tool_32_32-6-2', placedright: 'w_42_42-0-0', placedleft: 'w_42_42-0-1', speed: 0, help: 'Foraging Tools', tooltip: 'Tools used to harvest plants', range: 2, foraging: {speed: 120}},
 
   // hammers
   hammerCopper: {name: 'Copper Hammer', type: ITEM_TYPE.TOOL, stype: 'hammer', star: 2, image: 'tools_32_32-4-0', placedright: 'w_42_42-0-0', placedleft: 'w_42_42-0-1', speed: 0, help: 'Hammers', tooltip: 'Tools used to remove wall, furniture, workstation, converting them to item form'},
@@ -543,8 +543,8 @@ export const ITEMS = {
   fernC: {name: 'Crimsonfrond', type: 0, stype: 'herb', star: 3, image: null, placed: 'fuws_32_32-2-3', speed: 1900, foraging: {speed: 500, items: [{item: 'fernLeaf', count: 1, rainy: 1.8, windy: 1.8}]}, help: 'Ferns', tooltip: '???'},
   fernG: {name: 'Goldenveil', type: 0, stype: 'herb', star: 3, image: null, placed: 'fuws_32_32-2-3', speed: 1900, foraging: {speed: 500, items: [{item: 'fernLeaf', count: 1, rainy: 1.8, windy: 1.8}]}, help: 'Ferns', tooltip: '???'},
   fernM: {name: 'Mistfern', type: 0, stype: 'herb', star: 3, image: null, placed: 'fuws_32_32-2-3', speed: 1900, foraging: {speed: 500, items: [{item: 'fernLeaf', count: 1, rainy: 1.8, windy: 1.8}]}, help: 'Ferns', tooltip: '???'},
-  fernLeaf: {name: 'Fern Leaf', type: 0, stype: 'herb', star: 3, image: 'crafting_32_32-0-1', help: 'Ferns', tooltip: 'Crafting Material for Potions and Furniture'},
-  fernSpore: {name: 'Fern Spore', type: 0, stype: 'herb', star: 3, image: 'crafting_32_32-0-1', help: 'Ferns', tooltip: 'Crafting Material for Potions and Furniture'},
+  fernLeaf: {name: 'Fern Leaf', type: 0, stype: 'herb', star: 4, image: 'crafting_32_32-0-1', help: 'Ferns', tooltip: 'Crafting Material for Potions and Furniture'},
+  fernSpore: {name: 'Fern Spore', type: 0, stype: 'herb', star: 4, image: 'crafting_32_32-0-1', help: 'Ferns', tooltip: 'Crafting Material for Potions and Furniture'},
 
   velvetmoss: {name: 'Velvetmoss', type: 0, stype: 'herb', star: 3, image: 'crafting_32_32-0-1', placed: 'fuws_32_32-2-3', speed: 1900, foraging: {speed: 500, items: [{item: 'velvetmoss', count: 1, rainy: 1.8, windy: 1.8}]}, help: 'Velvetmoss', tooltip: '???'},
 

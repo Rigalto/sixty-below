@@ -335,8 +335,12 @@ class ForagingManager {
    * TODO: implémenter la formule complète (tool.foraging.speed + buff foraging-speed + prefix)
    * @returns {number} délai en ms
    */
-  #computeForageSpeedNatural (target, tool, prefix) {
-    return 2000
+  #computeForageSpeedNatural (tileNode, tool, prefix) {
+    let coefficient = 100 + tool.foraging.speed + buffManager.getBuff('foraging-speed')
+    coefficient += prefix === 'Quick' ? 20 : 0
+    coefficient += prefix === 'Keen' ? 5 : 0
+    coefficient -= prefix === 'Sturdy' ? 5 : 0
+    return Math.round((coefficient / 100) * tileNode.foraging.speed)
   }
 
   /**
