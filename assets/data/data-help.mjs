@@ -1402,6 +1402,8 @@ Mining Tool: <<itemStar|pickaxeCopper>> or better
 
 See [[Mining]], [[Mining Tools]] and [[Mining Buffs]] for details.
 
+<hr>
+
 **Foraging Loot** ⏳
 
 Foraging Tool: <<itemStar|sickleCopper>> or better

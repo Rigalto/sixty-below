@@ -4,6 +4,7 @@ import {eventBus, taskScheduler, microTasker, blockedTiles, rollLootWithBuffs} f
 import {NODE_TYPE, NODES, ITEM_TYPE, ITEMS} from '../assets/data/data.mjs'
 import {inventoryManager} from './inventory.mjs'
 import {buffManager} from './buff.mjs'
+import {database} from './database.mjs'
 import {chunkManager} from './world.mjs'
 import {playerManager} from './player.mjs'
 import {WORLD_WIDTH, MICROTASK} from './constant.mjs'
@@ -273,17 +274,40 @@ export const placingManager = new PlacingManager()
    FORAGING DE PLANTES
    ==================================================================================================== */
 
+const NATURAL_FORAGE_DAILY_LIMIT = 12
+
 class ForagingManager {
   #queue = [] // {type:'natural', tileIndex, tileNode, tool, prefix} | {type:'plant', plant, tileIndex, tool, prefix}
+  #foragedToday = new Set() // Set<tileIndex> — max NATURAL_FORAGE_DAILY_LIMIT par jour
 
   constructor () {
     // eventBus
     this.onTeleportBegin = this.onTeleportBegin.bind(this)
     this.onSlotActive = this.onSlotActive.bind(this)
+    this.onDayStart = this.onDayStart.bind(this)
     eventBus.on('player/teleport-begin', this.onTeleportBegin)
     eventBus.on('hotbar/slot-active', this.onSlotActive)
+    eventBus.on('time/daily', this.onDayStart)
+
     // Micro-Tasks
     this.onForage = this.onForage.bind(this)
+  }
+
+  /**
+   * Restaure la liste des tuiles NATURAL déjà foragée pendant le jour courant
+   * @param {Set} savedSet — index des tuiles foragées
+   */
+  init (savedSet) {
+    this.#foragedToday = savedSet ?? new Set()
+  }
+
+  /**
+   * Liaison EventBus : 'time/daily'.
+   * Vide la liste des tuiles NATURAL déjà foragée
+   */
+  onDayStart () {
+    this.#foragedToday.clear()
+    database.setGameState('naturalforaged', this.#foragedToday)
   }
 
   /**
@@ -301,8 +325,10 @@ class ForagingManager {
     // 1. Tuile NATURAL (forage du sol)
     if (tileNode.type & NODE_TYPE.NATURAL) {
       if (tool.star < tileNode.star) return
-      const speed = this.#computeForageSpeedNatural(tileNode, tool, prefix)
+      if (this.#foragedToday.size >= NATURAL_FORAGE_DAILY_LIMIT) return
+      if (this.#foragedToday.has(tileIndex)) return
 
+      const speed = this.#computeForageSpeedNatural(tileNode, tool, prefix)
       const wasEmpty = this.#queue.length === 0
       this.#queue.push({type: 'natural', tileIndex, tileNode, tool, prefix, speed})
       if (wasEmpty) {
@@ -398,6 +424,20 @@ class ForagingManager {
         this.#scheduleNext()
         return
       }
+
+      const buffValues = buffManager.getBuffs(entry.tileNode.foraging.buffList)
+      for (const lootItem of entry.tileNode.foraging.items) {
+        const count = rollLootWithBuffs(lootItem, buffValues)
+        if (count > 0) {
+          const itemCode = lootItem.item.code
+          inventoryManager.loot(itemCode, count, '')
+          eventBus.emit('player/loot-item', {itemCode})
+        }
+      }
+
+      this.#foragedToday.add(entry.tileIndex)
+      database.setGameState('naturalforaged', this.#foragedToday)
+
       console.log('ForagingManager.onForage — natural', entry)
     } else {
       if (!entry.plant.present) { // BUG 6 TODO

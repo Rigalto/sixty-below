@@ -318,6 +318,8 @@ class GameCore {
     // C'est ici qu'on initialise les managers
     // await FaunaManager.init(...)
 
+    foragingManager.init(state.naturalforaged)
+
     // 5.1 Objectstore Inventory
     const inventoryRecords = await database.readAllFromObjectStore('inventory')
     const itemsToDelete = []
