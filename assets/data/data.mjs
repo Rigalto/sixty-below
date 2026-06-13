@@ -327,6 +327,19 @@ export const ITEMS = {
   sickleSilver: {name: 'Silver Sickle', type: ITEM_TYPE.TOOL, stype: 'sickle', star: 3, image: 'tool_32_32-6-1', placedright: 'w_42_42-0-0', placedleft: 'w_42_42-0-1', speed: 0, help: 'Foraging Tools', tooltip: 'Tools used to harvest plants', range: 1, foraging: {speed: 60}},
   sickleGold: {name: 'Gold Sickle', type: ITEM_TYPE.TOOL, stype: 'sickle', star: 5, image: 'tool_32_32-6-2', placedright: 'w_42_42-0-0', placedleft: 'w_42_42-0-1', speed: 0, help: 'Foraging Tools', tooltip: 'Tools used to harvest plants', range: 2, foraging: {speed: 120}},
 
+  // Bug Nets
+  bugNetWood: {name: 'Wooden Bug Net', type: ITEM_TYPE.TOOL, stype: 'bugNet', star: 1, image: 'tool_32_32-6-3', placedright: 'w_42_42-0-0', placedleft: 'w_42_42-0-1', help: 'Catching Tools', tooltip: 'Tools used to catch bugs', range: 0, catching: {speed: 0}},
+  bugNetGold: {name: 'Gold Bug Net', type: ITEM_TYPE.TOOL, stype: 'bugNet', star: 3, image: 'tool_32_32-6-4', placedright: 'w_42_42-0-0', placedleft: 'w_42_42-0-1', speed: 0, help: 'Catching Tools', tooltip: 'Tools used to catch bugs', range: 1, catching: {speed: 80}},
+  bugNetCobalt: {name: 'Cobalt Bug Net', type: ITEM_TYPE.TOOL, stype: 'bugNet', star: 5, image: 'tool_32_32-6-5', placedright: 'w_42_42-0-0', placedleft: 'w_42_42-0-1', speed: 0, help: 'Catching Tools', tooltip: 'Tools used to catch bugs', range: 2, catching: {speed: 150}},
+
+  // Fishing Rods
+  rodOak: {name: 'Oak Fishing Rod', type: ITEM_TYPE.TOOL, stype: 'rod', star: 1, image: 'tool_32_32-7-0', placedright: 'w_42_42-0-0', placedleft: 'w_42_42-0-1', help: 'Fishing Rods', tooltip: 'Tools used to catch fishes', range: 0, fishing: {speed: 0, power: 15}},
+  rodMahogany: {name: 'Mahogany Fishing Rod', type: ITEM_TYPE.TOOL, stype: 'rod', star: 2, image: 'tool_32_32-7-1', placedright: 'w_42_42-0-0', placedleft: 'w_42_42-0-1', help: 'Fishing Rods', tooltip: 'Tools used to catch fishes', range: 0, fishing: {speed: 40, power: 25}},
+  rodBamboo: {name: 'Bamboo Fishing Rod', type: ITEM_TYPE.TOOL, stype: 'rod', star: 3, image: 'tool_32_32-7-2', placedright: 'w_42_42-0-0', placedleft: 'w_42_42-0-1', help: 'Fishing Rods', tooltip: 'Tools used to catch fishes', range: 1, fishing: {speed: 80, power: 35}},
+  rodCobalt: {name: 'Cobalt Fishing Rod', type: ITEM_TYPE.TOOL, stype: 'rod', star: 4, image: 'tool_32_32-7-3', placedright: 'w_42_42-0-0', placedleft: 'w_42_42-0-1', help: 'Fishing Rods', tooltip: 'Tools used to catch fishes', range: 2, fishing: {speed: 120, power: 45}},
+  rodPlatinum: {name: 'Platinum Fishing Rod', type: ITEM_TYPE.TOOL, stype: 'rod', star: 5, image: 'tool_32_32-7-3', placedright: 'w_42_42-0-0', placedleft: 'w_42_42-0-1', help: 'Fishing Rods', tooltip: 'Tools used to catch fishes', range: 3, fishing: {speed: 160, power: 60}},
+  rodCoral: {name: 'Coral Fishing Rod', type: ITEM_TYPE.TOOL, stype: 'rod', star: 5, image: 'tool_32_32-7-3', placedright: 'w_42_42-0-0', placedleft: 'w_42_42-0-1', help: 'Fishing Rods', tooltip: 'Tools used to catch fishes', range: 2, fishing: {speed: 200, power: 60}},
+
   // hammers
   hammerCopper: {name: 'Copper Hammer', type: ITEM_TYPE.TOOL, stype: 'hammer', star: 2, image: 'tools_32_32-4-0', placedright: 'w_42_42-0-0', placedleft: 'w_42_42-0-1', speed: 0, help: 'Hammers', tooltip: 'Tools used to remove wall, furniture, workstation, converting them to item form'},
 

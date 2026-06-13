@@ -137,7 +137,11 @@ Mining Loot: {{node:{3}:mining[:items[0]:item|link}}
   fullRecipeRow: '| [[item:{1}]] | {{item:{1}:star|star}} | {{recipe:{1}|station}} | {{recipe:{1}|ingredients}} |',
 
   // une ligne d'une table présentant un outil : nom, tier, speed bonus, range bonus
+  toolTypeRow: '| [[item:{1}]] | {{item:{1}:star|star}} | {{item:{1}:{2}:speed}} | {{item:{1}:range}} |',
+  // une ligne d'une table présentant les pickaxes : nom, tier, speed bonus, range bonus, tiles per hit
   pickaxeTypeRow: '| [[item:{1}]] | {{item:{1}:star|star}} | {{item:{1}:mining:speed}} | {{item:{1}:range}} | {{item:{1}:mining:tiles}} |',
+  // une ligne d'une table présentant les fishing rods : nom, tier, speed bonus, range bonus, fishing power
+  rodTypeRow: '| [[item:{1}]] | {{item:{1}:star|star}} | {{item:{1}:fishing:speed}} | {{item:{1}:range}} | {{item:{1}:fishing:power}} |',
   // une ligne d'une table présentant les buffs speed et range fournis par un outil : item, speed bonus, range bonus
   toolBuffRow: '| [[item:{1}]] | {{item:{1}:{2}:speed}}% | {{item:{1}:range}} |',
 
@@ -3249,6 +3253,20 @@ _Range bonus applies equally in all directions._
     title: 'Fishing Rods',
     category: ['Tool', 'Fishing'],
     content: `
+**Description**
+
+⏳
+
+**Fishing Rod Type**
+
+| Fishing Rod | Tier | Speed Bonus | Range Bonus | Fishing Power|
+|---|---|---|---|---|---|
+<<rodTypeRow|rodOak>>
+<<rodTypeRow|rodMahogany>>
+<<rodTypeRow|rodBamboo>>
+<<rodTypeRow|rodCobalt>>
+<<rodTypeRow|rodPlatinum>>
+<<rodTypeRow|rodCoral>>
     `
   },
   {
@@ -3776,7 +3794,18 @@ See [[Foraging Tools]] and [[Foraging Buffs]] for details.
     title: 'Foraging Tools',
     category: ['Tool', 'Foraging'],
     content: `
-    Sickles
+**Description**
+
+⏳
+
+**Sickle Type**
+
+| Sickle | Tier | Speed Bonus | Range Bonus |
+|---|---|---|---|---|
+<<toolTypeRow|sickleCopper|foraging>>
+<<toolTypeRow|sickleSilver|foraging>>
+<<toolTypeRow|sickleGold|foraging>>
+
     `
   },
   {
@@ -3845,6 +3874,35 @@ _Range bonus applies equally in all directions._
 | Well Fed ⏳ | +5% | — |
 | Plenty Satisfied ⏳ | +10% | — |
 | Exquisitely Stuffed ⏳ | +15% | — |
+
+    `
+  },
+
+  // ── Activities Catching ─────────────────────────────────────
+  //    Catching, Catching Tools (Bug Net), Ctaching Buffs
+  {
+    title: 'Catching',
+    category: ['Activities', 'Baits'],
+    content: `
+    Sickles
+    `
+  },
+  {
+    title: 'Catching Tools',
+    category: ['Tool', 'Baits'],
+    content: `
+**Description**
+
+⏳
+
+**Bug Net Type**
+
+| Bug Net | Tier | Speed Bonus | Range Bonus |
+|---|---|---|---|---|
+<<toolTypeRow|bugNetWood|catching>>
+<<toolTypeRow|bugNetGold|catching>>
+<<toolTypeRow|bugNetCobalt|catching>>
+
 
     `
   },
