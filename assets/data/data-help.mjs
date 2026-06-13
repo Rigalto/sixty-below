@@ -3700,6 +3700,76 @@ A small set of essential items can be crafted anywhere, without a workstation ne
     title: 'Foraging',
     category: ['Activities', 'Foraging'],
     content: `
+    **Description**
+
+Foraging lets you collect items from natural tiles without permanently removing them and ...⏳
+
+Use a [[item:sickleCopper|Sicle]] to forage. A sickle tier must be greater than or equal to the tile tier.
+
+
+**Forageable Natural Tiles**
+
+Natural tiles — forest, jungle, moss, fern, and mushroom grass — yield herbs, seeds, and organic materials when foraged.
+
+| Tile | Tier | Sickle | Loot |
+|---|---|---|---|
+| [[node:grassForest]] | {{node:grassForest:star|star}} | <<cellItemStar|sickleCopper>> | {{node:grassForest:foraging:items[*]:item|links}} |
+| [[node:grassJungle]] | {{node:grassJungle:star|star}} | <<cellItemStar|sickleSilver>>| {{node:grassJungle:foraging:items[*]:item|links}} |
+| [[node:grassMushroom]] | {{node:grassMushroom:star|star}} | <<cellItemStar|sickleSilver>>| {{node:grassMushroom:foraging:items[*]:item|links}} |
+| [[node:grassFern]] | {{node:grassFern:star|star}} | <<cellItemStar|sickleGold>>| {{node:grassFern:foraging:items[*]:item|links}} |
+| [[node:grassMoss]] | {{node:grassMoss:star|star}} | <<cellItemStar|sickleGold>>| {{node:grassMoss:foraging:items[*]:item|links}} |
+
+**Daily Limits**
+
+To preserve balance, foraging natural tiles is limited each in-game day:
+
+* Each natural tile can only be foraged once per day.
+* No more than 12 natural tiles can be foraged per day.
+
+The limits reset at midnight.
+
+<hr>
+
+**Forageable Plants**
+
+To be designed. ⏳
+
+<hr>
+
+**Foraging Speed**
+
+The base speed depends on the tile or plant being foraged. It is then modified by:
+
+* The [[Foraging Tools|Sickle type]] — higher-tier sickles provide a speed bonus
+* The pickaxe [[Gear Prefixes|prefix]] — _Quick_ (+20%), _Keen_ (+5%), _Sturdy_ (−5%)
+* [[Accessories]] ⏳
+* [[Armors|Armor]] ⏳
+* [[Potions]] ⏳
+* [[Food]] ⏳ (not sure)
+
+See [[Foraging Tools]] and [[Foraging Buffs]] for details.
+
+**Foraging Range**
+
+The base range covers ⏳ tiles in front of the player, ⏳ behind, and ⏳ above and below.
+
+It is then extended by:
+
+* The [[Foraging Tools|Sickle type]] — higher-tier sickles extend the range
+* The sickle [[Gear Prefixes|prefix]]
+* [[Accessories]]
+* [[Potions]]
+
+See [[Foraging Tools]] and [[Foraging Buffs]] for details.
+
+<hr>
+
+**See Also**
+
+* [[Mining]] — removing blocks permanently
+* [[Flora]] — plant behaviors against foraging
+* [[Foraging Tools]] — sickle types and stats
+* [[Foraging Buffs]] — complete speed and range modifiers
     `
   },
   {
@@ -4410,6 +4480,10 @@ All plants found in the world of Sixty-Below. Plants can be harvested for loot, 
 | [[item:inferncap]] | {{item:inferncap:star|star}} | Herb | Caverns bottom | [[item:inferncap]] | [[monster:lavaWorm]] / [[monster:magmaCrab]] (Foraging) |
 
 _For detailed information on each plant, click its name._
+
+**Life Cycle & Foraging behavior**⏳
+
+
 
 **Gardening** ⏳
 
