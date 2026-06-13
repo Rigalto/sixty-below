@@ -309,8 +309,7 @@ export const MICROTASK = {
   MINE_TILE: {priority: 24, capacity: 6, taskName: 'onMineTile'}, // minage d'une tuile
   PLACE_TILE: {priority: 24, capacity: 10, taskName: 'onPlaceTile'}, // pose d'un bloc
 
-  FORAGE_NATURAL: {priority: 24, capacity: 10, taskName: 'onForageNatural'}, // foraging d'une tuile NATURAL
-  FORAGE_PLANT: {priority: 24, capacity: 10, taskName: 'onForagePlant'}, // foraging d'une plante
+  FORAGE_ACTION: {priority: 24, capacity: 10, taskName: 'onForage'}, // foraging
 
   TELEPORT_PHASE1: {priority: 22, capacity: 1, taskName: 'onTeleportPhase1'}, // gère la téléportation
   TELEPORT_PHASE2: {priority: 22, capacity: 5, taskName: 'onTeleportPhase2'}, // gère la téléportation

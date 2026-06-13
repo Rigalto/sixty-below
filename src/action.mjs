@@ -97,7 +97,7 @@ class MiningManager {
   /**
  * Planifie le minage de la prochaine tuile en file, ou termine l'animation si la file est vide.
  */
-  #scheduleNextTile () {
+  #scheduleNext () {
     if (this.#queue.length > 0) {
       const speed = this.#queue[0].speed
       // TODO: changement de vitesse animation (speed)
@@ -120,7 +120,7 @@ class MiningManager {
 
     // La tuile a pu changer pendant le minage (sable, météorite, monster...)
     if (chunkManager.getTileAt(entry.tileIndex) !== entry.tileNode.code) {
-      this.#scheduleNextTile()
+      this.#scheduleNext()
       return
     }
 
@@ -155,7 +155,7 @@ class MiningManager {
       }
     }
 
-    this.#scheduleNextTile()
+    this.#scheduleNext()
   }
 
   /**
@@ -274,6 +274,8 @@ export const placingManager = new PlacingManager()
    ==================================================================================================== */
 
 class ForagingManager {
+  #queue = [] // {type:'natural', tileIndex, tileNode, tool, prefix} | {type:'plant', plant, tileIndex, tool, prefix}
+
   constructor () {
     // eventBus
     this.onTeleportBegin = this.onTeleportBegin.bind(this)
@@ -281,8 +283,7 @@ class ForagingManager {
     eventBus.on('player/teleport-begin', this.onTeleportBegin)
     eventBus.on('hotbar/slot-active', this.onSlotActive)
     // Micro-Tasks
-    this.onForageNatural = this.onForageNatural.bind(this)
-    this.onForagePlant = this.onForagePlant.bind(this)
+    this.onForage = this.onForage.bind(this)
   }
 
   /**
@@ -297,36 +298,53 @@ class ForagingManager {
     if (buffManager.getBuff('playerFreeze')) return
     if (!this.#isInForagingRange(tileIndex, tool, prefix)) return
 
-    // ── Branche 1 : tuile NATURAL (forage du sol) ──
+    // 1. Tuile NATURAL (forage du sol)
     if (tileNode.type & NODE_TYPE.NATURAL) {
       if (tool.star < tileNode.star) return
-      const speed = this.#computeForageSpeed(tileNode, tool, prefix) >> 1
-      taskScheduler.dequeue('forage-plant')
-      const {priority, capacity} = MICROTASK.FORAGE_NATURAL
-      taskScheduler.requeue('forage-natural', speed, this.onForageNatural, priority, capacity, tileIndex, tileNode, tool)
+      const speed = this.#computeForageSpeedNatural(tileNode, tool, prefix)
+
+      const wasEmpty = this.#queue.length === 0
+      this.#queue.push({type: 'natural', tileIndex, tileNode, tool, prefix, speed})
+      if (wasEmpty) {
+        // TODO: début animation outil (sickle)
+        this.#scheduleNext()
+      }
       return
     }
 
-    // ── Branche 2 : tuile SKY/VOID — chercher une plante sous la souris ──
+    // 2. Tuile SKY/VOID — chercher une plante sous la souris.
     if (tileNode.code !== NODES.SKY.code && tileNode.code !== NODES.VOID.code) return
     const plant = floraManager.getPlantAt(tileIndex)
     if (plant === null) return
-    if (!plant.present) return // OK pour Sunflower, pour les autres ? TODO
-    const plantItem = ITEMS[plant.itemId]
-    if (!plantItem.foraging) return // OK, mais à ajouter dans les specifications, c'est la première fois que l'on fait cela
+    if (!plant.present) return // OK pour Sunflower, pour les autres ? BUG TODO
+    const plantItem = ITEMS[plant.itemId] // Attention, toutes les plantes doivent avoir itemId ! BUG TODO
+    if (!plantItem.foraging) return
     if (tool.star < plantItem.star) return
-    const speed = this.#computeForageSpeed(plant, tool, prefix)
-    taskScheduler.dequeue('forage-natural')
-    const {priority, capacity} = MICROTASK.FORAGE_PLANT
-    taskScheduler.requeue('forage-plant', speed, this.onForagePlant, priority, capacity, plant, tileIndex, tool)
+    const speed = this.#computeForageSpeedPlant(plant, tool, prefix)
+
+    const wasEmpty = this.#queue.length === 0
+    this.#queue.push({type: 'plant', plant, tileIndex, tool, prefix, speed})
+    if (wasEmpty) {
+      // TODO: début animation outil (sickle)
+      this.#scheduleNext()
+    }
   }
 
   /**
-   * Calcule le délai de foraging en ms.
+   * Calcule le délai de foraging en ms pour le foraging des tuiles
    * TODO: implémenter la formule complète (tool.foraging.speed + buff foraging-speed + prefix)
    * @returns {number} délai en ms
    */
-  #computeForageSpeed (target, tool, prefix) {
+  #computeForageSpeedNatural (target, tool, prefix) {
+    return 2000
+  }
+
+  /**
+   * Calcule le délai de foraging en ms pour le foraging des tuiles
+   * TODO: implémenter la formule complète (tool.foraging.speed + buff foraging-speed + prefix)
+   * @returns {number} délai en ms
+   */
+  #computeForageSpeedPlant (plant, tool, prefix) {
     return 2000
   }
 
@@ -352,29 +370,48 @@ class ForagingManager {
   }
 
   /**
-   * Callback TaskScheduler : exécute le foraging d'une tuile NATURAL.
-   * @param {number} tileIndex
-   * @param {object} tileNode
-   * @param {object} tool
+   * Planifie le prochain foraging depuis le front de file.
    */
-  onForageNatural (tileIndex, tileNode, tool) {
-    console.log('ForagingManager.onForageNatural', {tileIndex, tileNode, tool})
+  #scheduleNext () {
+    if (this.#queue.length > 0) {
+    // TODO: changement de vitesse animation (speed)
+      const {priority, capacity} = MICROTASK.FORAGE_ACTION
+      taskScheduler.enqueue('forage-current', this.#queue[0].speed, this.onForage, priority, capacity)
+    } else {
+    // TODO: fin animation outil (sickle)
+    }
   }
 
   /**
-   * Callback TaskScheduler : exécute le foraging d'une plante.
-   * @param {object} plant    — record de la plante
-   * @param {number} tileIndex
-   * @param {object} tool
+   * Callback TaskScheduler : traite l'entrée en tête de file (natural ou plant).
    */
-  onForagePlant (plant, tileIndex, tool) {
-    console.log('ForagingManager.onForagePlant', {plant, tileIndex, tool})
+  onForage () {
+    const entry = this.#queue.shift()
+    if (entry === undefined) return
+
+    if (entry.type === 'natural') {
+      if (chunkManager.getTileAt(entry.tileIndex) !== entry.tileNode.code) {
+        this.#scheduleNext()
+        return
+      }
+      console.log('ForagingManager.onForage — natural', entry)
+    } else {
+      if (!entry.plant.present) { // BUG 6 TODO
+        this.#scheduleNext()
+        return
+      }
+      console.log('ForagingManager.onForage — plant', entry)
+    }
+
+    this.#scheduleNext()
   }
 
   /** Annule toute tâche de foraging en attente. */
   #interrupt () {
-    taskScheduler.dequeue('forage-natural')
-    taskScheduler.dequeue('forage-plant')
+    if (this.#queue.length === 0) return
+    this.#queue.length = 0
+    taskScheduler.dequeue('forage-current')
+    // TODO: annuler animation outil (sickle)
   }
 
   /** Liaison EventBus : 'player/teleport-begin'. */
