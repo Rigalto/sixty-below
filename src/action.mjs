@@ -330,6 +330,9 @@ class ForagingManager {
       if (this.#foragedToday.size >= NATURAL_FORAGE_DAILY_LIMIT) return
       if (this.#foragedToday.has(tileIndex)) return
 
+      this.#foragedToday.add(tileIndex)
+      database.setGameState('naturalforaged', this.#foragedToday)
+
       const speed = this.#computeForageSpeedNatural(tileNode, tool, prefix)
       const wasEmpty = this.#queue.length === 0
       this.#queue.push({type: 'natural', tileIndex, tileNode, tool, prefix, speed})
@@ -445,9 +448,6 @@ class ForagingManager {
           eventBus.emit('player/loot-item', {itemCode})
         }
       }
-
-      this.#foragedToday.add(entry.tileIndex)
-      database.setGameState('naturalforaged', this.#foragedToday)
 
       console.log('ForagingManager.onForage — natural', entry)
     } else {
