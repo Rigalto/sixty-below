@@ -104,11 +104,12 @@ export const IMAGE_FILES = [
 ]
 
 export const SOUND_FILES = [
-  // utilisables
+  // utilisaés
+  'assets/sounds/mining.ogg',
   'assets/sounds/teleport.mp3',
-  'assets/sounds/placeblock.mp3',
-  'assets/sounds/foragenatural.wav',
-  'assets/sounds/forageplant.mp3',
+  'assets/sounds/placing.mp3',
+  'assets/sounds/foraging.wav',
+  // provision
   'assets/sounds/placefurniture.mp3',
   'assets/sounds/unplace.mp3',
   'assets/sounds/fishing.mp3',
@@ -116,6 +117,7 @@ export const SOUND_FILES = [
   'assets/sounds/axe.wav',
   'assets/sounds/mine.wav',
   // provision
+  'assets/sounds/forageplant.mp3',
   'assets/sounds/dig.wav',
   'assets/sounds/tink1.wav',
   'assets/sounds/mining_hit.mp3',
