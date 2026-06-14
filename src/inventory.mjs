@@ -2601,6 +2601,7 @@ class InventoryOverlay {
    * Lié dans #bindEvents.
    */
   onChestSelectChange () {
+    this.#chestSelect.blur()
     const furniture = furnitureManager.getFurnitureById(this.#chestSelect.value)
     if (furniture === undefined) return
     this.#updateContainerSelection(furniture)
