@@ -6449,9 +6449,7 @@ export const debugHelpCategories = () => {
     console.log(`  ${cat.padEnd(20)} ${count} topic${count > 1 ? 's' : ''}`)
   }
   console.groupEnd()
-  console.log('.............................;;;;')
 }
-debugHelpCategories()
 
 // /////////////
 // 4 HYDRATATION

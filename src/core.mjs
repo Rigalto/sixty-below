@@ -2,7 +2,7 @@
 
 import {IS_DEV, TIME_BUDGET, MICROTASK_FN_NAME_TO_KEY, STATE, OVERLAYS, MICROTASK} from './constant.mjs'
 import {NODES, NODES_LOOKUP, SKY_BORDER_NODE, MAX_FURNITURE_W, MAX_FURNITURE_H, ITEM_TYPE, ITEMS, RECIPES, MONSTERS, PLANT_KIND, PLANT_TYPE, PLANT_SYSTEM_LOOKUP, ALL_PLANT_SYSTEMS, TREE_IMAGES} from '../assets/data/data.mjs'
-import {HELP_TITLES, hydrateHelp} from '../assets/data/data-help.mjs'
+import {HELP_TITLES, hydrateHelp, debugHelpCategories} from '../assets/data/data-help.mjs'
 import {loadAssets, resolveAssetData} from './assets.mjs'
 import {timeManager, taskScheduler, microTasker, eventBus, seededRNG, parseLootCount, parseLootBuffs, buildLootHelpRow, blockedTiles} from './utils.mjs'
 import {database} from './database.mjs'
@@ -257,6 +257,7 @@ class GameCore {
   #hydrateHelp () {
     const {count, errors} = hydrateHelp(NODES, ITEMS, RECIPES)
     console.log(`   🔹 Help hydratée : ${count} fiches, ${errors} erreur(s)`)
+    if (IS_DEV) debugHelpCategories()
   }
 
   /**
