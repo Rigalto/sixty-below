@@ -185,6 +185,15 @@ class SunflowerSystem {
   }
 
   /**
+ * Traite le foraging réussi : marque la fleur absente et persiste.
+ * Le loot est géré en commun par ForagingManager — cette méthode ne gère que l'état de la plante.
+ * @param {object} record
+ */
+  onForaged (record) {
+    this.#destroyPresent(record)
+  }
+
+  /**
    * Retourne le record du tournesol couvrant la tuile donnée, ou null.
    * @param {number} tileIndex — (y << 10) | x
    * @returns {object|null}
@@ -616,6 +625,15 @@ class SampleSystem {
     // ctx.drawImage(IMAGE_CACHE[img.imgIndex], img.sx, img.sy, img.sw, img.sh, pxX, pxY, img.sw, img.sh)
     // }
   }
+
+  /**
+ * Traite le foraging réussi de cette plante.
+ * IMPLÉMENTATION OBLIGATOIRE — chaque système définit son propre comportement post-foraging
+ * (disparition, état non-forageable temporaire, relance de croissance, etc.).
+ * Le loot est géré en commun par ForagingManager — cette méthode ne gère que l'état de la plante.
+ * @param {object} record
+ */
+  onForaged (record) { }
 
   /**
    * Retourne le record de la plante couvrant la tuile donnée, ou null.
