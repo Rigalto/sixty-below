@@ -17,6 +17,9 @@ class SaveManager {
     this.priority = priority
     this.capacity = capacity
     this.processSave = this.processSave.bind(this)
+
+    this.onVisibilityChange = this.onVisibilityChange.bind(this)
+    document.addEventListener('visibilitychange', this.onVisibilityChange)
   }
 
   /**
@@ -79,7 +82,7 @@ class SaveManager {
    */
   processSave () {
     // 1. Re-planification immédiate (Boucle infinie)
-    taskScheduler.enqueue('auto_save', 2000, this.processSave, this.priority, this.capacity)
+    taskScheduler.enqueueOnce('auto_save', 2000, this.processSave, this.priority, this.capacity)
 
     // Signal pour les écritures gamestate périodiques externes (ex: position joueur)
     eventBus.emit('save/tick')
@@ -115,6 +118,14 @@ class SaveManager {
     // --- D. Écriture Atomique (Transaction) ---
     // batchUpdate gère l'ouverture de la transaction sur tous les stores concernés
     database.batchUpdate(batchPayload)
+  }
+
+  /**
+ * Liaison DOM : 'visibilitychange' — force un save immédiat quand l'onglet passe en arrière-plan.
+ * Couvre changement d'onglet, minimisation, et précède fermeture/reload.
+ */
+  onVisibilityChange () {
+    if (document.visibilityState === 'hidden') this.processSave()
   }
 }
 export const saveManager = new SaveManager()

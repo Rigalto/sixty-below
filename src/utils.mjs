@@ -376,7 +376,7 @@ export class TaskScheduler {
   }
 
   // ajoute la tâche uniquement si elle n'est pas déjà présente
-  // ne fait rien si elle est présnete
+  // ne fait rien si elle est présente
   enqueueOnce (id, delay, fn, priority, capacityUnits, ...args) {
     for (const task of this.tasks) {
       if (!task.isRemoved && task.id === id) { return task.time }
