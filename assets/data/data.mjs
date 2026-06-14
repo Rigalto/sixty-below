@@ -836,6 +836,11 @@ export const PLANT_TYPE = {
   DAWNCAP: 74
 }
 
+// Peuplée dans GameCore.boot(), après import des systèmes.
+// Map<kind*100+type, xxxSystem> — résolution plante → système propriétaire
+export const PLANT_SYSTEM_LOOKUP = new Map()
+export const ALL_PLANT_SYSTEMS = []
+
 export const PARSNIP_COUNT = 12
 export const MANDRAKE_COUNT = 40
 export const CACTUS_COUNT = 40

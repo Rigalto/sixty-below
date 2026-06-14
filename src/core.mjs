@@ -1,7 +1,7 @@
 // inventory.mjs — GameCore - KeyboardManager - MouseManager
 
 import {IS_DEV, TIME_BUDGET, MICROTASK_FN_NAME_TO_KEY, STATE, OVERLAYS, MICROTASK} from './constant.mjs'
-import {NODES, NODES_LOOKUP, SKY_BORDER_NODE, MAX_FURNITURE_W, MAX_FURNITURE_H, ITEM_TYPE, ITEMS, RECIPES, MONSTERS, TREE_IMAGES} from '../assets/data/data.mjs'
+import {NODES, NODES_LOOKUP, SKY_BORDER_NODE, MAX_FURNITURE_W, MAX_FURNITURE_H, ITEM_TYPE, ITEMS, RECIPES, MONSTERS, PLANT_KIND, PLANT_TYPE, PLANT_SYSTEM_LOOKUP, ALL_PLANT_SYSTEMS, TREE_IMAGES} from '../assets/data/data.mjs'
 import {HELP_TITLES, hydrateHelp} from '../assets/data/data-help.mjs'
 import {loadAssets, resolveAssetData} from './assets.mjs'
 import {timeManager, taskScheduler, microTasker, eventBus, seededRNG, parseLootCount, parseLootBuffs, buildLootHelpRow, blockedTiles} from './utils.mjs'
@@ -23,6 +23,37 @@ import {miningManager, placingManager, foragingManager} from './action.mjs'
 import './combat.mjs'
 
 const WITH_DEBUG_HUD = true // passer à false pour désactiver sans toucher IS_DEV
+const plantSystemLookup = [ // Map<kind*100+type, system> — peuplée au fur et à mesure
+  //   [PLANT_KIND.NATURAL * 100 + PLANT_TYPE.NONE, naturalSystem],
+  //   [PLANT_KIND.TREE * 100 + PLANT_TYPE.OAK, treeSystem],
+  //   [PLANT_KIND.TREE * 100 + PLANT_TYPE.MAHOGANY, treeSystem],
+  //   [PLANT_KIND.TREE * 100 + PLANT_TYPE.COCONUT, treeSystem],
+  //   [PLANT_KIND.TREE * 100 + PLANT_TYPE.GIANT_MUSHROOM, treeSystem],
+  //   [PLANT_KIND.MUSHROOM * 100 + PLANT_TYPE.BOLETE, mushroomSystem],
+  //   [PLANT_KIND.MUSHROOM * 100 + PLANT_TYPE.PINKMYCENIA, mushroomSystem],
+  //   [PLANT_KIND.MUSHROOM * 100 + PLANT_TYPE.FROSTCAP, capystem],
+  //   [PLANT_KIND.MUSHROOM * 100 + PLANT_TYPE.DAWNCAP, capystem],
+  //   [PLANT_KIND.HERB * 100 + PLANT_TYPE.PLANT_TYPE.OLEANDER, oleanderSystem],
+  //   [PLANT_KIND.HERB * 100 + PLANT_TYPE.BLINKROOT, blinkrootSystem],
+  //   [PLANT_KIND.HERB * 100 + PLANT_TYPE.PARSNIP, parsnipSystem],
+  [PLANT_KIND.HERB * 100 + PLANT_TYPE.SUNFLOWER, sunflowerSystem]
+  //   [PLANT_KIND.HERB * 100 + PLANT_TYPE.FIREBLOSSOM, fireblossomSystem],
+  //   [PLANT_KIND.HERB * 100 + PLANT_TYPE.SKORN, skornSystem],
+  //   [PLANT_KIND.HERB * 100 + PLANT_TYPE.AMBERMIRAGE, ambermirageSystem],
+  //   [PLANT_KIND.HERB * 100 + PLANT_TYPE.BLOODMOON, bloodmoonSystem],
+  //   [PLANT_KIND.HERB * 100 + PLANT_TYPE.SHADOWFERN, fernSystem],
+  //   [PLANT_KIND.HERB * 100 + PLANT_TYPE.CRIMSONFROND, fernSystem],
+  //   [PLANT_KIND.HERB * 100 + PLANT_TYPE.GOLDENVEIL, fernSystem],
+  //   [PLANT_KIND.HERB * 100 + PLANT_TYPE.MISTFERN, fernSystem],
+  //   [PLANT_KIND.HERB * 100 + PLANT_TYPE.VELVETMOSS, mossSystem],
+  //   [PLANT_KIND.HERB * 100 + PLANT_TYPE.CORAL_R, coralSystem],
+  //   [PLANT_KIND.HERB * 100 + PLANT_TYPE.CORAL_P, coralSystem],
+  //   [PLANT_KIND.HERB * 100 + PLANT_TYPE.CORAL_Y, coralSystem],
+  //   [PLANT_KIND.HERB * 100 + PLANT_TYPE.CORAL_G, coralSystem],
+  //   [PLANT_KIND.SPREAD * 100 + PLANT_TYPE.NONE, spreadSystem],
+  //   [PLANT_KIND.SEED * 100 + PLANT_TYPE.NONE, seedSystem]
+]
+const allPlantSystems = [sunflowerSystem]
 
 const debugHUD = () => {
   const debugDiv = document.createElement('div')
@@ -90,6 +121,12 @@ class GameCore {
     this.#hydrateHelp()
     this.#hydrateAchievements()
     // this._hydrateBuffs() ...
+
+    PLANT_SYSTEM_LOOKUP.set('sunflower', sunflowerSystem)
+
+    // peuplement de PLANT_SYSTEM_LOOKUP (ecosystem, action...)
+    for (const [key, value] of plantSystemLookup) PLANT_SYSTEM_LOOKUP.set(key, value)
+    ALL_PLANT_SYSTEMS.push(...allPlantSystems)
 
     // 3. Liens avec le DOM
     mouseManager.init()

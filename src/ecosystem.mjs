@@ -5,7 +5,7 @@ import {WORLD_WIDTH, MICROTASK} from './constant.mjs'
 import {uniqueIdGenerator} from './database.mjs'
 
 import {eventBus, seededRNG, blockedTiles, microTasker} from './utils.mjs'
-import {NODES, ITEMS, PLANT_KIND, PLANT_TYPE} from '../assets/data/data.mjs'
+import {NODES, ITEMS, PLANT_KIND, PLANT_TYPE, PLANT_SYSTEM_LOOKUP, ALL_PLANT_SYSTEMS} from '../assets/data/data.mjs'
 import {IMAGE_CACHE} from './assets.mjs'
 import {saveManager} from './persistence.mjs'
 import {chunkManager} from './world.mjs'
@@ -459,40 +459,6 @@ export const sunflowerSystem = new SunflowerSystem()
    ==================================================================================================== */
 
 class FloraManager {
-  #systemMap = new Map([ // Map<kind*100+type, system> — peuplée au fur et à mesure
-    //   [PLANT_KIND.NATURAL * 100 + PLANT_TYPE.NONE, naturalSystem],
-    //   [PLANT_KIND.TREE * 100 + PLANT_TYPE.OAK, treeSystem],
-    //   [PLANT_KIND.TREE * 100 + PLANT_TYPE.MAHOGANY, treeSystem],
-    //   [PLANT_KIND.TREE * 100 + PLANT_TYPE.COCONUT, treeSystem],
-    //   [PLANT_KIND.TREE * 100 + PLANT_TYPE.GIANT_MUSHROOM, treeSystem],
-    //   [PLANT_KIND.MUSHROOM * 100 + PLANT_TYPE.BOLETE, mushroomSystem],
-    //   [PLANT_KIND.MUSHROOM * 100 + PLANT_TYPE.PINKMYCENIA, mushroomSystem],
-    //   [PLANT_KIND.MUSHROOM * 100 + PLANT_TYPE.FROSTCAP, capystem],
-    //   [PLANT_KIND.MUSHROOM * 100 + PLANT_TYPE.DAWNCAP, capystem],
-    //   [PLANT_KIND.HERB * 100 + PLANT_TYPE.PLANT_TYPE.OLEANDER, oleanderSystem],
-    //   [PLANT_KIND.HERB * 100 + PLANT_TYPE.BLINKROOT, blinkrootSystem],
-    //   [PLANT_KIND.HERB * 100 + PLANT_TYPE.PARSNIP, parsnipSystem],
-    [PLANT_KIND.HERB * 100 + PLANT_TYPE.SUNFLOWER, sunflowerSystem]
-    //   [PLANT_KIND.HERB * 100 + PLANT_TYPE.FIREBLOSSOM, fireblossomSystem],
-    //   [PLANT_KIND.HERB * 100 + PLANT_TYPE.SKORN, skornSystem],
-    //   [PLANT_KIND.HERB * 100 + PLANT_TYPE.AMBERMIRAGE, ambermirageSystem],
-    //   [PLANT_KIND.HERB * 100 + PLANT_TYPE.BLOODMOON, bloodmoonSystem],
-    //   [PLANT_KIND.HERB * 100 + PLANT_TYPE.SHADOWFERN, fernSystem],
-    //   [PLANT_KIND.HERB * 100 + PLANT_TYPE.CRIMSONFROND, fernSystem],
-    //   [PLANT_KIND.HERB * 100 + PLANT_TYPE.GOLDENVEIL, fernSystem],
-    //   [PLANT_KIND.HERB * 100 + PLANT_TYPE.MISTFERN, fernSystem],
-    //   [PLANT_KIND.HERB * 100 + PLANT_TYPE.VELVETMOSS, mossSystem],
-    //   [PLANT_KIND.HERB * 100 + PLANT_TYPE.CORAL_R, coralSystem],
-    //   [PLANT_KIND.HERB * 100 + PLANT_TYPE.CORAL_P, coralSystem],
-    //   [PLANT_KIND.HERB * 100 + PLANT_TYPE.CORAL_Y, coralSystem],
-    //   [PLANT_KIND.HERB * 100 + PLANT_TYPE.CORAL_G, coralSystem],
-    //   [PLANT_KIND.SPREAD * 100 + PLANT_TYPE.NONE, spreadSystem],
-    //   [PLANT_KIND.SEED * 100 + PLANT_TYPE.NONE, seedSystem]
-  ])
-
-  // naturalSystem, treeSystem, mushroomSystem, capystem, oleanderSystem, blinkrootSystem, parsnipSystem, fireblossomSystem, skornSystem, ambermirageSystem, bloodmoonSystem, fernSystem, mossSystem, coralSystem, spreadSystem, seedSystem
-  #allSystems = [sunflowerSystem] // system[] — dans l'ordre de rendu
-
   constructor () {
     this.onPreloadChunksChanged = this.onPreloadChunksChanged.bind(this)
     eventBus.on('camera/preload-chunks-changed', this.onPreloadChunksChanged)
@@ -502,7 +468,7 @@ class FloraManager {
    * Réinitialise tous les systèmes enregistrés.
    */
   init () {
-    for (const system of this.#allSystems) system.init()
+    for (const system of ALL_PLANT_SYSTEMS) system.init()
   }
 
   /**
@@ -511,7 +477,8 @@ class FloraManager {
    * @param {object} record — record de l'objectStore 'plant'
    */
   addPlant (record) {
-    const system = this.#systemMap.get(record.kind * 100 + record.type)
+    // const system = this.#systemMap.get(record.kind * 100 + record.type)
+    const system = PLANT_SYSTEM_LOOKUP.get(record.kind * 100 + record.type)
     if (system === undefined) return
     system.initPlant(record)
   }
@@ -522,7 +489,7 @@ class FloraManager {
    * @param {Set<number>} preloadChunks
    */
   onPreloadChunksChanged (preloadChunks) {
-    for (const system of this.#allSystems) system.onPreloadChunksChanged(preloadChunks)
+    for (const system of ALL_PLANT_SYSTEMS) system.onPreloadChunksChanged(preloadChunks)
   }
 
   /**
@@ -531,7 +498,7 @@ class FloraManager {
    * @returns {object|null}
    */
   getPlantAt (tileIndex) {
-    for (const system of this.#allSystems) {
+    for (const system of ALL_PLANT_SYSTEMS) {
       const plant = system.byTile.get(tileIndex)
       if (plant !== undefined) return plant
     }
@@ -543,7 +510,7 @@ class FloraManager {
    * @param {CanvasRenderingContext2D} ctx — contexte déjà transformé (caméra appliquée)
    */
   render (ctx) {
-    for (const system of this.#allSystems) system.render(ctx)
+    for (const system of ALL_PLANT_SYSTEMS) system.render(ctx)
   }
 }
 
