@@ -52,6 +52,7 @@ class MiningManager {
     const wasEmpty = this.#queue.length === 0
     this.#queue.push({tileIndex, tileNode, tool, prefix, speed})
     // TODO émettre un bruit spécifique à la pioche
+    eventBus.emit('sound/play', 'mine')
 
     if (wasEmpty) {
       // TODO: début animation outil
@@ -256,6 +257,7 @@ class PlacingManager {
 
     // on effectue les traitements induits
     eventBus.emit('world/tile-changed', {tileIndex, tileOldCode, tileNewCode})
+    eventBus.emit('sound/play', 'placeblock')
 
     // propagation SKY→VOID vers le bas : les SKY sous le bloc posé perdent leur connexion au ciel
     if (tileOldCode === SKY) {
@@ -331,7 +333,7 @@ class ForagingManager {
       const speed = this.#computeForageSpeedNatural(tileNode, tool, prefix)
       const wasEmpty = this.#queue.length === 0
       this.#queue.push({type: 'natural', tileIndex, tileNode, tool, prefix, speed})
-      eventBus.emit('sound/play', 'forage')
+      eventBus.emit('sound/play', 'foragenatural')
 
       if (wasEmpty) {
         // TODO: début animation outil (sickle)
@@ -351,6 +353,8 @@ class ForagingManager {
 
     const wasEmpty = this.#queue.length === 0
     this.#queue.push({type: 'plant', plant, tileIndex, tool, prefix, speed})
+    eventBus.emit('sound/play', 'forageplant')
+
     if (wasEmpty) {
       // TODO: début animation outil (sickle)
       this.#scheduleNext()

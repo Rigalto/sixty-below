@@ -448,6 +448,7 @@ class PlayerManager {
     this.#teleportDiv.classList.add('fading')
     buffManager.setBuff('playerFreeze', true)
     eventBus.emit('player/teleport-begin')
+    eventBus.emit('sound/play', 'teleport')
     const {priority, capacity} = MICROTASK.TELEPORT_PHASE2
     taskScheduler.enqueue('teleport-2', TELEPORT_FADE_MS, this.onTeleportPhase2, priority, capacity)
     console.log('<><><><><> Phase 1')

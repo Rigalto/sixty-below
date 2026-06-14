@@ -237,6 +237,12 @@ Cette section définit les événements officiels. Tout nouvel événement doit 
 | S | `map/close` | — | Fermeture de l'overlay carte. |
 | S | `hotbar/select-slot` | `number` slotIndex | Sélection d'un slot de la hotbar. |
 
+#### Sons et musique (`SoundManager`)
+
+| Dir. | Event Name | Payload Structure | Description |
+| :---: | :--- | :--- | :--- |
+| E | `sound/play` | `name: string` | Joue le son `name`. |
+| E | `sound/volume` | `volume: number` | Modifie le volume du son `0` pas de son, `100` volume maximum. |
 
 #### UI / Interface (Common)
 | Event Name | Payload Structure | Description |
