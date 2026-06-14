@@ -102,11 +102,14 @@ export const IMAGE_FILES = [
 ]
 
 export const SOUND_FILES = [
-  'assets/sounds/mining_hit.mp3',
-  'assets/sounds/mining_break.mp3',
-  'assets/sounds/water_splash.mp3'
+  'assets/sounds/dig.wav',
+  'assets/sounds/item1.wav',
+  'assets/sounds/tink1.wav'
   // ...
 ]
+
+// Contexte Web Audio partagé — créé une seule fois, suspendu jusqu'à interaction utilisateur
+const audioCtx = new (window.AudioContext || window.webkitAudioContext)()
 
 /* =========================================
    2. CACHES & INDEXES
@@ -217,20 +220,21 @@ export const loadAssets = async () => {
   })
 
   // 4.2 Chargement Sons (Web Audio API)
-  const sndPromises = []
-  // const audioCtx = new (window.AudioContext || window.webkitAudioContext)()
-  // const sndPromises = SOUND_FILES.map(path => {
-  //   return fetch(path)
-  //     .then(response => response.arrayBuffer())
-  //     .then(arrayBuffer => audioCtx.decodeAudioData(arrayBuffer))
-  //     .then(audioBuffer => {
-  //       const filename = path.substring(path.lastIndexOf('/') + 1, path.lastIndexOf('.'))
-  //       SOUND_CACHE[filename] = audioBuffer
-  //     })
-  //     .catch(e => console.error(`Sound error ${path}`, e))
-  // })
+  const sndPromises = SOUND_FILES.map(path => {
+    return fetch(path)
+      .then(response => response.arrayBuffer())
+      .then(arrayBuffer => audioCtx.decodeAudioData(arrayBuffer))
+      .then(audioBuffer => {
+        const filename = path.substring(path.lastIndexOf('/') + 1, path.lastIndexOf('.'))
+        SOUND_CACHE[filename] = audioBuffer
+      })
+      .catch(e => console.error(`Sound error ${path}`, e))
+  })
 
   await Promise.all([...imgPromises, ...sndPromises])
   console.timeEnd('Assets Loading')
+  console.log(`   🔹 Images chargées : ${IMAGE_CACHE.length}`)
+  console.log(`   🔹 Sons chargés : ${Object.keys(SOUND_CACHE).length}`)
+
   return {imageCount: IMAGE_CACHE.length, soundCount: Object.keys(SOUND_CACHE).length}
 }

@@ -392,7 +392,7 @@ Cette section définit les événements officiels. Tout nouvel événement doit 
 | E | `debug/buff-manager` | _(none)_ | Affiche sur la console le contenu de `#values` et `#fns`. |
 | S | `buff/trinket-changed` | `Set<string>` | Émis par `buffManager` quand un buff trinket change. Payload = buffIds modifiés. |
 
-#### Buffs Widget (`MiningManager`)
+#### Action de minage (`MiningManager`)
 
 | Dir. | Event Name | Payload Structure | Description |
 | :---: | :--- | :--- | :--- |
@@ -400,6 +400,17 @@ Cette section définit les événements officiels. Tout nouvel événement doit 
 | E | `player/teleport-begin` | — | Début de téléportation, avant fading. Le joueur est bloqué, ses actions annulées. |
 | S | `world/tile-changed` | `{ tileIndex: number, tileOldCode: number, tileNewCode: number }`| Le code de la tuile a été modifié. |
 | S | `player/loot-item` | `{itemCode: string}` | Émis pour chaque item looté. |
+| S | `sound/play` | `name: string` | Joue le son `name`. |
+
+#### Action de récolte (`ForagingManager`)
+
+| Dir. | Event Name | Payload Structure | Description |
+| :---: | :--- | :--- | :--- |
+| E | `hotbar/slot-active` | `{ index: number, slot: object, prevIndex: number }` | Émis à chaque changement de slot actif, ou de contenu du slot actif. |
+| E | `player/teleport-begin` | — | Début de téléportation, avant fading. Le joueur est bloqué, ses actions annulées. |
+| E | `time/daily` | `{ day, weather, nextWeather, moonPhase }` | Émis à minuit (changement de jour). |
+| S | `player/loot-item` | `{itemCode: string}` | Émis pour chaque item looté. |
+| S | `sound/play` | `name: string` | Joue le son `name`. |
 
 #### Toutes les plantes (`FloraManager`)
 

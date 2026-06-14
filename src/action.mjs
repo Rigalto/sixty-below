@@ -331,6 +331,8 @@ class ForagingManager {
       const speed = this.#computeForageSpeedNatural(tileNode, tool, prefix)
       const wasEmpty = this.#queue.length === 0
       this.#queue.push({type: 'natural', tileIndex, tileNode, tool, prefix, speed})
+      eventBus.emit('sound/play', 'forage')
+
       if (wasEmpty) {
         // TODO: début animation outil (sickle)
         this.#scheduleNext()
@@ -445,6 +447,17 @@ class ForagingManager {
         this.#scheduleNext()
         return
       }
+      const plantItem = ITEMS[plant.itemId]
+      const buffValues = buffManager.getBuffs(plantItem.foraging.buffList)
+      for (const lootItem of plantItem.foraging.items) {
+        const count = rollLootWithBuffs(lootItem, buffValues)
+        if (count > 0) {
+          const itemCode = lootItem.item.code
+          inventoryManager.loot(itemCode, count, '')
+          eventBus.emit('player/loot-item', {itemCode})
+        }
+      }
+      system.onForaged(plant)
       console.log('ForagingManager.onForage — plant', entry)
     }
 
