@@ -7,6 +7,7 @@ import {buffManager} from './buff.mjs'
 import {inventoryManager} from './inventory.mjs'
 import {camera} from './render.mjs'
 import {chunkManager} from './world.mjs'
+import {database} from './database.mjs'
 
 const WORLD_PX_W = WORLD_WIDTH << 4 // 16384 px
 const WORLD_PX_H = WORLD_HEIGHT << 4 // 8192 px
@@ -140,6 +141,7 @@ class PlayerManager {
   #moveState = 0 // 0=GROUNDED 1=JUMPING 2=FALLING
   #jumpStartY = 0 // px — #y au déclenchement du saut
   #fallStartY = 0 // px — #y au déclenchement de la chute (fin saut ou décrochage)
+  #carryX = 0 // résidu fractionnaire du déplacement horizontal, dans (-1, 1) ; remis à 0 si immobile ou bloqué
   #carryY = 0 // retient la partie décimale de la position en y pour ne travailler que sur des integer
 
   #teleportDiv = null // div#teleport-overlay — mis en cache à la première téléportation
@@ -152,6 +154,11 @@ class PlayerManager {
   #getFeetTileResult = {x: 0, y: 0} // résultat de getFeetTile()
   #getCenterTileResult = {x: 0, y: 0, direction: 1} // résultat de getCenterTile()
   #updateResult = {x: 0, y: 0} // résultat de update()
+
+  constructor () {
+    this.onSaveTick = this.onSaveTick.bind(this)
+    eventBus.on('save/tick', this.onSaveTick)
+  }
 
   /**
  * Initialise la position depuis le record gamestate.
@@ -173,6 +180,16 @@ class PlayerManager {
     eventBus.on('player/teleport', this.onTeleport)
 
     return {x: this.#x + (PLAYER.w >> 1), y: this.#y + (PLAYER.h >> 1)}
+  }
+
+  /**
+ * Liaison EventBus : 'save/tick' — écrit la position courante dans gamestate (clé 'player').
+ * Émis toutes les 2s par SaveManager.processSave, synchronisé avec le save des chunks.
+ */
+  onSaveTick () {
+    // const record = `${Math.round(this.#x)}|${Math.round(this.#y)}|${this.#direction}`
+    const record = `${this.#x}|${this.#y}|${this.#direction}`
+    database.setGameState('player', record)
   }
 
   /**
@@ -206,22 +223,26 @@ class PlayerManager {
    * @param {number} dt      - delta temps en ms
    */
   #horizontalMovement (directions, dt) {
-    if (directions === 0) return
+    if (directions === 0) { this.#carryX = 0; return }
     // détermination de la direction horizontale
     let direction = 0
     if (directions & 4) { direction -= 1 }
     if (directions & 8) { direction += 1 }
     // Si le joueur appuie à la fois à droite et à gauche, le mouvement est nul
-    if (direction === 0) return
+    if (directions === 0) { this.#carryX = 0; return }
 
     const speed = PLAYER.speed
     const dist = speed * dt * direction
     this.#direction = direction < 0 ? 0 : 1
 
+    const total = dist + this.#carryX
+    const intDist = total | 0
+    this.#carryX = total - intDist
+
     const hitbox = this.getHitbox() // objet partagé
     const x0 = hitbox.x
     const y0 = hitbox.y
-    hitbox.x = x0 + dist // hitbox sur position future
+    hitbox.x = x0 + intDist // hitbox sur position future
     const {hasSolid: solidFull} = this.#scanTiles(chunkManager.getTilesInRect(hitbox))
     if (solidFull) {
       // collision détectée : tentative Set Up
@@ -229,7 +250,7 @@ class PlayerManager {
       const {hasSolid: solidStep} = this.#scanTiles(chunkManager.getTilesInRect(hitbox))
       if (!solidStep) {
         // stepup possible
-        this.#x += dist
+        this.#x += intDist
         this.#y -= 16
       } else {
         // pas de step up possible : on tennte un décalage de un pixel
@@ -240,10 +261,11 @@ class PlayerManager {
         // on peut déplacer de un pixel, sinon on reste immobile
           this.#x += direction
         }
+        this.#carryX = 0 // collision : reliquat jeté
       }
     } else {
       // pas de collision
-      this.#x += dist
+      this.#x += intDist
     }
   }
 

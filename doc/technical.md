@@ -244,6 +244,12 @@ Cette section définit les événements officiels. Tout nouvel événement doit 
 | E | `sound/play` | `name: string` | Joue le son `name`. |
 | E | `sound/volume` | `volume: number` | Modifie le volume du son `0` pas de son, `100` volume maximum. |
 
+#### Persistance (`SaveManager`)
+
+| Dir. | Event Name | Payload Structure | Description |
+| :---: | :--- | :--- | :--- |
+| S | `save/tick` | — | Émis toutes les 2s par processSave, en synchronisation avec le save des chunks. Permet l'écriture périodique de clés gamestate par d'autres systèmes (ex: position joueur). |
+
 #### UI / Interface (Common)
 | Event Name | Payload Structure | Description |
 | :--- | :--- | :--- |
@@ -295,6 +301,7 @@ Cette section définit les événements officiels. Tout nouvel événement doit 
 | S | `player/move` | `{x: number, y: number}` | Émis quand la tuile sous les pieds du joueur change. Coordonnées en tuiles. |
 | S | `life/add` | `{dmg: number}` | Dégâts de chute. dmg < 0. |
 | E | `player/teleport` | `{x: number, y: number}` | Téléporte le joueur aux coordonnées tuiles données. |
+| E | `save/tick` | — | Écrit la position courante dans gamestate via database.setGameState('player', ...). |
 | S | `player/teleport-begin` | — | Début de téléportation, avant fading. Le joueur est bloqué, ses actions annulées. |
 | S | `player/teleport-end` | — | Fin de téléportation, avant fading. Le joueur est débloqué. |
 

@@ -2,7 +2,7 @@
 
 import {MICROTASK} from './constant.mjs'
 import {database} from './database.mjs'
-import {taskScheduler, timeManager} from './utils.mjs'
+import {taskScheduler, timeManager, eventBus} from './utils.mjs'
 import {chunkManager} from './world.mjs'
 
 class SaveManager {
@@ -80,6 +80,9 @@ class SaveManager {
   processSave () {
     // 1. Re-planification immédiate (Boucle infinie)
     taskScheduler.enqueue('auto_save', 2000, this.processSave, this.priority, this.capacity)
+
+    // Signal pour les écritures gamestate périodiques externes (ex: position joueur)
+    eventBus.emit('save/tick')
 
     const batchPayload = []
 
