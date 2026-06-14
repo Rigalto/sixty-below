@@ -408,6 +408,13 @@ Cette section définit les événements officiels. Tout nouvel événement doit 
 | S | `player/loot-item` | `{itemCode: string}` | Émis pour chaque item looté. |
 | S | `sound/play` | `name: string` | Joue le son `name`. |
 
+#### Placement de blocs dans le monde (`PlacingManager`)
+
+| Dir. | Event Name | Payload Structure | Description |
+| :---: | :--- | :--- | :--- |
+| S | `world/tile-changed` | `{ tileIndex: number, tileOldCode: number, tileNewCode: number }`| Le code de la tuile a été modifié. |
+| S | `sound/play` | `name: string` | Joue le son `name`. |
+
 #### Action de récolte (`ForagingManager`)
 
 | Dir. | Event Name | Payload Structure | Description |
