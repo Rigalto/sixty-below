@@ -7,12 +7,11 @@
 
 ## En cours
 
-- implémentation du foraging
-- implémenter `#computeForageSpeedPlant`
-- Dans le Invetory Panel, lorsque l'on sélectionne un coffre, le focus reste sur le menu déroulant et on ne peut plus fermer l'inventory panel
+- Dans le Inventory Panel, lorsque l'on sélectionne un coffre, le focus reste sur le menu déroulant et on ne peut plus fermer l'inventory panel
 - implémenter les graines de Sunflower qui augmentent la probabilité de pop de sunflower.
 - gérer blockedTiles pour les furnitures (mise à jour - les tests sont faits par l'appelant)
 - Sauvegarde de la position du joueur en database
+- SunflowerSystem : décommenter `treeSystem.isOakAt`
 - Trouver des sons de volume homogène pour chaque action du jeu.
 - Modifier le volume sonore des sons du jeu (ActionWidget)
 - Supprimer les actions de debug accessibles au joueur, quand hébergement sous GitHub :
@@ -345,14 +344,15 @@ La Sap corrode le Copper. Il doit donc être remplacer par du Gold.
 - Gestion des buffs (`BuffManager`)
 - Affichage des buffs (`BuffWidget`)
 - Gestion des meubles placés dans le monde (`FurnitureManager`)
+- Gestion des sons (`SoundManager`) - mining, placing, foraging, teleport
 
 ### Actions
-- Minage (`MiningManager`) - reste GEM/SHELL à traiter
+- Minage (`MiningManager`)
 - Plaçage des blocs (`PlacingManager`)
 
 ### Environement
 - Point d'entrée pour la flore (`FloraManager`)
-- Sunflower (`SunflowerSystem`) - impacts du changement de tuile traités partiellement
+- Sunflower (`SunflowerSystem`)
 
 ### Rendu (partiel)
 - `WorldRenderer` — rendu tuiles par chunks avec cache OffscreenCanvas

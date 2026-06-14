@@ -320,7 +320,7 @@ class SunflowerSystem {
 
   /**
  * Microtâche : vérifie si une tuile devenue GRASSFOREST peut accueillir un nouveau spot.
- * Conditions : tuiles voisines GRASSFOREST, pas d'oak dans [x-minDist, x+minDist], pas de spot existant.
+ * Conditions : pas d'oak dans [x-minDist, x+minDist], pas de spot existant.
  * @param {number} soilIndex
  */
   onSunflowerSpotCheck (soilIndex) {
@@ -328,15 +328,12 @@ class SunflowerSystem {
     const x = soilIndex & 0x3FF
 
     if (chunkManager.getTileAt(soilIndex) !== GRASSFOREST) return
-    // if (chunkManager.getTileAt(soilIndex - 1) !== GRASSFOREST) return
-    // if (chunkManager.getTileAt(soilIndex + 1) !== GRASSFOREST) return
     if (this.#spotsBySoil.has(soilIndex)) return
     // TODO enlever le commentaire que TreeSystem sera écrit et possédera la fonction
-    // Je ne suis pas sûr que les paramètres soient corrects
     // L'arbre occupe les positions x, x+1, x+2. Les tuiles interdites sont les tuiles
     // x-2, x-1, x+3 et x+4. Si la position du sunflower est xx, alors il ne doit pas y avoir
     // d'arbre en x+2, x+1, x-3 et x-4
-    // if (!treeSystem.isOakFreeAt(x-2, x-1, x+3, x+4)) return
+    // if (!treeSystem.isOakAt(x-2, x-1, x+3, x+4)) return
     // La signature isOakAt(...positions) dans TreeSystem fera un simple Set.has() sur chacune des 4 valeurs.
 
     const y = soilIndex >> 10

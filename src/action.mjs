@@ -375,12 +375,18 @@ class ForagingManager {
   }
 
   /**
-   * Calcule le délai de foraging en ms pour le foraging des tuiles
-   * TODO: implémenter la formule complète (tool.foraging.speed + buff foraging-speed + prefix)
-   * @returns {number} délai en ms
-   */
+ * Calcule le délai de foraging d'une plante, en ms.
+ * @param {object} plant — record de la plante (utilise plant.itemId)
+ * @param {object} tool — ITEMS[slot.item], outil sickle
+ * @param {string} prefix — préfixe de l'outil (Quick/Keen/Sturdy)
+ * @returns {number} délai en ms
+ */
   #computeForageSpeedPlant (plant, tool, prefix) {
-    return 2000
+    let coefficient = 100 + tool.foraging.speed + buffManager.getBuff('foraging-speed')
+    coefficient += prefix === 'Quick' ? 20 : 0
+    coefficient += prefix === 'Keen' ? 5 : 0
+    coefficient -= prefix === 'Sturdy' ? 5 : 0
+    return Math.round((coefficient / 100) * ITEMS[plant.itemId].foraging.speed)
   }
 
   /**
