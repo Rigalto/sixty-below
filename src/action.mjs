@@ -1,7 +1,7 @@
 // action.mjs — miningManager
 
 import {eventBus, taskScheduler, microTasker, blockedTiles, rollLootWithBuffs} from './utils.mjs'
-import {NODE_TYPE, NODES, ITEM_TYPE, ITEMS} from '../assets/data/data.mjs'
+import {NODE_TYPE, NODES, ITEM_TYPE, ITEMS, PLANT_SYSTEM_LOOKUP} from '../assets/data/data.mjs'
 import {inventoryManager} from './inventory.mjs'
 import {buffManager} from './buff.mjs'
 import {database} from './database.mjs'
@@ -342,8 +342,7 @@ class ForagingManager {
     if (tileNode.code !== NODES.SKY.code && tileNode.code !== NODES.VOID.code) return
     const plant = floraManager.getPlantAt(tileIndex)
     if (plant === null) return
-    if (!plant.present) return // OK pour Sunflower, pour les autres ? BUG TODO
-    const plantItem = ITEMS[plant.itemId] // Attention, toutes les plantes doivent avoir itemId ! BUG TODO
+    const plantItem = ITEMS[plant.itemId]
     if (!plantItem.foraging) return
     if (tool.star < plantItem.star) return
     const speed = this.#computeForageSpeedPlant(plant, tool, prefix)
@@ -440,7 +439,9 @@ class ForagingManager {
 
       console.log('ForagingManager.onForage — natural', entry)
     } else {
-      if (!entry.plant.present) { // BUG 6 TODO
+      const plant = entry.plant
+      const system = PLANT_SYSTEM_LOOKUP.get(plant.kind * 100 + plant.type)
+      if (!system.isPresent(plant)) {
         this.#scheduleNext()
         return
       }

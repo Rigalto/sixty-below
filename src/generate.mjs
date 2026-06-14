@@ -7040,6 +7040,7 @@ class PlantGenerator {
 
     this.#plants.push({
       id: uniqueIdGenerator.getUniqueId(),
+      entryId: ITEMS.coconut.code,
       kind: PLANT_KIND.TREE,
       type: PLANT_TYPE.COCONUT,
       index,
@@ -7174,6 +7175,7 @@ class PlantGenerator {
     const placeTree = (soilX, y, grassCode) => {
       const treeType = grassCode === GRASSFOREST ? PLANT_TYPE.OAK : PLANT_TYPE.MAHOGANY
       const treeName = grassCode === GRASSFOREST ? 'oak' : 'mahogany'
+      const treeId = grassCode === GRASSFOREST ? ITEMS.oak.code : ITEMS.mahogany.code
       const mushroomId = grassCode === GRASSFOREST ? 'bolete' : 'pinkMycenia'
       const soilIndex = (y << 10) | soilX
       const size = seededRNG.randomGetArrayValue(TREES_INIT_SIZE)
@@ -7182,6 +7184,7 @@ class PlantGenerator {
       if (treeType === PLANT_TYPE.OAK) oakPositions.add(soilX + 1)
       this.#plants.push({
         id: uniqueIdGenerator.getUniqueId(),
+        itemId: treeId,
         kind: PLANT_KIND.TREE,
         type: treeType,
         index: soilIndex - TREE_H * W,
@@ -7308,6 +7311,7 @@ class PlantGenerator {
 
       this.#plants.push({
         id: uniqueIdGenerator.getUniqueId(),
+        itemId: ITEMS.giantMushroom.code,
         kind: PLANT_KIND.TREE,
         type: PLANT_TYPE.GIANT_MUSHROOM,
         index: soilIndex - MUSH_H * W,

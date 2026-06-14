@@ -193,6 +193,13 @@ class SunflowerSystem {
     return this.byTile.get(tileIndex) ?? null
   }
 
+  /**
+ * Indique si le record est actuellement présent (forageable).
+ * @param {object} record
+ * @returns {boolean}
+ */
+  isPresent (record) { return record.present }
+
   // ////////////////////////////////////// //
   // GESTION DU CYCLE DE VIE DES SUNFLOWERS //
   // ////////////////////////////////////// //
@@ -543,6 +550,7 @@ class SampleSystem {
 
   /**
    * Réinitialise toutes les structures. Appelé en début de session.
+   * IMPLÉMENTATION OBLIGATOIRE
    */
   init () {
     this.byTile.clear()
@@ -553,6 +561,7 @@ class SampleSystem {
 
   /**
    * Enregistre un record actif et peuple les quatre structures internes.
+   * IMPLÉMENTATION OBLIGATOIRE
    * @param {object} record — record de l'objectStore 'plant' (deleted=false garanti par l'appelant)
    */
   initPlant (record) {
@@ -582,6 +591,7 @@ class SampleSystem {
   /**
    * Reconstruit #displayed depuis les chunks preload de la caméra.
    * Appelé directement par FloraManager (synchrone) — basculer en microtâche si dépassement 100µs.
+   * IMPLÉMENTATION OBLIGATOIRE
    * @param {Set<number>} preloadChunks
    */
   onPreloadChunksChanged (preloadChunks) {
@@ -595,6 +605,7 @@ class SampleSystem {
 
   /**
    * Dessine les plantes visibles sur le contexte transformé par la caméra.
+   * IMPLÉMENTATION OBLIGATOIRE
    * @param {CanvasRenderingContext2D} ctx — contexte déjà transformé (caméra appliquée)
    */
   render (ctx) {
@@ -608,12 +619,21 @@ class SampleSystem {
 
   /**
    * Retourne le record de la plante couvrant la tuile donnée, ou null.
+   * IMPLÉMENTATION OBLIGATOIRE
    * @param {number} tileIndex — (y << 10) | x
    * @returns {object|null}
    */
   getPlantAt (tileIndex) {
     return this.byTile.get(tileIndex) ?? null
   }
+
+  /**
+ * Indique si le record est actuellement présent (forageable).
+ * IMPLÉMENTATION OBLIGATOIRE — chaque système doit définir sa propre notion de présence.
+ * @param {object} record
+ * @returns {boolean}
+ */
+  isPresent (record) { return true }
 }
 
 export const sampleSystem = new SampleSystem()

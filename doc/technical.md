@@ -729,6 +729,7 @@ Les enregistrements sont de natures très différentes, nature déterminée par 
   * `naturalCode` : type de la tuile : NODES.GRASSFOREST.code, NODES.GRASSJUNGLE.code, NODES.GRASSMUSHROOM.code, NODES.GRASSFERN.code, NODES.GRASSMOSS.code
 * `kind` TREE : liste des arbres présents dans le monde
   * `id` : identifiant unique de l'abre
+  * `itemId` : item correspondant à l'arbre : `ITEMS.oak.code`, `ITEMS.mahogany.code`, `ITEMS.giantMushroom.code` et `ITEMS.coconut.code`
   * `index` : position de l'abre (coint haut gauche du rectangle englobant)
   * `type` : type de l'arbre : PLANT_TYPE.OAK, PLANT_TYPE.MAHOGANY, PLANT_TYPE.GIANTMUSHROOM, PLANT_TYPE.COCONUT
   * `w` et `h` : taille maximale de l'arbre
@@ -743,9 +744,9 @@ Les enregistrements sont de natures très différentes, nature déterminée par 
   * `shakedTimestamp` : heure (timestamp) à partir de laquelle l'arbre peut être secoué de nouveau
 * `kind` MUSHROOM : liste des spots de champignons présents dans le monde
   * `id` : identifiant unique du spot de champignon
+  * `itemId` : item correspondant au champignon qui pousse sur le spot : `ITEMS.bolete.code` et `ITEMS.pinkMycenia.code`
   * `index` : position du spot de champignon (coin haut gauche de l'image)
   * `type` : `PLANT_TYPE.NONE`
-  * `itemId` : item correspondant au champignon qui pousse sur le spot : `ITEMS.bolete.code` et `ITEMS.pinkMycenia.code`
   * `w` et `h` : taille du champignon
   * `x` et `y` : coordonnées pour le clipping de l'image (affichée si `x,y` est dans le rectangle visible)
   * `soilIndex` : position de la tuile solide sous la gauche du champignon (`index + h * 1024`)
@@ -753,9 +754,9 @@ Les enregistrements sont de natures très différentes, nature déterminée par 
   * _Visibilité pilotée globalement par l'heure in-game — les champignons d'un même type apparaissent et disparaissent simultanément._
 * `kind` HERB : liste des spots d'herbes (Parsnip, Sunflower) ou des herbes présentes dans le monde (Blinkroot, Coral, Parsnip, Sunflower, Fireblossom, Oleander, Skorn, Ambermirage)
   * `id` : identifiant unique de l'herbe
+  * `ìtemId` : identifiant de l'item correspondant à l'herbe
   * `index` : position de l'herbe (coin haut gauche de l'image)
   * `type` : type d'herbe (PLANT_TYPE.XXX)
-  * `ìtemId` : identifiant de l'item correspondant à l'herbe
   * `w` et `h` : taille de l'herbe
   * `x` et `y` : coordonnées pour le clipping de l'image (affichée si `x,y` est dans le rectangle visible)
   * `soilIndex` : position de la tuile solide sous la gauche de l'herbe (`index + h * 1024`)
