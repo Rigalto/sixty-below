@@ -9,6 +9,7 @@
 
 - implémentation du foraging
 - implémenter `#computeForageSpeedPlant`
+- Dans le Invetory Panel, lorsque l'on sélectionne un coffre, le focus reste sur le menu déroulant et on ne peut plus fermer l'inventory panel
 - implémenter les graines de Sunflower qui augmentent la probabilité de pop de sunflower.
 - gérer blockedTiles pour les furnitures (mise à jour - les tests sont faits par l'appelant)
 - Sauvegarde de la position du joueur en database
