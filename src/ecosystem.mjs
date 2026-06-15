@@ -465,6 +465,7 @@ class OleanderSystem {
   byTile = new Map() // Map<tileIndex, record> — public : membership O(1) + lookup record
   #list = [] // record[] — population fixe, référence affectée dans init(records)
   #byChunk = new Map() // Map<chunkKey, Set> — lookup spatial pour onPreloadChunksChanged
+  #bySoil = new Map() // Map<soilIndex, record> — oleanders présents : détection retrait du sol
   #displayed = new Set() // Set<record> — cible du render (chunks preload uniquement)
   #regrowQueue = [] // record[] — records present=false en attente d'un nouvel emplacement
   #image = null // image à afficher (mise en cache)
@@ -473,6 +474,8 @@ class OleanderSystem {
     // eventBus
     this.onFirstLoop = this.onFirstLoop.bind(this)
     eventBus.on('time/first-loop', this.onFirstLoop)
+    this.onTileChanged = this.onTileChanged.bind(this)
+    eventBus.on('world/tile-changed', this.onTileChanged)
     // micro-tâches
     this.onOleanderRegrow = this.onOleanderRegrow.bind(this)
   }
@@ -484,6 +487,7 @@ class OleanderSystem {
     this.byTile.clear()
     this.#list.length = 0
     this.#byChunk.clear()
+    this.#bySoil.clear()
     this.#displayed.clear()
     this.#regrowQueue.length = 0
 
@@ -503,6 +507,8 @@ class OleanderSystem {
     if (record.present) {
       addToByTile(this.byTile, record)
       addToByChunk(this.#byChunk, record)
+      this.#bySoil.set(record.soilIndex, record)
+
       // this.#bySoil.set(record.soilIndex, record)
       blockedTiles.blockPlacement(record.index)
       blockedTiles.blockPlacement(record.index + WORLD_WIDTH)
@@ -550,18 +556,18 @@ class OleanderSystem {
   }
 
   /**
-   * Traite le foraging réussi de cet oleander (hors loot, géré par ForagingManager).
-   * Marque le record absent, retire byTile/#byChunk/#displayed, débloque les tuiles
-   * occupées, persiste, puis programme la repousse (#regrowQueue + microtâche).
-   * Guard : no-op si record.present est déjà false.
+   * Détruit un oleander présent sans loot : retire byTile/#byChunk/#bySoil/#displayed,
+   * débloque les 3 tuiles occupées, persiste, puis programme la repousse
+   * (#regrowQueue + microtâche). Guard : no-op si record.present est déjà false.
    * @param {object} record
    */
-  onForaged (record) {
+  #destroyPresent (record) {
     if (!record.present) return
 
     record.present = false
     removeFromByTile(this.byTile, record)
     removeFromByChunk(this.#byChunk, record)
+    this.#bySoil.delete(record.soilIndex)
     this.#displayed.delete(record)
 
     blockedTiles.unblockPlacement(record.index)
@@ -575,6 +581,17 @@ class OleanderSystem {
       const {priority, capacity} = MICROTASK.OLEANDER_REGROW
       microTasker.enqueue(this.onOleanderRegrow, priority, capacity)
     }
+  }
+
+  /**
+   * Traite le foraging réussi de cet oleander (hors loot, géré par ForagingManager).
+   * Marque le record absent, retire byTile/#byChunk/#displayed, débloque les tuiles
+   * occupées, persiste, puis programme la repousse (#regrowQueue + microtâche).
+   * Guard : no-op si record.present est déjà false.
+   * @param {object} record
+   */
+  onForaged (record) {
+    this.#destroyPresent(record)
   }
 
   /**
@@ -657,6 +674,36 @@ class OleanderSystem {
     if (this.#regrowQueue.length !== 0) {
       const {priority, capacity} = MICROTASK.OLEANDER_REGROW
       microTasker.enqueue(this.onOleanderRegrow, priority, capacity)
+    }
+  }
+
+  /**
+   * Liaison EventBus : 'world/tile-changed'.
+   * Détruit l'oleander présent si une des 3 tuiles de son corps n'est plus VOID,
+   * ou si sa tuile sol n'est plus STONE. Relit les tuiles réelles avant d'agir.
+   * Pas de gestion de spot — population fixe, repousse via #regrowQueue.
+   * @param {{tileIndex: number, tileOldCode: number, tileNewCode: number}} payload
+   */
+  onTileChanged ({tileIndex, tileOldCode, tileNewCode}) {
+    const VOID = NODES.VOID.code
+    const STONE = NODES.STONE.code
+
+    // Cas 1 — tuile du corps : une des 3 VOID devient autre chose
+    const byBodyRecord = this.byTile.get(tileIndex)
+    if (byBodyRecord !== undefined && tileNewCode !== VOID) {
+      if (chunkManager.getTileAt(byBodyRecord.index) !== VOID ||
+        chunkManager.getTileAt(byBodyRecord.index + WORLD_WIDTH) !== VOID ||
+        chunkManager.getTileAt(byBodyRecord.index + 2 * WORLD_WIDTH) !== VOID) {
+        this.#destroyPresent(byBodyRecord)
+      }
+    }
+
+    // Cas 2 — tuile sol : STONE retiré
+    if (tileOldCode === STONE) {
+      const record = this.#bySoil.get(tileIndex)
+      if (record !== undefined && chunkManager.getTileAt(record.soilIndex) !== STONE) {
+        this.#destroyPresent(record)
+      }
     }
   }
 }
