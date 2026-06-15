@@ -7451,8 +7451,6 @@ class PlantGenerator {
   placeParsnipsSunflowers (surfaceLine, guarded, oakPositions) {
     const GRASSFOREST = NODES.GRASSFOREST.code
     const W = WORLD_WIDTH
-    // pour les stats
-    const sfPresent = 0
 
     // /////// //
     // PARSNIP //
