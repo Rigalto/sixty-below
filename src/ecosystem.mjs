@@ -1,7 +1,7 @@
 // ecosystem.mjs — FloraManager - CobwebSystem - HiveSystem
 // SunflowerSystem - OleanderSystem - SampleSystem
 
-import {WORLD_WIDTH, MICROTASK} from './constant.mjs'
+import {WORLD_WIDTH, MICROTASK, TOPSOIL_Y_SURFACE_UNDER, TOPSOIL_Y_UNDER_CAVERNS} from './constant.mjs'
 import {uniqueIdGenerator} from './database.mjs'
 
 import {eventBus, seededRNG, blockedTiles, microTasker} from './utils.mjs'
@@ -509,7 +509,7 @@ class OleanderSystem {
       blockedTiles.blockPlacement(record.index + 2 * WORLD_WIDTH)
       return
     }
-
+    console.log('>>>>>>>>>>>>>>>>>>>>><<<<<<<<<<<<<<<<<<<<<<<<<<<<<')
     this.#regrowQueue.push(record)
   }
 
@@ -522,7 +522,7 @@ class OleanderSystem {
   onFirstLoop () {
     if (this.#regrowQueue.length === 0) return
     const {priority, capacity} = MICROTASK.OLEANDER_REGROW
-    microTasker.enqueueOnce(this.onOleanderRegrow, priority, capacity)
+    microTasker.enqueue(this.onOleanderRegrow, priority, capacity)
   }
 
   /**
@@ -571,8 +571,10 @@ class OleanderSystem {
     saveManager.queueStaticUpdate({storeName: 'plant', record})
 
     this.#regrowQueue.push(record)
-    const {priority, capacity} = MICROTASK.OLEANDER_REGROW
-    microTasker.enqueueOnce(this.onOleanderRegrow, priority, capacity)
+    if (this.#regrowQueue.length === 1) {
+      const {priority, capacity} = MICROTASK.OLEANDER_REGROW
+      microTasker.enqueue(this.onOleanderRegrow, priority, capacity)
+    }
   }
 
   /**
@@ -592,12 +594,70 @@ class OleanderSystem {
   isPresent (record) { return record.present }
 
   /**
-   * Microtâche : vide #regrowQueue en cherchant un nouvel emplacement par record.
-   * TODO : contenu à définir.
+   * Microtâche : cherche un nouvel emplacement pour le dernier record de #regrowQueue,
+   * avec le même algorithme que placeOleanders (génération) : départ VOID, descente
+   * jusqu'au premier non-VOID, sol STONE, pocket VOID 1x3 au-dessus.
+   * blockedTiles — les 3 tuiles du pocket doivent être canPlace().
+   * Si trouvé : finalise le record (present=true, byTile/#byChunk, blockPlacement,
+   * persistence) et le retire de #regrowQueue (dernier élément, length--).
+   * Si rien trouvé, ou s'il reste des records, reprogramme pour la frame suivante.
    */
   onOleanderRegrow () {
-    // TODO
+    if (this.#regrowQueue.length === 0) return
     console.log('onOleanderRegrow')
+
+    const VOID = NODES.VOID.code
+    const STONE = NODES.STONE.code
+    const W = WORLD_WIDTH
+    const MAX_ATTEMPTS = 100
+
+    for (let attempt = 0; attempt < MAX_ATTEMPTS; attempt++) {
+      const cx = seededRNG.randomGetMinMax(1, W - 2)
+      const cy = seededRNG.randomGetMinMax(TOPSOIL_Y_SURFACE_UNDER, TOPSOIL_Y_UNDER_CAVERNS)
+
+      let soilIndex = (cy << 10) | cx
+      if (chunkManager.getTileAt(soilIndex) !== VOID) continue
+
+      const maxIndex = (TOPSOIL_Y_UNDER_CAVERNS << 10) | cx
+      while (soilIndex < maxIndex && chunkManager.getTileAt(soilIndex) === VOID) soilIndex += W
+
+      if (chunkManager.getTileAt(soilIndex) !== STONE) continue
+
+      const t1 = soilIndex - W
+      const t2 = t1 - W
+      const t3 = t2 - W
+
+      if (chunkManager.getTileAt(t1) !== VOID) continue
+      if (chunkManager.getTileAt(t2) !== VOID) continue
+      if (chunkManager.getTileAt(t3) !== VOID) continue
+
+      if (!blockedTiles.canPlace(t1)) continue
+      if (!blockedTiles.canPlace(t2)) continue
+      if (!blockedTiles.canPlace(t3)) continue
+
+      const record = this.#regrowQueue[this.#regrowQueue.length - 1]
+
+      record.soilIndex = soilIndex
+      record.index = t3
+      record.x = cx
+      record.y = t3 >> 10
+      record.present = true
+
+      addToByTile(this.byTile, record)
+      addToByChunk(this.#byChunk, record)
+      blockedTiles.blockPlacement(t1)
+      blockedTiles.blockPlacement(t2)
+      blockedTiles.blockPlacement(t3)
+      saveManager.queueStaticUpdate({storeName: 'plant', record})
+
+      this.#regrowQueue.length--
+      break
+    }
+
+    if (this.#regrowQueue.length !== 0) {
+      const {priority, capacity} = MICROTASK.OLEANDER_REGROW
+      microTasker.enqueue(this.onOleanderRegrow, priority, capacity)
+    }
   }
 }
 export const oleanderSystem = new OleanderSystem()

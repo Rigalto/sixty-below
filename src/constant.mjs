@@ -79,7 +79,7 @@ export const SEA_LEVEL = 56 // tuiles
 export const TOPSOIL_Y_SKY_SURFACE = 48
 export const TOPSOIL_Y_SURFACE_UNDER = 96
 export const TOPSOIL_Y_UNDER_CAVERNS = 240
-export const TOPSOIL_Y_CAVERNS_MID = 375
+export const TOPSOIL_Y_CAVERNS_MID = 500 // environ (CANVAS_HEIGHT + TOPSOIL_Y_UNDER_CAVERNS) / 2
 
 // Dimensions du Monde en Chunks
 // export const WORLD_WIDTH_CHUNKS = WORLD_WIDTH / CHUNK_SIZE // 128
@@ -318,7 +318,7 @@ export const MICROTASK = {
   SUNFLOWER_HOUR6: {priority: 20, capacity: 2, taskName: 'onSunflowerHour6'}, // gère les sunflower
   SUNFLOWER_HOUR17: {priority: 20, capacity: 1, taskName: 'onSunflowerHour17'}, // gère les sunflower
   SUNFLOWER_SPOT_CHECK: {priority: 20, capacity: 10, taskName: 'onSunflowerSpotCheck'}, // suppression d'un spot de sunflower
-  OLEANDER_REGROW: {priority: 20, capacity: 10, taskName: 'onOleanderRegrow'}, // recherche d'un nouvel emplacement pour les oleanders à repousser
+  OLEANDER_REGROW: {priority: 20, capacity: 2, taskName: 'onOleanderRegrow'}, // recherche d'un nouvel emplacement pour les oleanders à repousser
 
   UI_ENV_UPDATE: {priority: 18, capacity: 2, taskName: 'updateClockInOverlay'}, // affiche le widget time/weather/Moon/Location
   UI_TILE_HOVER: {priority: 18, capacity: 1, taskName: 'onTileHoverDetail'}, // affiche le widget tuile survolée
