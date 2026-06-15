@@ -107,18 +107,19 @@ export const IMAGE_FILES = [
 
 export const SOUND_FILES = [
   // utilisaés
-  'assets/sounds/mining.ogg',
-  'assets/sounds/teleport.mp3',
-  'assets/sounds/placing.mp3',
+  'assets/sounds/chopping.wav',
+  'assets/sounds/dead.mp3',
+  'assets/sounds/fishing.mp3',
   'assets/sounds/foraging.wav',
+  'assets/sounds/mining.ogg',
+  'assets/sounds/placing.mp3',
+  'assets/sounds/teleport.mp3',
+  'assets/sounds/toofar.wav',
+  'assets/sounds/unplacing.mp3',
+  'assets/sounds/wrong.wav',
   // provision
   'assets/sounds/placefurniture.mp3',
-  'assets/sounds/unplace.mp3',
-  'assets/sounds/fishing.mp3',
-  'assets/sounds/dead.mp3',
-  'assets/sounds/axe.wav',
   'assets/sounds/mine.wav',
-  // provision
   'assets/sounds/forageplant.mp3',
   'assets/sounds/dig.wav',
   'assets/sounds/tink1.wav',
@@ -126,6 +127,22 @@ export const SOUND_FILES = [
   'assets/sounds/mining_break.mp3'
   // ...
 ]
+
+// Volume relatif par son, en % (0-100, même échelle que sound/volume).
+// Absent de la table => 100 (pas d'atténuation). Combiné multiplicativement
+// avec le volume global via la chaîne source → gain (par son) → #masterGain.
+export const SOUND_VOLUMES = {
+  chopping: 100,
+  dead: 35,
+  fishing: 65,
+  // foraging: 100,
+  mining: 65,
+  placing: 75,
+  teleport: 40,
+  toofar: 10,
+  // unplacing: 100,
+  wrong: 10
+}
 
 // // Contexte Web Audio partagé — créé une seule fois, suspendu jusqu'à interaction utilisateur
 // const audioCtx = new (window.AudioContext || window.webkitAudioContext)()
@@ -297,20 +314,28 @@ class SoundManager {
     if (buffer === undefined) return
 
     if (this.#audioCtx.state === 'suspended') {
-      this.#audioCtx.resume().then(() => this.#startSource(buffer))
+      this.#audioCtx.resume().then(() => this.#startSource(buffer, name))
       return
     }
-    this.#startSource(buffer)
+    this.#startSource(buffer, name)
   }
 
   /**
-   * Crée et démarre un AudioBufferSourceNode éphémère pour le buffer donné.
+   * Crée et démarre un AudioBufferSourceNode éphémère pour le buffer donné,
+   * via un GainNode éphémère réglé selon SOUND_VOLUMES[name] (défaut 100),
+   * lui-même connecté à #masterGain (volume global).
    * @param {AudioBuffer} buffer
+   * @param {string} name — nom du son (clé SOUND_CACHE / SOUND_VOLUMES)
    */
-  #startSource (buffer) {
+  #startSource (buffer, name) {
     const source = this.#audioCtx.createBufferSource()
     source.buffer = buffer
-    source.connect(this.#masterGain)
+
+    const gain = this.#audioCtx.createGain()
+    gain.gain.value = (SOUND_VOLUMES[name] ?? 100) / 100
+
+    source.connect(gain)
+    gain.connect(this.#masterGain)
     source.start(0)
   }
 

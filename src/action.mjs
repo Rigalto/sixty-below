@@ -322,13 +322,13 @@ class ForagingManager {
    */
   tryForage (tileIndex, tileNode, tool, prefix) {
     if (buffManager.getBuff('playerFreeze')) return
-    if (!this.#isInForagingRange(tileIndex, tool, prefix)) return
 
     // 1. Tuile NATURAL (forage du sol)
     if (tileNode.type & NODE_TYPE.NATURAL) {
-      if (tool.star < tileNode.star) return
-      if (this.#foragedToday.size >= NATURAL_FORAGE_DAILY_LIMIT) return
-      if (this.#foragedToday.has(tileIndex)) return
+      if (!this.#isInForagingRange(tileIndex, tool, prefix)) { eventBus.emit('sound/play', 'toofar'); return }
+      if (tool.star < tileNode.star) { eventBus.emit('sound/play', 'wrong'); return }
+      if (this.#foragedToday.size >= NATURAL_FORAGE_DAILY_LIMIT) { eventBus.emit('sound/play', 'wrong'); return }
+      if (this.#foragedToday.has(tileIndex)) { eventBus.emit('sound/play', 'wrong'); return }
 
       this.#foragedToday.add(tileIndex)
       database.setGameState('naturalforaged', this.#foragedToday)
@@ -351,7 +351,9 @@ class ForagingManager {
     if (plant === null) return
     const plantItem = ITEMS[plant.itemId]
     if (!plantItem.foraging) return
-    if (tool.star < plantItem.star) return
+
+    if (!this.#isInForagingRange(tileIndex, tool, prefix)) { eventBus.emit('sound/play', 'toofar'); return }
+    if (tool.star < plantItem.star) { eventBus.emit('sound/play', 'wrong'); return }
     const speed = this.#computeForageSpeedPlant(plant, tool, prefix)
 
     const wasEmpty = this.#queue.length === 0
