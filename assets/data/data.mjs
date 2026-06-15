@@ -841,7 +841,8 @@ export const PLANT_TYPE = {
 export const PLANT_SYSTEM_LOOKUP = new Map()
 export const ALL_PLANT_SYSTEMS = []
 
-export const PARSNIP_COUNT = 12
+export const PARSNIP_RATE = 0.22
+export const SUNFLOWER_RATE = 0.18
 export const MANDRAKE_COUNT = 40
 export const CACTUS_COUNT = 40
 export const BAMBOO_COUNT = 40
