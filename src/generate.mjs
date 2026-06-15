@@ -8036,6 +8036,7 @@ class PlantGenerator {
     }
     if (rects.length === 0) return
 
+    const occupiedIndexes = new Set() // soilIndex déjà pris par un oleander placé
     let placed = 0
     let consecutiveFailures = 0
 
@@ -8061,8 +8062,10 @@ class PlantGenerator {
 
       const soilIndex = (y << 10) | cx
       if (chestIndexes.has(soilIndex)) { consecutiveFailures++; continue }
+      if (occupiedIndexes.has(soilIndex)) { consecutiveFailures++; continue }
 
       consecutiveFailures = 0
+      occupiedIndexes.add(soilIndex)
 
       this.#plants.push({
         id: uniqueIdGenerator.getUniqueId(),
