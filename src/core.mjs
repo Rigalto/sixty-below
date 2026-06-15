@@ -17,7 +17,7 @@ import {furnitureManager} from './housing.mjs'
 import {craftOverlay} from './craft.mjs'
 import {achievementManager} from './achievement.mjs'
 import {playerManager, hotbarOverlay} from './player.mjs'
-import {floraManager, sunflowerSystem} from './ecosystem.mjs'
+import {floraManager, sunflowerSystem, oleanderSystem} from './ecosystem.mjs'
 import {ACHIEVEMENT_CATEGORIES} from '../assets/data/data-achievement.mjs'
 import {miningManager, placingManager, foragingManager} from './action.mjs'
 import './combat.mjs'
@@ -33,7 +33,7 @@ const plantSystemLookup = [ // Map<kind*100+type, system> — peuplée au fur et
   //   [PLANT_KIND.MUSHROOM * 100 + PLANT_TYPE.PINKMYCENIA, mushroomSystem],
   //   [PLANT_KIND.MUSHROOM * 100 + PLANT_TYPE.FROSTCAP, capystem],
   //   [PLANT_KIND.MUSHROOM * 100 + PLANT_TYPE.DAWNCAP, capystem],
-  //   [PLANT_KIND.HERB * 100 + PLANT_TYPE.PLANT_TYPE.OLEANDER, oleanderSystem],
+  [PLANT_KIND.HERB * 100 + PLANT_TYPE.OLEANDER, oleanderSystem],
   //   [PLANT_KIND.HERB * 100 + PLANT_TYPE.BLINKROOT, blinkrootSystem],
   //   [PLANT_KIND.HERB * 100 + PLANT_TYPE.PARSNIP, parsnipSystem],
   [PLANT_KIND.HERB * 100 + PLANT_TYPE.SUNFLOWER, sunflowerSystem]
@@ -53,7 +53,7 @@ const plantSystemLookup = [ // Map<kind*100+type, system> — peuplée au fur et
   //   [PLANT_KIND.SPREAD * 100 + PLANT_TYPE.NONE, spreadSystem],
   //   [PLANT_KIND.SEED * 100 + PLANT_TYPE.NONE, seedSystem]
 ]
-const allPlantSystems = [sunflowerSystem]
+const allPlantSystems = [sunflowerSystem, oleanderSystem]
 
 const debugHUD = () => {
   const debugDiv = document.createElement('div')

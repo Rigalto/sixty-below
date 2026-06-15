@@ -1,5 +1,5 @@
 // ecosystem.mjs — FloraManager - CobwebSystem - HiveSystem
-// SunflowerSystem - SampleSystem
+// SunflowerSystem - OleanderSystem - SampleSystem
 
 import {WORLD_WIDTH, MICROTASK} from './constant.mjs'
 import {uniqueIdGenerator} from './database.mjs'
@@ -446,6 +446,131 @@ class SunflowerSystem {
   }
 }
 export const sunflowerSystem = new SunflowerSystem()
+
+// ...
+
+/* ====================================================================================================
+   OLEANDER SYSTEM
+   ====================================================================================================
+
+   Singleton : oleanderSystem.
+
+   Population constante : #list reçoit en une fois (init) le tableau complet des oleanders,
+   taille fixe jamais réallouée (pas de GC). Un record present=false signale un slot à faire
+   repousser ailleurs — mis en #regrowQueue, vidée par microtâche (contenu à définir).
+
+   ==================================================================================================== */
+
+class OleanderSystem {
+  byTile = new Map() // Map<tileIndex, record> — public : membership O(1) + lookup record
+  #list = [] // record[] — population fixe, référence affectée dans init(records)
+  #byChunk = new Map() // Map<chunkKey, Set> — lookup spatial pour onPreloadChunksChanged
+  #displayed = new Set() // Set<record> — cible du render (chunks preload uniquement)
+  #regrowQueue = [] // record[] — records present=false en attente d'un nouvel emplacement
+  #image = null // image à afficher (mise en cache)
+
+  constructor () {
+    // micro-tâches
+    this.onOleanderRegrow = this.onOleanderRegrow.bind(this)
+  }
+
+  /**
+   * Réinitialise toutes les structures.
+   */
+  init () {
+    this.byTile.clear()
+    this.#list.length = 0
+    this.#byChunk.clear()
+    this.#displayed.clear()
+    this.#regrowQueue.length = 0
+
+    this.#image = ITEMS.oleander.placed // après hydratation
+  }
+
+  /**
+   * Enregistre un oleander et peuple les structures internes.
+   * Si present=false, met le record en file de repousse et déclenche la microtâche
+   * de vidage (enqueueOnce — sans effet si déjà en file).
+   * @param {object} record — record HERB/OLEANDER (deleted=false garanti par l'appelant)
+   */
+  initPlant (record) {
+    this.#list.push(record)
+    // this.#spotsBySoil.set(record.soilIndex, record)
+
+    if (record.present) {
+      addToByTile(this.byTile, record)
+      addToByChunk(this.#byChunk, record)
+      // this.#bySoil.set(record.soilIndex, record)
+      blockedTiles.blockPlacement(record.index)
+      blockedTiles.blockPlacement(record.index + WORLD_WIDTH)
+      blockedTiles.blockPlacement(record.index + 2 * WORLD_WIDTH)
+      console.log('>>>>>>>>>>>>>>>>>>>, Oleander', record)
+      return
+    }
+
+    this.#regrowQueue.push(record)
+    const {priority, capacity} = MICROTASK.OLEANDER_REGROW
+    microTasker.enqueueOnce(this.onOleanderRegrow, priority, capacity)
+  }
+
+  /**
+   * Reconstruit #displayed depuis les chunks preload de la caméra.
+   * @param {Set<number>} preloadChunks
+   */
+  onPreloadChunksChanged (preloadChunks) {
+    buildDisplayed(this.#displayed, this.#byChunk, preloadChunks)
+    if (this.#displayed.size !== 0) { console.log('OleanderSystem.onPreloadChunksChanged', this.#displayed.size) }
+    console.log('OleanderSystem.onPreloadChunksChanged', this.#list)
+  }
+
+  /**
+   * Dessine les oleanders visibles et présents sur le contexte transformé.
+   * TODO : rendu spécifique (ITEMS.oleander.placed) — à définir.
+   * @param {CanvasRenderingContext2D} ctx — contexte déjà transformé (caméra appliquée)
+   */
+  render (ctx) {
+    const img = this.#image
+    for (const record of this.#displayed) {
+      const pxX = (record.index & 0x3FF) << 4
+      const pxY = (record.index >> 10) << 4
+      ctx.drawImage(IMAGE_CACHE[img.imgIndex], img.sx, img.sy, img.sw, img.sh, pxX, pxY, img.sw, img.sh)
+    }
+  }
+
+  /**
+   * Traite le foraging réussi de cet oleander.
+   * TODO : retrait des structures + mise en #regrowQueue — comportement à définir.
+   * @param {object} record
+   */
+  onForaged (record) {
+    // TODO
+  }
+
+  /**
+   * Retourne le record d'oleander couvrant la tuile donnée, ou null.
+   * @param {number} tileIndex — (y << 10) | x
+   * @returns {object|null}
+   */
+  getPlantAt (tileIndex) {
+    return this.byTile.get(tileIndex) ?? null
+  }
+
+  /**
+   * Indique si le record est actuellement présent (forageable).
+   * @param {object} record
+   * @returns {boolean}
+   */
+  isPresent (record) { return record.present }
+
+  /**
+   * Microtâche : vide #regrowQueue en cherchant un nouvel emplacement par record.
+   * TODO : contenu à définir.
+   */
+  onOleanderRegrow () {
+    // TODO
+  }
+}
+export const oleanderSystem = new OleanderSystem()
 
 /* ====================================================================================================
    FLORA MANAGER

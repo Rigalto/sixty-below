@@ -35,6 +35,9 @@ export const IMAGE_FILES = [
   // PLACED //
   // ////// //
 
+  'assets/sprites/placed_16_32.png',
+  'assets/sprites/placed_16_48.png',
+
   // supprimer ci-dessous
   // ////////////////////
 
@@ -73,7 +76,6 @@ export const IMAGE_FILES = [
   // PLACED //
   // /////////
   'assets/sprites/fuws_16_16.png',
-  'assets/sprites/placed_16_32.png',
   'assets/sprites/fuws_16_48.png',
   'assets/sprites/fuws_32_16.png',
   'assets/sprites/fuws_32_32.png',
