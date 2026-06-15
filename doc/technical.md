@@ -446,6 +446,12 @@ Cette section définit les événements officiels. Tout nouvel événement doit 
 | E | `time/first-loop` | `{ day, hour, minute, tslot, weather, nextWeather, skyColor, moonPhase, isDay }` | Émis une seule fois au démarrage du rendu. |
 | E | `world/tile-changed` | `{ tileIndex: number, tileOldCode: number, tileNewCode: number }`| Le code de la tuile a été modifié. |
 
+#### Oleander (`OleanderSystem`)
+
+| Dir. | Event Name | Payload Structure | Description |
+| :---: | :--- | :--- | :--- |
+| E | `time/first-loop` | `{ day, hour, minute, tslot, weather, nextWeather, skyColor, moonPhase, isDay }` | Émis une seule fois au démarrage du rendu. |
+
 
 #### Debug (`WorldMapDebug`, `RealtimeDebugWidget`, `BuffManager`)
 

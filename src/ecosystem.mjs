@@ -470,6 +470,9 @@ class OleanderSystem {
   #image = null // image à afficher (mise en cache)
 
   constructor () {
+    // eventBus
+    this.onFirstLoop = this.onFirstLoop.bind(this)
+    eventBus.on('time/first-loop', this.onFirstLoop)
     // micro-tâches
     this.onOleanderRegrow = this.onOleanderRegrow.bind(this)
   }
@@ -504,11 +507,20 @@ class OleanderSystem {
       blockedTiles.blockPlacement(record.index)
       blockedTiles.blockPlacement(record.index + WORLD_WIDTH)
       blockedTiles.blockPlacement(record.index + 2 * WORLD_WIDTH)
-      console.log('>>>>>>>>>>>>>>>>>>>, Oleander', record)
       return
     }
 
     this.#regrowQueue.push(record)
+  }
+
+  /**
+   * Liaison EventBus : 'time/first-loop' — émis une seule fois au démarrage du rendu,
+   * une fois le boot terminé (tous les éléments du monde placés).
+   * Déclenche la microtâche de repousse si #regrowQueue contient des records
+   * present=false chargés depuis la persistence.
+   */
+  onFirstLoop () {
+    if (this.#regrowQueue.length === 0) return
     const {priority, capacity} = MICROTASK.OLEANDER_REGROW
     microTasker.enqueueOnce(this.onOleanderRegrow, priority, capacity)
   }
@@ -538,12 +550,29 @@ class OleanderSystem {
   }
 
   /**
-   * Traite le foraging réussi de cet oleander.
-   * TODO : retrait des structures + mise en #regrowQueue — comportement à définir.
+   * Traite le foraging réussi de cet oleander (hors loot, géré par ForagingManager).
+   * Marque le record absent, retire byTile/#byChunk/#displayed, débloque les tuiles
+   * occupées, persiste, puis programme la repousse (#regrowQueue + microtâche).
+   * Guard : no-op si record.present est déjà false.
    * @param {object} record
    */
   onForaged (record) {
-    // TODO
+    if (!record.present) return
+
+    record.present = false
+    removeFromByTile(this.byTile, record)
+    removeFromByChunk(this.#byChunk, record)
+    this.#displayed.delete(record)
+
+    blockedTiles.unblockPlacement(record.index)
+    blockedTiles.unblockPlacement(record.index + WORLD_WIDTH)
+    blockedTiles.unblockPlacement(record.index + 2 * WORLD_WIDTH)
+
+    saveManager.queueStaticUpdate({storeName: 'plant', record})
+
+    this.#regrowQueue.push(record)
+    const {priority, capacity} = MICROTASK.OLEANDER_REGROW
+    microTasker.enqueueOnce(this.onOleanderRegrow, priority, capacity)
   }
 
   /**
@@ -568,6 +597,7 @@ class OleanderSystem {
    */
   onOleanderRegrow () {
     // TODO
+    console.log('onOleanderRegrow')
   }
 }
 export const oleanderSystem = new OleanderSystem()
