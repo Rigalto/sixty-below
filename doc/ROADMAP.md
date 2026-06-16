@@ -346,10 +346,13 @@ La Sap corrode le Copper. Il doit donc être remplacer par du Gold.
 ### Actions
 - Minage (`MiningManager`)
 - Plaçage des blocs (`PlacingManager`)
+- Récolte des plantes et blocs de natural (`ForagingManager`)
 
 ### Environement
 - Point d'entrée pour la flore (`FloraManager`)
 - Sunflower (`SunflowerSystem`)
+- Oleander (`OleanderSystem`)
+- Cobweb (`CobwebSystem`)
 
 ### Rendu (partiel)
 - `WorldRenderer` — rendu tuiles par chunks avec cache OffscreenCanvas

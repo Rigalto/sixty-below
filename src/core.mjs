@@ -17,7 +17,7 @@ import {furnitureManager} from './housing.mjs'
 import {craftOverlay} from './craft.mjs'
 import {achievementManager} from './achievement.mjs'
 import {playerManager, hotbarOverlay} from './player.mjs'
-import {floraManager, sunflowerSystem, oleanderSystem} from './ecosystem.mjs'
+import {floraManager, sunflowerSystem, oleanderSystem, cobwebSystem} from './ecosystem.mjs'
 import {ACHIEVEMENT_CATEGORIES} from '../assets/data/data-achievement.mjs'
 import {miningManager, placingManager, foragingManager} from './action.mjs'
 import './combat.mjs'
@@ -343,7 +343,7 @@ class GameCore {
     seedWidget.init(state.randomkey)
     buffManager.init()
     // hiveSystem.init(state.hives) // TODO
-    // cobwebSystem.init(state.cobwebcaves) // TODO
+    // cobwebCaveSystem.init(state.cobwebcaves) // TODO
     // lakeeSystem.init(state.lakes) // TODO
     // geodeSystem.init(state.geodecaves) // TODO
 
@@ -357,6 +357,7 @@ class GameCore {
     // await FaunaManager.init(...)
 
     foragingManager.init(state.naturalforaged)
+    cobwebSystem.init()
 
     // 5.1 Objectstore Inventory
     const inventoryRecords = await database.readAllFromObjectStore('inventory')

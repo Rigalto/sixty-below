@@ -1,11 +1,11 @@
 // ecosystem.mjs — FloraManager - CobwebSystem - HiveSystem
 // SunflowerSystem - OleanderSystem - SampleSystem
 
-import {WORLD_WIDTH, MICROTASK, TOPSOIL_Y_SURFACE_UNDER, TOPSOIL_Y_UNDER_CAVERNS} from './constant.mjs'
+import {WORLD_WIDTH, WORLD_HEIGHT, MICROTASK, TOPSOIL_Y_SKY_SURFACE, TOPSOIL_Y_SURFACE_UNDER, TOPSOIL_Y_UNDER_CAVERNS} from './constant.mjs'
 import {uniqueIdGenerator} from './database.mjs'
 
-import {eventBus, seededRNG, blockedTiles, microTasker} from './utils.mjs'
-import {NODES, ITEMS, PLANT_KIND, PLANT_TYPE, PLANT_SYSTEM_LOOKUP, ALL_PLANT_SYSTEMS} from '../assets/data/data.mjs'
+import {eventBus, seededRNG, blockedTiles, microTasker, taskScheduler} from './utils.mjs'
+import {NODES, ITEMS, PLANT_KIND, PLANT_TYPE, PLANT_SYSTEM_LOOKUP, ALL_PLANT_SYSTEMS, COBWEB_GROWTH_DELAY_MS} from '../assets/data/data.mjs'
 import {IMAGE_CACHE} from './assets.mjs'
 import {saveManager} from './persistence.mjs'
 import {chunkManager} from './world.mjs'
@@ -790,6 +790,170 @@ class FloraManager {
 }
 
 export const floraManager = new FloraManager()
+
+/* ====================================================================================================
+   COBWEB SYSTEM
+   ==================================================================================================== */
+
+class CobwebSystem {
+  constructor () {
+    // EventBus
+    this.onFirstLoop = this.onFirstLoop.bind(this)
+    eventBus.on('time/first-loop', this.onFirstLoop)
+    // Micro-task
+    this.onCobwebGrowthTick = this.onCobwebGrowthTick.bind(this)
+  }
+
+  /**
+   * Réinitialise le système. Aucun état interne à ce jour.
+   */
+  init () {}
+
+  /**
+   * Liaison EventBus : 'time/first-loop' — démarre la boucle de repousse des toiles.
+   */
+  onFirstLoop () {
+    this.#scheduleNext()
+  }
+
+  /**
+   * Planifie la prochaine tentative de pose. Délai de base COBWEB_GROWTH_DELAY_MS,
+   * modulé par un facteur aléatoire ×[0.8, 1.2[ pour éviter un rythme mécanique.
+   */
+  #scheduleNext () {
+    const delay = (COBWEB_GROWTH_DELAY_MS * seededRNG.randomGetRealMinMax(0.8, 1.2)) | 0
+    const {priority, capacity} = MICROTASK.COBWEB_GROWTH
+    taskScheduler.enqueue('cobweb-growth', delay, this.onCobwebGrowthTick, priority, capacity)
+  }
+
+  /**
+   * Callback TaskScheduler : tente une pose de toile, puis replanifie la tentative suivante.
+   */
+  onCobwebGrowthTick () {
+    this.#tryGrow()
+    this.#scheduleNext()
+  }
+
+  /**
+   * Tire une tuile aléatoire dans le monde (hors marge de bord). Abandon si elle n'est pas VOID.
+   * Sinon remonte au plafond et construit une toile de 4 à 9 tuiles.
+   */
+  #tryGrow () {
+    const VOID = NODES.VOID.code
+    const MARGIN = 4 // cohérent avec les Ghost Cells — évite tout artefact de wrap en bord de monde
+
+    const x = seededRNG.randomGetMinMax(MARGIN, WORLD_WIDTH - MARGIN - 1)
+    const y = seededRNG.randomGetMinMax(TOPSOIL_Y_SKY_SURFACE, WORLD_HEIGHT - MARGIN - 1)
+    if (chunkManager.getTile(x, y) !== VOID) return
+
+    this.#buildWeb(x, y, seededRNG.randomGetMinMax(4, 9))
+  }
+
+  /**
+   * Remonte au plafond depuis (cx, cy) et construit une toile organique de `count` tuiles max.
+   * Abandon si le plafond est HIVE, ou si la tuile de départ est réservée (blockedTiles).
+   * Port temps réel de WebFiller#buildWeb (generate.mjs).
+   * @param {number} cx
+   * @param {number} cy
+   * @param {number} count
+   */
+  #buildWeb (cx, cy, count) {
+    const VOID = NODES.VOID.code
+    const HIVE = NODES.HIVE.code
+    const W = WORLD_WIDTH
+
+    let idx = (cy << 10) | cx
+
+    while (chunkManager.getTileAt(idx - W) === VOID) {
+      idx -= W
+      cy--
+    }
+    if (chunkManager.getTileAt(idx - W) === HIVE) return
+    if (!blockedTiles.canPlace(idx)) return
+
+    this.#placeWeb(idx)
+    count--
+
+    const webX = [cx]
+    const webY = [cy]
+    let tentative = 10
+
+    while (count > 0 && tentative > 0) {
+      const i = seededRNG.randomGetMax(webX.length - 1)
+      const result = this.#stepWeb(webX[i], webY[i])
+      if (result !== null) {
+        webX.push(result.x)
+        webY.push(result.y)
+        count--
+        tentative = Math.max(10, 4 * webX.length)
+      } else {
+        tentative--
+      }
+    }
+  }
+
+  /**
+   * Tente d'étendre la toile depuis (x, y). Priorité : haut → gauche/droite (aléatoire) → bas.
+   * Port temps réel de WebFiller#stepWeb (generate.mjs).
+   * @param {number} x
+   * @param {number} y
+   * @returns {{x, y}|null}
+   */
+  #stepWeb (x, y) {
+    const W = WORLD_WIDTH
+    const idx = (y << 10) | x
+
+    if (this.#canGrowAt(idx - W)) {
+      this.#placeWeb(idx - W)
+      return {x, y: y - 1}
+    }
+
+    const leftOk = this.#canGrowAt(idx - 1)
+    const rightOk = this.#canGrowAt(idx + 1)
+
+    if (leftOk && rightOk) {
+      if (seededRNG.randomGetBool()) {
+        this.#placeWeb(idx + 1)
+        return {x: x + 1, y}
+      }
+      this.#placeWeb(idx - 1)
+      return {x: x - 1, y}
+    }
+    if (rightOk) {
+      this.#placeWeb(idx + 1)
+      return {x: x + 1, y}
+    }
+    if (leftOk) {
+      this.#placeWeb(idx - 1)
+      return {x: x - 1, y}
+    }
+    if (this.#canGrowAt(idx + W)) {
+      this.#placeWeb(idx + W)
+      return {x, y: y + 1}
+    }
+    return null
+  }
+
+  /**
+   * Indique si une toile peut s'étendre sur cette tuile : VOID et non réservée (blockedTiles).
+   * @param {number} index
+   * @returns {boolean}
+   */
+  #canGrowAt (index) {
+    return chunkManager.getTileAt(index) === NODES.VOID.code && blockedTiles.canPlace(index)
+  }
+
+  /**
+   * Écrit WEB sur une tuile VOID et émet l'événement de changement de tuile.
+   * @param {number} index
+   */
+  #placeWeb (index) {
+    chunkManager.setTileAt(index, NODES.WEB.code)
+    eventBus.emit('world/tile-changed', {tileIndex: index, tileOldCode: NODES.VOID.code, tileNewCode: NODES.WEB.code})
+    console.log('CobwebSystem.#placeWeb', {x: index & 0x3ff, y: index >> 10})
+  }
+}
+export const cobwebSystem = new CobwebSystem()
 
 /* ====================================================================================================
    SAMPLE SYSTEM
