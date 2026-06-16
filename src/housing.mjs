@@ -1,6 +1,6 @@
 // housing.mjs — FurnitureManager - HousingManager
 
-import {eventBus} from './utils.mjs'
+import {eventBus, blockedTiles} from './utils.mjs'
 import {uniqueIdGenerator} from './database.mjs'
 import {CONTAINER_STYPES} from './constant.mjs'
 import {saveManager} from './persistence.mjs'
@@ -103,10 +103,10 @@ class FurnitureManager {
   // ─── Helpers Occupancy ───────────────────────────────────────────────────────
 
   /**
-   * Inscrit un furniture dans les trois Sets d'occupation.
-   * - occupiedTiles : rectangle complet wxh
-   * - floorTiles    : ligne directement sous le furniture (interdite au mining)
-   * - surfaceTops   : ligne haute du furniture si surface:true (sol pour empilement)
+   * Inscrit un furniture dans les trois Sets d'occupation, et met à jour blockedTiles :
+   * - occupiedTiles : rectangle complet wxh → blockedTiles.blockPlacement (pose interdite)
+   * - floorTiles    : ligne directement sous le furniture → blockedTiles.blockMining (mining interdit)
+   * - surfaceTops   : ligne haute du furniture si surface:true (sol pour empilement, hors blockedTiles)
    * @param {object} furniture
    */
   #addToOccupancy (furniture) {
@@ -117,13 +117,17 @@ class FurnitureManager {
     for (let y = tileY; y < tileY + h; y++) {
       const rowBase = y << 10
       for (let x = tileX; x < tileX + w; x++) {
-        this.#occupiedTiles.add(rowBase | x)
+        const tileIndex = rowBase | x
+        this.#occupiedTiles.add(tileIndex)
+        blockedTiles.blockPlacement(tileIndex)
       }
     }
 
     const floorBase = (tileY + h) << 10
     for (let x = tileX; x < tileX + w; x++) {
-      this.#floorTiles.add(floorBase | x)
+      const tileIndex = floorBase | x
+      this.#floorTiles.add(tileIndex)
+      blockedTiles.blockMining(tileIndex)
     }
 
     if (ITEMS[furniture.code].surface) {
@@ -135,7 +139,8 @@ class FurnitureManager {
   }
 
   /**
-   * Retire un furniture des trois Sets d'occupation.
+   * Retire un furniture des trois Sets d'occupation, et libère les tuiles dans blockedTiles
+   * (symétrique de #addToOccupancy : occupiedTiles → unblockPlacement, floorTiles → unblockMining).
    * @param {object} furniture
    */
   #removeFromOccupancy (furniture) {
@@ -146,13 +151,17 @@ class FurnitureManager {
     for (let y = tileY; y < tileY + h; y++) {
       const rowBase = y << 10
       for (let x = tileX; x < tileX + w; x++) {
-        this.#occupiedTiles.delete(rowBase | x)
+        const tileIndex = rowBase | x
+        this.#occupiedTiles.delete(tileIndex)
+        blockedTiles.unblockPlacement(tileIndex)
       }
     }
 
     const floorBase = (tileY + h) << 10
     for (let x = tileX; x < tileX + w; x++) {
-      this.#floorTiles.delete(floorBase | x)
+      const tileIndex = floorBase | x
+      this.#floorTiles.delete(tileIndex)
+      blockedTiles.unblockMining(tileIndex)
     }
 
     if (ITEMS[furniture.code].surface) {

@@ -12,10 +12,7 @@
 - dans `sunflowerSystem`, prendre en compte le SUNFLOWER_RATE pour mettre le bon nombre de sunflowers dans le monde (nbre_slots * SUNFLOWER_RATE + [random -2, 2] tronqué avec | 0 )
 - implémenter les graines de Sunflower qui augmentent la probabilité de pop de sunflower.
 - implémenter une accélération progressive sur l'axe des X, pour pouvoir se positionner plus facilement.
-- gérer blockedTiles pour les furnitures (mise à jour - les tests sont faits par l'appelant)
-- Sauvegarde de la position du joueur en database
-- `SunflowerSystem` : décommenter `treeSystem.isOakAt`
-- Trouver des sons de volume homogène pour chaque action du jeu.
+ `SunflowerSystem` : décommenter `treeSystem.isOakAt`
 - Modifier le volume sonore des sons du jeu (ActionWidget)
 - Supprimer les actions de debug accessibles au joueur, quand hébergement sous GitHub :
   - affichage après génération du monde
@@ -28,7 +25,6 @@
 - corriger les icones dans tool_32_32 : dague, épée, bow, hache, pickaxe, hammer, bug net, fishing rod
 - continuer la correction et l'ajout de fiches d'aide (`HELP`) et d'items (`ITEMS`)
 - Recettes pour créer Linen Rope et l'utiliser
-- POI : seed:1234, mushroomCave: 950,280, fernCave: 500,170, mossCave: 650,120, topaz: 520,300
 
 ---
 
