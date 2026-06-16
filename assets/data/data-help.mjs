@@ -4843,6 +4843,7 @@ Parsnips are root vegetables found growing on the [[Forest]] floor. Their white 
 
 **Blooming hours**
 
+De nouveau parsnips poussent pendant la nuit à 3h00.
 Aime le [[Weather|Cloudy Weather]].
 
 **Harvest**
@@ -4869,6 +4870,7 @@ Aime le [[Weather|Cloudy Weather]].
 
 **Tips**
 
+* _Forage parsnips dans les clairières entre 3h et 6h pour laisser plus de place pour les [[Sunflower]]s._
 * _Foraging parsnips repeatedly in the same forest area will gradually deplete the local population._
 * _Varying your foraging routes across different forest zones ensures a steady supply._ ⏳
   `
@@ -4895,7 +4897,7 @@ Foraging a sunflower yields [[item:sunflowerSeed]] — scatter them on bare gras
 
 **Blooming Hours**
 
-* Appears at dawn (6h) and disappears at dusk (7h) (in-game time)
+* Appears at dawn (6h) and disappears at dusk (19h) (in-game time)
 
 **Harvest**
 

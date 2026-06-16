@@ -1,14 +1,15 @@
 // ecosystem.mjs — FloraManager - CobwebSystem - HiveSystem
-// SunflowerSystem - OleanderSystem -ParsnipSystem - CobwebSystem - SampleSystem
+// SunflowerSystem - OleanderSystem - ParsnipSystem - CobwebSystem - SampleSystem
 
 import {WORLD_WIDTH, WORLD_HEIGHT, MICROTASK, TOPSOIL_Y_SKY_SURFACE, TOPSOIL_Y_SURFACE_UNDER, TOPSOIL_Y_UNDER_CAVERNS} from './constant.mjs'
 import {uniqueIdGenerator} from './database.mjs'
 
 import {eventBus, seededRNG, blockedTiles, microTasker, taskScheduler} from './utils.mjs'
-import {NODES, ITEMS, PLANT_KIND, PLANT_TYPE, PLANT_SYSTEM_LOOKUP, ALL_PLANT_SYSTEMS, COBWEB_GROWTH_DELAY_MS} from '../assets/data/data.mjs'
+import {NODES, ITEMS, PLANT_KIND, PLANT_TYPE, PLANT_SYSTEM_LOOKUP, ALL_PLANT_SYSTEMS, COBWEB_GROWTH_DELAY_MS, PARSNIP_RATE} from '../assets/data/data.mjs'
 import {IMAGE_CACHE} from './assets.mjs'
 import {saveManager} from './persistence.mjs'
 import {chunkManager} from './world.mjs'
+import {buffManager} from './buff.mjs'
 import {camera} from './render.mjs'
 
 /* ====================================================================================================
@@ -726,12 +727,11 @@ class ParsnipSystem {
     // EventBus
     this.onTileChanged = this.onTileChanged.bind(this)
     eventBus.on('world/tile-changed', this.onTileChanged)
+    this.onHour3 = this.onHour3.bind(this)
+    eventBus.on('time/every-hour-3', this.onHour3)
     // Micro-task
     this.onParsnipSpotCheck = this.onParsnipSpotCheck.bind(this)
-
-    // TODO : rien ne remet present à true après un forage. SunflowerSystem utilise un cycle
-    // aube/crépuscule (onHour6/onHour17) qui ne semble pas pertinent pour une racine —
-    // mécanisme de repousse à concevoir séparément (timer par spot ? tirage périodique ?).
+    this.onParsnipHour3 = this.onParsnipHour3.bind(this)
   }
 
   /**
@@ -806,6 +806,53 @@ class ParsnipSystem {
    * @returns {boolean}
    */
   isPresent (record) { return record.present }
+
+  /** Liaison EventBus : 'time/every-hour-3' — reset nocturne et calcul de la nouvelle population. */
+  onHour3 () {
+    const {priority, capacity} = MICROTASK.PARSNIP_HOUR3
+    microTasker.enqueueOnce(this.onParsnipHour3, priority, capacity)
+  }
+
+  /**
+   * Microtâche : remet present=false sur tous les spots encore présents, puis fait pousser
+   * un nombre de parsnips calculé depuis PARSNIP_RATE + aléa[-2,2] + bonus buff 'cloudy' (+2).
+   * Tirage sans remise parmi #list, rejet si soilIndex ou index est bloqué.
+   */
+  onParsnipHour3 () {
+    for (const record of this.#list) {
+      if (!record.present) continue
+      this.#destroyPresent(record)
+    }
+
+    let count = ((this.#list.length * PARSNIP_RATE) | 0) + seededRNG.randomGetMinMax(-2, 2)
+    if (buffManager.getBuff('cloudy')) count += 2
+    if (count < 0) count = 0
+
+    const MAX_ATTEMPTS = 200 // borne de sécurité — pas une valeur d'équilibrage
+    let grown = 0
+    let attempts = 0
+    while (grown < count && attempts < MAX_ATTEMPTS) {
+      attempts++
+      const record = seededRNG.randomGetArrayValue(this.#list)
+      if (record.present) continue
+      if (!blockedTiles.canMine(record.soilIndex)) continue
+      if (!blockedTiles.canPlace(record.index)) continue
+
+      record.present = true
+      addToByTile(this.byTile, record)
+      addToByChunk(this.#byChunk, record)
+      this.#bySoil.set(record.soilIndex, record)
+      const px = record.index & 0x3FF
+      const py = record.index >> 10
+      for (let dy = 0; dy < record.h; dy++) {
+        const rowBase = (py + dy) << 10
+        for (let dx = 0; dx < record.w; dx++) blockedTiles.blockPlacement(rowBase | (px + dx))
+      }
+      saveManager.queueStaticUpdate({storeName: 'plant', record})
+      grown++
+    }
+    buildDisplayed(this.#displayed, this.#byChunk, camera.preloadChunks)
+  }
 
   /**
    * Détruit un parsnip présent sans loot : retire toutes les structures et persiste.
