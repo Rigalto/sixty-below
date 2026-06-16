@@ -1,5 +1,5 @@
 // ecosystem.mjs — FloraManager - CobwebSystem - HiveSystem
-// SunflowerSystem - OleanderSystem - SampleSystem
+// SunflowerSystem - OleanderSystem -ParsnipSystem - CobwebSystem - SampleSystem
 
 import {WORLD_WIDTH, WORLD_HEIGHT, MICROTASK, TOPSOIL_Y_SKY_SURFACE, TOPSOIL_Y_SURFACE_UNDER, TOPSOIL_Y_UNDER_CAVERNS} from './constant.mjs'
 import {uniqueIdGenerator} from './database.mjs'
@@ -708,6 +708,228 @@ class OleanderSystem {
   }
 }
 export const oleanderSystem = new OleanderSystem()
+
+// ParsnipSystem — calqué sur SunflowerSystem (spot toujours en DB, present = visible/forageable).
+// TODO ouverts (cf. commentaires inline) : conditions d'ajout d'un spot (onParsnipSpotCheck),
+// mécanisme de repousse après forage (rien ne remet present à true pour l'instant),
+// w/h placeholder à vérifier contre generate.mjs.
+class ParsnipSystem {
+  byTile = new Map() // Map<tileIndex, record> — public : membership O(1) + lookup record
+  #list = [] // record[] — tous les spots (présents ou non)
+  #byChunk = new Map() // Map<chunkKey, Set> — lookup spatial pour onPreloadChunksChanged
+  #bySoil = new Map() // Map<soilIndex, record> — plantes présentes : détection minage de la tuile sol
+  #spotsBySoil = new Map() // Map<soilIndex, record> — tous les spots (présents ou non) : suppression O(1)
+  #displayed = new Set() // Set<record> — spots dans les chunks preload (cible render)
+  #image = null // ITEMS.parsnip.placed, mis en cache dans init()
+
+  constructor () {
+    // EventBus
+    this.onTileChanged = this.onTileChanged.bind(this)
+    eventBus.on('world/tile-changed', this.onTileChanged)
+    // Micro-task
+    this.onParsnipSpotCheck = this.onParsnipSpotCheck.bind(this)
+
+    // TODO : rien ne remet present à true après un forage. SunflowerSystem utilise un cycle
+    // aube/crépuscule (onHour6/onHour17) qui ne semble pas pertinent pour une racine —
+    // mécanisme de repousse à concevoir séparément (timer par spot ? tirage périodique ?).
+  }
+
+  /**
+   * Réinitialise toutes les structures.
+   */
+  init () {
+    this.byTile.clear()
+    this.#list.length = 0
+    this.#byChunk.clear()
+    this.#bySoil.clear()
+    this.#spotsBySoil.clear()
+    this.#displayed.clear()
+
+    this.#image = ITEMS.parsnip.placed // après hydratation
+  }
+
+  /**
+   * Enregistre un spot et peuple les structures internes.
+   * @param {object} record — record HERB/PARSNIP (deleted=false garanti par l'appelant)
+   */
+  initPlant (record) {
+    this.#list.push(record)
+    this.#spotsBySoil.set(record.soilIndex, record)
+    if (!record.present) return
+    addToByTile(this.byTile, record)
+    addToByChunk(this.#byChunk, record)
+    this.#bySoil.set(record.soilIndex, record)
+  }
+
+  /**
+   * Reconstruit #displayed depuis les chunks preload de la caméra.
+   * @param {Set<number>} preloadChunks
+   */
+  onPreloadChunksChanged (preloadChunks) {
+    buildDisplayed(this.#displayed, this.#byChunk, preloadChunks)
+  }
+
+  /**
+   * Dessine les parsnips visibles et présents sur le contexte transformé.
+   * @param {CanvasRenderingContext2D} ctx — contexte déjà transformé (caméra appliquée)
+   */
+  render (ctx) {
+    const img = this.#image
+    for (const record of this.#displayed) {
+      const pxX = (record.index & 0x3FF) << 4
+      const pxY = (record.index >> 10) << 4
+      ctx.drawImage(IMAGE_CACHE[img.imgIndex], img.sx, img.sy, img.sw, img.sh, pxX, pxY, img.sw, img.sh)
+    }
+  }
+
+  /**
+   * Traite le foraging réussi : marque le parsnip absent et persiste.
+   * Le loot est géré en commun par ForagingManager — cette méthode ne gère que l'état de la plante.
+   * @param {object} record
+   */
+  onForaged (record) {
+    this.#destroyPresent(record)
+  }
+
+  /**
+   * Retourne le record du parsnip couvrant la tuile donnée, ou null.
+   * @param {number} tileIndex — (y << 10) | x
+   * @returns {object|null}
+   */
+  getPlantAt (tileIndex) {
+    return this.byTile.get(tileIndex) ?? null
+  }
+
+  /**
+   * Indique si le record est actuellement présent (forageable).
+   * @param {object} record
+   * @returns {boolean}
+   */
+  isPresent (record) { return record.present }
+
+  /**
+   * Détruit un parsnip présent sans loot : retire toutes les structures et persiste.
+   * Guard : no-op si record.present est déjà false.
+   * @param {object} record
+   */
+  #destroyPresent (record) {
+    if (!record.present) return
+    record.present = false
+    removeFromByTile(this.byTile, record)
+    removeFromByChunk(this.#byChunk, record)
+    this.#bySoil.delete(record.soilIndex)
+    this.#displayed.delete(record)
+    blockedTiles.unblockPlacement(record.index)
+    saveManager.queueStaticUpdate({storeName: 'plant', record})
+  }
+
+  /**
+   * Retire un spot de toutes les structures mémoire et le marque deleted en DB.
+   * Détruit le parsnip présent au préalable si nécessaire.
+   * @param {object} record
+   */
+  #removeSpot (record) {
+    this.#destroyPresent(record)
+    const list = this.#list
+    const idx = list.indexOf(record)
+    if (idx !== -1) {
+      list[idx] = list[list.length - 1]
+      list.length--
+    }
+    this.#spotsBySoil.delete(record.soilIndex)
+    record.deleted = true
+    saveManager.queueStaticUpdate({storeName: 'plant', record})
+  }
+
+  /**
+   * Indique si toutes les tuiles du corps du record valent encore code.
+   * @param {object} record
+   * @param {number} code — NODES.xxx.code attendu pour chaque tuile du corps
+   * @returns {boolean}
+   */
+  #bodyIs (record, code) { // TODO - Je ne comprends pas à quoi peut servir cette fonction
+    const px = record.index & 0x3FF
+    const py = record.index >> 10
+    for (let dy = 0; dy < record.h; dy++) {
+      const rowBase = (py + dy) << 10
+      for (let dx = 0; dx < record.w; dx++) {
+        if (chunkManager.getTileAt(rowBase | (px + dx)) !== code) return false
+      }
+    }
+    return true
+  }
+
+  /**
+   * Liaison EventBus : 'world/tile-changed'.
+   * — Détruit le parsnip présent si une tuile de son corps n'est plus SKY ou si son sol n'est plus GRASSFOREST.
+   * — Supprime le spot si son sol n'est plus GRASSFOREST.
+   * — Enqueue onParsnipSpotCheck si une tuile devient GRASSFOREST.
+   * Relit les tuiles réelles avant d'agir.
+   * @param {{tileIndex: number, tileOldCode: number, tileNewCode: number}} payload
+   */
+  onTileChanged ({tileIndex, tileOldCode, tileNewCode}) {
+    return
+    const SKY = NODES.SKY.code
+    const GRASSFOREST = NODES.GRASSFOREST.code
+
+    // Cas 1 — tuile du corps
+    const byBodyRecord = this.byTile.get(tileIndex)
+    if (byBodyRecord !== undefined && tileNewCode !== SKY) {
+      if (!this.#bodyIs(byBodyRecord, SKY)) this.#destroyPresent(byBodyRecord)
+    }
+
+    // Cas 2 — tuile sol : parsnip présent + spot
+    if (tileOldCode === GRASSFOREST) {
+      const record = this.#spotsBySoil.get(tileIndex)
+      if (record !== undefined && chunkManager.getTileAt(record.soilIndex) !== GRASSFOREST) {
+        this.#removeSpot(record)
+      }
+    }
+
+    // Cas 3 — nouvelle tuile GRASSFOREST : candidat spot
+    if (tileNewCode === GRASSFOREST) {
+      const {priority, capacity} = MICROTASK.PARSNIP_SPOT_CHECK
+      microTasker.enqueueOnce(this.onParsnipSpotCheck, priority, capacity, tileIndex)
+    }
+  }
+
+  /**
+   * Microtâche : vérifie si une tuile devenue GRASSFOREST peut accueillir un nouveau spot.
+   * TODO — conditions réelles non définies. Pour l'instant, reprend juste le minimum actif
+   * de SunflowerSystem (sol GRASSFOREST + pas de spot existant) : pas de contrainte de
+   * voisinage GRASSFOREST gauche/droite, pas d'exclusion oak/chest, pas de tolérance bolete.
+   * À porter une fois TreeSystem écrit (cf. DESIGN.md 8.7).
+   * @param {number} soilIndex
+   */
+  onParsnipSpotCheck (soilIndex) {
+    const GRASSFOREST = NODES.GRASSFOREST.code
+    const x = soilIndex & 0x3FF
+
+    if (chunkManager.getTileAt(soilIndex) !== GRASSFOREST) return
+    if (this.#spotsBySoil.has(soilIndex)) return
+
+    const y = soilIndex >> 10
+    const index = soilIndex - WORLD_WIDTH
+    const record = {
+      id: uniqueIdGenerator.getUniqueId(),
+      kind: PLANT_KIND.HERB,
+      type: PLANT_TYPE.PARSNIP,
+      index,
+      soilIndex,
+      itemId: 'parsnip',
+      present: false,
+      w: 1,
+      h: 1,
+      x,
+      y: y - 1,
+      deleted: false
+    }
+    this.#list.push(record)
+    this.#spotsBySoil.set(soilIndex, record)
+    saveManager.queueStaticUpdate({storeName: 'plant', record})
+  }
+}
+export const parsnipSystem = new ParsnipSystem()
 
 /* ====================================================================================================
    FLORA MANAGER

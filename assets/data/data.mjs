@@ -535,7 +535,7 @@ export const ITEMS = {
   mushroomGill: {name: 'Mushroom Gill', type: 0, stype: 'mushroom', star: 3, image: 'potions_32_32-1-5', help: 'Cave Mushrooms', tooltip: '???'},
 
   // Herbs
-  parsnip: {name: 'Parsnip', type: 0, stype: 'herb', star: 1, image: 'potions_32_32-1-5', placed: 'fuws_32_32-4-0', help: 'Parsnip', tooltip: '???'},
+  parsnip: {name: 'Parsnip', type: 0, stype: 'herb', star: 1, image: 'mined_32_32-6-0', placed: 'placed_16_16-0-0', help: 'Parsnip', tooltip: '???', foraging: {speed: 1800, items: [{item: 'parsnip', count: '1-3'}]}},
   parsnipMash: {name: 'Parsnip Mash', type: ITEM_TYPE.FOOD | ITEM_TYPE.USABLE, stype: 'food', star: 1, image: 'potions_32_32-1-5', help: 'Parsnip', tooltip: '???'},
   vegetableSoup: {name: 'Vegetable Soup', type: ITEM_TYPE.FOOD | ITEM_TYPE.USABLE, stype: 'food', star: 2, image: 'potions_32_32-1-5', help: 'Soups', tooltip: '???'},
 

@@ -35,6 +35,7 @@ export const IMAGE_FILES = [
   // PLACED //
   // ////// //
 
+  'assets/sprites/placed_16_16.png',
   'assets/sprites/placed_16_32.png',
   'assets/sprites/placed_16_48.png',
 

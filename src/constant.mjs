@@ -318,6 +318,8 @@ export const MICROTASK = {
   SUNFLOWER_HOUR6: {priority: 20, capacity: 2, taskName: 'onSunflowerHour6'}, // gère les sunflower
   SUNFLOWER_HOUR17: {priority: 20, capacity: 1, taskName: 'onSunflowerHour17'}, // gère les sunflower
   SUNFLOWER_SPOT_CHECK: {priority: 20, capacity: 10, taskName: 'onSunflowerSpotCheck'}, // suppression d'un spot de sunflower
+  PARSNIP_SPOT_CHECK: {priority: 20, capacity: 10, taskName: 'onParsnipSpotCheck'}, // ajout d'un spot de parsnip
+
   OLEANDER_REGROW: {priority: 20, capacity: 2, taskName: 'onOleanderRegrow'}, // recherche d'un nouvel emplacement pour les oleanders à repousser
   COBWEB_GROWTH: {priority: 20, capacity: 3, taskName: 'onCobwebGrowthTick'}, // tentative périodique de pose d'une toile d'araignée
 
