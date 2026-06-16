@@ -39,13 +39,13 @@ class MiningManager {
    * @param {string} prefix    — slot.prefix
    */
   tryMine (tileIndex, tileNode, tool, prefix) {
-    console.log('MiningManager.tryMine', {tileIndex, tileNode, tool, prefix})
-    if (tool.star < tileNode.star) return
+    if (buffManager.getBuff('playerFreeze')) return
     if (!(tileNode.type & (NODE_TYPE.SOLID | NODE_TYPE.WEB))) return
     if ((tileNode.type & NODE_TYPE.WALL)) return // Hammer
-    if (!blockedTiles.canMine(tileIndex)) return // includes ETERNAL
-    if (!this.#isInMiningRange(tileIndex, tool, prefix)) return
-    if (buffManager.getBuff('playerFreeze')) return
+    console.log('MiningManager.tryMine', {tileIndex, tileNode, tool, prefix})
+    if (!this.#isInMiningRange(tileIndex, tool, prefix)) { eventBus.emit('sound/play', 'toofar'); return }
+    if (tool.star < tileNode.star) { eventBus.emit('sound/play', 'wrong'); return }
+    if (!blockedTiles.canMine(tileIndex)) { eventBus.emit('sound/play', 'wrong'); return } // includes ETERNAL
 
     const speed = this.#computeMineSpeed(tileNode, tool, prefix)
 
@@ -208,11 +208,11 @@ class PlacingManager {
    * @param {object} item      — ITEMS[slot.item]
    */
   tryPlace (tileIndex, tileNode, item, slotIndex) {
+    if (buffManager.getBuff('playerFreeze')) return
     if (!PLACING_NODES.has(tileNode.code)) return
     console.log('PlacingManager.tryPlace', {tileIndex, tileNode, item})
-    if (!blockedTiles.canPlace(tileIndex)) return
-    if (!this.#isInPlacingRange(tileIndex)) return
-    if (buffManager.getBuff('playerFreeze')) return
+    if (!blockedTiles.canPlace(tileIndex)) { eventBus.emit('sound/play', 'toofar'); return }
+    if (!this.#isInPlacingRange(tileIndex)) { eventBus.emit('sound/play', 'wrong'); return }
     const {priority, capacity} = MICROTASK.PLACE_TILE
     microTasker.enqueue(this.onPlaceTile, priority, capacity, tileIndex, item, slotIndex)
   }
