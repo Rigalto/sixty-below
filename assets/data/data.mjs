@@ -543,9 +543,9 @@ export const ITEMS = {
   sunflowerSeed: {name: 'Sunflower Seed', type: ITEM_TYPE.SEED | ITEM_TYPE.PLACABLE, stype: 'seed', star: 1, image: 'potions_32_32-1-5', placed: 'fuws_32_32-4-0', help: 'Sunflower', tooltip: '???'},
   sunflowerOil: {name: 'Sunflower Oil', type: 0, stype: 'oil', star: 1, image: 'potions_32_32-1-5', placed: 'fuws_32_32-4-0', help: 'Sunflower', tooltip: 'Used in cooking, potions, and as a mechanical lubricant'},
 
-  oleander: {name: 'Oleander', type: 0, stype: 'herb', star: 3, image: 'fuws_32_32-4-0', placed: 'placed_16_48-1-0', help: 'Oleander', tooltip: '???', foraging: {speed: 2400, items: [{item: 'oleander', count: '1-5'}, {item: 'oleanderBulb', count: '1-2'}, {item: 'snail', count: 0.12, buffs: ['lucky:100', 'rainy:300']}]}},
-  oleanderOil: {name: 'Oleander Oil', type: 0, stype: 'oil', star: 3, image: 'potions_32_32-1-5', placed: 'fuws_32_32-4-0', help: 'Oleander', tooltip: 'Used in cooking, potions, and as a mechanical lubricant'},
-  oleanderBulb: {name: 'Oleander Bulb', type: 0, stype: 'vegie', star: 3, image: 'potions_32_32-1-5', placed: 'fuws_32_32-4-0', help: 'Oleander', tooltip: '???'},
+  oleander: {name: 'Oleander', type: 0, stype: 'herb', star: 3, image: 'mined_32_32-6-1', placed: 'placed_16_48-1-0', help: 'Oleander', tooltip: '???', foraging: {speed: 2400, items: [{item: 'oleander', count: '1-5'}, {item: 'oleanderBulb', count: '1-2'}, {item: 'snail', count: 0.12, buffs: ['lucky:100', 'rainy:300']}]}},
+  oleanderOil: {name: 'Oleander Oil', type: 0, stype: 'oil', star: 3, image: 'potions_32_32-1-5', help: 'Oleander', tooltip: 'Used in cooking, potions, and as a mechanical lubricant'},
+  oleanderBulb: {name: 'Oleander Bulb', type: 0, stype: 'vegie', star: 3, image: 'mined_32_32-6-2', help: 'Oleander', tooltip: 'Its pulp has a velvety, creamy texture'},
 
   ambermirage: {name: 'Ambermirage', type: 0, stype: 'herb', star: 1, image: 'potions_32_32-1-5', placed: 'fuws_32_32-4-0', help: 'Ambermirage', tooltip: '???'},
 
