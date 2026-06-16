@@ -167,8 +167,10 @@ export const SOUND_CACHE = {}
    ========================================= */
 
 /**
- * Analyse le nom de l'atlas pour en déduire la grille.
- * Ex: "mineral_16_16" -> cellW=16, cellH=16
+ * Analyse le nom de l'atlas pour en déduire la taille de cellule (grille).
+ * Ex : "mineral_16_16" → cellW=16, cellH=16. Fallback {cellW:16, cellH:16} si le format n'est pas respecté.
+ * @param {string} filename — nom de fichier sans extension, attendu sous la forme 'nom_w_h'
+ * @returns {object} - { cellW, cellH }
  */
 function parseAtlasName (filename) {
   const parts = filename.split('_')
@@ -183,9 +185,14 @@ function parseAtlasName (filename) {
 }
 
 /**
- * Transforme une chaîne de définition ("substrat_16_16+3") en données de rendu exploitables.
- * @param {string} codeStr - La chaîne brute.
- * @returns {object|null} - { imgId, sx, sy, sw, sh }
+ * Transforme une chaîne de définition en données de rendu exploitables par le Renderer.
+ * Deux syntaxes reconnues :
+ *   - "atlas+row"   (ex: "substrat_16_16+3") — mode autotile, colonne dynamique (bitmasking, hors fonction)
+ *   - "atlas-x-y"   (ex: "liquid_16_16-1-0") — mode static, coordonnées explicites
+ * Retourne null si codeStr est vide/absent, si le format n'est ni '+' ni '-', ou si l'atlas
+ * n'est pas dans ATLAS_INDEX (image non chargée).
+ * @param {string} codeStr — la chaîne brute ("atlas+row" ou "atlas-x-y")
+ * @returns {object|null} - { imgIndex, file, sx, sy, sw, sh, isAutoTile }
  */
 export const resolveAssetData = (codeStr) => {
   if (!codeStr) return null
@@ -236,6 +243,15 @@ export const resolveAssetData = (codeStr) => {
    4. LOADER ENGINE
    ========================================= */
 
+/**
+ * Charge toutes les images (IMAGE_FILES) et tous les sons (soundManager.loadSounds) en parallèle.
+ * Tolérant aux échecs individuels : une image en erreur logue et résout quand même (ne bloque pas
+ * les autres). Indexe chaque image par son nom de fichier sans extension (IMAGE_CACHE, ATLAS_INDEX).
+ * Note : imageCount compte les chemins traités (succès ou échec confondus, IMAGE_CACHE.length),
+ * tandis que soundCount ne compte que les sons effectivement décodés (SOUND_CACHE) — asymétrie
+ * à garder en tête si ces compteurs servent à détecter des échecs de chargement.
+ * @returns {Promise<object>} - { imageCount, soundCount }
+ */
 export const loadAssets = async () => {
   console.time('Assets Loading')
 
@@ -268,6 +284,41 @@ export const loadAssets = async () => {
 
   return {imageCount: IMAGE_CACHE.length, soundCount: Object.keys(SOUND_CACHE).length}
 }
+
+/* ====================================================================================================
+   SOUND MANAGER
+   ====================================================================================================
+
+   Autorité unique sur la lecture des sons et leur volume. Aucune logique DOM.
+   Seule classe du projet à écouter directement window (déblocage du contexte audio, cf. Interactions).
+   Singleton : soundManager.
+
+   Responsabilités :
+     - Chargement de tous les fichiers de SOUND_FILES en AudioBuffer (loadSounds),
+       tolérant aux échecs individuels (catch → log, ne bloque pas les autres fichiers)
+     - Lecture d'un son par son nom (playSound) ; no-op silencieux si absent de SOUND_CACHE
+     - Volume individuel par son (SOUND_VOLUMES) combiné multiplicativement au volume global
+     - Volume global de l'application (onSoundVolume, 0-100, 0 = muet)
+     - Reprise anticipée de #audioCtx (politique autoplay des navigateurs) à la première
+       interaction utilisateur (onFirstInteraction), pour masquer la latence avant le
+       premier son de gameplay
+
+   Interactions :
+     eventBus    — écoute : sound/play, sound/volume
+     window      — écoute : pointerdown, keydown, une seule fois ; déblocage de #audioCtx,
+                   les deux listeners sont retirés après la première interaction
+     loadAssets  — appelle loadSounds() au chargement initial, en parallèle des images
+
+   Sons (constantes module, assets.mjs) :
+     SOUND_FILES    — chemins sources, deux groupes : utilisés / provision (futurs sons)
+     SOUND_CACHE    — nom→AudioBuffer (clé = nom de fichier sans extension), peuplé par loadSounds()
+     SOUND_VOLUMES  — volume relatif par son, 0-100, défaut 100 si absent de la table
+
+   Graphe audio (par lecture, #startSource) :
+     AudioBufferSourceNode (éphémère) → GainNode (éphémère, SOUND_VOLUMES[name]) → #masterGain → destination.
+     Chaque appel crée sa propre paire source/gain, non référencée après start() —
+     lectures simultanées indépendantes, pas de limite de polyphonie.
+   ==================================================================================================== */
 
 class SoundManager {
   #audioCtx = new (window.AudioContext || window.webkitAudioContext)() // contexte Web Audio partagé
