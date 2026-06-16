@@ -908,6 +908,22 @@ L'item est classé dans la catégorie correspondant à sa méthode d'obtention l
 
 ---
 
+### 8.6 Retour Sonore des Actions [`action.mjs`, `assets.mjs :: SoundManager`]
+
+Toute action joueur déclenchée par clic (minage, placement, récolte…) suit la même hiérarchie de retour sonore, dans cet ordre de priorité :
+
+1. **Silence** — la cible n'a aucun sens pour cette action : mauvais type de tuile, pas de plante, plante non récoltable, mauvais type d'outil requis (ex. Hammer attendu sur un WALL). Le joueur "clique dans le vide" ; un son à chaque clic exploratoire deviendrait le son le plus joué du jeu.
+2. **`'toofar'`** — la cible aurait été valide, mais hors de la zone d'interaction du joueur (range de l'outil/action).
+3. **`'wrong'`** — la cible est valide et en portée, mais une règle de progression ou d'état bloque l'action *pour l'instant* : tier d'outil insuffisant, quota journalier atteint, tuile bloquée/occupée…
+4. **Son de l'action** (`'mining'`, `'placing'`, `'foraging'`…) — l'action est exécutée.
+
+* **Ordre des guards :** dans le code, les checks silencieux sont toujours évalués en premier, puis la range, puis les conditions. Un seul son joue par clic — la précédence découle directement de l'ordre des `return`, sans logique de priorité à écrire séparément.
+* **`playerFreeze` :** cas à part, toujours silencieux, vérifié avant tout le reste, quel que soit le type de tuile ciblée.
+* **Volume relatif :** chaque son a un volume individuel (`SOUND_VOLUMES`), combiné multiplicativement au volume global (`sound/volume`). `'too-far'` et `'wrong'` sont volontairement plus discrets que les sons d'action réussie, pour ne pas devenir agressifs sur un clic répété hors-cible.
+* **Précédent établi :** `ForagingManager.tryForage`, `PlacingManager.tryPlace`, `MiningManager.tryMine`. Toute nouvelle action joueur (`SowingManager`, `FurnishingManager`…) doit suivre cette même hiérarchie.
+
+---
+
 ## 9. Organisation du Projet
 
 ### 9.1 Structure des Fichiers
