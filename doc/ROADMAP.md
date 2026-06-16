@@ -25,6 +25,15 @@
 - corriger les icones dans tool_32_32 : dague, épée, bow, hache, pickaxe, hammer, bug net, fishing rod
 - continuer la correction et l'ajout de fiches d'aide (`HELP`) et d'items (`ITEMS`)
 - Recettes pour créer Linen Rope et l'utiliser
+- Mettre la bonne palette et un entourage noir pour tool_32_32, reste à faire :
+  - 0,0 - 0,1 - 0,2 - 0,3
+  - 1,0 - 1,1 - 1,2 - 1,3
+  - 2,0 - 2,1 - 2,2 - 2,3
+  - 3,0 - 3,1 - 3,2 - 3,3
+  - 4,0 - 4,1 - 4,2 - 4,3
+  - 5,0 - 5,1 - 5,2 - 5,3
+  - 6,0 - 6,1 - 6,2 - 6,3
+  - 7,0
 
 ---
 

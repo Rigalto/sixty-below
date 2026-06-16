@@ -4840,6 +4840,11 @@ Parsnips are root vegetables found growing on the [[Forest]] floor. Their white 
 * Layer: [[Surface]]
 * Grows on [[node:grassForest]]
 
+
+**Blooming hours**
+
+Aime le [[Weather|Cloudy Weather]].
+
 **Harvest**
 
 * [[Foraging|Interact to harvest]] — the plant disappears on harvest
