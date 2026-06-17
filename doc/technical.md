@@ -779,16 +779,16 @@ Les enregistrements sont de natures très différentes, nature déterminée par 
   * `grass` : type de tuile sur lequel l'arbre pousse (NODES.GRASSFOREST.code, NODES.GRASSJUNGLE.code, NODES.GRASSMUSHROOM.code, NODES.SAND.code)
   * `growthTimestamp` : heure (timestamp) de prochaine croissance (`null` si `size` === 0)
   * `shakedTimestamp` : heure (timestamp) à partir de laquelle l'arbre peut être secoué de nouveau
-* `kind` MUSHROOM : liste des spots de champignons présents dans le monde
+* `kind` MUSHROOM : liste des spots de champignons potentiels dans le monde (tuile à gauche et à droite de l'arbre correspondant, indépendamment de la nature de cette tuile)
   * `id` : identifiant unique du spot de champignon
   * `itemId` : item correspondant au champignon qui pousse sur le spot : `ITEMS.bolete.code` et `ITEMS.pinkMycenia.code`
   * `index` : position du spot de champignon (coin haut gauche de l'image)
   * `type` : `PLANT_TYPE.NONE`
-  * `w` et `h` : taille du champignon
+  * `w` et `h` : taille du champignon (w=1 et h=2)
   * `x` et `y` : coordonnées pour le clipping de l'image (affichée si `x,y` est dans le rectangle visible)
-  * `soilIndex` : position de la tuile solide sous la gauche du champignon (`index + h * 1024`)
+  * `soilIndex` : position de la tuile solide sous le champignon (`index + h * 1024` avec `h=2`)
   * `present` : booléen indiquant si un champignon est présent (`true`) ou non sur le spot de champignon
-  * _Visibilité pilotée globalement par l'heure in-game — les champignons d'un même type apparaissent et disparaissent simultanément._
+  * _Visibilité pilotée globalement par l'heure in-game — les champignons d'un même type apparaissent et disparaissent simultanément. La nature de la tuile est vérifiée dynamiquement avant la pousse._
 * `kind` HERB : liste des spots d'herbes (Parsnip, Sunflower) ou des herbes présentes dans le monde (Blinkroot, Coral, Parsnip, Sunflower, Fireblossom, Oleander, Skorn, Ambermirage)
   * `id` : identifiant unique de l'herbe
   * `ìtemId` : identifiant de l'item correspondant à l'herbe

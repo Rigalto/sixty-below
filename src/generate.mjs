@@ -7211,6 +7211,9 @@ class PlantGenerator {
     const placeMushroom = (soilX, y, mushroomId) => {
       const soilIndex = (y << 10) | soilX
       const type = mushroomId === 'bolete' ? PLANT_TYPE.BOLETE : PLANT_TYPE.PINKMYCENIA
+      const expectedCode = mushroomId === 'bolete' ? GRASSFOREST : GRASSJUNGLE
+      const present = worldBuffer.read(soilX, y) === expectedCode && seededRNG.randomGetBool()
+
       this.#plants.push({
         id: uniqueIdGenerator.getUniqueId(),
         kind: PLANT_KIND.MUSHROOM,
@@ -7220,7 +7223,7 @@ class PlantGenerator {
         soilIndex,
         w: MUSH_W,
         h: MUSH_H,
-        present: false,
+        present,
         deleted: false
       })
       guarded.add(soilX)
@@ -7246,24 +7249,20 @@ class PlantGenerator {
 
       if (count < 3) { x++; continue }
 
+      let treeX = x
       if (count === 3) {
-        placeTree(x, y, code)
         x += 5 // skip les 5 tuiles guardées
       } else if (count === 4) {
-        const treeLeft = seededRNG.randomGetBool()
-        const treeX = treeLeft ? x : x + 1
-        const mushX = treeLeft ? x + 3 : x
-        const {mushroomId} = placeTree(treeX, y, code)
-        placeMushroom(mushX, y, mushroomId)
+        treeX = seededRNG.randomGetBool() ? x : x + 1
         x += 6
       } else { // count === 5
-        const treeX = x + 1 // tuile centrale → arbre sur x+1, x+2, x+3
-        const mushLeft = seededRNG.randomGetBool()
-        const mushX = mushLeft ? x : x + 4
-        const {mushroomId} = placeTree(treeX, y, code)
-        placeMushroom(mushX, y, mushroomId)
+        treeX = x + 1 // tuile centrale → arbre sur x+1, x+2, x+3
         x += 6
       }
+
+      const {mushroomId} = placeTree(treeX, y, code)
+      placeMushroom(treeX - 1, y, mushroomId)
+      placeMushroom(treeX + 3, y, mushroomId)
     }
     return oakPositions
   }
