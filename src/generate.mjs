@@ -7154,9 +7154,12 @@ class PlantGenerator {
   // * bloom = false, bloomTimestamp = timestamp => position déterminée, attente fin de croissance (taskScheduler)
 
   /**
- * Place les arbres Oak et Mahogany ainsi que les champignons associés sur la ligne de surface.
- * Oak sur GRASSFOREST (3 tuiles), Mahogany sur GRASSJUNGLE (3 tuiles).
- * Champignons : Bolete près des Oak, Pink Mycenia près des Mahogany.
+ * Champignons : pour chaque arbre, un spot Bolete/Pink Mycenia est créé à gauche (x-1) ET à
+ * droite (x+3) du tronc, systématiquement — le spot existe quelle que soit la nature réelle
+ * de la tuile visée. 'present' initial : true si la tuile est bien du type attendu
+ * (GRASSFOREST pour Bolete, GRASSJUNGLE pour Pink Mycenia) ET dans 50% des cas (seededRNG).
+ * Toute revérification ultérieure (tuile qui change en cours de partie) se fait à la pousse,
+ * côté runtime (OakSystem/MahoganySystem) — aucun traitement sur world/tile-changed ici.
  *
  * @param {Int16Array} surfaceLine — Y de la première tuile solide par colonne
  * @param {Set<number>} guarded — colonnes protégées (modifié en place)
