@@ -759,6 +759,7 @@ class ParsnipSystem {
     addToByTile(this.byTile, record)
     addToByChunk(this.#byChunk, record)
     this.#bySoil.set(record.soilIndex, record)
+    blockedTiles.blockPlacement(record.index)
   }
 
   /**
@@ -842,12 +843,7 @@ class ParsnipSystem {
       addToByTile(this.byTile, record)
       addToByChunk(this.#byChunk, record)
       this.#bySoil.set(record.soilIndex, record)
-      const px = record.index & 0x3FF
-      const py = record.index >> 10
-      for (let dy = 0; dy < record.h; dy++) {
-        const rowBase = (py + dy) << 10
-        for (let dx = 0; dx < record.w; dx++) blockedTiles.blockPlacement(rowBase | (px + dx))
-      }
+      blockedTiles.blockPlacement(record.index)
       saveManager.queueStaticUpdate({storeName: 'plant', record})
       grown++
     }
