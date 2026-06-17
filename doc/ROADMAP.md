@@ -33,6 +33,10 @@
   - 4,0 - 4,1 - 4,2
   - 5,0 - 5,1 - 5,2
   - 6,0 - 6,1 - 6,2
+- Mettre la bonne palette et un entourage noir pour placed_16_32, reste à faire :
+  - 4,0 - 5,0 - 6,0 - 7,0
+  - 0,1 - 1,1, - 5,1
+
 
 ---
 

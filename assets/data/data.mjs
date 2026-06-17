@@ -528,10 +528,10 @@ export const ITEMS = {
   giantMushroom: {name: 'Giant Mushroom', type: 0, stype: 'tree', star: 1, image: null, help: 'Oak & Mahogany', tooltip: '???'},
 
   // Mushrooms
-  bolete: {name: 'Bolete', type: 0, stype: 'mushroom', star: 1, image: 'potions_32_32-1-5', placed: 'fuws_32_32-4-0', help: 'Surface Mushrooms', tooltip: '???'},
-  pinkMycenia: {name: 'Pink Mycenia', type: 0, stype: 'mushroom', star: 1, image: 'potions_32_32-1-5', placed: 'fuws_32_32-4-0', help: 'Surface Mushrooms', tooltip: '???'},
-  frostcap: {name: 'Frostcap', type: 0, stype: 'mushroom', star: 3, image: null, placed: 'potions_32_32-1-5', help: 'Cave Mushrooms', tooltip: '???'},
-  dawncap: {name: 'Dawncap', type: 0, stype: 'mushroom', star: 3, image: null, placed: 'potions_32_32-1-5', help: 'Cave Mushrooms', tooltip: '???'},
+  bolete: {name: 'Bolete', type: 0, stype: 'mushroom', star: 1, image: 'potions_32_32-1-5', placed: 'placed_16_32-0-0', help: 'Surface Mushrooms', tooltip: '???'},
+  pinkMycenia: {name: 'Pink Mycenia', type: 0, stype: 'mushroom', star: 1, image: 'potions_32_32-1-5', placed: 'placed_16_32-1-0', help: 'Surface Mushrooms', tooltip: '???'},
+  frostcap: {name: 'Frostcap', type: 0, stype: 'mushroom', star: 3, image: null, placed: 'placed_16_32-2-0', help: 'Cave Mushrooms', tooltip: '???'},
+  dawncap: {name: 'Dawncap', type: 0, stype: 'mushroom', star: 3, image: null, placed: 'placed_16_32-3-0', help: 'Cave Mushrooms', tooltip: '???'},
   mushroomGill: {name: 'Mushroom Gill', type: 0, stype: 'mushroom', star: 3, image: 'potions_32_32-1-5', help: 'Cave Mushrooms', tooltip: '???'},
 
   // Herbs
