@@ -974,6 +974,106 @@ class ParsnipSystem {
 }
 export const parsnipSystem = new ParsnipSystem()
 
+// OakSystem — gère Oak (TREE) et Bolete (MUSHROOM), couplés : un Oak crée ses 2 spots de
+// Bolete (gauche/droite), détruits avec lui. Pour l'instant : uniquement l'initialisation
+// et l'affichage des bolete. Le reste est TODO (cf. liste en fin de classe).
+class OakSystem {
+  // --- Oak (TREE) ---
+  oakByTile = new Map() // Map<tileIndex, record> — public, lookup par tuile (tronc)
+  #oakList = [] // record[] — tous les oaks
+  #oakByChunk = new Map() // Map<chunkKey, Set> — lookup spatial pour onPreloadChunksChanged
+  #oakBySoil = new Map() // Map<soilIndex, record> — détection minage/changement de la tuile sol
+  #oakDisplayed = new Set() // Set<record> — oaks dans les chunks preload (cible render)
+
+  // --- Bolete (MUSHROOM) ---
+  boleteByTile = new Map() // Map<tileIndex, record> — public, lookup par tuile
+  #boleteList = [] // record[] — tous les spots (présents ou non)
+  #boleteByChunk = new Map() // Map<chunkKey, Set> — lookup spatial pour onPreloadChunksChanged
+  #boleteBySoil = new Map() // Map<soilIndex, record> — spots présents : détection minage de la tuile sol
+  #boleteSpotsBySoil = new Map() // Map<soilIndex, record> — tous les spots : lookup pour suppression (destruction d'un oak)
+  #boleteDisplayed = new Set() // Set<record> — spots dans les chunks preload (cible render)
+  #boleteImage = null // ITEMS.bolete.placed, mis en cache dans init()
+
+  // constructor () {
+  //   // TODO : this.onTileChanged = this.onTileChanged.bind(this)
+  //   //        eventBus.on('world/tile-changed', this.onTileChanged)
+  //   //        — devra gérer le sol des oaks ET celui des bolete présents
+  // }
+
+  /**
+   * Réinitialise toutes les structures (oak et bolete) et met en cache le sprite bolete.
+   */
+  init () {
+    this.oakByTile.clear()
+    this.#oakList.length = 0
+    this.#oakByChunk.clear()
+    this.#oakBySoil.clear()
+    this.#oakDisplayed.clear()
+
+    this.boleteByTile.clear()
+    this.#boleteList.length = 0
+    this.#boleteByChunk.clear()
+    this.#boleteBySoil.clear()
+    this.#boleteSpotsBySoil.clear()
+    this.#boleteDisplayed.clear()
+
+    this.#boleteImage = ITEMS.bolete.placed // après hydratation
+  }
+
+  /**
+   * Hydrate un record depuis la DB. Aiguille par kind — seul le cas MUSHROOM (bolete)
+   * est traité pour l'instant.
+   * TODO : cas PLANT_KIND.TREE (oak) — taille, images par stade, growthTimestamp, shakedTimestamp.
+   * @param {object} record
+   */
+  initPlant (record) {
+    if (record.kind === PLANT_KIND.TREE) return // TODO
+
+    // record.kind === PLANT_KIND.MUSHROOM (bolete)
+    this.#boleteList.push(record)
+    this.#boleteSpotsBySoil.set(record.soilIndex, record)
+    if (!record.present) return
+    addToByTile(this.boleteByTile, record)
+    addToByChunk(this.#boleteByChunk, record)
+    this.#boleteBySoil.set(record.soilIndex, record)
+    blockedTiles.blockPlacement(record.index)
+    blockedTiles.blockPlacement(record.index + WORLD_WIDTH)
+  }
+
+  /**
+   * Reconstruit #boleteDisplayed depuis les chunks preload de la caméra.
+   * TODO : idem pour #oakDisplayed une fois #oakByChunk peuplé.
+   * @param {Set<number>} preloadChunks
+   */
+  onPreloadChunksChanged (preloadChunks) {
+    // TODO : buildDisplayed(this.#oakDisplayed, this.#oakByChunk, preloadChunks)
+    buildDisplayed(this.#boleteDisplayed, this.#boleteByChunk, preloadChunks)
+  }
+
+  /**
+   * Dessine les bolete visibles et présents.
+   * TODO : rendu des oaks (this.#oakDisplayed), sprite par stade de croissance (size, images).
+   * @param {CanvasRenderingContext2D} ctx — contexte déjà transformé (caméra appliquée)
+   */
+  render (ctx) {
+    const img = this.#boleteImage
+    for (const record of this.#boleteDisplayed) {
+      const pxX = (record.index & 0x3FF) << 4
+      const pxY = (record.index >> 10) << 4
+      ctx.drawImage(IMAGE_CACHE[img.imgIndex], img.sx, img.sy, img.sw, img.sh, pxX, pxY, img.sw, img.sh)
+    }
+  }
+
+  // TODO — à écrire :
+  //   getPlantAt(tileIndex), isPresent(record)
+  //   onForaged(record) — bolete uniquement (oak se mine/coupe, pas de foraging)
+  //   onTileChanged({tileIndex, tileOldCode, tileNewCode}) — sol oak ET sol bolete présent
+  //   floraison nocturne des bolete (apparition 21h, disparition 9h — cf. fiche d'aide)
+  //   création/destruction d'un oak : doit créer/détruire ses 2 bolete (soilIndex ± décalage)
+  //   croissance des oaks (size, growthTimestamp), secousse (shakedTimestamp)
+}
+export const oakSystem = new OakSystem()
+
 /* ====================================================================================================
    FLORA MANAGER
    ====================================================================================================
