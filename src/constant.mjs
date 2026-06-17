@@ -317,17 +317,17 @@ export const MICROTASK = {
 
   UNBLOOM_BOLETE: {priority: 20, capacity: 1, taskName: 'unbloomBolete'}, // supprime les bolete du monde
   BLOOM_BOLETE: {priority: 20, capacity: 2, taskName: 'bloomBolete'}, // ajoute les boletes dans le monde
-  SUNFLOWER_HOUR6: {priority: 20, capacity: 2, taskName: 'onSunflowerHour6'}, // gère les sunflower
-  SUNFLOWER_HOUR17: {priority: 20, capacity: 1, taskName: 'onSunflowerHour17'}, // gère les sunflower
+  BLOOM_SUNFLOWER: {priority: 20, capacity: 2, taskName: 'bloomSunflower'}, // gère les sunflower
+  UNBLOOM_SUNFLOWER: {priority: 20, capacity: 1, taskName: 'unbloomSunflower'}, // gère les sunflower
   SUNFLOWER_SPOT_CHECK: {priority: 20, capacity: 10, taskName: 'onSunflowerSpotCheck'}, // suppression d'un spot de sunflower
   PARSNIP_SPOT_CHECK: {priority: 20, capacity: 10, taskName: 'onParsnipSpotCheck'}, // ajout d'un spot de parsnip
   BLOOM_PARSNIP: {priority: 20, capacity: 4, taskName: 'bloomParsnip'}, // reset + repousse nocturne des parsnips
 
-  OLEANDER_REGROW: {priority: 20, capacity: 2, taskName: 'onOleanderRegrow'}, // recherche d'un nouvel emplacement pour les oleanders à repousser
+  OLEANDER_REGROW: {priority: 20, capacity: 2, taskName: 'oleanderRegrow'}, // recherche d'un nouvel emplacement pour les oleanders à repousser
   COBWEB_GROWTH: {priority: 20, capacity: 3, taskName: 'cobwebGrowth'}, // tentative périodique de pose d'une toile d'araignée
 
   UI_ENV_UPDATE: {priority: 18, capacity: 2, taskName: 'updateClockInOverlay'}, // affiche le widget time/weather/Moon/Location
-  UI_TILE_HOVER: {priority: 18, capacity: 1, taskName: 'onTileHoverDetail'}, // affiche le widget tuile survolée
+  UI_TILE_HOVER: {priority: 18, capacity: 2, taskName: 'onTileHoverDetail'}, // affiche le widget tuile survolée
   PROCESS_SAVE: {priority: 15, capacity: 12, taskName: 'processSave'}, // sauvegarde en database des chunks et autres records
   RENDER_DEBUG_OVERLAY: {priority: 10, capacity: 2, taskName: 'renderDebugOverlay'}, // affichage des informations de débug (temps exéec et taille files)
   PRUNE_CACHE: {priority: 8, capacity: 2, taskName: 'pruneCache'} // supprime les images des chunks distants

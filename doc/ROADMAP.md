@@ -41,6 +41,7 @@
 ---
 
 ## Dette technique
+- Dédoubler les handlers d'eventBus : `onPreloadChunksChanged`, `onCraftPerformed`, `onSlotActive`, `onTeleportBegin`
 - Dans les attributs 'mining' et 'foraging' transférer dans 'buffs' ce qui n'y est pas encore.
 - Vérifier que la convention pour les variables privées est prise en compte partout et Vérifier que les en-têtes des fonctions sont présents et à jour (prise en compte des modifications de conception) :
   - fait pour `achievement.mjs`, `action.mjs`, `assets.mjs`, `craft.mjs`, `ecosystem.mjs`, `help.mjs`, `inventory.mjs`, `ui.mjs`

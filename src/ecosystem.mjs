@@ -109,21 +109,21 @@ class SunflowerSystem {
 
   constructor () {
     // eventBus
-    this.onFirstLoop = this.onFirstLoop.bind(this)
-    this.onHour6 = this.onHour6.bind(this)
-    this.onHour10 = this.onHour10.bind(this)
-    this.onHour13 = this.onHour13.bind(this)
-    this.onHour17 = this.onHour17.bind(this)
-    eventBus.on('time/first-loop', this.onFirstLoop)
-    eventBus.on('time/every-hour-6', this.onHour6)
-    eventBus.on('time/every-hour-10', this.onHour10)
-    eventBus.on('time/every-hour-13', this.onHour13)
-    eventBus.on('time/every-hour-17', this.onHour17)
-    this.onTileChanged = this.onTileChanged.bind(this)
-    eventBus.on('world/tile-changed', this.onTileChanged)
+    this.onFirstLoopSunflower = this.onFirstLoopSunflower.bind(this)
+    this.onHour6Sunflower = this.onHour6Sunflower.bind(this)
+    this.onHour10Sunflower = this.onHour10Sunflower.bind(this)
+    this.onHour13Sunflower = this.onHour13Sunflower.bind(this)
+    this.onHour17Sunflower = this.onHour17Sunflower.bind(this)
+    eventBus.on('time/first-loop', this.onFirstLoopSunflower)
+    eventBus.on('time/every-hour-6', this.onHour6Sunflower)
+    eventBus.on('time/every-hour-10', this.onHour10Sunflower)
+    eventBus.on('time/every-hour-13', this.onHour13Sunflower)
+    eventBus.on('time/every-hour-17', this.onHour17Sunflower)
+    this.onTileChangedSunflower = this.onTileChangedSunflower.bind(this)
+    eventBus.on('world/tile-changed', this.onTileChangedSunflower)
     // micro-tâches
-    this.onSunflowerHour6 = this.onSunflowerHour6.bind(this)
-    this.onSunflowerHour17 = this.onSunflowerHour17.bind(this)
+    this.bloomSunflower = this.bloomSunflower.bind(this)
+    this.unbloomSunflower = this.unbloomSunflower.bind(this)
     this.onSunflowerSpotCheck = this.onSunflowerSpotCheck.bind(this)
 
     // TODO : quand un oak est planté, invalider et supprimer les spots sunflower
@@ -215,16 +215,16 @@ class SunflowerSystem {
   // ////////////////////////////////////// //
 
   /** Liaison EventBus : 'time/every-hour-6' — apparition, tête à gauche. */
-  onHour6 () {
-    const {priority, capacity} = MICROTASK.SUNFLOWER_HOUR6
-    microTasker.enqueueOnce(this.onSunflowerHour6, priority, capacity)
+  onHour6Sunflower () {
+    const {priority, capacity} = MICROTASK.BLOOM_SUNFLOWER
+    microTasker.enqueueOnce(this.bloomSunflower, priority, capacity)
   }
 
   /**
    * Microtâche : peuple byTile, #byChunk et #displayed pour les spots tirés à 18%.
    * Bloque les tuiles occupées dans blockedTiles.
    */
-  onSunflowerHour6 () {
+  bloomSunflower () {
     this.#currentImage = this.#imgLeft
     for (const record of this.#list) {
       // TODO : prendre en compte les graines de sunflower plantées (18 => 80)
@@ -244,21 +244,21 @@ class SunflowerSystem {
   }
 
   /** Liaison EventBus : 'time/every-hour-10' — pivot vers le centre. */
-  onHour10 () { this.#currentImage = this.#imgMid }
+  onHour10Sunflower () { this.#currentImage = this.#imgMid }
 
   /** Liaison EventBus : 'time/every-hour-13' — pivot vers la droite. */
-  onHour13 () { this.#currentImage = this.#imgRight }
+  onHour13Sunflower () { this.#currentImage = this.#imgRight }
 
   /** Liaison EventBus : 'time/every-hour-17' — disparition. */
-  onHour17 () {
-    const {priority, capacity} = MICROTASK.SUNFLOWER_HOUR17
-    microTasker.enqueueOnce(this.onSunflowerHour17, priority, capacity)
+  onHour17Sunflower () {
+    const {priority, capacity} = MICROTASK.UNBLOOM_SUNFLOWER
+    microTasker.enqueueOnce(this.unbloomSunflower, priority, capacity)
   }
 
   /**
    * Microtâche : libère les tuiles bloquées, vide byTile, #byChunk et #displayed.
    */
-  onSunflowerHour17 () {
+  unbloomSunflower () {
     this.byTile.clear()
     this.#byChunk.clear()
     this.#displayed.clear()
@@ -278,7 +278,7 @@ class SunflowerSystem {
    * Liaison EventBus : 'time/first-loop' — émis une seule fois au démarrage du rendu.
    * @param {{hour: number}} payload
    */
-  onFirstLoop ({hour}) {
+  onFirstLoopSunflower ({hour}) {
     if (hour < 10) this.#currentImage = this.#imgLeft
     else if (hour >= 13) this.#currentImage = this.#imgRight
     else this.#currentImage = this.#imgMid
@@ -366,7 +366,7 @@ class SunflowerSystem {
  * Relit les tuiles réelles avant d'agir.
  * @param {{tileIndex: number, tileOldCode: number, tileNewCode: number}} payload
  */
-  onTileChanged ({tileIndex, tileOldCode, tileNewCode}) {
+  onTileChangedSunflower ({tileIndex, tileOldCode, tileNewCode}) {
     const SKY = NODES.SKY.code
     const GRASSFOREST = NODES.GRASSFOREST.code
 
@@ -396,36 +396,6 @@ class SunflowerSystem {
   }
 
   /**
- * Liaison EventBus : 'world/tile-changed'.
- * Détruit le tournesol si une tuile de son corps n'est plus SKY,
- * ou si sa tuile sol n'est plus GRASSFOREST.
- * Relit les tuiles réelles avant d'agir — aucune supposition sur l'état courant.
- * @param {{tileIndex: number, tileOldCode: number, tileNewCode: number}} payload
- */
-  onTileChanged_ ({tileIndex, tileOldCode, tileNewCode}) {
-    const SKY = NODES.SKY.code
-    const GRASSFOREST = NODES.GRASSFOREST.code
-
-    // Cas 1 — tuile du corps
-    const byBodyRecord = this.byTile.get(tileIndex)
-    if (byBodyRecord !== undefined && tileNewCode !== SKY) {
-      if (chunkManager.getTileAt(byBodyRecord.index) !== SKY ||
-        chunkManager.getTileAt(byBodyRecord.index + WORLD_WIDTH) !== SKY) {
-        this.#destroyPresent(byBodyRecord)
-      }
-    }
-
-    // Cas 2 — tuile sol
-    if (tileOldCode === GRASSFOREST) {
-      const bySoilRecord = this.#bySoil.get(tileIndex)
-      if (bySoilRecord !== undefined &&
-        chunkManager.getTileAt(bySoilRecord.soilIndex) !== GRASSFOREST) {
-        this.#destroyPresent(bySoilRecord)
-      }
-    }
-  }
-
-  /**
  * DEBUG — Affiche un cercle bleu au centre de chaque spot enregistré dans #list.
  * Vérifie la cohérence avec #spotsBySoil (même cardinal attendu).
  * @param {CanvasRenderingContext2D} ctx — contexte déjà transformé (caméra appliquée)
@@ -447,8 +417,6 @@ class SunflowerSystem {
   }
 }
 export const sunflowerSystem = new SunflowerSystem()
-
-// ...
 
 /* ====================================================================================================
    OLEANDER SYSTEM
@@ -473,12 +441,12 @@ class OleanderSystem {
 
   constructor () {
     // eventBus
-    this.onFirstLoop = this.onFirstLoop.bind(this)
-    eventBus.on('time/first-loop', this.onFirstLoop)
-    this.onTileChanged = this.onTileChanged.bind(this)
-    eventBus.on('world/tile-changed', this.onTileChanged)
+    this.onFirstLoopOleander = this.onFirstLoopOleander.bind(this)
+    eventBus.on('time/first-loop', this.onFirstLoopOleander)
+    this.onTileChangedOleander = this.onTileChangedOleander.bind(this)
+    eventBus.on('world/tile-changed', this.onTileChangedOleander)
     // micro-tâches
-    this.onOleanderRegrow = this.onOleanderRegrow.bind(this)
+    this.oleanderRegrow = this.oleanderRegrow.bind(this)
   }
 
   /**
@@ -526,10 +494,10 @@ class OleanderSystem {
    * Déclenche la microtâche de repousse si #regrowQueue contient des records
    * present=false chargés depuis la persistence.
    */
-  onFirstLoop () {
+  onFirstLoopOleander () {
     if (this.#regrowQueue.length === 0) return
     const {priority, capacity} = MICROTASK.OLEANDER_REGROW
-    microTasker.enqueue(this.onOleanderRegrow, priority, capacity)
+    microTasker.enqueue(this.oleanderRegrow, priority, capacity)
   }
 
   /**
@@ -580,7 +548,7 @@ class OleanderSystem {
     this.#regrowQueue.push(record)
     if (this.#regrowQueue.length === 1) {
       const {priority, capacity} = MICROTASK.OLEANDER_REGROW
-      microTasker.enqueue(this.onOleanderRegrow, priority, capacity)
+      microTasker.enqueue(this.oleanderRegrow, priority, capacity)
     }
   }
 
@@ -620,9 +588,9 @@ class OleanderSystem {
    * persistence) et le retire de #regrowQueue (dernier élément, length--).
    * Si rien trouvé, ou s'il reste des records, reprogramme pour la frame suivante.
    */
-  onOleanderRegrow () {
+  oleanderRegrow () {
     if (this.#regrowQueue.length === 0) return
-    console.log('onOleanderRegrow')
+    console.log('oleanderRegrow')
 
     const VOID = NODES.VOID.code
     const STONE = NODES.STONE.code
@@ -674,7 +642,7 @@ class OleanderSystem {
 
     if (this.#regrowQueue.length !== 0) {
       const {priority, capacity} = MICROTASK.OLEANDER_REGROW
-      microTasker.enqueue(this.onOleanderRegrow, priority, capacity)
+      microTasker.enqueue(this.oleanderRegrow, priority, capacity)
     }
   }
 
@@ -685,7 +653,7 @@ class OleanderSystem {
    * Pas de gestion de spot — population fixe, repousse via #regrowQueue.
    * @param {{tileIndex: number, tileOldCode: number, tileNewCode: number}} payload
    */
-  onTileChanged ({tileIndex, tileOldCode, tileNewCode}) {
+  onTileChangedOleander ({tileIndex, tileOldCode, tileNewCode}) {
     const VOID = NODES.VOID.code
     const STONE = NODES.STONE.code
 
@@ -998,8 +966,8 @@ class OakSystem {
     // EventBus
     this.onHour16Bolete = this.onHour16Bolete.bind(this)
     eventBus.on('time/every-hour-16', this.onHour16Bolete)
-    this.onHour6Bolete = this.onHour6Bolete.bind(this)
-    eventBus.on('time/every-hour-6', this.onHour6Bolete)
+    this.onHour5Bolete = this.onHour5Bolete.bind(this)
+    eventBus.on('time/every-hour-5', this.onHour5Bolete)
     // Micro-task
     this.unbloomBolete = this.unbloomBolete.bind(this)
     this.bloomBolete = this.bloomBolete.bind(this)
@@ -1114,7 +1082,7 @@ class OakSystem {
   }
 
   /** Liaison EventBus : 'time/every-hour-6' — tirage de floraison matinale des bolete. */
-  onHour6Bolete () {
+  onHour5Bolete () {
     const {priority, capacity} = MICROTASK.BLOOM_BOLETE
     microTasker.enqueueOnce(this.bloomBolete, priority, capacity)
   }
@@ -1239,8 +1207,8 @@ export const floraManager = new FloraManager()
 class CobwebSystem {
   constructor () {
     // EventBus
-    this.onFirstLoop = this.onFirstLoop.bind(this)
-    eventBus.on('time/first-loop', this.onFirstLoop)
+    this.onFirstLoopCobweb = this.onFirstLoopCobweb.bind(this)
+    eventBus.on('time/first-loop', this.onFirstLoopCobweb)
     // Micro-task
     this.cobwebGrowth = this.cobwebGrowth.bind(this)
   }
@@ -1253,9 +1221,7 @@ class CobwebSystem {
   /**
    * Liaison EventBus : 'time/first-loop' — démarre la boucle de repousse des toiles.
    */
-  onFirstLoop () {
-    this.#scheduleNext()
-  }
+  onFirstLoopCobweb () { this.#scheduleNext() }
 
   /**
    * Planifie la prochaine tentative de pose. Délai de base COBWEB_GROWTH_DELAY_MS,
