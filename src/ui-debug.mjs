@@ -72,10 +72,11 @@ class RealtimeDebugWidget {
 
   #bindEvents () {
     // Écoute de l'événement émis par la boucle principale
-    eventBus.on('debug/frame-sample', this.#addSample.bind(this))
+    this.addSample = this.addSample.bind(this)
+    eventBus.on('debug/frame-sample', this.addSample)
   }
 
-  #addSample ({updateTime, renderTime, microTime}) {
+  addSample ({updateTime, renderTime, microTime}) {
     // Conversion en µs (1ms = 1000µs)
     const calcP = Math.round(updateTime * 1000)
     const renderP = Math.round(renderTime * 1000)
@@ -376,10 +377,11 @@ const DEBUG_PACKS = {
 
 class InventoryDebug {
   constructor () {
-    eventBus.on('debug/command', () => this.#onCommand())
+    this.onCommand = this.onCommand.bind(this)
+    eventBus.on('debug/command', this.onCommand)
   }
 
-  #onCommand () {
+  onCommand () {
     const cmd = window.prompt('Debug command:')
     if (cmd === null || cmd.trim() === '') return
     this.#execute(cmd.trim())

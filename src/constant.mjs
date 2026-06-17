@@ -315,14 +315,16 @@ export const MICROTASK = {
   TELEPORT_PHASE2: {priority: 22, capacity: 5, taskName: 'onTeleportPhase2'}, // gère la téléportation
   TELEPORT_PHASE3: {priority: 22, capacity: 2, taskName: 'onTeleportPhase3'}, // gère la téléportation
 
+  UNBLOOM_BOLETE: {priority: 20, capacity: 1, taskName: 'unbloomBolete'}, // supprime les bolete du monde
+  BLOOM_BOLETE: {priority: 20, capacity: 2, taskName: 'bloomBolete'}, // ajoute les boletes dans le monde
   SUNFLOWER_HOUR6: {priority: 20, capacity: 2, taskName: 'onSunflowerHour6'}, // gère les sunflower
   SUNFLOWER_HOUR17: {priority: 20, capacity: 1, taskName: 'onSunflowerHour17'}, // gère les sunflower
   SUNFLOWER_SPOT_CHECK: {priority: 20, capacity: 10, taskName: 'onSunflowerSpotCheck'}, // suppression d'un spot de sunflower
   PARSNIP_SPOT_CHECK: {priority: 20, capacity: 10, taskName: 'onParsnipSpotCheck'}, // ajout d'un spot de parsnip
-  PARSNIP_HOUR3: {priority: 20, capacity: 4, taskName: 'onParsnipHour3'}, // reset + repousse nocturne des parsnips
+  BLOOM_PARSNIP: {priority: 20, capacity: 4, taskName: 'bloomParsnip'}, // reset + repousse nocturne des parsnips
 
   OLEANDER_REGROW: {priority: 20, capacity: 2, taskName: 'onOleanderRegrow'}, // recherche d'un nouvel emplacement pour les oleanders à repousser
-  COBWEB_GROWTH: {priority: 20, capacity: 3, taskName: 'onCobwebGrowthTick'}, // tentative périodique de pose d'une toile d'araignée
+  COBWEB_GROWTH: {priority: 20, capacity: 3, taskName: 'cobwebGrowth'}, // tentative périodique de pose d'une toile d'araignée
 
   UI_ENV_UPDATE: {priority: 18, capacity: 2, taskName: 'updateClockInOverlay'}, // affiche le widget time/weather/Moon/Location
   UI_TILE_HOVER: {priority: 18, capacity: 1, taskName: 'onTileHoverDetail'}, // affiche le widget tuile survolée

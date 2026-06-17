@@ -877,22 +877,22 @@ class EnvironmentWidget {
   #bindEvents () {
     // Clock -> Time & Day (mesure : 50µs, microtask inutile)
     this.updateClockEnvironment = this.updateClockEnvironment.bind(this)
-    eventBus.on('time/clock', this.updateClockEnvironment.bind(this)) // TODO: utiliser l'eventBus 'time/every-5-minutes'
+    eventBus.on('time/clock', this.updateClockEnvironment) // TODO: utiliser l'eventBus 'time/every-5-minutes'
 
     // Daily -> Day, Weather & Moon (mesure : 100µs, microtask inutile)
     this.updateEnvironment = this.updateEnvironment.bind(this)
-    eventBus.on('time/daily', this.updateEnvironment.bind(this))
+    eventBus.on('time/daily', this.updateEnvironment)
 
     // Init Global -> Tout mettre à jour (estimation : 150µs, microtask inutile car acceptable lors de l'init)
     this.firstloopEnvironment = this.firstloopEnvironment.bind(this)
-    eventBus.on('time/first-loop', this.firstloopEnvironment.bind(this))
+    eventBus.on('time/first-loop', this.firstloopEnvironment)
 
     // (estimation : 50µs, microtask inutile)
     this.updateTimeslot = this.updateTimeslot.bind(this)
     eventBus.on('time/timeslot', this.updateTimeslot)
 
     this.onTrinketChanged = this.onTrinketChanged.bind(this)
-    eventBus.on('buff/trinket-changed', this.onTrinketChanged.bind(this))
+    eventBus.on('buff/trinket-changed', this.onTrinketChanged)
 
     // player/move (attachement/détachement dynamique) -> Coords
     this.updateCoords = this.updateCoords.bind(this)
@@ -1148,15 +1148,18 @@ class TileHoverWidget {
    * Abonnement aux événements.
    */
   #bindEvents () {
+    // EventBus
+    this.onTileHover = this.onTileHover.bind(this)
+    eventBus.on('world/tile-hover', this.onTileHover)
+    // Micro-task
     this.onTileHoverDetail = this.onTileHoverDetail.bind(this)
-    eventBus.on('world/tile-hover', this.#onTileHover.bind(this))
   }
 
   /**
    * Mise à jour synchrone du nom de tuile. Appelé depuis la loop via eventBus.
    * @param {object|null} node
    */
-  #onTileHover (node) {
+  onTileHover (node) {
     this.#spanTile.textContent = node ? node.name : '—'
   }
 

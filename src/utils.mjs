@@ -56,14 +56,19 @@ export class EventBus {
       output += `  Count: ${callbacks.size}\n`
       output += '  Listeners:\n'
 
+      // Ajoute ⚠️ si pas de nom, si le nom commence par '#' OU si le nom ne contient pas exactement une fois 'bound'
       for (const cb of callbacks) {
-        // Nettoyer le nom de la fonction pour gérer le préfixe "bound " (fréquent sur les events)
-        let fnName = cb.name || '(anonymous)'
-        if (fnName.startsWith('bound ')) {
-          fnName = fnName.substring(6)
-        }
+        let fnName = cb.name || '⚠️ (anonymous)'
+
+        const startsWithHash = fnName.includes('#')
+        const boundCount = (fnName.match(/bound/g) || []).length
+        const hasNoBoundOrTooMany = boundCount === 0 || boundCount > 1
+
+        if (startsWithHash || hasNoBoundOrTooMany) fnName = `⚠️ ${fnName}`
+
         output += `    - ${fnName}\n`
       }
+
       output += '---------------------------------\n'
     }
     console.log(output)

@@ -894,7 +894,7 @@ class KeyboardManager {
     // Debug dans la console (Touche ² (AZERTY) ou ` (QWERTY))
     if (IS_DEV && e.code === 'Backquote') { this.debugTrigger = true }
     if (IS_DEV && e.code === 'KeyT') {
-      gameCore.timeScale = gameCore.timeScale === 1 ? 10 : gameCore.timeScale === 10 ? 20 : 1
+      gameCore.timeScale = gameCore.timeScale === 1 ? 10 : gameCore.timeScale === 10 ? 50 : 1
       console.log(`⏱ x${gameCore.timeScale}`)
     }
     if (IS_DEV && e.code === 'NumpadAdd') gameCore.showBlockedTiles = true

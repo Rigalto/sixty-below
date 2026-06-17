@@ -725,13 +725,13 @@ class ParsnipSystem {
 
   constructor () {
     // EventBus
-    this.onTileChanged = this.onTileChanged.bind(this)
-    eventBus.on('world/tile-changed', this.onTileChanged)
-    this.onHour3 = this.onHour3.bind(this)
-    eventBus.on('time/every-hour-3', this.onHour3)
+    this.onTileChangedParsnip = this.onTileChangedParsnip.bind(this)
+    eventBus.on('world/tile-changed', this.onTileChangedParsnip)
+    this.onHour3Parsnip = this.onHour3Parsnip.bind(this)
+    eventBus.on('time/every-hour-3', this.onHour3Parsnip)
     // Micro-task
     this.onParsnipSpotCheck = this.onParsnipSpotCheck.bind(this)
-    this.onParsnipHour3 = this.onParsnipHour3.bind(this)
+    this.bloomParsnip = this.bloomParsnip.bind(this)
   }
 
   /**
@@ -809,9 +809,9 @@ class ParsnipSystem {
   isPresent (record) { return record.present }
 
   /** Liaison EventBus : 'time/every-hour-3' — reset nocturne et calcul de la nouvelle population. */
-  onHour3 () {
-    const {priority, capacity} = MICROTASK.PARSNIP_HOUR3
-    microTasker.enqueueOnce(this.onParsnipHour3, priority, capacity)
+  onHour3Parsnip () {
+    const {priority, capacity} = MICROTASK.BLOOM_PARSNIP
+    microTasker.enqueueOnce(this.bloomParsnip, priority, capacity)
   }
 
   /**
@@ -819,7 +819,7 @@ class ParsnipSystem {
    * un nombre de parsnips calculé depuis PARSNIP_RATE + aléa[-2,2] + bonus buff 'cloudy' (+2).
    * Tirage sans remise parmi #list, rejet si soilIndex ou index est bloqué.
    */
-  onParsnipHour3 () {
+  bloomParsnip () {
     for (const record of this.#list) {
       if (!record.present) continue
       this.#destroyPresent(record)
@@ -910,7 +910,7 @@ class ParsnipSystem {
    * Relit les tuiles réelles avant d'agir.
    * @param {{tileIndex: number, tileOldCode: number, tileNewCode: number}} payload
    */
-  onTileChanged ({tileIndex, tileOldCode, tileNewCode}) {
+  onTileChangedParsnip ({tileIndex, tileOldCode, tileNewCode}) {
     return
     const SKY = NODES.SKY.code
     const GRASSFOREST = NODES.GRASSFOREST.code
@@ -994,11 +994,20 @@ class OakSystem {
   #boleteDisplayed = new Set() // Set<record> — spots dans les chunks preload (cible render)
   #boleteImage = null // ITEMS.bolete.placed, mis en cache dans init()
 
-  // constructor () {
-  //   // TODO : this.onTileChanged = this.onTileChanged.bind(this)
-  //   //        eventBus.on('world/tile-changed', this.onTileChanged)
-  //   //        — devra gérer le sol des oaks ET celui des bolete présents
-  // }
+  constructor () {
+    // EventBus
+    this.onHour16Bolete = this.onHour16Bolete.bind(this)
+    eventBus.on('time/every-hour-16', this.onHour16Bolete)
+    this.onHour6Bolete = this.onHour6Bolete.bind(this)
+    eventBus.on('time/every-hour-6', this.onHour6Bolete)
+    // Micro-task
+    this.unbloomBolete = this.unbloomBolete.bind(this)
+    this.bloomBolete = this.bloomBolete.bind(this)
+
+    // TODO : this.onTileChanged = this.onTileChanged.bind(this)
+    //        eventBus.on('world/tile-changed', this.onTileChangedOak)
+    //        — devra gérer le sol des oaks ET celui des bolete présents
+  }
 
   /**
    * Réinitialise toutes les structures (oak et bolete) et met en cache le sprite bolete.
@@ -1065,12 +1074,70 @@ class OakSystem {
   }
 
   /**
+   * Détruit un bolete présent sans loot : retire toutes les structures et persiste.
+   * Guard : no-op si record.present est déjà false.
+   * @param {object} record
+   */
+  #destroyBoletePresent (record) {
+    if (!record.present) return
+    record.present = false
+    removeFromByTile(this.boleteByTile, record)
+    removeFromByChunk(this.#boleteByChunk, record)
+    this.#boleteBySoil.delete(record.soilIndex)
+    this.#boleteDisplayed.delete(record)
+    blockedTiles.unblockPlacement(record.index)
+    blockedTiles.unblockPlacement(record.index + WORLD_WIDTH)
+    saveManager.queueStaticUpdate({storeName: 'plant', record})
+  }
+
+  /**
    * Retourne le record (oak ou bolete) couvrant la tuile donnée, ou null.
    * @param {number} tileIndex — (y << 10) | x
    * @returns {object|null}
    */
   getPlantAt (tileIndex) {
     return this.oakByTile.get(tileIndex) ?? this.boleteByTile.get(tileIndex) ?? null
+  }
+
+  /** Liaison EventBus : 'time/every-hour-16' — tous les bolete présents repassent à false. */
+  onHour16Bolete () {
+    const {priority, capacity} = MICROTASK.UNBLOOM_BOLETE
+    microTasker.enqueueOnce(this.unbloomBolete, priority, capacity)
+  }
+
+  /** Microtâche : tous les bolete présents repassent à present=false. */
+  unbloomBolete () {
+    for (const record of this.#boleteList) {
+      if (!record.present) continue
+      this.#destroyBoletePresent(record)
+    }
+  }
+
+  /** Liaison EventBus : 'time/every-hour-6' — tirage de floraison matinale des bolete. */
+  onHour6Bolete () {
+    const {priority, capacity} = MICROTASK.BLOOM_BOLETE
+    microTasker.enqueueOnce(this.bloomBolete, priority, capacity)
+  }
+
+  /**
+   * Microtâche : parmi les spots dont le soilIndex est une GRASSFOREST, 50% passent à present=true.
+   */
+  bloomBolete () {
+    const GRASSFOREST = NODES.GRASSFOREST.code
+    for (const record of this.#boleteList) {
+      if (chunkManager.getTileAt(record.soilIndex) !== GRASSFOREST) continue
+      if (!seededRNG.randomGetBool()) continue
+      if (!blockedTiles.canPlace(record.index) || !blockedTiles.canPlace(record.index + WORLD_WIDTH)) continue
+
+      record.present = true
+      addToByTile(this.boleteByTile, record)
+      addToByChunk(this.#boleteByChunk, record)
+      this.#boleteBySoil.set(record.soilIndex, record)
+      blockedTiles.blockPlacement(record.index)
+      blockedTiles.blockPlacement(record.index + WORLD_WIDTH)
+      saveManager.queueStaticUpdate({storeName: 'plant', record})
+    }
+    buildDisplayed(this.#boleteDisplayed, this.#boleteByChunk, camera.preloadChunks)
   }
 
   // TODO — à écrire :
@@ -1175,7 +1242,7 @@ class CobwebSystem {
     this.onFirstLoop = this.onFirstLoop.bind(this)
     eventBus.on('time/first-loop', this.onFirstLoop)
     // Micro-task
-    this.onCobwebGrowthTick = this.onCobwebGrowthTick.bind(this)
+    this.cobwebGrowth = this.cobwebGrowth.bind(this)
   }
 
   /**
@@ -1197,13 +1264,13 @@ class CobwebSystem {
   #scheduleNext () {
     const delay = (COBWEB_GROWTH_DELAY_MS * seededRNG.randomGetRealMinMax(0.8, 1.2)) | 0
     const {priority, capacity} = MICROTASK.COBWEB_GROWTH
-    taskScheduler.enqueue('cobweb-growth', delay, this.onCobwebGrowthTick, priority, capacity)
+    taskScheduler.enqueue('cobweb-growth', delay, this.cobwebGrowth, priority, capacity)
   }
 
   /**
    * Callback TaskScheduler : tente une pose de toile, puis replanifie la tentative suivante.
    */
-  onCobwebGrowthTick () {
+  cobwebGrowth () {
     this.#tryGrow()
     this.#scheduleNext()
   }
