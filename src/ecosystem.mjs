@@ -1064,6 +1064,15 @@ class OakSystem {
     }
   }
 
+  /**
+   * Retourne le record (oak ou bolete) couvrant la tuile donnée, ou null.
+   * @param {number} tileIndex — (y << 10) | x
+   * @returns {object|null}
+   */
+  getPlantAt (tileIndex) {
+    return this.oakByTile.get(tileIndex) ?? this.boleteByTile.get(tileIndex) ?? null
+  }
+
   // TODO — à écrire :
   //   getPlantAt(tileIndex), isPresent(record)
   //   onForaged(record) — bolete uniquement (oak se mine/coupe, pas de foraging)
@@ -1139,8 +1148,8 @@ class FloraManager {
    */
   getPlantAt (tileIndex) {
     for (const system of ALL_PLANT_SYSTEMS) {
-      const plant = system.byTile.get(tileIndex)
-      if (plant !== undefined) return plant
+      const plant = system.getPlantAt(tileIndex)
+      if (plant !== null) return plant
     }
     return null
   }
