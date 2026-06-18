@@ -6923,12 +6923,12 @@ class PlantGenerator {
  * @param {number} soilY — coordonnée Y de la tuile support
  * @returns {Array<{tree, row, col, x, y}>} tableau d'images précalculées
  */
-  #buildTreeImages (treeName, soilX, soilY) {
+  #buildTreeImages (treeName, soilX) {
     const imageTable = TREE_IMAGES[treeName]
     const images = []
     for (let i = 0; i < imageTable.length; i++) {
       const col = seededRNG.randomGetArrayIndex(imageTable[i])
-      images.push({tree: treeName, row: i, col, x: soilX - 1, y: soilY - (imageTable.length - i) * 3})
+      images.push({tree: treeName, row: i, col, x: soilX - 1})
     }
     return images
   }
@@ -7036,7 +7036,7 @@ class PlantGenerator {
     const index = soilIndex - h * WORLD_WIDTH
     const soilX = soilIndex & 0x3FF
     const soilY = soilIndex >> 10
-    const images = this.#buildTreeImages('coconut', soilX, soilY)
+    const images = this.#buildTreeImages('coconut', soilX)
 
     this.#plants.push({
       id: uniqueIdGenerator.getUniqueId(),
@@ -7182,7 +7182,7 @@ class PlantGenerator {
       const mushroomId = grassCode === GRASSFOREST ? 'bolete' : 'pinkMycenia'
       const soilIndex = (y << 10) | soilX
       const size = seededRNG.randomGetArrayValue(TREES_INIT_SIZE)
-      const images = this.#buildTreeImages(treeName, soilX, y)
+      const images = this.#buildTreeImages(treeName, soilX)
 
       if (treeType === PLANT_TYPE.OAK) oakPositions.add(soilX + 1)
       this.#plants.push({
@@ -7306,7 +7306,7 @@ class PlantGenerator {
 
       const soilIndex = idx // tuile gauche
       const size = seededRNG.randomGetArrayValue(GIANT_MUSHROOM_INIT_SIZE)
-      const images = this.#buildTreeImages('giantMushroom', x, y)
+      const images = this.#buildTreeImages('giantMushroom', x)
 
       occupied.add(soilIndex)
       occupied.add(soilIndex + 1) // tuile droite (w=2)

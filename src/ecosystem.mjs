@@ -5,7 +5,7 @@ import {WORLD_WIDTH, WORLD_HEIGHT, MICROTASK, TOPSOIL_Y_SKY_SURFACE, TOPSOIL_Y_S
 import {uniqueIdGenerator} from './database.mjs'
 
 import {eventBus, seededRNG, blockedTiles, microTasker, taskScheduler} from './utils.mjs'
-import {NODES, ITEMS, PLANT_KIND, PLANT_TYPE, PLANT_SYSTEM_LOOKUP, ALL_PLANT_SYSTEMS, COBWEB_GROWTH_DELAY_MS, PARSNIP_RATE} from '../assets/data/data.mjs'
+import {NODES, ITEMS, PLANT_KIND, PLANT_TYPE, PLANT_SYSTEM_LOOKUP, ALL_PLANT_SYSTEMS, COBWEB_GROWTH_DELAY_MS, PARSNIP_RATE, TREE_IMAGES} from '../assets/data/data.mjs'
 import {IMAGE_CACHE} from './assets.mjs'
 import {saveManager} from './persistence.mjs'
 import {chunkManager} from './world.mjs'
@@ -39,6 +39,40 @@ const removeFromByTile = (byTile, record) => {
   const px = record.index & 0x3FF
   const py = record.index >> 10
   for (let dy = 0; dy < record.h; dy++) {
+    const rowBase = (py + dy) << 10
+    for (let dx = 0; dx < record.w; dx++) byTile.delete(rowBase | (px + dx))
+  }
+}
+
+/**
+ * Ajoute un arbre dans byTile pour les tuiles de sa zone d'interaction effective (dépendante
+ * de size). Hauteur = (size + 2) * 3 tuiles, ancrée sur soilIndex et remontant vers le haut.
+ * Largeur = record.w (3 tuiles) — l'image de rendu fait 5 tuiles de large, mais les 2 tuiles
+ * latérales ne font pas partie de la zone d'interaction (chopping, shaking, survol souris).
+ * @param {Map} byTile  @param {object} record — record TREE (oak)
+ */
+const addToByTileTree = (byTile, record) => {
+  const px = record.soilIndex & 0x3FF
+  const soilY = record.soilIndex >> 10
+  const h = (record.size + 2) * 3
+  const py = soilY - h
+  for (let dy = 0; dy < h; dy++) {
+    const rowBase = (py + dy) << 10
+    for (let dx = 0; dx < record.w; dx++) byTile.set(rowBase | (px + dx), record)
+  }
+}
+
+/**
+ * Retire un arbre de byTile pour les tuiles de sa zone d'interaction effective (dépendante
+ * de size). Symétrique d'addToByTileTree — même formule de hauteur.
+ * @param {Map} byTile  @param {object} record — record TREE (oak)
+ */
+const removeFromByTileTree = (byTile, record) => {
+  const px = record.soilIndex & 0x3FF
+  const soilY = record.soilIndex >> 10
+  const h = (record.size + 2) * 3
+  const py = soilY - h
+  for (let dy = 0; dy < h; dy++) {
     const rowBase = (py + dy) << 10
     for (let dx = 0; dx < record.w; dx++) byTile.delete(rowBase | (px + dx))
   }
@@ -945,12 +979,22 @@ export const parsnipSystem = new ParsnipSystem()
 // OakSystem — gère Oak (TREE) et Bolete (MUSHROOM), couplés : un Oak crée ses 2 spots de
 // Bolete (gauche/droite), détruits avec lui. Pour l'instant : uniquement l'initialisation
 // et l'affichage des bolete. Le reste est TODO (cf. liste en fin de classe).
+
+// Lignes d'images empilées par size (0 à 4)
+const OAK_SIZE_ROWS = [
+  [1, 0],
+  [1, 2, 0],
+  [1, 2, 3, 0],
+  [1, 2, 3, 4, 0],
+  [1, 2, 3, 4, 5, 6]
+]
+
 class OakSystem {
   // --- Oak (TREE) ---
-  oakByTile = new Map() // Map<tileIndex, record> — public, lookup par tuile (tronc)
+  oakByTile = new Map() // Map<tileIndex, record> — public, lookup par tuile
   #oakList = [] // record[] — tous les oaks
   #oakByChunk = new Map() // Map<chunkKey, Set> — lookup spatial pour onPreloadChunksChanged
-  #oakBySoil = new Map() // Map<soilIndex, record> — détection minage/changement de la tuile sol
+  #oakBySoil = new Map() // Map<soilIndex, record> — 3 entrées par oak (soilIndex, +1, +2) : détection minage/changement du sol
   #oakDisplayed = new Set() // Set<record> — oaks dans les chunks preload (cible render)
 
   // --- Bolete (MUSHROOM) ---
@@ -968,13 +1012,11 @@ class OakSystem {
     eventBus.on('time/every-hour-16', this.onHour16Bolete)
     this.onHour5Bolete = this.onHour5Bolete.bind(this)
     eventBus.on('time/every-hour-5', this.onHour5Bolete)
+    this.onTileChangedOak = this.onTileChangedOak.bind(this)
+    eventBus.on('world/tile-changed', this.onTileChangedOak)
     // Micro-task
     this.unbloomBolete = this.unbloomBolete.bind(this)
     this.bloomBolete = this.bloomBolete.bind(this)
-
-    // TODO : this.onTileChanged = this.onTileChanged.bind(this)
-    //        eventBus.on('world/tile-changed', this.onTileChangedOak)
-    //        — devra gérer le sol des oaks ET celui des bolete présents
   }
 
   /**
@@ -1004,7 +1046,23 @@ class OakSystem {
    * @param {object} record
    */
   initPlant (record) {
-    if (record.kind === PLANT_KIND.TREE) return // TODO
+    if (record.kind === PLANT_KIND.TREE) {
+      this.#oakList.push(record)
+      this.#oakBySoil.set(record.soilIndex, record)
+      this.#oakBySoil.set(record.soilIndex + 1, record)
+      this.#oakBySoil.set(record.soilIndex + 2, record)
+      addToByTileTree(this.oakByTile, record)
+      addToByChunk(this.#oakByChunk, record)
+
+      const px = record.index & 0x3FF
+      const py = record.index >> 10
+      blockedTiles.blockPlacementRect(px, py, record.w, record.h)
+
+      const soilX = record.soilIndex & 0x3FF
+      const soilY = record.soilIndex >> 10
+      blockedTiles.blockMiningRect(soilX, soilY, record.w, 1)
+      return
+    }
 
     // record.kind === PLANT_KIND.MUSHROOM (bolete)
     this.#boleteList.push(record)
@@ -1023,7 +1081,7 @@ class OakSystem {
    * @param {Set<number>} preloadChunks
    */
   onPreloadChunksChanged (preloadChunks) {
-    // TODO : buildDisplayed(this.#oakDisplayed, this.#oakByChunk, preloadChunks)
+    buildDisplayed(this.#oakDisplayed, this.#oakByChunk, preloadChunks)
     buildDisplayed(this.#boleteDisplayed, this.#boleteByChunk, preloadChunks)
   }
 
@@ -1038,6 +1096,18 @@ class OakSystem {
       const pxX = (record.index & 0x3FF) << 4
       const pxY = (record.index >> 10) << 4
       ctx.drawImage(IMAGE_CACHE[img.imgIndex], img.sx, img.sy, img.sw, img.sh, pxX, pxY, img.sw, img.sh)
+    }
+
+    for (const record of this.#oakDisplayed) {
+      const rows = OAK_SIZE_ROWS[record.size]
+      const soilYPx = (record.soilIndex >> 10) << 4
+      for (let i = 0; i < rows.length; i++) {
+        const image = record.images[rows[i]]
+        const img = TREE_IMAGES[image.tree][image.row][image.col]
+        const pxX = image.x << 4
+        const pxY = soilYPx - 48 * (i + 1)
+        ctx.drawImage(IMAGE_CACHE[img.imgIndex], img.sx, img.sy, img.sw, img.sh, pxX, pxY, img.sw, img.sh)
+      }
     }
   }
 
@@ -1059,6 +1129,16 @@ class OakSystem {
   }
 
   /**
+   * Traite le foraging réussi d'un bolete (hors loot, géré par ForagingManager).
+   * No-op pour un oak — un oak se mine/coupe, il ne se forage pas.
+   * @param {object} record
+   */
+  onForaged (record) {
+    if (record.kind === PLANT_KIND.TREE) return
+    this.#destroyBoletePresent(record)
+  }
+
+  /**
    * Retourne le record (oak ou bolete) couvrant la tuile donnée, ou null.
    * @param {number} tileIndex — (y << 10) | x
    * @returns {object|null}
@@ -1066,6 +1146,16 @@ class OakSystem {
   getPlantAt (tileIndex) {
     return this.oakByTile.get(tileIndex) ?? this.boleteByTile.get(tileIndex) ?? null
   }
+
+  /**
+   * Indique si le record est actuellement présent (forageable).
+   * Un oak n'a pas de notion de present/absent : son existence en tant que record vaut
+   * présence. Un bolete, en revanche, oscille selon le cycle jour/nuit — seul record.present
+   * fait foi.
+   * @param {object} record
+   * @returns {boolean}
+   */
+  isPresent (record) { return record.kind === PLANT_KIND.TREE || record.present }
 
   /** Liaison EventBus : 'time/every-hour-16' — tous les bolete présents repassent à false. */
   onHour16Bolete () {
@@ -1108,13 +1198,35 @@ class OakSystem {
     buildDisplayed(this.#boleteDisplayed, this.#boleteByChunk, camera.preloadChunks)
   }
 
-  // TODO — à écrire :
-  //   getPlantAt(tileIndex), isPresent(record)
-  //   onForaged(record) — bolete uniquement (oak se mine/coupe, pas de foraging)
-  //   onTileChanged({tileIndex, tileOldCode, tileNewCode}) — sol oak ET sol bolete présent
-  //   floraison nocturne des bolete (apparition 21h, disparition 9h — cf. fiche d'aide)
-  //   création/destruction d'un oak : doit créer/détruire ses 2 bolete (soilIndex ± décalage)
-  //   croissance des oaks (size, growthTimestamp), secousse (shakedTimestamp)
+  /**
+   * Réagit à un changement de tuile (EventBus : 'world/tile-changed').
+   * Branche oak : TODO — tuile support, secousse, etc. pas encore définis.
+   * Branche bolete : un bolete présent disparaît (present=false, spot conservé) si l'une de
+   * ses 2 tuiles de corps (.index, .index + WORLD_WIDTH) devient non-SKY, ou si sa tuile de
+   * support (.soilIndex) cesse d'être GRASSFOREST.
+   * @param {{tileIndex: number, tileOldCode: number, tileNewCode: number}} payload
+   */
+  onTileChangedOak ({tileIndex, tileOldCode, tileNewCode}) {
+    const SKY = NODES.SKY.code
+    const GRASSFOREST = NODES.GRASSFOREST.code
+
+    // Cas 1 — Bolete - une des 2 tuiles de corps du bolete devient non-SKY
+    const byBodyRecord = this.boleteByTile.get(tileIndex)
+    if (byBodyRecord !== undefined && tileNewCode !== SKY) {
+      this.#destroyBoletePresent(byBodyRecord)
+      return
+    }
+
+    // Cas 2 — Bolete - tuile de support : GRASSFOREST perdu
+    const bySoilRecord = this.#boleteBySoil.get(tileIndex)
+    if (bySoilRecord !== undefined && tileNewCode !== GRASSFOREST) {
+      this.#destroyBoletePresent(bySoilRecord)
+    }
+
+    // Cas 3 — Oak - TODO
+
+    // TODO : branche oak
+  }
 }
 export const oakSystem = new OakSystem()
 

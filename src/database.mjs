@@ -466,7 +466,7 @@ class DataBase {
     return this.addOrUpdateRecord('gamestate', {key, value}, existingTransaction)
   }
 
-  // lit une seule valeur
+  // lit une seule valeur - Non utlisé
   async getGameStateValue (key) {
     return this.getRecordByKey('gamestate', key).then(r => r ? r.value : undefined)
   }

@@ -785,6 +785,48 @@ class BlockedTiles {
   /** @param {number} tileIndex @returns {boolean} true si la tuile peut être minée */
   canMine (tileIndex) { return !this.#blocked.has(tileIndex) }
 
+  // --- FONCTIONS POUR LES RECTANGLES ---
+
+  /** Bloque une zone rectangulaire pour le placement. */
+  blockPlacementRect (x, y, w, h) {
+    for (let row = y; row < y + h; row++) {
+      const rowOffset = row << 10
+      for (let col = x; col < x + w; col++) {
+        this.#blocked.add(rowOffset | col)
+      }
+    }
+  }
+
+  /** Libère une zone rectangulaire pour le placement. */
+  unblockPlacementRect (x, y, w, h) {
+    for (let row = y; row < y + h; row++) {
+      const rowOffset = row << 10
+      for (let col = x; col < x + w; col++) {
+        this.#blocked.delete(rowOffset | col)
+      }
+    }
+  }
+
+  /** Bloque une zone rectangulaire pour le minage. */
+  blockMiningRect (x, y, w, h) {
+    for (let row = y; row < y + h; row++) {
+      const rowOffset = row << 10
+      for (let col = x; col < x + w; col++) {
+        this.#blocked.add(rowOffset | col)
+      }
+    }
+  }
+
+  /** Libère une zone rectangulaire pour le minage. */
+  unblockMiningRect (x, y, w, h) {
+    for (let row = y; row < y + h; row++) {
+      const rowOffset = row << 10
+      for (let col = x; col < x + w; col++) {
+        this.#blocked.delete(rowOffset | col)
+      }
+    }
+  }
+
   /**
  * Visualisation debug : carré rouge semi-transparent sur chaque tuile bloquée.
  * Permet de détecter les tuiles incorrectement bloquées ou libérées.

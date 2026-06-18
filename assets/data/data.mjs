@@ -858,29 +858,29 @@ export const COBWEB_GROWTH_DELAY_MS = 20000
 
 export const TREE_IMAGES = {
   coconut: [
-    ['coconut_64_48-0-0', 'coconut_64_48-0-1', 'coconut_64_48-0-2'],
+    ['coconut_64_48-4-0', 'coconut_64_48-0-1', 'coconut_64_48-0-2'],
     ['coconut_64_48-0-3', 'coconut_64_48-0-4', 'coconut_64_48-0-5'],
     ['coconut_64_48-1-0', 'coconut_64_48-1-1'],
     ['coconut_64_48-1-2', 'coconut_64_48-1-3', 'coconut_64_48-1-4'],
     ['coconut_64_48-1-5', 'coconut_64_48-2-0', 'coconut_64_48-2-1', 'coconut_64_48-2-2']
   ],
   oak: [
-    ['oak_80_48-0-0', 'oak_80_48-0-1', 'oak_80_48-0-2'],
-    ['oak_80_48-0-3', 'oak_80_48-0-4', 'oak_80_48-0-5'],
-    ['oak_80_48-1-0', 'oak_80_48-1-1'],
-    ['oak_80_48-1-2', 'oak_80_48-1-3', 'oak_80_48-1-4'],
-    ['oak_80_48-1-5', 'oak_80_48-2-0', 'oak_80_48-2-1', 'oak_80_48-2-2'],
-    ['oak_80_48-1-5', 'oak_80_48-2-0', 'oak_80_48-2-1', 'oak_80_48-2-2'],
-    ['oak_80_48-1-5', 'oak_80_48-2-0', 'oak_80_48-2-1', 'oak_80_48-2-2']
+    ['oak_80_48-0-0', 'oak_80_48-1-0'], // sommet arbre pas complet
+    ['oak_80_48-2-0', 'oak_80_48-3-0'], // tronc
+    ['oak_80_48-2-0', 'oak_80_48-3-0', 'oak_80_48-4-0', 'oak_80_48-5-0', 'oak_80_48-0-1', 'oak_80_48-1-1'], // pas de feuilles
+    ['oak_80_48-2-1', 'oak_80_48-3-1', 'oak_80_48-4-1', 'oak_80_48-5-1', 'oak_80_48-1-2', 'oak_80_48-2-2', 'oak_80_48-3-2', 'oak_80_48-4-2'], // 1 feuille
+    ['oak_80_48-0-2', 'oak_80_48-5-2', 'oak_80_48-0-3', 'oak_80_48-1-3', 'oak_80_48-2-3', 'oak_80_48-3-3', 'oak_80_48-4-3', 'oak_80_48-5-3'], // 2 feuilles
+    ['oak_80_48-0-4', 'oak_80_48-1-4', 'oak_80_48-2-4', 'oak_80_48-3-4'], // 3-4 feuillles
+    ['oak_80_48-0-5', 'oak_80_48-1-5', 'oak_80_48-2-5', 'oak_80_48-3-5', 'oak_80_48-4-5', 'oak_80_48-5-5'] // sommet arbre complet
   ],
   mahogany: [
-    ['mahogany_80_48-0-0', 'mahogany_80_48-0-1', 'mahogany_80_48-0-2'],
-    ['mahogany_80_48-0-3', 'mahogany_80_48-0-4', 'mahogany_80_48-0-5'],
-    ['mahogany_80_48-1-0', 'mahogany_80_48-1-1'],
-    ['mahogany_80_48-1-2', 'mahogany_80_48-1-3', 'mahogany_80_48-1-4'],
-    ['mahogany_80_48-1-5', 'mahogany_80_48-2-0', 'mahogany_80_48-2-1', 'mahogany_80_48-2-2'],
-    ['mahogany_80_48-1-5', 'mahogany_80_48-2-0', 'mahogany_80_48-2-1', 'mahogany_80_48-2-2'],
-    ['mahogany_80_48-1-5', 'mahogany_80_48-2-0', 'mahogany_80_48-2-1', 'mahogany_80_48-2-2']
+    ['mahogany_80_48-4-4', 'mahogany_80_48-5-4'], // sommet arbre pas complet
+    ['mahogany_80_48-0-0', 'mahogany_80_48-1-0'], // tronc
+    ['mahogany_80_48-2-0', 'mahogany_80_48-3-0', 'mahogany_80_48-4-0', 'mahogany_80_48-5-0', 'mahogany_80_48-0-1', 'mahogany_80_48-1-1'], // pas de feuilles
+    ['mahogany_80_48-2-1', 'mahogany_80_48-3-1', 'mahogany_80_48-4-1', 'mahogany_80_48-5-1', 'mahogany_80_48-1-2', 'mahogany_80_48-2-2', 'mahogany_80_48-3-2', 'mahogany_80_48-4-2'], // 1 feuille
+    ['mahogany_80_48-0-2', 'mahogany_80_48-5-2', 'mahogany_80_48-0-3', 'mahogany_80_48-1-3', 'mahogany_80_48-2-3', 'mahogany_80_48-3-3', 'mahogany_80_48-4-3', 'mahogany_80_48-5-3'], // 2 feuilles
+    ['mahogany_80_48-0-4', 'mahogany_80_48-1-4', 'mahogany_80_48-2-4', 'mahogany_80_48-3-4'], // 3-4 feuillles
+    ['mahogany_80_48-0-5', 'mahogany_80_48-1-5', 'mahogany_80_48-2-5', 'mahogany_80_48-3-5', 'mahogany_80_48-4-5', 'mahogany_80_48-5-5'] // sommet arbre complet
   ],
   giantMushroom: [
     ['giantmushroom_64_48-0-0', 'giantmushroom_64_48-0-1', 'giantmushroom_64_48-0-2'],
