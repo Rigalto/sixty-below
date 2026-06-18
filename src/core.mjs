@@ -19,7 +19,7 @@ import {achievementManager} from './achievement.mjs'
 import {playerManager, hotbarOverlay} from './player.mjs'
 import {floraManager, sunflowerSystem, oleanderSystem, parsnipSystem, oakSystem, cobwebSystem} from './ecosystem.mjs'
 import {ACHIEVEMENT_CATEGORIES} from '../assets/data/data-achievement.mjs'
-import {miningManager, placingManager, foragingManager} from './action.mjs'
+import {miningManager, placingManager, foragingManager, choppingManager} from './action.mjs'
 import './combat.mjs'
 
 const WITH_DEBUG_HUD = true // passer à false pour désactiver sans toucher IS_DEV
@@ -139,7 +139,7 @@ class GameCore {
     console.log('✅ Moteur prêt.')
   }
 
-  // Hydratation d'une action de loot (mining, harvesting, hamming...)
+  // Hydratation d'une action de loot (mining, harvesting, chopping, hamming...)
   #hydrateLootAction (action, actionName, nodeName) {
     const allNames = new Set()
 
@@ -153,7 +153,9 @@ class GameCore {
         lootItem.count = parseLootCount(lootItem.count)
         const {buffs, buffList} = parseLootBuffs(lootItem.buffs)
         lootItem.buffs = buffs
-        for (const name of buffList) allNames.add(name)
+        for (const name of buffList) {
+          if (name !== 'felling') allNames.add(name)
+        }
         lootItem.helpRow = buildLootHelpRow(lootItem)
       }
       action.buffList = [...allNames, `${actionName}-yield`]
@@ -212,6 +214,10 @@ class GameCore {
       if (item.placedLeft) item.placedLeft = resolveAssetData(item.placedLeft)
 
       if (item.foraging) this.#hydrateLootAction(item.foraging, 'foraging', item.name)
+      if (item.chopping) {
+        this.#hydrateLootAction(item.chopping, 'chopping', item.name)
+        if (item.chopping.extraLoot) this.#hydrateLootAction(item.chopping.extraLoot, 'chopping', item.name)
+      }
 
       if (!HELP_TITLES.has(item.help)) {
         console.error(`[core] ITEMS.${key} : help topic inconnu '${item.help}'`)
@@ -601,7 +607,7 @@ class GameCore {
     if (item.type & ITEM_TYPE.TOOL) {
       if (item.stype === 'pickaxe') miningManager.tryMine(tileIndex, tileNode, item, slot.prefix)
       // else if (item.stype === 'hammer') hammingManager.tryUse(tileIndex, tileNode, item, slot.prefix)
-      // else if (item.stype === 'axe') choppingManager.tryChop(tileIndex, tileNode, item, slot.prefix)
+      else if (item.stype === 'axe') choppingManager.tryChop(tileIndex, tileNode, item, slot.prefix)
       else if (item.stype === 'sickle') foragingManager.tryForage(tileIndex, tileNode, item, slot.prefix)
       // else if (item.stype === 'bugnet') catchingingManager.tryCatch(tileIndex, tileNode, item, slot.prefix)
       // else if (item.stype === 'fishingrod') fishingManager.tryFish(tileIndex, tileNode, item, slot.prefix)

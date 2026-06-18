@@ -497,3 +497,14 @@ class ForagingManager {
   }
 }
 export const foragingManager = new ForagingManager()
+
+/* ====================================================================================================
+   ABATTAGE D'ARBRES
+   ==================================================================================================== */
+
+class ChoppingManager {
+  tryChop (tileIndex, tileNode, item, prefix) {
+    //
+  }
+}
+export const choppingManager = new ChoppingManager()

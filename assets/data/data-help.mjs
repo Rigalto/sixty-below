@@ -121,7 +121,9 @@ Mining Loot: {{node:{3}:mining[:items[0]:item|link}}
   gemCutRow: '| [[item:{1}]] | {{item:{1}:star|star}} | [[Smelting|Furnace]] | [[item:{2}]] | {{item:{2}:star|star}} |',
   lootTableHeader: '| Item | Tier | Amount | Conditions | Modifiers |\n|---|---|---|---|---|',
   additiveNote: '_All modifiers are additive and stack with each other._',
+
   lootTable: '| Item | Tier | Amount | Conditions | Modifiers |\n|---|---|---|---|---|\n{{node:{1}:{2}:items[*]:helpRow|rows}}\n\n_All modifiers are additive and stack with each other._',
+  itemLootTable: '| Item | Tier | Amount | Conditions | Modifiers |\n|---|---|---|---|---|\n{{item:{1}:{2}:items[*]:helpRow|rows}}',
   miningDrop: '{{node:{1}:mining:items[0]:item|link}} {{node:{1}:mining:items[0]:item:star|star}}',
 
   // pour ajouter son tier à droite de l'item
@@ -4596,9 +4598,29 @@ Chopping trees yields logs, which can then be refined into planks using a [[Wood
 | [[item:oak]] | Any [[Chopping Tools|Axes]] | [[monster:boar]] |
 | [[item:mahogany]] | [[Chopping Tools|Iron Axes]] or better | [[monster:bulletAnt]] |
 
-| Tree | Chopping Loot | Extra Drop |
-| [[item:oak]] | {{item:oak:chopping:items}} | [[item:rootOak]] |
-| [[item:mahogany]] | {{item:oak:chopping:items}} | [[item:rootMahogany]] |
+<hr>
+
+**Oak Chopping Loot** ⏳
+
+Chopping Tool: <<itemStar|axeCopper>> or better
+
+<<itemLootTable|oak|chopping>>
+{{item:oak:chopping:extraLoot:items[*]:helpRow|rows}}
+
+**Mahogany Chopping Loot** ⏳
+
+Chopping Tool: <<itemStar|axeCopper>> or better
+
+<<itemLootTable|mahogany|chopping>>
+{{item:mahogany:chopping:extraLoot:items[*]:helpRow|rows}}
+
+**Chopping Details**
+
+<<additiveNote>>
+
+See [[Chopping]], [[Chopping Tools]] and [[Chopping Buffs]] for details.
+
+<hr>
 
 **Planting**
 

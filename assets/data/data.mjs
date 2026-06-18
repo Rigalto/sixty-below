@@ -344,7 +344,12 @@ export const ITEMS = {
   hammerCopper: {name: 'Copper Hammer', type: ITEM_TYPE.TOOL, stype: 'hammer', star: 2, image: 'tools_32_32-4-0', placedright: 'w_42_42-0-0', placedleft: 'w_42_42-0-1', speed: 0, help: 'Hammers', tooltip: 'Tools used to remove wall, furniture, workstation, converting them to item form'},
 
   // Axes
-  axeCopper: {name: 'Copper Axe', type: ITEM_TYPE.TOOL | ITEM_TYPE.WEAPON, stype: 'axe', star: 2, image: 'tools_32_32-2-0', placedright: 'w_42_42-0-0', placedleft: 'w_42_42-0-1', speed: 0, help: 'Axes', tooltip: 'Basic tools used to chop trees. Can be used as a slow weapon'},
+  axeCopper: {name: 'Copper Axe', type: ITEM_TYPE.TOOL | ITEM_TYPE.WEAPON, stype: 'axe', star: 2, image: 'tool_32_32-3-0', placedright: 'w_42_42-0-0', placedleft: 'w_42_42-0-1', speed: 0, help: 'Axes', tooltip: 'Basic tools used to chop trees. Can be used as a slow weapon', range: 0, chopping: {speed: 0}},
+  axeIron: {name: 'Iron Axe', type: ITEM_TYPE.TOOL | ITEM_TYPE.WEAPON, stype: 'axe', star: 3, image: 'tool_32_32-3-1', placedright: 'w_42_42-0-0', placedleft: 'w_42_42-0-1', speed: 0, help: 'Axes', tooltip: 'Basic tools used to chop trees. Can be used as a slow weapon', range: 0, chopping: {speed: 25}},
+  axeSilver: {name: 'Silver Axe', type: ITEM_TYPE.TOOL | ITEM_TYPE.WEAPON, stype: 'axe', star: 4, image: 'tool_32_32-3-2', placedright: 'w_42_42-0-0', placedleft: 'w_42_42-0-1', speed: 0, help: 'Axes', tooltip: 'Basic tools used to chop trees. Can be used as a slow weapon', range: 0, chopping: {speed: 50}},
+  axeGold: {name: 'Gold Axe', type: ITEM_TYPE.TOOL | ITEM_TYPE.WEAPON, stype: 'axe', star: 4, image: 'tool_32_32-3-3', placedright: 'w_42_42-0-0', placedleft: 'w_42_42-0-1', speed: 0, help: 'Axes', tooltip: 'Basic tools used to chop trees. Can be used as a slow weapon', range: 1, chopping: {speed: 75}},
+  axeCobalt: {name: 'Cobalt Axe', type: ITEM_TYPE.TOOL | ITEM_TYPE.WEAPON, stype: 'axe', star: 5, image: 'tool_32_32-3-4', placedright: 'w_42_42-0-0', placedleft: 'w_42_42-0-1', speed: 0, help: 'Axes', tooltip: 'Basic tools used to chop trees. Can be used as a slow weapon', range: 2, chopping: {speed: 100}},
+  axePlatinum: {name: 'Platinum Axe', type: ITEM_TYPE.TOOL | ITEM_TYPE.WEAPON, stype: 'axe', star: 5, image: 'tool_32_32-3-5', placedright: 'w_42_42-0-0', placedleft: 'w_42_42-0-1', speed: 0, help: 'Axes', tooltip: 'Basic tools used to chop trees. Can be used as a slow weapon', range: 3, chopping: {speed: 125}},
 
   // Swords
   swordCopper: {name: 'Copper Sword', type: ITEM_TYPE.WEAPON, stype: 'axe', star: 2, image: 'tools_32_32-4-0', placedright: 'w_42_42-0-0', placedleft: 'w_42_42-0-1', speed: 0, help: 'Swords', tooltip: 'Melee weapon'},
@@ -510,7 +515,7 @@ export const ITEMS = {
   coconutPulp: {name: 'Coconut Pulp', type: ITEM_TYPE.MATERIAL, stype: 'fruit', star: 1, image: 'potions_32_32-1-5', help: 'Coconut', tooltip: '???'},
   coconutMilk: {name: 'Coconut Milk', type: ITEM_TYPE.MATERIAL, stype: 'beverage', star: 1, image: 'potions_32_32-1-5', help: 'Coconut', tooltip: '???'},
 
-  oak: {name: 'Oak', type: 0, stype: 'tree', star: 1, image: null, help: 'Oak & Mahogany', tooltip: '???'},
+  oak: {name: 'Oak', type: 0, stype: 'tree', star: 1, image: null, help: 'Oak & Mahogany', tooltip: 'Common tree in forest, can be chopping or shaking', chopping: {speed: 1800, items: [{item: 'logOak', count: '1-2'}, {item: 'acorn', count: 0.25}], extraLoot: {items: [{item: 'rootOak', count: '2-5', buffs: ['+felling']}]}}},
   logOak: {name: 'Oak Log', type: 0, stype: 'log', star: 1, image: 'mined_32_32-1-4', help: 'Oak & Mahogany', tooltip: '???'},
   plankOak: {name: 'Oak Plank', type: 0, stype: 'plank', star: 1, image: 'refined_32_32-5-2', help: 'Oak & Mahogany', tooltip: '???'},
   rootOak: {name: 'Wood Root', type: 0, stype: 'root', star: 1, image: 'potions_32_32-1-5', help: 'Oak & Mahogany', tooltip: '???'},
@@ -519,7 +524,7 @@ export const ITEMS = {
   seedForest: {name: 'Forest Grass Seed', type: ITEM_TYPE.SEED | ITEM_TYPE.PLACABLE, stype: 'seed', star: 1, image: 'potions_32_32-1-5', help: 'Forest Grass', tooltip: 'Plant to change Dirt into Forest Grass'},
   seedJungle: {name: 'Jungle Grass Seed', type: ITEM_TYPE.SEED | ITEM_TYPE.PLACABLE, stype: 'seed', star: 1, image: 'potions_32_32-1-5', help: 'Jungle Grass', tooltip: 'Plant to change Silt into Jungle Grass'},
 
-  mahogany: {name: 'Mahogany', type: 0, stype: 'tree', star: 2, image: null, help: 'Oak & Mahogany', tooltip: '???'},
+  mahogany: {name: 'Mahogany', type: 0, stype: 'tree', star: 2, image: null, help: 'Oak & Mahogany', tooltip: 'Common tree in jungle, can be chopping or shaking', chopping: {speed: 1800, items: [{item: 'logMahogany', count: '1-2'}, {item: 'samara', count: 0.25}], extraLoot: {items: [{item: 'rootMahogany', count: '2-5', buffs: ['+felling']}]}}},
   logMahogany: {name: 'Mahogany Log', type: 0, stype: 'log', star: 2, image: 'mined_32_32-2-4', help: 'Oak & Mahogany', tooltip: '???'},
   plankMahogany: {name: 'Mahogany Plank', type: 0, stype: 'plank', star: 2, image: 'refined_32_32-6-2', help: 'Oak & Mahogany', tooltip: '???'},
   rootMahogany: {name: 'Mahogany Root', type: 0, stype: 'root', star: 2, image: 'potions_32_32-1-5', help: 'Oak & Mahogany', tooltip: '???'},
@@ -668,6 +673,14 @@ export const RECIPES = [
   {result: {item: 'pickaxePlatinum', count: 1}, station: 'forge', ingredients: [{item: 'pickaxeCobalt', count: 1}, {item: 'barPlatinum', count: 16}, {item: 'logMahogany', count: 6}, {item: 'cutSapphire', count: 4}]},
   {result: {item: 'pickaxeProspector', count: 1}, station: 'forge', ingredients: [{item: 'barPlatinum', count: 1}, {item: 'barPlatinum', count: 16}, {item: 'shellPowder', count: 1}, {item: 'nailIron', count: 5}]},
   {result: {item: 'pickaxeGeologist', count: 1}, station: 'forge', ingredients: [{item: 'barPlatinum', count: 1}, {item: 'barPlatinum', count: 16}, {item: 'shellPowder', count: 1}, {item: 'nailIron', count: 5}]},
+
+  // Axes
+  {result: {item: 'axeCopper', count: 1}, station: 'anvil', ingredients: [{item: 'barCopper', count: 10}, {item: 'logOak', count: 5}, {item: 'cutTopaz', count: 1}]},
+  {result: {item: 'axeIron', count: 1}, station: 'anvil', ingredients: [{item: 'axeCopper', count: 1}, {item: 'barIron', count: 12}, {item: 'logOak', count: 4}, {item: 'cutRuby', count: 1}]},
+  {result: {item: 'axeSilver', count: 1}, station: 'anvil', ingredients: [{item: 'axeIron', count: 1}, {item: 'barSilver', count: 12}, {item: 'logOak', count: 5}, {item: 'cutEmerald', count: 1}]},
+  {result: {item: 'axeGold', count: 1}, station: 'anvil', ingredients: [{item: 'axeSilver', count: 1}, {item: 'barGold', count: 14}, {item: 'logMahogany', count: 5}, {item: 'cutEmerald', count: 2}]},
+  {result: {item: 'axeCobalt', count: 1}, station: 'forge', ingredients: [{item: 'axeGold', count: 1}, {item: 'barCobalt', count: 17}, {item: 'logOak', count: 5}, {item: 'cutSapphire', count: 3}]},
+  {result: {item: 'axePlatinum', count: 1}, station: 'forge', ingredients: [{item: 'axeCobalt', count: 1}, {item: 'barPlatinum', count: 16}, {item: 'logMahogany', count: 7}, {item: 'cutSapphire', count: 4}]},
 
   // Teleporters
   {result: {item: 'teleporterYellow', count: 2}, station: 'forge', ingredients: [{item: 'fallenStar', count: 10}]},
