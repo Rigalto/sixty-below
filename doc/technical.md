@@ -775,7 +775,7 @@ Les enregistrements sont de natures très différentes, nature déterminée par 
   * `yBottom`: coordonnée pour le clipping de l'image (ou si `x,yBottom` est dans le rectangle visible)
   * `soilIndex` : position de la tuile solide sous la gauche de l'arbre (`index + h * 1024`)
   * `size` : croissance actuelle (0 à 4)
-  * `images` : tableau de 7 images (selon `size`, les images suivantes sont empilées : `0 => [1, 0]`, `1 => [1, 2, 0]`, `2 => [1, 2, 3, 0]`, `3 => [1, 2, 3, 4, 0]`, `4 => [1, 2, 3, 4, 5, 6]`). Chaque image est définie par les attributs `x` et `y` (position dans le monde où l'image doit être affichée) ainsi que `tree`, `row` et `col` (détermine l'image dans TREE_IMAGES).
+  * `images` : tableau de 7 images (selon `size`, les images suivantes sont empilées : `0 => [1, 0]`, `1 => [1, 2, 0]`, `2 => [1, 2, 3, 0]`, `3 => [1, 2, 3, 4, 0]`, `4 => [1, 2, 3, 4, 5, 6]`). Chaque image est définie par les attributs `x` (position dans le monde où l'image doit être affichée) ainsi que `tree`, `row` et `col` (détermine l'image dans TREE_IMAGES).
   * `grass` : type de tuile sur lequel l'arbre pousse (NODES.GRASSFOREST.code, NODES.GRASSJUNGLE.code, NODES.GRASSMUSHROOM.code, NODES.SAND.code)
   * `growthTimestamp` : heure (timestamp) de prochaine croissance (`null` si `size` === 0)
   * `shakedTimestamp` : heure (timestamp) à partir de laquelle l'arbre peut être secoué de nouveau
