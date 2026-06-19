@@ -1350,6 +1350,15 @@ class OakSystem {
       ctx.arc(cx, cy, 3, 0, 6.2832)
       ctx.fill()
     }
+    ctx.fillStyle = 'rgba(255, 0, 255, 0.7)'
+
+    for (const record of this.#oakList) {
+      const cx = ((record.soilIndex & 0x3FF) << 4) + 8
+      const cy = ((record.soilIndex >> 10) << 4) + 8
+      ctx.beginPath()
+      ctx.arc(cx, cy, 4, 0, 6.2832)
+      ctx.fill()
+    }
     if (this.#boleteList.length !== this.#boleteSpotsBySoil.size) {
       console.warn(`SunflowerSystem: #list(${this.#boleteList.length}) !== #spotsBySoil(${this.#boleteSpotsBySoil.size})`)
     }
