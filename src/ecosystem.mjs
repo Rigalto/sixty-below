@@ -1227,6 +1227,92 @@ class OakSystem {
 
     // TODO : branche oak
   }
+
+  // //////// //
+  // CHOPPING //
+  // //////// //
+
+  /**
+   * Traite le chopping réussi d'un oak (hors loot, géré par ChoppingManager).
+   * Décrémente size. Si size atteint -1, détruit l'arbre entièrement (et ses bolete).
+   * Sinon, met à jour byTile, blockedTiles, et persiste.
+   * @param {object} record — record TREE (oak ou mahogany)
+   */
+  onChopped (record) {
+    removeFromByTileTree(this.oakByTile, record)
+    record.size--
+    addToByTileTree(this.oakByTile, record)
+
+    if (record.size < 0) {
+      this.#destroyOak(record) // fait le queueStaticUpdate
+      return
+    }
+
+    saveManager.queueStaticUpdate({storeName: 'plant', record})
+  }
+
+  /**
+   * Détruit un oak complètement : retire toutes les structures, supprime ses spots bolete,
+   * libère blockedTiles (placement + mining sol).
+   * @param {object} record — record TREE
+   */
+  #destroyOak (record) {
+    // Retrait byTile et byChunk
+    removeFromByTileTree(this.oakByTile, record)
+    removeFromByChunk(this.#oakByChunk, record)
+    this.#oakDisplayed.delete(record)
+
+    // blockedTiles — rectangle de corps
+    const px = record.soilIndex & 0x3FF
+    const py = record.index >> 10
+    blockedTiles.unblockPlacementRect(px, py, record.w, record.h)
+
+    // blockedTiles — sol (3 tuiles)
+    const soilX = record.soilIndex & 0x3FF
+    const soilY = record.soilIndex >> 10
+    blockedTiles.unblockMiningRect(soilX, soilY, record.w, 1)
+
+    // Supprime les spots bolete associés
+    const bLeft = this.#boleteSpotsBySoil.get(record.soilIndex - 1)
+    const bRight = this.#boleteSpotsBySoil.get(record.soilIndex + record.w)
+    if (bLeft !== undefined) this.#destroyBoleteSpot(bLeft)
+    if (bRight !== undefined) this.#destroyBoleteSpot(bRight)
+
+    // Retrait de la liste principale (swap-last)
+    const idx = this.#oakList.indexOf(record)
+    if (idx !== -1) {
+      this.#oakList[idx] = this.#oakList[this.#oakList.length - 1]
+      this.#oakList.length--
+    }
+
+    // #oakBySoil — 3 entrées
+    this.#oakBySoil.delete(record.soilIndex)
+    this.#oakBySoil.delete(record.soilIndex + 1)
+    this.#oakBySoil.delete(record.soilIndex + 2)
+
+    // Persistance : marque deleted
+    record.deleted = true
+    saveManager.queueStaticUpdate({storeName: 'plant', record})
+  }
+
+  /**
+   * Détruit un spot bolete (présent ou non) : retire toutes les structures et persiste.
+   * @param {object} record — record MUSHROOM (bolete spot)
+   */
+  #destroyBoleteSpot (record) {
+    if (record.present) this.#destroyBoletePresent(record)
+
+    // Retrait de #boleteList (swap-last)
+    const idx = this.#boleteList.indexOf(record)
+    if (idx !== -1) {
+      this.#boleteList[idx] = this.#boleteList[this.#boleteList.length - 1]
+      this.#boleteList.length--
+    }
+    this.#boleteSpotsBySoil.delete(record.soilIndex)
+
+    record.deleted = true
+    saveManager.queueStaticUpdate({storeName: 'plant', record})
+  }
 }
 export const oakSystem = new OakSystem()
 

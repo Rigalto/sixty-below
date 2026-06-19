@@ -1,7 +1,7 @@
-// action.mjs — miningManager
+// action.mjs — MiningManager - PlacingManager - ForagingManager - ChoppingManager
 
 import {eventBus, taskScheduler, microTasker, blockedTiles, rollLootWithBuffs} from './utils.mjs'
-import {NODE_TYPE, NODES, ITEM_TYPE, ITEMS, PLANT_SYSTEM_LOOKUP} from '../assets/data/data.mjs'
+import {NODE_TYPE, NODES, ITEM_TYPE, ITEMS, PLANT_SYSTEM_LOOKUP, PLANT_KIND} from '../assets/data/data.mjs'
 import {inventoryManager} from './inventory.mjs'
 import {buffManager} from './buff.mjs'
 import {database} from './database.mjs'
@@ -503,8 +503,163 @@ export const foragingManager = new ForagingManager()
    ==================================================================================================== */
 
 class ChoppingManager {
-  tryChop (tileIndex, tileNode, item, prefix) {
-    //
+  #queue = [] // [{plant, tool, prefix, speed}] — arbres en attente, dans l'ordre de demande
+
+  constructor () {
+    // EventBus
+    this.onTeleportBegin = this.onTeleportBegin.bind(this)
+    this.onSlotActive = this.onSlotActive.bind(this)
+    eventBus.on('player/teleport-begin', this.onTeleportBegin)
+    eventBus.on('hotbar/slot-active', this.onSlotActive)
+    // Micro-tâche
+    this.onChopTree = this.onChopTree.bind(this)
+  }
+
+  /**
+   * Valide la demande et enfile l'arbre. Lance la tâche si la file était vide.
+   * Point d'entrée unique depuis core.mjs (#processWorldClick).
+   * @param {number} tileIndex — (y << 10) | x, tuile cliquée
+   * @param {object} tileNode  — NODES_LOOKUP[tileCode] (non utilisé directement : la cible est une plante)
+   * @param {object} tool      — ITEMS[slot.item], hache équipée
+   * @param {string} prefix    — slot.prefix
+   */
+  tryChop (tileIndex, tileNode, tool, prefix) {
+    if (buffManager.getBuff('playerFreeze')) return
+
+    const plant = floraManager.getPlantAt(tileIndex)
+    if (plant === null || plant.kind !== PLANT_KIND.TREE) return
+
+    const plantItem = ITEMS[plant.itemId]
+    if (!this.#isInChoppingRange(tileIndex, tool, prefix)) { eventBus.emit('sound/play', 'toofar'); return }
+    if (tool.star < plantItem.star) { eventBus.emit('sound/play', 'wrong'); return }
+
+    const speed = this.#computeChopSpeed(plantItem, tool, prefix)
+
+    const wasEmpty = this.#queue.length === 0
+    this.#queue.push({plant, tool, prefix, speed})
+    eventBus.emit('sound/play', 'chopping')
+
+    if (wasEmpty) {
+      const {priority, capacity} = MICROTASK.CHOP_TREE
+      taskScheduler.enqueue('chop-current', speed, this.onChopTree, priority, capacity)
+    }
+  }
+
+  /**
+   * Calcule le délai d'abattage en ms pour un arbre et un outil donnés.
+   * @param {object} plantItem — ITEMS[plant.itemId], porte plantItem.chopping.speed
+   * @param {object} tool      — hache équipée
+   * @param {string} prefix    — préfixe de l'outil
+   * @returns {number} délai en ms
+   */
+  #computeChopSpeed (plantItem, tool, prefix) {
+    let coefficient = 100 + tool.chopping.speed + buffManager.getBuff('chopping-speed')
+    coefficient += prefix === 'Quick' ? 20 : 0
+    coefficient += prefix === 'Keen' ? 5 : 0
+    coefficient -= prefix === 'Sturdy' ? 5 : 0
+    return (plantItem.chopping.speed * coefficient / 100) | 0
+  }
+
+  /**
+   * Vérifie que la tuile cliquée est dans le rectangle de chopping relatif au centre du joueur.
+   * @param {number} tileIndex — (y << 10) | x
+   * @param {object} tool      — hache équipée
+   * @param {string} prefix    — préfixe de l'outil
+   * @returns {boolean}
+   */
+  #isInChoppingRange (tileIndex, tool, prefix) {
+    const {x: cx, y: cy, direction} = playerManager.getCenterTile()
+    const rect = buffManager.getBuff('chopping-range')
+    const range = tool.range + (prefix === 'Extended' ? 2 : 0)
+    const ex = rect.x - range
+    const ey = rect.y - range
+    const ew = rect.w + 2 * range
+    const eh = rect.h + 2 * range
+    const tileX = tileIndex & 0x3FF
+    const tileY = tileIndex >> 10
+    const worldRectX = direction === 0 ? cx - ex - ew + 1 : cx + ex
+    return tileX >= worldRectX && tileX < worldRectX + ew &&
+           tileY >= cy + ey && tileY < cy + ey + eh
+  }
+
+  /**
+   * Planifie l'abattage de la prochaine section en file, ou termine si la file est vide.
+   */
+  #scheduleNext () {
+    if (this.#queue.length > 0) {
+      const {priority, capacity} = MICROTASK.CHOP_TREE
+      taskScheduler.enqueue('chop-current', this.#queue[0].speed, this.onChopTree, priority, capacity)
+    }
+    // TODO: fin animation outil (axe)
+  }
+
+  /**
+   * Callback TaskScheduler : exécute l'abattage d'une section de l'arbre en tête de file,
+   * distribue le loot, puis planifie la suivante si la file n'est pas vide.
+   */
+  onChopTree () {
+    const entry = this.#queue.shift()
+    if (entry === undefined) return
+
+    const {plant} = entry
+    const system = PLANT_SYSTEM_LOOKUP.get(plant.kind * 100 + plant.type)
+    if (system === undefined || !system.isPresent(plant)) {
+      this.#scheduleNext()
+      return
+    }
+
+    const plantItem = ITEMS[plant.itemId]
+    const buffValues = buffManager.getBuffs(plantItem.chopping.buffList)
+
+    // Loot standard (chaque coup)
+    for (const lootItem of plantItem.chopping.items) {
+      const count = rollLootWithBuffs(lootItem, buffValues)
+      if (count > 0) {
+        const itemCode = lootItem.item.code
+        inventoryManager.loot(itemCode, count, '')
+        eventBus.emit('player/loot-item', {itemCode})
+      }
+    }
+
+    // Délègue la mutation de state au TreeSystem
+    system.onChopped(plant)
+
+    // Extra drop si c'est le dernier coup (size est déjà décrémenté dans onChopped)
+    // plant est même supprimé de la mémoire...
+    if (plant.size < 0 && plantItem.chopping.extraDrop) {
+      for (const lootItem of plantItem.chopping.extraDrop.items) {
+        const count = rollLootWithBuffs(lootItem, buffValues)
+        if (count > 0) {
+          const itemCode = lootItem.item.code
+          inventoryManager.loot(itemCode, count, '')
+          eventBus.emit('player/loot-item', {itemCode})
+        }
+      }
+    }
+
+    this.#scheduleNext()
+  }
+
+  /**
+   * Vide la file et annule la tâche planifiée.
+   */
+  #interrupt () {
+    if (this.#queue.length === 0) return
+    this.#queue.length = 0
+    taskScheduler.dequeue('chop-current')
+    // TODO: annuler animation outil (axe)
+  }
+
+  /** Liaison EventBus : 'player/teleport-begin'. */
+  onTeleportBegin () { this.#interrupt() }
+
+  /**
+   * Liaison EventBus : 'hotbar/slot-active' — interrompt si le nouveau slot n'est plus une axe.
+   * @param {{slot: object}} payload
+   */
+  onSlotActive ({slot}) {
+    if (slot.item && ITEMS[slot.item].type & ITEM_TYPE.TOOL && ITEMS[slot.item].stype === 'axe') return
+    this.#interrupt()
   }
 }
 export const choppingManager = new ChoppingManager()

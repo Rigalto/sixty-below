@@ -432,6 +432,15 @@ Cette section définit les événements officiels. Tout nouvel événement doit 
 | S | `player/loot-item` | `{itemCode: string}` | Émis pour chaque item looté. |
 | S | `sound/play` | `name: string` | Joue le son `name`. |
 
+#### Action d'abattage (`ChoppingManager`)
+
+| Dir. | Event Name | Payload Structure | Description |
+| :---: | :--- | :--- | :--- |
+| E | `hotbar/slot-active` | `{ index: number, slot: object, prevIndex: number }` | Émis à chaque changement de slot actif, ou de contenu du slot actif. |
+| E | `player/teleport-begin` | — | Début de téléportation, avant fading. Le joueur est bloqué, ses actions annulées. |
+| S | `player/loot-item` | `{itemCode: string}` | Émis pour chaque item looté. |
+| S | `sound/play` | `name: string` | Joue le son `name`. |
+
 #### Toutes les plantes (`FloraManager`)
 
 | Dir. | Event Name | Payload Structure | Description |

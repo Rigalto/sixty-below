@@ -91,7 +91,7 @@ class BuffManager {
       return {x, y, w, h}
     }],
     ['mining-speed', () => {
-      return 100
+      return 0
     }],
     ['foraging-range', () => {
       const x = -2
@@ -101,7 +101,17 @@ class BuffManager {
       return {x, y, w, h}
     }],
     ['foraging-speed', () => {
-      return 100
+      return 0
+    }],
+    ['chopping-speed', () => {
+      return 0
+    }],
+    ['chopping-range', () => {
+      const x = -2
+      const y = -4
+      const w = 6
+      const h = 8
+      return {x, y, w, h}
     }]
   ])
 
