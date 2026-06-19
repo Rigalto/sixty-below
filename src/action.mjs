@@ -14,6 +14,22 @@ import {floraManager} from './ecosystem.mjs'
    HELPERS COMMUNS A TOUS LES MANAGERS
    ==================================================================================================== */
 
+/**
+ * Retire en place, de `queue`, toutes les entrées dont `entry[key] === value`. Compaction
+ * stable (préserve l'ordre des entrées restantes) — nécessaire pour une file FIFO pouvant
+ * mélanger des entrées ciblant des objets différents (ex : plusieurs arbres en attente).
+ * @param {Array<object>} queue — tableau d'entrées, muté en place
+ * @param {string} key — propriété à comparer sur chaque entrée
+ * @param {*} value — valeur de référence à retirer
+ */
+const purgeQueueByKey = (queue, key, value) => {
+  let w = 0
+  for (let r = 0; r < queue.length; r++) {
+    if (queue[r][key] !== value) queue[w++] = queue[r]
+  }
+  queue.length = w
+}
+
 /* ====================================================================================================
    GESTION DU MINAGE DE TUILES
    ==================================================================================================== */
@@ -596,6 +612,8 @@ class ChoppingManager {
   /**
    * Callback TaskScheduler : exécute l'abattage d'une section de l'arbre en tête de file,
    * distribue le loot, puis planifie la suivante si la file n'est pas vide.
+   * Si l'arbre vient d'être détruit (size < 0), purge la file des entrées restantes pour
+   * ce même arbre avant de planifier le prochain temps de coupe.
    */
   onChopTree () {
     const entry = this.#queue.shift()
@@ -620,6 +638,11 @@ class ChoppingManager {
         eventBus.emit('player/loot-item', {itemCode})
       }
     }
+
+    // Arbre détruit : purge les entrées restantes pour ce même arbre (clics en surplus
+    // avant le coup final) — évite de dépiler inutilement des coups sur un arbre qui n'existe
+    // plus.
+    if (plant.size < 0) purgeQueueByKey(this.#queue, 'plant', plant)
 
     // Délègue la mutation de state au TreeSystem
     system.onChopped(plant)
