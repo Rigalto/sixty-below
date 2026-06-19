@@ -388,12 +388,7 @@ class SunflowerSystem {
 
     if (chunkManager.getTileAt(soilIndex) !== GRASSFOREST) return
     if (this.#spotsBySoil.has(soilIndex)) return
-    // TODO enlever le commentaire que TreeSystem sera écrit et possédera la fonction
-    // L'arbre occupe les positions x, x+1, x+2. Les tuiles interdites sont les tuiles
-    // x-2, x-1, x+3 et x+4. Si la position du sunflower est xx, alors il ne doit pas y avoir
-    // d'arbre en x+2, x+1, x-3 et x-4
-    // if (!treeSystem.isOakAt(x-2, x-1, x+3, x+4)) return
-    // La signature isOakAt(...positions) dans TreeSystem fera un simple Set.has() sur chacune des 4 valeurs.
+    if (oakSystem.isOakAt(soilIndex - 2) || oakSystem.isOakAt(soilIndex + 2)) return
 
     const y = soilIndex >> 10
     const index = soilIndex - 2 * WORLD_WIDTH
@@ -434,13 +429,20 @@ class SunflowerSystem {
   }
 
   /**
- * Vérifie les emplacements latéraux pour les tournesols.
- * @param {...number} columnIndexes — Liste des index de tuiles à vérifier.
- */
-  onSunflowerLateralSpotCheck (...columnIndexes) {
-    for (const index of columnIndexes) {
-      this.onSunflowerSpotCheck(findSurfaceIndex(index))
-    }
+   * Micro-tâche : vérifie les 4 emplacements latéraux d'un arbre abattu (2 par flanc).
+   * Pour chaque tuile, teste d'abord la présence d'un oak vivant 2 tuiles plus loin du
+   * flanc testé (structure 1-2-T-T-T-3-4) — si absent, recherche la surface de la colonne
+   * (findSurfaceIndex, coût variable) et délègue à onSunflowerSpotCheck.
+   * @param {number} i1 — tuile "1" (2 tuiles à gauche de l'arbre)
+   * @param {number} i2 — tuile "2" (1 tuile à gauche de l'arbre)
+   * @param {number} i3 — tuile "3" (1 tuile à droite de l'arbre)
+   * @param {number} i4 — tuile "4" (2 tuiles à droite de l'arbre)
+   */
+  onSunflowerLateralSpotCheck (i1, i2, i3, i4) { // pas d'allocation de tableau
+    if (!oakSystem.isOakAt(i1 - 2)) this.onSunflowerSpotCheck(findSurfaceIndex(i1))
+    if (!oakSystem.isOakAt(i2 - 2)) this.onSunflowerSpotCheck(findSurfaceIndex(i2))
+    if (!oakSystem.isOakAt(i3 + 2)) this.onSunflowerSpotCheck(findSurfaceIndex(i3))
+    if (!oakSystem.isOakAt(i4 + 2)) this.onSunflowerSpotCheck(findSurfaceIndex(i4))
   }
 
   /**
@@ -1241,6 +1243,14 @@ class OakSystem {
    * @returns {boolean}
    */
   isPresent (record) { return record.kind === PLANT_KIND.TREE ? !record.deleted : record.present }
+
+  /**
+   * Indique si un oak vivant occupe exactement cette tuile de sol. O(1), zéro allocation —
+   * délègue à #oakBySoil, déjà peuplée avec les 3 tuiles de sol de chaque oak vivant.
+   * @param {number} tileIndex — (y << 10) | x
+   * @returns {boolean}
+   */
+  isOakAt (tileIndex) { return this.#oakBySoil.has(tileIndex) }
 
   /** Liaison EventBus : 'time/every-hour-16' — tous les bolete présents repassent à false. */
   onHour16Bolete () {
