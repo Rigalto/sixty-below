@@ -111,6 +111,27 @@ const buildDisplayed = (displayed, byChunk, preloadChunks) => {
   }
 }
 
+/**
+ * Retrouve l'index de la tuile de surface d'une colonne depuis un index de départ
+ * quelconque dans cette colonne. Si la tuile de départ n'est pas SKY, remonte jusqu'au
+ * premier SKY — la surface est juste en dessous. Si elle est SKY, descend jusqu'à la
+ * première tuile non-SKY — c'est la surface. Coût variable selon le relief (généralement
+ * quelques tuiles, borné par WORLD_HEIGHT dans le pire cas) — réservé aux micro-tâches.
+ * @param {number} index — tuile de départ, (y << 10) | x
+ * @returns {number} index de la tuile de surface
+ */
+const findSurfaceIndex = (index) => {
+  const SKY = NODES.SKY.code
+  if (chunkManager.getTileAt(index) !== SKY) {
+    let idx = index - WORLD_WIDTH
+    while (chunkManager.getTileAt(idx) !== SKY) idx -= WORLD_WIDTH
+    return idx + WORLD_WIDTH
+  }
+  let idx = index + WORLD_WIDTH
+  while (chunkManager.getTileAt(idx) === SKY) idx += WORLD_WIDTH
+  return idx
+}
+
 /* ====================================================================================================
    SUNFLOWER SYSTEM
    ====================================================================================================
@@ -155,10 +176,13 @@ class SunflowerSystem {
     eventBus.on('time/every-hour-17', this.onHour17Sunflower)
     this.onTileChangedSunflower = this.onTileChangedSunflower.bind(this)
     eventBus.on('world/tile-changed', this.onTileChangedSunflower)
+    this.onTreeDestroyedSunflower = this.onTreeDestroyedSunflower.bind(this)
+    eventBus.on('ecosystem/tree-destroyed', this.onTreeDestroyedSunflower)
     // micro-tâches
     this.bloomSunflower = this.bloomSunflower.bind(this)
     this.unbloomSunflower = this.unbloomSunflower.bind(this)
     this.onSunflowerSpotCheck = this.onSunflowerSpotCheck.bind(this)
+    this.onSunflowerLateralSpotCheck = this.onSunflowerLateralSpotCheck.bind(this)
 
     // TODO : quand un oak est planté, invalider et supprimer les spots sunflower
     // dans le rayon [oakX - SUNFLOWER_OAK_MIN_DIST, oakX + SUNFLOWER_OAK_MIN_DIST].
@@ -251,7 +275,7 @@ class SunflowerSystem {
   /** Liaison EventBus : 'time/every-hour-6' — apparition, tête à gauche. */
   onHour6Sunflower () {
     const {priority, capacity} = MICROTASK.BLOOM_SUNFLOWER
-    microTasker.enqueueOnce(this.bloomSunflower, priority, capacity)
+    microTasker.enqueue(this.bloomSunflower, priority, capacity)
   }
 
   /**
@@ -286,7 +310,7 @@ class SunflowerSystem {
   /** Liaison EventBus : 'time/every-hour-17' — disparition. */
   onHour17Sunflower () {
     const {priority, capacity} = MICROTASK.UNBLOOM_SUNFLOWER
-    microTasker.enqueueOnce(this.unbloomSunflower, priority, capacity)
+    microTasker.enqueue(this.unbloomSunflower, priority, capacity)
   }
 
   /**
@@ -393,6 +417,33 @@ class SunflowerSystem {
   }
 
   /**
+   * Liaison EventBus : 'ecosystem/tree-destroyed' — un arbre vient d'être abattu entièrement.
+   * Les 3 tuiles sous l'arbre sont vérifiées directement (même y que tileIndex, pas de scan).
+   * Les 2 colonnes de chaque flanc (zone auparavant exclue par la distance min. à l'oak)
+   * peuvent avoir un relief différent : leur surface est recherchée en micro-tâche
+   * (coût variable → hors budget handler).
+   * @param {number} tileIndex — tuile centrale du sol libéré (cf. OakSystem#destroyOak)
+   */
+  onTreeDestroyedSunflower (tileIndex) {
+    this.onSunflowerSpotCheck(tileIndex - 1)
+    this.onSunflowerSpotCheck(tileIndex)
+    this.onSunflowerSpotCheck(tileIndex + 1)
+
+    const {priority, capacity} = MICROTASK.SUNFLOWER_LATERAL_SPOT_CHECK
+    microTasker.enqueue(this.onSunflowerLateralSpotCheck, priority, capacity, tileIndex - 3, tileIndex - 2, tileIndex + 2, tileIndex + 3)
+  }
+
+  /**
+ * Vérifie les emplacements latéraux pour les tournesols.
+ * @param {...number} columnIndexes — Liste des index de tuiles à vérifier.
+ */
+  onSunflowerLateralSpotCheck (...columnIndexes) {
+    for (const index of columnIndexes) {
+      this.onSunflowerSpotCheck(findSurfaceIndex(index))
+    }
+  }
+
+  /**
  * Liaison EventBus : 'world/tile-changed'.
  * — Détruit le tournesol présent si une tuile de son corps n'est plus SKY ou si son sol n'est plus GRASSFOREST.
  * — Supprime le spot si son sol n'est plus GRASSFOREST.
@@ -425,7 +476,7 @@ class SunflowerSystem {
     // Cas 3 — nouvelle tuile GRASSFOREST : candidat spot
     if (tileNewCode === GRASSFOREST) {
       const {priority, capacity} = MICROTASK.SUNFLOWER_SPOT_CHECK
-      microTasker.enqueueOnce(this.onSunflowerSpotCheck, priority, capacity, tileIndex)
+      microTasker.enqueue(this.onSunflowerSpotCheck, priority, capacity, tileIndex)
     }
   }
 
@@ -500,12 +551,11 @@ class OleanderSystem {
   /**
    * Enregistre un oleander et peuple les structures internes.
    * Si present=false, met le record en file de repousse et déclenche la microtâche
-   * de vidage (enqueueOnce — sans effet si déjà en file).
+   * de vidage
    * @param {object} record — record HERB/OLEANDER (deleted=false garanti par l'appelant)
    */
   initPlant (record) {
     this.#list.push(record)
-    // this.#spotsBySoil.set(record.soilIndex, record)
 
     if (record.present) {
       addToByTile(this.byTile, record)
@@ -518,7 +568,6 @@ class OleanderSystem {
       blockedTiles.blockPlacement(record.index + 2 * WORLD_WIDTH)
       return
     }
-    console.log('>>>>>>>>>>>>>>>>>>>>><<<<<<<<<<<<<<<<<<<<<<<<<<<<<')
     this.#regrowQueue.push(record)
   }
 
@@ -815,7 +864,7 @@ class ParsnipSystem {
   /** Liaison EventBus : 'time/every-hour-3' — reset nocturne et calcul de la nouvelle population. */
   onHour3Parsnip () {
     const {priority, capacity} = MICROTASK.BLOOM_PARSNIP
-    microTasker.enqueueOnce(this.bloomParsnip, priority, capacity)
+    microTasker.enqueue(this.bloomParsnip, priority, capacity)
   }
 
   /**
@@ -936,7 +985,7 @@ class ParsnipSystem {
     // Cas 3 — nouvelle tuile GRASSFOREST : candidat spot
     if (tileNewCode === GRASSFOREST) {
       const {priority, capacity} = MICROTASK.PARSNIP_SPOT_CHECK
-      microTasker.enqueueOnce(this.onParsnipSpotCheck, priority, capacity, tileIndex)
+      microTasker.enqueue(this.onParsnipSpotCheck, priority, capacity, tileIndex)
     }
   }
 
@@ -1191,12 +1240,12 @@ class OakSystem {
    * @param {object} record
    * @returns {boolean}
    */
-  isPresent (record) { return record.kind === PLANT_KIND.TREE || record.present }
+  isPresent (record) { return record.kind === PLANT_KIND.TREE ? !record.deleted : record.present }
 
   /** Liaison EventBus : 'time/every-hour-16' — tous les bolete présents repassent à false. */
   onHour16Bolete () {
     const {priority, capacity} = MICROTASK.UNBLOOM_BOLETE
-    microTasker.enqueueOnce(this.unbloomBolete, priority, capacity)
+    microTasker.enqueue(this.unbloomBolete, priority, capacity)
   }
 
   /** Microtâche : tous les bolete présents repassent à present=false. */
@@ -1210,7 +1259,7 @@ class OakSystem {
   /** Liaison EventBus : 'time/every-hour-6' — tirage de floraison matinale des bolete. */
   onHour5Bolete () {
     const {priority, capacity} = MICROTASK.BLOOM_BOLETE
-    microTasker.enqueueOnce(this.bloomBolete, priority, capacity)
+    microTasker.enqueue(this.bloomBolete, priority, capacity)
   }
 
   /**

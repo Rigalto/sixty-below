@@ -308,7 +308,7 @@ export const MICROTASK = {
 
   MINE_TILE: {priority: 24, capacity: 6, taskName: 'onMineTile'}, // minage d'une tuile
   PLACE_TILE: {priority: 24, capacity: 10, taskName: 'onPlaceTile'}, // pose d'un bloc
-  CHOP_TREE: {priority: 24, capacity: 10, taskName: 'onChopTree'}, // abat une section d'arbre
+  CHOP_TREE: {priority: 24, capacity: 4, taskName: 'onChopTree'}, // abat une section d'arbre
 
   FORAGE_ACTION: {priority: 24, capacity: 10, taskName: 'onForage'}, // foraging
 
@@ -321,6 +321,8 @@ export const MICROTASK = {
   BLOOM_SUNFLOWER: {priority: 20, capacity: 2, taskName: 'bloomSunflower'}, // gère les sunflower
   UNBLOOM_SUNFLOWER: {priority: 20, capacity: 1, taskName: 'unbloomSunflower'}, // gère les sunflower
   SUNFLOWER_SPOT_CHECK: {priority: 20, capacity: 10, taskName: 'onSunflowerSpotCheck'}, // suppression d'un spot de sunflower
+  SUNFLOWER_LATERAL_SPOT_CHECK: {priority: 20, capacity: 2, taskName: 'onSunflowerLateralSpotCheck'}, // scan de surface + ajout d'un spot de sunflower (flancs d'arbre abattu)
+
   PARSNIP_SPOT_CHECK: {priority: 20, capacity: 10, taskName: 'onParsnipSpotCheck'}, // ajout d'un spot de parsnip
   BLOOM_PARSNIP: {priority: 20, capacity: 4, taskName: 'bloomParsnip'}, // reset + repousse nocturne des parsnips
 
