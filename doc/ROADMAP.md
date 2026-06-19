@@ -9,7 +9,6 @@
 
 - Implémenter dans sunFlowerSystem l'impact de la suppression d'un arbre
 - Implémenter dans parsnipSystem l'impact de la suppression d'un arbre
-- Afficher le rectangle chopping-range
 - Dans le Inventory Panel, lorsque l'on sélectionne un coffre, le focus reste sur le menu déroulant et on ne peut plus fermer l'inventory panel
 - dans generate, prende en compte les bolet dans la génération des parsnips
 - dans `sunflowerSystem`, prendre en compte le SUNFLOWER_RATE pour mettre le bon nombre de sunflowers dans le monde (nbre_slots * SUNFLOWER_RATE + [random -2, 2] tronqué avec | 0 )

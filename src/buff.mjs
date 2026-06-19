@@ -108,9 +108,9 @@ class BuffManager {
     }],
     ['chopping-range', () => {
       const x = -2
-      const y = -4
-      const w = 6
-      const h = 8
+      const y = -5
+      const w = 7
+      const h = 9
       return {x, y, w, h}
     }]
   ])

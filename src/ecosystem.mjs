@@ -1334,6 +1334,27 @@ class OakSystem {
     record.deleted = true
     saveManager.queueStaticUpdate({storeName: 'plant', record})
   }
+
+  /**
+ * DEBUG — Affiche un cercle jaune au centre de la tuile sous chaque spot enregistré dans #list.
+ * Vérifie la cohérence avec #spotsBySoil (même cardinal attendu).
+ * @param {CanvasRenderingContext2D} ctx — contexte déjà transformé (caméra appliquée)
+ */
+  debugRenderSpots (ctx) {
+    ctx.save()
+    ctx.fillStyle = 'rgba(255, 0, 0, 0.7)'
+    for (const record of this.#boleteList) {
+      const cx = ((record.index & 0x3FF) << 4) + 8
+      const cy = ((record.index >> 10) << 4) + 40
+      ctx.beginPath()
+      ctx.arc(cx, cy, 3, 0, 6.2832)
+      ctx.fill()
+    }
+    if (this.#boleteList.length !== this.#boleteSpotsBySoil.size) {
+      console.warn(`SunflowerSystem: #list(${this.#boleteList.length}) !== #spotsBySoil(${this.#boleteSpotsBySoil.size})`)
+    }
+    ctx.restore()
+  }
 }
 export const oakSystem = new OakSystem()
 

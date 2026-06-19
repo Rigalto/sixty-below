@@ -554,6 +554,7 @@ class GameCore {
       blockedTiles.render(ctx) // DEBUG
       sunflowerSystem.debugRenderSpots(ctx)
       parsnipSystem.debugRenderSpots(ctx)
+      oakSystem.debugRenderSpots(ctx)
     }
     if (this.showGrids) {
       const buffs = buffManager.getBuffs(['showGrid', 'showInteractionRange', 'showToolRange'])
@@ -627,9 +628,9 @@ class GameCore {
   #showToolRange (ctx) {
     const TOOL_RANGE_BUFF = new Map([
       ['pickaxe', 'mining-range'],
-      ['sickle', 'foraging-range'] // ← manquant
-      // ['hammer', 'hammer-range'],
-      // ['axe',    'axe-range'],
+      ['sickle', 'foraging-range'],
+      ['axe', 'chopping-range']
+      // ['hammer', 'hamming-range'],
     ])
     const slot = hotbarOverlay.activeSlot
     if (!slot.item) return
