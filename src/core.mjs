@@ -553,6 +553,7 @@ class GameCore {
     if (this.showBlockedTiles) {
       blockedTiles.render(ctx) // DEBUG
       sunflowerSystem.debugRenderSpots(ctx)
+      parsnipSystem.debugRenderSpots(ctx)
     }
     if (this.showGrids) {
       const buffs = buffManager.getBuffs(['showGrid', 'showInteractionRange', 'showToolRange'])
