@@ -5,7 +5,7 @@ import {NODES, NODES_LOOKUP, SKY_BORDER_NODE, MAX_FURNITURE_W, MAX_FURNITURE_H, 
 import {HELP_TITLES, hydrateHelp, debugHelpCategories} from '../assets/data/data-help.mjs'
 import {loadAssets, resolveAssetData} from './assets.mjs'
 import {timeManager, taskScheduler, microTasker, eventBus, seededRNG, parseLootCount, parseLootBuffs, buildLootHelpRow, blockedTiles} from './utils.mjs'
-import {database} from './database.mjs'
+import {database, uniqueIdGenerator} from './database.mjs'
 import {chunkManager} from './world.mjs'
 import {saveManager} from './persistence.mjs'
 import {camera, worldRenderer} from './render.mjs'
@@ -323,12 +323,11 @@ class GameCore {
     // 3. Dispatch aux systèmes (Injection de dépendance des données)
     // Valeur par défaut (480000) gérée si state.timestamp est undefined (nouveau jeu)
     timeManager.init(state.timestamp, state.weather, state.nextWeather)
+    taskScheduler.init(state.timestamp)
+    uniqueIdGenerator.init(state.uniqueidseed)
 
     // 4. Initialisation des systèmes (Layer 1)
     this.previousTileIndex = undefined
-
-    taskScheduler.init(state.timestamp)
-    timeManager.init(state.timestamp, state.weather, state.nextWeather)
 
     // Tuiles ETERNAL spéciales (gamestate)
     blockedTiles.init(state.eternals)

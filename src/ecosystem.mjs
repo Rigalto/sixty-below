@@ -731,6 +731,8 @@ class ParsnipSystem {
     eventBus.on('world/tile-changed', this.onTileChangedParsnip)
     this.onHour3Parsnip = this.onHour3Parsnip.bind(this)
     eventBus.on('time/every-hour-3', this.onHour3Parsnip)
+    this.onTreeDestroyedParsnip = this.onTreeDestroyedParsnip.bind(this)
+    eventBus.on('ecosystem/tree-destroyed', this.onTreeDestroyedParsnip)
     // Micro-task
     this.onParsnipSpotCheck = this.onParsnipSpotCheck.bind(this)
     this.bloomParsnip = this.bloomParsnip.bind(this)
@@ -936,6 +938,19 @@ class ParsnipSystem {
       const {priority, capacity} = MICROTASK.PARSNIP_SPOT_CHECK
       microTasker.enqueueOnce(this.onParsnipSpotCheck, priority, capacity, tileIndex)
     }
+  }
+
+  /**
+   * Liaison EventBus : 'ecosystem/tree-destroyed' — un arbre vient d'être abattu entièrement,
+   * libérant 3 tuiles de sol. Délègue à onParsnipSpotCheck pour chacune (GRASSFOREST +
+   * absence de spot déjà vérifiés là-bas). Les tuiles avant/après l'arbre ne sont pas concernées
+   * — déjà des spots potentiels indépendamment de la présence de l'arbre.
+   * @param {number} tileIndex — tuile centrale du sol libéré (cf. OakSystem#destroyOak)
+   */
+  onTreeDestroyedParsnip (tileIndex) {
+    this.onParsnipSpotCheck(tileIndex - 1)
+    this.onParsnipSpotCheck(tileIndex)
+    this.onParsnipSpotCheck(tileIndex + 1)
   }
 
   /**
@@ -1314,6 +1329,9 @@ class OakSystem {
     // Persistance : marque deleted
     record.deleted = true
     saveManager.queueStaticUpdate({storeName: 'plant', record})
+
+    // Notifie les autres systèmes : nouveaux spots potentiels au sol libérés
+    eventBus.emit('ecosystem/tree-destroyed', record.soilIndex + 1)
   }
 
   /**

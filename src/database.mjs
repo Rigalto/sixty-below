@@ -589,7 +589,7 @@ class UniqueIdGenerator {
 
     this.#currentSeed = chars.join('')
     this.#currentSuffix = 'a'
-    database.setGameState('unique_id_seed', this.#currentSeed)
+    database.setGameState('uniqueidseed', this.#currentSeed)
   }
 }
 
