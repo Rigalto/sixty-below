@@ -7460,7 +7460,8 @@ class PlantGenerator {
 
     const spots = []
     for (let x = 2; x < W - 2; x++) {
-      if (guarded.has(x)) continue // BUG : il ne faut tenir compte que des coffres et oak, pas des mushrooms
+      // pas de parsnip sur les garded sauf sur les spots de champignons
+      if (guarded.has(x) && !oakPositions.has(x + 2) && !oakPositions.has(x - 2)) continue
 
       const y = surfaceLine[x]
       if (worldBuffer.read(x, y) !== GRASSFOREST) continue
@@ -7506,17 +7507,11 @@ class PlantGenerator {
 
     const sunflowerSpots = []
     for (let x = 2; x < W - 2; x++) {
-      if (guarded.has(x)) continue // BUG : il ne faut tenir compte que des coffres et oak, pas des mushrooms
+      if (guarded.has(x)) continue
+      if (oakPositions.has(x - 3) || oakPositions.has(x + 3)) continue
 
       const y = surfaceLine[x]
       if (worldBuffer.read(x, y) !== GRASSFOREST) continue
-
-      // Pas spot potentiel si proche d'un Oak
-      let nearOak = false
-      for (const oakX of oakPositions) {
-        if (Math.abs(x - oakX) <= 3) { nearOak = true; break }
-      }
-      if (nearOak) continue
 
       sunflowerSpots.push(x)
     }
@@ -7529,7 +7524,7 @@ class PlantGenerator {
       sunflowerPresentSet.add(spot)
     }
 
-    for (const x of spots) {
+    for (const x of sunflowerSpots) {
       const y = surfaceLine[x]
       const soilIndex = (y << 10) | x
       const present = sunflowerPresentSet.has(x)
