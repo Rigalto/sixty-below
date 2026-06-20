@@ -59,6 +59,11 @@ class MiningManager {
     if (!(tileNode.type & (NODE_TYPE.SOLID | NODE_TYPE.WEB))) return
     if ((tileNode.type & NODE_TYPE.WALL)) return // Hammer
     console.log('MiningManager.tryMine', {tileIndex, tileNode, tool, prefix})
+
+    for (const entry of this.#queue) {
+      if (entry.tileIndex === tileIndex) return
+    }
+
     if (!this.#isInMiningRange(tileIndex, tool, prefix)) { eventBus.emit('sound/play', 'toofar'); return }
     if (tool.star < tileNode.star) { eventBus.emit('sound/play', 'wrong'); return }
     if (!blockedTiles.canMine(tileIndex)) { eventBus.emit('sound/play', 'wrong'); return } // includes ETERNAL
