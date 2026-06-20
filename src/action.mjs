@@ -639,11 +639,6 @@ class ChoppingManager {
       }
     }
 
-    // Arbre détruit : purge les entrées restantes pour ce même arbre (clics en surplus
-    // avant le coup final) — évite de dépiler inutilement des coups sur un arbre qui n'existe
-    // plus.
-    if (plant.size < 0) purgeQueueByKey(this.#queue, 'plant', plant)
-
     // Délègue la mutation de state au TreeSystem
     system.onChopped(plant)
 
@@ -659,6 +654,11 @@ class ChoppingManager {
         }
       }
     }
+
+    // Arbre détruit : purge les entrées restantes pour ce même arbre (clics en surplus
+    // avant le coup final) — évite de dépiler inutilement des coups sur un arbre qui n'existe
+    // plus.
+    if (plant.size < 0) purgeQueueByKey(this.#queue, 'plant', plant)
 
     this.#scheduleNext()
   }
