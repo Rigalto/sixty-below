@@ -7,14 +7,8 @@
 
 ## En cours
 
-- Implémenter dans sunFlowerSystem l'impact de la suppression d'un arbre
-- Implémenter dans parsnipSystem l'impact de la suppression d'un arbre
-- Dans le Inventory Panel, lorsque l'on sélectionne un coffre, le focus reste sur le menu déroulant et on ne peut plus fermer l'inventory panel
-- dans generate, prende en compte les bolet dans la génération des parsnips
-- dans `sunflowerSystem`, prendre en compte le SUNFLOWER_RATE pour mettre le bon nombre de sunflowers dans le monde (nbre_slots * SUNFLOWER_RATE + [random -2, 2] tronqué avec | 0 )
 - implémenter les graines de Sunflower qui augmentent la probabilité de pop de sunflower.
 - implémenter une accélération progressive sur l'axe des X, pour pouvoir se positionner plus facilement.
- `SunflowerSystem` : décommenter `treeSystem.isOakAt`
 - Modifier le volume sonore des sons du jeu (ActionWidget)
 - Supprimer les actions de debug accessibles au joueur, quand hébergement sous GitHub :
   - affichage après génération du monde

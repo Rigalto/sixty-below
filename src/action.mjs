@@ -368,6 +368,10 @@ class ForagingManager {
     const plantItem = ITEMS[plant.itemId]
     if (!plantItem.foraging) return
 
+    for (const entry of this.#queue) {
+      if (entry.type === 'plant' && entry.plant === plant) return
+    }
+
     if (!this.#isInForagingRange(tileIndex, tool, prefix)) { eventBus.emit('sound/play', 'toofar'); return }
     if (tool.star < plantItem.star) { eventBus.emit('sound/play', 'wrong'); return }
     const speed = this.#computeForageSpeedPlant(plant, tool, prefix)
