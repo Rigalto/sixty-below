@@ -823,6 +823,8 @@ class ParsnipSystem {
     eventBus.on('time/every-hour-3', this.onHour3Parsnip)
     this.onTreeDestroyedParsnip = this.onTreeDestroyedParsnip.bind(this)
     eventBus.on('ecosystem/tree-destroyed', this.onTreeDestroyedParsnip)
+    this.onTreePlantedParsnip = this.onTreePlantedParsnip.bind(this)
+    eventBus.on('ecosystem/tree-planted', this.onTreePlantedParsnip)
     // Micro-task
     this.onParsnipSpotCheck = this.onParsnipSpotCheck.bind(this)
     this.bloomParsnip = this.bloomParsnip.bind(this)
@@ -1004,18 +1006,20 @@ class ParsnipSystem {
    * Relit les tuiles réelles avant d'agir.
    * @param {{tileIndex: number, tileOldCode: number, tileNewCode: number}} payload
    */
+
   onTileChangedParsnip ({tileIndex, tileOldCode, tileNewCode}) {
-    return
     const SKY = NODES.SKY.code
     const GRASSFOREST = NODES.GRASSFOREST.code
 
-    // Cas 1 — tuile du corps
+    // Cas 1 — tuile du corps : SKY perdu
     const byBodyRecord = this.byTile.get(tileIndex)
     if (byBodyRecord !== undefined && tileNewCode !== SKY) {
-      if (!this.#bodyIs(byBodyRecord, SKY)) this.#destroyPresent(byBodyRecord)
+      if (chunkManager.getTileAt(byBodyRecord.index) !== SKY) {
+        this.#destroyPresent(byBodyRecord)
+      }
     }
 
-    // Cas 2 — tuile sol : parsnip présent + spot
+    // Cas 2 — tuile sol : GRASSFOREST perdu (plante + spot)
     if (tileOldCode === GRASSFOREST) {
       const record = this.#spotsBySoil.get(tileIndex)
       if (record !== undefined && chunkManager.getTileAt(record.soilIndex) !== GRASSFOREST) {
@@ -1041,6 +1045,23 @@ class ParsnipSystem {
     this.onParsnipSpotCheck(tileIndex - 1)
     this.onParsnipSpotCheck(tileIndex)
     this.onParsnipSpotCheck(tileIndex + 1)
+  }
+
+  /**
+   * Liaison EventBus : 'ecosystem/tree-planted' — un arbre vient d'être planté, occupant
+   * 3 tuiles de sol. Supprime les spots parsnip existants à ces 3 positions (s'il y en a),
+   * via #removeSpot (détruit la plante présente au préalable si besoin).
+   * @param {number} tileIndex — tuile centrale du sol occupé (payload identique à tree-destroyed)
+   */
+  onTreePlantedParsnip (tileIndex) {
+    const left = this.#spotsBySoil.get(tileIndex - 1)
+    if (left !== undefined) this.#removeSpot(left)
+
+    const center = this.#spotsBySoil.get(tileIndex)
+    if (center !== undefined) this.#removeSpot(center)
+
+    const right = this.#spotsBySoil.get(tileIndex + 1)
+    if (right !== undefined) this.#removeSpot(right)
   }
 
   /**
