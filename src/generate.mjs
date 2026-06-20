@@ -7504,18 +7504,14 @@ class PlantGenerator {
     // ///////// //
 
     const sunflowerSpots = []
-    for (let x = 2; x < W - 2; x++) {
-      if (guarded.has(x)) continue
-      if (oakPositions.has(x - 3) || oakPositions.has(x + 3)) continue
-
-      const y = surfaceLine[x]
-      if (worldBuffer.read(x, y) !== GRASSFOREST) continue
-
+    for (const x of spots) {
+    // exclusion sur les 4 tuiles restantes du rayon oak (x-1/x/x+1 déjà absentes de spots)
+      if (oakPositions.has(x - 3) || oakPositions.has(x - 2) || oakPositions.has(x + 2) || oakPositions.has(x + 3)) continue
       sunflowerSpots.push(x)
     }
 
     const sunflowerPresentSet = new Set()
-    const sunflowerCount = (spots.length * SUNFLOWER_RATE) | 0
+    const sunflowerCount = (sunflowerSpots.length * SUNFLOWER_RATE) | 0
     while (sunflowerPresentSet.size < sunflowerCount) {
       const spot = seededRNG.randomGetArrayValue(sunflowerSpots)
       if (parsnipPresentSet.has(spot)) continue
