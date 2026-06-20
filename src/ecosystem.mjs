@@ -197,6 +197,7 @@ class SunflowerSystem {
     this.#list.length = 0
     this.#byChunk.clear()
     this.#bySoil.clear()
+    this.#spotsBySoil.clear()
     this.#displayed.clear()
 
     const item = ITEMS.sunflower // après hydratation
@@ -387,6 +388,7 @@ class SunflowerSystem {
     const x = soilIndex & 0x3FF
 
     if (chunkManager.getTileAt(soilIndex) !== GRASSFOREST) return
+    console.log('>>>>>>>>>>>>>> onSunflowerSpotCheck', soilIndex, this.#spotsBySoil.has(soilIndex), this.#spotsBySoil.size)
     if (this.#spotsBySoil.has(soilIndex)) return
     if (oakSystem.isOakAtColumn((soilIndex & 0x3ff) - 2) || oakSystem.isOakAtColumn((soilIndex & 0x3ff) + 2)) return
 
@@ -1140,9 +1142,9 @@ class OakSystem {
       this.#oakBySoil.set(record.soilIndex, record)
       this.#oakBySoil.set(record.soilIndex + 1, record)
       this.#oakBySoil.set(record.soilIndex + 2, record)
-      this.#oakXSet.set((record.soilIndex & 0x3ff), record)
-      this.#oakXSet.set((record.soilIndex & 0x3ff) + 1, record)
-      this.#oakXSet.set((record.soilIndex & 0x3ff) + 2, record)
+      this.#oakXSet.add((record.soilIndex & 0x3ff))
+      this.#oakXSet.add((record.soilIndex & 0x3ff) + 1)
+      this.#oakXSet.add((record.soilIndex & 0x3ff) + 2)
       addToByTileTree(this.oakByTile, record)
       addToByChunk(this.#oakByChunk, record)
 
@@ -1390,8 +1392,8 @@ class OakSystem {
     this.#oakBySoil.delete(record.soilIndex + 2)
     // #oakXSet — 3 entrées
     this.#oakXSet.delete(record.soilIndex & 0x3ff)
-    this.#oakXSet.delete(record.soilIndex & 0x3ff + 1)
-    this.#oakXSet.delete(record.soilIndex & 0x3ff + 2)
+    this.#oakXSet.delete((record.soilIndex & 0x3ff) + 1)
+    this.#oakXSet.delete((record.soilIndex & 0x3ff) + 2)
 
     // Persistance : marque deleted
     record.deleted = true
