@@ -5,7 +5,7 @@ import {WORLD_WIDTH, WORLD_HEIGHT, MICROTASK, TOPSOIL_Y_SKY_SURFACE, TOPSOIL_Y_S
 import {uniqueIdGenerator} from './database.mjs'
 
 import {eventBus, seededRNG, blockedTiles, microTasker, taskScheduler} from './utils.mjs'
-import {NODES, ITEMS, PLANT_KIND, PLANT_TYPE, PLANT_SYSTEM_LOOKUP, ALL_PLANT_SYSTEMS, COBWEB_GROWTH_DELAY_MS, PARSNIP_RATE, TREE_IMAGES} from '../assets/data/data.mjs'
+import {NODES, ITEMS, PLANT_KIND, PLANT_TYPE, PLANT_SYSTEM_LOOKUP, ALL_PLANT_SYSTEMS, COBWEB_GROWTH_DELAY_MS, SUNFLOWER_RATE, PARSNIP_RATE, TREE_IMAGES} from '../assets/data/data.mjs'
 import {IMAGE_CACHE} from './assets.mjs'
 import {saveManager} from './persistence.mjs'
 import {chunkManager} from './world.mjs'
@@ -280,10 +280,47 @@ class SunflowerSystem {
   }
 
   /**
+   * Microtâche : sélectionne un nombre cible de spots à faire fleurir (nbre_slots * SUNFLOWER_RATE
+   * + aléa [-2, 2]), tire avec remise parmi #list jusqu'à atteindre ce nombre. Un spot déjà
+   * planté dans cette passe ou bloqué (blockedTiles.canPlace échoue) est skippé et retiré du
+   * budget de tentatives — borne MAX_ATTEMPTS, pas une valeur d'équilibrage.
+   */
+  bloomSunflower () {
+    this.#currentImage = this.#imgLeft
+
+    const list = this.#list
+    const targetCount = Math.min(
+      list.length,
+      Math.max(0, ((list.length * SUNFLOWER_RATE) | 0) + seededRNG.randomGetMinMax(-2, 2))
+    )
+
+    const MAX_ATTEMPTS = 200 // borne de sécurité — pas une valeur d'équilibrage
+    let grown = 0
+    let attempts = 0
+    while (grown < targetCount && attempts < MAX_ATTEMPTS) {
+      attempts++
+      const record = seededRNG.randomGetArrayValue(list)
+      if (record.present) continue
+      // TODO : prendre en compte les graines de sunflower plantées (influence sur le tirage)
+      if (!blockedTiles.canPlace(record.index) || !blockedTiles.canPlace(record.index + WORLD_WIDTH)) continue
+
+      record.present = true
+      addToByTile(this.byTile, record)
+      addToByChunk(this.#byChunk, record)
+      this.#bySoil.set(record.soilIndex, record)
+      blockedTiles.blockPlacement(record.index)
+      blockedTiles.blockPlacement(record.index + WORLD_WIDTH)
+      saveManager.queueStaticUpdate({storeName: 'plant', record})
+      grown++
+    }
+    buildDisplayed(this.#displayed, this.#byChunk, camera.preloadChunks)
+  }
+
+  /**
    * Microtâche : peuple byTile, #byChunk et #displayed pour les spots tirés à 18%.
    * Bloque les tuiles occupées dans blockedTiles.
    */
-  bloomSunflower () {
+  bloomSunflower_ () {
     this.#currentImage = this.#imgLeft
     for (const record of this.#list) {
       // TODO : prendre en compte les graines de sunflower plantées (18 => 80)
@@ -1693,7 +1730,6 @@ class CobwebSystem {
   #placeWeb (index) {
     chunkManager.setTileAt(index, NODES.WEB.code)
     eventBus.emit('world/tile-changed', {tileIndex: index, tileOldCode: NODES.VOID.code, tileNewCode: NODES.WEB.code})
-    console.log('CobwebSystem.#placeWeb', {x: index & 0x3ff, y: index >> 10})
   }
 }
 export const cobwebSystem = new CobwebSystem()
