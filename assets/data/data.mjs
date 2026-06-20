@@ -304,8 +304,8 @@ export const ITEMS = {
   // /////////////////////
 
   // Baits
-  worm: {name: 'Worm', type: ITEM_TYPE.BAIT, star: 1, stype: 'bait', image: 'blocks_16_16-0-0', help: 'Fishing Baits', tooltip: '???'},
-  goldWorm: {name: 'Gold Worm', type: ITEM_TYPE.BAIT, star: 2, stype: 'bait', image: 'blocks_16_16-0-0', help: 'Fishing Baits', tooltip: '???'},
+  worm: {name: 'Worm', type: ITEM_TYPE.BAIT, star: 1, stype: 'bait', image: 'mined_32_32-7-0', help: 'Fishing Baits', tooltip: '???'},
+  goldWorm: {name: 'Gold Worm', type: ITEM_TYPE.BAIT, star: 2, stype: 'bait', image: 'mined_32_32-7-1', help: 'Fishing Baits', tooltip: '???'},
   slug: {name: 'Slug', type: ITEM_TYPE.BAIT, star: 1, stype: 'bait', image: 'blocks_16_16-0-0', help: 'Fishing Baits', tooltip: '???'},
   goldSlug: {name: 'Gold Slug', type: ITEM_TYPE.BAIT, star: 1, stype: 'bait', image: 'blocks_16_16-0-0', help: 'Fishing Baits', tooltip: '???'},
   snail: {name: 'Snail', type: ITEM_TYPE.BAIT, star: 1, stype: 'bait', image: 'blocks_16_16-0-0', help: 'Fishing Baits', tooltip: '???'},
