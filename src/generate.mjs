@@ -7460,14 +7460,12 @@ class PlantGenerator {
 
     const spots = []
     for (let x = 2; x < W - 2; x++) {
-      // pas de parsnip sur les garded sauf sur les spots de champignons
-      if (guarded.has(x) && !oakPositions.has(x + 2) && !oakPositions.has(x - 2)) continue
+      // pas de parsnip sous les 3 tuiles d'un arbre — basé uniquement sur oakPositions,
+      // jamais sur guarded (qui inclut aussi les coffres : aucune liaison plante/meuble voulue)
+      if (oakPositions.has(x - 1) || oakPositions.has(x) || oakPositions.has(x + 1)) continue
 
       const y = surfaceLine[x]
       if (worldBuffer.read(x, y) !== GRASSFOREST) continue
-      if (worldBuffer.read(x - 1, surfaceLine[x - 1]) !== GRASSFOREST) continue
-      if (worldBuffer.read(x + 1, surfaceLine[x + 1]) !== GRASSFOREST) continue
-
       spots.push(x)
     }
 

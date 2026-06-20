@@ -7,6 +7,8 @@
 
 ## En cours
 
+- `SunflowerSystem` : impact de la naissance d'un arbre
+- `ParsnipSystem` : impact de la naissance d'un arbre
 - implémenter les graines de Sunflower qui augmentent la probabilité de pop de sunflower.
 - implémenter une accélération progressive sur l'axe des X, pour pouvoir se positionner plus facilement.
 - Modifier le volume sonore des sons du jeu (ActionWidget)
