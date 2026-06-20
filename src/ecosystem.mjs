@@ -388,7 +388,7 @@ class SunflowerSystem {
 
     if (chunkManager.getTileAt(soilIndex) !== GRASSFOREST) return
     if (this.#spotsBySoil.has(soilIndex)) return
-    if (oakSystem.isOakAt(soilIndex - 2) || oakSystem.isOakAt(soilIndex + 2)) return
+    if (oakSystem.isOakAtColumn((soilIndex & 0x3ff) - 2) || oakSystem.isOakAtColumn((soilIndex & 0x3ff) + 2)) return
 
     const y = soilIndex >> 10
     const index = soilIndex - 2 * WORLD_WIDTH
@@ -439,10 +439,10 @@ class SunflowerSystem {
    * @param {number} i4 — tuile "4" (2 tuiles à droite de l'arbre)
    */
   onSunflowerLateralSpotCheck (i1, i2, i3, i4) { // pas d'allocation de tableau
-    if (!oakSystem.isOakAt(i1 - 2)) this.onSunflowerSpotCheck(findSurfaceIndex(i1))
-    if (!oakSystem.isOakAt(i2 - 2)) this.onSunflowerSpotCheck(findSurfaceIndex(i2))
-    if (!oakSystem.isOakAt(i3 + 2)) this.onSunflowerSpotCheck(findSurfaceIndex(i3))
-    if (!oakSystem.isOakAt(i4 + 2)) this.onSunflowerSpotCheck(findSurfaceIndex(i4))
+    if (!oakSystem.isOakAtColumn((i1 & 0x3ff) - 2)) this.onSunflowerSpotCheck(findSurfaceIndex(i1))
+    if (!oakSystem.isOakAtColumn((i2 & 0x3ff) - 2)) this.onSunflowerSpotCheck(findSurfaceIndex(i2))
+    if (!oakSystem.isOakAtColumn((i3 & 0x3ff) + 2)) this.onSunflowerSpotCheck(findSurfaceIndex(i3))
+    if (!oakSystem.isOakAtColumn((i4 & 0x3ff) + 2)) this.onSunflowerSpotCheck(findSurfaceIndex(i4))
   }
 
   /**
@@ -1082,6 +1082,7 @@ class OakSystem {
   #oakList = [] // record[] — tous les oaks
   #oakByChunk = new Map() // Map<chunkKey, Set> — lookup spatial pour onPreloadChunksChanged
   #oakBySoil = new Map() // Map<soilIndex, record> — 3 entrées par oak (soilIndex, +1, +2) : détection minage/changement du sol
+  #oakXSet = new Set() // Set<number> — x (leftmost) des oaks vivants : exclusion de distance min. (sunflower)
   #oakDisplayed = new Set() // Set<record> — oaks dans les chunks preload (cible render)
 
   // --- Bolete (MUSHROOM) ---
@@ -1114,6 +1115,7 @@ class OakSystem {
     this.#oakList.length = 0
     this.#oakByChunk.clear()
     this.#oakBySoil.clear()
+    this.#oakXSet.clear()
     this.#oakDisplayed.clear()
 
     this.boleteByTile.clear()
@@ -1138,6 +1140,9 @@ class OakSystem {
       this.#oakBySoil.set(record.soilIndex, record)
       this.#oakBySoil.set(record.soilIndex + 1, record)
       this.#oakBySoil.set(record.soilIndex + 2, record)
+      this.#oakXSet.set((record.soilIndex & 0x3ff), record)
+      this.#oakXSet.set((record.soilIndex & 0x3ff) + 1, record)
+      this.#oakXSet.set((record.soilIndex & 0x3ff) + 2, record)
       addToByTileTree(this.oakByTile, record)
       addToByChunk(this.#oakByChunk, record)
 
@@ -1245,12 +1250,11 @@ class OakSystem {
   isPresent (record) { return record.kind === PLANT_KIND.TREE ? !record.deleted : record.present }
 
   /**
-   * Indique si un oak vivant occupe exactement cette tuile de sol. O(1), zéro allocation —
-   * délègue à #oakBySoil, déjà peuplée avec les 3 tuiles de sol de chaque oak vivant.
-   * @param {number} tileIndex — (y << 10) | x
+   * Indique si un oak vivant occupe cette tuile de sol. O(1), zéro allocation —
+   * @param {number} x
    * @returns {boolean}
    */
-  isOakAt (tileIndex) { return this.#oakBySoil.has(tileIndex) }
+  isOakAtColumn (x) { return this.#oakXSet.has(x) }
 
   /** Liaison EventBus : 'time/every-hour-16' — tous les bolete présents repassent à false. */
   onHour16Bolete () {
@@ -1384,6 +1388,10 @@ class OakSystem {
     this.#oakBySoil.delete(record.soilIndex)
     this.#oakBySoil.delete(record.soilIndex + 1)
     this.#oakBySoil.delete(record.soilIndex + 2)
+    // #oakXSet — 3 entrées
+    this.#oakXSet.delete(record.soilIndex & 0x3ff)
+    this.#oakXSet.delete(record.soilIndex & 0x3ff + 1)
+    this.#oakXSet.delete(record.soilIndex & 0x3ff + 2)
 
     // Persistance : marque deleted
     record.deleted = true
