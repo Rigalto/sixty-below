@@ -321,39 +321,58 @@ class SunflowerSystem {
       // TODO : prendre en compte les graines de sunflower plantées (influence sur le tirage)
       if (!blockedTiles.canPlace(record.index) || !blockedTiles.canPlace(record.index + WORLD_WIDTH)) continue
 
-      record.present = true
-      addToByTile(this.byTile, record)
-      addToByChunk(this.#byChunk, record)
-      this.#bySoil.set(record.soilIndex, record)
-      blockedTiles.blockPlacement(record.index)
-      blockedTiles.blockPlacement(record.index + WORLD_WIDTH)
-      saveManager.queueStaticUpdate({storeName: 'plant', record})
+      this.#growSpot(record)
       grown++
     }
+    this.growSewedSunflowers()
     buildDisplayed(this.#displayed, this.#byChunk, camera.preloadChunks)
   }
 
   /**
-   * Microtâche : peuple byTile, #byChunk et #displayed pour les spots tirés à 18%.
-   * Bloque les tuiles occupées dans blockedTiles.
+   * Fait pousser à 100% les sunflowers issus des graines plantées par le joueur (#sewedTiles).
+   * Pour chaque tuile : ignore si plus de spot, déjà
+   * present, ou l'une des 2 tuiles du corps (index, index+W) bloquée ou non-SKY. Sinon fait
+   * pousser le spot. Vide #sewedTiles en une seule fois (toutes les graines sont consommées,
+   * qu'elles aient germé ou non).
    */
-  bloomSunflower_ () {
-    this.#currentImage = this.#imgLeft
-    for (const record of this.#list) {
-      // TODO : prendre en compte les graines de sunflower plantées (18 => 80)
-      const present = seededRNG.randomGetPercent(18)
-      if (!present) continue
-      if (!blockedTiles.canPlace(record.index) || !blockedTiles.canPlace(record.index + WORLD_WIDTH)) continue
+  growSewedSunflowers () {
+    if (this.#sewedTiles.length === 0) return
+    const SKY = NODES.SKY.code
+    const W = WORLD_WIDTH
 
-      record.present = true
-      addToByTile(this.byTile, record)
-      addToByChunk(this.#byChunk, record)
-      this.#bySoil.set(record.soilIndex, record)
-      blockedTiles.blockPlacement(record.index)
-      blockedTiles.blockPlacement(record.index + WORLD_WIDTH)
-      saveManager.queueStaticUpdate({storeName: 'plant', record})
+    for (const tileIndex of this.#sewedTiles) {
+      const record = this.#spotsBySoil.get(tileIndex)
+      if (record === undefined) continue
+      if (record.present) continue
+
+      const tile1 = record.index
+      const tile2 = record.index + W
+      if (chunkManager.getTileAt(tile1) !== SKY) continue
+      if (chunkManager.getTileAt(tile2) !== SKY) continue
+      if (!blockedTiles.canPlace(tile1)) continue
+      if (!blockedTiles.canPlace(tile2)) continue
+
+      this.#growSpot(record)
     }
-    buildDisplayed(this.#displayed, this.#byChunk, camera.preloadChunks)
+
+    this.#sewedTiles.length = 0
+    database.setGameState('sewedsunflower', this.#sewedTiles)
+  }
+
+  /**
+   * Fait pousser un spot sunflower : marque present, peuple les structures, bloque les
+   * 2 tuiles du corps (record.index, record.index + W) et persiste. Aucune vérification —
+   * l'appelant garantit que le spot est éligible (non present, tuiles libres).
+   * @param {object} record
+   */
+  #growSpot (record) {
+    record.present = true
+    addToByTile(this.byTile, record)
+    addToByChunk(this.#byChunk, record)
+    this.#bySoil.set(record.soilIndex, record)
+    blockedTiles.blockPlacement(record.index)
+    blockedTiles.blockPlacement(record.index + WORLD_WIDTH)
+    saveManager.queueStaticUpdate({storeName: 'plant', record})
   }
 
   /** Liaison EventBus : 'time/every-hour-10' — pivot vers le centre. */
@@ -428,6 +447,15 @@ class SunflowerSystem {
       list.length--
     }
     this.#spotsBySoil.delete(record.soilIndex)
+
+    // Retrait de la graine plantée sur ce spot, si elle existe
+    const seedIdx = this.#sewedTiles.indexOf(record.soilIndex)
+    if (seedIdx !== -1) {
+      this.#sewedTiles[seedIdx] = this.#sewedTiles[this.#sewedTiles.length - 1]
+      this.#sewedTiles.length--
+      database.setGameState('sewedsunflower', this.#sewedTiles)
+    }
+
     record.deleted = true
     saveManager.queueStaticUpdate({storeName: 'plant', record})
   }
@@ -607,6 +635,10 @@ class SunflowerSystem {
    * @param {number} tileIndex — (y << 10) | x, tuile plantée
    */
   onSewedSunflower (tileIndex) {
+    if (!this.#spotsBySoil.has(tileIndex)) {
+      console.error(`SunflowerSystem.onSewedSunflower: aucun spot à tileIndex ${tileIndex}`)
+      return
+    }
     this.#sewedTiles.push(tileIndex)
     database.setGameState('sewedsunflower', this.#sewedTiles)
   }
