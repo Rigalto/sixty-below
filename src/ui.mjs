@@ -4,10 +4,11 @@ import {eventBus, seededRNG} from './utils.mjs'
 import {gameCore} from './core.mjs'
 import {buffManager} from './buff.mjs'
 import {playerManager} from './player.mjs'
-import {IS_DEV, WEATHER_TYPE, MOON_PHASE, MOON_PHASE_BLURRED, STATE, OVERLAYS, UI_LAYOUT, PATH_INVENTORY, PATH_CRAFT, PATH_TROPHY, PATH_HELP, PATH_NEW_WORLD, PATH_SAVE, PATH_RESTORE, PATH_DEBUG, PATH_CANCEL, SVG_ICON, PLAYER} from './constant.mjs'
+import {IS_DEV, WEATHER_TYPE, MOON_PHASE, MOON_PHASE_BLURRED, STATE, OVERLAYS, UI_LAYOUT, PATH_INVENTORY, PATH_CRAFT, PATH_TROPHY, PATH_HELP, PATH_ZOOM_IN, PATH_ZOOM_OUT, PATH_NEW_WORLD, PATH_SAVE, PATH_RESTORE, PATH_DEBUG, PATH_CANCEL, SVG_ICON, PLAYER} from './constant.mjs'
 import {furnitureManager} from './housing.mjs'
 import {floraManager} from './ecosystem.mjs'
 import {ITEMS} from '../assets/data/data.mjs'
+import {ZOOM_STEP} from './render.mjs'
 
 /* ====================================================================================================
    CSS - injection des styles utilisés par toutes les classes du fichier
@@ -102,7 +103,8 @@ uiStyle.textContent = /* css */`
   justify-content: center;
 }
 #menu-bar-root .menu-bar-btn svg            { width: 100%; height: 100%; }
-#menu-bar-root .menu-bar-btn:hover          { border-color: #bdc3c7; color: #ffffff; }
+#menu-bar-root .menu-bar-btn:hover:not(:disabled) { border-color: #bdc3c7; color: #ffffff; }
+#menu-bar-root .menu-bar-btn:disabled       { opacity: 0.35; cursor: default; }
 #menu-bar-root .menu-bar-btn-meta           { background-color: #442222; border-color: #663333; }
 #menu-bar-root .menu-bar-btn-meta:hover     { border-color: #cc4444; }
 
@@ -373,6 +375,8 @@ class MenuBarWidget {
   #btnCraft = null // bouton ouverture craft
   #btnAchievement = null // bouton ouverture succès
   #btnHelp = null // bouton ouverture aide
+  #btnZoomIn = null // bouton zoom avant
+  #btnZoomOut = null // bouton zoom arrière
   #btnNewWorld = null // bouton nouveau monde (meta)
   #btnSnapshot = null // bouton snapshot debug (meta)
 
@@ -394,6 +398,8 @@ class MenuBarWidget {
     const btnCraft = this.#createBtn('btn-craft', PATH_CRAFT, 'Open Crafting [C]')
     const btnAchievement = this.#createBtn('btn-achievement', PATH_TROPHY, 'Achievements [U]')
     const btnHelp = this.#createBtn('btn-help', PATH_HELP, 'Help [H]')
+    const btnZoomIn = this.#createBtn('btn-zoom-in', PATH_ZOOM_IN, 'Zoom In')
+    const btnZoomOut = this.#createBtn('btn-zoom-out', PATH_ZOOM_OUT, 'Zoom Out')
     const btnNew = this.#createBtn('btn-new', PATH_NEW_WORLD, 'Generate New World', true)
     const btnSnap = this.#createBtn('btn-snap', PATH_DEBUG, 'Debug:\nClick → Copy Snapshot\n² → Log Micro-tasks, Tasks & eventBus\nT → time x1/x10/x20 (cycle)', true)
 
@@ -402,6 +408,8 @@ class MenuBarWidget {
     this.#container.appendChild(btnCraft)
     this.#container.appendChild(btnAchievement)
     this.#container.appendChild(btnHelp)
+    this.#container.appendChild(btnZoomIn)
+    this.#container.appendChild(btnZoomOut)
     this.#container.appendChild(btnNew)
     this.#container.appendChild(btnSnap)
 
@@ -418,6 +426,8 @@ class MenuBarWidget {
     this.#btnCraft = btnCraft
     this.#btnAchievement = btnAchievement
     this.#btnHelp = btnHelp
+    this.#btnZoomIn = btnZoomIn
+    this.#btnZoomOut = btnZoomOut
     this.#btnNewWorld = btnNew
     this.#btnSnapshot = btnSnap
     if (!IS_DEV) this.#btnSnapshot.style.display = 'none'
@@ -448,8 +458,23 @@ class MenuBarWidget {
     this.#btnCraft.addEventListener('click', this.#onCraftClick.bind(this))
     this.#btnAchievement.addEventListener('click', this.#onAchievementClick.bind(this))
     this.#btnHelp.addEventListener('click', this.#onHelpClick.bind(this))
+    this.#btnZoomIn.addEventListener('click', this.#onZoomInClick.bind(this))
+    this.#btnZoomOut.addEventListener('click', this.#onZoomOutClick.bind(this))
     this.#btnNewWorld.addEventListener('click', this.#onNewWorldClick.bind(this))
     this.#btnSnapshot.addEventListener('click', this.#onSnapshotClick.bind(this))
+
+    this.onZoomChanged = this.onZoomChanged.bind(this)
+    eventBus.on('render/zoom-changed', this.onZoomChanged)
+  }
+
+  /**
+ * Grise le bouton zoom-in/zoom-out quand la borne correspondante est atteinte.
+ * Liaison EventBus : 'render/zoom-changed'.
+ * @param {{zoom: number, min: number, max: number}} param
+ */
+  onZoomChanged ({zoom, min, max}) {
+    this.#btnZoomIn.disabled = zoom >= max
+    this.#btnZoomOut.disabled = zoom <= min
   }
 
   /**
@@ -463,6 +488,10 @@ class MenuBarWidget {
   #onAchievementClick () { eventBus.emit('overlay/open-request', 'achievement') }
 
   #onHelpClick () { eventBus.emit('overlay/open-request', 'help') }
+
+  #onZoomInClick () { eventBus.emit('render/set-zoom', ZOOM_STEP) }
+
+  #onZoomOutClick () { eventBus.emit('render/set-zoom', -ZOOM_STEP) }
 
   #onNewWorldClick () { eventBus.emit('overlay/open-request', 'creation') }
 

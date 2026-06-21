@@ -213,7 +213,7 @@ Cette section définit les événements officiels. Tout nouvel événement doit 
 | S | `debug/frame-sample`| `{updateTime, renderTime, microTime}` | Temps exécution dans la loop pour les 3 budgets. |
 | S | `debug/buff-manager` | _(none)_ | Affiche sur la console le contenu de `#values` et `#fns`. |
 
-#### Core / State (`KeyboardManager`)
+#### Core / Clavier & State (`KeyboardManager`)
 
 | Dir. | Event Name | Payload Structure | Description |
 | :---: | :--- | :--- | :--- |
@@ -236,6 +236,12 @@ Cette section définit les événements officiels. Tout nouvel événement doit 
 | S | `combat/close` | — | Fermeture de l'overlay combat. |
 | S | `map/close` | — | Fermeture de l'overlay carte. |
 | S | `hotbar/select-slot` | `number` slotIndex | Sélection d'un slot de la hotbar. |
+
+#### Core / Souris (`MouseManager`)
+
+| Dir. | Event Name | Payload Structure | Description |
+| :---: | :--- | :--- | :--- |
+| S | `render/set-zoom` | `zoomIncrement: number` | Modifie le niveau de zoom (-0.2 ou +0.2). |
 
 #### Sons et musique (`SoundManager`)
 
@@ -261,7 +267,8 @@ Cette section définit les événements officiels. Tout nouvel événement doit 
 | Dir. | Event Name | Payload Structure | Description |
 | :---: | :--- | :--- | :--- |
 | E | `overlay/open-request`| `string` (Overlay ID) | Demande d'ouverture d'un overlay. Traitée par `KeyboardManager`. |
-
+| E | `render/zoom-changed` | `{zoom: number, min: number, max: number}` | Met à jour l'état `disabled` des boutons zoom-in/zoom-out.
+| S | `render/set-zoom` | `zoomIncrement: number` | Modifie le niveau de zoom (-0.2 ou +0.2). |
 
 #### Control Panel / Dialogue de création (`CreationDialogOverlay`)
 
@@ -315,9 +322,10 @@ Cette section définit les événements officiels. Tout nouvel événement doit 
 
 | Dir. | Event Name | Payload Structure | Description |
 | :--- | :--- | :--- |
-| E | `render/set-zoom` | `zoomLevel: number` | Modifie le niveau de zoom (1.0-2.0). |
+| E | `render/set-zoom` | `zoomIncrement: number` | Modifie le niveau de zoom (-0.2 ou +0.2). |
 | E | `time/sky-color-changed`| `string` (Hex Color) | Émis uniquement si la couleur change. |
 | S | `camera/preload-chunks-changed` | `Set<number>` | Émis à chaque changement de `preloadChunks`. |
+| S | `render/zoom-changed` | `{zoom: number, min: number, max: number}` | Met à jour l'état `disabled` des boutons zoom-in/zoom-out.
 
 #### Furniture (`FurnitureManager`)
 

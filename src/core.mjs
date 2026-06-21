@@ -8,7 +8,7 @@ import {timeManager, taskScheduler, microTasker, eventBus, seededRNG, parseLootC
 import {database, uniqueIdGenerator} from './database.mjs'
 import {chunkManager} from './world.mjs'
 import {saveManager} from './persistence.mjs'
-import {camera, worldRenderer} from './render.mjs'
+import {ZOOM_STEP, camera, worldRenderer} from './render.mjs'
 import {buffManager} from './buff.mjs'
 import {creationDialogOverlay, seedWidget, tileHoverWidget} from './ui.mjs'
 import {helpOverlay} from './help.mjs'
@@ -785,8 +785,6 @@ const MOVEMENT_MAP_GAME = {
   KeyD: 8
 }
 
-const ZOOM_STEP = 0.2 // pas de zoom par cran de molette
-
 const OVERLAY_MAP = {
   ...(IS_DEV && {m: 'map', M: 'map'}),
   i: 'inventory',
@@ -1071,7 +1069,7 @@ class MouseManager {
   onWheel (e) {
     e.preventDefault() // Bloque le scroll de page
     const step = e.deltaY < 0 ? ZOOM_STEP : -ZOOM_STEP
-    eventBus.emit('render/set-zoom', camera.zoom + step)
+    eventBus.emit('render/set-zoom', step)
   }
 
   // Voici la procédure pour désactiver les Gestes de bascule (Rocker Gestures) dans Vivaldi :

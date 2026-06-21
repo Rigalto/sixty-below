@@ -50,6 +50,9 @@ document.head.appendChild(renderStyle)
    ==================================================================================================== */
 
 const CAMERA_LERP = 0.1 // facteur de lissage du suivi caméra
+export const ZOOM_STEP = 0.2 // pas de zoom par cran (molette ou bouton)
+const ZOOM_MIN = 1.0 // niveau de zoom minimum (100%)
+const ZOOM_MAX = 2.0 // niveau de zoom maximum (200%)
 
 class Camera {
   #lastTargetX = 0 // Dernière cible (centre joueur, pixels Monde) reçue par update() — réutilisée par setZoom()
@@ -96,16 +99,20 @@ class Camera {
     this.y = Math.max(0, Math.min(camY, maxY)) | 0
     this.currentChunkIndex = (this.x >> 8) + ((this.y >> 8) * WORLD_CHUNKS_X)
 
+    eventBus.emit('render/zoom-changed', {zoom: this.zoom, min: ZOOM_MIN, max: ZOOM_MAX})
+
     this.#updateChunkLists()
   }
 
   /**
    * Modifie le zoom et recalcule la position pour rester dans les bornes
-   * @param {number} level - Facteur de zoom (ex: 0.5, 1, 2)
+   * Émet 'render/zoom-changed' avec l'état courant et les bornes.
+   * @param {number} increment - Modification du zoom (ex: -0.2 ou +0.2)
    */
-  setZoom (level) {
+  setZoom (increment) {
+    const level = this.zoom + increment
     // Sécurité pour éviter division par 0 ou zoom négatif
-    this.zoom = Math.max(1.0, Math.min(level, 2.0))
+    this.zoom = Math.max(ZOOM_MIN, Math.min(level, ZOOM_MAX))
 
     // On recentre sur la dernière position réelle du joueur
     this.init({x: this.#lastTargetX, y: this.#lastTargetY})
