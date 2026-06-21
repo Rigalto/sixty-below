@@ -2,7 +2,7 @@
 // SunflowerSystem - OleanderSystem - ParsnipSystem - CobwebSystem - SampleSystem
 
 import {WORLD_WIDTH, WORLD_HEIGHT, MICROTASK, TOPSOIL_Y_SKY_SURFACE, TOPSOIL_Y_SURFACE_UNDER, TOPSOIL_Y_UNDER_CAVERNS} from './constant.mjs'
-import {uniqueIdGenerator} from './database.mjs'
+import {database, uniqueIdGenerator} from './database.mjs'
 
 import {eventBus, seededRNG, blockedTiles, microTasker, taskScheduler} from './utils.mjs'
 import {NODES, ITEMS, PLANT_KIND, PLANT_TYPE, PLANT_SYSTEM_LOOKUP, ALL_PLANT_SYSTEMS, COBWEB_GROWTH_DELAY_MS, SUNFLOWER_RATE, PARSNIP_RATE, TREE_IMAGES} from '../assets/data/data.mjs'
@@ -162,6 +162,8 @@ class SunflowerSystem {
   #imgRight = null // ITEMS.sunflower.placedRight — tête à droite (13h–17h)
   #currentImage = null // pointeur vers l'image active
 
+  #sewedTiles = [] // number[] — tileIndex des graines de sunflower plantées par le joueur
+
   constructor () {
     // eventBus
     this.onFirstLoopSunflower = this.onFirstLoopSunflower.bind(this)
@@ -180,6 +182,8 @@ class SunflowerSystem {
     eventBus.on('ecosystem/tree-destroyed', this.onTreeDestroyedSunflower)
     this.onTreePlantedSunflower = this.onTreePlantedSunflower.bind(this)
     eventBus.on('ecosystem/tree-planted', this.onTreePlantedSunflower)
+    this.onSewedSunflower = this.onSewedSunflower.bind(this)
+    eventBus.on('sewed/sunflower', this.onSewedSunflower)
     // micro-tâches
     this.bloomSunflower = this.bloomSunflower.bind(this)
     this.unbloomSunflower = this.unbloomSunflower.bind(this)
@@ -208,6 +212,8 @@ class SunflowerSystem {
     this.#imgMid = item.placed
     this.#imgRight = item.placedRight
     this.#currentImage = this.#imgLeft
+
+    this.#sewedTiles.length = 0
   }
 
   /**
@@ -571,6 +577,35 @@ class SunflowerSystem {
       microTasker.enqueue(this.onSunflowerSpotCheck, priority, capacity, tileIndex)
     }
   }
+
+  // /////// //
+  // GRAINES //
+  // /////// //
+
+  /**
+   * Restaure la liste des tuiles de graines de sunflower plantées par le joueur, lue depuis
+   * gamestate au démarrage de session. Remplace le contenu courant de #sewedTiles.
+   * @param {number[]} sewedTiles — tableau persisté (gamestate.sewedsunflower), [] si absent
+   */
+  initSeed (sewedTiles) {
+    this.#sewedTiles.length = 0
+    for (const tileIndex of sewedTiles) this.#sewedTiles.push(tileIndex)
+  }
+
+  /**
+   * Liaison EventBus : 'sewed/sunflower' — le joueur a planté une graine de sunflower sur
+   * une tuile GRASSFOREST valide (vérifications déjà faites par SewingManager). Mémorise la
+   * tuile et persiste immédiatement la liste complète dans gamestate.
+   * @param {number} tileIndex — (y << 10) | x, tuile plantée
+   */
+  onSewedSunflower (tileIndex) {
+    this.#sewedTiles.push(tileIndex)
+    database.setGameState('sewedsunflower', this.#sewedTiles)
+  }
+
+  // ///// //
+  // DEBUG //
+  // ///// //
 
   /**
  * DEBUG — Affiche un cercle bleu au centre de chaque spot enregistré dans #list.
