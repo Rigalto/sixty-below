@@ -429,7 +429,16 @@ class InventoryDebug {
 
     if (command === 'emit') {
       const eventName = parts[1]
-      const payload = parts[2] !== undefined ? parts.slice(2).join(' ') : undefined
+      let payload = parts[2] !== undefined ? parts.slice(2).join(' ') : undefined
+
+      // Si le payload existe, on vérifie s'il s'agit d'un entier valide
+      if (payload !== undefined) {
+        const parsed = Number(payload)
+        if (Number.isInteger(parsed) && String(parsed) === payload.trim()) {
+          payload = parsed
+        }
+      }
+
       eventBus.emit(eventName, payload)
       return
     }
