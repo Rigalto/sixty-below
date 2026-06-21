@@ -545,7 +545,7 @@ export const ITEMS = {
   vegetableSoup: {name: 'Vegetable Soup', type: ITEM_TYPE.FOOD | ITEM_TYPE.USABLE, stype: 'food', star: 2, image: 'potions_32_32-1-5', help: 'Soups', tooltip: '???'},
 
   sunflower: {name: 'Sunflower', type: 0, stype: 'herb', star: 1, image: null, placed: 'placed_16_32-2-1', placedLeft: 'placed_16_32-3-1', placedRight: 'placed_16_32-4-1', help: 'Sunflower', tooltip: 'Blooms at dawn and always faces the sun', foraging: {speed: 2400, items: [{item: 'sunflowerSeed', count: '3-4'}, {item: 'worm', count: 0.10, buffs: ['lucky:100', 'rainy:200']}]}},
-  sunflowerSeed: {name: 'Sunflower Seed', type: ITEM_TYPE.SEED | ITEM_TYPE.PLACABLE, stype: 'seed', star: 1, image: 'potions_32_32-1-5', placed: 'fuws_32_32-4-0', help: 'Sunflower', tooltip: '???'},
+  sunflowerSeed: {name: 'Sunflower Seed', type: ITEM_TYPE.SEED | ITEM_TYPE.PLACABLE, stype: 'seed', star: 1, image: 'mined_32_32-6-3', placed: 'placed_16_16-1-0', help: 'Sunflower', tooltip: '???'},
   sunflowerOil: {name: 'Sunflower Oil', type: 0, stype: 'oil', star: 1, image: 'potions_32_32-1-5', placed: 'fuws_32_32-4-0', help: 'Sunflower', tooltip: 'Used in cooking, potions, and as a mechanical lubricant'},
 
   oleander: {name: 'Oleander', type: 0, stype: 'herb', star: 3, image: 'mined_32_32-6-1', placed: 'placed_16_48-1-0', help: 'Oleander', tooltip: '???', foraging: {speed: 2400, items: [{item: 'oleander', count: '1-5'}, {item: 'oleanderBulb', count: '1-2'}, {item: 'snail', count: 0.12, buffs: ['lucky:100', 'rainy:300']}]}},
