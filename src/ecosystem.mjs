@@ -428,7 +428,6 @@ class SunflowerSystem {
     const x = soilIndex & 0x3FF
 
     if (chunkManager.getTileAt(soilIndex) !== GRASSFOREST) return
-    console.log('>>>>>>>>>>>>>> onSunflowerSpotCheck', soilIndex, this.#spotsBySoil.has(soilIndex), this.#spotsBySoil.size)
     if (this.#spotsBySoil.has(soilIndex)) return
     if (oakSystem.isOakAtColumn((soilIndex & 0x3ff) - 2) || oakSystem.isOakAtColumn((soilIndex & 0x3ff) + 2)) return
 
@@ -547,11 +546,13 @@ class SunflowerSystem {
     const GRASSFOREST = NODES.GRASSFOREST.code
 
     // Cas 1 — tuile du corps
-    const byBodyRecord = this.byTile.get(tileIndex)
-    if (byBodyRecord !== undefined && tileNewCode !== SKY) {
-      if (chunkManager.getTileAt(byBodyRecord.index) !== SKY ||
+    if (tileNewCode !== SKY) {
+      const byBodyRecord = this.byTile.get(tileIndex)
+      if (byBodyRecord !== undefined) {
+        if (chunkManager.getTileAt(byBodyRecord.index) !== SKY ||
         chunkManager.getTileAt(byBodyRecord.index + WORLD_WIDTH) !== SKY) {
-        this.#destroyPresent(byBodyRecord)
+          this.#destroyPresent(byBodyRecord)
+        }
       }
     }
 
