@@ -157,6 +157,7 @@ class SunflowerSystem {
   #spotsBySoil = new Map() // Map<soilIndex, record> — tous les spots (présents ou non) : suppression O(1)
   #displayed = new Set() // Set<record> — spots dans les chunks preload (cible render)
 
+  #imgSeed = null // ITEMS.sunflowerSeed.placed — mis en cache dans init()
   #imgLeft = null // ITEMS.sunflower.placedLeft — tête à gauche (6h–10h), mis en cache dans init()
   #imgMid = null // ITEMS.sunflower.placed — tête au centre (10h–13h)
   #imgRight = null // ITEMS.sunflower.placedRight — tête à droite (13h–17h)
@@ -213,6 +214,7 @@ class SunflowerSystem {
     this.#imgRight = item.placedRight
     this.#currentImage = this.#imgLeft
 
+    this.#imgSeed = ITEMS.sunflowerSeed.placed // après hydratation
     this.#sewedTiles.length = 0
   }
 
@@ -248,8 +250,14 @@ class SunflowerSystem {
     const img = this.#currentImage
     for (const record of this.#displayed) {
       const pxX = (record.index & 0x3FF) << 4
-      const pxY = (record.index >> 10) << 4
+      const pxY = ((record.index >> 10) << 4) + 2
       ctx.drawImage(IMAGE_CACHE[img.imgIndex], img.sx, img.sy, img.sw, img.sh, pxX, pxY, img.sw, img.sh)
+    }
+    const seedImg = this.#imgSeed
+    for (const tileIndex of this.#sewedTiles) {
+      const pxX = (tileIndex & 0x3FF) << 4
+      const pxY = (tileIndex >> 10) << 4
+      ctx.drawImage(IMAGE_CACHE[seedImg.imgIndex], seedImg.sx, seedImg.sy, seedImg.sw, seedImg.sh, pxX, pxY, seedImg.sw, seedImg.sh)
     }
   }
 
@@ -960,7 +968,7 @@ class ParsnipSystem {
     const img = this.#image
     for (const record of this.#displayed) {
       const pxX = (record.index & 0x3FF) << 4
-      const pxY = (record.index >> 10) << 4
+      const pxY = ((record.index >> 10) << 4) + 2
       ctx.drawImage(IMAGE_CACHE[img.imgIndex], img.sx, img.sy, img.sw, img.sh, pxX, pxY, img.sw, img.sh)
     }
   }
@@ -1336,13 +1344,13 @@ class OakSystem {
     const img = this.#boleteImage
     for (const record of this.#boleteDisplayed) {
       const pxX = (record.index & 0x3FF) << 4
-      const pxY = (record.index >> 10) << 4
+      const pxY = ((record.index >> 10) << 4) + 2
       ctx.drawImage(IMAGE_CACHE[img.imgIndex], img.sx, img.sy, img.sw, img.sh, pxX, pxY, img.sw, img.sh)
     }
 
     for (const record of this.#oakDisplayed) {
       const rows = OAK_SIZE_ROWS[record.size]
-      const soilYPx = (record.soilIndex >> 10) << 4
+      const soilYPx = ((record.soilIndex >> 10) << 4) + 2
       for (let i = 0; i < rows.length; i++) {
         const image = record.images[rows[i]]
         const img = TREE_IMAGES[image.tree][image.row][image.col]
