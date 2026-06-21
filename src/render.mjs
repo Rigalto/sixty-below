@@ -52,6 +52,9 @@ document.head.appendChild(renderStyle)
 const CAMERA_LERP = 0.1 // facteur de lissage du suivi caméra
 
 class Camera {
+  #lastTargetX = 0 // Dernière cible (centre joueur, pixels Monde) reçue par update() — réutilisée par setZoom()
+  #lastTargetY = 0 // Dernière cible (centre joueur, pixels Monde) reçue par update() — réutilisée par setZoom()
+
   constructor () {
     // Position du coin haut-gauche du viewport (en pixels Monde)
     this.x = 0
@@ -104,12 +107,8 @@ class Camera {
     // Sécurité pour éviter division par 0 ou zoom négatif
     this.zoom = Math.max(1.0, Math.min(level, 2.0))
 
-    // On force une mise à jour immédiate pour replacer la caméra
-    // si le dé-zoom nous a fait sortir des limites du monde.
-    // On réutilise la position actuelle (this.x + le demi-écran logique actuel) comme cible.
-    const centerX = this.x + this.logicalHalfW
-    const centerY = this.y + this.logicalHalfH
-    this.init(centerX, centerY)
+    // On recentre sur la dernière position réelle du joueur
+    this.init({x: this.#lastTargetX, y: this.#lastTargetY})
   }
 
   /**
@@ -153,6 +152,10 @@ class Camera {
    * @param {{x: number, y: number}} target - Centre de la hitbox joueur en pixels monde
    */
   update ({x, y}) {
+    // Mémorisation de la cible réelle (réutilisée par setZoom)
+    this.#lastTargetX = x
+    this.#lastTargetY = y
+
     // 1. Calcul Cible Clampée
     const maxX = WORLD_PX_W - this.logicalWidth
     const maxY = WORLD_PX_H - this.logicalHeight

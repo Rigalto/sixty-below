@@ -785,6 +785,8 @@ const MOVEMENT_MAP_GAME = {
   KeyD: 8
 }
 
+const ZOOM_STEP = 0.2 // pas de zoom par cran de molette
+
 const OVERLAY_MAP = {
   ...(IS_DEV && {m: 'map', M: 'map'}),
   i: 'inventory',
@@ -987,6 +989,7 @@ class MouseManager {
     this.onMouseOut = this.onMouseOut.bind(this)
     this.onClick = this.onClick.bind(this)
     this.onContextMenu = this.onContextMenu.bind(this)
+    this.onWheel = this.onWheel.bind(this)
   }
 
   /**
@@ -1005,10 +1008,12 @@ class MouseManager {
     // - MouseOut : Reset Coordonnées
     // - Click : Gestion Clic Gauche
     // - ContextMenu : Gestion Clic Droit
+    // - Wheel : Zoom-in/Zoom-out
     this.#canvas.addEventListener('mousemove', this.onMouseMove)
     this.#canvas.addEventListener('mouseout', this.onMouseOut)
     this.#canvas.addEventListener('click', this.onClick)
     this.#canvas.addEventListener('contextmenu', this.onContextMenu)
+    this.#canvas.addEventListener('wheel', this.onWheel, {passive: false})
   }
 
   // "Read-and-Reset" Pattern pour les clics (indispensable car l'événement est instantané)
@@ -1057,6 +1062,16 @@ class MouseManager {
   onContextMenu (e) {
     e.preventDefault() // Bloque le menu natif
     this.right = true
+  }
+
+  /**
+   * Gestion Molette : zoom-in (deltaY < 0) / zoom-out (deltaY > 0)
+   * Émet 'render/set-zoom', les bornes sont appliquées par Camera.setZoom
+   */
+  onWheel (e) {
+    e.preventDefault() // Bloque le scroll de page
+    const step = e.deltaY < 0 ? ZOOM_STEP : -ZOOM_STEP
+    eventBus.emit('render/set-zoom', camera.zoom + step)
   }
 
   // Voici la procédure pour désactiver les Gestes de bascule (Rocker Gestures) dans Vivaldi :
