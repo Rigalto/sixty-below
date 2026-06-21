@@ -322,6 +322,7 @@ export const MICROTASK = {
   UNBLOOM_SUNFLOWER: {priority: 20, capacity: 1, taskName: 'unbloomSunflower'}, // gère les sunflower
   SUNFLOWER_SPOT_CHECK: {priority: 20, capacity: 10, taskName: 'onSunflowerSpotCheck'}, // suppression d'un spot de sunflower
   SUNFLOWER_LATERAL_SPOT_CHECK: {priority: 20, capacity: 2, taskName: 'onSunflowerLateralSpotCheck'}, // scan de surface + ajout d'un spot de sunflower (flancs d'arbre abattu)
+  SUNFLOWER_LATERAL_SPOT_REMOVE: {priority: 20, capacity: 2, taskName: 'onSunflowerLateralSpotRemove'}, // scan de surface + ajout d'un spot de sunflower (flancs d'arbre abattu)
 
   PARSNIP_SPOT_CHECK: {priority: 20, capacity: 10, taskName: 'onParsnipSpotCheck'}, // ajout d'un spot de parsnip
   BLOOM_PARSNIP: {priority: 20, capacity: 4, taskName: 'bloomParsnip'}, // reset + repousse nocturne des parsnips

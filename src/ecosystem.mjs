@@ -178,11 +178,14 @@ class SunflowerSystem {
     eventBus.on('world/tile-changed', this.onTileChangedSunflower)
     this.onTreeDestroyedSunflower = this.onTreeDestroyedSunflower.bind(this)
     eventBus.on('ecosystem/tree-destroyed', this.onTreeDestroyedSunflower)
+    this.onTreePlantedSunflower = this.onTreePlantedSunflower.bind(this)
+    eventBus.on('ecosystem/tree-planted', this.onTreePlantedSunflower)
     // micro-tâches
     this.bloomSunflower = this.bloomSunflower.bind(this)
     this.unbloomSunflower = this.unbloomSunflower.bind(this)
     this.onSunflowerSpotCheck = this.onSunflowerSpotCheck.bind(this)
     this.onSunflowerLateralSpotCheck = this.onSunflowerLateralSpotCheck.bind(this)
+    this.onSunflowerLateralSpotRemove = this.onSunflowerLateralSpotRemove.bind(this)
 
     // TODO : quand un oak est planté, invalider et supprimer les spots sunflower
     // dans le rayon [oakX - SUNFLOWER_OAK_MIN_DIST, oakX + SUNFLOWER_OAK_MIN_DIST].
@@ -484,6 +487,51 @@ class SunflowerSystem {
     if (!oakSystem.isOakAtColumn((i2 & 0x3ff) - 2)) this.onSunflowerSpotCheck(findSurfaceIndex(i2))
     if (!oakSystem.isOakAtColumn((i3 & 0x3ff) + 2)) this.onSunflowerSpotCheck(findSurfaceIndex(i3))
     if (!oakSystem.isOakAtColumn((i4 & 0x3ff) + 2)) this.onSunflowerSpotCheck(findSurfaceIndex(i4))
+  }
+
+  /**
+   * Liaison EventBus : 'ecosystem/tree-planted' — un arbre vient d'être planté, occupant
+   * 3 tuiles de sol à la même hauteur que tileIndex. Supprime directement les spots sunflower
+   * existants sur ces 3 positions (s'il y en a). Les 4 tuiles latérales (relief potentiellement
+   * différent) sont traitées en micro-tâche, symétriquement à onTreeDestroyedSunflower.
+   * @param {number} tileIndex — tuile centrale du sol occupé (payload identique à tree-destroyed)
+   */
+  onTreePlantedSunflower (tileIndex, treeId) {
+    if (treeId !== 'oak') return
+    let record = this.#spotsBySoil.get(tileIndex - 1)
+    if (record !== undefined) this.#removeSpot(record)
+
+    record = this.#spotsBySoil.get(tileIndex)
+    if (record !== undefined) this.#removeSpot(record)
+
+    record = this.#spotsBySoil.get(tileIndex + 1)
+    if (record !== undefined) this.#removeSpot(record)
+
+    const {priority, capacity} = MICROTASK.SUNFLOWER_LATERAL_SPOT_REMOVE
+    microTasker.enqueue(this.onSunflowerLateralSpotRemove, priority, capacity, tileIndex - 3, tileIndex - 2, tileIndex + 2, tileIndex + 3)
+  }
+
+  /**
+   * Micro-tâche : supprime les spots sunflower latéraux existants (2 par flanc) suite à une
+   * plantation d'arbre. Pour chaque tuile, recherche sa surface réelle (findSurfaceIndex,
+   * coût variable) puis supprime le spot s'il existe à ce soilIndex.
+   * @param {number} i1 — tuile "1" (2 tuiles à gauche de l'arbre)
+   * @param {number} i2 — tuile "2" (1 tuile à gauche de l'arbre)
+   * @param {number} i3 — tuile "3" (1 tuile à droite de l'arbre)
+   * @param {number} i4 — tuile "4" (2 tuiles à droite de l'arbre)
+   */
+  onSunflowerLateralSpotRemove (i1, i2, i3, i4) { // pas d'allocation de tableau
+    let record = this.#spotsBySoil.get(findSurfaceIndex(i1))
+    if (record !== undefined) this.#removeSpot(record)
+
+    record = this.#spotsBySoil.get(findSurfaceIndex(i2))
+    if (record !== undefined) this.#removeSpot(record)
+
+    record = this.#spotsBySoil.get(findSurfaceIndex(i3))
+    if (record !== undefined) this.#removeSpot(record)
+
+    record = this.#spotsBySoil.get(findSurfaceIndex(i4))
+    if (record !== undefined) this.#removeSpot(record)
   }
 
   /**
