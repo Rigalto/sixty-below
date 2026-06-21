@@ -456,9 +456,11 @@ class SunflowerSystem {
    * Les 2 colonnes de chaque flanc (zone auparavant exclue par la distance min. à l'oak)
    * peuvent avoir un relief différent : leur surface est recherchée en micro-tâche
    * (coût variable → hors budget handler).
-   * @param {number} tileIndex — tuile centrale du sol libéré (cf. OakSystem#destroyOak)
+   * @param {number} tileIndex — tuile centrale du sol libéré
+   * @param {string} treeId — identifiant de l'arbre
    */
-  onTreeDestroyedSunflower (tileIndex) {
+  onTreeDestroyedSunflower (tileIndex, treeId) {
+    if (treeId !== 'oak') return
     this.onSunflowerSpotCheck(tileIndex - 1)
     this.onSunflowerSpotCheck(tileIndex)
     this.onSunflowerSpotCheck(tileIndex + 1)
@@ -1039,9 +1041,11 @@ class ParsnipSystem {
    * libérant 3 tuiles de sol. Délègue à onParsnipSpotCheck pour chacune (GRASSFOREST +
    * absence de spot déjà vérifiés là-bas). Les tuiles avant/après l'arbre ne sont pas concernées
    * — déjà des spots potentiels indépendamment de la présence de l'arbre.
-   * @param {number} tileIndex — tuile centrale du sol libéré (cf. OakSystem#destroyOak)
+   * @param {number} tileIndex — tuile centrale du sol libéré
+   * @param {string} treeId — identifiant de l'arbre
    */
-  onTreeDestroyedParsnip (tileIndex) {
+  onTreeDestroyedParsnip (tileIndex, treeId) {
+    if (treeId !== 'oak') return
     this.onParsnipSpotCheck(tileIndex - 1)
     this.onParsnipSpotCheck(tileIndex)
     this.onParsnipSpotCheck(tileIndex + 1)
@@ -1051,9 +1055,11 @@ class ParsnipSystem {
    * Liaison EventBus : 'ecosystem/tree-planted' — un arbre vient d'être planté, occupant
    * 3 tuiles de sol. Supprime les spots parsnip existants à ces 3 positions (s'il y en a),
    * via #removeSpot (détruit la plante présente au préalable si besoin).
-   * @param {number} tileIndex — tuile centrale du sol occupé (payload identique à tree-destroyed)
+   * @param {number} tileIndex — tuile centrale du sol occupé
+   * @param {string} treeId — identifiant de l'arbre
    */
-  onTreePlantedParsnip (tileIndex) {
+  onTreePlantedParsnip (tileIndex, treeId) {
+    if (treeId !== 'oak') return
     const left = this.#spotsBySoil.get(tileIndex - 1)
     if (left !== undefined) this.#removeSpot(left)
 
@@ -1458,7 +1464,7 @@ class OakSystem {
     saveManager.queueStaticUpdate({storeName: 'plant', record})
 
     // Notifie les autres systèmes : nouveaux spots potentiels au sol libérés
-    eventBus.emit('ecosystem/tree-destroyed', record.soilIndex + 1)
+    eventBus.emit('ecosystem/tree-destroyed', record.soilIndex + 1, 'oak')
   }
 
   /**

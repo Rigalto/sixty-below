@@ -454,6 +454,8 @@ Cette section définit les événements officiels. Tout nouvel événement doit 
 | E | `time/every-hour-X` | `{ day, hour, minute, isDay }` | x : 0-23, émis à chaque passage à l'heure pile. |
 | E | `time/first-loop` | `{ day, hour, minute, tslot, weather, nextWeather, skyColor, moonPhase, isDay }` | Émis une seule fois au démarrage du rendu. |
 | E | `world/tile-changed` | `{ tileIndex: number, tileOldCode: number, tileNewCode: number }`| Le code de la tuile a été modifié. |
+| E | `ecosystem/tree-destroyed` | `number` (tileIndex), `string` treeId | Émis quand un arbre est entièrement abattu (size < 0). Payload = tuile centrale du sol (`soilIndex + 1`). |
+| E | `ecosystem/tree-planted` | `number` (tileIndex), `string` treeId | Émis quand un arbre est planté. Payload = tuile centrale du sol (`soilIndex + 1`). |
 
 #### Oleander (`OleanderSystem`)
 
@@ -468,8 +470,8 @@ Cette section définit les événements officiels. Tout nouvel événement doit 
 | :---: | :--- | :--- | :--- |
 | E | `time/every-hour-X` | `{ day, hour, minute, isDay }` | x : 0-23, émis à chaque passage à l'heure pile. |
 | E | `world/tile-changed` | `{ tileIndex: number, tileOldCode: number, tileNewCode: number }`| Le code de la tuile a été modifié. |
-| E | `ecosystem/tree-destroyed` | `number` (tileIndex) | Émis quand un arbre est entièrement abattu (size < 0). Payload = tuile centrale du sol (`soilIndex + 1`). |
-| E | `ecosystem/tree-planted` | `number` (tileIndex) | Émis quand un arbre est planté. Payload = tuile centrale du sol (`soilIndex + 1`). |
+| E | `ecosystem/tree-destroyed` | `number` (tileIndex), `string` treeId | Émis quand un arbre est entièrement abattu (size < 0). Payload = tuile centrale du sol (`soilIndex + 1`). |
+| E | `ecosystem/tree-planted` | `number` (tileIndex), `string` treeId | Émis quand un arbre est planté. Payload = tuile centrale du sol (`soilIndex + 1`). |
 
 #### Oak (`OakSystem`)
 
@@ -477,8 +479,8 @@ Cette section définit les événements officiels. Tout nouvel événement doit 
 | :---: | :--- | :--- | :--- |
 | E | `time/every-hour-X` | `{ day, hour, minute, isDay }` | x : 0-23, émis à chaque passage à l'heure pile. |
 | E | `world/tile-changed` | `{ tileIndex: number, tileOldCode: number, tileNewCode: number }`| Le code de la tuile a été modifié. |
-| S | `ecosystem/tree-destroyed` | `number` (tileIndex) | Émis quand un arbre est entièrement abattu (size < 0). Payload = tuile centrale du sol (`soilIndex + 1`). |
-| S | `ecosystem/tree-planted` | `number` (tileIndex) | Émis quand un arbre est planté. Payload = tuile centrale du sol (`soilIndex + 1`). |
+| S | `ecosystem/tree-destroyed` | `number` (tileIndex), `string` treeId | Émis quand un arbre est entièrement abattu (size < 0). Payload = tuile centrale du sol (`soilIndex + 1`). |
+| S | `ecosystem/tree-planted` | `number` (tileIndex), `string` treeId | Émis quand un arbre est planté. Payload = tuile centrale du sol (`soilIndex + 1`). |
 
 
 #### Debug (`WorldMapDebug`, `RealtimeDebugWidget`, `BuffManager`)
