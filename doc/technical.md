@@ -430,6 +430,13 @@ Cette section définit les événements officiels. Tout nouvel événement doit 
 | S | `world/tile-changed` | `{ tileIndex: number, tileOldCode: number, tileNewCode: number }`| Le code de la tuile a été modifié. |
 | S | `sound/play` | `name: string` | Joue le son `name`. |
 
+#### Plantage de graines dans le monde (`SowingManager`)
+
+| Dir. | Event Name | Payload Structure | Description |
+| :---: | :--- | :--- | :--- |
+| S | `sound/play` | `name: string` | Joue le son `name`. |
+| E | `sewed/sunflower` | `number` (tileIndex) | Le joueur plante une graine de sunflower. |
+
 #### Action de récolte (`ForagingManager`)
 
 | Dir. | Event Name | Payload Structure | Description |
@@ -464,8 +471,7 @@ Cette section définit les événements officiels. Tout nouvel événement doit 
 | E | `world/tile-changed` | `{ tileIndex: number, tileOldCode: number, tileNewCode: number }`| Le code de la tuile a été modifié. |
 | E | `ecosystem/tree-destroyed` | `number` (tileIndex), `string` treeId | Émis quand un arbre est entièrement abattu (size < 0). Payload = tuile centrale du sol (`soilIndex + 1`). |
 | E | `ecosystem/tree-planted` | `number` (tileIndex), `string` treeId | Émis quand un arbre est planté. Payload = tuile centrale du sol (`soilIndex + 1`). |
-| E | `sewed/sunflower` | `number` (tileIndex) | Émis par SewingManager quand le joueur plante une graine de sunflower sur une tuile GRASSFOREST valide et non bloquée. |
-
+| E | `sewed/sunflower` | `number` (tileIndex) | Le joueur plante une graine de sunflower. |
 
 #### Oleander (`OleanderSystem`)
 

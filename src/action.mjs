@@ -1,4 +1,4 @@
-// action.mjs — MiningManager - PlacingManager - ForagingManager - ChoppingManager
+// action.mjs — MiningManager - PlacingManager - ForagingManager - ChoppingManager - SowingManager
 
 import {eventBus, taskScheduler, microTasker, blockedTiles, rollLootWithBuffs} from './utils.mjs'
 import {NODE_TYPE, NODES, ITEM_TYPE, ITEMS, PLANT_SYSTEM_LOOKUP, PLANT_KIND} from '../assets/data/data.mjs'
@@ -695,3 +695,77 @@ class ChoppingManager {
   }
 }
 export const choppingManager = new ChoppingManager()
+
+/* ====================================================================================================
+   PLACEMENT DE GRAINES (SOWING)
+   ==================================================================================================== */
+
+class SowingManager {
+  /**
+   * Tente de planter la graine tenue en main sur la tuile cliquée.
+   * Délègue la logique métier par stype de graine.
+   * Seul point d'entrée depuis core.mjs (#processWorldClick).
+   * @param {number} tileIndex — (y << 10) | x — tuile cliquée
+   * @param {object} tileNode  — NODES_LOOKUP[tileCode]
+   * @param {object} item      — ITEMS[slot.item]
+   * @param {number} slotIndex — slot.slot (index hotbar, pour decrementHotbarSlotCount)
+   */
+  trySow (tileIndex, tileNode, item, slotIndex) {
+    if (buffManager.getBuff('playerFreeze')) return
+    if (item.code === 'sunflowerSeed') this.#trySowSunflowerSeed(tileIndex, tileNode, slotIndex)
+  }
+
+  /**
+   * Vérifie que la tuile est dans le rectangle d'interaction centré sur le joueur.
+   * Utilise 'interaction-range' — rectangle symétrique, sans composante directionnelle.
+   * @param {number} tileIndex — (y << 10) | x
+   * @returns {boolean}
+   */
+  #isInSowingRange (tileIndex) {
+    const {x: cx, y: cy} = playerManager.getCenterTile()
+    const rect = buffManager.getBuff('interaction-range')
+    const tileX = tileIndex & 0x3FF
+    const tileY = tileIndex >> 10
+    return tileX >= cx + rect.x && tileX < cx + rect.x + rect.w &&
+           tileY >= cy + rect.y && tileY < cy + rect.y + rect.h
+  }
+
+  /**
+   * Valide et exécute le placement d'une SunflowerSeed.
+   * Conditions : tuile GRASSFOREST, tuiles index-W et index-2W sont SKY et non bloquées.
+   * Silence si mauvaise tuile, 'wrong' si bloqué, 'placing' si succès.
+   * @param {number} tileIndex — tuile cliquée (le sol attendu)
+   * @param {object} tileNode
+   * @param {number} slotIndex
+   */
+  #trySowSunflowerSeed (tileIndex, tileNode, slotIndex) {
+    const GRASSFOREST = NODES.GRASSFOREST.code
+    const SKY = NODES.SKY.code
+    const W = WORLD_WIDTH
+
+    // Silence — mauvaise tuile de sol
+    if (tileNode.code !== GRASSFOREST) return
+
+    const body1 = tileIndex - W // tuile juste au-dessus
+    const body2 = body1 - W // tuile deux cases au-dessus
+
+    // Silence — tuiles du corps pas SKY
+    if (chunkManager.getTileAt(body1) !== SKY) return
+    if (chunkManager.getTileAt(body2) !== SKY) return
+
+    // 'toofar' — tuile hors de la zone d'interaction
+    if (!this.#isInSowingRange(tileIndex)) { eventBus.emit('sound/play', 'toofar'); return }
+
+    // 'wrong' — tuiles bloquées (furniture, plante déjà présente)
+    if (!blockedTiles.canPlace(body1) || !blockedTiles.canPlace(body2)) {
+      eventBus.emit('sound/play', 'wrong')
+      return
+    }
+
+    // Succès
+    eventBus.emit('sewed/sunflower', tileIndex)
+    inventoryManager.decrementHotbarSlotCount(slotIndex)
+    eventBus.emit('sound/play', 'placing')
+  }
+}
+export const sowingManager = new SowingManager()
