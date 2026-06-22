@@ -16,7 +16,6 @@
 - implémenter les graines de Sunflower qui augmentent la probabilité de pop de sunflower.
 - implémenter une accélération progressive sur l'axe des X, pour pouvoir se positionner plus facilement.
 - Modifier le volume sonore des sons du jeu (ActionWidget)
-- Implémenter le zoom.
 - Supprimer les actions de debug accessibles au joueur, quand hébergement sous GitHub :
   - affichage après génération du monde
   - DB_CONFIG.DEBUG constant.mjs
@@ -118,12 +117,6 @@ fs.writeFileSync('docs/help-rendered.html', htmlHelp.join('\n'))
 
 ## À faire — Gameplay
 
-### Exploration
-- Physique AABB et collisions
-- Caméra centrée joueur, zoom
-- Minage (vitesse selon `speed` du node, drops)
-- Cycle jour/nuit, météo, phases de lune
-
 ### Faune & Critters
 - Spawning par biome/layer (table MONSTERS)
 - Comportements : suit, fuit, erre
@@ -139,7 +132,6 @@ fs.writeFileSync('docs/help-rendered.html', htmlHelp.join('\n'))
 - Croissance des arbres (Oak, Mahogany, Cactus, Giant Mushroom)
 - Drops à l'abattage complet (Root, Mycelium, Taproot)
 - Agriculture : semences, pousses, récolte
-- Utiliser `placed`, `placedLeft` et `placedRight` pour sunfower en fonction de l'heure du jour
 
 ### Housing
 - Construction shelter (protection nocturne)
