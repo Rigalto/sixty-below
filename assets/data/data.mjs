@@ -534,7 +534,7 @@ export const ITEMS = {
 
   // Mushrooms - images OK
   bolete: {name: 'Bolete', type: 0, stype: 'mushroom', star: 1, image: 'mined_32_32-3-4', placed: 'placed_16_32-0-0', help: 'Surface Mushrooms', tooltip: '???', foraging: {speed: 2400, items: [{item: 'bolete', count: '1-3'}, {item: 'worm', count: 0.3, buffs: ['lucky:100', 'rainy:100']}]}},
-  pinkMycenia: {name: 'Pink Mycenia', type: 0, stype: 'mushroom', star: 1, image: 'mined_32_32-4-4', placed: 'placed_16_32-1-0', help: 'Surface Mushrooms', tooltip: '???', foraging: {speed: 2400, items: [{item: 'pinkMycenia', count: '1-3'}, {item: 'slug', count: 0.3, buffs: ['lucky:100', 'rainy:100']}]}},
+  pinkMycenia: {name: 'Pink Mycenia', type: 0, stype: 'mushroom', star: 2, image: 'mined_32_32-4-4', placed: 'placed_16_32-1-0', help: 'Surface Mushrooms', tooltip: '???', foraging: {speed: 2400, items: [{item: 'pinkMycenia', count: '1-3'}, {item: 'slug', count: 0.3, buffs: ['lucky:100', 'rainy:100']}]}},
   frostcap: {name: 'Frostcap', type: 0, stype: 'mushroom', star: 3, image: null, placed: 'mined_32_32-5-4', help: 'Cave Mushrooms', tooltip: '???', foraging: {speed: 2400, items: [{item: 'mushroomGill', count: '2-5'}, {item: 'snail', count: 0.3, buffs: ['lucky:100', 'rainy:100']}]}},
   dawncap: {name: 'Dawncap', type: 0, stype: 'mushroom', star: 3, image: null, placed: 'mined_32_32-6-4', help: 'Cave Mushrooms', tooltip: '???', foraging: {speed: 2400, items: [{item: 'mushroomGill', count: '2-5'}, {item: 'snail', count: 0.3, buffs: ['lucky:100', 'rainy:100']}]}},
   mushroomGill: {name: 'Mushroom Gill', type: 0, stype: 'mushroom', star: 3, image: 'mined_32_32-7-4', help: 'Cave Mushrooms', tooltip: '???'},

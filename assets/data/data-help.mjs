@@ -3296,6 +3296,19 @@ _Range bonus applies equally in all directions._
     title: 'Hammers',
     category: ['Tool'],
     content: `
+**Description**
+
+To be written
+
+**Hamming Types**
+
+To be written
+
+**Usage**
+
+* Shaking trees
+* Removing furnitures
+* Removing Walls
     `
   },
 
@@ -4736,8 +4749,8 @@ Surface Mushrooms grow at the base of [[Oak & Mahogany|Trees]] on the [[Forest]]
 
 **Location**
 
-* [[item:bolete]] ({{item:bolete:star|star}}) — [[Forest]] / [[Surface]], grows near [[Oak & Mahogany|Oak]] trees on [[node:grassForest]]
-* [[item:pinkMycenia]] ({{item:pinkMycenia:star|star}}) — [[Jungle]] / [[Surface]], grows near [[Oak & Mahogany|Mahogany]] trees on [[node:grassJungle]]
+* <<itemStar|bolete>> — [[Forest]] / [[Surface]], grows near [[Oak & Mahogany|Oak]] trees on [[node:grassForest]]
+* <<itemStar|pinkMycenia>> — [[Jungle]] / [[Surface]], grows near [[Oak & Mahogany|Mahogany]] trees on [[node:grassJungle]]
 
 **Blooming**
 
@@ -4755,8 +4768,8 @@ _All times are in-game. See [[Day & Night Cycle]] for reference._
 * [[Foraging|Interact to harvest]] — the mushroom disappears on harvest
 
 | Mushroom | Tool | Loot |
-|  [[item:bolete]] | Any [[Foraging Tools|Sickle]] | {{item:bolete:foraging:items}} |
-|  [[item:pinkMycenia]] | [[Foraging Tools|Iron Sickle]] or better | {{item:pinkMycenia:foraging:items}} |
+|  [[item:bolete]] | <<itemStar|sickleCopper>>  or better | {{item:bolete:foraging:items[*]:item|links}} |
+|  [[item:pinkMycenia]] |<<itemStar|sickleSilver>> or better | {{item:pinkMycenia:foraging:items[*]:item|links}} |
 
 **Usages**
 
@@ -6341,6 +6354,55 @@ It does not need to be equipped — carrying it in your [[Inventory]] is enough.
     category: ['Gameplay'],
     content: `
 **Description**
+
+<hr>
+
+**Interaction Range**
+
+* utilisé pour l'accès aux coffres (Inventory Panel)
+* utilisé pour l'accès aux coffres et aux Crafting Stations (Craft Panel)
+* utilisé pour le placement de furnitures dans le monde
+* utilisé pour retirer des furnitures du monde ([[Hammers]])
+* utilisé pour le plantage de graines
+* utilisé pour la récolte du Gardening
+
+**Interaction Range Buffs**
+
+To be designed
+
+<hr>
+
+**Mining Range**
+
+* utilisé pour le minage de blocks ([[Mining Tools|Pickaxes]])
+* utilisé pour le placement des blocks dans le monde
+
+**Mining Range Buffs**
+
+To be designed
+
+<hr>
+
+**Foraging Range**
+
+* utilisé pour le foraging des plantes ([[Foraging Tools|Sickles]])
+* utilisé pour le catching des critters ([[Catching Tools|Bug nets]])
+
+**Foraging Range Buffs**
+
+To be designed
+
+<hr>
+
+**Chopping Range**
+
+* utilisé pour l'abattage des arbres ([[Chopping Tools|Axes]])
+* utilisé pour le secouage des arbres ([[Hammers]])
+
+**Chopping Range Buffs**
+
+To be designed
+
   `
   },
   {
