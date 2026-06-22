@@ -495,7 +495,7 @@ class WorldGenerator {
       {key: 'losttemple', value: lostTemple},
       {key: 'moss', value: mossCaves},
       {key: 'mushrooms', value: mushroomCaves},
-      {key: 'naturalforaged', value: []},
+      {key: 'naturalforaged', value: new Set()},
       {key: 'nextweather', value: weather.nextWeather},
       {key: 'player', value: `${pxX}|${pxY}|1`},
       {key: 'pyramid', value: pyramid},
