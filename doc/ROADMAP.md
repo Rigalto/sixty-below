@@ -43,6 +43,7 @@
 ---
 
 ## Dette technique
+- Analyser s'il faut que le traitement de sowingManager soit effectué dans une micro-tâche.
 - Dédoubler les handlers d'eventBus : `onPreloadChunksChanged`, `onCraftPerformed`, `onSlotActive`, `onTeleportBegin`
 - Dans les attributs 'mining' et 'foraging' transférer dans 'buffs' ce qui n'y est pas encore.
 - Vérifier que la convention pour les variables privées est prise en compte partout et Vérifier que les en-têtes des fonctions sont présents et à jour (prise en compte des modifications de conception) :
@@ -92,7 +93,6 @@
 - Compléter les items : Oak Root, Mahogany Root, Mycelium, Taproot
 - Recettes utilisant les nouveaux matériaux (marbre, granite, obsidian, shell...)
 - Machines ancestrales : Décomposeur (rendement 80%) et Transmutateur — comme Furniture spécial
-- Hydrater les champs NODES.xxx.mining.keep (node)
 
 ### Utilitaire node.js pour génération du fichier d'aide
 
@@ -355,6 +355,8 @@ La Sap corrode le Copper. Il doit donc être remplacer par du Gold.
 - Minage (`MiningManager`)
 - Plaçage des blocs (`PlacingManager`)
 - Récolte des plantes et blocs de natural (`ForagingManager`)
+- Abattage des arbres (`ChoppingManager`)
+- Plantage de graines (`SowingManager`)
 
 ### Environement
 - Point d'entrée pour la flore (`FloraManager`)

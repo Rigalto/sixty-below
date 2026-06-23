@@ -329,37 +329,6 @@ class SunflowerSystem {
   }
 
   /**
-   * Fait pousser à 100% les sunflowers issus des graines plantées par le joueur (#sewedTiles).
-   * Pour chaque tuile : ignore si plus de spot, déjà
-   * present, ou l'une des 2 tuiles du corps (index, index+W) bloquée ou non-SKY. Sinon fait
-   * pousser le spot. Vide #sewedTiles en une seule fois (toutes les graines sont consommées,
-   * qu'elles aient germé ou non).
-   */
-  growSewedSunflowers () {
-    if (this.#sewedTiles.length === 0) return
-    const SKY = NODES.SKY.code
-    const W = WORLD_WIDTH
-
-    for (const tileIndex of this.#sewedTiles) {
-      const record = this.#spotsBySoil.get(tileIndex)
-      if (record === undefined) continue
-      if (record.present) continue
-
-      const tile1 = record.index
-      const tile2 = record.index + W
-      if (chunkManager.getTileAt(tile1) !== SKY) continue
-      if (chunkManager.getTileAt(tile2) !== SKY) continue
-      if (!blockedTiles.canPlace(tile1)) continue
-      if (!blockedTiles.canPlace(tile2)) continue
-
-      this.#growSpot(record)
-    }
-
-    this.#sewedTiles.length = 0
-    database.setGameState('sewedsunflower', this.#sewedTiles)
-  }
-
-  /**
    * Fait pousser un spot sunflower : marque present, peuple les structures, bloque les
    * 2 tuiles du corps (record.index, record.index + W) et persiste. Aucune vérification —
    * l'appelant garantit que le spot est éligible (non present, tuiles libres).
@@ -629,6 +598,37 @@ class SunflowerSystem {
   }
 
   /**
+   * Fait pousser à 100% les sunflowers issus des graines plantées par le joueur (#sewedTiles).
+   * Pour chaque tuile : ignore si plus de spot, déjà
+   * present, ou l'une des 2 tuiles du corps (index, index+W) bloquée ou non-SKY. Sinon fait
+   * pousser le spot. Vide #sewedTiles en une seule fois (toutes les graines sont consommées,
+   * qu'elles aient germé ou non).
+   */
+  growSewedSunflowers () {
+    if (this.#sewedTiles.length === 0) return
+    const SKY = NODES.SKY.code
+    const W = WORLD_WIDTH
+
+    for (const tileIndex of this.#sewedTiles) {
+      const record = this.#spotsBySoil.get(tileIndex)
+      if (record === undefined) continue
+      if (record.present) continue
+
+      const tile1 = record.index
+      const tile2 = record.index + W
+      if (chunkManager.getTileAt(tile1) !== SKY) continue
+      if (chunkManager.getTileAt(tile2) !== SKY) continue
+      if (!blockedTiles.canPlace(tile1)) continue
+      if (!blockedTiles.canPlace(tile2)) continue
+
+      this.#growSpot(record)
+    }
+
+    this.#sewedTiles.length = 0
+    database.setGameState('sewedsunflower', this.#sewedTiles)
+  }
+
+  /**
    * Liaison EventBus : 'sewed/sunflower' — le joueur a planté une graine de sunflower sur
    * une tuile GRASSFOREST valide (vérifications déjà faites par SewingManager). Mémorise la
    * tuile et persiste immédiatement la liste complète dans gamestate.
@@ -641,6 +641,19 @@ class SunflowerSystem {
     }
     this.#sewedTiles.push(tileIndex)
     database.setGameState('sewedsunflower', this.#sewedTiles)
+  }
+
+  /**
+   * Indique si une SunflowerSeed peut être plantée sur ce soilIndex.
+   * Conditions : pas d'oak à moins de 2 colonnes, pas de graine déjà semée sur ce slot.
+   * @param {number} soilIndex — (y << 10) | x
+   * @returns {boolean}
+   */
+  canSow (soilIndex, seed) {
+    if (seed !== 'sunflowerSeed') return null
+    const soilX = soilIndex & 0x3FF
+    if (oakSystem.isOakAtColumn(soilX - 2) || oakSystem.isOakAtColumn(soilX + 2)) return false
+    return !this.#sewedTiles.includes(soilIndex)
   }
 
   // ///// //
@@ -1719,6 +1732,23 @@ class FloraManager {
    */
   render (ctx) {
     for (const system of ALL_PLANT_SYSTEMS) system.render(ctx)
+  }
+
+  /**
+   * Délègue au système compétent la validation de semis d'une graine sur soilIndex.
+   * Retourne false si aucun système ne reconnaît l'itemCode.
+   * @param {number} soilIndex — (y << 10) | x
+   * @param {string} itemCode  — code de la graine (ex: 'sunflowerSeed')
+   * @returns {boolean}
+   */
+  canSow (soilIndex, seedId) {
+    for (const system of ALL_PLANT_SYSTEMS) {
+      if (system.canSow === undefined) continue // la plante ne se sème pas
+      const result = system.canSow(soilIndex, seedId)
+      if (result === null) continue // le système n'est pas concerné par la graine
+      return result
+    }
+    return false // aucune plante ne correspond à la graine
   }
 }
 

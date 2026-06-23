@@ -2544,10 +2544,10 @@ _When carrying any of these trinkets in your [[Inventory]], hold [R] to show gri
 
 | Trinket | Tier | Effect |
 |---|---|---|
-| [[item:setSquare]] | {{item:setSquare:star|star}} | Displays a red rectangle showing [[Interaction Range]] |
-| [[item:slidingBevel]] | {{item:slidingBevel:star|star}} | Displays an orange rectangle showing the active [[Tool Ranges|Tool Range]] |
+| [[item:setSquare]] | {{item:setSquare:star|star}} | Displays a red rectangle showing [[Ranges|Interaction Range]] |
+| [[item:slidingBevel]] | {{item:slidingBevel:star|star}} | Displays an orange rectangle showing the active [[Ranges|Tool Range]] |
 | [[item:draftingCompass]] | {{item:draftingCompass:star|star}} | Display a tile Grid |
-| [[item:theodolite]] | {{item:theodolite:star|star}} | Displays all three — tile grid, [[Interaction Range]] and active [[Tool Ranges|Tool Range]] |
+| [[item:theodolite]] | {{item:theodolite:star|star}} | Displays all three — tile grid, [[Ranges|Interaction Range]] and active [[Ranges|Tool Range]] |
     `
   },
   {
@@ -2872,8 +2872,8 @@ Surveyor's Tools are [[Trinkets]] that overlay spatial information on the world 
 
 | Trinket | Tier | Overlay |
 |---|---|---|
-| [[item:setSquare]] | {{item:setSquare:star|star}} | [[Interaction Range]] |
-| [[item:slidingBevel]] | {{item:slidingBevel:star|star}} | Active [[Tool Ranges| Tool Range]] |
+| [[item:setSquare]] | {{item:setSquare:star|star}} | [[Ranges|Interaction Range]] |
+| [[item:slidingBevel]] | {{item:slidingBevel:star|star}} | Active [[Ranges| Tool Range]] |
 | [[item:draftingCompass]] | {{item:draftingCompass:star|star}} | Tile grid |
 | [[item:theodolite]] | {{item:theodolite:star|star}} | All three |
 
@@ -2883,7 +2883,7 @@ The [[item:theodolite]] provides all three overlays in a single [[Inventory]] sl
 
 **Set Square — Interaction Range**
 
-The [[item:setSquare]] draws a red rectangle showing your [[Interaction Range]]: the area within which you can open [[Chests]], access [[Crafting Stations]], and interact with [[Furnitures]].
+The [[item:setSquare]] draws a red rectangle showing your [[Ranges|Interaction Range]]: the area within which you can open [[Chests]], access [[Crafting Stations]], interact with [[Furnitures]]...
 
 _The range can be extended by certain accessories or armors — the overlay updates in real time._
 
@@ -2891,7 +2891,7 @@ _The range can be extended by certain accessories or armors — the overlay upda
 
 **Sliding Bevel — Tool Range**
 
-The [[item:slidingBevel]] draws the action range of the tool currently selected in your [[Hotbar]]. The orange rectangle is directional — it follows the way you face and updates as you switch tools.
+The [[item:slidingBevel]] draws the action [[Ranges|Range]] of the tool currently selected in your [[Hotbar]]. The orange rectangle is directional — it follows the way you face and updates as you switch tools.
 
 * Only visible when an active tool slot is selected.
 * The range can be extended by certain accessories or armors.
@@ -2919,34 +2919,9 @@ The [[item:draftingCompass]] overlays two grids on the world:
 **See also**
 
 * [[Trinkets]] — full list of trinkets and their effects
-* [[Interaction Range]] — how interaction reach works and how to extend it
-* [[Tool Ranges]] — how tools reach works and how to extend it
+* [[Ranges|Interaction Range]] — how interaction reach works and how to extend it
+* [[Ranges|Tool Ranges]] — how tools reach works and how to extend it
 `
-  },
-
-  // ── Ranges ───────────────────────────────────────────────
-  {
-    title: 'Interaction Range',
-    category: ['Gameplay'],
-    content: `
-**Display**
-
-When a [[item:setSquare]] or a [[item:theodolite]] is present in your [[Inventory]], you can press [R] key to display a red rectangle around the interaction Range.
-    `
-  },
-  {
-    title: 'Tool Ranges',
-    category: ['Gameplay', 'Tool'],
-    content: `
-
-**Prefix**
-
-'Extended' [[Gear Prefixes|Prefix]] on a tool extend the range by 2 tiles in each direction.
-
-**Display**
-
-When a [[item:slidingBevel]] or a [[item:theodolite]] is present in your [[Inventory]], you can press [R] key to display an orange rectangle around the acctive Tool Range.
-    `
   },
 
   // ── Activities ───────────────────────────────────────────────
@@ -3013,7 +2988,7 @@ It is then extended by:
 * [[Accessories]]
 * [[Potions]]
 
-See [[Mining Tools]] and [[Mining Buffs]] for details.
+See [[Ranges]], [[Mining Tools]] and [[Mining Buffs]] for details.
 
 **Tiles per Click**
 
@@ -3041,7 +3016,7 @@ See [[Mining Tools]] for details.
     content: `
 **Description**
 
-Mining tools are used to harvest blocks from the world. Their effectiveness depends on two main attributes: **Mining Speed** (how fast a block is mined) and **Mining Range** (how far from the player blocks can be targeted). Higher-tier pickaxes unlock faster speeds, extended range, and the ability to mine multiple contiguous blocks in a single click.
+Mining tools are used to harvest blocks from the world. Their effectiveness depends on two main attributes: **Mining Speed** (how fast a block is mined) and [[Ranges|Mining Range]] (how far from the player blocks can be targeted). Higher-tier pickaxes unlock faster speeds, extended range, and the ability to mine multiple contiguous blocks in a single click.
 
 _A block can only be mined if the pickaxe tier is greater than or equal to the block tier._
 
@@ -3063,11 +3038,14 @@ _Tiles / click: only contiguous tiles of the same type are mined in a single cli
 
 **Mining Range**
 
-* Base mining range covers 3 tiles in front of the player, 2 tiles above and 2 tiles below.⏳
-* Higher-tier pickaxes extend this range by one, two or three tiles in all directions (see table above).
+* Base [[Ranges|Mining Range]] covers 3 tiles in front of the player, 2 tiles above and 2 tiles below.
+* Higher-tier [[Mining Tools|Pickaxes]] extend this range by one, two or three tiles in all directions.
+* The pickaxe [[Gear Prefixes|prefix]] 'Extended' extend this range by two tiles in all directions.
 * Equipping a item:stepStool: +4 tiles above
 * Equipping an item:abyssAnchor: +4 tiles below
-* Using a item:builderPotion (5h): +1 tile in each direction
+* Using a item:builderPotion (5h): +1 tile in each direction⏳
+
+<<additiveNote>>
 
 **Mining Speed**
 
@@ -3110,8 +3088,8 @@ Higher-tier pickaxes provide a mining speed bonus (see table above). Additional 
 
 **Tips**
 
-* _Use ?? to visualise the tile grid._ ⏳
-* _Use ?? to visualise the current Mining Range._ ⏳
+* _Use a [[item:draftingCompass]] or a [[item:theodolite]] to visualise the tile grid._
+* _Use a [[item:setSquare]] or a [[item:theodolite]] to visualise the current [[Ranges|Mining Range]]._
 
 **See also**
 
@@ -3386,7 +3364,7 @@ Prefixes enhance weapons, armors and tools, adding special properties beyond the
 | Farshot | +PO (Range) | Mobility |
 | Keen | +ATQ (Attack) | Offensive |
 | Sturdy | +DEF (Defense) | Defensive |
-| Extended | +[[Tool Ranges]] | Utility |
+| Extended | +[[Ranges|Tool Ranges]] | Utility |
 | Blazing | Inflicts [[Fire DOT]] on hit | DOT |
 | Venomous | Inflicts [[Poison DOT]] on hit | DOT |
 | Serrated | Inflicts [[Bleeding DOT]] on hit | DOT |
@@ -3414,7 +3392,7 @@ _Some specific gear pieces may deviate from these rules._ ⏳
 * **Quick** : increases tool speed by 20%.
 * **Keen** : increases tool speed by 5%.
 * **Sturdy** : decreases tool speed by 5%.
-* **Extended** : only available on tools. Extends [[Tool Ranges|Tool Range]] by 2 tiles in all directions.
+* **Extended** : only available on tools. Extends [[Ranges|Tool Range]] by 2 tiles in all directions.
 
 _When a tool is used as a weapon, standard weapon prefix effects apply._
 
@@ -4955,8 +4933,11 @@ Foraging a sunflower yields [[item:sunflowerSeed]] — scatter them on bare gras
 **Planting**
 
 * Place a [[item:sunflowerSeed]] in the [[Hotbar]] ([[Inventory]] Panel [I])
-* Select its slot, then left-click a free [[node:grassForest]] tile — the seed is consumed
-* Seeded spots have a much higher chance of blooming at the next dawn (18% → 80%) ⏳
+* Select its slot, then left-click a [[node:grassForest]] — the seed is consumed
+* The node has to be in [[Ranges|Interaction Range]], this range can be buffed
+* The tile must have be free and not within 2 tiles of an [[Oak & Mahogany|Oak]] trunk
+* Each spot accepts only one seed
+* Seeded spots have a 100% chance of blooming at the next dawn
 
 **[[item:sunflowerOil]] Crafting**
 
@@ -6366,6 +6347,9 @@ It does not need to be equipped — carrying it in your [[Inventory]] is enough.
 * utilisé pour le plantage de graines
 * utilisé pour la récolte du Gardening
 
+_When a [[item:setSquare]] or a [[item:theodolite]] is present in your [[Inventory]], you can press [R] key to display a red rectangle around the interaction Range._
+
+
 **Interaction Range Buffs**
 
 To be designed
@@ -6374,12 +6358,26 @@ To be designed
 
 **Mining Range**
 
-* utilisé pour le minage de blocks ([[Mining Tools|Pickaxes]])
-* utilisé pour le placement des blocks dans le monde
+Used for:
+* minage de blocks ([[Mining Tools|Pickaxes]])
+* placement des blocks dans le monde
+
+_When a [[item:setSquare]] or a [[item:theodolite]] is present in your [[Inventory]], and a [[Mining Tools|Pickaxe]] is seleted in the [[Hotbar]], you can press [R] key to display a orange rectangle around the Mining Range._
 
 **Mining Range Buffs**
 
-To be designed
+The base range covers 2 tiles behind the player center, 4 tiles in front, and 4 tiles above and below.
+
+It is then extended by:
+
+* Base mining range covers 3 tiles in front of the player, 2 tiles above and 2 tiles below.⏳
+* Higher-tier [[Mining Tools|Pickaxes]] extend this range by one, two or three tiles in all directions.
+* The pickaxe [[Gear Prefixes|prefix]] 'Extended' extend this range by two tiles in all directions.
+* Equipping a item:stepStool: +4 tiles above
+* Equipping an item:abyssAnchor: +4 tiles below
+* Using a item:builderPotion (5h): +1 tile in each direction⏳
+
+<<additiveNote>>
 
 <hr>
 
@@ -6387,6 +6385,8 @@ To be designed
 
 * utilisé pour le foraging des plantes ([[Foraging Tools|Sickles]])
 * utilisé pour le catching des critters ([[Catching Tools|Bug nets]])
+
+_When a [[item:setSquare]] or a [[item:theodolite]] is present in your [[Inventory]], and a [[Foraging Tools|Sickle]] or a [[Catching Tools|Bug net]] is seleted in the [[Hotbar]], you can press [R] key to display a orange rectangle around the Foraging Range._
 
 **Foraging Range Buffs**
 
@@ -6398,6 +6398,8 @@ To be designed
 
 * utilisé pour l'abattage des arbres ([[Chopping Tools|Axes]])
 * utilisé pour le secouage des arbres ([[Hammers]])
+
+_When a [[item:setSquare]] or a [[item:theodolite]] is present in your [[Inventory]], and an [[Chopping Tools|Axe]] or a [[Hammers|Hammer]] is seleted in the [[Hotbar]], you can press [R] key to display a orange rectangle around the Chopping Range._
 
 **Chopping Range Buffs**
 

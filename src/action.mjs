@@ -8,7 +8,7 @@ import {database} from './database.mjs'
 import {chunkManager} from './world.mjs'
 import {playerManager} from './player.mjs'
 import {WORLD_WIDTH, MICROTASK} from './constant.mjs'
-import {floraManager} from './ecosystem.mjs'
+import {floraManager, oakSystem} from './ecosystem.mjs'
 
 /* ====================================================================================================
    HELPERS COMMUNS A TOUS LES MANAGERS
@@ -711,8 +711,12 @@ class SowingManager {
    * @param {number} slotIndex — slot.slot (index hotbar, pour decrementHotbarSlotCount)
    */
   trySow (tileIndex, tileNode, item, slotIndex) {
+    const start = performance.now()
     if (buffManager.getBuff('playerFreeze')) return
     if (item.code === 'sunflowerSeed') this.#trySowSunflowerSeed(tileIndex, tileNode, slotIndex)
+    if (performance.now() - start > 0) {
+      console.error('SowingManager.trySow => Utiliser une micro-tâche', performance.now() - start)
+    }
   }
 
   /**
@@ -761,6 +765,9 @@ class SowingManager {
       eventBus.emit('sound/play', 'wrong')
       return
     }
+
+    // 'wrong' — règles métier de la graine
+    if (!floraManager.canSow(tileIndex, 'sunflowerSeed')) { eventBus.emit('sound/play', 'wrong'); return }
 
     // Succès
     eventBus.emit('sewed/sunflower', tileIndex)
