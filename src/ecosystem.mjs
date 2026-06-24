@@ -1305,6 +1305,8 @@ class OakSystem {
     eventBus.on('time/every-hour-5', this.onHour5Bolete)
     this.onTileChangedOak = this.onTileChangedOak.bind(this)
     eventBus.on('world/tile-changed', this.onTileChangedOak)
+    this.onSewedAcorn = this.onSewedAcorn.bind(this)
+    eventBus.on('sewed/acorn', this.onSewedAcorn)
     // Micro-task
     this.unbloomBolete = this.unbloomBolete.bind(this)
     this.bloomBolete = this.bloomBolete.bind(this)
@@ -1622,6 +1624,30 @@ class OakSystem {
     record.deleted = true
     saveManager.queueStaticUpdate({storeName: 'plant', record})
   }
+
+  // ////////// //
+  // PLANTATION //
+  // ////////// //
+
+  /**
+   * Indique si un Acorn peut être planté sur ce soilIndex.
+   * @param {number} soilIndex — (y << 10) | x
+   * @returns {boolean}
+   */
+  canSow (soilIndex, seed) {
+    if (seed !== 'acorn') return null
+    return true
+  }
+
+  onSewedAcorn (tileIndex) {}
+
+  // ////////// //
+  // CROISSANCE //
+  // ////////// //
+
+  // ///// //
+  // DEBUG //
+  // ///// //
 
   /**
  * DEBUG — Affiche un cercle jaune au centre de la tuile sous chaque spot enregistré dans #list.

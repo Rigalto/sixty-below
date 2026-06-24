@@ -8,7 +8,7 @@ import {database} from './database.mjs'
 import {chunkManager} from './world.mjs'
 import {playerManager} from './player.mjs'
 import {WORLD_WIDTH, MICROTASK} from './constant.mjs'
-import {floraManager, oakSystem} from './ecosystem.mjs'
+import {floraManager} from './ecosystem.mjs'
 
 /* ====================================================================================================
    HELPERS COMMUNS A TOUS LES MANAGERS
@@ -28,6 +28,26 @@ const purgeQueueByKey = (queue, key, value) => {
     if (queue[r][key] !== value) queue[w++] = queue[r]
   }
   queue.length = w
+}
+
+/**
+ * Teste si toutes les tuiles d'un rectangle de tuiles correspondent à nodeId.
+ * Retourne true dès qu'une tuile diffère — sortie anticipée.
+ * @param {number} index  — (y << 10) | x — coin haut-gauche du rectangle
+ * @param {number} w      — largeur en tuiles
+ * @param {number} h      — hauteur en tuiles
+ * @param {number} nodeId — code de tuile attendu sur toutes les cases
+ * @returns {boolean} true si au moins une tuile ≠ nodeId, false si toutes correspondent
+ */
+const tileRectHasOther = (index, w, h, nodeId) => {
+  let rowBase = index
+  for (let dy = 0; dy < h; dy++) {
+    for (let dx = 0; dx < w; dx++) {
+      if (chunkManager.getTileAt(rowBase + dx) !== nodeId) return true
+    }
+    rowBase += WORLD_WIDTH
+  }
+  return false
 }
 
 /* ====================================================================================================
@@ -701,22 +721,37 @@ export const choppingManager = new ChoppingManager()
    ==================================================================================================== */
 
 class SowingManager {
+  constructor () {
+    // Micro-tâches
+    this.doSow = this.doSow.bind(this)
+  }
+
   /**
    * Tente de planter la graine tenue en main sur la tuile cliquée.
+   * Vérifie playerFreeze puis délègue à doSow via micro-tâche.
+   * @param {number} tileIndex — (y << 10) | x — tuile cliquée
+   * @param {object} tileNode  — NODES_LOOKUP[tileCode]
+   * @param {object} item      — ITEMS[slot.item]
+   * @param {number} slotIndex — slot.slot (index hotbar)
+   */
+  trySow (tileIndex, tileNode, item, slotIndex) {
+    if (buffManager.getBuff('playerFreeze')) return
+    const {priority, capacity} = MICROTASK.SOW_SEED
+    microTasker.enqueue(this.doSow, priority, capacity, tileIndex, tileNode, item, slotIndex)
+  }
+
+  /**
+   * Exécuté en micro-tâche.
+   * Tente de planter la graine tenue en main sur la tuile cliquée.
    * Délègue la logique métier par stype de graine.
-   * Seul point d'entrée depuis core.mjs (#processWorldClick).
    * @param {number} tileIndex — (y << 10) | x — tuile cliquée
    * @param {object} tileNode  — NODES_LOOKUP[tileCode]
    * @param {object} item      — ITEMS[slot.item]
    * @param {number} slotIndex — slot.slot (index hotbar, pour decrementHotbarSlotCount)
    */
-  trySow (tileIndex, tileNode, item, slotIndex) {
-    const start = performance.now()
-    if (buffManager.getBuff('playerFreeze')) return
+  doSow (tileIndex, tileNode, item, slotIndex) {
     if (item.code === 'sunflowerSeed') this.#trySowSunflowerSeed(tileIndex, tileNode, slotIndex)
-    if (performance.now() - start > 0) {
-      console.error('SowingManager.trySow => Utiliser une micro-tâche', performance.now() - start)
-    }
+    else if (item.code === 'acorn') this.#trySowAcorn(tileIndex, tileNode, slotIndex)
   }
 
   /**
@@ -773,6 +808,46 @@ class SowingManager {
     eventBus.emit('sewed/sunflower', tileIndex)
     inventoryManager.decrementHotbarSlotCount(slotIndex)
     eventBus.emit('sound/play', 'placing')
+  }
+
+  /**
+   * Valide et exécute le placement d'un acorn (Oak seed).
+   * Conditions : tuile GRASSFOREST, tuiles index-W et index-2W sont SKY et non bloquées.
+   * Silence si mauvaise tuile, 'wrong' si bloqué, 'placing' si succès.
+   * @param {number} tileIndex — tuile cliquée (le sol attendu)
+   * @param {object} tileNode
+   * @param {number} slotIndex
+   */
+  #trySowAcorn (tileIndex, tileNode, slotIndex) {
+    const GRASSFOREST = NODES.GRASSFOREST.code
+
+    // vérification du sol
+    if (tileNode.code !== GRASSFOREST) return
+    if (chunkManager.getTileAt(tileIndex - 1) !== GRASSFOREST) return
+    if (chunkManager.getTileAt(tileIndex + 1) !== GRASSFOREST) return
+
+    // Vérification que le rectangle 3×18 au-dessus du sol est entièrement SKY
+    const soilIndex = tileIndex - 1
+    const SKY = NODES.SKY.code
+    if (tileRectHasOther(soilIndex - 18 * WORLD_WIDTH, 3, 18, SKY)) return
+
+    // 'toofar' — tuile hors de la zone d'interaction
+    if (!this.#isInSowingRange(tileIndex)) { eventBus.emit('sound/play', 'toofar'); return }
+
+    // 'wrong' — tuiles bloquées (furniture, plante déjà présente)
+    const soilX = soilIndex & 0x3FF
+    const soilY = soilIndex >> 10
+    if (!blockedTiles.canPlaceRect(soilX, soilY - 18, 3, 18)) { eventBus.emit('sound/play', 'wrong'); return }
+
+    // 'wrong' — règles métier de la graine
+    if (!floraManager.canSow(tileIndex, 'acorn')) { eventBus.emit('sound/play', 'wrong'); return }
+
+    // Succès
+    eventBus.emit('sewed/acorn', tileIndex)
+    inventoryManager.decrementHotbarSlotCount(slotIndex)
+    eventBus.emit('sound/play', 'placing')
+
+    console.log('SowingManager.#trySowAcorn', {tileIndex, tileNode, slotIndex})
   }
 }
 export const sowingManager = new SowingManager()

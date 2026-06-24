@@ -309,6 +309,7 @@ export const MICROTASK = {
   MINE_TILE: {priority: 24, capacity: 6, taskName: 'onMineTile'}, // minage d'une tuile
   PLACE_TILE: {priority: 24, capacity: 10, taskName: 'onPlaceTile'}, // pose d'un bloc
   CHOP_TREE: {priority: 24, capacity: 4, taskName: 'onChopTree'}, // abat une section d'arbre
+  SOW_SEED: {priority: 24, capacity: 4, taskName: 'doSow'}, // plante une graine
 
   FORAGE_ACTION: {priority: 24, capacity: 10, taskName: 'onForage'}, // foraging
 

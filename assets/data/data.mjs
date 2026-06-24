@@ -520,7 +520,7 @@ export const ITEMS = {
   plankOak: {name: 'Oak Plank', type: 0, stype: 'plank', star: 1, image: 'refined_32_32-5-2', help: 'Oak & Mahogany', tooltip: '???'},
   rootOak: {name: 'Wood Root', type: 0, stype: 'root', star: 1, image: 'potions_32_32-1-5', help: 'Oak & Mahogany', tooltip: '???'},
 
-  acorn: {name: 'Acorn', type: ITEM_TYPE.SEED | ITEM_TYPE.PLACABLE, stype: 'seed', star: 1, image: 'potions_32_32-1-5', help: 'Oak & Mahogany', tooltip: '???'},
+  acorn: {name: 'Acorn', type: ITEM_TYPE.SEED | ITEM_TYPE.PLACABLE, stype: 'seed', star: 1, image: 'mined_32_32-0-5', help: 'Oak & Mahogany', tooltip: '???'},
   seedForest: {name: 'Forest Grass Seed', type: ITEM_TYPE.SEED | ITEM_TYPE.PLACABLE, stype: 'seed', star: 1, image: 'potions_32_32-1-5', help: 'Forest Grass', tooltip: 'Plant to change Dirt into Forest Grass'},
   seedJungle: {name: 'Jungle Grass Seed', type: ITEM_TYPE.SEED | ITEM_TYPE.PLACABLE, stype: 'seed', star: 1, image: 'potions_32_32-1-5', help: 'Jungle Grass', tooltip: 'Plant to change Silt into Jungle Grass'},
 

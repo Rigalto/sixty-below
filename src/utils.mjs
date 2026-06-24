@@ -828,6 +828,36 @@ class BlockedTiles {
   }
 
   /**
+   * Teste si une zone rectangulaire complète peut accueillir un furniture ou une plante.
+   * @param {number} x @param {number} y @param {number} w @param {number} h
+   * @returns {boolean} true si aucune tuile du rectangle n'est bloquée pour le placement
+   */
+  canPlaceRect (x, y, w, h) {
+    for (let row = y; row < y + h; row++) {
+      const rowOffset = row << 10
+      for (let col = x; col < x + w; col++) {
+        if (this.#blocked.has(rowOffset | col)) return false
+      }
+    }
+    return true
+  }
+
+  /**
+   * Teste si une zone rectangulaire complète peut être minée.
+   * @param {number} x @param {number} y @param {number} w @param {number} h
+   * @returns {boolean} true si aucune tuile du rectangle n'est bloquée pour le minage
+   */
+  canMineRect (x, y, w, h) {
+    for (let row = y; row < y + h; row++) {
+      const rowOffset = row << 10
+      for (let col = x; col < x + w; col++) {
+        if (this.#blocked.has(rowOffset | col)) return false
+      }
+    }
+    return true
+  }
+
+  /**
  * Visualisation debug : carré rouge semi-transparent sur chaque tuile bloquée.
  * Permet de détecter les tuiles incorrectement bloquées ou libérées.
  * @param {CanvasRenderingContext2D} ctx — contexte déjà transformé (caméra appliquée)
