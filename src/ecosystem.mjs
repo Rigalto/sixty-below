@@ -112,6 +112,16 @@ const buildDisplayed = (displayed, byChunk, preloadChunks) => {
 }
 
 /**
+ * Ajoute un record dans displayed si son chunk est dans les chunks preload courants.
+ * @param {Set} displayed
+ * @param {object} record
+ */
+const addToDisplayed = (displayed, record) => {
+  const chunkKey = ((record.index >> 14) << 6) | ((record.index & 0x3FF) >> 4)
+  if (camera.preloadChunks.has(chunkKey)) displayed.add(record)
+}
+
+/**
  * Retrouve l'index de la tuile de surface d'une colonne depuis un index de départ
  * quelconque dans cette colonne. Si la tuile de départ n'est pas SKY, remonte jusqu'au
  * premier SKY — la surface est juste en dessous. Si elle est SKY, descend jusqu'à la
@@ -1639,7 +1649,82 @@ class OakSystem {
     return true
   }
 
-  onSewedAcorn (tileIndex) {}
+  /**
+   * Construit le tableau d'images d'un oak en tirant aléatoirement parmi les variantes disponibles.
+   * Miroir de PlantGenerator.#buildTreeImages.
+   * @param {number} soilX — coordonnée X de la tuile support gauche
+   * @returns {Array<{tree, row, col, x}>}
+   */
+  #buildTreeImages (soilX) {
+    const imageTable = TREE_IMAGES.oak
+    const images = []
+    for (let i = 0; i < imageTable.length; i++) {
+      const col = seededRNG.randomGetArrayIndex(imageTable[i])
+      images.push({tree: 'oak', row: i, col, x: soilX - 1})
+    }
+    return images
+  }
+
+  /**
+   * Liaison EventBus : 'sewed/acorn' — le joueur a planté un acorn sur une tuile GRASSFOREST
+   * valide (vérifications déjà faites par SowingManager). Crée l'oak (size=0) et ses deux
+   * spots bolete (present=false), enregistre dans toutes les structures, persiste et notifie.
+   * @param {number} tileIndex — (y << 10) | x, tuile cliquée (tuile centrale du sol, soilIndex+1)
+   */
+  onSewedAcorn (tileIndex) {
+    const TREE_H = 18
+    const TREE_W = 3
+    const soilIndex = tileIndex - 1
+    const soilX = soilIndex & 0x3FF
+    const soilY = soilIndex >> 10
+
+    const oakRecord = {
+      id: uniqueIdGenerator.getUniqueId(),
+      itemId: 'oak',
+      kind: PLANT_KIND.TREE,
+      type: PLANT_TYPE.OAK,
+      index: soilIndex - TREE_H * WORLD_WIDTH,
+      soilIndex,
+      w: TREE_W,
+      h: TREE_H,
+      size: 0,
+      images: this.#buildTreeImages(soilX),
+      grass: 'GRASSFOREST',
+      x: soilX,
+      yTop: soilY - TREE_H,
+      yBottom: soilY - 1,
+      growthTimestamp: null,
+      shakedTimestamp: null,
+      deleted: false
+    }
+    this.initPlant(oakRecord)
+    saveManager.queueStaticUpdate({storeName: 'plant', record: oakRecord})
+
+    // Pour que l'arbre soit rendu immédiatement.
+    addToDisplayed(this.#oakDisplayed, oakRecord)
+
+    const MUSH_H = 2
+    const MUSH_W = 1
+    for (const bSoilX of [soilX - 1, soilX + 3]) {
+      const bSoilIndex = (soilY << 10) | bSoilX
+      const boleteRecord = {
+        id: uniqueIdGenerator.getUniqueId(),
+        kind: PLANT_KIND.MUSHROOM,
+        type: PLANT_TYPE.BOLETE,
+        itemId: 'bolete',
+        index: bSoilIndex - MUSH_H * WORLD_WIDTH,
+        soilIndex: bSoilIndex,
+        w: MUSH_W,
+        h: MUSH_H,
+        present: false,
+        deleted: false
+      }
+      this.initPlant(boleteRecord)
+      saveManager.queueStaticUpdate({storeName: 'plant', record: boleteRecord})
+    }
+
+    eventBus.emit('ecosystem/tree-planted', soilIndex + 1, 'oak')
+  }
 
   // ////////// //
   // CROISSANCE //

@@ -436,6 +436,7 @@ Cette section définit les événements officiels. Tout nouvel événement doit 
 | :---: | :--- | :--- | :--- |
 | S | `sound/play` | `name: string` | Joue le son `name`. |
 | E | `sewed/sunflower` | `number` (tileIndex) | Le joueur plante une graine de sunflower. |
+| S | `sewed/acorn` | `number` (tileIndex) | Le joueur plante un acorn. |
 
 #### Action de récolte (`ForagingManager`)
 
@@ -497,6 +498,7 @@ Cette section définit les événements officiels. Tout nouvel événement doit 
 | E | `world/tile-changed` | `{ tileIndex: number, tileOldCode: number, tileNewCode: number }`| Le code de la tuile a été modifié. |
 | S | `ecosystem/tree-destroyed` | `number` (tileIndex), `string` treeId | Émis quand un arbre est entièrement abattu (size < 0). Payload = tuile centrale du sol (`soilIndex + 1`). |
 | S | `ecosystem/tree-planted` | `number` (tileIndex), `string` treeId | Émis quand un arbre est planté. Payload = tuile centrale du sol (`soilIndex + 1`). |
+| E | `sewed/acorn` | `number` (tileIndex) | Le joueur plante un acorn. |
 
 
 #### Debug (`WorldMapDebug`, `RealtimeDebugWidget`, `BuffManager`)
