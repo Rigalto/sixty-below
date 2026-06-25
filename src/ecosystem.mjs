@@ -201,10 +201,6 @@ class SunflowerSystem {
     this.onSunflowerSpotCheck = this.onSunflowerSpotCheck.bind(this)
     this.onSunflowerLateralSpotCheck = this.onSunflowerLateralSpotCheck.bind(this)
     this.onSunflowerLateralSpotRemove = this.onSunflowerLateralSpotRemove.bind(this)
-
-    // TODO : quand un oak est planté, invalider et supprimer les spots sunflower
-    // dans le rayon [oakX - SUNFLOWER_OAK_MIN_DIST, oakX + SUNFLOWER_OAK_MIN_DIST].
-    // Nécessite un event 'world/oak-planted' (ou équivalent) émis par TreeSystem.
   }
 
   /**
@@ -479,10 +475,9 @@ class SunflowerSystem {
    * Les 2 colonnes de chaque flanc (zone auparavant exclue par la distance min. à l'oak)
    * peuvent avoir un relief différent : leur surface est recherchée en micro-tâche
    * (coût variable → hors budget handler).
-   * @param {number} tileIndex — tuile centrale du sol libéré
-   * @param {string} treeId — identifiant de l'arbre
+   * @param {{tileIndex: number, treeId: string}} - tuile centrale du sol libéré / Identifiant de l'arbre
    */
-  onTreeDestroyedSunflower (tileIndex, treeId) {
+  onTreeDestroyedSunflower ({tileIndex, treeId}) {
     if (treeId !== 'oak') return
     this.onSunflowerSpotCheck(tileIndex - 1)
     this.onSunflowerSpotCheck(tileIndex)
@@ -514,9 +509,9 @@ class SunflowerSystem {
    * 3 tuiles de sol à la même hauteur que tileIndex. Supprime directement les spots sunflower
    * existants sur ces 3 positions (s'il y en a). Les 4 tuiles latérales (relief potentiellement
    * différent) sont traitées en micro-tâche, symétriquement à onTreeDestroyedSunflower.
-   * @param {number} tileIndex — tuile centrale du sol occupé (payload identique à tree-destroyed)
+   * @param {{tileIndex: number, treeId: string}} - tuile centrale du sol libéré / Identifiant de l'arbre
    */
-  onTreePlantedSunflower (tileIndex, treeId) {
+  onTreePlantedSunflower ({tileIndex, treeId}) {
     if (treeId !== 'oak') return
     let record = this.#spotsBySoil.get(tileIndex - 1)
     if (record !== undefined) this.#removeSpot(record)
@@ -1188,10 +1183,9 @@ class ParsnipSystem {
    * libérant 3 tuiles de sol. Délègue à onParsnipSpotCheck pour chacune (GRASSFOREST +
    * absence de spot déjà vérifiés là-bas). Les tuiles avant/après l'arbre ne sont pas concernées
    * — déjà des spots potentiels indépendamment de la présence de l'arbre.
-   * @param {number} tileIndex — tuile centrale du sol libéré
-   * @param {string} treeId — identifiant de l'arbre
+   * @param {{tileIndex: number, treeId: string}} - tuile centrale du sol libéré / Identifiant de l'arbre
    */
-  onTreeDestroyedParsnip (tileIndex, treeId) {
+  onTreeDestroyedParsnip ({tileIndex, treeId}) {
     if (treeId !== 'oak') return
     this.onParsnipSpotCheck(tileIndex - 1)
     this.onParsnipSpotCheck(tileIndex)
@@ -1202,10 +1196,9 @@ class ParsnipSystem {
    * Liaison EventBus : 'ecosystem/tree-planted' — un arbre vient d'être planté, occupant
    * 3 tuiles de sol. Supprime les spots parsnip existants à ces 3 positions (s'il y en a),
    * via #removeSpot (détruit la plante présente au préalable si besoin).
-   * @param {number} tileIndex — tuile centrale du sol occupé
-   * @param {string} treeId — identifiant de l'arbre
+   * @param {{tileIndex: number, treeId: string}} - tuile centrale du sol libéré / Identifiant de l'arbre
    */
-  onTreePlantedParsnip (tileIndex, treeId) {
+  onTreePlantedParsnip ({tileIndex, treeId}) {
     if (treeId !== 'oak') return
     const left = this.#spotsBySoil.get(tileIndex - 1)
     if (left !== undefined) this.#removeSpot(left)
@@ -1320,6 +1313,7 @@ class OakSystem {
     // Micro-task
     this.unbloomBolete = this.unbloomBolete.bind(this)
     this.bloomBolete = this.bloomBolete.bind(this)
+    this.growOak = this.growOak.bind(this)
   }
 
   /**
@@ -1351,13 +1345,14 @@ class OakSystem {
    */
   initPlant (record) {
     if (record.kind === PLANT_KIND.TREE) {
+      const soilIndex = record.soilIndex
       this.#oakList.push(record)
-      this.#oakBySoil.set(record.soilIndex, record)
-      this.#oakBySoil.set(record.soilIndex + 1, record)
-      this.#oakBySoil.set(record.soilIndex + 2, record)
-      this.#oakXSet.add((record.soilIndex & 0x3ff))
-      this.#oakXSet.add((record.soilIndex & 0x3ff) + 1)
-      this.#oakXSet.add((record.soilIndex & 0x3ff) + 2)
+      this.#oakBySoil.set(soilIndex, record)
+      this.#oakBySoil.set(soilIndex + 1, record)
+      this.#oakBySoil.set(soilIndex + 2, record)
+      this.#oakXSet.add((soilIndex & 0x3ff))
+      this.#oakXSet.add((soilIndex & 0x3ff) + 1)
+      this.#oakXSet.add((soilIndex & 0x3ff) + 2)
       addToByTileTree(this.oakByTile, record)
       addToByChunk(this.#oakByChunk, record)
 
@@ -1365,9 +1360,14 @@ class OakSystem {
       const py = record.index >> 10
       blockedTiles.blockPlacementRect(px, py, record.w, record.h)
 
-      const soilX = record.soilIndex & 0x3FF
-      const soilY = record.soilIndex >> 10
+      const soilX = soilIndex & 0x3FF
+      const soilY = soilIndex >> 10
       blockedTiles.blockMiningRect(soilX, soilY, record.w, 1)
+
+      if (record.growthTimestamp !== null) {
+        const {priority, capacity} = MICROTASK.OAK_GROW
+        taskScheduler.enqueueAbsolute(`oak_grow_${record.id}`, record.growthTimestamp, this.growOak, priority, capacity, soilIndex)
+      }
       return
     }
 
@@ -1562,6 +1562,11 @@ class OakSystem {
       return
     }
 
+    const growthDelay = (ITEMS.oak.growth * seededRNG.randomGetRealMinMax(0.8, 1.2)) | 0
+    const {priority, capacity} = MICROTASK.OAK_GROW
+    const taskId = `oak_grow_${record.id}`
+    record.growthTimestamp = taskScheduler.requeue(taskId, growthDelay, this.growOak, priority, capacity, record.soilIndex)
+
     saveManager.queueStaticUpdate({storeName: 'plant', record})
   }
 
@@ -1613,7 +1618,7 @@ class OakSystem {
     saveManager.queueStaticUpdate({storeName: 'plant', record})
 
     // Notifie les autres systèmes : nouveaux spots potentiels au sol libérés
-    eventBus.emit('ecosystem/tree-destroyed', record.soilIndex + 1, 'oak')
+    eventBus.emit('ecosystem/tree-destroyed', {tileIndex: record.soilIndex + 1, treeId: 'oak'})
   }
 
   /**
@@ -1678,8 +1683,13 @@ class OakSystem {
     const soilX = soilIndex & 0x3FF
     const soilY = soilIndex >> 10
 
+    const id = uniqueIdGenerator.getUniqueId()
+    const growthDelay = (ITEMS.oak.growth * seededRNG.randomGetRealMinMax(0.8, 1.2)) | 0
+    const {priority, capacity} = MICROTASK.OAK_GROW
+    const growthTimestamp = taskScheduler.enqueue(`oak_grow_${id}`, growthDelay, this.growOak, priority, capacity, soilIndex)
+
     const oakRecord = {
-      id: uniqueIdGenerator.getUniqueId(),
+      id,
       itemId: 'oak',
       kind: PLANT_KIND.TREE,
       type: PLANT_TYPE.OAK,
@@ -1693,7 +1703,7 @@ class OakSystem {
       x: soilX,
       yTop: soilY - TREE_H,
       yBottom: soilY - 1,
-      growthTimestamp: null,
+      growthTimestamp,
       shakedTimestamp: null,
       deleted: false
     }
@@ -1723,12 +1733,34 @@ class OakSystem {
       saveManager.queueStaticUpdate({storeName: 'plant', record: boleteRecord})
     }
 
-    eventBus.emit('ecosystem/tree-planted', soilIndex + 1, 'oak')
+    eventBus.emit('ecosystem/tree-planted', {tileIndex: soilIndex + 1, treeId: 'oak'})
   }
 
   // ////////// //
   // CROISSANCE //
   // ////////// //
+
+  growOak (soilIndex) {
+    const record = this.#oakBySoil.get(soilIndex)
+
+    if (record === undefined) return
+
+    record.size++
+
+    if (record.size < 4) {
+      const growthDelay = (ITEMS.oak.growth * seededRNG.randomGetRealMinMax(0.8, 1.2)) | 0
+      const {priority, capacity} = MICROTASK.OAK_GROW
+      record.growthTimestamp = taskScheduler.enqueue(`oak_grow_${record.id}`, growthDelay, this.growOak, priority, capacity, soilIndex)
+    } else {
+      record.growthTimestamp = null
+    }
+
+    saveManager.queueStaticUpdate({storeName: 'plant', record})
+  }
+
+  // /////// //
+  // SHAKING //
+  // /////// //
 
   // ///// //
   // DEBUG //

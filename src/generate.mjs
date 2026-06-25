@@ -7184,12 +7184,18 @@ class PlantGenerator {
       const treeType = grassCode === GRASSFOREST ? PLANT_TYPE.OAK : PLANT_TYPE.MAHOGANY
       const treeName = grassCode === GRASSFOREST ? 'oak' : 'mahogany'
       const treeId = grassCode === GRASSFOREST ? ITEMS.oak.code : ITEMS.mahogany.code
+      const growthBase = grassCode === GRASSFOREST ? ITEMS.oak.growth : ITEMS.mahogany.growth
       const mushroomId = grassCode === GRASSFOREST ? 'bolete' : 'pinkMycenia'
       const soilIndex = (y << 10) | soilX
       const size = seededRNG.randomGetArrayValue(TREES_INIT_SIZE)
       const images = this.#buildTreeImages(treeName, soilX)
 
       if (treeType === PLANT_TYPE.OAK) oakPositions.add(soilX + 1)
+      let growthTimestamp = null
+      if (size < 4) {
+        growthTimestamp = seededRNG.randomGetMinMax(1000, (1.2 * growthBase) | 0)
+      }
+
       this.#plants.push({
         id: uniqueIdGenerator.getUniqueId(),
         itemId: treeId,
@@ -7205,7 +7211,7 @@ class PlantGenerator {
         x: soilX,
         yTop: y - TREE_H,
         yBottom: y - 1,
-        growthTimestamp: null,
+        growthTimestamp,
         shakedTimestamp: null,
         deleted: false
       })
