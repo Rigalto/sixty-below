@@ -1,4 +1,4 @@
-// action.mjs — MiningManager - PlacingManager - ForagingManager - ChoppingManager - SowingManager
+// action.mjs — MiningManager - PlacingManager - ForagingManager - ChoppingManager - SowingManager - HammingManager
 
 import {eventBus, taskScheduler, microTasker, blockedTiles, rollLootWithBuffs} from './utils.mjs'
 import {NODE_TYPE, NODES, ITEM_TYPE, ITEMS, PLANT_SYSTEM_LOOKUP, PLANT_KIND} from '../assets/data/data.mjs'
@@ -9,6 +9,7 @@ import {chunkManager} from './world.mjs'
 import {playerManager} from './player.mjs'
 import {WORLD_WIDTH, MICROTASK} from './constant.mjs'
 import {floraManager} from './ecosystem.mjs'
+import {furnitureManager} from './housing.mjs'
 
 /* ====================================================================================================
    HELPERS COMMUNS A TOUS LES MANAGERS
@@ -66,6 +67,11 @@ class MiningManager {
     // Micro-tasks
     this.onMineTile = this.onMineTile.bind(this)
   }
+
+  /**
+   * Initialisation après début de session de jeu ou création d'un nouveau monde
+   */
+  init () { this.#queue.length = 0 }
 
   /**
    * Valide la demande et enfile la tuile. Lance la tâche si la file était vide.
@@ -334,6 +340,7 @@ class ForagingManager {
 
     // Micro-Tasks
     this.onForage = this.onForage.bind(this)
+    this.#queue.length = 0
   }
 
   /**
@@ -342,6 +349,7 @@ class ForagingManager {
    */
   init (savedSet) {
     this.#foragedToday = savedSet ?? new Set()
+    this.#queue.length = 0
   }
 
   /**
@@ -559,6 +567,8 @@ class ChoppingManager {
     // Micro-tâche
     this.onChopTree = this.onChopTree.bind(this)
   }
+
+  init () { this.#queue.length = 0 }
 
   /**
    * Valide la demande et enfile l'arbre. Lance la tâche si la file était vide.
@@ -851,3 +861,72 @@ class SowingManager {
   }
 }
 export const sowingManager = new SowingManager()
+
+/* ====================================================================================================
+   HAMMING
+   ==================================================================================================== */
+
+class HammingManager {
+  #queue = [] // [{plant, tool, prefix, speed}] — objet en attente, dans l'ordre de demande
+  constructor () {
+    // EventBus
+    this.onTeleportBegin = this.onTeleportBegin.bind(this)
+    this.onSlotActive = this.onSlotActive.bind(this)
+    eventBus.on('player/teleport-begin', this.onTeleportBegin)
+    eventBus.on('hotbar/slot-active', this.onSlotActive)
+  }
+
+  init () { this.#queue.length = 0 }
+
+  /**
+   * Point d'entrée unique depuis core.mjs (#processWorldClick).
+   * Détermine la cible du martelage (wall, meuble, arbre) et délègue.
+   * @param {number} tileIndex — (y << 10) | x
+   * @param {object} tileNode  — NODES_LOOKUP[tileCode]
+   * @param {object} tool      — ITEMS[slot.item], marteau équipé
+   * @param {string} prefix    — slot.prefix
+   */
+  tryUse (tileIndex, tileNode, tool, prefix) {
+    if (buffManager.getBuff('playerFreeze')) return
+
+    if (tileNode !== null && tileNode.type & (NODE_TYPE.WALL | NODE_TYPE.BWALL)) {
+      // TODO : unplacing de mur
+      return
+    }
+
+    const furniture = furnitureManager.getFurnitureAt(tileIndex)
+    if (furniture !== null) {
+      // TODO : unplacing de meuble
+      return
+    }
+
+    const plant = floraManager.getPlantAt(tileIndex)
+    if (plant !== null && plant.kind === PLANT_KIND.TREE) {
+      // TODO : secouage d'arbre
+
+    }
+  }
+
+  /**
+   * Vide la file et annule la tâche planifiée.
+   */
+  #interrupt () {
+    if (this.#queue.length === 0) return
+    this.#queue.length = 0
+    taskScheduler.dequeue('hamming-current')
+    // TODO: annuler animation outil (axe)
+  }
+
+  /** Liaison EventBus : 'player/teleport-begin'. */
+  onTeleportBegin () { this.#interrupt() }
+
+  /**
+   * Liaison EventBus : 'hotbar/slot-active' — interrompt si le nouveau slot n'est plus une axe.
+   * @param {{slot: object}} payload
+   */
+  onSlotActive ({slot}) {
+    if (slot.item && ITEMS[slot.item].type & ITEM_TYPE.TOOL && ITEMS[slot.item].stype === 'axe') return
+    this.#interrupt()
+  }
+}
+export const hammingManager = new HammingManager()

@@ -19,7 +19,7 @@ import {achievementManager} from './achievement.mjs'
 import {playerManager, hotbarOverlay} from './player.mjs'
 import {floraManager, sunflowerSystem, oleanderSystem, parsnipSystem, oakSystem, cobwebSystem} from './ecosystem.mjs'
 import {ACHIEVEMENT_CATEGORIES} from '../assets/data/data-achievement.mjs'
-import {miningManager, placingManager, foragingManager, choppingManager, sowingManager} from './action.mjs'
+import {miningManager, placingManager, foragingManager, choppingManager, sowingManager, hammingManager} from './action.mjs'
 import './combat.mjs'
 
 const WITH_DEBUG_HUD = true // passer à false pour désactiver sans toucher IS_DEV
@@ -361,7 +361,10 @@ class GameCore {
     // C'est ici qu'on initialise les managers
     // await FaunaManager.init(...)
 
+    miningManager.init()
     foragingManager.init(state.naturalforaged)
+    choppingManager.init()
+    hammingManager.init()
     cobwebSystem.init()
 
     // 5.1 Objectstore Inventory
@@ -608,7 +611,7 @@ class GameCore {
 
     if (item.type & ITEM_TYPE.TOOL) {
       if (item.stype === 'pickaxe') miningManager.tryMine(tileIndex, tileNode, item, slot.prefix)
-      // else if (item.stype === 'hammer') hammingManager.tryUse(tileIndex, tileNode, item, slot.prefix)
+      else if (item.stype === 'hammer') hammingManager.tryUse(tileIndex, tileNode, item, slot.prefix)
       else if (item.stype === 'axe') choppingManager.tryChop(tileIndex, tileNode, item, slot.prefix)
       else if (item.stype === 'sickle') foragingManager.tryForage(tileIndex, tileNode, item, slot.prefix)
       // else if (item.stype === 'bugnet') catchingingManager.tryCatch(tileIndex, tileNode, item, slot.prefix)
