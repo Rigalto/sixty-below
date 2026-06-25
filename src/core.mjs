@@ -214,6 +214,7 @@ class GameCore {
       if (item.placedLeft) item.placedLeft = resolveAssetData(item.placedLeft)
 
       if (item.foraging) this.#hydrateLootAction(item.foraging, 'foraging', item.name)
+      if (item.shaking) this.#hydrateLootAction(item.shaking, 'shaking', item.name)
       if (item.chopping) {
         this.#hydrateLootAction(item.chopping, 'chopping', item.name)
         if (item.chopping.extraLoot) this.#hydrateLootAction(item.chopping.extraLoot, 'chopping', item.name)

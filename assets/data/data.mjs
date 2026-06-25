@@ -515,10 +515,11 @@ export const ITEMS = {
   coconutPulp: {name: 'Coconut Pulp', type: ITEM_TYPE.MATERIAL, stype: 'fruit', star: 1, image: 'potions_32_32-1-5', help: 'Coconut', tooltip: '???'},
   coconutMilk: {name: 'Coconut Milk', type: ITEM_TYPE.MATERIAL, stype: 'beverage', star: 1, image: 'potions_32_32-1-5', help: 'Coconut', tooltip: '???'},
 
-  oak: {name: 'Oak', type: 0, stype: 'tree', star: 1, image: null, growth: 2 * 24 * 60 * 1000, help: 'Oak & Mahogany', tooltip: 'Common tree in forest, can be chopping or shaking', chopping: {speed: 1800, items: [{item: 'logOak', count: '1-2'}, {item: 'acorn', count: 0.25}], extraLoot: {items: [{item: 'rootOak', count: '2-5', buffs: ['+felling']}]}}},
+  oak: {name: 'Oak', type: 0, stype: 'tree', star: 1, image: null, growth: 2 * 24 * 60 * 1000, help: 'Oak & Mahogany', tooltip: 'Common tree in forest, can be chopping or shaking', chopping: {speed: 1800, items: [{item: 'logOak', count: '1-2'}, {item: 'acorn', count: 0.25}], extraLoot: {items: [{item: 'rootOak', count: '2-5', buffs: ['+felling']}]}}, shaking: {speed: 1800, items: [{item: 'eggBird', count: '1-2'}, {item: 'acorn', count: 0.25}]}},
   logOak: {name: 'Oak Log', type: 0, stype: 'log', star: 1, image: 'mined_32_32-1-4', help: 'Oak & Mahogany', tooltip: '???'},
   plankOak: {name: 'Oak Plank', type: 0, stype: 'plank', star: 1, image: 'refined_32_32-5-2', help: 'Oak & Mahogany', tooltip: '???'},
   rootOak: {name: 'Wood Root', type: 0, stype: 'root', star: 1, image: 'potions_32_32-1-5', help: 'Oak & Mahogany', tooltip: '???'},
+  eggBird: {name: 'Spider Egg', type: 0, stype: 'egg', star: 1, image: 'mined_32_32-1-4', help: 'Oak & Mahogany', tooltip: '???'},
 
   acorn: {name: 'Acorn', type: ITEM_TYPE.SEED | ITEM_TYPE.PLACABLE, stype: 'seed', star: 1, image: 'mined_32_32-0-5', help: 'Oak & Mahogany', tooltip: '???'},
   seedForest: {name: 'Forest Grass Seed', type: ITEM_TYPE.SEED | ITEM_TYPE.PLACABLE, stype: 'seed', star: 1, image: 'potions_32_32-1-5', help: 'Forest Grass', tooltip: 'Plant to change Dirt into Forest Grass'},

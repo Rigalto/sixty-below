@@ -867,16 +867,29 @@ export const sowingManager = new SowingManager()
    ==================================================================================================== */
 
 class HammingManager {
-  #queue = [] // [{plant, tool, prefix, speed}] — objet en attente, dans l'ordre de demande
+  #queue = [] // [{type, plant, tool, prefix, speed}] — objet en attente, dans l'ordre de demande
   constructor () {
     // EventBus
     this.onTeleportBegin = this.onTeleportBegin.bind(this)
     this.onSlotActive = this.onSlotActive.bind(this)
     eventBus.on('player/teleport-begin', this.onTeleportBegin)
     eventBus.on('hotbar/slot-active', this.onSlotActive)
+    // Micro-tasks
+    this.onHamming = this.onHamming.bind(this)
   }
 
   init () { this.#queue.length = 0 }
+
+  /**
+   * Planifie la prochaine utilisation du hammer en file, ou termine si la file est vide.
+   */
+  #scheduleNext () {
+    if (this.#queue.length > 0) {
+      const {priority, capacity} = MICROTASK.CHOP_TREE
+      taskScheduler.enqueue('hamming-current', this.#queue[0].speed, this.onHamming, priority, capacity)
+    }
+    // TODO: fin animation outil (axe)
+  }
 
   /**
    * Point d'entrée unique depuis core.mjs (#processWorldClick).
@@ -905,6 +918,89 @@ class HammingManager {
       // TODO : secouage d'arbre
 
     }
+  }
+
+  /**
+   * Callback TaskScheduler : exécute l'action du hammer en tête de file,
+   * distribue le loot, puis planifie la suivante si la file n'est pas vide.
+   * Si l'arbre vient d'être détruit (size < 0), purge la file des entrées restantes pour
+   * ce même arbre avant de planifier le prochain temps de coupe.
+   */
+  onHamming () {
+    const entry = this.#queue.shift()
+    if (entry === undefined) return
+
+    if (entry.type === 'tree') {
+      // TODO - secouage de l'arbre
+    } else if (entry.type === 'furniture') {
+      // TODO - unplacing de furniture
+    } else if (entry.type === 'wall') {
+      // TODO - unplacing de furniture
+    }
+
+    this.#scheduleNext()
+  }
+
+  /**
+   * Vérifie que l'on peut secouer l'arbre et place l'action dans la queue
+   * @param {number} tileIndex — (y << 10) | x
+   * @param {object} tree      — l'arbre à secouer
+   * @param {object} tool      — ITEMS[slot.item], marteau équipé
+   * @param {string} prefix    — slot.prefix
+   */
+  tryShaking (tileIndex, tree, tool, prefix) {
+    const plantItem = ITEMS[tree.itemId]
+    if (!this.#isInHammingRange(tileIndex, tool, prefix)) { eventBus.emit('sound/play', 'toofar'); return }
+    if (tool.star < plantItem.star) { eventBus.emit('sound/play', 'wrong'); return }
+    // TODO : vérifier que shakingTimestamp est 'null'
+
+    const speed = this.#computeShakingSpeed(plantItem, tool, prefix)
+
+    const wasEmpty = this.#queue.length === 0
+    this.#queue.push({type: 'tree', tree, tool, prefix, speed})
+    eventBus.emit('sound/play', 'chopping')
+
+    if (wasEmpty) {
+      const {priority, capacity} = MICROTASK.SHAKE_TREE
+      taskScheduler.enqueue('hamming-current', speed, this.onHamming, priority, capacity)
+    }
+  }
+
+  /**
+   * Calcule le délai d'abattage en ms pour un arbre et un outil donnés.
+   * @param {object} plantItem — ITEMS[plant.itemId], porte plantItem.chopping.speed
+   * @param {object} tool      — hache équipée
+   * @param {string} prefix    — préfixe de l'outil
+   * @returns {number} délai en ms
+   */
+  #computeShakingSpeed (plantItem, tool, prefix) {
+    let coefficient = 100 + tool.shaking.speed + buffManager.getBuff('chopping-speed')
+    coefficient += prefix === 'Quick' ? 20 : 0
+    coefficient += prefix === 'Keen' ? 5 : 0
+    coefficient -= prefix === 'Sturdy' ? 5 : 0
+    return (plantItem.shaking.speed * coefficient / 100) | 0
+  }
+
+  /**
+   * Vérifie que la tuile cliquée est dans le rectangle de shaking relatif au centre du joueur.
+   * @param {number} tileIndex — (y << 10) | x
+   * @param {object} tool      — marteau équipé
+   * @param {string} prefix    — préfixe de l'outil
+   * @returns {boolean}
+   */
+  #isInHammingRange (tileIndex, tool, prefix) {
+    const {x: cx, y: cy, direction} = playerManager.getCenterTile()
+    const rect = buffManager.getBuff('chopping-range')
+    const range = tool.range + (prefix === 'Extended' ? 2 : 0)
+    const ex = rect.x - range
+    const ey = rect.y - range
+    const ew = rect.w + 2 * range
+    const eh = rect.h + 2 * range
+    const tileX = tileIndex & 0x3FF
+    const tileY = tileIndex >> 10
+    const worldRectX = direction === 0 ? cx - ex - ew + 1 : cx + ex
+    return tileX >= worldRectX && tileX < worldRectX + ew &&
+           tileY >= cy + ey && tileY < cy + ey + eh
   }
 
   /**
