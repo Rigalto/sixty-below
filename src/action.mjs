@@ -932,6 +932,33 @@ class HammingManager {
 
     if (entry.type === 'tree') {
       // TODO - secouage de l'arbre
+
+      const {tree} = entry
+      // const system = PLANT_SYSTEM_LOOKUP.get(plant.kind * 100 + plant.type)
+      // if (system === undefined || !system.isPresent(plant)) {
+      //   this.#scheduleNext()
+      //   return
+      // }
+
+      const plantItem = ITEMS[tree.itemId]
+      if (plantItem.shaking === undefined) {
+        this.#scheduleNext()
+        return
+      }
+      const buffValues = buffManager.getBuffs(plantItem.shaking.buffList)
+
+      // Loot standard (chaque coup)
+      for (const lootItem of plantItem.shaking.items) {
+        const count = rollLootWithBuffs(lootItem, buffValues)
+        if (count > 0) {
+          const itemCode = lootItem.item.code
+          inventoryManager.loot(itemCode, count, '')
+          eventBus.emit('player/loot-item', {itemCode})
+        }
+      }
+
+      // Délègue la mutation de state au TreeSystem
+      eventBus.emit(`shaked/${plantItem.code}`, tree.soilIndex)
     } else if (entry.type === 'furniture') {
       // TODO - unplacing de furniture
     } else if (entry.type === 'wall') {
@@ -952,7 +979,6 @@ class HammingManager {
     const plantItem = ITEMS[tree.itemId]
     if (!this.#isInHammingRange(tileIndex, tool, prefix)) { eventBus.emit('sound/play', 'toofar'); return }
     if (tool.star < plantItem.star) { eventBus.emit('sound/play', 'wrong'); return }
-    // TODO : vérifier que shakingTimestamp est 'null'
 
     const speed = this.#computeShakingSpeed(plantItem, tool, prefix)
 

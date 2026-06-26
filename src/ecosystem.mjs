@@ -1310,10 +1310,13 @@ class OakSystem {
     eventBus.on('world/tile-changed', this.onTileChangedOak)
     this.onSewedAcorn = this.onSewedAcorn.bind(this)
     eventBus.on('sewed/acorn', this.onSewedAcorn)
+    this.onShaked = this.onShaked.bind(this)
+    eventBus.on('shaked/oak', this.onShaked)
     // Micro-task
     this.unbloomBolete = this.unbloomBolete.bind(this)
     this.bloomBolete = this.bloomBolete.bind(this)
     this.growOak = this.growOak.bind(this)
+    this.oakEndShake = this.oakEndShake.bind(this)
   }
 
   /**
@@ -1338,9 +1341,7 @@ class OakSystem {
   }
 
   /**
-   * Hydrate un record depuis la DB. Aiguille par kind — seul le cas MUSHROOM (bolete)
-   * est traité pour l'instant.
-   * TODO : cas PLANT_KIND.TREE (oak) — taille, images par stade, growthTimestamp, shakedTimestamp.
+   * Hydrate un record depuis la DB. Aiguille par kind.
    * @param {object} record
    */
   initPlant (record) {
@@ -1367,6 +1368,10 @@ class OakSystem {
       if (record.growthTimestamp !== null) {
         const {priority, capacity} = MICROTASK.OAK_GROW
         taskScheduler.enqueueAbsolute(`oak_grow_${record.id}`, record.growthTimestamp, this.growOak, priority, capacity, soilIndex)
+      }
+      if (record.shakedTimestamp !== null) {
+        const {priority, capacity} = MICROTASK.OAK_END_SHAKE
+        taskScheduler.enqueueAbsolute(`oak_shake_${record.id}`, record.shakedTimestamp, this.oakEndShake, priority, capacity, soilIndex)
       }
       return
     }
@@ -1761,6 +1766,28 @@ class OakSystem {
   // /////// //
   // SHAKING //
   // /////// //
+
+  /**
+   * L'action de secouage est de nouveau autorisée sur cet arbte.
+   * @param {number} soilIndex — (y << 10) | x, tuile de gauche du sol, sur lequel se trouve l'arbre)
+   */
+  oakEndShake (soilIndex) {
+    const record = this.#oakBySoil.get(soilIndex)
+    if (record === undefined) return
+
+    record.shakedTimestamp = null
+    saveManager.queueStaticUpdate({storeName: 'plant', record})
+  }
+
+  onShaked (soilIndex) {
+    const record = this.#oakBySoil.get(soilIndex)
+    if (record === undefined) return
+
+    const {priority, capacity} = MICROTASK.OAK_END_SHAKE
+    const shakedTimestamp = taskScheduler.enqueue(`oak_shake_${record.id}`, 24 * 60 * 1000, this.oakEndShake, priority, capacity, soilIndex)
+    record.shakedTimestamp = shakedTimestamp
+    saveManager.queueStaticUpdate({storeName: 'plant', record})
+  }
 
   // ///// //
   // DEBUG //

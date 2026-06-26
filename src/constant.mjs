@@ -311,6 +311,7 @@ export const MICROTASK = {
   CHOP_TREE: {priority: 24, capacity: 4, taskName: 'onChopTree'}, // abat une section d'arbre
   SOW_SEED: {priority: 24, capacity: 4, taskName: 'doSow'}, // plante une graine
   OAK_GROW: {priority: 24, capacity: 4, taskName: 'growOak'}, // croissance d'un tronçon d'oak
+  OAK_END_SHAKE: {priority: 24, capacity: 4, taskName: 'oakEndShake'}, // fin de la période où un arbre n'est pas shakable
 
   FORAGE_ACTION: {priority: 24, capacity: 10, taskName: 'onForage'}, // foraging
 
