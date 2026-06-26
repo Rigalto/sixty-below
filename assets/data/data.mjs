@@ -341,7 +341,7 @@ export const ITEMS = {
   rodCoral: {name: 'Coral Fishing Rod', type: ITEM_TYPE.TOOL, stype: 'rod', star: 5, image: 'tool_32_32-7-3', placedright: 'w_42_42-0-0', placedleft: 'w_42_42-0-1', help: 'Fishing Rods', tooltip: 'Tools used to catch fishes', range: 2, fishing: {speed: 200, power: 60}},
 
   // hammers
-  hammerCopper: {name: 'Copper Hammer', type: ITEM_TYPE.TOOL, stype: 'hammer', star: 2, image: 'tools_32_32-4-0', placedright: 'w_42_42-0-0', placedleft: 'w_42_42-0-1', speed: 0, help: 'Hammers', tooltip: 'Tools used to remove wall, furniture, workstation, converting them to item form'},
+  hammerCopper: {name: 'Copper Hammer', type: ITEM_TYPE.TOOL, stype: 'hammer', star: 2, image: 'tool_32_32-5-0', placedright: 'w_42_42-0-0', placedleft: 'w_42_42-0-1', range: 0, shaking: {speed: 0}, help: 'Hammers', tooltip: 'Tools used to remove wall, furniture, workstation, converting them to item form'},
 
   // Axes
   axeCopper: {name: 'Copper Axe', type: ITEM_TYPE.TOOL | ITEM_TYPE.WEAPON, stype: 'axe', star: 2, image: 'tool_32_32-3-0', placedright: 'w_42_42-0-0', placedleft: 'w_42_42-0-1', speed: 0, help: 'Axes', tooltip: 'Basic tools used to chop trees. Can be used as a slow weapon', range: 0, chopping: {speed: 0}},
@@ -515,17 +515,41 @@ export const ITEMS = {
   coconutPulp: {name: 'Coconut Pulp', type: ITEM_TYPE.MATERIAL, stype: 'fruit', star: 1, image: 'potions_32_32-1-5', help: 'Coconut', tooltip: '???'},
   coconutMilk: {name: 'Coconut Milk', type: ITEM_TYPE.MATERIAL, stype: 'beverage', star: 1, image: 'potions_32_32-1-5', help: 'Coconut', tooltip: '???'},
 
-  oak: {name: 'Oak', type: 0, stype: 'tree', star: 1, image: null, growth: 2 * 24 * 60 * 1000, help: 'Oak & Mahogany', tooltip: 'Common tree in forest, can be chopping or shaking', chopping: {speed: 1800, items: [{item: 'logOak', count: '1-2'}, {item: 'acorn', count: 0.25}], extraLoot: {items: [{item: 'rootOak', count: '2-5', buffs: ['+felling']}]}}, shaking: {speed: 1800, items: [{item: 'eggBird', count: '1-2'}, {item: 'acorn', count: 0.25}]}},
+  oak: {
+    name: 'Oak',
+    type: 0,
+    stype: 'tree',
+    star: 1,
+    image: null,
+    growth: 2 * 24 * 60 * 1000,
+    help: 'Oak & Mahogany',
+    tooltip: 'Common tree in forest, can be chopping or shaking',
+    chopping: {speed: 1800, items: [{item: 'logOak', count: '1-2'}, {item: 'acorn', count: 0.25}, {item: 'feather', count: 0.08}, {item: 'apple', count: 0.05}], extraLoot: {items: [{item: 'rootOak', count: '2-5', buffs: ['+felling']}]}},
+    shaking: {speed: 1800, items: [{item: 'egg', count: 0.75}, {item: 'feather', count: 0.75}, {item: 'acorn', count: 0.25}, {item: 'logOak', count: 0.12}, {item: 'apple', count: 0.10}]}
+  },
   logOak: {name: 'Oak Log', type: 0, stype: 'log', star: 1, image: 'mined_32_32-1-4', help: 'Oak & Mahogany', tooltip: '???'},
   plankOak: {name: 'Oak Plank', type: 0, stype: 'plank', star: 1, image: 'refined_32_32-5-2', help: 'Oak & Mahogany', tooltip: '???'},
   rootOak: {name: 'Wood Root', type: 0, stype: 'root', star: 1, image: 'potions_32_32-1-5', help: 'Oak & Mahogany', tooltip: '???'},
-  eggBird: {name: 'Spider Egg', type: 0, stype: 'egg', star: 1, image: 'mined_32_32-1-4', help: 'Oak & Mahogany', tooltip: '???'},
+  egg: {name: 'Bird Egg', type: 0, stype: 'egg', star: 1, image: 'mined_32_32-2-5', help: 'Oak & Mahogany', tooltip: '???'},
+  feather: {name: 'Bird Feather', type: 0, stype: 'feather', star: 1, image: 'mined_32_32-1-5', help: 'Oak & Mahogany', tooltip: '???'},
+  apple: {name: 'Apple', type: 0, stype: 'fruit', star: 1, image: 'mined_32_32-3-5', help: 'Oak & Mahogany', tooltip: 'An apple a day keeps Doctor Bones away!'},
 
   acorn: {name: 'Acorn', type: ITEM_TYPE.SEED | ITEM_TYPE.PLACABLE, stype: 'seed', star: 1, image: 'mined_32_32-0-5', help: 'Oak & Mahogany', tooltip: '???'},
   seedForest: {name: 'Forest Grass Seed', type: ITEM_TYPE.SEED | ITEM_TYPE.PLACABLE, stype: 'seed', star: 1, image: 'potions_32_32-1-5', help: 'Forest Grass', tooltip: 'Plant to change Dirt into Forest Grass'},
   seedJungle: {name: 'Jungle Grass Seed', type: ITEM_TYPE.SEED | ITEM_TYPE.PLACABLE, stype: 'seed', star: 1, image: 'potions_32_32-1-5', help: 'Jungle Grass', tooltip: 'Plant to change Silt into Jungle Grass'},
 
-  mahogany: {name: 'Mahogany', type: 0, stype: 'tree', star: 2, image: null, growth: 3 * 24 * 60 * 1000, help: 'Oak & Mahogany', tooltip: 'Common tree in jungle, can be chopping or shaking', chopping: {speed: 1800, items: [{item: 'logMahogany', count: '1-2'}, {item: 'samara', count: 0.25}], extraLoot: {items: [{item: 'rootMahogany', count: '2-5', buffs: ['+felling']}]}}},
+  mahogany: {
+    name: 'Mahogany',
+    type: 0,
+    stype: 'tree',
+    star: 2,
+    image: null,
+    growth: 3 * 24 * 60 * 1000,
+    help: 'Oak & Mahogany',
+    tooltip: 'Common tree in jungle, can be chopping or shaking',
+    chopping: {speed: 1800, items: [{item: 'logMahogany', count: '1-2'}, {item: 'samara', count: 0.25}], extraLoot: {items: [{item: 'rootMahogany', count: '2-5', buffs: ['+felling']}]}},
+    shaking: {speed: 1800, items: [{item: 'egg', count: 0.75}, {item: 'feather', count: 0.75}, {item: 'samara', count: 0.25}, {item: 'logMahogany', count: 0.12}]}
+  },
   logMahogany: {name: 'Mahogany Log', type: 0, stype: 'log', star: 2, image: 'mined_32_32-2-4', help: 'Oak & Mahogany', tooltip: '???'},
   plankMahogany: {name: 'Mahogany Plank', type: 0, stype: 'plank', star: 2, image: 'refined_32_32-6-2', help: 'Oak & Mahogany', tooltip: '???'},
   rootMahogany: {name: 'Mahogany Root', type: 0, stype: 'root', star: 2, image: 'potions_32_32-1-5', help: 'Oak & Mahogany', tooltip: '???'},

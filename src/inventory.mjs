@@ -445,7 +445,13 @@ class InventoryManager {
    * @param {object} dbSlot — enregistrement DB individuel (bag/hotbar/armor/accessory)
    */
   initSlot (dbSlot) {
-    const {container, slot, furnitureId} = dbSlot
+    const {container, slot, furnitureId, item} = dbSlot
+    if (item !== '' && ITEMS[item] === undefined) {
+      console.error('InventoryManager.init item inconnu', dbSlot)
+      dbSlot.item = ''
+      dbSlot.count = 0
+      dbSlot.prefix = ''
+    }
     if (container === 'bag') {
       this.#bag[slot] = dbSlot
     } else if (container === 'hotbar') {
@@ -530,7 +536,7 @@ class InventoryManager {
     }
     this.#staticBuffs.trinkets.length = 0
     for (const slot of this.#bag) {
-      if (slot.item !== '' && (ITEMS[slot.item].type & ITEM_TYPE.TRINKET)) {
+      if (slot.item !== '' && (ITEMS[slot.item]?.type & ITEM_TYPE.TRINKET)) {
         this.#staticBuffs.trinkets.push(slot.item)
       }
     }
