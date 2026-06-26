@@ -1783,6 +1783,11 @@ class OakSystem {
     const record = this.#oakBySoil.get(soilIndex)
     if (record === undefined) return
 
+    if (record.shakedTimestamp !== null) {
+      this.onChopped(record)
+      return
+    }
+
     const {priority, capacity} = MICROTASK.OAK_END_SHAKE
     const shakedTimestamp = taskScheduler.enqueue(`oak_shake_${record.id}`, 24 * 60 * 1000, this.oakEndShake, priority, capacity, soilIndex)
     record.shakedTimestamp = shakedTimestamp

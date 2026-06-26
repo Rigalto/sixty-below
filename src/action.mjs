@@ -885,7 +885,7 @@ class HammingManager {
    */
   #scheduleNext () {
     if (this.#queue.length > 0) {
-      const {priority, capacity} = MICROTASK.CHOP_TREE
+      const {priority, capacity} = MICROTASK.HAMMER_USE
       taskScheduler.enqueue('hamming-current', this.#queue[0].speed, this.onHamming, priority, capacity)
     }
     // TODO: fin animation outil (axe)
@@ -915,8 +915,7 @@ class HammingManager {
 
     const plant = floraManager.getPlantAt(tileIndex)
     if (plant !== null && plant.kind === PLANT_KIND.TREE) {
-      // TODO : secouage d'arbre
-
+      this.tryShaking(tileIndex, plant, tool, prefix)
     }
   }
 
@@ -934,21 +933,17 @@ class HammingManager {
       // TODO - secouage de l'arbre
 
       const {tree} = entry
-      // const system = PLANT_SYSTEM_LOOKUP.get(plant.kind * 100 + plant.type)
-      // if (system === undefined || !system.isPresent(plant)) {
-      //   this.#scheduleNext()
-      //   return
-      // }
-
       const plantItem = ITEMS[tree.itemId]
       if (plantItem.shaking === undefined) {
         this.#scheduleNext()
         return
       }
-      const buffValues = buffManager.getBuffs(plantItem.shaking.buffList)
+
+      const lootTable = tree.shakedTimestamp === null ? plantItem.shaking : plantItem.chopping
+      const buffValues = buffManager.getBuffs(lootTable.buffList)
 
       // Loot standard (chaque coup)
-      for (const lootItem of plantItem.shaking.items) {
+      for (const lootItem of lootTable.items) {
         const count = rollLootWithBuffs(lootItem, buffValues)
         if (count > 0) {
           const itemCode = lootItem.item.code
@@ -959,6 +954,19 @@ class HammingManager {
 
       // Délègue la mutation de state au TreeSystem
       eventBus.emit(`shaked/${plantItem.code}`, tree.soilIndex)
+
+      // Extra drop si c'est le dernier coup (size est déjà décrémenté dans onChopped)
+      // plant est même supprimé de la mémoire...
+      if (tree.size < 0 && plantItem.chopping.extraDrop) {
+        for (const lootItem of plantItem.chopping.extraDrop.items) {
+          const count = rollLootWithBuffs(lootItem, buffValues)
+          if (count > 0) {
+            const itemCode = lootItem.item.code
+            inventoryManager.loot(itemCode, count, '')
+            eventBus.emit('player/loot-item', {itemCode})
+          }
+        }
+      }
     } else if (entry.type === 'furniture') {
       // TODO - unplacing de furniture
     } else if (entry.type === 'wall') {
@@ -1047,7 +1055,7 @@ class HammingManager {
    * @param {{slot: object}} payload
    */
   onSlotActive ({slot}) {
-    if (slot.item && ITEMS[slot.item].type & ITEM_TYPE.TOOL && ITEMS[slot.item].stype === 'axe') return
+    if (slot.item && ITEMS[slot.item].type & ITEM_TYPE.TOOL && ITEMS[slot.item].stype === 'hammer') return
     this.#interrupt()
   }
 }

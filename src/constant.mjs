@@ -309,6 +309,7 @@ export const MICROTASK = {
   MINE_TILE: {priority: 24, capacity: 6, taskName: 'onMineTile'}, // minage d'une tuile
   PLACE_TILE: {priority: 24, capacity: 10, taskName: 'onPlaceTile'}, // pose d'un bloc
   CHOP_TREE: {priority: 24, capacity: 4, taskName: 'onChopTree'}, // abat une section d'arbre
+  HAMMER_USE: {priority: 24, capacity: 4, taskName: 'onHamming'}, // traitement d'une utilisation du Hammer
   SOW_SEED: {priority: 24, capacity: 4, taskName: 'doSow'}, // plante une graine
   OAK_GROW: {priority: 24, capacity: 4, taskName: 'growOak'}, // croissance d'un tronçon d'oak
   OAK_END_SHAKE: {priority: 24, capacity: 4, taskName: 'oakEndShake'}, // fin de la période où un arbre n'est pas shakable
