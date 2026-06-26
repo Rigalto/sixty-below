@@ -902,6 +902,7 @@ class KeyboardManager {
     // Guard : ignorer toutes les touches si le focus est sur un champ de saisie
     const tag = e.target.tagName
     if (tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT') return
+    if ((e.key === 'Tab') || (e.code === 'Tab')) e.preventDefault()
 
     // Debug dans la console (Touche ² (AZERTY) ou ` (QWERTY))
     if (IS_DEV && e.code === 'Backquote') { this.debugTrigger = true }
