@@ -930,35 +930,15 @@ class HammingManager {
     if (entry === undefined) return
 
     if (entry.type === 'tree') {
-      // TODO - secouage de l'arbre
-
+      // Secouage de l'arbre
       const {tree} = entry
       const plantItem = ITEMS[tree.itemId]
-      if (plantItem.shaking === undefined) {
-        this.#scheduleNext()
-        return
-      }
+      if (plantItem.shaking === undefined) { this.#scheduleNext(); return }
 
-      const lootTable = tree.shakedTimestamp === null ? plantItem.shaking : plantItem.chopping
-      const buffValues = buffManager.getBuffs(lootTable.buffList)
-
-      // Loot standard (chaque coup)
-      for (const lootItem of lootTable.items) {
-        const count = rollLootWithBuffs(lootItem, buffValues)
-        if (count > 0) {
-          const itemCode = lootItem.item.code
-          inventoryManager.loot(itemCode, count, '')
-          eventBus.emit('player/loot-item', {itemCode})
-        }
-      }
-
-      // Délègue la mutation de state au TreeSystem
-      eventBus.emit(`shaked/${plantItem.code}`, tree.soilIndex)
-
-      // Extra drop si c'est le dernier coup (size est déjà décrémenté dans onChopped)
-      // plant est même supprimé de la mémoire...
-      if (tree.size < 0 && plantItem.chopping.extraDrop) {
-        for (const lootItem of plantItem.chopping.extraDrop.items) {
+      // Loot standard shaking
+      if (tree.shakedTimestamp === null) {
+        const buffValues = buffManager.getBuffs(plantItem.shaking.buffList)
+        for (const lootItem of plantItem.shaking.items) {
           const count = rollLootWithBuffs(lootItem, buffValues)
           if (count > 0) {
             const itemCode = lootItem.item.code
@@ -967,6 +947,9 @@ class HammingManager {
           }
         }
       }
+
+      // Délègue la mutation de state au TreeSystem
+      eventBus.emit(`shaked/${plantItem.code}`, tree.soilIndex)
     } else if (entry.type === 'furniture') {
       // TODO - unplacing de furniture
     } else if (entry.type === 'wall') {
