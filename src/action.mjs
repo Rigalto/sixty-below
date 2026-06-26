@@ -995,7 +995,7 @@ class HammingManager {
     eventBus.emit('sound/play', 'chopping')
 
     if (wasEmpty) {
-      const {priority, capacity} = MICROTASK.SHAKE_TREE
+      const {priority, capacity} = MICROTASK.HAMMER_USE
       taskScheduler.enqueue('hamming-current', speed, this.onHamming, priority, capacity)
     }
   }

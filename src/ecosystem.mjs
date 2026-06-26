@@ -1618,6 +1618,10 @@ class OakSystem {
     this.#oakXSet.delete((record.soilIndex & 0x3ff) + 1)
     this.#oakXSet.delete((record.soilIndex & 0x3ff) + 2)
 
+    // Purge des tâches scheduler
+    taskScheduler.dequeue(`oak_grow_${record.id}`)
+    taskScheduler.dequeue(`oak_shake_${record.id}`)
+
     // Persistance : marque deleted
     record.deleted = true
     saveManager.queueStaticUpdate({storeName: 'plant', record})
