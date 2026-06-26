@@ -524,8 +524,8 @@ export const ITEMS = {
     growth: 2 * 24 * 60 * 1000,
     help: 'Oak & Mahogany',
     tooltip: 'Common tree in forest, can be chopping or shaking',
-    chopping: {speed: 1800, items: [{item: 'logOak', count: '1-2'}, {item: 'acorn', count: 0.25}, {item: 'feather', count: 0.08}, {item: 'apple', count: 0.05}], extraLoot: {items: [{item: 'rootOak', count: '2-5', buffs: ['+felling']}]}},
-    shaking: {speed: 1800, items: [{item: 'egg', count: 0.75}, {item: 'feather', count: 0.75}, {item: 'acorn', count: 0.25}, {item: 'logOak', count: 0.12}, {item: 'apple', count: 0.10}]}
+    chopping: {speed: 1800, items: [{item: 'logOak', count: '1-2'}, {item: 'acorn', count: 0.25}, {item: 'feather', count: 0.08}, {item: 'apple', count: 0.05}, {item: 'peach', count: 0.04}], extraLoot: {items: [{item: 'rootOak', count: '2-5', buffs: ['+felling']}]}},
+    shaking: {speed: 1800, items: [{item: 'egg', count: 0.75}, {item: 'feather', count: 0.75}, {item: 'acorn', count: 0.25}, {item: 'logOak', count: 0.12}, {item: 'apple', count: 0.10}, {item: 'peach', count: 0.8}]}
   },
   logOak: {name: 'Oak Log', type: 0, stype: 'log', star: 1, image: 'mined_32_32-1-4', help: 'Oak & Mahogany', tooltip: '???'},
   plankOak: {name: 'Oak Plank', type: 0, stype: 'plank', star: 1, image: 'refined_32_32-5-2', help: 'Oak & Mahogany', tooltip: '???'},
@@ -533,6 +533,7 @@ export const ITEMS = {
   egg: {name: 'Bird Egg', type: 0, stype: 'egg', star: 1, image: 'mined_32_32-2-5', help: 'Oak & Mahogany', tooltip: '???'},
   feather: {name: 'Bird Feather', type: 0, stype: 'feather', star: 1, image: 'mined_32_32-1-5', help: 'Oak & Mahogany', tooltip: '???'},
   apple: {name: 'Apple', type: 0, stype: 'fruit', star: 1, image: 'mined_32_32-3-5', help: 'Oak & Mahogany', tooltip: 'An apple a day keeps Doctor Bones away!'},
+  peach: {name: 'Peach', type: 0, stype: 'fruit', star: 1, image: 'mined_32_32-4-5', help: 'Oak & Mahogany', tooltip: '???'},
 
   acorn: {name: 'Acorn', type: ITEM_TYPE.SEED | ITEM_TYPE.PLACABLE, stype: 'seed', star: 1, image: 'mined_32_32-0-5', help: 'Oak & Mahogany', tooltip: '???'},
   seedForest: {name: 'Forest Grass Seed', type: ITEM_TYPE.SEED | ITEM_TYPE.PLACABLE, stype: 'seed', star: 1, image: 'potions_32_32-1-5', help: 'Forest Grass', tooltip: 'Plant to change Dirt into Forest Grass'},
