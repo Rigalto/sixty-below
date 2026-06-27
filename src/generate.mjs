@@ -7060,6 +7060,7 @@ class PlantGenerator {
       grass: SAND,
       growthTimestamp: null,
       shakedTimestamp: null,
+      blocked: 0,
       deleted: false
     })
   }
@@ -7213,6 +7214,7 @@ class PlantGenerator {
         yBottom: y - 1,
         growthTimestamp,
         shakedTimestamp: null,
+        blocked: 0,
         deleted: false
       })
 
@@ -7339,6 +7341,7 @@ class PlantGenerator {
         yBottom: y - 1,
         growthTimestamp: null,
         shakedTimestamp: null,
+        blocked: 0,
         deleted: false
       })
 

@@ -586,6 +586,8 @@ class ChoppingManager {
 
     const plantItem = ITEMS[plant.itemId]
     if (!this.#isInChoppingRange(tileIndex, tool, prefix)) { eventBus.emit('sound/play', 'toofar'); return }
+    if (plant.blocked > 0) { eventBus.emit('sound/play', 'wrong'); return }
+
     if (tool.star < plantItem.star) { eventBus.emit('sound/play', 'wrong'); return }
 
     const speed = this.#computeChopSpeed(plantItem, tool, prefix)
@@ -969,6 +971,8 @@ class HammingManager {
   tryShaking (tileIndex, tree, tool, prefix) {
     const plantItem = ITEMS[tree.itemId]
     if (!this.#isInHammingRange(tileIndex, tool, prefix)) { eventBus.emit('sound/play', 'toofar'); return }
+    if (tree.blocked > 0) { eventBus.emit('sound/play', 'wrong'); return }
+
     if (tool.star < plantItem.star) { eventBus.emit('sound/play', 'wrong'); return }
 
     const speed = this.#computeShakingSpeed(plantItem, tool, prefix)

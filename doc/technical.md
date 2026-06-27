@@ -827,6 +827,7 @@ Les enregistrements sont de natures très différentes, nature déterminée par 
   * `grass` : type de tuile sur lequel l'arbre pousse (NODES.GRASSFOREST.code, NODES.GRASSJUNGLE.code, NODES.GRASSMUSHROOM.code, NODES.SAND.code)
   * `growthTimestamp` : heure (timestamp) de prochaine croissance (`null` si `size` === 0)
   * `shakedTimestamp` : heure (timestamp) à partir de laquelle l'arbre peut être secoué de nouveau
+  * `blocked` : nombre de tuiles non SKY dans la zone au-dessus du sol qui bloquent l'arbre
 * `kind` MUSHROOM : liste des spots de champignons potentiels dans le monde (tuile à gauche et à droite de l'arbre correspondant, indépendamment de la nature de cette tuile)
   * `id` : identifiant unique du spot de champignon
   * `itemId` : item correspondant au champignon qui pousse sur le spot : `ITEMS.bolete.code` et `ITEMS.pinkMycenia.code`

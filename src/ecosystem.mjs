@@ -1748,6 +1748,7 @@ class OakSystem {
       yBottom: soilY - 1,
       growthTimestamp,
       shakedTimestamp: null,
+      blocked: 0,
       deleted: false
     }
     this.initPlant(oakRecord)
@@ -1787,6 +1788,7 @@ class OakSystem {
     const record = this.#oakBySoil.get(soilIndex)
 
     if (record === undefined) return
+    if (record.blocked > 0) return // arbre bloqué : croissance suspendue, tâche abandonnée
 
     removeFromByTileTree(this.oakByTile, this.#oakByFullRect, record)
     record.size++
