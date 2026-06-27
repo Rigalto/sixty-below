@@ -51,6 +51,26 @@ const tileRectHasOther = (index, w, h, nodeId) => {
   return false
 }
 
+/**
+ * Résout un objet loot-action hydraté : tire chaque entrée avec buffs et crédite l'inventaire.
+ * Émet 'player/loot-item' pour chaque item obtenu (son, achievements, UI…).
+ * Le préfixe d'item (tools/armor/weapons) n'est pas encore tiré — toujours ''.
+ * TODO: générer le préfixe aléatoire quand les items de type TOOL/ARMOR/WEAPON seront lootables.
+ * @param {object} lootAction — objet hydraté portant {buffList, items[]}
+ *                              (ex : tileNode.mining, plantItem.chopping, plantItem.shaking…)
+ */
+const resolveLoot = (lootAction) => {
+  const buffValues = buffManager.getBuffs(lootAction.buffList)
+  for (const lootItem of lootAction.items) {
+    const count = rollLootWithBuffs(lootItem, buffValues)
+    if (count > 0) {
+      const itemCode = lootItem.item.code
+      inventoryManager.loot(itemCode, count, '')
+      eventBus.emit('player/loot-item', {itemCode})
+    }
+  }
+}
+
 /* ====================================================================================================
    GESTION DU MINAGE DE TUILES
    ==================================================================================================== */
@@ -194,15 +214,7 @@ class MiningManager {
     chunkManager.setTileAt(entry.tileIndex, tileNewCode)
     eventBus.emit('world/tile-changed', {tileIndex: entry.tileIndex, tileOldCode: entry.tileNode.code, tileNewCode})
     // loot
-    const buffValues = buffManager.getBuffs(entry.tileNode.mining.buffList)
-    for (const lootItem of entry.tileNode.mining.items) {
-      const count = rollLootWithBuffs(lootItem, buffValues)
-      if (count > 0) {
-        const itemCode = lootItem.item.code
-        inventoryManager.loot(itemCode, count, '')
-        eventBus.emit('player/loot-item', {itemCode})
-      }
-    }
+    resolveLoot(entry.tileNode.mining)
 
     this.#scheduleNext()
   }
@@ -494,15 +506,7 @@ class ForagingManager {
         return
       }
 
-      const buffValues = buffManager.getBuffs(entry.tileNode.foraging.buffList)
-      for (const lootItem of entry.tileNode.foraging.items) {
-        const count = rollLootWithBuffs(lootItem, buffValues)
-        if (count > 0) {
-          const itemCode = lootItem.item.code
-          inventoryManager.loot(itemCode, count, '')
-          eventBus.emit('player/loot-item', {itemCode})
-        }
-      }
+      resolveLoot(entry.tileNode.foraging)
 
       console.log('ForagingManager.onForage — natural', entry)
     } else {
@@ -513,15 +517,8 @@ class ForagingManager {
         return
       }
       const plantItem = ITEMS[plant.itemId]
-      const buffValues = buffManager.getBuffs(plantItem.foraging.buffList)
-      for (const lootItem of plantItem.foraging.items) {
-        const count = rollLootWithBuffs(lootItem, buffValues)
-        if (count > 0) {
-          const itemCode = lootItem.item.code
-          inventoryManager.loot(itemCode, count, '')
-          eventBus.emit('player/loot-item', {itemCode})
-        }
-      }
+      resolveLoot(plantItem.foraging)
+
       system.onForaged(plant)
       console.log('ForagingManager.onForage — plant', entry)
     }
@@ -668,32 +665,15 @@ class ChoppingManager {
     }
 
     const plantItem = ITEMS[plant.itemId]
-    const buffValues = buffManager.getBuffs(plantItem.chopping.buffList)
-
-    // Loot standard (chaque coup)
-    for (const lootItem of plantItem.chopping.items) {
-      const count = rollLootWithBuffs(lootItem, buffValues)
-      if (count > 0) {
-        const itemCode = lootItem.item.code
-        inventoryManager.loot(itemCode, count, '')
-        eventBus.emit('player/loot-item', {itemCode})
-      }
-    }
+    // loot standard : chaque coup
+    resolveLoot(plantItem.chopping)
 
     // Délègue la mutation de state au TreeSystem
     system.onChopped(plant)
 
     // Extra drop si c'est le dernier coup (size est déjà décrémenté dans onChopped)
-    // plant est même supprimé de la mémoire...
     if (plant.size < 0 && plantItem.chopping.extraDrop) {
-      for (const lootItem of plantItem.chopping.extraDrop.items) {
-        const count = rollLootWithBuffs(lootItem, buffValues)
-        if (count > 0) {
-          const itemCode = lootItem.item.code
-          inventoryManager.loot(itemCode, count, '')
-          eventBus.emit('player/loot-item', {itemCode})
-        }
-      }
+      resolveLoot(plantItem.chopping.extraDrop)
     }
 
     // Arbre détruit : purge les entrées restantes pour ce même arbre (clics en surplus
@@ -938,17 +918,7 @@ class HammingManager {
       if (plantItem.shaking === undefined) { this.#scheduleNext(); return }
 
       // Loot standard shaking
-      if (tree.shakedTimestamp === null) {
-        const buffValues = buffManager.getBuffs(plantItem.shaking.buffList)
-        for (const lootItem of plantItem.shaking.items) {
-          const count = rollLootWithBuffs(lootItem, buffValues)
-          if (count > 0) {
-            const itemCode = lootItem.item.code
-            inventoryManager.loot(itemCode, count, '')
-            eventBus.emit('player/loot-item', {itemCode})
-          }
-        }
-      }
+      if (tree.shakedTimestamp === null) resolveLoot(plantItem.shaking)
 
       // Délègue la mutation de state au TreeSystem
       eventBus.emit(`shaked/${plantItem.code}`, tree.soilIndex)
