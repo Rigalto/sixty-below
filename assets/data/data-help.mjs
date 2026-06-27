@@ -4563,33 +4563,27 @@ Chopping trees yields logs, which can then be refined into planks using a [[Wood
 
 **Growth**
 
-* Trees grow through 5 visible stages (1 to 5)
-* A new section grows every 2-3 in-game days for Oak, 3-4 days for Mahogany ⏳
-* Maximum size is 5 sections
+* Trees grow through 5 stages, visible from the moment they are planted
+* A new section grows approximately every 2 in-game days for Oak, 3 days for Mahogany
+* Growth stops at stage 5 — a fully grown tree no longer changes
+* If the space above the tree is obstructed (by water, sand, or other material), growth is suspended until the obstruction clears
 
-**Interactions - Shaking**
+**Planting**
 
-* A tree can only be shaken once per in-game day — shaking too frequently weakens the tree. ⏳
+* Shaking and chopping both have a chance to yield [[item:acorn]] (Oak) or [[item:samara]] (Mahogany)
+* Place a seed on the **central** tile of 3 consecutive horizontal [[node:grassForest]] (acorn) or [[node:grassJungle]] (samara) tiles
+* The tree appears immediately at first stage and grows naturally from there
+* The 18 tiles above the planting spot must be completely clear — the tree cannot be planted in an obstructed space
 
-| Tree | Tool | Encounter |
-| [[item:oak]] | Any [[Shaking Tools|Hammers]] | [[monster:hornet]] |
-| [[item:mahogany]] | [[Shaking Tools|Iron Hammers]] or better | [[monster:eyelashViper]] |
-
-| Tree | Shaking Loot |
-| [[item:oak]] | {{item:oak:shaking:items}} |
-| [[item:mahogany]] | {{item:mahogany:shaking:items}} |
+<hr>
 
 **Interactions - Chopping**
 
-* Chopping removes one section — the tree shrinks by one stage
-* When the last section is chopped, the tree disappears completely and yields an extra drop
-* A chopped tree will regrow naturally over time if at least one section remains
-
-| Tree | Tool | Encounter |
-| [[item:oak]] | Any [[Chopping Tools|Axes]] | [[monster:boar]] |
-| [[item:mahogany]] | [[Chopping Tools|Iron Axes]] or better | [[monster:bulletAnt]] |
-
-<hr>
+* Select an [[Chopping Tools|Axe]] and click the tree to chop it
+* Each chop removes one section — the tree shrinks by one stage
+* When the last section is chopped, the tree disappears completely and yields an extra drop (roots)
+* A chopped tree regrows naturally over time if at least one section remains
+* Chopping is blocked while the tree is obstructed
 
 **Oak Chopping Loot** ⏳
 
@@ -4605,32 +4599,76 @@ Chopping Tool: <<itemStar|axeCopper>> or better
 <<itemLootTable|mahogany|chopping>>
 {{item:mahogany:chopping:extraLoot:items[*]:helpRow|rows}}
 
+**Chopping Encounters**
+
+| Tree | Encounter |
+| [[item:oak]] | [[monster:boar]] |
+| [[item:mahogany]] | [[monster:bulletAnt]] |
+
 **Chopping Details**
 
-<<additiveNote>>
+* Chopping speed and range depend on the axe used and can be extended by [[Chopping Buffs]].
 
 See [[Chopping]], [[Chopping Tools]] and [[Chopping Buffs]] for details.
 
 <hr>
 
-**Planting**
+**Interactions - Shaking**
 
-* Shaking and chopping both yield [[item:acorn]] (Oak) or [[item:samara]] (Mahogany)
-* Place a seed on 3 consecutive horizontal [[node:grassForest]] (acorn) or [[node:grassJungle]] (samara) tiles
-* The tree immediately appears at stage 1 and grows naturally from there
+* Select a [[Hammers|Hammer]] and click the tree to shake it
+* Shaking yields items without damaging the tree
+* Shaking is blocked while the tree is obstructed
+* A tree can only be shaken once every in-game day — shaking it again before that delay
+  expires causes the tree to lose one section with no loot
 
-**Refining**
+**Oak Shaking Loot** ⏳
 
-Chop trees to gather logs, then process them into planks at a [[Woodworking|Workbench]].
+Shaking Tool: <<itemStar|hammerCopper>> or better
+
+<<itemLootTable|oak|shaking>>
+{{item:oak:shaking:extraLoot:items[*]:helpRow|rows}}
+
+**Mahogany Shaking Loot** ⏳
+
+Shaking Tool: <<itemStar|hammerCopper>> or better
+
+<<itemLootTable|mahogany|shaking>>
+{{item:mahogany:shaking:extraLoot:items[*]:helpRow|rows}}
+
+**Shaking Encounters**
+
+| Tree | Encounter |
+| [[item:oak]] | [[monster:hornet]] |
+| [[item:mahogany]] | [[monster:eyelashViper]] |
+
+**Shaking Details**
+
+* Shaking speed and range depend on the hammer used and can be extended by [[Chopping Buffs]] (shaking and chopping share the same buffs).
+
+See [[Shaking]], [[Hammers]] and [[Chopping Buffs]] for details.
+
+<hr>
+
+**Usage**
+
+[[item:logOak]]s and [[item:logMahogany]]s are essential crafting materials —
+they are core components of [[Furnitures]], [[Crafting Stations]], [[Tools]] and [[Weapons]].
+
+They can be used as-is or processed into planks at a [[Woodworking|Workbench]].
 
 | Tree | Raw Material | Refined Material |
-|  <<itemStar|oak>> | <<itemStar|logOak>> |  <<itemStar|plankOak>> |
-|  <<itemStar|mahogany>> | <<itemStar|logMahogany>> |  <<itemStar|plankMahogany>> |
+| <<itemStar|oak>> | <<itemStar|logOak>> | <<itemStar|plankOak>> |
+| <<itemStar|mahogany>> | <<itemStar|logMahogany>> | <<itemStar|plankMahogany>> |
+
+Shaking and chopping also yield drops used in [[Food]], [[Potions]] and [[Accessories]] — making
+a well-managed forest one of the most valuable resources in the game.
+
+<hr>
 
 **Tips**
 
 * _Chopping a tree down to its last section is risky — one more chop removes it permanently._ ⏳
-* _Shaking a tree is less rewarding but safer than chopping — no wood, but no stumps either._ ⏳
+* _Shaking a tree is less rewarding but safer than chopping — less wood, but no stumps either._ ⏳
 * _Chopping removes the tree permanently — it will not regrow unless replanted._ ⏳
 * _Too many oaks reduce [[Sunflower]] growing spots — manage your forest density carefully._ ⏳
   `
@@ -6329,7 +6367,7 @@ It does not need to be equipped — carrying it in your [[Inventory]] is enough.
   },
 
   // ── Gameplay ─────────────────────────────────────────────────
-  //    Range, Achievements, Achievements Panel
+  //    Range, Achievements, Achievements Panel, Tools
   {
     title: 'Ranges',
     category: ['Gameplay'],
@@ -6493,8 +6531,31 @@ Click the same row again to collapse. Only one category can be expanded at a tim
 
 * _See [[Achievements]] for a full explanation of how points are calculated._
   `
-  }
+  },
+  {
+    title: 'Tools',
+    category: ['Gameplay'],
+    content: `
+**Description**
 
+Les tools sont des items placés dans la hotbar pour être utilisé pour performer une action.
+
+**Tools list**
+
+| Tool | Actions |
+| --- | --- |
+| [[Mining Tools|Pickaxe]] | Mining trees |
+| [[Chopping Tools|Axe]] | Chopping trees |
+| [[Hammers|Hammer]] | Shaking trees, removing Walls and placed [[Furnitures]] |
+| [[Foraging Tools|Sickle]] | Foraging plants |
+| [[Catching Tools|Bug Net]] | Catching critters |
+| [[Fishing Rods|Fishing Rod]] | Catching fishes |
+
+**Sea Also**
+
+* [[Weapons]]
+  `
+  }
 ]
 
 /* ====================================================================================================
