@@ -45,36 +45,67 @@ const removeFromByTile = (byTile, record) => {
 }
 
 /**
- * Ajoute un arbre dans byTile pour les tuiles de sa zone d'interaction effective (dépendante
- * de size). Hauteur = (size + 2) * 3 tuiles, ancrée sur soilIndex et remontant vers le haut.
- * Largeur = record.w (3 tuiles) — l'image de rendu fait 5 tuiles de large, mais les 2 tuiles
- * latérales ne font pas partie de la zone d'interaction (chopping, shaking, survol souris).
- * @param {Map} byTile  @param {object} record — record TREE (oak)
+ * Ajoute un arbre dans byFullRect (rectangle complet 3×18, fixe) et dans byTile
+ * (zone d'interaction effective, (size+2)*3 lignes). Deux boucles séquentielles
+ * sans branchement : la première couvre les lignes hors zone active (byFullRect seul),
+ * la seconde les lignes actives (byFullRect + byTile).
+ * rowBase est incrémenté par WORLD_WIDTH à chaque ligne — pas de recalcul d'index.
+ * @param {Map} byTile      — lookup interaction (tileIndex → record)
+ * @param {Map} byFullRect  — lookup obstruction complète (tileIndex → record)
+ * @param {object} record   — record TREE (oak)
  */
-const addToByTileTree = (byTile, record) => {
+const addToByTileTree = (byTile, byFullRect, record) => {
   const px = record.soilIndex & 0x3FF
   const soilY = record.soilIndex >> 10
-  const h = (record.size + 2) * 3
-  const py = soilY - h
-  for (let dy = 0; dy < h; dy++) {
-    const rowBase = (py + dy) << 10
-    for (let dx = 0; dx < record.w; dx++) byTile.set(rowBase | (px + dx), record)
+  const hFull = record.h // 18, fixe
+  const hActive = (record.size + 2) * 3 // zone d'interaction
+  const hInert = hFull - hActive // lignes hors zone active
+  const w = record.w
+  let rowBase = (soilY - hFull) << 10
+
+  // Boucle 1 — lignes hors zone active : byFullRect uniquement
+  for (let dy = 0; dy < hInert; dy++, rowBase += WORLD_WIDTH) {
+    for (let dx = 0; dx < w; dx++) byFullRect.set(rowBase | (px + dx), record)
+  }
+
+  // Boucle 2 — lignes de la zone active : byFullRect + byTile
+  for (let dy = 0; dy < hActive; dy++, rowBase += WORLD_WIDTH) {
+    for (let dx = 0; dx < w; dx++) {
+      const tileIndex = rowBase | (px + dx)
+      byFullRect.set(tileIndex, record)
+      byTile.set(tileIndex, record)
+    }
   }
 }
 
 /**
- * Retire un arbre de byTile pour les tuiles de sa zone d'interaction effective (dépendante
- * de size). Symétrique d'addToByTileTree — même formule de hauteur.
- * @param {Map} byTile  @param {object} record — record TREE (oak)
+ * Retire un arbre de byFullRect et de byTile. Structure miroir d'addToByTileTree —
+ * mêmes deux boucles séquentielles, set/delete inversés.
+ * @param {Map} byTile      — lookup interaction (tileIndex → record)
+ * @param {Map} byFullRect  — lookup obstruction complète (tileIndex → record)
+ * @param {object} record   — record TREE (oak)
  */
-const removeFromByTileTree = (byTile, record) => {
+const removeFromByTileTree = (byTile, byFullRect, record) => {
   const px = record.soilIndex & 0x3FF
   const soilY = record.soilIndex >> 10
-  const h = (record.size + 2) * 3
-  const py = soilY - h
-  for (let dy = 0; dy < h; dy++) {
-    const rowBase = (py + dy) << 10
-    for (let dx = 0; dx < record.w; dx++) byTile.delete(rowBase | (px + dx))
+  const hFull = record.h
+  const hActive = (record.size + 2) * 3
+  const hInert = hFull - hActive
+  const w = record.w
+  let rowBase = (soilY - hFull) << 10
+
+  // Boucle 1 — lignes hors zone active : byFullRect uniquement
+  for (let dy = 0; dy < hInert; dy++, rowBase += WORLD_WIDTH) {
+    for (let dx = 0; dx < w; dx++) byFullRect.delete(rowBase | (px + dx))
+  }
+
+  // Boucle 2 — lignes de la zone active : byFullRect + byTile
+  for (let dy = 0; dy < hActive; dy++, rowBase += WORLD_WIDTH) {
+    for (let dx = 0; dx < w; dx++) {
+      const tileIndex = rowBase | (px + dx)
+      byFullRect.delete(tileIndex)
+      byTile.delete(tileIndex)
+    }
   }
 }
 
@@ -1284,7 +1315,9 @@ const OAK_SIZE_ROWS = [
 
 class OakSystem {
   // --- Oak (TREE) ---
-  oakByTile = new Map() // Map<tileIndex, record> — public, lookup par tuile
+  oakByTile = new Map() // Map<tileIndex, record> — public, zone d'interaction (size-dépendante)
+  #oakByFullRect = new Map() // Map<tileIndex, record> — rectangle complet 3×18, surveillance obstruction
+
   #oakList = [] // record[] — tous les oaks
   #oakByChunk = new Map() // Map<chunkKey, Set> — lookup spatial pour onPreloadChunksChanged
   #oakBySoil = new Map() // Map<soilIndex, record> — 3 entrées par oak (soilIndex, +1, +2) : détection minage/changement du sol
@@ -1324,6 +1357,7 @@ class OakSystem {
    */
   init () {
     this.oakByTile.clear()
+    this.#oakByFullRect.clear()
     this.#oakList.length = 0
     this.#oakByChunk.clear()
     this.#oakBySoil.clear()
@@ -1354,7 +1388,7 @@ class OakSystem {
       this.#oakXSet.add((soilIndex & 0x3ff))
       this.#oakXSet.add((soilIndex & 0x3ff) + 1)
       this.#oakXSet.add((soilIndex & 0x3ff) + 2)
-      addToByTileTree(this.oakByTile, record)
+      addToByTileTree(this.oakByTile, this.#oakByFullRect, record)
       addToByChunk(this.#oakByChunk, record)
 
       const px = record.index & 0x3FF
@@ -1558,9 +1592,9 @@ class OakSystem {
    * @param {object} record — record TREE (oak ou mahogany)
    */
   onChopped (record) {
-    removeFromByTileTree(this.oakByTile, record)
+    removeFromByTileTree(this.oakByTile, this.#oakByFullRect, record)
     record.size--
-    addToByTileTree(this.oakByTile, record)
+    addToByTileTree(this.oakByTile, this.#oakByFullRect, record)
 
     if (record.size < 0) {
       this.#destroyOak(record) // fait le queueStaticUpdate
@@ -1582,7 +1616,7 @@ class OakSystem {
    */
   #destroyOak (record) {
     // Retrait byTile et byChunk
-    removeFromByTileTree(this.oakByTile, record)
+    removeFromByTileTree(this.oakByTile, this.#oakByFullRect, record)
     removeFromByChunk(this.#oakByChunk, record)
     this.#oakDisplayed.delete(record)
 
@@ -1754,7 +1788,9 @@ class OakSystem {
 
     if (record === undefined) return
 
+    removeFromByTileTree(this.oakByTile, this.#oakByFullRect, record)
     record.size++
+    addToByTileTree(this.oakByTile, this.#oakByFullRect, record)
 
     if (record.size < 4) {
       const growthDelay = (ITEMS.oak.growth * seededRNG.randomGetRealMinMax(0.8, 1.2)) | 0
