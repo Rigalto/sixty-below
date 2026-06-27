@@ -71,6 +71,22 @@ const resolveLoot = (lootAction) => {
   }
 }
 
+/**
+ * Calcule le délai d'action en ms pour un outil et un préfixe donnés.
+ * @param {number} baseSpeed   — vitesse de base de l'action (tileNode/plantItem.XXX.speed)
+ * @param {number} toolSpeed   — bonus de vitesse de l'outil (tool.XXX.speed)
+ * @param {string} buffSpeed   — identigfiant du bonus de vitesse du buff actif ('XXX-speed')
+ * @param {string} prefix      — préfixe de l'outil (slot.prefix)
+ * @returns {number} délai en ms
+ */
+const computeActionSpeed = (baseSpeed, toolSpeed, buffSpeed, prefix) => {
+  let coefficient = 100 + toolSpeed + buffManager.getBuff(buffSpeed)
+  coefficient += prefix === 'Quick' ? 20 : 0
+  coefficient += prefix === 'Keen' ? 5 : 0
+  coefficient -= prefix === 'Sturdy' ? 5 : 0
+  return (baseSpeed * coefficient / 100) | 0
+}
+
 /* ====================================================================================================
    GESTION DU MINAGE DE TUILES
    ==================================================================================================== */
@@ -114,7 +130,7 @@ class MiningManager {
     if (tool.star < tileNode.star) { eventBus.emit('sound/play', 'wrong'); return }
     if (!blockedTiles.canMine(tileIndex)) { eventBus.emit('sound/play', 'wrong'); return } // includes ETERNAL
 
-    const speed = this.#computeMineSpeed(tileNode, tool, prefix)
+    const speed = computeActionSpeed(tileNode.mining.speed, tool.mining.speed, 'mining-speed', prefix)
 
     const wasEmpty = this.#queue.length === 0
     this.#queue.push({tileIndex, tileNode, tool, prefix, speed})
@@ -126,20 +142,6 @@ class MiningManager {
       const {priority, capacity} = MICROTASK.MINE_TILE
       taskScheduler.enqueue('mine-current', speed, this.onMineTile, priority, capacity)
     }
-  }
-
-  /**
-   * Calcule le délai de minage en ms pour une tuile et un outil donnés.
-   * @param {object} tileNode — NODES_LOOKUP[tileCode]
-   * @param {object} tool     — ITEMS[slot.item]
-   * @returns {number} délai en ms
-   */
-  #computeMineSpeed (tileNode, tool, prefix) {
-    let coefficient = 100 + tool.mining.speed + buffManager.getBuff('mining-speed')
-    coefficient += prefix === 'Quick' ? 20 : 0
-    coefficient += prefix === 'Keen' ? 5 : 0
-    coefficient -= prefix === 'Sturdy' ? 5 : 0
-    return Math.round((coefficient / 100) * tileNode.mining.speed)
   }
 
   /**
@@ -394,7 +396,8 @@ class ForagingManager {
       this.#foragedToday.add(tileIndex)
       database.setGameState('naturalforaged', this.#foragedToday)
 
-      const speed = this.#computeForageSpeedNatural(tileNode, tool, prefix)
+      const speed = computeActionSpeed(tileNode.foraging.speed, tool.foraging.speed, 'foraging-speed', prefix)
+
       const wasEmpty = this.#queue.length === 0
       this.#queue.push({type: 'natural', tileIndex, tileNode, tool, prefix, speed})
       eventBus.emit('sound/play', 'foraging')
@@ -419,7 +422,7 @@ class ForagingManager {
 
     if (!this.#isInForagingRange(tileIndex, tool, prefix)) { eventBus.emit('sound/play', 'toofar'); return }
     if (tool.star < plantItem.star) { eventBus.emit('sound/play', 'wrong'); return }
-    const speed = this.#computeForageSpeedPlant(plant, tool, prefix)
+    const speed = computeActionSpeed(plantItem.foraging.speed, tool.foraging.speed, 'foraging-speed', prefix)
 
     const wasEmpty = this.#queue.length === 0
     this.#queue.push({type: 'plant', plant, tileIndex, tool, prefix, speed})
@@ -429,34 +432,6 @@ class ForagingManager {
       // TODO: début animation outil (sickle)
       this.#scheduleNext()
     }
-  }
-
-  /**
-   * Calcule le délai de foraging en ms pour le foraging des tuiles
-   * TODO: implémenter la formule complète (tool.foraging.speed + buff foraging-speed + prefix)
-   * @returns {number} délai en ms
-   */
-  #computeForageSpeedNatural (tileNode, tool, prefix) {
-    let coefficient = 100 + tool.foraging.speed + buffManager.getBuff('foraging-speed')
-    coefficient += prefix === 'Quick' ? 20 : 0
-    coefficient += prefix === 'Keen' ? 5 : 0
-    coefficient -= prefix === 'Sturdy' ? 5 : 0
-    return Math.round((coefficient / 100) * tileNode.foraging.speed)
-  }
-
-  /**
- * Calcule le délai de foraging d'une plante, en ms.
- * @param {object} plant — record de la plante (utilise plant.itemId)
- * @param {object} tool — ITEMS[slot.item], outil sickle
- * @param {string} prefix — préfixe de l'outil (Quick/Keen/Sturdy)
- * @returns {number} délai en ms
- */
-  #computeForageSpeedPlant (plant, tool, prefix) {
-    let coefficient = 100 + tool.foraging.speed + buffManager.getBuff('foraging-speed')
-    coefficient += prefix === 'Quick' ? 20 : 0
-    coefficient += prefix === 'Keen' ? 5 : 0
-    coefficient -= prefix === 'Sturdy' ? 5 : 0
-    return Math.round((coefficient / 100) * ITEMS[plant.itemId].foraging.speed)
   }
 
   /**
@@ -587,7 +562,7 @@ class ChoppingManager {
 
     if (tool.star < plantItem.star) { eventBus.emit('sound/play', 'wrong'); return }
 
-    const speed = this.#computeChopSpeed(plantItem, tool, prefix)
+    const speed = computeActionSpeed(plantItem.chopping.speed, tool.chopping.speed, 'chopping-speed', prefix)
 
     const wasEmpty = this.#queue.length === 0
     this.#queue.push({plant, tool, prefix, speed})
@@ -597,21 +572,6 @@ class ChoppingManager {
       const {priority, capacity} = MICROTASK.CHOP_TREE
       taskScheduler.enqueue('chop-current', speed, this.onChopTree, priority, capacity)
     }
-  }
-
-  /**
-   * Calcule le délai d'abattage en ms pour un arbre et un outil donnés.
-   * @param {object} plantItem — ITEMS[plant.itemId], porte plantItem.chopping.speed
-   * @param {object} tool      — hache équipée
-   * @param {string} prefix    — préfixe de l'outil
-   * @returns {number} délai en ms
-   */
-  #computeChopSpeed (plantItem, tool, prefix) {
-    let coefficient = 100 + tool.chopping.speed + buffManager.getBuff('chopping-speed')
-    coefficient += prefix === 'Quick' ? 20 : 0
-    coefficient += prefix === 'Keen' ? 5 : 0
-    coefficient -= prefix === 'Sturdy' ? 5 : 0
-    return (plantItem.chopping.speed * coefficient / 100) | 0
   }
 
   /**
@@ -945,7 +905,7 @@ class HammingManager {
 
     if (tool.star < plantItem.star) { eventBus.emit('sound/play', 'wrong'); return }
 
-    const speed = this.#computeShakingSpeed(plantItem, tool, prefix)
+    const speed = computeActionSpeed(plantItem.shaking.speed, tool.shaking.speed, 'chopping-speed', prefix)
 
     const wasEmpty = this.#queue.length === 0
     this.#queue.push({type: 'tree', tree, tool, prefix, speed})
