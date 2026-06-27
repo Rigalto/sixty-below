@@ -1576,9 +1576,36 @@ class OakSystem {
       this.#destroyBoletePresent(bySoilRecord)
     }
 
-    // Cas 3 — Oak - TODO
+    // Cas 3 — Oak - tuile du rectangle complet 3×18 change d'état SKY
+    const byFullRecord = this.#oakByFullRect.get(tileIndex)
+    if (byFullRecord === undefined) return
 
-    // TODO : branche oak
+    // Cas 3.1. Obstruction : une tuile SKY devient autre chose
+    if (tileNewCode !== SKY) {
+      byFullRecord.blocked++
+      if (byFullRecord.blocked === 1) {
+        // Transition libre → bloqué : annule la croissance en cours
+        taskScheduler.dequeue(`oak_grow_${byFullRecord.id}`)
+        byFullRecord.growthTimestamp = null
+      }
+      saveManager.queueStaticUpdate({storeName: 'plant', record: byFullRecord})
+      return
+    }
+
+    // Cas 3.2. Libération : une tuile redevient SKY
+    if (byFullRecord.blocked === 0) return // guard : compteur déjà à zéro (cohérence)
+    byFullRecord.blocked--
+    if (byFullRecord.blocked === 0) {
+      // Transition bloqué → libre : relance la croissance si l'arbre n'est pas adulte
+      if (byFullRecord.size < 4) {
+        const growthDelay = (ITEMS.oak.growth * seededRNG.randomGetRealMinMax(0.8, 1.2)) | 0
+        const {priority, capacity} = MICROTASK.OAK_GROW
+        byFullRecord.growthTimestamp = taskScheduler.enqueue(
+          `oak_grow_${byFullRecord.id}`, growthDelay, this.growOak, priority, capacity, byFullRecord.soilIndex
+        )
+      }
+    }
+    saveManager.queueStaticUpdate({storeName: 'plant', record: byFullRecord})
   }
 
   // //////// //
