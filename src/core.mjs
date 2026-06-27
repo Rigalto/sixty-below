@@ -633,8 +633,8 @@ class GameCore {
     const TOOL_RANGE_BUFF = new Map([
       ['pickaxe', 'mining-range'],
       ['sickle', 'foraging-range'],
+      ['hammer', 'chopping-range'],
       ['axe', 'chopping-range']
-      // ['hammer', 'hamming-range'],
     ])
     const slot = hotbarOverlay.activeSlot
     if (!slot.item) return
