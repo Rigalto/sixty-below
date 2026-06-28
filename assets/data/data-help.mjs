@@ -2883,7 +2883,7 @@ The [[item:theodolite]] provides all three overlays in a single [[Inventory]] sl
 
 **Set Square — Interaction Range**
 
-The [[item:setSquare]] draws a red rectangle showing your [[Ranges|Interaction Range]]: the area within which you can open [[Chests]], access [[Crafting Stations]], interact with [[Furnitures]]...
+The [[item:setSquare]] draws a red rectangle showing your [[Ranges|Interaction Range]]: the area within which you can open [[Chests]], access [[Crafting Stations]], interact with [[Furnitures]], place items in the world...
 
 _The range can be extended by certain accessories or armors — the overlay updates in real time._
 
@@ -3198,8 +3198,10 @@ _Range bonus applies equally in all directions._
 
 | Armor | Speed Bonus | Range Bonus |
 |---|---|---|
-| item:miningArmor (full set) ⏳ | +80% | — |
-
+| Mining Armor Head | +10% | — |
+| Mining Armor Body | +20% | — |
+| Mining Armor Feet | +15% | — |
+| Mining Armor Full Set ⏳ | +50% | 1 |
 <hr>
 
 **Potions**
@@ -3536,14 +3538,14 @@ Click any slot to see its full recipe on the right.
 If the recipe also **returns** items (containers, empty vessels…), they appear below the result.
 
 **Crafting Station** — the Crafting Station required.
-* _Green background_ — the Crafting Station is within range.
+* _Green background_ — the Crafting Station is within [[Ranges|Interaction Range]].
 * _Blue background_ — the Crafting Station is not nearby.
 
 **Ingredients** — each ingredient shows _available / needed_ for the current number of runs.
 * _Green background_ — quantity is sufficient.
 * _Blue background_ — quantity is insufficient.
 
-**Ingredient sources** — ingredients are drawn from your [[Inventory|bag]], your [[Hotbar]], and any chest, cabinet or closet within range. The crafting station must also be within range. The effective range can be extended by certain [[Crafting Buffs]].
+**Ingredient sources** — ingredients are drawn from your [[Inventory|bag]], your [[Hotbar]], and any chest, cabinet or closet within [[Ranges|Interaction Range]]. The crafting station must also be within [[Ranges|Interaction Range]]. The effective range can be extended by certain [[Crafting Buffs]].
 
 _Tip : clicking a green-bordered ingredient or station icon copies its name into the text filter, showing you the recipe that produces it — useful for tracing a crafting chain._
 
@@ -3554,7 +3556,7 @@ _Tip : clicking a green-bordered ingredient or station icon copies its name into
 At the bottom right of the panel:
 
 * **? button** — opens the [[Help Panel]]. If a recipe is selected, navigates directly to the help topic of the result item. Otherwise opens the Help Panel on its default page.
-* **Runs** — number of times to execute the recipe. The range _(1 – N)_ shows the maximum possible given your current stock. The field is locked if no ingredients are available.
+* **Runs** — number of times to execute the recipe. The range _(1 - N)_ shows the maximum possible given your current stock. The field is locked if no ingredients are available.
 * **Craft x N** — the button shows the total number of items produced _(runs x yield)_. It turns green and becomes clickable only when all ingredients are available, the station is nearby, and the bag has room for the result.
 
 After a successful craft, the ingredient counts and grid colours update automatically.
@@ -3570,7 +3572,9 @@ Certain buffs modify crafting behaviour. ⏳
 * ⏳ _Artisan's Luck_ — chance to produce one extra item per run
 * ⏳ _Frugal Hands_ — chance to not consume one or more ingredients
 * ⏳ _[[Luck Buff]]_ — small chance to not consume one or more ingredients and small chance to produce one extra item per run
-* ⏳ _Extended Reach_ — increases the range within which bags, chests, cabinets, closets and crafting stations are accessible
+* ⏳ _Extended Reach_ — increases the [[Ranges|Interaction Range]] within which
+.
+chests, cabinets, closets and crafting stations are accessible
 
 See [[Crafting Buffs]] for more details.
 
@@ -3814,9 +3818,9 @@ See [[Foraging Tools]] and [[Foraging Buffs]] for details.
 
 <hr>
 
-**Pickaxe Type**
+**Sickle Type**
 
-| Pickaxe | Speed Bonus | Range Bonus |
+| Sickle | Speed Bonus | Range Bonus |
 |---|---|---|
 <<toolBuffRow|sickleCopper|mining>>
 <<toolBuffRow|sickleSilver|mining>>
@@ -3847,7 +3851,10 @@ _Range bonus applies equally in all directions._
 
 | Armor | Speed Bonus | Range Bonus |
 |---|---|---|
-| item:miningArmor (full set) ⏳ | +80% | — |
+| Foraging Armor Head | +10% | — |
+| Foraging Armor Body | +20% | — |
+| Foraging Armor Feet | +15% | — |
+| Foraging Armor Full Set ⏳ | +50% | 1 |
 
 <hr>
 
@@ -5912,7 +5919,7 @@ _Changes are only saved when the panel is closed._
 * **Bag** (8x8 grid) — main storage, 64 slots
 * **Armor** (3 slots) — Head, Body and Foot equipment
 * **Accessories** (5 slots) — passive equipment worn at all times
-* **Chest** (right panel) — contents of nearest containers in range
+* **Chest** (right panel) — contents of nearest containers in [[Ranges|Interaction Range]]
 
 _If all three armor pieces belong to the same [[Armor Sets|Armor Set], their slots turn bright green — a visual indicator that the full set bonus is active._
 
@@ -5954,14 +5961,14 @@ _Accessory slots only accept accessories. If the destination is occupied, the di
 
 **Containers** (chest panel)
 
-When a [[Housing|chest, closet or cabinet]] is within range, its contents appear in the right panel.⏳
+When a [[Housing|chest, closet or cabinet]] is within [[Ranges|Interaction Range]], its contents appear in the right panel.⏳
 
 * Use the dropdown to select which container to browse
 * Use the Rename button to rename the selected container
 * Drag items between the bag and the chest freely
 * Use the Arrow button to quickly move the selected item
 
-_If no container is in range, the chest panel is inactive._
+_If no container is in [[Ranges|Interaction Range]], the chest panel is inactive._
 
 <hr>
 
@@ -5995,7 +6002,7 @@ _From the world around you:_
 * [[Weather]] affects foraging, movement and some creature spawns
 * The [[Day & Night Cycle|time of day]] grants different bonuses depending on the period
 * Tiles beneath your feet can slow you down or grant bonuses ([[node:web]], [[node:grassMoss]]...)
-* [[Furnitures|Furniture]] placed nearby can provide passive bonuses when you are within range
+* [[Furnitures|Furniture]] placed nearby can provide passive bonuses when you are within [[Ranges|Interaction Range]]
 
 _From your equipment:_
 
@@ -6025,7 +6032,7 @@ Consuming the same type too quickly extends the cooldown before you can benefit 
 * [[Movement Buffs]] — speed, jump, gravity, friction
 * [[Combat Buffs]] — damage, defense, critical hits
 * [[Housing Buffs]] — placement speed, range
-* [[Fishing Buffs]] — better yield, special encounters
+* [[Fishing Buffs]] — better yield, special encounters, rangee
 * [[Gardening Buffs]] — better yield,
 * [[Luck Buff]] — rare loot, special encounters
 * Environmental Buffs — [[Weather|weather]], [[Moon Phases|moon]], [[Day & Night Cycle|time of day]]
@@ -6367,7 +6374,7 @@ It does not need to be equipped — carrying it in your [[Inventory]] is enough.
   },
 
   // ── Gameplay ─────────────────────────────────────────────────
-  //    Range, Achievements, Achievements Panel, Tools
+  //    Ranges, Achievements, Achievements Panel, Tools
   {
     title: 'Ranges',
     category: ['Gameplay'],
@@ -6380,12 +6387,14 @@ It does not need to be equipped — carrying it in your [[Inventory]] is enough.
 
 * utilisé pour l'accès aux coffres (Inventory Panel)
 * utilisé pour l'accès aux coffres et aux Crafting Stations (Craft Panel)
+* utilisé pour le placement de blocks dans le monde
 * utilisé pour le placement de furnitures dans le monde
+* utilisé pour le placement de murs dans le monde
 * utilisé pour retirer des furnitures du monde ([[Hammers]])
 * utilisé pour le plantage de graines
 * utilisé pour la récolte du Gardening
 
-_When a [[item:setSquare]] or a [[item:theodolite]] is present in your [[Inventory]], you can press [R] key to display a red rectangle around the interaction Range._
+_When a [[item:setSquare]] or a [[item:theodolite]] is present in your [[Inventory]], you can press [R] key to display a red rectangle around the [[Ranges|Interaction Range]]._
 
 
 **Interaction Range Buffs**
@@ -6398,7 +6407,6 @@ To be designed
 
 Used for:
 * minage de blocks ([[Mining Tools|Pickaxes]])
-* placement des blocks dans le monde
 
 _When a [[item:setSquare]] or a [[item:theodolite]] is present in your [[Inventory]], and a [[Mining Tools|Pickaxe]] is seleted in the [[Hotbar]], you can press [R] key to display a orange rectangle around the Mining Range._
 
