@@ -87,6 +87,31 @@ const computeActionSpeed = (baseSpeed, toolSpeed, buffSpeed, prefix) => {
   return (baseSpeed * coefficient / 100) | 0
 }
 
+/**
+ * Teste si une tuile est dans le rectangle d'action directionnel d'un outil.
+ * Le rectangle est centré sur le joueur, étendu par tool.range et le préfixe 'Extended',
+ * et décalé selon la direction du joueur (face gauche ou droite).
+ * @param {number} tileIndex — (y << 10) | x
+ * @param {object} tool      — outil équipé, portant tool.range
+ * @param {string} prefix    — préfixe de l'outil (Quick / Keen / Sturdy / Extended)
+ * @param {string} buffName  — identifiant du buff de range ('mining-range', 'chopping-range'…)
+ * @returns {boolean}
+ */
+const isInToolRange = (tileIndex, tool, prefix, buffName) => {
+  const {x: cx, y: cy, direction} = playerManager.getCenterTile()
+  const rect = buffManager.getBuff(buffName)
+  const range = tool.range + (prefix === 'Extended' ? 2 : 0)
+  const ex = rect.x - range
+  const ey = rect.y - range
+  const ew = rect.w + 2 * range
+  const eh = rect.h + 2 * range
+  const tileX = tileIndex & 0x3FF
+  const tileY = tileIndex >> 10
+  const worldRectX = direction === 0 ? cx - ex - ew + 1 : cx + ex
+  return tileX >= worldRectX && tileX < worldRectX + ew &&
+         tileY >= cy + ey && tileY < cy + ey + eh
+}
+
 /* ====================================================================================================
    GESTION DU MINAGE DE TUILES
    ==================================================================================================== */
@@ -126,7 +151,7 @@ class MiningManager {
       if (entry.tileIndex === tileIndex) return
     }
 
-    if (!this.#isInMiningRange(tileIndex, tool, prefix)) { eventBus.emit('sound/play', 'toofar'); return }
+    if (!isInToolRange(tileIndex, tool, prefix, 'mining-range')) { eventBus.emit('sound/play', 'toofar'); return }
     if (tool.star < tileNode.star) { eventBus.emit('sound/play', 'wrong'); return }
     if (!blockedTiles.canMine(tileIndex)) { eventBus.emit('sound/play', 'wrong'); return } // includes ETERNAL
 
@@ -142,27 +167,6 @@ class MiningManager {
       const {priority, capacity} = MICROTASK.MINE_TILE
       taskScheduler.enqueue('mine-current', speed, this.onMineTile, priority, capacity)
     }
-  }
-
-  /**
- * Vérifie que la tuile est dans le rectangle de minage relatif au centre du joueur.
- * @param {number} tileIndex — (y << 10) | x
- * @returns {boolean}
- */
-  #isInMiningRange (tileIndex, tool, prefix) {
-    const {x: cx, y: cy, direction} = playerManager.getCenterTile()
-    const rect = buffManager.getBuff('mining-range')
-    const range = tool.range + (prefix === 'Extended' ? 2 : 0)
-    const ex = rect.x - range
-    const ey = rect.y - range
-    const ew = rect.w + 2 * range
-    const eh = rect.h + 2 * range
-    const tileX = tileIndex & 0x3FF
-    const tileY = tileIndex >> 10
-    const worldRectY = cy + ey
-    const worldRectX = direction === 0 ? cx - ex - ew + 1 : cx + ex
-    return tileX >= worldRectX && tileX < worldRectX + ew &&
-         tileY >= worldRectY && tileY < worldRectY + eh
   }
 
   /**
@@ -273,25 +277,9 @@ class PlacingManager {
     if (!PLACING_NODES.has(tileNode.code)) return
     console.log('PlacingManager.tryPlace', {tileIndex, tileNode, item})
     if (!blockedTiles.canPlace(tileIndex)) { eventBus.emit('sound/play', 'toofar'); return }
-    if (!this.#isInPlacingRange(tileIndex)) { eventBus.emit('sound/play', 'wrong'); return }
+    if (!isInInteractionRange(tileIndex)) { eventBus.emit('sound/play', 'wrong'); return }
     const {priority, capacity} = MICROTASK.PLACE_TILE
     microTasker.enqueue(this.onPlaceTile, priority, capacity, tileIndex, item, slotIndex)
-  }
-
-  /**
-   * Vérifie que la tuile est dans le rectangle d'interaction du joueur.
-   * Utilise mining-range sans expansion outil (les blocs n'ont pas de stat range).
-   * @param {number} tileIndex — (y << 10) | x
-   * @returns {boolean}
-   */
-  #isInPlacingRange (tileIndex) {
-    const {x: cx, y: cy, direction} = playerManager.getCenterTile()
-    const rect = buffManager.getBuff('mining-range')
-    const tileX = tileIndex & 0x3FF
-    const tileY = tileIndex >> 10
-    const worldRectX = direction === 0 ? cx - rect.x - rect.w + 1 : cx + rect.x
-    return tileX >= worldRectX && tileX < worldRectX + rect.w &&
-         tileY >= cy + rect.y && tileY < cy + rect.y + rect.h
   }
 
   /**
@@ -388,7 +376,7 @@ class ForagingManager {
 
     // 1. Tuile NATURAL (forage du sol)
     if (tileNode.type & NODE_TYPE.NATURAL) {
-      if (!this.#isInForagingRange(tileIndex, tool, prefix)) { eventBus.emit('sound/play', 'toofar'); return }
+      if (!isInToolRange(tileIndex, tool, prefix, 'foraging-range')) { eventBus.emit('sound/play', 'toofar'); return }
       if (tool.star < tileNode.star) { eventBus.emit('sound/play', 'wrong'); return }
       if (this.#foragedToday.size >= NATURAL_FORAGE_DAILY_LIMIT) { eventBus.emit('sound/play', 'wrong'); return }
       if (this.#foragedToday.has(tileIndex)) { eventBus.emit('sound/play', 'wrong'); return }
@@ -420,7 +408,7 @@ class ForagingManager {
       if (entry.type === 'plant' && entry.plant === plant) return
     }
 
-    if (!this.#isInForagingRange(tileIndex, tool, prefix)) { eventBus.emit('sound/play', 'toofar'); return }
+    if (!isInToolRange(tileIndex, tool, prefix, 'foraging-range')) { eventBus.emit('sound/play', 'toofar'); return }
     if (tool.star < plantItem.star) { eventBus.emit('sound/play', 'wrong'); return }
     const speed = computeActionSpeed(plantItem.foraging.speed, tool.foraging.speed, 'foraging-speed', prefix)
 
@@ -432,27 +420,6 @@ class ForagingManager {
       // TODO: début animation outil (sickle)
       this.#scheduleNext()
     }
-  }
-
-  /**
-   * Vérifie que la tuile est dans le rectangle de foraging relatif au centre du joueur.
-   * @param {number} tileIndex — (y << 10) | x
-   * @returns {boolean}
-   */
-  #isInForagingRange (tileIndex, tool, prefix) {
-    const {x: cx, y: cy, direction} = playerManager.getCenterTile()
-    const rect = buffManager.getBuff('foraging-range')
-    const range = tool.range + (prefix === 'Extended' ? 2 : 0)
-    const ex = rect.x - range
-    const ey = rect.y - range
-    const ew = rect.w + 2 * range
-    const eh = rect.h + 2 * range
-    const tileX = tileIndex & 0x3FF
-    const tileY = tileIndex >> 10
-    const worldRectX = direction === 0 ? cx - ex - ew + 1 : cx + ex
-    const worldRectY = cy + ey
-    return tileX >= worldRectX && tileX < worldRectX + ew &&
-           tileY >= worldRectY && tileY < worldRectY + eh
   }
 
   /**
@@ -557,7 +524,7 @@ class ChoppingManager {
     if (plant === null || plant.kind !== PLANT_KIND.TREE) return
 
     const plantItem = ITEMS[plant.itemId]
-    if (!this.#isInChoppingRange(tileIndex, tool, prefix)) { eventBus.emit('sound/play', 'toofar'); return }
+    if (!isInToolRange(tileIndex, tool, prefix, 'chopping-range')) { eventBus.emit('sound/play', 'toofar'); return }
     if (plant.blocked > 0) { eventBus.emit('sound/play', 'wrong'); return }
 
     if (tool.star < plantItem.star) { eventBus.emit('sound/play', 'wrong'); return }
@@ -572,28 +539,6 @@ class ChoppingManager {
       const {priority, capacity} = MICROTASK.CHOP_TREE
       taskScheduler.enqueue('chop-current', speed, this.onChopTree, priority, capacity)
     }
-  }
-
-  /**
-   * Vérifie que la tuile cliquée est dans le rectangle de chopping relatif au centre du joueur.
-   * @param {number} tileIndex — (y << 10) | x
-   * @param {object} tool      — hache équipée
-   * @param {string} prefix    — préfixe de l'outil
-   * @returns {boolean}
-   */
-  #isInChoppingRange (tileIndex, tool, prefix) {
-    const {x: cx, y: cy, direction} = playerManager.getCenterTile()
-    const rect = buffManager.getBuff('chopping-range')
-    const range = tool.range + (prefix === 'Extended' ? 2 : 0)
-    const ex = rect.x - range
-    const ey = rect.y - range
-    const ew = rect.w + 2 * range
-    const eh = rect.h + 2 * range
-    const tileX = tileIndex & 0x3FF
-    const tileY = tileIndex >> 10
-    const worldRectX = direction === 0 ? cx - ex - ew + 1 : cx + ex
-    return tileX >= worldRectX && tileX < worldRectX + ew &&
-           tileY >= cy + ey && tileY < cy + ey + eh
   }
 
   /**
@@ -885,7 +830,7 @@ class HammingManager {
    */
   tryShaking (tileIndex, tree, tool, prefix) {
     const plantItem = ITEMS[tree.itemId]
-    if (!this.#isInHammingRange(tileIndex, tool, prefix)) { eventBus.emit('sound/play', 'toofar'); return }
+    if (!isInToolRange(tileIndex, tool, prefix, 'chopping-range')) { eventBus.emit('sound/play', 'toofar'); return }
     if (tree.blocked > 0) { eventBus.emit('sound/play', 'wrong'); return }
 
     if (tool.star < plantItem.star) { eventBus.emit('sound/play', 'wrong'); return }
@@ -900,43 +845,6 @@ class HammingManager {
       const {priority, capacity} = MICROTASK.HAMMER_USE
       taskScheduler.enqueue('hamming-current', speed, this.onHamming, priority, capacity)
     }
-  }
-
-  /**
-   * Calcule le délai d'abattage en ms pour un arbre et un outil donnés.
-   * @param {object} plantItem — ITEMS[plant.itemId], porte plantItem.chopping.speed
-   * @param {object} tool      — hache équipée
-   * @param {string} prefix    — préfixe de l'outil
-   * @returns {number} délai en ms
-   */
-  #computeShakingSpeed (plantItem, tool, prefix) {
-    let coefficient = 100 + tool.shaking.speed + buffManager.getBuff('chopping-speed')
-    coefficient += prefix === 'Quick' ? 20 : 0
-    coefficient += prefix === 'Keen' ? 5 : 0
-    coefficient -= prefix === 'Sturdy' ? 5 : 0
-    return (plantItem.shaking.speed * coefficient / 100) | 0
-  }
-
-  /**
-   * Vérifie que la tuile cliquée est dans le rectangle de shaking relatif au centre du joueur.
-   * @param {number} tileIndex — (y << 10) | x
-   * @param {object} tool      — marteau équipé
-   * @param {string} prefix    — préfixe de l'outil
-   * @returns {boolean}
-   */
-  #isInHammingRange (tileIndex, tool, prefix) {
-    const {x: cx, y: cy, direction} = playerManager.getCenterTile()
-    const rect = buffManager.getBuff('chopping-range')
-    const range = tool.range + (prefix === 'Extended' ? 2 : 0)
-    const ex = rect.x - range
-    const ey = rect.y - range
-    const ew = rect.w + 2 * range
-    const eh = rect.h + 2 * range
-    const tileX = tileIndex & 0x3FF
-    const tileY = tileIndex >> 10
-    const worldRectX = direction === 0 ? cx - ex - ew + 1 : cx + ex
-    return tileX >= worldRectX && tileX < worldRectX + ew &&
-           tileY >= cy + ey && tileY < cy + ey + eh
   }
 
   /**
