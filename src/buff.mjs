@@ -126,11 +126,6 @@ class BuffManager {
   #currentWeather
   #currentTimeslot
 
-  constructor () {
-    // Initialisation des buffers trinkets
-    this.initTrinket()
-  }
-
   initTrinket () {
     this.#resetBuffer(this.#trinketA, TRINKET_BUFF_TABLE)
     this.#resetBuffer(this.#trinketB, TRINKET_BUFF_TABLE)
