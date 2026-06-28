@@ -6,6 +6,7 @@ import {CONTAINER_STYPES} from './constant.mjs'
 import {saveManager} from './persistence.mjs'
 import {camera} from './render.mjs'
 import {playerManager} from './player.mjs'
+import {isInInteractionRange} from './buff.mjs' // ← ajouter
 import {IMAGE_CACHE} from './assets.mjs'
 import {MAX_FURNITURE_W, MAX_FURNITURE_H, ITEMS} from '../assets/data/data.mjs'
 
@@ -235,69 +236,42 @@ class FurnitureManager {
    * @param {Set<string>} stypes — sous-types acceptés
    * @returns {Array<object>}
    */
-  getFurnituresInRange (buffId, stypes) {
-    // const {x: cx, y: cy} = playerManager.getCenterTile()  // TODO PlayerManager
-    // const {w: rw, h: rh} = buffManager.getBuff(buffId)
-    const cx = 206; const cy = 405 // DEBUG
-    const rw = 10; const rh = 8 // DEBUG
-
-    const x0 = cx - rw; const x1 = cx + rw
-    const y0 = cy - rh; const y1 = cy + rh
-
+  getFurnituresInRange (stypes) {
+    const centerTile = playerManager.getCenterTile()
     const result = []
     for (const furniture of this.#displayed) {
       if (!stypes.has(furniture.stype)) continue
-      const fx = furniture.index & 0x3FF
-      const fy = furniture.index >> 10
-      if (fx >= x0 && fx <= x1 && fy >= y0 && fy <= y1) { result.push(furniture) }
+      if (isInInteractionRange(furniture.index, centerTile)) result.push(furniture)
     }
     return result
   }
 
   /**
-   * Retourne les containers (chest, closet, cabinet...) dans le range 'range-chest' autour du joueur.
+   * Retourne les containers (chest, closet, cabinet...) dans le range 'interaction-range' autour du joueur.
    * Le range 24x20 tuiles couvrirait 9 this.#byChunk.get — moins efficace que le scan direct.
    * @returns {Array<object>}
    */
   getNearbyContainers () {
-    const {x: cx, y: cy} = playerManager.getCenterTile() // TODO PlayerManager
-    // const {w: rw, h: rh} = buffManager.getBuff('interaction-range')
-
-    const rw = 10; const rh = 8 // DEBUG
-
-    const x0 = cx - rw; const x1 = cx + rw
-    const y0 = cy - rh; const y1 = cy + rh
-
+    const centerTile = playerManager.getCenterTile()
     const result = []
     for (const furniture of this.#displayed) {
       if (!CONTAINER_STYPES.has(furniture.stype)) continue
-      const fx = furniture.index & 0x3FF
-      const fy = furniture.index >> 10
-      if (fx >= x0 && fx <= x1 && fy >= y0 && fy <= y1) result.push(furniture)
+      if (isInInteractionRange(furniture.index, centerTile)) result.push(furniture)
     }
     return result
   }
 
   /**
-   * Retourne les crafting stations dans le range 'range-station' autour du joueur.
+   * Retourne les crafting stations dans le range 'interaction-range' autour du joueur.
    * Le range 24x20 tuiles couvrirait 9 this.#byChunk.get — moins efficace que le scan direct.
    * @returns {Array<object>}
    */
   getNearbyCraftingStations () {
-    // const {x: cx, y: cy} = playerManager.getCenterTile()  // TODO PlayerManager
-    // const {w: rw, h: rh} = buffManager.getBuff('interaction-range')
-    const cx = 512; const cy = 200 // DEBUG
-    const rw = 10; const rh = 8 // DEBUG
-
-    const x0 = cx - rw; const x1 = cx + rw
-    const y0 = cy - rh; const y1 = cy + rh
-
+    const centerTile = playerManager.getCenterTile()
     const result = []
     for (const furniture of this.#displayed) {
       if (furniture.stype !== 'station') continue
-      const fx = furniture.index & 0x3FF
-      const fy = furniture.index >> 10
-      if (fx >= x0 && fx <= x1 && fy >= y0 && fy <= y1) result.push(furniture)
+      if (isInInteractionRange(furniture.index, centerTile)) result.push(furniture)
     }
     return result
   }

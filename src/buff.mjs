@@ -3,6 +3,7 @@
 import {ITEMS, TRINKET_BUFF_TABLE} from '../assets/data/data.mjs'
 import {eventBus, timeManager} from './utils.mjs'
 import {UI_LAYOUT} from './constant.mjs'
+import {playerManager} from './player.mjs'
 // import {timeManager, taskScheduler, microTasker} from './utils.mjs'
 
 /**
@@ -318,8 +319,27 @@ class BuffManager {
 export const buffManager = new BuffManager()
 
 /* ====================================================================================================
-   AFFICHAGE DES BUFFS ACTIFS
+   FONCTIONS HELPERS
    ==================================================================================================== */
+
+/**
+ * Teste si une tuile est dans l'interaction range centré sur le joueur.
+ * Rectangle symétrique (sans direction) — coffres, stations, furnitures, pose de murs/furniture,
+ * sowing, gardening.
+ * @param {number} tileIndex    — (y << 10) | x
+ * @param {object} [centerTile] — résultat de playerManager.getCenterTile() ; récupéré
+ *                                automatiquement si absent (évite un appel redondant chez
+ *                                les appelants qui l'ont déjà calculé)
+ * @returns {boolean}
+ */
+export const isInInteractionRange = (tileIndex, centerTile) => {
+  const {x, y, w, h} = buffManager.getBuff('interaction-range')
+  const {x: cx, y: cy} = centerTile ?? playerManager.getCenterTile()
+  const tileX = tileIndex & 0x3FF
+  const tileY = tileIndex >> 10
+  return tileX >= cx + x && tileX < cx + x + w &&
+         tileY >= cy + y && tileY < cy + y + h
+}
 
 /* ====================================================================================================
    AFFICHAGE DES BUFFS ACTIFS

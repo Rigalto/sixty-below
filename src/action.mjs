@@ -3,7 +3,7 @@
 import {eventBus, taskScheduler, microTasker, blockedTiles, rollLootWithBuffs} from './utils.mjs'
 import {NODE_TYPE, NODES, ITEM_TYPE, ITEMS, PLANT_SYSTEM_LOOKUP, PLANT_KIND} from '../assets/data/data.mjs'
 import {inventoryManager} from './inventory.mjs'
-import {buffManager} from './buff.mjs'
+import {buffManager, isInInteractionRange} from './buff.mjs'
 import {database} from './database.mjs'
 import {chunkManager} from './world.mjs'
 import {playerManager} from './player.mjs'
@@ -707,21 +707,6 @@ class SowingManager {
   }
 
   /**
-   * Vérifie que la tuile est dans le rectangle d'interaction centré sur le joueur.
-   * Utilise 'interaction-range' — rectangle symétrique, sans composante directionnelle.
-   * @param {number} tileIndex — (y << 10) | x
-   * @returns {boolean}
-   */
-  #isInSowingRange (tileIndex) {
-    const {x: cx, y: cy} = playerManager.getCenterTile()
-    const rect = buffManager.getBuff('interaction-range')
-    const tileX = tileIndex & 0x3FF
-    const tileY = tileIndex >> 10
-    return tileX >= cx + rect.x && tileX < cx + rect.x + rect.w &&
-           tileY >= cy + rect.y && tileY < cy + rect.y + rect.h
-  }
-
-  /**
    * Valide et exécute le placement d'une SunflowerSeed.
    * Conditions : tuile GRASSFOREST, tuiles index-W et index-2W sont SKY et non bloquées.
    * Silence si mauvaise tuile, 'wrong' si bloqué, 'placing' si succès.
@@ -745,7 +730,7 @@ class SowingManager {
     if (chunkManager.getTileAt(body2) !== SKY) return
 
     // 'toofar' — tuile hors de la zone d'interaction
-    if (!this.#isInSowingRange(tileIndex)) { eventBus.emit('sound/play', 'toofar'); return }
+    if (!isInInteractionRange(tileIndex)) { eventBus.emit('sound/play', 'toofar'); return }
 
     // 'wrong' — tuiles bloquées (furniture, plante déjà présente)
     if (!blockedTiles.canPlace(body1) || !blockedTiles.canPlace(body2)) {
@@ -784,7 +769,7 @@ class SowingManager {
     if (tileRectHasOther(soilIndex - 18 * WORLD_WIDTH, 3, 18, SKY)) return
 
     // 'toofar' — tuile hors de la zone d'interaction
-    if (!this.#isInSowingRange(tileIndex)) { eventBus.emit('sound/play', 'toofar'); return }
+    if (!isInInteractionRange(tileIndex)) { eventBus.emit('sound/play', 'toofar'); return }
 
     // 'wrong' — tuiles bloquées (furniture, plante déjà présente)
     const soilX = soilIndex & 0x3FF
