@@ -146,7 +146,7 @@ export const NODES = {
   HIVE: {code: 94, name: 'Hive', type: NODE_TYPE.ROCK | NODE_TYPE.SOLID, stype: 'block', star: 3, color: '#ffaa33', image: 'mineral_16_16+13', mining: {speed: 1800, items: [{item: 'blockHive', count: 1}]}, help: 'Hive'},
   OBSIDIAN: {code: 92, name: 'Obsidian', type: NODE_TYPE.ROCK | NODE_TYPE.SOLID, star: 5, color: '#4ea666', image: 'mineral_16_16+14', mining: {speed: 6000, items: [{item: 'blockObsidian', count: 1}]}, help: 'Obsidian'},
   METEORITE: {code: 93, name: 'Meteorite', type: NODE_TYPE.ROCK | NODE_TYPE.SOLID, stype: 'block', star: 5, color: '#7d6f5f', image: 'mineral_16_16+15', mining: {speed: 6500, items: [{item: 'blockMeteorite', count: 1}]}, help: 'Meteorite'}, // SURFACE
-  SHELL: {code: 95, name: 'Shell', type: NODE_TYPE.ROCK | NODE_TYPE.SOLID, stype: 'block', star: 3, color: '#fee267', image: 'substrat_16_16+15', mining: {speed: 1800, keep: 'SANDSTONE', items: [{item: 'blockShell', count: 4}]}, help: 'Shell'},
+  SHELL: {code: 95, name: 'Shell', type: NODE_TYPE.ROCK | NODE_TYPE.SOLID | NODE_TYPE.SUBSTRAT, stype: 'block', star: 3, color: '#fee267', image: 'substrat_16_16+15', mining: {speed: 1800, keep: 'SANDSTONE', items: [{item: 'blockShell', count: 4}]}, help: 'Shell'},
 
   // ── HOUSING (murs des maisons) ────────────────────────
 
