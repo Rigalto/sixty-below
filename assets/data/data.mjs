@@ -896,13 +896,16 @@ export const INFERNCAP_COUNT = 60
 export const COBWEB_GROWTH_DELAY_MS = 20000
 
 export const TREE_IMAGES = {
-  coconut: [
-    ['coconut_64_48-4-0', 'coconut_64_48-0-1', 'coconut_64_48-0-2'],
-    ['coconut_64_48-0-3', 'coconut_64_48-0-4', 'coconut_64_48-0-5'],
-    ['coconut_64_48-1-0', 'coconut_64_48-1-1'],
-    ['coconut_64_48-1-2', 'coconut_64_48-1-3', 'coconut_64_48-1-4'],
-    ['coconut_64_48-1-5', 'coconut_64_48-2-0', 'coconut_64_48-2-1', 'coconut_64_48-2-2']
-  ],
+  coconut: {
+    '0_0': ['oak_80_48-0-1'], // NOK
+    '0_1': ['oak_80_48-0-1'], // NOK
+    '1_0': ['oak_80_48-0-1'], // NOK
+    '1_1': ['oak_80_48-0-1'], // OK
+    '1_2': ['oak_80_48-0-1'], // NOK
+    '2_1': ['oak_80_48-0-1'], // NOK
+    '2_2': ['oak_80_48-0-1'], // NOK
+    head: ['oak_80_48-0-0', 'oak_80_48-0-0'] // NOK
+  },
   oak: [
     ['oak_80_48-0-0', 'oak_80_48-1-0'], // sommet arbre pas complet
     ['oak_80_48-2-0', 'oak_80_48-3-0'], // tronc
