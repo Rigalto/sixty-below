@@ -304,12 +304,18 @@ export const ITEMS = {
   // /////////////////////
 
   // Baits
-  worm: {name: 'Worm', type: ITEM_TYPE.BAIT, star: 1, stype: 'bait', image: 'mined_32_32-7-0', help: 'Fishing Baits', tooltip: '???'},
-  goldWorm: {name: 'Gold Worm', type: ITEM_TYPE.BAIT, star: 2, stype: 'bait', image: 'mined_32_32-7-1', help: 'Fishing Baits', tooltip: '???'},
-  slug: {name: 'Slug', type: ITEM_TYPE.BAIT, star: 1, stype: 'bait', image: 'mined_32_32-0-0', help: 'Fishing Baits', tooltip: '???'},
-  goldSlug: {name: 'Gold Slug', type: ITEM_TYPE.BAIT, star: 1, stype: 'bait', image: 'mined_32_32-0-0', help: 'Fishing Baits', tooltip: '???'},
-  snail: {name: 'Snail', type: ITEM_TYPE.BAIT, star: 1, stype: 'bait', image: 'mined_32_32-0-0', help: 'Fishing Baits', tooltip: '???'},
-  frog: {name: 'Frog', type: ITEM_TYPE.BAIT, star: 1, stype: 'bait', image: 'mined_32_32-0-0', help: 'Fishing Baits', tooltip: '???'},
+  worm: {name: 'Worm', type: ITEM_TYPE.BAIT, star: 1, stype: 'bait', image: 'bait_32_32-0-0', help: 'Fishing Baits', tooltip: '???'},
+  slug: {name: 'Slug', type: ITEM_TYPE.BAIT, star: 1, stype: 'bait', image: 'bait_32_32-1-0', help: 'Fishing Baits', tooltip: '???'},
+  snail: {name: 'Snail', type: ITEM_TYPE.BAIT, star: 1, stype: 'bait', image: 'bait_32_32-2-0', help: 'Fishing Baits', tooltip: '???'},
+  goldWorm: {name: 'Gold Worm', type: ITEM_TYPE.BAIT, star: 2, stype: 'bait', image: 'bait_32_32-0-1', help: 'Fishing Baits', tooltip: '???'},
+  goldSlug: {name: 'Gold Slug', type: ITEM_TYPE.BAIT, star: 1, stype: 'bait', image: 'bait_32_32-1-1', help: 'Fishing Baits', tooltip: '???'},
+  turretSnail: {name: 'Turret Snail ', type: ITEM_TYPE.BAIT, star: 1, stype: 'bait', image: 'bait_32_32-2-1', help: 'Fishing Baits', tooltip: '???'},
+  buterfly: {name: 'Buterfly', type: ITEM_TYPE.BAIT, star: 1, stype: 'bait', image: 'bait_32_32-0-2', help: 'Fishing Baits', tooltip: '???'},
+  ladybug: {name: 'Ladybug', type: ITEM_TYPE.BAIT, star: 1, stype: 'bait', image: 'bait_32_32-1-2', help: 'Fishing Baits', tooltip: '???'},
+  bunny: {name: 'Bunny', type: ITEM_TYPE.BAIT, star: 1, stype: 'critter', image: 'bait_32_32-2-2', help: 'Fishing Baits', tooltip: '???'},
+  frog: {name: 'Frog', type: ITEM_TYPE.BAIT, star: 1, stype: 'critter', image: 'bait_32_32-0-3', help: 'Fishing Baits', tooltip: '???'},
+  squirel: {name: 'Squirel', type: ITEM_TYPE.BAIT, star: 1, stype: 'critter', image: 'bait_32_32-1-3', help: 'Fishing Baits', tooltip: '???'},
+  redSlug: {name: 'Red Slug', type: ITEM_TYPE.BAIT, star: 1, stype: 'bait', image: 'bait_32_32-2-3', help: 'Fishing Baits', tooltip: '???'},
 
   // pickaxes
   pickaxeCopper: {name: 'Copper Pickaxe', type: ITEM_TYPE.TOOL, stype: 'pickaxe', star: 2, image: 'tools_32_32-4-0', placedright: 'w_42_42-0-0', placedleft: 'w_42_42-0-1', help: 'Mining Tools', tooltip: 'Tools used to remove blocks, converting them to item form', range: 0, mining: {speed: 0, tiles: 1}},

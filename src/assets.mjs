@@ -23,6 +23,8 @@ export const IMAGE_FILES = [
 
   // Items minés / substrat, topsoil, web, ore, raw gem, rock
   'assets/sprites/mined_32_32.png',
+  // critters / baits
+  'assets/sprites/bait_32_32.png',
   // Items raffinés / bar, cut gem, metal fitting, fabric
   'assets/sprites/refined_32_32.png',
   // trinkets
@@ -68,8 +70,6 @@ export const IMAGE_FILES = [
   'assets/sprites/potions_32_32.png',
   // crafting seul
   'assets/sprites/crafting_32_32.png',
-  // critters / bait
-  'assets/sprites/critter_32_32.png',
   // food
   'assets/sprites/food_32_32.png',
   // PLACED //
