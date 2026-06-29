@@ -6925,7 +6925,6 @@ class PlantGenerator {
  * Construit le tableau d'images d'un arbre en tirant aléatoirement parmi les variantes disponibles.
  * @param {string} treeName — clé dans TREE_IMAGES ('oak', 'mahogany', 'coconut', 'giantMushroom')
  * @param {number} soilX — coordonnée X de la tuile support gauche
- * @param {number} soilY — coordonnée Y de la tuile support
  * @returns {Array<{tree, row, col, x, y}>} tableau d'images précalculées
  */
   #buildTreeImages (treeName, soilX) {
@@ -6935,6 +6934,43 @@ class PlantGenerator {
       const col = seededRNG.randomGetArrayIndex(imageTable[i])
       images.push({tree: treeName, row: i, col, x: soilX - 1})
     }
+    return images
+  }
+
+  /**
+ * Construit le tableau d'images d'un cocotier en tirant aléatoirement parmi les variantes disponibles.
+ * @param {number} soilX — coordonnée X de la tuile support gauche
+ * @returns {Array<{tree, row, col, x, y}>} tableau d'images précalculées
+ */
+  #buildCoconutImages (soilX) {
+    const imageTable = TREE_IMAGES.coconut
+
+    const rules = {
+      0: [0, 1],
+      1: [0, 1, 2],
+      2: [1, 2]
+    }
+
+    // On initialise la chaîne avec le bas du premier étage (le centre)
+    const nodes = [1]
+
+    // On tire aléatoirement les 3 nœuds intermédiaires
+    for (let i = 0; i < 3; i++) {
+      nodes.push(seededRNG.randomGetArrayValue(rules[i]))
+    }
+
+    // On force le nœud final (le haut du dernier étage) au centre
+    nodes.push(1)
+
+    // Étape de lecture pour récupérer tes 4 images d'étages
+    const images = []
+    for (let i = 0; i < 4; i++) {
+      const key = `${nodes[i]}_${nodes[i + 1]}`
+      const col = seededRNG.randomGetArrayIndex(imageTable[key])
+      images.push({tree: 'coconut', key, col, x: soilX - 1})
+    }
+    const head = seededRNG.randomGetArrayIndex(imageTable.head)
+    images.push({tree: 'coconut', key: 'head', col: head, x: soilX - 1})
     return images
   }
 
@@ -7041,7 +7077,7 @@ class PlantGenerator {
     const index = soilIndex - h * WORLD_WIDTH
     const soilX = soilIndex & 0x3FF
     const soilY = soilIndex >> 10
-    const images = this.#buildTreeImages('coconut', soilX)
+    const images = this.#buildCoconutImages(soilX)
 
     this.#plants.push({
       id: uniqueIdGenerator.getUniqueId(),

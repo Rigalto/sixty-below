@@ -38,6 +38,7 @@
 - Mettre la bonne palette et un entourage noir pour placed_16_32, reste à faire :
   - 4,0 - 5,0 - 6,0 - 7,0
   - 0,1 - 1,1, - 5,1
+- Terminer les images pour les coconut trees
 
 
 ---
@@ -363,6 +364,7 @@ La Sap corrode le Copper. Il doit donc être remplacer par du Gold.
 - Sunflower (`SunflowerSystem`)
 - Oleander (`OleanderSystem`)
 - Cobweb (`CobwebSystem`)
+- Oak (`OakSystem`)
 
 ### Rendu (partiel)
 - `WorldRenderer` — rendu tuiles par chunks avec cache OffscreenCanvas

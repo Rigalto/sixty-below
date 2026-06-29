@@ -244,7 +244,9 @@ class GameCore {
     let count = 0
     for (const treeType in TREE_IMAGES) {
       const rows = TREE_IMAGES[treeType]
-      for (const images of rows) {
+      // Object.values(rows) extrait les tableaux d'images,
+      // qu'il s'agisse d'un Array ou d'un Object standard.
+      for (const images of Object.values(rows)) {
         for (let col = 0; col < images.length; col++) {
           images[col] = resolveAssetData(images[col])
           count++
