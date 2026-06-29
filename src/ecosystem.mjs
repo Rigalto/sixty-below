@@ -1900,6 +1900,101 @@ class OakSystem {
 export const oakSystem = new OakSystem()
 
 /* ====================================================================================================
+   COCONUT SYSTEM
+   ==================================================================================================== */
+
+class CoconutSystem {
+  byTile = new Map() // Map<tileIndex, record> — public, rectangle complet 3×15 (interaction = blocage)
+  #byFullRect = new Map() // Map<tileIndex, record> — rectangle complet 3×15 (obstruction)
+  #list = [] // record[] — tous les cocotiers
+  #byChunk = new Map() // Map<chunkKey, Set> — lookup spatial pour onPreloadChunksChanged
+  #displayed = new Set() // Set<record> — cible du render (chunks preload uniquement)
+
+  /**
+   * Réinitialise toutes les structures. Appelé en début de session.
+   */
+  init () {
+    this.byTile.clear()
+    this.#byFullRect.clear()
+    this.#list.length = 0
+    this.#byChunk.clear()
+    this.#displayed.clear()
+  }
+
+  /**
+   * Hydrate un record coconut depuis la DB et peuple les structures internes.
+   * Bloque le placement sur 3 tuiles de large (w réel du cocotier) × 15 de haut,
+   * et le minage sur les 3 tuiles de sol.
+   * @param {object} record — record TREE/COCONUT (deleted=false garanti par l'appelant)
+   */
+  initPlant (record) {
+    this.#list.push(record)
+    addToByTileTree(this.byTile, this.#byFullRect, record)
+    addToByChunk(this.#byChunk, record)
+
+    const px = record.index & 0x3FF
+    const py = record.index >> 10
+    blockedTiles.blockPlacementRect(px, py, record.w, record.h)
+
+    const soilX = record.soilIndex & 0x3FF
+    const soilY = record.soilIndex >> 10
+    blockedTiles.blockMiningRect(soilX, soilY, record.w, 1)
+  }
+
+  /**
+   * Reconstruit #displayed depuis les chunks preload de la caméra.
+   * @param {Set<number>} preloadChunks
+   */
+  onPreloadChunksChanged (preloadChunks) {
+    buildDisplayed(this.#displayed, this.#byChunk, preloadChunks)
+  }
+
+  /**
+   * Dessine les cocotiers visibles sur le contexte transformé.
+   * Les 5 images (étages 0–3 + head) sont empilées du sol vers le sommet,
+   * lookupées par key dans TREE_IMAGES.coconut (objet), non par indice de tableau.
+   * @param {CanvasRenderingContext2D} ctx — contexte déjà transformé (caméra appliquée)
+   */
+  render (ctx) {
+    const coconutImages = TREE_IMAGES.coconut
+    for (const record of this.#displayed) {
+      const soilYPx = ((record.soilIndex >> 10) << 4) + 2
+      for (let i = 0; i < record.images.length; i++) {
+        const image = record.images[i]
+        const img = coconutImages[image.key][image.col]
+        const pxX = image.x << 4
+        const pxY = soilYPx - 48 * (i + 1)
+        ctx.drawImage(IMAGE_CACHE[img.imgIndex], img.sx, img.sy, img.sw, img.sh, pxX, pxY, img.sw, img.sh)
+      }
+    }
+  }
+
+  /**
+   * Retourne le record du cocotier couvrant la tuile donnée, ou null.
+   * @param {number} tileIndex — (y << 10) | x
+   * @returns {object|null}
+   */
+  getPlantAt (tileIndex) {
+    return this.byTile.get(tileIndex) ?? null
+  }
+
+  /**
+   * Les cocotiers ne se foragent pas — no-op.
+   * @param {object} record
+   */
+  onForaged (record) {}
+
+  /**
+   * Un cocotier est toujours présent.
+   * @param {object} record
+   * @returns {boolean}
+   */
+  isPresent (record) { return true }
+}
+
+export const coconutSystem = new CoconutSystem()
+
+/* ====================================================================================================
    FLORA MANAGER
    ====================================================================================================
 
@@ -2282,98 +2377,3 @@ class SampleSystem {
 }
 
 export const sampleSystem = new SampleSystem()
-
-/* ====================================================================================================
-   COCONUT SYSTEM
-   ==================================================================================================== */
-
-class CoconutSystem {
-  byTile = new Map() // Map<tileIndex, record> — public, rectangle complet 3×15 (interaction = blocage)
-  #byFullRect = new Map() // Map<tileIndex, record> — rectangle complet 3×15 (obstruction)
-  #list = [] // record[] — tous les cocotiers
-  #byChunk = new Map() // Map<chunkKey, Set> — lookup spatial pour onPreloadChunksChanged
-  #displayed = new Set() // Set<record> — cible du render (chunks preload uniquement)
-
-  /**
-   * Réinitialise toutes les structures. Appelé en début de session.
-   */
-  init () {
-    this.byTile.clear()
-    this.#byFullRect.clear()
-    this.#list.length = 0
-    this.#byChunk.clear()
-    this.#displayed.clear()
-  }
-
-  /**
-   * Hydrate un record coconut depuis la DB et peuple les structures internes.
-   * Bloque le placement sur 3 tuiles de large (w réel du cocotier) × 15 de haut,
-   * et le minage sur les 3 tuiles de sol.
-   * @param {object} record — record TREE/COCONUT (deleted=false garanti par l'appelant)
-   */
-  initPlant (record) {
-    this.#list.push(record)
-    addToByTileTree(this.byTile, this.#byFullRect, record)
-    addToByChunk(this.#byChunk, record)
-
-    const px = record.index & 0x3FF
-    const py = record.index >> 10
-    blockedTiles.blockPlacementRect(px, py, record.w, record.h)
-
-    const soilX = record.soilIndex & 0x3FF
-    const soilY = record.soilIndex >> 10
-    blockedTiles.blockMiningRect(soilX, soilY, record.w, 1)
-  }
-
-  /**
-   * Reconstruit #displayed depuis les chunks preload de la caméra.
-   * @param {Set<number>} preloadChunks
-   */
-  onPreloadChunksChanged (preloadChunks) {
-    buildDisplayed(this.#displayed, this.#byChunk, preloadChunks)
-  }
-
-  /**
-   * Dessine les cocotiers visibles sur le contexte transformé.
-   * Les 5 images (étages 0–3 + head) sont empilées du sol vers le sommet,
-   * lookupées par key dans TREE_IMAGES.coconut (objet), non par indice de tableau.
-   * @param {CanvasRenderingContext2D} ctx — contexte déjà transformé (caméra appliquée)
-   */
-  render (ctx) {
-    const coconutImages = TREE_IMAGES.coconut
-    for (const record of this.#displayed) {
-      const soilYPx = ((record.soilIndex >> 10) << 4) + 2
-      for (let i = 0; i < record.images.length; i++) {
-        const image = record.images[i]
-        const img = coconutImages[image.key][image.col]
-        const pxX = image.x << 4
-        const pxY = soilYPx - 48 * (i + 1)
-        ctx.drawImage(IMAGE_CACHE[img.imgIndex], img.sx, img.sy, img.sw, img.sh, pxX, pxY, img.sw, img.sh)
-      }
-    }
-  }
-
-  /**
-   * Retourne le record du cocotier couvrant la tuile donnée, ou null.
-   * @param {number} tileIndex — (y << 10) | x
-   * @returns {object|null}
-   */
-  getPlantAt (tileIndex) {
-    return this.byTile.get(tileIndex) ?? null
-  }
-
-  /**
-   * Les cocotiers ne se foragent pas — no-op.
-   * @param {object} record
-   */
-  onForaged (record) {}
-
-  /**
-   * Un cocotier est toujours présent.
-   * @param {object} record
-   * @returns {boolean}
-   */
-  isPresent (record) { return true }
-}
-
-export const coconutSystem = new CoconutSystem()

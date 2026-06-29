@@ -7090,7 +7090,7 @@ class PlantGenerator {
 
     this.#plants.push({
       id: uniqueIdGenerator.getUniqueId(),
-      entryId: ITEMS.coconut.code,
+      itemId: ITEMS.coconut.code,
       kind: PLANT_KIND.TREE,
       type: PLANT_TYPE.COCONUT,
       index,
