@@ -7073,7 +7073,7 @@ class PlantGenerator {
   #placeOneCoconut (soilIndex) {
     const SAND = NODES.SAND.code
     const h = 15
-    const w = 2
+    const w = 3
     const index = soilIndex - h * WORLD_WIDTH
     const soilX = soilIndex & 0x3FF
     const soilY = soilIndex >> 10

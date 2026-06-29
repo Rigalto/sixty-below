@@ -306,10 +306,10 @@ export const ITEMS = {
   // Baits
   worm: {name: 'Worm', type: ITEM_TYPE.BAIT, star: 1, stype: 'bait', image: 'mined_32_32-7-0', help: 'Fishing Baits', tooltip: '???'},
   goldWorm: {name: 'Gold Worm', type: ITEM_TYPE.BAIT, star: 2, stype: 'bait', image: 'mined_32_32-7-1', help: 'Fishing Baits', tooltip: '???'},
-  slug: {name: 'Slug', type: ITEM_TYPE.BAIT, star: 1, stype: 'bait', image: 'blocks_16_16-0-0', help: 'Fishing Baits', tooltip: '???'},
-  goldSlug: {name: 'Gold Slug', type: ITEM_TYPE.BAIT, star: 1, stype: 'bait', image: 'blocks_16_16-0-0', help: 'Fishing Baits', tooltip: '???'},
-  snail: {name: 'Snail', type: ITEM_TYPE.BAIT, star: 1, stype: 'bait', image: 'blocks_16_16-0-0', help: 'Fishing Baits', tooltip: '???'},
-  frog: {name: 'Frog', type: ITEM_TYPE.BAIT, star: 1, stype: 'bait', image: 'blocks_16_16-0-0', help: 'Fishing Baits', tooltip: '???'},
+  slug: {name: 'Slug', type: ITEM_TYPE.BAIT, star: 1, stype: 'bait', image: 'mined_32_32-0-0', help: 'Fishing Baits', tooltip: '???'},
+  goldSlug: {name: 'Gold Slug', type: ITEM_TYPE.BAIT, star: 1, stype: 'bait', image: 'mined_32_32-0-0', help: 'Fishing Baits', tooltip: '???'},
+  snail: {name: 'Snail', type: ITEM_TYPE.BAIT, star: 1, stype: 'bait', image: 'mined_32_32-0-0', help: 'Fishing Baits', tooltip: '???'},
+  frog: {name: 'Frog', type: ITEM_TYPE.BAIT, star: 1, stype: 'bait', image: 'mined_32_32-0-0', help: 'Fishing Baits', tooltip: '???'},
 
   // pickaxes
   pickaxeCopper: {name: 'Copper Pickaxe', type: ITEM_TYPE.TOOL, stype: 'pickaxe', star: 2, image: 'tools_32_32-4-0', placedright: 'w_42_42-0-0', placedleft: 'w_42_42-0-1', help: 'Mining Tools', tooltip: 'Tools used to remove blocks, converting them to item form', range: 0, mining: {speed: 0, tiles: 1}},
@@ -897,14 +897,14 @@ export const COBWEB_GROWTH_DELAY_MS = 20000
 
 export const TREE_IMAGES = {
   coconut: {
-    '0_0': ['oak_80_48-0-1'], // NOK
-    '0_1': ['oak_80_48-0-1'], // NOK
-    '1_0': ['oak_80_48-0-1'], // NOK
-    '1_1': ['oak_80_48-0-1'], // OK
-    '1_2': ['oak_80_48-0-1'], // NOK
-    '2_1': ['oak_80_48-0-1'], // NOK
-    '2_2': ['oak_80_48-0-1'], // NOK
-    head: ['oak_80_48-0-0', 'oak_80_48-0-0'] // NOK
+    '0_0': ['coconut_80_48-0-2'], // OK
+    '0_1': ['coconut_80_48-3-1'], // OK
+    '1_0': ['coconut_80_48-3-0'], // OK
+    '1_1': ['coconut_80_48-0-1', 'coconut_80_48-1-1'], // OK
+    '1_2': ['coconut_80_48-3-3'], // OK
+    '2_1': ['coconut_80_48-3-2'], // OK
+    '2_2': ['coconut_80_48-0-3'], // OK
+    head: ['coconut_80_48-0-0', 'coconut_80_48-0-0'] // NOK
   },
   oak: [
     ['oak_80_48-0-0', 'oak_80_48-1-0'], // sommet arbre pas complet

@@ -45,8 +45,6 @@ export const IMAGE_FILES = [
   // TILES //
   // ////////
 
-  // Tuiles de grass / jungle grass / mushroom grass / ash grass
-  'assets/sprites/grass_16_16.png',
   // Tuiles de wood wall / background wall
   'assets/sprites/wall_16_16.png',
   // sea / water / honey / lava
@@ -92,6 +90,7 @@ export const IMAGE_FILES = [
   'assets/sprites/feet_26_12.png',
   'assets/sprites/oak_80_48.png',
   'assets/sprites/mahogany_80_48.png',
+  'assets/sprites/coconut_80_48.png',
   // IN HAND //
   // //////////
   'assets/sprites/s_42_42.png',
