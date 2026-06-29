@@ -351,7 +351,15 @@ class WorldGenerator {
 
     console.log('[WorldGenerator::liquidFiller] - Sea', (performance.now() - t0).toFixed(3), 'ms')
 
-    // 8.2. Ajout des coffres et objets spéciaux
+    // 8.2.1. Coconut - ajoutés avant les coffres, car ils ont peut de place pour pousser
+    plantGenerator.placeSeaCoconut(leftBeach.beachRect, surfaceLine, true, guarded)
+    plantGenerator.placeSeaCoconut(rightBeach.beachRect, surfaceLine, false, guarded)
+    for (const lake of surfaceLakes) {
+      plantGenerator.placeOasisCoconut(lake, surfaceLine, guarded)
+    }
+    await progress('Coconuts')
+
+    // 8.2.2. Ajout des coffres et objets spéciaux
     furnitureGenerator.placeSeaChests(leftSeaRect)
     furnitureGenerator.placeSeaChests(rightSeaRect)
     furnitureGenerator.placeSurfaceLineChests(surfaceLine, guarded, biomesDescription)
@@ -366,18 +374,10 @@ class WorldGenerator {
 
     // 8.3. Ajout des plantes et des coraux - TODO
 
-    // 8.3.0. Détermination du temps
+    // 8.3.1. Détermination du temps
     const currentWeather = seededRNG.randomGetArrayWeighted(WEATHER_TYPE)
     const nextWeather = seededRNG.randomGetArrayWeighted(WEATHER_TYPE)
     const weather = {currentWeather, nextWeather}
-
-    // 8.3.1. Coconut
-    plantGenerator.placeSeaCoconut(leftBeach.beachRect, surfaceLine, true, guarded)
-    plantGenerator.placeSeaCoconut(rightBeach.beachRect, surfaceLine, false, guarded)
-    for (const lake of surfaceLakes) {
-      plantGenerator.placeOasisCoconut(lake, surfaceLine, guarded)
-    }
-    await progress('Coconuts')
 
     // 8.3.2. Oak / Mahogany / Giant Mushroom
     const oakPositions = plantGenerator.placeTrees(surfaceLine, guarded)
@@ -6888,6 +6888,8 @@ class FurnitureGenerator {
 
       const chest = this.addFurnitureAt(((y - 2) << 10) | chestX, CHEST_TYPE[biome])
       this.fillChest(chest)
+      guardedX.add(chestX)
+      guardedX.add(chestX + 1)
       placed++
     }
   }
@@ -6923,7 +6925,7 @@ class PlantGenerator {
 
   /**
  * Construit le tableau d'images d'un arbre en tirant aléatoirement parmi les variantes disponibles.
- * @param {string} treeName — clé dans TREE_IMAGES ('oak', 'mahogany', 'coconut', 'giantMushroom')
+ * @param {string} treeName — clé dans TREE_IMAGES ('oak', 'mahogany', 'giantMushroom')
  * @param {number} soilX — coordonnée X de la tuile support gauche
  * @returns {Array<{tree, row, col, x, y}>} tableau d'images précalculées
  */
@@ -6934,43 +6936,6 @@ class PlantGenerator {
       const col = seededRNG.randomGetArrayIndex(imageTable[i])
       images.push({tree: treeName, row: i, col, x: soilX - 1})
     }
-    return images
-  }
-
-  /**
- * Construit le tableau d'images d'un cocotier en tirant aléatoirement parmi les variantes disponibles.
- * @param {number} soilX — coordonnée X de la tuile support gauche
- * @returns {Array<{tree, row, col, x, y}>} tableau d'images précalculées
- */
-  #buildCoconutImages (soilX) {
-    const imageTable = TREE_IMAGES.coconut
-
-    const rules = {
-      0: [0, 1],
-      1: [0, 1, 2],
-      2: [1, 2]
-    }
-
-    // On initialise la chaîne avec le bas du premier étage (le centre)
-    const nodes = [1]
-
-    // On tire aléatoirement les 3 nœuds intermédiaires
-    for (let i = 0; i < 3; i++) {
-      nodes.push(seededRNG.randomGetArrayValue(rules[i]))
-    }
-
-    // On force le nœud final (le haut du dernier étage) au centre
-    nodes.push(1)
-
-    // Étape de lecture pour récupérer tes 4 images d'étages
-    const images = []
-    for (let i = 0; i < 4; i++) {
-      const key = `${nodes[i]}_${nodes[i + 1]}`
-      const col = seededRNG.randomGetArrayIndex(imageTable[key])
-      images.push({tree: 'coconut', key, col, x: soilX - 1})
-    }
-    const head = seededRNG.randomGetArrayIndex(imageTable.head)
-    images.push({tree: 'coconut', key: 'head', col: head, x: soilX - 1})
     return images
   }
 
@@ -6994,14 +6959,17 @@ class PlantGenerator {
       const yNext = surfaceLine[x + dir]
 
       if (y !== yNext) continue
-      if (guarded.has(x) || guarded.has(x + dir)) continue
+      if (guarded.has(x) || guarded.has(x + dir) || guarded.has(x + dir + dir)) continue
       if (worldBuffer.read(x, y) !== SAND) continue
       if (worldBuffer.read(x + dir, y) !== SAND) continue
+      if (worldBuffer.read(x + dir + dir, y) !== SAND) continue
       if (worldBuffer.read(x, y - 1) === SEA || worldBuffer.read(x, y - 1) === WATER) continue
       if (worldBuffer.read(x + dir, y - 1) === SEA || worldBuffer.read(x + dir, y - 1) === WATER) continue
+      if (worldBuffer.read(x + dir + dir, y - 1) === SEA || worldBuffer.read(x + dir + dir, y - 1) === WATER) continue
 
       guarded.add(x)
       guarded.add(x + dir)
+      guarded.add(x + dir + dir)
 
       const soilIndex = (y << 10) | (isLeft ? x : x - 1)
       this.#placeOneCoconut(soilIndex)
@@ -7038,11 +7006,13 @@ class PlantGenerator {
 
         const yNext = surfaceLine[x + dir]
         if (y !== yNext) continue
-        if (guarded.has(x) || guarded.has(x + dir)) continue
+        if (guarded.has(x) || guarded.has(x + dir) || guarded.has(x + dir + dir)) continue
         if (worldBuffer.read(x, y) !== SAND) continue
         if (worldBuffer.read(x + dir, y) !== SAND) continue
+        if (worldBuffer.read(x + dir + dir, y) !== SAND) continue
         if (above === WATER || above === SEA) continue
         if (worldBuffer.read(x + dir, y - 1) === WATER || worldBuffer.read(x + dir, y - 1) === SEA) continue
+        if (worldBuffer.read(x + dir + dir, y - 1) === WATER || worldBuffer.read(x + dir + dir, y - 1) === SEA) continue
 
         return {x, y, dir}
       }
@@ -7061,9 +7031,48 @@ class PlantGenerator {
     const {x, y, dir} = chosen
     guarded.add(x)
     guarded.add(x + dir)
+    guarded.add(x + dir + dir)
 
     const soilIndex = (y << 10) | (dir === 1 ? x : x - 1)
     this.#placeOneCoconut(soilIndex)
+  }
+
+  /**
+ * Construit le tableau d'images d'un cocotier en tirant aléatoirement parmi les variantes disponibles.
+ * @param {number} soilX — coordonnée X de la tuile support gauche
+ * @returns {Array<{tree, row, col, x, y}>} tableau d'images précalculées
+ */
+  #buildCoconutImages (soilX) {
+    const imageTable = TREE_IMAGES.coconut
+
+    const rules = {
+      0: [0, 1],
+      1: [0, 1, 2],
+      2: [1, 2]
+    }
+
+    // On initialise la chaîne avec le bas du premier étage (le centre)
+    const nodes = [1]
+
+    // On tire aléatoirement les 3 nœuds intermédiaires
+    for (let i = 0; i < 3; i++) {
+      nodes.push(seededRNG.randomGetArrayValue(rules[nodes[i]]))
+    }
+
+    // On force le nœud final (le haut du dernier étage) au centre
+    nodes.push(1)
+
+    // Étape de lecture pour récupérer tes 4 images d'étages
+    const images = []
+    for (let i = 0; i < 4; i++) {
+      const key = `${nodes[i]}_${nodes[i + 1]}`
+      console.log('>>>>>>>>>>>>>>>>> TREE_IMAGES key', key)
+      const col = seededRNG.randomGetArrayIndex(imageTable[key])
+      images.push({tree: 'coconut', key, col, x: soilX - 1})
+    }
+    const head = seededRNG.randomGetArrayIndex(imageTable.head)
+    images.push({tree: 'coconut', key: 'head', col: head, x: soilX - 1})
+    return images
   }
 
   /**
