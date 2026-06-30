@@ -330,6 +330,7 @@ taskScheduler.enqueue('my_task_id', 2000, this.myMethod, priority, capacity, arg
 - **Overdraw:** Always use `Camera` for culling in `RENDER` phase.
 - **Blocking the Main Thread:** Any operation &gt;0.1 ms must use `MicroTasker`.
 - **Anonymous Lambdas in `EventBus` or Micro-task:** Always bind callbacks before registration.
+- **Constants in `data-gen.mjs`:** this file is uploded only when a world is generated. Any constant used in game loop cannot be stored here.
 
 ---
 
