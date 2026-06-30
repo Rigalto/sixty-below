@@ -910,7 +910,7 @@ export const TREE_IMAGES = {
     '1_2': ['coconut_80_48-3-3'], // OK
     '2_1': ['coconut_80_48-3-2'], // OK
     '2_2': ['coconut_80_48-0-3'], // OK
-    head: ['coconut_80_48-0-0', 'coconut_80_48-0-0'] // NOK
+    head: ['coconut_80_48-0-0', 'coconut_80_48-1-0', 'coconut_80_48-2-0']
   },
   oak: [
     ['oak_80_48-0-0', 'oak_80_48-1-0'], // sommet arbre pas complet
