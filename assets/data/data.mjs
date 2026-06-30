@@ -900,6 +900,8 @@ export const INFERNCAP_COUNT = 60
 // CobwebSystem (ecosystem.mjs) — délai de base entre deux tentatives de pose
 // de toile (ms). Modulé à l'usage par un facteur aléatoire x[0.8, 1.2[.
 export const COBWEB_GROWTH_DELAY_MS = 20000
+// cycle naturelle des noix de coco. Modulé à l'usage par un facteur aléatoire x[0.8, 1.2[.
+export const COCONUT_CYCLE_DELAY = 20 * 60 * 1000
 
 export const TREE_IMAGES = {
   coconut: {
