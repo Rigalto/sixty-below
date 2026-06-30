@@ -516,7 +516,7 @@ export const ITEMS = {
   bucketSap: {name: 'Sap Bucket', type: ITEM_TYPE.FURNITURE | ITEM_TYPE.PLACABLE | ITEM_TYPE.TOOL, stype: 'tableware', star: 1, image: 'furniture_32_32-13-0', placed: 'fuws_32_32-0-3', help: 'Buckets', tooltip: 'Amount of lava. Can be poured out'},
 
   // Trees
-  coconut: {name: 'Coconut', type: ITEM_TYPE.MATERIAL, stype: 'tree', star: 1, image: 'potions_32_32-1-5', placed: 'fuws_32_32-4-0', help: 'Coconut', tooltip: '???'},
+  coconut: {name: 'Coconut', type: ITEM_TYPE.MATERIAL, stype: 'tree', star: 1, image: 'mined_32_32-5-5', placed: 'placed_16_16-2-0', help: 'Coconut', tooltip: '???'},
   coconutFiber: {name: 'Coconut Fiber', type: ITEM_TYPE.MATERIAL, stype: 'textile', star: 1, image: 'potions_32_32-1-5', help: 'Coconut', tooltip: '???'},
   coconutPulp: {name: 'Coconut Pulp', type: ITEM_TYPE.MATERIAL, stype: 'fruit', star: 1, image: 'potions_32_32-1-5', help: 'Coconut', tooltip: '???'},
   coconutMilk: {name: 'Coconut Milk', type: ITEM_TYPE.MATERIAL, stype: 'beverage', star: 1, image: 'potions_32_32-1-5', help: 'Coconut', tooltip: '???'},

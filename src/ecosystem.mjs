@@ -5,7 +5,7 @@ import {WORLD_WIDTH, WORLD_HEIGHT, MICROTASK, TOPSOIL_Y_SKY_SURFACE, TOPSOIL_Y_S
 import {database, uniqueIdGenerator} from './database.mjs'
 
 import {eventBus, seededRNG, blockedTiles, microTasker, taskScheduler} from './utils.mjs'
-import {NODES, ITEMS, PLANT_KIND, PLANT_TYPE, PLANT_SYSTEM_LOOKUP, ALL_PLANT_SYSTEMS, COBWEB_GROWTH_DELAY_MS, SUNFLOWER_RATE, PARSNIP_RATE, TREE_IMAGES} from '../assets/data/data.mjs'
+import {NODES, ITEMS, PLANT_KIND, PLANT_TYPE, PLANT_SYSTEM_LOOKUP, ALL_PLANT_SYSTEMS, COBWEB_GROWTH_DELAY_MS, SUNFLOWER_RATE, PARSNIP_RATE, COCONUT_CYCLE_DELAY, TREE_IMAGES} from '../assets/data/data.mjs'
 import {IMAGE_CACHE} from './assets.mjs'
 import {saveManager} from './persistence.mjs'
 import {chunkManager} from './world.mjs'
@@ -1907,8 +1907,13 @@ class CoconutSystem {
   byTile = new Map() // Map<tileIndex, record> — public, rectangle complet 3×15 (interaction = blocage)
   #byFullRect = new Map() // Map<tileIndex, record> — rectangle complet 3×15 (obstruction)
   #list = [] // record[] — tous les cocotiers
+  #bySoil = new Map() // Map<soilIndex, record> — lookup O(1) pour les callbacks TaskScheduler
   #byChunk = new Map() // Map<chunkKey, Set> — lookup spatial pour onPreloadChunksChanged
   #displayed = new Set() // Set<record> — cible du render (chunks preload uniquement)
+
+  constructor () {
+    this.onCoconutCycle = this.onCoconutCycle.bind(this)
+  }
 
   /**
    * Réinitialise toutes les structures. Appelé en début de session.
@@ -1930,6 +1935,7 @@ class CoconutSystem {
   initPlant (record) {
     this.#list.push(record)
     addToByTileTree(this.byTile, this.#byFullRect, record)
+    this.#bySoil.set(record.soilIndex, record)
     addToByChunk(this.#byChunk, record)
 
     const px = record.index & 0x3FF
@@ -1939,6 +1945,9 @@ class CoconutSystem {
     const soilX = record.soilIndex & 0x3FF
     const soilY = record.soilIndex >> 10
     blockedTiles.blockMiningRect(soilX, soilY, record.w, 1)
+
+    const {priority, capacity} = MICROTASK.COCONUT_CYCLE
+    taskScheduler.enqueueAbsolute(`coconut_cycle_${record.id}`, record.treeTimestamp, this.onCoconutCycle, priority, capacity, record.soilIndex)
   }
 
   /**
@@ -1952,7 +1961,9 @@ class CoconutSystem {
   /**
    * Dessine les cocotiers visibles sur le contexte transformé.
    * Les 5 images (étages 0–3 + head) sont empilées du sol vers le sommet,
-   * lookupées par key dans TREE_IMAGES.coconut (objet), non par indice de tableau.
+   * lookupées par key dans TREE_IMAGES.coconut (objet).
+   * Si hasNutInTree, la noix de coco est dessinée centrée
+   * sur le tronçon le plus haut, par-dessus le cocotier.
    * @param {CanvasRenderingContext2D} ctx — contexte déjà transformé (caméra appliquée)
    */
   render (ctx) {
@@ -1965,6 +1976,14 @@ class CoconutSystem {
         const pxX = image.x << 4
         const pxY = soilYPx - 48 * (i + 1)
         ctx.drawImage(IMAGE_CACHE[img.imgIndex], img.sx, img.sy, img.sw, img.sh, pxX, pxY, img.sw, img.sh)
+      }
+      if (record.hasNutInTree) {
+        const nutImg = ITEMS.coconut.placed
+        const topPxX = (record.index & 0x3FF) << 4
+        const topPxY = (record.index >> 10) << 4
+        const nutPxX = topPxX + 32
+        const nutPxY = topPxY + 16
+        ctx.drawImage(IMAGE_CACHE[nutImg.imgIndex], nutImg.sx, nutImg.sy, nutImg.sw, nutImg.sh, nutPxX, nutPxY, 16, 16)
       }
     }
   }
@@ -1990,6 +2009,37 @@ class CoconutSystem {
    * @returns {boolean}
    */
   isPresent (record) { return true }
+
+  /**
+   * Bascule périodique de l'arbre — exécute treeNextAction puis programme le cycle suivant.
+   * 'fall' : si hasNutInTree, fait tomber la noix au sol (écrase l'ancienne noix au sol
+   *          si présente) et bascule hasNutInTree à false. Si pas de noix (récoltée par
+   *          shake entre temps), aucune chute — la noix au sol n'est pas affectée.
+   * 'grow' : fait pousser une noix dans l'arbre (hasNutInTree = true).
+   * Dans tous les cas, treeNextAction est inversé et un nouveau cycle est programmé.
+   * @param {number} soilIndex — (y << 10) | x, clé du record dans #bySoil
+   */
+  onCoconutCycle (soilIndex) {
+    const record = this.#bySoil.get(soilIndex)
+    if (record === undefined) return
+
+    if (record.treeNextAction === 'fall') {
+      if (record.hasNutInTree) {
+        // this.#dropNutToGround(record)
+        record.hasNutInTree = false
+      }
+      record.treeNextAction = 'grow'
+    } else {
+      record.hasNutInTree = true
+      record.treeNextAction = 'fall'
+    }
+
+    const cycleDelay = (COCONUT_CYCLE_DELAY * seededRNG.randomGetRealMinMax(0.8, 1.2)) | 0
+    const {priority, capacity} = MICROTASK.COCONUT_CYCLE
+    record.treeTimestamp = taskScheduler.enqueue(`coconut_cycle_${record.id}`, cycleDelay, this.onCoconutCycle, priority, capacity, soilIndex)
+
+    saveManager.queueStaticUpdate({storeName: 'plant', record})
+  }
 }
 
 export const coconutSystem = new CoconutSystem()
