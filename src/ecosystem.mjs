@@ -1903,6 +1903,8 @@ export const oakSystem = new OakSystem()
    COCONUT SYSTEM
    ==================================================================================================== */
 
+const COCONUT_FALL_MAX_DIST = 16
+
 class CoconutSystem {
   byTile = new Map() // Map<tileIndex, record> — public, rectangle complet 3×15 (interaction = blocage)
   #byFullRect = new Map() // Map<tileIndex, record> — rectangle complet 3×15 (obstruction)
@@ -1910,9 +1912,12 @@ class CoconutSystem {
   #bySoil = new Map() // Map<soilIndex, record> — lookup O(1) pour les callbacks TaskScheduler
   #byChunk = new Map() // Map<chunkKey, Set> — lookup spatial pour onPreloadChunksChanged
   #displayed = new Set() // Set<record> — cible du render (chunks preload uniquement)
+  #nutImg = null // image hydratée de la noix au sol
 
   constructor () {
+    // micro-tâches
     this.onCoconutCycle = this.onCoconutCycle.bind(this)
+    this.onCoconutGroundDecay = this.onCoconutGroundDecay.bind(this)
   }
 
   /**
@@ -1924,6 +1929,7 @@ class CoconutSystem {
     this.#list.length = 0
     this.#byChunk.clear()
     this.#displayed.clear()
+    this.#nutImg = ITEMS.coconut.placed
   }
 
   /**
@@ -1938,7 +1944,7 @@ class CoconutSystem {
     this.#bySoil.set(record.soilIndex, record)
     addToByChunk(this.#byChunk, record)
 
-    const px = record.index & 0x3FF
+    const px = (record.index & 0x3FF) + 1
     const py = record.index >> 10
     blockedTiles.blockPlacementRect(px, py, record.w, record.h)
 
@@ -1948,6 +1954,11 @@ class CoconutSystem {
 
     const {priority, capacity} = MICROTASK.COCONUT_CYCLE
     taskScheduler.enqueueAbsolute(`coconut_cycle_${record.id}`, record.treeTimestamp, this.onCoconutCycle, priority, capacity, record.soilIndex)
+
+    if (record.groundTimestamp !== null) {
+      const {priority: gPriority, capacity: gCapacity} = MICROTASK.COCONUT_GROUND_DECAY
+      taskScheduler.enqueueAbsolute(`coconut_ground_${record.id}`, record.groundTimestamp, this.onCoconutGroundDecay, gPriority, gCapacity, record.soilIndex)
+    }
   }
 
   /**
@@ -1978,13 +1989,29 @@ class CoconutSystem {
         ctx.drawImage(IMAGE_CACHE[img.imgIndex], img.sx, img.sy, img.sw, img.sh, pxX, pxY, img.sw, img.sh)
       }
       if (record.hasNutInTree) {
-        const nutImg = ITEMS.coconut.placed
+        const nutImg = this.#nutImg
         const topPxX = (record.index & 0x3FF) << 4
         const topPxY = (record.index >> 10) << 4
         const nutPxX = topPxX + 32
         const nutPxY = topPxY + 16
         ctx.drawImage(IMAGE_CACHE[nutImg.imgIndex], nutImg.sx, nutImg.sy, nutImg.sw, nutImg.sh, nutPxX, nutPxY, 16, 16)
       }
+    }
+    this.#renderGroundNuts(ctx)
+  }
+
+  /**
+   * Dessine les noix de coco posées au sol (record.groundTimestamp !== null), peu importe
+   * leur position par rapport aux chunks preload — leur nombre est trop faible pour
+   * justifier une structure spatiale dédiée. Point d'extension pour l'animation de chute.
+   * @param {CanvasRenderingContext2D} ctx — contexte déjà transformé (caméra appliquée)
+   */
+  #renderGroundNuts (ctx) {
+    for (const record of this.#list) {
+      if (record.groundTimestamp === null) continue
+      const pxX = (record.groundIndex & 0x3FF) << 4
+      const pxY = (record.groundIndex >> 10) << 4
+      ctx.drawImage(IMAGE_CACHE[this.#nutImg.imgIndex], this.#nutImg.sx, this.#nutImg.sy, this.#nutImg.sw, this.#nutImg.sh, pxX, pxY, 16, 16)
     }
   }
 
@@ -2025,7 +2052,13 @@ class CoconutSystem {
 
     if (record.treeNextAction === 'fall') {
       if (record.hasNutInTree) {
-        // this.#dropNutToGround(record)
+        const nutIndex = this.#findCoconutGroundIndex(record.soilIndex)
+        if (nutIndex !== null) {
+          record.groundIndex = nutIndex
+          const groundDelay = (COCONUT_CYCLE_DELAY * seededRNG.randomGetRealMinMax(0.8, 1.2)) | 0
+          const {priority, capacity} = MICROTASK.COCONUT_GROUND_DECAY
+          record.groundTimestamp = taskScheduler.requeue(`coconut_ground_${record.id}`, groundDelay, this.onCoconutGroundDecay, priority, capacity, soilIndex)
+        }
         record.hasNutInTree = false
       }
       record.treeNextAction = 'grow'
@@ -2038,6 +2071,44 @@ class CoconutSystem {
     const {priority, capacity} = MICROTASK.COCONUT_CYCLE
     record.treeTimestamp = taskScheduler.enqueue(`coconut_cycle_${record.id}`, cycleDelay, this.onCoconutCycle, priority, capacity, soilIndex)
 
+    saveManager.queueStaticUpdate({storeName: 'plant', record})
+  }
+
+  /**
+ * Cherche la position au sol où la noix de coco doit tomber, en s'écartant du tronc
+ * du cocotier jusqu'à trouver une tuile de surface (findSurfaceIndex) non bloquée
+ * pour le placement. Alterne gauche/droite (premier côté tiré 50/50 une seule fois) en
+ * augmentant la distance d'1 tuile à chaque échec des deux côtés.
+ * Abandonne au-delà de COCONUT_FALL_MAX_DIST tuiles.
+ * @param {object} record — record du cocotier
+ * @returns {number|null} index de la tuile (SKY, au-dessus du sol) où poser la noix, ou null
+ */
+  #findCoconutGroundIndex (soilIndex) {
+    const soilX = soilIndex & 0x3FF
+    const soilY = soilIndex >> 10
+    let side = seededRNG.randomGetBool() ? 1 : -1
+
+    for (let distance = 1; distance <= COCONUT_FALL_MAX_DIST; distance++) {
+      for (let i = 0; i < 2; i++) {
+        const x = soilX + side * distance
+        const surfaceIndex = findSurfaceIndex((soilY << 10) | x) - WORLD_WIDTH
+        if (blockedTiles.canPlace(surfaceIndex)) return surfaceIndex
+        side = -side
+      }
+    }
+    return null
+  }
+
+  /**
+   * Disparition naturelle de la noix au sol — la noix n'a pas été ramassée par le joueur
+   * dans le délai imparti. Réinitialise simplement groundTimestamp.
+   * @param {number} soilIndex — (y << 10) | x, clé du record dans #bySoil
+   */
+  onCoconutGroundDecay (soilIndex) {
+    const record = this.#bySoil.get(soilIndex)
+    if (record === undefined) return
+
+    record.groundTimestamp = null
     saveManager.queueStaticUpdate({storeName: 'plant', record})
   }
 }
