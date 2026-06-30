@@ -7078,7 +7078,7 @@ class PlantGenerator {
   /**
  * Crée et enregistre un cocotier dans l'objectstore plant.
  * Tirage initial : pas de noix au sol, 50% de chance d'avoir une noix dans l'arbre.
- * @param {number} soilIndex — index de la tuile support droite du cocotier (coin bas-droit)
+ * @param {number} soilIndex — index de la tuile support gauche du cocotier (coin bas-gauche)
  */
   #placeOneCoconut (soilIndex) {
     const SAND = NODES.SAND.code

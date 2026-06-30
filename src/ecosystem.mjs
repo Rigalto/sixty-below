@@ -2057,7 +2057,7 @@ class CoconutSystem {
           record.groundIndex = nutIndex
           const groundDelay = (COCONUT_CYCLE_DELAY * seededRNG.randomGetRealMinMax(0.8, 1.2)) | 0
           const {priority, capacity} = MICROTASK.COCONUT_GROUND_DECAY
-          record.groundTimestamp = taskScheduler.requeue(`coconut_ground_${record.id}`, groundDelay, this.onCoconutGroundDecay, priority, capacity, soilIndex)
+          record.groundTimestamp = taskScheduler.enqueue(`coconut_ground_${record.id}`, groundDelay, this.onCoconutGroundDecay, priority, capacity, soilIndex)
         }
         record.hasNutInTree = false
       }
@@ -2075,22 +2075,22 @@ class CoconutSystem {
   }
 
   /**
- * Cherche la position au sol où la noix de coco doit tomber, en s'écartant du tronc
- * du cocotier jusqu'à trouver une tuile de surface (findSurfaceIndex) non bloquée
- * pour le placement. Alterne gauche/droite (premier côté tiré 50/50 une seule fois) en
- * augmentant la distance d'1 tuile à chaque échec des deux côtés.
- * Abandonne au-delà de COCONUT_FALL_MAX_DIST tuiles.
- * @param {object} record — record du cocotier
- * @returns {number|null} index de la tuile (SKY, au-dessus du sol) où poser la noix, ou null
- */
+   * Cherche la position au sol où la noix de coco doit tomber, en s'écartant du centre
+   * du tronc (3 tuiles de large) jusqu'à trouver une tuile de surface (findSurfaceIndex)
+   * non bloquée pour le placement. Alterne gauche/droite (premier côté tiré 50/50 une
+   * seule fois) en augmentant la distance d'1 tuile à chaque échec des deux côtés.
+   * Abandonne au-delà de COCONUT_FALL_MAX_DIST tuiles.
+   * @param {number} soilIndex — (y << 10) | x, coin gauche du sol du cocotier (w=3)
+   * @returns {number|null} index de la tuile (SKY, au-dessus du sol) où poser la noix, ou null
+   */
   #findCoconutGroundIndex (soilIndex) {
-    const soilX = soilIndex & 0x3FF
+    const centerX = (soilIndex & 0x3FF) + 1
     const soilY = soilIndex >> 10
     let side = seededRNG.randomGetBool() ? 1 : -1
 
-    for (let distance = 1; distance <= COCONUT_FALL_MAX_DIST; distance++) {
+    for (let distance = 2; distance <= COCONUT_FALL_MAX_DIST; distance++) {
       for (let i = 0; i < 2; i++) {
-        const x = soilX + side * distance
+        const x = centerX + side * distance
         const surfaceIndex = findSurfaceIndex((soilY << 10) | x) - WORLD_WIDTH
         if (blockedTiles.canPlace(surfaceIndex)) return surfaceIndex
         side = -side
