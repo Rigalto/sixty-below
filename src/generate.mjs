@@ -7084,7 +7084,7 @@ class PlantGenerator {
     const SAND = NODES.SAND.code
     const h = 15
     const w = 3
-    const index = soilIndex - h * WORLD_WIDTH
+    const index = soilIndex - h * WORLD_WIDTH - 1
     const soilX = soilIndex & 0x3FF
     const soilY = soilIndex >> 10
     const images = this.#buildCoconutImages(soilX)
