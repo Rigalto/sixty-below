@@ -268,10 +268,10 @@ export const ITEMS = {
   barPlatinum: {name: 'Platinum Bar', type: 0, star: 5, stype: 'bar', image: 'refined_32_32-5-0', help: 'Metals', tooltip: 'Crafting material used to craft tools, weapons, armor, and other items'},
 
   // Raw Gems [succès]
-  rawTopaz: {name: 'Raw Topaz', type: 0, star: 2, stype: 'gem', image: 'mined_32_32-3-3', help: 'Gems', tooltip: 'Valuable crafting materials to be cut at a Stone Bench'},
-  rawRuby: {name: 'Raw Ruby', type: 0, star: 3, stype: 'gem', image: 'mined_32_32-4-3', help: 'Gems', tooltip: 'Valuable crafting materials to be cut at a Stone Bench'},
-  rawEmerald: {name: 'Raw Emerald', type: 0, star: 4, stype: 'gem', image: 'mined_32_32-5-3', help: 'Gems', tooltip: 'Valuable crafting materials to be cut at a Stone Bench'},
-  rawSapphire: {name: 'Raw Sapphire', type: 0, star: 5, stype: 'gem', image: 'mined_32_32-0-4', help: 'Gems', tooltip: 'Valuable crafting materials to be cut at a Stone Bench'},
+  rawTopaz: {name: 'Raw Topaz', type: 0, star: 2, stype: 'gem', image: 'mined_32_32-0-4', help: 'Gems', tooltip: 'Valuable crafting materials to be cut at a Stone Bench'},
+  rawRuby: {name: 'Raw Ruby', type: 0, star: 3, stype: 'gem', image: 'mined_32_32-1-4', help: 'Gems', tooltip: 'Valuable crafting materials to be cut at a Stone Bench'},
+  rawEmerald: {name: 'Raw Emerald', type: 0, star: 4, stype: 'gem', image: 'mined_32_32-2-4', help: 'Gems', tooltip: 'Valuable crafting materials to be cut at a Stone Bench'},
+  rawSapphire: {name: 'Raw Sapphire', type: 0, star: 5, stype: 'gem', image: 'mined_32_32-3-4', help: 'Gems', tooltip: 'Valuable crafting materials to be cut at a Stone Bench'},
 
   // Cut Gems [succès]
   cutTopaz: {name: 'Cut Topaz', type: 0, star: 2, stype: 'gem', image: 'refined_32_32-0-1', help: 'Gems', tooltip: 'Enhances weapons, gears and accessories'},
@@ -280,8 +280,8 @@ export const ITEMS = {
   cutSapphire: {name: 'Cut Sapphire', type: 0, star: 5, stype: 'gem', image: 'refined_32_32-3-1', help: 'Gems', tooltip: 'Enhances weapons, gears and accessories'},
 
   // Rock - Geode Stones
-  blockGranite: {name: 'Granite Block', type: ITEM_TYPE.BLOCK | ITEM_TYPE.PLACABLE, star: 4, stype: 'block', placedNode: 'GRANITE', image: 'blocks_16_16-0-0', help: 'Geode Stones', tooltip: 'Prized crafting materials found in crystalline structures'},
-  blockMarble: {name: 'Marble Block', type: ITEM_TYPE.BLOCK | ITEM_TYPE.PLACABLE, star: 4, stype: 'block', placedNode: 'MARBLE', image: 'blocks_16_16-0-0', help: 'Geode Stones', tooltip: 'Prized crafting materials found in crystalline structures'},
+  blockGranite: {name: 'Granite Block', type: ITEM_TYPE.BLOCK | ITEM_TYPE.PLACABLE, star: 4, stype: 'block', placedNode: 'GRANITE', image: 'mined_32_32-1-2', help: 'Geode Stones', tooltip: 'Prized crafting materials found in crystalline structures'},
+  blockMarble: {name: 'Marble Block', type: ITEM_TYPE.BLOCK | ITEM_TYPE.PLACABLE, star: 4, stype: 'block', placedNode: 'MARBLE', image: 'mined_32_32-2-2', help: 'Geode Stones', tooltip: 'Prized crafting materials found in crystalline structures'},
   // Rock - Others
   blockObsidian: {name: 'Obsidian Block', type: ITEM_TYPE.BLOCK | ITEM_TYPE.PLACABLE, star: 5, stype: 'block', placedNode: 'OBSIDIAN', image: 'blocks_16_16-0-0', help: 'Obsidian', tooltip: 'Hardest material'},
   blockMeteorite: {name: 'Meteorite Block', type: ITEM_TYPE.BLOCK, star: 5, stype: 'block', image: 'blocks_16_16-0-0', help: 'Meteorite', tooltip: 'Falling from space, hard to use'},
@@ -291,11 +291,11 @@ export const ITEMS = {
   beeswax: {name: 'Beeswax', type: 0, star: 3, stype: 'wax', image: 'refined_32_32-5-1', help: 'Hive', tooltip: 'Melted down from honeycombs, used as a binding agent'},
 
   // Shell
-  blockShell: {name: 'Shell Block', type: ITEM_TYPE.BLOCK, star: 3, stype: 'block', image: 'mined_32_32-2-2', help: 'Shell', tooltip: 'Can be easily powdered'},
+  blockShell: {name: 'Shell Block', type: ITEM_TYPE.BLOCK, star: 3, stype: 'block', image: 'mined_32_32-5-4', help: 'Shell', tooltip: 'Can be easily powdered'},
   shellPowder: {name: 'Shell Powder', type: 0, star: 3, stype: 'powder', image: 'refined_32_32-4-1', help: 'Shell', tooltip: 'A fine natural abrasive — used in polishing and grinding recipes'},
 
   // Cobweb
-  silk: {name: 'Silk', type: 0, star: 1, stype: 'cobweb', image: 'mined_32_32-2-1', help: 'Cobweb', tooltip: 'Mined from Cobweb, used to craft Fabric'},
+  silk: {name: 'Silk', type: 0, star: 1, stype: 'cobweb', image: 'mined_32_32-4-4', help: 'Cobweb', tooltip: 'Mined from Cobweb, used to craft Fabric'},
   fabric: {name: 'Fabric', type: 0, star: 1, stype: 'cobweb', image: 'blocks_16_16-0-0', help: 'Cobweb', tooltip: 'Common material used for armors and furniture'},
   eggSpider: {name: 'Spider Egg', type: 0, star: 3, stype: 'egg', image: 'foraged_32_32-4-1', help: 'Eggs', tooltip: '???'},
   eggSnake: {name: 'Snake Egg', type: 0, star: 4, stype: 'egg', image: 'foraged_32_32-5-1', help: 'Eggs', tooltip: '???'},
