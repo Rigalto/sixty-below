@@ -401,6 +401,8 @@ class ForagingManager {
     if (tileNode.code !== NODES.SKY.code && tileNode.code !== NODES.VOID.code) return
     const plant = floraManager.getPlantAt(tileIndex)
     if (plant === null) return
+    if (!floraManager.canForage(plant)) return
+
     const plantItem = ITEMS[plant.itemId]
     if (!plantItem.foraging) return
 
@@ -522,6 +524,7 @@ class ChoppingManager {
 
     const plant = floraManager.getPlantAt(tileIndex)
     if (plant === null || plant.kind !== PLANT_KIND.TREE) return
+    if (!floraManager.canChop(plant)) return
 
     const plantItem = ITEMS[plant.itemId]
     if (!isInToolRange(tileIndex, tool, prefix, 'chopping-range')) { eventBus.emit('sound/play', 'toofar'); return }
@@ -829,6 +832,7 @@ class HammingManager {
    * @param {string} prefix    — slot.prefix
    */
   tryShaking (tileIndex, tree, tool, prefix) {
+    if (!floraManager.canShake(tree)) return
     const plantItem = ITEMS[tree.itemId]
     if (!isInToolRange(tileIndex, tool, prefix, 'chopping-range')) { eventBus.emit('sound/play', 'toofar'); return }
     if (tree.blocked > 0) { eventBus.emit('sound/play', 'wrong'); return }

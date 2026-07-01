@@ -2036,17 +2036,11 @@ class CoconutSystem {
   getPlantAt (tileIndex) {
     for (const record of this.#list) {
       if (record.groundTimestamp !== null && record.groundIndex === tileIndex) {
-        return {itemId: 'coconut', isGroundNut: true, parentId: record.id}
+        return {itemId: 'coconut', isGroundNut: true, parentId: record.id, kind: record.kind, type: record.type}
       }
     }
     return this.byTile.get(tileIndex) ?? null
   }
-
-  /**
-   * Les cocotiers ne se foragent pas — no-op.
-   * @param {object} record
-   */
-  onForaged (record) {}
 
   /**
    * Un cocotier est toujours présent.
@@ -2135,6 +2129,46 @@ class CoconutSystem {
     record.groundTimestamp = null
     saveManager.queueStaticUpdate({storeName: 'plant', record})
   }
+
+  // //////// //
+  // FORAGING //
+  // //////// //
+
+  /**
+   * Retourne true si la plante pointée par plant est forageable.
+   * Seule la noix au sol (isGroundNut) est forageable sur un cocotier.
+   * @param {object} plant — pseudo-record retourné par getPlantAt
+   * @returns {boolean}
+   */
+  canForage (plant) { return plant.isGroundNut === true }
+
+  /**
+   * On récolte la noix au sol.
+   * @param {object} record
+   */
+  onForaged (record) {
+    console.log('CoconutSystem.onForaged >>>>>>>>>>>>>>>>>>>>>>><<<', record)
+  }
+
+  // //////// //
+  // SHAKING //
+  // //////// //
+
+  /**
+   * Retourne true si le cocotier peut être secoué (noix présente dans l'arbre).
+   * @param {object} plant — pseudo-record retourné par getPlantAt
+   * @returns {boolean}
+   */
+  canShake (plant) { return plant.isGroundNut !== true && plant.hasNutInTree === true }
+
+  // //////// //
+  // Chopping //
+  // //////// //
+  /**
+   * Le cocotier ne peut pas être coupé.
+   * @returns {boolean}
+   */
+  canChop () { return false }
 }
 
 export const coconutSystem = new CoconutSystem()
@@ -2233,6 +2267,42 @@ class FloraManager {
       return result
     }
     return false // aucune plante ne correspond à la graine
+  }
+
+  /**
+   * Délègue au système compétent la validation de foraging d'une plante.
+   * Retourne false si le système ne permet pas le foraging sur ce record.
+   * @param {object} plant — record ou pseudo-record retourné par getPlantAt
+   * @returns {boolean}
+   */
+  canForage (plant) {
+    const system = PLANT_SYSTEM_LOOKUP.get(plant.kind * 100 + plant.type)
+    if (system === undefined || system.canForage === undefined) return true
+    return system.canForage(plant)
+  }
+
+  /**
+   * Délègue au système compétent la validation de shaking d'une plante.
+   * Retourne false si le système ne permet pas le shaking sur ce record.
+   * @param {object} plant — record ou pseudo-record retourné par getPlantAt
+   * @returns {boolean}
+   */
+  canShake (plant) {
+    const system = PLANT_SYSTEM_LOOKUP.get(plant.kind * 100 + plant.type)
+    if (system === undefined || system.canShake === undefined) return true
+    return system.canShake(plant)
+  }
+
+  /**
+   * Délègue au système compétent la validation de chopping d'une plante.
+   * Retourne true par défaut si le système n'implémente pas canChop.
+   * @param {object} plant — record retourné par getPlantAt
+   * @returns {boolean}
+   */
+  canChop (plant) {
+    const system = PLANT_SYSTEM_LOOKUP.get(plant.kind * 100 + plant.type)
+    if (system === undefined || system.canChop === undefined) return true
+    return system.canChop(plant)
   }
 }
 
