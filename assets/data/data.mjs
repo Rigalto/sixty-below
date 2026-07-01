@@ -518,9 +518,9 @@ export const ITEMS = {
 
   // Trees
   coconut: {name: 'Coconut', type: 0, stype: 'tree', star: 1, image: 'foraged_32_32-1-2', placed: 'placed_16_16-2-0', help: 'Coconut', tooltip: '???', shaking: {speed: 2400, items: [{item: 'coconut', count: 1}]}, foraging: {speed: 2400, items: [{item: 'coconut', count: 1}]}},
-  coconutFiber: {name: 'Coconut Fiber', type: 0, stype: 'textile', star: 2, image: 'refined_32_32-0-3', help: 'Coconut', tooltip: '???'},
-  coconutPulp: {name: 'Coconut Pulp', type: 0, stype: 'fruit', star: 2, image: 'refined_32_32-1-3', help: 'Coconut', tooltip: '???'},
-  coconutMilk: {name: 'Coconut Milk', type: 0, stype: 'beverage', star: 2, image: 'refined_32_32-2-3', help: 'Coconut', tooltip: '???'},
+  coconutFiber: {name: 'Coconut Fiber', type: 0, stype: 'textile', star: 1, image: 'refined_32_32-0-3', help: 'Coconut', tooltip: '???'},
+  coconutPulp: {name: 'Coconut Pulp', type: 0, stype: 'fruit', star: 1, image: 'refined_32_32-1-3', help: 'Coconut', tooltip: '???'},
+  coconutMilk: {name: 'Coconut Milk', type: 0, stype: 'beverage', star: 1, image: 'refined_32_32-2-3', help: 'Coconut', tooltip: '???'},
 
   oak: {
     name: 'Oak',
