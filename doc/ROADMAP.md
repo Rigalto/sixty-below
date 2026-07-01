@@ -368,6 +368,7 @@ La Sap corrode le Copper. Il doit donc être remplacer par du Gold.
 - Oleander (`OleanderSystem`)
 - Cobweb (`CobwebSystem`)
 - Oak (`OakSystem`)
+- Coconut (`CoconutSystem`)
 
 ### Rendu (partiel)
 - `WorldRenderer` — rendu tuiles par chunks avec cache OffscreenCanvas

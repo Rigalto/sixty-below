@@ -500,6 +500,11 @@ Cette section définit les événements officiels. Tout nouvel événement doit 
 | S | `ecosystem/tree-planted` | `{tileIndex: number, treeId: string}` | Émis quand un arbre est planté. Payload = tuile centrale du sol (`soilIndex + 1`). |
 | E | `sewed/acorn` | `number` (tileIndex) | Le joueur plante un acorn. |
 
+#### Coconut (`CoconutSystem`)
+
+| Dir. | Event Name | Payload Structure | Description |
+| :---: | :--- | :--- | :--- |
+| E | `shaked/coconut` | `number` (soilIndex) | Émis par HammingManager quand le joueur secoue un cocotier. |
 
 #### Debug (`WorldMapDebug`, `RealtimeDebugWidget`, `BuffManager`)
 

@@ -1917,6 +1917,9 @@ class CoconutSystem {
   #falling = {} // {[record.id]: {pxX, pxY, pxYFinal, frames}} — noix en cours de chute
 
   constructor () {
+    // eventBus
+    this.onShaked = this.onShaked.bind(this)
+    eventBus.on('shaked/coconut', this.onShaked)
     // micro-tâches
     this.onCoconutCycle = this.onCoconutCycle.bind(this)
     this.onCoconutGroundDecay = this.onCoconutGroundDecay.bind(this)
@@ -1966,6 +1969,7 @@ class CoconutSystem {
 
   /**
    * Reconstruit #displayed depuis les chunks preload de la caméra.
+   * Uniquement pour les arbres : les noix de coco seront toutes affichées.
    * @param {Set<number>} preloadChunks
    */
   onPreloadChunksChanged (preloadChunks) {
@@ -2006,7 +2010,8 @@ class CoconutSystem {
   /**
    * Dessine les noix de coco posées au sol (record.groundTimestamp !== null), peu importe
    * leur position par rapport aux chunks preload — leur nombre est trop faible pour
-   * justifier une structure spatiale dédiée. Point d'extension pour l'animation de chute.
+   * justifier une structure spatiale dédiée.
+   * La chute est animée via this.#falling.
    * @param {CanvasRenderingContext2D} ctx — contexte déjà transformé (caméra appliquée)
    */
   #renderGroundNuts (ctx) {
@@ -2092,6 +2097,10 @@ class CoconutSystem {
     saveManager.queueStaticUpdate({storeName: 'plant', record})
   }
 
+  // ////////////////////// //
+  // NOIX DE COCO PAR TERRE //
+  // ////////////////////// //
+
   /**
    * Cherche la position au sol où la noix de coco doit tomber, en s'écartant du centre
    * du tronc (3 tuiles de large) jusqu'à trouver une tuile de surface (findSurfaceIndex)
@@ -2169,6 +2178,21 @@ class CoconutSystem {
    * @returns {boolean}
    */
   canShake (plant) { return plant.isGroundNut !== true && plant.hasNutInTree === true }
+
+  /**
+   * Liaison EventBus : 'shaked/coconut' — le joueur a secoué le cocotier.
+   * Si hasNutInTree, loot et retire la noix de l'arbre sans modifier le cycle
+   * (treeTimestamp et treeNextAction restent inchangés).
+   * @param {number} soilIndex — (y << 10) | x
+   */
+  onShaked (soilIndex) {
+    const record = this.#bySoil.get(soilIndex)
+    if (record === undefined) return
+    if (!record.hasNutInTree) return
+
+    record.hasNutInTree = false
+    saveManager.queueStaticUpdate({storeName: 'plant', record})
+  }
 
   // //////// //
   // Chopping //
