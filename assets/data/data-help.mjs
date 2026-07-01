@@ -1024,10 +1024,15 @@ Despite the nuisance they represent, cobwebs are one of the most valuable resour
 * [[Cobweb Cave]]s — concentrated, all biomes
 * All tunnels and caverns — scattered, all biomes
 
-**Collection** ⏳
+**Mining** ⏳
 
-* Mine with any [[Mining Tools|Pickaxes]] — drops [[item:silk]] {{item:silk:star|star}}
-* Deleted with a [[item:flamethrower]] - No loot
+* Mine with any [[Mining Tools|Pickaxes]]
+
+<<lootTable|web|mining>>
+
+**Burning** ⏳
+
+* Deleted with a [[item:flamethrower]] ⏳ — No loot
 
 **Crafting chain**
 
@@ -4471,16 +4476,21 @@ Food restores health and provides temporary buffs. More elaborate preparations r
     title: 'Eggs',
     category: ['Food'],
     content: `
+**Description**
+
+⏳
+
 **Eggs Type**
 
-{{item:vegetableSoup:star|star}}
+| Egg | Tier | Found | Main usage |
+|---|---|---|---|
+| [[item:egg]] | {{item:egg:star|star}} | Chopping/Shaking [[item:oak]] | ⏳ |
+| [[item:eggMaleo]] | {{item:eggMaleo:star|star}} | Chopping/Shaking [[item:mahogany]] | ⏳ |
+| [[item:eggSpider]] | {{item:eggSpider:star|star}} | Mining [[node:web]] | Potions |
+| [[item:eggSnake]] | {{item:eggSnake:star|star}} | ⏳ | ⏳ |
 
 **Recipes**
-
-| Egg | Found | Usage |
-|---|---|---|
-| [[item:eggSpider]] | Mining [[node:web]] | Potions |
-      `
+`
   },
 
   // ── Potions ──────────────────────────────────────────────────

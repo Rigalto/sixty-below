@@ -297,7 +297,8 @@ export const ITEMS = {
   // Cobweb
   silk: {name: 'Silk', type: 0, star: 1, stype: 'cobweb', image: 'mined_32_32-2-1', help: 'Cobweb', tooltip: 'Mined from Cobweb, used to craft Fabric'},
   fabric: {name: 'Fabric', type: 0, star: 1, stype: 'cobweb', image: 'blocks_16_16-0-0', help: 'Cobweb', tooltip: 'Common material used for armors and furniture'},
-  eggSpider: {name: 'Spider Egg', type: 0, star: 1, stype: 'egg', image: 'blocks_16_16-0-0', help: 'Eggs', tooltip: '???'},
+  eggSpider: {name: 'Spider Egg', type: 0, star: 3, stype: 'egg', image: 'foraged_32_32-4-1', help: 'Eggs', tooltip: '???'},
+  eggSnake: {name: 'Snake Egg', type: 0, star: 4, stype: 'egg', image: 'foraged_32_32-5-1', help: 'Eggs', tooltip: '???'},
   ropeLinen: {name: 'Linen Rope', type: 0, star: 4, stype: 'rope', image: 'loom_32_32-0-0', help: 'Ropes', tooltip: '???'},
 
   // A NETTOYER CI-DESSOUS
@@ -516,7 +517,7 @@ export const ITEMS = {
   bucketSap: {name: 'Sap Bucket', type: ITEM_TYPE.FURNITURE | ITEM_TYPE.PLACABLE | ITEM_TYPE.TOOL, stype: 'tableware', star: 1, image: 'furniture_32_32-13-0', placed: 'fuws_32_32-0-3', help: 'Buckets', tooltip: 'Amount of lava. Can be poured out'},
 
   // Trees
-  coconut: {name: 'Coconut', type: 0, stype: 'tree', star: 1, image: 'mined_32_32-5-5', placed: 'placed_16_16-2-0', help: 'Coconut', tooltip: '???', shaking: {speed: 2400, items: [{item: 'coconut', count: 1}]}, foraging: {speed: 2400, items: [{item: 'coconut', count: 1}]}},
+  coconut: {name: 'Coconut', type: 0, stype: 'tree', star: 1, image: 'foraged_32_32-1-2', placed: 'placed_16_16-2-0', help: 'Coconut', tooltip: '???', shaking: {speed: 2400, items: [{item: 'coconut', count: 1}]}, foraging: {speed: 2400, items: [{item: 'coconut', count: 1}]}},
   coconutFiber: {name: 'Coconut Fiber', type: 0, stype: 'textile', star: 2, image: 'refined_32_32-0-3', help: 'Coconut', tooltip: '???'},
   coconutPulp: {name: 'Coconut Pulp', type: 0, stype: 'fruit', star: 2, image: 'refined_32_32-1-3', help: 'Coconut', tooltip: '???'},
   coconutMilk: {name: 'Coconut Milk', type: 0, stype: 'beverage', star: 2, image: 'refined_32_32-2-3', help: 'Coconut', tooltip: '???'},
@@ -533,15 +534,16 @@ export const ITEMS = {
     chopping: {speed: 1800, items: [{item: 'logOak', count: '1-2'}, {item: 'acorn', count: 0.25}, {item: 'feather', count: 0.08}, {item: 'apple', count: 0.05}, {item: 'peach', count: 0.04}], extraLoot: {items: [{item: 'rootOak', count: '2-5', buffs: ['+felling']}]}},
     shaking: {speed: 1800, items: [{item: 'egg', count: 0.75}, {item: 'feather', count: 0.75}, {item: 'acorn', count: 0.25}, {item: 'logOak', count: 0.12}, {item: 'apple', count: 0.10}, {item: 'peach', count: 0.8}]}
   },
-  logOak: {name: 'Oak Log', type: 0, stype: 'log', star: 1, image: 'mined_32_32-1-4', help: 'Oak & Mahogany', tooltip: '???'},
+  logOak: {name: 'Oak Log', type: 0, stype: 'log', star: 1, image: 'foraged_32_32-1-0', help: 'Oak & Mahogany', tooltip: '???'},
   plankOak: {name: 'Oak Plank', type: 0, stype: 'plank', star: 1, image: 'refined_32_32-5-2', help: 'Oak & Mahogany', tooltip: '???'},
   rootOak: {name: 'Wood Root', type: 0, stype: 'root', star: 1, image: 'potions_32_32-1-5', help: 'Oak & Mahogany', tooltip: '???'},
-  egg: {name: 'Bird Egg', type: 0, stype: 'egg', star: 1, image: 'mined_32_32-2-5', help: 'Oak & Mahogany', tooltip: '???'},
-  feather: {name: 'Bird Feather', type: 0, stype: 'feather', star: 1, image: 'mined_32_32-1-5', help: 'Oak & Mahogany', tooltip: '???'},
-  apple: {name: 'Apple', type: 0, stype: 'fruit', star: 1, image: 'mined_32_32-3-5', help: 'Oak & Mahogany', tooltip: 'An apple a day keeps Doctor Bones away!'},
-  peach: {name: 'Peach', type: 0, stype: 'fruit', star: 1, image: 'mined_32_32-4-5', help: 'Oak & Mahogany', tooltip: '???'},
+  egg: {name: 'Bird Egg', type: 0, stype: 'egg', star: 1, image: 'foraged_32_32-2-1', help: 'Oak & Mahogany', tooltip: '???'},
+  eggMaleo: {name: 'Maleo Egg', type: 0, stype: 'egg', star: 2, image: 'foraged_32_32-3-1', help: 'Oak & Mahogany', tooltip: '???'}, // jungle
+  feather: {name: 'Bird Feather', type: 0, stype: 'feather', star: 1, image: 'foraged_32_32-4-2', help: 'Oak & Mahogany', tooltip: '???'},
+  apple: {name: 'Apple', type: 0, stype: 'fruit', star: 1, image: 'foraged_32_32-2-2', help: 'Oak & Mahogany', tooltip: 'An apple a day keeps Doctor Bones away!'},
+  peach: {name: 'Peach', type: 0, stype: 'fruit', star: 1, image: 'foraged_32_32-3-2', help: 'Oak & Mahogany', tooltip: '???'},
 
-  acorn: {name: 'Acorn', type: ITEM_TYPE.SEED | ITEM_TYPE.PLACABLE, stype: 'seed', star: 1, image: 'mined_32_32-0-5', help: 'Oak & Mahogany', tooltip: '???'},
+  acorn: {name: 'Acorn', type: ITEM_TYPE.SEED | ITEM_TYPE.PLACABLE, stype: 'seed', star: 1, image: 'foraged_32_32-0-1', help: 'Oak & Mahogany', tooltip: '???'},
   seedForest: {name: 'Forest Grass Seed', type: ITEM_TYPE.SEED | ITEM_TYPE.PLACABLE, stype: 'seed', star: 1, image: 'potions_32_32-1-5', help: 'Forest Grass', tooltip: 'Plant to change Dirt into Forest Grass'},
   seedJungle: {name: 'Jungle Grass Seed', type: ITEM_TYPE.SEED | ITEM_TYPE.PLACABLE, stype: 'seed', star: 1, image: 'potions_32_32-1-5', help: 'Jungle Grass', tooltip: 'Plant to change Silt into Jungle Grass'},
 
@@ -557,32 +559,32 @@ export const ITEMS = {
     chopping: {speed: 1800, items: [{item: 'logMahogany', count: '1-2'}, {item: 'samara', count: 0.25}], extraLoot: {items: [{item: 'rootMahogany', count: '2-5', buffs: ['+felling']}]}},
     shaking: {speed: 1800, items: [{item: 'egg', count: 0.75}, {item: 'feather', count: 0.75}, {item: 'samara', count: 0.25}, {item: 'logMahogany', count: 0.12}]}
   },
-  logMahogany: {name: 'Mahogany Log', type: 0, stype: 'log', star: 2, image: 'mined_32_32-2-4', help: 'Oak & Mahogany', tooltip: '???'},
+  logMahogany: {name: 'Mahogany Log', type: 0, stype: 'log', star: 2, image: 'foraged_32_32-2-0', help: 'Oak & Mahogany', tooltip: '???'},
   plankMahogany: {name: 'Mahogany Plank', type: 0, stype: 'plank', star: 2, image: 'refined_32_32-6-2', help: 'Oak & Mahogany', tooltip: '???'},
   rootMahogany: {name: 'Mahogany Root', type: 0, stype: 'root', star: 2, image: 'potions_32_32-1-5', help: 'Oak & Mahogany', tooltip: '???'},
-  samara: {name: 'Samara', type: ITEM_TYPE.SEED | ITEM_TYPE.PLACABLE, stype: 'seed', star: 2, image: 'potions_32_32-1-5', help: 'Oak & Mahogany', tooltip: '???'},
+  samara: {name: 'Samara', type: ITEM_TYPE.SEED | ITEM_TYPE.PLACABLE, stype: 'seed', star: 2, image: 'foraged_32_32-1-1', help: 'Oak & Mahogany', tooltip: '???'},
 
   giantMushroom: {name: 'Giant Mushroom', type: 0, stype: 'tree', star: 1, image: null, help: 'Oak & Mahogany', tooltip: '???'},
 
   // Mushrooms - images OK
-  bolete: {name: 'Bolete', type: 0, stype: 'mushroom', star: 1, image: 'mined_32_32-3-4', placed: 'placed_16_32-0-0', help: 'Surface Mushrooms', tooltip: '???', foraging: {speed: 2400, items: [{item: 'bolete', count: '1-3'}, {item: 'worm', count: 0.3, buffs: ['lucky:100', 'rainy:100']}]}},
-  pinkMycenia: {name: 'Pink Mycenia', type: 0, stype: 'mushroom', star: 2, image: 'mined_32_32-4-4', placed: 'placed_16_32-1-0', help: 'Surface Mushrooms', tooltip: '???', foraging: {speed: 2400, items: [{item: 'pinkMycenia', count: '1-3'}, {item: 'slug', count: 0.3, buffs: ['lucky:100', 'rainy:100']}]}},
-  frostcap: {name: 'Frostcap', type: 0, stype: 'mushroom', star: 3, image: null, placed: 'mined_32_32-5-4', help: 'Cave Mushrooms', tooltip: '???', foraging: {speed: 2400, items: [{item: 'mushroomGill', count: '2-5'}, {item: 'snail', count: 0.3, buffs: ['lucky:100', 'rainy:100']}]}},
-  dawncap: {name: 'Dawncap', type: 0, stype: 'mushroom', star: 3, image: null, placed: 'mined_32_32-6-4', help: 'Cave Mushrooms', tooltip: '???', foraging: {speed: 2400, items: [{item: 'mushroomGill', count: '2-5'}, {item: 'snail', count: 0.3, buffs: ['lucky:100', 'rainy:100']}]}},
-  mushroomGill: {name: 'Mushroom Gill', type: 0, stype: 'mushroom', star: 3, image: 'mined_32_32-7-4', help: 'Cave Mushrooms', tooltip: '???'},
+  bolete: {name: 'Bolete', type: 0, stype: 'mushroom', star: 1, image: 'foraged_32_32-3-0', placed: 'placed_16_32-0-0', help: 'Surface Mushrooms', tooltip: '???', foraging: {speed: 2400, items: [{item: 'bolete', count: '1-3'}, {item: 'worm', count: 0.3, buffs: ['lucky:100', 'rainy:100']}]}},
+  pinkMycenia: {name: 'Pink Mycenia', type: 0, stype: 'mushroom', star: 2, image: 'foraged_32_32-4-0', placed: 'placed_16_32-1-0', help: 'Surface Mushrooms', tooltip: '???', foraging: {speed: 2400, items: [{item: 'pinkMycenia', count: '1-3'}, {item: 'slug', count: 0.3, buffs: ['lucky:100', 'rainy:100']}]}},
+  frostcap: {name: 'Frostcap', type: 0, stype: 'mushroom', star: 3, image: null, placed: 'foraged_32_32-5-0', help: 'Cave Mushrooms', tooltip: '???', foraging: {speed: 2400, items: [{item: 'mushroomGill', count: '2-5'}, {item: 'snail', count: 0.3, buffs: ['lucky:100', 'rainy:100']}]}},
+  dawncap: {name: 'Dawncap', type: 0, stype: 'mushroom', star: 3, image: null, placed: 'foraged_32_32-6-0', help: 'Cave Mushrooms', tooltip: '???', foraging: {speed: 2400, items: [{item: 'mushroomGill', count: '2-5'}, {item: 'snail', count: 0.3, buffs: ['lucky:100', 'rainy:100']}]}},
+  mushroomGill: {name: 'Mushroom Gill', type: 0, stype: 'mushroom', star: 3, image: 'foraged_32_32-7-0', help: 'Cave Mushrooms', tooltip: '???'},
 
   // Herbs
-  parsnip: {name: 'Parsnip', type: 0, stype: 'herb', star: 1, image: 'mined_32_32-6-0', placed: 'placed_16_16-0-0', help: 'Parsnip', tooltip: '???', foraging: {speed: 1800, items: [{item: 'parsnip', count: '1-3'}]}},
+  parsnip: {name: 'Parsnip', type: 0, stype: 'herb', star: 1, image: 'foraged_32_32-6-1', placed: 'placed_16_16-0-0', help: 'Parsnip', tooltip: '???', foraging: {speed: 1800, items: [{item: 'parsnip', count: '1-3'}]}},
   parsnipMash: {name: 'Parsnip Mash', type: ITEM_TYPE.FOOD | ITEM_TYPE.USABLE, stype: 'food', star: 1, image: 'potions_32_32-1-5', help: 'Parsnip', tooltip: '???'},
   vegetableSoup: {name: 'Vegetable Soup', type: ITEM_TYPE.FOOD | ITEM_TYPE.USABLE, stype: 'food', star: 2, image: 'potions_32_32-1-5', help: 'Soups', tooltip: '???'},
 
   sunflower: {name: 'Sunflower', type: 0, stype: 'herb', star: 1, image: null, placed: 'placed_16_32-2-1', placedLeft: 'placed_16_32-3-1', placedRight: 'placed_16_32-4-1', help: 'Sunflower', tooltip: 'Blooms at dawn and always faces the sun', foraging: {speed: 2400, items: [{item: 'sunflowerSeed', count: '3-4'}, {item: 'worm', count: 0.10, buffs: ['lucky:100', 'rainy:200']}]}},
-  sunflowerSeed: {name: 'Sunflower Seed', type: ITEM_TYPE.SEED | ITEM_TYPE.PLACABLE, stype: 'seed', star: 1, image: 'mined_32_32-6-3', placed: 'placed_16_16-1-0', help: 'Sunflower', tooltip: '???'},
+  sunflowerSeed: {name: 'Sunflower Seed', type: ITEM_TYPE.SEED | ITEM_TYPE.PLACABLE, stype: 'seed', star: 1, image: 'foraged_32_32-0-0', placed: 'placed_16_16-1-0', help: 'Sunflower', tooltip: '???'},
   sunflowerOil: {name: 'Sunflower Oil', type: 0, stype: 'oil', star: 1, image: 'potions_32_32-1-5', placed: 'fuws_32_32-4-0', help: 'Sunflower', tooltip: 'Used in cooking, potions, and as a mechanical lubricant'},
 
-  oleander: {name: 'Oleander', type: 0, stype: 'herb', star: 3, image: 'mined_32_32-6-1', placed: 'placed_16_48-1-0', help: 'Oleander', tooltip: '???', foraging: {speed: 2400, items: [{item: 'oleander', count: '1-5'}, {item: 'oleanderBulb', count: '1-2'}, {item: 'snail', count: 0.12, buffs: ['lucky:100', 'rainy:300']}]}},
+  oleander: {name: 'Oleander', type: 0, stype: 'herb', star: 3, image: 'foraged_32_32-7-1', placed: 'placed_16_48-1-0', help: 'Oleander', tooltip: '???', foraging: {speed: 2400, items: [{item: 'oleander', count: '1-5'}, {item: 'oleanderBulb', count: '1-2'}, {item: 'snail', count: 0.12, buffs: ['lucky:100', 'rainy:300']}]}},
   oleanderOil: {name: 'Oleander Oil', type: 0, stype: 'oil', star: 3, image: 'potions_32_32-1-5', help: 'Oleander', tooltip: 'Used in cooking, potions, and as a mechanical lubricant'},
-  oleanderBulb: {name: 'Oleander Bulb', type: 0, stype: 'vegie', star: 3, image: 'mined_32_32-6-2', help: 'Oleander', tooltip: 'Its pulp has a velvety, creamy texture'},
+  oleanderBulb: {name: 'Oleander Bulb', type: 0, stype: 'vegie', star: 3, image: 'foraged_32_32-0-2', help: 'Oleander', tooltip: 'Its pulp has a velvety, creamy texture'},
 
   ambermirage: {name: 'Ambermirage', type: 0, stype: 'herb', star: 1, image: 'potions_32_32-1-5', placed: 'fuws_32_32-4-0', help: 'Ambermirage', tooltip: '???'},
 

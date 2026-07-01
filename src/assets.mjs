@@ -23,6 +23,8 @@ export const IMAGE_FILES = [
 
   // Items minés / substrat, topsoil, web, ore, raw gem, rock
   'assets/sprites/mined_32_32.png',
+  // Items foraged / shaked /
+  'assets/sprites/foraged_32_32.png',
   // critters / baits
   'assets/sprites/bait_32_32.png',
   // Items raffinés / bar, cut gem, metal fitting, fabric, coconut
