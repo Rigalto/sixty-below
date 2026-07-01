@@ -1904,6 +1904,7 @@ export const oakSystem = new OakSystem()
    ==================================================================================================== */
 
 const COCONUT_FALL_MAX_DIST = 16
+const COCONUT_FALL_SPEED = 3 // pixels par frame sur l'axe Y (10 tuiles/seconde à 60fps)
 
 class CoconutSystem {
   byTile = new Map() // Map<tileIndex, record> — public, rectangle complet 3×15 (interaction = blocage)
@@ -1913,6 +1914,7 @@ class CoconutSystem {
   #byChunk = new Map() // Map<chunkKey, Set> — lookup spatial pour onPreloadChunksChanged
   #displayed = new Set() // Set<record> — cible du render (chunks preload uniquement)
   #nutImg = null // image hydratée de la noix au sol
+  #falling = {} // {[record.id]: {pxX, pxY, pxYFinal, frames}} — noix en cours de chute
 
   constructor () {
     // micro-tâches
@@ -1929,6 +1931,7 @@ class CoconutSystem {
     this.#list.length = 0
     this.#byChunk.clear()
     this.#displayed.clear()
+    this.#falling = {}
     this.#nutImg = ITEMS.coconut.placed
   }
 
@@ -2009,6 +2012,16 @@ class CoconutSystem {
   #renderGroundNuts (ctx) {
     for (const record of this.#list) {
       if (record.groundTimestamp === null) continue
+
+      const falling = this.#falling[record.id]
+      if (falling !== undefined) {
+        ctx.drawImage(IMAGE_CACHE[this.#nutImg.imgIndex], this.#nutImg.sx, this.#nutImg.sy, this.#nutImg.sw, this.#nutImg.sh, falling.pxX, falling.pxY, 16, 16)
+        falling.pxY += COCONUT_FALL_SPEED
+        falling.frames--
+        if (falling.frames <= 0) delete this.#falling[record.id]
+        continue
+      }
+
       const pxX = (record.groundIndex & 0x3FF) << 4
       const pxY = (record.groundIndex >> 10) << 4
       ctx.drawImage(IMAGE_CACHE[this.#nutImg.imgIndex], this.#nutImg.sx, this.#nutImg.sy, this.#nutImg.sw, this.#nutImg.sh, pxX, pxY, 16, 16)
@@ -2055,6 +2068,12 @@ class CoconutSystem {
         const nutIndex = this.#findCoconutGroundIndex(record.soilIndex)
         if (nutIndex !== null) {
           record.groundIndex = nutIndex
+
+          const pxYStart = (record.index >> 10) << 4
+          const pxYFinal = (nutIndex >> 10) << 4
+          const frames = ((pxYFinal - pxYStart) / COCONUT_FALL_SPEED) | 0
+          this.#falling[record.id] = {pxX: (nutIndex & 0x3FF) << 4, pxY: pxYStart, pxYFinal, frames}
+
           const groundDelay = (COCONUT_CYCLE_DELAY * seededRNG.randomGetRealMinMax(0.8, 1.2)) | 0
           const {priority, capacity} = MICROTASK.COCONUT_GROUND_DECAY
           record.groundTimestamp = taskScheduler.enqueue(`coconut_ground_${record.id}`, groundDelay, this.onCoconutGroundDecay, priority, capacity, soilIndex)
