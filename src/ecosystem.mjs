@@ -2034,6 +2034,11 @@ class CoconutSystem {
    * @returns {object|null}
    */
   getPlantAt (tileIndex) {
+    for (const record of this.#list) {
+      if (record.groundTimestamp !== null && record.groundIndex === tileIndex) {
+        return {itemId: 'coconut', isGroundNut: true, parentId: record.id}
+      }
+    }
     return this.byTile.get(tileIndex) ?? null
   }
 
