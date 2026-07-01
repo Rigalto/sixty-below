@@ -43,6 +43,7 @@
    - 3 images sur ligne 2
    - 4 images sur ligne 3
    - 4 images sur ligne 4
+- Mettre les images pour coconut fiber/milk/pulp
 
 ---
 

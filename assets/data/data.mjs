@@ -516,10 +516,10 @@ export const ITEMS = {
   bucketSap: {name: 'Sap Bucket', type: ITEM_TYPE.FURNITURE | ITEM_TYPE.PLACABLE | ITEM_TYPE.TOOL, stype: 'tableware', star: 1, image: 'furniture_32_32-13-0', placed: 'fuws_32_32-0-3', help: 'Buckets', tooltip: 'Amount of lava. Can be poured out'},
 
   // Trees
-  coconut: {name: 'Coconut', type: ITEM_TYPE.MATERIAL, stype: 'tree', star: 1, image: 'mined_32_32-5-5', placed: 'placed_16_16-2-0', help: 'Coconut', tooltip: '???', shaking: {speed: 2400, items: [{item: 'coconut', count: 1}]}, foraging: {speed: 2400, items: [{item: 'coconut', count: 1}]}},
-  coconutFiber: {name: 'Coconut Fiber', type: ITEM_TYPE.MATERIAL, stype: 'textile', star: 1, image: 'potions_32_32-1-5', help: 'Coconut', tooltip: '???'},
-  coconutPulp: {name: 'Coconut Pulp', type: ITEM_TYPE.MATERIAL, stype: 'fruit', star: 1, image: 'potions_32_32-1-5', help: 'Coconut', tooltip: '???'},
-  coconutMilk: {name: 'Coconut Milk', type: ITEM_TYPE.MATERIAL, stype: 'beverage', star: 1, image: 'potions_32_32-1-5', help: 'Coconut', tooltip: '???'},
+  coconut: {name: 'Coconut', type: 0, stype: 'tree', star: 1, image: 'mined_32_32-5-5', placed: 'placed_16_16-2-0', help: 'Coconut', tooltip: '???', shaking: {speed: 2400, items: [{item: 'coconut', count: 1}]}, foraging: {speed: 2400, items: [{item: 'coconut', count: 1}]}},
+  coconutFiber: {name: 'Coconut Fiber', type: 0, stype: 'textile', star: 2, image: 'refined_32_32-0-3', help: 'Coconut', tooltip: '???'},
+  coconutPulp: {name: 'Coconut Pulp', type: 0, stype: 'fruit', star: 2, image: 'refined_32_32-1-3', help: 'Coconut', tooltip: '???'},
+  coconutMilk: {name: 'Coconut Milk', type: 0, stype: 'beverage', star: 2, image: 'refined_32_32-2-3', help: 'Coconut', tooltip: '???'},
 
   oak: {
     name: 'Oak',
@@ -813,6 +813,11 @@ export const RECIPES = [
   {result: {item: 'slidingBevel', count: 1}, station: 'workbench', ingredients: [{item: 'plateIron', count: 1}, {item: 'wireGold', count: 1}, {item: 'stripSilver', count: 1}]},
   {result: {item: 'draftingCompass', count: 1}, station: 'jewelerBench', ingredients: [{item: 'plateCopper', count: 1}, {item: 'wireGold', count: 2}, {item: 'shellPowder', count: 1}]},
   {result: {item: 'theodolite', count: 1}, station: 'forge', ingredients: [{item: 'plateCobalt', count: 1}, {item: 'setSquare', count: 1}, {item: 'draftingCompass', count: 1}, {item: 'blockMarble', count: 1}, {item: 'cutEmerald', count: 2}]},
+
+  // ── Coconut Processing ──────────────────────────────────────
+  {result: {item: 'coconutFiber', count: 1}, station: 'workbench', ingredients: [{item: 'coconut', count: 1}], returned: [{item: 'coconutPulp', count: 1}, {item: 'coconutMilk', count: 1}]},
+  {result: {item: 'coconutPulp', count: 1}, station: 'workbench', ingredients: [{item: 'coconut', count: 1}], returned: [{item: 'coconutFiber', count: 1}, {item: 'coconutMilk', count: 1}]},
+  {result: {item: 'coconutMilk', count: 1}, station: 'workbench', ingredients: [{item: 'coconut', count: 1}], returned: [{item: 'coconutFiber', count: 1}, {item: 'coconutPulp', count: 1}]},
 
   // Food - Tier 1-3
   {result: {item: 'sunflowerOil', count: 1}, station: 'tableWood', ingredients: [{item: 'sunflowerSeed', count: 1}]},

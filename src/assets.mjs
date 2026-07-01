@@ -25,7 +25,7 @@ export const IMAGE_FILES = [
   'assets/sprites/mined_32_32.png',
   // critters / baits
   'assets/sprites/bait_32_32.png',
-  // Items raffinés / bar, cut gem, metal fitting, fabric
+  // Items raffinés / bar, cut gem, metal fitting, fabric, coconut
   'assets/sprites/refined_32_32.png',
   // trinkets
   'assets/sprites/trinket_32_32.png',

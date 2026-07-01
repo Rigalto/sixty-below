@@ -4724,39 +4724,80 @@ Giant Mushrooms grow in the depths of [[Mushroom Cave|Mushroom Caves]], their bi
     content: `
 **Description**
 
-Coconut trees grow on sandy shores — along the ocean coastline and at the edges of desert oases. Their tall silhouette and distinctive crown make them easy to spot from a distance. Unlike Oaks and Mahoganies, Coconut trees do not grow or change size.
-
-**Tier**
-
-{{item:coconut:star|star}}
+Coconut trees grow along sea shores and around desert oases. Unlike other trees, they cannot be chopped down or replanted — they are a permanent part of the landscape.
 
 **Location**
 
-* Ocean shoreline — left and right sea borders
-* Desert [[Surface Lake|Oasis]] shores
-* Grows on [[node:sand]]
+* Sea shores (left and right beaches)
+* Desert oasis shores
 
-**Interactions — Shaking**
+<hr>
 
-* A tree can only be shaken once per in-game day — shaking too frequently weakens the tree. ⏳
+**Interactions - Shaking**
 
-| Tool | Loot | Encounter |
-|---|---|---|
-| Any [[Shaking Tools|Hammer]] | {{item:coconut:shaking:items}} | [[monster:coconutCrab]] |
+* Select a [[Hammers|Hammer]] and click the tree to shake it
+* Shaking a coconut tree with a nut in it drops the nut to the ground
+* If there is no nut in the tree, shaking has no effect
 
-**Interactions — Chopping**
+Shaking Tool: <<itemStar|hammerCopper>> or better
 
-* Coconut trees cannot be logged — they are permanently rooted in the sand ⏳
+**Shaking Loot** ⏳
 
-**Recipes**
+<<itemLootTable|coconut|shaking>>
 
-TODO : add recipes with dropped items as ingredient⏳
+**Shaking Encounters**
+
+| Tree | Encounter |
+| Coconut | [[monster:coconutCrab]] |
+
+<hr>
+
+**Coconut Nut Cycle**
+
+* A coconut tree alternately grows a nut and drops it to the ground, approximately every 20 in-game hours
+* When a nut falls, it lands on a ground tile beside the tree
+* A fallen nut disappears naturally after approximately 20 in-game hours if not collected
+* Shaking a tree with a nut harvests it directly — the cycle continues unaffected
+
+<hr>
+
+**Foraging**
+
+* Select a [[Foraging Tools|Sickle]] and click the nut on the ground to collect it
+* The nut disappears immediately upon collection
+
+Foraging Tool: <<itemStar|sickleCopper>> or better
+
+**Foraging Loot** ⏳
+
+<<itemLootTable|coconut|foraging>>
+
+<hr>
+
+**Coconut Processing**
+
+A raw [[item:coconut]] can be processed at a [[Woodworking|Workbench]] into three ingredients — each recipe produces all three simultaneously:
+
+| Product | Also returns |
+| [[item:coconutFiber]] | [[item:coconutPulp]], [[item:coconutMilk]] |
+| [[item:coconutPulp]] | [[item:coconutFiber]], [[item:coconutMilk]] |
+| [[item:coconutMilk]] | [[item:coconutFiber]], [[item:coconutPulp]] |
+
+Search for any of the three products in the [[Crafting|Craft Panel]] to find the recipe.
+
+**Coconut Fiber Usages** ⏳
+
+**Coconut Pulp Usages** ⏳
+
+**Coconut Milk Usages** ⏳
+
+<hr>
 
 **Tips**
 
-* _Coconut trees never grow or shrink — they are a permanent fixture of the landscape._ ⏳
+* _A nut on the ground will eventually disappear — collect it before the next cycle drops another one._
+* _Coconut trees cannot be chopped or replanted — treat them as a renewable, fixed resource._
 * _Coconut Crabs are attracted by the vibration of shaking — be ready to fight._ ⏳
-* _[[item:coconutMilk]] and [[item:coconutPulp]] are valuable food ingredients._ ⏳
   `
   },
 
