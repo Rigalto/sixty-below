@@ -2036,7 +2036,7 @@ class CoconutSystem {
   getPlantAt (tileIndex) {
     for (const record of this.#list) {
       if (record.groundTimestamp !== null && record.groundIndex === tileIndex) {
-        return {itemId: 'coconut', isGroundNut: true, parentId: record.id, kind: record.kind, type: record.type}
+        return {itemId: 'coconut', isGroundNut: true, parentId: record.soilIndex, kind: record.kind, type: record.type}
       }
     }
     return this.byTile.get(tileIndex) ?? null
@@ -2143,11 +2143,20 @@ class CoconutSystem {
   canForage (plant) { return plant.isGroundNut === true }
 
   /**
-   * On récolte la noix au sol.
-   * @param {object} record
+   * Foraging réussi d'une noix de coco au sol (isGroundNut garanti par canForage).
+   * Supprime la noix au sol et annule toute animation de chute en cours.
+   * Le loot est géré en amont par ForagingManager.
+   * @param {object} plant — pseudo-record retourné par getPlantAt (contient parentId)
    */
-  onForaged (record) {
-    console.log('CoconutSystem.onForaged >>>>>>>>>>>>>>>>>>>>>>><<<', record)
+  onForaged (plant) {
+    const record = this.#bySoil.get(plant.parentId)
+    if (record === undefined) return
+
+    record.groundTimestamp = null
+    delete this.#falling[record.id]
+    taskScheduler.dequeue(`coconut_ground_${record.id}`)
+
+    saveManager.queueStaticUpdate({storeName: 'plant', record})
   }
 
   // //////// //
