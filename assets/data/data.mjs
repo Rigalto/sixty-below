@@ -911,11 +911,11 @@ export const COBWEB_GROWTH_DELAY_MS = 20000
 export const COCONUT_CYCLE_DELAY = 20 * 60 * 1000
 
 export const TREE_IMAGES = {
-  coconut: {
+  coconut: { // 0 : décalage à gauche, 1 : centré, 2 : décalage à droite
     '0_0': ['coconut_80_48-0-2'], // OK
     '0_1': ['coconut_80_48-3-1'], // OK
     '1_0': ['coconut_80_48-3-0'], // OK
-    '1_1': ['coconut_80_48-0-1', 'coconut_80_48-1-1'], // OK
+    '1_1': ['coconut_80_48-0-1', 'coconut_80_48-1-1', 'coconut_80_48-2-1'],
     '1_2': ['coconut_80_48-3-3'], // OK
     '2_1': ['coconut_80_48-3-2'], // OK
     '2_2': ['coconut_80_48-0-3'], // OK
