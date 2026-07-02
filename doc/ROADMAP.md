@@ -41,7 +41,7 @@
 - Terminer les images pour les coconut trees :
    - 2 images sur ligne 1
    - 2 images sur ligne 2
-   - 4 images sur ligne 3
+   - 2 images sur ligne 3
    - 4 images sur ligne 4
 
 ---
