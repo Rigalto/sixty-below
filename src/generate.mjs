@@ -206,6 +206,7 @@ class WorldGenerator {
     const surfaceLakes = worldCarver.digSurfaceLakes(skySurface)
     const lakeLiquidBodies = surfaceLakes.map(h => h.liquidBody)
     surfaceLakes.forEach(l => delete l.liquidBody)
+
     const underLakes = worldCarver.digUndergroundLakes(surfaceUnder, underCaverns)
     const underLakeLiquidBodies = underLakes.map(h => h.liquidBody)
     underLakes.forEach(l => delete l.liquidBody)
@@ -2958,8 +2959,8 @@ class WorldCarver {
       // ── Passe 5 - Consolidation des berges ──────────────────────────────────────────────
       const sideCode = lakeCreation.side
       const boundY2 = Math.max(rect2.y2, rect3.y2)
-      const boundX1 = Math.min(rect2.x1, rect3.x1)
-      const boundX2 = Math.max(rect2.x2, rect3.x2)
+      const boundX1 = Math.min(rect2.x1, rect3.x1) - 1
+      const boundX2 = Math.max(rect2.x2, rect3.x2) + 1
 
       for (let y = cy; y <= boundY2; y++) {
         for (let x = boundX1 - 1; x <= boundX2; x++) {
@@ -7066,7 +7067,6 @@ class PlantGenerator {
     const images = []
     for (let i = 0; i < 4; i++) {
       const key = `${nodes[i]}_${nodes[i + 1]}`
-      console.log('>>>>>>>>>>>>>>>>> TREE_IMAGES key', key)
       const col = seededRNG.randomGetArrayIndex(imageTable[key])
       images.push({tree: 'coconut', key, col, x: soilX - 1})
     }
