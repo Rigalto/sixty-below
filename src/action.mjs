@@ -652,6 +652,7 @@ class SowingManager {
   doSow (tileIndex, tileNode, item, slotIndex) {
     if (item.code === 'sunflowerSeed') this.#trySowSunflowerSeed(tileIndex, tileNode, slotIndex)
     else if (item.code === 'acorn') this.#trySowAcorn(tileIndex, tileNode, slotIndex)
+    else if (item.code === 'samara') this.#trySowSamara(tileIndex, tileNode, slotIndex)
   }
 
   /**
@@ -697,8 +698,8 @@ class SowingManager {
 
   /**
    * Valide et exécute le placement d'un acorn (Oak seed).
-   * Conditions : tuile GRASSFOREST, tuiles index-W et index-2W sont SKY et non bloquées.
-   * Silence si mauvaise tuile, 'wrong' si bloqué, 'placing' si succès.
+   * Conditions : tuile centrale de 3 GRASSFOREST consécutives, rectangle 3×18 au-dessus du
+   * sol entièrement SKY. Silence si mauvaise tuile, 'wrong' si bloqué, 'placing' si succès.
    * @param {number} tileIndex — tuile cliquée (le sol attendu)
    * @param {object} tileNode
    * @param {number} slotIndex
@@ -731,8 +732,44 @@ class SowingManager {
     eventBus.emit('sewed/acorn', tileIndex)
     inventoryManager.decrementHotbarSlotCount(slotIndex)
     eventBus.emit('sound/play', 'placing')
+  }
 
-    console.log('SowingManager.#trySowAcorn', {tileIndex, tileNode, slotIndex})
+  /**
+   * Valide et exécute le placement d'un samara (Mahogany seed).
+   * Conditions : tuile centrale de 3 GRASSJUNGLE consécutives, rectangle 3×18 au-dessus du
+   * sol entièrement SKY. Silence si mauvaise tuile, 'wrong' si bloqué, 'placing' si succès.
+   * @param {number} tileIndex — tuile cliquée (le sol attendu)
+   * @param {object} tileNode
+   * @param {number} slotIndex
+   */
+  #trySowSamara (tileIndex, tileNode, slotIndex) {
+    const GRASSJUNGLE = NODES.GRASSJUNGLE.code
+
+    // vérification du sol
+    if (tileNode.code !== GRASSJUNGLE) return
+    if (chunkManager.getTileAt(tileIndex - 1) !== GRASSJUNGLE) return
+    if (chunkManager.getTileAt(tileIndex + 1) !== GRASSJUNGLE) return
+
+    // Vérification que le rectangle 3×18 au-dessus du sol est entièrement SKY
+    const soilIndex = tileIndex - 1
+    const SKY = NODES.SKY.code
+    if (tileRectHasOther(soilIndex - 18 * WORLD_WIDTH, 3, 18, SKY)) return
+
+    // 'toofar' — tuile hors de la zone d'interaction
+    if (!isInInteractionRange(tileIndex)) { eventBus.emit('sound/play', 'toofar'); return }
+
+    // 'wrong' — tuiles bloquées (furniture, plante déjà présente)
+    const soilX = soilIndex & 0x3FF
+    const soilY = soilIndex >> 10
+    if (!blockedTiles.canPlaceRect(soilX, soilY - 18, 3, 18)) { eventBus.emit('sound/play', 'wrong'); return }
+
+    // 'wrong' — règles métier de la graine
+    if (!floraManager.canSow(tileIndex, 'samara')) { eventBus.emit('sound/play', 'wrong'); return }
+
+    // Succès
+    eventBus.emit('sewed/samara', tileIndex)
+    inventoryManager.decrementHotbarSlotCount(slotIndex)
+    eventBus.emit('sound/play', 'placing')
   }
 }
 export const sowingManager = new SowingManager()
