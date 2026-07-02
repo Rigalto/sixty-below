@@ -263,43 +263,6 @@ export const PATH_COMBAT = 'M7 17a2 2 0 1 0-2 2h14a2 2 0 1 0-2-2zM11 18v5a1 1 0 
 export const SVG_ICON = (icon, config = '') => `<svg viewBox="0 0 24 24" ${config}><path fill="currentColor" d="${icon}"/></svg>`
 
 /* =========================================
-   DEFINITION DES NOEUDS
-   ========================================= */
-// const tileCode = NODES.CLAY.code
-// const tileDesc = NODES.CLAY
-// const tileDesc = NODES_LOOKUP[tileCode]
-
-// CI-DESSOUS A SUPPRIMER
-
-// 1. Calcul des Flags
-//   let flags = TILE_FLAG.NONE
-//   if (node.solid) flags |= TILE_FLAG.SOLID
-//   if (node.type === TILE_TYPE.LIQUID) flags |= TILE_FLAG.LIQUID
-//   if (node.type === TILE_TYPE.WALL || node.type === TILE_TYPE.BWALL) flags |= TILE_FLAG.WALL
-//   if (node.speed > 0) flags |= TILE_FLAG.MINABLE
-
-// 2. Enrichissement de l'objet (Mutation)
-//   node.flags = flags
-//   node.rgbColor = hexToRgb(node.color) // TODO Vérifier si utile
-//   node.viscosity = node.viscosity || 0
-//   node.speed = node.speed || 0
-
-// Préparation pour hydratation (sera remplacé par assets.mjs)
-//   node._imageRaw = node.image // utilité ?
-//   node._waveRaw = node.waveImage
-
-// 3. Stockage Référence
-//   NODES_LOOKUP[node.code] = node
-
-// 4. Linkage Biomes
-//   if (node.biome !== undefined && BIOME.code[node.biome]) {
-//     const b = BIOME.code[node.biome]
-//     if (node.type === TILE_TYPE.TOPSOIL) b.ground = node.code
-//     else if (node.type === TILE_TYPE.GEM) b.gem = node.code
-//   }
-// }
-
-/* =========================================
    CAPACITES ET PRIORITES DES MICRO-TACHES
    ========================================= */
 
