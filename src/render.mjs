@@ -1,6 +1,6 @@
 // render.mjs — Camera - WorldRenderer - SkyRenderer - LightRenderer
 
-import {WORLD_WIDTH, WORLD_HEIGHT, CANVAS_WIDTH, CANVAS_HEIGHT, OVERLAYS, MICROTASK} from './constant.mjs'
+import {WORLD_WIDTH, WORLD_HEIGHT, CANVAS_WIDTH, CANVAS_HEIGHT, OVERLAYS, MICROTASK, SEA_LEVEL} from './constant.mjs'
 import {NODES, NODE_TYPE, NODES_LOOKUP, SKY_BORDER_NODE} from '../assets/data/data.mjs'
 import {eventBus, microTasker, taskScheduler} from './utils.mjs'
 import {IMAGE_CACHE} from './assets.mjs'
@@ -398,7 +398,8 @@ class WorldRenderer {
   /**
    * Génère l'image d'un chunk dans son OffscreenCanvas.
    * Pour chaque tuile : aplat couleur, puis border blending (bandeaux voisins + image autotile),
-   * ou image statique sans blending.
+   * ou image statique sans blending. Sur la ligne SEA_LEVEL, une tuile disposant d'un waveImage
+   * (SEA, DEEPSEA) l'utilise à la place de image (effet de vague en surface).
    * Les tuiles ETERNAL (image=null) sont rendues en aplat couleur uniquement — pas de blending.
    * @param {number} chunkIndex
    * @param {OffscreenCanvas} canvas
@@ -413,12 +414,14 @@ class WorldRenderer {
 
     const chunkX = (chunkIndex & 0x3F) << 4 // tuile X coin haut-gauche
     const chunkY = (chunkIndex >> 6) << 4 // tuile Y coin haut-gauche
+    const seaSurfaceRow = SEA_LEVEL - chunkY // row local (0-15) où appliquer waveImage ; hors plage → jamais dans ce chunk
     let rowIdx = (chunkY << 10) | chunkX // index monde première tuile du chunk
     let py = 0
 
     for (let row = 0; row < 16; row++) {
       let px = 0
       for (let col = 0; col < 16; col++) {
+        const isSeaSurfaceRow = row === seaSurfaceRow
         const idx = rowIdx + col
         const tileId = chunkManager.getTileAt(idx)
         const node = NODES_LOOKUP[tileId]
@@ -426,14 +429,20 @@ class WorldRenderer {
         // on ne trace par les tuiles transparentes
         if (!node || node.color === 'none') { px += 16; continue }
 
-        const img = node.image
+        const img = isSeaSurfaceRow && node.waveImage ? node.waveImage : node.image
 
-        // ── Cas 1 : ETERNAL ou image statique → aplat + drawImage sans blending ──
+        // ── Cas 1 : image statique ou absente → drawImage seul, aplat couleur en fallback uniquement ──
         if (!img || !img.isAutoTile) {
-          ctx.fillStyle = node.color
-          ctx.fillRect(px, py, 16, 16)
           if (img) {
+            const topNode = NODES_LOOKUP[chunkManager.getTileAt(idx - 1024)]
+            if (topNode && topNode.color !== 'none') {
+              ctx.fillStyle = topNode.color
+              ctx.fillRect(px, py, 16, 2)
+            }
             ctx.drawImage(IMAGE_CACHE[img.imgIndex], img.sx, img.sy, img.sw, img.sh, px, py, 16, 16)
+          } else {
+            ctx.fillStyle = node.color
+            ctx.fillRect(px, py, 16, 16)
           }
           px += 16
           continue
