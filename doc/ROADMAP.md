@@ -42,7 +42,7 @@
    - 2 images sur ligne 1
    - 2 images sur ligne 2
    - 2 images sur ligne 3
-   - 4 images sur ligne 4
+   - 2 images sur ligne 4
 
 ---
 
