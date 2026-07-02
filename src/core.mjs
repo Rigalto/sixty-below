@@ -17,7 +17,7 @@ import {furnitureManager} from './housing.mjs'
 import {craftOverlay} from './craft.mjs'
 import {achievementManager} from './achievement.mjs'
 import {playerManager, hotbarOverlay} from './player.mjs'
-import {floraManager, sunflowerSystem, oleanderSystem, parsnipSystem, oakSystem, cobwebSystem, coconutSystem} from './ecosystem.mjs'
+import {floraManager, sunflowerSystem, oleanderSystem, parsnipSystem, oakSystem, mahoganySystem, cobwebSystem, coconutSystem} from './ecosystem.mjs'
 import {ACHIEVEMENT_CATEGORIES} from '../assets/data/data-achievement.mjs'
 import {miningManager, placingManager, foragingManager, choppingManager, sowingManager, hammingManager} from './action.mjs'
 import './combat.mjs'
@@ -26,11 +26,11 @@ const WITH_DEBUG_HUD = true // passer à false pour désactiver sans toucher IS_
 const plantSystemLookup = [ // Map<kind*100+type, system> — peuplée au fur et à mesure
   //   [PLANT_KIND.NATURAL * 100 + PLANT_TYPE.NONE, naturalSystem],
   [PLANT_KIND.TREE * 100 + PLANT_TYPE.OAK, oakSystem],
-  //   [PLANT_KIND.TREE * 100 + PLANT_TYPE.MAHOGANY, treeSystem],
+  [PLANT_KIND.TREE * 100 + PLANT_TYPE.MAHOGANY, mahoganySystem],
   [PLANT_KIND.TREE * 100 + PLANT_TYPE.COCONUT, coconutSystem],
   //   [PLANT_KIND.TREE * 100 + PLANT_TYPE.GIANT_MUSHROOM, treeSystem],
   [PLANT_KIND.MUSHROOM * 100 + PLANT_TYPE.BOLETE, oakSystem],
-  //   [PLANT_KIND.MUSHROOM * 100 + PLANT_TYPE.PINKMYCENIA, mushroomSystem],
+  [PLANT_KIND.MUSHROOM * 100 + PLANT_TYPE.PINKMYCENIA, mahoganySystem],
   //   [PLANT_KIND.MUSHROOM * 100 + PLANT_TYPE.FROSTCAP, capystem],
   //   [PLANT_KIND.MUSHROOM * 100 + PLANT_TYPE.DAWNCAP, capystem],
   [PLANT_KIND.HERB * 100 + PLANT_TYPE.OLEANDER, oleanderSystem],
@@ -53,7 +53,7 @@ const plantSystemLookup = [ // Map<kind*100+type, system> — peuplée au fur et
   //   [PLANT_KIND.SPREAD * 100 + PLANT_TYPE.NONE, spreadSystem],
   //   [PLANT_KIND.SEED * 100 + PLANT_TYPE.NONE, seedSystem]
 ]
-const allPlantSystems = [sunflowerSystem, oleanderSystem, parsnipSystem, oakSystem, coconutSystem]
+const allPlantSystems = [sunflowerSystem, oleanderSystem, parsnipSystem, oakSystem, mahoganySystem, coconutSystem]
 
 const debugHUD = () => {
   const debugDiv = document.createElement('div')
@@ -521,7 +521,7 @@ class GameCore {
 
     // DEBUG
     if (IS_DEV && WITH_DEBUG_HUD) {
-      this.hudDiv.innerHTML = `Mouse: ${mouseManager.mouse.x}, ${mouseManager.mouse.y}, ${tileIndex}, ${tileCode}`
+      this.hudDiv.innerHTML = `Mouse: ${tileIndex & 0x3ff}, ${tileIndex >> 10}, ${tileCode}`
     }
     if (leftClick) { console.log('leftClick', mouseManager.mouse) }
     if (rightClick) { console.log('rightClick', mouseManager.mouse) }

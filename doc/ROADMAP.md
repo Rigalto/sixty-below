@@ -39,14 +39,15 @@
   - 4,0 - 5,0 - 6,0 - 7,0
   - 0,1 - 1,1, - 5,1
 - Terminer les images pour les coconut trees :
-   - 2 images sur ligne 1
-   - 2 images sur ligne 2
+   - 1 images sur ligne 1
+   - 1 images sur ligne 2
    - 2 images sur ligne 3
    - 2 images sur ligne 4
 
 ---
 
 ## Dette technique
+- Après une génération d'un monde, si on était en vitessex50, on reste en vitessex50.
 - Analyser s'il faut que le traitement de sowingManager soit effectué dans une micro-tâche.
 - Dédoubler les handlers d'eventBus : `onPreloadChunksChanged`, `onCraftPerformed`, `onSlotActive`, `onTeleportBegin`
 - Dans les attributs 'mining' et 'foraging' transférer dans 'buffs' ce qui n'y est pas encore.

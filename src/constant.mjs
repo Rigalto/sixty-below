@@ -276,6 +276,8 @@ export const MICROTASK = {
   SOW_SEED: {priority: 24, capacity: 4, taskName: 'doSow'}, // plante une graine
   OAK_GROW: {priority: 24, capacity: 4, taskName: 'growOak'}, // croissance d'un tronçon d'oak
   OAK_END_SHAKE: {priority: 24, capacity: 4, taskName: 'oakEndShake'}, // fin de la période où un arbre n'est pas shakable
+  MAHOGANY_GROW: {priority: 24, capacity: 4, taskName: 'growMahogany'}, // croissance d'un tronçon de mahogany
+  MAHOGANY_END_SHAKE: {priority: 24, capacity: 4, taskName: 'mahoganyEndShake'}, // fin de la période où un arbre n'est pas shakable
 
   FORAGE_ACTION: {priority: 24, capacity: 10, taskName: 'onForage'}, // foraging
 
@@ -285,6 +287,9 @@ export const MICROTASK = {
 
   UNBLOOM_BOLETE: {priority: 20, capacity: 1, taskName: 'unbloomBolete'}, // supprime les bolete du monde
   BLOOM_BOLETE: {priority: 20, capacity: 2, taskName: 'bloomBolete'}, // ajoute les boletes dans le monde
+  UNBLOOM_PINKMYCENIA: {priority: 20, capacity: 1, taskName: 'unbloomPinkMycenia'}, // supprime les pink mycenia du monde
+  BLOOM_PINKMYCENIA: {priority: 20, capacity: 2, taskName: 'bloomPinkMycenia'}, // ajoute les pink mycenia dans le monde
+
   BLOOM_SUNFLOWER: {priority: 20, capacity: 2, taskName: 'bloomSunflower'}, // gère les sunflower
   UNBLOOM_SUNFLOWER: {priority: 20, capacity: 1, taskName: 'unbloomSunflower'}, // gère les sunflower
   SUNFLOWER_SPOT_CHECK: {priority: 20, capacity: 10, taskName: 'onSunflowerSpotCheck'}, // suppression d'un spot de sunflower

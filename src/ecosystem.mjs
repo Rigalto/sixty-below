@@ -1,4 +1,4 @@
-// ecosystem.mjs — FloraManager - CobwebSystem - HiveSystem
+// ecosystem.mjs — FloraManager - OakSystem - MahoganySystem - HiveSystem
 // SunflowerSystem - OleanderSystem - ParsnipSystem - CobwebSystem - SampleSystem
 
 import {WORLD_WIDTH, WORLD_HEIGHT, MICROTASK, TOPSOIL_Y_SKY_SURFACE, TOPSOIL_Y_SURFACE_UNDER, TOPSOIL_Y_UNDER_CAVERNS} from './constant.mjs'
@@ -52,7 +52,7 @@ const removeFromByTile = (byTile, record) => {
  * rowBase est incrémenté par WORLD_WIDTH à chaque ligne — pas de recalcul d'index.
  * @param {Map} byTile      — lookup interaction (tileIndex → record)
  * @param {Map} byFullRect  — lookup obstruction complète (tileIndex → record)
- * @param {object} record   — record TREE (oak)
+ * @param {object} record   — record TREE (oak, mahogany)
  */
 const addToByTileTree = (byTile, byFullRect, record) => {
   const px = record.soilIndex & 0x3FF
@@ -1616,7 +1616,7 @@ class OakSystem {
    * Traite le chopping réussi d'un oak (hors loot, géré par ChoppingManager).
    * Décrémente size. Si size atteint -1, détruit l'arbre entièrement (et ses bolete).
    * Sinon, met à jour byTile, blockedTiles, et persiste.
-   * @param {object} record — record TREE (oak ou mahogany)
+   * @param {object} record — record TREE (oak)
    */
   onChopped (record) {
     removeFromByTileTree(this.oakByTile, this.#oakByFullRect, record)
@@ -1769,7 +1769,7 @@ class OakSystem {
       h: TREE_H,
       size: 0,
       images: this.#buildTreeImages(soilX),
-      grass: 'GRASSFOREST',
+      grass: NODES.GRASSFOREST.code,
       x: soilX,
       yTop: soilY - TREE_H,
       yBottom: soilY - 1,
@@ -1898,6 +1898,617 @@ class OakSystem {
   }
 }
 export const oakSystem = new OakSystem()
+
+// MahoganySystem — gère Mahogany (TREE) et Pink Mycenia (MUSHROOM), couplés : un Mahogany crée
+// ses 2 spots de Pink Mycenia (gauche/droite), détruits avec lui. Miroir de OakSystem : mêmes
+// mécaniques (croissance, chopping, shaking, floraison jour/nuit), GRASSJUNGLE au lieu de
+// GRASSFOREST, Pink Mycenia au lieu de Bolete, samara au lieu d'acorn.
+
+// Lignes d'images empilées par size (0 à 4) — identique à OAK_SIZE_ROWS, dupliqué pour garder
+// chaque système autonome (pas de dépendance croisée OakSystem/MahoganySystem)
+const MAHOGANY_SIZE_ROWS = [
+  [1, 0],
+  [1, 2, 0],
+  [1, 2, 3, 0],
+  [1, 2, 3, 4, 0],
+  [1, 2, 3, 4, 5, 6]
+]
+
+class MahoganySystem {
+  // --- Mahogany (TREE) ---
+  mahoganyByTile = new Map() // Map<tileIndex, record> — public, zone d'interaction (size-dépendante)
+  #mahoganyByFullRect = new Map() // Map<tileIndex, record> — rectangle complet 3×18, surveillance obstruction
+  #mahoganyList = [] // record[] — tous les mahoganies
+  #mahoganyByChunk = new Map() // Map<chunkKey, Set> — lookup spatial pour onPreloadChunksChanged
+  #mahoganyBySoil = new Map() // Map<soilIndex, record> — 3 entrées par mahogany (soilIndex, +1, +2) : détection minage/changement du sol
+  #mahoganyXSet = new Set() // Set<number> — x (leftmost) des mahoganies vivants : lookup pour isMahoganyAtColumn (miroir structurel de #oakXSet ; aucun système Jungle ne l'utilise pour l'instant)
+  #mahoganyDisplayed = new Set() // Set<record> — mahoganies dans les chunks preload (cible render)
+
+  // --- Pink Mycenia (MUSHROOM) ---
+  pinkMyceniaByTile = new Map() // Map<tileIndex, record> — public, lookup par tuile
+  #pinkMyceniaList = [] // record[] — tous les spots (présents ou non)
+  #pinkMyceniaByChunk = new Map() // Map<chunkKey, Set> — lookup spatial pour onPreloadChunksChanged
+  #pinkMyceniaBySoil = new Map() // Map<soilIndex, record> — spots présents : détection minage de la tuile sol
+  #pinkMyceniaSpotsBySoil = new Map() // Map<soilIndex, record> — tous les spots : lookup pour suppression (destruction d'un mahogany)
+  #pinkMyceniaDisplayed = new Set() // Set<record> — spots dans les chunks preload (cible render)
+  #pinkMyceniaImage = null // ITEMS.pinkMycenia.placed, mis en cache dans init()
+
+  constructor () {
+    // EventBus
+    this.onHour16PinkMycenia = this.onHour16PinkMycenia.bind(this)
+    eventBus.on('time/every-hour-16', this.onHour16PinkMycenia)
+    this.onHour5PinkMycenia = this.onHour5PinkMycenia.bind(this)
+    eventBus.on('time/every-hour-5', this.onHour5PinkMycenia)
+    this.onTileChangedMahogany = this.onTileChangedMahogany.bind(this)
+    eventBus.on('world/tile-changed', this.onTileChangedMahogany)
+    this.onSewedSamara = this.onSewedSamara.bind(this)
+    eventBus.on('sewed/samara', this.onSewedSamara)
+    this.onShaked = this.onShaked.bind(this)
+    eventBus.on('shaked/mahogany', this.onShaked)
+    // Micro-task
+    this.unbloomPinkMycenia = this.unbloomPinkMycenia.bind(this)
+    this.bloomPinkMycenia = this.bloomPinkMycenia.bind(this)
+    this.growMahogany = this.growMahogany.bind(this)
+    this.mahoganyEndShake = this.mahoganyEndShake.bind(this)
+  }
+
+  /**
+   * Réinitialise toutes les structures (mahogany et pink mycenia) et met en cache le sprite pink mycenia.
+   */
+  init () {
+    this.mahoganyByTile.clear()
+    this.#mahoganyByFullRect.clear()
+    this.#mahoganyList.length = 0
+    this.#mahoganyByChunk.clear()
+    this.#mahoganyBySoil.clear()
+    this.#mahoganyXSet.clear()
+    this.#mahoganyDisplayed.clear()
+
+    this.pinkMyceniaByTile.clear()
+    this.#pinkMyceniaList.length = 0
+    this.#pinkMyceniaByChunk.clear()
+    this.#pinkMyceniaBySoil.clear()
+    this.#pinkMyceniaSpotsBySoil.clear()
+    this.#pinkMyceniaDisplayed.clear()
+
+    this.#pinkMyceniaImage = ITEMS.pinkMycenia.placed // après hydratation
+  }
+
+  /**
+   * Hydrate un record depuis la DB. Aiguille par kind.
+   * @param {object} record
+   */
+  initPlant (record) {
+    if (record.kind === PLANT_KIND.TREE) {
+      const soilIndex = record.soilIndex
+      this.#mahoganyList.push(record)
+      this.#mahoganyBySoil.set(soilIndex, record)
+      this.#mahoganyBySoil.set(soilIndex + 1, record)
+      this.#mahoganyBySoil.set(soilIndex + 2, record)
+      this.#mahoganyXSet.add((soilIndex & 0x3ff))
+      this.#mahoganyXSet.add((soilIndex & 0x3ff) + 1)
+      this.#mahoganyXSet.add((soilIndex & 0x3ff) + 2)
+      addToByTileTree(this.mahoganyByTile, this.#mahoganyByFullRect, record)
+      addToByChunk(this.#mahoganyByChunk, record)
+
+      const px = record.index & 0x3FF
+      const py = record.index >> 10
+      blockedTiles.blockPlacementRect(px, py, record.w, record.h)
+
+      const soilX = soilIndex & 0x3FF
+      const soilY = soilIndex >> 10
+      blockedTiles.blockMiningRect(soilX, soilY, record.w, 1)
+
+      if (record.growthTimestamp !== null) {
+        const {priority, capacity} = MICROTASK.MAHOGANY_GROW
+        taskScheduler.enqueueAbsolute(`mahogany_grow_${record.id}`, record.growthTimestamp, this.growMahogany, priority, capacity, soilIndex)
+      }
+      if (record.shakedTimestamp !== null) {
+        const {priority, capacity} = MICROTASK.MAHOGANY_END_SHAKE
+        taskScheduler.enqueueAbsolute(`mahogany_shake_${record.id}`, record.shakedTimestamp, this.mahoganyEndShake, priority, capacity, soilIndex)
+      }
+      return
+    }
+
+    // record.kind === PLANT_KIND.MUSHROOM (pink mycenia)
+    this.#pinkMyceniaList.push(record)
+    this.#pinkMyceniaSpotsBySoil.set(record.soilIndex, record)
+    if (!record.present) return
+    addToByTile(this.pinkMyceniaByTile, record)
+    addToByChunk(this.#pinkMyceniaByChunk, record)
+    this.#pinkMyceniaBySoil.set(record.soilIndex, record)
+    blockedTiles.blockPlacement(record.index)
+    blockedTiles.blockPlacement(record.index + WORLD_WIDTH)
+  }
+
+  /**
+   * Reconstruit #mahoganyDisplayed et #pinkMyceniaDisplayed depuis les chunks preload de la caméra.
+   * @param {Set<number>} preloadChunks
+   */
+  onPreloadChunksChanged (preloadChunks) {
+    buildDisplayed(this.#mahoganyDisplayed, this.#mahoganyByChunk, preloadChunks)
+    buildDisplayed(this.#pinkMyceniaDisplayed, this.#pinkMyceniaByChunk, preloadChunks)
+  }
+
+  /**
+   * Dessine les pink mycenia puis les mahoganies visibles et présents (même ordre de calque
+   * que OakSystem : champignons sous les arbres).
+   * @param {CanvasRenderingContext2D} ctx — contexte déjà transformé (caméra appliquée)
+   */
+  render (ctx) {
+    const img = this.#pinkMyceniaImage
+    for (const record of this.#pinkMyceniaDisplayed) {
+      const pxX = (record.index & 0x3FF) << 4
+      const pxY = ((record.index >> 10) << 4) + 2
+      ctx.drawImage(IMAGE_CACHE[img.imgIndex], img.sx, img.sy, img.sw, img.sh, pxX, pxY, img.sw, img.sh)
+    }
+
+    for (const record of this.#mahoganyDisplayed) {
+      const rows = MAHOGANY_SIZE_ROWS[record.size]
+      const soilYPx = ((record.soilIndex >> 10) << 4) + 2
+      for (let i = 0; i < rows.length; i++) {
+        const image = record.images[rows[i]]
+        const img = TREE_IMAGES[image.tree][image.row][image.col]
+        const pxX = image.x << 4
+        const pxY = soilYPx - 48 * (i + 1)
+        ctx.drawImage(IMAGE_CACHE[img.imgIndex], img.sx, img.sy, img.sw, img.sh, pxX, pxY, img.sw, img.sh)
+      }
+    }
+  }
+
+  /**
+   * Détruit un pink mycenia présent sans loot : retire toutes les structures et persiste.
+   * Guard : no-op si record.present est déjà false.
+   * @param {object} record
+   */
+  #destroyPinkMyceniaPresent (record) {
+    if (!record.present) return
+    record.present = false
+    removeFromByTile(this.pinkMyceniaByTile, record)
+    removeFromByChunk(this.#pinkMyceniaByChunk, record)
+    this.#pinkMyceniaBySoil.delete(record.soilIndex)
+    this.#pinkMyceniaDisplayed.delete(record)
+    blockedTiles.unblockPlacement(record.index)
+    blockedTiles.unblockPlacement(record.index + WORLD_WIDTH)
+    saveManager.queueStaticUpdate({storeName: 'plant', record})
+  }
+
+  /**
+   * Traite le foraging réussi d'un pink mycenia (hors loot, géré par ForagingManager).
+   * No-op pour un mahogany — un mahogany se mine/coupe, il ne se forage pas.
+   * @param {object} record
+   */
+  onForaged (record) {
+    if (record.kind === PLANT_KIND.TREE) return
+    this.#destroyPinkMyceniaPresent(record)
+  }
+
+  /**
+   * Retourne le record (mahogany ou pink mycenia) couvrant la tuile donnée, ou null.
+   * @param {number} tileIndex — (y << 10) | x
+   * @returns {object|null}
+   */
+  getPlantAt (tileIndex) {
+    return this.mahoganyByTile.get(tileIndex) ?? this.pinkMyceniaByTile.get(tileIndex) ?? null
+  }
+
+  /**
+   * Indique si le record est actuellement présent (forageable).
+   * Un mahogany n'a pas de notion de present/absent : son existence en tant que record vaut
+   * présence. Un pink mycenia, en revanche, oscille selon le cycle jour/nuit — seul
+   * record.present fait foi.
+   * @param {object} record
+   * @returns {boolean}
+   */
+  isPresent (record) { return record.kind === PLANT_KIND.TREE ? !record.deleted : record.present }
+
+  /**
+   * Indique si un mahogany vivant occupe cette tuile de sol. O(1), zéro allocation.
+   * @param {number} x
+   * @returns {boolean}
+   */
+  isMahoganyAtColumn (x) { return this.#mahoganyXSet.has(x) }
+
+  /** Liaison EventBus : 'time/every-hour-16' — tous les pink mycenia présents repassent à false. */
+  onHour16PinkMycenia () {
+    const {priority, capacity} = MICROTASK.UNBLOOM_PINKMYCENIA
+    microTasker.enqueue(this.unbloomPinkMycenia, priority, capacity)
+  }
+
+  /** Microtâche : tous les pink mycenia présents repassent à present=false. */
+  unbloomPinkMycenia () {
+    for (const record of this.#pinkMyceniaList) {
+      if (!record.present) continue
+      this.#destroyPinkMyceniaPresent(record)
+    }
+  }
+
+  /** Liaison EventBus : 'time/every-hour-5' — tirage de floraison matinale des pink mycenia. */
+  onHour5PinkMycenia () {
+    const {priority, capacity} = MICROTASK.BLOOM_PINKMYCENIA
+    microTasker.enqueue(this.bloomPinkMycenia, priority, capacity)
+  }
+
+  /**
+   * Microtâche : parmi les spots dont le soilIndex est une GRASSJUNGLE, 50% passent à present=true.
+   */
+  bloomPinkMycenia () {
+    const GRASSJUNGLE = NODES.GRASSJUNGLE.code
+    for (const record of this.#pinkMyceniaList) {
+      if (chunkManager.getTileAt(record.soilIndex) !== GRASSJUNGLE) continue
+      if (!seededRNG.randomGetBool()) continue
+      if (!blockedTiles.canPlace(record.index) || !blockedTiles.canPlace(record.index + WORLD_WIDTH)) continue
+
+      record.present = true
+      addToByTile(this.pinkMyceniaByTile, record)
+      addToByChunk(this.#pinkMyceniaByChunk, record)
+      this.#pinkMyceniaBySoil.set(record.soilIndex, record)
+      blockedTiles.blockPlacement(record.index)
+      blockedTiles.blockPlacement(record.index + WORLD_WIDTH)
+      saveManager.queueStaticUpdate({storeName: 'plant', record})
+    }
+    buildDisplayed(this.#pinkMyceniaDisplayed, this.#pinkMyceniaByChunk, camera.preloadChunks)
+  }
+
+  /**
+   * Réagit à un changement de tuile (EventBus : 'world/tile-changed').
+   * Branche mahogany : TODO — tuile support, secousse, etc. pas encore définis (miroir OakSystem).
+   * Branche pink mycenia : un pink mycenia présent disparaît (present=false, spot conservé) si
+   * l'une de ses 2 tuiles de corps (.index, .index + WORLD_WIDTH) devient non-SKY, ou si sa
+   * tuile de support (.soilIndex) cesse d'être GRASSJUNGLE.
+   * @param {{tileIndex: number, tileOldCode: number, tileNewCode: number}} payload
+   */
+  onTileChangedMahogany ({tileIndex, tileOldCode, tileNewCode}) {
+    const SKY = NODES.SKY.code
+    const GRASSJUNGLE = NODES.GRASSJUNGLE.code
+
+    // Cas 1 — Pink Mycenia - une des 2 tuiles de corps du pink mycenia devient non-SKY
+    const byBodyRecord = this.pinkMyceniaByTile.get(tileIndex)
+    if (byBodyRecord !== undefined && tileNewCode !== SKY) {
+      this.#destroyPinkMyceniaPresent(byBodyRecord)
+      return
+    }
+
+    // Cas 2 — Pink Mycenia - tuile de support : GRASSJUNGLE perdu
+    const bySoilRecord = this.#pinkMyceniaBySoil.get(tileIndex)
+    if (bySoilRecord !== undefined && tileNewCode !== GRASSJUNGLE) {
+      this.#destroyPinkMyceniaPresent(bySoilRecord)
+    }
+
+    // Cas 3 — Mahogany - tuile du rectangle complet 3×18 change d'état SKY
+    const byFullRecord = this.#mahoganyByFullRect.get(tileIndex)
+    if (byFullRecord === undefined) return
+
+    // Cas 3.1. Obstruction : une tuile SKY devient autre chose
+    if (tileNewCode !== SKY) {
+      byFullRecord.blocked++
+      if (byFullRecord.blocked === 1) {
+        // Transition libre → bloqué : annule la croissance en cours
+        taskScheduler.dequeue(`mahogany_grow_${byFullRecord.id}`)
+        byFullRecord.growthTimestamp = null
+      }
+      saveManager.queueStaticUpdate({storeName: 'plant', record: byFullRecord})
+      return
+    }
+
+    // Cas 3.2. Libération : une tuile redevient SKY
+    if (byFullRecord.blocked === 0) return // guard : compteur déjà à zéro (cohérence)
+    byFullRecord.blocked--
+    if (byFullRecord.blocked === 0) {
+      // Transition bloqué → libre : relance la croissance si l'arbre n'est pas adulte
+      if (byFullRecord.size < 4) {
+        const growthDelay = (ITEMS.mahogany.growth * seededRNG.randomGetRealMinMax(0.8, 1.2)) | 0
+        const {priority, capacity} = MICROTASK.MAHOGANY_GROW
+        byFullRecord.growthTimestamp = taskScheduler.enqueue(
+          `mahogany_grow_${byFullRecord.id}`, growthDelay, this.growMahogany, priority, capacity, byFullRecord.soilIndex
+        )
+      }
+    }
+    saveManager.queueStaticUpdate({storeName: 'plant', record: byFullRecord})
+  }
+
+  // //////// //
+  // CHOPPING //
+  // //////// //
+
+  /**
+   * Traite le chopping réussi d'un mahogany (hors loot, géré par ChoppingManager).
+   * Décrémente size. Si size atteint -1, détruit l'arbre entièrement (et ses pink mycenia).
+   * Sinon, met à jour byTile, blockedTiles, et persiste.
+   * @param {object} record — record TREE (mahogany)
+   */
+  onChopped (record) {
+    removeFromByTileTree(this.mahoganyByTile, this.#mahoganyByFullRect, record)
+    record.size--
+    addToByTileTree(this.mahoganyByTile, this.#mahoganyByFullRect, record)
+
+    if (record.size < 0) {
+      this.#destroyMahogany(record) // fait le queueStaticUpdate
+      return
+    }
+
+    const growthDelay = (ITEMS.mahogany.growth * seededRNG.randomGetRealMinMax(0.8, 1.2)) | 0
+    const {priority, capacity} = MICROTASK.MAHOGANY_GROW
+    const taskId = `mahogany_grow_${record.id}`
+    record.growthTimestamp = taskScheduler.requeue(taskId, growthDelay, this.growMahogany, priority, capacity, record.soilIndex)
+
+    saveManager.queueStaticUpdate({storeName: 'plant', record})
+  }
+
+  /**
+   * Détruit un mahogany complètement : retire toutes les structures, supprime ses spots pink
+   * mycenia, libère blockedTiles (placement + mining sol).
+   * @param {object} record — record TREE
+   */
+  #destroyMahogany (record) {
+    // Retrait byTile et byChunk
+    removeFromByTileTree(this.mahoganyByTile, this.#mahoganyByFullRect, record)
+    removeFromByChunk(this.#mahoganyByChunk, record)
+    this.#mahoganyDisplayed.delete(record)
+
+    // blockedTiles — rectangle de corps
+    const px = record.soilIndex & 0x3FF
+    const py = record.index >> 10
+    blockedTiles.unblockPlacementRect(px, py, record.w, record.h)
+
+    // blockedTiles — sol (3 tuiles)
+    const soilX = record.soilIndex & 0x3FF
+    const soilY = record.soilIndex >> 10
+    blockedTiles.unblockMiningRect(soilX, soilY, record.w, 1)
+
+    // Supprime les spots pink mycenia associés
+    const pLeft = this.#pinkMyceniaSpotsBySoil.get(record.soilIndex - 1)
+    const pRight = this.#pinkMyceniaSpotsBySoil.get(record.soilIndex + record.w)
+    if (pLeft !== undefined) this.#destroyPinkMyceniaSpot(pLeft)
+    if (pRight !== undefined) this.#destroyPinkMyceniaSpot(pRight)
+
+    // Retrait de la liste principale (swap-last)
+    const idx = this.#mahoganyList.indexOf(record)
+    if (idx !== -1) {
+      this.#mahoganyList[idx] = this.#mahoganyList[this.#mahoganyList.length - 1]
+      this.#mahoganyList.length--
+    }
+
+    // #mahoganyBySoil — 3 entrées
+    this.#mahoganyBySoil.delete(record.soilIndex)
+    this.#mahoganyBySoil.delete(record.soilIndex + 1)
+    this.#mahoganyBySoil.delete(record.soilIndex + 2)
+    // #mahoganyXSet — 3 entrées
+    this.#mahoganyXSet.delete(record.soilIndex & 0x3ff)
+    this.#mahoganyXSet.delete((record.soilIndex & 0x3ff) + 1)
+    this.#mahoganyXSet.delete((record.soilIndex & 0x3ff) + 2)
+
+    // Purge des tâches scheduler
+    taskScheduler.dequeue(`mahogany_grow_${record.id}`)
+    taskScheduler.dequeue(`mahogany_shake_${record.id}`)
+
+    // Persistance : marque deleted
+    record.deleted = true
+    saveManager.queueStaticUpdate({storeName: 'plant', record})
+
+    // Notifie les autres systèmes : nouveaux spots potentiels au sol libérés
+    eventBus.emit('ecosystem/tree-destroyed', {tileIndex: record.soilIndex + 1, treeId: 'mahogany'})
+  }
+
+  /**
+   * Détruit un spot pink mycenia (présent ou non) : retire toutes les structures et persiste.
+   * @param {object} record — record MUSHROOM (pink mycenia spot)
+   */
+  #destroyPinkMyceniaSpot (record) {
+    if (record.present) this.#destroyPinkMyceniaPresent(record)
+
+    // Retrait de #pinkMyceniaList (swap-last)
+    const idx = this.#pinkMyceniaList.indexOf(record)
+    if (idx !== -1) {
+      this.#pinkMyceniaList[idx] = this.#pinkMyceniaList[this.#pinkMyceniaList.length - 1]
+      this.#pinkMyceniaList.length--
+    }
+    this.#pinkMyceniaSpotsBySoil.delete(record.soilIndex)
+
+    record.deleted = true
+    saveManager.queueStaticUpdate({storeName: 'plant', record})
+  }
+
+  // ////////// //
+  // PLANTATION //
+  // ////////// //
+
+  /**
+   * Indique si un Samara peut être planté sur ce soilIndex.
+   * @param {number} soilIndex — (y << 10) | x
+   * @returns {boolean}
+   */
+  canSow (soilIndex, seed) {
+    if (seed !== 'samara') return null
+    return true
+  }
+
+  /**
+   * Construit le tableau d'images d'un mahogany en tirant aléatoirement parmi les variantes
+   * disponibles. Miroir de PlantGenerator.#buildTreeImages.
+   * @param {number} soilX — coordonnée X de la tuile support gauche
+   * @returns {Array<{tree, row, col, x}>}
+   */
+  #buildTreeImages (soilX) {
+    const imageTable = TREE_IMAGES.mahogany
+    const images = []
+    for (let i = 0; i < imageTable.length; i++) {
+      const col = seededRNG.randomGetArrayIndex(imageTable[i])
+      images.push({tree: 'mahogany', row: i, col, x: soilX - 1})
+    }
+    return images
+  }
+
+  /**
+   * Liaison EventBus : 'sewed/samara' — le joueur a planté un samara sur une tuile GRASSJUNGLE
+   * valide (vérifications déjà faites par SowingManager). Crée le mahogany (size=0) et ses deux
+   * spots pink mycenia (present=false), enregistre dans toutes les structures, persiste et notifie.
+   * @param {number} tileIndex — (y << 10) | x, tuile cliquée (tuile centrale du sol, soilIndex+1)
+   */
+  onSewedSamara (tileIndex) {
+    const TREE_H = 18
+    const TREE_W = 3
+    const soilIndex = tileIndex - 1
+    const soilX = soilIndex & 0x3FF
+    const soilY = soilIndex >> 10
+
+    const id = uniqueIdGenerator.getUniqueId()
+    const growthDelay = (ITEMS.mahogany.growth * seededRNG.randomGetRealMinMax(0.8, 1.2)) | 0
+    const {priority, capacity} = MICROTASK.MAHOGANY_GROW
+    const growthTimestamp = taskScheduler.enqueue(`mahogany_grow_${id}`, growthDelay, this.growMahogany, priority, capacity, soilIndex)
+
+    const mahoganyRecord = {
+      id,
+      itemId: 'mahogany',
+      kind: PLANT_KIND.TREE,
+      type: PLANT_TYPE.MAHOGANY,
+      index: soilIndex - TREE_H * WORLD_WIDTH,
+      soilIndex,
+      w: TREE_W,
+      h: TREE_H,
+      size: 0,
+      images: this.#buildTreeImages(soilX),
+      grass: NODES.GRASSJUNGLE.code,
+      x: soilX,
+      yTop: soilY - TREE_H,
+      yBottom: soilY - 1,
+      growthTimestamp,
+      shakedTimestamp: null,
+      blocked: 0,
+      deleted: false
+    }
+    this.initPlant(mahoganyRecord)
+    saveManager.queueStaticUpdate({storeName: 'plant', record: mahoganyRecord})
+
+    // Pour que l'arbre soit rendu immédiatement.
+    addToDisplayed(this.#mahoganyDisplayed, mahoganyRecord)
+
+    const MUSH_H = 2
+    const MUSH_W = 1
+    for (const pSoilX of [soilX - 1, soilX + 3]) {
+      const pSoilIndex = (soilY << 10) | pSoilX
+      const pinkMyceniaRecord = {
+        id: uniqueIdGenerator.getUniqueId(),
+        kind: PLANT_KIND.MUSHROOM,
+        type: PLANT_TYPE.PINKMYCENIA,
+        itemId: 'pinkMycenia',
+        index: pSoilIndex - MUSH_H * WORLD_WIDTH,
+        soilIndex: pSoilIndex,
+        w: MUSH_W,
+        h: MUSH_H,
+        present: false,
+        deleted: false
+      }
+      this.initPlant(pinkMyceniaRecord)
+      saveManager.queueStaticUpdate({storeName: 'plant', record: pinkMyceniaRecord})
+    }
+
+    eventBus.emit('ecosystem/tree-planted', {tileIndex: soilIndex + 1, treeId: 'mahogany'})
+  }
+
+  // ////////// //
+  // CROISSANCE //
+  // ////////// //
+
+  /**
+   * Callback TaskScheduler : fait croître le mahogany d'un tronçon (size++), sauf si obstrué.
+   * Replanifie la prochaine pousse tant que size < 4, sinon fixe growthTimestamp à null.
+   * @param {number} soilIndex — (y << 10) | x, tuile de gauche du sol
+   */
+  growMahogany (soilIndex) {
+    const record = this.#mahoganyBySoil.get(soilIndex)
+
+    if (record === undefined) return
+    if (record.blocked > 0) return // arbre bloqué : croissance suspendue, tâche abandonnée
+
+    removeFromByTileTree(this.mahoganyByTile, this.#mahoganyByFullRect, record)
+    record.size++
+    addToByTileTree(this.mahoganyByTile, this.#mahoganyByFullRect, record)
+
+    if (record.size < 4) {
+      const growthDelay = (ITEMS.mahogany.growth * seededRNG.randomGetRealMinMax(0.8, 1.2)) | 0
+      const {priority, capacity} = MICROTASK.MAHOGANY_GROW
+      record.growthTimestamp = taskScheduler.enqueue(`mahogany_grow_${record.id}`, growthDelay, this.growMahogany, priority, capacity, soilIndex)
+    } else {
+      record.growthTimestamp = null
+    }
+
+    saveManager.queueStaticUpdate({storeName: 'plant', record})
+  }
+
+  // /////// //
+  // SHAKING //
+  // /////// //
+
+  /**
+   * L'action de secouage est de nouveau autorisée sur cet arbre.
+   * @param {number} soilIndex — (y << 10) | x, tuile de gauche du sol, sur lequel se trouve l'arbre
+   */
+  mahoganyEndShake (soilIndex) {
+    const record = this.#mahoganyBySoil.get(soilIndex)
+    if (record === undefined) return
+
+    record.shakedTimestamp = null
+    saveManager.queueStaticUpdate({storeName: 'plant', record})
+  }
+
+  /**
+   * Liaison EventBus : 'shaked/mahogany' — le joueur a secoué le mahogany. Si déjà secoué
+   * récemment (shakedTimestamp actif), la secousse est traitée comme un chopping (pénalité).
+   * Sinon, démarre le cooldown de 24h.
+   * @param {number} soilIndex — (y << 10) | x, tuile de gauche du sol
+   */
+  onShaked (soilIndex) {
+    const record = this.#mahoganyBySoil.get(soilIndex)
+    if (record === undefined) return
+
+    if (record.shakedTimestamp !== null) {
+      this.onChopped(record)
+      return
+    }
+
+    const {priority, capacity} = MICROTASK.MAHOGANY_END_SHAKE
+    const shakedTimestamp = taskScheduler.enqueue(`mahogany_shake_${record.id}`, 24 * 60 * 1000, this.mahoganyEndShake, priority, capacity, soilIndex)
+    record.shakedTimestamp = shakedTimestamp
+    saveManager.queueStaticUpdate({storeName: 'plant', record})
+  }
+
+  // ///// //
+  // DEBUG //
+  // ///// //
+
+  /**
+   * DEBUG — Affiche un cercle rose au centre de chaque spot pink mycenia, et un cercle
+   * brun-mahogany au centre du sol de chaque mahogany. Vérifie la cohérence #pinkMyceniaList
+   * vs #pinkMyceniaSpotsBySoil (même cardinal attendu).
+   * @param {CanvasRenderingContext2D} ctx — contexte déjà transformé (caméra appliquée)
+   */
+  debugRenderSpots (ctx) {
+    ctx.save()
+    ctx.fillStyle = 'rgba(255, 105, 180, 0.8)'
+    for (const record of this.#pinkMyceniaList) {
+      const cx = ((record.index & 0x3FF) << 4) + 8
+      const cy = ((record.index >> 10) << 4) + 40
+      ctx.beginPath()
+      ctx.arc(cx, cy, 3, 0, 6.2832)
+      ctx.fill()
+    }
+    ctx.fillStyle = 'rgba(180, 90, 40, 0.8)'
+
+    for (const record of this.#mahoganyList) {
+      const cx = ((record.soilIndex & 0x3FF) << 4) + 8
+      const cy = ((record.soilIndex >> 10) << 4) + 8
+      ctx.beginPath()
+      ctx.arc(cx, cy, 4, 0, 6.2832)
+      ctx.fill()
+    }
+    if (this.#pinkMyceniaList.length !== this.#pinkMyceniaSpotsBySoil.size) {
+      console.warn(`MahoganySystem: #list(${this.#pinkMyceniaList.length}) !== #spotsBySoil(${this.#pinkMyceniaSpotsBySoil.size})`)
+    }
+    ctx.restore()
+  }
+}
+export const mahoganySystem = new MahoganySystem()
 
 /* ====================================================================================================
    COCONUT SYSTEM
