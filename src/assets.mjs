@@ -51,7 +51,7 @@ export const IMAGE_FILES = [
 
   // Tuiles de wood wall / background wall
   'assets/sprites/wall_16_16.png',
-  // sea / water / honey / lava
+  // sea / water / honey / sap
   'assets/sprites/liquid_16_16.png',
   // ITEMS //
   // ////////
