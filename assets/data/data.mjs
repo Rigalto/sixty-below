@@ -252,12 +252,12 @@ export const ITEMS = {
   blockSlate: {name: 'Slate Block', type: ITEM_TYPE.BLOCK | ITEM_TYPE.PLACABLE, star: 5, stype: 'block', placedNode: 'SLATE', image: 'mined_32_32-2-1', help: 'Slate', tooltip: 'Mined block — used in construction and crafting'},
 
   // Chunks [succès]
-  chunkCopper: {name: 'Copper Chunk', type: 0, star: 1, stype: 'chunk', image: 'mined_32_32-3-2', help: 'Metals', tooltip: 'Primary crafting materials crafted into bars at a Furnace'},
-  chunkIron: {name: 'Iron Chunk', type: 0, star: 2, stype: 'chunk', image: 'mined_32_32-4-2', help: 'Metals', tooltip: 'Primary crafting materials crafted into bars at a Furnace'},
-  chunkSilver: {name: 'Silver Chunk', type: 0, star: 3, stype: 'chunk', image: 'mined_32_32-5-2', help: 'Metals', tooltip: 'Primary crafting materials crafted into bars at a Furnace'},
-  chunkGold: {name: 'Gold Chunk', type: 0, star: 3, stype: 'chunk', image: 'mined_32_32-0-3', help: 'Metals', tooltip: 'Primary crafting materials crafted into bars at a Furnace'},
-  chunkCobalt: {name: 'Cobalt Chunk', type: 0, star: 4, stype: 'chunk', image: 'mined_32_32-1-3', help: 'Metals', tooltip: 'Primary crafting materials crafted into bars at a Furnace'},
-  chunkPlatinum: {name: 'Platinum Chunk', type: 0, star: 5, stype: 'chunk', image: 'mined_32_32-2-3', help: 'Metals', tooltip: 'Primary crafting materials crafted into bars at a Furnace'},
+  chunkCopper: {name: 'Copper Chunk', type: 0, star: 1, stype: 'chunk', image: 'mined_32_32-0-3', help: 'Metals', tooltip: 'Primary crafting materials crafted into bars at a Furnace'},
+  chunkIron: {name: 'Iron Chunk', type: 0, star: 2, stype: 'chunk', image: 'mined_32_32-1-3', help: 'Metals', tooltip: 'Primary crafting materials crafted into bars at a Furnace'},
+  chunkSilver: {name: 'Silver Chunk', type: 0, star: 3, stype: 'chunk', image: 'mined_32_32-2-3', help: 'Metals', tooltip: 'Primary crafting materials crafted into bars at a Furnace'},
+  chunkGold: {name: 'Gold Chunk', type: 0, star: 3, stype: 'chunk', image: 'mined_32_32-3-3', help: 'Metals', tooltip: 'Primary crafting materials crafted into bars at a Furnace'},
+  chunkCobalt: {name: 'Cobalt Chunk', type: 0, star: 4, stype: 'chunk', image: 'mined_32_32-4-3', help: 'Metals', tooltip: 'Primary crafting materials crafted into bars at a Furnace'},
+  chunkPlatinum: {name: 'Platinum Chunk', type: 0, star: 5, stype: 'chunk', image: 'mined_32_32-5-3', help: 'Metals', tooltip: 'Primary crafting materials crafted into bars at a Furnace'},
 
   // Bars  [succès]
   barCopper: {name: 'Copper Bar', type: 0, star: 1, stype: 'bar', image: 'refined_32_32-0-0', help: 'Metals', tooltip: 'Crafting material used to craft tools, weapons, armor, and other items'},
@@ -283,11 +283,11 @@ export const ITEMS = {
   blockGranite: {name: 'Granite Block', type: ITEM_TYPE.BLOCK | ITEM_TYPE.PLACABLE, star: 4, stype: 'block', placedNode: 'GRANITE', image: 'mined_32_32-1-2', help: 'Geode Stones', tooltip: 'Prized crafting materials found in crystalline structures'},
   blockMarble: {name: 'Marble Block', type: ITEM_TYPE.BLOCK | ITEM_TYPE.PLACABLE, star: 4, stype: 'block', placedNode: 'MARBLE', image: 'mined_32_32-2-2', help: 'Geode Stones', tooltip: 'Prized crafting materials found in crystalline structures'},
   // Rock - Others
-  blockObsidian: {name: 'Obsidian Block', type: ITEM_TYPE.BLOCK | ITEM_TYPE.PLACABLE, star: 5, stype: 'block', placedNode: 'OBSIDIAN', image: 'blocks_16_16-0-0', help: 'Obsidian', tooltip: 'Hardest material'},
-  blockMeteorite: {name: 'Meteorite Block', type: ITEM_TYPE.BLOCK, star: 5, stype: 'block', image: 'blocks_16_16-0-0', help: 'Meteorite', tooltip: 'Falling from space, hard to use'},
+  blockObsidian: {name: 'Obsidian Block', type: ITEM_TYPE.BLOCK | ITEM_TYPE.PLACABLE, star: 5, stype: 'block', placedNode: 'OBSIDIAN', image: 'mined_32_32-3-2', help: 'Obsidian', tooltip: 'Hardest material'},
+  blockMeteorite: {name: 'Meteorite Block', type: ITEM_TYPE.BLOCK, star: 5, stype: 'block', image: 'mined_32_32-3-2', help: 'Meteorite', tooltip: 'Falling from space, hard to use'},
 
   // Hive
-  blockHive: {name: 'Hive Block', type: ITEM_TYPE.BLOCK, star: 3, stype: 'block', image: 'blocks_16_16-0-0', help: 'Hive', tooltip: 'Hexagonal alveoles build by Bees'},
+  blockHive: {name: 'Hive Block', type: ITEM_TYPE.BLOCK, star: 3, stype: 'block', image: 'mined_32_32-4-2', help: 'Hive', tooltip: 'Hexagonal alveoles build by Bees'},
   beeswax: {name: 'Beeswax', type: 0, star: 3, stype: 'wax', image: 'refined_32_32-5-1', help: 'Hive', tooltip: 'Melted down from honeycombs, used as a binding agent'},
 
   // Shell
@@ -296,7 +296,7 @@ export const ITEMS = {
 
   // Cobweb
   silk: {name: 'Silk', type: 0, star: 1, stype: 'cobweb', image: 'mined_32_32-4-4', help: 'Cobweb', tooltip: 'Mined from Cobweb, used to craft Fabric'},
-  fabric: {name: 'Fabric', type: 0, star: 1, stype: 'cobweb', image: 'blocks_16_16-0-0', help: 'Cobweb', tooltip: 'Common material used for armors and furniture'},
+  fabric: {name: 'Fabric', type: 0, star: 1, stype: 'cobweb', image: 'refined_32_32-7-2', help: 'Cobweb', tooltip: 'Common material used for armors and furniture'},
   eggSpider: {name: 'Spider Egg', type: 0, star: 3, stype: 'egg', image: 'foraged_32_32-4-1', help: 'Eggs', tooltip: '???'},
   eggSnake: {name: 'Snake Egg', type: 0, star: 4, stype: 'egg', image: 'foraged_32_32-5-1', help: 'Eggs', tooltip: '???'},
   ropeLinen: {name: 'Linen Rope', type: 0, star: 4, stype: 'rope', image: 'loom_32_32-0-0', help: 'Ropes', tooltip: '???'},

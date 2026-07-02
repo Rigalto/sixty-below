@@ -60,7 +60,7 @@ export const IMAGE_FILES = [
   // dirt / stone / clay / mud / sand / humus / silt / ash
   // granite / marble / obsidian / hellstone / sandstone / hive
   // topaz / rubis / emerald / sapphir
-  'assets/sprites/blocks_16_16.png',
+  // 'assets/sprites/blocks_16_16.png',
   // weapons / tools / walls / seeds / platforms / bags
   // misc
   'assets/sprites/tools_32_32.png',
