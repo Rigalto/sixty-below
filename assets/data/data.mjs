@@ -531,15 +531,16 @@ export const ITEMS = {
     growth: 2 * 24 * 60 * 1000,
     help: 'Oak & Mahogany',
     tooltip: 'Common tree in forest, can be chopping or shaking',
-    chopping: {speed: 1800, items: [{item: 'logOak', count: '1-2'}, {item: 'acorn', count: 0.25}, {item: 'feather', count: 0.08}, {item: 'apple', count: 0.05}, {item: 'peach', count: 0.04}], extraLoot: {items: [{item: 'rootOak', count: '2-5', buffs: ['+felling']}]}},
-    shaking: {speed: 1800, items: [{item: 'egg', count: 0.75}, {item: 'feather', count: 0.75}, {item: 'acorn', count: 0.25}, {item: 'logOak', count: 0.12}, {item: 'apple', count: 0.10}, {item: 'peach', count: 0.8}]}
+    chopping: {speed: 1800, items: [{item: 'logOak', count: '1-2'}, {item: 'acorn', count: 0.25}, {item: 'featherBird', count: 0.08}, {item: 'apple', count: 0.05}, {item: 'peach', count: 0.04}], extraLoot: {items: [{item: 'rootOak', count: '2-5', buffs: ['+felling']}]}},
+    shaking: {speed: 1800, items: [{item: 'egg', count: 0.75}, {item: 'featherBird', count: 0.75}, {item: 'acorn', count: 0.25}, {item: 'logOak', count: 0.12}, {item: 'apple', count: 0.10}, {item: 'peach', count: 0.8}]}
   },
   logOak: {name: 'Oak Log', type: 0, stype: 'log', star: 1, image: 'foraged_32_32-1-0', help: 'Oak & Mahogany', tooltip: '???'},
   plankOak: {name: 'Oak Plank', type: 0, stype: 'plank', star: 1, image: 'refined_32_32-5-2', help: 'Oak & Mahogany', tooltip: '???'},
   rootOak: {name: 'Wood Root', type: 0, stype: 'root', star: 1, image: 'potions_32_32-1-5', help: 'Oak & Mahogany', tooltip: '???'},
   egg: {name: 'Bird Egg', type: 0, stype: 'egg', star: 1, image: 'foraged_32_32-2-1', help: 'Oak & Mahogany', tooltip: '???'},
   eggMaleo: {name: 'Maleo Egg', type: 0, stype: 'egg', star: 2, image: 'foraged_32_32-3-1', help: 'Oak & Mahogany', tooltip: '???'}, // jungle
-  feather: {name: 'Bird Feather', type: 0, stype: 'feather', star: 1, image: 'foraged_32_32-4-2', help: 'Oak & Mahogany', tooltip: '???'},
+  featherBird: {name: 'Bird Feather', type: 0, stype: 'feather', star: 1, image: 'foraged_32_32-4-2', help: 'Oak & Mahogany', tooltip: '???'},
+  featherKakapo: {name: 'Kakapo Feather', type: 0, stype: 'feather', star: 2, image: 'foraged_32_32-5-2', help: 'Oak & Mahogany', tooltip: '???'},
   apple: {name: 'Apple', type: 0, stype: 'fruit', star: 1, image: 'foraged_32_32-2-2', help: 'Oak & Mahogany', tooltip: 'An apple a day keeps Doctor Bones away!'},
   peach: {name: 'Peach', type: 0, stype: 'fruit', star: 1, image: 'foraged_32_32-3-2', help: 'Oak & Mahogany', tooltip: '???'},
 
@@ -556,8 +557,8 @@ export const ITEMS = {
     growth: 3 * 24 * 60 * 1000,
     help: 'Oak & Mahogany',
     tooltip: 'Common tree in jungle, can be chopping or shaking',
-    chopping: {speed: 1800, items: [{item: 'logMahogany', count: '1-2'}, {item: 'samara', count: 0.25}], extraLoot: {items: [{item: 'rootMahogany', count: '2-5', buffs: ['+felling']}]}},
-    shaking: {speed: 1800, items: [{item: 'egg', count: 0.75}, {item: 'feather', count: 0.75}, {item: 'samara', count: 0.25}, {item: 'logMahogany', count: 0.12}]}
+    chopping: {speed: 1800, items: [{item: 'logMahogany', count: '1-2'}, {item: 'samara', count: 0.25}, {item: 'featherKakapo', count: 0.08}], extraLoot: {items: [{item: 'rootMahogany', count: '2-5', buffs: ['+felling']}]}},
+    shaking: {speed: 1800, items: [{item: 'egg', count: 0.75}, {item: 'featherKakapo', count: 0.75}, {item: 'samara', count: 0.25}, {item: 'logMahogany', count: 0.12}]}
   },
   logMahogany: {name: 'Mahogany Log', type: 0, stype: 'log', star: 2, image: 'foraged_32_32-2-0', help: 'Oak & Mahogany', tooltip: '???'},
   plankMahogany: {name: 'Mahogany Plank', type: 0, stype: 'plank', star: 2, image: 'refined_32_32-6-2', help: 'Oak & Mahogany', tooltip: '???'},
@@ -586,7 +587,7 @@ export const ITEMS = {
   oleanderOil: {name: 'Oleander Oil', type: 0, stype: 'oil', star: 3, image: 'potions_32_32-1-5', help: 'Oleander', tooltip: 'Used in cooking, potions, and as a mechanical lubricant'},
   oleanderBulb: {name: 'Oleander Bulb', type: 0, stype: 'vegie', star: 3, image: 'foraged_32_32-0-2', help: 'Oleander', tooltip: 'Its pulp has a velvety, creamy texture'},
 
-  ambermirage: {name: 'Ambermirage', type: 0, stype: 'herb', star: 1, image: 'potions_32_32-1-5', placed: 'fuws_32_32-4-0', help: 'Ambermirage', tooltip: '???'},
+  ambermirage: {name: 'Ambermirage', type: 0, stype: 'herb', star: 1, image: 'foraged_32_32-5-2', placed: 'placed_16_16-3-0', help: 'Ambermirage', tooltip: '???'},
 
   bloodmoon: {name: 'Bloodmoon', type: 0, stype: 'herb', star: 2, image: 'potions_32_32-1-5', placed: 'fuws_32_32-4-0', help: 'Bloodmoon', tooltip: '???'},
   bloodmoonSeed: {name: 'Bloodmoon Seed', type: ITEM_TYPE.SEED | ITEM_TYPE.PLACABLE, stype: 'seed', star: 2, image: 'potions_32_32-1-5', placed: 'fuws_32_32-4-0', help: 'Bloodmoon', tooltip: '???'},
