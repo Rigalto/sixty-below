@@ -872,7 +872,7 @@ Les enregistrements sont de natures très différentes, nature déterminée par 
   * `w` et `h` : taille de l'herbe
   * `x` et `y` : coordonnées pour le clipping de l'image (affichée si `x,y` est dans le rectangle visible)
   * `soilIndex` : position de la tuile solide sous la gauche de l'herbe (`index + h * 1024`)
-  * `present` : booléen indiquant si une herbe est présente (`true`) ou non sur le spot (uniquement pour Parsnip, Sunflower)
+  * `present` : booléen indiquant si une herbe est présente (`true`) ou non sur le spot (uniquement pour Parsnip, Sunflower, Ambermirage)
   * `bloom` : l'herbe est mature et peut être récoltée (`true`)
   * `bloomTimestamp` : heure (timestamp) de prochaine récolte possible
 * `kind` SPREAD : liste des tuiles auto-propagées dans le monde

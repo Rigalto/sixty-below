@@ -896,6 +896,7 @@ export const ALL_PLANT_SYSTEMS = []
 
 export const PARSNIP_RATE = 0.22
 export const SUNFLOWER_RATE = 0.18
+export const AMBERMIRAGE_PCENT = 20
 export const MANDRAKE_COUNT = 40
 export const CACTUS_COUNT = 40
 export const BAMBOO_COUNT = 40
@@ -917,8 +918,8 @@ export const TREE_IMAGES = {
     '0_1': ['coconut_80_48-3-1', 'coconut_80_48-4-1'], // OK
     '1_0': ['coconut_80_48-3-0', 'coconut_80_48-4-0'], // OK
     '1_1': ['coconut_80_48-0-1', 'coconut_80_48-1-1', 'coconut_80_48-2-1'],
-    '1_2': ['coconut_80_48-3-3'], // OK
-    '2_1': ['coconut_80_48-3-2'], // OK
+    '1_2': ['coconut_80_48-3-3', 'coconut_80_48-4-3'], // OK
+    '2_1': ['coconut_80_48-3-2', 'coconut_80_48-4-2'], // OK
     '2_2': ['coconut_80_48-0-3', 'coconut_80_48-1-3', 'coconut_80_48-2-3'],
     head: ['coconut_80_48-0-0', 'coconut_80_48-1-0', 'coconut_80_48-2-0']
   },
