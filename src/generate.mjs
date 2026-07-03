@@ -6941,38 +6941,52 @@ class PlantGenerator {
   }
 
   /**
+ * Vérifie si (pos, y) est une position centrale valide pour un cocotier : les 3 tuiles de
+ * surface (pos-1, pos, pos+1) sont à la même hauteur, aucune n'est guardée, toutes SAND, et
+ * les deux tuiles latérales (pos-1, pos+1) ne sont pas surmontées d'eau (WATER/SEA).
+ * @param {number} pos — colonne centrale testée
+ * @param {number} y — Y de la tuile de surface en pos
+ * @param {Int16Array} surfaceLine — Y de la première tuile solide par colonne
+ * @param {Set<number>} guarded — colonnes protégées
+ * @returns {boolean}
+ */
+  #isValidCoconutSpot (pos, y, surfaceLine, guarded) {
+    const SAND = NODES.SAND.code
+    const WATER = NODES.WATER.code
+    const SEA = NODES.SEA.code
+
+    if (surfaceLine[pos - 1] !== y || surfaceLine[pos + 1] !== y) return false
+    if (guarded.has(pos - 1) || guarded.has(pos) || guarded.has(pos + 1)) return false
+    if (worldBuffer.read(pos - 1, y) !== SAND) return false
+    if (worldBuffer.read(pos, y) !== SAND) return false
+    if (worldBuffer.read(pos + 1, y) !== SAND) return false
+    if (worldBuffer.read(pos - 1, y - 1) === WATER || worldBuffer.read(pos - 1, y - 1) === SEA) return false
+    if (worldBuffer.read(pos + 1, y - 1) === WATER || worldBuffer.read(pos + 1, y - 1) === SEA) return false
+
+    return true
+  }
+
+  /**
  * Place un cocotier sur une plage en bord de mer.
+ * pos suit le centre du cocotier (indépendant de la direction) — soilIndex = pos - 1 dans tous les cas.
  * @param {{x, y, w, h}} beachRect — rectangle de la plage
  * @param {Int16Array} surfaceLine — Y de la première tuile solide par colonne
  * @param {boolean} isLeft — true = plage gauche (parcours gauche→droite), false = droite→gauche
  */
   placeSeaCoconut (beachRect, surfaceLine, isLeft, guarded) {
-    const SEA = NODES.SEA.code
-    const WATER = NODES.WATER.code
-    const SAND = NODES.SAND.code
-
-    const x0 = isLeft ? beachRect.x : beachRect.x + beachRect.w - 1
-    const x1 = isLeft ? beachRect.x + beachRect.w - 1 : beachRect.x
     const dir = isLeft ? 1 : -1
+    const pos0 = isLeft ? beachRect.x + 1 : beachRect.x + beachRect.w - 2
+    const pos1 = isLeft ? beachRect.x + beachRect.w - 1 : beachRect.x
 
-    for (let x = x0; isLeft ? x < x1 : x > x1; x += dir) {
-      const y = surfaceLine[x]
-      const yNext = surfaceLine[x + dir]
+    for (let pos = pos0; isLeft ? pos < pos1 : pos > pos1; pos += dir) {
+      const y = surfaceLine[pos]
+      if (!this.#isValidCoconutSpot(pos, y, surfaceLine, guarded)) continue
 
-      if (y !== yNext) continue
-      if (guarded.has(x) || guarded.has(x + dir) || guarded.has(x + dir + dir)) continue
-      if (worldBuffer.read(x, y) !== SAND) continue
-      if (worldBuffer.read(x + dir, y) !== SAND) continue
-      if (worldBuffer.read(x + dir + dir, y) !== SAND) continue
-      if (worldBuffer.read(x, y - 1) === SEA || worldBuffer.read(x, y - 1) === WATER) continue
-      if (worldBuffer.read(x + dir, y - 1) === SEA || worldBuffer.read(x + dir, y - 1) === WATER) continue
-      if (worldBuffer.read(x + dir + dir, y - 1) === SEA || worldBuffer.read(x + dir + dir, y - 1) === WATER) continue
+      guarded.add(pos - 1)
+      guarded.add(pos)
+      guarded.add(pos + 1)
 
-      guarded.add(x)
-      guarded.add(x + dir)
-      guarded.add(x + dir + dir)
-
-      const soilIndex = (y << 10) | (isLeft ? x : x - 1)
+      const soilIndex = (y << 10) | (pos - 1)
       this.#placeOneCoconut(soilIndex)
       return
     }
@@ -6998,24 +7012,14 @@ class PlantGenerator {
     const findSide = (startX, dir) => {
       let lastWaterX = startX // on est sûr que cx est sous l'eau
 
-      for (let x = startX; x > 1 && x < W - 2; x += dir) {
-        const y = surfaceLine[x]
-        const above = worldBuffer.read(x, y - 1)
+      for (let pos = startX; pos > 2 && pos < W - 3; pos += dir) {
+        const y = surfaceLine[pos]
+        const above = worldBuffer.read(pos, y - 1)
 
-        if (above === WATER || above === SEA) { lastWaterX = x; continue }
-        if (Math.abs(x - lastWaterX) > MAX_DIST) return null
-
-        const yNext = surfaceLine[x + dir]
-        if (y !== yNext) continue
-        if (guarded.has(x) || guarded.has(x + dir) || guarded.has(x + dir + dir)) continue
-        if (worldBuffer.read(x, y) !== SAND) continue
-        if (worldBuffer.read(x + dir, y) !== SAND) continue
-        if (worldBuffer.read(x + dir + dir, y) !== SAND) continue
-        if (above === WATER || above === SEA) continue
-        if (worldBuffer.read(x + dir, y - 1) === WATER || worldBuffer.read(x + dir, y - 1) === SEA) continue
-        if (worldBuffer.read(x + dir + dir, y - 1) === WATER || worldBuffer.read(x + dir + dir, y - 1) === SEA) continue
-
-        return {x, y, dir}
+        if (above === WATER || above === SEA) { lastWaterX = pos; continue }
+        if (Math.abs(pos - lastWaterX) > MAX_DIST) return null
+        if (!this.#isValidCoconutSpot(pos, y, surfaceLine, guarded)) continue
+        return {pos, y}
       }
       return null
     }
@@ -7029,12 +7033,12 @@ class PlantGenerator {
       ? (seededRNG.randomGetBool() ? right : left)
       : (right ?? left)
 
-    const {x, y, dir} = chosen
-    guarded.add(x)
-    guarded.add(x + dir)
-    guarded.add(x + dir + dir)
+    const {pos, y} = chosen
+    guarded.add(pos - 1)
+    guarded.add(pos)
+    guarded.add(pos + 1)
 
-    const soilIndex = (y << 10) | (dir === 1 ? x : x - 1)
+    const soilIndex = (y << 10) | (pos - 1)
     this.#placeOneCoconut(soilIndex)
   }
 
@@ -7479,7 +7483,6 @@ class PlantGenerator {
     const badWeather = initialWeather === WEATHER_TYPE_CODE.RAINY || initialWeather === WEATHER_TYPE_CODE.STORMY
 
     for (let x = 2; x < W - 2; x++) {
-      if (guarded.has(x)) continue
       const y = surfaceLine[x]
 
       if (worldBuffer.read(x, y) !== SAND) continue
@@ -7487,7 +7490,7 @@ class PlantGenerator {
       const rightSand = (worldBuffer.read(x + 1, surfaceLine[x + 1]) === SAND)
 
       const soilIndex = (y << 10) | x
-      const present = !badWeather && leftSand && rightSand && seededRNG.randomGetPercent(AMBERMIRAGE_PCENT)
+      const present = !guarded.has(x) && !badWeather && leftSand && rightSand && seededRNG.randomGetPercent(AMBERMIRAGE_PCENT)
       if (present) guarded.add(x)
 
       this.#plants.push({

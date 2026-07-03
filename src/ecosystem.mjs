@@ -1,5 +1,6 @@
 // ecosystem.mjs — FloraManager - OakSystem - MahoganySystem - HiveSystem
-// SunflowerSystem - OleanderSystem - ParsnipSystem - CobwebSystem - SampleSystem
+// SunflowerSystem - OleanderSystem - ParsnipSystem - AmbermirageSystem - CobwebSystem
+// SampleSystem
 
 import {WORLD_WIDTH, WORLD_HEIGHT, MICROTASK, TOPSOIL_Y_SKY_SURFACE, TOPSOIL_Y_SURFACE_UNDER, TOPSOIL_Y_UNDER_CAVERNS} from './constant.mjs'
 import {database, uniqueIdGenerator} from './database.mjs'
@@ -2951,6 +2952,150 @@ class FloraManager {
 }
 
 export const floraManager = new FloraManager()
+
+// AmbermirageSystem — spot toujours en DB, present = visible/forageable).
+// Spécificité : TOUS les spots de surface SAND sont enregistrés (pas seulement ceux avec voisins
+// SAND) — l'éligibilité (x-1 et x+1 également SAND) est une condition de `present`, pas d'existence
+// du spot. #byX indexe directement par colonne (record ou null) : lookup O(1) d'un voisin sans
+// connaître son y, nécessaire pour toute vérification x-1/x+1.
+// TODO ouverts : entretien réactif de #byX/#spotsBySoil sur world/tile-changed (création,
+// déplacement, suppression de spot selon la nouvelle tuile de surface de la colonne — cf. règle
+// donnée par Didier), déclencheur du recalcul de `present` (cycle horaire façon Parsnip, ou
+// météo ?), canForage (non défini — hérite du défaut FloraManager : true).
+class AmbermirageSystem {
+  byTile = new Map() // Map<tileIndex, record> — public : membership O(1) + lookup record
+  #list = [] // record[] — tous les spots (présents ou non)
+  #byChunk = new Map() // Map<chunkKey, Set> — lookup spatial pour onPreloadChunksChanged
+  #bySoil = new Map() // Map<soilIndex, record> — plantes présentes : détection minage de la tuile sol
+  #spotsBySoil = new Map() // Map<soilIndex, record> — tous les spots (présents ou non) : suppression O(1)
+  #byX = new Array(WORLD_WIDTH).fill(null) // record|null par colonne — lookup direct voisin x-1/x+1 (TODO : entretien réactif)
+  #displayed = new Set() // Set<record> — spots dans les chunks preload (cible render)
+  #image = null // ITEMS.ambermirage.placed, mis en cache dans init()
+
+  // constructor () {
+  // // TODO — EventBus : world/tile-changed (entretien #byX + recalcul present), déclencheur du
+  // // cycle de floraison (cf. commentaire de classe).
+  // }
+
+  /**
+ * Réinitialise toutes les structures. Appelé en début de session.
+ */
+  init () {
+    this.byTile.clear()
+    this.#list.length = 0
+    this.#byChunk.clear()
+    this.#bySoil.clear()
+    this.#spotsBySoil.clear()
+    this.#byX.fill(null)
+    this.#displayed.clear()
+
+    this.#image = ITEMS.ambermirage.placed // après hydratation
+  }
+
+  /**
+ * Enregistre un spot et peuple les structures internes.
+ * @param {object} record — record HERB/AMBERMIRAGE actif (deleted=false garanti par l'appelant)
+ */
+  initPlant (record) {
+    this.#list.push(record)
+    this.#spotsBySoil.set(record.soilIndex, record)
+    this.#byX[record.x] = record
+    if (!record.present) return
+    addToByTile(this.byTile, record)
+    addToByChunk(this.#byChunk, record)
+    this.#bySoil.set(record.soilIndex, record)
+    blockedTiles.blockPlacement(record.index)
+  }
+
+  /**
+ * Reconstruit #displayed depuis les chunks preload de la caméra.
+ * @param {Set<number>} preloadChunks
+ */
+  onPreloadChunksChanged (preloadChunks) {
+    buildDisplayed(this.#displayed, this.#byChunk, preloadChunks)
+  }
+
+  /**
+ * Dessine les ambermirages visibles et présents sur le contexte transformé.
+ * @param {CanvasRenderingContext2D} ctx — contexte déjà transformé (caméra appliquée)
+ */
+  render (ctx) {
+    const img = this.#image
+    for (const record of this.#displayed) {
+      const pxX = (record.index & 0x3FF) << 4
+      const pxY = ((record.index >> 10) << 4) + 2
+      ctx.drawImage(IMAGE_CACHE[img.imgIndex], img.sx, img.sy, img.sw, img.sh, pxX, pxY, img.sw, img.sh)
+    }
+  }
+
+  /**
+ * Traite le foraging réussi : marque l'ambermirage absent et persiste.
+ * Le loot est géré en commun par ForagingManager — cette méthode ne gère que l'état de la plante.
+ * @param {object} record
+ */
+  onForaged (record) {
+    this.#destroyPresent(record)
+  }
+
+  /**
+ * Retourne le record de l'ambermirage couvrant la tuile donnée, ou null.
+ * @param {number} tileIndex — (y << 10) | x
+ * @returns {object|null}
+ */
+  getPlantAt (tileIndex) {
+    return this.byTile.get(tileIndex) ?? null
+  }
+
+  /**
+ * Indique si le record est actuellement présent (forageable).
+ * @param {object} record
+ * @returns {boolean}
+ */
+  isPresent (record) { return record.present }
+
+  /**
+ * Détruit un ambermirage présent sans loot : retire toutes les structures et persiste.
+ * Guard : no-op si record.present est déjà false.
+ * @param {object} record
+ */
+  #destroyPresent (record) {
+    if (!record.present) return
+    record.present = false
+    removeFromByTile(this.byTile, record)
+    removeFromByChunk(this.#byChunk, record)
+    this.#bySoil.delete(record.soilIndex)
+    this.#displayed.delete(record)
+    blockedTiles.unblockPlacement(record.index)
+    saveManager.queueStaticUpdate({storeName: 'plant', record})
+  }
+
+  // ///// //
+  // DEBUG //
+  // ///// //
+
+  /**
+* DEBUG — Affiche un cercle orange au centre de la tuile sous chaque spot enregistré dans #list
+* (tous les spots SAND, present ou non). Vérifie la cohérence avec #spotsBySoil (même cardinal
+* attendu).
+* @param {CanvasRenderingContext2D} ctx — contexte déjà transformé (caméra appliquée)
+*/
+  debugRenderSpots (ctx) {
+    ctx.save()
+    ctx.fillStyle = 'rgba(43, 0, 255, 0.7)'
+    for (const record of this.#list) {
+      const cx = ((record.index & 0x3FF) << 4) + 8
+      const cy = ((record.index >> 10) << 4) + 40 - 16
+      ctx.beginPath()
+      ctx.arc(cx, cy, 4, 0, 6.2832)
+      ctx.fill()
+    }
+    if (this.#list.length !== this.#spotsBySoil.size) {
+      console.warn(`AmbermirageSystem: #list(${this.#list.length}) !== #spotsBySoil(${this.#spotsBySoil.size})`)
+    }
+    ctx.restore()
+  }
+}
+export const ambermirageSystem = new AmbermirageSystem()
 
 /* ====================================================================================================
    COBWEB SYSTEM

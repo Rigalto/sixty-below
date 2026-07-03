@@ -17,7 +17,7 @@ import {furnitureManager} from './housing.mjs'
 import {craftOverlay} from './craft.mjs'
 import {achievementManager} from './achievement.mjs'
 import {playerManager, hotbarOverlay} from './player.mjs'
-import {floraManager, sunflowerSystem, oleanderSystem, parsnipSystem, oakSystem, mahoganySystem, cobwebSystem, coconutSystem} from './ecosystem.mjs'
+import {floraManager, sunflowerSystem, oleanderSystem, parsnipSystem, ambermirageSystem, oakSystem, mahoganySystem, cobwebSystem, coconutSystem} from './ecosystem.mjs'
 import {ACHIEVEMENT_CATEGORIES} from '../assets/data/data-achievement.mjs'
 import {miningManager, placingManager, foragingManager, choppingManager, sowingManager, hammingManager} from './action.mjs'
 import './combat.mjs'
@@ -36,10 +36,10 @@ const plantSystemLookup = [ // Map<kind*100+type, system> — peuplée au fur et
   [PLANT_KIND.HERB * 100 + PLANT_TYPE.OLEANDER, oleanderSystem],
   //   [PLANT_KIND.HERB * 100 + PLANT_TYPE.BLINKROOT, blinkrootSystem],
   [PLANT_KIND.HERB * 100 + PLANT_TYPE.PARSNIP, parsnipSystem],
-  [PLANT_KIND.HERB * 100 + PLANT_TYPE.SUNFLOWER, sunflowerSystem]
+  [PLANT_KIND.HERB * 100 + PLANT_TYPE.SUNFLOWER, sunflowerSystem],
   //   [PLANT_KIND.HERB * 100 + PLANT_TYPE.FIREBLOSSOM, fireblossomSystem],
   //   [PLANT_KIND.HERB * 100 + PLANT_TYPE.SKORN, skornSystem],
-  //   [PLANT_KIND.HERB * 100 + PLANT_TYPE.AMBERMIRAGE, ambermirageSystem],
+  [PLANT_KIND.HERB * 100 + PLANT_TYPE.AMBERMIRAGE, ambermirageSystem]
   //   [PLANT_KIND.HERB * 100 + PLANT_TYPE.BLOODMOON, bloodmoonSystem],
   //   [PLANT_KIND.HERB * 100 + PLANT_TYPE.SHADOWFERN, fernSystem],
   //   [PLANT_KIND.HERB * 100 + PLANT_TYPE.CRIMSONFROND, fernSystem],
@@ -53,7 +53,7 @@ const plantSystemLookup = [ // Map<kind*100+type, system> — peuplée au fur et
   //   [PLANT_KIND.SPREAD * 100 + PLANT_TYPE.NONE, spreadSystem],
   //   [PLANT_KIND.SEED * 100 + PLANT_TYPE.NONE, seedSystem]
 ]
-const allPlantSystems = [sunflowerSystem, oleanderSystem, parsnipSystem, oakSystem, mahoganySystem, coconutSystem]
+const allPlantSystems = [sunflowerSystem, oleanderSystem, parsnipSystem, ambermirageSystem, oakSystem, mahoganySystem, coconutSystem]
 
 const debugHUD = () => {
   const debugDiv = document.createElement('div')
@@ -560,6 +560,7 @@ class GameCore {
       blockedTiles.render(ctx) // DEBUG
       sunflowerSystem.debugRenderSpots(ctx)
       parsnipSystem.debugRenderSpots(ctx)
+      ambermirageSystem.debugRenderSpots(ctx)
       oakSystem.debugRenderSpots(ctx)
     }
     if (this.showGrids) {

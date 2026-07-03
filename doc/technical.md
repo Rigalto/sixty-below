@@ -491,6 +491,13 @@ Cette section définit les événements officiels. Tout nouvel événement doit 
 | E | `ecosystem/tree-destroyed` | `{tileIndex: number, treeId: string}` | Émis quand un arbre est entièrement abattu (size < 0). Payload = tuile centrale du sol (`soilIndex + 1`). |
 | E | `ecosystem/tree-planted` | `{tileIndex: number, treeId: string}` | Émis quand un arbre est planté. Payload = tuile centrale du sol (`soilIndex + 1`). |
 
+#### Ambermirage (`AmbermirageSystem`)
+
+| Dir. | Event Name | Payload Structure | Description |
+| :---: | :--- | :--- | :--- |
+
+Aucun événement écouté pour l'instant. TODO
+
 #### Oak (`OakSystem`)
 
 | Dir. | Event Name | Payload Structure | Description |
