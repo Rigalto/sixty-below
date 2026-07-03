@@ -176,14 +176,31 @@ The Surface is the topmost layer of the world, where the player begins their adv
 
 **Materials**
 
-* [[node:grassForest]], [[node:dirt]] — [[Forest]]
-* [[node:sand]], [[node:sandstone]] — [[Desert]]
-* [[node:grassJungle]], [[node:silt]] — [[Jungle]]
+| Tile | Tier | Type | Biome |
+|---|---|---|---|
+| [[node:grassForest]] | {{node:grassForest:star|star}} | Natural | [[Forest]] |
+| [[node:grassJungle]] | {{node:grassJungle:star|star}} | Natural | [[Jungle]] |
+| [[node:dirt]] | {{node:dirt:star|star}} | Topsoil | [[Forest]] |
+| [[node:sand]] | {{node:sand:star|star}} | Topsoil | [[Desert]] |
+| [[node:silt]] | {{node:silt:star|star}} | Topsoil | [[Jungle]] |
+| [[node:humus]] | {{node:humus:star|star}} | Topsoil |  All biomes |
+| [[node:clay]] | {{node:clay:star|star}} | Substrat | [[Forest]] |
+| [[node:sandstone]] | {{node:sandstone:star|star}} | Substrat | [[Desert]] |
+| [[node:mud]] | {{node:mud:star|star}} | Substrat | [[Jungle]] |
 
 **Resources**
 
-* [[item:chunkCopper]], [[item:chunkIron]] — common
-* Surface plants and critters ⏳
+| Ressource | Tier | Type | Biome |
+|---|---|---|---|
+| [[item:chunkCopper]] | {{item:chunkCopper:star|star}} | Ore | All biomes |
+| [[item:oak]] | {{item:oak:star|star}} | Tree | [[Forest]] |
+| [[item:coconut]] | {{item:coconut:star|star}} | Tree | Desert lake, Sea shore |
+| [[item:mahogany]] | {{item:mahogany:star|star}} | Tree | [[Jungle]] |
+| [[item:bolete]] | {{item:bolete:star|star}} | Mushroom | [[Forest]] |
+| [[item:pinkMycenia]] | {{item:pinkMycenia:star|star}} | Mushroom | [[Jungle]] |
+| [[item:sunflower]] | {{item:sunflower:star|star}} | Herb | [[Forest]] |
+| [[item:parsnip]] | {{item:parsnip:star|star}} | Herb | [[Forest]] |
+| [[item:ambermirage]] | {{item:ambermirage:star|star}} | Herb | [[Desert]] |
 
 **Mini-biomes**
 
