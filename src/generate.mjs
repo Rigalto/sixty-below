@@ -7005,7 +7005,6 @@ class PlantGenerator {
   placeOasisCoconut (lake, surfaceLine, guarded) {
     const SEA = NODES.SEA.code
     const WATER = NODES.WATER.code
-    const SAND = NODES.SAND.code
     const W = WORLD_WIDTH
     const MAX_DIST = 16
 
