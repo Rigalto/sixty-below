@@ -362,8 +362,10 @@ La Sap corrode le Copper. Il doit donc être remplacer par du Gold.
 - Point d'entrée pour la flore (`FloraManager`)
 - Sunflower (`SunflowerSystem`)
 - Oleander (`OleanderSystem`)
+- Ambermirage (`AmbermirageSystem`)
 - Cobweb (`CobwebSystem`)
 - Oak (`OakSystem`)
+- Mahogany (`MahoganySystem`)
 - Coconut (`CoconutSystem`)
 
 ### Rendu (partiel)
