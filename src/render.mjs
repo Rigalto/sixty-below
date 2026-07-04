@@ -3,7 +3,7 @@
 import {WORLD_WIDTH, WORLD_HEIGHT, CANVAS_WIDTH, CANVAS_HEIGHT, OVERLAYS, MICROTASK, SEA_LEVEL} from './constant.mjs'
 import {NODES, NODE_TYPE, NODES_LOOKUP, SKY_BORDER_NODE} from '../assets/data/data.mjs'
 import {eventBus, microTasker, taskScheduler} from './utils.mjs'
-import {IMAGE_CACHE} from './assets.mjs'
+import {IMAGE_CACHE, PADDING} from './assets.mjs'
 import {chunkManager} from './world.mjs'
 
 if (WORLD_WIDTH !== 1024 || WORLD_HEIGHT !== 512 || CANVAS_WIDTH !== 1024 || CANVAS_HEIGHT !== 768) {
@@ -401,6 +401,9 @@ class WorldRenderer {
    * ou image statique sans blending. Sur la ligne SEA_LEVEL, une tuile disposant d'un waveImage
    * (SEA, DEEPSEA) l'utilise à la place de image (effet de vague en surface).
    * Les tuiles ETERNAL (image=null) sont rendues en aplat couleur uniquement — pas de blending.
+   * Les variantes à colonne dynamique (NATURAL, autotile générique, SKY_BORDER_NODE) compensent
+   * PADDING localement : sx = variant * (img.sw + 2*PADDING) + PADDING — resolveAssetData ne
+   * peut pas précalculer ce sx puisque la colonne n'est connue qu'au moment du rendu.
    * @param {number} chunkIndex
    * @param {OffscreenCanvas} canvas
    */
@@ -410,6 +413,8 @@ class WorldRenderer {
     const TOPSOIL_SUBSTRAT = NODE_TYPE.TOPSOIL | NODE_TYPE.SUBSTRAT
 
     const ctx = canvas.getContext('2d')
+    ctx.imageSmoothingEnabled = false
+
     ctx.clearRect(0, 0, canvas.width, canvas.height)
 
     const chunkX = (chunkIndex & 0x3F) << 4 // tuile X coin haut-gauche
@@ -460,9 +465,8 @@ class WorldRenderer {
           if (right === SKY || right === VOID) variant |= 4 // 4 - 2
           variant -= 1 // 1-7 => 0-6
 
-          // ctx.fillStyle = node.color
-          // ctx.fillRect(px, py, 16, 16)
-          ctx.drawImage(IMAGE_CACHE[img.imgIndex], variant * img.sw, img.sy, img.sw, img.sh, px, py, 16, 16)
+          ctx.drawImage(IMAGE_CACHE[img.imgIndex], variant * (img.sw + 2 * PADDING) + PADDING, img.sy, img.sw, img.sh, px, py, 16, 16)
+
           px += 16
           continue
         }
@@ -507,7 +511,7 @@ class WorldRenderer {
         }
 
         // Image autotile — colonne = variant, ligne = sy pré-calculé
-        ctx.drawImage(IMAGE_CACHE[img.imgIndex], variant * img.sw, img.sy, img.sw, img.sh, px, py, 16, 16)
+        ctx.drawImage(IMAGE_CACHE[img.imgIndex], variant * (img.sw + 2 * PADDING) + PADDING, img.sy, img.sw, img.sh, px, py, 16, 16)
 
         // ── Cas 4 : tuile de surface - ajout d'une bordure ──
         if (node.type & TOPSOIL_SUBSTRAT) {
@@ -517,7 +521,7 @@ class WorldRenderer {
           if (right === SKY) skyVariant |= 4 // 4 - 2
 
           const bi = SKY_BORDER_NODE.image
-          ctx.drawImage(IMAGE_CACHE[bi.imgIndex], (skyVariant - 1) * bi.sw, bi.sy, bi.sw, bi.sh, px, py, 16, 16)
+          ctx.drawImage(IMAGE_CACHE[bi.imgIndex], (skyVariant - 1) * (bi.sw + 2 * PADDING) + PADDING, bi.sy, bi.sw, bi.sh, px, py, 16, 16)
         }
 
         px += 16
@@ -526,42 +530,6 @@ class WorldRenderer {
       py += 16
     }
   }
-
-  // /**
-  //  * Fonction de dessin (Placeholder)
-  //  * Sera plus tard remplie par la logique de lecture des tuiles
-  //  */
-  // #drawChunkToCanvas (chunkIndex, canvas) {
-  //   const ctx = canvas.getContext('2d')
-
-  //   // 1. Nettoyage impératif (le canvas peut venir du canvasPool et contenir une vieille image)
-  //   ctx.clearRect(0, 0, canvas.width, canvas.height)
-
-  //   // 2. Récupération des données locales du chunk (Uint8Array de 256 octets)
-  //   const chunkData = chunkManager.getChunkData(chunkIndex)
-
-  //   // 3. Boucle de rendu (16x16)
-  //   // chunkData est un tableau plat de 0 à 255 correspondant exactement à notre tile 16x16
-  //   for (let i = 0; i < 256; i++) {
-  //     // ID de la tuile
-  //     const tileId = chunkData[i]
-
-  //     // Coordonnées locales dans le chunk (Optimisation bitwise)
-  //     const x = i & 0xF // i % 16
-  //     const y = i >> 4 // i / 16
-
-  //     // Lookup des propriétés
-  //     const node = NODES_LOOKUP[tileId]
-
-  //     // 4. Dessin du carré de couleur
-  //     // TODO: Implémenter l'utilisation des textures
-  //     if (node && node.color !== 'none') {
-  //       ctx.fillStyle = node.color
-  //       ctx.fillRect(x << 4, y << 4, 16, 16)
-  //     }
-  //   }
-  //   console.log(`[Render] Generating image for Chunk ${chunkIndex}`)
-  // }
 
   /**
    * PHASE UPDATE
@@ -771,6 +739,7 @@ class SkyRenderer {
     // On promet au navigateur que ce canvas est totalement opaque.
     // Le GPU n'a pas à calculer de transparence avec l'arrière-plan de la page web.
     this.#ctx = this.#canvas.getContext('2d', {alpha: false})
+    this.#ctx.imageSmoothingEnabled = false
 
     // 4. Ajout au DOM
     const container = document.getElementById('canvas-container')
@@ -826,6 +795,7 @@ class LightRenderer {
     // 3. Configuration du Contexte
     // On garde les settings par défaut (alpha: true) pour la transparence
     this.ctx = this.canvas.getContext('2d')
+    this.ctx.imageSmoothingEnabled = false
 
     // 4. Ancrage dans le conteneur central
     const container = document.getElementById('canvas-container')

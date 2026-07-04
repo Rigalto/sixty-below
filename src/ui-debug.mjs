@@ -207,6 +207,7 @@ class WorldMapDebug {
 
     document.body.appendChild(this.canvas)
     this.ctx = this.canvas.getContext('2d', {alpha: false}) // Opaque pour perf
+    this.ctx.imageSmoothingEnabled = false
   }
 
   #initColorCache () {

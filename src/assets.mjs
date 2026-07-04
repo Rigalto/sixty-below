@@ -3,6 +3,25 @@
 import {eventBus} from './utils.mjs'
 
 /* =========================================
+   0. CONFIGURATION ATLAS
+   ========================================= */
+
+// Racine des sprites — bascule entre atlas bruts (debug, bleeding visible au zoom) et atlas
+// paddés (production, générés par extrude-atlas.mjs). Exportée : inventory.mjs construit ses
+// URL de background-image hors canvas et doit rester cohérente avec ce choix.
+//
+// Pour régénérer les atlas paddés (une fois, hors runtime) :
+//   node extrude-atlas.mjs assets/sprites assets/sprites-padded
+//
+export const BASE_DIR = 'assets/sprites' // debug — artefact de bleeding visible
+// const BASE_DIR = 'assets/sprites-padded' // production
+
+// Dérivée de BASE_DIR : 1 si l'atlas paddé est actif, 0 sinon (atlas brut, debug bleeding).
+// Exportée : render.mjs en a besoin pour corriger le pas des variantes autotile (colonne
+// dynamique calculée au runtime, hors de resolveAssetData — cf. commentaire de la fonction).
+export const PADDING = BASE_DIR === 'assets/sprites-padded' ? 1 : 0
+
+/* =========================================
    1. LISTES DES FICHIERS
    ========================================= */
 
@@ -12,36 +31,36 @@ export const IMAGE_FILES = [
   // ///// //
 
   // Tuiles de terrain / substrat, topsoil, web
-  'assets/sprites/substrat_16_16.png',
+  `${BASE_DIR}/substrat_16_16.png`,
   // Tuiles de mineral / ore, deposit, rock
-  'assets/sprites/mineral_16_16.png',
+  `${BASE_DIR}/mineral_16_16.png`,
   // Tuiles de natural / grass
-  'assets/sprites/natural_16_16.png',
+  `${BASE_DIR}/natural_16_16.png`,
 
   // ITEMS //
   // ///// //
 
   // Items minés / substrat, topsoil, web, ore, raw gem, rock
-  'assets/sprites/mined_32_32.png',
+  `${BASE_DIR}/mined_32_32.png`,
   // Items foraged / shaked /
-  'assets/sprites/foraged_32_32.png',
+  `${BASE_DIR}/foraged_32_32.png`,
   // critters / baits
-  'assets/sprites/bait_32_32.png',
+  `${BASE_DIR}/bait_32_32.png`,
   // Items raffinés / bar, cut gem, metal fitting, fabric, coconut
-  'assets/sprites/refined_32_32.png',
+  `${BASE_DIR}/refined_32_32.png`,
   // trinkets
-  'assets/sprites/trinket_32_32.png',
+  `${BASE_DIR}/trinket_32_32.png`,
   // tools
-  'assets/sprites/tool_32_32.png',
+  `${BASE_DIR}/tool_32_32.png`,
   // provisoire
-  'assets/sprites/loom_32_32.png',
+  `${BASE_DIR}/loom_32_32.png`,
 
   // PLACED //
   // ////// //
 
-  'assets/sprites/placed_16_16.png',
-  'assets/sprites/placed_16_32.png',
-  'assets/sprites/placed_16_48.png',
+  `${BASE_DIR}/placed_16_16.png`,
+  `${BASE_DIR}/placed_16_32.png`,
+  `${BASE_DIR}/placed_16_48.png`,
 
   // supprimer ci-dessous
   // ////////////////////
@@ -50,9 +69,9 @@ export const IMAGE_FILES = [
   // ////////
 
   // Tuiles de wood wall / background wall
-  'assets/sprites/wall_16_16.png',
+  `${BASE_DIR}/wall_16_16.png`,
   // sea / water / honey / sap
-  'assets/sprites/liquid_16_16.png',
+  `${BASE_DIR}/liquid_16_16.png`,
   // ITEMS //
   // ////////
   // Items des blocs de minage
@@ -63,48 +82,48 @@ export const IMAGE_FILES = [
   // 'assets/sprites/blocks_16_16.png',
   // weapons / tools / walls / seeds / platforms / bags
   // misc
-  'assets/sprites/tools_32_32.png',
+  `${BASE_DIR}/tools_32_32.png`,
   // accessory
-  'assets/sprites/accessories_32_32.png',
+  `${BASE_DIR}/accessories_32_32.png`,
   // furniture / crafting station
-  'assets/sprites/furniture_32_32.png',
+  `${BASE_DIR}/furniture_32_32.png`,
   // potions / consumables
-  'assets/sprites/potions_32_32.png',
+  `${BASE_DIR}/potions_32_32.png`,
   // crafting seul
-  'assets/sprites/crafting_32_32.png',
+  `${BASE_DIR}/crafting_32_32.png`,
   // food
-  'assets/sprites/food_32_32.png',
+  `${BASE_DIR}/food_32_32.png`,
   // PLACED //
   // /////////
-  'assets/sprites/fuws_16_16.png',
-  'assets/sprites/fuws_16_48.png',
-  'assets/sprites/fuws_32_16.png',
-  'assets/sprites/fuws_32_32.png',
-  'assets/sprites/fuws_32_48.png',
-  'assets/sprites/fuws_32_80.png',
-  'assets/sprites/fuws_48_16.png',
-  'assets/sprites/fuws_48_32.png',
-  'assets/sprites/fuws_48_48.png',
-  'assets/sprites/fuws_64_32.png',
-  'assets/sprites/npc_26_46.png',
-  'assets/sprites/heads_26_22.png',
-  'assets/sprites/bodies_26_18.png',
-  'assets/sprites/feet_26_12.png',
-  'assets/sprites/oak_80_48.png',
-  'assets/sprites/mahogany_80_48.png',
-  'assets/sprites/coconut_80_48.png',
+  `${BASE_DIR}/fuws_16_16.png`,
+  `${BASE_DIR}/fuws_16_48.png`,
+  `${BASE_DIR}/fuws_32_16.png`,
+  `${BASE_DIR}/fuws_32_32.png`,
+  `${BASE_DIR}/fuws_32_48.png`,
+  `${BASE_DIR}/fuws_32_80.png`,
+  `${BASE_DIR}/fuws_48_16.png`,
+  `${BASE_DIR}/fuws_48_32.png`,
+  `${BASE_DIR}/fuws_48_48.png`,
+  `${BASE_DIR}/fuws_64_32.png`,
+  `${BASE_DIR}/npc_26_46.png`,
+  `${BASE_DIR}/heads_26_22.png`,
+  `${BASE_DIR}/bodies_26_18.png`,
+  `${BASE_DIR}/feet_26_12.png`,
+  `${BASE_DIR}/oak_80_48.png`,
+  `${BASE_DIR}/mahogany_80_48.png`,
+  `${BASE_DIR}/coconut_80_48.png`,
   // IN HAND //
   // //////////
-  'assets/sprites/s_42_42.png',
-  'assets/sprites/w_42_42.png',
-  'assets/sprites/w_62_62.png',
+  `${BASE_DIR}/s_42_42.png`,
+  `${BASE_DIR}/w_42_42.png`,
+  `${BASE_DIR}/w_62_62.png`,
   // IHM //
   // //////
-  'assets/sprites/buff_32_32.png', // buffs et town signs
-  'assets/sprites/moon_50_50.png',
-  'assets/sprites/env_32_32.png',
-  'assets/sprites/coins_16_16.png', // aussi un item
-  'assets/sprites/ihm_32_32.png'
+  `${BASE_DIR}/buff_32_32.png`, // buffs et town signs
+  `${BASE_DIR}/moon_50_50.png`,
+  `${BASE_DIR}/env_32_32.png`,
+  `${BASE_DIR}/coins_16_16.png`, // aussi un item
+  `${BASE_DIR}/ihm_32_32.png`
 ]
 
 export const SOUND_FILES = [
@@ -233,8 +252,11 @@ export const resolveAssetData = (codeStr) => {
   return {
     imgIndex, // L'entier ultra-rapide pour le renderer
     file: atlasName,
-    sx: col * cellW, // Position X de base (0 pour autotile)
-    sy: row * cellH, // Position Y (Ligne du matériau)
+    // sx: col * cellW, // Position X de base (0 pour autotile)
+    // sy: row * cellH, // Position Y (Ligne du matériau)
+    sx: col * (cellW + 2 * PADDING) + PADDING, // Position X de base (+PADDING, 0 base pour autotile)
+    sy: row * (cellH + 2 * PADDING) + PADDING, // Position Y (Ligne du matériau, +PADDING)
+
     sw: cellW,
     sh: cellH,
     isAutoTile // Flag utile pour le Renderer (savoir s'il doit calculer et appliquer le mask)
