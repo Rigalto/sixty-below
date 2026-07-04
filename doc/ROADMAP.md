@@ -39,8 +39,6 @@
   - 4,0 - 5,0 - 6,0 - 7,0
   - 0,1 - 1,1, - 5,1
 - Terminer les images pour les coconut trees :
-   - 1 images sur ligne 2
-   - 1 images sur ligne 3
    - 1 images sur ligne 4
 
 ---

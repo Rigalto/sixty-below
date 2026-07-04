@@ -915,11 +915,11 @@ export const COCONUT_CYCLE_DELAY = 20 * 60 * 1000
 export const TREE_IMAGES = {
   coconut: { // 0 : décalage à gauche, 1 : centré, 2 : décalage à droite
     '0_0': ['coconut_80_48-0-2', 'coconut_80_48-1-2', 'coconut_80_48-2-2'],
-    '0_1': ['coconut_80_48-3-1', 'coconut_80_48-4-1'], // OK
+    '0_1': ['coconut_80_48-3-1', 'coconut_80_48-4-1', 'coconut_80_48-5-1'],
     '1_0': ['coconut_80_48-3-0', 'coconut_80_48-4-0', 'coconut_80_48-5-0'],
     '1_1': ['coconut_80_48-0-1', 'coconut_80_48-1-1', 'coconut_80_48-2-1'],
     '1_2': ['coconut_80_48-3-3', 'coconut_80_48-4-3'], // OK
-    '2_1': ['coconut_80_48-3-2', 'coconut_80_48-4-2'], // OK
+    '2_1': ['coconut_80_48-3-2', 'coconut_80_48-4-2', 'coconut_80_48-5-2'],
     '2_2': ['coconut_80_48-0-3', 'coconut_80_48-1-3', 'coconut_80_48-2-3'],
     head: ['coconut_80_48-0-0', 'coconut_80_48-1-0', 'coconut_80_48-2-0']
   },
