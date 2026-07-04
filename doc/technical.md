@@ -499,6 +499,7 @@ Cette section définit les événements officiels. Tout nouvel événement doit 
 | E | `time/every-hour-10` | `{ day, hour, minute, isDay }` | Début du créneau de floraison quotidien (skip si rainy/stormy). |
 | E | `time/every-hour-14` | `{ day, hour, minute, isDay }` | Flétrissement inconditionnel de tous les ambermirages présents. |
 | E | `sewed/ambermirage` | `number` (soilIndex) | Le joueur plante une graine d'ambermirage. |
+| E | `world/tile-changed` | `{ tileIndex: number, tileOldCode: number, tileNewCode: number }` | Entretien réactif des spots (création, déplacement, suppression). |
 
 #### Oak (`OakSystem`)
 

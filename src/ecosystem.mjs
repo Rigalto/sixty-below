@@ -1325,10 +1325,12 @@ class AmbermirageSystem {
     eventBus.on('time/every-hour-14', this.onHour14Ambermirage)
     this.onSewedAmbermirage = this.onSewedAmbermirage.bind(this)
     eventBus.on('sewed/ambermirage', this.onSewedAmbermirage)
+    this.onTileChangedAmbermirage = this.onTileChangedAmbermirage.bind(this)
+    eventBus.on('world/tile-changed', this.onTileChangedAmbermirage)
     // Micro-tâches
     this.bloomAmbermirage = this.bloomAmbermirage.bind(this)
     this.unbloomAmbermirage = this.unbloomAmbermirage.bind(this)
-    // TODO — EventBus : world/tile-changed (entretien #byX + recalcul present)
+    this.onAmbermirageTileCheck = this.onAmbermirageTileCheck.bind(this)
   }
 
   /**
@@ -1478,13 +1480,10 @@ class AmbermirageSystem {
   bloomAmbermirage () {
     if (buffManager.getBuff('rainy') || buffManager.getBuff('stormy')) return
 
-    const SKY = NODES.SKY.code
-
     for (const record of this.#list) {
       if (record.present) continue
 
       if (!blockedTiles.canPlace(record.index)) continue
-      if (chunkManager.getTileAt(record.index) !== SKY) continue
       if (this.#byX[record.x - 1] === null) continue
       if (this.#byX[record.x + 1] === null) continue
 
@@ -1526,6 +1525,173 @@ class AmbermirageSystem {
     this.#bySoil.delete(record.soilIndex)
     this.#displayed.delete(record)
     blockedTiles.unblockPlacement(record.index)
+    saveManager.queueStaticUpdate({storeName: 'plant', record})
+  }
+
+  /**
+   * Liaison EventBus : 'world/tile-changed' — programme onAmbermirageTileCheck en microtâche+   * pour cette tuile. Aucune logique métier ici (mesuré jusqu'à 300µs en direct, hors budget+   * frame si traité en synchrone).
+   * @param {{tileIndex: number, tileOldCode: number, tileNewCode: number}} payload
+   */
+  onTileChangedAmbermirage ({tileIndex}) {
+    const {priority, capacity} = MICROTASK.AMBERMIRAGE_TILE_CHECK
+    microTasker.enqueue(this.onAmbermirageTileCheck, priority, capacity, tileIndex)
+  }
+
+  /**
+   * Microtâche : entretien réactif d'un spot d'ambermirage pour une tuile modifiée. Relit
+   * l'état courant de la tuile via chunkManager (pas le tileNewCode de l'event d'origine,
+   * potentiellement obsolète si la tuile a rechangé entre l'event et l'exécution différée).
+   * Décompose 4 cas : (A) tuile modifiée = tuile-plante (record.index) d'un spot existant de
+   * la colonne — remonte le spot si le sable a progressé d'un cran, détruit sinon ; (B) tuile
+   * modifiée = tuile-sol (record.soilIndex) — descend le spot si le sol a été creusé et qu'une
+   * nouvelle surface SAND apparaît en dessous, détruit sinon ; (C-1) aucun
+   * spot dans la colonne — création possible ; (C-2) un spot existe dans la colonne mais la
+   * tuile modifiée n'est ni son index ni son soilIndex — sans effet (bloomAmbermirage ne lit
+   * jamais qu'index/soilIndex, jamais une autre tuile de la colonne).
+   * @param {number} tileIndex
+   */
+  onAmbermirageTileCheck (tileIndex) {
+    const tileNewCode = chunkManager.getTileAt(tileIndex)
+    const x = tileIndex & 0x3FF
+    const record = this.#byX[x]
+
+    if (record === null) {
+      this.#tryCreateSpot(x, tileIndex, tileNewCode)
+      return
+    }
+
+    if (tileIndex === record.index) {
+      this.#onPlantTileChanged(record, tileIndex, tileNewCode)
+      return
+    }
+
+    if (tileIndex === record.soilIndex) {
+      this.#onSoilTileChanged(record, tileNewCode)
+    }
+  }
+
+  /**
+   * Gère un changement sur la tuile-plante (record.index) d'un spot existant. Détruit d'abord
+   * la fleur si présente (avec l'ancien record.index, avant toute modification du record — sinon
+   * blockedTiles.unblockPlacement libérerait la mauvaise tuile). Si la nouvelle tuile est SAND
+   * et que la tuile encore au-dessus est SKY, le sable a progressé d'un cran : on remonte le
+   * spot d'une case plutôt que détruire puis recréer. Sinon, le spot est détruit.
+   * @param {object} record
+   * @param {number} tileIndex — égal à record.index (avant mise à jour)
+   * @param {number} tileNewCode
+   */
+  #onPlantTileChanged (record, tileIndex, tileNewCode) {
+    const SAND = NODES.SAND.code
+    const SKY = NODES.SKY.code
+    const W = WORLD_WIDTH
+
+    if (record.present) this.#destroyPresent(record)
+
+    if (tileNewCode === SAND && chunkManager.getTileAt(tileIndex - W) === SKY) {
+      this.#spotsBySoil.delete(record.soilIndex)
+      record.soilIndex = tileIndex
+      record.index = tileIndex - W
+      record.y -= 1
+      this.#spotsBySoil.set(record.soilIndex, record)
+      saveManager.queueStaticUpdate({storeName: 'plant', record})
+      return
+    }
+
+    this.#destroySpot(record)
+  }
+
+  /**
+   * Gère un changement sur la tuile-sol (record.soilIndex) d'un spot existant. Détruit d'abord
+   * la fleur si présente. Si la nouvelle tuile est SKY et que la tuile juste en dessous est
+   * SAND, le sol a été creusé et une nouvelle surface SAND est apparue en dessous : on descend
+   * le spot d'une case plutôt que détruire puis recréer. Sinon, le spot est détruit.
+   * @param {object} record
+   * @param {number} tileNewCode
+   */
+  #onSoilTileChanged (record, tileNewCode) {
+    const SAND = NODES.SAND.code
+    const SKY = NODES.SKY.code
+    const W = WORLD_WIDTH
+
+    if (record.present) this.#destroyPresent(record)
+
+    if (tileNewCode === SKY && chunkManager.getTileAt(record.soilIndex + W) === SAND) {
+      this.#spotsBySoil.delete(record.soilIndex)
+      record.index = record.soilIndex
+      record.soilIndex = record.soilIndex + W
+      record.y += 1
+      this.#spotsBySoil.set(record.soilIndex, record)
+      saveManager.queueStaticUpdate({storeName: 'plant', record})
+      return
+    }
+
+    this.#destroySpot(record)
+  }
+
+  /**
+   * Supprime définitivement un spot (pas seulement la fleur, cf. #destroyPresent ci-dessus) :
+   * détruit la fleur si encore présente, retire toutes les références (#spotsBySoil, #byX),
+   * marque le record deleted et persiste, retire le record de #list (swap  length--, O(n) via
+   * indexOf — cf. remarque sur une possible suppression de #list).
+   * @param {object} record
+   */
+  #destroySpot (record) {
+    if (record.present) this.#destroyPresent(record)
+    this.#spotsBySoil.delete(record.soilIndex)
+    this.#byX[record.x] = null
+    record.deleted = true
+    saveManager.queueStaticUpdate({storeName: 'plant', record})
+
+    const idx = this.#list.indexOf(record)
+    this.#list[idx] = this.#list[this.#list.length - 1]
+    this.#list.length--
+  }
+
+  /**
+   * Tente de créer un nouveau spot après un changement de tuile dans une colonne qui n'en avait
+   * pas. Deux cas symétriques, mutuellement exclusifs (tileNewCode ne peut valoir qu'une chose) :
+   *   - la tuile modifiée devient SAND et la tuile au-dessus (déjà en place) est SKY
+   *     → spot à tileIndex (ex: dépôt de sable exposé directement).
+   *   - la tuile modifiée devient SKY et la tuile en dessous (déjà en place) est SAND
+   *     → spot à tileIndex + W (ex: creusement/suppression qui expose un SAND déjà présent).
+   * Démarre toujours present:false — la pousse effective se joue à bloomAmbermirage (10h00).
+   * @param {number} x
+   * @param {number} tileIndex
+   * @param {number} tileNewCode
+   */
+  #tryCreateSpot (x, tileIndex, tileNewCode) {
+    const SAND = NODES.SAND.code
+    const SKY = NODES.SKY.code
+    const W = WORLD_WIDTH
+
+    let soilIndex
+    if (tileNewCode === SAND && chunkManager.getTileAt(tileIndex - W) === SKY) {
+      soilIndex = tileIndex
+    } else if (tileNewCode === SKY && chunkManager.getTileAt(tileIndex + W) === SAND) {
+      soilIndex = tileIndex + W
+    } else {
+      return
+    }
+
+    const y = soilIndex >> 10
+    const record = {
+      id: uniqueIdGenerator.getUniqueId(),
+      kind: PLANT_KIND.HERB,
+      type: PLANT_TYPE.AMBERMIRAGE,
+      index: soilIndex - W,
+      soilIndex,
+      itemId: 'ambermirage',
+      w: 1,
+      h: 1,
+      x,
+      y: y - 1,
+      present: false,
+      deleted: false
+    }
+
+    this.#list.push(record)
+    this.#spotsBySoil.set(record.soilIndex, record)
+    this.#byX[x] = record
     saveManager.queueStaticUpdate({storeName: 'plant', record})
   }
 
