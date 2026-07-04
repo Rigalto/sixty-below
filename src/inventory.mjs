@@ -1187,6 +1187,7 @@ class InventoryManager {
       if (slot.locked || slot.item !== item || slot.prefix !== prefix) continue
       slot.count += count
       this.#dirtyKeys.add(slot)
+      this.save()
       return
     }
     // Stack hotbar
@@ -1194,6 +1195,7 @@ class InventoryManager {
       if (slot.locked || slot.item !== item || slot.prefix !== prefix) continue
       slot.count += count
       this.#dirtyKeys.add(slot)
+      this.save()
       eventBus.emit('hotbar/slot-update', {index: slot.slot, slot})
       return
     }
@@ -1204,6 +1206,7 @@ class InventoryManager {
       slot.count = count
       slot.prefix = prefix
       this.#dirtyKeys.add(slot)
+      this.save()
       return
     }
     // Premier libre hotbar
@@ -1213,6 +1216,7 @@ class InventoryManager {
       slot.count = count
       slot.prefix = prefix
       this.#dirtyKeys.add(slot)
+      this.save()
       eventBus.emit('hotbar/slot-update', {index: slot.slot, slot})
       return
     }
