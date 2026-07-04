@@ -420,6 +420,8 @@ class GameCore {
       await database.deleteMultipleRecords('plant', plantsToDelete)
     }
     sunflowerSystem.initSeed(state.sewedsunflower)
+    ambermirageSystem.initSeed(state.sewedambermirage ?? [])
+
     floraManager.onPreloadChunksChanged(camera.preloadChunks)
 
     // 5.5 TODO Monsters

@@ -6,7 +6,7 @@ import {WORLD_WIDTH, WORLD_HEIGHT, MICROTASK, TOPSOIL_Y_SKY_SURFACE, TOPSOIL_Y_S
 import {database, uniqueIdGenerator} from './database.mjs'
 
 import {eventBus, seededRNG, blockedTiles, microTasker, taskScheduler} from './utils.mjs'
-import {NODES, ITEMS, PLANT_KIND, PLANT_TYPE, PLANT_SYSTEM_LOOKUP, ALL_PLANT_SYSTEMS, COBWEB_GROWTH_DELAY_MS, SUNFLOWER_RATE, PARSNIP_RATE, COCONUT_CYCLE_DELAY, TREE_IMAGES} from '../assets/data/data.mjs'
+import {NODES, ITEMS, PLANT_KIND, PLANT_TYPE, PLANT_SYSTEM_LOOKUP, ALL_PLANT_SYSTEMS, COBWEB_GROWTH_DELAY_MS, SUNFLOWER_RATE, PARSNIP_RATE, AMBERMIRAGE_PCENT, COCONUT_CYCLE_DELAY, TREE_IMAGES} from '../assets/data/data.mjs'
 import {IMAGE_CACHE} from './assets.mjs'
 import {saveManager} from './persistence.mjs'
 import {chunkManager} from './world.mjs'
@@ -978,10 +978,10 @@ class OleanderSystem {
 }
 export const oleanderSystem = new OleanderSystem()
 
-// ParsnipSystem — calqué sur SunflowerSystem (spot toujours en DB, present = visible/forageable).
-// TODO ouverts (cf. commentaires inline) : conditions d'ajout d'un spot (onParsnipSpotCheck),
-// mécanisme de repousse après forage (rien ne remet present à true pour l'instant),
-// w/h placeholder à vérifier contre generate.mjs.
+/* ====================================================================================================
+   PARSNIP SYSTEM
+   ==================================================================================================== */
+
 class ParsnipSystem {
   byTile = new Map() // Map<tileIndex, record> — public : membership O(1) + lookup record
   #list = [] // record[] — tous les spots (présents ou non)
@@ -1301,9 +1301,265 @@ class ParsnipSystem {
 }
 export const parsnipSystem = new ParsnipSystem()
 
-// OakSystem — gère Oak (TREE) et Bolete (MUSHROOM), couplés : un Oak crée ses 2 spots de
-// Bolete (gauche/droite), détruits avec lui. Pour l'instant : uniquement l'initialisation
-// et l'affichage des bolete. Le reste est TODO (cf. liste en fin de classe).
+/* ====================================================================================================
+   AMBERMIRAGE SYSTEM
+   ==================================================================================================== */
+
+class AmbermirageSystem {
+  byTile = new Map() // Map<tileIndex, record> — public : membership O(1) + lookup record
+  #list = [] // record[] — tous les spots (présents ou non)
+  #byChunk = new Map() // Map<chunkKey, Set> — lookup spatial pour onPreloadChunksChanged
+  #bySoil = new Map() // Map<soilIndex, record> — plantes présentes : détection minage de la tuile sol
+  #spotsBySoil = new Map() // Map<soilIndex, record> — tous les spots (présents ou non) : suppression O(1)
+  #byX = new Array(WORLD_WIDTH).fill(null) // record|null par colonne — lookup direct voisin x-1/x+1
+  #sewedTiles = new Set() // Set<soilIndex> — tuiles semées (100% de pousse)
+  #displayed = new Set() // Set<record> — spots dans les chunks preload (cible render)
+  #image = null // ITEMS.ambermirage.placed, mis en cache dans init()
+  #imgSeed = null // ITEMS.ambermirageSeed.placed, mis en cache dans init()
+
+  constructor () {
+    // EventBus
+    this.onHour10Ambermirage = this.onHour10Ambermirage.bind(this)
+    eventBus.on('time/every-hour-10', this.onHour10Ambermirage)
+    this.onHour14Ambermirage = this.onHour14Ambermirage.bind(this)
+    eventBus.on('time/every-hour-14', this.onHour14Ambermirage)
+    this.onSewedAmbermirage = this.onSewedAmbermirage.bind(this)
+    eventBus.on('sewed/ambermirage', this.onSewedAmbermirage)
+    // Micro-tâches
+    this.bloomAmbermirage = this.bloomAmbermirage.bind(this)
+    this.unbloomAmbermirage = this.unbloomAmbermirage.bind(this)
+    // TODO — EventBus : world/tile-changed (entretien #byX + recalcul present)
+  }
+
+  /**
+ * Réinitialise toutes les structures. Appelé en début de session.
+ */
+  init () {
+    this.byTile.clear()
+    this.#list.length = 0
+    this.#byChunk.clear()
+    this.#bySoil.clear()
+    this.#spotsBySoil.clear()
+    this.#byX.fill(null)
+    this.#sewedTiles.clear()
+    this.#displayed.clear()
+
+    this.#image = ITEMS.ambermirage.placed // après hydratation
+    this.#imgSeed = ITEMS.ambermirageSeed.placed // après hydratation
+  }
+
+  /**
+ * Enregistre un spot et peuple les structures internes.
+ * @param {object} record — record HERB/AMBERMIRAGE actif (deleted=false garanti par l'appelant)
+ */
+  initPlant (record) {
+    this.#list.push(record)
+    this.#spotsBySoil.set(record.soilIndex, record)
+    this.#byX[record.x] = record
+    if (!record.present) return
+    addToByTile(this.byTile, record)
+    addToByChunk(this.#byChunk, record)
+    this.#bySoil.set(record.soilIndex, record)
+    blockedTiles.blockPlacement(record.index)
+  }
+
+  /**
+ * Reconstruit #displayed depuis les chunks preload de la caméra.
+ * @param {Set<number>} preloadChunks
+ */
+  onPreloadChunksChanged (preloadChunks) {
+    buildDisplayed(this.#displayed, this.#byChunk, preloadChunks)
+  }
+
+  /**
+ * Dessine les ambermirages visibles et présents sur le contexte transformé.
+ * Dessine également, hors chunks preload (liste courte), la graine sur chaque tuile semée.
+ * @param {CanvasRenderingContext2D} ctx — contexte déjà transformé (caméra appliquée)
+ */
+  render (ctx) {
+    const img = this.#image
+    for (const record of this.#displayed) {
+      const pxX = (record.index & 0x3FF) << 4
+      const pxY = ((record.index >> 10) << 4) + 2
+      ctx.drawImage(IMAGE_CACHE[img.imgIndex], img.sx, img.sy, img.sw, img.sh, pxX, pxY, img.sw, img.sh)
+    }
+
+    const seedImg = this.#imgSeed
+    for (const soilIndex of this.#sewedTiles) {
+      const pxX = (soilIndex & 0x3FF) << 4
+      const pxY = (soilIndex >> 10) << 4
+      ctx.drawImage(IMAGE_CACHE[seedImg.imgIndex], seedImg.sx, seedImg.sy, seedImg.sw, seedImg.sh, pxX, pxY, seedImg.sw, seedImg.sh)
+    }
+  }
+
+  /**
+ * Traite le foraging réussi : marque l'ambermirage absent et persiste.
+ * Le loot est géré en commun par ForagingManager — cette méthode ne gère que l'état de la plante.
+ * @param {object} record
+ */
+  onForaged (record) {
+    this.#destroyPresent(record)
+  }
+
+  /**
+ * Retourne le record de l'ambermirage couvrant la tuile donnée, ou null.
+ * @param {number} tileIndex — (y << 10) | x
+ * @returns {object|null}
+ */
+  getPlantAt (tileIndex) {
+    return this.byTile.get(tileIndex) ?? null
+  }
+
+  /**
+ * Indique si le record est actuellement présent (forageable).
+ * @param {object} record
+ * @returns {boolean}
+ */
+  isPresent (record) { return record.present }
+
+  /**
+   * Restaure la liste des tuiles de graines d'ambermirage plantées par le joueur, lue depuis
+   * gamestate au démarrage de session. Remplace le contenu courant de #sewedTiles.
+   * @param {number[]} sewedTiles — tableau persisté (gamestate.sewedambermirage), [] si absent
+   */
+  initSeed (sewedTiles) {
+    this.#sewedTiles.clear()
+    for (const soilIndex of sewedTiles) this.#sewedTiles.add(soilIndex)
+  }
+
+  /**
+   * Liaison EventBus : 'sewed/ambermirage' — le joueur a planté une graine d'ambermirage sur
+   * une tuile SAND valide (vérifications déjà faites par SowingManager). Mémorise la tuile et
+   * persiste immédiatement la liste complète dans gamestate.
+   * @param {number} soilIndex — (y << 10) | x, tuile plantée
+   */
+  onSewedAmbermirage (soilIndex) {
+    if (!this.#spotsBySoil.has(soilIndex)) {
+      console.error(`AmbermirageSystem.onSewedAmbermirage: aucun spot à soilIndex ${soilIndex}`)
+      return
+    }
+    this.#sewedTiles.add(soilIndex)
+    database.setGameState('sewedambermirage', [...this.#sewedTiles])
+  }
+
+  /**
+   * Indique si une AmbermirageSeed peut être plantée sur ce soilIndex.
+   * Seule condition : pas de graine déjà semée sur ce spot.
+   * @param {number} soilIndex — (y << 10) | x
+   * @param {string} seed
+   * @returns {boolean|null} null si `seed` n'est pas 'ambermirageSeed'
+   */
+  canSow (soilIndex, seed) {
+    if (seed !== 'ambermirageSeed') return null
+    return !this.#sewedTiles.has(soilIndex)
+  }
+
+  /** Liaison EventBus : 'time/every-hour-10' — début du créneau de floraison quotidien. */
+  onHour10Ambermirage () {
+    const {priority, capacity} = MICROTASK.BLOOM_AMBERMIRAGE
+    microTasker.enqueue(this.bloomAmbermirage, priority, capacity)
+  }
+
+  /** Liaison EventBus : 'time/every-hour-14' — fin du créneau, flétrissement complet. */
+  onHour14Ambermirage () {
+    const {priority, capacity} = MICROTASK.UNBLOOM_AMBERMIRAGE
+    microTasker.enqueue(this.unbloomAmbermirage, priority, capacity)
+  }
+
+  /**
+   * Microtâche : tente de faire pousser un ambermirage sur chaque spot encore absent.
+   * Skip total (aucune pousse, aucun tirage) si le temps du jour est rainy ou stormy.
+   * Un spot doit toujours être éligible pour germer, semé ou non — tuile-plante (record.index)
+   * libre (blockedTiles) et encore SKY (donc pas envahie par un liquide entretemps), colonnes
+   * voisines (record.x-1, record.x1) toujours enregistrées comme SAND dans #byX. Semé
+   * (#sewedTiles) : 100% si éligible. Sinon : AMBERMIRAGE_PCENT% si éligible.
+   * #sewedTiles est vidée en fin de passe (toutes les graines sont consommées, germées ou non).
+   */
+  bloomAmbermirage () {
+    if (buffManager.getBuff('rainy') || buffManager.getBuff('stormy')) return
+
+    const SKY = NODES.SKY.code
+
+    for (const record of this.#list) {
+      if (record.present) continue
+
+      if (!blockedTiles.canPlace(record.index)) continue
+      if (chunkManager.getTileAt(record.index) !== SKY) continue
+      if (this.#byX[record.x - 1] === null) continue
+      if (this.#byX[record.x + 1] === null) continue
+
+      const sown = this.#sewedTiles.has(record.soilIndex)
+      if (!sown && !seededRNG.randomGetPercent(AMBERMIRAGE_PCENT)) continue
+
+      record.present = true
+      addToByTile(this.byTile, record)
+      addToByChunk(this.#byChunk, record)
+      this.#bySoil.set(record.soilIndex, record)
+      blockedTiles.blockPlacement(record.index)
+      saveManager.queueStaticUpdate({storeName: 'plant', record})
+    }
+
+    this.#sewedTiles.clear() // toutes les graines sont consommées, qu'elles aient germé ou non
+    database.setGameState('sewedambermirage', [])
+    buildDisplayed(this.#displayed, this.#byChunk, camera.preloadChunks)
+  }
+
+  /**
+   * Microtâche : flétrit tous les ambermirages actuellement présents, sans condition ni loot.
+   * Itère #bySoil (uniquement les présents), pas #list entier.
+   */
+  unbloomAmbermirage () {
+    for (const record of this.#bySoil.values()) this.#destroyPresent(record)
+    buildDisplayed(this.#displayed, this.#byChunk, camera.preloadChunks)
+  }
+
+  /**
+ * Détruit un ambermirage présent sans loot : retire toutes les structures et persiste.
+ * Guard : no-op si record.present est déjà false.
+ * @param {object} record
+ */
+  #destroyPresent (record) {
+    if (!record.present) return
+    record.present = false
+    removeFromByTile(this.byTile, record)
+    removeFromByChunk(this.#byChunk, record)
+    this.#bySoil.delete(record.soilIndex)
+    this.#displayed.delete(record)
+    blockedTiles.unblockPlacement(record.index)
+    saveManager.queueStaticUpdate({storeName: 'plant', record})
+  }
+
+  // ///// //
+  // DEBUG //
+  // ///// //
+
+  /**
+* DEBUG — Affiche un cercle orange au centre de la tuile sous chaque spot enregistré dans #list
+* (tous les spots SAND, present ou non). Vérifie la cohérence avec #spotsBySoil (même cardinal
+* attendu).
+* @param {CanvasRenderingContext2D} ctx — contexte déjà transformé (caméra appliquée)
+*/
+  debugRenderSpots (ctx) {
+    ctx.save()
+    ctx.fillStyle = 'rgba(43, 0, 255, 0.7)'
+    for (const record of this.#list) {
+      const cx = ((record.index & 0x3FF) << 4) + 8
+      const cy = ((record.index >> 10) << 4) + 40 - 16
+      ctx.beginPath()
+      ctx.arc(cx, cy, 4, 0, 6.2832)
+      ctx.fill()
+    }
+    if (this.#list.length !== this.#spotsBySoil.size) {
+      console.warn(`AmbermirageSystem: #list(${this.#list.length}) !== #spotsBySoil(${this.#spotsBySoil.size})`)
+    }
+    ctx.restore()
+  }
+}
+export const ambermirageSystem = new AmbermirageSystem()
+
+/* ====================================================================================================
+   OAK SYSTEM
+   ==================================================================================================== */
 
 // Lignes d'images empilées par size (0 à 4)
 const OAK_SIZE_ROWS = [
@@ -1900,10 +2156,9 @@ class OakSystem {
 }
 export const oakSystem = new OakSystem()
 
-// MahoganySystem — gère Mahogany (TREE) et Pink Mycenia (MUSHROOM), couplés : un Mahogany crée
-// ses 2 spots de Pink Mycenia (gauche/droite), détruits avec lui. Miroir de OakSystem : mêmes
-// mécaniques (croissance, chopping, shaking, floraison jour/nuit), GRASSJUNGLE au lieu de
-// GRASSFOREST, Pink Mycenia au lieu de Bolete, samara au lieu d'acorn.
+/* ====================================================================================================
+   MAHOGANY SYSTEM
+   ==================================================================================================== */
 
 // Lignes d'images empilées par size (0 à 4) — identique à OAK_SIZE_ROWS, dupliqué pour garder
 // chaque système autonome (pas de dépendance croisée OakSystem/MahoganySystem)
@@ -2952,150 +3207,6 @@ class FloraManager {
 }
 
 export const floraManager = new FloraManager()
-
-// AmbermirageSystem — spot toujours en DB, present = visible/forageable).
-// Spécificité : TOUS les spots de surface SAND sont enregistrés (pas seulement ceux avec voisins
-// SAND) — l'éligibilité (x-1 et x+1 également SAND) est une condition de `present`, pas d'existence
-// du spot. #byX indexe directement par colonne (record ou null) : lookup O(1) d'un voisin sans
-// connaître son y, nécessaire pour toute vérification x-1/x+1.
-// TODO ouverts : entretien réactif de #byX/#spotsBySoil sur world/tile-changed (création,
-// déplacement, suppression de spot selon la nouvelle tuile de surface de la colonne — cf. règle
-// donnée par Didier), déclencheur du recalcul de `present` (cycle horaire façon Parsnip, ou
-// météo ?), canForage (non défini — hérite du défaut FloraManager : true).
-class AmbermirageSystem {
-  byTile = new Map() // Map<tileIndex, record> — public : membership O(1) + lookup record
-  #list = [] // record[] — tous les spots (présents ou non)
-  #byChunk = new Map() // Map<chunkKey, Set> — lookup spatial pour onPreloadChunksChanged
-  #bySoil = new Map() // Map<soilIndex, record> — plantes présentes : détection minage de la tuile sol
-  #spotsBySoil = new Map() // Map<soilIndex, record> — tous les spots (présents ou non) : suppression O(1)
-  #byX = new Array(WORLD_WIDTH).fill(null) // record|null par colonne — lookup direct voisin x-1/x+1 (TODO : entretien réactif)
-  #displayed = new Set() // Set<record> — spots dans les chunks preload (cible render)
-  #image = null // ITEMS.ambermirage.placed, mis en cache dans init()
-
-  // constructor () {
-  // // TODO — EventBus : world/tile-changed (entretien #byX + recalcul present), déclencheur du
-  // // cycle de floraison (cf. commentaire de classe).
-  // }
-
-  /**
- * Réinitialise toutes les structures. Appelé en début de session.
- */
-  init () {
-    this.byTile.clear()
-    this.#list.length = 0
-    this.#byChunk.clear()
-    this.#bySoil.clear()
-    this.#spotsBySoil.clear()
-    this.#byX.fill(null)
-    this.#displayed.clear()
-
-    this.#image = ITEMS.ambermirage.placed // après hydratation
-  }
-
-  /**
- * Enregistre un spot et peuple les structures internes.
- * @param {object} record — record HERB/AMBERMIRAGE actif (deleted=false garanti par l'appelant)
- */
-  initPlant (record) {
-    this.#list.push(record)
-    this.#spotsBySoil.set(record.soilIndex, record)
-    this.#byX[record.x] = record
-    if (!record.present) return
-    addToByTile(this.byTile, record)
-    addToByChunk(this.#byChunk, record)
-    this.#bySoil.set(record.soilIndex, record)
-    blockedTiles.blockPlacement(record.index)
-  }
-
-  /**
- * Reconstruit #displayed depuis les chunks preload de la caméra.
- * @param {Set<number>} preloadChunks
- */
-  onPreloadChunksChanged (preloadChunks) {
-    buildDisplayed(this.#displayed, this.#byChunk, preloadChunks)
-  }
-
-  /**
- * Dessine les ambermirages visibles et présents sur le contexte transformé.
- * @param {CanvasRenderingContext2D} ctx — contexte déjà transformé (caméra appliquée)
- */
-  render (ctx) {
-    const img = this.#image
-    for (const record of this.#displayed) {
-      const pxX = (record.index & 0x3FF) << 4
-      const pxY = ((record.index >> 10) << 4) + 2
-      ctx.drawImage(IMAGE_CACHE[img.imgIndex], img.sx, img.sy, img.sw, img.sh, pxX, pxY, img.sw, img.sh)
-    }
-  }
-
-  /**
- * Traite le foraging réussi : marque l'ambermirage absent et persiste.
- * Le loot est géré en commun par ForagingManager — cette méthode ne gère que l'état de la plante.
- * @param {object} record
- */
-  onForaged (record) {
-    this.#destroyPresent(record)
-  }
-
-  /**
- * Retourne le record de l'ambermirage couvrant la tuile donnée, ou null.
- * @param {number} tileIndex — (y << 10) | x
- * @returns {object|null}
- */
-  getPlantAt (tileIndex) {
-    return this.byTile.get(tileIndex) ?? null
-  }
-
-  /**
- * Indique si le record est actuellement présent (forageable).
- * @param {object} record
- * @returns {boolean}
- */
-  isPresent (record) { return record.present }
-
-  /**
- * Détruit un ambermirage présent sans loot : retire toutes les structures et persiste.
- * Guard : no-op si record.present est déjà false.
- * @param {object} record
- */
-  #destroyPresent (record) {
-    if (!record.present) return
-    record.present = false
-    removeFromByTile(this.byTile, record)
-    removeFromByChunk(this.#byChunk, record)
-    this.#bySoil.delete(record.soilIndex)
-    this.#displayed.delete(record)
-    blockedTiles.unblockPlacement(record.index)
-    saveManager.queueStaticUpdate({storeName: 'plant', record})
-  }
-
-  // ///// //
-  // DEBUG //
-  // ///// //
-
-  /**
-* DEBUG — Affiche un cercle orange au centre de la tuile sous chaque spot enregistré dans #list
-* (tous les spots SAND, present ou non). Vérifie la cohérence avec #spotsBySoil (même cardinal
-* attendu).
-* @param {CanvasRenderingContext2D} ctx — contexte déjà transformé (caméra appliquée)
-*/
-  debugRenderSpots (ctx) {
-    ctx.save()
-    ctx.fillStyle = 'rgba(43, 0, 255, 0.7)'
-    for (const record of this.#list) {
-      const cx = ((record.index & 0x3FF) << 4) + 8
-      const cy = ((record.index >> 10) << 4) + 40 - 16
-      ctx.beginPath()
-      ctx.arc(cx, cy, 4, 0, 6.2832)
-      ctx.fill()
-    }
-    if (this.#list.length !== this.#spotsBySoil.size) {
-      console.warn(`AmbermirageSystem: #list(${this.#list.length}) !== #spotsBySoil(${this.#spotsBySoil.size})`)
-    }
-    ctx.restore()
-  }
-}
-export const ambermirageSystem = new AmbermirageSystem()
 
 /* ====================================================================================================
    COBWEB SYSTEM

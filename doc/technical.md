@@ -438,6 +438,7 @@ Cette section définit les événements officiels. Tout nouvel événement doit 
 | S | `sewed/sunflower` | `number` (tileIndex) | Le joueur plante une graine de sunflower. |
 | S | `sewed/acorn` | `number` (tileIndex) | Le joueur plante un acorn. |
 | S | `sewed/samara` | `number` (tileIndex) | Le joueur plante un samara. |
+| S | `sewed/ambermirage` | `number` (tileIndex) | Le joueur plante une graine d'ambermirage. |
 
 #### Action de récolte (`ForagingManager`)
 
@@ -495,8 +496,9 @@ Cette section définit les événements officiels. Tout nouvel événement doit 
 
 | Dir. | Event Name | Payload Structure | Description |
 | :---: | :--- | :--- | :--- |
-
-Aucun événement écouté pour l'instant. TODO
+| E | `time/every-hour-10` | `{ day, hour, minute, isDay }` | Début du créneau de floraison quotidien (skip si rainy/stormy). |
+| E | `time/every-hour-14` | `{ day, hour, minute, isDay }` | Flétrissement inconditionnel de tous les ambermirages présents. |
+| E | `sewed/ambermirage` | `number` (soilIndex) | Le joueur plante une graine d'ambermirage. |
 
 #### Oak (`OakSystem`)
 

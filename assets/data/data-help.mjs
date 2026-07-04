@@ -4874,7 +4874,7 @@ _All times are in-game. See [[Day & Night Cycle]] for reference._
 **Tips**
 
 * _Surface Mushrooms only appear at night — plan your foraging accordingly._ ⏳
-* _Knowing tomorrow's weather helps plan your foraging — the [[item:bottledFrog]] accessory reveals the next day's forecast._ ⏳
+* _Knowing tomorrow's weather helps plan your foraging — the [[item:bottledFrog]] trinket reveals the next day's forecast._ ⏳
 * _All mushrooms of the same species appear simultaneously — a single rainy night can yield a large harvest._ ⏳
   `
   },
@@ -5099,10 +5099,24 @@ The Ambermirage is a common desert flower that blooms only during the hottest ho
 
 * [[item:ambermirage]] — crafting ingredient
 
+**Usages**
+
+* [[item:ambermirage]] — crafting ingredient ⏳
+* [[item:ambermirageSeed]] — replanting Ambermirage ⏳
+
+**Planting**
+
+* Place a [[item:ambermirageSeed]] in the [[Hotbar]] ([[Inventory]] Panel [I])
+* Select its slot, then left-click a [[node:sand]] — the seed is consumed
+* The node has to be in [[Ranges|Interaction Range]], this range can be buffed
+* The tile must have be free and the left/right surface tiles has to be [[node:sand]]
+* Each spot accepts only one seed
+* Seeded spots have a 100% chance of blooming at the next day
+
 **Tips**
 
 * _Plan your desert expeditions around the blooming window — Ambermirages are only available for 4 hours a day._
-* _Bad [[Weather]] cancels all blooming for the entire day._ ⏳
+* _Bad [[Weather]] cancels all blooming for the entire day — the [[item:bottledFrog]] trinket reveals the next day's forecast._ ⏳
   `
   },
   {

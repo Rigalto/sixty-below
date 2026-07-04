@@ -587,7 +587,8 @@ export const ITEMS = {
   oleanderOil: {name: 'Oleander Oil', type: 0, stype: 'oil', star: 3, image: 'potions_32_32-1-5', help: 'Oleander', tooltip: 'Used in cooking, potions, and as a mechanical lubricant'},
   oleanderBulb: {name: 'Oleander Bulb', type: 0, stype: 'vegie', star: 3, image: 'foraged_32_32-0-2', help: 'Oleander', tooltip: 'Its pulp has a velvety, creamy texture'},
 
-  ambermirage: {name: 'Ambermirage', type: 0, stype: 'herb', star: 1, image: 'foraged_32_32-5-2', placed: 'placed_16_16-3-0', help: 'Ambermirage', tooltip: '???'},
+  ambermirage: {name: 'Ambermirage', type: 0, stype: 'herb', star: 1, image: 'foraged_32_32-6-2', placed: 'placed_16_16-3-0', help: 'Ambermirage', tooltip: '???', foraging: {speed: 2400, items: [{item: 'ambermirage', count: '1-2'}, {item: 'ambermirageSeed', count: 0.5, buffs: ['lucky:50']}]}},
+  ambermirageSeed: {name: 'Ambermirage Seed', type: ITEM_TYPE.SEED | ITEM_TYPE.PLACABLE, stype: 'seed', star: 2, image: 'foraged_32_32-7-2', placed: 'placed_16_16-4-0', help: 'Ambermirage', tooltip: '???'},
 
   bloodmoon: {name: 'Bloodmoon', type: 0, stype: 'herb', star: 2, image: 'potions_32_32-1-5', placed: 'fuws_32_32-4-0', help: 'Bloodmoon', tooltip: '???'},
   bloodmoonSeed: {name: 'Bloodmoon Seed', type: ITEM_TYPE.SEED | ITEM_TYPE.PLACABLE, stype: 'seed', star: 2, image: 'potions_32_32-1-5', placed: 'fuws_32_32-4-0', help: 'Bloodmoon', tooltip: '???'},
@@ -918,7 +919,7 @@ export const TREE_IMAGES = {
     '0_1': ['coconut_80_48-3-1', 'coconut_80_48-4-1', 'coconut_80_48-5-1'],
     '1_0': ['coconut_80_48-3-0', 'coconut_80_48-4-0', 'coconut_80_48-5-0'],
     '1_1': ['coconut_80_48-0-1', 'coconut_80_48-1-1', 'coconut_80_48-2-1'],
-    '1_2': ['coconut_80_48-3-3', 'coconut_80_48-4-3'], // OK
+    '1_2': ['coconut_80_48-3-3', 'coconut_80_48-4-3', 'coconut_80_48-5-3'],
     '2_1': ['coconut_80_48-3-2', 'coconut_80_48-4-2', 'coconut_80_48-5-2'],
     '2_2': ['coconut_80_48-0-3', 'coconut_80_48-1-3', 'coconut_80_48-2-3'],
     head: ['coconut_80_48-0-0', 'coconut_80_48-1-0', 'coconut_80_48-2-0']

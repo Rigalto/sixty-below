@@ -653,6 +653,7 @@ class SowingManager {
     if (item.code === 'sunflowerSeed') this.#trySowSunflowerSeed(tileIndex, tileNode, slotIndex)
     else if (item.code === 'acorn') this.#trySowAcorn(tileIndex, tileNode, slotIndex)
     else if (item.code === 'samara') this.#trySowSamara(tileIndex, tileNode, slotIndex)
+    else if (item.code === 'ambermirageSeed') this.#trySowAmbermirageSeed(tileIndex, tileNode, slotIndex)
   }
 
   /**
@@ -768,6 +769,45 @@ class SowingManager {
 
     // Succès
     eventBus.emit('sewed/samara', tileIndex)
+    inventoryManager.decrementHotbarSlotCount(slotIndex)
+    eventBus.emit('sound/play', 'placing')
+  }
+
+  /**
+   * Valide et exécute le placement d'une AmbermirageSeed.
+   * Conditions : tuile SAND, tuile index-W (la tuile-plante) SKY. Silence si mauvaise tuile,
+   * 'wrong' si bloqué, 'placing' si succès.
+   * @param {number} tileIndex — tuile cliquée (le sol SAND attendu)
+   * @param {object} tileNode
+   * @param {number} slotIndex
+   */
+  #trySowAmbermirageSeed (tileIndex, tileNode, slotIndex) {
+    const SAND = NODES.SAND.code
+    const SKY = NODES.SKY.code
+    const W = WORLD_WIDTH
+
+    // Silence — mauvaise tuile de sol
+    if (tileNode.code !== SAND) return
+
+    const body1 = tileIndex - W // tuile juste au-dessus
+
+    // Silence — tuile du corps pas SKY
+    if (chunkManager.getTileAt(body1) !== SKY) return
+
+    // 'toofar' — tuile hors de la zone d'interaction
+    if (!isInInteractionRange(tileIndex)) { eventBus.emit('sound/play', 'toofar'); return }
+
+    // 'wrong' — tuile bloquée (furniture, plante déjà présente)
+    if (!blockedTiles.canPlace(body1)) {
+      eventBus.emit('sound/play', 'wrong')
+      return
+    }
+
+    // 'wrong' — règles métier de la graine
+    if (!floraManager.canSow(tileIndex, 'ambermirageSeed')) { eventBus.emit('sound/play', 'wrong'); return }
+
+    // Succès
+    eventBus.emit('sewed/ambermirage', tileIndex)
     inventoryManager.decrementHotbarSlotCount(slotIndex)
     eventBus.emit('sound/play', 'placing')
   }
