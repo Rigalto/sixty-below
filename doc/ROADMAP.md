@@ -47,8 +47,7 @@
 - Dédoubler les handlers d'eventBus : `onPreloadChunksChanged`, `onCraftPerformed`, `onSlotActive`, `onTeleportBegin`
 - Dans les attributs 'mining' et 'foraging' transférer dans 'buffs' ce qui n'y est pas encore.
 - Vérifier que la convention pour les variables privées est prise en compte partout et Vérifier que les en-têtes des fonctions sont présents et à jour (prise en compte des modifications de conception) :
-  - fait pour `achievement.mjs`, `action.mjs`, `assets.mjs`, `craft.mjs`, `ecosystem.mjs`, `help.mjs`, `inventory.mjs`, `ui.mjs`
-- Dans `buff.mjs`, remplacer les styles inline par des règles CSS injectées dans le DOM.
+  - fait pour `achievement.mjs`, `action.mjs`, `assets.mjs`, `buff.mjs`, `craft.mjs`, `ecosystem.mjs`, `help.mjs`, `inventory.mjs`, `ui.mjs`
 
 - Supprimer les retours de fonctions (dans la boucle chaude) qui renvoient un objet par : soit un accès à des variables de classes (privées ou publiques), soit par un objet pré-alloué.
 

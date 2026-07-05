@@ -126,6 +126,10 @@ class BuffManager {
   #currentWeather
   #currentTimeslot
 
+  /**
+   * Initialise les buffers de trinkets (A et B) à 0 et définit le buffer courant.
+   * Émet l'événement de changement initial pour notifier les abonnés.
+   */
   initTrinket () {
     this.#resetBuffer(this.#trinketA, TRINKET_BUFF_TABLE)
     this.#resetBuffer(this.#trinketB, TRINKET_BUFF_TABLE)
@@ -135,6 +139,10 @@ class BuffManager {
     eventBus.emit('buff/trinket-changed', new Set(Object.keys(TRINKET_BUFF_TABLE)))
   }
 
+  /**
+   * Initialise le gestionnaire de buffs. Démare les états par défaut (météo, lune, temps),
+   * lie les écouteurs d'événements globaux et configure les buffers.
+   */
   init () {
     // Initialisation des buffs de lune à false
     for (const key of MOON_BUFF_KEYS) this.#values.set(key, false)
@@ -172,6 +180,12 @@ class BuffManager {
     this.timestamps.set('dyn1', timeManager.timestamp + 124000)
   }
 
+  /**
+   * Handler eventBus déclenché chaque jour. Met à jour la phase de la lune et la météo actuelle.
+   * @param {Object} payload
+   * @param {number} payload.weather - Index de la nouvelle météo.
+   * @param {number} payload.moonPhase - Index (0-7) de la phase de la lune.
+   */
   onDaily ({weather, moonPhase}) {
     // Met à 'false' la phase précédente et à 'true' la phase courante
     this.#values.set(MOON_BUFF_KEYS[(moonPhase - 1) & 7], false)
@@ -183,6 +197,12 @@ class BuffManager {
     this.#currentWeather = weather
   }
 
+  /**
+   * Handler eventBus déclenché lors du changement de tranche horaire (timeslot) ou du cycle jour/nuit.
+   * @param {Object} payload
+   * @param {number} payload.tslot - Index de la tranche horaire actuelle.
+   * @param {boolean} payload.isDay - Indique s'il fait jour.
+   */
   onTimeslot ({tslot, isDay}) {
   // Période
     this.#values.set(TIMESLOT_BUFF_KEYS[this.#currentTimeslot], false)
@@ -194,6 +214,9 @@ class BuffManager {
     this.#values.set('isNight', !isDay)
   }
 
+  /**
+   * Affiche l'état interne complet du BuffManager dans la console à des fins de débogage.
+   */
   onDebug () {
     let output = '--- BuffManager - Values ---\n'
     for (const [key, value] of this.#values) {
@@ -212,10 +235,10 @@ class BuffManager {
 
   /**
    * Retourne la valeur d'un buff.
-   * Cherche d'abord dans #values (O(1)), puis dans #fns (calcul à la demande).
+   * Cherche d'abord dans #values (O(1)), puis dans #fns (calcul à la demande), puis dans les trinkets.
    * Retourne 0 si le buff est inconnu (neutre pour numériques, falsy pour booléens).
    * @param {string} name
-   * @returns {number}
+   * @returns {number|boolean|Object}
    */
   getBuff (name) {
     return this.#values.get(name) ?? this.#fns.get(name)?.() ?? this.#currentTrinket[name] ?? 0
@@ -225,7 +248,7 @@ class BuffManager {
    * Retourne les valeurs de plusieurs buffs en une seule opération.
    * Utilisé notamment par rollLootWithBuffs.
    * @param {string[]} names
-   * @returns {Object.<string, number>}
+   * @returns {Object.<string, number|boolean|Object>}
    */
   getBuffs (names) {
     const result = {}
@@ -236,19 +259,21 @@ class BuffManager {
   }
 
   /**
- * Positionne directement un buff élémentaire dans #values.
- * Réservé aux buffs dont la source est externe à BuffManager (ex: playerFreeze).
- * @param {string} name
- * @param {number|boolean} value
- */
+   * Positionne directement un buff élémentaire dans #values.
+   * Réservé aux buffs dont la source est externe à BuffManager (ex: playerFreeze).
+   * @param {string} name
+   * @param {number|boolean} value
+   */
   setBuff (name, value) {
     this.#values.set(name, value)
   }
 
   /**
    * Handler 'inventory/static-buffs' — dispatche vers chaque sous-handler.
-   * Bindé dans constructor.
-   * @param {{armor: string[], accessories: string[], trinkets: string[]}} payload
+   * @param {Object} payload
+   * @param {string[]} payload.armor - Liste des IDs d'armures équipées.
+   * @param {string[]} payload.accessories - Liste des IDs d'accessoires équipés.
+   * @param {string[]} payload.trinkets - Liste des IDs de bibelots (trinkets) équipés.
    */
   onStaticBuffs ({armor, accessories, trinkets}) {
     // this.#onArmorBuffs(armor)               // TODO
@@ -257,9 +282,8 @@ class BuffManager {
   }
 
   /**
-   * Recalcule les buffs trinkets, détecte les changements et émet buff/trinket-changed.
-   * Bindé dans init() — écoute 'inventory/static-buffs'.
-   * @param {{trinkets: string[]}} payload
+   * Recalcule les buffs trinkets, détecte les changements et émet 'buff/trinket-changed'.
+   * @param {string[]} trinkets - Liste des IDs de trinkets actuellement équipés.
    */
   onTrinketsBuffs (trinkets) {
     this.#resetBuffer(this.#nextTrinket, TRINKET_BUFF_TABLE)
@@ -270,19 +294,19 @@ class BuffManager {
   }
 
   /**
-   * Remet à 0 toutes les entrées d'un buffer.
-   * @param {object} buffer - {buffId: value}
-   * @param {object} table  - {buffId: op}
+   * Remet à 0 toutes les entrées d'un buffer basé sur une table de référence.
+   * @param {Object.<string, number>} buffer - Le buffer cible à nettoyer ({buffId: value}).
+   * @param {Object.<string, string>} table - La table de référence des buffs ({buffId: op}).
    */
   #resetBuffer (buffer, table) {
     for (const key in table) { buffer[key] = 0 }
   }
 
   /**
-   * Applique les buffs des items dans buffer selon leur op (sum / max / or / direct).
-   * @param {string[]} itemIds
-   * @param {object}   table  - {buffId: op}
-   * @param {object}   buffer - {buffId: value}
+   * Applique les buffs des items spécifiés dans le buffer selon leur opération ('sum', 'max', 'or').
+   * @param {string[]} itemIds - Tableau des identifiants des items à appliquer.
+   * @param {Object.<string, string>} table - Table liant le buff à son type d'opération mathématique.
+   * @param {Object.<string, number>} buffer - Le buffer de destination modifié par effet de bord.
    */
   #applyItems (itemIds, table, buffer) {
     for (const itemId of itemIds) {
@@ -296,11 +320,11 @@ class BuffManager {
   }
 
   /**
-   * Retourne les buffIds dont la valeur diffère entre current et next.
-   * @param {object} table
-   * @param {object} current
-   * @param {object} next
-   * @returns {Set<string>}
+   * Compare le buffer courant et le nouveau buffer pour en extraire les clés modifiées.
+   * @param {Object.<string, string>} table - Table des types de buffs servant de référence de clés.
+   * @param {Object.<string, number>} current - Le buffer actif avant modification.
+   * @param {Object.<string, number>} next - Le nouveau buffer calculé.
+   * @returns {Set<string>} Ensemble contenant les buffIds modifiés.
    */
   #computeChanged (table, current, next) {
     const changed = new Set()
@@ -340,6 +364,51 @@ export const isInInteractionRange = (tileIndex, centerTile) => {
    AFFICHAGE DES BUFFS ACTIFS
    ==================================================================================================== */
 
+const buffStyle = document.createElement('style')
+buffStyle.textContent = /* css */`
+  #buff-widget {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+    padding: 6px;
+    background-color: rgba(60, 65, 75, 0.9);
+    border: 1px solid #444;
+    border-radius: 6px;
+    width: 100%;
+    box-sizing: border-box;
+    margin-bottom: 10px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.5);
+    order: ${UI_LAYOUT.BUFF};
+ }
+
+  .buff-item {
+    flex-direction: column;
+    align-items: center;
+    width: 32px;
+    cursor: default;
+  }
+
+  .buff-icon {
+    width: 32px;
+    height: 32px;
+    background-image: url('assets/sprites/buff_32_32.png');
+    background-repeat: no-repeat;
+    image-rendering: pixelated;
+    flex-shrink: 0;
+  }
+
+  .buff-time {
+    font-size: 10px;
+    text-align: center;
+    line-height: 1;
+    min-height: 12px;
+    user-select: none;
+    color: #ffffff;
+    text-shadow: 1px 1px 2px #000000;
+  }
+`
+document.head.appendChild(buffStyle)
+
 // Définition des buffs affichables
 // { id, title, x, y, timed }
 // x, y : coordonnées dans buff_32_32.png (multiples de 32)
@@ -352,11 +421,9 @@ const DISPLAY_BUFFS = [
 ]
 
 class BuffWidget {
-  #container
-  #buffIds
-
-  // Refs DOM précalculées : Map<id, {el, timeEl}>
-  #refs = new Map()
+  #container = null // référence de la balise eenglobant le widget
+  #buffIds // liste de tous les buffs
+  #refs = new Map() // Refs DOM précalculées : Map<id, {el, timeEl}>
 
   constructor () {
     this.#buildDOM()
@@ -365,60 +432,30 @@ class BuffWidget {
     this.#buffIds = DISPLAY_BUFFS.filter(def => def.id !== 'armors').map(def => def.id)
   }
 
+  /**
+   * Construit la structure DOM du widget, applique l'ordre de layout,
+   * génère les conteneurs de buffs et injecte le tout dans la barre latérale droite.
+   */
   #buildDOM () {
     this.#container = document.createElement('div')
     this.#container.id = 'buff-widget'
-    Object.assign(this.#container.style, {
-      display: 'flex',
-      flexWrap: 'wrap',
-      gap: '4px',
-      padding: '6px',
-      backgroundColor: 'rgba(60, 65, 75, 0.9)',
-      border: '1px solid #444',
-      borderRadius: '6px',
-      width: '100%',
-      boxSizing: 'border-box',
-      order: UI_LAYOUT.BUFF, // ← position dans le Control Panel
-      marginBottom: '10px',
-      boxShadow: '0 2px 10px rgba(0,0,0,0.5)'
-    })
 
     for (const def of DISPLAY_BUFFS) {
       const el = document.createElement('div')
       el.title = def.title
-      Object.assign(el.style, {
-        display: def.id === 'armors' ? 'flex' : 'none',
-        flexDirection: 'column',
-        alignItems: 'center',
-        width: '32px',
-        cursor: 'default'
-      })
+      el.className = 'buff-item'
+      el.title = def.title
+      el.style.display = def.id === 'armors' ? 'flex' : 'none'
 
       // Icône via ::before simulé avec un div dédié
       const icon = document.createElement('div')
-      Object.assign(icon.style, {
-        width: '32px',
-        height: '32px',
-        backgroundImage: 'url(assets/sprites/buff_32_32.png)',
-        backgroundRepeat: 'no-repeat',
-        backgroundPosition: `${def.x}px ${def.y}px`,
-        imageRendering: 'pixelated',
-        flexShrink: '0'
-      })
+      icon.className = 'buff-icon'
+      icon.style.backgroundPosition = `${def.x}px ${def.y}px`
       el.appendChild(icon)
 
       // Temps restant
       const timeEl = document.createElement('div')
-      Object.assign(timeEl.style, {
-        fontSize: '10px',
-        // color: '#cccccc',
-        textAlign: 'center',
-        lineHeight: '1',
-        minHeight: '12px',
-        userSelect: 'none',
-        color: '#ffffff',
-        textShadow: '1px 1px 2px #000000'
-      })
+      timeEl.className = 'buff-time'
       el.appendChild(timeEl)
 
       this.#container.appendChild(el)
@@ -434,13 +471,18 @@ class BuffWidget {
     }
   }
 
-  // setInterval 1s — toujours actif, même overlay ouvert ou génération nouveau monde en cours.
-  // Si affichage erroné pendant génération : remettre les buffs à false avant génération
-  // (objectStore buff écrasé de toute façon). Ne pas arrêter/relancer le setInterval.
+  /**
+   * Démarre l'intervalle d'actualisation du widget à un rythme d'une fois par seconde.
+   * Cet intervalle reste actif en tâche de fond de manière continue.
+   */
   #startInterval () {
     setInterval(() => this.#update(), 1000)
   }
 
+  /**
+   * Lit les valeurs et expirations des buffs pour mettre à jour l'affichage
+   * et le décompte textuel du temps restant de chaque icône du DOM.
+   */
   #update () {
     const now = timeManager.timestamp
     const values = buffManager.getBuffs(this.#buffIds)
