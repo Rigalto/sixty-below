@@ -302,6 +302,7 @@ class GameCore {
     seededRNG.init()
 
     // OBLIGATOIRE EN PREMIER POUR QUE LES MANAGERS PUISSENT TRAVAILLER
+    this.timeScale = 1
     microTasker.init()
     microTasker.initDebug(MICROTASK_FN_NAME_TO_KEY)
 

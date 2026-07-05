@@ -10,6 +10,7 @@ export {WORLD_WIDTH, WORLD_HEIGHT, SEA_LEVEL, TOPSOIL_Y_SKY_SURFACE, TOPSOIL_Y_S
 // ── Table d'indirection biome x layer → code de tuile substrat ───────────────
 // Source de vérité : DESIGN.md
 // Couches : 'sky' | 'surface' | 'under' | 'caverns'
+// indique quels matériaux placer dans la totalité de chaque rectangle, avant d'y ajouter des clusters d'autres matériaux
 export const BIOME_TILE_MAP = {
   [BIOME_TYPE.FOREST]: {
     sky: NODES.SKY.code,
@@ -31,6 +32,18 @@ export const BIOME_TILE_MAP = {
   }
 }
 
+/**
+ * Topsoil natif par biome pour addNativeTopsoilClusters().
+ * percent : fraction de la bande de surface visée en couverture réelle
+ * Permet d'ajouter les tuiles de topspoil dans la couche de surface
+ * Combiné avec la table précédente, en surface : Forest = CLAY+DIRT, Desert = SANDSTONE/SAND, Jungle = MUD/SILT
+ */
+export const NATIVE_TOPSOIL_MAP = {
+  [BIOME_TYPE.FOREST]: {code: NODES.DIRT.code, percent: 0.5},
+  [BIOME_TYPE.DESERT]: {code: NODES.SAND.code, percent: 0.5},
+  [BIOME_TYPE.JUNGLE]: {code: NODES.SILT.code, percent: 0.5}
+}
+
 // taille maximale de la mer
 export const SEA_MAX_WIDTH = 90
 export const SEA_MAX_HEIGHT = 150
@@ -39,7 +52,6 @@ export const SEA_MAX_JITTER = 10
 export const CLUSTER_SCATTER_MAP = {
   [BIOME_TYPE.FOREST]: {
     surface: [
-      {code: NODES.CLAY.code, percent: 0.020},
       {code: NODES.STONE.code, percent: 0.010},
       {code: NODES.SANDSTONE.code, percent: 0.05},
       {code: NODES.MUD.code, percent: 0.05},
@@ -71,7 +83,6 @@ export const CLUSTER_SCATTER_MAP = {
   },
   [BIOME_TYPE.DESERT]: {
     surface: [
-      {code: NODES.SANDSTONE.code, percent: 0.020},
       {code: NODES.ASH.code, percent: 0.010},
       {code: NODES.CLAY.code, percent: 0.05},
       {code: NODES.MUD.code, percent: 0.05},
@@ -103,7 +114,6 @@ export const CLUSTER_SCATTER_MAP = {
   },
   [BIOME_TYPE.JUNGLE]: {
     surface: [
-      {code: NODES.MUD.code, percent: 0.020},
       {code: NODES.LIMESTONE.code, percent: 0.010},
       {code: NODES.CLAY.code, percent: 0.005},
       {code: NODES.SANDSTONE.code, percent: 0.005},
@@ -234,10 +244,10 @@ export const ORE_GEM_SCATTER_MAP = {
 export const TOPSOIL_SCATTER_MAP = {
   [BIOME_TYPE.FOREST]: {
     surface: [
-      {code: NODES.DIRT.code, percent: 0.020}, // natif
-      {code: NODES.SAND.code, percent: 0.05}, // étranger
-      {code: NODES.SILT.code, percent: 0.05}, // étranger
-      {code: NODES.HUMUS.code, percent: 0.003} // transversal
+      {code: NODES.DIRT.code, percent: 0.50, native: true}, // natif
+      {code: NODES.SILT.code, percent: 0.0008}, // étranger
+      {code: NODES.SAND.code, percent: 0.001}, // étranger
+      {code: NODES.HUMUS.code, percent: 0.0006} // transversal
     ],
     under: [
       {code: NODES.DIRT.code, percent: 0.010}, // natif
@@ -254,7 +264,7 @@ export const TOPSOIL_SCATTER_MAP = {
   },
   [BIOME_TYPE.DESERT]: {
     surface: [
-      {code: NODES.SAND.code, percent: 0.020}, // natif
+      {code: NODES.SAND.code, percent: 0.020, native: true}, // natif
       {code: NODES.DIRT.code, percent: 0.005}, // étranger
       {code: NODES.SILT.code, percent: 0.005}, // étranger
       {code: NODES.HUMUS.code, percent: 0.001} // surprise
@@ -272,7 +282,7 @@ export const TOPSOIL_SCATTER_MAP = {
   },
   [BIOME_TYPE.JUNGLE]: {
     surface: [
-      {code: NODES.SILT.code, percent: 0.020}, // natif
+      {code: NODES.SILT.code, percent: 0.020, native: true}, // natif
       {code: NODES.DIRT.code, percent: 0.005}, // étranger
       {code: NODES.SAND.code, percent: 0.005}, // étranger
       {code: NODES.HUMUS.code, percent: 0.005} // transversal
