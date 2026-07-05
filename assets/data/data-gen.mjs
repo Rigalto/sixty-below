@@ -235,34 +235,34 @@ export const TOPSOIL_SCATTER_MAP = {
   [BIOME_TYPE.FOREST]: {
     surface: [
       {code: NODES.DIRT.code, percent: 0.020}, // natif
-      {code: NODES.SAND.code, percent: 0.012}, // étranger
-      {code: NODES.SILT.code, percent: 0.012}, // étranger
-      {code: NODES.HUMUS.code, percent: 0.002} // transversal rare
+      {code: NODES.SAND.code, percent: 0.05}, // étranger
+      {code: NODES.SILT.code, percent: 0.05}, // étranger
+      {code: NODES.HUMUS.code, percent: 0.003} // transversal
     ],
     under: [
-      {code: NODES.DIRT.code, percent: 0.009}, // natif
-      {code: NODES.SAND.code, percent: 0.005}, // étranger
-      {code: NODES.SILT.code, percent: 0.005}, // étranger
-      {code: NODES.HUMUS.code, percent: 0.008} // transversal principal
+      {code: NODES.DIRT.code, percent: 0.010}, // natif
+      {code: NODES.HUMUS.code, percent: 0.010} // transversal
+      {code: NODES.SAND.code, percent: 0.003}, // étranger
+      {code: NODES.SILT.code, percent: 0.003}, // étranger
     ],
     caverns_top: [
       {code: NODES.DIRT.code, percent: 0.006}, // natif
       {code: NODES.SAND.code, percent: 0.003}, // étranger
       {code: NODES.SILT.code, percent: 0.003}, // étranger
-      {code: NODES.HUMUS.code, percent: 0.005} // transversal moyen
+      {code: NODES.HUMUS.code, percent: 0.005} // transversal
     ]
   },
   [BIOME_TYPE.DESERT]: {
     surface: [
       {code: NODES.SAND.code, percent: 0.020}, // natif
-      {code: NODES.DIRT.code, percent: 0.012}, // étranger
-      {code: NODES.SILT.code, percent: 0.012}, // étranger
-      {code: NODES.HUMUS.code, percent: 0.0005} // surprise
+      {code: NODES.DIRT.code, percent: 0.005}, // étranger
+      {code: NODES.SILT.code, percent: 0.005}, // étranger
+      {code: NODES.HUMUS.code, percent: 0.001} // surprise
     ],
     under: [
-      {code: NODES.SAND.code, percent: 0.009}, // natif
-      {code: NODES.DIRT.code, percent: 0.005}, // étranger
-      {code: NODES.SILT.code, percent: 0.005} // étranger
+      {code: NODES.SAND.code, percent: 0.010}, // natif
+      {code: NODES.DIRT.code, percent: 0.003}, // étranger
+      {code: NODES.SILT.code, percent: 0.003} // étranger
     ],
     caverns_top: [
       {code: NODES.SAND.code, percent: 0.006}, // natif
@@ -273,15 +273,15 @@ export const TOPSOIL_SCATTER_MAP = {
   [BIOME_TYPE.JUNGLE]: {
     surface: [
       {code: NODES.SILT.code, percent: 0.020}, // natif
-      {code: NODES.DIRT.code, percent: 0.012}, // étranger
-      {code: NODES.SAND.code, percent: 0.012}, // étranger
-      {code: NODES.HUMUS.code, percent: 0.002} // transversal rare
-    ],
-    under: [
-      {code: NODES.SILT.code, percent: 0.009}, // natif
       {code: NODES.DIRT.code, percent: 0.005}, // étranger
       {code: NODES.SAND.code, percent: 0.005}, // étranger
-      {code: NODES.HUMUS.code, percent: 0.008} // transversal principal
+      {code: NODES.HUMUS.code, percent: 0.005} // transversal
+    ],
+    under: [
+      {code: NODES.SILT.code, percent: 0.010}, // natif
+      {code: NODES.HUMUS.code, percent: 0.010} // transversal
+      {code: NODES.DIRT.code, percent: 0.005}, // étranger
+      {code: NODES.SAND.code, percent: 0.003}, // étranger
     ],
     caverns_top: [
       {code: NODES.SILT.code, percent: 0.006}, // natif
