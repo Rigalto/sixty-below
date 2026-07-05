@@ -39,19 +39,21 @@ export const SEA_MAX_JITTER = 10
 export const CLUSTER_SCATTER_MAP = {
   [BIOME_TYPE.FOREST]: {
     surface: [
-      {code: NODES.SANDSTONE.code, percent: 0.010},
-      {code: NODES.MUD.code, percent: 0.010},
+      {code: NODES.CLAY.code, percent: 0.020},
       {code: NODES.STONE.code, percent: 0.010},
+      {code: NODES.SANDSTONE.code, percent: 0.05},
+      {code: NODES.MUD.code, percent: 0.05},
       {code: NODES.ASH.code, percent: 0.003},
       {code: NODES.LIMESTONE.code, percent: 0.003}
     ],
     under: [
+      {code: NODES.STONE.code, percent: 0.010},
       {code: NODES.CLAY.code, percent: 0.010},
+      {code: NODES.HARDSTONE.code, percent: 0.05},
+      {code: NODES.ASH.code, percent: 0.005},
+      {code: NODES.LIMESTONE.code, percent: 0.005},
       {code: NODES.SANDSTONE.code, percent: 0.003},
       {code: NODES.MUD.code, percent: 0.003},
-      {code: NODES.ASH.code, percent: 0.010},
-      {code: NODES.LIMESTONE.code, percent: 0.010},
-      {code: NODES.HARDSTONE.code, percent: 0.003},
       {code: NODES.HELLSTONE.code, percent: 0.001},
       {code: NODES.SLATE.code, percent: 0.001}
     ],
@@ -69,19 +71,21 @@ export const CLUSTER_SCATTER_MAP = {
   },
   [BIOME_TYPE.DESERT]: {
     surface: [
-      {code: NODES.CLAY.code, percent: 0.010},
-      {code: NODES.MUD.code, percent: 0.010},
+      {code: NODES.SANDSTONE.code, percent: 0.020},
       {code: NODES.ASH.code, percent: 0.010},
+      {code: NODES.CLAY.code, percent: 0.05},
+      {code: NODES.MUD.code, percent: 0.05},
       {code: NODES.STONE.code, percent: 0.003},
       {code: NODES.LIMESTONE.code, percent: 0.003}
     ],
     under: [
+      {code: NODES.ASH.code, percent: 0.020},
       {code: NODES.SANDSTONE.code, percent: 0.010},
+      {code: NODES.STONE.code, percent: 0.005},
+      {code: NODES.LIMESTONE.code, percent: 0.005},
+      {code: NODES.HELLSTONE.code, percent: 0.003},
       {code: NODES.CLAY.code, percent: 0.003},
       {code: NODES.MUD.code, percent: 0.003},
-      {code: NODES.STONE.code, percent: 0.010},
-      {code: NODES.LIMESTONE.code, percent: 0.010},
-      {code: NODES.HELLSTONE.code, percent: 0.003},
       {code: NODES.HARDSTONE.code, percent: 0.001},
       {code: NODES.SLATE.code, percent: 0.001}
     ],
@@ -99,19 +103,21 @@ export const CLUSTER_SCATTER_MAP = {
   },
   [BIOME_TYPE.JUNGLE]: {
     surface: [
-      {code: NODES.CLAY.code, percent: 0.010},
-      {code: NODES.SANDSTONE.code, percent: 0.010},
+      {code: NODES.MUD.code, percent: 0.020},
       {code: NODES.LIMESTONE.code, percent: 0.010},
+      {code: NODES.CLAY.code, percent: 0.005},
+      {code: NODES.SANDSTONE.code, percent: 0.005},
       {code: NODES.STONE.code, percent: 0.003},
       {code: NODES.ASH.code, percent: 0.003}
     ],
     under: [
+      {code: NODES.LIMESTONE.code, percent: 0.020},
       {code: NODES.MUD.code, percent: 0.010},
+      {code: NODES.STONE.code, percent: 0.005},
+      {code: NODES.ASH.code, percent: 0.005},
+      {code: NODES.SLATE.code, percent: 0.003},
       {code: NODES.CLAY.code, percent: 0.003},
       {code: NODES.SANDSTONE.code, percent: 0.003},
-      {code: NODES.STONE.code, percent: 0.010},
-      {code: NODES.ASH.code, percent: 0.010},
-      {code: NODES.SLATE.code, percent: 0.003},
       {code: NODES.HARDSTONE.code, percent: 0.001},
       {code: NODES.HELLSTONE.code, percent: 0.001}
     ],

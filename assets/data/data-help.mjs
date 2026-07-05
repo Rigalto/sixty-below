@@ -174,7 +174,7 @@ The Surface is the topmost layer of the world, where the player begins their adv
 * Includes several tile-layers below the visible surface line
 * Exposed to the [[Day & Night Cycle|day/night cycle]] and [[Weather]] ⏳
 
-**Materials**
+**Tiles**
 
 | Tile | Tier | Type | Biome |
 |---|---|---|---|
@@ -187,6 +187,9 @@ The Surface is the topmost layer of the world, where the player begins their adv
 | [[node:clay]] | {{node:clay:star|star}} | Substrat | [[Forest]] |
 | [[node:sandstone]] | {{node:sandstone:star|star}} | Substrat | [[Desert]] |
 | [[node:mud]] | {{node:mud:star|star}} | Substrat | [[Jungle]] |
+| [[node:stone]] | {{node:stone:star|star}} | Substrat | [[Forest]] |
+| [[node:ash]] | {{node:ash:star|star}} | Substrat | [[Desert]] |
+| [[node:limestone]] | {{node:mud:star|star}} | Substrat | [[Jungle]] |
 
 **Resources**
 
@@ -221,7 +224,7 @@ The Surface is the topmost layer of the world, where the player begins their adv
   },
   {
     title: 'Underground',
-    category: ['Layer'],
+    category: ['Layer', 'Underground'],
     content: `
 **Description**
 
@@ -232,11 +235,20 @@ The Underground layer begins just below the surface. It is darker, more dangerou
 * Below the Surface
 * Above the Caverns
 
-**Materials**
+**Tiles**
 
-* [[node:stone]], [[node:clay]] — [[Forest]]
-* [[node:sandstone]], [[node:stone]] — [[Desert]]
-* [[node:mud]], [[node:clay]] — [[Jungle]]
+| Tile | Tier | Type | Biome |
+|---|---|---|---|
+| [[node:dirt]] | {{node:dirt:star|star}} | Topsoil | [[Forest]] |
+| [[node:sand]] | {{node:sand:star|star}} | Topsoil | [[Desert]] |
+| [[node:silt]] | {{node:silt:star|star}} | Topsoil | [[Jungle]] |
+| [[node:humus]] | {{node:humus:star|star}} | Topsoil |  All biomes |
+| [[node:clay]] | {{node:clay:star|star}} | Substrat | [[Forest]] |
+| [[node:stone]] | {{node:stone:star|star}} | Substrat | [[Forest]] |
+| [[node:sandstone]] | {{node:sandstone:star|star}} | Substrat | [[Desert]] |
+| [[node:ash]] | {{node:ash:star|star}} | Substrat | [[Desert]] |
+| [[node:mud]] | {{node:mud:star|star}} | Substrat | [[Jungle]] |
+| [[node:limestone]] | {{node:limestone:star|star}} | Substrat | [[Jungle]] |
 
 **Resources**
 
@@ -1967,7 +1979,7 @@ Mud is the primary substrat of [[Jungle]] biomes. Its soft, damp texture support
     content: `
 **Description**
 
-Limestone is a sedimentary substrat found as intrusions across [[Jungle]] biome. The pale color of this sedimentary substrat and its layered structure make it recognizable underground.
+Limestone is a sedimentary substrat found in [[Jungle]] biome. The pale color of this sedimentary substrat and its layered structure make it recognizable underground.
 
 **Tier**
 
@@ -1975,8 +1987,10 @@ Limestone is a sedimentary substrat found as intrusions across [[Jungle]] biome.
 
 **Main Location**
 
-* [[Underground]] — [[Jungle]], dominant (native substrat)
-* [[Caverns]] Top — [[Jungle]], moderate density
+* [[Underground]] — [[Jungle]], high density
+* [[Surface]] — [[Jungle]], medium density
+* [[Underground]] — [[Foret]] & [[Desert]], low density
+* Trace amounts worldwide
 
 **Loot** ⏳
 
