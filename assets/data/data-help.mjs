@@ -162,7 +162,7 @@ export const HELP = [
   //    Surface, Underground, Caverns
   {
     title: 'Surface',
-    category: ['Layer'],
+    category: ['Surface', 'Layer'],
     content: `
 **Description**
 
@@ -5095,10 +5095,6 @@ The Ambermirage is a common desert flower that blooms only during the hottest ho
 
 * Foraging an AmberMirage may disturb a [[monster:scorpion]] hiding beneath its petals — be ready to [[Fighting|fight]]. ⏳
 
-**Usages** ⏳
-
-* [[item:ambermirage]] — crafting ingredient
-
 **Usages**
 
 * [[item:ambermirage]] — crafting ingredient ⏳
@@ -5109,9 +5105,10 @@ The Ambermirage is a common desert flower that blooms only during the hottest ho
 * Place a [[item:ambermirageSeed]] in the [[Hotbar]] ([[Inventory]] Panel [I])
 * Select its slot, then left-click a [[node:sand]] — the seed is consumed
 * The node has to be in [[Ranges|Interaction Range]], this range can be buffed
-* The tile must have be free and the left/right surface tiles has to be [[node:sand]]
 * Each spot accepts only one seed
 * Seeded spots have a 100% chance of blooming at the next day
+
+_Note: even a seeded spot won't bloom if its surface neighbors are not [[node:sand]], or if something blocks/covers it, before 10:00_
 
 **Tips**
 
