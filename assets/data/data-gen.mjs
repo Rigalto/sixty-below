@@ -241,9 +241,9 @@ export const TOPSOIL_SCATTER_MAP = {
     ],
     under: [
       {code: NODES.DIRT.code, percent: 0.010}, // natif
-      {code: NODES.HUMUS.code, percent: 0.010} // transversal
+      {code: NODES.HUMUS.code, percent: 0.010}, // transversal
       {code: NODES.SAND.code, percent: 0.003}, // étranger
-      {code: NODES.SILT.code, percent: 0.003}, // étranger
+      {code: NODES.SILT.code, percent: 0.003} // étranger
     ],
     caverns_top: [
       {code: NODES.DIRT.code, percent: 0.006}, // natif
@@ -279,9 +279,9 @@ export const TOPSOIL_SCATTER_MAP = {
     ],
     under: [
       {code: NODES.SILT.code, percent: 0.010}, // natif
-      {code: NODES.HUMUS.code, percent: 0.010} // transversal
+      {code: NODES.HUMUS.code, percent: 0.010}, // transversal
       {code: NODES.DIRT.code, percent: 0.005}, // étranger
-      {code: NODES.SAND.code, percent: 0.003}, // étranger
+      {code: NODES.SAND.code, percent: 0.003} // étranger
     ],
     caverns_top: [
       {code: NODES.SILT.code, percent: 0.006}, // natif
