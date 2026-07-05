@@ -1406,7 +1406,7 @@ The Sea borders both sides of the world. Its deep, dark waters are home to uniqu
   //    Forest Grass, Jungle Grass, Mushroom Grass, Fern Grass, Moss Grass
   {
     title: 'Forest Grass',
-    category: ['Natural'],
+    category: ['Natural', 'Surface'],
     content: `
 **Description**
 
@@ -1449,7 +1449,7 @@ See [[Foraging]], [[Foraging Tools]] and [[Foraging Buffs]] for details.
   },
   {
     title: 'Jungle Grass',
-    category: ['Natural'],
+    category: ['Natural', 'Surface'],
     content: `
 **Description**
 
@@ -4582,7 +4582,7 @@ _Gardening plants and their details will be added in a future update._ ⏳
   //    Oak & Mahogany, Giant Mushroom, Coconut
   {
     title: 'Oak & Mahogany',
-    category: ['Plant', 'Forest', 'Jungle'],
+    category: ['Plant', 'Forest', 'Jungle', 'Surface'],
     content: `
 **Description**
 
@@ -4747,7 +4747,7 @@ Giant Mushrooms grow in the depths of [[Mushroom Cave|Mushroom Caves]], their bi
   },
   {
     title: 'Coconut',
-    category: ['Plant', 'Forest', 'Desert'],
+    category: ['Plant', 'Forest', 'Desert', 'Surface'],
     content: `
 **Description**
 
@@ -4832,7 +4832,7 @@ Search for any of the three products in the [[Crafting|Craft Panel]] to find the
   // Surface Mushrooms, Cave Mushrooms
   {
     title: 'Surface Mushrooms',
-    category: ['Plant', 'Forest', 'Jungle'],
+    category: ['Plant', 'Forest', 'Jungle', 'Surface'],
     content: `
 **Description**
 
@@ -4950,7 +4950,7 @@ _All times are in-game. See [[Day & Night Cycle]] for reference._
   // Parsnip, Sunflower, Ambermirage, Bloodmoon, Corals
   {
     title: 'Parsnip',
-    category: ['Plant', 'Forest'],
+    category: ['Plant', 'Forest', 'Surface'],
     content: `
 **Description**
 
@@ -5003,7 +5003,7 @@ Aime le [[Weather|Cloudy Weather]].
   },
   {
     title: 'Sunflower',
-    category: ['Plant', 'Forest'],
+    category: ['Plant', 'Forest', 'Surface'],
     content: `
 **Description**
 
@@ -5064,7 +5064,7 @@ Foraging a sunflower yields [[item:sunflowerSeed]] — scatter them on bare gras
   },
   {
     title: 'Ambermirage',
-    category: ['Plant', 'Desert'],
+    category: ['Plant', 'Desert', 'Surface'],
     content: `
 **Description**
 
