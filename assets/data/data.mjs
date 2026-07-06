@@ -923,10 +923,10 @@ export const THORNSPINE_SIZES = [2, 3, 3, 4]
 export const TREE_IMAGES = {
   thornspine: {
     '0T0-0T0': ['cactus_80_48-0-2', 'cactus_80_48-1-2', 'cactus_80_48-2-2'],
-    '0T0-1T0': ['cactus_80_48-0-0'], // NOK
+    '0T0-1T0': ['cactus_80_48-0-3', 'cactus_80_48-1-3', 'cactus_80_48-2-3'],
     '0T0-0T1': ['cactus_80_48-3-2', 'cactus_80_48-4-2', 'cactus_80_48-5-2'],
-    '0T0-1T1': ['cactus_80_48-0-0'], // NOK
-    '1T0-0T0': ['cactus_80_48-0-0'], // NOK
+    '0T0-1T1': ['cactus_80_48-3-3', 'cactus_80_48-4-3', 'cactus_80_48-5-3'],
+    '1T0-0T0': ['cactus_80_48-0-4', 'cactus_80_48-1-4', 'cactus_80_48-2-4'],
     '1T0-1T0': ['cactus_80_48-0-0'], // NOK
     '1T0-0T1': ['cactus_80_48-0-0'], // NOK
     '1T0-1T1': ['cactus_80_48-0-0'], // NOK
