@@ -927,14 +927,14 @@ export const TREE_IMAGES = {
     '0T0-0T1': ['cactus_80_48-3-2', 'cactus_80_48-4-2', 'cactus_80_48-5-2'],
     '0T0-1T1': ['cactus_80_48-3-3', 'cactus_80_48-4-3', 'cactus_80_48-5-3'],
     '1T0-0T0': ['cactus_80_48-0-4', 'cactus_80_48-1-4', 'cactus_80_48-2-4'],
-    '1T0-1T0': ['cactus_80_48-0-0'], // NOK
+    '1T0-1T0': ['cactus_80_48-3-5', 'cactus_80_48-4-5', 'cactus_80_48-5-5'],
     '1T0-0T1': ['cactus_80_48-0-0'], // NOK
     '1T0-1T1': ['cactus_80_48-0-0'], // NOK
     '0T1-0T0': ['cactus_80_48-3-4', 'cactus_80_48-4-4', 'cactus_80_48-5-4'],
     '0T1-1T0': ['cactus_80_48-0-0'], // NOK
-    '0T1-0T1': ['cactus_80_48-0-0'], // NOK
+    '0T1-0T1': ['cactus_80_48-0-6', 'cactus_80_48-1-6', 'cactus_80_48-2-6'],
     '0T1-1T1': ['cactus_80_48-0-0'], // NOK
-    '1T1-0T0': ['cactus_80_48-0-5', 'cactus_80_48-1-5', 'cactus_80_48-2-5'], // NOK+
+    '1T1-0T0': ['cactus_80_48-0-5', 'cactus_80_48-1-5', 'cactus_80_48-2-5'],
     '1T1-1T0': ['cactus_80_48-0-0'], // NOK
     '1T1-0T1': ['cactus_80_48-0-0'], // NOK
     '1T1-1T1': ['cactus_80_48-0-0'], // NOK
