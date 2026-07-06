@@ -857,7 +857,7 @@ export const PLANT_TYPE = {
   MAHOGANY: 12,
   COCONUT: 13,
   GIANT_MUSHROOM: 14,
-  THORNSPIRE: 15,
+  THORNSPINE: 15,
   // Surface Herbs
   PARSNIP: 21,
   SUNFLOWER: 22,
@@ -922,9 +922,9 @@ export const THORNSPINE_SIZES = [2, 3, 3, 4]
 
 export const TREE_IMAGES = {
   thornspine: {
-    '0T0-0T0': ['cactus_80_48-0-0'], // NOK
+    '0T0-0T0': ['cactus_80_48-0-2', 'cactus_80_48-1-2', 'cactus_80_48-2-2'],
     '0T0-1T0': ['cactus_80_48-0-0'], // NOK
-    '0T0-0T1': ['cactus_80_48-0-0'], // NOK
+    '0T0-0T1': ['cactus_80_48-3-2', 'cactus_80_48-4-2', 'cactus_80_48-5-2'],
     '0T0-1T1': ['cactus_80_48-0-0'], // NOK
     '1T0-0T0': ['cactus_80_48-0-0'], // NOK
     '1T0-1T0': ['cactus_80_48-0-0'], // NOK
@@ -940,8 +940,8 @@ export const TREE_IMAGES = {
     '1T1-1T1': ['cactus_80_48-0-0'], // NOK
     'head-0T0': ['cactus_80_48-0-0', 'cactus_80_48-1-0', 'cactus_80_48-2-0'],
     'head-1T0': ['cactus_80_48-3-0', 'cactus_80_48-4-0', 'cactus_80_48-5-0'],
-    'head-0T1': ['cactus_80_48-0-0'], // NOK
-    'head-1T1': ['cactus_80_48-0-0'] // NOK
+    'head-0T1': ['cactus_80_48-0-1', 'cactus_80_48-1-1', 'cactus_80_48-2-1'],
+    'head-1T1': ['cactus_80_48-3-1', 'cactus_80_48-4-1', 'cactus_80_48-5-1']
   },
   coconut: { // 0 : décalage à gauche, 1 : centré, 2 : décalage à droite
     '0_0': ['coconut_80_48-0-2', 'coconut_80_48-1-2', 'coconut_80_48-2-2'],

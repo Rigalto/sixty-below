@@ -2,8 +2,8 @@
 
 import {seededRNG, shuffleArray, rollLoot} from './utils.mjs'
 import {database, uniqueIdGenerator} from './database.mjs'
-import {WORLD_WIDTH, WORLD_HEIGHT, SEA_LEVEL, TOPSOIL_Y_SKY_SURFACE, TOPSOIL_Y_SURFACE_UNDER, TOPSOIL_Y_UNDER_CAVERNS, TOPSOIL_Y_CAVERNS_MID, BIOME_TILE_MAP, SEA_MAX_JITTER, SEA_MAX_WIDTH, SEA_MAX_HEIGHT, CLUSTER_SCATTER_MAP, ORE_GEM_SCATTER_MAP, PERLIN_OFFSET_NATURALIZER, PERLIN_OFFSET_TUNNEL, PERLIN_OFFSET_SURFACE_TUNNEL, PERLIN_OFFSET_SMALL_TUNNEL, PERLIN_OFFSET_CAVERN, PERLIN_OFFSET_HIVE, PERLIN_OFFSET_HEART, PERLIN_OFFSET_MUSHROOM, PERLIN_OFFSET_COBWEB, PERLIN_OFFSET_FERNS, PERLIN_OFFSET_LAKES, PERLIN_OFFSET_SHELL, PERLIN_OFFSET_TEMPLE, PERLIN_OFFSET_BEACH, SMALL_CAVERNS_COUNT, MEDIUM_CAVERNS_COUNT, UNDERGROUND_TUNNEL_COUNT, CAVERNS_TUNNEL_COUNT, SMALL_TUNNELS_COUNT, HIVE_RADIUS_MIN, HIVE_RADIUS_MAX, COBWEB_CAVE_COUNT_MIN, COBWEB_CAVE_COUNT_MAX, COBWEB_RADIUS_X_MIN, COBWEB_RADIUS_X_MAX, COBWEB_RADIUS_Y_MIN, COBWEB_RADIUS_Y_MAX, COBWEB_CAVE_MAIN_MIN, COBWEB_CAVE_MAIN_MAX, COBWEB_CAVE_SIDE_MIN, COBWEB_CAVE_SIDE_MAX, COBWEB_SCATTER_COUNT, COBWEB_SCATTER_SIZE_MIN, COBWEB_SCATTER_SIZE_MAX, GEODE_CAVE_COUNT_MIN, GEODE_CAVE_COUNT_MAX, GEODE_RADIUS_MIN, GEODE_RADIUS_MAX, GEODE_TARGET_CLUSTER_COUNT, GEODE_CLUSTER_SIZE_MIN, GEODE_CLUSTER_SIZE_MAX, NATIVE_TOPSOIL_MAP, LAKE_RADIUS_X_MIN, LAKE_RADIUS_X_MAX, LAKE_RADIUS_Y_MIN, LAKE_RADIUS_Y_MAX, LAKE_PIT_RADIUS_X_MIN, LAKE_PIT_RADIUS_X_MAX, LAKE_PIT_RADIUS_Y_MIN, LAKE_PIT_RADIUS_Y_MAX, LAKE_CREATION_MAP, UNDERGROUND_LAKE_UNDER_COUNT, UNDERGROUND_LAKE_CAVERNS_COUNT, UNDERGROUND_LAKE_RADIUS_MIN, UNDERGROUND_LAKE_RADIUS_MAX, BLIND_LAKE_COUNT, BLIND_LAKE_RADIUS_MIN, BLIND_LAKE_RADIUS_MAX, SAP_LAKE_UNDER_COUNT, SAP_LAKE_CAVERNS_COUNT, SAP_LAKE_RADIUS_MIN, SAP_LAKE_RADIUS_MAX, SAP_POCKET_COUNT, SAP_POCKET_RADIUS_MIN, SAP_POCKET_RADIUS_MAX, WATER_PUDDLE_COUNT, SAP_PUDDLE_COUNT, PUDDLE_HEIGHT_MIN, PUDDLE_HEIGHT_MAX, FOSSIL_VEIN_COUNT, FERN_CAVE_RADIUS_X_MIN, FERN_CAVE_RADIUS_X_MAX, FERN_CAVE_RADIUS_Y_MIN, FERN_CAVE_RADIUS_Y_MAX, MOSS_CAVE_RADIUS_X_MIN, MOSS_CAVE_RADIUS_X_MAX, MOSS_CAVE_RADIUS_Y_MIN, MOSS_CAVE_RADIUS_Y_MAX, SAND_POCKET_RADIUS_X_MIN, SAND_POCKET_RADIUS_X_MAX, SAND_POCKET_RADIUS_Y_MIN, SAND_POCKET_RADIUS_Y_MAX, MUSHROOM_CAVE_RADIUS_X_MIN, MUSHROOM_CAVE_RADIUS_X_MAX, MUSHROOM_CAVE_RADIUS_Y_MIN, MUSHROOM_CAVE_RADIUS_Y_MAX, PYRAMID_WALL_INDEXES, PYRAMID_VOID_INDEXES, PYRAMID_WIDTH, PYRAMID_HEIGHT, PYRAMID_ROOM1_DELTA, PYRAMID_ROOM2_DELTA, TEMPLE_RUIN_WALL_INDEXES, TEMPLE_RUIN_COLUMNS_INDEXES, CHEST_CONTENT, TREES_INIT_SIZE, GIANT_MUSHROOM_INIT_SIZE} from '../assets/data/data-gen.mjs'
-import {NODES, NODES_LOOKUP, NODE_TYPE, BIOME_TYPE, PLANT_KIND, PLANT_TYPE, ITEMS, TREE_IMAGES, PARSNIP_RATE, SUNFLOWER_RATE, MANDRAKE_COUNT, PRICKLEPAD_COUNT, BAMBOO_COUNT, OLEANDER_COUNT, SATANS_CUBE_COUNT, SNEAKTHORN_COUNT, CURSEDCROWN_COUNT, ABYSSHORN_COUNT, INFERNCAP_COUNT, COCONUT_CYCLE_DELAY} from '../assets/data/data.mjs'
+import {WORLD_WIDTH, WORLD_HEIGHT, SEA_LEVEL, TOPSOIL_Y_SKY_SURFACE, TOPSOIL_Y_SURFACE_UNDER, TOPSOIL_Y_UNDER_CAVERNS, BIOME_TILE_MAP, SEA_MAX_JITTER, SEA_MAX_WIDTH, SEA_MAX_HEIGHT, CLUSTER_SCATTER_MAP, ORE_GEM_SCATTER_MAP, PERLIN_OFFSET_NATURALIZER, PERLIN_OFFSET_TUNNEL, PERLIN_OFFSET_SURFACE_TUNNEL, PERLIN_OFFSET_SMALL_TUNNEL, PERLIN_OFFSET_CAVERN, PERLIN_OFFSET_HIVE, PERLIN_OFFSET_HEART, PERLIN_OFFSET_MUSHROOM, PERLIN_OFFSET_COBWEB, PERLIN_OFFSET_FERNS, PERLIN_OFFSET_LAKES, PERLIN_OFFSET_SHELL, PERLIN_OFFSET_TEMPLE, PERLIN_OFFSET_BEACH, SMALL_CAVERNS_COUNT, MEDIUM_CAVERNS_COUNT, UNDERGROUND_TUNNEL_COUNT, CAVERNS_TUNNEL_COUNT, SMALL_TUNNELS_COUNT, HIVE_RADIUS_MIN, HIVE_RADIUS_MAX, COBWEB_CAVE_COUNT_MIN, COBWEB_CAVE_COUNT_MAX, COBWEB_RADIUS_X_MIN, COBWEB_RADIUS_X_MAX, COBWEB_RADIUS_Y_MIN, COBWEB_RADIUS_Y_MAX, COBWEB_CAVE_MAIN_MIN, COBWEB_CAVE_MAIN_MAX, COBWEB_CAVE_SIDE_MIN, COBWEB_CAVE_SIDE_MAX, COBWEB_SCATTER_COUNT, COBWEB_SCATTER_SIZE_MIN, COBWEB_SCATTER_SIZE_MAX, GEODE_CAVE_COUNT_MIN, GEODE_CAVE_COUNT_MAX, GEODE_RADIUS_MIN, GEODE_RADIUS_MAX, GEODE_TARGET_CLUSTER_COUNT, GEODE_CLUSTER_SIZE_MIN, GEODE_CLUSTER_SIZE_MAX, NATIVE_TOPSOIL_MAP, LAKE_RADIUS_X_MIN, LAKE_RADIUS_X_MAX, LAKE_RADIUS_Y_MIN, LAKE_RADIUS_Y_MAX, LAKE_PIT_RADIUS_X_MIN, LAKE_PIT_RADIUS_X_MAX, LAKE_PIT_RADIUS_Y_MIN, LAKE_PIT_RADIUS_Y_MAX, LAKE_CREATION_MAP, UNDERGROUND_LAKE_UNDER_COUNT, UNDERGROUND_LAKE_CAVERNS_COUNT, UNDERGROUND_LAKE_RADIUS_MIN, UNDERGROUND_LAKE_RADIUS_MAX, BLIND_LAKE_COUNT, BLIND_LAKE_RADIUS_MIN, BLIND_LAKE_RADIUS_MAX, SAP_LAKE_UNDER_COUNT, SAP_LAKE_CAVERNS_COUNT, SAP_LAKE_RADIUS_MIN, SAP_LAKE_RADIUS_MAX, SAP_POCKET_COUNT, SAP_POCKET_RADIUS_MIN, SAP_POCKET_RADIUS_MAX, WATER_PUDDLE_COUNT, SAP_PUDDLE_COUNT, PUDDLE_HEIGHT_MIN, PUDDLE_HEIGHT_MAX, FOSSIL_VEIN_COUNT, FERN_CAVE_RADIUS_X_MIN, FERN_CAVE_RADIUS_X_MAX, FERN_CAVE_RADIUS_Y_MIN, FERN_CAVE_RADIUS_Y_MAX, MOSS_CAVE_RADIUS_X_MIN, MOSS_CAVE_RADIUS_X_MAX, MOSS_CAVE_RADIUS_Y_MIN, MOSS_CAVE_RADIUS_Y_MAX, SAND_POCKET_RADIUS_X_MIN, SAND_POCKET_RADIUS_X_MAX, SAND_POCKET_RADIUS_Y_MIN, SAND_POCKET_RADIUS_Y_MAX, MUSHROOM_CAVE_RADIUS_X_MIN, MUSHROOM_CAVE_RADIUS_X_MAX, MUSHROOM_CAVE_RADIUS_Y_MIN, MUSHROOM_CAVE_RADIUS_Y_MAX, PYRAMID_WALL_INDEXES, PYRAMID_VOID_INDEXES, PYRAMID_WIDTH, PYRAMID_HEIGHT, PYRAMID_ROOM1_DELTA, PYRAMID_ROOM2_DELTA, TEMPLE_RUIN_WALL_INDEXES, TEMPLE_RUIN_COLUMNS_INDEXES, CHEST_CONTENT, TREES_INIT_SIZE, GIANT_MUSHROOM_INIT_SIZE} from '../assets/data/data-gen.mjs'
+import {NODES, NODES_LOOKUP, NODE_TYPE, BIOME_TYPE, PLANT_KIND, PLANT_TYPE, ITEMS, TREE_IMAGES, THORNSPINE_JUNCTIONS, THORNSPINE_SIZES, PARSNIP_RATE, SUNFLOWER_RATE, MANDRAKE_COUNT, PRICKLEPAD_COUNT, BAMBOO_COUNT, OLEANDER_COUNT, SATANS_CUBE_COUNT, SNEAKTHORN_COUNT, CURSEDCROWN_COUNT, ABYSSHORN_COUNT, INFERNCAP_COUNT, COCONUT_CYCLE_DELAY} from '../assets/data/data.mjs'
 import {IS_DEV, WEATHER_TYPE, WEATHER_TYPE_CODE, BAG_CAPACITY, HOTBAR_CAPACITY, ARMOR_CAPACITY, ACCESSORY_CAPACITY, CONTAINER_CAPACITY, CONTAINER_STYPES, PLAYER} from './constant.mjs'
 
 /* ====================================================================================================
@@ -399,6 +399,7 @@ class WorldGenerator {
     plantGenerator.placeAmbermirages(surfaceLine, guarded, currentWeather)
     plantGenerator.placeParsnipsSunflowers(surfaceLine, guarded, oakPositions)
     plantGenerator.placeBloodmoons(surfaceLine, guarded)
+    const thornspineCount = plantGenerator.placeThornspines(surfaceLine, guarded, biomesDescription)
     await progress('Surface Herbs')
 
     const fernCount = plantGenerator.placeFerns(fernsPlants)
@@ -433,7 +434,7 @@ class WorldGenerator {
       console.log('.................... liquidBodies', liquidBodies)
       const lakes = [...surfaceLakes, ...underLakes, ...blindLakes, ...sapLakes, ...sapPockets]
       const plants = [...fernsPlants, ...mossPlants, ...mushroomPlants, ...surfacePlants, ...plantGenerator.plants]
-      await this.save(seed, {hives, cobwebCaves, geodeCaves, lakes, liquidBodies, fernsCaves, mossCaves, mushroomCaves, pyramid, ruinedcabin, lostTemple, ancientHouse, leftBeach, rightBeach, antlions, anthills, termites, plants, hearts, triskels, graveyard, weather, fernCount})
+      await this.save(seed, {hives, cobwebCaves, geodeCaves, lakes, liquidBodies, fernsCaves, mossCaves, mushroomCaves, pyramid, ruinedcabin, lostTemple, ancientHouse, leftBeach, rightBeach, antlions, anthills, termites, plants, hearts, triskels, graveyard, weather, fernCount, thornspineCount})
       worldBuffer.clear()
     }
 
@@ -444,7 +445,7 @@ class WorldGenerator {
     if (debug) { return worldBuffer } // appelant responsable du clear()
   }
 
-  async save (seed, {hives, cobwebCaves, geodeCaves, lakes, liquidBodies, fernsCaves, mossCaves, mushroomCaves, plants, pyramid, ruinedcabin, lostTemple, ancientHouse, leftBeach, rightBeach, antlions, anthills, termites, hearts, triskels, graveyard, weather, fernCount}) {
+  async save (seed, {hives, cobwebCaves, geodeCaves, lakes, liquidBodies, fernsCaves, mossCaves, mushroomCaves, plants, pyramid, ruinedcabin, lostTemple, ancientHouse, leftBeach, rightBeach, antlions, anthills, termites, hearts, triskels, graveyard, weather, fernCount, thornspineCount}) {
     const start = window.performance.now()
     // 1. Sauvegarde des tuiles
     await database.clearObjectStore('world_chunks')
@@ -483,6 +484,7 @@ class WorldGenerator {
       {key: 'craftfilterstation', value: ''},
       {key: 'craftfiltertype', value: ''},
       {key: 'eternals', value: this.#collectEternalTiles()},
+      {key: 'thornspinecount', value: thornspineCount},
       {key: 'ferncount', value: fernCount},
       {key: 'ferns', value: fernsCaves},
       {key: 'geodecaves', value: geodeCaves},
@@ -7187,6 +7189,175 @@ class PlantGenerator {
       deleted: false
     })
   }
+
+  // /////////// //
+  // THORNSPINES //
+  // /////////// //
+
+  /**
+   * Place jusqu'à `quota` Thornspines sur les tuiles SAND de surface du biome Desert. `quota`
+   * est un plafond (chunks de largeur des zones Desert + 2 pour les shores) : on crée TOUJOURS
+   * exactement `quota` records en base, jamais plus ni moins ensuite — aucune création/suppression
+   * runtime.
+   * - `present: true`  → emplacement valide trouvé, position + images renseignées.
+   * - `present: false` → reliquat (quota - placed) si le désert n'offre pas assez de place :
+   *   record dormant, sans position valide, en attente d'un futur emplacement.
+   * `bloom` (fleur forageable) est indépendant de `present`.
+   *
+   * @param {Int16Array} surfaceLine
+   * @param {Set<number>} guarded
+   * @param {Array<{biome, width, offset}>} biomesDescription
+   * @returns {number} quota — nombre total de records créés (== quota calculé, jamais `placed`)
+   */
+  placeThornspines (surfaceLine, guarded, biomesDescription) {
+    const SAND = NODES.SAND.code
+    const SKY = NODES.SKY.code
+
+    // 1. Quota : chunks de largeur des zones Desert + 2 (shores)
+    let quota = 2
+    for (const zone of biomesDescription) {
+      if (zone.biome === BIOME_TYPE.DESERT) quota += Math.ceil(zone.width / 16)
+    }
+
+    // 2. Collecte des spots valides, limitée aux zones Desert
+    const spots = []
+    for (const zone of biomesDescription) {
+      if (zone.biome !== BIOME_TYPE.DESERT) continue
+      const x1 = zone.offset + zone.width - 3 // dernier x tel que x, x+1, x+2 restent dans la zone
+
+      for (let x = zone.offset; x <= x1; x++) {
+        if (guarded.has(x) || guarded.has(x + 1) || guarded.has(x + 2)) continue
+
+        const y = surfaceLine[x]
+        if (surfaceLine[x + 1] !== y || surfaceLine[x + 2] !== y) continue
+        if (worldBuffer.read(x, y) !== SAND || worldBuffer.read(x + 1, y) !== SAND || worldBuffer.read(x + 2, y) !== SAND) continue
+        if (worldBuffer.read(x, y - 1) !== SKY || worldBuffer.read(x + 1, y - 1) !== SKY || worldBuffer.read(x + 2, y - 1) !== SKY) continue
+
+        spots.push(x)
+      }
+    }
+
+    // 3. Tirage aléatoire, retrait swap+length-- (sans allocation superflue)
+    let placed = 0
+    while (placed < quota && spots.length > 0) {
+      const idx = seededRNG.randomGetMinMax(0, spots.length - 1)
+      const x = spots[idx]
+      spots[idx] = spots[spots.length - 1]
+      spots.length--
+
+      // un tirage précédent a pu consommer ces colonnes entre-temps
+      if (guarded.has(x) || guarded.has(x + 1) || guarded.has(x + 2)) continue
+
+      this.#placeOneThornspine(x, surfaceLine[x])
+      guarded.add(x)
+      guarded.add(x + 1)
+      guarded.add(x + 2)
+      placed++
+    }
+
+    // Reliquat : records dormants, present=false, en attente d'un emplacement futur
+    for (let i = placed; i < quota; i++) this.#placeDormantThornspine()
+
+    if (IS_DEV) console.log(`   🔹 Thornspines : ${placed} / ${quota}`)
+    return quota
+  }
+
+  /**
+   * Construit la chaîne d'images d'un Thornspine (base + tronçons + head). Aucune règle de
+   * compatibilité : chaque frontière entre segments tire indépendamment une jonction parmi
+   * THORNSPINE_JUNCTIONS ; la jonction du haut d'un segment devient telle quelle la jonction
+   * du bas du suivant. La base a toujours pour bas '0T0' (tronc central seul au sol).
+   * @param {number} soilX — coordonnée X de la tuile support gauche (hitbox 3 tuiles)
+   * @param {number} size — nombre total de segments (2 à 4)
+   * @returns {Array<{tree, key, col, x}>}
+   */
+  #buildThornspineImages (soilX, size) {
+    const imageTable = TREE_IMAGES.thornspine
+    const images = []
+    let bottom = '0T0'
+
+    for (let i = 0; i < size - 1; i++) {
+      const top = seededRNG.randomGetArrayValue(THORNSPINE_JUNCTIONS)
+      const key = `${bottom}-${top}`
+      const col = seededRNG.randomGetArrayIndex(imageTable[key])
+      images.push({tree: 'thornspine', key, col, x: soilX - 1})
+      bottom = top
+    }
+
+    const headKey = `head-${bottom}`
+    const headCol = seededRNG.randomGetArrayIndex(imageTable[headKey])
+    images.push({tree: 'thornspine', key: headKey, col: headCol, x: soilX - 1})
+
+    return images
+  }
+
+  /**
+   * Crée et enregistre un Thornspine dans l'objectstore plant. Taille tirée dans
+   * THORNSPINE_SIZES (2/3/4 segments), image construite intégralement au placement — pas de
+   * croissance. `present` : indique la fleur forageable au sommet (mécanique identique à la
+   * noix de coco). Valeur initiale à false par défaut — cf. question ouverte.
+   * @param {number} soilX — coordonnée X de la tuile support gauche
+   * @param {number} y — Y de la tuile de surface
+   */
+  #placeOneThornspine (soilX, y) {
+    const size = seededRNG.randomGetArrayValue(THORNSPINE_SIZES)
+    const h = size * 3
+    const soilIndex = (y << 10) | soilX
+
+    this.#plants.push({
+      id: uniqueIdGenerator.getUniqueId(),
+      itemId: 'thornspine',
+      kind: PLANT_KIND.TREE,
+      type: PLANT_TYPE.THORNSPINE,
+      index: soilIndex - h * WORLD_WIDTH,
+      soilIndex,
+      w: 3,
+      h,
+      size,
+      images: this.#buildThornspineImages(soilX, size),
+      present: true,
+      bloom: false, // TODO : confirmer un % initial comme Fern/Oleander, ou toujours false ?
+      x: soilX,
+      yTop: y - h,
+      yBottom: y - 1,
+      blocked: 0,
+      deleted: false
+    })
+  }
+
+  /**
+   * Crée un Thornspine dormant (present=false) — aucun emplacement valide trouvé lors de la
+   * génération. Champs fixes (id, itemId, kind, type, w, blocked, deleted) correctement
+   * positionnés — ils ne seront plus jamais modifiés. Champs variables (index, soilIndex, x,
+   * yTop, yBottom, size, images, bloom) à 0/[]/false par défaut — jamais lus tant que present
+   * reste false, ignorés par la boucle de jeu ; seule leur shape (mêmes clés, mêmes types que
+   * #placeOneThornspine) importe, pour rester monomorphe.
+   */
+  #placeDormantThornspine () {
+    this.#plants.push({
+      id: uniqueIdGenerator.getUniqueId(),
+      itemId: 'thornspine',
+      kind: PLANT_KIND.TREE,
+      type: PLANT_TYPE.THORNSPINE,
+      index: 0,
+      soilIndex: 0,
+      w: 3,
+      h: 0,
+      size: 0,
+      images: [],
+      present: false,
+      bloom: false,
+      x: 0,
+      yTop: 0,
+      yBottom: 0,
+      blocked: 0,
+      deleted: false
+    })
+  }
+
+  // ////// //
+  // CORALS //
+  // ////// //
 
   /**
  * Place des coraux dans une zone de mer.
