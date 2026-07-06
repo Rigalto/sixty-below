@@ -247,7 +247,7 @@ caverns_top), rare en surface, et anecdotique dans DESERT (surprise géologique)
 Une seconde passe post-creusement (algorithme distinct) recouvrira les parois des
 tunnels et cavernes formés.
 
-Les densités sont définies dans `TOPSOIL_SCATTER_MAP` (`data-gen.mjs`).
+Les densités sont définies dans `CLUSTER_SCATTER_MAP` (`data-gen.mjs`).
 Les constantes d'interpolation Y sont dans `constant.mjs` (`TOPSOIL_Y_*`).
 
 | Quantité | percent |

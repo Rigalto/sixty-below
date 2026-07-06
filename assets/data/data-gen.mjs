@@ -52,95 +52,126 @@ export const SEA_MAX_JITTER = 10
 export const CLUSTER_SCATTER_MAP = {
   [BIOME_TYPE.FOREST]: {
     surface: [
-      {code: NODES.STONE.code, percent: 0.010},
-      {code: NODES.SANDSTONE.code, percent: 0.05},
-      {code: NODES.MUD.code, percent: 0.05},
-      {code: NODES.ASH.code, percent: 0.003},
-      {code: NODES.LIMESTONE.code, percent: 0.003}
+      {code: NODES.STONE.code, percent: 0.07, sizeMin: 8, sizeMax: 14}, // substrat
+      {code: NODES.SANDSTONE.code, percent: 0.04, sizeMin: 8, sizeMax: 14}, // substrat
+      {code: NODES.MUD.code, percent: 0.04, sizeMin: 8, sizeMax: 14}, // substrat
+      {code: NODES.ASH.code, percent: 0.03, sizeMin: 8, sizeMax: 14}, // substrat
+      {code: NODES.LIMESTONE.code, percent: 0.03, sizeMin: 8, sizeMax: 14}, // substrat
+      {code: NODES.SILT.code, percent: 0.02, sizeMin: 5, sizeMax: 10}, // topsoil
+      {code: NODES.SAND.code, percent: 0.02, sizeMin: 5, sizeMax: 10}, // topsoil
+      {code: NODES.HUMUS.code, percent: 0.02, sizeMin: 5, sizeMax: 10} // topsoil
     ],
     under: [
-      {code: NODES.STONE.code, percent: 0.010},
-      {code: NODES.CLAY.code, percent: 0.010},
-      {code: NODES.HARDSTONE.code, percent: 0.05},
-      {code: NODES.ASH.code, percent: 0.005},
-      {code: NODES.LIMESTONE.code, percent: 0.005},
-      {code: NODES.SANDSTONE.code, percent: 0.003},
-      {code: NODES.MUD.code, percent: 0.003},
-      {code: NODES.HELLSTONE.code, percent: 0.001},
-      {code: NODES.SLATE.code, percent: 0.001}
-    ],
+      {code: NODES.STONE.code, percent: 0.010, sizeMin: 5, sizeMax: 9}, // substrat
+      {code: NODES.CLAY.code, percent: 0.010, sizeMin: 5, sizeMax: 9}, // substrat
+      {code: NODES.HARDSTONE.code, percent: 0.05, sizeMin: 5, sizeMax: 9}, // substrat
+      {code: NODES.ASH.code, percent: 0.005, sizeMin: 5, sizeMax: 9}, // substrat
+      {code: NODES.LIMESTONE.code, percent: 0.005, sizeMin: 5, sizeMax: 9}, // substrat
+      {code: NODES.SANDSTONE.code, percent: 0.003, sizeMin: 5, sizeMax: 9}, // substrat
+      {code: NODES.MUD.code, percent: 0.003, sizeMin: 5, sizeMax: 9}, // substrat
+      {code: NODES.HELLSTONE.code, percent: 0.001, sizeMin: 5, sizeMax: 9}, // substrat
+      {code: NODES.SLATE.code, percent: 0.001, sizeMin: 5, sizeMax: 9}, // substrat
+      {code: NODES.DIRT.code, percent: 0.006, sizeMin: 5, sizeMax: 10}, // topsoil
+      {code: NODES.HUMUS.code, percent: 0.010, sizeMin: 5, sizeMax: 10}, // topsoil
+      {code: NODES.SAND.code, percent: 0.003, sizeMin: 5, sizeMax: 10}, // topsoil
+      {code: NODES.SILT.code, percent: 0.003, sizeMin: 5, sizeMax: 10} // topsoil
+    ], // substrat
     caverns_top: [
-      {code: NODES.HELLSTONE.code, percent: 0.010},
-      {code: NODES.SLATE.code, percent: 0.010},
-      {code: NODES.STONE.code, percent: 0.003},
-      {code: NODES.ASH.code, percent: 0.001},
-      {code: NODES.LIMESTONE.code, percent: 0.001}
+      {code: NODES.HELLSTONE.code, percent: 0.010, sizeMin: 3, sizeMax: 6}, // substrat
+      {code: NODES.SLATE.code, percent: 0.010, sizeMin: 3, sizeMax: 6}, // substrat
+      {code: NODES.STONE.code, percent: 0.003, sizeMin: 3, sizeMax: 6}, // substrat
+      {code: NODES.ASH.code, percent: 0.001, sizeMin: 3, sizeMax: 6}, // substrat
+      {code: NODES.LIMESTONE.code, percent: 0.001, sizeMin: 3, sizeMax: 6}, // substrat
+      {code: NODES.DIRT.code, percent: 0.006, sizeMin: 5, sizeMax: 10}, // topsoil
+      {code: NODES.SAND.code, percent: 0.003, sizeMin: 5, sizeMax: 10}, // topsoil
+      {code: NODES.SILT.code, percent: 0.003, sizeMin: 5, sizeMax: 10}, // topsoil
+      {code: NODES.HUMUS.code, percent: 0.005, sizeMin: 5, sizeMax: 10} // topsoil
     ],
     caverns_bottom: [
-      {code: NODES.HELLSTONE.code, percent: 0.010},
-      {code: NODES.SLATE.code, percent: 0.010}
+      {code: NODES.HELLSTONE.code, percent: 0.010, sizeMin: 3, sizeMax: 6}, // substrat
+      {code: NODES.SLATE.code, percent: 0.010, sizeMin: 3, sizeMax: 6} // substrat
     ]
   },
   [BIOME_TYPE.DESERT]: {
     surface: [
-      {code: NODES.ASH.code, percent: 0.010},
-      {code: NODES.CLAY.code, percent: 0.05},
-      {code: NODES.MUD.code, percent: 0.05},
-      {code: NODES.STONE.code, percent: 0.003},
-      {code: NODES.LIMESTONE.code, percent: 0.003}
+      {code: NODES.ASH.code, percent: 0.06, sizeMin: 8, sizeMax: 14}, // substrat
+      {code: NODES.CLAY.code, percent: 0.03, sizeMin: 8, sizeMax: 14}, // substrat
+      {code: NODES.MUD.code, percent: 0.03, sizeMin: 8, sizeMax: 14}, // substrat
+      {code: NODES.STONE.code, percent: 0.02, sizeMin: 8, sizeMax: 14}, // substrat
+      {code: NODES.LIMESTONE.code, percent: 0.02, sizeMin: 8, sizeMax: 14}, // substrat
+      {code: NODES.DIRT.code, percent: 0.02, sizeMin: 5, sizeMax: 10}, // topsoil
+      {code: NODES.SILT.code, percent: 0.02, sizeMin: 5, sizeMax: 10}, // topsoil
+      {code: NODES.HUMUS.code, percent: 0.02, sizeMin: 5, sizeMax: 10} // topsoil
     ],
     under: [
-      {code: NODES.ASH.code, percent: 0.020},
-      {code: NODES.SANDSTONE.code, percent: 0.010},
-      {code: NODES.STONE.code, percent: 0.005},
-      {code: NODES.LIMESTONE.code, percent: 0.005},
-      {code: NODES.HELLSTONE.code, percent: 0.003},
-      {code: NODES.CLAY.code, percent: 0.003},
-      {code: NODES.MUD.code, percent: 0.003},
-      {code: NODES.HARDSTONE.code, percent: 0.001},
-      {code: NODES.SLATE.code, percent: 0.001}
+      {code: NODES.ASH.code, percent: 0.020, sizeMin: 5, sizeMax: 9}, // substrat
+      {code: NODES.SANDSTONE.code, percent: 0.010, sizeMin: 5, sizeMax: 9}, // substrat
+      {code: NODES.STONE.code, percent: 0.005, sizeMin: 5, sizeMax: 9}, // substrat
+      {code: NODES.LIMESTONE.code, percent: 0.005, sizeMin: 5, sizeMax: 9}, // substrat
+      {code: NODES.HELLSTONE.code, percent: 0.003, sizeMin: 5, sizeMax: 9}, // substrat
+      {code: NODES.CLAY.code, percent: 0.003, sizeMin: 5, sizeMax: 9}, // substrat
+      {code: NODES.MUD.code, percent: 0.003, sizeMin: 5, sizeMax: 9}, // substrat
+      {code: NODES.HARDSTONE.code, percent: 0.001, sizeMin: 5, sizeMax: 9}, // substrat
+      {code: NODES.SLATE.code, percent: 0.001, sizeMin: 5, sizeMax: 9}, // substrat
+      {code: NODES.SAND.code, percent: 0.010, sizeMin: 5, sizeMax: 10}, // topsoil
+      {code: NODES.DIRT.code, percent: 0.003, sizeMin: 5, sizeMax: 10}, // topsoil
+      {code: NODES.SILT.code, percent: 0.003, sizeMin: 5, sizeMax: 10} // topsoil
     ],
     caverns_top: [
-      {code: NODES.HARDSTONE.code, percent: 0.010},
-      {code: NODES.SLATE.code, percent: 0.010},
-      {code: NODES.ASH.code, percent: 0.003},
-      {code: NODES.STONE.code, percent: 0.001},
-      {code: NODES.LIMESTONE.code, percent: 0.001}
+      {code: NODES.HARDSTONE.code, percent: 0.010, sizeMin: 3, sizeMax: 6}, // substrat
+      {code: NODES.SLATE.code, percent: 0.010, sizeMin: 3, sizeMax: 6}, // substrat
+      {code: NODES.ASH.code, percent: 0.003, sizeMin: 3, sizeMax: 6}, // substrat
+      {code: NODES.STONE.code, percent: 0.001, sizeMin: 3, sizeMax: 6}, // substrat
+      {code: NODES.LIMESTONE.code, percent: 0.001, sizeMin: 3, sizeMax: 6}, // substrat
+      {code: NODES.SAND.code, percent: 0.006, sizeMin: 5, sizeMax: 10}, // topsoil
+      {code: NODES.DIRT.code, percent: 0.003, sizeMin: 5, sizeMax: 10}, // topsoil
+      {code: NODES.SILT.code, percent: 0.003, sizeMin: 5, sizeMax: 10} // topsoil
     ],
     caverns_bottom: [
-      {code: NODES.HARDSTONE.code, percent: 0.010},
-      {code: NODES.SLATE.code, percent: 0.010}
+      {code: NODES.HARDSTONE.code, percent: 0.010, sizeMin: 3, sizeMax: 6}, // substrat
+      {code: NODES.SLATE.code, percent: 0.010, sizeMin: 3, sizeMax: 6} // substrat
     ]
   },
   [BIOME_TYPE.JUNGLE]: {
     surface: [
-      {code: NODES.LIMESTONE.code, percent: 0.010},
-      {code: NODES.CLAY.code, percent: 0.005},
-      {code: NODES.SANDSTONE.code, percent: 0.005},
-      {code: NODES.STONE.code, percent: 0.003},
-      {code: NODES.ASH.code, percent: 0.003}
+      {code: NODES.LIMESTONE.code, percent: 0.06, sizeMin: 8, sizeMax: 14}, // substrat
+      {code: NODES.CLAY.code, percent: 0.03, sizeMin: 8, sizeMax: 14}, // substrat
+      {code: NODES.SANDSTONE.code, percent: 0.03, sizeMin: 8, sizeMax: 14}, // substrat
+      {code: NODES.STONE.code, percent: 0.02, sizeMin: 8, sizeMax: 14}, // substrat
+      {code: NODES.ASH.code, percent: 0.02, sizeMin: 8, sizeMax: 14}, // substrat
+      {code: NODES.DIRT.code, percent: 0.02, sizeMin: 5, sizeMax: 10}, // topsoil
+      {code: NODES.SAND.code, percent: 0.02, sizeMin: 5, sizeMax: 10}, // topsoil
+      {code: NODES.HUMUS.code, percent: 0.02, sizeMin: 5, sizeMax: 10} // topsoil
     ],
     under: [
-      {code: NODES.LIMESTONE.code, percent: 0.020},
-      {code: NODES.MUD.code, percent: 0.010},
-      {code: NODES.STONE.code, percent: 0.005},
-      {code: NODES.ASH.code, percent: 0.005},
-      {code: NODES.SLATE.code, percent: 0.003},
-      {code: NODES.CLAY.code, percent: 0.003},
-      {code: NODES.SANDSTONE.code, percent: 0.003},
-      {code: NODES.HARDSTONE.code, percent: 0.001},
-      {code: NODES.HELLSTONE.code, percent: 0.001}
+      {code: NODES.LIMESTONE.code, percent: 0.020, sizeMin: 5, sizeMax: 9}, // substrat
+      {code: NODES.MUD.code, percent: 0.010, sizeMin: 5, sizeMax: 9}, // substrat
+      {code: NODES.STONE.code, percent: 0.005, sizeMin: 5, sizeMax: 9}, // substrat
+      {code: NODES.ASH.code, percent: 0.005, sizeMin: 5, sizeMax: 9}, // substrat
+      {code: NODES.SLATE.code, percent: 0.003, sizeMin: 5, sizeMax: 9}, // substrat
+      {code: NODES.CLAY.code, percent: 0.003, sizeMin: 5, sizeMax: 9}, // substrat
+      {code: NODES.SANDSTONE.code, percent: 0.003, sizeMin: 5, sizeMax: 9}, // substrat
+      {code: NODES.HARDSTONE.code, percent: 0.001, sizeMin: 5, sizeMax: 9}, // substrat
+      {code: NODES.HELLSTONE.code, percent: 0.001, sizeMin: 5, sizeMax: 9}, // substrat
+      {code: NODES.SILT.code, percent: 0.010, sizeMin: 5, sizeMax: 10}, // topsoil
+      {code: NODES.HUMUS.code, percent: 0.010, sizeMin: 5, sizeMax: 10}, // topsoil
+      {code: NODES.DIRT.code, percent: 0.005, sizeMin: 5, sizeMax: 10}, // topsoil
+      {code: NODES.SAND.code, percent: 0.003, sizeMin: 5, sizeMax: 10} // topsoil
     ],
     caverns_top: [
-      {code: NODES.HARDSTONE.code, percent: 0.010},
-      {code: NODES.HELLSTONE.code, percent: 0.010},
-      {code: NODES.LIMESTONE.code, percent: 0.003},
-      {code: NODES.STONE.code, percent: 0.001},
-      {code: NODES.ASH.code, percent: 0.001}
+      {code: NODES.HARDSTONE.code, percent: 0.010, sizeMin: 3, sizeMax: 6}, // substrat
+      {code: NODES.HELLSTONE.code, percent: 0.010, sizeMin: 3, sizeMax: 6}, // substrat
+      {code: NODES.LIMESTONE.code, percent: 0.003, sizeMin: 3, sizeMax: 6}, // substrat
+      {code: NODES.STONE.code, percent: 0.001, sizeMin: 3, sizeMax: 6}, // substrat
+      {code: NODES.ASH.code, percent: 0.001, sizeMin: 3, sizeMax: 6}, // substrat
+      {code: NODES.SILT.code, percent: 0.006, sizeMin: 5, sizeMax: 10}, // topsoil
+      {code: NODES.DIRT.code, percent: 0.003, sizeMin: 5, sizeMax: 10}, // topsoil
+      {code: NODES.SAND.code, percent: 0.003, sizeMin: 5, sizeMax: 10}, // topsoil
+      {code: NODES.HUMUS.code, percent: 0.005, sizeMin: 5, sizeMax: 10} // topsoil
     ],
     caverns_bottom: [
-      {code: NODES.HARDSTONE.code, percent: 0.010},
-      {code: NODES.HELLSTONE.code, percent: 0.010}
+      {code: NODES.HARDSTONE.code, percent: 0.010, sizeMin: 3, sizeMax: 6}, // substrat
+      {code: NODES.HELLSTONE.code, percent: 0.010, sizeMin: 3, sizeMax: 6} // substrat
     ]
   }
 }
@@ -237,67 +268,6 @@ export const ORE_GEM_SCATTER_MAP = {
     ],
     hell: [
       {code: NODES.OBSIDIAN.code, percent: 0.0002, sizeMin: 18, sizeMax: 38}
-    ]
-  }
-}
-
-export const TOPSOIL_SCATTER_MAP = {
-  [BIOME_TYPE.FOREST]: {
-    surface: [
-      {code: NODES.DIRT.code, percent: 0.50, native: true}, // natif
-      {code: NODES.SILT.code, percent: 0.0008}, // étranger
-      {code: NODES.SAND.code, percent: 0.001}, // étranger
-      {code: NODES.HUMUS.code, percent: 0.0006} // transversal
-    ],
-    under: [
-      {code: NODES.DIRT.code, percent: 0.010}, // natif
-      {code: NODES.HUMUS.code, percent: 0.010}, // transversal
-      {code: NODES.SAND.code, percent: 0.003}, // étranger
-      {code: NODES.SILT.code, percent: 0.003} // étranger
-    ],
-    caverns_top: [
-      {code: NODES.DIRT.code, percent: 0.006}, // natif
-      {code: NODES.SAND.code, percent: 0.003}, // étranger
-      {code: NODES.SILT.code, percent: 0.003}, // étranger
-      {code: NODES.HUMUS.code, percent: 0.005} // transversal
-    ]
-  },
-  [BIOME_TYPE.DESERT]: {
-    surface: [
-      {code: NODES.SAND.code, percent: 0.020, native: true}, // natif
-      {code: NODES.DIRT.code, percent: 0.005}, // étranger
-      {code: NODES.SILT.code, percent: 0.005}, // étranger
-      {code: NODES.HUMUS.code, percent: 0.001} // surprise
-    ],
-    under: [
-      {code: NODES.SAND.code, percent: 0.010}, // natif
-      {code: NODES.DIRT.code, percent: 0.003}, // étranger
-      {code: NODES.SILT.code, percent: 0.003} // étranger
-    ],
-    caverns_top: [
-      {code: NODES.SAND.code, percent: 0.006}, // natif
-      {code: NODES.DIRT.code, percent: 0.003}, // étranger
-      {code: NODES.SILT.code, percent: 0.003} // étranger
-    ]
-  },
-  [BIOME_TYPE.JUNGLE]: {
-    surface: [
-      {code: NODES.SILT.code, percent: 0.020, native: true}, // natif
-      {code: NODES.DIRT.code, percent: 0.005}, // étranger
-      {code: NODES.SAND.code, percent: 0.005}, // étranger
-      {code: NODES.HUMUS.code, percent: 0.005} // transversal
-    ],
-    under: [
-      {code: NODES.SILT.code, percent: 0.010}, // natif
-      {code: NODES.HUMUS.code, percent: 0.010}, // transversal
-      {code: NODES.DIRT.code, percent: 0.005}, // étranger
-      {code: NODES.SAND.code, percent: 0.003} // étranger
-    ],
-    caverns_top: [
-      {code: NODES.SILT.code, percent: 0.006}, // natif
-      {code: NODES.DIRT.code, percent: 0.003}, // étranger
-      {code: NODES.SAND.code, percent: 0.003}, // étranger
-      {code: NODES.HUMUS.code, percent: 0.005} // transversal moyen
     ]
   }
 }

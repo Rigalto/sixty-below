@@ -226,9 +226,7 @@ export const itemTypeToString = (type, armorSlot = null) => {
 
 // OAK ROOT — drop lorsque l'on abat complètement un Oak
 // MAHOGANY ROOT — drop lorsque l'on abat complètement un Mahogany
-// TAPROOT — drop lorsque l'on abat complètement un Cactus
-// MYCELIUM —
-// drop lorsque l'on abat complètement un Giant Mushroom
+// MYCELIUM — drop lorsque l'on abat complètement un Giant Mushroom
 
 export const ITEMS = {
 
@@ -522,6 +520,11 @@ export const ITEMS = {
   coconutPulp: {name: 'Coconut Pulp', type: 0, stype: 'fruit', star: 1, image: 'refined_32_32-1-3', help: 'Coconut', tooltip: '???'},
   coconutMilk: {name: 'Coconut Milk', type: 0, stype: 'beverage', star: 1, image: 'refined_32_32-2-3', help: 'Coconut', tooltip: '???'},
 
+  thornspine: {name: 'Thornspine', type: 0, stype: 'tree', star: 3, image: null, help: 'Thornspine', tooltip: '???', logging: {speed: 2200, items: [{item: 'cactusFiber', count: '2-3'}, {item: 'cactusSpine', count: '4-10'}]}, foraging: {speed: 2000, items: [{item: 'thornspineFlower', count: 1}, {item: 'cactusSpine', count: 0.60}]}},
+  thornspineFlower: {name: 'Thornspine Flower', type: 0, stype: 'flower', star: 3, image: 'refined_32_32-0-3', help: 'Thornspine', tooltip: '???'},
+  cactusSpine: {name: 'Cactus Spine', type: 0, stype: 'Spine', star: 2, image: 'refined_32_32-1-3', help: 'Thornspine', tooltip: '???'},
+  cactusFiber: {name: 'Cactus Fiber', type: 0, stype: 'beverage', star: 2, image: 'refined_32_32-2-3', help: 'Thornspine', tooltip: '???'},
+
   oak: {
     name: 'Oak',
     type: 0,
@@ -611,13 +614,11 @@ export const ITEMS = {
   mandrake: {name: 'Mandrake', type: 0, stype: 'herb', star: 2, image: null, placed: 'fuws_32_32-2-3', speed: 1900, foraging: {speed: 500, items: [{item: 'mandrakeRoot', count: 1, rainy: 1.8, windy: 1.8}]}, help: 'Mandrake', tooltip: 'Harvest to collect Potions and Food ingredients'},
   mandrakeRoot: {name: 'Mandrake Root', type: 0, stype: 'herb', star: 3, image: 'crafting_32_32-0-1', help: 'Mandrake', tooltip: 'Crafting Material for Potions and Food'},
 
-  cactus1: {name: 'Cactus', type: 0, stype: 'herb', star: 2, image: null, placed: 'fuws_32_32-2-3', help: 'Cactus', tooltip: '???'},
-  cactus2: {name: 'Cactus', type: 0, stype: 'herb', star: 2, image: null, placed: 'fuws_32_32-2-3', help: 'Cactus', tooltip: '???'},
-  cactus3: {name: 'Cactus', type: 0, stype: 'herb', star: 2, image: null, placed: 'fuws_32_32-2-3', help: 'Cactus', tooltip: '???'},
-  cactus4: {name: 'Cactus', type: 0, stype: 'herb', star: 2, image: null, placed: 'fuws_32_32-2-3', help: 'Cactus', tooltip: '???'},
-  cactus: {name: 'Cactus', type: 0, stype: 'herb', star: 2, image: 'fuws_32_32-2-3', help: 'Cactus', tooltip: '???'},
-  cactusFiber: {name: 'Cactus Fiber', type: 0, stype: 'herb', star: 2, image: 'fuws_32_32-2-3', help: 'Cactus', tooltip: '???'},
-  cactusSpine: {name: 'Cactus Spine', type: 0, stype: 'herb', star: 2, image: 'fuws_32_32-2-3', help: 'Cactus', tooltip: '???'},
+  pricklepad: {name: 'Pricklepad', type: 0, stype: 'herb', star: 3, image: null, placed: 'fuws_32_32-2-3', help: 'Pricklepad', tooltip: '???', foraging: {speed: 1800, items: [{item: 'pricklepadFruit', count: '1-3'}, {item: 'cactusSpine', count: 0.80}, {item: 'cactusFiber', count: 1.80}]}},
+  pricklepad1: {name: 'Pricklepad', type: 0, stype: 'herb', star: 3, image: null, placed: 'fuws_32_32-2-3', help: 'Pricklepad', tooltip: '???', foraging: {speed: 1800, items: [{item: 'pricklepadFruit', count: '1-3'}, {item: 'cactusSpine', count: 0.80}, {item: 'cactusFiber', count: 1.80}]}},
+  pricklepad2: {name: 'Pricklepad', type: 0, stype: 'herb', star: 3, image: null, placed: 'fuws_32_32-2-3', help: 'Pricklepad', tooltip: '???', foraging: {speed: 1800, items: [{item: 'pricklepadFruit', count: '1-3'}, {item: 'cactusSpine', count: 0.80}, {item: 'cactusFiber', count: 1.80}]}},
+  pricklepad3: {name: 'Pricklepad', type: 0, stype: 'herb', star: 3, image: null, placed: 'fuws_32_32-2-3', help: 'Pricklepad', tooltip: '???', foraging: {speed: 1800, items: [{item: 'pricklepadFruit', count: '1-3'}, {item: 'cactusSpine', count: 0.80}, {item: 'cactusFiber', count: 1.80}]}},
+  pricklepadFruit: {name: 'Pricklepad Fruit', type: 0, stype: 'herb', star: 2, image: 'fuws_32_32-2-3', help: 'Pricklepad', tooltip: '???'},
 
   bamboo: {name: 'Bamboo', type: 0, stype: 'herb', star: 2, image: null, placed: 'fuws_32_32-2-3', help: 'Bamboo', tooltip: '???'},
   bambooStalk: {name: 'Bamboo Stalk', type: 0, stype: 'herb', star: 2, image: 'fuws_32_32-2-3', help: 'Bamboo', tooltip: '???'},
@@ -856,6 +857,7 @@ export const PLANT_TYPE = {
   MAHOGANY: 12,
   COCONUT: 13,
   GIANT_MUSHROOM: 14,
+  THORNSPIRE: 15,
   // Surface Herbs
   PARSNIP: 21,
   SUNFLOWER: 22,
@@ -869,7 +871,7 @@ export const PLANT_TYPE = {
   VELVETMOSS: 35,
   // Underground Herbs
   MANDRAKE: 41,
-  CACTUS: 42,
+  PRICKLEPAD: 42,
   BAMBOO: 43,
   OLEANDER: 44,
   // Caverns Herbs
@@ -899,7 +901,7 @@ export const PARSNIP_RATE = 0.22
 export const SUNFLOWER_RATE = 0.18
 export const AMBERMIRAGE_PCENT = 20
 export const MANDRAKE_COUNT = 40
-export const CACTUS_COUNT = 40
+export const PRICKLEPAD_COUNT = 40
 export const BAMBOO_COUNT = 40
 export const OLEANDER_COUNT = 100
 export const SATANS_CUBE_COUNT = 80
@@ -912,8 +914,35 @@ export const INFERNCAP_COUNT = 60
 export const COBWEB_GROWTH_DELAY_MS = 20000
 // cycle naturelle des noix de coco. Modulé à l'usage par un facteur aléatoire x[0.8, 1.2[.
 export const COCONUT_CYCLE_DELAY = 20 * 60 * 1000
+// Jonctions possibles d'un tronçon (tronc central toujours présent) :
+// gauche présent/absent, droit présent/absent — 4 combinaisons.
+export const THORNSPINE_JUNCTIONS = ['0T0', '1T0', '0T1', '1T1']
+// Répartition du nombre de segments (base + tronçons + head) : 25% / 50% / 25%
+export const THORNSPINE_SIZES = [2, 3, 3, 4]
 
 export const TREE_IMAGES = {
+  thornspine: {
+    '0T0-0T0': ['cactus_80_48-0-0'], // NOK
+    '0T0-1T0': ['cactus_80_48-0-0'], // NOK
+    '0T0-0T1': ['cactus_80_48-0-0'], // NOK
+    '0T0-1T1': ['cactus_80_48-0-0'], // NOK
+    '1T0-0T0': ['cactus_80_48-0-0'], // NOK
+    '1T0-1T0': ['cactus_80_48-0-0'], // NOK
+    '1T0-0T1': ['cactus_80_48-0-0'], // NOK
+    '1T0-1T1': ['cactus_80_48-0-0'], // NOK
+    '0T1-0T0': ['cactus_80_48-0-0'], // NOK
+    '0T1-1T0': ['cactus_80_48-0-0'], // NOK
+    '0T1-0T1': ['cactus_80_48-0-0'], // NOK
+    '0T1-1T1': ['cactus_80_48-0-0'], // NOK
+    '1T1-0T0': ['cactus_80_48-0-0'], // NOK
+    '1T1-1T0': ['cactus_80_48-0-0'], // NOK
+    '1T1-0T1': ['cactus_80_48-0-0'], // NOK
+    '1T1-1T1': ['cactus_80_48-0-0'], // NOK
+    'head-0T0': ['cactus_80_48-0-0', 'cactus_80_48-1-0', 'cactus_80_48-2-0'],
+    'head-1T0': ['cactus_80_48-3-0', 'cactus_80_48-4-0', 'cactus_80_48-5-0'],
+    'head-0T1': ['cactus_80_48-0-0'], // NOK
+    'head-1T1': ['cactus_80_48-0-0'] // NOK
+  },
   coconut: { // 0 : décalage à gauche, 1 : centré, 2 : décalage à droite
     '0_0': ['coconut_80_48-0-2', 'coconut_80_48-1-2', 'coconut_80_48-2-2'],
     '0_1': ['coconut_80_48-3-1', 'coconut_80_48-4-1', 'coconut_80_48-5-1'],

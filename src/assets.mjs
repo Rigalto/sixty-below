@@ -62,6 +62,14 @@ export const IMAGE_FILES = [
   `${BASE_DIR}/placed_16_32.png`,
   `${BASE_DIR}/placed_16_48.png`,
 
+  // TREES //
+  // ////// //
+
+  `${BASE_DIR}/oak_80_48.png`,
+  `${BASE_DIR}/mahogany_80_48.png`,
+  `${BASE_DIR}/coconut_80_48.png`,
+  `${BASE_DIR}/cactus_80_48.png`,
+
   // supprimer ci-dessous
   // ////////////////////
 
@@ -109,9 +117,7 @@ export const IMAGE_FILES = [
   `${BASE_DIR}/heads_26_22.png`,
   `${BASE_DIR}/bodies_26_18.png`,
   `${BASE_DIR}/feet_26_12.png`,
-  `${BASE_DIR}/oak_80_48.png`,
-  `${BASE_DIR}/mahogany_80_48.png`,
-  `${BASE_DIR}/coconut_80_48.png`,
+
   // IN HAND //
   // //////////
   `${BASE_DIR}/s_42_42.png`,

@@ -232,7 +232,7 @@ La Sap corrode le Copper. Il doit donc être remplacer par du Gold.
 
 ### Données (Layer 3)
 - `data.mjs` — NODES, ITEMS, PLANTS, RECIPES (structure + cross-références)
-- `data-gen.mjs` — BIOME_TILE_MAP, CLUSTER_SCATTER_MAP, ORE_GEM_SCATTER_MAP, TOPSOIL_SCATTER_MAP, LAKE_CREATION_MAP, constantes de génération
+- `data-gen.mjs` — BIOME_TILE_MAP, CLUSTER_SCATTER_MAP, ORE_GEM_SCATTER_MAP, LAKE_CREATION_MAP, constantes de génération
 
 ### Génération du monde
 - `BiomesGenerator` — disposition horizontale des biomes, largeurs des mers

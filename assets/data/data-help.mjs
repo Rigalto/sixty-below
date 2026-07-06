@@ -197,13 +197,15 @@ The Surface is the topmost layer of the world, where the player begins their adv
 |---|---|---|---|
 | [[item:chunkCopper]] | {{item:chunkCopper:star|star}} | Ore | All biomes |
 | [[item:oak]] | {{item:oak:star|star}} | Tree | [[Forest]] |
-| [[item:coconut]] | {{item:coconut:star|star}} | Tree | Desert lake, Sea shore |
+| [[item:coconut]] | {{item:coconut:star|star}} | Tree | [[Desert]] lake, [[Sea]] shore |
+| [[item:thornspine]] | {{item:thornspine:star|star}} | Tree | [[Desert]], [[Sea]] shore |
 | [[item:mahogany]] | {{item:mahogany:star|star}} | Tree | [[Jungle]] |
 | [[item:bolete]] | {{item:bolete:star|star}} | Mushroom | [[Forest]] |
 | [[item:pinkMycenia]] | {{item:pinkMycenia:star|star}} | Mushroom | [[Jungle]] |
 | [[item:sunflower]] | {{item:sunflower:star|star}} | Herb | [[Forest]] |
 | [[item:parsnip]] | {{item:parsnip:star|star}} | Herb | [[Forest]] |
 | [[item:ambermirage]] | {{item:ambermirage:star|star}} | Herb | [[Desert]] |
+| [[item:pricklepad]] | {{item:pricklepad:star|star}} | Herb | [[Desert]] tunnels |
 
 **Mini-biomes**
 
@@ -1989,7 +1991,7 @@ Limestone is a sedimentary substrat found in [[Jungle]] biome. The pale color of
 
 * [[Underground]] — [[Jungle]], high density
 * [[Surface]] — [[Jungle]], medium density
-* [[Underground]] — [[Foret]] & [[Desert]], low density
+* [[Underground]] — [[Forest]] & [[Desert]], low density
 * Trace amounts worldwide
 
 **Loot** ⏳
@@ -4547,16 +4549,17 @@ All plants found in the world of Sixty-Below. Plants can be harvested for loot, 
 
 | Name | Tier | Type | Location | Main Loot | Encounters |
 |---|---|---|---|---|---|
-| [[item:coconut]] | {{item:coconut:star|star}} | Tree | Sea shore, Desert Oasis shore | [[item:coconut]], [[item:coconutFiber]], [[item:coconutPulp]], [[item:coconutMilk]] | [[monster:coconutCrab]] (Shaking) |
+| [[item:coconut]] | {{item:coconut:star|star}} | Tree | [[Sea]] shore, [[Desert]] Oasis shore<br>[[node:sand]] | [[item:coconut]], [[item:coconutFiber]], [[item:coconutPulp]], [[item:coconutMilk]] | [[monster:coconutCrab]] (Shaking) |
+| [[item:thornspine]] | {{item:thornspine:star|star}} | Tree | [[Sea]] shore, [[Desert]]<br>[[node:sand]] | [[item:thornspineFlower]], [[item:cactusSpine]], [[item:cactusFiber]] | [[monster:scorpion]] |
 | [[item:oak]] | {{item:oak:star|star}} | Tree | [[Forest]] / [[Surface]] | [[item:logOak]], [[item:acorn]] | [[monster:hornet]] (Shaking) / [[monster:boar]] (Chopping) |
 | [[item:mahogany]] | {{item:mahogany:star|star}} | Tree | [[Jungle]] / [[Surface]] | [[item:logMahogany]] | [[monster:eyelashViper]] (Shaking) / [[monster:bulletAnt]] (Chopping) |
 | [[item:giantMushroom]] | {{item:giantMushroom:star|star}} | Tree | [[Mushroom Cave]] | ⏳ | [[monster:isopod]]  (Chopping) |
 | [[item:bolete]] | {{item:bolete:star|star}} | Mushroom | [[Forest]] / [[Surface]] | [[item:bolete]] | [[monster:adder]] (Foraging) |
 | [[item:pinkMycenia]] | {{item:pinkMycenia:star|star}} | Mushroom | [[Jungle]] / [[Surface]] | [[item:pinkMycenia]] | [[monster:giantRedSlug]] (Foraging) |
-| [[item:coralR]] | {{item:coralR:star|star}} | Herb | Under Sea / [[node:sand]] | [[item:coral]] | [[monster:moray]] (Foraging) |
-| [[item:coralP]] | {{item:coralP:star|star}} | Herb | Under Sea / [[node:sand]] | [[item:coral]] | [[monster:moray]] (Foraging) |
-| [[item:coralY]] | {{item:coralY:star|star}} | Herb | Under Sea / [[node:sand]] | [[item:coral]] | [[monster:moray]] (Foraging) |
-| [[item:coralG]] | {{item:coralG:star|star}} | Herb | Under Sea / [[node:sand]] | [[item:coral]] | [[monster:moray]] (Foraging) |
+| [[item:coralR]] | {{item:coralR:star|star}} | Herb | Under [[Sea]] / [[node:sand]] | [[item:coral]] | [[monster:moray]] (Foraging) |
+| [[item:coralP]] | {{item:coralP:star|star}} | Herb | Under [[Sea]] / [[node:sand]] | [[item:coral]] | [[monster:moray]] (Foraging) |
+| [[item:coralY]] | {{item:coralY:star|star}} | Herb | Under [[Sea]] / [[node:sand]] | [[item:coral]] | [[monster:moray]] (Foraging) |
+| [[item:coralG]] | {{item:coralG:star|star}} | Herb | Under [[Sea]] / [[node:sand]] | [[item:coral]] | [[monster:moray]] (Foraging) |
 | [[item:ambermirage]] | {{item:ambermirage:star|star}} | Herb | [[Surface]] / [[node:sand]] | [[item:ambermirage]] | [[monster:scorpion]] (Foraging) |
 | [[item:parsnip]] | {{item:parsnip:star|star}} | Herb | [[Forest]] / [[Surface]] | [[item:parsnip]] | [[monster:vole]] (Foraging) |
 | [[item:sunflower]] | {{item:sunflower:star|star}} | Herb | [[Forest]] / [[Surface]] | [[item:sunflowerSeed]] | [[monster:hedgehog]] (Foraging) |
@@ -4568,15 +4571,15 @@ All plants found in the world of Sixty-Below. Plants can be harvested for loot, 
 | [[item:velvetmoss]] | {{item:velvetmoss:star|star}} | Herb | Moss Cave / [[node:grassmoss]] | [[item:velvetmoss]] | [[monster:woodlouse]] (Foraging) |
 | [[item:frostcap]] | {{item:frostcap:star|star}} | Herb | Mushroom Cave / [[node:grassmushroom]] | [[item:mushroomGill]] | [[monster:woodlouse]] (Foraging) |
 | [[item:dawncap]] | {{item:dawncap:star|star}} | Herb | Mushroom Cave / [[node:grassmushroom]] | [[item:mushroomGill]] | [[monster:woodlouse]] (Foraging) |
-| [[item:mandrake]] | {{item:mandrake:star|star}} | Herb | FOREST Underground / [[node:dirt]] | [[item:mandrakeRoot]] | [[monster:wraith]] (Foraging) |
-| [[item:cactus]] | {{item:cactus:star|star}} | Herb | DESERT Underground / [[node:sand]] | [[item:cactus]] | [[monster:scorpion]] (Foraging) |
-| [[item:bamboo]] | {{item:bamboo:star|star}} | Herb | JUNGLE Underground / [[node:silt]] | [[item:bambooStalk]] | [[monster:centipede]] (Foraging) |
-| [[item:oleander]] | {{item:oleander:star|star}} | Herb | Underground / [[node:stone]] | [[item:oleander]] | [[monster:caveBeetle]] (Foraging) |
-| [[item:satansCube]] | {{item:satansCube:star|star}} | Herb | FOREST+DESERT Caverns | [[item:satansCube]] | [[monster:firesalamander]] (Foraging) |
-| [[item:sneakthorn]] | {{item:sneakthorn:star|star}} | Herb | FOREST+JUNGLE Caverns | [[item:sneakthorn]] | [[monster:vampire]] (Foraging) |
-| [[item:cursedcrown]] | {{item:cursedcrown:star|star}} | Herb | JUNGLE+DESERT Caverns | [[item:cursedcrown]] | [[monster:fireAnt]] (Foraging) |
-| [[item:abysshorn]] | {{item:abysshorn:star|star}} | Herb | Caverns top | [[item:abysshorn]] | [[monster:caveJellyfish]] (Foraging) |
-| [[item:inferncap]] | {{item:inferncap:star|star}} | Herb | Caverns bottom | [[item:inferncap]] | [[monster:lavaWorm]] / [[monster:magmaCrab]] (Foraging) |
+| [[item:mandrake]] | {{item:mandrake:star|star}} | Herb | [[Forest]] [[Underground]] / [[node:dirt]] | [[item:mandrakeRoot]] | [[monster:wraith]] (Foraging) |
+| [[item:pricklepad]] | {{item:pricklepad:star|star}} | Herb | [[Desert]] [[Underground]] / [[node:sand]] | [[item:pricklepadFruit]], [[item:cactusSpine]], [[item:cactusFiber]] | [[monster:scorpion]] (Foraging) |
+| [[item:bamboo]] | {{item:bamboo:star|star}} | Herb | [[Jungle]] [[Underground]] / [[node:silt]] | [[item:bambooStalk]] | [[monster:centipede]] (Foraging) |
+| [[item:oleander]] | {{item:oleander:star|star}} | Herb | [[Underground]] / [[node:stone]] | [[item:oleander]] | [[monster:caveBeetle]] (Foraging) |
+| [[item:satansCube]] | {{item:satansCube:star|star}} | Herb | [[Forest]]+[[Desert]] [[Caverns]] | [[item:satansCube]] | [[monster:firesalamander]] (Foraging) |
+| [[item:sneakthorn]] | {{item:sneakthorn:star|star}} | Herb | [[Forest]]+[[Jungle]] [[Caverns]] | [[item:sneakthorn]] | [[monster:vampire]] (Foraging) |
+| [[item:cursedcrown]] | {{item:cursedcrown:star|star}} | Herb | [[Jungle]]+[[Desert]] [[Caverns]] | [[item:cursedcrown]] | [[monster:fireAnt]] (Foraging) |
+| [[item:abysshorn]] | {{item:abysshorn:star|star}} | Herb | [[Caverns]] top | [[item:abysshorn]] | [[monster:caveJellyfish]] (Foraging) |
+| [[item:inferncap]] | {{item:inferncap:star|star}} | Herb | [[Caverns]] bottom | [[item:inferncap]] | [[monster:lavaWorm]] / [[monster:magmaCrab]] (Foraging) |
 
 _For detailed information on each plant, click its name._
 
@@ -4593,7 +4596,7 @@ _Gardening plants and their details will be added in a future update._ ⏳
   },
 
   // ── Plants - Trees ───────────────────────────────────────────
-  //    Oak & Mahogany, Giant Mushroom, Coconut
+  //    Oak & Mahogany, Giant Mushroom, Coconut, Thornspine
   {
     title: 'Oak & Mahogany',
     category: ['Plant', 'Forest', 'Jungle', 'Surface'],
@@ -4761,7 +4764,7 @@ Giant Mushrooms grow in the depths of [[Mushroom Cave|Mushroom Caves]], their bi
   },
   {
     title: 'Coconut',
-    category: ['Plant', 'Forest', 'Desert', 'Surface'],
+    category: ['Plant', 'Desert', 'Surface'],
     content: `
 **Description**
 
@@ -4839,6 +4842,17 @@ Search for any of the three products in the [[Crafting|Craft Panel]] to find the
 * _A nut on the ground will eventually disappear — collect it before the next cycle drops another one._
 * _Coconut trees cannot be chopped or replanted — treat them as a renewable, fixed resource._
 * _Coconut Crabs are attracted by the vibration of shaking — be ready to fight._ ⏳
+  `
+  },
+  {
+    title: 'Thornspine',
+    category: ['Plant', 'Desert', 'Surface'],
+    content: `
+**Description**
+
+**Sea Also**
+
+* [[item:pricklepad]]: an other cactus, spreading in [[Underground]]
   `
   },
 
@@ -5349,7 +5363,7 @@ Velvetmoss is a slow-growing, deep-purple moss found exclusively in [[Moss Cave|
   },
 
   // ── Plants - Underground Herbs ───────────────────────────────
-  //    Mandrake, Cactus, Bamboo, Oleander
+  //    Mandrake, Pricklepad, Bamboo, Oleander
   {
     title: 'Mandrake',
     category: ['Plant', 'Forest'],
@@ -5393,16 +5407,16 @@ The Mandrake is a root plant found in the tunnels and underground passages of [[
   `
   },
   {
-    title: 'Cactus',
-    category: ['Plant', 'Desert'],
+    title: 'Pricklepad',
+    category: ['Plant', 'Desert', 'Underground', 'Surface'],
     content: `
 **Description**
 
-The underground Cactus is a hardy desert plant that has adapted to the complete absence of sunlight. Its thick, ribbed trunk and characteristic branching arms are unmistakable — even in the dark tunnels of [[Desert]] biomes.
+The underground Pricklepad is a hardy desert plant that has adapted to the complete absence of sunlight. Its thick, ribbed trunk and characteristic branching arms are unmistakable — even in the dark tunnels of [[Desert]] biomes.
 
 **Tier**
 
-{{item:cactus:star|star}}
+{{item:pricklepad:star|star}}
 
 **Location**
 
@@ -5413,29 +5427,40 @@ The underground Cactus is a hardy desert plant that has adapted to the complete 
 **Population**
 
 * The species neither grows nor declines — natural balance maintains the population
-* Harvested Cactus do not regrow
+* Harvested Pricklepad do not regrow
 
-**Harvest**
+<hr>
 
-* [[Foraging|Interact to harvest]] — the plant disappears permanently on harvest
-* Tool: [[Foraging Tools|Silver Sickle]] or better ⏳
-* Loot: [[item:cactus]], [[item:cactusFiber]], [[item:cactusSpine]]
+**Foraging**
+
+Foraging Tool: <<itemStar|sickleCopper>> or better
+
+_The Pricklepad disappears immediately upon collection_
+
+**Foraging Loot** ⏳
+
+<<itemLootTable|pricklepad|foraging>>
 
 **Dangers**
 
-* Foraging a Cactus triggers the spines — each harvest inflicts [[Bleeding DOT]] regardless of equipment. ⏳
+* Foraging a Pricklepad triggers the spines — each harvest inflicts [[Bleeding DOT]] regardless of equipment. ⏳
 * The disturbance may attract a [[monster:scorpion]] lurking in the surrounding tunnels. ⏳
+
+<hr>
 
 **Usages** ⏳
 
-* [[item:cactus]] — food and crafting ingredient ⏳
+* [[item:pricklepadFruit]] — food and crafting ingredient ⏳
 * [[item:cactusFiber]] — crafting ingredient ⏳
 * [[item:cactusSpine]] — crafting ingredient ⏳
 
 **Tips**
 
-* _Cactus plants are well-spaced — finding one rarely means finding another nearby._ ⏳
 * _Their silhouette is recognizable even without a [[Torches|Torch]] — use that to navigate._ ⏳
+
+**Sea Also**
+
+* [[item:thornspine]]: an other cactus, spreading in [[Surface]]
   `
   },
   {
