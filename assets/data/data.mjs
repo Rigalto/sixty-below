@@ -934,7 +934,7 @@ export const TREE_IMAGES = {
     '0T1-1T0': ['cactus_80_48-0-0'], // NOK
     '0T1-0T1': ['cactus_80_48-0-0'], // NOK
     '0T1-1T1': ['cactus_80_48-0-0'], // NOK
-    '1T1-0T0': ['cactus_80_48-0-0'], // NOK
+    '1T1-0T0': ['cactus_80_48-0-5', 'cactus_80_48-1-5', 'cactus_80_48-2-5'], // NOK+
     '1T1-1T0': ['cactus_80_48-0-0'], // NOK
     '1T1-0T1': ['cactus_80_48-0-0'], // NOK
     '1T1-1T1': ['cactus_80_48-0-0'], // NOK
