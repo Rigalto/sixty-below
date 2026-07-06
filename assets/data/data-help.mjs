@@ -4425,7 +4425,7 @@ Used to craft [[item:torch]].
   //    Chests
   {
     title: 'Chests',
-    category: ['Tree'],
+    category: ['Furniture'],
     content: `
     56 slots
     `
@@ -4849,6 +4849,8 @@ Search for any of the three products in the [[Crafting|Craft Panel]] to find the
     category: ['Plant', 'Desert', 'Surface'],
     content: `
 **Description**
+
+Tree like
 
 **Sea Also**
 

@@ -844,7 +844,7 @@ Les enregistrements sont de natures très différentes, nature déterminée par 
   * `id` : identifiant unique de l'abre
   * `itemId` : item correspondant à l'arbre : `ITEMS.oak.code`, `ITEMS.mahogany.code`, `ITEMS.giantMushroom.code` et `ITEMS.coconut.code`
   * `index` : position de l'abre (coint haut gauche du rectangle englobant)
-  * `type` : type de l'arbre : PLANT_TYPE.OAK, PLANT_TYPE.MAHOGANY, PLANT_TYPE.GIANTMUSHROOM, PLANT_TYPE.COCONUT
+  * `type` : type de l'arbre : PLANT_TYPE.OAK, PLANT_TYPE.MAHOGANY, PLANT_TYPE.GIANTMUSHROOM, PLANT_TYPE.COCONUT, PLANT_TYPE.THORNSPINE
   * `w` et `h` : taille maximale de l'arbre
   * `x`: coordonnée pour le clipping de l'image
   * `yTop`: coordonnée pour le clipping de l'image (affichée si `x,yTop` est dans le rectangle visible)

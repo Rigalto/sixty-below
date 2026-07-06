@@ -1,5 +1,5 @@
-// ecosystem.mjs — FloraManager - OakSystem - MahoganySystem - HiveSystem
-// SunflowerSystem - OleanderSystem - ParsnipSystem - AmbermirageSystem - CobwebSystem
+// ecosystem.mjs — FloraManager - OakSystem - MahoganySystem - CoconutSystem - ThornspineSystem
+// SunflowerSystem - OleanderSystem - ParsnipSystem - AmbermirageSystem - CobwebSystem - HiveSystem
 // SampleSystem
 
 import {WORLD_WIDTH, WORLD_HEIGHT, MICROTASK, TOPSOIL_Y_SKY_SURFACE, TOPSOIL_Y_SURFACE_UNDER, TOPSOIL_Y_UNDER_CAVERNS} from './constant.mjs'
@@ -173,6 +173,151 @@ const findSurfaceIndex = (index) => {
   while (chunkManager.getTileAt(idx) === SKY) idx += WORLD_WIDTH
   return idx
 }
+
+/* ====================================================================================================
+   THORNSPINE SYSTEM
+   ==================================================================================================== */
+
+class ThornspineSystem {
+  byTile = new Map() // Map<tileIndex, record> — public, lookup interaction (rectangle complet w×h)
+  #list = [] // record[] — tous les thornspines
+  #byChunk = new Map() // Map<chunkKey, Set> — lookup spatial pour onPreloadChunksChanged
+  #displayed = new Set() // Set<record> — cible du render (chunks preload uniquement)
+  #quota = 0 // Nombre maximal de Thornspine, nombre exact d'enregistrements
+
+  /**
+   * Réinitialise toutes les structures. Appelé en début de session.
+   */
+  init (quota) {
+    this.#quota = quota
+    this.byTile.clear()
+    this.#list.length = 0
+    this.#byChunk.clear()
+    this.#displayed.clear()
+  }
+
+  /**
+   * Enregistre un thornspine et peuple les structures internes. Bloque le placement sur tout
+   * le rectangle englobant et le minage de la ligne de sol (miroir Oak/Mahogany — évite de
+   * pouvoir miner le sable sous un thornspine et le faire flotter).
+   * @param {object} record — record TREE/THORNSPINE (deleted=false garanti par l'appelant)
+   */
+  initPlant (record) {
+    this.#list.push(record)
+    addToByTile(this.byTile, record)
+    addToByChunk(this.#byChunk, record)
+
+    const px = record.index & 0x3FF
+    const py = record.index >> 10
+    blockedTiles.blockPlacementRect(px, py, record.w, record.h)
+
+    const soilX = record.soilIndex & 0x3FF
+    const soilY = record.soilIndex >> 10
+    blockedTiles.blockMiningRect(soilX, soilY, record.w, 1)
+  }
+
+  /**
+   * Reconstruit #displayed depuis les chunks preload de la caméra.
+   * @param {Set<number>} preloadChunks
+   */
+  onPreloadChunksChanged (preloadChunks) {
+    buildDisplayed(this.#displayed, this.#byChunk, preloadChunks)
+  }
+
+  /**
+   * Dessine les thornspines visibles. Pas de croissance : chaque record trace la totalité de
+   * son tableau 'images' (segments empilés bas → haut, 3 tuiles/segment), sans indirection par
+   * 'size' — contrairement à Oak/Mahogany.
+   * @param {CanvasRenderingContext2D} ctx — contexte déjà transformé (caméra appliquée)
+   */
+  render (ctx) {
+    for (const record of this.#displayed) {
+      const soilYPx = ((record.soilIndex >> 10) << 4) + 2
+      for (let i = 0; i < record.images.length; i++) {
+        const image = record.images[i]
+        const img = TREE_IMAGES[image.tree][image.key][image.col]
+        const pxX = image.x << 4
+        const pxY = soilYPx - 48 * (i + 1)
+        ctx.drawImage(IMAGE_CACHE[img.imgIndex], img.sx, img.sy, img.sw, img.sh, pxX, pxY, img.sw, img.sh)
+      }
+    }
+  }
+
+  /**
+   * Détruit un thornspine complètement : retire byTile/#byChunk/#displayed, libère
+   * blockedTiles (rectangle complet + ligne de sol), retire de #list (swap-last), persiste.
+   * @param {object} record — record TREE (thornspine)
+   */
+  #destroy (record) {
+    removeFromByTile(this.byTile, record)
+    removeFromByChunk(this.#byChunk, record)
+    this.#displayed.delete(record)
+
+    const px = record.index & 0x3FF
+    const py = record.index >> 10
+    blockedTiles.unblockPlacementRect(px, py, record.w, record.h)
+
+    const soilX = record.soilIndex & 0x3FF
+    const soilY = record.soilIndex >> 10
+    blockedTiles.unblockMiningRect(soilX, soilY, record.w, 1)
+
+    const idx = this.#list.indexOf(record)
+    if (idx !== -1) {
+      this.#list[idx] = this.#list[this.#list.length - 1]
+      this.#list.length--
+    }
+
+    record.deleted = true
+    saveManager.queueStaticUpdate({storeName: 'plant', record})
+  }
+
+  /**
+   * Callback ChoppingManager (action.mjs) : un seul coup de hache détruit le thornspine.
+   * Respecte le contrat générique (size décrémenté, size < 0 déclenche extraDrop/purge côté
+   * appelant) sans repousse par étage — record.size passe de 0 à -1 puis destruction immédiate.
+   * @param {object} record — record TREE (thornspine)
+   */
+  onChopped (record) {
+    record.size--
+    this.#destroy(record)
+  }
+
+  /**
+   * Le thornspine ne se secoue pas.
+   * @returns {boolean}
+   */
+  canShake () { return false }
+
+  /**
+   * Foraging (Sickle, en fleur) — non implémenté : en attente du système de floraison.
+   * @param {object} record
+   * @returns {boolean}
+   */
+  canForage (record) { return false }
+
+  /**
+   * No-op — le thornspine ne se forage pas encore (voir canForage).
+   * @param {object} record
+   */
+  onForaged (record) { }
+
+  /**
+   * Retourne le thornspine couvrant la tuile donnée, ou null.
+   * @param {number} tileIndex — (y << 10) | x
+   * @returns {object|null}
+   */
+  getPlantAt (tileIndex) {
+    return this.byTile.get(tileIndex) ?? null
+  }
+
+  /**
+   * Un thornspine existe toujours pleinement tant que son record n'a pas été détruit
+   * (pas de notion present/absent).
+   * @returns {boolean}
+   */
+  isPresent () { return true }
+}
+export const thornspineSystem = new ThornspineSystem()
 
 /* ====================================================================================================
    SUNFLOWER SYSTEM

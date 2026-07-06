@@ -17,7 +17,7 @@ import {furnitureManager} from './housing.mjs'
 import {craftOverlay} from './craft.mjs'
 import {achievementManager} from './achievement.mjs'
 import {playerManager, hotbarOverlay} from './player.mjs'
-import {floraManager, sunflowerSystem, oleanderSystem, parsnipSystem, ambermirageSystem, oakSystem, mahoganySystem, cobwebSystem, coconutSystem} from './ecosystem.mjs'
+import {floraManager, sunflowerSystem, oleanderSystem, parsnipSystem, ambermirageSystem, oakSystem, mahoganySystem, cobwebSystem, coconutSystem, thornspineSystem} from './ecosystem.mjs'
 import {ACHIEVEMENT_CATEGORIES} from '../assets/data/data-achievement.mjs'
 import {miningManager, placingManager, foragingManager, choppingManager, sowingManager, hammingManager} from './action.mjs'
 import './combat.mjs'
@@ -28,6 +28,7 @@ const plantSystemLookup = [ // Map<kind*100+type, system> — peuplée au fur et
   [PLANT_KIND.TREE * 100 + PLANT_TYPE.OAK, oakSystem],
   [PLANT_KIND.TREE * 100 + PLANT_TYPE.MAHOGANY, mahoganySystem],
   [PLANT_KIND.TREE * 100 + PLANT_TYPE.COCONUT, coconutSystem],
+  [PLANT_KIND.TREE * 100 + PLANT_TYPE.THORNSPINE, thornspineSystem],
   //   [PLANT_KIND.TREE * 100 + PLANT_TYPE.GIANT_MUSHROOM, treeSystem],
   [PLANT_KIND.MUSHROOM * 100 + PLANT_TYPE.BOLETE, oakSystem],
   [PLANT_KIND.MUSHROOM * 100 + PLANT_TYPE.PINKMYCENIA, mahoganySystem],
@@ -53,7 +54,7 @@ const plantSystemLookup = [ // Map<kind*100+type, system> — peuplée au fur et
   //   [PLANT_KIND.SPREAD * 100 + PLANT_TYPE.NONE, spreadSystem],
   //   [PLANT_KIND.SEED * 100 + PLANT_TYPE.NONE, seedSystem]
 ]
-const allPlantSystems = [sunflowerSystem, oleanderSystem, parsnipSystem, ambermirageSystem, oakSystem, mahoganySystem, coconutSystem]
+const allPlantSystems = [sunflowerSystem, oleanderSystem, parsnipSystem, ambermirageSystem, oakSystem, mahoganySystem, coconutSystem, thornspineSystem]
 
 const debugHUD = () => {
   const debugDiv = document.createElement('div')
@@ -410,6 +411,8 @@ class GameCore {
     achievementManager.init(achievementRecords)
 
     // 5.4 Objectstore Plant
+    thornspineSystem.init(state.thornspinecount) // avant lecture des records
+
     const plantRecords = await database.readAllFromObjectStore('plant')
     const plantsToDelete = []
     floraManager.init()
