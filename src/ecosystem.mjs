@@ -183,13 +183,11 @@ class ThornspineSystem {
   #list = [] // record[] — tous les thornspines
   #byChunk = new Map() // Map<chunkKey, Set> — lookup spatial pour onPreloadChunksChanged
   #displayed = new Set() // Set<record> — cible du render (chunks preload uniquement)
-  #quota = 0 // Nombre maximal de Thornspine, nombre exact d'enregistrements
 
   /**
-   * Réinitialise toutes les structures. Appelé en début de session.
+   * Réinitialise toutes les structures.
    */
   init (quota) {
-    this.#quota = quota
     this.byTile.clear()
     this.#list.length = 0
     this.#byChunk.clear()
@@ -197,13 +195,19 @@ class ThornspineSystem {
   }
 
   /**
-   * Enregistre un thornspine et peuple les structures internes. Bloque le placement sur tout
-   * le rectangle englobant et le minage de la ligne de sol (miroir Oak/Mahogany — évite de
-   * pouvoir miner le sable sous un thornspine et le faire flotter).
-   * @param {object} record — record TREE/THORNSPINE (deleted=false garanti par l'appelant)
+   * Enregistre un thornspine. Population fixe (this.#quota) posée une fois pour toutes à la
+   * génération — aucun record n'est jamais créé ni supprimé en DB après coup. 'present' fait
+   * seul foi de l'existence :
+   *   - present=false : le record ne correspond à rien actuellement → stocké dans #list (pool
+   *     des absents), aucune structure spatiale ni blocage de tuile.
+   *   - present=true  : enregistrement spatial complet (byTile, #byChunk, blockedTiles).
+   * @param {object} record — record TREE/THORNSPINE
    */
   initPlant (record) {
     this.#list.push(record)
+
+    if (!record.present) return
+
     addToByTile(this.byTile, record)
     addToByChunk(this.#byChunk, record)
 
@@ -225,9 +229,8 @@ class ThornspineSystem {
   }
 
   /**
-   * Dessine les thornspines visibles. Pas de croissance : chaque record trace la totalité de
-   * son tableau 'images' (segments empilés bas → haut, 3 tuiles/segment), sans indirection par
-   * 'size' — contrairement à Oak/Mahogany.
+   * Dessine les thornspines visibles. Chaque record trace la totalité de
+   * son tableau 'images' (segments empilés bas → haut, 3 tuiles/segment).
    * @param {CanvasRenderingContext2D} ctx — contexte déjà transformé (caméra appliquée)
    */
   render (ctx) {
@@ -244,11 +247,13 @@ class ThornspineSystem {
   }
 
   /**
-   * Détruit un thornspine complètement : retire byTile/#byChunk/#displayed, libère
-   * blockedTiles (rectangle complet + ligne de sol), retire de #list (swap-last), persiste.
+   * Retire un thornspine du monde sans le supprimer en DB : passe present à false, libère
+   * toutes les structures spatiales et les tuiles bloquées, persiste.
    * @param {object} record — record TREE (thornspine)
    */
   #destroy (record) {
+    record.present = false
+
     removeFromByTile(this.byTile, record)
     removeFromByChunk(this.#byChunk, record)
     this.#displayed.delete(record)
@@ -261,24 +266,14 @@ class ThornspineSystem {
     const soilY = record.soilIndex >> 10
     blockedTiles.unblockMiningRect(soilX, soilY, record.w, 1)
 
-    const idx = this.#list.indexOf(record)
-    if (idx !== -1) {
-      this.#list[idx] = this.#list[this.#list.length - 1]
-      this.#list.length--
-    }
-
-    record.deleted = true
     saveManager.queueStaticUpdate({storeName: 'plant', record})
   }
 
   /**
    * Callback ChoppingManager (action.mjs) : un seul coup de hache détruit le thornspine.
-   * Respecte le contrat générique (size décrémenté, size < 0 déclenche extraDrop/purge côté
-   * appelant) sans repousse par étage — record.size passe de 0 à -1 puis destruction immédiate.
    * @param {object} record — record TREE (thornspine)
    */
   onChopped (record) {
-    record.size--
     this.#destroy(record)
   }
 
@@ -311,11 +306,11 @@ class ThornspineSystem {
   }
 
   /**
-   * Un thornspine existe toujours pleinement tant que son record n'a pas été détruit
-   * (pas de notion present/absent).
+   * Indique si le thornspine existe actuellement dans le monde.
+   * @param {object} record
    * @returns {boolean}
    */
-  isPresent () { return true }
+  isPresent (record) { return record.present }
 }
 export const thornspineSystem = new ThornspineSystem()
 
