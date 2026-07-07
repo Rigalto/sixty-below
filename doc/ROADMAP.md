@@ -8,7 +8,6 @@
 ## En cours
 
 - Thornspine (Cactus de surface) : placement en génération fait. Reste à faire :
-  - 3 images d'atlas (thornspine_80_48, 480×480)
   - ITEMS.thornspine : fiche data-help.mjs
   - apparition/disparition des fleurs
   - foraging des fleurs
