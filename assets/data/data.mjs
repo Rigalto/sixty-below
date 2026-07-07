@@ -520,10 +520,10 @@ export const ITEMS = {
   coconutPulp: {name: 'Coconut Pulp', type: 0, stype: 'fruit', star: 1, image: 'refined_32_32-1-3', help: 'Coconut', tooltip: '???'},
   coconutMilk: {name: 'Coconut Milk', type: 0, stype: 'beverage', star: 1, image: 'refined_32_32-2-3', help: 'Coconut', tooltip: '???'},
 
-  thornspine: {name: 'Thornspine', type: 0, stype: 'tree', star: 3, image: null, help: 'Thornspine', tooltip: '???', logging: {speed: 2200, items: [{item: 'cactusFiber', count: '2-3'}, {item: 'cactusSpine', count: '4-10'}]}, foraging: {speed: 2000, items: [{item: 'thornspineFlower', count: 1}, {item: 'cactusSpine', count: 0.60}]}},
+  thornspine: {name: 'Thornspine', type: 0, stype: 'tree', star: 3, image: null, help: 'Thornspine', tooltip: '???', chopping: {speed: 2200, items: [{item: 'cactusFiber', count: '2-3'}, {item: 'cactusSpine', count: '4-10'}]}, foraging: {speed: 2000, items: [{item: 'thornspineFlower', count: 1}, {item: 'cactusSpine', count: 0.60}]}},
   thornspineFlower: {name: 'Thornspine Flower', type: 0, stype: 'flower', star: 3, image: 'refined_32_32-0-3', help: 'Thornspine', tooltip: '???'},
-  cactusSpine: {name: 'Cactus Spine', type: 0, stype: 'Spine', star: 2, image: 'refined_32_32-1-3', help: 'Thornspine', tooltip: '???'},
-  cactusFiber: {name: 'Cactus Fiber', type: 0, stype: 'beverage', star: 2, image: 'refined_32_32-2-3', help: 'Thornspine', tooltip: '???'},
+  cactusSpine: {name: 'Cactus Spine', type: 0, stype: 'Spine', star: 2, image: 'foraged_32_32-0-3', help: 'Thornspine', tooltip: '???'},
+  cactusFiber: {name: 'Cactus Fiber', type: 0, stype: 'beverage', star: 2, image: 'foraged_32_32-1-3', help: 'Thornspine', tooltip: '???'},
 
   oak: {
     name: 'Oak',
