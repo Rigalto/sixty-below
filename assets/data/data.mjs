@@ -939,8 +939,8 @@ export const TREE_IMAGES = {
     '0T1-1T0': ['cactus_80_48-0-7', 'cactus_80_48-1-7', 'cactus_80_48-2-7'],
     '1T0-1T1': ['cactus_80_48-3-7', 'cactus_80_48-4-7', 'cactus_80_48-5-7'],
     '0T1-1T1': ['cactus_80_48-0-8', 'cactus_80_48-1-8', 'cactus_80_48-2-8'],
-    '1T1-1T0': ['cactus_80_48-0-0'], // NOK
-    '1T1-0T1': ['cactus_80_48-0-0'], // NOK
+    '1T1-1T0': ['cactus_80_48-3-8', 'cactus_80_48-4-8', 'cactus_80_48-5-8'],
+    '1T1-0T1': ['cactus_80_48-0-9', 'cactus_80_48-1-9', 'cactus_80_48-2-9'],
     '1T1-1T1': ['cactus_80_48-0-0'] // NOK
   },
   coconut: { // 0 : décalage à gauche, 1 : centré, 2 : décalage à droite
