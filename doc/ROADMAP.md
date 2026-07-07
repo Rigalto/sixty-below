@@ -8,7 +8,7 @@
 ## En cours
 
 - Thornspine (Cactus de surface) : placement en génération fait. Reste à faire :
-  - 15 images d'atlas (thornspine_80_48, 480×480)
+  - 12 images d'atlas (thornspine_80_48, 480×480)
   - ITEMS.thornspine : fiche data-help.mjs
   - ThornspineSystem (ecosystem.mjs) : hitbox 3 tuiles, chop destructeur, foraging de la fleur (Sickle Silver+), pas de shake, repousse via thornspineCount
 - `SunflowerSystem` : impact de la naissance d'un arbre
