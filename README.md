@@ -21,7 +21,7 @@
 * Conception générale terminée (conception de chaque classe en cours)
 * Création d'un nouveau monde : 100%
 * Panneaux d'information (Inventaire, craft, succès, aide, contrôle) : 90%
-* Affichage (tuiles, meubles 100%, plantes 5%, monstres 0%, lumière 0%)
+* Affichage (tuiles, meubles 100%, plantes 10%, monstres 0%, lumière 0%)
 * Déplacement joueur : 80%
 * Actions joueur : 20%
 * Evolution de l'environnement : 5%

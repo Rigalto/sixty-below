@@ -305,6 +305,8 @@ export const MICROTASK = {
   BLOOM_AMBERMIRAGE: {priority: 20, capacity: 6, taskName: 'bloomAmbermirage'}, // pousse quotidienne à 10h00 (créneau 10h-14h)
   UNBLOOM_AMBERMIRAGE: {priority: 20, capacity: 2, taskName: 'unbloomAmbermirage'}, // flétrissement inconditionnel à 14h00
 
+  THORNSPINE_REGROW: {priority: 20, capacity: 10, taskName: 'thornspineRegrow'}, // recherche d'un nouvel emplacement pour les thornspines à repousser
+
   OLEANDER_REGROW: {priority: 20, capacity: 2, taskName: 'oleanderRegrow'}, // recherche d'un nouvel emplacement pour les oleanders à repousser
   COBWEB_GROWTH: {priority: 20, capacity: 3, taskName: 'cobwebGrowth'}, // tentative périodique de pose d'une toile d'araignée
   AMBERMIRAGE_TILE_CHECK: {priority: 20, capacity: 10, taskName: 'onAmbermirageTileCheck'}, // entretien réactif d'un spot pour une tuile modifiée

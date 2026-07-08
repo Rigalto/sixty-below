@@ -6,7 +6,9 @@ import {WORLD_WIDTH, WORLD_HEIGHT, MICROTASK, TOPSOIL_Y_SKY_SURFACE, TOPSOIL_Y_S
 import {database, uniqueIdGenerator} from './database.mjs'
 
 import {eventBus, seededRNG, blockedTiles, microTasker, taskScheduler} from './utils.mjs'
-import {NODES, ITEMS, PLANT_KIND, PLANT_TYPE, PLANT_SYSTEM_LOOKUP, ALL_PLANT_SYSTEMS, COBWEB_GROWTH_DELAY_MS, SUNFLOWER_RATE, PARSNIP_RATE, AMBERMIRAGE_PCENT, COCONUT_CYCLE_DELAY, TREE_IMAGES, THORNSPINE_UNBLOOM_PCENT, THORNSPINE_BLOOM_PCENT} from '../assets/data/data.mjs'
+import {
+  NODES, ITEMS, PLANT_KIND, PLANT_TYPE, PLANT_SYSTEM_LOOKUP, ALL_PLANT_SYSTEMS, COBWEB_GROWTH_DELAY_MS, SUNFLOWER_RATE, PARSNIP_RATE, AMBERMIRAGE_PCENT, COCONUT_CYCLE_DELAY, TREE_IMAGES, THORNSPINE_JUNCTIONS, THORNSPINE_SIZES, THORNSPINE_UNBLOOM_PCENT, THORNSPINE_BLOOM_PCENT
+} from '../assets/data/data.mjs'
 import {IMAGE_CACHE} from './assets.mjs'
 import {saveManager} from './persistence.mjs'
 import {chunkManager} from './world.mjs'
@@ -178,20 +180,26 @@ const findSurfaceIndex = (index) => {
    THORNSPINE SYSTEM
    ==================================================================================================== */
 
+const THORNSPINE_REGROW_DELAY_MS = 1257 // délai de rappel de la tâche de recherche de place (constante locale)
+
 class ThornspineSystem {
   byTile = new Map() // Map<tileIndex, record> — public, lookup interaction (rectangle complet w×h)
   #list = [] // record[] — tous les thornspines
   #byChunk = new Map() // Map<chunkKey, Set> — lookup spatial pour onPreloadChunksChanged
   #displayed = new Set() // Set<record> — cible du render (chunks preload uniquement)
   #flowerImage = null // image ITEMS.thornspineFlower.placed
+  #regrowQueue = [] // record[] — thornspines absents (present=false) en attente d'une place
 
   /**
    * Abonnement EventBus unique du système ('time/every-hour'), lié une seule fois à la
    * construction (pas dans init(), pour éviter les abonnements dupliqués entre sessions).
    */
   constructor () {
+    // eventBus
     this.onHourThornspine = this.onHourThornspine.bind(this)
     eventBus.on('time/every-hour', this.onHourThornspine)
+    // Micro-tâche
+    this.thornspineRegrow = this.thornspineRegrow.bind(this)
   }
 
   /**
@@ -217,8 +225,10 @@ class ThornspineSystem {
   initPlant (record) {
     this.#list.push(record)
 
-    if (!record.present) return
-
+    if (!record.present) {
+      this.#trackAbsent(record)
+      return
+    }
     addToByTile(this.byTile, record)
     addToByChunk(this.#byChunk, record)
 
@@ -285,6 +295,7 @@ class ThornspineSystem {
     const soilY = record.soilIndex >> 10
     blockedTiles.unblockMiningRect(soilX, soilY, record.w, 1)
 
+    this.#trackAbsent(record)
     saveManager.queueStaticUpdate({storeName: 'plant', record})
   }
 
@@ -335,6 +346,144 @@ class ThornspineSystem {
    * @returns {boolean}
    */
   isPresent (record) { return record.present }
+
+  // ///////////////////// //
+  // POUSSE DES THORNSPINE //
+  // ///////////////////// //
+
+  /**
+   * Ajoute un thornspine à la file de repousse. Démarre la tâche périodique de recherche de
+   * place si la file était vide (évite les doublons de tâche planifiée en parallèle).
+   * @param {object} record — record TREE (thornspine), present=false
+   */
+  #trackAbsent (record) {
+    this.#regrowQueue.push(record)
+    if (this.#regrowQueue.length !== 1) return
+
+    const {priority, capacity} = MICROTASK.THORNSPINE_REGROW
+    taskScheduler.enqueue('thornspine-regrow', THORNSPINE_REGROW_DELAY_MS, this.thornspineRegrow, priority, capacity)
+  }
+
+  /**
+   * Tire une colonne aléatoire et teste si ses 3 tuiles de surface sont SAND à la même
+   * hauteur, avec 3 tuiles de SKY juste au-dessus, et si les 6 tuiles sont libres de tout
+   * blocage (blockedTiles).
+   * @returns {number|null} soilIndex (tuile de sol gauche) si valide, sinon null
+   */
+  #findThornspineSoil () {
+    const SAND = NODES.SAND.code
+    const SKY = NODES.SKY.code
+    const w = 3
+
+    const x = seededRNG.randomGetMinMax(1, WORLD_WIDTH - w - 1)
+    const soilIndex = findSurfaceIndex((TOPSOIL_Y_SKY_SURFACE << 10) | x)
+    const soilY = soilIndex >> 10
+
+    if (!chunkManager.isRectCode(x, soilY, w, 1, SAND)) return null
+    if (!chunkManager.isRectCode(x, soilY - 1, w, 1, SKY)) return null
+    if (!blockedTiles.canMineRect(x, soilY, w, 1)) return null
+    if (!blockedTiles.canPlaceRect(x, soilY - 1, w, 1)) return null
+
+    return soilIndex
+  }
+
+  /**
+   * Tire une hauteur (via THORNSPINE_SIZES) et vérifie que la zone
+   * aérienne correspondante (3 tuiles de large, h de haut, au-dessus de soilIndex) est
+   * intégralement SKY et libre de tout blocage.
+   * @param {number} soilIndex — tuile de sol gauche
+   * @returns {number} hauteur en tuiles si valide, 0 sinon
+   */
+  #findThornspineHeight (soilIndex) {
+    const w = 3
+    const x = soilIndex & 0x3FF
+    const soilY = soilIndex >> 10
+    const size = seededRNG.randomGetArrayValue(THORNSPINE_SIZES)
+    const h = size * 3
+    const topY = soilY - h
+
+    if (!chunkManager.isRectCode(x, topY, w, h, NODES.SKY.code)) return 0
+    if (!blockedTiles.canPlaceRect(x, topY, w, h)) return 0
+
+    return h
+  }
+
+  /**
+   * Construit la chaîne d'images d'un thornspine (base + tronçons + head) : chaque
+   * frontière entre segments tire une jonction indépendante parmi
+   * THORNSPINE_JUNCTIONS, chaînée à la précédente ; la base a toujours '0T0' au sol.
+   * @param {number} soilX — coordonnée X de la tuile support gauche
+   * @param {number} size — nombre total de segments
+   * @returns {Array<{tree, key, col, x}>}
+   */
+  #buildThornspineImages (soilX, size) {
+    const imageTable = TREE_IMAGES.thornspine
+    const images = []
+    let bottom = '0T0'
+
+    for (let i = 0; i < size - 1; i++) {
+      const top = seededRNG.randomGetArrayValue(THORNSPINE_JUNCTIONS)
+      const key = `${bottom}-${top}`
+      const col = seededRNG.randomGetArrayIndex(imageTable[key])
+      images.push({tree: 'thornspine', key, col, x: soilX - 1})
+      bottom = top
+    }
+
+    const headKey = `head-${bottom}`
+    const headCol = seededRNG.randomGetArrayIndex(imageTable[headKey])
+    images.push({tree: 'thornspine', key: headKey, col: headCol, x: soilX - 1})
+
+    return images
+  }
+
+  /**
+   * Cherche une place valide pour le dernier thornspine de la file de repousse (sol, puis
+   * hauteur). Si trouvé, le fait réapparaître (present, bloom, images, x/yTop/yBottom,
+   * structures spatiales, blocage des tuiles, persistence) et le retire de la file.
+   * Replanifie tant que la file n'est pas vide.
+   */
+  thornspineRegrow () {
+    const soilIndex = this.#findThornspineSoil()
+
+    if (soilIndex !== null) {
+      const h = this.#findThornspineHeight(soilIndex)
+
+      if (h !== 0) {
+        const soilX = soilIndex & 0x3FF
+        const soilY = soilIndex >> 10
+        const size = h / 3
+        const record = this.#regrowQueue[this.#regrowQueue.length - 1]
+
+        record.index = soilIndex - h * WORLD_WIDTH
+        record.soilIndex = soilIndex
+        record.h = h
+        record.size = size
+        record.images = this.#buildThornspineImages(soilX, size)
+        record.present = true
+        record.bloom = false
+        record.x = soilX
+        record.yTop = soilY - h
+        record.yBottom = soilY - 1
+
+        addToByTile(this.byTile, record)
+        addToByChunk(this.#byChunk, record)
+        addToDisplayed(this.#displayed, record)
+
+        const py = record.index >> 10
+        blockedTiles.blockPlacementRect(soilX, py, record.w, h)
+        blockedTiles.blockMiningRect(soilX, soilY, record.w, 1)
+
+        saveManager.queueStaticUpdate({storeName: 'plant', record})
+
+        this.#regrowQueue.length--
+      }
+    }
+
+    if (this.#regrowQueue.length !== 0) {
+      const {priority, capacity} = MICROTASK.THORNSPINE_REGROW
+      taskScheduler.enqueue('thornspine-regrow', THORNSPINE_REGROW_DELAY_MS, this.thornspineRegrow, priority, capacity)
+    }
+  }
 
   // ////// //
   // FLEURS //
@@ -795,10 +944,9 @@ class SunflowerSystem {
     if (tileNewCode !== SKY) {
       const byBodyRecord = this.byTile.get(tileIndex)
       if (byBodyRecord !== undefined) {
-        if (chunkManager.getTileAt(byBodyRecord.index) !== SKY ||
-        chunkManager.getTileAt(byBodyRecord.index + WORLD_WIDTH) !== SKY) {
-          this.#destroyPresent(byBodyRecord)
-        }
+        const x = byBodyRecord.index & 0x3FF
+        const y = byBodyRecord.index >> 10
+        if (!chunkManager.isRectCode(x, y, 1, 2, SKY)) this.#destroyPresent(byBodyRecord)
       }
     }
 
@@ -1108,30 +1256,21 @@ class OleanderSystem {
       if (chunkManager.getTileAt(soilIndex) !== STONE) continue
 
       const t1 = soilIndex - W
-      const t2 = t1 - W
-      const t3 = t2 - W
-
-      if (chunkManager.getTileAt(t1) !== VOID) continue
-      if (chunkManager.getTileAt(t2) !== VOID) continue
-      if (chunkManager.getTileAt(t3) !== VOID) continue
-
-      if (!blockedTiles.canPlace(t1)) continue
-      if (!blockedTiles.canPlace(t2)) continue
-      if (!blockedTiles.canPlace(t3)) continue
+      const topY = (t1 >> 10) - 2
+      if (!chunkManager.isRectCode(cx, topY, 1, 3, VOID)) continue
+      if (!blockedTiles.canPlaceRect(cx, topY, 1, 3)) continue
 
       const record = this.#regrowQueue[this.#regrowQueue.length - 1]
 
       record.soilIndex = soilIndex
-      record.index = t3
+      record.index = (topY << 10) | cx
       record.x = cx
-      record.y = t3 >> 10
+      record.y = topY
       record.present = true
 
       addToByTile(this.byTile, record)
       addToByChunk(this.#byChunk, record)
-      blockedTiles.blockPlacement(t1)
-      blockedTiles.blockPlacement(t2)
-      blockedTiles.blockPlacement(t3)
+      blockedTiles.blockPlacementRect(cx, topY, 1, 3)
       saveManager.queueStaticUpdate({storeName: 'plant', record})
 
       this.#regrowQueue.length--
@@ -1158,11 +1297,9 @@ class OleanderSystem {
     // Cas 1 — tuile du corps : une des 3 VOID devient autre chose
     const byBodyRecord = this.byTile.get(tileIndex)
     if (byBodyRecord !== undefined && tileNewCode !== VOID) {
-      if (chunkManager.getTileAt(byBodyRecord.index) !== VOID ||
-        chunkManager.getTileAt(byBodyRecord.index + WORLD_WIDTH) !== VOID ||
-        chunkManager.getTileAt(byBodyRecord.index + 2 * WORLD_WIDTH) !== VOID) {
-        this.#destroyPresent(byBodyRecord)
-      }
+      const x = byBodyRecord.index & 0x3FF
+      const y = byBodyRecord.index >> 10
+      if (!chunkManager.isRectCode(x, y, 1, 3, VOID)) this.#destroyPresent(byBodyRecord)
     }
 
     // Cas 2 — tuile sol : STONE retiré
@@ -1352,24 +1489,6 @@ class ParsnipSystem {
     this.#spotsBySoil.delete(record.soilIndex)
     record.deleted = true
     saveManager.queueStaticUpdate({storeName: 'plant', record})
-  }
-
-  /**
-   * Indique si toutes les tuiles du corps du record valent encore code.
-   * @param {object} record
-   * @param {number} code — NODES.xxx.code attendu pour chaque tuile du corps
-   * @returns {boolean}
-   */
-  #bodyIs (record, code) { // TODO - Je ne comprends pas à quoi peut servir cette fonction
-    const px = record.index & 0x3FF
-    const py = record.index >> 10
-    for (let dy = 0; dy < record.h; dy++) {
-      const rowBase = (py + dy) << 10
-      for (let dx = 0; dx < record.w; dx++) {
-        if (chunkManager.getTileAt(rowBase | (px + dx)) !== code) return false
-      }
-    }
-    return true
   }
 
   /**
