@@ -509,7 +509,6 @@ class WorldGenerator {
       {key: 'sewedambermirage', value: []},
       {key: 'spawn', value: `${pxX}|${pxY}`},
       {key: 'termites', value: termites},
-      {key: 'thornspinecount', value: thornspineCount},
       {key: 'timestamp', value: 480 * 1000}, // Day 1 - 8:00
       {key: 'triskels', value: triskels},
       {key: 'uniqueidseed', value: 'a'},
@@ -7316,7 +7315,7 @@ class PlantGenerator {
       size,
       images: this.#buildThornspineImages(soilX, size),
       present: true,
-      bloom: false, // TODO : confirmer un % initial comme Fern/Oleander, ou toujours false ?
+      bloom: seededRNG.randomGetPercent(33),
       x: soilX,
       yTop: y - h,
       yBottom: y - 1,

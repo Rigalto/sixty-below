@@ -521,7 +521,7 @@ export const ITEMS = {
   coconutMilk: {name: 'Coconut Milk', type: 0, stype: 'beverage', star: 1, image: 'refined_32_32-2-3', help: 'Coconut', tooltip: '???'},
 
   thornspine: {name: 'Thornspine', type: 0, stype: 'tree', star: 3, image: null, help: 'Thornspine', tooltip: '???', chopping: {speed: 2200, items: [{item: 'cactusFiber', count: '2-3'}, {item: 'cactusSpine', count: '4-10'}]}, foraging: {speed: 2000, items: [{item: 'thornspineFlower', count: 1}, {item: 'cactusSpine', count: 0.60}]}},
-  thornspineFlower: {name: 'Thornspine Flower', type: 0, stype: 'flower', star: 3, image: 'refined_32_32-0-3', help: 'Thornspine', tooltip: '???'},
+  thornspineFlower: {name: 'Thornspine Flower', type: 0, stype: 'flower', star: 3, image: 'foraged_32_32-2-3', placed: 'placed_16_16-5-0', help: 'Thornspine', tooltip: '???'},
   cactusSpine: {name: 'Cactus Spine', type: 0, stype: 'Spine', star: 2, image: 'foraged_32_32-0-3', help: 'Thornspine', tooltip: '???'},
   cactusFiber: {name: 'Cactus Fiber', type: 0, stype: 'beverage', star: 2, image: 'foraged_32_32-1-3', help: 'Thornspine', tooltip: '???'},
 
@@ -919,6 +919,8 @@ export const COCONUT_CYCLE_DELAY = 20 * 60 * 1000
 export const THORNSPINE_JUNCTIONS = ['0T0', '1T0', '0T1', '1T1']
 // Répartition du nombre de segments (base + tronçons + head) : 25% / 50% / 25%
 export const THORNSPINE_SIZES = [2, 3, 3, 4]
+export const THORNSPINE_BLOOM_PCENT = 25 // probabilité NF→F par passage
+export const THORNSPINE_UNBLOOM_PCENT = 50 // probabilité F→NF par passage — 2× BLOOM → cible ~1/3 en fleurs
 
 export const TREE_IMAGES = {
   thornspine: {

@@ -411,7 +411,7 @@ class GameCore {
     achievementManager.init(achievementRecords)
 
     // 5.4 Objectstore Plant
-    thornspineSystem.init(state.thornspinecount) // avant lecture des records
+    thornspineSystem.init() // avant lecture des records
 
     const plantRecords = await database.readAllFromObjectStore('plant')
     const plantsToDelete = []

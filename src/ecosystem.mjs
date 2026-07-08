@@ -6,7 +6,7 @@ import {WORLD_WIDTH, WORLD_HEIGHT, MICROTASK, TOPSOIL_Y_SKY_SURFACE, TOPSOIL_Y_S
 import {database, uniqueIdGenerator} from './database.mjs'
 
 import {eventBus, seededRNG, blockedTiles, microTasker, taskScheduler} from './utils.mjs'
-import {NODES, ITEMS, PLANT_KIND, PLANT_TYPE, PLANT_SYSTEM_LOOKUP, ALL_PLANT_SYSTEMS, COBWEB_GROWTH_DELAY_MS, SUNFLOWER_RATE, PARSNIP_RATE, AMBERMIRAGE_PCENT, COCONUT_CYCLE_DELAY, TREE_IMAGES} from '../assets/data/data.mjs'
+import {NODES, ITEMS, PLANT_KIND, PLANT_TYPE, PLANT_SYSTEM_LOOKUP, ALL_PLANT_SYSTEMS, COBWEB_GROWTH_DELAY_MS, SUNFLOWER_RATE, PARSNIP_RATE, AMBERMIRAGE_PCENT, COCONUT_CYCLE_DELAY, TREE_IMAGES, THORNSPINE_UNBLOOM_PCENT, THORNSPINE_BLOOM_PCENT} from '../assets/data/data.mjs'
 import {IMAGE_CACHE} from './assets.mjs'
 import {saveManager} from './persistence.mjs'
 import {chunkManager} from './world.mjs'
@@ -183,15 +183,26 @@ class ThornspineSystem {
   #list = [] // record[] — tous les thornspines
   #byChunk = new Map() // Map<chunkKey, Set> — lookup spatial pour onPreloadChunksChanged
   #displayed = new Set() // Set<record> — cible du render (chunks preload uniquement)
+  #flowerImage = null // image ITEMS.thornspineFlower.placed
+
+  /**
+   * Abonnement EventBus unique du système ('time/every-hour'), lié une seule fois à la
+   * construction (pas dans init(), pour éviter les abonnements dupliqués entre sessions).
+   */
+  constructor () {
+    this.onHourThornspine = this.onHourThornspine.bind(this)
+    eventBus.on('time/every-hour', this.onHourThornspine)
+  }
 
   /**
    * Réinitialise toutes les structures.
    */
-  init (quota) {
+  init () {
     this.byTile.clear()
     this.#list.length = 0
     this.#byChunk.clear()
     this.#displayed.clear()
+    this.#flowerImage = ITEMS.thornspineFlower.placed // après hydratation
   }
 
   /**
@@ -234,6 +245,8 @@ class ThornspineSystem {
    * @param {CanvasRenderingContext2D} ctx — contexte déjà transformé (caméra appliquée)
    */
   render (ctx) {
+    const flower = this.#flowerImage
+
     for (const record of this.#displayed) {
       const soilYPx = ((record.soilIndex >> 10) << 4) + 2
       for (let i = 0; i < record.images.length; i++) {
@@ -243,6 +256,12 @@ class ThornspineSystem {
         const pxY = soilYPx - 48 * (i + 1)
         ctx.drawImage(IMAGE_CACHE[img.imgIndex], img.sx, img.sy, img.sw, img.sh, pxX, pxY, img.sw, img.sh)
       }
+
+      if (!record.bloom) continue
+
+      const pxX = ((record.index & 0x3FF) << 4) + 17
+      const pxY = ((record.index >> 10) << 4) + 46
+      ctx.drawImage(IMAGE_CACHE[flower.imgIndex], flower.sx, flower.sy, flower.sw, flower.sh, pxX, pxY, flower.sw, flower.sh)
     }
   }
 
@@ -284,17 +303,22 @@ class ThornspineSystem {
   canShake () { return false }
 
   /**
-   * Foraging (Sickle, en fleur) — non implémenté : en attente du système de floraison.
+   * Indique si le thornspine peut être fauché à la Sickle : uniquement lorsqu'il porte des
+   * fleurs.
    * @param {object} record
    * @returns {boolean}
    */
-  canForage (record) { return false }
+  canForage (record) { return record.bloom === true }
 
   /**
-   * No-op — le thornspine ne se forage pas encore (voir canForage).
+   * Fait disparaître les fleurs d'un thornspine (bloom repasse à false) et persiste. Le
+   * thornspine lui-même reste en place — seul l'état floraison change.
    * @param {object} record
    */
-  onForaged (record) { }
+  onForaged (record) {
+    record.bloom = false
+    saveManager.queueStaticUpdate({storeName: 'plant', record})
+  }
 
   /**
    * Retourne le thornspine couvrant la tuile donnée, ou null.
@@ -311,6 +335,40 @@ class ThornspineSystem {
    * @returns {boolean}
    */
   isPresent (record) { return record.present }
+
+  // ////// //
+  // FLEURS //
+  // ////// //
+
+  /**
+   * Liaison EventBus : 'time/every-hour' — parcourt un quart de #list (offset = hour % 4, step 4), ignore les absents
+   * (present=false), et fait basculer 'bloom' de façon asymétrique :
+   *   - NF → F avec probabilité THORNSPINE_BLOOM_PCENT
+   *   - F → NF avec probabilité THORNSPINE_UNBLOOM_PCENT
+   * Persiste tous les records modifiés en un seul appel batché.
+   * @param {{hour: number}} payload
+   */
+  onHourThornspine ({hour}) {
+    const offset = hour % 4
+    const updates = []
+
+    for (let i = offset; i < this.#list.length; i += 4) {
+      const record = this.#list[i]
+      if (!record.present) continue
+
+      if (record.bloom) {
+        if (!seededRNG.randomGetPercent(THORNSPINE_UNBLOOM_PCENT)) continue
+        record.bloom = false
+      } else {
+        if (!seededRNG.randomGetPercent(THORNSPINE_BLOOM_PCENT)) continue
+        record.bloom = true
+      }
+
+      updates.push({storeName: 'plant', record})
+    }
+
+    if (updates.length !== 0) saveManager.queueStaticUpdate(updates)
+  }
 }
 export const thornspineSystem = new ThornspineSystem()
 

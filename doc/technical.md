@@ -529,6 +529,12 @@ Cette section définit les événements officiels. Tout nouvel événement doit 
 | :---: | :--- | :--- | :--- |
 | E | `shaked/coconut` | `number` (soilIndex) | Émis par HammingManager quand le joueur secoue un cocotier. |
 
+#### Thornspine (`ThornspineSystem`)
+
+| Dir. | Event Name | Payload Structure | Description |
+| :---: | :--- | :--- | :--- |
+| E | `time/every-hour` | `{ day, hour, minute, isDay }` | Cycle bloom/unbloom asymétrique sur 1/4 de la population (offset = hour % 4). |
+
 #### Debug (`WorldMapDebug`, `RealtimeDebugWidget`, `BuffManager`)
 
 | Dir. | Event Name | Payload Structure | Description |
@@ -863,6 +869,7 @@ Les enregistrements sont de natures très différentes, nature déterminée par 
     `null` = pas de noix au sol
   * `groundIndex` : `(y << 10) | x` — Cocotier seulement - position de la noix au sol ; valide seulement si
     `groundTimestamp !== null`
+  * `bloom` : indique si une fleur de thornspine est présente ou non.
   * `blocked` : nombre de tuiles non SKY dans la zone au-dessus du sol qui bloquent l'arbre
 * `kind` MUSHROOM : liste des spots de champignons potentiels dans le monde (tuile à gauche et à droite de l'arbre correspondant, indépendamment de la nature de cette tuile)
   * `id` : identifiant unique du spot de champignon
