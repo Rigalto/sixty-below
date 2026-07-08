@@ -515,6 +515,9 @@ class HelpOverlay {
    * @param {string} title
    */
   navigateTo (title) {
+    // Si on clique sur l'item déjà actif, on ne fait rien
+    if (title === this.#currentTopic) return
+
     // Tronque le futur si on navigue depuis un point intermédiaire
     if (this.#historyIndex < this.#history.length - 1) {
       this.#history = this.#history.slice(0, this.#historyIndex + 1)
