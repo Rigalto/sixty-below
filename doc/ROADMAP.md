@@ -9,10 +9,8 @@
 
 - Thornspine (Cactus de surface) : placement en génération fait. Reste à faire :
   - ITEMS.thornspine : fiche data-help.mjs
-  - apparition/disparition des fleurs
-  - foraging des fleurs
   - repousse via thornspineCount
-- Refonte images de Mahogany 5 / 36
+- Refonte images de Mahogany 10 / 36
 - `SunflowerSystem` : impact de la naissance d'un arbre
 - Tester Cas 1 (`onTileChangedParsnip`) : destruction du parsnip présent quand la tuile du corps n'est plus SKY (spot conservé) — écoulement d'un SAND.
 - Tester Cas 1 (`onTileChangedParsnip`) : destruction du parsnip présent quand la tuile du corps n'est plus SKY (spot conservé) — écoulement d'un liquide.
@@ -20,7 +18,7 @@
 - Tester `onTreePlantedParsnip` : apparition d'un oak.
 - Tester `onTreePlantedSunflower` : apparition d'un oak.
 - implémenter les graines de Sunflower qui augmentent la probabilité de pop de sunflower.
-- implémenter une accélération progressive sur l'axe des X, pour pouvoir se positionner plus facilement.
+- implémenter une accélération progressive sur l'axe des X, pour pouvoir se positionner plus facilement. Arrêt instantané.
 - Modifier le volume sonore des sons du jeu (ActionWidget)
 - Supprimer les actions de debug accessibles au joueur, quand hébergement sous GitHub :
   - affichage après génération du monde
@@ -44,14 +42,11 @@
 - Mettre la bonne palette et un entourage noir pour placed_16_32, reste à faire :
   - 4,0 - 5,0 - 6,0 - 7,0
   - 0,1 - 1,1, - 5,1
+- Images des coffres.
 
 ---
 
 ## Dette technique
-- Après une génération d'un monde, si on était en vitessex50, on reste en vitessex50.
-- Analyser s'il faut que le traitement de sowingManager soit effectué dans une micro-tâche.
-- Dédoubler les handlers d'eventBus : `onPreloadChunksChanged`, `onCraftPerformed`, `onSlotActive`, `onTeleportBegin`
-- Dans les attributs 'mining' et 'foraging' transférer dans 'buffs' ce qui n'y est pas encore.
 - Vérifier que la convention pour les variables privées est prise en compte partout et Vérifier que les en-têtes des fonctions sont présents et à jour (prise en compte des modifications de conception) :
   - fait pour `achievement.mjs`, `action.mjs`, `assets.mjs`, `buff.mjs`, `craft.mjs`, `ecosystem.mjs`, `help.mjs`, `inventory.mjs`, `ui.mjs`
 
@@ -64,7 +59,6 @@
 
 ## À faire — Bugs connus
 - Lorsqu'une tuile est modifiée sans déplacement de la souris, les informations la concernant dans le Control Panel ne sont pas mises à jour
-- Lorsque l'on clique plusieurs fois sur le même topic dans l'aide, il est ajouté plusieurs fois dans l'historique
 - Il n'y a pas assez de Cactus dans le monde => sans doute pas assez de SAND sur le sol souterrain.
 - Il n'y a pas assez de Bamboo dans le monde => sans doute pas assez de SILT sur le sol souterrain.
 - Il n'y a pas assez de Oleanders dans le monde => sans doute pas assez de STONE sur le sol souterrain.
