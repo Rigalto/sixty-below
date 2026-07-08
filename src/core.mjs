@@ -19,7 +19,7 @@ import {achievementManager} from './achievement.mjs'
 import {playerManager, hotbarOverlay} from './player.mjs'
 import {floraManager, sunflowerSystem, oleanderSystem, parsnipSystem, ambermirageSystem, oakSystem, mahoganySystem, cobwebSystem, coconutSystem, thornspineSystem} from './ecosystem.mjs'
 import {ACHIEVEMENT_CATEGORIES} from '../assets/data/data-achievement.mjs'
-import {miningManager, placingManager, foragingManager, choppingManager, sowingManager, hammingManager} from './action.mjs'
+import {miningManager, placingManager, foragingManager, choppingManager, sowingManager, hammingManager, furnishingManager} from './action.mjs'
 import './combat.mjs'
 
 const WITH_DEBUG_HUD = true // passer à false pour désactiver sans toucher IS_DEV
@@ -630,7 +630,7 @@ class GameCore {
     } else if (item.type & ITEM_TYPE.PLACABLE) {
       if (item.type & ITEM_TYPE.BLOCK) placingManager.tryPlace(tileIndex, tileNode, item, slot.slot)
       else if (item.type & ITEM_TYPE.SEED) sowingManager.trySow(tileIndex, tileNode, item, slot.slot)
-      // else if (item.type & ITEM_TYPE.FURNITURE) furnishingManager.tryPlace(tileIndex, tileNode, item, slot.prefix)
+      else if (item.type & ITEM_TYPE.FURNITURE) furnishingManager.tryPlace(tileIndex, tileNode, item, slot.slot)
     }
   }
 

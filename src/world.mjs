@@ -99,7 +99,7 @@ class ChunkManager {
 
   /**
    * Teste si toutes les tuiles d'un rectangle valent le même code.
-   * @param {number} x @param {number} y @param {number} w @param {number} h
+   * @param {number} x @param {number} y @param {number} w @param {number} h - en tuiles
    * @param {number} code
    * @returns {boolean} true si toutes les tuiles du rectangle valent code
    */
@@ -112,6 +112,23 @@ class ChunkManager {
       rowBase += WORLD_WIDTH
     }
     return true
+  }
+
+  /**
+   * Retourne l'ensemble des codes de tuiles distincts présents dans un rectangle.
+   * @param {number} x @param {number} y @param {number} w @param {number} h - en tuiles
+   * @returns {Set<number>}
+   */
+  getRectCodes (x, y, w, h) {
+    const codes = new Set()
+    let rowBase = (y << 10) | x
+    for (let row = 0; row < h; row++) {
+      for (let col = 0; col < w; col++) {
+        codes.add(this.#data[rowBase + col])
+      }
+      rowBase += WORLD_WIDTH
+    }
+    return codes
   }
 
   /**

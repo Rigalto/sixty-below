@@ -269,6 +269,7 @@ export const SVG_ICON = (icon, config = '') => `<svg viewBox="0 0 24 24" ${confi
 export const MICROTASK = {
   RENDER_CHUNK_QUEUE: {priority: 30, capacity: 12, taskName: 'processRenderQueue'}, // génère les images des dirty chunks
 
+  FURNISHING_PLACE: {priority: 24, capacity: 10, taskName: 'onPlaceFurniture'}, // plaçage d'un meuble dans le monde
   MINE_TILE: {priority: 24, capacity: 6, taskName: 'onMineTile'}, // minage d'une tuile
   PLACE_TILE: {priority: 24, capacity: 10, taskName: 'onPlaceTile'}, // pose d'un bloc
   CHOP_TREE: {priority: 24, capacity: 4, taskName: 'onChopTree'}, // abat une section d'arbre

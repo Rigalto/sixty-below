@@ -1,7 +1,8 @@
-// action.mjs — MiningManager - PlacingManager - ForagingManager - ChoppingManager - SowingManager - HammingManager
+// action.mjs — MiningManager - PlacingManager - ForagingManager - ChoppingManager
+// SowingManager - HammingManager - FurnishingManager
 
 import {eventBus, taskScheduler, microTasker, blockedTiles, rollLootWithBuffs} from './utils.mjs'
-import {NODE_TYPE, NODES, ITEM_TYPE, ITEMS, PLANT_SYSTEM_LOOKUP, PLANT_KIND} from '../assets/data/data.mjs'
+import {NODE_TYPE, NODES_LOOKUP, NODES, ITEM_TYPE, ITEMS, PLANT_SYSTEM_LOOKUP, PLANT_KIND} from '../assets/data/data.mjs'
 import {inventoryManager} from './inventory.mjs'
 import {buffManager, isInInteractionRange} from './buff.mjs'
 import {database} from './database.mjs'
@@ -276,8 +277,8 @@ class PlacingManager {
     if (buffManager.getBuff('playerFreeze')) return
     if (!PLACING_NODES.has(tileNode.code)) return
     console.log('PlacingManager.tryPlace', {tileIndex, tileNode, item})
-    if (!blockedTiles.canPlace(tileIndex)) { eventBus.emit('sound/play', 'toofar'); return }
-    if (!isInInteractionRange(tileIndex)) { eventBus.emit('sound/play', 'wrong'); return }
+    if (!isInInteractionRange(tileIndex)) { eventBus.emit('sound/play', 'toofar'); return }
+    if (!blockedTiles.canPlace(tileIndex)) { eventBus.emit('sound/play', 'wrong'); return }
     const {priority, capacity} = MICROTASK.PLACE_TILE
     microTasker.enqueue(this.onPlaceTile, priority, capacity, tileIndex, item, slotIndex)
   }
@@ -320,6 +321,69 @@ class PlacingManager {
   }
 }
 export const placingManager = new PlacingManager()
+
+/* ====================================================================================================
+   POSE DE MEUBLES (FURNISHING)
+   ==================================================================================================== */
+
+class FurnishingManager {
+  constructor () {
+    // Micro-tâche
+    this.onPlaceFurniture = this.onPlaceFurniture.bind(this)
+  }
+
+  /**
+   * Valide la demande de pose et déclenche la micro-tâche si le meuble est de type normal
+   * (ni floating, ni onTop — ces deux branches ne sont pas encore traitées).
+   * @param {number} tileIndex — (y << 10) | x — tuile cliquée, coin bas-gauche du meuble
+   * @param {object} tileNode  — NODES_LOOKUP[tileCode] (non utilisé — le footprint est relu tuile par tuile en micro-tâche)
+   * @param {object} item      — ITEMS[slot.item]
+   * @param {number} slotIndex — slot.slot (index hotbar)
+   */
+  tryPlace (tileIndex, tileNode, item, slotIndex) {
+    if (buffManager.getBuff('playerFreeze')) return
+
+    const {priority, capacity} = MICROTASK.FURNISHING_PLACE
+    microTasker.enqueue(this.onPlaceFurniture, priority, capacity, tileIndex, item, slotIndex)
+  }
+
+  /**
+   * Exécuté en micro-tâche. Valide puis pose un meuble normal : footprint w×h en GAZ ou BWALL
+   * (mélange autorisé), sol SOLID ou ETERNAL juste en dessous, aucune tuile bloquée, à portée
+   * d'interaction.
+   * @param {number} tileIndex — (y << 10) | x — coin bas-gauche cliqué
+   * @param {object} item      — ITEMS[slot.item]
+   * @param {number} slotIndex — slot.slot (index hotbar)
+   */
+  onPlaceFurniture (tileIndex, item, slotIndex) {
+    const placedImage = item.placed ?? item.placedLeft
+    const w = placedImage.sw >> 4
+    const h = placedImage.sh >> 4
+    const px = tileIndex & 0x3FF
+    const topY = (tileIndex >> 10) - h + 1
+
+    const FOOTPRINT_MASK = NODE_TYPE.GAZ | NODE_TYPE.BWALL
+    const footprintCodes = chunkManager.getRectCodes(px, topY, w, h)
+    for (const code of footprintCodes) {
+      if ((NODES_LOOKUP[code].type & FOOTPRINT_MASK) === 0) return
+    }
+
+    const FLOOR_MASK = NODE_TYPE.SOLID | NODE_TYPE.ETERNAL
+    const floorBase = ((topY + h) << 10) | px
+    for (let dx = 0; dx < w; dx++) {
+      const node = NODES_LOOKUP[chunkManager.getTileAt(floorBase + dx)]
+      if ((node.type & FLOOR_MASK) === 0) return
+    }
+
+    if (!isInInteractionRange(tileIndex)) { eventBus.emit('sound/play', 'toofar'); return }
+    if (!blockedTiles.canPlaceRect(px, topY, w, h)) { eventBus.emit('sound/play', 'wrong'); return }
+
+    furnitureManager.place(item.code, tileIndex)
+    inventoryManager.decrementHotbarSlotCount(slotIndex)
+    eventBus.emit('sound/play', 'placing')
+  }
+}
+export const furnishingManager = new FurnishingManager()
 
 /* ====================================================================================================
    FORAGING DE PLANTES
