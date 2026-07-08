@@ -4710,7 +4710,7 @@ Chopping Tool: <<itemStar|axeCopper>> or better
 
 **Mahogany Chopping Loot** ⏳
 
-Chopping Tool: <<itemStar|axeCopper>> or better
+Chopping Tool: <<itemStar|axeIron>> or better
 
 <<itemLootTable|mahogany|chopping>>
 {{item:mahogany:chopping:extraLoot:items[*]:helpRow|rows}}
@@ -4939,7 +4939,7 @@ A tall desert cactus, unmistakable with its segmented, spiny trunk rising straig
 * A single chop fells the entire plant.
 * The Thornspine disappears until it regrows elsewhere in the Desert.
 
-Chopping Tool: <<itemStar|axeIron>> or better
+Chopping Tool: <<itemStar|axeSilver>> or better
 
 **Thornspine Chopping Loot**
 
