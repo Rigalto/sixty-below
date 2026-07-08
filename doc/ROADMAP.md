@@ -9,8 +9,7 @@
 
 - Thornspine (Cactus de surface) : placement en génération fait. Reste à faire :
   - ITEMS.thornspine : fiche data-help.mjs
-  - repousse via thornspineCount
-- Refonte images de Mahogany 10 / 36
+- Refonte images de Mahogany 15 / 36
 - `SunflowerSystem` : impact de la naissance d'un arbre
 - Tester Cas 1 (`onTileChangedParsnip`) : destruction du parsnip présent quand la tuile du corps n'est plus SKY (spot conservé) — écoulement d'un SAND.
 - Tester Cas 1 (`onTileChangedParsnip`) : destruction du parsnip présent quand la tuile du corps n'est plus SKY (spot conservé) — écoulement d'un liquide.
