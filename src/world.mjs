@@ -98,6 +98,23 @@ class ChunkManager {
   getTile (x, y) { return this.#data[(y << 10) | x] }
 
   /**
+   * Teste si toutes les tuiles d'un rectangle valent le même code.
+   * @param {number} x @param {number} y @param {number} w @param {number} h
+   * @param {number} code
+   * @returns {boolean} true si toutes les tuiles du rectangle valent code
+   */
+  isRectCode (x, y, w, h, code) {
+    let rowBase = (y << 10) | x
+    for (let row = 0; row < h; row++) {
+      for (let col = 0; col < w; col++) {
+        if (this.#data[rowBase + col] !== code) return false
+      }
+      rowBase += WORLD_WIDTH
+    }
+    return true
+  }
+
+  /**
    * Retourne les codes des tuiles chevauchant le rectangle pixel donné, même partiellement.
    * Vue sur un buffer interne — invalide à l'appel suivant.
    * @param {{x: number, y: number, w: number, h: number}} rect - pixels monde, entiers

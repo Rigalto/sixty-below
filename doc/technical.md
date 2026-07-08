@@ -1036,6 +1036,7 @@ Maître unique de la donnée monde. Le renderer et la persistence **ne font que 
 | `init`                    | `(savedChunks: Array): void`     | Hydrate le buffer depuis la DB. Lève une erreur si count ≠ 2048.   |
 | `getTile`                 | `(x, y): number`                 | Hot path. Pas de bounds checking (Ghost Cells).                    |
 | `getTileAt`               | `(index): number`                | Hot path. Pas de bounds checking (Ghost Cells).                    |
+| `isRectCode`              | `(x, y, w, h, code): boolean`    | Teste si toutes les tuiles d'un rectangle valent le même code.     |
 | `getTilesInRect` | `({x, y, w, h}): Uint8Array` | Codes des tuiles chevauchant le rectangle pixel (même partiellement). Vue sur buffer interne — invalide à l'appel suivant. Requiert `w > 0`, `h > 0`. Maximum 64 tuiles. |
 | `setTile`                 | `(x, y, code): void`             | Écriture avec dirty flags (render + save).                         |
 | `setTileAt`               | `(index, code): void`            | Écriture avec dirty flags (render + save).                         |
