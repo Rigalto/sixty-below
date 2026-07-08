@@ -7,10 +7,7 @@
 
 ## En cours
 
-- Thornspine (Cactus de surface) : placement en génération fait. Reste à faire :
-  - ITEMS.thornspine : fiche data-help.mjs
 - Refonte images de Mahogany 15 / 36
-- `SunflowerSystem` : impact de la naissance d'un arbre
 - Tester Cas 1 (`onTileChangedParsnip`) : destruction du parsnip présent quand la tuile du corps n'est plus SKY (spot conservé) — écoulement d'un SAND.
 - Tester Cas 1 (`onTileChangedParsnip`) : destruction du parsnip présent quand la tuile du corps n'est plus SKY (spot conservé) — écoulement d'un liquide.
 - Tester Cas 3 (`onTileChangedParsnip`) : apparition d'un nouveau spot quand une tuile devient GRASSFOREST (propagation naturelle).
@@ -365,6 +362,7 @@ La Sap corrode le Copper. Il doit donc être remplacer par du Gold.
 - Oak (`OakSystem`)
 - Mahogany (`MahoganySystem`)
 - Coconut (`CoconutSystem`)
+- Thornspine (`ThornspineSystem`)
 
 ### Rendu (partiel)
 - `WorldRenderer` — rendu tuiles par chunks avec cache OffscreenCanvas

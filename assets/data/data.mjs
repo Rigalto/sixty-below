@@ -609,7 +609,7 @@ export const ITEMS = {
   coralP: {name: 'Starfire Pillar Coral', type: 0, stype: 'herb', star: 2, image: null, placed: 'fuws_32_32-3-3', speed: 1900, foraging: {speed: 500, items: [{item: 'coral', count: 1, rainy: 1.8, windy: 1.8}]}, help: 'Corals', tooltip: 'Crafting Material for Potions and Furniture'},
   coralY: {name: 'Flickering Torch Coral', type: 0, stype: 'herb', star: 2, image: null, placed: 'fuws_32_32-4-3', speed: 1900, foraging: {speed: 500, items: [{item: 'coral', count: 1, rainy: 1.8, windy: 1.8}]}, help: 'Corals', tooltip: 'Crafting Material for Potions and Furniture'},
   coralG: {name: 'Whispering Fan Coral', type: 0, stype: 'herb', star: 2, image: null, placed: 'fuws_32_32-5-3', speed: 1900, foraging: {speed: 500, items: [{item: 'coral', count: 1, rainy: 1.8, windy: 1.8}]}, help: 'Corals', tooltip: 'Crafting Material for Potions and Furniture'},
-  coral: {name: 'Coral', type: 0, stype: 'herb', star: 2, image: 'crafting_32_32-0-1', help: 'Corals', tooltip: 'Crafting Material for Potions and Furniture'},
+  coral: {name: 'Coral', type: 0, stype: 'herb', star: 2, image: 'foraged_32_32-3-3', help: 'Corals', tooltip: 'Crafting Material for Potions and Furniture'},
 
   mandrake: {name: 'Mandrake', type: 0, stype: 'herb', star: 2, image: null, placed: 'fuws_32_32-2-3', speed: 1900, foraging: {speed: 500, items: [{item: 'mandrakeRoot', count: 1, rainy: 1.8, windy: 1.8}]}, help: 'Mandrake', tooltip: 'Harvest to collect Potions and Food ingredients'},
   mandrakeRoot: {name: 'Mandrake Root', type: 0, stype: 'herb', star: 3, image: 'crafting_32_32-0-1', help: 'Mandrake', tooltip: 'Crafting Material for Potions and Food'},
@@ -646,7 +646,13 @@ export const ITEMS = {
   campfire: {name: 'Campfire', type: ITEM_TYPE.FURNITURE | ITEM_TYPE.PLACABLE, stype: 'light', star: 1, image: 'furniture_32_32-7-3', placed: 'fuws_48_32-2-1', help: 'Campfires', tooltip: 'Provides Cozy Buff when lit'},
 
   // Platforms
-  platformOak: {name: 'Wood Platform', type: ITEM_TYPE.FURNITURE | ITEM_TYPE.PLACABLE, stype: 'platform', star: 1, furnitureSet: 'wood', image: 'furniture_32_32-6-7', placed: 'fuws_16_16-0-1', placedleft: 's_42_42-0-5', placedright: 's_42_42-0-4', help: 'Platforms', tooltip: 'Can be walked on, but also allow movement through the space they occupy'},
+  platformOak: {name: 'Oak Platform', type: ITEM_TYPE.FURNITURE | ITEM_TYPE.PLACABLE, stype: 'platform', star: 1, furnitureSet: 'wood', image: 'furniture_32_32-0-7', placed: 'placed_16_16-0-1', placedleft: 's_42_42-0-5', placedright: 's_42_42-0-4', help: 'Platforms', tooltip: 'Can be walked on, but also allow movement through the space they occupy'},
+  platformGlass: {name: 'Glass Platform', type: ITEM_TYPE.FURNITURE | ITEM_TYPE.PLACABLE, stype: 'platform', star: 1, furnitureSet: 'coral', image: 'furniture_32_32-3-7', placed: 'placed_16_16-3-1', placedleft: 's_42_42-0-5', placedright: 's_42_42-0-4', help: 'Platforms', tooltip: 'Can be walked on, but also allow movement through the space they occupy'},
+  platformMahogany: {name: 'Mahogany Platform', type: ITEM_TYPE.FURNITURE | ITEM_TYPE.PLACABLE, stype: 'platform', star: 2, furnitureSet: 'mahogany', image: 'furniture_32_32-1-7', placed: 'placed_16_16-1-1', placedleft: 's_42_42-0-5', placedright: 's_42_42-0-4', help: 'Platforms', tooltip: 'Can be walked on, but also allow movement through the space they occupy'},
+  platformReef: {name: 'Reef Platform', type: ITEM_TYPE.FURNITURE | ITEM_TYPE.PLACABLE, stype: 'platform', star: 2, furnitureSet: 'coral', image: 'furniture_32_32-2-7', placed: 'placed_16_16-2-1', placedleft: 's_42_42-0-5', placedright: 's_42_42-0-4', help: 'Platforms', tooltip: 'Can be walked on, but also allow movement through the space they occupy'},
+  // ??? Platform : placed: 'placed_16_16-4-1' / modifier les couleurs
+  // ??? Platform : placed: 'placed_16_16-5-1' / modifier les couleurs
+  // ??? Platform : placed: 'placed_16_16-6-1' / modifier les couleurs
 
   // woodptfm: {name: 'Wood Platform', type: ITEM_TYPE.FURNITURE, stype: 'platform', floating: true, furnitureSet: 'wood', sell: 25, star: 1, image: 'furniture_32_32-6-7', placed: 'fuws_16_16-0-1', placedleft: 's_42_42-0-5', placedright: 's_42_42-0-4', help: 'Platforms', tooltip: 'Can be walked on, but also allow movement through the space they occupy'},
 
@@ -700,6 +706,11 @@ export const ITEMS = {
    ============================================================================ */
 
 export const RECIPES = [
+  // Platforms
+  {result: {item: 'platformOak', count: 6}, station: 'byHand', ingredients: [{item: 'logOak', count: 1}]},
+  {result: {item: 'platformGlass', count: 10}, station: 'byHand', ingredients: [{item: 'glass', count: 1}]},
+  {result: {item: 'platformMahogany', count: 8}, station: 'byHand', ingredients: [{item: 'logMahogany', count: 1}]},
+  {result: {item: 'platformReef', count: 6}, station: 'byHand', ingredients: [{item: 'coral', count: 1}]},
 
   // Pickaxes
   {result: {item: 'pickaxeCopper', count: 1}, station: 'anvil', ingredients: [{item: 'barCopper', count: 8}, {item: 'logOak', count: 4}, {item: 'cutTopaz', count: 1}]},
