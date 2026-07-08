@@ -349,12 +349,12 @@ export const ITEMS = {
   hammerCopper: {name: 'Copper Hammer', type: ITEM_TYPE.TOOL, stype: 'hammer', star: 2, image: 'tool_32_32-5-0', placedright: 'w_42_42-0-0', placedleft: 'w_42_42-0-1', range: 0, shaking: {speed: 0}, help: 'Hammers', tooltip: 'Tools used to remove wall, furniture, workstation, converting them to item form'},
 
   // Axes
-  axeCopper: {name: 'Copper Axe', type: ITEM_TYPE.TOOL | ITEM_TYPE.WEAPON, stype: 'axe', star: 2, image: 'tool_32_32-3-0', placedright: 'w_42_42-0-0', placedleft: 'w_42_42-0-1', speed: 0, help: 'Axes', tooltip: 'Basic tools used to chop trees. Can be used as a slow weapon', range: 0, chopping: {speed: 0}},
-  axeIron: {name: 'Iron Axe', type: ITEM_TYPE.TOOL | ITEM_TYPE.WEAPON, stype: 'axe', star: 3, image: 'tool_32_32-3-1', placedright: 'w_42_42-0-0', placedleft: 'w_42_42-0-1', speed: 0, help: 'Axes', tooltip: 'Basic tools used to chop trees. Can be used as a slow weapon', range: 0, chopping: {speed: 25}},
-  axeSilver: {name: 'Silver Axe', type: ITEM_TYPE.TOOL | ITEM_TYPE.WEAPON, stype: 'axe', star: 4, image: 'tool_32_32-3-2', placedright: 'w_42_42-0-0', placedleft: 'w_42_42-0-1', speed: 0, help: 'Axes', tooltip: 'Basic tools used to chop trees. Can be used as a slow weapon', range: 0, chopping: {speed: 50}},
-  axeGold: {name: 'Gold Axe', type: ITEM_TYPE.TOOL | ITEM_TYPE.WEAPON, stype: 'axe', star: 4, image: 'tool_32_32-3-3', placedright: 'w_42_42-0-0', placedleft: 'w_42_42-0-1', speed: 0, help: 'Axes', tooltip: 'Basic tools used to chop trees. Can be used as a slow weapon', range: 1, chopping: {speed: 75}},
-  axeCobalt: {name: 'Cobalt Axe', type: ITEM_TYPE.TOOL | ITEM_TYPE.WEAPON, stype: 'axe', star: 5, image: 'tool_32_32-3-4', placedright: 'w_42_42-0-0', placedleft: 'w_42_42-0-1', speed: 0, help: 'Axes', tooltip: 'Basic tools used to chop trees. Can be used as a slow weapon', range: 2, chopping: {speed: 100}},
-  axePlatinum: {name: 'Platinum Axe', type: ITEM_TYPE.TOOL | ITEM_TYPE.WEAPON, stype: 'axe', star: 5, image: 'tool_32_32-3-5', placedright: 'w_42_42-0-0', placedleft: 'w_42_42-0-1', speed: 0, help: 'Axes', tooltip: 'Basic tools used to chop trees. Can be used as a slow weapon', range: 3, chopping: {speed: 125}},
+  axeCopper: {name: 'Copper Axe', type: ITEM_TYPE.TOOL | ITEM_TYPE.WEAPON, stype: 'axe', star: 1, image: 'tool_32_32-3-0', placedright: 'w_42_42-0-0', placedleft: 'w_42_42-0-1', speed: 0, help: 'Chopping Tools', tooltip: 'Basic tools used to chop trees. Can be used as a slow weapon', range: 0, chopping: {speed: 0}},
+  axeIron: {name: 'Iron Axe', type: ITEM_TYPE.TOOL | ITEM_TYPE.WEAPON, stype: 'axe', star: 2, image: 'tool_32_32-3-1', placedright: 'w_42_42-0-0', placedleft: 'w_42_42-0-1', speed: 0, help: 'Chopping Tools', tooltip: 'Basic tools used to chop trees. Can be used as a slow weapon', range: 0, chopping: {speed: 25}},
+  axeSilver: {name: 'Silver Axe', type: ITEM_TYPE.TOOL | ITEM_TYPE.WEAPON, stype: 'axe', star: 3, image: 'tool_32_32-3-2', placedright: 'w_42_42-0-0', placedleft: 'w_42_42-0-1', speed: 0, help: 'Chopping Tools', tooltip: 'Basic tools used to chop trees. Can be used as a slow weapon', range: 0, chopping: {speed: 50}},
+  axeGold: {name: 'Gold Axe', type: ITEM_TYPE.TOOL | ITEM_TYPE.WEAPON, stype: 'axe', star: 3, image: 'tool_32_32-3-3', placedright: 'w_42_42-0-0', placedleft: 'w_42_42-0-1', speed: 0, help: 'Chopping Tools', tooltip: 'Basic tools used to chop trees. Can be used as a slow weapon', range: 1, chopping: {speed: 75}},
+  axeCobalt: {name: 'Cobalt Axe', type: ITEM_TYPE.TOOL | ITEM_TYPE.WEAPON, stype: 'axe', star: 4, image: 'tool_32_32-3-4', placedright: 'w_42_42-0-0', placedleft: 'w_42_42-0-1', speed: 0, help: 'Chopping Tools', tooltip: 'Basic tools used to chop trees. Can be used as a slow weapon', range: 2, chopping: {speed: 100}},
+  axePlatinum: {name: 'Platinum Axe', type: ITEM_TYPE.TOOL | ITEM_TYPE.WEAPON, stype: 'axe', star: 5, image: 'tool_32_32-3-5', placedright: 'w_42_42-0-0', placedleft: 'w_42_42-0-1', speed: 0, help: 'Chopping Tools', tooltip: 'Basic tools used to chop trees. Can be used as a slow weapon', range: 3, chopping: {speed: 125}},
 
   // Swords
   swordCopper: {name: 'Copper Sword', type: ITEM_TYPE.WEAPON, stype: 'axe', star: 2, image: 'tools_32_32-4-0', placedright: 'w_42_42-0-0', placedleft: 'w_42_42-0-1', speed: 0, help: 'Swords', tooltip: 'Melee weapon'},
@@ -568,7 +568,7 @@ export const ITEMS = {
   rootMahogany: {name: 'Mahogany Root', type: 0, stype: 'root', star: 2, image: 'potions_32_32-1-5', help: 'Oak & Mahogany', tooltip: '???'},
   samara: {name: 'Samara', type: ITEM_TYPE.SEED | ITEM_TYPE.PLACABLE, stype: 'seed', star: 2, image: 'foraged_32_32-1-1', help: 'Oak & Mahogany', tooltip: '???'},
 
-  giantMushroom: {name: 'Giant Mushroom', type: 0, stype: 'tree', star: 1, image: null, help: 'Oak & Mahogany', tooltip: '???'},
+  giantMushroom: {name: 'Giant Mushroom', type: 0, stype: 'tree', star: 4, image: null, help: 'Oak & Mahogany', tooltip: '???'},
 
   // Mushrooms - images OK
   bolete: {name: 'Bolete', type: 0, stype: 'mushroom', star: 1, image: 'foraged_32_32-3-0', placed: 'placed_16_32-0-0', help: 'Surface Mushrooms', tooltip: '???', foraging: {speed: 2400, items: [{item: 'bolete', count: '1-3'}, {item: 'worm', count: 0.3, buffs: ['lucky:100', 'rainy:100']}]}},
@@ -712,11 +712,11 @@ export const RECIPES = [
   {result: {item: 'pickaxeGeologist', count: 1}, station: 'forge', ingredients: [{item: 'barPlatinum', count: 1}, {item: 'barPlatinum', count: 16}, {item: 'shellPowder', count: 1}, {item: 'nailIron', count: 5}]},
 
   // Axes
-  {result: {item: 'axeCopper', count: 1}, station: 'anvil', ingredients: [{item: 'barCopper', count: 10}, {item: 'logOak', count: 5}, {item: 'cutTopaz', count: 1}]},
-  {result: {item: 'axeIron', count: 1}, station: 'anvil', ingredients: [{item: 'axeCopper', count: 1}, {item: 'barIron', count: 12}, {item: 'logOak', count: 4}, {item: 'cutRuby', count: 1}]},
-  {result: {item: 'axeSilver', count: 1}, station: 'anvil', ingredients: [{item: 'axeIron', count: 1}, {item: 'barSilver', count: 12}, {item: 'logOak', count: 5}, {item: 'cutEmerald', count: 1}]},
-  {result: {item: 'axeGold', count: 1}, station: 'anvil', ingredients: [{item: 'axeSilver', count: 1}, {item: 'barGold', count: 14}, {item: 'logMahogany', count: 5}, {item: 'cutEmerald', count: 2}]},
-  {result: {item: 'axeCobalt', count: 1}, station: 'forge', ingredients: [{item: 'axeGold', count: 1}, {item: 'barCobalt', count: 17}, {item: 'logOak', count: 5}, {item: 'cutSapphire', count: 3}]},
+  {result: {item: 'axeCopper', count: 1}, station: 'anvil', ingredients: [{item: 'barCopper', count: 10}, {item: 'logOak', count: 5}]},
+  {result: {item: 'axeIron', count: 1}, station: 'anvil', ingredients: [{item: 'axeCopper', count: 1}, {item: 'barIron', count: 12}, {item: 'logOak', count: 4}, {item: 'cutTopaz', count: 1}]},
+  {result: {item: 'axeSilver', count: 1}, station: 'anvil', ingredients: [{item: 'axeIron', count: 1}, {item: 'barSilver', count: 12}, {item: 'logOak', count: 5}, {item: 'cutRuby', count: 1}]},
+  {result: {item: 'axeGold', count: 1}, station: 'anvil', ingredients: [{item: 'axeSilver', count: 1}, {item: 'barGold', count: 14}, {item: 'logMahogany', count: 5}, {item: 'cutRuby', count: 2}]},
+  {result: {item: 'axeCobalt', count: 1}, station: 'forge', ingredients: [{item: 'axeGold', count: 1}, {item: 'barCobalt', count: 17}, {item: 'logOak', count: 5}, {item: 'cutEmerald', count: 3}]},
   {result: {item: 'axePlatinum', count: 1}, station: 'forge', ingredients: [{item: 'axeCobalt', count: 1}, {item: 'barPlatinum', count: 16}, {item: 'logMahogany', count: 7}, {item: 'cutSapphire', count: 4}]},
 
   // Teleporters

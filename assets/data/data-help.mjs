@@ -118,7 +118,7 @@ Mining Loot: {{node:{3}:mining[:items[0]:item|link}}
   metalChunksRow: '| [[node:{1}]] | [[item:{2}]] | {{item:{2}:star|star}} | [[item:{3}]] | {{item:{3}:star|star}} |',
   metalBarsRow: '| [[item:{1}]] | {{item:{1}:star|star}} | {{recipe:{2}|station}} | [[item:{2}]] | {{item:{2}:star|star}} |',
   gemRawRow: '| [[node:{1}]] | [[item:{2}]] | {{item:{2}:star|star}} | [[item:{3}]] | {{item:{3}:star|star}} |',
-  gemCutRow: '| [[item:{1}]] | {{item:{1}:star|star}} | [[Smelting|Furnace]] | [[item:{2}]] | {{item:{2}:star|star}} |',
+  gemCutRow: '| [[item:{1}]] | {{item:{1}:star|star}} | [[item:stoneBench]] | [[item:{2}]] | {{item:{2}:star|star}} |',
   lootTableHeader: '| Item | Tier | Amount | Conditions | Modifiers |\n|---|---|---|---|---|',
   additiveNote: '_All modifiers are additive and stack with each other._',
 
@@ -2185,32 +2185,28 @@ Raw gems are placed in your [[Inventory]] when mined with a [[Mining Tools|Picka
 
 | Deposit | Raw Gem | Raw Gem Tier | Pickaxe | Pickaxe Tier |
 |---|---|---|---|---|
-{{gemRawRow|topaz|rawTopaz|pickaxeCopper}}
-{{gemRawRow|ruby|rawRuby|pickaxeCopper}}
-{{gemRawRow|emerald|rawEmerald|pickaxeIron}}
-{{gemRawRow|sapphire|rawSapphire|pickaxeSilver}}
-
-**Raw Gems Recipes** ⏳
-
-* {{recipe:shellPowder}}
+<<gemRawRow|topaz|rawTopaz|pickaxeCopper>>
+<<gemRawRow|ruby|rawRuby|pickaxeIron>>
+<<gemRawRow|emerald|rawEmerald|pickaxeSilver>>
+<<gemRawRow|sapphire|rawSapphire|pickaxeCobalt>>
 
 **Cut Gems**
 
 | Raw Gem | Raw Gem Tier | Crafting Station | Cut Gem | Cut Gem Tier |
 |---|---|---|---|---|
-{{gemCutRow|rawTopaz|Topaz}}
-{{gemCutRow|rawRuby|Ruby}}
-{{gemCutRow|rawEmerald|Emerald}}
-{{gemCutRow|rawSapphire|Sapphire}}
+<<gemCutRow|rawTopaz|cutTopaz>>
+<<gemCutRow|rawRuby|cutRuby>>
+<<gemCutRow|rawEmerald|cutEmerald>>
+<<gemCutRow|rawSapphire|cutSapphire>>
 
 **Usages**
 
 | Gem | Equipment tier | Other uses |
 |---|---|---|
-| [[item:rawTopaz]] | {{item:rawTopaz:star|star}} — accessories, weapons | ⏳ |
-| [[item:rawRuby]] | {{item:rawRuby:star|star}} — accessories, weapons | ⏳ |
-| [[item:rawEmerald]] | {{item:rawEmerald:star|star}} — accessories, weapons | ⏳ |
-| [[item:rawSapphire]] | {{item:rawSapphire:star|star}} — accessories, weapons | ⏳ |
+| [[item:cutTopaz]] | {{item:cutTopaz:star|star}} — accessories, weapons | ⏳ |
+| [[item:cutRuby]] | {{item:cutRuby:star|star}} — accessories, weapons | ⏳ |
+| [[item:cutEmerald]] | {{item:cutEmerald:star|star}} — accessories, weapons | ⏳ |
+| [[item:cutSapphire]] | {{item:cutSapphire:star|star}} — accessories, weapons | ⏳ |
 
 **Tips**
 
@@ -3330,15 +3326,6 @@ To be written
     `
   },
 
-  // ── Activities Chopping  ─────────────────────────────────────
-  //    Axes
-  {
-    title: 'Axes',
-    category: ['Tool'],
-    content: `
-    `
-  },
-
   // ── Activities Fighting ──────────────────────────────────────
   //    Fighting, Damage Types, Gear Prefixes, Weapons, Swords, Bows, Flamethrower
   {
@@ -3957,8 +3944,86 @@ _Range bonus applies equally in all directions._
     title: 'Chopping Tools',
     category: ['Tool', 'Chopping'],
     content: `
-    Sickles
-    `
+**Description**
+
+Chopping tools are used to harvest [[Flora|Trees]]. Their effectiveness depends on two main attributes: **Chopping Speed** (how fast a tree is chopped) and [[Ranges|Chopping Range]] (how far from the player trees can be targeted). Higher-tier axes unlock faster speeds, extended range.
+
+_A tree can only be chopped if the axe tier is greater than or equal to the tree tier._
+
+**Axe Types**
+
+| Axe | Tier | Speed Bonus | Range Bonus |
+|---|---|---|---|
+<<toolTypeRow|axeCopper|chopping>>
+<<toolTypeRow|axeIron|chopping>>
+<<toolTypeRow|axeSilver|chopping>>
+<<toolTypeRow|axeGold|chopping>>
+<<toolTypeRow|axeCobalt|chopping>>
+<<toolTypeRow|axePlatinum|chopping>>
+
+**Choppable Trees**
+
+| Tree | Tier | Location |
+|---|---|---|
+| [[item:oak]] | {{item:oak:star|star}} | [[Surface]] [[Forest]] |
+| [[item:mahogany]] | {{item:mahogany:star|star}} | [[Surface]] [[Jungle]] |
+| [[item:thornspine]] | {{item:thornspine:star|star}} | [[Surface]] [[Desert]] and [[Sea]] Shore |
+| [[item:giantMushroom]] | {{item:giantMushroom:star|star}} | [[Underground]] Caves |
+
+<hr>
+
+**Chopping Range**
+
+* Base [[Ranges|Chopping Range]] covers 3 tiles in front of the player, 2 tiles back, 4 tiles above and 2 tiles below.
+* Higher-tier [[Chopping Tools|Axes]] extend this range by one, two or three tiles in all directions.
+* The axe [[Gear Prefixes|prefix]] 'Extended' extend this range by two tiles in all directions.
+* Equipping a item:stepStool: +4 tiles above
+* Equipping an item:abyssAnchor: +4 tiles below
+* Using a item:loggerPotion (6h): +1 tile in each direction⏳
+
+<<additiveNote>>
+
+**Chopping Speed**
+
+Higher-tier axes provide a chopping speed bonus (see table above). Additional bonuses:
+
+* item:loggerPotion (6h): +25%⏳
+* item:chisel or item:toolbox (accessory): +25%⏳
+* Food Buff: +5% (Well Fed), +10% (Plenty Satisfied), +15% (Exquisitely Stuffed)⏳
+* Full item:miningArmor set: +80%⏳
+
+**Axes Crafting**
+
+| Axe | Tier | Station | Materials |
+|---|---|---|---|
+<<fullRecipeRow|axeCopper>>
+<<fullRecipeRow|axeIron>>
+<<fullRecipeRow|axeSilver>>
+<<fullRecipeRow|axeGold>>
+<<fullRecipeRow|axeCobalt>>
+<<fullRecipeRow|axePlatinum>>
+
+**World Creation**
+
+* One [[item:axeCopper]] is given to the player at [[World Creation]].
+* This starting axe does not grant any [[Achievements|Achievement]] points.
+
+**How to use**
+
+* Open the [[Inventory]] Panel [I]
+* Place an axe in the [[Hotbar]]
+* Select it from the Hotbar
+* Click on the tree to chop it
+
+**Tips**
+
+* _Use a [[item:draftingCompass]] or a [[item:theodolite]] to visualise the tile grid._
+* _Use a [[item:setSquare]] or a [[item:theodolite]] to visualise the current [[Ranges|Chopping Range]]._
+
+**See also**
+
+* [[Ranges]] — complete overview of all ranges and range buffs
+* [[Chopping]] — collecting resources with an [[Chopping Tools|Axe]]    `
   },
   {
     title: 'Chopping Buffs',
@@ -4850,7 +4915,58 @@ Search for any of the three products in the [[Crafting|Craft Panel]] to find the
     content: `
 **Description**
 
-Tree like
+A tall desert cactus, unmistakable with its segmented, spiny trunk rising straight out of the sand. Unlike most desert plants, a Thornspine occasionally bursts into bloom — and those blooms are the only part worth harvesting without cutting the whole plant down.
+
+**Tier**
+
+{{item:thornspine:star|star}}
+
+**Location**
+
+* Biome: [[Desert]]
+* Layer: [[Surface]]
+* Grows on [[node:sand]]
+
+**Population**
+
+* A chopped Thornspine eventually grows back on its own, somewhere on suitable Desert sand — not necessarily the same spot.
+
+<hr>
+
+**Chopping**
+
+* Select an [[Chopping Tools|Axe]] and click the trunk to chop it down.
+* A single chop fells the entire plant.
+* The Thornspine disappears until it regrows elsewhere in the Desert.
+
+Chopping Tool: <<itemStar|axeIron>> or better
+
+**Thornspine Chopping Loot**
+
+<<itemLootTable|thornspine|chopping>>
+
+<hr>
+
+**Foraging Flowers**
+
+* Thornspines bloom and wither on their own over time — only some are ever in flower at once.
+* While in bloom, select a [[Foraging Tools|Sickle]] and click the trunk to harvest it.
+* Harvesting the flower doesn't destroy the plant — only the bloom disappears, until it flowers again later.
+
+Foraging Tool: <<itemStar|sickleSilver>> or better
+
+**Thornspine Foraging Loot** ⏳
+
+<<itemLootTable|thornspine|foraging>>
+
+**Dangers** ⏳
+
+_Coming soon_
+
+**Tips**
+
+* _A Thornspine without flowers isn't worth waiting around for — chop it for wood-like material instead, or come back later once it blooms._
+* _Chopped Thornspines don't respawn instantly — if you need flowers now, look for a different one already in bloom._
 
 **Sea Also**
 
