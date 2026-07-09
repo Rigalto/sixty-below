@@ -1024,7 +1024,7 @@ class HammingManager {
 
     const wasEmpty = this.#queue.length === 0
     this.#queue.push({type: 'furniture', furniture, tool, prefix, speed})
-    eventBus.emit('sound/play', 'chopping')
+    eventBus.emit('sound/play', 'placing')
 
     if (wasEmpty) {
       const {priority, capacity} = MICROTASK.HAMMER_USE
