@@ -424,6 +424,13 @@ class InventoryManager {
     trinkets: [] // variable — reset via length = 0
   }
 
+  constructor () {
+    this.onFurniturePlaced = this.onFurniturePlaced.bind(this)
+    eventBus.on('furniture/placed', this.onFurniturePlaced)
+    this.onFurnitureUnplaced = this.onFurnitureUnplaced.bind(this)
+    eventBus.on('furniture/unplaced', this.onFurnitureUnplaced)
+  }
+
   /**
    * Réinitialise toutes les structures mémoire.
    * À appeler au startSession avant les appels à initSlot.
@@ -521,6 +528,21 @@ class InventoryManager {
    * @returns {object}
    */
   getContainerSlot (furnitureId, index) { return this.#containers.get(furnitureId)[index] }
+
+  /**
+   * Indique si tous les slots d'un container sont vides. Un container sans slots chargés
+   * (jamais rempli) est considéré vide.
+   * @param {string} furnitureId
+   * @returns {boolean}
+   */
+  isContainerEmpty (furnitureId) {
+    const slots = this.#containers.get(furnitureId)
+    if (slots === undefined) return true
+    for (const slot of slots) {
+      if (slot.item !== '') return false
+    }
+    return true
+  }
 
   /**
    * Scanne l'inventaire et retourne la liste des itemIds donnant des buffs passifs.
@@ -1375,6 +1397,47 @@ class InventoryManager {
     }
 
     return remaining
+  }
+
+  /**
+  * Liaison EventBus : 'furniture/placed' — crée les slots vides d'un nouveau container et
+  * les persiste. Sans effet si le meuble posé n'est pas un type de container.
+  * @param {string} furnitureId
+  */
+  onFurniturePlaced (furnitureId) {
+    const furniture = furnitureManager.getFurnitureById(furnitureId)
+    const stype = furniture.stype
+    if (!CONTAINER_STYPES.has(stype)) return
+
+    const capacity = CONTAINER_CAPACITY[stype]
+    const slots = []
+    const updates = []
+    for (let i = 0; i < capacity; i++) {
+      const slot = {container: stype, furnitureId, item: '', count: 0, prefix: '', slot: i, locked: false, deleted: false}
+      slots.push(slot)
+      updates.push({storeName: 'inventory', record: slot})
+    }
+    this.#containers.set(furnitureId, slots)
+    saveManager.queueStaticUpdate(updates)
+  }
+
+  /**
+   * Liaison EventBus : 'furniture/unplaced' — supprime les slots d'un container retiré du
+   * monde (marqués deleted=true en DB, retirés de #containers). Sans effet si le meuble
+   * retiré n'était pas un container.
+   * @param {string} furnitureId
+   */
+  onFurnitureUnplaced (furnitureId) {
+    const slots = this.#containers.get(furnitureId)
+    if (slots === undefined) return
+
+    const updates = []
+    for (const slot of slots) {
+      slot.deleted = true
+      updates.push({storeName: 'inventory', record: slot})
+    }
+    saveManager.queueStaticUpdate(updates)
+    this.#containers.delete(furnitureId)
   }
 }
 export const inventoryManager = new InventoryManager()
@@ -2567,6 +2630,11 @@ class InventoryOverlay {
     if (containers.length === 0) {
       this.#selectedFurnitureId = null
       this.#btnRename.disabled = true
+      this.#chestIcon.style.backgroundImage = ''
+      this.#chestIcon.title = ''
+      for (const slot of this.#containerSlots) {
+        slot.classList.add('inactive')
+      }
       return
     }
 

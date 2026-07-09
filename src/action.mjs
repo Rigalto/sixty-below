@@ -1015,6 +1015,11 @@ class HammingManager {
     if (!isInInteractionRange(tileIndex)) { eventBus.emit('sound/play', 'toofar'); return }
     if (tool.star < furnitureItem.star) { eventBus.emit('sound/play', 'wrong'); return }
 
+    if (furniture.stype === 'chest' && !inventoryManager.isContainerEmpty(furniture.id)) {
+      eventBus.emit('sound/play', 'wrong')
+      return
+    }
+
     const speed = computeActionSpeed(furnitureItem.unplacing.speed, tool.shaking.speed, 'chopping-speed', prefix)
 
     const wasEmpty = this.#queue.length === 0

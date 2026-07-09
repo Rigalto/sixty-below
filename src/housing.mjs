@@ -389,6 +389,11 @@ class FurnitureManager {
       case 'campfire':
         record.lit = false
         break
+      case 'chest' :
+      case 'closet' :
+      case 'cabinet' :
+        record.name = `C-${record.id}`
+        break
     }
 
     this.#list.push(record)

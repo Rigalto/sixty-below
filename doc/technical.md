@@ -349,6 +349,8 @@ Cette section définit les événements officiels. Tout nouvel événement doit 
 | S | `help/topic` | `string` (topic) | Navigation vers une fiche d'aide. |
 | S | `debug/command` | — | Prompt de debug. |
 | S | `overlay/open-request` | `string` (overlayId) | Demande d'ouverture d'un overlay. |
+| E | `furniture/placed` | `string` (furnitureId) | Crée les slots vides si le meuble posé est un container. |
+| E | `furniture/unplaced` | `string` (furnitureId) | Supprime les slots du meuble s'il est un container. |
 
 #### Hotbar (`HotbarOverlay`)
 
@@ -1488,6 +1490,8 @@ Autorité unique sur l'état mémoire de l'inventaire. Aucune logique DOM.
 | `getContainerSlot` | `(furnitureId: string, index: number) → object` | Retourne la référence mémoire d'un slot container-furniture. |
 | `getContainer` | `(furnitureId: string) → Array\|undefined` | Retourne le tableau de slots d'un container chargé. |
 | `getStaticBuffs` | `() → Array<string>` | Retourne les itemIds donnant des buffs passifs : armor + accessoires équipés + trinkets du bag. |
+| `isContainerEmpty` | `(furnitureId: string) → boolean` | Indique si tous les slots d'un container sont vides |
+
 
 #### Modifications
 
