@@ -7,13 +7,12 @@
 
 ## En cours
 
-- Refonte images de Mahogany 15 / 36
+- Refonte images de Mahogany 6 / 36
 - Tester Cas 1 (`onTileChangedParsnip`) : destruction du parsnip présent quand la tuile du corps n'est plus SKY (spot conservé) — écoulement d'un SAND.
 - Tester Cas 1 (`onTileChangedParsnip`) : destruction du parsnip présent quand la tuile du corps n'est plus SKY (spot conservé) — écoulement d'un liquide.
 - Tester Cas 3 (`onTileChangedParsnip`) : apparition d'un nouveau spot quand une tuile devient GRASSFOREST (propagation naturelle).
 - Tester `onTreePlantedParsnip` : apparition d'un oak.
 - Tester `onTreePlantedSunflower` : apparition d'un oak.
-- implémenter les graines de Sunflower qui augmentent la probabilité de pop de sunflower.
 - implémenter une accélération progressive sur l'axe des X, pour pouvoir se positionner plus facilement. Arrêt instantané.
 - Modifier le volume sonore des sons du jeu (ActionWidget)
 - Supprimer les actions de debug accessibles au joueur, quand hébergement sous GitHub :
@@ -55,17 +54,15 @@
 
 ## À faire — Bugs connus
 - Lorsqu'une tuile est modifiée sans déplacement de la souris, les informations la concernant dans le Control Panel ne sont pas mises à jour
-- Il n'y a pas assez de Cactus dans le monde => sans doute pas assez de SAND sur le sol souterrain.
+- Il n'y a pas assez de Pricklepad dans le monde => sans doute pas assez de SAND sur le sol souterrain.
 - Il n'y a pas assez de Bamboo dans le monde => sans doute pas assez de SILT sur le sol souterrain.
 - Il n'y a pas assez de Oleanders dans le monde => sans doute pas assez de STONE sur le sol souterrain.
 - Il est aussi possible que le sol soit trop accidenté pour disposer de spots élligibles en nombre suffisant, il faudrait ajouter alors une érosion partielle, en bouchant les trous et supprimant les bosses dans 80-90% des cas.
-- Génération du monde : densité un peu trop faible des tunnels en Surface
 - Génération du monde : densité trop élevée des tunnels en Underground et Caverns (revoir les constantes `SMALL_TUNNELS_COUNT` et `CAVERNS_TUNNEL_COUNT`)
 
 ## À faire — Amélioration
 
 - Remplacer toutes les icônes Unicode 'météo' et ''phases de la lune' par des icônes SVG ou image png
-- Remplacer le `new Uint8Array(256)` de `getChunkData` par un buffer statique réutilisable pré-alloué — quand la fonction sera à nouveau nécessaire (sauvegarde, génération). Si elle n'est pas utilisée : la supprimer (code mort).
 
 ---
 
@@ -139,7 +136,6 @@ fs.writeFileSync('docs/help-rendered.html', htmlHelp.join('\n'))
 - Recettes et crafting stations
 - Décomposeur (rendement 80%) et Transmutateur (résolution pénurie de ressources)
 
-
 ### Meteorite (événement runtime)
 - Événement rare : impact depuis l'espace, détruit arbres/plantes/shelter/furniture
 - Tuiles METEORITE minables, tier 5
@@ -195,11 +191,9 @@ La Sap corrode le Copper. Il doit donc être remplacer par du Gold.
 
 ## À faire — Écosystème (`ecosystem.mjs`)
 
-- Régénération WEB (timer global, tous espaces vides souterrains)
 - Régénération HONEY dans les ruches
 - Régénération SAP dans les Sap Pockets (lente)
 - Régénération Shell en bord/fond de mer
-- Croissance flore hors-vue (décorrélée des chunks)
 - Événement Meteorite (impact, dégâts, oxydation)
 
 ---
@@ -213,7 +207,7 @@ La Sap corrode le Copper. Il doit donc être remplacer par du Gold.
 ## Connu mais différé
 
 - Nettoyage `ROADMAP.md` : supprimer les entrées au fur et à mesure
-- Sprites manquants : GRASSFERN, GRASSMUSHROOM
+
 ---
 
 ## Terminé
@@ -343,14 +337,17 @@ La Sap corrode le Copper. Il doit donc être remplacer par du Gold.
 - Gestion de l'inventaire (`InventoryManager`)
 - Gestion des buffs (`BuffManager`)
 - Affichage des buffs (`BuffWidget`)
-- Gestion des meubles placés dans le monde (`FurnitureManager`)
-- Gestion des sons (`SoundManager`) - mining, placing, foraging, teleport
+- Gestion des meubles placés dans le monde (`FurnitureManager`, `FurnishingManager`, `HammingManager`)
+- Gestion des sons (`SoundManager`) - mining, placing, chopping, foraging, teleport (too far, wrong)
 
 ### Actions
 - Minage (`MiningManager`)
 - Plaçage des blocs (`PlacingManager`)
+- Plaçage des meubles (`FurnishingManager`)
+- Récupération des meubles placés (`HammingManager`)
 - Récolte des plantes et blocs de natural (`ForagingManager`)
 - Abattage des arbres (`ChoppingManager`)
+- Secouage des arbres (`HammingManager`)
 - Plantage de graines (`SowingManager`)
 
 ### Environement
@@ -369,3 +366,4 @@ La Sap corrode le Copper. Il doit donc être remplacer par du Gold.
 - `SkyRenderer` — cycle jour/nuit
 - `Camera` — projection monde/canvas, culling, zoom
 - `FurnitureManager` — affichage des meubles
+- `FloraManager` — affichage de la flore
