@@ -7,7 +7,6 @@
 
 ## En cours
 
-- Refonte images de Mahogany 6 / 36
 - Tester Cas 1 (`onTileChangedParsnip`) : destruction du parsnip présent quand la tuile du corps n'est plus SKY (spot conservé) — écoulement d'un SAND.
 - Tester Cas 1 (`onTileChangedParsnip`) : destruction du parsnip présent quand la tuile du corps n'est plus SKY (spot conservé) — écoulement d'un liquide.
 - Tester Cas 3 (`onTileChangedParsnip`) : apparition d'un nouveau spot quand une tuile devient GRASSFOREST (propagation naturelle).
