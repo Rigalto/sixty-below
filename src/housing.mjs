@@ -65,6 +65,7 @@ class FurnitureManager {
   #occupiedTiles = new Set() // Set<tileIndex> — tuiles couvertes par un furniture
   #floorTiles = new Set() // Set<tileIndex> — tuiles directement sous un furniture
   #surfaceTops = new Set() // Set<tileIndex> — tuiles hautes des furnitures surface:true
+  #platformTiles = new Set() // Set<tileIndex> — tuile occupée par une platform (stype:'platform', toujours 1x1)
 
   constructor () {
     this.onPreloadChunksChanged = this.onPreloadChunksChanged.bind(this)
@@ -139,6 +140,8 @@ class FurnitureManager {
         this.#surfaceTops.add(topBase | x)
       }
     }
+
+    if (furniture.stype === 'platform') this.#platformTiles.add(furniture.index)
   }
 
   /**
@@ -175,6 +178,7 @@ class FurnitureManager {
         this.#surfaceTops.delete(topBase | x)
       }
     }
+    if (furniture.stype === 'platform') this.#platformTiles.delete(furniture.index)
   }
 
   // ─── Initialisation ──────────────────────────────────────────────────────────
@@ -192,6 +196,7 @@ class FurnitureManager {
     this.#occupiedTiles.clear()
     this.#floorTiles.clear()
     this.#surfaceTops.clear()
+    this.#platformTiles.clear()
 
     for (const record of dbRecords) {
       this.#list.push(record)
@@ -231,6 +236,13 @@ class FurnitureManager {
    * @returns {boolean}
    */
   isSurfaceTop (index) { return this.#surfaceTops.has(index) }
+
+  /**
+   * Tuile occupée par une platform.
+   * @param {number} index
+   * @returns {boolean}
+   */
+  isPlatformTile (index) { return this.#platformTiles.has(index) }
 
   /**
    * Retourne les furnitures de #displayed dans le rectangle centré joueur défini par buffId.

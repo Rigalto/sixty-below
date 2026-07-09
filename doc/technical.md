@@ -1643,6 +1643,7 @@ Champs optionnels selon `stype` :
 | `isTileOccupied` | `(index: number) → boolean` | `#occupiedTiles: Set<number>` — rectangle wxh complet |
 | `isFloorTile` | `(index: number) → boolean` | `#floorTiles: Set<number>` — ligne tileY+h |
 | `isSurfaceTop` | `(index: number) → boolean` | `#surfaceTops: Set<number>` — ligne tileY si `ITEMS[code].surface` |
+| `isPlatformTile` | `(index: number) → boolean` | `#platformTiles: Set<number>` — tuile tileY occupée par une platform |
 
 #### Actions
 
