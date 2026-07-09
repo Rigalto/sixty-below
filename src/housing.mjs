@@ -124,11 +124,13 @@ class FurnitureManager {
       }
     }
 
-    const floorBase = (tileY + h) << 10
-    for (let x = tileX; x < tileX + w; x++) {
-      const tileIndex = floorBase | x
-      this.#floorTiles.add(tileIndex)
-      blockedTiles.blockMining(tileIndex)
+    if (!ITEMS[furniture.code].floating) {
+      const floorBase = (tileY + h) << 10
+      for (let x = tileX; x < tileX + w; x++) {
+        const tileIndex = floorBase | x
+        this.#floorTiles.add(tileIndex)
+        blockedTiles.blockMining(tileIndex)
+      }
     }
 
     if (ITEMS[furniture.code].surface) {

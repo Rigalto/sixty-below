@@ -368,11 +368,13 @@ class FurnishingManager {
       if ((NODES_LOOKUP[code].type & FOOTPRINT_MASK) === 0) return
     }
 
-    const FLOOR_MASK = NODE_TYPE.SOLID | NODE_TYPE.ETERNAL
-    const floorBase = ((topY + h) << 10) | px
-    for (let dx = 0; dx < w; dx++) {
-      const node = NODES_LOOKUP[chunkManager.getTileAt(floorBase + dx)]
-      if ((node.type & FLOOR_MASK) === 0) return
+    if (!item.floating) {
+      const FLOOR_MASK = NODE_TYPE.SOLID | NODE_TYPE.ETERNAL
+      const floorBase = ((topY + h) << 10) | px
+      for (let dx = 0; dx < w; dx++) {
+        const node = NODES_LOOKUP[chunkManager.getTileAt(floorBase + dx)]
+        if ((node.type & FLOOR_MASK) === 0) return
+      }
     }
 
     if (!isInInteractionRange(tileIndex)) { eventBus.emit('sound/play', 'toofar'); return }
