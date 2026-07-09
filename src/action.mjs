@@ -928,7 +928,7 @@ class HammingManager {
 
     const furniture = furnitureManager.getFurnitureAt(tileIndex)
     if (furniture !== null) {
-      // TODO : unplacing de meuble
+      this.tryUnplacing(tileIndex, furniture, tool, prefix)
       return
     }
 
@@ -960,9 +960,14 @@ class HammingManager {
       // Délègue la mutation de state au TreeSystem
       eventBus.emit(`shaked/${plantItem.code}`, tree.soilIndex)
     } else if (entry.type === 'furniture') {
-      // TODO - unplacing de furniture
+      const {furniture} = entry
+      if (furnitureManager.getFurnitureById(furniture.id) !== undefined) {
+        furnitureManager.unplace(furniture.id)
+        inventoryManager.loot(furniture.code, 1, '')
+        eventBus.emit('furniture/unplaced', furniture.id)
+      }
     } else if (entry.type === 'wall') {
-      // TODO - unplacing de furniture
+      // TODO - unplacing de mur
     }
 
     this.#scheduleNext()
@@ -987,6 +992,33 @@ class HammingManager {
 
     const wasEmpty = this.#queue.length === 0
     this.#queue.push({type: 'tree', tree, tool, prefix, speed})
+    eventBus.emit('sound/play', 'chopping')
+
+    if (wasEmpty) {
+      const {priority, capacity} = MICROTASK.HAMMER_USE
+      taskScheduler.enqueue('hamming-current', speed, this.onHamming, priority, capacity)
+    }
+  }
+
+  /**
+   * Vérifie que l'on peut retirer le meuble et place l'action dans la queue.
+   * Silence si le meuble est IMMOVABLE (decomposer, transmutator...).
+   * @param {number} tileIndex — (y << 10) | x
+   * @param {object} furniture — le meuble à retirer
+   * @param {object} tool      — ITEMS[slot.item], marteau équipé
+   * @param {string} prefix    — slot.prefix
+   */
+  tryUnplacing (tileIndex, furniture, tool, prefix) {
+    const furnitureItem = ITEMS[furniture.code]
+    if (furnitureItem.type & ITEM_TYPE.IMMOVABLE) return
+
+    if (!isInInteractionRange(tileIndex)) { eventBus.emit('sound/play', 'toofar'); return }
+    if (tool.star < furnitureItem.star) { eventBus.emit('sound/play', 'wrong'); return }
+
+    const speed = computeActionSpeed(furnitureItem.unplacing.speed, tool.shaking.speed, 'chopping-speed', prefix)
+
+    const wasEmpty = this.#queue.length === 0
+    this.#queue.push({type: 'furniture', furniture, tool, prefix, speed})
     eventBus.emit('sound/play', 'chopping')
 
     if (wasEmpty) {

@@ -430,6 +430,14 @@ Cette section définit les événements officiels. Tout nouvel événement doit 
 | S | `world/tile-changed` | `{ tileIndex: number, tileOldCode: number, tileNewCode: number }`| Le code de la tuile a été modifié. |
 | S | `sound/play` | `name: string` | Joue le son `name`. |
 
+#### Secouage d'arbre / retrait meuble (`HammingManager`)
+
+| Dir. | Event Name | Payload Structure | Description |
+| :---: | :--- | :--- | :--- |
+| S | `sound/play` | `name: string` | Joue le son `name`. |
+| E | `shaked/<tree>` | `number` (soilIndex) | Le joueur a secoué un arbre. |
+| S | `furniture/unplaced` | `id: string` | Un meuble a été retiré du monde. |
+
 #### Placement de meubles dans le monde (`FurnishingManager`)
 
 | Dir. | Event Name | Payload Structure | Description |
