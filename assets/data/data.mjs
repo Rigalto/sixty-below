@@ -632,7 +632,7 @@ export const ITEMS = {
 
   // Gardening
   clayPot: {name: 'Clay Pot', type: ITEM_TYPE.FURNITURE | ITEM_TYPE.PLACABLE, stype: 'pot', surface: true, onTop: true, star: 1, capacity: 1, image: 'furniture_32_32-0-8', placed: 'placed_16_16-2-3', placedleft: 'placed_16_16-3-3', placedright: 'placed_16_16-4-3', unplacing: {speed: 800}, help: 'Clay Pots', tooltip: 'Gardening Container'},
-  clayPot2: {name: 'Clay Pots (x2)', type: ITEM_TYPE.FURNITURE | ITEM_TYPE.PLACABLE, stype: 'pot', surface: true, onTop: true, star: 1, capacity: 2, image: 'furniture_32_32-1-8', placed: 'fuws_32_16-0-0', placedleft: 'fuws_32_16-1-0', placedright: 'fuws_32_16-2-0', unplacing: {speed: 800}, help: 'Clay Pots', tooltip: 'Gardening Container'},
+  clayPot2: {name: 'Clay Pots (x2)', type: ITEM_TYPE.FURNITURE | ITEM_TYPE.PLACABLE, stype: 'pot', surface: true, onTop: true, star: 1, capacity: 2, image: 'furniture_32_32-1-8', placed: 'placed_32_16-0-0', placedleft: 'placed_32_16-1-0', placedright: 'fuws_32_16-2-0', unplacing: {speed: 800}, help: 'Clay Pots', tooltip: 'Gardening Container'},
   clayPot3: {name: 'Clay Pot (x3)', type: ITEM_TYPE.FURNITURE | ITEM_TYPE.PLACABLE, stype: 'pot', surface: true, onTop: true, star: 1, capacity: 3, image: 'furniture_32_32-2-8', placed: 'fuws_48_16-0-0', placedleft: 'fuws_48_16-1-0', placedright: 'fuws_48_16-2-0', unplacing: {speed: 800}, help: 'Clay Pots', tooltip: 'Gardening Container'},
   clayPot4: {name: 'Clay Pot (x4)', type: ITEM_TYPE.FURNITURE | ITEM_TYPE.PLACABLE, stype: 'pot', surface: true, onTop: true, star: 1, capacity: 4, image: 'furniture_32_32-3-8', placed: 'fuws_32_32-0-4', placedleft: 'fuws_32_32-1-4', placedright: 'fuws_32_32-2-4', unplacing: {speed: 800}, help: 'Clay Pots', tooltip: 'Gardening Container'},
 
