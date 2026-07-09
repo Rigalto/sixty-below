@@ -4654,7 +4654,7 @@ _For detailed information on each plant, click its name._
 
 **Gardening** ⏳
 
-Plants cultivated in [[item:clayPot1||Clay Pots]] stacked in [[Underground]] and [[Caverns]] zones. These plants are not found in the wild and require active care from the player.
+Plants cultivated in [[item:clayPot]]s stacked in [[Underground]] and [[Caverns]] zones. These plants are not found in the wild and require active care from the player.
 
 _Gardening plants and their details will be added in a future update._ ⏳
   `
