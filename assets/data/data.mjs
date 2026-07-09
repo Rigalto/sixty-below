@@ -500,7 +500,7 @@ export const ITEMS = {
   mug: {name: 'Mug', type: ITEM_TYPE.FURNITURE | ITEM_TYPE.PLACABLE, stype: 'tableware', star: 1, onTop: true, image: 'furniture_32_32-7-7', placed: 'fuws_32_32-1-3', help: 'Tableware', tooltip: 'The best Ale container'},
   plate: {name: 'Plate', type: ITEM_TYPE.FURNITURE | ITEM_TYPE.PLACABLE, stype: 'tableware', star: 1, onTop: true, image: 'furniture_32_32-8-7', placed: 'placed_16_16-0-3', help: 'Tableware', tooltip: 'Looks as good as it tastes'},
   trencher: {name: 'Wooden Trencher', type: ITEM_TYPE.FURNITURE | ITEM_TYPE.PLACABLE, stype: 'tableware', onTop: true, star: 1, image: 'furniture_32_32-9-7', placed: 'placed_16_16-1-3', help: 'Tableware', tooltip: 'A rustic wooden plate, perfect for simple meals'},
-gsg
+
   // Liquid containers (small capacity) - images OK
   glass: {name: 'Glass', type: 0, stype: 'tableware', star: 1, image: 'refined_32_32-4-2', help: 'Bottles', tooltip: 'Used to make Bottles or decorative furniture'},
   bottle: {name: 'Bottle', type: ITEM_TYPE.FURNITURE | ITEM_TYPE.PLACABLE | ITEM_TYPE.TOOL, stype: 'tableware', star: 1, furnitureSet: 'glass', image: 'tool_32_32-0-6', placed: 'tool_32_32-0-6', help: 'Bottles', tooltip: 'Crafting container for potions and food'},
