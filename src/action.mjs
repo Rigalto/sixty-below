@@ -380,9 +380,10 @@ class FurnishingManager {
     if (!isInInteractionRange(tileIndex)) { eventBus.emit('sound/play', 'toofar'); return }
     if (!blockedTiles.canPlaceRect(px, topY, w, h)) { eventBus.emit('sound/play', 'wrong'); return }
 
-    furnitureManager.place(item.code, tileIndex)
+    const furniture = furnitureManager.place(item.code, tileIndex)
     inventoryManager.decrementHotbarSlotCount(slotIndex)
     eventBus.emit('sound/play', 'placing')
+    eventBus.emit('furniture/placed', furniture.id)
   }
 }
 export const furnishingManager = new FurnishingManager()

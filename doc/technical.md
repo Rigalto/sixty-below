@@ -430,6 +430,13 @@ Cette section définit les événements officiels. Tout nouvel événement doit 
 | S | `world/tile-changed` | `{ tileIndex: number, tileOldCode: number, tileNewCode: number }`| Le code de la tuile a été modifié. |
 | S | `sound/play` | `name: string` | Joue le son `name`. |
 
+#### Placement de meubles dans le monde (`FurnishingManager`)
+
+| Dir. | Event Name | Payload Structure | Description |
+| :---: | :--- | :--- | :--- |
+| S | `sound/play` | `name: string` | Joue le son `name`. |
+| S | `furniture/placed` | `id: string` | Un meuble a été placé dans le monde. |
+
 #### Plantage de graines dans le monde (`SowingManager`)
 
 | Dir. | Event Name | Payload Structure | Description |
