@@ -206,8 +206,7 @@ class PlayerManager {
   update (dt, directions) {
     this.#horizontalMovement(directions, dt)
     this.#handleJump(dt, directions)
-    this.#applyGravity(dt) // application de la gravité
-    // TODO platforms
+    this.#applyGravity(dt, directions) // application de la gravité, directions pour le drop-through platform (bas)
 
     // affichage de la position du joueur dans le Control Panel (EnvironmentWidget)
     this.#notifyCurrentPosition()
@@ -305,12 +304,16 @@ class PlayerManager {
   }
 
   /**
- * Gère le déclenchement et la chute due à la gravité.
- * @param {number} dt
- */
-  #applyGravity (dt) {
+   * Applique la gravité et gère l'atterrissage / la chute (états GROUNDED / FALLING).
+   * Une platform sous les pieds compte comme sol, sauf si la touche bas (bit 2) est enfoncée
+   * — dans ce cas le joueur la traverse (les tuiles solides restent bloquantes).
+   * @param {number} dt
+   * @param {number} directions - bitmask directionsGame (bit 2 = DOWN)
+   */
+  #applyGravity (dt, directions) {
     if (this.#moveState === 1) return // JUMPING
 
+    const dropThrough = (directions & 2) !== 0
     const hitbox = this.getHitbox() // objet partagé
     const y0 = hitbox.y
     const h0 = hitbox.h
@@ -321,6 +324,16 @@ class PlayerManager {
     const {hasSolid: solidBelow} = this.#scanTiles(chunkManager.getTilesInRect(hitbox))
     const platformBelow = this.#hasPlatform(hitbox)
     hitbox.h = h0 // restauration car objet partagé
+
+    if (dropThrough && !solidBelow && platformBelow) {
+      // traversée immédiate d'une tuile de platform
+      this.#y += 16
+      this.#fallStartY = this.#y
+      this.#vy = 0
+      this.#carryY = 0
+      this.#moveState = 2 // FALLING
+      return
+    }
 
     if (solidBelow || platformBelow) {
       if (this.#moveState === 2) { // FALLING
@@ -360,7 +373,7 @@ class PlayerManager {
 
       hitbox.y = newY + h0 - 1
       hitbox.h = 1
-      const platformFull = this.#hasPlatform(hitbox)
+      const platformFull = !dropThrough && this.#hasPlatform(hitbox)
       hitbox.h = h0
 
       // Si on percute le sol, on se contente de descendre d'un pixel.

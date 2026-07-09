@@ -178,14 +178,22 @@ La Sap corrode le Copper. Il doit donc être remplacer par du Gold.
 
 ---
 
+## À faire — Joueur
+
+- Le joueur doit flotter sur les liquides
+- La touche 'S' doit lui permettre de plonger
+- Affichage des armures
+- Affichage des outils en main
+- Affichage du loot au-dessus du joueur (éphémère)
+
+---
+
 ## À faire — Rendu (`render.mjs`)
 
 - Auto-tiling (transitions de texture entre tuiles adjacentes)
-- Rendu flore (arbres, mushrooms, cactus)
 - Rendu liquides (animations)
 - Éclairage (LightRenderer — 4 passes)
-- Cycle jour/nuit (SkyRenderer)
-- Rendu faune et player (sprites animés)
+- Rendu faune (sprites animés)
 
 ---
 
@@ -201,12 +209,6 @@ La Sap corrode le Copper. Il doit donc être remplacer par du Gold.
 ## À faire — UI (`ui.mjs`)
 
 - Panel combat (overlay tactique)
-
----
-
-## Connu mais différé
-
-- Nettoyage `ROADMAP.md` : supprimer les entrées au fur et à mesure
 
 ---
 
@@ -349,6 +351,12 @@ La Sap corrode le Copper. Il doit donc être remplacer par du Gold.
 - Abattage des arbres (`ChoppingManager`)
 - Secouage des arbres (`HammingManager`)
 - Plantage de graines (`SowingManager`)
+
+### Joueur
+ - Déplacement horizontal (touches 'Q' et 'D') (`PlayerManager`)
+ - Saut du joueur (touche 'Z') (`PlayerManager`)
+ - Chute due à la gravité (`PlayerManager`)
+ - Utilisation des plate-formes (`PlayerManager`)
 
 ### Environement
 - Point d'entrée pour la flore (`FloraManager`)
