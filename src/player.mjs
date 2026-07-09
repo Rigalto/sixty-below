@@ -5,6 +5,7 @@ import {NODE_TYPE, NODES_LOOKUP, ITEMS} from '../assets/data/data.mjs'
 import {eventBus, taskScheduler} from './utils.mjs'
 import {buffManager} from './buff.mjs'
 import {inventoryManager} from './inventory.mjs'
+import {furnitureManager} from './housing.mjs'
 import {camera} from './render.mjs'
 import {chunkManager} from './world.mjs'
 import {database} from './database.mjs'
@@ -318,9 +319,10 @@ class PlayerManager {
     hitbox.y = y0 + h0
     hitbox.h = 1
     const {hasSolid: solidBelow} = this.#scanTiles(chunkManager.getTilesInRect(hitbox))
+    const platformBelow = this.#hasPlatform(hitbox)
     hitbox.h = h0 // restauration car objet partagé
 
-    if (solidBelow) {
+    if (solidBelow || platformBelow) {
       if (this.#moveState === 2) { // FALLING
         // la descente est arrêtée, on calcule les dommages
         const deltaY = this.#y - this.#fallStartY
@@ -355,8 +357,14 @@ class PlayerManager {
 
       hitbox.y = newY
       const {hasSolid: solidFull} = this.#scanTiles(chunkManager.getTilesInRect(hitbox))
+
+      hitbox.y = newY + h0 - 1
+      hitbox.h = 1
+      const platformFull = this.#hasPlatform(hitbox)
+      hitbox.h = h0
+
       // Si on percute le sol, on se contente de descendre d'un pixel.
-      if (solidFull) {
+      if (solidFull || platformFull) {
         this.#y += 1
       } else {
         this.#vy = vy
@@ -422,6 +430,22 @@ class PlayerManager {
     this.#getHitboxResult.x = this.#x
     this.#getHitboxResult.y = this.#y
     return this.#getHitboxResult
+  }
+
+  /**
+   * Indique si une platform occupe l'une des tuiles couvertes par le rectangle pixel donné.
+   * @param {{x:number, y:number, w:number, h:number}} hitbox
+   * @returns {boolean}
+   */
+  #hasPlatform (hitbox) {
+    const tileY = hitbox.y >> 4
+    const tileXMin = hitbox.x >> 4
+    const tileXMax = (hitbox.x + hitbox.w - 1) >> 4
+    const rowBase = tileY << 10
+    for (let tx = tileXMin; tx <= tileXMax; tx++) {
+      if (furnitureManager.isPlatformTile(rowBase | tx)) return true
+    }
+    return false
   }
 
   /**
