@@ -104,7 +104,6 @@ export const IMAGE_FILES = [
   `${BASE_DIR}/food_32_32.png`,
   // PLACED //
   // /////////
-  `${BASE_DIR}/fuws_16_16.png`,
   `${BASE_DIR}/fuws_16_48.png`,
   `${BASE_DIR}/fuws_32_16.png`,
   `${BASE_DIR}/fuws_32_32.png`,

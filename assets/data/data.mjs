@@ -498,9 +498,9 @@ export const ITEMS = {
   // Food containers
   bowl: {name: 'Bowl', type: ITEM_TYPE.FURNITURE | ITEM_TYPE.PLACABLE, stype: 'tableware', star: 1, onTop: true, image: 'furniture_32_32-6-2', placed: 'fuws_32_32-3-0', help: 'Tableware', tooltip: 'The best soups are made in old bowls'},
   mug: {name: 'Mug', type: ITEM_TYPE.FURNITURE | ITEM_TYPE.PLACABLE, stype: 'tableware', star: 1, onTop: true, image: 'furniture_32_32-7-7', placed: 'fuws_32_32-1-3', help: 'Tableware', tooltip: 'The best Ale container'},
-  plate: {name: 'Plate', type: ITEM_TYPE.FURNITURE | ITEM_TYPE.PLACABLE, stype: 'tableware', star: 1, onTop: true, image: 'furniture_32_32-8-7', placed: 'fuws_16_16-0-0', help: 'Tableware', tooltip: 'Looks as good as it tastes'},
-  trencher: {name: 'Wooden Trencher', type: ITEM_TYPE.FURNITURE | ITEM_TYPE.PLACABLE, stype: 'tableware', onTop: true, star: 1, image: 'furniture_32_32-9-7', placed: 'fuws_16_16-1-0', help: 'Tableware', tooltip: 'A rustic wooden plate, perfect for simple meals'},
-
+  plate: {name: 'Plate', type: ITEM_TYPE.FURNITURE | ITEM_TYPE.PLACABLE, stype: 'tableware', star: 1, onTop: true, image: 'furniture_32_32-8-7', placed: 'placed_16_16-0-3', help: 'Tableware', tooltip: 'Looks as good as it tastes'},
+  trencher: {name: 'Wooden Trencher', type: ITEM_TYPE.FURNITURE | ITEM_TYPE.PLACABLE, stype: 'tableware', onTop: true, star: 1, image: 'furniture_32_32-9-7', placed: 'placed_16_16-1-3', help: 'Tableware', tooltip: 'A rustic wooden plate, perfect for simple meals'},
+gsg
   // Liquid containers (small capacity) - images OK
   glass: {name: 'Glass', type: 0, stype: 'tableware', star: 1, image: 'refined_32_32-4-2', help: 'Bottles', tooltip: 'Used to make Bottles or decorative furniture'},
   bottle: {name: 'Bottle', type: ITEM_TYPE.FURNITURE | ITEM_TYPE.PLACABLE | ITEM_TYPE.TOOL, stype: 'tableware', star: 1, furnitureSet: 'glass', image: 'tool_32_32-0-6', placed: 'tool_32_32-0-6', help: 'Bottles', tooltip: 'Crafting container for potions and food'},
@@ -631,16 +631,22 @@ export const ITEMS = {
   inferncap: {name: 'Inferncap', type: 0, stype: 'herb', star: 5, image: 'fuws_32_32-2-3', placed: 'fuws_32_32-2-3', foraging: {speed: 500, items: [{item: 'inferncap', count: 1, rainy: 1.8, windy: 1.8}]}, help: 'Inferncap', tooltip: 'Harvest to collect Potions and Food ingredients'},
 
   // Gardening
-  clayPot1: {name: 'Clay Pot (1x1)', type: ITEM_TYPE.FURNITURE | ITEM_TYPE.PLACABLE, stype: 'pot', surface: true, onTop: true, star: 1, capacity: 1, image: 'furniture_32_32-0-8', placed: 'fuws_16_16-0-2', placedleft: 'fuws_16_16-1-2', placedright: 'fuws_16_16-2-2', help: 'Clay Pots', tooltip: 'Gardening Container'},
-  clayPot2: {name: 'Clay Pot (2x1)', type: ITEM_TYPE.FURNITURE | ITEM_TYPE.PLACABLE, stype: 'pot', surface: true, onTop: true, star: 1, capacity: 2, image: 'furniture_32_32-1-8', placed: 'fuws_32_16-0-0', placedleft: 'fuws_32_16-1-0', placedright: 'fuws_32_16-2-0', help: 'Clay Pots', tooltip: 'Gardening Container'},
-  clayPot3: {name: 'Clay Pot (3x1)', type: ITEM_TYPE.FURNITURE | ITEM_TYPE.PLACABLE, stype: 'pot', surface: true, onTop: true, star: 1, capacity: 3, image: 'furniture_32_32-2-8', placed: 'fuws_48_16-0-0', placedleft: 'fuws_48_16-1-0', placedright: 'fuws_48_16-2-0', help: 'Clay Pots', tooltip: 'Gardening Container'},
-  clayPot4: {name: 'Clay Pot (2x2)', type: ITEM_TYPE.FURNITURE | ITEM_TYPE.PLACABLE, stype: 'pot', surface: true, onTop: true, star: 1, capacity: 4, image: 'furniture_32_32-3-8', placed: 'fuws_32_32-0-4', placedleft: 'fuws_32_32-1-4', placedright: 'fuws_32_32-2-4', help: 'Clay Pots', tooltip: 'Gardening Container'},
+  clayPot: {name: 'Clay Pot', type: ITEM_TYPE.FURNITURE | ITEM_TYPE.PLACABLE, stype: 'pot', surface: true, onTop: true, star: 1, capacity: 1, image: 'furniture_32_32-0-8', placed: 'placed_16_16-2-3', placedleft: 'placed_16_16-3-3', placedright: 'placed_16_16-4-3', help: 'Clay Pots', tooltip: 'Gardening Container'},
+  clayPot2: {name: 'Clay Pots (x2)', type: ITEM_TYPE.FURNITURE | ITEM_TYPE.PLACABLE, stype: 'pot', surface: true, onTop: true, star: 1, capacity: 2, image: 'furniture_32_32-1-8', placed: 'fuws_32_16-0-0', placedleft: 'fuws_32_16-1-0', placedright: 'fuws_32_16-2-0', help: 'Clay Pots', tooltip: 'Gardening Container'},
+  clayPot3: {name: 'Clay Pot (x3)', type: ITEM_TYPE.FURNITURE | ITEM_TYPE.PLACABLE, stype: 'pot', surface: true, onTop: true, star: 1, capacity: 3, image: 'furniture_32_32-2-8', placed: 'fuws_48_16-0-0', placedleft: 'fuws_48_16-1-0', placedright: 'fuws_48_16-2-0', help: 'Clay Pots', tooltip: 'Gardening Container'},
+  clayPot4: {name: 'Clay Pot (x4)', type: ITEM_TYPE.FURNITURE | ITEM_TYPE.PLACABLE, stype: 'pot', surface: true, onTop: true, star: 1, capacity: 4, image: 'furniture_32_32-3-8', placed: 'fuws_32_32-0-4', placedleft: 'fuws_32_32-1-4', placedright: 'fuws_32_32-2-4', help: 'Clay Pots', tooltip: 'Gardening Container'},
 
   // Accessories
 
   // Torches
   gel: {name: 'Gel', type: ITEM_TYPE.MATERIAL, stype: 'light', star: 1, image: 'crafting_32_32-2-0', help: 'Gel', tooltip: 'Crafting material dropped by most slimes'},
-  torch: {name: 'Torch', type: ITEM_TYPE.FURNITURE | ITEM_TYPE.PLACABLE, stype: 'light', star: 1, floating: true, furnitureSet: 'wood', image: 'furniture_32_32-0-3', placed: 'fuws_16_16-2-0', help: 'Torches', tooltip: 'Illuminates the night and closed spaces'},
+  torch: {name: 'Torch', type: ITEM_TYPE.FURNITURE | ITEM_TYPE.PLACABLE, stype: 'light', star: 1, floating: true, furnitureSet: 'wood', image: 'furniture_32_32-0-3', placed: 'placed_16_16-0-2', help: 'Torches', tooltip: 'Illuminates the night and closed spaces'},
+  // Autre torche placed: 'placed_16_16-1-2'
+  // Autre torche placed: 'placed_16_16-2-2'
+  // Autre torche placed: 'placed_16_16-3-2'
+  // Autre torche placed: 'placed_16_16-4-2'
+  // Autre torche placed: 'placed_16_16-5-2'
+  // Autre torche placed: 'placed_16_16-6-2'
 
   // Campfires
   campfire: {name: 'Campfire', type: ITEM_TYPE.FURNITURE | ITEM_TYPE.PLACABLE, stype: 'light', star: 1, image: 'furniture_32_32-7-3', placed: 'fuws_48_32-2-1', help: 'Campfires', tooltip: 'Provides Cozy Buff when lit'},
