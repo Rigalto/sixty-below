@@ -3499,6 +3499,34 @@ Biome: [[Jungle]]
     content: `
     Three slots: Head, Body, Foot
 
+
+    **Axe Types**
+
+| Set | Armor | Slot | Tier | Defense Bonus | Other Bonus |
+|---|---|---|---|
+| - | [[item:bucket]] | Head | {{item:bucket:star|star}} | {{item:bucket:defense}} | - |
+| Wood | [[item:headOak]] | Head | {{item:headOak:star|star}} | {{item:headOak:defense}} | - |
+| Wood | [[item:bodyOak]] | Body | {{item:bodyOak:star|star}} | {{item:bodyOak:defense}} | - |
+| Wood | [[item:footOak]] | Foot | {{item:footOak:star|star}} | {{item:footOak:defense}} | - |
+| Copper | [[item:headCopper]] | Head | {{item:headCopper:star|star}} | {{item:headCopper:defense}} | - |
+| Copper | [[item:bodyCopper]] | Body | {{item:bodyCopper:star|star}} | {{item:bodyCopper:defense}} | - |
+| Copper | [[item:footCopper]] | Foot | {{item:footCopper:star|star}} | {{item:footCopper:defense}} | - |
+| Mining | [[item:headMiner]] | Head | {{item:headMiner:star|star}} | {{item:headMiner:defense}} | Mining Speed: {{item:headMiner:buff[0]:value}}% |
+| Mining | [[item:bodyMiner]] | Body | {{item:bodyMiner:star|star}} | {{item:bodyMiner:defense}} | Mining Speed: {{item:bodyMiner:buff[0]:value}}% |
+| Mining | [[item:footMiner]] | Foot | {{item:footMiner:star|star}} | {{item:footMiner:defense}} | Mining Speed: {{item:footMiner:buff[0]:value}}% |
+| Silver | [[item:headSilver]] | Head | {{item:headSilver:star|star}} | {{item:headSilver:defense}} | - |
+| Silver | [[item:bodySilver]] | Body | {{item:bodySilver:star|star}} | {{item:bodySilver:defense}} | - |
+| Silver | [[item:footSilver]] | Foot | {{item:footSilver:star|star}} | {{item:footSilver:defense}} | - |
+| Gold | [[item:headGold]] | Head | {{item:headGold:star|star}} | {{item:headGold:defense}} | - |
+| Gold | [[item:bodyGold]] | Body | {{item:bodyGold:star|star}} | {{item:bodyGold:defense}} | - |
+| Gold | [[item:footGold]] | Foot | {{item:footGold:star|star}} | {{item:footGold:defense}} | - |
+| Cobalt | [[item:headCobalt]] | Head | {{item:headCobalt:star|star}} | {{item:headCobalt:defense}} | - |
+| Cobalt | [[item:bodyCobalt]] | Body | {{item:bodyCobalt:star|star}} | {{item:bodyCobalt:defense}} | - |
+| Cobalt | [[item:footCobalt]] | Foot | {{item:footCobalt:star|star}} | {{item:footCobalt:defense}} | - |
+| Platinum | [[item:headPlatinum]] | Head | {{item:headPlatinum:star|star}} | {{item:headPlatinum:defense}} | - |
+| Platinum | [[item:bodyPlatinum]] | Body | {{item:bodyPlatinum:star|star}} | {{item:bodyPlatinum:defense}} | - |
+| Platinum | [[item:footPlatinum]] | Foot | {{item:footPlatinum:star|star}} | {{item:footPlatinum:defense}} | - |
+
     Armor prefixes :
 
     [[Armor Sets]] :

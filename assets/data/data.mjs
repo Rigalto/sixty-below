@@ -715,33 +715,33 @@ export const ITEMS = {
   bodyOak: {name: 'Wood Chainmail', type: ITEM_TYPE.ARMOR, stype: '', star: 1, image: 'armor_32_32-1-0', armorImage: 'body_26_18-1-0', defense: 1, help: 'Armors', tooltip: 'Provides sturdy protection', armor: 'body', set: 'wood'},
   footOak: {name: 'Wood Greaves', type: ITEM_TYPE.ARMOR, stype: '', star: 1, image: 'armor_32_32-2-0', armorImage: 'foot_26_12-1-0', defense: 0, help: 'Armors', tooltip: 'Provides sturdy protection', armor: 'foot', set: 'wood'},
 
-  headCopper: {name: 'Copper Helmet', type: ITEM_TYPE.ARMOR, stype: '', star: 1, image: 'armor_32_32-3-0', armorImage: 'head_26_22-2-0', defense: 1, help: 'Armors', tooltip: 'Provides sturdy protection', armor: 'head', set: 'copper'},
-  bodyCopper: {name: 'Copper Chainmail', type: ITEM_TYPE.ARMOR, stype: '', star: 1, image: 'armor_32_32-4-0', armorImage: 'body_26_18-2-0', defense: 1, help: 'Armors', tooltip: 'Provides sturdy protection', armor: 'body', set: 'copper'},
-  footCopper: {name: 'Copper Greaves', type: ITEM_TYPE.ARMOR, stype: '', star: 1, image: 'armor_32_32-5-0', armorImage: 'foot_26_12-2-0', defense: 0, help: 'Armors', tooltip: 'Provides sturdy protection', armor: 'foot', set: 'copper'},
+  headCopper: {name: 'Copper Helmet', type: ITEM_TYPE.ARMOR, stype: '', star: 2, image: 'armor_32_32-3-0', armorImage: 'head_26_22-2-0', defense: 1, help: 'Armors', tooltip: 'Provides sturdy protection', armor: 'head', set: 'copper'},
+  bodyCopper: {name: 'Copper Chainmail', type: ITEM_TYPE.ARMOR, stype: '', star: 2, image: 'armor_32_32-4-0', armorImage: 'body_26_18-2-0', defense: 2, help: 'Armors', tooltip: 'Provides sturdy protection', armor: 'body', set: 'copper'},
+  footCopper: {name: 'Copper Greaves', type: ITEM_TYPE.ARMOR, stype: '', star: 2, image: 'armor_32_32-5-0', armorImage: 'foot_26_12-2-0', defense: 1, help: 'Armors', tooltip: 'Provides sturdy protection', armor: 'foot', set: 'copper'},
 
-  headIron: {name: 'Iron Helmet', type: ITEM_TYPE.ARMOR, stype: '', star: 1, image: 'armor_32_32-0-1', armorImage: 'head_26_22-3-0', defense: 1, help: 'Armors', tooltip: 'Provides sturdy protection', armor: 'head', set: 'iron'},
-  bodyIron: {name: 'Iron Chainmail', type: ITEM_TYPE.ARMOR, stype: '', star: 1, image: 'armor_32_32-1-1', armorImage: 'body_26_18-3-0', defense: 1, help: 'Armors', tooltip: 'Provides sturdy protection', armor: 'body', set: 'iron'},
-  footIron: {name: 'Iron Greaves', type: ITEM_TYPE.ARMOR, stype: '', star: 1, image: 'armor_32_32-2-1', armorImage: 'foot_26_12-3-0', defense: 0, help: 'Armors', tooltip: 'Provides sturdy protection', armor: 'foot', set: 'iron'},
+  headIron: {name: 'Iron Helmet', type: ITEM_TYPE.ARMOR, stype: '', star: 2, image: 'armor_32_32-0-1', armorImage: 'head_26_22-3-0', defense: 2, help: 'Armors', tooltip: 'Provides sturdy protection', armor: 'head', set: 'iron'},
+  bodyIron: {name: 'Iron Chainmail', type: ITEM_TYPE.ARMOR, stype: '', star: 2, image: 'armor_32_32-1-1', armorImage: 'body_26_18-3-0', defense: 3, help: 'Armors', tooltip: 'Provides sturdy protection', armor: 'body', set: 'iron'},
+  footIron: {name: 'Iron Greaves', type: ITEM_TYPE.ARMOR, stype: '', star: 2, image: 'armor_32_32-2-1', armorImage: 'foot_26_12-3-0', defense: 2, help: 'Armors', tooltip: 'Provides sturdy protection', armor: 'foot', set: 'iron'},
 
-  headSilver: {name: 'Silver Helmet', type: ITEM_TYPE.ARMOR, stype: '', star: 1, image: 'armor_32_32-3-1', armorImage: 'head_26_22-4-0', defense: 1, help: 'Armors', tooltip: 'Provides sturdy protection', armor: 'head', set: 'silver'},
-  bodySilver: {name: 'Silver Chainmail', type: ITEM_TYPE.ARMOR, stype: '', star: 1, image: 'armor_32_32-4-1', armorImage: 'body_26_18-4-0', defense: 1, help: 'Armors', tooltip: 'Provides sturdy protection', armor: 'body', set: 'silver'},
-  footSilver: {name: 'Silver Greaves', type: ITEM_TYPE.ARMOR, stype: '', star: 1, image: 'armor_32_32-5-1', armorImage: 'foot_26_12-4-0', defense: 0, help: 'Armors', tooltip: 'Provides sturdy protection', armor: 'foot', set: 'silver'},
+  headSilver: {name: 'Silver Helmet', type: ITEM_TYPE.ARMOR, stype: '', star: 3, image: 'armor_32_32-3-1', armorImage: 'head_26_22-4-0', defense: 3, help: 'Armors', tooltip: 'Provides sturdy protection', armor: 'head', set: 'silver'},
+  bodySilver: {name: 'Silver Chainmail', type: ITEM_TYPE.ARMOR, stype: '', star: 3, image: 'armor_32_32-4-1', armorImage: 'body_26_18-4-0', defense: 4, help: 'Armors', tooltip: 'Provides sturdy protection', armor: 'body', set: 'silver'},
+  footSilver: {name: 'Silver Greaves', type: ITEM_TYPE.ARMOR, stype: '', star: 3, image: 'armor_32_32-5-1', armorImage: 'foot_26_12-4-0', defense: 3, help: 'Armors', tooltip: 'Provides sturdy protection', armor: 'foot', set: 'silver'},
 
-  headGold: {name: 'Gold Helmet', type: ITEM_TYPE.ARMOR, stype: '', star: 1, image: 'armor_32_32-0-2', armorImage: 'head_26_22-5-0', defense: 1, help: 'Armors', tooltip: 'Provides sturdy protection', armor: 'head', set: 'gold'},
-  bodyGold: {name: 'Gold Chainmail', type: ITEM_TYPE.ARMOR, stype: '', star: 1, image: 'armor_32_32-1-2', armorImage: 'body_26_18-5-0', defense: 1, help: 'Armors', tooltip: 'Provides sturdy protection', armor: 'body', set: 'gold'},
-  footGold: {name: 'Gold Greaves', type: ITEM_TYPE.ARMOR, stype: '', star: 1, image: 'armor_32_32-2-2', armorImage: 'foot_26_12-5-0', defense: 0, help: 'Armors', tooltip: 'Provides sturdy protection', armor: 'foot', set: 'gold'},
+  headGold: {name: 'Gold Helmet', type: ITEM_TYPE.ARMOR, stype: '', star: 3, image: 'armor_32_32-0-2', armorImage: 'head_26_22-5-0', defense: 4, help: 'Armors', tooltip: 'Provides sturdy protection', armor: 'head', set: 'gold'},
+  bodyGold: {name: 'Gold Chainmail', type: ITEM_TYPE.ARMOR, stype: '', star: 3, image: 'armor_32_32-1-2', armorImage: 'body_26_18-5-0', defense: 5, help: 'Armors', tooltip: 'Provides sturdy protection', armor: 'body', set: 'gold'},
+  footGold: {name: 'Gold Greaves', type: ITEM_TYPE.ARMOR, stype: '', star: 3, image: 'armor_32_32-2-2', armorImage: 'foot_26_12-5-0', defense: 4, help: 'Armors', tooltip: 'Provides sturdy protection', armor: 'foot', set: 'gold'},
 
-  headCobalt: {name: 'Cobalt Helmet', type: ITEM_TYPE.ARMOR, stype: '', star: 1, image: 'armor_32_32-3-2', armorImage: 'head_26_22-7-0', defense: 1, help: 'Armors', tooltip: 'Provides sturdy protection', armor: 'head', set: 'cobalt'},
-  bodyCobalt: {name: 'Cobalt Chainmail', type: ITEM_TYPE.ARMOR, stype: '', star: 1, image: 'armor_32_32-4-2', armorImage: 'body_26_18-7-0', defense: 1, help: 'Armors', tooltip: 'Provides sturdy protection', armor: 'body', set: 'cobalt'},
-  footCobalt: {name: 'Cobalt Greaves', type: ITEM_TYPE.ARMOR, stype: '', star: 1, image: 'armor_32_32-5-2', armorImage: 'foot_26_12-7-0', defense: 0, help: 'Armors', tooltip: 'Provides sturdy protection', armor: 'foot', set: 'cobalt'},
+  headCobalt: {name: 'Cobalt Helmet', type: ITEM_TYPE.ARMOR, stype: '', star: 4, image: 'armor_32_32-3-2', armorImage: 'head_26_22-7-0', defense: 9, help: 'Armors', tooltip: 'Provides sturdy protection', armor: 'head', set: 'cobalt'},
+  bodyCobalt: {name: 'Cobalt Breastplate', type: ITEM_TYPE.ARMOR, stype: '', star: 4, image: 'armor_32_32-4-2', armorImage: 'body_26_18-7-0', defense: 10, help: 'Armors', tooltip: 'Provides sturdy protection', armor: 'body', set: 'cobalt'},
+  footCobalt: {name: 'Cobalt Leggings', type: ITEM_TYPE.ARMOR, stype: '', star: 4, image: 'armor_32_32-5-2', armorImage: 'foot_26_12-7-0', defense: 8, help: 'Armors', tooltip: 'Provides sturdy protection', armor: 'foot', set: 'cobalt'},
 
-  headPlatinum: {name: 'Platinum Helmet', type: ITEM_TYPE.ARMOR, stype: '', star: 1, image: 'armor_32_32-0-3', armorImage: 'head_26_22-1-1', defense: 1, help: 'Armors', tooltip: 'Provides sturdy protection', armor: 'head', set: 'platinum'},
-  bodyPlatinum: {name: 'Platinum Chainmail', type: ITEM_TYPE.ARMOR, stype: '', star: 1, image: 'armor_32_32-1-3', armorImage: 'body_26_18-0-1', defense: 1, help: 'Armors', tooltip: 'Provides sturdy protection', armor: 'body', set: 'platinum'},
-  footPlatinum: {name: 'Platinum Greaves', type: ITEM_TYPE.ARMOR, stype: '', star: 1, image: 'armor_32_32-2-3', armorImage: 'foot_26_12-0-1', defense: 0, help: 'Armors', tooltip: 'Provides sturdy protection', armor: 'foot', set: 'platinum'},
+  headPlatinum: {name: 'Platinum Helmet', type: ITEM_TYPE.ARMOR, stype: '', star: 5, image: 'armor_32_32-0-3', armorImage: 'head_26_22-1-1', defense: 12, help: 'Armors', tooltip: 'Provides sturdy protection', armor: 'head', set: 'platinum'},
+  bodyPlatinum: {name: 'Platinum Breastplate', type: ITEM_TYPE.ARMOR, stype: '', star: 5, image: 'armor_32_32-1-3', armorImage: 'body_26_18-0-1', defense: 16, help: 'Armors', tooltip: 'Provides sturdy protection', armor: 'body', set: 'platinum'},
+  footPlatinum: {name: 'Platinum Leggings', type: ITEM_TYPE.ARMOR, stype: '', star: 5, image: 'armor_32_32-2-3', armorImage: 'foot_26_12-0-1', defense: 12, help: 'Armors', tooltip: 'Provides sturdy protection', armor: 'foot', set: 'platinum'},
 
-  headMiner: {name: 'Miner Helmet', type: ITEM_TYPE.ARMOR, stype: '', star: 1, image: 'armor_32_32-3-3', armorImage: 'head_26_22-6-0', defense: 1, help: 'Armors', tooltip: 'Provides sturdy protection', armor: 'head', set: 'miner'},
-  bodyMiner: {name: 'Miner Chainmail', type: ITEM_TYPE.ARMOR, stype: '', star: 1, image: 'armor_32_32-4-3', armorImage: 'body_26_18-6-0', defense: 1, help: 'Armors', tooltip: 'Provides sturdy protection', armor: 'body', set: 'miner'},
-  footMiner: {name: 'Miner Greaves', type: ITEM_TYPE.ARMOR, stype: '', star: 1, image: 'armor_32_32-5-3', armorImage: 'foot_26_12-6-0', defense: 0, help: 'Armors', tooltip: 'Provides sturdy protection', armor: 'foot', set: 'miner'}
+  headMiner: {name: 'Mining Helmet', type: ITEM_TYPE.ARMOR, stype: '', star: 2, image: 'armor_32_32-3-3', armorImage: 'head_26_22-6-0', defense: 2, buff: [{buff: 'miningspeed', value: 10}], help: 'Armors', tooltip: 'Provides sturdy protection', armor: 'head', set: 'miner'},
+  bodyMiner: {name: 'Mining Shirt', type: ITEM_TYPE.ARMOR, stype: '', star: 2, image: 'armor_32_32-4-3', armorImage: 'body_26_18-6-0', defense: 1, buff: [{buff: 'miningspeed', value: 10}], help: 'Armors', tooltip: 'Provides sturdy protection', armor: 'body', set: 'miner'},
+  footMiner: {name: 'Mining Pants', type: ITEM_TYPE.ARMOR, stype: '', star: 2, image: 'armor_32_32-5-3', armorImage: 'foot_26_12-6-0', defense: 1, buff: [{buff: 'miningspeed', value: 10}], help: 'Armors', tooltip: 'Provides sturdy protection', armor: 'foot', set: 'miner'}
 
 }
 
