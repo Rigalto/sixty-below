@@ -72,6 +72,14 @@ export const IMAGE_FILES = [
   `${BASE_DIR}/coconut_80_48.png`,
   `${BASE_DIR}/cactus_80_48.png`,
 
+  // ARMORS //
+  // ////// //
+
+  `${BASE_DIR}/armor_32_32.png`,
+  `${BASE_DIR}/head_26_22.png`,
+  `${BASE_DIR}/body_26_18.png`,
+  `${BASE_DIR}/foot_26_12.png`,
+
   // supprimer ci-dessous
   // ////////////////////
 
@@ -114,9 +122,6 @@ export const IMAGE_FILES = [
   `${BASE_DIR}/fuws_48_48.png`,
   `${BASE_DIR}/fuws_64_32.png`,
   `${BASE_DIR}/npc_26_46.png`,
-  `${BASE_DIR}/heads_26_22.png`,
-  `${BASE_DIR}/bodies_26_18.png`,
-  `${BASE_DIR}/feet_26_12.png`,
 
   // IN HAND //
   // //////////
