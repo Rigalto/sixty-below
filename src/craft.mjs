@@ -1048,8 +1048,6 @@ class CraftOverlay {
   #loadNearbyStations () {
     this.#nearbyStations = new Set()
     this.#nearbyStations.add('byHand') // toujours disponible sans station physique
-    this.#nearbyStations.add('furnace') // DEBUG
-    this.#nearbyStations.add('workbench') // DEBUG
     const stations = furnitureManager.getNearbyCraftingStations()
     for (const furniture of stations) this.#nearbyStations.add(furniture.code)
   }
