@@ -16,7 +16,7 @@ import {inventoryManager} from './inventory.mjs'
 import {furnitureManager} from './housing.mjs'
 import {craftOverlay} from './craft.mjs'
 import {achievementManager} from './achievement.mjs'
-import {playerManager, hotbarOverlay} from './player.mjs'
+import {playerManager, lootPopupManager, hotbarOverlay} from './player.mjs'
 import {floraManager, sunflowerSystem, oleanderSystem, parsnipSystem, ambermirageSystem, oakSystem, mahoganySystem, cobwebSystem, coconutSystem, thornspineSystem} from './ecosystem.mjs'
 import {ACHIEVEMENT_CATEGORIES} from '../assets/data/data-achievement.mjs'
 import {miningManager, placingManager, foragingManager, choppingManager, sowingManager, hammingManager, furnishingManager} from './action.mjs'
@@ -563,6 +563,7 @@ class GameCore {
     furnitureManager.render(ctx)
     // monsterManager.render(ctx)
     playerManager.render(ctx)
+    lootPopupManager.render(ctx)
     if (this.showBlockedTiles) {
       blockedTiles.render(ctx) // DEBUG
       sunflowerSystem.debugRenderSpots(ctx)

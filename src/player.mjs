@@ -1,4 +1,4 @@
-// player.mjs — PlayerManager - LifeManager - HotbarOverlay
+// player.mjs — PlayerManager - LootPopupManager - LifeManager - HotbarOverlay
 
 import {WORLD_WIDTH, WORLD_HEIGHT, PLAYER, MICROTASK, TELEPORT_FADE_MS, TELEPORT_WAIT_MS, HOTBAR_CAPACITY} from './constant.mjs'
 import {NODE_TYPE, NODES_LOOKUP, ITEMS} from '../assets/data/data.mjs'
@@ -612,6 +612,71 @@ class PlayerManager {
   }
 }
 export const playerManager = new PlayerManager()
+
+const LOOT_POPUP_FRAMES = 120 // durée d'affichage d'une icône lootée, en frames (~2s à 60 FPS)
+const LOOT_ICON_SIZE = 32
+const LOOT_ICON_GAP = 4
+
+/* ====================================================================================================
+   POPUP DE LOOT (icônes au-dessus de la tête du joueur)
+   ==================================================================================================== */
+
+class LootPopupManager {
+  #queue = [] // {image, framesLeft}[] — ordre FIFO, le plus ancien en tête
+
+  constructor () {
+    this.onLootItem = this.onLootItem.bind(this)
+    eventBus.on('player/loot-item', this.onLootItem)
+  }
+
+  /**
++  * Liaison EventBus : 'player/loot-item' — résout l'image de l'item et l'ajoute en fin de file.
+   * @param {{itemCode: string}} payload
+   */
+  onLootItem ({itemCode}) {
+    this.#queue.push({image: ITEMS[itemCode].image, framesLeft: LOOT_POPUP_FRAMES})
+  }
+
+  /**
+   * Dessine les icônes de la file en ligne horizontale centrée au-dessus de la tête du
+   * joueur (les plus anciennes à gauche), puis décrémente leur temps d'affichage restant et
+   * retire celles arrivées à zéro. Requiert que ctx soit déjà transformé (caméra appliquée).
+   * @param {CanvasRenderingContext2D} ctx
+   */
+  render (ctx) {
+    if (this.#queue.length === 0) return
+
+    const hitbox = playerManager.getHitbox()
+    const totalWidth = this.#queue.length * LOOT_ICON_SIZE + (this.#queue.length - 1) * LOOT_ICON_GAP
+    let px = hitbox.x + (hitbox.w >> 1) - (totalWidth >> 1)
+    const py = hitbox.y - LOOT_ICON_SIZE - 8
+
+    let expired = 0
+    for (let i = 0; i < this.#queue.length; i++) {
+      const entry = this.#queue[i]
+      const img = entry.image
+      ctx.globalAlpha = entry.framesLeft / LOOT_POPUP_FRAMES
+      ctx.drawImage(IMAGE_CACHE[img.imgIndex], img.sx, img.sy, img.sw, img.sh, px, py, LOOT_ICON_SIZE, LOOT_ICON_SIZE)
+      px += LOOT_ICON_SIZE + LOOT_ICON_GAP
+
+      entry.framesLeft--
+      if (entry.framesLeft <= 0) expired++
+    }
+    ctx.globalAlpha = 1
+
+    // while (expired < this.#queue.length && this.#queue[expired].framesLeft <= 0) expired++
+
+    if (expired > 0) {
+      // on copie les éléments dans le tableau sans impact pour le GC
+      const remaining = this.#queue.length - expired
+      for (let i = 0; i < remaining; i++) {
+        this.#queue[i] = this.#queue[i + expired]
+      }
+      this.#queue.length = remaining
+    }
+  }
+}
+export const lootPopupManager = new LootPopupManager()
 
 class LifeManager {
 }

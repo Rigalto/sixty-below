@@ -181,9 +181,7 @@ La Sap corrode le Copper. Il doit donc être remplacer par du Gold.
 
 - Le joueur doit flotter sur les liquides
 - La touche 'S' doit lui permettre de plonger
-- Affichage des armures
 - Affichage des outils en main
-- Affichage du loot au-dessus du joueur (éphémère)
 
 ---
 
@@ -340,6 +338,7 @@ La Sap corrode le Copper. Il doit donc être remplacer par du Gold.
 - Affichage des buffs (`BuffWidget`)
 - Gestion des meubles placés dans le monde (`FurnitureManager`, `FurnishingManager`, `HammingManager`)
 - Gestion des sons (`SoundManager`) - mining, placing, chopping, foraging, teleport (too far, wrong)
+- Gestion des succès (`AchievementManager`)
 
 ### Actions
 - Minage (`MiningManager`)
@@ -356,6 +355,8 @@ La Sap corrode le Copper. Il doit donc être remplacer par du Gold.
  - Saut du joueur (touche 'Z') (`PlayerManager`)
  - Chute due à la gravité (`PlayerManager`)
  - Utilisation des plate-formes (`PlayerManager`)
+ - Affichage des armures portées (`PlayerManager`)
+ - Affichage éphémère du loot (`LootPopupManager`)
 
 ### Environement
 - Point d'entrée pour la flore (`FloraManager`)
@@ -368,7 +369,7 @@ La Sap corrode le Copper. Il doit donc être remplacer par du Gold.
 - Coconut (`CoconutSystem`)
 - Thornspine (`ThornspineSystem`)
 
-### Rendu (partiel)
+### Rendu
 - `WorldRenderer` — rendu tuiles par chunks avec cache OffscreenCanvas
 - `SkyRenderer` — cycle jour/nuit
 - `Camera` — projection monde/canvas, culling, zoom
