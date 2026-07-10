@@ -63,6 +63,7 @@ export const IMAGE_FILES = [
   `${BASE_DIR}/placed_16_48.png`,
   `${BASE_DIR}/placed_32_16.png`,
   `${BASE_DIR}/placed_32_32.png`,
+  `${BASE_DIR}/placed_48_16.png`,
 
   // TREES //
   // ////// //
@@ -117,7 +118,6 @@ export const IMAGE_FILES = [
   `${BASE_DIR}/fuws_32_32.png`,
   `${BASE_DIR}/fuws_32_48.png`,
   `${BASE_DIR}/fuws_32_80.png`,
-  `${BASE_DIR}/fuws_48_16.png`,
   `${BASE_DIR}/fuws_48_32.png`,
   `${BASE_DIR}/fuws_48_48.png`,
   `${BASE_DIR}/fuws_64_32.png`,
