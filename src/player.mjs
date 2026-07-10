@@ -9,6 +9,7 @@ import {furnitureManager} from './housing.mjs'
 import {camera} from './render.mjs'
 import {chunkManager} from './world.mjs'
 import {database} from './database.mjs'
+import {IMAGE_CACHE} from './assets.mjs'
 
 const WORLD_PX_W = WORLD_WIDTH << 4 // 16384 px
 const WORLD_PX_H = WORLD_HEIGHT << 4 // 8192 px
@@ -155,10 +156,14 @@ class PlayerManager {
   #getFeetTileResult = {x: 0, y: 0} // résultat de getFeetTile()
   #getCenterTileResult = {x: 0, y: 0, direction: 1} // résultat de getCenterTile()
   #updateResult = {x: 0, y: 0} // résultat de update()
+  #armor = [null, null, null] // itemId des 3 slots d'armure (tête, torse, jambes) — synchronisé via 'inventory/static-buffs'
 
   constructor () {
+    // eventBus
     this.onSaveTick = this.onSaveTick.bind(this)
     eventBus.on('save/tick', this.onSaveTick)
+    this.onInventoryStaticBuffs = this.onInventoryStaticBuffs.bind(this)
+    eventBus.on('inventory/static-buffs', this.onInventoryStaticBuffs)
   }
 
   /**
@@ -469,14 +474,44 @@ class PlayerManager {
   //     return [this.#x + (PLAYER.w >> 1), this.#y + (PLAYER.h >> 1)]
   //   }
 
+  // ///////// //
+  // AFFICHAGE //
+  // ///////// //
+
   /**
-   * Dessine la hitbox du joueur (placeholder — remplacé par les sprites).
+   * Dessine le joueur : pieds, corps, tête, empilés avec un léger recouvrement
+   * (offsets 34 / 16 / 0 px depuis le haut de la hitbox).
    * Requiert que ctx soit déjà transformé (caméra appliquée).
    * @param {CanvasRenderingContext2D} ctx
    */
   render (ctx) {
-    ctx.fillStyle = 'rgba(255, 0, 0, 0.5)'
-    ctx.fillRect(this.#x, this.#y, PLAYER.w, PLAYER.h)
+    // hitbox
+    // ctx.fillStyle = 'rgba(255, 0, 0, 0.5)'
+    // ctx.fillRect(this.#x, this.#y, PLAYER.w, PLAYER.h)
+
+    const [head, body, foot] = this.#armor
+    const mirror = this.#direction === 0
+    const px = mirror ? -this.#x - PLAYER.w : this.#x
+    if (mirror) { ctx.save(); ctx.scale(-1, 1) }
+
+    ctx.drawImage(IMAGE_CACHE[foot.imgIndex], foot.sx, foot.sy, foot.sw, foot.sh, px, this.#y + 34, foot.sw, foot.sh)
+    ctx.drawImage(IMAGE_CACHE[body.imgIndex], body.sx, body.sy, body.sw, body.sh, px, this.#y + 16, body.sw, body.sh)
+    ctx.drawImage(IMAGE_CACHE[head.imgIndex], head.sx, head.sy, head.sw, head.sh, px, this.#y, head.sw, head.sh)
+
+    if (mirror) ctx.restore()
+  }
+
+  /**
+   * Liaison EventBus : 'inventory/static-buffs' — mémorise les 3 itemId d'armure équipés,
+   * résout l'image à afficher pour chaque partie (tête, corps, pieds), en repli sur les
+   * images par défaut (playerHead/playerBody/playerFoot) pour tout slot vide.
+   * @param {{armor: string[3], accessories: string[5], trinkets: string[]}} payload
+   */
+  onInventoryStaticBuffs ({armor}) {
+    this.#armor[0] = ITEMS[armor[0] !== '' ? armor[0] : 'playerHead'].armorImage
+    this.#armor[1] = ITEMS[armor[1] !== '' ? armor[1] : 'playerBody'].armorImage
+    this.#armor[2] = ITEMS[armor[2] !== '' ? armor[2] : 'playerFoot'].armorImage
+    console.log('PlayerManager.onInventoryStaticBuffs >>>>>>>>>>>>>>>>>>>>>>>>>>>', this.#armor)
   }
 
   // ///////////// //

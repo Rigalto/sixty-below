@@ -509,7 +509,7 @@ export const ITEMS = {
   sap: {name: 'Bottled Sap', type: ITEM_TYPE.FURNITURE | ITEM_TYPE.PLACABLE | ITEM_TYPE.POTION | ITEM_TYPE.USABLE, stype: 'tableware', star: 1, image: 'tool_32_32-2-6', placed: 'tool_32_32-2-6', heal: 80, sickness: 60, timedbuff: 'honey', time: 15, unplacing: {speed: 600}, help: 'Bottles', tooltip: 'Healing item'},
 
   // Liquid containers (large capacity)
-  bucket: {name: 'Empty Bucket', type: ITEM_TYPE.FURNITURE | ITEM_TYPE.PLACABLE | ITEM_TYPE.TOOL | ITEM_TYPE.ARMOR, stype: 'tableware', armor: 'head', star: 1, image: 'furniture_32_32-10-0', placed: 'fuws_32_32-5-0', unplacing: {speed: 600}, help: 'Buckets', tooltip: 'Used to scoop up a small amount of water, honey or sap', placedright: 'heads_26_22-0-2', placedleft: 'heads_26_22-0-3', defense: 1},
+  bucket: {name: 'Empty Bucket', type: ITEM_TYPE.FURNITURE | ITEM_TYPE.PLACABLE | ITEM_TYPE.TOOL | ITEM_TYPE.ARMOR, stype: 'tableware', armor: 'head', star: 1, image: 'furniture_32_32-10-0', placed: 'fuws_32_32-5-0', armorImage: 'heads_26_22-0-2', unplacing: {speed: 600}, help: 'Buckets', tooltip: 'Used to scoop up a small amount of water, honey or sap', placedright: 'heads_26_22-0-2', placedleft: 'heads_26_22-0-3', defense: 1},
   bucketWater: {name: 'Water Bucket', type: ITEM_TYPE.FURNITURE | ITEM_TYPE.PLACABLE | ITEM_TYPE.TOOL, stype: 'tableware', star: 1, image: 'furniture_32_32-11-0', placed: 'fuws_32_32-6-0', unplacing: {speed: 600}, help: 'Buckets', tooltip: 'Amount of water. Can be poured out'},
   bucketHoney: {name: 'Honey Bucket', type: ITEM_TYPE.FURNITURE | ITEM_TYPE.PLACABLE | ITEM_TYPE.TOOL, stype: 'tableware', star: 1, image: 'furniture_32_32-12-0', placed: 'fuws_32_32-7-0', unplacing: {speed: 600}, help: 'Buckets', tooltip: 'Amount of honey. Can be poured out'},
   bucketSap: {name: 'Sap Bucket', type: ITEM_TYPE.FURNITURE | ITEM_TYPE.PLACABLE | ITEM_TYPE.TOOL, stype: 'tableware', star: 1, image: 'furniture_32_32-13-0', placed: 'fuws_32_32-0-3', unplacing: {speed: 600}, help: 'Buckets', tooltip: 'Amount of lava. Can be poured out'},
@@ -704,7 +704,17 @@ export const ITEMS = {
   flour: {name: 'Flour', type: 0, stype: 'food', star: 1, image: 'tools_32_32-12-7', help: 'Food', tooltip: 'Component for daw'},
   daw: {name: 'Daw', type: 0, stype: 'food', star: 1, image: 'tools_32_32-12-7', help: 'Food', tooltip: 'To cook for bread and pies'},
   bread: {name: 'Bread', type: ITEM_TYPE.FOOD, stype: 'food', star: 1, image: 'tools_32_32-12-7', help: 'Food', tooltip: 'Restaure health when eated'},
-  croissant: {name: 'Croissant', type: ITEM_TYPE.FOOD | ITEM_TYPE.USABLE, stype: 'food', star: 1, image: 'food_32_32-7-1', help: 'Food', tooltip: 'Restaure health when eated'}
+  croissant: {name: 'Croissant', type: ITEM_TYPE.FOOD | ITEM_TYPE.USABLE, stype: 'food', star: 1, image: 'food_32_32-7-1', help: 'Food', tooltip: 'Restaure health when eated'},
+
+  // armors
+  playerHead: {name: 'Player Head', type: 0, stype: '', star: 1, image: null, armorImage: 'heads_26_22-0-0', help: 'Armors', tooltip: ''},
+  playerBody: {name: 'Player Body', type: 0, stype: '', star: 1, image: null, armorImage: 'bodies_26_18-0-0', help: 'Armors', tooltip: ''},
+  playerFoot: {name: 'Player Foot', type: 0, stype: '', star: 1, image: null, armorImage: 'feet_26_12-0-0', help: 'Armors', tooltip: ''},
+
+  headOak: {name: 'Wood Helmet', type: ITEM_TYPE.ARMOR, stype: '', star: 1, image: 'tools_32_32-10-7', armorImage: 'heads_26_22-1-0', defense: 1, help: 'Armors', tooltip: 'Provides sturdy protection', armor: 'head', set: 'wood'},
+  bodyOak: {name: 'Wood Chainmail', type: ITEM_TYPE.ARMOR, stype: '', star: 1, image: 'tools_32_32-10-7', armorImage: 'bodies_26_22-1-0', defense: 1, help: 'Armors', tooltip: 'Provides sturdy protection', armor: 'head', set: 'wood'},
+  footOak: {name: 'Wood Greaves', type: ITEM_TYPE.ARMOR, stype: '', star: 1, image: 'tools_32_32-10-7', armorImage: 'feet_26_22-1-0', defense: 0, help: 'Armors', tooltip: 'Provides sturdy protection', armor: 'head', set: 'wood'}
+
 }
 
 /* ============================================================================

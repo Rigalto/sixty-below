@@ -213,6 +213,7 @@ class GameCore {
       if (item.placed) item.placed = resolveAssetData(item.placed)
       if (item.placedRight) item.placedRight = resolveAssetData(item.placedRight)
       if (item.placedLeft) item.placedLeft = resolveAssetData(item.placedLeft)
+      if (item.armorImage) item.armorImage = resolveAssetData(item.armorImage)
 
       if (item.foraging) this.#hydrateLootAction(item.foraging, 'foraging', item.name)
       if (item.shaking) this.#hydrateLootAction(item.shaking, 'shaking', item.name)
