@@ -160,11 +160,12 @@ class MiningManager {
 
     const wasEmpty = this.#queue.length === 0
     this.#queue.push({tileIndex, tileNode, tool, prefix, speed})
-    // TODO émettre un bruit spécifique à la pioche
+    // émettre un bruit spécifique à la pioche
     eventBus.emit('sound/play', 'mining')
 
     if (wasEmpty) {
-      // TODO: début animation outil
+      // début animation outil
+      eventBus.emit('tool/swing-start', {speed})
       const {priority, capacity} = MICROTASK.MINE_TILE
       taskScheduler.enqueue('mine-current', speed, this.onMineTile, priority, capacity)
     }
@@ -176,11 +177,13 @@ class MiningManager {
   #scheduleNext () {
     if (this.#queue.length > 0) {
       const speed = this.#queue[0].speed
-      // TODO: changement de vitesse animation (speed)
+      // changement de vitesse animation (speed)
+      eventBus.emit('tool/swing-start', {speed})
       const {priority, capacity} = MICROTASK.MINE_TILE
       taskScheduler.enqueue('mine-current', speed, this.onMineTile, priority, capacity)
     } else {
-    // TODO: fin animation outil
+      // fin animation outil
+      eventBus.emit('tool/swing-end')
     }
   }
 
@@ -233,7 +236,8 @@ class MiningManager {
     if (this.#queue.length === 0) return
     this.#queue.length = 0
     taskScheduler.dequeue('mine-current')
-    // TODO: annuler animation outil
+    // annuler animation outil
+    eventBus.emit('tool/swing-end')
   }
 
   /** Liaison EventBus : 'player/teleport-begin'. */
@@ -457,10 +461,8 @@ class ForagingManager {
       this.#queue.push({type: 'natural', tileIndex, tileNode, tool, prefix, speed})
       eventBus.emit('sound/play', 'foraging')
 
-      if (wasEmpty) {
-        // TODO: début animation outil (sickle)
-        this.#scheduleNext()
-      }
+      if (wasEmpty) this.#scheduleNext()
+
       return
     }
 
@@ -485,10 +487,7 @@ class ForagingManager {
     this.#queue.push({type: 'plant', plant, tileIndex, tool, prefix, speed})
     eventBus.emit('sound/play', 'foraging')
 
-    if (wasEmpty) {
-      // TODO: début animation outil (sickle)
-      this.#scheduleNext()
-    }
+    if (wasEmpty) this.#scheduleNext()
   }
 
   /**
@@ -496,11 +495,14 @@ class ForagingManager {
    */
   #scheduleNext () {
     if (this.#queue.length > 0) {
-    // TODO: changement de vitesse animation (speed)
+      const speed = this.#queue[0].speed
+      // changement de vitesse animation (speed)
+      eventBus.emit('tool/swing-start', {speed})
       const {priority, capacity} = MICROTASK.FORAGE_ACTION
-      taskScheduler.enqueue('forage-current', this.#queue[0].speed, this.onForage, priority, capacity)
+      taskScheduler.enqueue('forage-current', speed, this.onForage, priority, capacity)
     } else {
-    // TODO: fin animation outil (sickle)
+      // fin animation outil (sickle)
+      eventBus.emit('tool/swing-end')
     }
   }
 
@@ -542,7 +544,8 @@ class ForagingManager {
     if (this.#queue.length === 0) return
     this.#queue.length = 0
     taskScheduler.dequeue('forage-current')
-    // TODO: annuler animation outil (sickle)
+    // annuler animation outil (sickle)
+    eventBus.emit('tool/swing-end')
   }
 
   /** Liaison EventBus : 'player/teleport-begin'. */
@@ -606,6 +609,7 @@ class ChoppingManager {
     eventBus.emit('sound/play', 'chopping')
 
     if (wasEmpty) {
+      eventBus.emit('tool/swing-start', {speed})
       const {priority, capacity} = MICROTASK.CHOP_TREE
       taskScheduler.enqueue('chop-current', speed, this.onChopTree, priority, capacity)
     }
@@ -616,10 +620,14 @@ class ChoppingManager {
    */
   #scheduleNext () {
     if (this.#queue.length > 0) {
+      const speed = this.#queue[0].speed
+      eventBus.emit('tool/swing-start', {speed})
       const {priority, capacity} = MICROTASK.CHOP_TREE
-      taskScheduler.enqueue('chop-current', this.#queue[0].speed, this.onChopTree, priority, capacity)
+      taskScheduler.enqueue('chop-current', speed, this.onChopTree, priority, capacity)
+    } else {
+      // fin animation outil (axe)
+      eventBus.emit('tool/swing-end')
     }
-    // TODO: fin animation outil (axe)
   }
 
   /**
@@ -666,7 +674,8 @@ class ChoppingManager {
     if (this.#queue.length === 0) return
     this.#queue.length = 0
     taskScheduler.dequeue('chop-current')
-    // TODO: annuler animation outil (axe)
+    // annuler animation outil (axe)
+    eventBus.emit('tool/swing-end')
   }
 
   /** Liaison EventBus : 'player/teleport-begin'. */
@@ -904,10 +913,14 @@ class HammingManager {
    */
   #scheduleNext () {
     if (this.#queue.length > 0) {
+      const speed = this.#queue[0].speed
+      eventBus.emit('tool/swing-start', {speed})
       const {priority, capacity} = MICROTASK.HAMMER_USE
-      taskScheduler.enqueue('hamming-current', this.#queue[0].speed, this.onHamming, priority, capacity)
+      taskScheduler.enqueue('hamming-current', speed, this.onHamming, priority, capacity)
+    } else {
+      // fin animation outil (axe)
+      eventBus.emit('tool/swing-end')
     }
-    // TODO: fin animation outil (axe)
   }
 
   /**
@@ -995,6 +1008,7 @@ class HammingManager {
     eventBus.emit('sound/play', 'chopping')
 
     if (wasEmpty) {
+      eventBus.emit('tool/swing-start', {speed})
       const {priority, capacity} = MICROTASK.HAMMER_USE
       taskScheduler.enqueue('hamming-current', speed, this.onHamming, priority, capacity)
     }
@@ -1027,6 +1041,7 @@ class HammingManager {
     eventBus.emit('sound/play', 'placing')
 
     if (wasEmpty) {
+      eventBus.emit('tool/swing-start', {speed})
       const {priority, capacity} = MICROTASK.HAMMER_USE
       taskScheduler.enqueue('hamming-current', speed, this.onHamming, priority, capacity)
     }
@@ -1039,7 +1054,8 @@ class HammingManager {
     if (this.#queue.length === 0) return
     this.#queue.length = 0
     taskScheduler.dequeue('hamming-current')
-    // TODO: annuler animation outil (axe)
+    // annuler animation outil (axe)
+    eventBus.emit('tool/swing-end')
   }
 
   /** Liaison EventBus : 'player/teleport-begin'. */
