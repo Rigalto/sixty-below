@@ -630,11 +630,11 @@ export const ITEMS = {
   abysshorn: {name: 'Abysshorn', type: 0, stype: 'herb', star: 5, image: 'fuws_32_32-2-3', placed: 'fuws_32_32-2-3', foraging: {speed: 500, items: [{item: 'abysshorn', count: 1, rainy: 1.8, windy: 1.8}]}, help: 'Abysshorn', tooltip: 'Harvest to collect Potions and Food ingredients'},
   inferncap: {name: 'Inferncap', type: 0, stype: 'herb', star: 5, image: 'fuws_32_32-2-3', placed: 'fuws_32_32-2-3', foraging: {speed: 500, items: [{item: 'inferncap', count: 1, rainy: 1.8, windy: 1.8}]}, help: 'Inferncap', tooltip: 'Harvest to collect Potions and Food ingredients'},
 
-  // Gardening
+  // Gardening - images OK
   clayPot: {name: 'Clay Pot', type: ITEM_TYPE.FURNITURE | ITEM_TYPE.PLACABLE, stype: 'pot', surface: true, onTop: true, star: 1, capacity: 1, image: 'furniture_32_32-0-8', placed: 'placed_16_16-2-3', placedleft: 'placed_16_16-3-3', placedright: 'placed_16_16-4-3', unplacing: {speed: 800}, help: 'Clay Pots', tooltip: 'Gardening Container'},
   clayPot2: {name: 'Clay Pots (x2)', type: ITEM_TYPE.FURNITURE | ITEM_TYPE.PLACABLE, stype: 'pot', surface: true, onTop: true, star: 1, capacity: 2, image: 'furniture_32_32-1-8', placed: 'placed_32_16-0-0', placedleft: 'placed_32_16-1-0', placedright: 'fuws_32_16-2-0', unplacing: {speed: 800}, help: 'Clay Pots', tooltip: 'Gardening Container'},
   clayPot3: {name: 'Clay Pot (x3)', type: ITEM_TYPE.FURNITURE | ITEM_TYPE.PLACABLE, stype: 'pot', surface: true, onTop: true, star: 1, capacity: 3, image: 'furniture_32_32-2-8', placed: 'placed_48_16-0-0', placedleft: 'placed_48_16-1-0', placedright: 'placed_48_16-2-0', unplacing: {speed: 800}, help: 'Clay Pots', tooltip: 'Gardening Container'},
-  clayPot4: {name: 'Clay Pot (x4)', type: ITEM_TYPE.FURNITURE | ITEM_TYPE.PLACABLE, stype: 'pot', surface: true, onTop: true, star: 1, capacity: 4, image: 'furniture_32_32-3-8', placed: 'fuws_32_32-0-4', placedleft: 'fuws_32_32-1-4', placedright: 'fuws_32_32-2-4', unplacing: {speed: 800}, help: 'Clay Pots', tooltip: 'Gardening Container'},
+  clayPot4: {name: 'Clay Pot (x4)', type: ITEM_TYPE.FURNITURE | ITEM_TYPE.PLACABLE, stype: 'pot', surface: true, onTop: true, star: 1, capacity: 4, image: 'furniture_32_32-3-8', placed: 'placed_32_32-1-0', placedleft: 'placed_32_32-2-0', placedright: 'placed_32_32-3-0', unplacing: {speed: 800}, help: 'Clay Pots', tooltip: 'Gardening Container'},
 
   // Accessories
 
@@ -691,11 +691,6 @@ export const ITEMS = {
   slidingBevel: {name: 'Sliding Bevel', type: ITEM_TYPE.TRINKET, stype: 'trinket', star: 3, image: 'trinket_32_32-1-2', help: 'Surveyor\'s Tools', tooltip: 'When in Inventory, press [R] display tool range', buff: [{buff: 'showToolRange', value: true}]},
   draftingCompass: {name: 'Drafting Compass', type: ITEM_TYPE.TRINKET, stype: 'trinket', star: 3, image: 'trinket_32_32-2-2', help: 'Surveyor\'s Tools', tooltip: 'When in Inventory, press [R] display tiles Grid', buff: [{buff: 'showGrid', value: true}]},
   theodolite: {name: 'Theodolite', type: ITEM_TYPE.TRINKET, stype: 'trinket', star: 4, image: 'trinket_32_32-3-2', help: 'Surveyor\'s Tools', tooltip: 'When in Inventory, press [R] display tiles Grid & perception and tool ranges', buff: [{buff: 'showInteractionRange', value: true}, {buff: 'showToolRange', value: true}, {buff: 'showGrid', value: true}]},
-
-  // Armors ITEM_TYPE.ARMOR, stype: 'tableware', armor: 'head'
-  headWood: {name: 'Wood Helmet', type: ITEM_TYPE.ARMOR, stype: 'head', armor: 'head', star: 1, image: 'tools_32_32-10-7', placedright: 'heads_26_22-1-0', placedleft: 'heads_26_22-1-1', defense: 1, help: 'Armors', tooltip: 'Provides sturdy protection', set: 'wood'},
-  bodyWood: {name: 'Wood Chainmail', type: ITEM_TYPE.ARMOR, stype: 'body', armor: 'body', star: 1, image: 'tools_32_32-11-7', placedright: 'bodies_26_18-1-0', placedleft: 'bodies_26_18-1-1', defense: 1, help: 'Armors', tooltip: 'Provides sturdy protection', set: 'wood'},
-  footWood: {name: 'Wood Greaves', type: ITEM_TYPE.ARMOR, stype: 'foot', armor: 'foot', star: 1, image: 'tools_32_32-12-7', placedright: 'feet_26_12-1-0', placedleft: 'feet_26_12-1-1', defense: 0, help: 'Armors', tooltip: 'Provides sturdy protection', set: 'wood'},
 
   // Monster drops
   antlionMandible: {name: 'Antlion Mandible', type: 0, stype: 'monster', star: 2, image: 'tools_32_32-12-7', help: 'Antlion Pit', tooltip: 'Component for cutting tools'},
