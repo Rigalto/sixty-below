@@ -16,7 +16,7 @@ import {inventoryManager} from './inventory.mjs'
 import {furnitureManager} from './housing.mjs'
 import {craftOverlay} from './craft.mjs'
 import {achievementManager} from './achievement.mjs'
-import {playerManager, lootPopupManager, hotbarOverlay} from './player.mjs'
+import {playerManager, lootPopupManager, handedToolManager, hotbarOverlay} from './player.mjs'
 import {floraManager, sunflowerSystem, oleanderSystem, parsnipSystem, ambermirageSystem, oakSystem, mahoganySystem, cobwebSystem, coconutSystem, thornspineSystem} from './ecosystem.mjs'
 import {ACHIEVEMENT_CATEGORIES} from '../assets/data/data-achievement.mjs'
 import {miningManager, placingManager, foragingManager, choppingManager, sowingManager, hammingManager, furnishingManager} from './action.mjs'
@@ -345,6 +345,7 @@ class GameCore {
     // position et direction du joueur
     const position = playerManager.init(state.player)
     camera.init(position)
+    lootPopupManager.init()
 
     // Puis initialisaton du rendering du monde
     worldRenderer.init()
@@ -424,7 +425,7 @@ class GameCore {
     if (plantsToDelete.length > 0) {
       await database.deleteMultipleRecords('plant', plantsToDelete)
     }
-    sunflowerSystem.initSeed(state.sewedsunflower)
+    sunflowerSystem.initSeed(state.sewedsunflower ?? [])
     ambermirageSystem.initSeed(state.sewedambermirage ?? [])
 
     floraManager.onPreloadChunksChanged(camera.preloadChunks)
@@ -564,6 +565,7 @@ class GameCore {
     // monsterManager.render(ctx)
     playerManager.render(ctx)
     lootPopupManager.render(ctx)
+    handedToolManager.render(ctx)
     if (this.showBlockedTiles) {
       blockedTiles.render(ctx) // DEBUG
       sunflowerSystem.debugRenderSpots(ctx)

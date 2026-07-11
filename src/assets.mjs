@@ -133,7 +133,6 @@ export const IMAGE_FILES = [
   `${BASE_DIR}/buff_32_32.png`, // buffs et town signs
   `${BASE_DIR}/moon_50_50.png`,
   `${BASE_DIR}/env_32_32.png`,
-  `${BASE_DIR}/coins_16_16.png`, // aussi un item
   `${BASE_DIR}/ihm_32_32.png`
 ]
 

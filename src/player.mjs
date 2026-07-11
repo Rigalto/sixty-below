@@ -1,7 +1,7 @@
 // player.mjs — PlayerManager - LootPopupManager - LifeManager - HotbarOverlay
 
 import {WORLD_WIDTH, WORLD_HEIGHT, PLAYER, MICROTASK, TELEPORT_FADE_MS, TELEPORT_WAIT_MS, HOTBAR_CAPACITY} from './constant.mjs'
-import {NODE_TYPE, NODES_LOOKUP, ITEMS} from '../assets/data/data.mjs'
+import {NODE_TYPE, NODES_LOOKUP, ITEM_TYPE, ITEMS} from '../assets/data/data.mjs'
 import {eventBus, taskScheduler} from './utils.mjs'
 import {buffManager} from './buff.mjs'
 import {inventoryManager} from './inventory.mjs'
@@ -630,6 +630,11 @@ class LootPopupManager {
   }
 
   /**
+   * Vide la file des items lootés.
+   */
+  init () { this.#queue.length = 0 }
+
+  /**
 +  * Liaison EventBus : 'player/loot-item' — résout l'image de l'item et l'ajoute en fin de file.
    * @param {{itemCode: string}} payload
    */
@@ -677,6 +682,66 @@ class LootPopupManager {
   }
 }
 export const lootPopupManager = new LootPopupManager()
+
+/* ====================================================================================================
+   ITEM TENU EN MAIN
+   ==================================================================================================== */
+
+const ICON_SIZE = 24 // taille de destination de l'item tenu en main (échelle 0.5 de l'icône 32x32 source)
+const HAND_OFFSET_X = 10 // px depuis le coin gauche de la hitbox — position de la main
+const HAND_OFFSET_Y = 18 // px depuis le haut de la hitbox
+
+class HandedToolManager {
+  #image = null // handedImage résolu du slot actif — null si absent, item vide, ou TOOL (animé, TODO)
+
+  constructor () {
+    this.onSlotActive = this.onSlotActive.bind(this)
+    eventBus.on('hotbar/slot-active', this.onSlotActive)
+  }
+
+  /**
+   * Liaison EventBus : 'hotbar/slot-active' — résout l'image à tenir en main pour le nouveau
+   * slot actif. null si le slot est vide, si l'item est TOOL (animé — TODO), ou s'il n'a pas
+   * de handedImage.
+   * @param {{index: number, slot: object, prevIndex: number}} payload
+   */
+  onSlotActive ({slot}) {
+    if (slot.item === '') { this.#image = null; return }
+    const item = ITEMS[slot.item]
+    if (item.type & ITEM_TYPE.TOOL) { this.#image = null; return } // TODO : items TOOL animés
+    if (!(item.type & ITEM_TYPE.PLACABLE)) { this.#image = null; return }
+    this.#image = item.image
+  }
+
+  /**
+   * Dessine l'item tenu en main, miroir horizontal selon la direction du joueur. Sans effet
+   * si aucun item en main ou si l'item est de type TOOL (animation à venir — TODO).
+   * Requiert que ctx soit déjà transformé (caméra appliquée).
+   * @param {CanvasRenderingContext2D} ctx
+   */
+  render (ctx) {
+    if (this.#image === null) return
+    const img = this.#image
+    const hitbox = playerManager.getHitbox()
+    const direction = playerManager.getCenterTile().direction
+    const py = hitbox.y + HAND_OFFSET_Y
+
+    if (direction === 0) {
+      const px = hitbox.x + (PLAYER.w - HAND_OFFSET_X - ICON_SIZE)
+      ctx.save()
+      ctx.scale(-1, 1)
+      ctx.drawImage(IMAGE_CACHE[img.imgIndex], img.sx, img.sy, img.sw, img.sh, -px - ICON_SIZE, py, ICON_SIZE, ICON_SIZE)
+      ctx.restore()
+    } else {
+      ctx.drawImage(IMAGE_CACHE[img.imgIndex], img.sx, img.sy, img.sw, img.sh, hitbox.x + HAND_OFFSET_X, py, ICON_SIZE, ICON_SIZE)
+    }
+  }
+}
+export const handedToolManager = new HandedToolManager()
+
+/* ====================================================================================================
+   HOTBAR OVERLAY
+   ==================================================================================================== */
 
 class LifeManager {
 }
