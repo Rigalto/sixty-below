@@ -179,7 +179,7 @@ export const CLUSTER_SCATTER_MAP = {
 export const ORE_GEM_SCATTER_MAP = {
   [BIOME_TYPE.FOREST]: {
     surface: [
-      {code: NODES.COPPER.code, percent: 0.05, sizeMin: 3, sizeMax: 5}
+      {code: NODES.COPPER.code, percent: 0.03, sizeMin: 3, sizeMax: 5}
     ],
     under: [
       {code: NODES.COPPER.code, percent: 0.08, sizeMin: 4, sizeMax: 8},
@@ -210,7 +210,7 @@ export const ORE_GEM_SCATTER_MAP = {
   },
   [BIOME_TYPE.DESERT]: {
     surface: [
-      {code: NODES.COPPER.code, percent: 0.002, sizeMin: 3, sizeMax: 5}
+      {code: NODES.COPPER.code, percent: 0.03, sizeMin: 3, sizeMax: 5}
     ],
     under: [
       {code: NODES.COPPER.code, percent: 0.008, sizeMin: 4, sizeMax: 8},
