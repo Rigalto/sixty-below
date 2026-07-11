@@ -179,33 +179,33 @@ export const CLUSTER_SCATTER_MAP = {
 export const ORE_GEM_SCATTER_MAP = {
   [BIOME_TYPE.FOREST]: {
     surface: [
-      {code: NODES.COPPER.code, percent: 0.005, sizeMin: 3, sizeMax: 5}
+      {code: NODES.COPPER.code, percent: 0.05, sizeMin: 3, sizeMax: 5}
     ],
     under: [
-      {code: NODES.COPPER.code, percent: 0.008, sizeMin: 4, sizeMax: 8},
-      {code: NODES.IRON.code, percent: 0.004, sizeMin: 4, sizeMax: 8},
-      {code: NODES.SILVER.code, percent: 0.0003, sizeMin: 3, sizeMax: 6} // pénalisé /2
+      {code: NODES.COPPER.code, percent: 0.08, sizeMin: 4, sizeMax: 8},
+      {code: NODES.IRON.code, percent: 0.04, sizeMin: 4, sizeMax: 8},
+      {code: NODES.SILVER.code, percent: 0.003, sizeMin: 3, sizeMax: 6} // pénalisé /2
     ],
     caverns_top: [
-      {code: NODES.COPPER.code, percent: 0.004, sizeMin: 4, sizeMax: 8},
-      {code: NODES.IRON.code, percent: 0.004, sizeMin: 4, sizeMax: 8},
-      {code: NODES.SILVER.code, percent: 0.002, sizeMin: 4, sizeMax: 8}, // pénalisé /2
-      {code: NODES.GOLD.code, percent: 0.004, sizeMin: 5, sizeMax: 9},
-      {code: NODES.COBALT.code, percent: 0.002, sizeMin: 5, sizeMax: 10},
-      {code: NODES.TOPAZ.code, percent: 0.003, sizeMin: 8, sizeMax: 14}
+      {code: NODES.COPPER.code, percent: 0.04, sizeMin: 4, sizeMax: 8},
+      {code: NODES.IRON.code, percent: 0.04, sizeMin: 4, sizeMax: 8},
+      {code: NODES.SILVER.code, percent: 0.02, sizeMin: 4, sizeMax: 8}, // pénalisé /2
+      {code: NODES.GOLD.code, percent: 0.04, sizeMin: 5, sizeMax: 9},
+      {code: NODES.COBALT.code, percent: 0.02, sizeMin: 5, sizeMax: 10},
+      {code: NODES.TOPAZ.code, percent: 0.03, sizeMin: 8, sizeMax: 14}
     ],
     caverns_bottom: [
-      {code: NODES.COPPER.code, percent: 0.001, sizeMin: 3, sizeMax: 6},
-      {code: NODES.IRON.code, percent: 0.002, sizeMin: 4, sizeMax: 8},
-      {code: NODES.SILVER.code, percent: 0.001, sizeMin: 4, sizeMax: 8}, // pénalisé /2
-      {code: NODES.GOLD.code, percent: 0.002, sizeMin: 5, sizeMax: 9},
-      {code: NODES.COBALT.code, percent: 0.004, sizeMin: 6, sizeMax: 12},
-      {code: NODES.PLATINUM.code, percent: 0.004, sizeMin: 6, sizeMax: 12},
-      {code: NODES.TOPAZ.code, percent: 0.002, sizeMin: 6, sizeMax: 12},
-      {code: NODES.SAPPHIRE.code, percent: 0.003, sizeMin: 8, sizeMax: 16}
+      {code: NODES.COPPER.code, percent: 0.01, sizeMin: 3, sizeMax: 6},
+      {code: NODES.IRON.code, percent: 0.02, sizeMin: 4, sizeMax: 8},
+      {code: NODES.SILVER.code, percent: 0.01, sizeMin: 4, sizeMax: 8}, // pénalisé /2
+      {code: NODES.GOLD.code, percent: 0.02, sizeMin: 5, sizeMax: 9},
+      {code: NODES.COBALT.code, percent: 0.04, sizeMin: 6, sizeMax: 12},
+      {code: NODES.PLATINUM.code, percent: 0.04, sizeMin: 6, sizeMax: 12},
+      {code: NODES.TOPAZ.code, percent: 0.02, sizeMin: 6, sizeMax: 12},
+      {code: NODES.SAPPHIRE.code, percent: 0.03, sizeMin: 8, sizeMax: 16}
     ],
     hell: [
-      {code: NODES.OBSIDIAN.code, percent: 0.0002, sizeMin: 16, sizeMax: 36}
+      {code: NODES.OBSIDIAN.code, percent: 0.002, sizeMin: 16, sizeMax: 36}
     ]
   },
   [BIOME_TYPE.DESERT]: {
