@@ -2,7 +2,7 @@
 
 import {WORLD_WIDTH, WORLD_HEIGHT, PLAYER, MICROTASK, TELEPORT_FADE_MS, TELEPORT_WAIT_MS, HOTBAR_CAPACITY} from './constant.mjs'
 import {NODE_TYPE, NODES_LOOKUP, ITEM_TYPE, ITEMS} from '../assets/data/data.mjs'
-import {eventBus, taskScheduler} from './utils.mjs'
+import {eventBus, taskScheduler, timeManager} from './utils.mjs'
 import {buffManager} from './buff.mjs'
 import {inventoryManager} from './inventory.mjs'
 import {furnitureManager} from './housing.mjs'
@@ -689,14 +689,30 @@ export const lootPopupManager = new LootPopupManager()
 
 const ICON_SIZE = 24 // taille de destination de l'item tenu en main (échelle 0.5 de l'icône 32x32 source)
 const HAND_OFFSET_X = 10 // px depuis le coin gauche de la hitbox — position de la main
-const HAND_OFFSET_Y = 18 // px depuis le haut de la hitbox
+const HAND_OFFSET_TOOL_Y = 30 // px depuis le haut de la hitbox
+const HAND_OFFSET_PLACABLE_Y = 18 // px depuis le haut de la hitbox
+
+const TOOL_PIVOT_X = 6 // px depuis le bord gauche de handedImage — axe de rotation
+const TOOL_PIVOT_Y = 24 // px depuis le haut de handedImage — manche centré verticalement
+const TOOL_SWING_MIN_DEG = -80
+const TOOL_SWING_MAX_DEG = 80
+const DEG_TO_RAD = Math.PI / 180
 
 class HandedToolManager {
   #image = null // handedImage résolu du slot actif — null si absent, item vide, ou TOOL (animé, TODO)
+  #isTool = false // true si #image est un outil (rotation, taille native) — false si PLACABLE (statique, ICON_SIZE)
+  #swinging = false
+  #swingStart = 0 // timeManager.timestamp au dernier 'tool/swing-start'
+  #swingSpeed = 0 // ms — durée d'un balayage complet (-80° à +80°)
 
   constructor () {
+    // eventBus
     this.onSlotActive = this.onSlotActive.bind(this)
     eventBus.on('hotbar/slot-active', this.onSlotActive)
+    this.onSwingStart = this.onSwingStart.bind(this)
+    eventBus.on('tool/swing-start', this.onSwingStart)
+    this.onSwingEnd = this.onSwingEnd.bind(this)
+    eventBus.on('tool/swing-end', this.onSwingEnd)
   }
 
   /**
@@ -706,25 +722,92 @@ class HandedToolManager {
    * @param {{index: number, slot: object, prevIndex: number}} payload
    */
   onSlotActive ({slot}) {
+    console.log('HandedToolManager.onSlotActive', slot)
+
     if (slot.item === '') { this.#image = null; return }
     const item = ITEMS[slot.item]
-    if (item.type & ITEM_TYPE.TOOL) { this.#image = null; return } // TODO : items TOOL animés
+    if (item.type & ITEM_TYPE.TOOL) { this.#image = item.placed ?? null; this.#isTool = true; return }
     if (!(item.type & ITEM_TYPE.PLACABLE)) { this.#image = null; return }
     this.#image = item.image
+    this.#isTool = false
   }
 
   /**
-   * Dessine l'item tenu en main, miroir horizontal selon la direction du joueur. Sans effet
-   * si aucun item en main ou si l'item est de type TOOL (animation à venir — TODO).
+   * Liaison EventBus : 'tool/swing-start' — (re)démarre le balayage de l'outil tenu en main.
+   * @param {{speed: number}} payload — durée en ms d'un balayage complet
+   */
+  onSwingStart ({speed}) {
+    this.#swinging = true
+    this.#swingSpeed = speed
+    this.#swingStart = timeManager.timestamp
+    console.log('HandedToolManager.onSwingStart', speed, this.#swingStart)
+  }
+
+  /**
+   * Liaison EventBus : 'tool/swing-end' — arrête le balayage, l'outil revient à l'horizontale.
+   */
+  onSwingEnd () {
+    this.#swinging = false
+    console.log('HandedToolManager.onSwinonSwingEndgStart')
+  }
+
+  /**
+   * Dessine l'item tenu en main : délègue à #renderTool ou #renderStatic selon #isTool.
    * Requiert que ctx soit déjà transformé (caméra appliquée).
    * @param {CanvasRenderingContext2D} ctx
    */
   render (ctx) {
     if (this.#image === null) return
+    if (this.#isTool) this.#renderTool(ctx)
+    else this.#renderStatic(ctx)
+  }
+
+  /**
+   * Dessine un outil TOOL à taille native, avec rotation (-80° à +80° en cours de balayage,
+   * horizontale au repos) autour du pivot TOOL_PIVOT_X/Y. Miroir horizontal (repère entier
+   * retourné) selon la direction du joueur.
+   * @param {CanvasRenderingContext2D} ctx
+   */
+  #renderTool (ctx) {
+    if (this.#image === null) return
     const img = this.#image
     const hitbox = playerManager.getHitbox()
     const direction = playerManager.getCenterTile().direction
-    const py = hitbox.y + HAND_OFFSET_Y
+
+    let angleDeg = TOOL_SWING_MIN_DEG
+    if (this.#swinging) {
+      const elapsed = timeManager.timestamp - this.#swingStart
+      const progress = Math.min(elapsed / this.#swingSpeed, 1)
+      angleDeg = TOOL_SWING_MIN_DEG + progress * (TOOL_SWING_MAX_DEG - TOOL_SWING_MIN_DEG)
+    } else {
+      angleDeg = 0 // horizontale au repos
+    }
+
+    const handX = hitbox.x + HAND_OFFSET_X
+    const handY = hitbox.y + HAND_OFFSET_TOOL_Y
+
+    ctx.save()
+    if (direction === 0) {
+      ctx.scale(-1, 1)
+      ctx.translate(-handX, handY)
+    } else {
+      ctx.translate(handX, handY)
+    }
+    ctx.rotate(angleDeg * DEG_TO_RAD)
+    ctx.drawImage(IMAGE_CACHE[img.imgIndex], img.sx, img.sy, img.sw, img.sh, -TOOL_PIVOT_X, -TOOL_PIVOT_Y, img.sw, img.sh)
+    ctx.restore()
+  }
+
+  /**
+  * Dessine un item PLACABLE statique, à taille réduite (ICON_SIZE), miroir horizontal selon
+  * la direction du joueur.
+  * @param {CanvasRenderingContext2D} ctx
+  */
+  #renderStatic (ctx) {
+    const img = this.#image
+    const hitbox = playerManager.getHitbox()
+    const direction = playerManager.getCenterTile().direction
+    const py = hitbox.y + HAND_OFFSET_PLACABLE_Y
 
     if (direction === 0) {
       const px = hitbox.x + (PLAYER.w - HAND_OFFSET_X - ICON_SIZE)
@@ -831,6 +914,9 @@ class HotbarOverlay {
   onHotbarChanged (hotbar) {
     for (let i = 0; i < HOTBAR_CAPACITY; i++) {
       this.#updateSlotDOM(this.#slots[i], hotbar[i])
+    }
+    if (this.#activeIndex !== -1) {
+      eventBus.emit('hotbar/slot-active', {index: this.#activeIndex, slot: hotbar[this.#activeIndex], prevIndex: this.#activeIndex})
     }
   }
 

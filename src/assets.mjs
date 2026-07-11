@@ -81,6 +81,11 @@ export const IMAGE_FILES = [
   `${BASE_DIR}/body_26_18.png`,
   `${BASE_DIR}/foot_26_12.png`,
 
+  // TOOLS //
+  // ///// //
+
+  `${BASE_DIR}/handed_48_48.png`,
+
   // supprimer ci-dessous
   // ////////////////////
 

@@ -317,7 +317,7 @@ export const ITEMS = {
   redSlug: {name: 'Red Slug', type: ITEM_TYPE.BAIT, star: 1, stype: 'bait', image: 'bait_32_32-2-3', help: 'Fishing Baits', tooltip: '???'},
 
   // pickaxes
-  pickaxeCopper: {name: 'Copper Pickaxe', type: ITEM_TYPE.TOOL, stype: 'pickaxe', star: 2, image: 'tools_32_32-4-0', placedright: 'w_42_42-0-0', placedleft: 'w_42_42-0-1', help: 'Mining Tools', tooltip: 'Tools used to remove blocks, converting them to item form', range: 0, mining: {speed: 0, tiles: 1}},
+  pickaxeCopper: {name: 'Copper Pickaxe', type: ITEM_TYPE.TOOL, stype: 'pickaxe', star: 2, image: 'tools_32_32-4-0', placed: 'handed_48_48-0-0', help: 'Mining Tools', tooltip: 'Tools used to remove blocks, converting them to item form', range: 0, mining: {speed: 0, tiles: 1}},
   pickaxeIron: {name: 'Iron Pickaxe', type: ITEM_TYPE.TOOL, stype: 'pickaxe', star: 3, image: 'tools_32_32-4-0', placedright: 'w_42_42-0-0', placedleft: 'w_42_42-0-1', help: 'Mining Tools', tooltip: 'Tools used to remove blocks, converting them to item form', range: 0, mining: {speed: 25, tiles: 1}},
   pickaxeSilver: {name: 'Silver Pickaxe', type: ITEM_TYPE.TOOL, stype: 'pickaxe', star: 4, image: 'tools_32_32-4-0', placedright: 'w_42_42-0-0', placedleft: 'w_42_42-0-1', help: 'Mining Tools', tooltip: 'Tools used to remove blocks, converting them to item form', range: 0, mining: {speed: 50, tiles: 1}},
   pickaxeGold: {name: 'Gold Pickaxe', type: ITEM_TYPE.TOOL, stype: 'pickaxe', star: 4, image: 'tools_32_32-4-0', placedright: 'w_42_42-0-0', placedleft: 'w_42_42-0-1', help: 'Mining Tools', tooltip: 'Tools used to remove blocks, converting them to item form', range: 1, mining: {speed: 75, tiles: 1}},
