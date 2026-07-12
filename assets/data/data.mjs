@@ -276,6 +276,10 @@ export const ITEMS = {
   cutRuby: {name: 'Cut Ruby', type: 0, star: 3, stype: 'gem', image: 'refined_32_32-1-1', help: 'Gems', tooltip: 'Enhances weapons, gears and accessories'},
   cutEmerald: {name: 'Cut Emerald', type: 0, star: 4, stype: 'gem', image: 'refined_32_32-2-1', help: 'Gems', tooltip: 'Enhances weapons, gears and accessories'},
   cutSapphire: {name: 'Cut Sapphire', type: 0, star: 5, stype: 'gem', image: 'refined_32_32-3-1', help: 'Gems', tooltip: 'Enhances weapons, gears and accessories'},
+  dustTopaz: {name: 'Topaz Dust', type: 0, star: 2, stype: 'dust', image: 'refined_32_32-3-3', help: 'Gems', tooltip: 'used to craft abrasives'},
+  dustRuby: {name: 'Ruby Dust', type: 0, star: 3, stype: 'dust', image: 'refined_32_32-4-3', help: 'Gems', tooltip: 'used to craft abrasives'},
+  dustEmerald: {name: 'Emerald Dust', type: 0, star: 4, stype: 'dust', image: 'refined_32_32-5-3', help: 'Gems', tooltip: 'used to craft abrasives'},
+  dustSapphire: {name: 'Sapphire Dust', type: 0, star: 5, stype: 'dust', image: 'refined_32_32-6-3', help: 'Gems', tooltip: 'used to craft abrasives'},
 
   // Rock - Geode Stones
   blockGranite: {name: 'Granite Block', type: ITEM_TYPE.BLOCK | ITEM_TYPE.PLACABLE, star: 4, stype: 'block', placedNode: 'GRANITE', image: 'mined_32_32-1-2', help: 'Geode Stones', tooltip: 'Prized crafting materials found in crystalline structures'},
@@ -288,9 +292,11 @@ export const ITEMS = {
   blockHive: {name: 'Hive Block', type: ITEM_TYPE.BLOCK, star: 3, stype: 'block', image: 'mined_32_32-4-2', help: 'Hive', tooltip: 'Hexagonal alveoles build by Bees'},
   beeswax: {name: 'Beeswax', type: 0, star: 3, stype: 'wax', image: 'refined_32_32-5-1', help: 'Hive', tooltip: 'Melted down from honeycombs, used as a binding agent'},
 
-  // Shell
+  // Shell - Image OK
   blockShell: {name: 'Shell Block', type: ITEM_TYPE.BLOCK, star: 3, stype: 'block', image: 'mined_32_32-5-4', help: 'Shell', tooltip: 'Can be easily powdered'},
   shellPowder: {name: 'Shell Powder', type: 0, star: 3, stype: 'powder', image: 'refined_32_32-4-1', help: 'Shell', tooltip: 'A fine natural abrasive — used in polishing and grinding recipes'},
+  emeri: {name: 'Emeri', type: 0, star: 4, stype: 'powder', image: 'refined_32_32-7-4', help: 'Shell', tooltip: 'A strong abrasive — used in  grinding recipes'},
+  corundumPowder: {name: 'Corundum Powder', type: 0, star: 5, stype: 'powder', image: 'refined_32_32-7-3', help: 'Shell', tooltip: 'A strong abrasive — used in  grinding recipes'},
 
   // Cobweb
   silk: {name: 'Silk', type: 0, star: 1, stype: 'cobweb', image: 'mined_32_32-4-4', help: 'Cobweb', tooltip: 'Mined from Cobweb, used to craft Fabric'},
@@ -760,7 +766,7 @@ export const RECIPES = [
   // Sickles
   {result: {item: 'sickleCopper', count: 1}, station: 'anvil', ingredients: [{item: 'plateCopper', count: 6}, {item: 'logOak', count: 4}]},
   {result: {item: 'sickleSilver', count: 1}, station: 'anvil', ingredients: [{item: 'barSilver', count: 2}, {item: 'logMahogany', count: 4}, {item: 'shellPowder', count: 1}]},
-  {result: {item: 'sickleGold', count: 1}, station: 'forge', ingredients: [{item: 'barGold', count: 2}, {item: 'bambooStalk', count: 4}, {item: 'shellPowder', count: 1}]},
+  {result: {item: 'sickleGold', count: 1}, station: 'forge', ingredients: [{item: 'barGold', count: 2}, {item: 'bambooStalk', count: 4}, {item: 'corundumPowder', count: 1}]},
 
   // Pickaxes
   {result: {item: 'pickaxeCopper', count: 1}, station: 'anvil', ingredients: [{item: 'barCopper', count: 8}, {item: 'logOak', count: 4}, {item: 'cutTopaz', count: 1}]},
@@ -802,10 +808,10 @@ export const RECIPES = [
   {result: {item: 'triskelAncient', count: 1}, station: 'alchemyTable', ingredients: [{item: 'triskelCopper', count: 1}, {item: 'triskelSilver', count: 1}, {item: 'triskelGold', count: 1}]},
 
   // Gems
-  {result: {item: 'cutTopaz', count: 3}, station: 'stoneBench', ingredients: [{item: 'rawTopaz', count: 1}]},
-  {result: {item: 'cutRuby', count: 2}, station: 'stoneBench', ingredients: [{item: 'rawRuby', count: 1}]},
-  {result: {item: 'cutEmerald', count: 2}, station: 'stoneBench', ingredients: [{item: 'rawEmerald', count: 1}]},
-  {result: {item: 'cutSapphire', count: 1}, station: 'stoneBench', ingredients: [{item: 'rawSapphire', count: 1}]},
+  {result: {item: 'cutTopaz', count: 3}, returned: [{item: 'dustTopaz', count: 2}], station: 'stoneBench', ingredients: [{item: 'rawTopaz', count: 1}]},
+  {result: {item: 'cutRuby', count: 2}, returned: [{item: 'dustRuby', count: 2}], station: 'stoneBench', ingredients: [{item: 'rawRuby', count: 1}]},
+  {result: {item: 'cutEmerald', count: 2}, returned: [{item: 'dustEmerald', count: 2}], station: 'stoneBench', ingredients: [{item: 'rawEmerald', count: 1}]},
+  {result: {item: 'cutSapphire', count: 1}, returned: [{item: 'dustSapphire', count: 2}], station: 'stoneBench', ingredients: [{item: 'rawSapphire', count: 1}]},
   // planks
   {result: {item: 'plankOak', count: 4}, station: 'workbench', ingredients: [{item: 'logOak', count: 1}]},
   {result: {item: 'plankMahogany', count: 4}, station: 'workbench', ingredients: [{item: 'logMahogany', count: 1}]},
@@ -851,6 +857,8 @@ export const RECIPES = [
   {result: {item: 'barCobalt', count: 1}, station: 'furnace', ingredients: [{item: 'chunkCobalt', count: 5}, {item: 'logOak', count: 1}, {item: 'logMahogany', count: 1}]},
   {result: {item: 'barPlatinum', count: 1}, station: 'blastFurnace', ingredients: [{item: 'chunkPlatinum', count: 5}, {item: 'logOak', count: 1}, {item: 'logMahogany', count: 1}]},
   {result: {item: 'shellPowder', count: 3}, station: 'stoneBench', ingredients: [{item: 'blockShell', count: 1}]},
+  {result: {item: 'corundumPowder', count: 2}, station: 'stoneBench', ingredients: [{item: 'dustRuby', count: 1}, {item: 'dustSapphire', count: 1}]},
+  {result: {item: 'emeri', count: 2}, station: 'stoneBench', ingredients: [{item: 'dustTopaz', count: 1}, {item: 'dustEmerald', count: 1}]},
   {result: {item: 'beeswax', count: 7}, station: 'stoneBench', ingredients: [{item: 'blockHive', count: 2}]},
 
   // Metal fittings
