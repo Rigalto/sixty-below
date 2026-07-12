@@ -4868,9 +4868,16 @@ Coconut trees grow along sea shores and around desert oases. Unlike other trees,
 * Sea shores (left and right beaches)
 * Desert oasis shores
 
+**Coconut Nut Cycle**
+
+* A coconut tree alternately grows a nut and drops it to the ground, approximately every 20 in-game hours
+* When a nut falls, it lands on a ground tile beside the tree
+* A fallen nut disappears naturally after approximately 20 in-game hours if not collected
+* Shaking a tree with a nut harvests it directly — the cycle continues unaffected
+
 <hr>
 
-**Interactions - Shaking**
+**Shaking**
 
 * Select a [[Hammers|Hammer]] and click the tree to shake it
 * Shaking a coconut tree with a nut in it drops the nut to the ground
@@ -4885,16 +4892,8 @@ Shaking Tool: <<itemStar|hammerCopper>> or better
 **Shaking Encounters**
 
 | Tree | Encounter |
+|---|---|
 | Coconut | [[monster:coconutCrab]] |
-
-<hr>
-
-**Coconut Nut Cycle**
-
-* A coconut tree alternately grows a nut and drops it to the ground, approximately every 20 in-game hours
-* When a nut falls, it lands on a ground tile beside the tree
-* A fallen nut disappears naturally after approximately 20 in-game hours if not collected
-* Shaking a tree with a nut harvests it directly — the cycle continues unaffected
 
 <hr>
 
@@ -4915,10 +4914,11 @@ Foraging Tool: <<itemStar|sickleCopper>> or better
 
 A raw [[item:coconut]] can be processed at a [[Woodworking|Workbench]] into three ingredients — each recipe produces all three simultaneously:
 
-| Product | Also returns |
-| [[item:coconutFiber]] | [[item:coconutPulp]], [[item:coconutMilk]] |
-| [[item:coconutPulp]] | [[item:coconutFiber]], [[item:coconutMilk]] |
-| [[item:coconutMilk]] | [[item:coconutFiber]], [[item:coconutPulp]] |
+| Product | Tier | Also returns |
+|---|---|---|
+| [[item:coconutFiber]] | {{item:coconutFiber:star|star}} | [[item:coconutPulp]], [[item:coconutMilk]] |
+| [[item:coconutPulp]] | {{item:coconutPulp:star|star}} | [[item:coconutFiber]], [[item:coconutMilk]] |
+| [[item:coconutMilk]] | {{item:coconutMilk:star|star}} | [[item:coconutFiber]], [[item:coconutPulp]] |
 
 Search for any of the three products in the [[Crafting|Craft Panel]] to find the recipe.
 
@@ -5213,9 +5213,9 @@ Foraging a sunflower yields [[item:sunflowerSeed]] — scatter them on bare gras
 
 **Usages**
 
-* [[item:sunflowerSeed]] — replanting Sunflowers ⏳
-* [[item:sunflowerOil]] — extracted from seeds, essential ingredient for food and ointments ⏳
-* [[item:oleanderOil]] — contains 50% [[item:sunflowerOil]] ⏳
+* <<itemStar|sunflowerSeed>>— replanting Sunflowers ⏳
+* <<itemStar|sunflowerOil>>— extracted from seeds, essential ingredient for food and ointments ⏳
+* <<itemStar|oleanderOil>>— contains 50% [[item:sunflowerOil]] ⏳
 
 **Planting**
 
