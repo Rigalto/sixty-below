@@ -327,10 +327,10 @@ export const ITEMS = {
   pickaxeProspector: {name: 'Prospector\'s Pickaxe', type: ITEM_TYPE.TOOL, stype: 'pickaxe', star: 5, image: 'tools_32_32-4-0', placedright: 'w_42_42-0-0', placedleft: 'w_42_42-0-1', help: 'Mining Tools', tooltip: 'Tools used to remove multiple blocks, converting them to item form', range: 0, mining: {speed: 75, tiles: 5}},
   pickaxeGeologist: {name: 'Geologist\'s Pickaxe', type: ITEM_TYPE.TOOL, stype: 'pickaxe', star: 5, image: 'tools_32_32-4-0', placedright: 'w_42_42-0-0', placedleft: 'w_42_42-0-1', help: 'Mining Tools', tooltip: 'Tools used to remove multiple blocks, converting them to item form', range: 2, mining: {speed: 100, tiles: 7}},
 
-  // Sickles
-  sickleCopper: {name: 'Copper Sickle', type: ITEM_TYPE.TOOL, stype: 'sickle', star: 1, image: 'tool_32_32-6-0', placed: 'placed_42_42-0-3', help: 'Foraging Tools', tooltip: 'Tools used to harvest plants', range: 0, foraging: {speed: 0}},
-  sickleSilver: {name: 'Silver Sickle', type: ITEM_TYPE.TOOL, stype: 'sickle', star: 3, image: 'tool_32_32-6-1', placedright: 'w_42_42-0-0', placedleft: 'w_42_42-0-1', speed: 0, help: 'Foraging Tools', tooltip: 'Tools used to harvest plants', range: 1, foraging: {speed: 60}},
-  sickleGold: {name: 'Gold Sickle', type: ITEM_TYPE.TOOL, stype: 'sickle', star: 5, image: 'tool_32_32-6-2', placedright: 'w_42_42-0-0', placedleft: 'w_42_42-0-1', speed: 0, help: 'Foraging Tools', tooltip: 'Tools used to harvest plants', range: 2, foraging: {speed: 120}},
+  // Sickles - OK images
+  sickleCopper: {name: 'Copper Sickle', type: ITEM_TYPE.TOOL, stype: 'sickle', star: 1, image: 'tool_32_32-0-3', placed: 'placed_42_42-0-3', help: 'Foraging Tools', tooltip: 'Tools used to harvest plants', range: 0, foraging: {speed: 0}},
+  sickleSilver: {name: 'Silver Sickle', type: ITEM_TYPE.TOOL, stype: 'sickle', star: 3, image: 'tool_32_32-1-3', placedright: 'placed_42_42-1-3', speed: 0, help: 'Foraging Tools', tooltip: 'Tools used to harvest plants', range: 1, foraging: {speed: 60}},
+  sickleGold: {name: 'Gold Sickle', type: ITEM_TYPE.TOOL, stype: 'sickle', star: 5, image: 'tool_32_32-2-3', placed: 'placed_42_42-2-3', speed: 0, help: 'Foraging Tools', tooltip: 'Tools used to harvest plants', range: 2, foraging: {speed: 120}},
 
   // Bug Nets
   bugNetWood: {name: 'Wooden Bug Net', type: ITEM_TYPE.TOOL, stype: 'bugNet', star: 1, image: 'tool_32_32-6-3', placedright: 'w_42_42-0-0', placedleft: 'w_42_42-0-1', help: 'Catching Tools', tooltip: 'Tools used to catch bugs', range: 0, catching: {speed: 0}},
@@ -756,6 +756,11 @@ export const RECIPES = [
   {result: {item: 'platformGlass', count: 10}, station: 'byHand', ingredients: [{item: 'glass', count: 1}]},
   {result: {item: 'platformMahogany', count: 8}, station: 'byHand', ingredients: [{item: 'logMahogany', count: 1}]},
   {result: {item: 'platformReef', count: 6}, station: 'byHand', ingredients: [{item: 'coral', count: 1}]},
+
+  // Sickles
+  {result: {item: 'sickleCopper', count: 1}, station: 'anvil', ingredients: [{item: 'plateCopper', count: 6}, {item: 'logOak', count: 4}]},
+  {result: {item: 'sickleSilver', count: 1}, station: 'anvil', ingredients: [{item: 'barSilver', count: 2}, {item: 'logMahogany', count: 4}, {item: 'shellPowder', count: 1}]},
+  {result: {item: 'sickleGold', count: 1}, station: 'forge', ingredients: [{item: 'barGold', count: 2}, {item: 'bambooStalk', count: 4}, {item: 'shellPowder', count: 1}]},
 
   // Pickaxes
   {result: {item: 'pickaxeCopper', count: 1}, station: 'anvil', ingredients: [{item: 'barCopper', count: 8}, {item: 'logOak', count: 4}, {item: 'cutTopaz', count: 1}]},

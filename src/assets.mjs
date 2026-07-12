@@ -86,6 +86,11 @@ export const IMAGE_FILES = [
 
   `${BASE_DIR}/handed_48_48.png`,
 
+  // WEAPONS //
+  // /////// //
+
+  `${BASE_DIR}/weapon_32_32.png`,
+
   // supprimer ci-dessous
   // ////////////////////
 
