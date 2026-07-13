@@ -131,6 +131,9 @@ document.head.appendChild(playerStyle)
 
    ==================================================================================================== */
 
+const ACCEL_RAMP_TIME = 320 // ms — durée pour passer de la vitesse min à PLAYER.speed
+const ACCEL_MIN_RATIO = 0.2 // fraction de PLAYER.speed au tout début du déplacement
+
 class PlayerManager {
   #x = 0 // px monde — coin haut-gauche de la hitbox
   #y = 0 // px monde — coin haut-gauche de la hitbox
@@ -145,6 +148,8 @@ class PlayerManager {
   #fallStartY = 0 // px — #y au déclenchement de la chute (fin saut ou décrochage)
   #carryX = 0 // résidu fractionnaire du déplacement horizontal, dans (-1, 1) ; remis à 0 si immobile ou bloqué
   #carryY = 0 // retient la partie décimale de la position en y pour ne travailler que sur des integer
+  #rampX = 0 // ms écoulées dans la direction horizontale courante ; remis à 0 à l'arrêt ou au changement de sens
+  #prevDirSign = 0 // -1, 0 ou 1 — signe du déplacement horizontal à la frame précédente
 
   #teleportDiv = null // div#teleport-overlay — mis en cache à la première téléportation
   #teleportTarget = null // {x, y} en pixels — cible de la téléportation
@@ -223,20 +228,29 @@ class PlayerManager {
 
   /**
    * Déplace le joueur horizontalement avec détection de collision.
+   * La vitesse est rampée depuis ACCEL_MIN_RATIO × PLAYER.speed jusqu'à PLAYER.speed
+   * sur ACCEL_RAMP_TIME ms, réinitialisée à l'arrêt ou au changement de sens.
    * Tente dans l'ordre : déplacement complet, step-up d'une tuile, glissement d'un pixel.
    * @param {-1|1} direction - sens du déplacement (-1 gauche, 1 droite)
    * @param {number} dt      - delta temps en ms
    */
   #horizontalMovement (directions, dt) {
-    if (directions === 0) { this.#carryX = 0; return }
+    if (directions === 0) { this.#carryX = 0; this.#rampX = 0; this.#prevDirSign = 0; return }
     // détermination de la direction horizontale
     let direction = 0
     if (directions & 4) { direction -= 1 }
     if (directions & 8) { direction += 1 }
     // Si le joueur appuie à la fois à droite et à gauche, le mouvement est nul
-    if (directions === 0) { this.#carryX = 0; return }
+    if (directions === 0) { this.#carryX = 0; this.#rampX = 0; this.#prevDirSign = 0; return }
 
-    const speed = PLAYER.speed
+    // changement de sens : on repart de la vitesse minimale pour permettre un repositionnement précis
+    if (direction !== this.#prevDirSign) { this.#rampX = 0 }
+    this.#prevDirSign = direction
+    this.#rampX = this.#rampX + dt < ACCEL_RAMP_TIME ? this.#rampX + dt : ACCEL_RAMP_TIME
+
+    const ratio = ACCEL_MIN_RATIO + (1 - ACCEL_MIN_RATIO) * (this.#rampX / ACCEL_RAMP_TIME)
+
+    const speed = PLAYER.speed * ratio
     const dist = speed * dt * direction
     this.#direction = direction < 0 ? 0 : 1
 
