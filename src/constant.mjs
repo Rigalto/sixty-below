@@ -275,6 +275,7 @@ export const MICROTASK = {
   CHOP_TREE: {priority: 24, capacity: 4, taskName: 'onChopTree'}, // abat une section d'arbre
   HAMMER_USE: {priority: 24, capacity: 4, taskName: 'onHamming'}, // traitement d'une utilisation du Hammer
   SOW_SEED: {priority: 24, capacity: 4, taskName: 'doSow'}, // plante une graine
+  FILL_CONTAINER: {priority: 24, capacity: 4, taskName: 'onFillContainer'}, // remplit une bottle/bucket depuis une tuile liquide
   OAK_GROW: {priority: 24, capacity: 4, taskName: 'growOak'}, // croissance d'un tronçon d'oak
   OAK_END_SHAKE: {priority: 24, capacity: 4, taskName: 'oakEndShake'}, // fin de la période où un arbre n'est pas shakable
   MAHOGANY_GROW: {priority: 24, capacity: 4, taskName: 'growMahogany'}, // croissance d'un tronçon de mahogany

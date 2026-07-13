@@ -1,7 +1,7 @@
 // inventory.mjs — GameCore - KeyboardManager - MouseManager
 
 import {IS_DEV, TIME_BUDGET, MICROTASK_FN_NAME_TO_KEY, STATE, OVERLAYS, MICROTASK} from './constant.mjs'
-import {NODES, NODES_LOOKUP, SKY_BORDER_NODE, MAX_FURNITURE_W, MAX_FURNITURE_H, ITEM_TYPE, ITEMS, RECIPES, MONSTERS, PLANT_KIND, PLANT_TYPE, PLANT_SYSTEM_LOOKUP, ALL_PLANT_SYSTEMS, TREE_IMAGES} from '../assets/data/data.mjs'
+import {NODES, NODES_LOOKUP, NODE_TYPE, SKY_BORDER_NODE, MAX_FURNITURE_W, MAX_FURNITURE_H, ITEM_TYPE, ITEMS, RECIPES, MONSTERS, PLANT_KIND, PLANT_TYPE, PLANT_SYSTEM_LOOKUP, ALL_PLANT_SYSTEMS, TREE_IMAGES} from '../assets/data/data.mjs'
 import {HELP_TITLES, hydrateHelp, debugHelpCategories} from '../assets/data/data-help.mjs'
 import {loadAssets, resolveAssetData} from './assets.mjs'
 import {timeManager, taskScheduler, microTasker, eventBus, seededRNG, parseLootCount, parseLootBuffs, buildLootHelpRow, blockedTiles} from './utils.mjs'
@@ -19,7 +19,7 @@ import {achievementManager} from './achievement.mjs'
 import {playerManager, lootPopupManager, handedToolManager, hotbarOverlay} from './player.mjs'
 import {floraManager, sunflowerSystem, oleanderSystem, parsnipSystem, ambermirageSystem, oakSystem, mahoganySystem, cobwebSystem, coconutSystem, thornspineSystem} from './ecosystem.mjs'
 import {ACHIEVEMENT_CATEGORIES} from '../assets/data/data-achievement.mjs'
-import {miningManager, placingManager, foragingManager, choppingManager, sowingManager, hammingManager, furnishingManager} from './action.mjs'
+import {miningManager, placingManager, foragingManager, choppingManager, sowingManager, hammingManager, furnishingManager, fillingManager} from './action.mjs'
 import './combat.mjs'
 
 const WITH_DEBUG_HUD = true // passer à false pour désactiver sans toucher IS_DEV
@@ -623,7 +623,9 @@ class GameCore {
 
     const item = ITEMS[slot.item]
 
-    if (item.type & ITEM_TYPE.TOOL) {
+    if ((item.type & ITEM_TYPE.FILLABLE) && (tileNode.type & NODE_TYPE.LIQUID)) {
+      fillingManager.tryFill(tileIndex, tileNode, item, slot.slot)
+    } else if (item.type & ITEM_TYPE.TOOL) {
       if (item.stype === 'pickaxe') miningManager.tryMine(tileIndex, tileNode, item, slot.prefix)
       else if (item.stype === 'hammer') hammingManager.tryUse(tileIndex, tileNode, item, slot.prefix)
       else if (item.stype === 'axe') choppingManager.tryChop(tileIndex, tileNode, item, slot.prefix)

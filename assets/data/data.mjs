@@ -323,20 +323,20 @@ export const ITEMS = {
   redSlug: {name: 'Red Slug', type: ITEM_TYPE.BAIT, star: 1, stype: 'bait', image: 'bait_32_32-2-3', help: 'Fishing Baits', tooltip: '???'},
 
   // pickaxes
-  pickaxeCopper: {name: 'Copper Pickaxe', type: ITEM_TYPE.TOOL, stype: 'pickaxe', star: 2, image: 'tools_32_32-0-0', placed: 'handed_48_48-0-0', help: 'Mining Tools', tooltip: 'Tools used to remove blocks, converting them to item form', range: 0, mining: {speed: 0, tiles: 1}},
-  pickaxeIron: {name: 'Iron Pickaxe', type: ITEM_TYPE.TOOL, stype: 'pickaxe', star: 3, image: 'tools_32_32-1-0', placed: 'handed_48_48-1-0', help: 'Mining Tools', tooltip: 'Tools used to remove blocks, converting them to item form', range: 0, mining: {speed: 25, tiles: 1}},
-  pickaxeSilver: {name: 'Silver Pickaxe', type: ITEM_TYPE.TOOL, stype: 'pickaxe', star: 4, image: 'tools_32_32-2-0', placedright: 'w_42_42-0-0', placedleft: 'w_42_42-0-1', help: 'Mining Tools', tooltip: 'Tools used to remove blocks, converting them to item form', range: 0, mining: {speed: 50, tiles: 1}},
-  pickaxeGold: {name: 'Gold Pickaxe', type: ITEM_TYPE.TOOL, stype: 'pickaxe', star: 4, image: 'tools_32_32-3-0', placedright: 'w_42_42-0-0', placedleft: 'w_42_42-0-1', help: 'Mining Tools', tooltip: 'Tools used to remove blocks, converting them to item form', range: 1, mining: {speed: 75, tiles: 1}},
-  pickaxeCobalt: {name: 'Cobalt Pickaxe', type: ITEM_TYPE.TOOL, stype: 'pickaxe', star: 5, image: 'tools_32_32-4-0', placedright: 'w_42_42-0-0', placedleft: 'w_42_42-0-1', help: 'Mining Tools', tooltip: 'Tools used to remove blocks, converting them to item form', range: 2, mining: {speed: 100, tiles: 1}},
-  pickaxePlatinum: {name: 'Platinum Pickaxe', type: ITEM_TYPE.TOOL, stype: 'pickaxe', star: 5, image: 'tools_32_32-5-0', placedright: 'w_42_42-0-0', placedleft: 'w_42_42-0-1', help: 'Mining Tools', tooltip: 'Tools used to remove blocks, converting them to item form', range: 3, mining: {speed: 125, tiles: 1}},
-  pickaxeBone: {name: 'Bone Pickaxe', type: ITEM_TYPE.TOOL, stype: 'pickaxe', star: 4, image: 'tools_32_32-1-5', placedright: 'w_42_42-0-0', placedleft: 'w_42_42-0-1', help: 'Mining Tools', tooltip: 'Tools used to remove blocks, converting them to item form', range: 1, mining: {speed: 175, tiles: 1}},
-  pickaxeProspector: {name: 'Prospector\'s Pickaxe', type: ITEM_TYPE.TOOL, stype: 'pickaxe', star: 5, image: 'tools_32_32-2-5', placedright: 'w_42_42-0-0', placedleft: 'w_42_42-0-1', help: 'Mining Tools', tooltip: 'Tools used to remove multiple blocks, converting them to item form', range: 0, mining: {speed: 75, tiles: 5}},
-  pickaxeGeologist: {name: 'Geologist\'s Pickaxe', type: ITEM_TYPE.TOOL, stype: 'pickaxe', star: 5, image: 'tools_32_32-3-5', placedright: 'w_42_42-0-0', placedleft: 'w_42_42-0-1', help: 'Mining Tools', tooltip: 'Tools used to remove multiple blocks, converting them to item form', range: 2, mining: {speed: 100, tiles: 7}},
+  pickaxeCopper: {name: 'Copper Pickaxe', type: ITEM_TYPE.TOOL, stype: 'pickaxe', star: 2, image: 'tool_32_32-0-0', placed: 'handed_48_48-0-0', help: 'Mining Tools', tooltip: 'Tools used to remove blocks, converting them to item form', range: 0, mining: {speed: 0, tiles: 1}},
+  pickaxeIron: {name: 'Iron Pickaxe', type: ITEM_TYPE.TOOL, stype: 'pickaxe', star: 3, image: 'tool_32_32-1-0', placed: 'handed_48_48-1-0', help: 'Mining Tools', tooltip: 'Tools used to remove blocks, converting them to item form', range: 0, mining: {speed: 25, tiles: 1}},
+  pickaxeSilver: {name: 'Silver Pickaxe', type: ITEM_TYPE.TOOL, stype: 'pickaxe', star: 4, image: 'tool_32_32-2-0', placedright: 'w_42_42-0-0', placedleft: 'w_42_42-0-1', help: 'Mining Tools', tooltip: 'Tools used to remove blocks, converting them to item form', range: 0, mining: {speed: 50, tiles: 1}},
+  pickaxeGold: {name: 'Gold Pickaxe', type: ITEM_TYPE.TOOL, stype: 'pickaxe', star: 4, image: 'tool_32_32-3-0', placedright: 'w_42_42-0-0', placedleft: 'w_42_42-0-1', help: 'Mining Tools', tooltip: 'Tools used to remove blocks, converting them to item form', range: 1, mining: {speed: 75, tiles: 1}},
+  pickaxeCobalt: {name: 'Cobalt Pickaxe', type: ITEM_TYPE.TOOL, stype: 'pickaxe', star: 5, image: 'tool_32_32-4-0', placedright: 'w_42_42-0-0', placedleft: 'w_42_42-0-1', help: 'Mining Tools', tooltip: 'Tools used to remove blocks, converting them to item form', range: 2, mining: {speed: 100, tiles: 1}},
+  pickaxePlatinum: {name: 'Platinum Pickaxe', type: ITEM_TYPE.TOOL, stype: 'pickaxe', star: 5, image: 'tool_32_32-5-0', placedright: 'w_42_42-0-0', placedleft: 'w_42_42-0-1', help: 'Mining Tools', tooltip: 'Tools used to remove blocks, converting them to item form', range: 3, mining: {speed: 125, tiles: 1}},
+  pickaxeBone: {name: 'Bone Pickaxe', type: ITEM_TYPE.TOOL, stype: 'pickaxe', star: 4, image: 'tool_32_32-1-5', placedright: 'w_42_42-0-0', placedleft: 'w_42_42-0-1', help: 'Mining Tools', tooltip: 'Tools used to remove blocks, converting them to item form', range: 1, mining: {speed: 175, tiles: 1}},
+  pickaxeProspector: {name: 'Prospector\'s Pickaxe', type: ITEM_TYPE.TOOL, stype: 'pickaxe', star: 5, image: 'tool_32_32-2-5', placedright: 'w_42_42-0-0', placedleft: 'w_42_42-0-1', help: 'Mining Tools', tooltip: 'Tools used to remove multiple blocks, converting them to item form', range: 0, mining: {speed: 75, tiles: 5}},
+  pickaxeGeologist: {name: 'Geologist\'s Pickaxe', type: ITEM_TYPE.TOOL, stype: 'pickaxe', star: 5, image: 'tool_32_32-3-5', placedright: 'w_42_42-0-0', placedleft: 'w_42_42-0-1', help: 'Mining Tools', tooltip: 'Tools used to remove multiple blocks, converting them to item form', range: 2, mining: {speed: 100, tiles: 7}},
 
   // Sickles - OK images
-  sickleCopper: {name: 'Copper Sickle', type: ITEM_TYPE.TOOL, stype: 'sickle', star: 1, image: 'tool_32_32-0-3', placed: 'placed_42_42-0-3', help: 'Foraging Tools', tooltip: 'Tools used to harvest plants', range: 0, foraging: {speed: 0}},
-  sickleSilver: {name: 'Silver Sickle', type: ITEM_TYPE.TOOL, stype: 'sickle', star: 3, image: 'tool_32_32-1-3', placedright: 'placed_42_42-1-3', speed: 0, help: 'Foraging Tools', tooltip: 'Tools used to harvest plants', range: 1, foraging: {speed: 60}},
-  sickleGold: {name: 'Gold Sickle', type: ITEM_TYPE.TOOL, stype: 'sickle', star: 5, image: 'tool_32_32-2-3', placed: 'placed_42_42-2-3', speed: 0, help: 'Foraging Tools', tooltip: 'Tools used to harvest plants', range: 2, foraging: {speed: 120}},
+  sickleCopper: {name: 'Copper Sickle', type: ITEM_TYPE.TOOL, stype: 'sickle', star: 1, image: 'tool_32_32-0-3', placed: 'handed_48_48-0-3', help: 'Foraging Tools', tooltip: 'Tools used to harvest plants', range: 0, foraging: {speed: 0}},
+  sickleSilver: {name: 'Silver Sickle', type: ITEM_TYPE.TOOL, stype: 'sickle', star: 3, image: 'tool_32_32-1-3', placed: 'handed_48_48-1-3', speed: 0, help: 'Foraging Tools', tooltip: 'Tools used to harvest plants', range: 1, foraging: {speed: 60}},
+  sickleGold: {name: 'Gold Sickle', type: ITEM_TYPE.TOOL, stype: 'sickle', star: 5, image: 'tool_32_32-2-3', placed: 'handed_48_48-2-3', speed: 0, help: 'Foraging Tools', tooltip: 'Tools used to harvest plants', range: 2, foraging: {speed: 120}},
 
   // Bug Nets
   bugNetWood: {name: 'Wooden Bug Net', type: ITEM_TYPE.TOOL, stype: 'bugNet', star: 1, image: 'tool_32_32-3-3', placedright: 'w_42_42-0-0', placedleft: 'w_42_42-0-1', help: 'Catching Tools', tooltip: 'Tools used to catch bugs', range: 0, catching: {speed: 0}},
@@ -516,9 +516,9 @@ export const ITEMS = {
   // Liquid containers (small capacity) - images OK
   glass: {name: 'Glass', type: 0, stype: 'glass', star: 1, image: 'refined_32_32-4-2', help: 'Bottles', tooltip: 'Used to make Bottles or decorative furniture'},
   bottle: {name: 'Bottle', type: ITEM_TYPE.FURNITURE | ITEM_TYPE.PLACABLE | ITEM_TYPE.FILLABLE, stype: 'container', star: 1, furnitureSet: 'glass', image: 'container_32_32-0-0', placed: 'container_32_32-0-0', unplacing: {speed: 600}, help: 'Bottles', tooltip: 'Crafting container for potions and food'},
-  water: {name: 'Bottled Water', type: ITEM_TYPE.FURNITURE | ITEM_TYPE.PLACABLE | ITEM_TYPE.POTION | ITEM_TYPE.USABLE, stype: 'container', star: 1, image: 'container_32_32-1-0', placed: 'container_32_32-1-0', heal: 20, sickness: 40, unplacing: {speed: 600}, help: 'Bottles', tooltip: 'Healing item and Crafting Material for potions'},
-  sap: {name: 'Bottled Sap', type: ITEM_TYPE.FURNITURE | ITEM_TYPE.PLACABLE | ITEM_TYPE.POTION | ITEM_TYPE.USABLE, stype: 'container', star: 1, image: 'container_32_32-2-0', placed: 'container_32_32-2-0', heal: 80, sickness: 60, timedbuff: 'honey', time: 15, unplacing: {speed: 600}, help: 'Bottles', tooltip: 'Healing item'},
-  honey: {name: 'Bottled Honey', type: ITEM_TYPE.FURNITURE | ITEM_TYPE.PLACABLE | ITEM_TYPE.POTION | ITEM_TYPE.USABLE, stype: 'container', star: 1, image: 'container_32_32-3-0', placed: 'container_32_32-3-0', heal: 80, sickness: 60, timedbuff: 'honey', time: 15, unplacing: {speed: 600}, help: 'Bottles', tooltip: 'Healing item'},
+  bottleWater: {name: 'Bottled Water', type: ITEM_TYPE.FURNITURE | ITEM_TYPE.PLACABLE | ITEM_TYPE.POTION | ITEM_TYPE.USABLE, stype: 'container', star: 1, image: 'container_32_32-1-0', placed: 'container_32_32-1-0', heal: 20, sickness: 40, unplacing: {speed: 600}, help: 'Bottles', tooltip: 'Healing item and Crafting Material for potions'},
+  bottleSap: {name: 'Bottled Sap', type: ITEM_TYPE.FURNITURE | ITEM_TYPE.PLACABLE | ITEM_TYPE.POTION | ITEM_TYPE.USABLE, stype: 'container', star: 1, image: 'container_32_32-2-0', placed: 'container_32_32-2-0', heal: 80, sickness: 60, timedbuff: 'honey', time: 15, unplacing: {speed: 600}, help: 'Bottles', tooltip: 'Healing item'},
+  bottleHoney: {name: 'Bottled Honey', type: ITEM_TYPE.FURNITURE | ITEM_TYPE.PLACABLE | ITEM_TYPE.POTION | ITEM_TYPE.USABLE, stype: 'container', star: 1, image: 'container_32_32-3-0', placed: 'container_32_32-3-0', heal: 80, sickness: 60, timedbuff: 'honey', time: 15, unplacing: {speed: 600}, help: 'Bottles', tooltip: 'Healing item'},
 
   // Liquid containers (large capacity)
   bucket: {name: 'Empty Bucket', type: ITEM_TYPE.FURNITURE | ITEM_TYPE.PLACABLE | ITEM_TYPE.FILLABLE | ITEM_TYPE.ARMOR, stype: 'container', armor: 'head', star: 1, image: 'container_32_32-0-1', placed: 'container_32_32-0-1', armorImage: 'head_26_22-0-2', unplacing: {speed: 600}, help: 'Buckets', tooltip: 'Used to scoop up a small amount of water, honey or sap', defense: 1},
@@ -771,7 +771,7 @@ export const RECIPES = [
   // Pickaxes
   {result: {item: 'pickaxeCopper', count: 1}, station: 'anvil', ingredients: [{item: 'barCopper', count: 8}, {item: 'logOak', count: 4}, {item: 'cutTopaz', count: 1}]},
   {result: {item: 'pickaxeIron', count: 1}, station: 'anvil', ingredients: [{item: 'barIron', count: 10}, {item: 'logOak', count: 3}, {item: 'cutRuby', count: 1}]},
-  {result: {item: 'pickaxeSilver', count: 1}, station: 'anvil', ingredients: [{item: 'barSilver', count: 10}, {item: 'logOak', count: 4}, {item: 'cutEmerald', count: 1}]},
+  {result: {item: 'pickaxeSilver', count: 1}, station: 'anvil', ingredients: [{item: 'barSilver', count: 10}, {item: 'logMahogany', count: 4}, {item: 'cutEmerald', count: 1}]},
   {result: {item: 'pickaxeGold', count: 1}, station: 'anvil', ingredients: [{item: 'barGold', count: 12}, {item: 'logMahogany', count: 4}, {item: 'cutEmerald', count: 2}]},
   {result: {item: 'pickaxeCobalt', count: 1}, station: 'forge', ingredients: [{item: 'barCobalt', count: 14}, {item: 'logOak', count: 4}, {item: 'cutSapphire', count: 3}]},
   {result: {item: 'pickaxePlatinum', count: 1}, station: 'forge', ingredients: [{item: 'barPlatinum', count: 16}, {item: 'logMahogany', count: 6}, {item: 'cutSapphire', count: 4}]},
@@ -781,9 +781,9 @@ export const RECIPES = [
   // Axes
   {result: {item: 'axeCopper', count: 1}, station: 'anvil', ingredients: [{item: 'barCopper', count: 10}, {item: 'logOak', count: 5}]},
   {result: {item: 'axeIron', count: 1}, station: 'anvil', ingredients: [{item: 'barIron', count: 12}, {item: 'logOak', count: 4}, {item: 'cutTopaz', count: 1}]},
-  {result: {item: 'axeSilver', count: 1}, station: 'anvil', ingredients: [{item: 'barSilver', count: 12}, {item: 'logOak', count: 5}, {item: 'cutRuby', count: 1}]},
+  {result: {item: 'axeSilver', count: 1}, station: 'anvil', ingredients: [{item: 'barSilver', count: 12}, {item: 'logMahogany', count: 5}, {item: 'cutRuby', count: 1}]},
   {result: {item: 'axeGold', count: 1}, station: 'anvil', ingredients: [{item: 'barGold', count: 14}, {item: 'logMahogany', count: 5}, {item: 'cutRuby', count: 2}]},
-  {result: {item: 'axeCobalt', count: 1}, station: 'forge', ingredients: [{item: 'barCobalt', count: 17}, {item: 'logOak', count: 5}, {item: 'cutEmerald', count: 3}]},
+  {result: {item: 'axeCobalt', count: 1}, station: 'forge', ingredients: [{item: 'barCobalt', count: 17}, {item: 'logMahogany', count: 5}, {item: 'cutEmerald', count: 3}]},
   {result: {item: 'axePlatinum', count: 1}, station: 'forge', ingredients: [{item: 'barPlatinum', count: 16}, {item: 'logMahogany', count: 7}, {item: 'cutSapphire', count: 4}]},
 
   // Hammers
@@ -905,7 +905,7 @@ export const RECIPES = [
   // Food - Tier 1-3
   {result: {item: 'sunflowerOil', count: 1}, station: 'tableWood', ingredients: [{item: 'sunflowerSeed', count: 1}]},
   {result: {item: 'oleanderOil', count: 2}, station: 'cookingPot', ingredients: [{item: 'oleander', count: 1}, {item: 'sunflowerOil', count: 1}]},
-  {result: {item: 'daw', count: 4}, station: 'byHand', ingredients: [{item: 'flour', count: 1}, {item: 'water', count: 1}], returned: [{item: 'bottle', count: 1}]},
+  {result: {item: 'daw', count: 4}, station: 'byHand', ingredients: [{item: 'flour', count: 1}, {item: 'bottleWater', count: 1}], returned: [{item: 'bottle', count: 1}]},
   {result: {item: 'bread', count: 1}, station: 'furnace', ingredients: [{item: 'daw', count: 1}]},
   {result: {item: 'croissant', count: 2}, station: 'furnace', ingredients: [{item: 'daw', count: 1}, {item: 'sunflowerOil', count: 1}]}
   // {output: 'clafoutis', station: 'furnace', recipe: [{item: 'flour', count: 1}, {item: 'milk', count: 1}, {item: 'cherry', count: 1}], bonus: [{item: 'cherryseed', count: 1}], built: 2},

@@ -870,7 +870,7 @@ Hives are large circular caverns built by [[Bees]] deep in [[Jungle]] biomes. Th
 **Loot** ⏳
 
 * [[node:honey]] — forms pools on the floor, abundant but dangerous to collect while [[Bees]] are present
-  * Collected with a [[item:bottle]] in hand → <<itemStar|honey>>
+  * Collected with a [[item:bottle]] in hand → <<itemStar|bottleHoney>>
 * [[node:hive]] — makes up the walls and ceiling of the Hive
   * [[Mining|Mined]] with an [[item:pickaxeIron]] or better → **<<itemStar|blockHive>>**
   * [[item:blockHive]] can be [[Crafting|smelted]] in a [[item:cookingPot]] → **<<itemStar|beeswax>>**
@@ -2367,7 +2367,7 @@ Obsidian is a volcanic glass formed where lava meets water. It is one of the har
 
 **Creating Obsidian** ⏳
 
-* Equip a [[item:water]]
+* Equip a [[item:bottleWater]]
 * Click on an empty tile above a [[node:lava]] tile
 * An Obsidian block appears at the clicked location
 * _Warning : lava is extremely dangerous — keep your distance and act quickly._
@@ -4288,9 +4288,9 @@ Empty containers used as crafting ingredients in cooking and potion recipes. The
 Filled directly from a liquid source in the world. Used as crafting ingredients in cooking and potion recipes.
 
 * <<itemStar|bottle>> — empty bottle, filled by clicking on a liquid tile
-  * [[item:water]] — [[node:water]] — healing item and potion ingredient
-  * [[item:honey]] — [[node:honey]] — healing item and buff
-  * [[item:sap]] — [[node:sap]] — buff
+  * [[item:bottleWater]] — [[node:water]] — healing item and potion ingredient
+  * [[item:bottleHoney]] — [[node:honey]] — healing item and buff
+  * [[item:bottleSap]] — [[node:sap]] — buff
 
 _[[Bottles]] are returned upon consuming the recipe result._ ⏳
 
@@ -4328,9 +4328,9 @@ Parler d'abord du Glass, puis des Bottles.
 **Bottle Types**
 
 * <<itemStar|bottle>> — empty bottle
-* <<itemStar|water>> — when full of [[node:water]]
-* <<itemStar|honey>> — when full of [[node:honey]]
-* <<itemStar|sap>> — when full of [[node:sap]]
+* <<itemStar|bottleWater>> — when full of [[node:water]]
+* <<itemStar|bottleHoney>> — when full of [[node:honey]]
+* <<itemStar|bottleSap>> — when full of [[node:sap]]
 
 **[[item:bottle]] Crafting**
 

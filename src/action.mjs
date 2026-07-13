@@ -1,5 +1,5 @@
 // action.mjs — MiningManager - PlacingManager - ForagingManager - ChoppingManager
-// SowingManager - HammingManager - FurnishingManager
+// SowingManager - HammingManager - FurnishingManager - FillingManager
 
 import {eventBus, taskScheduler, microTasker, blockedTiles, rollLootWithBuffs} from './utils.mjs'
 import {NODE_TYPE, NODES_LOOKUP, NODES, ITEM_TYPE, ITEMS, PLANT_SYSTEM_LOOKUP, PLANT_KIND} from '../assets/data/data.mjs'
@@ -391,6 +391,74 @@ class FurnishingManager {
   }
 }
 export const furnishingManager = new FurnishingManager()
+
+/* ====================================================================================================
+   REMPLISSAGE DE CONTENANTS (FILLING)
+   ==================================================================================================== */
+
+/** Résultat obtenu par liquide source */
+const LIQUID_RESULT_SUFFIX = {
+  [NODES.SEA.code]: 'Water',
+  [NODES.WATER.code]: 'Water',
+  [NODES.HONEY.code]: 'Honey',
+  [NODES.SAP.code]: 'Sap'
+}
+
+class FillingManager {
+  constructor () {
+    // Micro-tâche
+    this.onFillContainer = this.onFillContainer.bind(this)
+  }
+
+  /**
+   * Valide la demande de remplissage et déclenche la micro-tâche.
+   * Point d'entrée unique depuis core.mjs (#processWorldClick), appelé uniquement
+   * si l'item tenu est FILLABLE et la tuile cliquée est LIQUID.
+   * @param {number} tileIndex — (y << 10) | x
+   * @param {object} tileNode  — NODES_LOOKUP[tileCode]
+   * @param {object} item      — ITEMS[slot.item] (bottle ou bucket)
+   * @param {number} slotIndex — slot.slot (index hotbar)
+   */
+  tryFill (tileIndex, tileNode, item, slotIndex) {
+    if (buffManager.getBuff('playerFreeze')) return
+    if (!isInInteractionRange(tileIndex)) { eventBus.emit('sound/play', 'toofar'); return }
+    const {priority, capacity} = MICROTASK.FILL_CONTAINER
+    microTasker.enqueue(this.onFillContainer, priority, capacity, tileIndex, tileNode, item, slotIndex)
+  }
+
+  /**
+   * Callback MicroTasker : exécute le remplissage.
+   * Re-vérifie la tuile cible — elle a pu changer entre tryFill et l'exécution.
+   * Consomme l'item en main, crédite le contenant rempli, transforme la tuile en SKY
+   * (si la tuile au-dessus est SKY) ou VOID, émet 'world/tile-changed'.
+   * @param {number} tileIndex
+   * @param {object} tileNode
+   * @param {object} item
+   * @param {number} slotIndex
+   */
+  onFillContainer (tileIndex, tileNode, item, slotIndex) {
+    const tileOldCode = chunkManager.getTileAt(tileIndex)
+    if (tileOldCode !== tileNode.code) return // tuile changée entre-temps
+
+    const suffix = LIQUID_RESULT_SUFFIX[tileOldCode]
+    if (suffix === undefined) return // liquide non convertible (ex. Deep Sea)
+
+    const resultId = `${item.code}${suffix}`
+
+    // consommation / crédit
+    inventoryManager.decrementHotbarSlotCount(slotIndex)
+    inventoryManager.loot(resultId, 1, '')
+
+    // transformation de la tuile
+    const aboveCode = chunkManager.getTileAt(tileIndex - WORLD_WIDTH)
+    const tileNewCode = aboveCode === NODES.SKY.code ? NODES.SKY.code : NODES.VOID.code
+    chunkManager.setTileAt(tileIndex, tileNewCode)
+    eventBus.emit('world/tile-changed', {tileIndex, tileOldCode, tileNewCode})
+
+    eventBus.emit('sound/play', 'placing')
+  }
+}
+export const fillingManager = new FillingManager()
 
 /* ====================================================================================================
    FORAGING DE PLANTES
