@@ -84,6 +84,8 @@ export const IMAGE_FILES = [
   // TOOLS //
   // ///// //
 
+  `${BASE_DIR}/tools_32_32.png`,
+  `${BASE_DIR}/container_32_32.png`,
   `${BASE_DIR}/handed_48_48.png`,
 
   // WEAPONS //
@@ -111,7 +113,6 @@ export const IMAGE_FILES = [
   // 'assets/sprites/blocks_16_16.png',
   // weapons / tools / walls / seeds / platforms / bags
   // misc
-  `${BASE_DIR}/tools_32_32.png`,
   // accessory
   `${BASE_DIR}/accessories_32_32.png`,
   // furniture / crafting station
