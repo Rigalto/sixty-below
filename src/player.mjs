@@ -246,11 +246,21 @@ class PlayerManager {
     // changement de sens : on repart de la vitesse minimale pour permettre un repositionnement précis
     if (direction !== this.#prevDirSign) { this.#rampX = 0 }
     this.#prevDirSign = direction
-    this.#rampX = this.#rampX + dt < ACCEL_RAMP_TIME ? this.#rampX + dt : ACCEL_RAMP_TIME
 
-    const ratio = ACCEL_MIN_RATIO + (1 - ACCEL_MIN_RATIO) * (this.#rampX / ACCEL_RAMP_TIME)
-
-    const speed = PLAYER.speed * ratio
+    let speed
+    if (this.#rampX >= ACCEL_RAMP_TIME) {
+      // cas majoritaire : rampe déjà à son terme, vitesse max directe
+      speed = PLAYER.speed
+    } else {
+      this.#rampX += dt
+      if (this.#rampX >= ACCEL_RAMP_TIME) {
+        this.#rampX = ACCEL_RAMP_TIME
+        speed = PLAYER.speed
+      } else {
+        const ratio = ACCEL_MIN_RATIO + (1 - ACCEL_MIN_RATIO) * (this.#rampX / ACCEL_RAMP_TIME)
+        speed = PLAYER.speed * ratio
+      }
+    }
     const dist = speed * dt * direction
     this.#direction = direction < 0 ? 0 : 1
 
