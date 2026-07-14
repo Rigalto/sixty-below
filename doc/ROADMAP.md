@@ -12,7 +12,7 @@
 - Tester Cas 3 (`onTileChangedParsnip`) : apparition d'un nouveau spot quand une tuile devient GRASSFOREST (propagation naturelle).
 - Tester `onTreePlantedParsnip` : apparition d'un oak.
 - Tester `onTreePlantedSunflower` : apparition d'un oak.
-- implémenter une accélération progressive sur l'axe des X, pour pouvoir se positionner plus facilement. Arrêt instantané.
+- Implémenter le vidage (`PouringManager`) des containers remplis (bottle, bucket).
 - Modifier le volume sonore des sons du jeu (ActionWidget)
 - Supprimer les actions de debug accessibles au joueur, quand hébergement sous GitHub :
   - affichage après génération du monde
@@ -20,9 +20,8 @@
 - Implémenter l'attribut 'tiles' du mining (permet de miner plusieurs tuiles en une seule fois)
 - Utiliser les wood planks dans des recettes
 - Supprimer les chunks en mémoire qui sont périmés
-- brancher les Crafting Stations au craft panel
-- implémenter les platforms dans le déplacement.
-- corriger les icones dans tool_32_32 : dague, épée, bow, hache, pickaxe, hammer, bug net, fishing rod
+- corriger les icones dans weapon_32_32 : dague, épée, bow, boomrang
+- corriger les icones dans tool_32_32 : hache, pickaxe, hammer, axe
 - continuer la correction et l'ajout de fiches d'aide (`HELP`) et d'items (`ITEMS`)
 - Recettes pour créer Linen Rope et l'utiliser
 - Mettre la bonne palette et un entourage noir pour tool_32_32, reste à faire :
