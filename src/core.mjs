@@ -17,7 +17,7 @@ import {furnitureManager} from './housing.mjs'
 import {craftOverlay} from './craft.mjs'
 import {achievementManager} from './achievement.mjs'
 import {playerManager, lootPopupManager, handedToolManager, hotbarOverlay} from './player.mjs'
-import {floraManager, sunflowerSystem, oleanderSystem, parsnipSystem, ambermirageSystem, oakSystem, mahoganySystem, cobwebSystem, coconutSystem, thornspineSystem} from './ecosystem.mjs'
+import {floraManager, sunflowerSystem, oleanderSystem, parsnipSystem, ambermirageSystem, oakSystem, mahoganySystem, cobwebSystem, coconutSystem, thornspineSystem, spreadForestSystem} from './ecosystem.mjs'
 import {ACHIEVEMENT_CATEGORIES} from '../assets/data/data-achievement.mjs'
 import {miningManager, placingManager, foragingManager, choppingManager, sowingManager, hammingManager, furnishingManager, fillingManager} from './action.mjs'
 import './combat.mjs'
@@ -40,7 +40,7 @@ const plantSystemLookup = [ // Map<kind*100+type, system> — peuplée au fur et
   [PLANT_KIND.HERB * 100 + PLANT_TYPE.SUNFLOWER, sunflowerSystem],
   //   [PLANT_KIND.HERB * 100 + PLANT_TYPE.FIREBLOSSOM, fireblossomSystem],
   //   [PLANT_KIND.HERB * 100 + PLANT_TYPE.SKORN, skornSystem],
-  [PLANT_KIND.HERB * 100 + PLANT_TYPE.AMBERMIRAGE, ambermirageSystem]
+  [PLANT_KIND.HERB * 100 + PLANT_TYPE.AMBERMIRAGE, ambermirageSystem],
   //   [PLANT_KIND.HERB * 100 + PLANT_TYPE.BLOODMOON, bloodmoonSystem],
   //   [PLANT_KIND.HERB * 100 + PLANT_TYPE.SHADOWFERN, fernSystem],
   //   [PLANT_KIND.HERB * 100 + PLANT_TYPE.CRIMSONFROND, fernSystem],
@@ -51,10 +51,13 @@ const plantSystemLookup = [ // Map<kind*100+type, system> — peuplée au fur et
   //   [PLANT_KIND.HERB * 100 + PLANT_TYPE.CORAL_P, coralSystem],
   //   [PLANT_KIND.HERB * 100 + PLANT_TYPE.CORAL_Y, coralSystem],
   //   [PLANT_KIND.HERB * 100 + PLANT_TYPE.CORAL_G, coralSystem],
+  [PLANT_KIND.SPREAD * 100 + PLANT_TYPE.FOREST, spreadForestSystem]
+  // [PLANT_KIND.SPREAD * 100 + PLANT_TYPE.NONE, spreadMushroomSystem],
+  // [PLANT_KIND.SPREAD * 100 + PLANT_TYPE.JUNGLE, spreadJungleSystem]
   //   [PLANT_KIND.SPREAD * 100 + PLANT_TYPE.NONE, spreadSystem],
   //   [PLANT_KIND.SEED * 100 + PLANT_TYPE.NONE, seedSystem]
 ]
-const allPlantSystems = [sunflowerSystem, oleanderSystem, parsnipSystem, ambermirageSystem, oakSystem, mahoganySystem, coconutSystem, thornspineSystem]
+const allPlantSystems = [sunflowerSystem, oleanderSystem, parsnipSystem, ambermirageSystem, oakSystem, mahoganySystem, coconutSystem, thornspineSystem, spreadForestSystem]
 
 const debugHUD = () => {
   const debugDiv = document.createElement('div')
@@ -568,10 +571,11 @@ class GameCore {
     handedToolManager.render(ctx)
     if (this.showBlockedTiles) {
       blockedTiles.render(ctx) // DEBUG
-      sunflowerSystem.debugRenderSpots(ctx)
-      parsnipSystem.debugRenderSpots(ctx)
-      ambermirageSystem.debugRenderSpots(ctx)
-      oakSystem.debugRenderSpots(ctx)
+      // sunflowerSystem.debugRenderSpots(ctx)
+      // parsnipSystem.debugRenderSpots(ctx)
+      // ambermirageSystem.debugRenderSpots(ctx)
+      // oakSystem.debugRenderSpots(ctx)
+      spreadForestSystem.debugRenderSpots(ctx)
     }
     if (this.showGrids) {
       const buffs = buffManager.getBuffs(['showGrid', 'showInteractionRange', 'showToolRange'])

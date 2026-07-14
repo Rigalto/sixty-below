@@ -19,6 +19,7 @@
   - DB_CONFIG.DEBUG constant.mjs
 - Implémenter l'attribut 'tiles' du mining (permet de miner plusieurs tuiles en une seule fois)
 - Utiliser les wood planks dans des recettes
+- Dans `paintSurfaceNatural`, on prépare des enregistements : sont-ils utilisés quelque part ? Dans cette même fonction, on retourne `surfacePlants`, a priori utilisée uniquement pour l'enregistrement. Il faudra sans doute nettoyer en n'enregistrant pas les tuiles GRASSFOREST et JUNGLEFOREST.
 - Supprimer les chunks en mémoire qui sont périmés
 - corriger les icones dans weapon_32_32 : dague, épée, bow, boomrang
 - corriger les icones dans tool_32_32 : hache, pickaxe, hammer, axe

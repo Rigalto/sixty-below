@@ -391,9 +391,9 @@ class WorldGenerator {
     await progress('Corals')
 
     // 8.3.4. Natural Spreading
-    plantGenerator.spreadNatural(surfacePlants, NODES.GRASSFOREST.code, NODES.CLAY.code, NODES.SKY.code)
-    plantGenerator.spreadNatural(surfacePlants, NODES.GRASSJUNGLE.code, NODES.MUD.code, NODES.SKY.code)
-    plantGenerator.spreadNatural(mushroomPlants, NODES.GRASSMUSHROOM.code, NODES.HUMUS.code, NODES.VOID.code)
+    plantGenerator.spreadNatural(surfaceLine, NODES.GRASSFOREST.code, NODES.DIRT.code, PLANT_TYPE.FOREST)
+    plantGenerator.spreadNatural(surfaceLine, NODES.GRASSJUNGLE.code, NODES.SILT.code, PLANT_TYPE.JUNGLE)
+    plantGenerator.spreadMushroom(mushroomPlants, NODES.GRASSMUSHROOM.code, NODES.HUMUS.code, NODES.VOID.code, PLANT_TYPE.NONE)
     await progress('Natural Spreading')
 
     plantGenerator.placeAmbermirages(surfaceLine, guarded, currentWeather)
@@ -5260,8 +5260,7 @@ class WorldCarver {
  * @param {Int16Array}                    surfaceLine       — Y de la première tuile solide par colonne
  * @param {Array<{biome, width, offset}>} biomesDescription — zones biome ordonnées
  * @param {Set<number>} xPositions — ensemble des coordonnées X protégées contre la transformation en NATURAL
- *  @returns {plants: Array<{kind, index, type, deleted}>}
-
+ * @returns {plants: Array<{kind, index, type, deleted}>}
  */
   paintSurfaceNatural (surfaceLine, biomesDescription, guarded) {
     const GRASSFOREST = NODES.GRASSFOREST.code
@@ -7649,17 +7648,64 @@ class PlantGenerator {
   }
 
   /**
- * Ensemence les tuiles TOPSOIL exposées au GAZ voisines des tuiles NATURAL.
- * Crée des enregistrements SPREAD dans l'objectstore plant.
+ * Crée un enregistrement SPREAD pour chaque tuile DIRT/SILT de la ligne de surface,
+ * armé (spreadTimestamp non-null) uniquement si elle borde déjà une tuile NATURAL.
  *
- * @param {Array<{kind, type, index, deleted}>} naturalPlants — tuiles NATURAL (filtrées par naturalCode)
- * @param {number} naturalCode — code NATURAL (GRASSFOREST, GRASSJUNGLE, GRASSMUSHROOM)
- * @param {number} topsoilCode — code TOPSOIL (CLAY, MUD, HUMUS)
- * @param {number} gazCode     — code GAZ (SKY ou VOID)
+ * @param {Int16Array} surfaceLine — Y de la première tuile solide par colonne
+ * @param {number} naturalCode — code NATURAL (GRASSFOREST, GRASSJUNGLE)
+ * @param {number} topsoilCode — code TOPSOIL (DIRT, SILT)
+ * @param {number} plantType   — PLANT_TYPE.FOREST ou PLANT_TYPE.JUNGLE
  */
-  spreadNatural (naturalPlants, naturalCode, topsoilCode, gazCode) {
+  spreadNatural (surfaceLine, naturalCode, topsoilCode, plantType) {
     const W = WORLD_WIDTH
-    const DAY_MS = 1_440_000
+    const HOUR_MS = 60_000 // 1h in-game = 60s temps réel
+
+    for (let x = 1; x < W - 1; x++) {
+      const y = surfaceLine[x]
+      const idx = (y << 10) | x
+
+      if (worldBuffer.readAt(idx) !== topsoilCode) continue
+
+      // 6 voisins : gauche, droite, haut-gauche, bas-gauche, haut-droite, bas-droite
+      const hasNaturalNeighbor =
+        worldBuffer.readAt(idx - 1) === naturalCode ||
+        worldBuffer.readAt(idx + 1) === naturalCode ||
+        worldBuffer.readAt(idx - W - 1) === naturalCode ||
+        worldBuffer.readAt(idx + W - 1) === naturalCode ||
+        worldBuffer.readAt(idx - W + 1) === naturalCode ||
+        worldBuffer.readAt(idx + W + 1) === naturalCode
+
+      const spreadTimestamp = hasNaturalNeighbor
+        ? (seededRNG.randomGetRealMinMax(24, 48) * HOUR_MS) | 0
+        : null
+
+      this.#plants.push({
+        id: uniqueIdGenerator.getUniqueId(),
+        kind: PLANT_KIND.SPREAD,
+        type: plantType,
+        index: idx,
+        naturalCode,
+        topsoilCode,
+        spreadTimestamp,
+        deleted: false
+      })
+    }
+  }
+
+  /**
+   * Ensemence les tuiles de HUMUS par des spores provenant des MUSHROOMGRASS avoisinantes.
+   * Crée des enregistrements SPREAD dans l'objectstore plant.
+   *
+   * @param {Array<{kind, type, index, deleted}>} naturalPlants — tuiles NATURAL (filtrées par naturalCode)
+   * @param {number} naturalCode — code NATURAL (GRASSFOREST, GRASSJUNGLE, GRASSMUSHROOM)
+   * @param {number} topsoilCode — code TOPSOIL (DIRT, SILT, HUMUS)
+   * @param {number} gazCode     — code GAZ (SKY ou VOID)
+   * @param {number} plantType   — PLANT_TYPE.FOREST, PLANT_TYPE.JUNGLE, ou PLANT_TYPE.NONE (mushroom)
+   */
+  spreadMushroom (naturalPlants, naturalCode, topsoilCode, gazCode, plantType) {
+    const W = WORLD_WIDTH
+    const HOUR_MS = 60_000 // 1h in-game = 60s temps réel
+
     const seeded = new Set() // évite les doublons
 
     for (const plant of naturalPlants) {
@@ -7685,11 +7731,11 @@ class PlantGenerator {
         seeded.add(nIdx)
 
         // const delay = Math.round(seededRNG.randomGetRealMinMax(1, 4) * DAY_MS)
-        const delay = (seededRNG.randomGetRealMinMax(1, 4) * DAY_MS) | 0
+        const delay = (seededRNG.randomGetRealMinMax(1, 48) * HOUR_MS) | 0
         this.#plants.push({
           id: uniqueIdGenerator.getUniqueId(),
           kind: PLANT_KIND.SPREAD,
-          type: PLANT_TYPE.NONE,
+          type: plantType,
           index: nIdx,
           naturalCode,
           topsoilCode,

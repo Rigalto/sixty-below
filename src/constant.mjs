@@ -287,6 +287,9 @@ export const MICROTASK = {
   TELEPORT_PHASE2: {priority: 22, capacity: 5, taskName: 'onTeleportPhase2'}, // gère la téléportation
   TELEPORT_PHASE3: {priority: 22, capacity: 2, taskName: 'onTeleportPhase3'}, // gère la téléportation
 
+  SPREAD_FOREST_TILE_CHECK: {priority: 20, capacity: 10, taskName: 'onSpreadForestTileCheck'}, // entretien réactif d'un record spread pour une tuile modifiée
+  SPREAD_FOREST_GROW: {priority: 20, capacity: 4, taskName: 'onSpreadForestGrow'}, // transformation DIRT → GRASSFOREST à l'échéance
+
   UNBLOOM_BOLETE: {priority: 20, capacity: 1, taskName: 'unbloomBolete'}, // supprime les bolete du monde
   BLOOM_BOLETE: {priority: 20, capacity: 2, taskName: 'bloomBolete'}, // ajoute les boletes dans le monde
   UNBLOOM_PINKMYCENIA: {priority: 20, capacity: 1, taskName: 'unbloomPinkMycenia'}, // supprime les pink mycenia du monde

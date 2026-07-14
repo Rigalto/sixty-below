@@ -911,9 +911,9 @@ Les enregistrements sont de natures très différentes, nature déterminée par 
   * `bloomTimestamp` : heure (timestamp) de prochaine récolte possible
 * `kind` SPREAD : liste des tuiles auto-propagées dans le monde
   * `id` : identifiant unique de la graine
-  * `type` : `PLANT_TYPE.NONE`
+  * `type` : `PLANT_TYPE.FOREST`, `PLANT_TYPE.JUNGLE`, ou `PLANT_TYPE.NONE` (mushroom, non distingué)
   * `index` : position de la graine (tuile où elle se trouve)
-  * `topsoilCode` : type de tuile ensemencée (`NODES.CLAY.code`, `NODES.MUD.code`, `NODES.HUMUS.code`)
+  * `topsoilCode` : type de tuile ensemencée (`NODES.DIRT.code`, `NODES.SILT.code`, `NODES.HUMUS.code`)
   * `naturalCode` : type de tuile ensemencée (`NODES.GRASSFOREST.code`, `NODES.GRASSJUNGLE.code`, `NODES.GRASSMUSHROOM.code`)
   * `spreadTimestamp` : timestamp auquel la transformation sera effectuée
 
@@ -1280,7 +1280,7 @@ Le paramètre `offsetX` de `digNoisyCircle`, `digNoisyEllipse` et `digNoisyRect`
 | `liquidFiller`       | `LiquidFiller`      | Flood-fill BFS des zones liquides et automate pour le SAND. |
 | `webFiller` | `WebFiller` | Peuplement WEB : `fillCobwebCave(cx, cy)` pour les caves, `scatterWebs(surfaceUnder)` pour le peuplement global différé. |
 | `furnitureGenerator ` | `FurnitureGenerator ` | Gestion des furnitures. `init()`, `getFurnitureSize(code)`, `addFurnitureAt(index, code)`, `get furnitures()`, `firstAvailableSlot(container, capacity, furnitureId)`, `addInHotbar(item, count, prefix, slot)`, `addInChest(chest, item, count, prefix)`, `get inventory()`, `placeSeaChests(seaRect)`, `placeCavernChests(zoneRects)`, `placeUndergroundChests(zoneRects)`, `placeSurfaceChests(zoneRects)`, `placeSurfaceLineChests(surfaceLine, guardedX, biomesDescription)`, `fillChest (chest)` |
-| `plantGenerator`       | `PlantGenerator`      | Ajout de la flore dans le monde. `init()`, `get plants()`, `placeSeaCoconut(beachRect, surfaceLine, isLeft, guarded)`, `placeOasisCoconut(lake, surfaceLine, guarded)`, `placeCorals(seaRect, guarded)`, `placeTrees(surfaceLine, guarded)`, `placeGiantMushrooms(mushroomPlants)`, `spreadNatural(naturalPlants, naturalCode, topsoilCode, gazCode)`, `placeAmbermirages(surfaceLine, guarded, initialWeather)`, `.placeParsnipsSunflowers(surfaceLine, guarded, oakPositions)`, `placeBloodmoons(surfaceLine, guarded)`, `placeFerns(fernsPlants):count`, `placeMoss(mossPlants)`, `placeCaveMushrooms(mushroomPlants, initialWeather, giantOccupied)`, `placeMandrakes(zoneRects, chestIndexes)`, `placeCactus(zoneRects, chestRects)`, `placeBamboo(zoneRects, chestIndexes)`, `placeOleanders(zoneRects, chestIndexes)`, `placeSatansCubes(zoneRects, chestIndexes)`, `placeSneakthorns(zoneRects, chestIndexes)`, `placeCursedcrowns(zoneRects, chestIndexes)`, `placeAbysshorns(zoneRects, chestIndexes)`, `placeInferncaps(zoneRects, chestIndexes)`, `placeThornspines(surfaceLine, guarded, biomesDescription):count` |
+| `plantGenerator`       | `PlantGenerator`      | Ajout de la flore dans le monde. `init()`, `get plants()`, `placeSeaCoconut(beachRect, surfaceLine, isLeft, guarded)`, `placeOasisCoconut(lake, surfaceLine, guarded)`, `placeCorals(seaRect, guarded)`, `placeTrees(surfaceLine, guarded)`, `placeGiantMushrooms(mushroomPlants)`, `spreadNatural(surfaceLine, naturalCode, topsoilCode, plantType)`, `spreadMushroom(naturalPlants, naturalCode, topsoilCode, gazCode, plantType)`, `placeAmbermirages(surfaceLine, guarded, initialWeather)`, `.placeParsnipsSunflowers(surfaceLine, guarded, oakPositions)`, `placeBloodmoons(surfaceLine, guarded)`, `placeFerns(fernsPlants):count`, `placeMoss(mossPlants)`, `placeCaveMushrooms(mushroomPlants, initialWeather, giantOccupied)`, `placeMandrakes(zoneRects, chestIndexes)`, `placeCactus(zoneRects, chestRects)`, `placeBamboo(zoneRects, chestIndexes)`, `placeOleanders(zoneRects, chestIndexes)`, `placeSatansCubes(zoneRects, chestIndexes)`, `placeSneakthorns(zoneRects, chestIndexes)`, `placeCursedcrowns(zoneRects, chestIndexes)`, `placeAbysshorns(zoneRects, chestIndexes)`, `placeInferncaps(zoneRects, chestIndexes)`, `placeThornspines(surfaceLine, guarded, biomesDescription):count` |
 
 ---
 

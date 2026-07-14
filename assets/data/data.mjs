@@ -967,7 +967,10 @@ export const PLANT_TYPE = {
   BOLETE: 71,
   PINKMYCENIA: 72,
   FROSTCAP: 73,
-  DAWNCAP: 74
+  DAWNCAP: 74,
+  // Spread
+  FOREST: 81,
+  JUNGLE: 82
 }
 
 // Peuplée dans GameCore.boot(), après import des systèmes.

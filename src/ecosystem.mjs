@@ -1,5 +1,6 @@
 // ecosystem.mjs — FloraManager - OakSystem - MahoganySystem - CoconutSystem - ThornspineSystem
 // SunflowerSystem - OleanderSystem - ParsnipSystem - AmbermirageSystem - CobwebSystem - HiveSystem
+// SpreadForestSystem
 // SampleSystem
 
 import {WORLD_WIDTH, WORLD_HEIGHT, MICROTASK, TOPSOIL_Y_SKY_SURFACE, TOPSOIL_Y_SURFACE_UNDER, TOPSOIL_Y_UNDER_CAVERNS} from './constant.mjs'
@@ -3851,6 +3852,321 @@ class CobwebSystem {
   }
 }
 export const cobwebSystem = new CobwebSystem()
+
+/* ====================================================================================================
+   SPREAD FOREST SYSTEM
+   ====================================================================================================
+
+   Singleton : spreadForestSystem.
+
+   Suit toutes les tuiles DIRT exposées au SKY (candidates ou non à la transformation en
+   GRASSFOREST). Un record existe pour chaque tuile éligible ; spreadTimestamp est null tant
+   qu'aucun voisin GRASSFOREST ne l'a armée. Purement réactif : aucun scan périodique, tout
+   passe par 'world/tile-changed'.
+
+   Règles (cf. conception validée) :
+     1. Cycle de vie du record — dépend uniquement de l'éligibilité (DIRT + SKY au-dessus),
+        indépendamment du voisinage.
+     2. Armement / désarmement — dépend uniquement du voisinage GRASSFOREST d'un record existant.
+     3. Reversion GRASSFOREST → DIRT quand le SKY au-dessus disparaît (émet 'world/tile-changed',
+        traité ensuite comme un minage classique par la règle 2).
+
+   ==================================================================================================== */
+
+class SpreadForestSystem {
+  #list = [] // record[] — toutes les tuiles DIRT+SKY suivies (armées ou non)
+  #byIndex = new Map() // Map<tileIndex, record> — lookup O(1) pour les règles 1/2/3
+
+  constructor () {
+    // eventBus
+    this.onTileChangedSpread = this.onTileChangedSpread.bind(this)
+    eventBus.on('world/tile-changed', this.onTileChangedSpread)
+    // micro-tâches
+    this.onSpreadForestTileCheck = this.onSpreadForestTileCheck.bind(this)
+    this.onSpreadForestGrow = this.onSpreadForestGrow.bind(this)
+  }
+
+  /**
+   * Réinitialise toutes les structures. Appelé en début de session.
+   */
+  init () {
+    this.#list.length = 0
+    this.#byIndex.clear()
+  }
+
+  /**
+   * Hydrate un record SPREAD/NONE depuis la DB. Réarme le timer si spreadTimestamp était déjà
+   * fixé avant la sauvegarde (le record a survécu à un rechargement).
+   * @param {object} record — record de l'objectStore 'plant' (deleted=false garanti par l'appelant)
+   */
+  initPlant (record) {
+    this.#list.push(record)
+    this.#byIndex.set(record.index, record)
+
+    if (record.spreadTimestamp !== null) {
+      const {priority, capacity} = MICROTASK.SPREAD_FOREST_GROW
+      taskScheduler.enqueueAbsolute(`spread_forest_grow_${record.id}`, record.spreadTimestamp, this.onSpreadForestGrow, priority, capacity, record.index)
+    }
+  }
+
+  /**
+   * FloraManager n'affiche rien pour ce système (les tuiles DIRT/GRASSFOREST sont dessinées
+   * par WorldRenderer, pas par une surcouche plante) — aucune structure de culling nécessaire.
+   * IMPLÉMENTATION OBLIGATOIRE (contrat FloraManager)
+   * @param {Set<number>} preloadChunks
+   */
+  onPreloadChunksChanged (preloadChunks) { }
+
+  /**
+   * Aucun rendu propre — les tuiles suivies sont déjà des tuiles de decor normales.
+   * IMPLÉMENTATION OBLIGATOIRE (contrat FloraManager)
+   * @param {CanvasRenderingContext2D} ctx
+   */
+  render (ctx) { }
+
+  /**
+   * Ces records ne représentent pas une plante interactive (pas de foraging/shake/chop) :
+   * jamais retourné comme "plante sur cette tuile".
+   * IMPLÉMENTATION OBLIGATOIRE (contrat FloraManager)
+   * @param {number} tileIndex
+   * @returns {null}
+   */
+  getPlantAt (tileIndex) { return null }
+
+  /**
+   * IMPLÉMENTATION OBLIGATOIRE (contrat FloraManager) — non utilisé, getPlantAt renvoie
+   * toujours null pour ce système donc isPresent n'est jamais appelé en pratique.
+   * @param {object} record
+   * @returns {boolean}
+   */
+  isPresent (record) { return record.spreadTimestamp !== null }
+
+  /**
+   * Calcule les 6 voisins (gauche, droite, haut-gauche, bas-gauche, haut-droite, bas-droite)
+   * d'une tuile. Allocation d'un tableau littéral — appelé uniquement sur changement de tuile
+   * réel (rare), jamais en render/frame loop : hors contrainte zéro-GC.
+   * @param {number} tileIndex — (y << 10) | x
+   * @returns {number[]}
+   */
+  #neighborsOf (tileIndex) {
+    const W = WORLD_WIDTH
+    return [
+      tileIndex - 1, tileIndex + 1,
+      tileIndex - W - 1, tileIndex + W - 1,
+      tileIndex - W + 1, tileIndex + W + 1
+    ]
+  }
+
+  /**
+   * Indique si au moins un des 6 voisins de la tuile est actuellement GRASSFOREST.
+   * @param {number} tileIndex
+   * @returns {boolean}
+   */
+  #hasForestGrassNeighbor (tileIndex) {
+    const GRASSFOREST = NODES.GRASSFOREST.code
+    for (const nIdx of this.#neighborsOf(tileIndex)) {
+      if (chunkManager.getTileAt(nIdx) === GRASSFOREST) return true
+    }
+    return false
+  }
+
+  /**
+   * Règle 1 (création) — crée un record dormant (spreadTimestamp null) pour une tuile DIRT
+   * nouvellement exposée au SKY, si aucun record n'existe déjà. Tente immédiatement l'armement
+   * (un voisin GRASSFOREST peut déjà être présent).
+   * @param {number} tileIndex
+   */
+  #tryCreateRecord (tileIndex) {
+    if (this.#byIndex.has(tileIndex)) return
+
+    const record = {
+      id: uniqueIdGenerator.getUniqueId(),
+      kind: PLANT_KIND.SPREAD,
+      type: PLANT_TYPE.FOREST,
+      index: tileIndex,
+      topsoilCode: NODES.DIRT.code,
+      naturalCode: NODES.GRASSFOREST.code,
+      spreadTimestamp: null,
+      deleted: false
+    }
+    this.#list.push(record)
+    this.#byIndex.set(tileIndex, record)
+    saveManager.queueStaticUpdate({storeName: 'plant', record})
+
+    this.#tryArm(tileIndex)
+  }
+
+  /**
+   * Règle 1 (suppression) — retire le record de cette tuile (n'est plus DIRT, ou n'est plus
+   * exposée au SKY). Désarme le timer si nécessaire. No-op si aucun record.
+   * @param {number} tileIndex
+   */
+  #removeRecord (tileIndex) {
+    const record = this.#byIndex.get(tileIndex)
+    if (record === undefined) return
+
+    if (record.spreadTimestamp !== null) taskScheduler.dequeue(`spread_forest_grow_${record.id}`)
+
+    record.deleted = true
+    saveManager.queueStaticUpdate({storeName: 'plant', record})
+
+    this.#byIndex.delete(tileIndex)
+    const idx = this.#list.indexOf(record)
+    this.#list[idx] = this.#list[this.#list.length - 1]
+    this.#list.length--
+  }
+
+  /**
+   * Règle 2 (armement) — arme un record suivi si non déjà armé et si au moins un voisin
+   * GRASSFOREST est présent. No-op si la tuile n'est pas suivie.
+   * @param {number} tileIndex
+   */
+  #tryArm (tileIndex) {
+    const record = this.#byIndex.get(tileIndex)
+    if (record === undefined) return
+    if (record.spreadTimestamp !== null) return
+    if (!this.#hasForestGrassNeighbor(tileIndex)) return
+
+    const HOUR_MS = 60_000 // 1h in-game = 60s temps réel (cohérent avec DAY_MS = 1_440_000)
+    const delay = (seededRNG.randomGetRealMinMax(24, 48) * HOUR_MS) | 0
+
+    const {priority, capacity} = MICROTASK.SPREAD_FOREST_GROW
+    record.spreadTimestamp = taskScheduler.enqueue(`spread_forest_grow_${record.id}`, delay, this.onSpreadForestGrow, priority, capacity, tileIndex)
+    saveManager.queueStaticUpdate({storeName: 'plant', record})
+  }
+
+  /**
+   * Règle 2 (désarmement) — désarme un record armé s'il ne reste plus aucun voisin
+   * GRASSFOREST. No-op si la tuile n'est pas suivie ou déjà dormante.
+   * @param {number} tileIndex
+   */
+  #tryDisarm (tileIndex) {
+    const record = this.#byIndex.get(tileIndex)
+    if (record === undefined) return
+    if (record.spreadTimestamp === null) return
+    if (this.#hasForestGrassNeighbor(tileIndex)) return
+
+    taskScheduler.dequeue(`spread_forest_grow_${record.id}`)
+    record.spreadTimestamp = null
+    saveManager.queueStaticUpdate({storeName: 'plant', record})
+  }
+
+  /**
+   * Règle 3 — reverte une tuile GRASSFOREST en DIRT (le SKY au-dessus vient de disparaître).
+   * Émet 'world/tile-changed', traité en retour par les règles 1/2 comme un minage classique.
+   * @param {number} tileIndex
+   */
+  #revertToDirt (tileIndex) {
+    const DIRT = NODES.DIRT.code
+    const GRASSFOREST = NODES.GRASSFOREST.code
+    chunkManager.setTileAt(tileIndex, DIRT)
+    eventBus.emit('world/tile-changed', {tileIndex, tileOldCode: GRASSFOREST, tileNewCode: DIRT})
+  }
+
+  /** Liaison EventBus : 'world/tile-changed' — programme onSpreadForestTileCheck en microtâche. */
+  onTileChangedSpread ({tileIndex, tileOldCode, tileNewCode}) {
+    const {priority, capacity} = MICROTASK.SPREAD_FOREST_TILE_CHECK
+    microTasker.enqueue(this.onSpreadForestTileCheck, priority, capacity, tileIndex, tileOldCode, tileNewCode)
+  }
+
+  /**
+   * Microtâche : applique les règles 1, 2 et 3 pour une tuile modifiée.
+   * @param {number} tileIndex
+   * @param {number} tileOldCode
+   * @param {number} tileNewCode
+   */
+  onSpreadForestTileCheck (tileIndex, tileOldCode, tileNewCode) {
+    const DIRT = NODES.DIRT.code
+    const GRASSFOREST = NODES.GRASSFOREST.code
+    const SKY = NODES.SKY.code
+    const W = WORLD_WIDTH
+
+    // Règle 1a — la tuile cesse d'être DIRT (minage, remplacement)
+    if (tileOldCode === DIRT && tileNewCode !== DIRT) this.#removeRecord(tileIndex)
+
+    // Règle 1b — la tuile devient DIRT, SKY déjà présent au-dessus
+    if (tileNewCode === DIRT && chunkManager.getTileAt(tileIndex - W) === SKY) this.#tryCreateRecord(tileIndex)
+
+    // Règle 1c / Règle 3 — le SKY au-dessus disparaît : la tuile du dessous perd son éligibilité,
+    // ou reverte si elle est GRASSFOREST
+    if (tileOldCode === SKY && tileNewCode !== SKY) {
+      const belowIndex = tileIndex + W
+      if (chunkManager.getTileAt(belowIndex) === GRASSFOREST) {
+        this.#revertToDirt(belowIndex)
+      } else {
+        this.#removeRecord(belowIndex)
+      }
+    }
+
+    // Règle 1d — le SKY apparaît : la tuile du dessous devient potentiellement éligible
+    if (tileNewCode === SKY && chunkManager.getTileAt(tileIndex + W) === DIRT) this.#tryCreateRecord(tileIndex + W)
+
+    // Règle 2a — une nouvelle GRASSFOREST arme ses voisins DIRT déjà suivis
+    if (tileNewCode === GRASSFOREST) {
+      for (const nIdx of this.#neighborsOf(tileIndex)) this.#tryArm(nIdx)
+    }
+
+    // Règle 2b — une GRASSFOREST disparaît : désarme les voisins qui n'ont plus de voisin GRASSFOREST
+    if (tileOldCode === GRASSFOREST && tileNewCode !== GRASSFOREST) {
+      for (const nIdx of this.#neighborsOf(tileIndex)) this.#tryDisarm(nIdx)
+    }
+  }
+
+  /**
+   * Callback TaskScheduler : échéance de propagation naturelle. Revalide l'éligibilité avant
+   * de transformer (la tuile a pu changer entre la programmation et l'exécution) — si invalide,
+   * désarme sans transformer. Émet 'world/tile-changed', qui déclenche en retour la règle 1a
+   * (retrait du record de cette tuile, devenue GRASSFOREST) et la règle 2a (armement en chaîne
+   * des voisins DIRT).
+   * @param {number} tileIndex
+   */
+  onSpreadForestGrow (tileIndex) {
+    const record = this.#byIndex.get(tileIndex)
+    if (record === undefined) return // supprimé entre-temps
+
+    const DIRT = NODES.DIRT.code
+    const SKY = NODES.SKY.code
+    const GRASSFOREST = NODES.GRASSFOREST.code
+    const W = WORLD_WIDTH
+
+    if (chunkManager.getTileAt(tileIndex) !== DIRT ||
+        chunkManager.getTileAt(tileIndex - W) !== SKY ||
+        !this.#hasForestGrassNeighbor(tileIndex)) {
+      record.spreadTimestamp = null
+      saveManager.queueStaticUpdate({storeName: 'plant', record})
+      return
+    }
+
+    chunkManager.setTileAt(tileIndex, GRASSFOREST)
+    eventBus.emit('world/tile-changed', {tileIndex, tileOldCode: DIRT, tileNewCode: GRASSFOREST})
+  }
+
+  // ///// //
+  // DEBUG //
+  // ///// //
+
+  /**
+   * DEBUG — Affiche un cercle vert sur chaque tuile suivie et armée (spreadTimestamp actif),
+   * un cercle gris sur chaque tuile suivie mais dormante. Vérifie la cohérence #list vs #byIndex.
+   * @param {CanvasRenderingContext2D} ctx — contexte déjà transformé (caméra appliquée)
+   */
+  debugRenderSpots (ctx) {
+    ctx.save()
+    for (const record of this.#list) {
+      const cx = ((record.index & 0x3FF) << 4) + 8
+      const cy = ((record.index >> 10) << 4) + 8
+      ctx.fillStyle = record.spreadTimestamp !== null ? 'rgba(0, 220, 0, 0.8)' : 'rgba(232, 47, 232, 0.6)'
+      ctx.beginPath()
+      ctx.arc(cx, cy, 4, 0, 6.2832)
+      ctx.fill()
+    }
+    if (this.#list.length !== this.#byIndex.size) {
+      console.warn(`SpreadForestSystem: #list(${this.#list.length}) !== #byIndex(${this.#byIndex.size})`)
+    }
+    ctx.restore()
+  }
+}
+export const spreadForestSystem = new SpreadForestSystem()
 
 /* ====================================================================================================
    SAMPLE SYSTEM
