@@ -450,10 +450,12 @@ class FillingManager {
     inventoryManager.loot(resultId, 1, '')
 
     // transformation de la tuile
-    const aboveCode = chunkManager.getTileAt(tileIndex - WORLD_WIDTH)
-    const tileNewCode = aboveCode === NODES.SKY.code ? NODES.SKY.code : NODES.VOID.code
-    chunkManager.setTileAt(tileIndex, tileNewCode)
-    eventBus.emit('world/tile-changed', {tileIndex, tileOldCode, tileNewCode})
+    if (item.code === 'bucket') {
+      const aboveCode = chunkManager.getTileAt(tileIndex - WORLD_WIDTH)
+      const tileNewCode = aboveCode === NODES.SKY.code ? NODES.SKY.code : NODES.VOID.code
+      chunkManager.setTileAt(tileIndex, tileNewCode)
+      eventBus.emit('world/tile-changed', {tileIndex, tileOldCode, tileNewCode})
+    }
 
     eventBus.emit('sound/play', 'placing')
   }
