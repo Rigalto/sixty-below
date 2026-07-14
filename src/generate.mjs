@@ -507,6 +507,7 @@ class WorldGenerator {
       {key: 'sewedsunflower', value: []},
       {key: 'sewedmoonglow', value: []},
       {key: 'sewedambermirage', value: []},
+      {key: 'sownseedgrass', value: []},
       {key: 'spawn', value: `${pxX}|${pxY}`},
       {key: 'termites', value: termites},
       {key: 'timestamp', value: 480 * 1000}, // Day 1 - 8:00

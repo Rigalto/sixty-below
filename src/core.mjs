@@ -373,6 +373,7 @@ class GameCore {
 
     miningManager.init()
     foragingManager.init(state.naturalforaged)
+    sowingManager.init(state.sownseedgrass)
     choppingManager.init()
     hammingManager.init()
     cobwebSystem.init()

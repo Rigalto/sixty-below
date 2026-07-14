@@ -1,7 +1,7 @@
 // action.mjs — MiningManager - PlacingManager - ForagingManager - ChoppingManager
 // SowingManager - HammingManager - FurnishingManager - FillingManager
 
-import {eventBus, taskScheduler, microTasker, blockedTiles, rollLootWithBuffs} from './utils.mjs'
+import {eventBus, taskScheduler, microTasker, blockedTiles, rollLootWithBuffs, seededRNG} from './utils.mjs'
 import {NODE_TYPE, NODES_LOOKUP, NODES, ITEM_TYPE, ITEMS, PLANT_SYSTEM_LOOKUP, PLANT_KIND} from '../assets/data/data.mjs'
 import {inventoryManager} from './inventory.mjs'
 import {buffManager, isInInteractionRange} from './buff.mjs'
@@ -767,9 +767,43 @@ export const choppingManager = new ChoppingManager()
    ==================================================================================================== */
 
 class SowingManager {
+  #sownSeedGrass = new Map() // Map<tileIndex, {index, oldCode, newCode, germinateTimestamp}> — dédoublonnage + source de persistance
+  #dirty = false // true si #sownSeeds a changé depuis la dernière écriture gamestate
+
   constructor () {
+    // eventBus
+    this.onSaveTick = this.onSaveTick.bind(this)
+    eventBus.on('save/tick', this.onSaveTick)
     // Micro-tâches
     this.doSow = this.doSow.bind(this)
+    this.onSeedGrassGerminate = this.onSeedGrassGerminate.bind(this)
+  }
+
+  /**
+   * Hydrate les graines en attente de germination. Réarme chaque timer.
+   * @param {Array<{index, oldCode, newCode, germinateTimestamp}>} sownSeedGrass — persisté (gamestate.sownseeds), [] si absent
+   */
+  init (sownSeedGrass = []) {
+    this.#sownSeedGrass.clear()
+    this.#dirty = false
+
+    for (const seed of sownSeedGrass) {
+      this.#sownSeedGrass.set(seed.index, seed)
+      const {priority, capacity} = MICROTASK.SEED_GRASS_GERMINATE
+      taskScheduler.enqueueAbsolute(`seed_grass_${seed.index}`, seed.germinateTimestamp, this.onSeedGrassGerminate, priority, capacity, seed.index)
+    }
+  }
+
+  /**
+   * Liaison EventBus : 'save/tick' — écrit l'état courant des graines en attente dans
+   * gamestate (clé 'sownseeds'). Émis toutes les 2s par SaveManager.processSave, synchronisé
+   * avec le save des chunks.
+   */
+  onSaveTick () {
+    if (!this.#dirty) return
+    // consersion Map => Array
+    database.setGameState('sownseedgrass', [...this.#sownSeedGrass.values()])
+    this.#dirty = false
   }
 
   /**
@@ -800,6 +834,77 @@ class SowingManager {
     else if (item.code === 'acorn') this.#trySowAcorn(tileIndex, tileNode, slotIndex)
     else if (item.code === 'samara') this.#trySowSamara(tileIndex, tileNode, slotIndex)
     else if (item.code === 'ambermirageSeed') this.#trySowAmbermirageSeed(tileIndex, tileNode, slotIndex)
+    else if (item.code === 'seedForest') this.#trySowSeed(tileIndex, tileNode, slotIndex, NODES.DIRT.code, NODES.GRASSFOREST.code)
+    else if (item.code === 'seedJungle') this.#trySowSeed(tileIndex, tileNode, slotIndex, NODES.SILT.code, NODES.GRASSJUNGLE.code)
+  }
+
+  /**
+   * Valide et exécute le placement d'une ForestGrassSeed ou JungleGrassSeed. Aiguillage
+   * commun aux deux graines — seuls topsoilCode/naturalCode changent.
+   * Conditions : tuile topsoilCode, tuile au-dessus SKY, non bloquée, pas déjà ensemencée.
+   * Silence si mauvaise tuile, 'wrong' si bloqué/déjà semée, 'placing' si succès.
+   * @param {number} tileIndex — tuile cliquée (le sol attendu)
+   * @param {object} tileNode
+   * @param {number} slotIndex
+   * @param {number} topsoilCode — NODES.DIRT.code ou NODES.SILT.code
+   * @param {number} naturalCode — NODES.GRASSFOREST.code ou NODES.GRASSJUNGLE.code
+   */
+  #trySowSeed (tileIndex, tileNode, slotIndex, topsoilCode, naturalCode) {
+    const SKY = NODES.SKY.code
+    const W = WORLD_WIDTH
+
+    // Silence — mauvaise tuile de sol
+    if (tileNode.code !== topsoilCode) return
+
+    // Silence — tuile au-dessus pas SKY
+    if (chunkManager.getTileAt(tileIndex - W) !== SKY) return
+
+    // 'toofar' — tuile hors de la zone d'interaction
+    if (!isInInteractionRange(tileIndex)) { eventBus.emit('sound/play', 'toofar'); return }
+
+    // 'wrong' — tuile bloquée ou déjà ensemencée
+    if (!blockedTiles.canPlace(tileIndex) || this.#sownSeedGrass.has(tileIndex)) {
+      eventBus.emit('sound/play', 'wrong')
+      return
+    }
+
+    // Succès — planifie la germination
+    const DAY_MS = 1_440_000
+    const delay = (seededRNG.randomGetRealMinMax(0.8, 1.2) * DAY_MS) | 0
+    const {priority, capacity} = MICROTASK.SEED_GRASS_GERMINATE
+    const germinateTimestamp = taskScheduler.enqueue(`seed_grass_${tileIndex}`, delay, this.onSeedGrassGerminate, priority, capacity, tileIndex)
+
+    const seed = {index: tileIndex, oldCode: topsoilCode, newCode: naturalCode, germinateTimestamp}
+    this.#sownSeedGrass.set(tileIndex, seed)
+    this.#dirty = true
+
+    inventoryManager.decrementHotbarSlotCount(slotIndex)
+    eventBus.emit('sound/play', 'placing')
+  }
+
+  /**
+   * Callback TaskScheduler : échéance de germination. Revalide l'éligibilité avant de
+   * transformer (la tuile a pu changer depuis le semis) — germination inconditionnelle
+   * (aucun voisinage requis). Retire la graine dans tous les cas (germée ou non).
+   * @param {number} tileIndex
+   */
+  onSeedGrassGerminate (tileIndex) {
+    const seed = this.#sownSeedGrass.get(tileIndex)
+    if (seed === undefined) return // supprimé entre-temps (ne devrait pas arriver)
+
+    const {oldCode, newCode} = seed
+    const SKY = NODES.SKY.code
+    const W = WORLD_WIDTH
+
+    if (chunkManager.getTileAt(tileIndex) === oldCode &&
+        chunkManager.getTileAt(tileIndex - W) === SKY &&
+        blockedTiles.canPlace(tileIndex)) {
+      chunkManager.setTileAt(tileIndex, newCode)
+      eventBus.emit('world/tile-changed', {tileIndex, tileOldCode: oldCode, tileNewCode: newCode})
+    }
+
+    this.#sownSeedGrass.delete(tileIndex)
+    this.#dirty = true
   }
 
   /**
