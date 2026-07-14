@@ -4722,7 +4722,7 @@ class WorldCarver {
     }
 
     // 4.4 Tableware sur les meubles plats ───────────────────────────────────
-    const TABLEWARE_ITEMS = ['bowl', 'mug', 'plate', 'trencher', 'bottle', 'water', 'honey', 'sap', 'bucket', 'bucketWater', 'bucketHoney', 'bucketSap']
+    const TABLEWARE_ITEMS = ['bowl', 'mug', 'plate', 'trencher', 'bottle', 'bottleWater', 'bottleHoney', 'bottleSap', 'bucket', 'bucketWater', 'bucketHoney', 'bucketSap']
 
     for (const {index, w} of surfaceFurnitures) {
       if (seededRNG.randomGetPercent(20)) continue
@@ -5266,8 +5266,8 @@ class WorldCarver {
   paintSurfaceNatural (surfaceLine, biomesDescription, guarded) {
     const GRASSFOREST = NODES.GRASSFOREST.code
     const GRASSJUNGLE = NODES.GRASSJUNGLE.code
-    const CLAY = NODES.CLAY.code
-    const MUD = NODES.MUD.code
+    const DIRT = NODES.DIRT.code
+    const SILT = NODES.SILT.code
     const SAND = NODES.SAND.code
     const SEA = NODES.SEA.code
     const WATER = NODES.WATER.code
@@ -5281,8 +5281,8 @@ class WorldCarver {
     NATURAL_CODE[BIOME_TYPE.DESERT] = SAND
 
     const TOPSOIL_CODE = []
-    TOPSOIL_CODE[BIOME_TYPE.FOREST] = CLAY
-    TOPSOIL_CODE[BIOME_TYPE.JUNGLE] = MUD
+    TOPSOIL_CODE[BIOME_TYPE.FOREST] = DIRT
+    TOPSOIL_CODE[BIOME_TYPE.JUNGLE] = SILT
     TOPSOIL_CODE[BIOME_TYPE.DESERT] = SAND
 
     const tiles = []
