@@ -4342,7 +4342,9 @@ Parler d'abord du Glass, puis des Bottles.
 
 **How to fill**
 
-⏳
+* Hold an empty [[item:bottle]] in your active hotbar slot
+* Click on a liquid tile — [[node:water]], [[node:honey]], [[node:sap]] or the [[node:sea]] — to fill it.
+* The empty bottle is consumed and replaced by the matching filled bottle.
 
 **How to empty**
 
@@ -4387,7 +4389,10 @@ Parler d'abord du Glass, puis des Bottles.
 
 **How to fill**
 
-⏳
+* Hold an [[item:bucket]] in your active hotbar slot
+* Click on a liquid tile — [[node:water]], [[node:honey]], [[node:sap]] or the [[node:sea]] — to fill it.
+* The [[item:bucket]] is consumed and replaced by the matching filled bucket.
+* One tile is removed from the liquid body.
 
 **How to empty**
 
