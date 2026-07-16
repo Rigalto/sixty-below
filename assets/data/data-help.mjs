@@ -1007,7 +1007,7 @@ The Lost Temple is an ancient Greek-style structure buried deep in the [[Jungle]
 
 * The [[item:brokenDecomposer]] becomes usable after repair
 * To repair : equip [[item:decomposerPart]] and click on the [[item:brokenDecomposer]]
-* The [[item:brokenDecomposer]] is replaced by the [[item:decomposer]] — a powerful tier 5 [[Crafting Stations||crafting station]]
+* The [[item:brokenDecomposer]] is replaced by the [[item:decomposer]] — a powerful tier 5 [[Crafting Stations|crafting station]]
 * The [[item:decomposer]] is immovable — the Lost Temple is its permanent location
 * The [[item:decomposer]] breaks down items into a portion of their crafting ingredients — a powerful tool for recovering rare materials from unwanted equipment.
 
@@ -2646,7 +2646,7 @@ Managed trough the [[item:noticeBoard]].
   },
   {
     title: 'Furnitures',
-    category: ['Housing'],
+    category: ['Housing', 'Furniture'],
     content: `
 **Furnitures list**
 
@@ -2662,6 +2662,7 @@ Managed trough the [[item:noticeBoard]].
 * [[Doors]]
 * [[item:campfire]]
 * [[Fireplaces]]
+* [[item:lifeCrystal]]
 * [[item:platformOak]]
 * [[Sofas]]
 * [[Tables]]
@@ -3472,6 +3473,13 @@ To be written
 
 To be written
 
+**Striking Range**
+
+* Hammers and [[Chopping Tools|Axes]] share the same [[Ranges|Striking Range]]
+* Base range covers 3 tiles in front of the player, 2 tiles back, 4 tiles above and 2 tiles below.
+* Bas range xcaan be extented
+* See [[Ranges]] topic for details
+
 **Usages**
 
 * Shaking trees
@@ -4128,7 +4136,7 @@ _Range bonus applies equally in all directions._
     content: `
 **Description**
 
-Chopping tools are used to harvest [[Flora|Trees]]. Their effectiveness depends on two main attributes: **Chopping Speed** (how fast a tree is chopped) and [[Ranges|Chopping Range]] (how far from the player trees can be targeted). Higher-tier axes unlock faster speeds, extended range.
+Chopping tools are used to harvest [[Flora|Trees]]. Their effectiveness depends on two main attributes: **Chopping Speed** (how fast a tree is chopped) and [[Ranges|Striking Range]] (how far from the player trees can be targeted). Higher-tier axes unlock faster speeds, extended range.
 
 _A tree can only be chopped if the axe tier is greater than or equal to the tree tier._
 
@@ -4154,16 +4162,12 @@ _A tree can only be chopped if the axe tier is greater than or equal to the tree
 
 <hr>
 
-**Chopping Range**
+**Striking Range**
 
-* Base [[Ranges|Chopping Range]] covers 3 tiles in front of the player, 2 tiles back, 4 tiles above and 2 tiles below.
-* Higher-tier [[Chopping Tools|Axes]] extend this range by one, two or three tiles in all directions.
-* The axe [[Gear Prefixes|prefix]] 'Extended' extend this range by two tiles in all directions.
-* Equipping a item:stepStool: +4 tiles above
-* Equipping an item:abyssAnchor: +4 tiles below
-* Using a item:loggerPotion (6h): +1 tile in each direction⏳
-
-<<additiveNote>>
+* Axes and [[Hammers]] share the same [[Ranges|Striking Range]]
+* Base range covers 3 tiles in front of the player, 2 tiles back, 4 tiles above and 2 tiles below.
+* Bas range xcaan be extented
+* See [[Ranges]] topic for details
 
 **Chopping Speed**
 
@@ -4200,7 +4204,7 @@ Higher-tier axes provide a chopping speed bonus (see table above). Additional bo
 **Tips**
 
 * _Use a [[item:draftingCompass]] or a [[item:theodolite]] to visualise the tile grid._
-* _Use a [[item:setSquare]] or a [[item:theodolite]] to visualise the current [[Ranges|Chopping Range]]._
+* _Use a [[item:setSquare]] or a [[item:theodolite]] to visualise the current [[Ranges|Striking Range]]._
 
 **See also**
 
@@ -4570,7 +4574,7 @@ Parler d'abord du Glass, puis des Bottles.
     title: 'Gel',
     category: ['Crafting Ingredient'],
     content: `
-Dropped by [[monster:slime||Slimes]]
+Dropped by [[monster:slime|Slimes]]
 Used to craft [[item:torch]].
     `
   },
@@ -4686,11 +4690,113 @@ Used to craft [[item:torch]].
   },
 
   // ── Life Potion ──────────────────────────────────────────────
-  //    Life Crystal
+  //    Life Crystal, Life Potion, Health
   {
     title: 'Life Crystal',
     category: ['Furniture'],
     content: `
+**Description**
+
+This old artefact is placed in [[Underground]] Layer during [[World Creation]].
+When consumed a Life Crystal increase permanently the [[Health]] Capacity.
+
+**Tier**
+
+{{item:lifeCrystal:star|star}}
+
+**Collecting**
+
+Life Crystals are collected with <<itemStar|hammerCopper>> or better.
+
+* Place a [[Hammers|Hammer]] in the [[Hotbar]] ([[Inventory]] Panel [I])
+* Select its slot, then left-click a [[item:lifeCrystal]]
+* the crystal is removed from the xorld and placed in your [[Inventory]]
+* The crystal has to be in [[Ranges|Striking Range]], this range can be buffed
+
+**How to Use**
+
+* Open your [[Inventory]] Panel [I])
+* Select the slot containing Life Crystals
+* Click on 'Use Item' Icon - Shortcut [Space]
+* One Life Crystal is consumed and your [[Health]] Capacity is increased by 20 points, adding one heart in the [[Health|Health Panel]]
+
+**Tips**
+
+* Once you are enough strong to survive in [[Underground]] Layer, try to find as quickly as possible Life Crystals
+* You can increase futhermore your maximum [[Health]] by using [[Life Fruit]].
+    `
+  },
+  {
+    title: 'Life Fruit',
+    category: ['Potion'],
+    content: `
+**Description**
+
+Coming soon. ⏳
+
+* [[Life Crystal]]
+    `
+  },
+  {
+    title: 'Health',
+    category: ['Gameplay'],
+    content: `
+**Description**
+
+Health is the character's life count, represented by a meter of heart icons at the top-right of the screen. Each red heart shown represents 20 health, and each gold heart represents 25 health.
+
+Taking damage causes health to drop, signified by the meter fading from right to left.
+
+**Health Capacity**
+
+* New characters begin with 5 red hearts, or 100 health.
+* Health capacity can be increased using [[Life Crystal]]s, which add a single red heart each to the health meter permanently, increasing health capacity by 20 each.
+* This can be done until the health meter reaches 20 red hearts (400 health).
+* Later in the game, the character can use [[Life Fruit]] to increase the capacity of their hearts by 5 health each, signified by permanently turning the color of each heart gold.
+* With 15 [[Life Crystal]]s and 20 [[Life Fruit]]s used, a character can reach 20 gold hearts, which equals 500 health capacity.
+* A further temporary boost to 600 health capacity can be achieved using a 'Lifeforce Potion'⏳.
+
+**Health Panel**
+
+* Health is displayed in the Right Panel, between [[Environment Panel]] and [[Buff Panel]]
+* Capacity is shown by red and gold hearts.
+* Current health is displayed by graying hearts.
+* Hovering over the hearts gives accurate data: current health, maximum health, regeneration rate (health/s).
+
+<hr>
+
+**Health regeneration**
+
+Health regenerates naturally over time. The rate can be influenced by several factors, as detailed below:⏳
+
+To be designed.
+
+| Name | How to Obtain | Regeneration Rate | Regeneration Buff | Buff Name |
+|---|---|---|---|---|
+
+<<additiveNote>>
+
+_The natural health regeneration rate scales with maximum health. This means that, excluding other bonuses or penalties, it takes approximately 100 seconds to restore full health from 1 HP, regardless of the character's total Max Health._
+
+<hr>
+
+**Health Restoration**
+
+In addition to natural regeneration, Health can be restored instantly by consuming certain items. However, most of these items inflict the Potion Sickness debuff.⏳
+
+| Item | Health Restored | Sickness Duration |
+|---|---|---|
+
+_The Potion Sickness debuff is applied after consuming these items, preventing the use of any other healing items (except [[Life Crystal]]s or [[Life Fruit]]s) for the duration specified in the table._
+
+<hr>
+
+**Tips**
+
+* _Prioritize increasing your maximum health with [[Life Crystal]]ls and [[Life Fruit]]s as you find them._
+* _Strategically place Campfires⏳ and Heart Lanterns⏳ in your base and arenas to benefit from their regeneration buffs._
+* _lways carry healing items, especially during exploration or boss fights._
+* _Be mindful of the Potion Sickness cooldown to avoid wasting healing items._
     `
   },
 
@@ -4750,6 +4856,10 @@ Food restores health and provides temporary buffs. More elaborate preparations r
     title: 'Soups',
     category: ['Food'],
     content: `
+**Description**
+
+Coming soon.
+
 **Tier**
 
 {{item:vegetableSoup:star|star}}
@@ -6196,9 +6306,9 @@ Once you have basic tools and a shelter, you can start exploring:
 * **World** — the central area. Move with arrow keys or **WASD**. The world extends far below the [[Surface]] — see [[Underground]] and [[Caverns]].
 * **[[Control Panel]]** — runs along the right edge.
   * _Action buttons_ — [[Inventory]] **[I]**, [[Crafting]] **[K]**, [[Help Panel]] **[H]**, zoom, sound, new world
-  * _Environment widget_ — [[Day & Night Cycle||day, time], [[Weather]], [[Moon Phases]], player coordinates
+  * _Environment widget_ — [[Day & Night Cycle|day, time]], [[Weather]], [[Moon Phases]], player coordinates
   * _Health gauge_
-  * _Active [[Buff Panel||buffs/debuffs]]_
+  * _Active [[Buff Panel|buffs/debuffs]]_
 * **Panels** — pause exploration and open a full-screen panel. Press the same key again or click ✕ to close.
   * [[Inventory]] **[I]** — bag, hotbar, armor and accessories
   * [[Crafting]] **[K]** — browse recipes, inspect ingredients, craft items
@@ -6865,17 +6975,23 @@ To be designed
 
 <hr>
 
-**Chopping Range**
+**Striking Range**
 
 * utilisé pour l'abattage des arbres ([[Chopping Tools|Axes]])
 * utilisé pour le secouage des arbres ([[Hammers]])
+* utilisé pour la destruction/récupération de furniture ([[Hammers]])
+* utilisé pour la destruction/récupération des murs ([[Hammers]])
 
-_When a [[item:setSquare]] or a [[item:theodolite]] is present in your [[Inventory]], and an [[Chopping Tools|Axe]] or a [[Hammers|Hammer]] is seleted in the [[Hotbar]], you can press [R] key to display a orange rectangle around the Chopping Range._
+_When a [[item:setSquare]] or a [[item:theodolite]] is present in your [[Inventory]], and an [[Chopping Tools|Axe]] or a [[Hammers|Hammer]] is seleted in the [[Hotbar]], you can press [R] key to display a orange rectangle around the Striking Range._
 
-**Chopping Range Buffs**
+**Striking Range Buffs**
 
-To be designed
-
+* Base Striking Range covers 3 tiles in front of the player, 2 tiles back, 4 tiles above and 2 tiles below.
+* Higher-tier [[Chopping Tools|Axes]] or [[Hammers]] extend this range by one, two or three tiles in all directions.
+* The axe/hammer [[Gear Prefixes|prefix]] 'Extended' extend this range by two tiles in all directions.
+* Equipping a item:stepStool: +4 tiles above⏳
+* Equipping an item:abyssAnchor: +4 tiles below⏳
+* Using a item:loggerPotion (6h): +1 tile in each direction⏳
   `
   },
   {

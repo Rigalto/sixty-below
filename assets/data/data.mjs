@@ -382,7 +382,7 @@ export const ITEMS = {
   spiderFang: {name: 'Spider Fang', type: ITEM_TYPE.MATERIAL, stype: 'fang', star: 3, image: 'tools_32_32-4-0', placedright: 'w_42_42-0-0', placedleft: 'w_42_42-0-1', help: 'Spiders', tooltip: '???'},
 
   // crystall
-  lifeCrystal: {name: 'Life Crystal', type: ITEM_TYPE.FURNITURE | ITEM_TYPE.UNIQUE | ITEM_TYPE.USABLE, stype: 'life', star: 1, image: 'furniture_32_32-12-2', placed: 'furniture_32_32-6-3', unplacing: {speed: 1800}, help: 'Life Crystal', tooltip: 'Permanently increases maximum life by 20\nCollect with a Hammer'},
+  lifeCrystal: {name: 'Life Crystal', type: ITEM_TYPE.FURNITURE | ITEM_TYPE.UNIQUE | ITEM_TYPE.USABLE, stype: 'life', star: 1, image: 'foraged_32_32-7-2', placed: 'foraged_32_32-7-2', unplacing: {speed: 1800}, help: 'Life Crystal', tooltip: 'Permanently increases maximum life by 20\nCollect with a Hammer'},
 
   // triskel
   triskelCopper: {name: 'Copper Triskel', type: ITEM_TYPE.FURNITURE | ITEM_TYPE.UNIQUE | ITEM_TYPE.MATERIAL, stype: 'triskel', star: 3, image: 'furniture_32_32-12-2', placed: 'furniture_32_32-6-3', unplacing: {speed: 1800}, help: 'Triskels', tooltip: ''},
@@ -603,7 +603,7 @@ export const ITEMS = {
   oleanderBulb: {name: 'Oleander Bulb', type: 0, stype: 'vegie', star: 3, image: 'foraged_32_32-0-2', help: 'Oleander', tooltip: 'Its pulp has a velvety, creamy texture'},
 
   ambermirage: {name: 'Ambermirage', type: 0, stype: 'herb', star: 1, image: 'foraged_32_32-6-2', placed: 'placed_16_16-3-0', help: 'Ambermirage', tooltip: '???', foraging: {speed: 2400, items: [{item: 'ambermirage', count: '1-2'}, {item: 'ambermirageSeed', count: 0.5, buffs: ['lucky:50']}]}},
-  ambermirageSeed: {name: 'Ambermirage Seed', type: ITEM_TYPE.SEED | ITEM_TYPE.PLACABLE, stype: 'seed', star: 2, image: 'foraged_32_32-7-2', placed: 'placed_16_16-4-0', help: 'Ambermirage', tooltip: '???'},
+  ambermirageSeed: {name: 'Ambermirage Seed', type: ITEM_TYPE.SEED | ITEM_TYPE.PLACABLE, stype: 'seed', star: 2, image: 'foraged_32_32-6-3', placed: 'placed_16_16-4-0', help: 'Ambermirage', tooltip: '???'},
 
   bloodmoon: {name: 'Bloodmoon', type: 0, stype: 'herb', star: 2, image: 'potions_32_32-1-5', placed: 'fuws_32_32-4-0', help: 'Bloodmoon', tooltip: '???'},
   bloodmoonSeed: {name: 'Bloodmoon Seed', type: ITEM_TYPE.SEED | ITEM_TYPE.PLACABLE, stype: 'seed', star: 2, image: 'potions_32_32-1-5', placed: 'fuws_32_32-4-0', help: 'Bloodmoon', tooltip: '???'},
