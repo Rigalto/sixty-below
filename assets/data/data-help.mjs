@@ -12,6 +12,7 @@
  *   Ne pas utiliser 'logging', mais 'chopping'.
  *   Ne pas mettre dans la section "See Also" une fiche cible déjà linkée dans le texte.
  *   Ne mettre une balise <hr> que si les sections qu'elles délimitent peuvent se lire seules, indépendamment de celles qui précèdent ou suivent.
+ *   Outil ou meilleur => [[item:tool] or better / Outil ou équivalent => [[item:tool]  or equivalent / Outil équivalent ou meilleur => [[item:tool] ] or higher
  *
  * ── Markdown ───────────────────────────────────────────────────
  *   **gras**         _italique_        __souligné__
@@ -124,7 +125,6 @@ Mining Loot: {{node:{3}:mining[:items[0]:item|link}}
 
   lootTable: '| Item | Tier | Amount | Conditions | Modifiers |\n|---|---|---|---|---|\n{{node:{1}:{2}:items[*]:helpRow|rows}}\n\n_All modifiers are additive and stack with each other._',
   itemLootTable: '| Item | Tier | Amount | Conditions | Modifiers |\n|---|---|---|---|---|\n{{item:{1}:{2}:items[*]:helpRow|rows}}',
-  miningDrop: '{{node:{1}:mining:items[0]:item|link}} {{node:{1}:mining:items[0]:item:star|star}}',
 
   // pour ajouter son tier à droite de l'item
   itemStar: '[[item:{1}]] {{item:{1}:star|star}}',
@@ -867,13 +867,30 @@ Hives are large circular caverns built by [[Bees]] deep in [[Jungle]] biomes. Th
 | [[monster:hornet]] | Uncommon |
 | [[monster:beeQueen]] | Boss |
 
-**Loot** ⏳
+<hr>
 
-* [[node:honey]] — forms pools on the floor, abundant but dangerous to collect while [[Bees]] are present
-  * Collected with a [[item:bottle]] in hand → <<itemStar|bottleHoney>>
+**Collecting Honey**
+
+* [[node:honey]] forms pools on the floor, abundant but dangerous to collect while [[Bees]] are present
+* Collected with a [[item:bottle]] selected in [[Hotbar]] → <<itemStar|bottleHoney>>
+
+**Mining Hive**
+
 * [[node:hive]] — makes up the walls and ceiling of the Hive
-  * [[Mining|Mined]] with an [[item:pickaxeIron]] or better → **<<itemStar|blockHive>>**
-  * [[item:blockHive]] can be [[Crafting|smelted]] in a [[item:cookingPot]] → **<<itemStar|beeswax>>**
+* Mining Tool: <<itemStar|pickaxeIron>> or better
+
+<<lootTable|hive|mining>>
+
+_[[item:blockHive]] can be [[Crafting|smelted]] in a [[item:cookingPot]] → <<itemStar|beeswax>>_
+
+See [[Mining]], [[Mining Tools]] and [[Mining Buffs]] for details.
+
+<hr>
+
+**Usages**
+
+* [[item:bottleHoney]] is used for food or potion ([[item:bottle]] is returned)
+* [[item:blockHive]] can be [[Crafting|smelted]] in a [[item:cookingPot]] → <<itemStar|beeswax>>
 
 **Tips**
 
@@ -1436,7 +1453,7 @@ Grass covers the surface of [[Forest]] biomes. It is the most common natural til
 
 <hr>
 
-**Mining Loot** ⏳
+**Mining** ⏳
 
 Mining Tool: <<itemStar|pickaxeCopper>> or better
 
@@ -1446,7 +1463,7 @@ See [[Mining]], [[Mining Tools]] and [[Mining Buffs]] for details.
 
 <hr>
 
-**Foraging Loot** ⏳
+**Foraging** ⏳
 
 Foraging Tool: <<itemStar|sickleCopper>> or better
 
@@ -1456,9 +1473,28 @@ See [[Foraging]], [[Foraging Tools]] and [[Foraging Buffs]] for details.
 
 <hr>
 
+**Natural Spread**
+
+* [[node:dirt]] tiles exposed to the sky, next to existing Forest Grass, slowly turn into Forest Grass on their own
+* The transformation takes between 24 and 48 in-game hours once a Forest Grass neighbor is present
+* Spread cascades outward, tile by tile, as each new patch creates new candidates around itself
+
+**Replanting**
+
+* Place a [[item:seedForest]] in the [[Hotbar]] ([[Inventory]] Panel [I])
+* Select its slot, then left-click a [[node:dirt]] tile exposed to the sky — the seed is consumed
+* The tile has to be in [[Ranges|Interaction Range]], this range can be buffed
+* Each tile accepts only one seed
+* Unlike natural spread, germination is guaranteed and doesn't require a Forest Grass neighbor — it happens in about one in-game day after planting
+
+<hr>
+
 **Tips**
 
-* _Grass grows back naturally on exposed [[node:dirt]] tiles over time._ ⏳
+* _Grass regrows on its own near existing patches — clearing a whole area of Forest Grass slows down its natural return._
+* _Plant [[item:seedForest]] on isolated [[node:dirt]] patches to skip the wait for natural spread to reach them._
+* _Planting an [[item:acorn]] requires 3 consecutive [[node:grassForest]] tiles — and if you also want [[item:bolete]] to grow at its base later, that [[node:grassForest]] has to stay in place under the tree._
+
   `
   },
   {
@@ -1479,7 +1515,7 @@ Jungle Grass covers the surface of [[Jungle]] biomes. Denser and more vibrant th
 
 <hr>
 
-**Mining Loot** ⏳
+**Mining** ⏳
 
 Mining Tool: <<itemStar|pickaxeCopper>> or better
 
@@ -1489,7 +1525,7 @@ See [[Mining]], [[Mining Tools]] and [[Mining Buffs]] for details.
 
 <hr>
 
-**Foraging Loot** ⏳
+**Foraging** ⏳
 
 Foraging Tool: <<itemStar|sickleSilver>> or better
 
@@ -1499,9 +1535,27 @@ See [[Foraging]], [[Foraging Tools]] and [[Foraging Buffs]] for details.
 
 <hr>
 
+**Natural Spread**
+
+* [[node:silt]] tiles exposed to the sky, next to existing [[node:grassJungle]], slowly turn into [[node:grassJungle]] on their own
+* The transformation takes between 24 and 48 in-game hours once a [[node:grassJungle]] neighbor is present
+* Spread cascades outward, tile by tile, as each new patch creates new candidates around itself
+
+**Replanting**
+
+* Place a [[item:seedJungle]] in the [[Hotbar]] ([[Inventory]] Panel [I])
+* Select its slot, then left-click a [[node:silt]] tile exposed to the sky — the seed is consumed
+* The tile has to be in [[Ranges|Interaction Range]], this range can be buffed
+* Each tile accepts only one seed
+* Unlike natural spread, germination is guaranteed and doesn't require a [[node:grassJungle]] neighbor — it happens around one in-game day after planting
+
+<hr>
+
 **Tips**
 
-* _Jungle Grass grows back naturally on exposed [[node:silt]] tiles over time._ ⏳
+* _Jungle Grass regrows on its own near existing patches — clearing a whole area of Jungle Grass slows down its natural return._
+* _Plant [[item:seedJungle]] on isolated Silt patches to skip the wait for natural spread to reach them._
+* _Planting a [[item:samara]] requires 3 consecutive [[node:grassJungle]] tiles — and if you also want [[item:pinkMycenia]] to grow at its base later, that [[node:grassJungle]] has to stay in place under the tree._
   `
   },
   {
@@ -1522,7 +1576,7 @@ Fern Grass covers the floor of [[Fern Cave]]s. Giant ferns grow from this soft, 
 
 <hr>
 
-**Mining Loot** ⏳
+**Mining** ⏳
 
 Mining Tool: <<itemStar|pickaxeSilver>> or better
 
@@ -1532,7 +1586,7 @@ See [[Mining]], [[Mining Tools]] and [[Mining Buffs]] for details.
 
 <hr>
 
-**Foraging Loot** ⏳
+**Foraging** ⏳
 
 Foraging Tool: <<itemStar|sickleGold>>
 
@@ -1565,7 +1619,7 @@ Luminous moss that covers the walls and floor of [[Moss Cave]]s. Its soft green 
 
 <hr>
 
-**Mining Loot** ⏳
+**Mining** ⏳
 
 Mining Tool: <<itemStar|pickaxeSilver>> or better
 
@@ -1575,7 +1629,7 @@ See [[Mining]], [[Mining Tools]] and [[Mining Buffs]] for details.
 
 <hr>
 
-**Foraging Loot** ⏳
+**Foraging** ⏳
 
 Foraging Tool: <<itemStar|sickleGold>>
 
@@ -1609,7 +1663,7 @@ Mushroom Grass covers the floor of [[Mushroom Cave]]s. [[Giant Mushroom]]s grow 
 
 <hr>
 
-**Mining Loot** ⏳
+**Mining** ⏳
 
 Mining Tool: <<itemStar|pickaxeIron>> or better
 
@@ -1619,7 +1673,7 @@ See [[Mining]], [[Mining Tools]] and [[Mining Buffs]] for details.
 
 <hr>
 
-**Foraging Loot** ⏳
+**Foraging** ⏳
 
 Foraging Tool: <<itemStar|sickleSilver>>
 
@@ -1654,10 +1708,17 @@ Dirt is the primary topsoil of [[Forest]] biomes. It supports surface vegetation
 
 * [[Surface]] and [[Underground]] — [[Forest]], high density
 
-**Loot** ⏳
+<hr>
 
-* <<miningDrop|dirt>>
-* {{node:dirt:mining:items[1]:item|link}}
+**Mining**
+
+Mining Tool: <<itemStar|pickaxeCopper>> or better
+
+<<lootTable|dirt|mining>>
+
+See [[Mining]], [[Mining Tools]] and [[Mining Buffs]] for details.
+
+<hr>
 
 **Recipes** ⏳
 
@@ -1681,9 +1742,17 @@ Sand is the primary topsoil of [[Desert]] biomes. It is subject to gravity — u
 * [[Surface]] and [[Underground]] — [[Desert]], high density
 * [[Sand Pocket]]s — [[Underground]], [[Desert]]
 
-**Loot** ⏳
+<hr>
 
-* <<miningDrop|sand>>
+**Mining**
+
+Mining Tool: <<itemStar|pickaxeCopper>> or better
+
+<<lootTable|sand|mining>>
+
+See [[Mining]], [[Mining Tools]] and [[Mining Buffs]] for details.
+
+<hr>
 
 **Tips**
 
@@ -1707,9 +1776,17 @@ Silt is the primary topsoil of [[Jungle]] biomes. Its fine, damp texture support
 
 * [[Surface]] and [[Underground]] — [[Jungle]], high density
 
-**Loot** ⏳
+<hr>
 
-* <<miningDrop|silt>>
+**Mining**
+
+Mining Tool: <<itemStar|pickaxeCopper>> or better
+
+<<lootTable|silt|mining>>
+
+See [[Mining]], [[Mining Tools]] and [[Mining Buffs]] for details.
+
+<hr>
 
 **Recipes** ⏳
 
@@ -1746,9 +1823,17 @@ Humus is a rich organic topsoil found across all biomes, though it is most abund
 * [[Fern Cave]] floor — [[Forest]]
 * [[Mushroom Cave]] floor — [[Forest]]
 
-**Loot** ⏳
+<hr>
 
-* <<miningDrop|humus>>
+**Mining**
+
+Mining Tool: <<itemStar|pickaxeCopper>> or better
+
+<<lootTable|humus|mining>>
+
+See [[Mining]], [[Mining Tools]] and [[Mining Buffs]] for details.
+
+<hr>
 
 **Recipes** ⏳
 
@@ -1807,9 +1892,17 @@ Clay is the most common substrat in [[Forest]] biomes. Its soft, workable textur
 
 * [[Surface]] and [[Underground]] — [[Forest]], high density
 
-**Loot** ⏳
+<hr>
 
-* <<miningDrop|clay>>
+**Mining**
+
+Mining Tool: <<itemStar|pickaxeCopper>> or better
+
+<<lootTable|clay|mining>>
+
+See [[Mining]], [[Mining Tools]] and [[Mining Buffs]] for details.
+
+<hr>
 
 **Recipes** ⏳
 
@@ -1833,9 +1926,17 @@ Stone is the second most common substrat in [[Forest]] biomes, found deeper than
 * [[Underground]] — [[Forest]], dominant (native substrat)
 * [[Caverns]] Top — [[Forest]], moderate density
 
-**Loot** ⏳
+<hr>
 
-* <<miningDrop|stone>>
+**Mining**
+
+Mining Tool: <<itemStar|pickaxeCopper>> or better
+
+<<lootTable|stone|mining>>
+
+See [[Mining]], [[Mining Tools]] and [[Mining Buffs]] for details.
+
+<hr>
 
 **Recipes** ⏳
 
@@ -1858,9 +1959,17 @@ Hardstone is a dense, resistant substrat found in the deepest parts of [[Forest]
 
 * [[Caverns]] — [[Forest]], dominant (native substrat)
 
-**Loot** ⏳
+<hr>
 
-* <<miningDrop|hardstone>>
+**Mining**
+
+Mining Tool: <<itemStar|pickaxeSilver>> or higher
+
+<<lootTable|hardstone|mining>>
+
+See [[Mining]], [[Mining Tools]] and [[Mining Buffs]] for details.
+
+<hr>
 
 **Recipes** ⏳
 
@@ -1885,9 +1994,17 @@ Sandstone is the primary substrat of [[Desert]] biomes. It also forms the natura
 * [[Sea]] borders
 * [[Sand Pocket]]: [[Caverns]] — [[Desert]]
 
-**Loot** ⏳
+<hr>
 
-* <<miningDrop|sandstone>>
+**Mining**
+
+Mining Tool: <<itemStar|pickaxeCopper>> or better
+
+<<lootTable|sandstone|mining>>
+
+See [[Mining]], [[Mining Tools]] and [[Mining Buffs]] for details.
+
+<hr>
 
 **Recipes** ⏳
 
@@ -1911,9 +2028,17 @@ Ash is the second most common substrat in [[Forest]] biomes, found deeper than [
 * [[Underground]] — [[Desert]], dominant (native substrat)
 * [[Caverns]] Top — [[Desert]], moderate density
 
-**Loot** ⏳
+<hr>
 
-* <<miningDrop|ash>>
+**Mining**
+
+Mining Tool: <<itemStar|pickaxeIron>> or better
+
+<<lootTable|ash|mining>>
+
+See [[Mining]], [[Mining Tools]] and [[Mining Buffs]] for details.
+
+<hr>
 
 **Recipes** ⏳
 
@@ -1936,9 +2061,17 @@ Hellstone is an extremely hard volcanic substrat found in the deepest parts of [
 
 * [[Caverns]] — [[Desert]], dominant (native substrat)
 
-**Loot** ⏳
+<hr>
 
-* <<miningDrop|hellstone>>
+**Mining**
+
+Mining Tool: <<itemStar|pickaxeCobalt>> or equivalent
+
+<<lootTable|hellstone|mining>>
+
+See [[Mining]], [[Mining Tools]] and [[Mining Buffs]] for details.
+
+<hr>
 
 **Recipes** ⏳
 
@@ -1966,9 +2099,17 @@ Mud is the primary substrat of [[Jungle]] biomes. Its soft, damp texture support
 * [[Surface]] and [[Underground]] — [[Jungle]], high density
 * [[Moss Cave]] walls and floor
 
-**Loot** ⏳
+<hr>
 
-* <<miningDrop|mud>>
+**Mining**
+
+Mining Tool: <<itemStar|pickaxeCopper>> or better
+
+<<lootTable|mud|mining>>
+
+See [[Mining]], [[Mining Tools]] and [[Mining Buffs]] for details.
+
+<hr>
 
 **Recipes** ⏳
 
@@ -1994,9 +2135,17 @@ Limestone is a sedimentary substrat found in [[Jungle]] biome. The pale color of
 * [[Underground]] — [[Forest]] & [[Desert]], low density
 * Trace amounts worldwide
 
-**Loot** ⏳
+<hr>
 
-* <<miningDrop|limestone>>
+**Mining**
+
+Mining Tool: <<itemStar|pickaxeSilver>> or higher
+
+<<lootTable|limestone|mining>>
+
+See [[Mining]], [[Mining Tools]] and [[Mining Buffs]] for details.
+
+<hr>
 
 **Recipes** ⏳
 
@@ -2019,9 +2168,17 @@ Slate is a hard metamorphic substrat found in the deepest parts of [[Jungle]] bi
 
 * [[Caverns]] — [[Jungle]], dominant (native substrat)
 
-**Loot** ⏳
+<hr>
 
-* <<miningDrop|slate>>
+**Mining**
+
+Mining Tool: <<itemStar|pickaxeCobalt>> or equivalent
+
+<<lootTable|slate|mining>>
+
+See [[Mining]], [[Mining Tools]] and [[Mining Buffs]] for details.
+
+<hr>
 
 **Recipes** ⏳
 
@@ -2330,6 +2487,8 @@ Blocks are placed in your [[Inventory]] when mined with a [[Mining Tools|Pickaxe
 {{geodeRow|Granite|blockGranite|pickaxeCobalt}}
 {{geodeRow|Marble|blockMarble|pickaxeCobalt}}
 
+_Higher Pickaxe can also be used._
+
 **Usages**
 
 | Block | Tier | Uses |
@@ -2360,10 +2519,19 @@ Obsidian is a volcanic glass formed where lava meets water. It is one of the har
 * [[Caverns]] — all biomes, rare clusters
 * Created by the player by pouring water onto [[node:lava]] ⏳
 
-**Mining** ⏳
+<hr>
 
-* {{node:obsidian:mining:items[0]:item|link}}
-* Requires a tier 5 [[item:pickaxePlatinum]] — applies to both natural and player-created Obsidian
+**Mining**
+
+Mining Tool: <<itemStar|pickaxeCobalt>> or equivalent
+
+<<lootTable|obsidian|mining>>
+
+_Applies to both natural and player-created Obsidian._
+
+See [[Mining]], [[Mining Tools]] and [[Mining Buffs]] for details.
+
+<hr>
 
 **Creating Obsidian** ⏳
 
@@ -2394,42 +2562,21 @@ Meteorite is an extraterrestrial rock that falls from the sky in rare [[Events]]
 * Impact craters on the [[Surface]] — random [[Events]] ⏳
 * Rare clusters near impact sites ⏳
 
-**Loot** ⏳
+<hr>
 
-* {{node:meteorite:mining:items[0]:item|link}}
+**Mining**
+
+Mining Tool: <<itemStar|pickaxeCobalt>> or equivalent
+
+<<lootTable|meteorite|mining>>
+
+See [[Mining]], [[Mining Tools]] and [[Mining Buffs]] for details.
+
+<hr>
 
 **Recipes** ⏳
 
 * {{recipe:meteoriteBar}}
-  `
-  },
-  {
-    title: 'Hive',
-    category: ['Rock'],
-    content: `
-**Description**
-
-Hive is a biological material that forms the walls of [[Hive]] mini-biomes. It is secreted by bees and has a distinctive honeycomb structure.
-
-**Tier**
-
-{{node:hive:star|star}}
-
-**Main Location**
-
-* [[Hive]] walls — [[Jungle]], [[Caverns]] Top
-
-**Loot** ⏳
-
-* {{node:hive:mining:items[0]:item|link}}
-
-**Recipes** ⏳
-
-* {{recipe:hiveBlock}}
-
-**Tips**
-
-* _Destroying Hive blocks will anger the inhabitants._ ⏳
   `
   },
   {
@@ -2451,12 +2598,19 @@ Mining it yields [[item:blockShell]], which can be ground into [[item:shellPowde
 * [[Fossil Vein]] — [[Desert]], [[Caverns]] Top
 * [[Sea]] borders and floor — slow regeneration ⏳
 
-**Loot** ⏳
+<hr>
 
-* [[Mining]] with an [[item:pickaxeIron]] or better → {{node:shell:mining:items[0]:item|link}}
+**Mining**
 
+Mining Tool: <<itemStar|pickaxeIron>> or better
 
-**Main Usages** ⏳
+<<lootTable|shell|mining>>
+
+See [[Mining]], [[Mining Tools]] and [[Mining Buffs]] for details.
+
+<hr>
+
+**Usages** ⏳
 
 * Basic ingredient for furntiure and construction
 * Decorative ingredient for tools and weapons
@@ -3133,7 +3287,7 @@ Higher-tier pickaxes provide a mining speed bonus (see table above). Additional 
   },
   {
     title: 'Mineable Blocks',
-    category: ['Mining', 'Natural', 'Topsoil', 'Substrat', 'Ore', 'Gem', 'Rock'],
+    category: ['Mining', 'Natural', 'Topsoil', 'Substrat', 'Ore', 'Gem', 'Rock', 'Mini-biome'],
     content: `
 **All mineable blocks**
 
@@ -3318,7 +3472,7 @@ To be written
 
 To be written
 
-**Usage**
+**Usages**
 
 * Shaking trees
 * Removing furnitures
@@ -3463,7 +3617,7 @@ _When a tool is used as a weapon, standard weapon prefix effects apply._
 
 {{item:flamethrower:star|star}}
 
-**Main usages**
+**Usages**
 
 * Used as a tool for deleting large bulks of [[Cobweb]]⏳
     `
@@ -4292,15 +4446,15 @@ Filled directly from a liquid source in the world. Used as crafting ingredients 
   * [[item:bottleHoney]] — [[node:honey]] — healing item and buff
   * [[item:bottleSap]] — [[node:sap]] — buff
 
-_[[Bottles]] are returned upon consuming the recipe result._ ⏳
+_[[Bottles]] are returned upon consuming the recipe result._
 
 **Large Liquid Containers**
 
 Filled directly from a liquid source in the world. Used as tools to transport and pour liquids — the empty bucket is recovered after pouring.
 * <<itemStar|bucket>> — empty bucket ⏳
-  * [[item:bucketWater]] — Water Bucket — pour water into the world ⏳
-  * [[item:bucketHoney]] — Honey Bucket — pour honey into the world ⏳
-  * [[item:bucketSap]] — Sap Bucket — pour sap into the world ⏳
+  * [[item:bucketWater]] — pour [[node:water]] into the world ⏳
+  * [[item:bucketHoney]] — pour [[node:honey]] into the world ⏳
+  * [[item:bucketSap]] — pour [[node:sap]] into the world ⏳
 
 **See also**
 
@@ -4396,14 +4550,16 @@ Parler d'abord du Glass, puis des Bottles.
 
 **How to empty**
 
-⏳
+* Hold an [[item:bucketWater]], [[item:bucketHoney]] or [[item:bucketSap]] in your active hotbar slot
+* Click on an empty tile
+* The item si consumed and replaced by an [[item:bucket]]⏳
+* The tile is filled with the liquid ([[node:water]], [[node:honey]] or [[node:sap]])⏳
 
 **Usages**
 
 ⏳
 
 **Tips**
-* Parler des [[item:bucket]]s.
 * _See [[Tableware]] for the full list of containers._
     `
   },
@@ -4798,7 +4954,7 @@ See [[Shaking]], [[Hammers]] and [[Chopping Buffs]] for details.
 
 <hr>
 
-**Usage**
+**Usages**
 
 [[item:logOak]]s and [[item:logMahogany]]s are essential crafting materials —
 they are core components of [[Furnitures]], [[Crafting Stations]], [[Tools]] and [[Weapons]].
@@ -6498,7 +6654,7 @@ Activation fails silently in the following cases:
   },
   {
     title: 'World Creation',
-    category: ['Gameplay', 'World'],
+    category: ['Gameplay'],
     content: `
     `
   },
