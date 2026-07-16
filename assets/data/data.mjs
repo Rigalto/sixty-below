@@ -183,7 +183,7 @@ export const NODES_LOOKUP = []
 // sa nature (ce qu'il est) : 'FURNITURE', 'WALL', ...
 // les actions qui peuvent être conduite dessus : 'CRAFTING' (à renommer), 'USABLE', 'PLACABLE', 'UNDELETABLE', 'CRAFTABLLE', 'REMOVABLE', 'AMMUNITION'...
 export const ITEM_TYPE = {
-  NONE: 0, FURNITURE: 0x1, TOOL: 0x2, BAIT: 0x4, FOOD: 0x08, BLOCK: 0x10, WALL: 0x20, MECHANISM: 0x40, AMMUNITION: 0x80, SEED: 0x100, ARMOR: 0x200, BAG: 0x400, WEAPON: 0x800, TRINKET: 0x1000, ACCESSORY: 0x2000, POTION: 0x4000, IMMOVABLE: 0x8000, UNDISPOSABLE: 0x10000, MATERIAL: 0x20000, CRAFTABLE: 0x40000, USABLE: 0x80000, PLACABLE: 0x100000, UNIQUE: 0x200000, FILLABLE: 0x400000, FREE2: 0x800000
+  NONE: 0, FURNITURE: 0x1, TOOL: 0x2, BAIT: 0x4, FOOD: 0x08, BLOCK: 0x10, WALL: 0x20, MECHANISM: 0x40, AMMUNITION: 0x80, SEED: 0x100, ARMOR: 0x200, BAG: 0x400, WEAPON: 0x800, TRINKET: 0x1000, ACCESSORY: 0x2000, POTION: 0x4000, IMMOVABLE: 0x8000, UNDISPOSABLE: 0x10000, MATERIAL: 0x20000, CRAFTABLE: 0x40000, USABLE: 0x80000, PLACABLE: 0x100000, UNIQUE: 0x200000, FILLABLE: 0x400000, POURABLE: 0x800000
 }
 
 export const MAX_FURNITURE_W = 3 // tuiles — vérification taille réelle dans GameCore.#hydrateItems()
@@ -522,9 +522,9 @@ export const ITEMS = {
 
   // Liquid containers (large capacity)
   bucket: {name: 'Empty Bucket', type: ITEM_TYPE.FURNITURE | ITEM_TYPE.PLACABLE | ITEM_TYPE.FILLABLE | ITEM_TYPE.ARMOR, stype: 'container', armor: 'head', star: 1, image: 'container_32_32-0-1', placed: 'container_32_32-0-1', armorImage: 'head_26_22-0-2', unplacing: {speed: 600}, help: 'Buckets', tooltip: 'Used to scoop up a small amount of water, honey or sap', defense: 1},
-  bucketWater: {name: 'Water Bucket', type: ITEM_TYPE.FURNITURE | ITEM_TYPE.PLACABLE, stype: 'container', star: 1, image: 'container_32_32-1-1', placed: 'container_32_32-1-1', unplacing: {speed: 600}, help: 'Buckets', tooltip: 'Amount of water. Can be poured out'},
-  bucketSap: {name: 'Sap Bucket', type: ITEM_TYPE.FURNITURE | ITEM_TYPE.PLACABLE, stype: 'container', star: 1, image: 'container_32_32-2-1', placed: 'container_32_32-0-1', unplacing: {speed: 600}, help: 'Buckets', tooltip: 'Amount of lava. Can be poured out'},
-  bucketHoney: {name: 'Honey Bucket', type: ITEM_TYPE.FURNITURE | ITEM_TYPE.PLACABLE, stype: 'container', star: 1, image: 'container_32_32-3-1', placed: 'container_32_32-3-1', unplacing: {speed: 600}, help: 'Buckets', tooltip: 'Amount of honey. Can be poured out'},
+  bucketWater: {name: 'Water Bucket', type: ITEM_TYPE.FURNITURE | ITEM_TYPE.POURABLE, stype: 'container', star: 1, image: 'container_32_32-1-1', unplacing: {speed: 600}, help: 'Buckets', tooltip: 'Amount of water. Can be poured out'},
+  bucketSap: {name: 'Sap Bucket', type: ITEM_TYPE.FURNITURE | ITEM_TYPE.POURABLE, stype: 'container', star: 1, image: 'container_32_32-2-1', unplacing: {speed: 600}, help: 'Buckets', tooltip: 'Amount of lava. Can be poured out'},
+  bucketHoney: {name: 'Honey Bucket', type: ITEM_TYPE.FURNITURE | ITEM_TYPE.POURABLE, stype: 'container', star: 1, image: 'container_32_32-3-1', unplacing: {speed: 600}, help: 'Buckets', tooltip: 'Amount of honey. Can be poured out'},
 
   // Trees
   coconut: {name: 'Coconut', type: 0, stype: 'tree', star: 1, image: 'foraged_32_32-1-2', placed: 'placed_16_16-2-0', help: 'Coconut', tooltip: '???', shaking: {speed: 2400, items: [{item: 'coconut', count: 1}]}, foraging: {speed: 2400, items: [{item: 'coconut', count: 1}]}},
