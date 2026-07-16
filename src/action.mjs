@@ -11,6 +11,7 @@ import {playerManager} from './player.mjs'
 import {WORLD_WIDTH, MICROTASK} from './constant.mjs'
 import {floraManager} from './ecosystem.mjs'
 import {furnitureManager} from './housing.mjs'
+import {IMAGE_CACHE} from './assets.mjs'
 
 /* ====================================================================================================
    HELPERS COMMUNS A TOUS LES MANAGERS
@@ -769,6 +770,8 @@ export const choppingManager = new ChoppingManager()
 class SowingManager {
   #sownSeedGrass = new Map() // Map<tileIndex, {index, oldCode, newCode, germinateTimestamp}> — dédoublonnage + source de persistance
   #dirty = false // true si #sownSeeds a changé depuis la dernière écriture gamestate
+  #imageForest = null // ITEMS.seedForest.placed, mis en cache après hydratation
+  #imageJungle = null // ITEMS.seedJungle.placed, mis en cache après hydratation
 
   constructor () {
     // eventBus
@@ -786,6 +789,8 @@ class SowingManager {
   init (sownSeedGrass = []) {
     this.#sownSeedGrass.clear()
     this.#dirty = false
+    this.#imageForest = ITEMS.seedForest.placed // après hydratation
+    this.#imageJungle = ITEMS.seedJungle.placed // après hydratation
 
     for (const seed of sownSeedGrass) {
       this.#sownSeedGrass.set(seed.index, seed)
@@ -1061,6 +1066,21 @@ class SowingManager {
     eventBus.emit('sewed/ambermirage', tileIndex)
     inventoryManager.decrementHotbarSlotCount(slotIndex)
     eventBus.emit('sound/play', 'placing')
+  }
+
+  /**
+   * Dessine les graines en attente de germination, en surimpression de leur tuile. Liste
+   * courte — dessinées sans culling par chunk, comme AmbermirageSystem.#sewedTiles.
+   * @param {CanvasRenderingContext2D} ctx — contexte déjà transformé (caméra appliquée)
+   */
+  render (ctx) {
+    const GRASSFOREST = NODES.GRASSFOREST.code
+    for (const seed of this.#sownSeedGrass.values()) {
+      const img = seed.newCode === GRASSFOREST ? this.#imageForest : this.#imageJungle
+      const pxX = (seed.index & 0x3FF) << 4
+      const pxY = (seed.index >> 10) << 4
+      ctx.drawImage(IMAGE_CACHE[img.imgIndex], img.sx, img.sy, img.sw, img.sh, pxX, pxY, img.sw, img.sh)
+    }
   }
 }
 export const sowingManager = new SowingManager()

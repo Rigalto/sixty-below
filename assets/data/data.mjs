@@ -533,7 +533,7 @@ export const ITEMS = {
   coconutMilk: {name: 'Coconut Milk', type: 0, stype: 'beverage', star: 1, image: 'refined_32_32-2-3', help: 'Coconut', tooltip: '???'},
 
   thornspine: {name: 'Thornspine', type: 0, stype: 'tree', star: 3, image: null, help: 'Thornspine', tooltip: '???', chopping: {speed: 2200, items: [{item: 'cactusFiber', count: '2-3'}, {item: 'cactusSpine', count: '4-10'}]}, foraging: {speed: 2000, items: [{item: 'thornspineFlower', count: 1}, {item: 'cactusSpine', count: 0.60}]}},
-  thornspineFlower: {name: 'Thornspine Flower', type: 0, stype: 'flower', star: 3, image: 'foraged_32_32-2-3', placed: 'placed_16_16-5-0', help: 'Thornspine', tooltip: '???'},
+  thornspineFlower: {name: 'Thornspine Flower', type: 0, stype: 'flower', star: 3, image: 'foraged_32_32-2-3', placed: 'placed_16_16-0-3', help: 'Thornspine', tooltip: '???'},
   cactusSpine: {name: 'Cactus Spine', type: 0, stype: 'Spine', star: 2, image: 'foraged_32_32-0-3', help: 'Thornspine', tooltip: '???'},
   cactusFiber: {name: 'Cactus Fiber', type: 0, stype: 'beverage', star: 2, image: 'foraged_32_32-1-3', help: 'Thornspine', tooltip: '???'},
 
@@ -560,8 +560,8 @@ export const ITEMS = {
   peach: {name: 'Peach', type: 0, stype: 'fruit', star: 1, image: 'foraged_32_32-3-2', help: 'Oak & Mahogany', tooltip: '???'},
 
   acorn: {name: 'Acorn', type: ITEM_TYPE.SEED | ITEM_TYPE.PLACABLE, stype: 'seed', star: 1, image: 'foraged_32_32-0-1', help: 'Oak & Mahogany', tooltip: '???'},
-  seedForest: {name: 'Forest Grass Seed', type: ITEM_TYPE.SEED | ITEM_TYPE.PLACABLE, stype: 'seed', star: 1, image: 'potions_32_32-1-5', help: 'Forest Grass', tooltip: 'Plant to change Dirt into Forest Grass'},
-  seedJungle: {name: 'Jungle Grass Seed', type: ITEM_TYPE.SEED | ITEM_TYPE.PLACABLE, stype: 'seed', star: 1, image: 'potions_32_32-1-5', help: 'Jungle Grass', tooltip: 'Plant to change Silt into Jungle Grass'},
+  seedForest: {name: 'Forest Grass Seed', type: ITEM_TYPE.SEED | ITEM_TYPE.PLACABLE, stype: 'seed', star: 1, image: 'foraged_32_32-4-3', placed: 'placed_16_16-5-0', help: 'Forest Grass', tooltip: 'Plant to change Dirt into Forest Grass'},
+  seedJungle: {name: 'Jungle Grass Seed', type: ITEM_TYPE.SEED | ITEM_TYPE.PLACABLE, stype: 'seed', star: 1, image: 'foraged_32_32-5-3', placed: 'placed_16_16-6-0', help: 'Jungle Grass', tooltip: 'Plant to change Silt into Jungle Grass'},
 
   mahogany: {
     name: 'Mahogany',

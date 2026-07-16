@@ -4154,7 +4154,7 @@ class SpreadForestSystem {
     ctx.save()
     for (const record of this.#list) {
       const cx = ((record.index & 0x3FF) << 4) + 8
-      const cy = ((record.index >> 10) << 4) + 8
+      const cy = ((record.index >> 10) << 4) + 8 + 16
       ctx.fillStyle = record.spreadTimestamp !== null ? 'rgba(0, 220, 0, 0.8)' : 'rgba(232, 47, 232, 0.6)'
       ctx.beginPath()
       ctx.arc(cx, cy, 4, 0, 6.2832)
