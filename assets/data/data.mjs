@@ -522,9 +522,9 @@ export const ITEMS = {
 
   // Liquid containers (large capacity)
   bucket: {name: 'Empty Bucket', type: ITEM_TYPE.FURNITURE | ITEM_TYPE.PLACABLE | ITEM_TYPE.FILLABLE | ITEM_TYPE.ARMOR, stype: 'container', armor: 'head', star: 1, image: 'container_32_32-0-1', placed: 'container_32_32-0-1', armorImage: 'head_26_22-0-2', unplacing: {speed: 600}, help: 'Buckets', tooltip: 'Used to scoop up a small amount of water, honey or sap', defense: 1},
-  bucketWater: {name: 'Water Bucket', type: ITEM_TYPE.FURNITURE | ITEM_TYPE.POURABLE, stype: 'container', star: 1, image: 'container_32_32-1-1', unplacing: {speed: 600}, help: 'Buckets', tooltip: 'Amount of water. Can be poured out'},
-  bucketSap: {name: 'Sap Bucket', type: ITEM_TYPE.FURNITURE | ITEM_TYPE.POURABLE, stype: 'container', star: 1, image: 'container_32_32-2-1', unplacing: {speed: 600}, help: 'Buckets', tooltip: 'Amount of lava. Can be poured out'},
-  bucketHoney: {name: 'Honey Bucket', type: ITEM_TYPE.FURNITURE | ITEM_TYPE.POURABLE, stype: 'container', star: 1, image: 'container_32_32-3-1', unplacing: {speed: 600}, help: 'Buckets', tooltip: 'Amount of honey. Can be poured out'},
+  bucketWater: {name: 'Water Bucket', type: ITEM_TYPE.FURNITURE | ITEM_TYPE.POURABLE, stype: 'container', star: 1, image: 'container_32_32-1-1', help: 'Buckets', tooltip: 'Amount of water. Can be poured out', pouring: {liquid: NODES.WATER.code, container: 'bucket'}},
+  bucketSap: {name: 'Sap Bucket', type: ITEM_TYPE.FURNITURE | ITEM_TYPE.POURABLE, stype: 'container', star: 1, image: 'container_32_32-2-1', help: 'Buckets', tooltip: 'Amount of sap. Can be poured out', pouring: {liquid: NODES.SAP.code, container: 'bucket'}},
+  bucketHoney: {name: 'Honey Bucket', type: ITEM_TYPE.FURNITURE | ITEM_TYPE.POURABLE, stype: 'container', star: 1, image: 'container_32_32-3-1', help: 'Buckets', tooltip: 'Amount of honey. Can be poured out', pouring: {liquid: NODES.HONEY.code, container: 'bucket'}},
 
   // Trees
   coconut: {name: 'Coconut', type: 0, stype: 'tree', star: 1, image: 'foraged_32_32-1-2', placed: 'placed_16_16-2-0', help: 'Coconut', tooltip: '???', shaking: {speed: 2400, items: [{item: 'coconut', count: 1}]}, foraging: {speed: 2400, items: [{item: 'coconut', count: 1}]}},

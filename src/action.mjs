@@ -1,5 +1,5 @@
 // action.mjs — MiningManager - PlacingManager - ForagingManager - ChoppingManager
-// SowingManager - HammingManager - FurnishingManager - FillingManager
+// SowingManager - HammingManager - FurnishingManager - FillingManager - PouringManager
 
 import {eventBus, taskScheduler, microTasker, blockedTiles, rollLootWithBuffs, seededRNG} from './utils.mjs'
 import {NODE_TYPE, NODES_LOOKUP, NODES, ITEM_TYPE, ITEMS, PLANT_SYSTEM_LOOKUP, PLANT_KIND} from '../assets/data/data.mjs'
@@ -212,6 +212,7 @@ class MiningManager {
       : (tileAboveCode === SKY || tileAboveCode === NODES.FOG.code) ? SKY : VOID
 
     // descente en remplaçant les VOID par des SKY
+    let propagationEnd = entry.tileIndex // évite la création dynamique d'un ARRAY
     if (tileNewCode === SKY) {
       let idx = entry.tileIndex + WORLD_WIDTH
       while (chunkManager.getTileAt(idx) === VOID) {
@@ -219,11 +220,18 @@ class MiningManager {
         eventBus.emit('world/tile-changed', {tileIndex: idx, tileOldCode: VOID, tileNewCode: SKY})
         idx += WORLD_WIDTH
       }
+      propagationEnd = idx - WORLD_WIDTH
     }
-
-    // Propagation des SKY vers le bas.
     chunkManager.setTileAt(entry.tileIndex, tileNewCode)
+
+    // on effectue les traitements induits mainteannt que le monde est désormais entièrement cohérent
+    let idx = entry.tileIndex + WORLD_WIDTH
+    while (idx <= propagationEnd) {
+      eventBus.emit('world/tile-changed', {tileIndex: idx, tileOldCode: VOID, tileNewCode: SKY})
+      idx += WORLD_WIDTH
+    }
     eventBus.emit('world/tile-changed', {tileIndex: entry.tileIndex, tileOldCode: entry.tileNode.code, tileNewCode})
+
     // loot
     resolveLoot(entry.tileNode.mining)
 
@@ -310,19 +318,25 @@ class PlacingManager {
     // consommer inventaire
     inventoryManager.decrementHotbarSlotCount(slotIndex)
 
-    // on effectue les traitements induits
-    eventBus.emit('world/tile-changed', {tileIndex, tileOldCode, tileNewCode})
-    eventBus.emit('sound/play', 'placing')
-
     // propagation SKY→VOID vers le bas : les SKY sous le bloc posé perdent leur connexion au ciel
+    let propagationEnd = tileIndex // évite la création dynamique d'un tableau
     if (tileOldCode === SKY) {
       let idx = tileIndex + WORLD_WIDTH
       while (chunkManager.getTileAt(idx) === SKY) {
         chunkManager.setTileAt(idx, VOID)
-        eventBus.emit('world/tile-changed', {tileIndex: idx, tileOldCode: SKY, tileNewCode: VOID})
         idx += WORLD_WIDTH
       }
+      propagationEnd = idx - WORLD_WIDTH
     }
+
+    // on effectue les traitements induits mainteannt que le monde est désormais entièrement cohérent
+    eventBus.emit('world/tile-changed', {tileIndex, tileOldCode, tileNewCode})
+    let idx = tileIndex + WORLD_WIDTH
+    while (idx <= propagationEnd) {
+      eventBus.emit('world/tile-changed', {tileIndex: idx, tileOldCode: SKY, tileNewCode: VOID})
+      idx += WORLD_WIDTH
+    }
+    eventBus.emit('sound/play', 'placing')
   }
 }
 export const placingManager = new PlacingManager()
@@ -462,6 +476,88 @@ class FillingManager {
   }
 }
 export const fillingManager = new FillingManager()
+
+/* ====================================================================================================
+   VIDAGE DE CONTENANTS (POURING)
+   ==================================================================================================== */
+
+/** Codes de tuiles acceptant le versement d'un seau plein. */
+const POURING_NODES = new Set([NODES.SKY.code, NODES.VOID.code])
+
+class PouringManager {
+  constructor () {
+    // Micro-tâche
+    this.onPourContainer = this.onPourContainer.bind(this)
+  }
+
+  /**
+   * Valide la demande de versement et déclenche la micro-tâche.
+   * Point d'entrée unique depuis core.mjs (#processWorldClick), appelé uniquement
+   * si l'item tenu est POURABLE.
+   * @param {number} tileIndex — (y << 10) | x
+   * @param {object} tileNode  — NODES_LOOKUP[tileCode]
+   * @param {object} item      — ITEMS[slot.item] (bucketWater, bucketHoney ou bucketSap)
+   * @param {number} slotIndex — slot.slot (index hotbar)
+   */
+  tryPour (tileIndex, tileNode, item, slotIndex) {
+    if (buffManager.getBuff('playerFreeze')) return
+    if (!POURING_NODES.has(tileNode.code)) return
+    if (!isInInteractionRange(tileIndex)) { eventBus.emit('sound/play', 'toofar'); return }
+    if (!blockedTiles.canPlace(tileIndex)) { eventBus.emit('sound/play', 'wrong'); return }
+    const {priority, capacity} = MICROTASK.POUR_CONTAINER
+    microTasker.enqueue(this.onPourContainer, priority, capacity, tileIndex, tileNode, item, slotIndex)
+  }
+
+  /**
+   * Callback MicroTasker : exécute le versement.
+   * Re-vérifie la tuile cible et le blocage — ils ont pu changer entre tryPour et l'exécution.
+   * Consomme le seau plein, crédite un seau vide, pose la tuile de liquide correspondante,
+   * émet 'world/tile-changed'. Si la tuile remplacée était SKY, propage VOID sur les tuiles
+   * SKY situées en dessous (même logique que PlacingManager.onPlaceTile).
+   * @param {number} tileIndex
+   * @param {object} tileNode
+   * @param {object} item
+   * @param {number} slotIndex
+   */
+  onPourContainer (tileIndex, tileNode, item, slotIndex) {
+    const tileOldCode = chunkManager.getTileAt(tileIndex)
+    if (tileOldCode !== tileNode.code) return // tuile changée entre-temps
+    if (!blockedTiles.canPlace(tileIndex)) return // bloquée entre-temps
+
+    const tileNewCode = item.pouring.liquid
+    if (tileNewCode === undefined) return // item non versable (sécurité)
+
+    // consommation / crédit
+    inventoryManager.decrementHotbarSlotCount(slotIndex)
+    inventoryManager.loot(item.pouring.container, 1, '')
+
+    // transformation de la tuile
+    chunkManager.setTileAt(tileIndex, tileNewCode)
+    eventBus.emit('world/tile-changed', {tileIndex, tileOldCode, tileNewCode})
+    eventBus.emit('sound/play', 'placing')
+
+    // propagation SKY→VOID vers le bas : les SKY sous le liquide posé perdent leur connexion au ciel
+    let propagationEnd = tileIndex // évite la création dynamique d'un Array
+    if (tileOldCode === NODES.SKY.code) {
+      let idx = tileIndex + WORLD_WIDTH
+      while (chunkManager.getTileAt(idx) === NODES.SKY.code) {
+        chunkManager.setTileAt(idx, NODES.VOID.code)
+        idx += WORLD_WIDTH
+      }
+      propagationEnd = idx - WORLD_WIDTH
+    }
+
+    // on effectue les traitements induits mainteannt que le monde est désormais entièrement cohérent
+    eventBus.emit('world/tile-changed', {tileIndex, tileOldCode, tileNewCode})
+    let idx = tileIndex + WORLD_WIDTH
+    while (idx <= propagationEnd) {
+      eventBus.emit('world/tile-changed', {tileIndex: idx, tileOldCode: NODES.SKY.code, tileNewCode: NODES.VOID.code})
+      idx += WORLD_WIDTH
+    }
+    eventBus.emit('sound/play', 'placing')
+  }
+}
+export const pouringManager = new PouringManager()
 
 /* ====================================================================================================
    FORAGING DE PLANTES

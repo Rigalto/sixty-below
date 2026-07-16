@@ -350,6 +350,7 @@ La Sap corrode le Copper. Il doit donc être remplacer par du Gold.
 - Secouage des arbres (`HammingManager`)
 - Plantage de graines (`SowingManager`)
 - Remplissage d'un conteneur par un liquie (`FillingManager`)
+- Vidage d'un seau plein dans le monde (`PouringManager`)
 
 ### Joueur
  - Déplacement horizontal (touches 'Q' et 'D') (`PlayerManager`)

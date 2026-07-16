@@ -19,7 +19,7 @@ import {achievementManager} from './achievement.mjs'
 import {playerManager, lootPopupManager, handedToolManager, hotbarOverlay} from './player.mjs'
 import {floraManager, sunflowerSystem, oleanderSystem, parsnipSystem, ambermirageSystem, oakSystem, mahoganySystem, cobwebSystem, coconutSystem, thornspineSystem, spreadForestSystem} from './ecosystem.mjs'
 import {ACHIEVEMENT_CATEGORIES} from '../assets/data/data-achievement.mjs'
-import {miningManager, placingManager, foragingManager, choppingManager, sowingManager, hammingManager, furnishingManager, fillingManager} from './action.mjs'
+import {miningManager, placingManager, foragingManager, choppingManager, sowingManager, hammingManager, furnishingManager, fillingManager, pouringManager} from './action.mjs'
 import './combat.mjs'
 
 const WITH_DEBUG_HUD = true // passer à false pour désactiver sans toucher IS_DEV
@@ -631,6 +631,8 @@ class GameCore {
 
     if ((item.type & ITEM_TYPE.FILLABLE) && (tileNode.type & NODE_TYPE.LIQUID)) {
       fillingManager.tryFill(tileIndex, tileNode, item, slot.slot)
+    } else if ((item.type & ITEM_TYPE.POURABLE) && (tileNode.type & NODE_TYPE.GAZ)) {
+      pouringManager.tryPour(tileIndex, tileNode, item, slot.slot)
     } else if (item.type & ITEM_TYPE.TOOL) {
       if (item.stype === 'pickaxe') miningManager.tryMine(tileIndex, tileNode, item, slot.prefix)
       else if (item.stype === 'hammer') hammingManager.tryUse(tileIndex, tileNode, item, slot.prefix)

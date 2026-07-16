@@ -173,6 +173,9 @@ par des objets `{imageIndex, x, y, w, h}` directement utilisables pour le rendu.
 - Si le listener dépasse 0,1 ms → déléguer au `MicroTasker`.
 - **Interdit : lambdas anonymes** dans `on()` — impossible à `off()` par la suite.
 - Toujours binder le callback avant enregistrement : `this.myHandler = this.myHandler.bind(this)`.
+- Une action modifiant plusieurs tuiles en cascade (propagation SKY/VOID, etc.) doit appliquer
+  tous les `chunkManager.setTileAt()` avant d'émettre le moindre `world/tile-changed` — les
+  listeners synchrones doivent toujours lire un monde déjà cohérent.
 
 **Pattern d'usage standard :**
 ```javascript
@@ -446,6 +449,20 @@ Cette section définit les événements officiels. Tout nouvel événement doit 
 | :---: | :--- | :--- | :--- |
 | S | `sound/play` | `name: string` | Joue le son `name`. |
 | S | `furniture/placed` | `id: string` | Un meuble a été placé dans le monde. |
+
+#### Vidage de conteneurs dans le monde (`PouringManager`)
+
+| Dir. | Event Name | Payload Structure | Description |
+| :---: | :--- | :--- | :--- |
+| S | `world/tile-changed` | `{ tileIndex: number, tileOldCode: number, tileNewCode: number }`| Le code de la tuile a été modifié. |
+| S | `sound/play` | `name: string` | Joue le son `name`. |
+
+#### Remplissage de conteneurs depuis le monde (`FillingManager`)
+
+| Dir. | Event Name | Payload Structure | Description |
+| :---: | :--- | :--- | :--- |
+| S | `world/tile-changed` | `{ tileIndex: number, tileOldCode: number, tileNewCode: number }`| Le code de la tuile a été modifié. |
+| S | `sound/play` | `name: string` | Joue le son `name`. |
 
 #### Plantage de graines dans le monde (`SowingManager`)
 
