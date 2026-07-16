@@ -442,10 +442,12 @@ class FillingManager {
   }
 
   /**
-   * Callback MicroTasker : exécute le remplissage.
+ * Callback MicroTasker : exécute le remplissage.
    * Re-vérifie la tuile cible — elle a pu changer entre tryFill et l'exécution.
-   * Consomme l'item en main, crédite le contenant rempli, transforme la tuile en SKY
-   * (si la tuile au-dessus est SKY) ou VOID, émet 'world/tile-changed'.
+   * Consomme l'item en main, crédite le contenant rempli. Pour un bucket, transforme la tuile
+   * en SKY (si la tuile au-dessus est SKY, avec propagation sur les VOID consécutifs en dessous)
+   * ou VOID. Toutes les tuiles concernées sont modifiées avant l'émission des eventBus
+   * 'world/tile-changed', pour que les listeners synchrones lisent un monde déjà cohérent.
    * @param {number} tileIndex
    * @param {object} tileNode
    * @param {object} item
@@ -466,10 +468,31 @@ class FillingManager {
 
     // transformation de la tuile
     if (item.code === 'bucket') {
+      const SKY = NODES.SKY.code
+      const VOID = NODES.VOID.code
       const aboveCode = chunkManager.getTileAt(tileIndex - WORLD_WIDTH)
-      const tileNewCode = aboveCode === NODES.SKY.code ? NODES.SKY.code : NODES.VOID.code
+      const tileNewCode = aboveCode === SKY ? SKY : VOID
+
+      // mutation de toutes les tuiles concernées
       chunkManager.setTileAt(tileIndex, tileNewCode)
+
+      let propagationEnd = tileIndex
+      if (tileNewCode === SKY) {
+        let idx = tileIndex + WORLD_WIDTH
+        while (chunkManager.getTileAt(idx) === VOID) {
+          chunkManager.setTileAt(idx, SKY)
+          idx += WORLD_WIDTH
+        }
+        propagationEnd = idx - WORLD_WIDTH
+      }
+
+      // émission — le monde est désormais entièrement cohérent
       eventBus.emit('world/tile-changed', {tileIndex, tileOldCode, tileNewCode})
+      let idx = tileIndex + WORLD_WIDTH
+      while (idx <= propagationEnd) {
+        eventBus.emit('world/tile-changed', {tileIndex: idx, tileOldCode: VOID, tileNewCode: SKY})
+        idx += WORLD_WIDTH
+      }
     }
 
     eventBus.emit('sound/play', 'placing')
