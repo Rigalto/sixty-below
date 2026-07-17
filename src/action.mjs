@@ -10,7 +10,7 @@ import {chunkManager} from './world.mjs'
 import {playerManager} from './player.mjs'
 import {WORLD_WIDTH, MICROTASK} from './constant.mjs'
 import {floraManager} from './ecosystem.mjs'
-import {furnitureManager} from './housing.mjs'
+import {furnitureManager, teleporterManager} from './housing.mjs'
 import {IMAGE_CACHE} from './assets.mjs'
 
 /* ====================================================================================================
@@ -397,6 +397,7 @@ class FurnishingManager {
     }
 
     if (!isInInteractionRange(tileIndex)) { eventBus.emit('sound/play', 'toofar'); return }
+    if (item.stype === 'teleporter' && !teleporterManager.canPlace(item.code)) { eventBus.emit('sound/play', 'wrong'); return }
     if (!blockedTiles.canPlaceRect(px, topY, w, h)) { eventBus.emit('sound/play', 'wrong'); return }
 
     const furniture = furnitureManager.place(item.code, tileIndex)

@@ -579,6 +579,16 @@ class TeleporterManager {
   }
 
   /**
+   * Indique si la couleur donnée a encore un emplacement libre.
+   * @param {string} code — itemId dans ITEMS (teleporterYellow, teleporterRed...)
+   * @returns {boolean} true si moins de 2 téléporteurs de cette couleur sont posés
+   */
+  canPlace (code) {
+    const base = TELEPORTER_COLOR_SLOT[code]
+    return this.#positions[base] === 0 || this.#positions[base + 1] === 0
+  }
+
+  /**
    * Affiche dans la console une ligne par couleur (7), avec la position 'x,y' ou 'empty'
    * pour chacun des 2 emplacements de la couleur.
    */
