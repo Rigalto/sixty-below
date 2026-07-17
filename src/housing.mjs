@@ -203,6 +203,7 @@ class FurnitureManager {
       this.#byId.set(record.id, record)
       this.#addToChunks(record)
       this.#addToOccupancy(record)
+      if (record.stype === 'teleporter') teleporterManager.initTeleporter(record)
     }
     console.log('FurnitureManager.init', {list: this.#list, byId: this.#byId, byChunk: this.#byChunk})
   }
@@ -466,6 +467,144 @@ class FurnitureManager {
   }
 }
 export const furnitureManager = new FurnitureManager()
+
+/* ====================================================================================================
+   TELEPORTER MANAGER
+   ====================================================================================================
+
+   Autorité unique sur la position des téléporteurs posés dans le monde. Aucune logique DOM.
+   Singleton : teleporterManager.
+
+   Responsabilités :
+     - Mémoriser l'index tuile de chaque téléporteur posé, par couleur (2 emplacements par couleur)
+     - Entretenir cette liste au fil des placements/retraits de furniture en temps réel (eventBus)
+
+   Reconstruction au démarrage :
+     Aucune persistance propre. init() vide les 14 emplacements et doit être appelé AVANT
+     furnitureManager.init(), qui appelle directement initTeleporter() pour chaque record
+     stype === 'teleporter' restauré (même fichier — pas d'eventBus pour ce cas).
+
+   Interactions :
+     furnitureManager — appelant direct de initTeleporter() lors de la restauration
+                       — lookup du record posé (code, index) sur 'furniture/placed' (pose joueur)
+     eventBus          — écoute : 'furniture/placed', 'furniture/unplaced'
+
+   ==================================================================================================== */
+
+/** Emplacement de base (sur 2) dans #positions, par code d'item téléporteur. */
+const TELEPORTER_COLOR_SLOT = {
+  teleporterYellow: 0,
+  teleporterOrange: 2,
+  teleporterRed: 4,
+  teleporterGreen: 6,
+  teleporterBlue: 8,
+  teleporterNavy: 10,
+  teleporterPurple: 12
+}
+
+class TeleporterManager {
+  #positions = new Uint32Array(14) // index tuile par emplacement — 0 = absent (cf. TELEPORTER_COLOR_SLOT)
+  #byFurnitureId = new Map() // Map<furnitureId, slot> — entretenue au fil des placements/retraits
+
+  constructor () {
+    this.onFurniturePlaced = this.onFurniturePlaced.bind(this)
+    this.onFurnitureUnplaced = this.onFurnitureUnplaced.bind(this)
+    eventBus.on('furniture/placed', this.onFurniturePlaced)
+    eventBus.on('furniture/unplaced', this.onFurnitureUnplaced)
+  }
+
+  /**
+   * Vide les 14 emplacements. Doit être appelé avant furnitureManager.init().
+   * Appelé depuis core.mjs au startSession.
+   */
+  init () {
+    this.#positions.fill(0)
+    this.#byFurnitureId.clear()
+  }
+
+  /**
+   * Enregistre un téléporteur restauré au chargement dans le premier emplacement libre de sa
+   * couleur. Appelé directement par FurnitureManager.init() pour chaque record
+   * stype === 'teleporter' — les deux classes partagent le même fichier, pas besoin de
+   * passer par l'eventBus 'furniture/placed' (réservé aux poses joueur en temps réel).
+   * @param {object} furniture — record complet {id, code, index, stype, ...}
+   */
+  initTeleporter (furniture) {
+    this.#register(furniture.id, furniture.code, furniture.index)
+  }
+
+  /**
+   * Enregistre un téléporteur dans le premier emplacement libre de sa couleur. Sans effet si
+   * les deux emplacements de cette couleur sont déjà occupés.
+   * @param {string} furnitureId
+   * @param {string} code   — itemId dans ITEMS (détermine la couleur)
+   * @param {number} index  — tuile (y << 10) | x
+   */
+  #register (furnitureId, code, index) {
+    const base = TELEPORTER_COLOR_SLOT[code]
+    let slot = -1
+    if (this.#positions[base] === 0) slot = base
+    else if (this.#positions[base + 1] === 0) slot = base + 1
+    if (slot === -1) return
+
+    this.#positions[slot] = index
+    this.#byFurnitureId.set(furnitureId, slot)
+  }
+
+  /**
+   * Liaison EventBus : 'furniture/placed' — pose joueur en temps réel. Enregistre le
+   * téléporteur posé dans le premier emplacement libre de sa couleur. Sans effet si le
+   * meuble n'est pas un téléporteur.
+   * Lié dans le constructeur — référence stable pour off().
+   * @param {string} furnitureId
+   */
+  onFurniturePlaced (furnitureId) {
+    const furniture = furnitureManager.getFurnitureById(furnitureId)
+    if (furniture === undefined || furniture.stype !== 'teleporter') return
+    this.#register(furniture.id, furniture.code, furniture.index)
+  }
+
+  /**
+   * Liaison EventBus : 'furniture/unplaced' — libère l'emplacement du téléporteur retiré.
+   * Sans effet si le meuble retiré n'était pas un téléporteur suivi.
+   * Lié dans le constructeur — référence stable pour off().
+   * @param {string} furnitureId
+   */
+  onFurnitureUnplaced (furnitureId) {
+    const slot = this.#byFurnitureId.get(furnitureId)
+    if (slot === undefined) return
+
+    this.#positions[slot] = 0
+    this.#byFurnitureId.delete(furnitureId)
+  }
+
+  /**
+   * Affiche dans la console une ligne par couleur (7), avec la position 'x,y' ou 'empty'
+   * pour chacun des 2 emplacements de la couleur.
+   */
+  debug () {
+    console.log('--- TeleporterManager - Color: Position 1 / Position 2 ---')
+    for (const code of Object.keys(TELEPORTER_COLOR_SLOT)) {
+      const base = TELEPORTER_COLOR_SLOT[code]
+      console.log(`${code.slice(10)}: ${this.#formatSlot(this.#positions[base])} / ${this.#formatSlot(this.#positions[base + 1])}`)
+    }
+  }
+
+  /**
+   * Formate un emplacement pour l'affichage debug.
+   * @param {number} index — tuile (y << 10) | x, 0 = absent
+   * @returns {string} 'x,y' si occupé, 'empty' sinon
+   */
+  #formatSlot (index) {
+    if (index === 0) return 'empty'
+    return `${index & 0x3FF},${index >> 10}`
+  }
+}
+export const teleporterManager = new TeleporterManager()
+
+/* ====================================================================================================
+   HOUSING MANAGER
+   ==================================================================================================== */
 
 class HousingManager {
 }

@@ -13,7 +13,7 @@ import {buffManager} from './buff.mjs'
 import {creationDialogOverlay, seedWidget, tileHoverWidget} from './ui.mjs'
 import {helpOverlay} from './help.mjs'
 import {inventoryManager} from './inventory.mjs'
-import {furnitureManager} from './housing.mjs'
+import {furnitureManager, teleporterManager} from './housing.mjs'
 import {craftOverlay} from './craft.mjs'
 import {achievementManager} from './achievement.mjs'
 import {playerManager, lootPopupManager, handedToolManager, hotbarOverlay} from './player.mjs'
@@ -396,6 +396,7 @@ class GameCore {
     inventoryManager.initDone() // vérification de l'intégrité des slots (appel optionnel)
 
     // 5.2 Objectstore Furniture
+    teleporterManager.init() // obligatoirement avant la lecture des furnitures placés
     const furnitureRecords = await database.readAllFromObjectStore('furniture')
     const furnituresToDelete = []
     const activeFurnitures = []
@@ -767,6 +768,7 @@ class GameCore {
     eventBus.debugStats()
     microTasker.debugStats()
     taskScheduler.debugStats()
+    teleporterManager.debug()
     eventBus.emit('debug/buff-manager')
   }
 }
