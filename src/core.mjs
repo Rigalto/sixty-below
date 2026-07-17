@@ -528,9 +528,7 @@ class GameCore {
 
     // 2.G Gestion du clic droit la souris
     const rightClick = mouseManager.consumeRightClick() // "Read-and-Reset"
-    if (rightClick) {
-      //
-    }
+    if (rightClick) this.#processWorldRightClick(tileIndex)
 
     // DEBUG
     if (IS_DEV && WITH_DEBUG_HUD) {
@@ -648,6 +646,20 @@ class GameCore {
       else if (item.type & ITEM_TYPE.SEED) sowingManager.trySow(tileIndex, tileNode, item, slot.slot)
       else if (item.type & ITEM_TYPE.FURNITURE) furnishingManager.tryPlace(tileIndex, tileNode, item, slot.slot)
     }
+  }
+
+  /**
+   * Aiguillage des actions déclenchées par un clic droit monde. Le clic droit ne concerne que
+   * les furnitures — aucun effet si la tuile cliquée ne porte pas de meuble.
+   * Appelée depuis la loop uniquement si un clic droit a été consommé.
+   * @param {number} tileIndex — (y << 10) | x
+   */
+  #processWorldRightClick (tileIndex) {
+    const furniture = furnitureManager.getFurnitureAt(tileIndex)
+    if (furniture === null) return
+
+    if (furniture.stype === 'teleporter') teleporterManager.tryTeleport(tileIndex, furniture)
+    // TODO : autres stype de furniture (chest, door...)
   }
 
   /**

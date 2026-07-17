@@ -357,6 +357,7 @@ La Sap corrode le Copper. Il doit donc être remplacer par du Gold.
  - Saut du joueur (touche 'Z') (`PlayerManager`)
  - Chute due à la gravité (`PlayerManager`)
  - Utilisation des plate-formes (`PlayerManager`)
+ - Utilisation des téléporteurs (`TeleporterManager`)
  - Affichage des armures portées (`PlayerManager`)
  - Affichage éphémère du loot (`LootPopupManager`)
 

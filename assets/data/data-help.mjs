@@ -6767,11 +6767,12 @@ Seven types exist, each identified by its color. A color determines which telepo
 
 * Craft a pair of matching teleporters.
 * Place each teleporter at a different location in the world.
-* Right click a teleporter to activate it — you are instantly transported next to its twin.⏳
+* Right click a teleporter to activate it — you are instantly transported directly to its twin.
 
-Activation fails silently in the following cases:
+Activation fails in the following cases:
+* The clicked teleporter is out of [[Ranges|Interaction Range]].
 * The twin teleporter is not placed in the world.
-* There is no room next to the twin for the player to stand.
+* There is no room around the twin for the player to stand.
 
 To remove a teleporter from the world: use a <<itemStar|hammerSilver>> or higher.
 
@@ -6796,9 +6797,11 @@ _It is not possible to place in the world more than two teleporters of the same 
 **Tips**
 
 * _Place one teleporter at your base and one at a dangerous area — instant escape when things go wrong._
-* _Teleporters can be retrieved with a [[Hammers|Hammer]] if you want to move them._ ⏳
 * _Label chest nearby each teleporter to remember where each pair leads._
 * _Seven types means up to seven independent fast-travel networks in a single world._
+* _In an area with [[node:sand]] nearby, protect your teleporter from being buried — several containment strategies work, so find the one that fits your build._
+* _The most common strategy is a central hub room housing all seven teleporters together. Other layouts can offer faster point-to-point travel depending on your needs._
+* _Use colors as a memory aid for each destination — for example, green for your Gardening area, blue for Fishing, red for your monsters Farm._
 
 **See also**
 

@@ -2,13 +2,14 @@
 
 import {eventBus, blockedTiles} from './utils.mjs'
 import {uniqueIdGenerator} from './database.mjs'
-import {CONTAINER_STYPES} from './constant.mjs'
+import {CONTAINER_STYPES, PLAYER} from './constant.mjs'
 import {saveManager} from './persistence.mjs'
 import {camera} from './render.mjs'
 import {playerManager} from './player.mjs'
 import {isInInteractionRange} from './buff.mjs' // ← ajouter
 import {IMAGE_CACHE} from './assets.mjs'
-import {MAX_FURNITURE_W, MAX_FURNITURE_H, ITEMS} from '../assets/data/data.mjs'
+import {MAX_FURNITURE_W, MAX_FURNITURE_H, ITEMS, NODES_LOOKUP, NODE_TYPE} from '../assets/data/data.mjs'
+import {chunkManager} from './world.mjs'
 
 /* ====================================================================================================
    FURNITURE MANAGER
@@ -586,6 +587,40 @@ class TeleporterManager {
   canPlace (code) {
     const base = TELEPORTER_COLOR_SLOT[code]
     return this.#positions[base] === 0 || this.#positions[base + 1] === 0
+  }
+
+  /**
+   * Active le téléporteur cliqué : retrouve son jumeau, vérifie que les 6 tuiles couvertes par
+   * la hitbox joueur à l'arrivée (2 colonnes x 3 lignes, centrées sur les 2 colonnes du jumeau,
+   * coin bas aligné sur son coin bas) ne contiennent aucune tuile solide, puis déclenche
+   * 'player/teleport'. Émet 'toofar' hors de portée, 'wrong' si le jumeau est absent ou l'arrivée
+   * bloquée.
+   * @param {number} tileIndex — (y << 10) | x — tuile cliquée
+   * @param {object} furniture — meuble téléporteur sous la souris (stype === 'teleporter')
+   */
+  tryTeleport (tileIndex, furniture) {
+    if (!isInInteractionRange(tileIndex)) { eventBus.emit('sound/play', 'toofar'); return }
+
+    const base = TELEPORTER_COLOR_SLOT[furniture.code]
+    const twinIndex = this.#positions[base] === furniture.index ? this.#positions[base + 1] : this.#positions[base]
+    if (twinIndex === 0) { eventBus.emit('sound/play', 'wrong'); return }
+
+    const twin = furnitureManager.getFurnitureAt(twinIndex)
+    if (twin === null) { eventBus.emit('sound/play', 'wrong'); return }
+
+    const leftX = twin.index & 0x3FF
+    const topY = twin.index >> 10
+
+    // Hitbox joueur (26x46) centrée sur les 2 colonnes du jumeau (32px), coin bas aligné sur
+    // son coin bas : occupe exactement les colonnes [leftX, leftX+1] et les lignes [topY-1, topY+1].
+    const SOLID = NODE_TYPE.SOLID | NODE_TYPE.ETERNAL
+    const codes = chunkManager.getRectCodes(leftX, topY - 1, twin.w, 3)
+    for (const code of codes) {
+      if (NODES_LOOKUP[code].type & SOLID) { eventBus.emit('sound/play', 'wrong'); return }
+    }
+
+    // x = leftX + 1 (colonne droite du jumeau) → onTeleport centre le joueur sur les 2 colonnes
+    eventBus.emit('player/teleport', {x: leftX + 1, y: topY + twin.h})
   }
 
   /**
