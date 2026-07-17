@@ -499,6 +499,18 @@ Cette section définit les événements officiels. Tout nouvel événement doit 
 | :---: | :--- | :--- | :--- |
 | E | `camera/preload-chunks-changed` | `Set<number>` | Émis à chaque changement de `preloadChunks`. |
 
+#### Spread Forêt (`SpreadForestSystem`)
+
+| Dir. | Event Name | Payload Structure | Description |
+| :---: | :--- | :--- | :--- |
+| E/S | `world/tile-changed` | `{ tileIndex: number, tileOldCode: number, tileNewCode: number }` | Émis lors du changement d'une tuile. |
+
+#### Spread Jungle (`SpreadJungleSystem`)
+
+| Dir. | Event Name | Payload Structure | Description |
+| :---: | :--- | :--- | :--- |
+| E/S | `world/tile-changed` | `{ tileIndex: number, tileOldCode: number, tileNewCode: number }` | Émis lors du changement d'une tuile. |
+
 #### Sunflower (`SunflowerSystem`)
 
 | Dir. | Event Name | Payload Structure | Description |

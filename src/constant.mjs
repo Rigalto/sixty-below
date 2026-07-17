@@ -290,6 +290,8 @@ export const MICROTASK = {
 
   SPREAD_FOREST_TILE_CHECK: {priority: 20, capacity: 10, taskName: 'onSpreadForestTileCheck'}, // entretien réactif d'un record spread pour une tuile modifiée
   SPREAD_FOREST_GROW: {priority: 20, capacity: 4, taskName: 'onSpreadForestGrow'}, // transformation DIRT → GRASSFOREST à l'échéance
+  SPREAD_JUNGLE_TILE_CHECK: {priority: 20, capacity: 10, taskName: 'onSpreadJungleTileCheck'}, // entretien réactif d'un record spread pour une tuile modifiée
+  SPREAD_JUNGLE_GROW: {priority: 20, capacity: 4, taskName: 'onSpreadJungleGrow'}, // transformation SILT → GRASSJUNGLE à l'échéance
   SEED_GRASS_GERMINATE: {priority: 20, capacity: 4, taskName: 'onSeedGrassGerminate'}, // germination d'une graine plantée (ForestGrassSeed, JungleGrassSeed)
 
   UNBLOOM_BOLETE: {priority: 20, capacity: 1, taskName: 'unbloomBolete'}, // supprime les bolete du monde
