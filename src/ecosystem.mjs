@@ -2556,6 +2556,7 @@ class OakSystem {
     const record = this.#oakBySoil.get(soilIndex)
 
     if (record === undefined) return
+    if (record.size >= 4) { record.growthTimestamp = null; return }
     if (record.blocked > 0) return // arbre bloqué : croissance suspendue, tâche abandonnée
 
     removeFromByTileTree(this.oakByTile, this.#oakByFullRect, record)
@@ -2747,6 +2748,7 @@ class MahoganySystem {
         const {priority, capacity} = MICROTASK.MAHOGANY_END_SHAKE
         taskScheduler.enqueueAbsolute(`mahogany_shake_${record.id}`, record.shakedTimestamp, this.mahoganyEndShake, priority, capacity, soilIndex)
       }
+
       return
     }
 
@@ -3159,6 +3161,7 @@ class MahoganySystem {
     const record = this.#mahoganyBySoil.get(soilIndex)
 
     if (record === undefined) return
+    if (record.size >= 4) { record.growthTimestamp = null; return }
     if (record.blocked > 0) return // arbre bloqué : croissance suspendue, tâche abandonnée
 
     removeFromByTileTree(this.mahoganyByTile, this.#mahoganyByFullRect, record)
