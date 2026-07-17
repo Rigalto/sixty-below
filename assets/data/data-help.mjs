@@ -196,6 +196,7 @@ The Surface is the topmost layer of the world, where the player begins their adv
 | Ressource | Tier | Type | Biome |
 |---|---|---|---|
 | [[item:chunkCopper]] | {{item:chunkCopper:star|star}} | Ore | All biomes |
+| [[item:chunkIron]] | {{item:chunkIron:star|star}} | Ore | All biomes |
 | [[item:oak]] | {{item:oak:star|star}} | Tree | [[Forest]] |
 | [[item:coconut]] | {{item:coconut:star|star}} | Tree | [[Desert]] lake, [[Sea]] shore |
 | [[item:thornspine]] | {{item:thornspine:star|star}} | Tree | [[Desert]], [[Sea]] shore |
@@ -254,7 +255,16 @@ The Underground layer begins just below the surface. It is darker, more dangerou
 
 **Resources**
 
-* [[item:chunkCopper]], [[item:chunkIron]], [[item:chunkSilver]] — common
+
+**Resources**
+
+| Ressource | Tier | Type | Biome |
+|---|---|---|---|
+| [[item:chunkCopper]] | {{item:chunkCopper:star|star}} | Ore | All biomes |
+| [[item:chunkIron]] | {{item:chunkIron:star|star}} | Ore | All biomes |
+| [[item:chunkSilver]] | {{item:chunkSilver:star|star}} | Ore | All biomes |
+| [[item:pricklepad]] | {{item:pricklepad:star|star}} | Herb | [[Desert]] |
+| [[item:oleander]] | {{item:oleander:star|star}} | Herb | All biomes |
 
 **Mini-biomes**
 
@@ -1708,6 +1718,18 @@ Dirt is the primary topsoil of [[Forest]] biomes. It supports surface vegetation
 
 * [[Surface]] and [[Underground]] — [[Forest]], high density
 
+**Inhabitants**
+
+Dirt is teeming with hidden life. Among its various denizens, the [[item:worm]] thrives in great numbers. These creatures prosper in this nutrient-rich layer, feeding on the decaying organic matter and turning the earth.
+
+**Soil Spreading**
+
+The soil of the forest is alive and constantly evolving.
+
+Under normal conditions, a bare [[node:dirt]] tile will naturally transform into [[node:grassForest]] over time. This transition requires at least one neighboring [[node:grassForest]] tile to spread its roots and cover the raw soil.
+
+You can cultivate new areas without waiting for natural growth. By sowing a [[item:seedForest]] directly onto a [[node:dirt]] tile, you will transform it into [[node:grassForest]] upon growth, establishing the foundation for a brand new ecosystem.
+
 <hr>
 
 **Mining**
@@ -1775,6 +1797,18 @@ Silt is the primary topsoil of [[Jungle]] biomes. Its fine, damp texture support
 **Main Location**
 
 * [[Surface]] and [[Underground]] — [[Jungle]], high density
+
+**Inhabitants**
+
+Dirt is teeming with hidden life. Among its various denizens, the [[item:slug]] thrives in great numbers. These creatures prosper in this nutrient-rich layer, feeding on the decaying organic matter and turning the earth.
+
+**Soil Spreading**
+
+The soil of the jungle is alive and constantly evolving.
+
+Under normal conditions, a bare [[node:silt]] tile will naturally transform into [[node:grassJungle]] over time. This transition requires at least one neighboring [[node:grassJungle]] tile to spread its roots and cover the raw soil.
+
+You can cultivate new areas without waiting for natural growth. By sowing a [[item:seedJungle]] directly onto a [[node:silt]] tile, you will transform it into [[node:grassJungle]] upon growth, establishing the foundation for a brand new ecosystem.
 
 <hr>
 

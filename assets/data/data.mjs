@@ -104,11 +104,11 @@ export const NODES = {
     star: 1,
     color: '#db9b63',
     image: 'substrat_16_16+11',
-    mining: {speed: 1000, items: [{item: 'blockDirt', count: 1}, {item: 'worm', count: 0.15, lucky: 1.2, rainy: 1.7}]},
+    mining: {speed: 1000, items: [{item: 'blockDirt', count: 1}, {item: 'worm', count: 0.15, buffs: ['lucky:200', 'rainy:200']}]},
     help: 'Dirt'
   },
   SAND: {code: 41, name: 'Sand', type: NODE_TYPE.TOPSOIL | NODE_TYPE.SOLID, stype: 'block', star: 1, color: '#fff198', image: 'substrat_16_16+12', mining: {speed: 1000, items: [{item: 'blockSand', count: 1}]}, viscosity: 500, help: 'Sand'},
-  SILT: {code: 42, name: 'Silt', type: NODE_TYPE.TOPSOIL | NODE_TYPE.SOLID, stype: 'block', star: 2, color: '#73c882', image: 'substrat_16_16+13', mining: {speed: 1000, items: [{item: 'blockSilt', count: 1}]}, help: 'Silt'},
+  SILT: {code: 42, name: 'Silt', type: NODE_TYPE.TOPSOIL | NODE_TYPE.SOLID, stype: 'block', star: 2, color: '#73c882', image: 'substrat_16_16+13', mining: {speed: 1000, items: [{item: 'blockSilt', count: 1}, {item: 'slug', count: 0.15, buffs: ['lucky:200', 'rainy:200']}]}, help: 'Silt'},
   HUMUS: {code: 43, name: 'Humus', type: NODE_TYPE.TOPSOIL | NODE_TYPE.SOLID, stype: 'block', star: 2, color: '#e2b3ff', image: 'substrat_16_16+14', mining: {speed: 1000, items: [{item: 'blockHumus', count: 1}]}, help: 'Humus'},
 
   // ── Substrat (roche de base, peu propice aux plantes) ────────────────────────
