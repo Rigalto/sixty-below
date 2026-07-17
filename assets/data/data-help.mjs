@@ -6742,8 +6742,7 @@ The player is freeze during all the Teleportation process.
     title: 'Teleporters',
     category: ['Furniture', 'Gameplay'],
     content: `
-  **Description**
-
+**Description**
 
 Teleporters are powerful artefacts that allow instant travel across the world in under a second.
 They are crafted and placed in pairs — activating one transports the player directly to its twin. ⏳
@@ -6752,25 +6751,33 @@ They are crafted and placed in pairs — activating one transports the player di
 
 Seven types exist, each identified by its color. A color determines which teleporters form a valid pair.
 
-| Teleporter | Color |
+| Teleporter | Tier | Color |
 |---|---|
-| [[item:teleporterYellow]] | Yellow |
-| [[item:teleporterRed]] | Red |
-| [[item:teleporterOrange]] | Orange |
-| [[item:teleporterGreen]] | Green |
-| [[item:teleporterBlue]] | Light Blue |
-| [[item:teleporterNavy]] | Dark Blue |
-| [[item:teleporterPurple]] | Purple |
+| [[item:teleporterYellow]] | {{item:teleporterYellow:star|star}} | Yellow |
+| [[item:teleporterRed]] | {{item:teleporterRed:star|star}} | Red |
+| [[item:teleporterOrange]] | {{item:teleporterOrange:star|star}} | Orange |
+| [[item:teleporterGreen]] | {{item:teleporterGreen:star|star}} | Green |
+| [[item:teleporterBlue]] | {{item:teleporterBlue:star|star}} | Light Blue |
+| [[item:teleporterNavy]] | {{item:teleporterNavy:star|star}} | Dark Blue |
+| [[item:teleporterPurple]] | {{item:teleporterPurple:star|star}} | Purple |
+
+<hr>
 
 **How to Use**
 
 * Craft a pair of matching teleporters.
-* Place each teleporter at a different location in the world.⏳
-* Click a teleporter to activate it — you are instantly transported next to its twin.⏳
+* Place each teleporter at a different location in the world.
+* Right click a teleporter to activate it — you are instantly transported next to its twin.⏳
 
 Activation fails silently in the following cases:
 * The twin teleporter is not placed in the world.
 * There is no room next to the twin for the player to stand.
+
+To remove a teleporter from the world: use a <<itemStar|hammerSilver>> or higher.
+
+_It is not possible to place in the world more than two teleporters of the same color._
+
+<hr>
 
 **Crafting** ⏳
 
@@ -6783,6 +6790,8 @@ Activation fails silently in the following cases:
 <<fullRecipeRow|teleporterBlue>>
 <<fullRecipeRow|teleporterNavy>>
 <<fullRecipeRow|teleporterPurple>>
+
+<hr>
 
 **Tips**
 
