@@ -617,10 +617,10 @@ export const ITEMS = {
 
   velvetmoss: {name: 'Velvetmoss', type: 0, stype: 'herb', star: 3, image: 'crafting_32_32-0-1', placed: 'fuws_32_32-2-3', speed: 1900, foraging: {speed: 500, items: [{item: 'velvetmoss', count: 1, rainy: 1.8, windy: 1.8}]}, help: 'Velvetmoss', tooltip: '???'},
 
-  coralR: {name: 'Sunburst Brain Coral', type: 0, stype: 'herb', star: 2, image: null, placed: 'fuws_32_32-2-3', speed: 1900, foraging: {speed: 500, items: [{item: 'coral', count: 1, rainy: 1.8, windy: 1.8}]}, help: 'Corals', tooltip: 'Crafting Material for Potions and Furniture'},
-  coralP: {name: 'Starfire Pillar Coral', type: 0, stype: 'herb', star: 2, image: null, placed: 'fuws_32_32-3-3', speed: 1900, foraging: {speed: 500, items: [{item: 'coral', count: 1, rainy: 1.8, windy: 1.8}]}, help: 'Corals', tooltip: 'Crafting Material for Potions and Furniture'},
-  coralY: {name: 'Flickering Torch Coral', type: 0, stype: 'herb', star: 2, image: null, placed: 'fuws_32_32-4-3', speed: 1900, foraging: {speed: 500, items: [{item: 'coral', count: 1, rainy: 1.8, windy: 1.8}]}, help: 'Corals', tooltip: 'Crafting Material for Potions and Furniture'},
-  coralG: {name: 'Whispering Fan Coral', type: 0, stype: 'herb', star: 2, image: null, placed: 'fuws_32_32-5-3', speed: 1900, foraging: {speed: 500, items: [{item: 'coral', count: 1, rainy: 1.8, windy: 1.8}]}, help: 'Corals', tooltip: 'Crafting Material for Potions and Furniture'},
+  coralR: {name: 'Sunburst Brain Coral', type: 0, stype: 'herb', star: 2, image: null, placed: 'placed_32_32-0-1', speed: 1900, foraging: {speed: 500, items: [{item: 'coral', count: 1, rainy: 1.8, windy: 1.8}]}, help: 'Corals', tooltip: 'Crafting Material for Potions and Furniture'},
+  coralP: {name: 'Starfire Pillar Coral', type: 0, stype: 'herb', star: 2, image: null, placed: 'placed_32_32-1-1', speed: 1900, foraging: {speed: 500, items: [{item: 'coral', count: 1, rainy: 1.8, windy: 1.8}]}, help: 'Corals', tooltip: 'Crafting Material for Potions and Furniture'},
+  coralY: {name: 'Flickering Torch Coral', type: 0, stype: 'herb', star: 2, image: null, placed: 'placed_32_32-2-1', speed: 1900, foraging: {speed: 500, items: [{item: 'coral', count: 1, rainy: 1.8, windy: 1.8}]}, help: 'Corals', tooltip: 'Crafting Material for Potions and Furniture'},
+  coralG: {name: 'Whispering Fan Coral', type: 0, stype: 'herb', star: 2, image: null, placed: 'placed_32_32-3-1', speed: 1900, foraging: {speed: 500, items: [{item: 'coral', count: 1, rainy: 1.8, windy: 1.8}]}, help: 'Corals', tooltip: 'Crafting Material for Potions and Furniture'},
   coral: {name: 'Coral', type: 0, stype: 'herb', star: 2, image: 'foraged_32_32-3-3', help: 'Corals', tooltip: 'Crafting Material for Potions and Furniture'},
 
   mandrake: {name: 'Mandrake', type: 0, stype: 'herb', star: 2, image: null, placed: 'fuws_32_32-2-3', speed: 1900, foraging: {speed: 500, items: [{item: 'mandrakeRoot', count: 1, rainy: 1.8, windy: 1.8}]}, help: 'Mandrake', tooltip: 'Harvest to collect Potions and Food ingredients'},
@@ -1002,6 +1002,13 @@ export const THORNSPINE_JUNCTIONS = ['0T0', '1T0', '0T1', '1T1']
 export const THORNSPINE_SIZES = [2, 3, 3, 4]
 export const THORNSPINE_BLOOM_PCENT = 25 // probabilité NF→F par passage
 export const THORNSPINE_UNBLOOM_PCENT = 50 // probabilité F→NF par passage — 2× BLOOM → cible ~1/3 en fleurs
+// Espèces de corail tirées aléatoirement à la pose (génération et repousse runtime)
+export const CORAL_TYPES = [
+  {type: PLANT_TYPE.CORAL_R, itemId: 'coralR'},
+  {type: PLANT_TYPE.CORAL_P, itemId: 'coralP'},
+  {type: PLANT_TYPE.CORAL_Y, itemId: 'coralY'},
+  {type: PLANT_TYPE.CORAL_G, itemId: 'coralG'}
+]
 
 export const TREE_IMAGES = {
   thornspine: {

@@ -316,6 +316,7 @@ export const MICROTASK = {
 
   THORNSPINE_REGROW: {priority: 20, capacity: 10, taskName: 'thornspineRegrow'}, // recherche d'un nouvel emplacement pour les thornspines à repousser
 
+  CORAL_SEARCH: {priority: 20, capacity: 10, taskName: 'coralSearch'}, // recherche d'un nouvel emplacement pour les coraux à repousser
   OLEANDER_REGROW: {priority: 20, capacity: 2, taskName: 'oleanderRegrow'}, // recherche d'un nouvel emplacement pour les oleanders à repousser
   COBWEB_GROWTH: {priority: 20, capacity: 3, taskName: 'cobwebGrowth'}, // tentative périodique de pose d'une toile d'araignée
   AMBERMIRAGE_TILE_CHECK: {priority: 20, capacity: 10, taskName: 'onAmbermirageTileCheck'}, // entretien réactif d'un spot pour une tuile modifiée

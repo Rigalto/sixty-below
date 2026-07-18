@@ -1,6 +1,6 @@
 // ecosystem.mjs — FloraManager - OakSystem - MahoganySystem - CoconutSystem - ThornspineSystem
 // SunflowerSystem - OleanderSystem - ParsnipSystem - AmbermirageSystem - CobwebSystem - HiveSystem
-// SpreadForestSystem - SpreadJungleSystem
+// SpreadForestSystem - SpreadJungleSystem - CoralSystem
 // SampleSystem
 
 import {WORLD_WIDTH, WORLD_HEIGHT, MICROTASK, TOPSOIL_Y_SKY_SURFACE, TOPSOIL_Y_SURFACE_UNDER, TOPSOIL_Y_UNDER_CAVERNS} from './constant.mjs'
@@ -521,6 +521,150 @@ class ThornspineSystem {
   }
 }
 export const thornspineSystem = new ThornspineSystem()
+
+/* ====================================================================================================
+   CORAL SYSTEM
+
+   Singleton : coralSystem.
+
+   Gère les coraux du fond marin. Population fixe (cf. generate.mjs : placeCorals garantit
+   toujours `count` records, comblés par des records dormants bloom=false si nécessaire) —
+   aucune création/suppression de record en session, uniquement bloom true/false.
+
+   Structure record : kind HERB · type CORAL_R/P/Y/G · w 2 · h 2 · pas de bloomTimestamp
+   (la repousse est pilotée par #regrowQueue + gamestate.coralsearchtimestamp, pas par un
+   timer individuel sur le record).
+   ==================================================================================================== */
+
+class CoralSystem {
+  byTile = new Map() // Map<tileIndex, record> — public : membership O(1) + lookup record
+  #list = [] // record[] — tous les coraux (bloom true ou false)
+  #byChunk = new Map() // Map<chunkKey, Set> — lookup spatial pour onPreloadChunksChanged
+  #displayed = new Set() // Set<record> — coraux dans les chunks preload (cible render)
+  #regrowQueue = [] // record[] — coraux bloom=false en attente d'une position
+  #searchtimestamp = null // timestamp de prochaine croissance de corail
+
+  constructor () {
+    // Micro-tâches
+    this.coralSearch = this.coralSearch.bind(this)
+  }
+
+  /**
+   * Réinitialise toutes les structures. Appelé en début de session, avant toute hydratation.
+   */
+  init () {
+    this.byTile.clear()
+    this.#list.length = 0
+    this.#byChunk.clear()
+    this.#displayed.clear()
+    this.#regrowQueue.length = 0
+  }
+
+  /**
+   * Initialise le temps de prochaine tentative de pousse d'un corail.
+   * Appelé en début de session, avant toute hydratation.
+   * @param {integer} timestamp
+   */
+  initTimestamp (timestamp) {
+    this.#searchtimestamp = timestamp
+  }
+
+  /**
+   * Hydrate un record depuis la DB. bloom=false → mis en attente de repousse (#regrowQueue),
+   * sans déclenchement de recherche ici (cf. initSearch, appelé une fois toute l'hydratation
+   * terminée). bloom=true → enregistré dans les structures spatiales et ses tuiles réservées
+   * (placement sur le rectangle du corail, minage sur la tuile de sable sous lui).
+   * @param {object} record — record HERB/CORAL_X (deleted=false garanti par l'appelant)
+   */
+  initPlant (record) {
+    this.#list.push(record)
+    if (!record.bloom) {
+      this.#regrowQueue.push(record)
+      if (this.#regrowQueue.length === 1) {
+        const {priority, capacity} = MICROTASK.CORAL_SEARCH
+        taskScheduler.enqueueAbsolute('coral-search', this.#searchtimestamp, this.coralSearch, priority, capacity)
+      }
+      return
+    }
+
+    addToByTile(this.byTile, record)
+    addToByChunk(this.#byChunk, record)
+    blockedTiles.blockPlacementRect(record.x, record.y, record.w, record.h)
+    blockedTiles.blockMiningRect(record.x, record.y + record.h, record.w, 1)
+  }
+
+  debug () {
+    console.log(`[CoralSystem] ${this.#list.length} coraux récupérés, ${this.#regrowQueue.length} en attente de repousse`)
+  }
+
+  /**
+   * TODO (prochaine étape) : une tentative de recherche de position sur le fond marin, pose
+   * immédiate si trouvée, relance à deux vitesses sinon. Stub actuel : vérifie uniquement que
+   * le taskScheduler déclenche correctement l'appel à l'échéance prévue.
+   */
+  coralSearch () {
+    console.log('[CoralSystem] coralSearch déclenché — algorithme de recherche à implémenter')
+  }
+
+  /**
+   * Reconstruit #displayed depuis les chunks preload de la caméra.
+   * @param {Set<number>} preloadChunks
+   */
+  onPreloadChunksChanged (preloadChunks) {
+    buildDisplayed(this.#displayed, this.#byChunk, preloadChunks)
+  }
+
+  /**
+   * Dessine les coraux visibles. Une seule image par record (ITEMS[itemId].placed, sprite
+   * 32×32 couvrant exactement le rectangle 2×2) — pas de variante gauche/droite, pas de calque
+   * supplémentaire : #displayed ne contient que des records bloom=true.
+   * @param {CanvasRenderingContext2D} ctx — contexte déjà transformé (caméra appliquée)
+   */
+  render (ctx) {
+    for (const record of this.#displayed) {
+      const img = ITEMS[record.itemId].placed
+      const pxX = record.x << 4
+      const pxY = record.y << 4
+      ctx.drawImage(IMAGE_CACHE[img.imgIndex], img.sx, img.sy, img.sw, img.sh, pxX, pxY, img.sw, img.sh)
+    }
+  }
+
+  /**
+   * Traite le foraging réussi : retire le corail des structures actives, libère ses tuiles,
+   * bascule bloom=false et le met en attente de repousse. Ne programme pas encore de nouvelle
+   * recherche taskScheduler ici — cf. TODO coralSearch (prochaine étape, dépend des constantes
+   * de délai à deux vitesses pas encore définies).
+   * @param {object} record
+   */
+  onForaged (record) {
+    removeFromByTile(this.byTile, record)
+    removeFromByChunk(this.#byChunk, record)
+    this.#displayed.delete(record)
+    blockedTiles.unblockPlacementRect(record.x, record.y, record.w, record.h)
+    blockedTiles.unblockMiningRect(record.x, record.y + record.h, record.w, 1)
+
+    record.bloom = false
+    saveManager.queueStaticUpdate({storeName: 'plant', record})
+    this.#regrowQueue.push(record)
+  }
+
+  /**
+   * Retourne le record du corail couvrant la tuile donnée, ou null.
+   * @param {number} tileIndex — (y << 10) | x
+   * @returns {object|null}
+   */
+  getPlantAt (tileIndex) {
+    return this.byTile.get(tileIndex) ?? null
+  }
+
+  /**
+   * Indique si le record est actuellement présent (forageable).
+   * @param {object} record
+   * @returns {boolean}
+   */
+  isPresent (record) { return record.bloom }
+}
+export const coralSystem = new CoralSystem()
 
 /* ====================================================================================================
    SUNFLOWER SYSTEM

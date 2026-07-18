@@ -17,7 +17,7 @@ import {furnitureManager, teleporterManager} from './housing.mjs'
 import {craftOverlay} from './craft.mjs'
 import {achievementManager} from './achievement.mjs'
 import {playerManager, lootPopupManager, handedToolManager, hotbarOverlay} from './player.mjs'
-import {floraManager, sunflowerSystem, oleanderSystem, parsnipSystem, ambermirageSystem, oakSystem, mahoganySystem, cobwebSystem, coconutSystem, thornspineSystem, spreadForestSystem, spreadJungleSystem} from './ecosystem.mjs'
+import {floraManager, sunflowerSystem, oleanderSystem, parsnipSystem, ambermirageSystem, oakSystem, mahoganySystem, cobwebSystem, coconutSystem, thornspineSystem, spreadForestSystem, spreadJungleSystem, coralSystem} from './ecosystem.mjs'
 import {ACHIEVEMENT_CATEGORIES} from '../assets/data/data-achievement.mjs'
 import {miningManager, placingManager, foragingManager, choppingManager, sowingManager, hammingManager, furnishingManager, fillingManager, pouringManager} from './action.mjs'
 import './combat.mjs'
@@ -47,17 +47,17 @@ const plantSystemLookup = [ // Map<kind*100+type, system> — peuplée au fur et
   //   [PLANT_KIND.HERB * 100 + PLANT_TYPE.GOLDENVEIL, fernSystem],
   //   [PLANT_KIND.HERB * 100 + PLANT_TYPE.MISTFERN, fernSystem],
   //   [PLANT_KIND.HERB * 100 + PLANT_TYPE.VELVETMOSS, mossSystem],
-  //   [PLANT_KIND.HERB * 100 + PLANT_TYPE.CORAL_R, coralSystem],
-  //   [PLANT_KIND.HERB * 100 + PLANT_TYPE.CORAL_P, coralSystem],
-  //   [PLANT_KIND.HERB * 100 + PLANT_TYPE.CORAL_Y, coralSystem],
-  //   [PLANT_KIND.HERB * 100 + PLANT_TYPE.CORAL_G, coralSystem],
+  [PLANT_KIND.HERB * 100 + PLANT_TYPE.CORAL_R, coralSystem],
+  [PLANT_KIND.HERB * 100 + PLANT_TYPE.CORAL_P, coralSystem],
+  [PLANT_KIND.HERB * 100 + PLANT_TYPE.CORAL_Y, coralSystem],
+  [PLANT_KIND.HERB * 100 + PLANT_TYPE.CORAL_G, coralSystem],
   [PLANT_KIND.SPREAD * 100 + PLANT_TYPE.FOREST, spreadForestSystem],
   [PLANT_KIND.SPREAD * 100 + PLANT_TYPE.JUNGLE, spreadJungleSystem]
   // [PLANT_KIND.SPREAD * 100 + PLANT_TYPE.NONE, spreadMushroomSystem],
   //   [PLANT_KIND.SPREAD * 100 + PLANT_TYPE.NONE, spreadSystem],
   //   [PLANT_KIND.SEED * 100 + PLANT_TYPE.NONE, seedSystem]
 ]
-const allPlantSystems = [sunflowerSystem, oleanderSystem, parsnipSystem, ambermirageSystem, oakSystem, mahoganySystem, coconutSystem, thornspineSystem, spreadForestSystem, spreadJungleSystem]
+const allPlantSystems = [sunflowerSystem, oleanderSystem, parsnipSystem, ambermirageSystem, oakSystem, mahoganySystem, coconutSystem, thornspineSystem, spreadForestSystem, spreadJungleSystem, coralSystem]
 
 const debugHUD = () => {
   const debugDiv = document.createElement('div')
@@ -419,6 +419,7 @@ class GameCore {
 
     // 5.4 Objectstore Plant
     thornspineSystem.init() // avant lecture des records
+    coralSystem.initTimestamp(state.coralsearchtimestamp) // avant lecture des records
 
     const plantRecords = await database.readAllFromObjectStore('plant')
     const plantsToDelete = []
@@ -781,6 +782,7 @@ class GameCore {
     microTasker.debugStats()
     taskScheduler.debugStats()
     teleporterManager.debug()
+    coralSystem.debug()
     eventBus.emit('debug/buff-manager')
   }
 }

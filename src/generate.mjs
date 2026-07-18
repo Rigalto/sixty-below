@@ -3,7 +3,7 @@
 import {seededRNG, shuffleArray, rollLoot} from './utils.mjs'
 import {database, uniqueIdGenerator} from './database.mjs'
 import {WORLD_WIDTH, WORLD_HEIGHT, SEA_LEVEL, TOPSOIL_Y_SKY_SURFACE, TOPSOIL_Y_SURFACE_UNDER, TOPSOIL_Y_UNDER_CAVERNS, BIOME_TILE_MAP, SEA_MAX_JITTER, SEA_MAX_WIDTH, SEA_MAX_HEIGHT, CLUSTER_SCATTER_MAP, ORE_GEM_SCATTER_MAP, PERLIN_OFFSET_NATURALIZER, PERLIN_OFFSET_TUNNEL, PERLIN_OFFSET_SURFACE_TUNNEL, PERLIN_OFFSET_SMALL_TUNNEL, PERLIN_OFFSET_CAVERN, PERLIN_OFFSET_HIVE, PERLIN_OFFSET_HEART, PERLIN_OFFSET_MUSHROOM, PERLIN_OFFSET_COBWEB, PERLIN_OFFSET_FERNS, PERLIN_OFFSET_LAKES, PERLIN_OFFSET_SHELL, PERLIN_OFFSET_TEMPLE, PERLIN_OFFSET_BEACH, SMALL_CAVERNS_COUNT, MEDIUM_CAVERNS_COUNT, UNDERGROUND_TUNNEL_COUNT, CAVERNS_TUNNEL_COUNT, SMALL_TUNNELS_COUNT, HIVE_RADIUS_MIN, HIVE_RADIUS_MAX, COBWEB_CAVE_COUNT_MIN, COBWEB_CAVE_COUNT_MAX, COBWEB_RADIUS_X_MIN, COBWEB_RADIUS_X_MAX, COBWEB_RADIUS_Y_MIN, COBWEB_RADIUS_Y_MAX, COBWEB_CAVE_MAIN_MIN, COBWEB_CAVE_MAIN_MAX, COBWEB_CAVE_SIDE_MIN, COBWEB_CAVE_SIDE_MAX, COBWEB_SCATTER_COUNT, COBWEB_SCATTER_SIZE_MIN, COBWEB_SCATTER_SIZE_MAX, GEODE_CAVE_COUNT_MIN, GEODE_CAVE_COUNT_MAX, GEODE_RADIUS_MIN, GEODE_RADIUS_MAX, GEODE_TARGET_CLUSTER_COUNT, GEODE_CLUSTER_SIZE_MIN, GEODE_CLUSTER_SIZE_MAX, NATIVE_TOPSOIL_MAP, LAKE_RADIUS_X_MIN, LAKE_RADIUS_X_MAX, LAKE_RADIUS_Y_MIN, LAKE_RADIUS_Y_MAX, LAKE_PIT_RADIUS_X_MIN, LAKE_PIT_RADIUS_X_MAX, LAKE_PIT_RADIUS_Y_MIN, LAKE_PIT_RADIUS_Y_MAX, LAKE_CREATION_MAP, UNDERGROUND_LAKE_UNDER_COUNT, UNDERGROUND_LAKE_CAVERNS_COUNT, UNDERGROUND_LAKE_RADIUS_MIN, UNDERGROUND_LAKE_RADIUS_MAX, BLIND_LAKE_COUNT, BLIND_LAKE_RADIUS_MIN, BLIND_LAKE_RADIUS_MAX, SAP_LAKE_UNDER_COUNT, SAP_LAKE_CAVERNS_COUNT, SAP_LAKE_RADIUS_MIN, SAP_LAKE_RADIUS_MAX, SAP_POCKET_COUNT, SAP_POCKET_RADIUS_MIN, SAP_POCKET_RADIUS_MAX, WATER_PUDDLE_COUNT, SAP_PUDDLE_COUNT, PUDDLE_HEIGHT_MIN, PUDDLE_HEIGHT_MAX, FOSSIL_VEIN_COUNT, FERN_CAVE_RADIUS_X_MIN, FERN_CAVE_RADIUS_X_MAX, FERN_CAVE_RADIUS_Y_MIN, FERN_CAVE_RADIUS_Y_MAX, MOSS_CAVE_RADIUS_X_MIN, MOSS_CAVE_RADIUS_X_MAX, MOSS_CAVE_RADIUS_Y_MIN, MOSS_CAVE_RADIUS_Y_MAX, SAND_POCKET_RADIUS_X_MIN, SAND_POCKET_RADIUS_X_MAX, SAND_POCKET_RADIUS_Y_MIN, SAND_POCKET_RADIUS_Y_MAX, MUSHROOM_CAVE_RADIUS_X_MIN, MUSHROOM_CAVE_RADIUS_X_MAX, MUSHROOM_CAVE_RADIUS_Y_MIN, MUSHROOM_CAVE_RADIUS_Y_MAX, PYRAMID_WALL_INDEXES, PYRAMID_VOID_INDEXES, PYRAMID_WIDTH, PYRAMID_HEIGHT, PYRAMID_ROOM1_DELTA, PYRAMID_ROOM2_DELTA, TEMPLE_RUIN_WALL_INDEXES, TEMPLE_RUIN_COLUMNS_INDEXES, CHEST_CONTENT, TREES_INIT_SIZE, GIANT_MUSHROOM_INIT_SIZE} from '../assets/data/data-gen.mjs'
-import {NODES, NODES_LOOKUP, NODE_TYPE, BIOME_TYPE, PLANT_KIND, PLANT_TYPE, ITEMS, TREE_IMAGES, THORNSPINE_JUNCTIONS, THORNSPINE_SIZES, PARSNIP_RATE, SUNFLOWER_RATE, MANDRAKE_COUNT, PRICKLEPAD_COUNT, BAMBOO_COUNT, OLEANDER_COUNT, SATANS_CUBE_COUNT, SNEAKTHORN_COUNT, CURSEDCROWN_COUNT, ABYSSHORN_COUNT, INFERNCAP_COUNT, COCONUT_CYCLE_DELAY} from '../assets/data/data.mjs'
+import {NODES, NODES_LOOKUP, NODE_TYPE, BIOME_TYPE, PLANT_KIND, PLANT_TYPE, ITEMS, TREE_IMAGES, THORNSPINE_JUNCTIONS, THORNSPINE_SIZES, CORAL_TYPES, PARSNIP_RATE, SUNFLOWER_RATE, MANDRAKE_COUNT, PRICKLEPAD_COUNT, BAMBOO_COUNT, OLEANDER_COUNT, SATANS_CUBE_COUNT, SNEAKTHORN_COUNT, CURSEDCROWN_COUNT, ABYSSHORN_COUNT, INFERNCAP_COUNT, COCONUT_CYCLE_DELAY} from '../assets/data/data.mjs'
 import {IS_DEV, WEATHER_TYPE, WEATHER_TYPE_CODE, BAG_CAPACITY, HOTBAR_CAPACITY, ARMOR_CAPACITY, ACCESSORY_CAPACITY, CONTAINER_CAPACITY, CONTAINER_STYPES, PLAYER} from './constant.mjs'
 
 /* ====================================================================================================
@@ -479,6 +479,7 @@ class WorldGenerator {
       {key: 'beachleft', value: leftBeach},
       {key: 'beachright', value: rightBeach},
       {key: 'cobwebcaves', value: cobwebCaves},
+      {key: 'coralsearchtimestamp', value: (480 + 1440) * 1000}, // Jour 1 - 8:00
       {key: 'craftfiltermaterial', value: 'logOak'},
       {key: 'craftfiltermode', value: 'type'},
       {key: 'craftfilterstation', value: 'byHand'},
@@ -6680,6 +6681,7 @@ class FurnitureGenerator {
       const cy = seededRNG.randomGetMinMax(seaRect.y1 + 1, seaRect.y2 - 2)
 
       if (worldBuffer.read(cx, cy) !== SEA) continue
+      if (tileGuard.has((cy << 10) | cx)) continue
 
       // Descendre jusqu'à la première tuile non SEA
       let y = cy
@@ -6690,12 +6692,16 @@ class FurnitureGenerator {
       // Tester placement à droite : cx et cx+1, tuiles au-dessus SEA
       const canRight = worldBuffer.read(cx + 1, y) !== SEA &&
                      worldBuffer.read(cx + 1, y - 1) === SEA &&
-                     worldBuffer.read(cx + 1, y - 2) === SEA
+                     worldBuffer.read(cx + 1, y - 2) === SEA &&
+                     !tileGuard.has(((y - 1) << 10) | cx) &&
+                     !tileGuard.has(((y - 1) << 10) | (cx + 1))
 
       // Tester placement à gauche : cx et cx-1, tuiles au-dessus SEA
       const canLeft = worldBuffer.read(cx - 1, y) !== SEA &&
                      worldBuffer.read(cx - 1, y - 1) === SEA &&
-                     worldBuffer.read(cx - 1, y - 2) === SEA
+                     worldBuffer.read(cx - 1, y - 2) === SEA &&
+                     !tileGuard.has(((y - 1) << 10) | cx) &&
+                     !tileGuard.has(((y - 1) << 10) | (cx - 1))
 
       if (!canLeft && !canRight) continue
 
@@ -6703,6 +6709,7 @@ class FurnitureGenerator {
       const chestX = goLeft ? cx - 1 : cx
 
       const chest = this.addFurnitureAt(((y - 2) << 10) | chestX, 'oceanChest')
+      tileGuard.addRect(chestX, y - 2, chestX + 1, y - 1)
 
       this.fillChest(chest)
       placed++
@@ -6738,6 +6745,7 @@ class FurnitureGenerator {
         const cy = seededRNG.randomGetMinMax(rect.yUnder + 1, rect.yCaverns - 2)
 
         if (worldBuffer.read(cx, cy) !== VOID) continue
+        if (tileGuard.has((cy << 10) | cx)) continue
 
         // Descendre jusqu'à la première tuile non VOID
         let y = cy
@@ -6750,13 +6758,17 @@ class FurnitureGenerator {
         const canRight = worldBuffer.read(cx + 1, y) !== VOID &&
                        !LIQUIDS.has(worldBuffer.read(cx + 1, y)) &&
                        worldBuffer.read(cx + 1, y - 1) === VOID &&
-                       worldBuffer.read(cx + 1, y - 2) === VOID
+                       worldBuffer.read(cx + 1, y - 2) === VOID &&
+                       !tileGuard.has(((y - 1) << 10) | cx) &&
+                       !tileGuard.has(((y - 1) << 10) | (cx + 1))
 
         // Tester placement à gauche
         const canLeft = worldBuffer.read(cx - 1, y) !== VOID &&
                        !LIQUIDS.has(worldBuffer.read(cx - 1, y)) &&
                        worldBuffer.read(cx - 1, y - 1) === VOID &&
-                       worldBuffer.read(cx - 1, y - 2) === VOID
+                       worldBuffer.read(cx - 1, y - 2) === VOID &&
+                      !tileGuard.has(((y - 1) << 10) | cx) &&
+                      !tileGuard.has(((y - 1) << 10) | (cx - 1))
 
         if (!canLeft && !canRight) continue
 
@@ -6768,6 +6780,7 @@ class FurnitureGenerator {
         chestIndexes.add(chestIndex + 1) // coffre occupe 2 tuiles de large
         chestRects.push({x: chestX, y: y - 2, w: 2, h: 2})
         const chest = this.addFurnitureAt(chestIndex, chestType)
+        tileGuard.addRect(chestX, y - 2, chestX + 1, y - 1)
 
         this.fillChest(chest)
         placed++
@@ -6805,6 +6818,7 @@ class FurnitureGenerator {
         const cy = seededRNG.randomGetMinMax(rect.ySurface + 1, rect.yUnder - 2)
 
         if (worldBuffer.read(cx, cy) !== VOID) continue
+        if (tileGuard.has((cy << 10) | cx)) continue
 
         // Descendre jusqu'à la première tuile non VOID
         let y = cy
@@ -6817,13 +6831,17 @@ class FurnitureGenerator {
         const canRight = worldBuffer.read(cx + 1, y) !== VOID &&
                        !LIQUIDS.has(worldBuffer.read(cx + 1, y)) &&
                        worldBuffer.read(cx + 1, y - 1) === VOID &&
-                       worldBuffer.read(cx + 1, y - 2) === VOID
+                       worldBuffer.read(cx + 1, y - 2) === VOID &&
+                       !tileGuard.has(((y - 1) << 10) | cx) &&
+                       !tileGuard.has(((y - 1) << 10) | (cx + 1))
 
         // Tester placement à gauche
         const canLeft = worldBuffer.read(cx - 1, y) !== VOID &&
                        !LIQUIDS.has(worldBuffer.read(cx - 1, y)) &&
                        worldBuffer.read(cx - 1, y - 1) === VOID &&
-                       worldBuffer.read(cx - 1, y - 2) === VOID
+                       worldBuffer.read(cx - 1, y - 2) === VOID &&
+                       !tileGuard.has(((y - 1) << 10) | cx) &&
+                       !tileGuard.has(((y - 1) << 10) | (cx - 1))
 
         if (!canLeft && !canRight) continue
 
@@ -6835,6 +6853,7 @@ class FurnitureGenerator {
         chestIndexes.add(chestIndex + 1) // coffre occupe 2 tuiles de large
         chestRects.push({x: chestX, y: y - 2, w: 2, h: 2})
         const chest = this.addFurnitureAt(chestIndex, chestType)
+        tileGuard.addRect(chestX, y - 2, chestX + 1, y - 1)
 
         this.fillChest(chest)
         placed++
@@ -6871,6 +6890,7 @@ class FurnitureGenerator {
         const cy = seededRNG.randomGetMinMax(rect.skySurface + 1, rect.ySurface - 2)
 
         if (worldBuffer.read(cx, cy) !== VOID) continue
+        if (tileGuard.has((cy << 10) | cx)) continue
 
         // Descendre jusqu'à la première tuile non VOID
         let y = cy
@@ -6883,13 +6903,17 @@ class FurnitureGenerator {
         const canRight = worldBuffer.read(cx + 1, y) !== VOID &&
                        !LIQUIDS.has(worldBuffer.read(cx + 1, y)) &&
                        worldBuffer.read(cx + 1, y - 1) === VOID &&
-                       worldBuffer.read(cx + 1, y - 2) === VOID
+                       worldBuffer.read(cx + 1, y - 2) === VOID &&
+                       !tileGuard.has(((y - 1) << 10) | cx) &&
+                       !tileGuard.has(((y - 1) << 10) | (cx + 1))
 
         // Tester placement à gauche
         const canLeft = worldBuffer.read(cx - 1, y) !== VOID &&
                        !LIQUIDS.has(worldBuffer.read(cx - 1, y)) &&
                        worldBuffer.read(cx - 1, y - 1) === VOID &&
-                       worldBuffer.read(cx - 1, y - 2) === VOID
+                       worldBuffer.read(cx - 1, y - 2) === VOID &&
+                      !tileGuard.has(((y - 1) << 10) | cx) &&
+                      !tileGuard.has(((y - 1) << 10) | (cx - 1))
 
         if (!canLeft && !canRight) continue
 
@@ -6901,6 +6925,7 @@ class FurnitureGenerator {
         chestIndexes.add(chestIndex + 1) // coffre occupe 2 tuiles de large
         chestRects.push({x: chestX, y: y - 2, w: 2, h: 2})
         const chest = this.addFurnitureAt(chestIndex, chestType)
+        tileGuard.addRect(chestX, y - 2, chestX + 1, y - 1)
 
         this.fillChest(chest)
         placed++
@@ -7359,19 +7384,16 @@ class PlantGenerator {
   // ////// //
 
   /**
- * Place des coraux dans une zone de mer.
- * @param {{x1, y1, x2, y2}} seaRect — rectangle englobant la mer
- * @param {Set<number>} guarded — colonnes protégées (modifié en place)
- */
+   * Place des coraux sur le fond marin (tuiles SAND) d'une mer. Le nombre de records créés est
+   * toujours égal à `count` (tiré aléatoirement entre 7 et 11) : les emplacements non trouvés
+   * après épuisement des tentatives sont comblés par des records dormants (bloom=false) — c'est
+   * ce total qui fixe la population maximale de coraux pour cette mer, jamais recréée en session.
+   * @param {{x1, y1, x2, y2}} seaRect — rectangle englobant la mer
+   * @param {Set<number>} guarded — colonnes protégées (modifié en place)
+   */
   placeCorals (seaRect, guarded) {
     const SEA = NODES.SEA.code
     const SAND = NODES.SAND.code
-    const CORAL_TYPES = [
-      {type: PLANT_TYPE.CORAL_R, itemId: 'coralR'},
-      {type: PLANT_TYPE.CORAL_P, itemId: 'coralP'},
-      {type: PLANT_TYPE.CORAL_Y, itemId: 'coralY'},
-      {type: PLANT_TYPE.CORAL_G, itemId: 'coralG'}
-    ]
     const W = WORLD_WIDTH
     const h = 2
     const w = 2
@@ -7433,11 +7455,39 @@ class PlantGenerator {
         x: coralX,
         y: y - 2,
         bloom: true,
-        bloomTimestamp: null,
         deleted: false
       })
       placed++
     }
+
+    // Reliquat : records dormants, bloom=false, en attente d'un emplacement futur
+    for (let i = placed; i < count; i++) this.#placeDormantCoral()
+
+    if (IS_DEV) console.log(`   🔹 Corals : ${placed} / ${count}`)
+  }
+
+  /**
+   * Crée un corail dormant (bloom=false) — aucun emplacement valide trouvé lors de la
+   * génération. Champs fixes (id, kind, w, h, deleted) correctement positionnés. Champs
+   * variables (type, itemId, index, soilIndex, x, y) à 0/'' par défaut — jamais lus tant que
+   * bloom reste false ; seule leur shape (mêmes clés, mêmes types que le record actif) importe,
+   * pour rester monomorphe.
+   */
+  #placeDormantCoral () {
+    this.#plants.push({
+      id: uniqueIdGenerator.getUniqueId(),
+      kind: PLANT_KIND.HERB,
+      type: CORAL_TYPES[0].type,
+      itemId: '',
+      index: 0,
+      soilIndex: 0,
+      w: 2,
+      h: 2,
+      x: 0,
+      y: 0,
+      bloom: false,
+      deleted: false
+    })
   }
 
   // Lors de la récolte, le corail disparait (bloom = false, bloomTimestamp = null)
@@ -7765,6 +7815,7 @@ class PlantGenerator {
     const W = WORLD_WIDTH
 
     for (let x = 2; x < W - 2; x++) {
+      if (guarded.has(x)) continue
       const y = surfaceLine[x]
 
       if (worldBuffer.read(x, y) !== SAND) continue
@@ -7809,6 +7860,7 @@ class PlantGenerator {
 
     const spots = []
     for (let x = 2; x < W - 2; x++) {
+      if (guarded.has(x)) continue
       // pas de parsnip sous les 3 tuiles d'un arbre — basé uniquement sur oakPositions,
       // jamais sur guarded (qui inclut aussi les coffres : aucune liaison plante/meuble voulue)
       if (oakPositions.has(x - 1) || oakPositions.has(x) || oakPositions.has(x + 1)) continue
@@ -7914,7 +7966,7 @@ class PlantGenerator {
     const W = WORLD_WIDTH
 
     for (let x = 2; x < W - 2; x++) {
-      if (guarded.has(x)) continue
+      if (guarded.has(x) || guarded.has(x - 1) || guarded.has(x + 1)) continue
 
       const y = surfaceLine[x]
       if (worldBuffer.read(x, y) !== GRASSJUNGLE) continue

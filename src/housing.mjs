@@ -2,7 +2,7 @@
 
 import {eventBus, blockedTiles} from './utils.mjs'
 import {uniqueIdGenerator} from './database.mjs'
-import {CONTAINER_STYPES, PLAYER} from './constant.mjs'
+import {CONTAINER_STYPES} from './constant.mjs'
 import {saveManager} from './persistence.mjs'
 import {camera} from './render.mjs'
 import {playerManager} from './player.mjs'
