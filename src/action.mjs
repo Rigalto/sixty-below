@@ -657,8 +657,8 @@ class ForagingManager {
       return
     }
 
-    // 2. Tuile SKY/VOID — chercher une plante sous la souris.
-    if (tileNode.code !== NODES.SKY.code && tileNode.code !== NODES.VOID.code) return
+    // 2. Tuile SKY/VOID/SEA — chercher une plante sous la souris.
+    if (tileNode.code !== NODES.SKY.code && tileNode.code !== NODES.VOID.code && tileNode.code !== NODES.SEA.code) return
     const plant = floraManager.getPlantAt(tileIndex)
     if (plant === null) return
     if (!floraManager.canForage(plant)) return
