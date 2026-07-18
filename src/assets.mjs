@@ -55,6 +55,11 @@ export const IMAGE_FILES = [
   // provisoire
   `${BASE_DIR}/loom_32_32.png`,
 
+  // FURNITURES //
+  // ////////// //
+
+  `${BASE_DIR}/station_32_32.png`,
+
   // PLACED //
   // ////// //
 
