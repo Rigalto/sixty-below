@@ -130,7 +130,7 @@ export class MicroTasker {
     while (i > 0 && this.taskQueue[i - 1].index > task.index) { i-- }
     this.taskQueue.splice(i, 0, task)
 
-    if (this.taskQueue.length > 20) {
+    if (this.taskQueue.length > 40) {
       console.log('microTasker.#addToTaskQueue', this.debug())
     }
   }
