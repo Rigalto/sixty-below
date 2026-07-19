@@ -371,6 +371,7 @@ La Sap corrode le Copper. Il doit donc être remplacer par du Gold.
 - Mahogany (`MahoganySystem`)
 - Coconut (`CoconutSystem`)
 - Thornspine (`ThornspineSystem`)
+- Corail (`CoralSystem`)
 
 ### Rendu
 - `WorldRenderer` — rendu tuiles par chunks avec cache OffscreenCanvas
