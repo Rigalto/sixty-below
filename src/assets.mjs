@@ -68,6 +68,7 @@ export const IMAGE_FILES = [
   `${BASE_DIR}/placed_16_48.png`,
   `${BASE_DIR}/placed_32_16.png`,
   `${BASE_DIR}/placed_32_32.png`,
+  `${BASE_DIR}/placed_32_48.png`,
   `${BASE_DIR}/placed_48_16.png`,
 
   // TREES //

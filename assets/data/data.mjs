@@ -453,16 +453,16 @@ export const ITEMS = {
 
   // crafting station
   byHand: {name: 'By Hand', type: ITEM_TYPE.FURNITURE, stype: 'station', star: 0, image: 'station_32_32-0-0', placed: null, help: 'Crafting Stations', tooltip: 'No Crafting Station required'},
-  tableWood: {name: 'Wooden Table', type: ITEM_TYPE.FURNITURE | ITEM_TYPE.PLACABLE, stype: 'station', star: 1, image: 'station_32_32-1-0', placed: 'fuws_48_32-1-0', unplacing: {speed: 1500}, help: 'Wooden Table', tooltip: 'A precision assembly requires a very flat surface.', furnitureSet: 'wood', surface: true},
+  tableWood: {name: 'Wooden Table', type: ITEM_TYPE.FURNITURE | ITEM_TYPE.PLACABLE, stype: 'station', star: 1, image: 'station_32_32-1-0', placed: 'placed_32_32-0-2', unplacing: {speed: 1500}, help: 'Wooden Table', tooltip: 'A precision assembly requires a very flat surface.', furnitureSet: 'wood', surface: true},
 
-  workbench: {name: 'Workbench', type: ITEM_TYPE.FURNITURE | ITEM_TYPE.PLACABLE, stype: 'station', star: 1, furnitureSet: 'wood', surface: true, image: 'station_32_32-2-0', placed: 'fuws_48_32-2-0', unplacing: {speed: 2400}, help: 'Woodworking', tooltip: 'Crafting station for many essential items'},
-  sawmill: {name: 'Sawmill', type: ITEM_TYPE.FURNITURE | ITEM_TYPE.PLACABLE, stype: 'station', star: 3, image: 'station_32_32-3-0', placed: 'fuws_48_48-0-1', unplacing: {speed: 2400}, help: 'Woodworking', tooltip: ' Crafting station for advanced Wood and Furniture crafting'},
+  workbench: {name: 'Workbench', type: ITEM_TYPE.FURNITURE | ITEM_TYPE.PLACABLE, stype: 'station', star: 1, furnitureSet: 'wood', surface: true, image: 'station_32_32-2-0', placed: 'placed_32_32-1-2', unplacing: {speed: 2400}, help: 'Woodworking', tooltip: 'Crafting station for many essential items'},
+  sawmill: {name: 'Sawmill', type: ITEM_TYPE.FURNITURE | ITEM_TYPE.PLACABLE, stype: 'station', star: 3, image: 'station_32_32-3-0', placed: 'placed_32_32-2-2', unplacing: {speed: 2400}, help: 'Woodworking', tooltip: ' Crafting station for advanced Wood and Furniture crafting'},
 
-  anvil: {name: 'Anvil', type: ITEM_TYPE.FURNITURE | ITEM_TYPE.PLACABLE, stype: 'station', star: 2, image: 'station_32_32-0-1', placed: 'fuws_32_32-1-0', unplacing: {speed: 2400}, help: 'Forging', tooltip: 'Crafting station used to craft metal bars into tools, weapons, armor, and other items'},
-  forge: {name: 'Forge', type: ITEM_TYPE.FURNITURE | ITEM_TYPE.PLACABLE, stype: 'station', star: 4, image: 'station_32_32-1-1', placed: 'fuws_32_32-0-0', unplacing: {speed: 2400}, help: 'Forging', tooltip: 'Crafting stations used to craft metal bars into tools, weapons, armor, and other items'},
+  anvil: {name: 'Anvil', type: ITEM_TYPE.FURNITURE | ITEM_TYPE.PLACABLE, stype: 'station', star: 2, image: 'station_32_32-0-1', placed: 'placed_32_16-2-1', unplacing: {speed: 2400}, help: 'Forging', tooltip: 'Crafting station used to craft metal bars into tools, weapons, armor, and other items'},
+  forge: {name: 'Forge', type: ITEM_TYPE.FURNITURE | ITEM_TYPE.PLACABLE, stype: 'station', star: 4, image: 'station_32_32-1-1', placed: 'placed_32_48-0-0', unplacing: {speed: 2400}, help: 'Forging', tooltip: 'Crafting stations used to craft metal bars into tools, weapons, armor, and other items'},
 
-  furnace: {name: 'Furnace', type: ITEM_TYPE.FURNITURE | ITEM_TYPE.PLACABLE, stype: 'station', star: 2, image: 'furniture_32_32-6-0', placed: 'fuws_48_48-0-0', unplacing: {speed: 2400}, help: 'Smelting', tooltip: 'Crafting station for metal smelting'},
-  blastFurnace: {name: 'Blast Furnace', type: ITEM_TYPE.FURNITURE | ITEM_TYPE.PLACABLE, stype: 'station', star: 4, image: 'furniture_32_32-5-0', placed: 'fuws_48_48-1-0', unplacing: {speed: 2400}, help: 'Smelting', tooltip: 'Crafting station for strong metal smelting'},
+  furnace: {name: 'Furnace', type: ITEM_TYPE.FURNITURE | ITEM_TYPE.PLACABLE, stype: 'station', star: 2, image: 'station_32_32-2-1', placed: 'placed_32_32-3-2', unplacing: {speed: 2400}, help: 'Smelting', tooltip: 'Crafting station for metal smelting'},
+  blastFurnace: {name: 'Blast Furnace', type: ITEM_TYPE.FURNITURE | ITEM_TYPE.PLACABLE, stype: 'station', star: 4, image: 'station_32_32-3-1', placed: 'placed_32_48-1-0', unplacing: {speed: 2400}, help: 'Smelting', tooltip: 'Crafting station for strong metal smelting'},
 
   // Metal Fittings Fasteners [succès]
   nailIron: {name: 'Iron Nail', type: 0, stype: 'fitting', star: 2, image: 'refined_32_32-6-0', help: 'Metal Fittings', tooltip: 'Fastener used to built or repair a lot of items'},
