@@ -3,13 +3,10 @@
 // SpreadForestSystem - SpreadJungleSystem - CoralSystem
 // SampleSystem
 
-import {WORLD_WIDTH, WORLD_HEIGHT, MICROTASK, TOPSOIL_Y_SKY_SURFACE, TOPSOIL_Y_SURFACE_UNDER, TOPSOIL_Y_UNDER_CAVERNS} from './constant.mjs'
+import {WORLD_WIDTH, WORLD_HEIGHT, MICROTASK, TOPSOIL_Y_SKY_SURFACE, TOPSOIL_Y_SURFACE_UNDER, TOPSOIL_Y_UNDER_CAVERNS, SEA_LEVEL} from './constant.mjs'
 import {database, uniqueIdGenerator} from './database.mjs'
-
 import {eventBus, seededRNG, blockedTiles, microTasker, taskScheduler} from './utils.mjs'
-import {
-  NODES, ITEMS, PLANT_KIND, PLANT_TYPE, PLANT_SYSTEM_LOOKUP, ALL_PLANT_SYSTEMS, COBWEB_GROWTH_DELAY_MS, SUNFLOWER_RATE, PARSNIP_RATE, AMBERMIRAGE_PCENT, COCONUT_CYCLE_DELAY, TREE_IMAGES, THORNSPINE_JUNCTIONS, THORNSPINE_SIZES, THORNSPINE_UNBLOOM_PCENT, THORNSPINE_BLOOM_PCENT
-} from '../assets/data/data.mjs'
+import {NODES, ITEMS, PLANT_KIND, PLANT_TYPE, PLANT_SYSTEM_LOOKUP, ALL_PLANT_SYSTEMS, COBWEB_GROWTH_DELAY_MS, SUNFLOWER_RATE, PARSNIP_RATE, AMBERMIRAGE_PCENT, COCONUT_CYCLE_DELAY, TREE_IMAGES, THORNSPINE_JUNCTIONS, THORNSPINE_SIZES, THORNSPINE_UNBLOOM_PCENT, THORNSPINE_BLOOM_PCENT, CORAL_TYPES} from '../assets/data/data.mjs'
 import {IMAGE_CACHE} from './assets.mjs'
 import {saveManager} from './persistence.mjs'
 import {chunkManager} from './world.mjs'
@@ -536,6 +533,22 @@ export const thornspineSystem = new ThornspineSystem()
    timer individuel sur le record).
    ==================================================================================================== */
 
+// Repousse des coraux — deux vitesses de relance de coralSearch selon le résultat de la
+// tentative précédente
+export const CORAL_SEARCH_DELAY_FOUND_MS = 1440 * 1000 // ~1 jour in-game — position trouvée
+export const CORAL_SEARCH_DELAY_EMPTY_MS = 60 * 1000 // ~1 heure in-game — rien trouvé
+
+// Approximation temporaire des mers, en attendant la gestion des liquides (non conçue à ce
+// jour) qui fournira le rectangle englobant réel — cf. WorldCarver.addSeaExclusions() en
+// génération, qui fait le calcul exact avec jitter.
+// TODO : remplacer par le vrai rectangle une fois ce système conçu.
+const CORAL_SEA_MAX_WIDTH = 90
+const CORAL_SEA_MAX_HEIGHT = 150
+const CORAL_SEA_RECTS = [
+  {x1: 1, y1: SEA_LEVEL + 1, x2: CORAL_SEA_MAX_WIDTH, y2: SEA_LEVEL + CORAL_SEA_MAX_HEIGHT},
+  {x1: WORLD_WIDTH - 1 - CORAL_SEA_MAX_WIDTH, y1: SEA_LEVEL + 1, x2: WORLD_WIDTH - 2, y2: SEA_LEVEL + CORAL_SEA_MAX_HEIGHT}
+]
+
 class CoralSystem {
   byTile = new Map() // Map<tileIndex, record> — public : membership O(1) + lookup record
   #list = [] // record[] — tous les coraux (bloom true ou false)
@@ -598,12 +611,90 @@ class CoralSystem {
   }
 
   /**
-   * TODO (prochaine étape) : une tentative de recherche de position sur le fond marin, pose
-   * immédiate si trouvée, relance à deux vitesses sinon. Stub actuel : vérifie uniquement que
-   * le taskScheduler déclenche correctement l'appel à l'échéance prévue.
+   * Une tentative de recherche de position (une colonne, une mer tirée au hasard). Si trouvée,
+   * pose immédiatement le corail recyclé (bloom=true) et le retire de #regrowQueue. Relance
+   * toujours la tâche si la file n'est pas vide — délai long si une position vient d'être
+   * trouvée (pas d'urgence pour le suivant), court sinon (retenter vite). Persiste l'échéance
+   * dans gamestate à chaque relance, pour rester correcte après un rechargement (cf. initTimestamp).
    */
   coralSearch () {
-    console.log('[CoralSystem] coralSearch déclenché — algorithme de recherche à implémenter')
+    const record = this.#regrowQueue[this.#regrowQueue.length - 1]
+    const floorIndex = this.#findCoralFloor()
+    const soilX = floorIndex !== -1 ? this.#findCoralSide(floorIndex) : -1
+    const found = soilX !== -1
+
+    if (found) {
+      const y = floorIndex >> 10
+      const soilIndex = (y << 10) | soilX
+      const {type, itemId} = seededRNG.randomGetArrayValue(CORAL_TYPES)
+
+      record.type = type
+      record.itemId = itemId
+      record.soilIndex = soilIndex
+      record.index = soilIndex - record.h * WORLD_WIDTH
+      record.x = soilX
+      record.y = y - record.h
+      record.bloom = true
+
+      addToByTile(this.byTile, record)
+      addToByChunk(this.#byChunk, record)
+      blockedTiles.blockPlacementRect(record.x, record.y, record.w, record.h)
+      blockedTiles.blockMiningRect(record.x, record.y + record.h, record.w, 1)
+      saveManager.queueStaticUpdate({storeName: 'plant', record})
+      buildDisplayed(this.#displayed, this.#byChunk, camera.preloadChunks)
+
+      this.#regrowQueue.length--
+    }
+
+    if (this.#regrowQueue.length !== 0) {
+      const base = found ? CORAL_SEARCH_DELAY_FOUND_MS : CORAL_SEARCH_DELAY_EMPTY_MS
+      const delay = (base * seededRNG.randomGetRealMinMax(0.8, 1.2)) | 0
+      const {priority, capacity} = MICROTASK.CORAL_SEARCH
+      const timestamp = taskScheduler.enqueue('coral-search', delay, this.coralSearch, priority, capacity)
+      database.setGameState('coralsearchtimestamp', timestamp)
+    }
+  }
+
+  /**
+   * Tire une mer et une colonne au hasard, descend jusqu'à la première tuile non-SEA.
+   * @returns {number} index packé (y<<10)|x du sol si SAND trouvée dans les bornes du rect, -1 sinon
+   */
+  #findCoralFloor () {
+    const SEA = NODES.SEA.code
+    const SAND = NODES.SAND.code
+    const rect = seededRNG.randomGetArrayValue(CORAL_SEA_RECTS)
+
+    const cx = seededRNG.randomGetMinMax(rect.x1 + 1, rect.x2 - 2)
+    let y = seededRNG.randomGetMinMax(rect.y1 + 1, rect.y2 - 2)
+
+    if (chunkManager.getTile(cx, y) !== SEA) return -1
+    while (y < rect.y2 && chunkManager.getTile(cx, y) === SEA) y++
+    if (chunkManager.getTile(cx, y) !== SAND) return -1
+
+    return (y << 10) | cx
+  }
+
+  /**
+   * Teste les deux côtés du sol trouvé (SAND adjacent + pocket 2×2 SEA au-dessus + tuiles libres).
+   * @param {number} floorIndex — retour de #findCoralFloor
+   * @returns {number} soilX retenu, -1 si aucun côté valide
+   */
+  #findCoralSide (floorIndex) {
+    const SEA = NODES.SEA.code
+    const SAND = NODES.SAND.code
+    const cx = floorIndex & 0x3FF
+    const y = floorIndex >> 10
+
+    const canRight = chunkManager.getTile(cx + 1, y) === SAND &&
+      chunkManager.isRectCode(cx, y - 2, 2, 2, SEA) &&
+      blockedTiles.canPlaceRect(cx, y - 2, 2, 2) && blockedTiles.canMineRect(cx, y, 2, 1)
+
+    const canLeft = chunkManager.getTile(cx - 1, y) === SAND &&
+      chunkManager.isRectCode(cx - 1, y - 2, 2, 2, SEA) &&
+      blockedTiles.canPlaceRect(cx - 1, y - 2, 2, 2) && blockedTiles.canMineRect(cx - 1, y, 2, 1)
+
+    if (!canLeft && !canRight) return -1
+    return (canLeft && (!canRight || seededRNG.randomGetBool())) ? cx - 1 : cx
   }
 
   /**
@@ -631,9 +722,8 @@ class CoralSystem {
 
   /**
    * Traite le foraging réussi : retire le corail des structures actives, libère ses tuiles,
-   * bascule bloom=false et le met en attente de repousse. Ne programme pas encore de nouvelle
-   * recherche taskScheduler ici — cf. TODO coralSearch (prochaine étape, dépend des constantes
-   * de délai à deux vitesses pas encore définies).
+   * bascule bloom=false et le met en attente de repousse, programme une nouvelle
+   * recherche taskScheduler.
    * @param {object} record
    */
   onForaged (record) {
@@ -646,6 +736,11 @@ class CoralSystem {
     record.bloom = false
     saveManager.queueStaticUpdate({storeName: 'plant', record})
     this.#regrowQueue.push(record)
+    if (this.#regrowQueue.length !== 1) return
+
+    const {priority, capacity} = MICROTASK.CORAL_SEARCH
+    const timestamp = taskScheduler.enqueue('coral-search', CORAL_SEARCH_DELAY_EMPTY_MS, this.coralSearch, priority, capacity)
+    database.setGameState('coralsearchtimestamp', timestamp)
   }
 
   /**
@@ -769,7 +864,6 @@ class SunflowerSystem {
    */
   onPreloadChunksChanged (preloadChunks) {
     buildDisplayed(this.#displayed, this.#byChunk, preloadChunks)
-    if (this.#displayed.size !== 0) { console.log('SunflowerSystem.onPreloadChunksChanged', this.#displayed.size) }
   }
 
   /**
@@ -1297,8 +1391,6 @@ class OleanderSystem {
    */
   onPreloadChunksChanged (preloadChunks) {
     buildDisplayed(this.#displayed, this.#byChunk, preloadChunks)
-    if (this.#displayed.size !== 0) { console.log('OleanderSystem.onPreloadChunksChanged', this.#displayed.size) }
-    console.log('OleanderSystem.onPreloadChunksChanged', this.#list)
   }
 
   /**
@@ -1415,6 +1507,7 @@ class OleanderSystem {
 
       addToByTile(this.byTile, record)
       addToByChunk(this.#byChunk, record)
+      addToDisplayed(this.#displayed, record)
       blockedTiles.blockPlacementRect(cx, topY, 1, 3)
       saveManager.queueStaticUpdate({storeName: 'plant', record})
 
