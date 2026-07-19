@@ -464,7 +464,7 @@ export const ITEMS = {
   furnace: {name: 'Furnace', type: ITEM_TYPE.FURNITURE | ITEM_TYPE.PLACABLE, stype: 'station', star: 2, image: 'station_32_32-2-1', placed: 'placed_32_32-3-2', unplacing: {speed: 2400}, help: 'Smelting', tooltip: 'Crafting station for metal smelting'},
   blastFurnace: {name: 'Blast Furnace', type: ITEM_TYPE.FURNITURE | ITEM_TYPE.PLACABLE, stype: 'station', star: 4, image: 'station_32_32-3-1', placed: 'placed_32_48-1-0', unplacing: {speed: 2400}, help: 'Smelting', tooltip: 'Crafting station for strong metal smelting'},
 
-  stoneBench: {name: 'Stone Bench', type: ITEM_TYPE.FURNITURE | ITEM_TYPE.PLACABLE, stype: 'station', star: 3, image: 'furniture_32_32-1-0', placed: 'fuws_48_32-0-0', unplacing: {speed: 2400}, help: 'Stoneworking', tooltip: 'Crafting station for sharpenig tools and weapons'},
+  stoneBench: {name: 'Stone Bench', type: ITEM_TYPE.FURNITURE | ITEM_TYPE.PLACABLE, stype: 'station', star: 3, image: 'station_32_32-0-2', placed: 'placed_32_48-2-0', unplacing: {speed: 2400}, help: 'Stoneworking', tooltip: 'Crafting station for sharpenig tools and weapons'},
 
   loom: {name: 'Loom', type: ITEM_TYPE.FURNITURE | ITEM_TYPE.PLACABLE, stype: 'station', star: 2, image: 'furniture_32_32-1-0', placed: 'fuws_48_32-0-0', unplacing: {speed: 2400}, help: 'Weaving', tooltip: 'Crafting station for cloth'},
 
