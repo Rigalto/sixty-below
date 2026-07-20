@@ -472,7 +472,7 @@ export const ITEMS = {
   tanningRack: {name: 'Tanning Rack', type: ITEM_TYPE.FURNITURE | ITEM_TYPE.PLACABLE, stype: 'station', star: 3, image: 'furniture_32_32-1-0', placed: 'fuws_48_32-0-0', unplacing: {speed: 2400}, help: 'Leatherworking', tooltip: 'Crafting station for leather'},
   leather: {name: 'Leather', type: 0, stype: 'leather', star: 1, image: 'crafting_32_32-2-0', help: 'Leatherworking', tooltip: '???'},
 
-  jewelerBench: {name: 'Jeweler\'s Bench', type: ITEM_TYPE.FURNITURE | ITEM_TYPE.PLACABLE, stype: 'station', star: 3, surface: true, image: 'furniture_32_32-7-0', placed: 'fuws_48_48-2-0', unplacing: {speed: 2400}, help: 'Jewelry', tooltip: 'Crafting station for jewels and accessories'},
+  jewelerBench: {name: 'Jeweler\'s Bench', type: ITEM_TYPE.FURNITURE | ITEM_TYPE.PLACABLE, stype: 'station', star: 3, surface: true, image: 'furniture_32_32-7-0', placed: 'placed_32_48-3-0', unplacing: {speed: 2400}, help: 'Jewelry', tooltip: 'Crafting station for jewels and accessories'},
   alchemyTable: {name: 'Alchemy Table', type: ITEM_TYPE.FURNITURE | ITEM_TYPE.PLACABLE, stype: 'station', star: 2, image: 'furniture_32_32-8-0', placed: 'fuws_48_48-2-1', unplacing: {speed: 2400}, help: 'Alchemy', tooltip: 'Crafting station for potions'},
   cookingPot: {name: 'Cooking Pot', type: ITEM_TYPE.FURNITURE | ITEM_TYPE.PLACABLE, stype: 'station', star: 2, image: 'furniture_32_32-9-0', unplacing: {speed: 2400}, placed: 'fuws_32_32-7-2', help: 'Cooking', tooltip: 'Crafting station for food'},
 
