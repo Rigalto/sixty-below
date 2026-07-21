@@ -476,9 +476,9 @@ export const ITEMS = {
   alchemyTable: {name: 'Alchemy Table', type: ITEM_TYPE.FURNITURE | ITEM_TYPE.PLACABLE, stype: 'station', star: 2, image: 'furniture_32_32-8-0', placed: 'fuws_48_48-2-1', unplacing: {speed: 2400}, help: 'Alchemy', tooltip: 'Crafting station for potions'},
   cookingPot: {name: 'Cooking Pot', type: ITEM_TYPE.FURNITURE | ITEM_TYPE.PLACABLE, stype: 'station', star: 2, image: 'furniture_32_32-9-0', unplacing: {speed: 2400}, placed: 'fuws_32_32-7-2', help: 'Cooking', tooltip: 'Crafting station for food'},
 
-  brokenDecomposer: {name: 'Broken Decomposer', type: ITEM_TYPE.FURNITURE | ITEM_TYPE.IMMOVABLE, stype: 'immovable', star: 5, image: null, placed: 'fuws_48_32-0-1', help: 'Lost Temple', tooltip: '????'},
-  decomposerPart: {name: 'Decomposer Part', type: ITEM_TYPE.TOOL, stype: 'part', star: 5, image: null, placed: 'fuws_48_32-0-1', help: 'Decomposer', tooltip: 'Part used to repair Broken Decomposer'},
-  decomposer: {name: 'Decomposer', type: ITEM_TYPE.FURNITURE | ITEM_TYPE.IMMOVABLE, stype: 'station', star: 5, image: null, placed: 'fuws_48_32-0-1', help: 'Decomposer', tooltip: '????'},
+  brokenDecomposer: {name: 'Broken Decomposer', type: ITEM_TYPE.FURNITURE | ITEM_TYPE.IMMOVABLE, stype: 'immovable', star: 5, image: null, placed: 'placed_32_32-6-2', help: 'Lost Temple', tooltip: '????'},
+  decomposerPart: {name: 'Decomposer Part', type: ITEM_TYPE.TOOL, stype: 'part', star: 5, image: 'tool_32_32-4-5', help: 'Decomposer', tooltip: 'Part used to repair Broken Decomposer'},
+  decomposer: {name: 'Decomposer', type: ITEM_TYPE.FURNITURE | ITEM_TYPE.IMMOVABLE, stype: 'station', star: 5, image: 'station_32_32-2-3', placed: 'placed_32_32-5-2', help: 'Decomposer', tooltip: '????'},
   transmutator: {name: 'Transmutator', type: ITEM_TYPE.FURNITURE | ITEM_TYPE.IMMOVABLE, stype: 'station', star: 5, image: null, placed: 'fuws_48_32-0-1', help: 'Transmutator', tooltip: '????'},
 
   // Metal Fittings Fasteners [succès]
