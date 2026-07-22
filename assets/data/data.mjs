@@ -477,7 +477,7 @@ export const ITEMS = {
   cookingPot: {name: 'Cooking Pot', type: ITEM_TYPE.FURNITURE | ITEM_TYPE.PLACABLE, stype: 'station', star: 2, image: 'furniture_32_32-9-0', unplacing: {speed: 2400}, placed: 'fuws_32_32-7-2', help: 'Cooking', tooltip: 'Crafting station for food'},
 
   brokenDecomposer: {name: 'Broken Decomposer', type: ITEM_TYPE.FURNITURE | ITEM_TYPE.IMMOVABLE, stype: 'immovable', star: 5, image: null, placed: 'placed_32_32-6-2', help: 'Lost Temple', tooltip: 'Once repaired, recovers most of an item\'s crafting components'},
-  decomposerPart: {name: 'Decomposer Part', type: ITEM_TYPE.TOOL, stype: 'part', star: 5, image: 'tool_32_32-4-5', help: 'Decomposer', tooltip: 'Part used to repair Broken Decomposer'},
+  decomposerPart: {name: 'Decomposer Part', type: ITEM_TYPE.TOOL, stype: 'part', star: 5, image: 'tool_32_32-4-5', placed: 'handed_48_48-0-4', help: 'Decomposer', tooltip: 'Part used to repair Broken Decomposer'},
   decomposer: {name: 'Decomposer', type: ITEM_TYPE.FURNITURE | ITEM_TYPE.IMMOVABLE, stype: 'station', star: 5, image: 'station_32_32-2-3', placed: 'placed_32_32-5-2', help: 'Decomposer', tooltip: 'Recovers most of an item\'s crafting components'},
   transmutator: {name: 'Transmutator', type: ITEM_TYPE.FURNITURE | ITEM_TYPE.IMMOVABLE, stype: 'station', star: 5, image: null, placed: 'fuws_48_32-0-1', help: 'Transmutator', tooltip: '????'},
 

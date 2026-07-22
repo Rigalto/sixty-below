@@ -450,6 +450,13 @@ Cette section définit les événements officiels. Tout nouvel événement doit 
 | S | `sound/play` | `name: string` | Joue le son `name`. |
 | S | `furniture/placed` | `id: string` | Un meuble a été placé dans le monde. |
 
+#### Réparation du Decomposer (`DecomposerManager`)
+
+| Dir. | Event Name | Payload Structure | Description |
+| :---: | :--- | :--- | :--- |
+| S | `sound/play` | `name: string` | Joue le son `name`. |
+| S | `furniture/repaired` | `id: string` | Un meuble a été réparé (transformation de code en place). |
+
 #### Vidage de conteneurs dans le monde (`PouringManager`)
 
 | Dir. | Event Name | Payload Structure | Description |

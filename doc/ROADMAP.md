@@ -21,6 +21,7 @@
 - Utiliser les wood planks dans des recettes
 - Dans `paintSurfaceNatural`, on prépare des enregistements : sont-ils utilisés quelque part ? Dans cette même fonction, on retourne `surfacePlants`, a priori utilisée uniquement pour l'enregistrement. Il faudra sans doute nettoyer en n'enregistrant pas les tuiles GRASSFOREST et JUNGLEFOREST.
 - Supprimer les chunks en mémoire qui sont périmés
+- Les icones des buckets placed devrait faire 16*16 pixels.
 - corriger les icones dans weapon_32_32 : dague, épée, bow, boomrang
 - corriger les icones dans tool_32_32 : hache, pickaxe, hammer, axe
 - continuer la correction et l'ajout de fiches d'aide (`HELP`) et d'items (`ITEMS`)
@@ -351,6 +352,7 @@ La Sap corrode le Copper. Il doit donc être remplacer par du Gold.
 - Plantage de graines (`SowingManager`)
 - Remplissage d'un conteneur par un liquie (`FillingManager`)
 - Vidage d'un seau plein dans le monde (`PouringManager`)
+- Réparation du décomposeur (`DecomposerManager`)
 
 ### Joueur
  - Déplacement horizontal (touches 'Q' et 'D') (`PlayerManager`)

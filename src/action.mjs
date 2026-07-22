@@ -1,5 +1,6 @@
 // action.mjs — MiningManager - PlacingManager - ForagingManager - ChoppingManager
 // SowingManager - HammingManager - FurnishingManager - FillingManager - PouringManager
+// DecomposerManager
 
 import {eventBus, taskScheduler, microTasker, blockedTiles, rollLootWithBuffs, seededRNG} from './utils.mjs'
 import {NODE_TYPE, NODES_LOOKUP, NODES, ITEM_TYPE, ITEMS, PLANT_SYSTEM_LOOKUP, PLANT_KIND} from '../assets/data/data.mjs'
@@ -1249,11 +1250,6 @@ class HammingManager {
   tryUse (tileIndex, tileNode, tool, prefix) {
     if (buffManager.getBuff('playerFreeze')) return
 
-    if (tileNode !== null && tileNode.type & (NODE_TYPE.WALL | NODE_TYPE.BWALL)) {
-      // TODO : unplacing de mur
-      return
-    }
-
     const furniture = furnitureManager.getFurnitureAt(tileIndex)
     if (furniture !== null) {
       this.tryUnplacing(tileIndex, furniture, tool, prefix)
@@ -1263,6 +1259,11 @@ class HammingManager {
     const plant = floraManager.getPlantAt(tileIndex)
     if (plant !== null && plant.kind === PLANT_KIND.TREE) {
       this.tryShaking(tileIndex, plant, tool, prefix)
+    }
+
+    if (tileNode !== null && tileNode.type & (NODE_TYPE.WALL | NODE_TYPE.BWALL)) {
+      // TODO : unplacing de mur
+
     }
   }
 
@@ -1386,3 +1387,43 @@ class HammingManager {
   }
 }
 export const hammingManager = new HammingManager()
+
+/* ====================================================================================================
+   RÉPARATION DU DECOMPOSER
+   ====================================================================================================
+
+   Autorité unique sur la réparation du Broken Decomposer trouvé dans Lost Temple.
+   Singleton : decomposerManager.
+
+   Responsabilités :
+     - Valider et exécuter la transformation brokenDecomposer → decomposer au clic gauche avec
+       decomposerPart en main
+
+   ==================================================================================================== */
+
+class DecomposerManager {
+  /**
+   * Valide et exécute la réparation du Broken Decomposer : transforme le meuble en Decomposer
+   * (station de craft) et consomme le decomposerPart tenu en main. Silence si aucun meuble sous
+   * le curseur ou si ce n'est pas un brokenDecomposer.
+   * Point d'entrée unique depuis core.mjs (#processWorldClick).
+   * @param {number} tileIndex — (y << 10) | x
+   * @param {object} tileNode  — NODES_LOOKUP[tileCode] (non utilisé — le meuble est relu via furnitureManager.getFurnitureAt)
+   * @param {object} item      — ITEMS[slot.item], decomposerPart
+   * @param {number} slotIndex — slot.slot (index hotbar)
+   */
+  tryRepair (tileIndex, tileNode, item, slotIndex) {
+    if (buffManager.getBuff('playerFreeze')) return
+
+    const furniture = furnitureManager.getFurnitureAt(tileIndex)
+    if (furniture === null || furniture.code !== 'brokenDecomposer') return
+
+    if (!isInInteractionRange(tileIndex)) { eventBus.emit('sound/play', 'toofar'); return }
+
+    furnitureManager.changeCode(furniture.id, 'decomposer')
+    inventoryManager.decrementHotbarSlotCount(slotIndex)
+    eventBus.emit('sound/play', 'placing')
+    eventBus.emit('furniture/repaired', furniture.id)
+  }
+}
+export const decomposerManager = new DecomposerManager()
