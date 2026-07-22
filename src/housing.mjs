@@ -466,6 +466,21 @@ class FurnitureManager {
     record.name = name
     saveManager.queueStaticUpdate({storeName: 'furniture', record})
   }
+
+  /**
+   * Change le code d'un furniture déjà posé (et son stype associé, dérivé du nouvel item).
+   * Ne touche ni la position ni le footprint (w, h, index inchangés) — à l'appelant de garantir
+   * que l'ancien et le nouveau code partagent la même empreinte.
+   * @param {string} furnitureId
+   * @param {string} newCode — itemId dans ITEMS
+   */
+  changeCode (furnitureId, newCode) {
+    const record = this.#byId.get(furnitureId)
+    if (record === undefined) return
+    record.code = newCode
+    record.stype = ITEMS[newCode].stype
+    saveManager.queueStaticUpdate({storeName: 'furniture', record})
+  }
 }
 export const furnitureManager = new FurnitureManager()
 
