@@ -62,6 +62,7 @@
 
 ## À faire — Amélioration
 
+- Dédoubler la Crafting Station 'Cooking Pot'. Un 'furniture' qui, après un clic droit, allume un feu dessous et devient une station 'Cooking Pot'. Après 6 heures in-game, le feu s'éteint et la station 'Cooking Pot' redevient le furniture.
 - Remplacer toutes les icônes Unicode 'météo' et ''phases de la lune' par des icônes SVG ou image png
 
 ---
