@@ -4403,7 +4403,45 @@ Le [[item:stoneBench]] is a [[Crafting Stations|Crafting Station]] qui permet de
   {
     title: 'Decomposer',
     category: ['Crafting', 'Crafting Stations'],
-    content: ''
+    content: `
+**Description**
+
+This ancient tier 5 [[Crafting Stations|Crafting Station]] can be found in [[Lost Temple]], in [[Jungle]] biome and [[Caverns]] Layer.
+
+Unfortunatly, it is broken and you have to repair it before using it to break down items into a fraction of their crafting ingredients.
+
+**Location**
+
+* Center of [[Lost Temple]]
+* [[Jungle]] biome and [[Caverns]] Layer
+* The decomposer cannot be moved
+
+<hr>
+
+**Crafting a [[item:decomposerPart]]**
+
+Coming Soon ⏳
+
+**How to Repair**
+
+* Open your [[Inventory]] Panel [I])
+* Select the slot containing the [[item:decomposerPart]]
+* Click on the [[item:brokenDecomposer]] in the world
+* The [[item:brokenDecomposer]] is repaired and becomes a fully operationnal [[item:decomposer]]
+
+<hr>
+
+**How to Use**
+
+* Left clic on the [[item:decomposer]] in the world
+* A 'Decomposer Panel' is displayed ⏳
+
+<hr>
+
+**Tips**
+
+* _Put a [[Teleporters|Teleporter]] close to the Decomposer to ease its usage._
+    `
   },
   {
     title: 'Transmutator',
