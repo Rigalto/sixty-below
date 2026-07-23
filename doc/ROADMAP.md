@@ -12,7 +12,6 @@
 - Tester Cas 3 (`onTileChangedParsnip`) : apparition d'un nouveau spot quand une tuile devient GRASSFOREST (propagation naturelle).
 - Tester `onTreePlantedParsnip` : apparition d'un oak.
 - Tester `onTreePlantedSunflower` : apparition d'un oak.
-- Implémenter le vidage (`PouringManager`) des containers remplis (bottle, bucket).
 - Modifier le volume sonore des sons du jeu (ActionWidget)
 - Supprimer les actions de debug accessibles au joueur, quand hébergement sous GitHub :
   - affichage après génération du monde
@@ -48,9 +47,6 @@
 - Supprimer les retours de fonctions (dans la boucle chaude) qui renvoient un objet par : soit un accès à des variables de classes (privées ou publiques), soit par un objet pré-alloué.
 
 ---
-
-## À faire — Bugs connus dans génération du monde
-- Les meubles sont mal positionnés en y dans les maisons anciennes
 
 ## À faire — Bugs connus
 - Lorsqu'une tuile est modifiée sans déplacement de la souris, les informations la concernant dans le Control Panel ne sont pas mises à jour

@@ -470,10 +470,10 @@ export const ITEMS = {
   jewelerBench: {name: 'Jeweler\'s Bench', type: ITEM_TYPE.FURNITURE | ITEM_TYPE.PLACABLE, stype: 'station', star: 3, surface: true, image: 'station_32_32-2-2', placed: 'placed_32_48-3-0', unplacing: {speed: 2400}, help: 'Jewelry', tooltip: 'Crafting station for jewels and accessories'},
 
   // Leatherworking
-  tanningRack: {name: 'Tanning Rack', type: ITEM_TYPE.FURNITURE | ITEM_TYPE.PLACABLE, stype: 'station', star: 3, image: 'furniture_32_32-1-0', placed: 'fuws_48_32-0-0', unplacing: {speed: 2400}, help: 'Leatherworking', tooltip: 'Crafting station for leather'},
+  tanningRack: {name: 'Tanning Rack', type: ITEM_TYPE.FURNITURE | ITEM_TYPE.PLACABLE, stype: 'station', star: 3, image: 'station_32_32-3-2', placed: 'placed_32_32-5-1', unplacing: {speed: 2400}, help: 'Leatherworking', tooltip: 'Crafting station for leather'},
   leather: {name: 'Leather', type: 0, stype: 'leather', star: 1, image: 'crafting_32_32-2-0', help: 'Leatherworking', tooltip: '???'},
 
-  alchemyTable: {name: 'Alchemy Table', type: ITEM_TYPE.FURNITURE | ITEM_TYPE.PLACABLE, stype: 'station', star: 2, image: 'furniture_32_32-8-0', placed: 'fuws_48_48-2-1', unplacing: {speed: 2400}, help: 'Alchemy', tooltip: 'Crafting station for potions'},
+  alchemyTable: {name: 'Alchemy Table', type: ITEM_TYPE.FURNITURE | ITEM_TYPE.PLACABLE, stype: 'station', star: 2, image: 'station_32_32-0-3', placed: 'placed_32_32-4-1', unplacing: {speed: 2400}, help: 'Alchemy', tooltip: 'Crafting station for potions'},
   cookingPot: {name: 'Cooking Pot', type: ITEM_TYPE.FURNITURE | ITEM_TYPE.PLACABLE, stype: 'station', star: 2, image: 'station_32_32-1-3', placed: 'placed_32_32-7-2', unplacing: {speed: 2400}, help: 'Cooking', tooltip: 'Crafting station for food'},
 
   brokenDecomposer: {name: 'Broken Decomposer', type: ITEM_TYPE.FURNITURE | ITEM_TYPE.IMMOVABLE, stype: 'immovable', star: 5, image: null, placed: 'placed_32_32-6-2', help: 'Lost Temple', tooltip: 'Once repaired, recovers most of an item\'s crafting components'},
