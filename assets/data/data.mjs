@@ -605,7 +605,7 @@ export const ITEMS = {
   ambermirage: {name: 'Ambermirage', type: 0, stype: 'herb', star: 1, image: 'foraged_32_32-6-2', placed: 'placed_16_16-3-0', help: 'Ambermirage', tooltip: '???', foraging: {speed: 2400, items: [{item: 'ambermirage', count: '1-2'}, {item: 'ambermirageSeed', count: 0.5, buffs: ['lucky:50']}]}},
   ambermirageSeed: {name: 'Ambermirage Seed', type: ITEM_TYPE.SEED | ITEM_TYPE.PLACABLE, stype: 'seed', star: 2, image: 'foraged_32_32-6-3', placed: 'placed_16_16-4-0', help: 'Ambermirage', tooltip: '???'},
 
-  bloodmoon: {name: 'Bloodmoon', type: 0, stype: 'herb', star: 2, image: 'potions_32_32-1-5', placed: 'fuws_32_32-4-0', help: 'Bloodmoon', tooltip: '???'},
+  bloodmoon: {name: 'Bloodmoon', type: 0, stype: 'herb', star: 2, image: 'potions_32_32-1-5', placed: 'placed_16_32-4-0', placedLeft: 'placed_16_32-5-0', help: 'Bloodmoon', tooltip: '???'},
   bloodmoonSeed: {name: 'Bloodmoon Seed', type: ITEM_TYPE.SEED | ITEM_TYPE.PLACABLE, stype: 'seed', star: 2, image: 'potions_32_32-1-5', placed: 'fuws_32_32-4-0', help: 'Bloodmoon', tooltip: '???'},
 
   fernS: {name: 'Shadowfern', type: 0, stype: 'herb', star: 3, image: null, placed: 'fuws_32_32-2-3', speed: 1900, foraging: {speed: 500, items: [{item: 'fernLeaf', count: 1, rainy: 1.8, windy: 1.8}]}, help: 'Ferns', tooltip: '???'},

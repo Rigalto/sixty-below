@@ -1,6 +1,6 @@
 // ecosystem.mjs — FloraManager - OakSystem - MahoganySystem - CoconutSystem - ThornspineSystem
 // SunflowerSystem - OleanderSystem - ParsnipSystem - AmbermirageSystem - CobwebSystem - HiveSystem
-// SpreadForestSystem - SpreadJungleSystem - CoralSystem
+// SpreadForestSystem - SpreadJungleSystem - CoralSystem - BloodmoonSystem
 // SampleSystem
 
 import {WORLD_WIDTH, WORLD_HEIGHT, MICROTASK, TOPSOIL_Y_SKY_SURFACE, TOPSOIL_Y_SURFACE_UNDER, TOPSOIL_Y_UNDER_CAVERNS, SEA_LEVEL} from './constant.mjs'
@@ -4722,6 +4722,113 @@ class SpreadJungleSystem {
   }
 }
 export const spreadJungleSystem = new SpreadJungleSystem()
+
+/* ====================================================================================================
+   BLOODMOON SYSTEM
+   ==================================================================================================== */
+
+class BloodmoonSystem {
+  byTile = new Map() // Map<tileIndex, record> — public : membership O(1) + lookup record
+  #list = [] // record[] — tous les spots (present ou non), population fixe posée à la génération
+  #byChunk = new Map() // Map<chunkKey, Set> — lookup spatial pour onPreloadChunksChanged
+  #displayed = new Set() // Set<record> — spots present dans les chunks preload (cible render)
+  #imageBloom = null // ITEMS.bloodmoon.placed, mis en cache dans init()
+  #imageUnbloom = null // ITEMS.bloodmoon.placed, mis en cache dans init()
+
+  /**
+   * Réinitialise toutes les structures. Appelé en début de session.
+   */
+  init () {
+    this.byTile.clear()
+    this.#list.length = 0
+    this.#byChunk.clear()
+    this.#displayed.clear()
+
+    this.#imageBloom = ITEMS.bloodmoon.placed // après hydratation
+    this.#imageUnbloom = ITEMS.bloodmoon.placedLeft // après hydratation
+  }
+
+  /**
+   * Enregistre un spot et peuple les structures internes. 'present' fait foi de l'existence
+   * physique du plant sur ce spot (indépendant de 'bloom', qui pilote uniquement la fleur
+   * nocturne) :
+   *   - present=false : spot vacant, conservé dans #list uniquement (pas de structure spatiale)
+   *   - present=true  : enregistrement spatial complet (byTile, #byChunk) + blocage de placement
+   * @param {object} record — record HERB/BLOODMOON (deleted=false garanti par l'appelant)
+   */
+  initPlant (record) {
+    this.#list.push(record)
+
+    if (!record.present) return
+    addToByTile(this.byTile, record)
+    addToByChunk(this.#byChunk, record)
+    blockedTiles.blockPlacement(record.index)
+    blockedTiles.blockPlacement(record.index - WORLD_WIDTH)
+  }
+
+  /**
+   * Reconstruit #displayed depuis les chunks preload de la caméra.
+   * @param {Set<number>} preloadChunks
+   */
+  onPreloadChunksChanged (preloadChunks) {
+    buildDisplayed(this.#displayed, this.#byChunk, preloadChunks)
+  }
+
+  /**
+   * Dessine les bloodmoons actuellement en fleur (record.bloom === true) parmi les spots
+   * present affichés. Un spot present mais non bloom (hors créneau nocturne, ou Nouvelle Lune)
+   * ne dessine rien — le sprite unique représente la fleur elle-même.
+   * @param {CanvasRenderingContext2D} ctx — contexte déjà transformé (caméra appliquée)
+   */
+  render (ctx) {
+    for (const record of this.#displayed) {
+      const img = record.bloom ? this.#imageBloom : this.#imageUnbloom
+      const pxX = (record.index & 0x3FF) << 4
+      const pxY = ((record.index >> 10) << 4) + 1
+      ctx.drawImage(IMAGE_CACHE[img.imgIndex], img.sx, img.sy, img.sw, img.sh, pxX, pxY, img.sw, img.sh)
+    }
+  }
+
+  /**
+   * Retourne le record de bloodmoon couvrant la tuile donnée, ou null.
+   * @param {number} tileIndex — (y << 10) | x
+   * @returns {object|null}
+   */
+  getPlantAt (tileIndex) {
+    return this.byTile.get(tileIndex) ?? null
+  }
+
+  /**
+   * Indique si le plant existe physiquement sur ce spot, indépendamment de l'état de floraison.
+   * @param {object} record
+   * @returns {boolean}
+   */
+  isPresent (record) { return record.present }
+
+  // ///// //
+  // DEBUG //
+  // ///// //
+
+  /**
+   * DEBUG — Affiche un cercle rouge sombre au centre de chaque spot enregistré dans #list
+   * (present ou non), pour valider visuellement la population chargée indépendamment du
+   * cycle jour/nuit (bloom).
+   * @param {CanvasRenderingContext2D} ctx — contexte déjà transformé (caméra appliquée)
+   */
+  debugRenderSpots (ctx) {
+    ctx.save()
+    ctx.fillStyle = 'rgba(139, 0, 0, 0.7)'
+    for (const record of this.#list) {
+      const cx = ((record.index & 0x3FF) << 4) + 8
+      const cy = ((record.index >> 10) << 4) + 8
+      ctx.beginPath()
+      ctx.arc(cx, cy, 4, 0, 6.2832)
+      ctx.fill()
+    }
+    ctx.restore()
+  }
+}
+export const bloodmoonSystem = new BloodmoonSystem()
 
 /* ====================================================================================================
    SAMPLE SYSTEM

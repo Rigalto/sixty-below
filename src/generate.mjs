@@ -7966,12 +7966,10 @@ class PlantGenerator {
     const W = WORLD_WIDTH
 
     for (let x = 2; x < W - 2; x++) {
-      if (guarded.has(x) || guarded.has(x - 1) || guarded.has(x + 1)) continue
+      if (guarded.has(x)) continue
 
       const y = surfaceLine[x]
       if (worldBuffer.read(x, y) !== GRASSJUNGLE) continue
-      if (worldBuffer.read(x - 1, surfaceLine[x - 1]) !== GRASSJUNGLE) continue
-      if (worldBuffer.read(x + 1, surfaceLine[x + 1]) !== GRASSJUNGLE) continue
 
       const soilIndex = (y << 10) | x
       const present = seededRNG.randomGetPercent(15)
@@ -7982,13 +7980,13 @@ class PlantGenerator {
         id: uniqueIdGenerator.getUniqueId(),
         kind: PLANT_KIND.HERB,
         type: PLANT_TYPE.BLOODMOON,
-        index: soilIndex - W,
+        index: soilIndex - 2 * W,
         soilIndex,
         itemId: 'bloodmoon',
         w: 1,
-        h: 1,
+        h: 2,
         x,
-        y: y - 1,
+        y: y - 2,
         bloom: false,
         bloomTimestamp: null,
         present,
