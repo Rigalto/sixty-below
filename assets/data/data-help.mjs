@@ -451,7 +451,7 @@ The Jungle is a lush, dangerous biome teeming with life. It features unique liqu
 * Gems: [[item:rawEmerald]], [[item:rawSapphire]]
 * Topsoil: [[node:silt]], [[node:humus]]
 * Liquid: [[node:sap]] — found in Sap Lakes and Sap Pockets
-* [[Bees]] product: [[node:honey], [[node:hive] — found in [[Hive]]s
+* [[Bees]] product: [[node:honey]], [[node:hive]] — found in [[Hive]]s
 
 **Mini-biomes**
 
@@ -461,6 +461,12 @@ The Jungle is a lush, dangerous biome teeming with life. It features unique liqu
 * [[Sap Pocket]] — Caverns deep
 * [[Lost Temple]] — Caverns
 * [[Graveyard]] — Caverns Bottom
+
+**Flora** ⏳
+
+* Trees: [[item:mahogany]]
+* Mushrooms: [[item:pinkMycenia]]
+* Herbs: [[item:bloodmoon]], [[item:bamboo]], [[item:sneakthorn]], [[item:cursedcrown]], [[item:abysshorn]], [[item:inferncap]], [[item:velvetmoss]] ([[Moss Cave]]),
 
 **Fauna** ⏳
 
@@ -5000,13 +5006,13 @@ All plants found in the world of Sixty-Below. Plants can be harvested for loot, 
 | [[item:parsnip]] | {{item:parsnip:star|star}} | Herb | [[Forest]] / [[Surface]] | [[item:parsnip]] | [[monster:vole]] (Foraging) |
 | [[item:sunflower]] | {{item:sunflower:star|star}} | Herb | [[Forest]] / [[Surface]] | [[item:sunflowerSeed]] | [[monster:hedgehog]] (Foraging) |
 | [[item:bloodmoon]] | {{item:bloodmoon:star|star}} | Herb | [[Jungle]] / [[Surface]] | [[item:bloodmoon]] | [[monster:mamba]] (Foraging) |
-| [[item:fernS]] | {{item:fernS:star|star}} | Herb | Fern Cave / [[node:grassfern]] | [[item:fernLeaf]] | [[monster:dendrobate]] /  [[monster:mamba]] (Foraging) |
-| [[item:fernC]] | {{item:fernC:star|star}} | Herb | Fern Cave / [[node:grassfern]] | [[item:fernLeaf]] | [[monster:dendrobate]] /  [[monster:mamba]] (Foraging) |
-| [[item:fernG]] | {{item:fernG:star|star}} | Herb | Fern Cave / [[node:grassfern]] | [[item:fernLeaf]] | [[monster:dendrobate]] /  [[monster:mamba]] (Foraging) |
-| [[item:fernM]] | {{item:fernM:star|star}} | Herb | Fern Cave / [[node:grassfern]] | [[item:fernLeaf]] | [[monster:dendrobate]] /  [[monster:mamba]] (Foraging) |
-| [[item:velvetmoss]] | {{item:velvetmoss:star|star}} | Herb | Moss Cave / [[node:grassmoss]] | [[item:velvetmoss]] | [[monster:woodlouse]] (Foraging) |
-| [[item:frostcap]] | {{item:frostcap:star|star}} | Herb | Mushroom Cave / [[node:grassmushroom]] | [[item:mushroomGill]] | [[monster:woodlouse]] (Foraging) |
-| [[item:dawncap]] | {{item:dawncap:star|star}} | Herb | Mushroom Cave / [[node:grassmushroom]] | [[item:mushroomGill]] | [[monster:woodlouse]] (Foraging) |
+| [[item:fernS]] | {{item:fernS:star|star}} | Herb | [[Fern Cave]] / [[node:grassfern]] | [[item:fernLeaf]] | [[monster:dendrobate]] /  [[monster:mamba]] (Foraging) |
+| [[item:fernC]] | {{item:fernC:star|star}} | Herb | [[Fern Cave]] / [[node:grassfern]] | [[item:fernLeaf]] | [[monster:dendrobate]] /  [[monster:mamba]] (Foraging) |
+| [[item:fernG]] | {{item:fernG:star|star}} | Herb | [[Fern Cave]] / [[node:grassfern]] | [[item:fernLeaf]] | [[monster:dendrobate]] /  [[monster:mamba]] (Foraging) |
+| [[item:fernM]] | {{item:fernM:star|star}} | Herb | [[Fern Cave]] / [[node:grassfern]] | [[item:fernLeaf]] | [[monster:dendrobate]] /  [[monster:mamba]] (Foraging) |
+| [[item:velvetmoss]] | {{item:velvetmoss:star|star}} | Herb | [[Moss Cave]] / [[node:grassmoss]] | [[item:velvetmoss]] | [[monster:woodlouse]] (Foraging) |
+| [[item:frostcap]] | {{item:frostcap:star|star}} | Herb | [[Mushroom Cave]] / [[node:grassmushroom]] | [[item:mushroomGill]] | [[monster:woodlouse]] (Foraging) |
+| [[item:dawncap]] | {{item:dawncap:star|star}} | Herb | [[Mushroom Cave]] / [[node:grassmushroom]] | [[item:mushroomGill]] | [[monster:woodlouse]] (Foraging) |
 | [[item:mandrake]] | {{item:mandrake:star|star}} | Herb | [[Forest]] [[Underground]] / [[node:dirt]] | [[item:mandrakeRoot]] | [[monster:wraith]] (Foraging) |
 | [[item:pricklepad]] | {{item:pricklepad:star|star}} | Herb | [[Desert]] [[Underground]] / [[node:sand]] | [[item:pricklepadFruit]], [[item:cactusSpine]], [[item:cactusFiber]] | [[monster:scorpion]] (Foraging) |
 | [[item:bamboo]] | {{item:bamboo:star|star}} | Herb | [[Jungle]] [[Underground]] / [[node:silt]] | [[item:bambooStalk]] | [[monster:centipede]] (Foraging) |
