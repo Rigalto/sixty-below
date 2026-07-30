@@ -5027,8 +5027,6 @@ _For detailed information on each plant, click its name._
 
 **Life Cycle & Foraging behavior**⏳
 
-
-
 **Gardening** ⏳
 
 Plants cultivated in [[item:clayPot]]s stacked in [[Underground]] and [[Caverns]] zones. These plants are not found in the wild and require active care from the player.
@@ -5339,6 +5337,8 @@ Foraging Tool: <<itemStar|sickleSilver>> or better
 **Dangers** ⏳
 
 _Coming soon_
+
+<hr>
 
 **Tips**
 
@@ -5659,35 +5659,69 @@ The Bloodmoon is a nocturnal flower found in the [[Jungle]] forests. Its deep cr
 
 **Blooming Hours**
 
-* Appears at night and disappears at dawn⏳
-* Does not bloom during the [[Moon Phases|New Moon]] — nourished by moonlight⏳
+* Appears at night and disappears at dawn
+* Does not bloom during the [[Moon Phases|New Moon]] — nourished by moonlight
 
-**Harvest**
+<hr>
 
-* [[Foraging|Interact to harvest]] the flower — it will regrow next night
-* Tool: any [[Foraging Tools|Sickle]]⏳
-* The plant is permanently destroyed only by [[Mining]] its supporting tile with a [[Mining Tools|Pickaxe]]
-* Loot: [[item:bloodmoon]], rare chance of [[item:bloodmoonSeed]]
+**Foraging Flowers**
+
+* While in bloom, select a [[Foraging Tools|Sickle]] and click the herb to harvest the flowers.
+* Harvesting the flower doesn't destroy the plant — only the bloom disappears, it will flowers next night.
+
+Foraging Tool: <<itemStar|sickleSilver>> or better
+
+**Bloodmoon Foraging Loot**
+
+<<itemLootTable|bloodmoon|foraging>>
+
+**Dangers** ⏳
+
+* Foraging a Bloodmoon at night may disturb a [[monster:mamba]] hiding among the undergrowth — its bite inflicts [[Damage Types|Piercing]] damage and [[Damage Types|Poison]]. ⏳
+* Foraging at night in the [[Jungle]] exposes you to increased fauna activity — proceed with caution. ⏳
+
+<hr>
+
+**Destroying Bloodmoon**
+
+The plant is permanently destroyed by:
+
+* [[Mining]] its supporting tile with a [[Mining Tools|Pickaxe]].
+* Pouring on the Bloodmoon some liquid from [[item:bucketWater]], [[item:bucketSap]] or [[item:bucketHoney]].
+* [[item:sand]] falling.
+* Liquid flowing.
+
+<hr>
 
 **Planting**
 
-* Place a [[item:bloodmoonSeed]] on a [[node:mud]] tile to grow a new Bloodmoon plant ⏳
+[[item:bloodmoonSeed]] can be obtained from:
+
+* Foraging a Bloodmoon
+* Fighting ??? (rare loot) ⏳
+
+How to plant:
+
+* Place a [[item:bloodmoonSeed]] in the [[Hotbar]] ([[Inventory]] Panel [I])
+* Select its slot, then left-click a free [[node:grassJungle]] tile — the seed is consumed
+* The tile has to be in [[Ranges|Interaction Range]], this range can be buffed
+* Germination is instantaneous, without any flowers
+
+<hr>
 
 **Usages** ⏳
 
 * [[item:bloodmoon]] — health regeneration during combat
 * [[item:bloodmoon]] — essential ingredient for [[Underground]] potions ⏳
 
-**Dangers**
-
-* Foraging a Bloodmoon at night may disturb a [[monster:mamba]] hiding among the undergrowth — its bite inflicts [[Damage Types|Piercing]] damage and [[Damage Types|Poison]]. ⏳
-* Foraging at night in the [[Jungle]] exposes you to increased fauna activity — proceed with caution. ⏳
+<hr>
 
 **Tips**
 
 * _The Bloodmoon does not bloom during the [[Moon Phases|New Moon]] — plan your foraging around the lunar cycle._
 * _Its regenerative potions are essential before venturing into the [[Underground]]._ ⏳
 * _The supporting tile can be mined to permanently remove the plant — useful for clearing paths, but irreversible._ ⏳
+* _Garder un stock minium de graines pour pouvoir replanter des Bloodmoon en cas de hazard (chute de météorite, par exemple)_
   `
   },
   {

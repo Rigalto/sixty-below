@@ -4816,6 +4816,30 @@ class BloodmoonSystem {
    */
   isPresent (record) { return !record.deleted }
 
+  // //////// //
+  // FORAGING //
+  // //////// //
+
+  /**
+   * Indique si le bloodmoon peut être fauché à la Sickle : uniquement lorsqu'il porte sa
+   * fleur (record.bloom === true).
+   * @param {object} record
+   * @returns {boolean}
+   */
+  canForage (record) { return record.bloom === true }
+
+  /**
+   * Traite le foraging réussi : fait disparaître la fleur (bloom repasse à false) et persiste.
+   * La plante elle-même reste en place (vivace) — elle refleurira à la prochaine fenêtre
+   * nocturne (onHour21Bloodmoon), sauf Nouvelle Lune. Le loot est géré en commun par
+   * ForagingManager — cette méthode ne gère que l'état de la plante.
+   * @param {object} record
+   */
+  onForaged (record) {
+    record.bloom = false
+    saveManager.queueStaticUpdate({storeName: 'plant', record})
+  }
+
   // ///////////// //
   // BLOOM/UNBLOOM //
   // ///////////// //
