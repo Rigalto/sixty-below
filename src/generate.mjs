@@ -7953,14 +7953,16 @@ class PlantGenerator {
   }
 
   /**
- * Place les spots de Bloodmoon sur les tuiles GRASSJUNGLE de surface.
- * Tous les spots valides sont enregistrés — 15% sont présents au démarrage.
- * Le jeu démarrant à 8h00, bloom = false pour tous les enregistrements.
- * Ajoute à guarded les colonnes des spots présents.
- *
- * @param {Int16Array} surfaceLine — Y de la première tuile solide par colonne
- * @param {Set<number>} guarded — colonnes protégées (modifié en place)
- */
+   * Place les Bloodmoons sur les tuiles GRASSJUNGLE de surface. Vivace : population fixe
+   * posée une fois pour toutes à la génération, aucune repousse naturelle — seul le joueur
+   * peut en replanter via une graine. Seuls les spots retenus (15% des spots valides)
+   * produisent un record ; les spots non retenus ne sont pas conservés (aucune valeur au
+   * runtime, jamais consultés). Le jeu démarrant à 8h00, bloom = false pour tous les
+   * enregistrements créés.
+   * Ajoute à guarded les colonnes retenues.
+   * @param {Int16Array} surfaceLine — Y de la première tuile solide par colonne
+   * @param {Set<number>} guarded — colonnes protégées (modifié en place)
+   */
   placeBloodmoons (surfaceLine, guarded) {
     const GRASSJUNGLE = NODES.GRASSJUNGLE.code
     const W = WORLD_WIDTH
@@ -7971,10 +7973,9 @@ class PlantGenerator {
       const y = surfaceLine[x]
       if (worldBuffer.read(x, y) !== GRASSJUNGLE) continue
 
+      if (!seededRNG.randomGetPercent(15)) continue
       const soilIndex = (y << 10) | x
-      const present = seededRNG.randomGetPercent(15)
-
-      if (present) guarded.add(x)
+      guarded.add(x)
 
       this.#plants.push({
         id: uniqueIdGenerator.getUniqueId(),
@@ -7988,8 +7989,6 @@ class PlantGenerator {
         x,
         y: y - 2,
         bloom: false,
-        bloomTimestamp: null,
-        present,
         deleted: false
       })
     }

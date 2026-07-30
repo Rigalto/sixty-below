@@ -4729,11 +4729,24 @@ export const spreadJungleSystem = new SpreadJungleSystem()
 
 class BloodmoonSystem {
   byTile = new Map() // Map<tileIndex, record> — public : membership O(1) + lookup record
-  #list = [] // record[] — tous les spots (present ou non), population fixe posée à la génération
+  #list = [] // record[] — tous les bloodmoons existants (vivace, aucun record dormant)
   #byChunk = new Map() // Map<chunkKey, Set> — lookup spatial pour onPreloadChunksChanged
   #displayed = new Set() // Set<record> — spots present dans les chunks preload (cible render)
   #imageBloom = null // ITEMS.bloodmoon.placed, mis en cache dans init()
   #imageUnbloom = null // ITEMS.bloodmoon.placed, mis en cache dans init()
+
+  /**
+   * Abonnements EventBus uniques ('time/every-hour-21', 'time/every-hour-3'), liés une seule
+   * fois à la construction (pas dans init(), pour éviter les abonnements dupliqués entre
+   * sessions). Traitement direct dans les handlers (< 0.1ms mesuré) — pas de microtâche.
+   */
+  constructor () {
+    // eventBus
+    this.bloomBloodmoon = this.bloomBloodmoon.bind(this)
+    eventBus.on('time/every-hour-21', this.bloomBloodmoon)
+    this.unbloomBloodmoon = this.unbloomBloodmoon.bind(this)
+    eventBus.on('time/every-hour-3', this.unbloomBloodmoon)
+  }
 
   /**
    * Réinitialise toutes les structures. Appelé en début de session.
@@ -4749,21 +4762,19 @@ class BloodmoonSystem {
   }
 
   /**
-   * Enregistre un spot et peuple les structures internes. 'present' fait foi de l'existence
-   * physique du plant sur ce spot (indépendant de 'bloom', qui pilote uniquement la fleur
-   * nocturne) :
-   *   - present=false : spot vacant, conservé dans #list uniquement (pas de structure spatiale)
-   *   - present=true  : enregistrement spatial complet (byTile, #byChunk) + blocage de placement
+   * Enregistre un plant et peuple les structures internes. Vivace : un record existant est
+   * par construction présent (pas d'état dormant) — enregistrement spatial complet
+   * (byTile, #byChunk) + blocage de placement sur tout le rectangle occupé (record.w × record.h)
+   * systématique.
    * @param {object} record — record HERB/BLOODMOON (deleted=false garanti par l'appelant)
    */
   initPlant (record) {
     this.#list.push(record)
 
-    if (!record.present) return
     addToByTile(this.byTile, record)
     addToByChunk(this.#byChunk, record)
     blockedTiles.blockPlacement(record.index)
-    blockedTiles.blockPlacement(record.index - WORLD_WIDTH)
+    blockedTiles.blockPlacement(record.index + WORLD_WIDTH)
   }
 
   /**
@@ -4803,7 +4814,40 @@ class BloodmoonSystem {
    * @param {object} record
    * @returns {boolean}
    */
-  isPresent (record) { return record.present }
+  isPresent (record) { return !record.deleted }
+
+  // ///////////// //
+  // BLOOM/UNBLOOM //
+  // ///////////// //
+
+  /**
+   * Liaison EventBus : 'time/every-hour-21' : fait fleurir tous les bloodmoons present (record.bloom = true), sauf pendant
+   * la Nouvelle Lune où la floraison est entièrement annulée pour la nuit. Ne modifie aucune
+   * structure spatiale — bascule uniquement bloom et persiste en un seul appel batché.
+   */
+  bloomBloodmoon () {
+    if (buffManager.getBuff('newMoon')) return
+
+    const updates = []
+    for (const record of this.#list) {
+      record.bloom = true
+      updates.push({storeName: 'plant', record})
+    }
+    if (updates.length !== 0) saveManager.queueStaticUpdate(updates)
+  }
+
+  /**
+   * Liaison EventBus : 'time/every-hour-3' : flétrit inconditionnellement tous les bloodmoons present (record.bloom =
+   * false), quelle que soit la phase lunaire de la nuit écoulée. Persiste en un seul appel batché.
+   */
+  unbloomBloodmoon () {
+    const updates = []
+    for (const record of this.#list) {
+      record.bloom = false
+      updates.push({storeName: 'plant', record})
+    }
+    if (updates.length !== 0) saveManager.queueStaticUpdate(updates)
+  }
 
   // ///// //
   // DEBUG //
