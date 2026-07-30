@@ -4746,6 +4746,8 @@ class BloodmoonSystem {
     eventBus.on('time/every-hour-21', this.bloomBloodmoon)
     this.unbloomBloodmoon = this.unbloomBloodmoon.bind(this)
     eventBus.on('time/every-hour-3', this.unbloomBloodmoon)
+    this.onSewedBloodmoon = this.onSewedBloodmoon.bind(this)
+    eventBus.on('sewed/bloodmoon', this.onSewedBloodmoon)
   }
 
   /**
@@ -4838,6 +4840,67 @@ class BloodmoonSystem {
   onForaged (record) {
     record.bloom = false
     saveManager.queueStaticUpdate({storeName: 'plant', record})
+  }
+
+  // ///////////// //
+  // PLANTATION //
+  // ///////////// //
+
+  /**
+   * Liaison EventBus : 'sewed/bloodmoon' — le joueur a planté une graine de bloodmoon sur une
+   * tuile GRASSJUNGLE valide (tuiles de corps SKY et non bloquées déjà vérifiées par
+   * SowingManager). Contrairement aux autres graines, la pousse est instantanée : construit et
+   * enregistre immédiatement un nouveau plant (bloom=false), sans délai de germination.
+   * @param {number} soilIndex — (y << 10) | x, tuile GRASSJUNGLE cliquée
+   */
+  onSewedBloodmoon (soilIndex) {
+    const x = soilIndex & 0x3FF
+    const y = soilIndex >> 10
+    const W = WORLD_WIDTH
+
+    const record = {
+      id: uniqueIdGenerator.getUniqueId(),
+      kind: PLANT_KIND.HERB,
+      type: PLANT_TYPE.BLOODMOON,
+      index: soilIndex - 2 * W,
+      soilIndex,
+      itemId: 'bloodmoon',
+      w: 1,
+      h: 2,
+      x,
+      y: y - 2,
+      bloom: false,
+      deleted: false
+    }
+
+    this.#list.push(record)
+    addToByTile(this.byTile, record)
+    addToByChunk(this.#byChunk, record)
+    addToDisplayed(this.#displayed, record)
+
+    blockedTiles.blockPlacementRect(x, y - 2, record.w, record.h)
+
+    saveManager.queueStaticUpdate({storeName: 'plant', record})
+  }
+
+  /**
+   * Indique si une BloodmoonSeed peut être plantée sur ce soilIndex. Aucune règle métier
+   * supplémentaire à ce jour — la validation de tuile (GRASSJUNGLE, corps SKY, non bloqué)
+   * est déjà faite par SowingManager.
+   * @param {number} soilIndex — (y << 10) | x
+   * @param {string} seed
+   * @returns {boolean|null} null si `seed` n'est pas 'bloodmoonSeed'
+   */
+  canSow (soilIndex, seed) {
+    // la graine ne me concerne pas
+    if (seed !== 'bloodmoonSeed') return null
+
+    // tuiles bloquées (furniture, plante déjà présente)
+    const W = WORLD_WIDTH
+    if (!blockedTiles.canPlace(soilIndex - W) || !blockedTiles.canPlace(soilIndex - 2 * W)) {
+      return false
+    }
+    return true
   }
 
   // ///////////// //

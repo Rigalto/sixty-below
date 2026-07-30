@@ -960,6 +960,7 @@ class SowingManager {
     else if (item.code === 'acorn') this.#trySowAcorn(tileIndex, tileNode, slotIndex)
     else if (item.code === 'samara') this.#trySowSamara(tileIndex, tileNode, slotIndex)
     else if (item.code === 'ambermirageSeed') this.#trySowAmbermirageSeed(tileIndex, tileNode, slotIndex)
+    else if (item.code === 'bloodmoonSeed') this.#trySowBloodmoonSeed(tileIndex, tileNode, slotIndex)
     else if (item.code === 'seedForest') this.#trySowSeed(tileIndex, tileNode, slotIndex, NODES.DIRT.code, NODES.GRASSFOREST.code)
     else if (item.code === 'seedJungle') this.#trySowSeed(tileIndex, tileNode, slotIndex, NODES.SILT.code, NODES.GRASSJUNGLE.code)
   }
@@ -1070,6 +1071,33 @@ class SowingManager {
 
     // Succès
     eventBus.emit('sewed/sunflower', tileIndex)
+    inventoryManager.decrementHotbarSlotCount(slotIndex)
+    eventBus.emit('sound/play', 'placing')
+  }
+
+  /**
+   * Valide et exécute le placement d'une BloodmoonSeed. Contrairement aux autres graines, la
+   * pousse est instantanée — la plante apparaît dès la validation, sans délai de germination.
+   * Conditions : tuile GRASSJUNGLE, tuiles index-W et index-2W sont SKY et non bloquées.
+   * Silence si mauvaise tuile, 'wrong' si bloqué, 'placing' si succès.
+   * @param {number} tileIndex — tuile cliquée (le sol attendu)
+   * @param {object} tileNode
+   * @param {number} slotIndex
+   */
+  #trySowBloodmoonSeed (tileIndex, tileNode, slotIndex) {
+    const GRASSJUNGLE = NODES.GRASSJUNGLE.code
+
+    // Silence — mauvaise tuile de sol
+    if (tileNode.code !== GRASSJUNGLE) return
+
+    // 'toofar' — tuile hors de la zone d'interaction
+    if (!isInInteractionRange(tileIndex)) { eventBus.emit('sound/play', 'toofar'); return }
+
+    // 'wrong' — règles métier de la graine
+    if (!floraManager.canSow(tileIndex, 'bloodmoonSeed')) { eventBus.emit('sound/play', 'wrong'); return }
+
+    // Succès — pousse instantanée
+    eventBus.emit('sewed/bloodmoon', tileIndex)
     inventoryManager.decrementHotbarSlotCount(slotIndex)
     eventBus.emit('sound/play', 'placing')
   }
