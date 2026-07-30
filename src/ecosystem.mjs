@@ -4826,7 +4826,7 @@ class BloodmoonSystem {
    * @param {object} record
    * @returns {boolean}
    */
-  canForage (record) { return record.bloom === true }
+  canForage (record) { return record.bloom }
 
   /**
    * Traite le foraging réussi : fait disparaître la fleur (bloom repasse à false) et persiste.
