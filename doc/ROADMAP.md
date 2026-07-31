@@ -7,9 +7,11 @@
 
 ## En cours
 
-- Tester Cas 1 (`onTileChangedParsnip`) : destruction du parsnip présent quand la tuile du corps n'est plus SKY (spot conservé) — écoulement d'un SAND.
-- Tester Cas 1 (`onTileChangedParsnip`) : destruction du parsnip présent quand la tuile du corps n'est plus SKY (spot conservé) — écoulement d'un liquide.
-- Tester Cas 3 (`onTileChangedParsnip`) : apparition d'un nouveau spot quand une tuile devient GRASSFOREST (propagation naturelle).
+### Code et tests
+
+- Implémenter les herbes, reste :
+- Tester : destruction d'une herbe quand la tuile du corps n'est plus SKY (spot conservé) — écoulement d'un SAND.
+- Tester : destruction d'une herbe quand la tuile du corps n'est plus SKY (spot conservé) — écoulement d'un liquide.
 - Tester `onTreePlantedParsnip` : apparition d'un oak.
 - Tester `onTreePlantedSunflower` : apparition d'un oak.
 - Modifier le volume sonore des sons du jeu (ActionWidget)
@@ -20,6 +22,9 @@
 - Utiliser les wood planks dans des recettes
 - Dans `paintSurfaceNatural`, on prépare des enregistements : sont-ils utilisés quelque part ? Dans cette même fonction, on retourne `surfacePlants`, a priori utilisée uniquement pour l'enregistrement. Il faudra sans doute nettoyer en n'enregistrant pas les tuiles GRASSFOREST et JUNGLEFOREST.
 - Supprimer les chunks en mémoire qui sont périmés
+
+### Images, sons et aide en ligne
+
 - Les icones des buckets placed devrait faire 16*16 pixels.
 - corriger les icones dans weapon_32_32 : dague, épée, bow, boomrang
 - corriger les icones dans tool_32_32 : hache, pickaxe, hammer, axe
@@ -34,7 +39,7 @@
   - 5,0 - 5,1 - 5,2
   - 6,1 - 6,2
 - Mettre la bonne palette et un entourage noir pour placed_16_32, reste à faire :
-  - 4,0 - 5,0 - 6,0 - 7,0
+  - 6,0 - 7,0
   - 0,1 - 1,1, - 5,1
 - Images des coffres.
 - Fiche aide : Corals
@@ -44,18 +49,18 @@
 ## Dette technique
 - Vérifier que la convention pour les variables privées est prise en compte partout et Vérifier que les en-têtes des fonctions sont présents et à jour (prise en compte des modifications de conception) :
   - fait pour `achievement.mjs`, `action.mjs`, `assets.mjs`, `buff.mjs`, `craft.mjs`, `ecosystem.mjs`, `help.mjs`, `inventory.mjs`, `ui.mjs`
-
 - Supprimer les retours de fonctions (dans la boucle chaude) qui renvoient un objet par : soit un accès à des variables de classes (privées ou publiques), soit par un objet pré-alloué.
 
 ---
 
 ## À faire — Bugs connus
 - Lorsqu'une tuile est modifiée sans déplacement de la souris, les informations la concernant dans le Control Panel ne sont pas mises à jour
+- Il faut qu'il y ait des clusters de STONE dans tous les biomes et toutes les layers.
 - Il n'y a pas assez de Pricklepad dans le monde => sans doute pas assez de SAND sur le sol souterrain.
 - Il n'y a pas assez de Bamboo dans le monde => sans doute pas assez de SILT sur le sol souterrain.
 - Il n'y a pas assez de Oleanders dans le monde => sans doute pas assez de STONE sur le sol souterrain.
 - Il est aussi possible que le sol soit trop accidenté pour disposer de spots élligibles en nombre suffisant, il faudrait ajouter alors une érosion partielle, en bouchant les trous et supprimant les bosses dans 80-90% des cas.
-- Génération du monde : densité trop élevée des tunnels en Underground et Caverns (revoir les constantes `SMALL_TUNNELS_COUNT` et `CAVERNS_TUNNEL_COUNT`)
+- Génération du monde : densité des tunnels correcte en surface, mais densité des tunnels trop élevée en Underground et Caverns (revoir les constantes `SMALL_TUNNELS_COUNT` et `CAVERNS_TUNNEL_COUNT`)
 
 ## À faire — Amélioration
 
@@ -63,7 +68,6 @@
 - Remplacer toutes les icônes Unicode 'météo' et ''phases de la lune' par des icônes SVG ou image png
 
 ---
-
 ## À faire — Buffs
 
 - `BuffManager` :
@@ -372,6 +376,7 @@ La Sap corrode le Copper. Il doit donc être remplacer par du Gold.
 - Coconut (`CoconutSystem`)
 - Thornspine (`ThornspineSystem`)
 - Corail (`CoralSystem`)
+- Bloodmoon (`BloodmoonSystem`)
 
 ### Rendu
 - `WorldRenderer` — rendu tuiles par chunks avec cache OffscreenCanvas

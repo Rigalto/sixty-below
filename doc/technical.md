@@ -536,6 +536,15 @@ Cette section définit les événements officiels. Tout nouvel événement doit 
 | E | `time/first-loop` | `{ day, hour, minute, tslot, weather, nextWeather, skyColor, moonPhase, isDay }` | Émis une seule fois au démarrage du rendu. |
 | E | `world/tile-changed` | `{ tileIndex: number, tileOldCode: number, tileNewCode: number }`| Le code de la tuile a été modifié. |
 
+#### Bloodmoon (`BloodmoonSystem`)
+
+| Dir. | Event Name | Payload Structure | Description |
+| :---: | :--- | :--- | :--- |
+| E | `time/every-hour-21` | `{ day, hour, minute, isDay }` | Début de la fenêtre nocturne de floraison, sauf Nouvelle Lune. |
+| E | `time/every-hour-3` | `{ day, hour, minute, isDay }` | Flétrissement inconditionnel à l'aube. |
+| E | `sewed/bloodmoon` | `number` (tileIndex) | Le joueur plante une graine de bloodmoon (pousse instantanée). |
+| E | `world/tile-changed` | `{ tileIndex: number, tileOldCode: number, tileNewCode: number }` | Détecte la perte de la tuile sol (minage) ou du corps (SKY perdu). |
+
 #### Parsnip (`ParsnipSystem`)
 
 | Dir. | Event Name | Payload Structure | Description |
