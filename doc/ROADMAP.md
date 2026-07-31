@@ -9,7 +9,10 @@
 
 ### Code et tests
 
-- Implémenter les herbes, reste :
+- Implémenter les herbes, reste : Mandrake, Pricklepad, Bamboo, Satan's Cube, Sneakthorn, Cursedcrown, Abysshorn, InfernCap
+- Implémenter les plants des mini-biomes, reste : fern Cave, Mushroom Cave
+- Implémenter les Giant Mushrooms.
+- Implémenter la réduction de vitesse dans les liquides ou les cobweb.
 - Tester : destruction d'une herbe quand la tuile du corps n'est plus SKY (spot conservé) — écoulement d'un SAND.
 - Tester : destruction d'une herbe quand la tuile du corps n'est plus SKY (spot conservé) — écoulement d'un liquide.
 - Tester `onTreePlantedParsnip` : apparition d'un oak.
@@ -375,7 +378,7 @@ La Sap corrode le Copper. Il doit donc être remplacer par du Gold.
 - Mahogany (`MahoganySystem`)
 - Coconut (`CoconutSystem`)
 - Thornspine (`ThornspineSystem`)
-- Corail (`CoralSystem`)
+- Coral (`CoralSystem`)
 - Bloodmoon (`BloodmoonSystem`)
 
 ### Rendu
