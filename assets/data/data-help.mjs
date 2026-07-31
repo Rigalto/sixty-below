@@ -1088,22 +1088,7 @@ Despite the nuisance they represent, cobwebs are one of the most valuable resour
 * [[Cobweb Cave]]s — concentrated, all biomes
 * All tunnels and caverns — scattered, all biomes
 
-**Mining** ⏳
-
-* Mine with any [[Mining Tools|Pickaxes]]
-
-<<lootTable|web|mining>>
-
-**Burning** ⏳
-
-* Deleted with a [[item:flamethrower]] ⏳ — No loot
-
-**Crafting chain**
-
-* [[item:silk]] → [[item:fabric]] — craft at [[item:loom]] ⏳
-* [[item:fabric]] is an essential ingredient for armors, furniture and accessories.
-
-**Ecosystem** ⏳
+**Ecosystem**
 
 * Spiders continuously spin new cobwebs over time.
 * If left uncleared, cobwebs will eventually fill entire tunnel sections.
@@ -1114,6 +1099,27 @@ Despite the nuisance they represent, cobwebs are one of the most valuable resour
 * Cobweb threads are nearly invisible until you are already tangled in them — by then, each step pulls a dozen more filaments across your legs and arms.
 * Walking through [[node:web]] reduces [[Movement Buffs|Movement Speed]] ({{node:web:buffs:movementSpeed}}%)
 * See [[Movement Buffs]] for details
+
+<hr>
+
+**Mining**
+
+Mining Tool: <<itemStar|pickaxeCopper>> or better
+
+<<lootTable|web|mining>>
+
+**Burning** ⏳
+
+* Deleted with a [[item:flamethrower]] ⏳ — No loot
+
+<hr>
+
+**Crafting chain**
+
+* [[item:silk]] → [[item:fabric]] — craft at [[item:loom]] ⏳
+* [[item:fabric]] is an essential ingredient for armors, furniture and accessories.
+
+<hr>
 
 **Tips**
 
@@ -5011,8 +5017,8 @@ All plants found in the world of Sixty-Below. Plants can be harvested for loot, 
 | [[item:fernG]] | {{item:fernG:star|star}} | Herb | [[Fern Cave]] / [[node:grassfern]] | [[item:fernLeaf]] | [[monster:dendrobate]] /  [[monster:mamba]] (Foraging) |
 | [[item:fernM]] | {{item:fernM:star|star}} | Herb | [[Fern Cave]] / [[node:grassfern]] | [[item:fernLeaf]] | [[monster:dendrobate]] /  [[monster:mamba]] (Foraging) |
 | [[item:velvetmoss]] | {{item:velvetmoss:star|star}} | Herb | [[Moss Cave]] / [[node:grassmoss]] | [[item:velvetmoss]] | [[monster:woodlouse]] (Foraging) |
-| [[item:frostcap]] | {{item:frostcap:star|star}} | Herb | [[Mushroom Cave]] / [[node:grassmushroom]] | [[item:mushroomGill]] | [[monster:woodlouse]] (Foraging) |
-| [[item:dawncap]] | {{item:dawncap:star|star}} | Herb | [[Mushroom Cave]] / [[node:grassmushroom]] | [[item:mushroomGill]] | [[monster:woodlouse]] (Foraging) |
+| [[item:frostcap]] | {{item:frostcap:star|star}} | Mushroom | [[Mushroom Cave]] / [[node:grassmushroom]] | [[item:mushroomGill]] | [[monster:woodlouse]] (Foraging) |
+| [[item:dawncap]] | {{item:dawncap:star|star}} | Mushroom | [[Mushroom Cave]] / [[node:grassmushroom]] | [[item:mushroomGill]] | [[monster:woodlouse]] (Foraging) |
 | [[item:mandrake]] | {{item:mandrake:star|star}} | Herb | [[Forest]] [[Underground]] / [[node:dirt]] | [[item:mandrakeRoot]] | [[monster:wraith]] (Foraging) |
 | [[item:pricklepad]] | {{item:pricklepad:star|star}} | Herb | [[Desert]] [[Underground]] / [[node:sand]] | [[item:pricklepadFruit]], [[item:cactusSpine]], [[item:cactusFiber]] | [[monster:scorpion]] (Foraging) |
 | [[item:bamboo]] | {{item:bamboo:star|star}} | Herb | [[Jungle]] [[Underground]] / [[node:silt]] | [[item:bambooStalk]] | [[monster:centipede]] (Foraging) |
@@ -5489,21 +5495,29 @@ Parsnips are root vegetables found growing on the [[Forest]] floor. Their white 
 * Layer: [[Surface]]
 * Grows on [[node:grassForest]]
 
-
 **Blooming hours**
 
 De nouveau parsnips poussent pendant la nuit à 3h00.
 Aime le [[Weather|Cloudy Weather]].
 
-**Harvest**
+<hr>
 
-* [[Foraging|Interact to harvest]] — the plant disappears on harvest
-* Tool: any [[Foraging Tools|Sickle]]⏳
-* Loot: [[item:parsnip]]
+**Foraging Parsnip**
+
+* [[Foraging|Interact to harvest]]
+* The plant disappears on harvest
+
+Foraging Tool: <<itemStar|sickleCopper>> or better
+
+**Parsnip Foraging Loot**
+
+<<itemLootTable|parsnip|foraging>>
 
 **Dangers**
 
 * Foraging a Parsnip may disturb a [[monster:vole]] hiding among the roots — its bite inflicts [[Damage Types|Piercing]] damage and may cause [[Bleeding DOT]]. ⏳
+
+<hr>
 
 **Usages** ⏳
 
@@ -5516,6 +5530,8 @@ Aime le [[Weather|Cloudy Weather]].
 
 * [[item:parsnipMash]]
 * [[item:vegetableSoup]]
+
+<hr>
 
 **Tips**
 
@@ -5548,23 +5564,36 @@ Foraging a sunflower yields [[item:sunflowerSeed]] — scatter them on bare gras
 
 * Appears at dawn (6h) and disappears at dusk (19h) (in-game time)
 
-**Harvest**
+<hr>
 
-* [[Foraging|Interact to harvest]] — the flower disappears on harvest
-* Tool: any [[Foraging Tools|Sickle]]
-* Loot: {{item:sunflower:foraging:items[*]:item|links}}
-* [[item:worm]]s are more abundant during [[Weather|Rainy Weather]]
-* Chance of catching a [[item:worm]] is increased by [[Luck Buff]]
+**Foraging Sunflower**
+
+* [[Foraging|Interact to harvest]]
+* The flower disappears on harvest
+
+Foraging Tool: <<itemStar|sickleCopper>> or better
+
+**Sunflower Foraging Loot**
+
+<<itemLootTable|sunflower|foraging>>
 
 **Dangers**
 
 * Foraging a Sunflower may disturb a [[monster:hedgehog]] hiding nearby — its spines inflict [[Damage Types|Piercing]] damage and may cause [[Bleeding DOT]]. ⏳
+
+<hr>
 
 **Usages**
 
 * <<itemStar|sunflowerSeed>>— replanting Sunflowers ⏳
 * <<itemStar|sunflowerOil>>— extracted from seeds, essential ingredient for food and ointments ⏳
 * <<itemStar|oleanderOil>>— contains 50% [[item:sunflowerOil]] ⏳
+
+**[[item:sunflowerOil]] Crafting**
+
+<<fullRecipe|sunflowerOil>>
+
+<hr>
 
 **Planting**
 
@@ -5575,9 +5604,7 @@ Foraging a sunflower yields [[item:sunflowerSeed]] — scatter them on bare gras
 * Each spot accepts only one seed
 * Seeded spots have a 100% chance of blooming at the next dawn
 
-**[[item:sunflowerOil]] Crafting**
-
-<<fullRecipe|sunflowerOil>>
+<hr>
 
 **Tips**
 
@@ -5608,20 +5635,31 @@ The Ambermirage is a common desert flower that blooms only during the hottest ho
 * Appears at 10:00 and disappears at 14:00 (in-game time)
 * Never appears during Rainy or Stormy [[Weather]]
 
-**Harvest**
+<hr>
 
-* [[Foraging|Interact to harvest]] — the flower disappears on harvest⏳
-* Tool: any [[Foraging Tools|Sickle]]⏳
-* Loot: [[item:ambermirage]]⏳
+**Foraging Ambermirage**
+
+* [[Foraging|Interact to harvest]]
+* The flower disappears on harvest
+
+Foraging Tool: <<itemStar|sickleCopper>> or better
+
+**Ambermirage Foraging Loot**
+
+<<itemLootTable|ambermirage|foraging>>
 
 **Dangers**
 
 * Foraging an AmberMirage may disturb a [[monster:scorpion]] hiding beneath its petals — be ready to [[Fighting|fight]]. ⏳
 
+<hr>
+
 **Usages**
 
 * [[item:ambermirage]] — crafting ingredient ⏳
 * [[item:ambermirageSeed]] — replanting Ambermirage ⏳
+
+<hr>
 
 **Planting**
 
@@ -5632,6 +5670,8 @@ The Ambermirage is a common desert flower that blooms only during the hottest ho
 * Seeded spots have a 100% chance of blooming at the next day
 
 _Note: even a seeded spot won't bloom if its surface neighbors are not [[node:sand]], or if something blocks/covers it, before 10:00_
+
+<hr>
 
 **Tips**
 
@@ -5738,7 +5778,7 @@ Corals are marine organisms found on the sandy floor of the ocean. Four distinct
 
 **Location**
 
-* Layer: Under Sea
+* Biome: [[Sea]]
 * Grows on [[node:sand]] — ocean floor only
 
 **Species**
@@ -5750,28 +5790,42 @@ Corals are marine organisms found on the sandy floor of the ocean. Four distinct
 | [[item:coralY]] | Yellow |
 | [[item:coralG]] | Green |
 
-**Harvest**
+<hr>
 
-* [[Foraging|Interact to harvest]] — the coral disappears on harvest
-* Tool: any [[Foraging Tools|Sickle]] ⏳
-* Loot: [[item:coral]]
+**Foraging Corals**
 
-**Regrowth**
+* [[Foraging|Interact to harvest]]
+* The coral disappears on harvest
 
-* Foraging a coral triggers the slow growth of another coral elsewhere on the ocean floor
-* New corals take 2 to 4 in-game days to fully grow before they can be harvested
+Foraging Tool: <<itemStar|sickleSilver>> or better
 
-**Usages** ⏳
+**Coral Foraging Loot**
 
-* [[item:coral]] — crafting ingredient ⏳
+<<itemLootTable|coralR|foraging>>
 
 **Dangers**
 
 * [[monster:moray]] may attack when foraging coral. ⏳
 
+<hr>
+
+**Regrowth**
+
+* Foraging a coral clears its spot, inducing a replacement spot.
+* Regrowth always takes from one to several days.
+* Regrowth is purely natural — there is no seed or planting method for corals.
+
+<hr>
+
+**Usages** ⏳
+
+* [[item:coral]] — crafting ingredient ⏳
+
+<hr>
+
 **Tips**
 
-* _The ocean always maintains the same number of corals — patience is rewarded._ ⏳
+* _The ocean always maintains the same number of corals — patience is rewarded._
 * _Bring a breathing potion before diving to harvest corals._ ⏳
   `
   },
@@ -6059,21 +6113,32 @@ Oleander is a common shrub found in the underground passages of all three biomes
 * The species neither grows nor declines — natural balance maintains the population
 * Harvested Oleander does not regrow
 
-**Harvest**
+<hr>
 
-* [[Foraging|Interact to harvest]] — the plant disappears permanently on harvest
-* Tool: [[Foraging Tools|Silver Sickle]] or better ⏳
-* Loot: [[item:oleander]], [[item:oleanderBulb]]
+**Foraging Oleander**
+
+* [[Foraging|Interact to harvest]]
+* The plant disappears on harvest
+
+Foraging Tool: <<itemStar|sickleSilver>> or better
+
+**Oleander Foraging Loot**
+
+<<itemLootTable|oleander|foraging>>
 
 **Dangers**
 
 * The scent of Oleander berries attracts a [[monster:caveBeetle]] — its metallic blue-green carapace is nearly invisible against the stone walls. ⏳
+
+<hr>
 
 **Usages** ⏳
 
 * [[item:oleander]] — crafting ingredient ⏳
 * [[item:oleanderBulb]] — crafting ingredient ⏳
 * [[item:oleanderOil]] — heat-stable cooking oil, required for tier 3 food preparation ⏳
+
+<hr>
 
 **Tips**
 
