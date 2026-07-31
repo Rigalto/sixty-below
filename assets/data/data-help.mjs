@@ -5659,7 +5659,7 @@ The Bloodmoon is a nocturnal flower found in the [[Jungle]] forests. Its deep cr
 
 **Blooming Hours**
 
-* Appears at night and disappears at dawn
+* Appears at night (21:00) and disappears at dawn (3:00)
 * Does not bloom during the [[Moon Phases|New Moon]] — nourished by moonlight
 
 <hr>
@@ -5667,7 +5667,7 @@ The Bloodmoon is a nocturnal flower found in the [[Jungle]] forests. Its deep cr
 **Foraging Flowers**
 
 * While in bloom, select a [[Foraging Tools|Sickle]] and click the herb to harvest the flowers.
-* Harvesting the flower doesn't destroy the plant — only the bloom disappears, it will flowers next night.
+* Harvesting the flower doesn't destroy the plant — only the bloom disappears. It blooms again the following night, unless that night is a [[Moon Phases|New Moon]].
 
 Foraging Tool: <<itemStar|sickleSilver>> or better
 
@@ -5703,9 +5703,9 @@ The plant is permanently destroyed by:
 How to plant:
 
 * Place a [[item:bloodmoonSeed]] in the [[Hotbar]] ([[Inventory]] Panel [I])
-* Select its slot, then left-click a free [[node:grassJungle]] tile — the seed is consumed
+* Select its slot, then left-click a [[node:grassJungle]] tile with two clear tiles above it — the seed is consumed
 * The tile has to be in [[Ranges|Interaction Range]], this range can be buffed
-* Germination is instantaneous, without any flowers
+* Growth is instantaneous — the plant appears immediately, not yet in bloom
 
 <hr>
 
@@ -5720,8 +5720,8 @@ How to plant:
 
 * _The Bloodmoon does not bloom during the [[Moon Phases|New Moon]] — plan your foraging around the lunar cycle._
 * _Its regenerative potions are essential before venturing into the [[Underground]]._ ⏳
-* _The supporting tile can be mined to permanently remove the plant — useful for clearing paths, but irreversible._ ⏳
-* _Garder un stock minium de graines pour pouvoir replanter des Bloodmoon en cas de hazard (chute de météorite, par exemple)_
+* _The supporting tile can be mined to permanently remove the plant — useful for clearing paths, but irreversible._
+* _Keep a minimum stock of seeds so you can replant Bloodmoons after a hazard (a meteorite strike, for example)._
   `
   },
   {

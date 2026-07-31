@@ -4731,6 +4731,7 @@ class BloodmoonSystem {
   byTile = new Map() // Map<tileIndex, record> — public : membership O(1) + lookup record
   #list = [] // record[] — tous les bloodmoons existants (vivace, aucun record dormant)
   #byChunk = new Map() // Map<chunkKey, Set> — lookup spatial pour onPreloadChunksChanged
+  #bySoil = new Map() // Map<soilIndex, record> — détection minage de la tuile support
   #displayed = new Set() // Set<record> — spots present dans les chunks preload (cible render)
   #imageBloom = null // ITEMS.bloodmoon.placed, mis en cache dans init()
   #imageUnbloom = null // ITEMS.bloodmoon.placed, mis en cache dans init()
@@ -4748,6 +4749,8 @@ class BloodmoonSystem {
     eventBus.on('time/every-hour-3', this.unbloomBloodmoon)
     this.onSewedBloodmoon = this.onSewedBloodmoon.bind(this)
     eventBus.on('sewed/bloodmoon', this.onSewedBloodmoon)
+    this.onTileChangedBloodmoon = this.onTileChangedBloodmoon.bind(this)
+    eventBus.on('world/tile-changed', this.onTileChangedBloodmoon)
   }
 
   /**
@@ -4757,6 +4760,7 @@ class BloodmoonSystem {
     this.byTile.clear()
     this.#list.length = 0
     this.#byChunk.clear()
+    this.#bySoil.clear()
     this.#displayed.clear()
 
     this.#imageBloom = ITEMS.bloodmoon.placed // après hydratation
@@ -4775,6 +4779,7 @@ class BloodmoonSystem {
 
     addToByTile(this.byTile, record)
     addToByChunk(this.#byChunk, record)
+    this.#bySoil.set(record.soilIndex, record)
     blockedTiles.blockPlacement(record.index)
     blockedTiles.blockPlacement(record.index + WORLD_WIDTH)
   }
@@ -4818,6 +4823,57 @@ class BloodmoonSystem {
    */
   isPresent (record) { return !record.deleted }
 
+  // /////////// //
+  // DESTRUCTION //
+  // /////////// //
+
+  /**
+   * Liaison EventBus : 'world/tile-changed'.
+   * — Détruit le bloodmoon si l'une des 2 tuiles de son corps n'est plus SKY (sable qui
+   *   s'effondre, liquide qui remplit...).
+   * — Détruit le bloodmoon si sa tuile sol n'est plus GRASSJUNGLE (minage).
+   * Relit les tuiles réelles avant d'agir plutôt que de se fier au payload seul.
+   * @param {{tileIndex: number, tileOldCode: number, tileNewCode: number}} payload
+   */
+  onTileChangedBloodmoon ({tileIndex, tileOldCode, tileNewCode}) {
+    const GRASSJUNGLE = NODES.GRASSJUNGLE.code
+
+    // Cas 1 — tuile du corps : record trouvé ⇒ tileOldCode était SKY ⇒ tileNewCode ne l'est plus
+    const byBodyRecord = this.byTile.get(tileIndex)
+    if (byBodyRecord !== undefined) this.#destroy(byBodyRecord)
+
+    // Cas 2 — tuile sol : GRASSJUNGLE perdu (minage)
+    if (tileOldCode === GRASSJUNGLE) {
+      const record = this.#bySoil.get(tileIndex)
+      if (record !== undefined) this.#destroy(record)
+    }
+  }
+
+  /**
+   * Détruit définitivement un bloodmoon (vivace, aucune repousse) : retire toutes les
+   * structures mémoire, débloque le rectangle occupé, marque deleted et persiste. Purge de
+   * #list par swap + length-- (tableau non ordonné).
+   * @param {object} record
+   */
+  #destroy (record) {
+    removeFromByTile(this.byTile, record)
+    removeFromByChunk(this.#byChunk, record)
+    this.#bySoil.delete(record.soilIndex)
+    this.#displayed.delete(record)
+
+    blockedTiles.unblockPlacement(record.index)
+    blockedTiles.unblockPlacement(record.index + WORLD_WIDTH)
+
+    const idx = this.#list.indexOf(record)
+    if (idx !== -1) {
+      this.#list[idx] = this.#list[this.#list.length - 1]
+      this.#list.length--
+    }
+
+    record.deleted = true
+    saveManager.queueStaticUpdate({storeName: 'plant', record})
+  }
+
   // //////// //
   // FORAGING //
   // //////// //
@@ -4842,9 +4898,9 @@ class BloodmoonSystem {
     saveManager.queueStaticUpdate({storeName: 'plant', record})
   }
 
-  // ///////////// //
+  // ////////// //
   // PLANTATION //
-  // ///////////// //
+  // ////////// //
 
   /**
    * Liaison EventBus : 'sewed/bloodmoon' — le joueur a planté une graine de bloodmoon sur une
@@ -4876,6 +4932,7 @@ class BloodmoonSystem {
     this.#list.push(record)
     addToByTile(this.byTile, record)
     addToByChunk(this.#byChunk, record)
+    this.#bySoil.set(soilIndex, record)
     addToDisplayed(this.#displayed, record)
 
     blockedTiles.blockPlacementRect(x, y - 2, record.w, record.h)
