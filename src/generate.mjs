@@ -6612,7 +6612,7 @@ class FurnitureGenerator {
     // Ajout des items par défaut dans l'inventaire
     this.#addInHotbar('pickaxeCopper', 1, '', 0)
     this.#addInHotbar('axeCopper', 1, '', 1)
-    this.#addInHotbar('hammerCopper', 1, '', 2)
+    this.#addInHotbar('hammerOak', 1, '', 2)
   }
 
   /**
