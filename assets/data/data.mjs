@@ -617,13 +617,18 @@ export const ITEMS = {
 
   velvetmoss: {name: 'Velvetmoss', type: 0, stype: 'herb', star: 3, image: 'crafting_32_32-0-1', placed: 'fuws_32_32-2-3', speed: 1900, foraging: {speed: 500, items: [{item: 'velvetmoss', count: 1, rainy: 1.8, windy: 1.8}]}, help: 'Velvetmoss', tooltip: '???'},
 
-  coralR: {name: 'Sunburst Brain Coral', type: 0, stype: 'herb', star: 2, image: null, placed: 'placed_32_32-0-1', speed: 1900, foraging: {speed: 500, items: [{item: 'coral', count: 1, rainy: 1.8, windy: 1.8}]}, help: 'Corals', tooltip: 'Crafting Material for Potions and Furniture'},
-  coralP: {name: 'Starfire Pillar Coral', type: 0, stype: 'herb', star: 2, image: null, placed: 'placed_32_32-1-1', speed: 1900, foraging: {speed: 500, items: [{item: 'coral', count: 1, rainy: 1.8, windy: 1.8}]}, help: 'Corals', tooltip: 'Crafting Material for Potions and Furniture'},
-  coralY: {name: 'Flickering Torch Coral', type: 0, stype: 'herb', star: 2, image: null, placed: 'placed_32_32-2-1', speed: 1900, foraging: {speed: 500, items: [{item: 'coral', count: 1, rainy: 1.8, windy: 1.8}]}, help: 'Corals', tooltip: 'Crafting Material for Potions and Furniture'},
-  coralG: {name: 'Whispering Fan Coral', type: 0, stype: 'herb', star: 2, image: null, placed: 'placed_32_32-3-1', speed: 1900, foraging: {speed: 500, items: [{item: 'coral', count: 1, rainy: 1.8, windy: 1.8}]}, help: 'Corals', tooltip: 'Crafting Material for Potions and Furniture'},
+  coralR: {name: 'Sunburst Brain Coral', type: 0, stype: 'herb', star: 2, image: null, placed: 'placed_32_32-0-1', speed: 1900, foraging: {speed: 500, items: [{item: 'coral', count: 1}, {item: 'oyster', count: 0.12, buffs: ['lucky:100', 'rainy:300']}]}, help: 'Corals', tooltip: 'Crafting Material for Potions and Furniture'},
+  coralP: {name: 'Starfire Pillar Coral', type: 0, stype: 'herb', star: 2, image: null, placed: 'placed_32_32-1-1', speed: 1900, foraging: {speed: 500, items: [{item: 'coral', count: 1}, {item: 'oyster', count: 0.12, buffs: ['lucky:100', 'rainy:300']}]}, help: 'Corals', tooltip: 'Crafting Material for Potions and Furniture'},
+  coralY: {name: 'Flickering Torch Coral', type: 0, stype: 'herb', star: 2, image: null, placed: 'placed_32_32-2-1', speed: 1900, foraging: {speed: 500, items: [{item: 'coral', count: 1}, {item: 'oyster', count: 0.12, buffs: ['lucky:100', 'rainy:300']}]}, help: 'Corals', tooltip: 'Crafting Material for Potions and Furniture'},
+  coralG: {name: 'Whispering Fan Coral', type: 0, stype: 'herb', star: 2, image: null, placed: 'placed_32_32-3-1', speed: 1900, foraging: {speed: 500, items: [{item: 'coral', count: 1}, {item: 'oyster', count: 0.12, buffs: ['lucky:100', 'rainy:300']}]}, help: 'Corals', tooltip: 'Crafting Material for Potions and Furniture'},
   coral: {name: 'Coral', type: 0, stype: 'herb', star: 2, image: 'foraged_32_32-3-3', help: 'Corals', tooltip: 'Crafting Material for Potions and Furniture'},
+  oyster: {name: 'Oyster', type: 0, stype: 'food', star: 2, image: 'foraged_32_32-2-4', help: 'Oyster', tooltip: 'Open it to eat and collect pearls'},
+  shuckedOyster: {name: 'Shucked Oyster', type: 0, stype: 'food', star: 2, image: 'foraged_32_32-3-4', help: 'Oyster', tooltip: 'Minor improvements to all stats (10 minutes)'},
+  pearlWhite: {name: 'White Pearl', type: 0, stype: 'pearl', star: 2, image: 'foraged_32_32-4-4', help: 'Oyster', tooltip: 'Major ingredient of Luck Potion'},
+  pearlBlack: {name: 'Black Pearl', type: 0, stype: 'pearl', star: 3, image: 'foraged_32_32-5-4', help: 'Oyster', tooltip: 'Major ingredient of Luck Potion'},
+  pearlPink: {name: 'Black Pink', type: 0, stype: 'pearl', star: 4, image: 'foraged_32_32-6-4', help: 'Oyster', tooltip: 'Major ingredient of Luck Potion'},
 
-  mandrake: {name: 'Mandrake', type: 0, stype: 'herb', star: 2, image: null, placed: 'fuws_32_32-2-3', speed: 1900, foraging: {speed: 500, items: [{item: 'mandrakeRoot', count: 1, rainy: 1.8, windy: 1.8}]}, help: 'Mandrake', tooltip: 'Harvest to collect Potions and Food ingredients'},
+  mandrake: {name: 'Mandrake', type: 0, stype: 'herb', star: 2, image: null, placed: 'placed_32_32-5-0', speed: 1900, foraging: {speed: 500, items: [{item: 'mandrakeRoot', count: 1}, {item: 'slug', count: 0.12, buffs: ['lucky:100', 'rainy:300']}]}, help: 'Mandrake', tooltip: 'Harvest to collect Potions and Food ingredients'},
   mandrakeRoot: {name: 'Mandrake Root', type: 0, stype: 'herb', star: 3, image: 'crafting_32_32-0-1', help: 'Mandrake', tooltip: 'Crafting Material for Potions and Food'},
 
   pricklepad: {name: 'Pricklepad', type: 0, stype: 'herb', star: 3, image: null, placed: 'fuws_32_32-2-3', help: 'Pricklepad', tooltip: '???', foraging: {speed: 1800, items: [{item: 'pricklepadFruit', count: '1-3'}, {item: 'cactusSpine', count: 0.80}, {item: 'cactusFiber', count: 1.80}]}},
@@ -983,10 +988,10 @@ export const ALL_PLANT_SYSTEMS = []
 export const PARSNIP_RATE = 0.22
 export const SUNFLOWER_RATE = 0.18
 export const AMBERMIRAGE_PCENT = 20
-export const MANDRAKE_COUNT = 40
-export const PRICKLEPAD_COUNT = 40
+export const OLEANDER_COUNT = 60
+export const MANDRAKE_COUNT = 60
+export const PRICKLEPAD_COUNT = 60
 export const BAMBOO_COUNT = 40
-export const OLEANDER_COUNT = 100
 export const SATANS_CUBE_COUNT = 80
 export const SNEAKTHORN_COUNT = 80
 export const CURSEDCROWN_COUNT = 80

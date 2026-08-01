@@ -376,10 +376,15 @@ The Forest is the starting biome, located at the center of the world. It is the 
 * [[Underground Lake]] — Caverns
 * [[Graveyard]] — Caverns Bottom
 
+**Flora** ⏳
+
+* Trees: [[item:oak]]
+* Mushrooms: [[item:bolete]]
+* Herbs: [[item:sunflower]], [[item:parsnip]], [[item:oleander]], [[item:satansCube]], [[item:sneakthorn]], [[item:abysshorn]], [[item:inferncap]]
+
 **Fauna** ⏳
 
-* [[monster:beetle]], [[monster:greenSlime]], [[monster:blueSlime]]
-* [[monster:bat]], [[monster:caveWorm]] — Underground
+* [[monster:Worm]]
   `
   },
   {
@@ -415,6 +420,11 @@ The Desert biome is characterized by its sandy terrain and arid atmosphere. It c
 * [[Pyramid]] — Underground
 * [[Ancient House]] — Caverns deep
 * [[Graveyard]] — Caverns Bottom
+
+**Flora** ⏳
+
+* Trees: [[item:coconut]], [[item:thornspine]]
+* Herbs: [[item:pricklepad]], [[item:satansCube]], [[item:cursedcrown]], [[item:abysshorn]], [[item:inferncap]]
 
 **Fauna** ⏳
 
@@ -1432,7 +1442,7 @@ Sap is a rare green liquid found exclusively in [[Jungle]] biomes. It fills Sap 
   },
   {
     title: 'Sea',
-    category: ['Liquid', 'Mini-biome'],
+    category: ['Mini-biome', 'Sea', 'Liquid'],
     content: `
 **Description**
 
@@ -1443,10 +1453,34 @@ The Sea borders both sides of the world. Its deep, dark waters are home to uniqu
 * Left and right borders of the world
 * Depth : from [[Surface]] level down to [[Caverns]] Bottom
 
-**Collection** ⏳
+**Materials**
+
+* Solid: [[node:sand]], [[node:sandstone]]
+* Liquid: [[node:sea]]
+* Sea Shore : [[node:shell]], [[node:sand]], [[node:sandstone]]
+
+**Flora**
+
+* Trees: [[item:coconut]], [[item:thornspine]] (Sea Shore)
+* Herbs: [[item:ambermirage]] (Sea Shore)
+* Corals: [[item:coralR]], [[item:coralP]], [[item:coralY]], [[item:coralG]]
+
+**Fauna**
+
+* xxx: [[item:oyster]]
+
+Coming Soon.⏳
+
+<hr>
+
+**How to collect Water**
+
+Coming soon⏳
 
 * [[item:bottle]] — small quantity
 * [[item:bucket]] — large quantity
+
+<hr>
 
 **Tips**
 
@@ -4995,13 +5029,13 @@ All plants found in the world of Sixty-Below. Plants can be harvested for loot, 
 
 **Wild Plants**
 
-| Name | Tier | Type | Location | Main Loot | Encounters |
+| Name/Tier | Type | Location | Tile | Main Loot | Encounters |
 |---|---|---|---|---|---|
-| [[item:coconut]] | {{item:coconut:star|star}} | Tree | [[Sea]] shore, [[Desert]] Oasis shore<br>[[node:sand]] | [[item:coconut]], [[item:coconutFiber]], [[item:coconutPulp]], [[item:coconutMilk]] | [[monster:coconutCrab]] (Shaking) |
-| [[item:thornspine]] | {{item:thornspine:star|star}} | Tree | [[Sea]] shore, [[Desert]]<br>[[node:sand]] | [[item:thornspineFlower]], [[item:cactusSpine]], [[item:cactusFiber]] | [[monster:scorpion]] |
-| [[item:oak]] | {{item:oak:star|star}} | Tree | [[Forest]] / [[Surface]] | [[item:logOak]], [[item:acorn]] | [[monster:hornet]] (Shaking) / [[monster:boar]] (Chopping) |
-| [[item:mahogany]] | {{item:mahogany:star|star}} | Tree | [[Jungle]] / [[Surface]] | [[item:logMahogany]] | [[monster:eyelashViper]] (Shaking) / [[monster:bulletAnt]] (Chopping) |
-| [[item:giantMushroom]] | {{item:giantMushroom:star|star}} | Tree | [[Mushroom Cave]] | ⏳ | [[monster:isopod]]  (Chopping) |
+| <<cellItemStar|coconut>> | Tree | [[Sea]] shore<br>[[Desert]] Oasis shore | [[node:sand]] | [[item:coconut]], [[item:coconutFiber]], [[item:coconutPulp]], [[item:coconutMilk]] | [[monster:coconutCrab]] (Shaking) |
+| <<cellItemStar|thornspine>> | Tree | [[Sea]] shore<br>[[Desert]] | [[node:sand]] | [[item:thornspineFlower]], [[item:cactusSpine]], [[item:cactusFiber]] | [[monster:scorpion]] |
+| <<cellItemStar|oak>> | Tree | [[Forest]]<br>[[Surface]] | [[node:grassForest]] | [[item:logOak]], [[item:acorn]] | [[monster:hornet]] (Shaking) / [[monster:boar]] (Chopping) |
+| <<cellItemStar|mahogany>> | Tree | [[Jungle]]<br>[[Surface]] | [[node:grassJungle]] | [[item:logMahogany]] | [[monster:eyelashViper]] (Shaking) / [[monster:bulletAnt]] (Chopping) |
+| <<cellItemStar|giantMushroom>> | Tree | [[Mushroom Cave]] | [[node:grassMushroom]] | ⏳ | [[monster:isopod]]  (Chopping) |
 | [[item:bolete]] | {{item:bolete:star|star}} | Mushroom | [[Forest]] / [[Surface]] | [[item:bolete]] | [[monster:adder]] (Foraging) |
 | [[item:pinkMycenia]] | {{item:pinkMycenia:star|star}} | Mushroom | [[Jungle]] / [[Surface]] | [[item:pinkMycenia]] | [[monster:giantRedSlug]] (Foraging) |
 | [[item:coralR]] | {{item:coralR:star|star}} | Herb | Under [[Sea]] / [[node:sand]] | [[item:coral]] | [[monster:moray]] (Foraging) |
@@ -5728,7 +5762,7 @@ The plant is permanently destroyed by:
 
 * [[Mining]] its supporting tile with a [[Mining Tools|Pickaxe]].
 * Pouring on the Bloodmoon some liquid from [[item:bucketWater]], [[item:bucketSap]] or [[item:bucketHoney]].
-* [[item:sand]] falling.
+* [[node:sand]] falling.
 * Liquid flowing.
 
 <hr>
@@ -5765,8 +5799,17 @@ How to plant:
   `
   },
   {
+    title: 'Oyster',
+    category: ['Sea'],
+    content: `
+**Description**
+
+Coming Soon.
+  `
+  },
+  {
     title: 'Corals',
-    category: ['Plant', 'Ocean'],
+    category: ['Plant', 'Sea'],
     content: `
 **Description**
 
@@ -5949,11 +5992,11 @@ Velvetmoss is a slow-growing, deep-purple moss found exclusively in [[Moss Cave|
   //    Mandrake, Pricklepad, Bamboo, Oleander
   {
     title: 'Mandrake',
-    category: ['Plant', 'Forest'],
+    category: ['Plant', 'Jungle', 'Underground'],
     content: `
 **Description**
 
-The Mandrake is a root plant found in the tunnels and underground passages of [[Forest]] biomes. Its gnarled, humanoid root is unmistakable — and its scream when uprooted is said to drive the unwary mad. Whether that is true or merely a story told to scare apprentice foragers is a matter of debate.
+The Mandrake is a root plant found in the tunnels and underground passages of [[Jungle]] biomes. Its gnarled, humanoid root is unmistakable — and its scream when uprooted is said to drive the unwary mad. Whether that is true or merely a story told to scare apprentice foragers is a matter of debate.
 
 **Tier**
 
@@ -5961,9 +6004,9 @@ The Mandrake is a root plant found in the tunnels and underground passages of [[
 
 **Location**
 
-* Biome: [[Forest]]
-* Layer: [[Surface]] tunnels and [[Underground]]
-* Grows on [[node:dirt]]
+* Biome: mostly [[Jungle]] — rare colonies in [[Forest]] and [[Desert]] where [[node:limestone]] intrusions reach the surface
+* Layer: [[Underground]]
+* Grows on [[node:limestone]]
 
 **Population**
 
@@ -6002,7 +6045,7 @@ Foraging Tool: <<itemStar|sickleSilver>> or better
   },
   {
     title: 'Pricklepad',
-    category: ['Plant', 'Desert', 'Underground', 'Surface'],
+    category: ['Plant', 'Desert', 'Underground'],
     content: `
 **Description**
 
@@ -6015,8 +6058,8 @@ The underground Pricklepad is a hardy desert plant that has adapted to the compl
 **Location**
 
 * Biome: [[Desert]]
-* Layer: [[Surface]] tunnels and [[Underground]]
-* Grows on [[node:sand]]
+* Layer: [[Underground]]
+* Grows on [[node:ash]]
 
 **Population**
 
@@ -6047,6 +6090,8 @@ _The Pricklepad disappears immediately upon collection_
 * [[item:pricklepadFruit]] — food and crafting ingredient ⏳
 * [[item:cactusFiber]] — crafting ingredient ⏳
 * [[item:cactusSpine]] — crafting ingredient ⏳
+
+<hr>
 
 **Tips**
 
@@ -6103,11 +6148,11 @@ Underground Bamboo thrives in the humid tunnels and passages of [[Jungle]] biome
   },
   {
     title: 'Oleander',
-    category: ['Plant', 'Forest', 'Desert', 'Jungle', 'Underground'],
+    category: ['Plant', 'Forest', 'Underground'],
     content: `
 **Description**
 
-Oleander is a common shrub found in the underground passages of all three biomes. Its deep purple berries contain potent alkaloids that, when steeped in [[item:sunflowerOil]], produce [[item:oleanderOil]] — a heat-stable cooking oil prized by experienced explorers.
+Oleander is a common shrub found in the underground passages of Forest biome. Its deep purple berries contain potent alkaloids that, when steeped in [[item:sunflowerOil]], produce [[item:oleanderOil]] — a heat-stable cooking oil prized by experienced explorers.
 
 **Tier**
 
@@ -6115,7 +6160,7 @@ Oleander is a common shrub found in the underground passages of all three biomes
 
 **Location**
 
-* Biome: [[Forest]], [[Desert]], [[Jungle]]
+* Biome: mostly [[Forest]] — rare colonies in [[Desert]] and [[Jungle]] where [[node:stone]] intrusions reach the surface
 * Layer: [[Underground]]
 * Grows on [[node:stone]]
 

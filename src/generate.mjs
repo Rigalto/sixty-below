@@ -307,9 +307,9 @@ class WorldGenerator {
     await progress('Puddles')
 
     // 7. Traitement de la surface
-    // ATTENTION : plus d'utilisation de tileGuard à partir de maintenant
     // tileGuard.debug() // DEBUG
-    tileGuard.init()
+    // ATTENTION : plus d'utilisation de tileGuard mais de placedGuard à partir de maintenant
+    placedGuard.init()
     let surfaceLine = worldCarver.buildErodedSurfaceLine()
 
     // 7.1. Ajout des mini-biomes de surface
@@ -342,9 +342,6 @@ class WorldGenerator {
 
     // 8. Traitenents non relatifs aux tuiles
 
-    // A supprimer
-    // worldCarver.debugTraceTunnel()
-
     // 8.1. Ajout des topsoils / natural (forêt et jungle)
 
     // DEBUG — à supprimer après mise au point
@@ -352,7 +349,7 @@ class WorldGenerator {
 
     console.log('[WorldGenerator::liquidFiller] - Sea', (performance.now() - t0).toFixed(3), 'ms')
 
-    // 8.2.1. Coconut - ajoutés avant les coffres, car ils ont peut de place pour pousser
+    // 8.2.1. Coconut - ajoutés avant les coffres, car ils ont peu de place pour pousser
     plantGenerator.placeSeaCoconut(leftBeach.beachRect, surfaceLine, true, guarded)
     plantGenerator.placeSeaCoconut(rightBeach.beachRect, surfaceLine, false, guarded)
     for (const lake of surfaceLakes) {
@@ -386,8 +383,8 @@ class WorldGenerator {
     await progress('Trees')
 
     // 8.3.3. Coral
-    plantGenerator.placeCorals(leftSeaRect, guarded)
-    plantGenerator.placeCorals(rightSeaRect, guarded)
+    plantGenerator.placeCorals(leftSeaRect)
+    plantGenerator.placeCorals(rightSeaRect)
     await progress('Corals')
 
     // 8.3.4. Natural Spreading
@@ -407,10 +404,10 @@ class WorldGenerator {
     plantGenerator.placeCaveMushrooms(mushroomPlants, currentWeather, giantOccupied)
     await progress('Mini-biome Plants')
 
-    plantGenerator.placeMandrakes(zoneRects, chestIndexes)
+    plantGenerator.placeMandrakes(zoneRects)
     plantGenerator.placeCactus(zoneRects, chestRects)
     plantGenerator.placeBamboo(zoneRects, chestIndexes)
-    plantGenerator.placeOleanders(zoneRects, chestIndexes)
+    plantGenerator.placeOleanders(zoneRects)
     await progress('Underground Plants')
 
     plantGenerator.placeSatansCubes(zoneRects, chestIndexes)
@@ -2309,6 +2306,60 @@ class TileGuard {
 }
 
 export const tileGuard = new TileGuard()
+
+/* ====================================================================================================
+   GUARD DES OBJETS PLACÉS (MEUBLES, PLANTES...)
+   ==================================================================================================== */
+
+class PlacedGuard {
+  #tiles
+
+  constructor () {
+    this.#tiles = new Set()
+  }
+
+  /**
+   * Vide la liste des tuiles occupées.
+   * À appeler depuis generate() juste avant le premier placement d'objet (meubles, plantes...).
+   */
+  init () {
+    this.#tiles.clear()
+  }
+
+  /**
+   * Teste si une tuile est occupée.
+   * @param {number} index
+   * @returns {boolean}
+   */
+  has (index) {
+    return this.#tiles.has(index)
+  }
+
+  /**
+   * Réserve une tuile.
+   * @param {number} index
+   */
+  add (index) {
+    this.#tiles.add(index)
+  }
+
+  /**
+   * Réserve toutes les tuiles d'un rectangle.
+   * @param {number} x1
+   * @param {number} y1
+   * @param {number} x2
+   * @param {number} y2
+   */
+  addRect (x1, y1, x2, y2) {
+    for (let y = y1; y <= y2; y++) {
+      for (let x = x1; x <= x2; x++) {
+        this.#tiles.add((y << 10) | x)
+      }
+    }
+  }
+}
+
+export const placedGuard = new PlacedGuard()
 
 /* ====================================================================================================
    CREUSEMENT DE TUNNELS ET DE CAVERNES DANS LE MONDE
@@ -6681,7 +6732,7 @@ class FurnitureGenerator {
       const cy = seededRNG.randomGetMinMax(seaRect.y1 + 1, seaRect.y2 - 2)
 
       if (worldBuffer.read(cx, cy) !== SEA) continue
-      if (tileGuard.has((cy << 10) | cx)) continue
+      if (placedGuard.has((cy << 10) | cx)) continue
 
       // Descendre jusqu'à la première tuile non SEA
       let y = cy
@@ -6693,15 +6744,15 @@ class FurnitureGenerator {
       const canRight = worldBuffer.read(cx + 1, y) !== SEA &&
                      worldBuffer.read(cx + 1, y - 1) === SEA &&
                      worldBuffer.read(cx + 1, y - 2) === SEA &&
-                     !tileGuard.has(((y - 1) << 10) | cx) &&
-                     !tileGuard.has(((y - 1) << 10) | (cx + 1))
+                     !placedGuard.has(((y - 1) << 10) | cx) &&
+                     !placedGuard.has(((y - 1) << 10) | (cx + 1))
 
       // Tester placement à gauche : cx et cx-1, tuiles au-dessus SEA
       const canLeft = worldBuffer.read(cx - 1, y) !== SEA &&
                      worldBuffer.read(cx - 1, y - 1) === SEA &&
                      worldBuffer.read(cx - 1, y - 2) === SEA &&
-                     !tileGuard.has(((y - 1) << 10) | cx) &&
-                     !tileGuard.has(((y - 1) << 10) | (cx - 1))
+                     !placedGuard.has(((y - 1) << 10) | cx) &&
+                     !placedGuard.has(((y - 1) << 10) | (cx - 1))
 
       if (!canLeft && !canRight) continue
 
@@ -6709,7 +6760,7 @@ class FurnitureGenerator {
       const chestX = goLeft ? cx - 1 : cx
 
       const chest = this.addFurnitureAt(((y - 2) << 10) | chestX, 'oceanChest')
-      tileGuard.addRect(chestX, y - 2, chestX + 1, y - 1)
+      placedGuard.addRect(chestX, y - 2, chestX + 1, y - 1)
 
       this.fillChest(chest)
       placed++
@@ -6745,7 +6796,7 @@ class FurnitureGenerator {
         const cy = seededRNG.randomGetMinMax(rect.yUnder + 1, rect.yCaverns - 2)
 
         if (worldBuffer.read(cx, cy) !== VOID) continue
-        if (tileGuard.has((cy << 10) | cx)) continue
+        if (placedGuard.has((cy << 10) | cx)) continue
 
         // Descendre jusqu'à la première tuile non VOID
         let y = cy
@@ -6759,16 +6810,16 @@ class FurnitureGenerator {
                        !LIQUIDS.has(worldBuffer.read(cx + 1, y)) &&
                        worldBuffer.read(cx + 1, y - 1) === VOID &&
                        worldBuffer.read(cx + 1, y - 2) === VOID &&
-                       !tileGuard.has(((y - 1) << 10) | cx) &&
-                       !tileGuard.has(((y - 1) << 10) | (cx + 1))
+                       !placedGuard.has(((y - 1) << 10) | cx) &&
+                       !placedGuard.has(((y - 1) << 10) | (cx + 1))
 
         // Tester placement à gauche
         const canLeft = worldBuffer.read(cx - 1, y) !== VOID &&
                        !LIQUIDS.has(worldBuffer.read(cx - 1, y)) &&
                        worldBuffer.read(cx - 1, y - 1) === VOID &&
                        worldBuffer.read(cx - 1, y - 2) === VOID &&
-                      !tileGuard.has(((y - 1) << 10) | cx) &&
-                      !tileGuard.has(((y - 1) << 10) | (cx - 1))
+                      !placedGuard.has(((y - 1) << 10) | cx) &&
+                      !placedGuard.has(((y - 1) << 10) | (cx - 1))
 
         if (!canLeft && !canRight) continue
 
@@ -6780,7 +6831,7 @@ class FurnitureGenerator {
         chestIndexes.add(chestIndex + 1) // coffre occupe 2 tuiles de large
         chestRects.push({x: chestX, y: y - 2, w: 2, h: 2})
         const chest = this.addFurnitureAt(chestIndex, chestType)
-        tileGuard.addRect(chestX, y - 2, chestX + 1, y - 1)
+        placedGuard.addRect(chestX, y - 2, chestX + 1, y - 1)
 
         this.fillChest(chest)
         placed++
@@ -6818,7 +6869,7 @@ class FurnitureGenerator {
         const cy = seededRNG.randomGetMinMax(rect.ySurface + 1, rect.yUnder - 2)
 
         if (worldBuffer.read(cx, cy) !== VOID) continue
-        if (tileGuard.has((cy << 10) | cx)) continue
+        if (placedGuard.has((cy << 10) | cx)) continue
 
         // Descendre jusqu'à la première tuile non VOID
         let y = cy
@@ -6832,16 +6883,16 @@ class FurnitureGenerator {
                        !LIQUIDS.has(worldBuffer.read(cx + 1, y)) &&
                        worldBuffer.read(cx + 1, y - 1) === VOID &&
                        worldBuffer.read(cx + 1, y - 2) === VOID &&
-                       !tileGuard.has(((y - 1) << 10) | cx) &&
-                       !tileGuard.has(((y - 1) << 10) | (cx + 1))
+                       !placedGuard.has(((y - 1) << 10) | cx) &&
+                       !placedGuard.has(((y - 1) << 10) | (cx + 1))
 
         // Tester placement à gauche
         const canLeft = worldBuffer.read(cx - 1, y) !== VOID &&
                        !LIQUIDS.has(worldBuffer.read(cx - 1, y)) &&
                        worldBuffer.read(cx - 1, y - 1) === VOID &&
                        worldBuffer.read(cx - 1, y - 2) === VOID &&
-                       !tileGuard.has(((y - 1) << 10) | cx) &&
-                       !tileGuard.has(((y - 1) << 10) | (cx - 1))
+                       !placedGuard.has(((y - 1) << 10) | cx) &&
+                       !placedGuard.has(((y - 1) << 10) | (cx - 1))
 
         if (!canLeft && !canRight) continue
 
@@ -6853,7 +6904,7 @@ class FurnitureGenerator {
         chestIndexes.add(chestIndex + 1) // coffre occupe 2 tuiles de large
         chestRects.push({x: chestX, y: y - 2, w: 2, h: 2})
         const chest = this.addFurnitureAt(chestIndex, chestType)
-        tileGuard.addRect(chestX, y - 2, chestX + 1, y - 1)
+        placedGuard.addRect(chestX, y - 2, chestX + 1, y - 1)
 
         this.fillChest(chest)
         placed++
@@ -6887,10 +6938,10 @@ class FurnitureGenerator {
 
       for (let attempts = 0; attempts < MAX_ATTEMPTS && placed < count; attempts++) {
         const cx = seededRNG.randomGetMinMax(rect.x0 + 1, rect.x1 - 2)
-        const cy = seededRNG.randomGetMinMax(rect.skySurface + 1, rect.ySurface - 2)
+        const cy = seededRNG.randomGetMinMax(rect.ySkySurface + 1, rect.ySurface - 2)
 
         if (worldBuffer.read(cx, cy) !== VOID) continue
-        if (tileGuard.has((cy << 10) | cx)) continue
+        if (placedGuard.has((cy << 10) | cx)) continue
 
         // Descendre jusqu'à la première tuile non VOID
         let y = cy
@@ -6904,16 +6955,16 @@ class FurnitureGenerator {
                        !LIQUIDS.has(worldBuffer.read(cx + 1, y)) &&
                        worldBuffer.read(cx + 1, y - 1) === VOID &&
                        worldBuffer.read(cx + 1, y - 2) === VOID &&
-                       !tileGuard.has(((y - 1) << 10) | cx) &&
-                       !tileGuard.has(((y - 1) << 10) | (cx + 1))
+                       !placedGuard.has(((y - 1) << 10) | cx) &&
+                       !placedGuard.has(((y - 1) << 10) | (cx + 1))
 
         // Tester placement à gauche
         const canLeft = worldBuffer.read(cx - 1, y) !== VOID &&
                        !LIQUIDS.has(worldBuffer.read(cx - 1, y)) &&
                        worldBuffer.read(cx - 1, y - 1) === VOID &&
                        worldBuffer.read(cx - 1, y - 2) === VOID &&
-                      !tileGuard.has(((y - 1) << 10) | cx) &&
-                      !tileGuard.has(((y - 1) << 10) | (cx - 1))
+                      !placedGuard.has(((y - 1) << 10) | cx) &&
+                      !placedGuard.has(((y - 1) << 10) | (cx - 1))
 
         if (!canLeft && !canRight) continue
 
@@ -6925,7 +6976,7 @@ class FurnitureGenerator {
         chestIndexes.add(chestIndex + 1) // coffre occupe 2 tuiles de large
         chestRects.push({x: chestX, y: y - 2, w: 2, h: 2})
         const chest = this.addFurnitureAt(chestIndex, chestType)
-        tileGuard.addRect(chestX, y - 2, chestX + 1, y - 1)
+        placedGuard.addRect(chestX, y - 2, chestX + 1, y - 1)
 
         this.fillChest(chest)
         placed++
@@ -7389,9 +7440,8 @@ class PlantGenerator {
    * après épuisement des tentatives sont comblés par des records dormants (bloom=false) — c'est
    * ce total qui fixe la population maximale de coraux pour cette mer, jamais recréée en session.
    * @param {{x1, y1, x2, y2}} seaRect — rectangle englobant la mer
-   * @param {Set<number>} guarded — colonnes protégées (modifié en place)
    */
-  placeCorals (seaRect, guarded) {
+  placeCorals (seaRect) {
     const SEA = NODES.SEA.code
     const SAND = NODES.SAND.code
     const W = WORLD_WIDTH
@@ -7418,20 +7468,26 @@ class PlantGenerator {
       if (worldBuffer.read(cx, y) !== SAND) continue
 
       // Tester placement à droite
-      const canRight = !guarded.has(cx) && !guarded.has(cx + 1) &&
-                     worldBuffer.read(cx + 1, y) === SAND &&
+      const canRight = worldBuffer.read(cx + 1, y) === SAND &&
                      worldBuffer.read(cx, y - 1) === SEA &&
                      worldBuffer.read(cx + 1, y - 1) === SEA &&
                      worldBuffer.read(cx, y - 2) === SEA &&
-                     worldBuffer.read(cx + 1, y - 2) === SEA
+                     worldBuffer.read(cx + 1, y - 2) === SEA &&
+                     !placedGuard.has(((y - 1) << 10) | cx) &&
+                     !placedGuard.has(((y - 1) << 10) | (cx + 1)) &&
+                     !placedGuard.has(((y - 2) << 10) | cx) &&
+                     !placedGuard.has(((y - 2) << 10) | (cx + 1))
 
       // Tester placement à gauche
-      const canLeft = !guarded.has(cx) && !guarded.has(cx - 1) &&
-                     worldBuffer.read(cx - 1, y) === SAND &&
+      const canLeft = worldBuffer.read(cx - 1, y) === SAND &&
                      worldBuffer.read(cx, y - 1) === SEA &&
                      worldBuffer.read(cx - 1, y - 1) === SEA &&
                      worldBuffer.read(cx, y - 2) === SEA &&
-                     worldBuffer.read(cx - 1, y - 2) === SEA
+                     worldBuffer.read(cx - 1, y - 2) === SEA &&
+                     !placedGuard.has(((y - 1) << 10) | cx) &&
+                     !placedGuard.has(((y - 1) << 10) | (cx - 1)) &&
+                     !placedGuard.has(((y - 2) << 10) | cx) &&
+                     !placedGuard.has(((y - 2) << 10) | (cx - 1))
 
       if (!canLeft && !canRight) continue
 
@@ -7440,8 +7496,7 @@ class PlantGenerator {
       const soilIndex = (y << 10) | coralX
       const {type, itemId} = seededRNG.randomGetArrayValue(CORAL_TYPES)
 
-      guarded.add(coralX)
-      guarded.add(coralX + 1)
+      placedGuard.addRect(coralX, y - 2, coralX + 1, y - 1)
 
       this.#plants.push({
         id: uniqueIdGenerator.getUniqueId(),
@@ -8173,25 +8228,25 @@ class PlantGenerator {
   }
 
   /**
-   * Place les Mandrakes dans les layers surface et under du biome Forest.
-   * Substrat : DIRT avec VOID en y-1, y-2, y-3.
+   * Place les Mandrakes dans la layer underground de tous les biomes.
+   * Substrat : 2 tuiles de LIMESTONE à la même hauteur (cx et cx+1).
+   * VOID requis sur les 2x2 tuiles occupées (y-1 et y-2, cx et cx+1).
    * Nombre constant défini par MANDRAKE_COUNT.
    * Arrêt après MAX_ATTEMPTS tirages infructueux consécutifs.
+   * Respecte et alimente placedGuard (anti-coffre + anti-chevauchement avec toute autre entité
+   * placée, pas seulement les autres Mandrakes).
    *
-   * @param {Array<{x0, x1, ySurface, yUnder, yCaverns, biome}>} zoneRects
-   * @param {Set<number>} chestIndexes — index interdits (coffres)
+   * @param {Array<{x0, x1, ySkySurface, ySurface, yUnder, yCaverns, biome}>} zoneRects
    */
-  placeMandrakes (zoneRects, chestIndexes) {
+  placeMandrakes (zoneRects) {
     const VOID = NODES.VOID.code
-    const DIRT = NODES.DIRT.code
+    const LIMESTONE = NODES.LIMESTONE.code
     const W = WORLD_WIDTH
     const MAX_ATTEMPTS = 100
 
-    // Collecter les rectangles Forest surface + under
     const rects = []
     for (const rect of zoneRects) {
-      if (rect.biome !== BIOME_TYPE.FOREST) continue
-      rects.push({x0: rect.x0, x1: rect.x1, y0: rect.ySkySurface, y1: rect.yUnder})
+      rects.push({x0: rect.x0, x1: rect.x1, y0: rect.ySurface, y1: rect.yUnder})
     }
     if (rects.length === 0) return
 
@@ -8200,8 +8255,8 @@ class PlantGenerator {
 
     while (placed < MANDRAKE_COUNT && consecutiveFailures < MAX_ATTEMPTS) {
       const rect = seededRNG.randomGetArrayValue(rects)
-      const cx = seededRNG.randomGetMinMax(rect.x0 + 1, rect.x1 - 1)
-      const cy = seededRNG.randomGetMinMax(rect.y0 + 2, rect.y1 - 1)
+      const cx = seededRNG.randomGetMinMax(rect.x0 + 1, rect.x1 - 2)
+      const cy = seededRNG.randomGetMinMax(rect.y0 + 1, rect.y1 - 1)
 
       if (worldBuffer.read(cx, cy) !== VOID) { consecutiveFailures++; continue }
 
@@ -8209,34 +8264,42 @@ class PlantGenerator {
       let y = cy
       while (y < rect.y1 && worldBuffer.read(cx, y) === VOID) y++
 
-      if (worldBuffer.read(cx, y) !== DIRT) { consecutiveFailures++; continue }
+      // Deux tuiles LIMESTONE à la même hauteur
+      if (worldBuffer.read(cx, y) !== LIMESTONE) { consecutiveFailures++; continue }
+      if (worldBuffer.read(cx + 1, y) !== LIMESTONE) { consecutiveFailures++; continue }
 
-      // Vérifier VOID en y-1, y-2, y-3
-      if (worldBuffer.read(cx, y - 1) !== VOID) { consecutiveFailures++; continue }
-      if (worldBuffer.read(cx, y - 2) !== VOID) { consecutiveFailures++; continue }
-      if (worldBuffer.read(cx, y - 3) !== VOID) { consecutiveFailures++; continue }
-
-      const soilIndex = (y << 10) | cx
-      if (chestIndexes.has(soilIndex)) { consecutiveFailures++; continue }
+      // VOID + non réservé sur les 2x2 tuiles occupées par le sprite (y-1, y-2 × cx, cx+1)
+      let canPlace = true
+      for (let dx = 0; dx <= 1 && canPlace; dx++) {
+        for (let dy = 1; dy <= 2 && canPlace; dy++) {
+          if (worldBuffer.read(cx + dx, y - dy) !== VOID) canPlace = false
+          if (placedGuard.has(((y - dy) << 10) | (cx + dx))) canPlace = false
+        }
+      }
+      if (!canPlace) { consecutiveFailures++; continue }
 
       consecutiveFailures = 0
+      placedGuard.addRect(cx, y - 2, cx + 1, y - 1)
+
+      const soilIndex = (y << 10) | cx
 
       this.#plants.push({
         id: uniqueIdGenerator.getUniqueId(),
         kind: PLANT_KIND.HERB,
         type: PLANT_TYPE.MANDRAKE,
-        index: soilIndex - 3 * W,
+        index: soilIndex - 2 * W,
         soilIndex,
         itemId: 'mandrake',
-        w: 1,
-        h: 3,
+        w: 2,
+        h: 2,
         x: cx,
-        y: y - 3,
+        y: y - 2,
         present: true,
         deleted: false
       })
       placed++
     }
+    if (IS_DEV) console.log(`   🔹 Mandrakes : ${placed}`)
   }
 
   /**
@@ -8408,12 +8471,12 @@ class PlantGenerator {
    * Substrat : STONE avec VOID sur les 3 tuiles au-dessus.
    * Nombre constant défini par OLEANDER_COUNT.
    * Arrêt après MAX_ATTEMPTS tirages infructueux consécutifs.
-   * Anti-coffre : test sur chestIndexes pour la tuile support.
+   * Respecte et alimente placedGuard (anti-coffre + anti-chevauchement avec toute autre entité
+   * placée, pas seulement les autres Oleanders).
    *
    * @param {Array<{x0, x1, ySkySurface, ySurface, yUnder, yCaverns, biome}>} zoneRects
-   * @param {Set<number>} chestIndexes — index interdits (coffres)
    */
-  placeOleanders (zoneRects, chestIndexes) {
+  placeOleanders (zoneRects) {
     const VOID = NODES.VOID.code
     const STONE = NODES.STONE.code
     const W = WORLD_WIDTH
@@ -8425,7 +8488,6 @@ class PlantGenerator {
     }
     if (rects.length === 0) return
 
-    const occupiedIndexes = new Set() // soilIndex déjà pris par un oleander placé
     let placed = 0
     let consecutiveFailures = 0
 
@@ -8436,25 +8498,24 @@ class PlantGenerator {
 
       if (worldBuffer.read(cx, cy) !== VOID) { consecutiveFailures++; continue }
 
-      // Descendre jusqu'à la première tuile non VOID dans le rectangle
       let y = cy
       while (y < rect.y1 && worldBuffer.read(cx, y) === VOID) y++
 
       if (worldBuffer.read(cx, y) !== STONE) { consecutiveFailures++; continue }
 
-      // Pocket VOID 1x3 au-dessu de cx
       const canPlace = worldBuffer.read(cx, y - 1) === VOID &&
                         worldBuffer.read(cx, y - 2) === VOID &&
-                        worldBuffer.read(cx, y - 3) === VOID
+                        worldBuffer.read(cx, y - 3) === VOID &&
+                        !placedGuard.has(((y - 1) << 10) | cx) &&
+                        !placedGuard.has(((y - 2) << 10) | cx) &&
+                        !placedGuard.has(((y - 3) << 10) | cx)
 
       if (!canPlace) { consecutiveFailures++; continue }
 
-      const soilIndex = (y << 10) | cx
-      if (chestIndexes.has(soilIndex)) { consecutiveFailures++; continue }
-      if (occupiedIndexes.has(soilIndex)) { consecutiveFailures++; continue }
-
       consecutiveFailures = 0
-      occupiedIndexes.add(soilIndex)
+      placedGuard.addRect(cx, y - 3, cx, y - 1)
+
+      const soilIndex = (y << 10) | cx
 
       this.#plants.push({
         id: uniqueIdGenerator.getUniqueId(),
