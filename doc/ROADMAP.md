@@ -9,7 +9,7 @@
 
 ### Code et tests
 
-- Implémenter les herbes, reste : Mandrake, Pricklepad, Bamboo, Satan's Cube, Sneakthorn, Cursedcrown, Abysshorn, InfernCap
+- Implémenter les herbes, reste : Mandrake (en cours), Pricklepad, Bamboo, Satan's Cube, Sneakthorn, Cursedcrown, Abysshorn, InfernCap
 - Implémenter les plants des mini-biomes, reste : fern Cave, Mushroom Cave
 - Implémenter les Giant Mushrooms.
 - Implémenter la réduction de vitesse dans les liquides ou les cobweb.
@@ -28,7 +28,6 @@
 
 ### Images, sons et aide en ligne
 
-- Les icones des buckets placed devrait faire 16*16 pixels.
 - corriger les icones dans weapon_32_32 : dague, épée, bow, boomrang
 - corriger les icones dans tool_32_32 : hache, pickaxe, hammer, axe
 - continuer la correction et l'ajout de fiches d'aide (`HELP`) et d'items (`ITEMS`)

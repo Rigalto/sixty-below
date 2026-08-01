@@ -751,7 +751,7 @@ class HandedToolManager {
     if (slot.item === '') { this.#image = null; return }
     const item = ITEMS[slot.item]
     if (item.type & ITEM_TYPE.TOOL) { this.#image = item.placed ?? null; this.#isTool = true; return }
-    if (!(item.type & ITEM_TYPE.PLACABLE)) { this.#image = null; return }
+    if (!(item.type & (ITEM_TYPE.PLACABLE | ITEM_TYPE.POURABLE))) { this.#image = null; return }
     this.#image = item.image
     this.#isTool = false
   }
