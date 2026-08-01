@@ -1,5 +1,6 @@
 // ecosystem.mjs — FloraManager - OakSystem - MahoganySystem - CoconutSystem - ThornspineSystem
-// SunflowerSystem - OleanderSystem - ParsnipSystem - AmbermirageSystem - CobwebSystem - HiveSystem
+// SunflowerSystem - OleanderSystem - MandrakeSystem - ParsnipSystem - AmbermirageSystem
+// CobwebSystem - HiveSystem
 // SpreadForestSystem - SpreadJungleSystem - CoralSystem - BloodmoonSystem
 // SampleSystem
 
@@ -1364,7 +1365,6 @@ class OleanderSystem {
       addToByChunk(this.#byChunk, record)
       this.#bySoil.set(record.soilIndex, record)
 
-      // this.#bySoil.set(record.soilIndex, record)
       blockedTiles.blockPlacement(record.index)
       blockedTiles.blockPlacement(record.index + WORLD_WIDTH)
       blockedTiles.blockPlacement(record.index + 2 * WORLD_WIDTH)
@@ -1550,6 +1550,139 @@ class OleanderSystem {
   }
 }
 export const oleanderSystem = new OleanderSystem()
+
+/* ====================================================================================================
+   MANDRAKE SYSTEM
+   ====================================================================================================
+
+   Singleton : mandrakeSystem.
+
+   Population constante : #list reçoit en une fois (init) le tableau complet des mandrakes,
+   taille fixe jamais réallouée (pas de GC). Un record present=false signale un slot à faire
+   repousser ailleurs — mis en #regrowQueue, vidée par microtâche (contenu à définir).
+
+   ==================================================================================================== */
+
+class MandrakeSystem {
+  byTile = new Map() // Map<tileIndex, record> — public : membership O(1) + lookup record
+  #list = [] // record[] — population fixe, référence affectée dans init(records)
+  #byChunk = new Map() // Map<chunkKey, Set> — lookup spatial pour onPreloadChunksChanged
+  #bySoil = new Map() // Map<soilIndex, record> — mandrakes présents : détection retrait du sol (2 entrées/record, sol sur 2 tuiles)
+  #displayed = new Set() // Set<record> — cible du render (chunks preload uniquement)
+  #regrowQueue = [] // record[] — records present=false en attente d'un nouvel emplacement
+  #image = null // image à afficher (mise en cache)
+
+  constructor () {
+    // eventBus
+    this.onFirstLoopMandrake = this.onFirstLoopMandrake.bind(this)
+    eventBus.on('time/first-loop', this.onFirstLoopMandrake)
+    this.onTileChangedMandrake = this.onTileChangedMandrake.bind(this)
+    eventBus.on('world/tile-changed', this.onTileChangedMandrake)
+    // micro-tâches
+    this.mandrakeRegrow = this.mandrakeRegrow.bind(this)
+  }
+
+  /**
+   * Réinitialise toutes les structures.
+   * Appelé en début de session, avant toute hydratation.
+   */
+  init () {
+    this.byTile.clear()
+    this.#list.length = 0
+    this.#byChunk.clear()
+    this.#bySoil.clear()
+    this.#displayed.clear()
+    this.#regrowQueue.length = 0
+
+    this.#image = ITEMS.mandrake.placed // après hydratation
+  }
+
+  /**
+   * Enregistre un mandrake et peuple les structures internes.
+   * Si present=false, met le record en file de repousse.
+   * @param {object} record — record HERB/MANDRAKE (deleted=false garanti par l'appelant)
+   */
+  initPlant (record) {
+    this.#list.push(record)
+
+    if (record.present) {
+      addToByTile(this.byTile, record)
+      addToByChunk(this.#byChunk, record)
+      this.#bySoil.set(record.soilIndex, record)
+      this.#bySoil.set(record.soilIndex + 1, record) // sol sur 2 tuiles (cx, cx+1)
+
+      blockedTiles.blockPlacementRect(record.x, record.y, record.w, record.h)
+      return
+    }
+    this.#regrowQueue.push(record)
+  }
+
+  /**
+   * Reconstruit #displayed depuis les chunks preload de la caméra.
+   * @param {Set<number>} preloadChunks
+   */
+  onPreloadChunksChanged (preloadChunks) {
+    buildDisplayed(this.#displayed, this.#byChunk, preloadChunks)
+  }
+
+  /**
+   * Dessine les mandrakes visibles et présents sur le contexte transformé.
+   * @param {CanvasRenderingContext2D} ctx — contexte déjà transformé (caméra appliquée)
+   */
+  render (ctx) {
+    const img = this.#image
+    for (const record of this.#displayed) {
+      const pxX = (record.index & 0x3FF) << 4
+      const pxY = ((record.index >> 10) << 4) + 2
+      ctx.drawImage(IMAGE_CACHE[img.imgIndex], img.sx, img.sy, img.sw, img.sh, pxX, pxY, img.sw, img.sh)
+    }
+  }
+
+  /**
+   * Retourne le record de mandrake couvrant la tuile donnée, ou null.
+   * @param {number} tileIndex — (y << 10) | x
+   * @returns {object|null}
+   */
+  getPlantAt (tileIndex) {
+    return this.byTile.get(tileIndex) ?? null
+  }
+
+  /**
+   * Indique si le record est actuellement présent (forageable).
+   * @param {object} record
+   * @returns {boolean}
+   */
+  isPresent (record) { return record.present }
+
+  /**
+   * TODO — Liaison EventBus : 'time/first-loop'. Déclenchera la microtâche de repousse si
+   * #regrowQueue contient des records present=false chargés depuis la persistence
+   * (cf. OleanderSystem.onFirstLoopOleander).
+   */
+  onFirstLoopMandrake () {
+    // TODO
+  }
+
+  /**
+   * TODO — Microtâche de repousse (cf. OleanderSystem.oleanderRegrow) : recherche d'un
+   * nouvel emplacement (2 LIMESTONE à la même hauteur, VOID 2x2 au-dessus, tileGuarded)
+   * pour chaque record de #regrowQueue.
+   */
+  mandrakeRegrow () {
+    // TODO
+  }
+
+  /**
+   * TODO — Liaison EventBus : 'world/tile-changed'. Détruira le mandrake présent si une des
+   * 4 tuiles VOID du sprite n'est plus libre, ou si l'une des 2 tuiles sol n'est plus
+   * LIMESTONE.
+   * @param {{tileIndex: number, tileOldCode: number, tileNewCode: number}} payload
+   */
+  onTileChangedMandrake ({tileIndex, tileOldCode, tileNewCode}) {
+    // TODO
+  }
+}
+export const mandrakeSystem = new MandrakeSystem()
 
 /* ====================================================================================================
    PARSNIP SYSTEM

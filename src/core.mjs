@@ -17,7 +17,7 @@ import {furnitureManager, teleporterManager} from './housing.mjs'
 import {craftOverlay} from './craft.mjs'
 import {achievementManager} from './achievement.mjs'
 import {playerManager, lootPopupManager, handedToolManager, hotbarOverlay} from './player.mjs'
-import {floraManager, sunflowerSystem, oleanderSystem, parsnipSystem, ambermirageSystem, oakSystem, mahoganySystem, cobwebSystem, coconutSystem, thornspineSystem, spreadForestSystem, spreadJungleSystem, coralSystem, bloodmoonSystem} from './ecosystem.mjs'
+import {floraManager, sunflowerSystem, oleanderSystem, mandrakeSystem, parsnipSystem, ambermirageSystem, oakSystem, mahoganySystem, cobwebSystem, coconutSystem, thornspineSystem, spreadForestSystem, spreadJungleSystem, coralSystem, bloodmoonSystem} from './ecosystem.mjs'
 import {ACHIEVEMENT_CATEGORIES} from '../assets/data/data-achievement.mjs'
 import {miningManager, placingManager, foragingManager, choppingManager, sowingManager, hammingManager, furnishingManager, fillingManager, pouringManager, decomposerManager} from './action.mjs'
 import './combat.mjs'
@@ -29,13 +29,13 @@ const plantSystemLookup = [ // Map<kind*100+type, system> — peuplée au fur et
   [PLANT_KIND.TREE * 100 + PLANT_TYPE.MAHOGANY, mahoganySystem],
   [PLANT_KIND.TREE * 100 + PLANT_TYPE.COCONUT, coconutSystem],
   [PLANT_KIND.TREE * 100 + PLANT_TYPE.THORNSPINE, thornspineSystem],
-  //   [PLANT_KIND.TREE * 100 + PLANT_TYPE.GIANT_MUSHROOM, treeSystem],
+  //   [PLANT_KIND.TREE * 100 + PLANT_TYPE.GIANT_MUSHROOM, giantMushroomSystem],
   [PLANT_KIND.MUSHROOM * 100 + PLANT_TYPE.BOLETE, oakSystem],
   [PLANT_KIND.MUSHROOM * 100 + PLANT_TYPE.PINKMYCENIA, mahoganySystem],
   //   [PLANT_KIND.MUSHROOM * 100 + PLANT_TYPE.FROSTCAP, capystem],
   //   [PLANT_KIND.MUSHROOM * 100 + PLANT_TYPE.DAWNCAP, capystem],
   [PLANT_KIND.HERB * 100 + PLANT_TYPE.OLEANDER, oleanderSystem],
-  //   [PLANT_KIND.HERB * 100 + PLANT_TYPE.BLINKROOT, blinkrootSystem],
+  [PLANT_KIND.HERB * 100 + PLANT_TYPE.MANDRAKE, mandrakeSystem],
   [PLANT_KIND.HERB * 100 + PLANT_TYPE.PARSNIP, parsnipSystem],
   [PLANT_KIND.HERB * 100 + PLANT_TYPE.SUNFLOWER, sunflowerSystem],
   //   [PLANT_KIND.HERB * 100 + PLANT_TYPE.FIREBLOSSOM, fireblossomSystem],
@@ -57,7 +57,7 @@ const plantSystemLookup = [ // Map<kind*100+type, system> — peuplée au fur et
   //   [PLANT_KIND.SPREAD * 100 + PLANT_TYPE.NONE, spreadSystem],
   //   [PLANT_KIND.SEED * 100 + PLANT_TYPE.NONE, seedSystem]
 ]
-const allPlantSystems = [sunflowerSystem, oleanderSystem, parsnipSystem, ambermirageSystem, oakSystem, mahoganySystem, coconutSystem, thornspineSystem, spreadForestSystem, spreadJungleSystem, coralSystem, bloodmoonSystem]
+const allPlantSystems = [sunflowerSystem, oleanderSystem, parsnipSystem, ambermirageSystem, oakSystem, mahoganySystem, coconutSystem, thornspineSystem, spreadForestSystem, spreadJungleSystem, coralSystem, bloodmoonSystem, mandrakeSystem]
 
 const debugHUD = () => {
   const debugDiv = document.createElement('div')

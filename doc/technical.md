@@ -943,7 +943,7 @@ Les enregistrements sont de natures très différentes, nature déterminée par 
   * `soilIndex` : position de la tuile solide sous le champignon (`index + h * 1024` avec `h=2`)
   * `present` : booléen indiquant si un champignon est présent (`true`) ou non sur le spot de champignon
   * _Visibilité pilotée globalement par l'heure in-game — les champignons d'un même type apparaissent et disparaissent simultanément. La nature de la tuile est vérifiée dynamiquement avant la pousse._
-* `kind` HERB : liste des spots d'herbes (Parsnip, Sunflower) ou des herbes présentes dans le monde (Blinkroot, Coral, Parsnip, Sunflower, Fireblossom, Oleander, Skorn, Ambermirage)
+* `kind` HERB : liste des spots d'herbes (Parsnip, Sunflower) ou des herbes présentes dans le monde (Mandrake, Coral, Parsnip, Sunflower, Fireblossom, Oleander, Skorn, Ambermirage)
   * `id` : identifiant unique de l'herbe
   * `ìtemId` : identifiant de l'item correspondant à l'herbe
   * `index` : position de l'herbe (coin haut gauche de l'image)
