@@ -45,7 +45,7 @@
   - 6,0 - 7,0
   - 0,1 - 1,1, - 5,1
 - Images des coffres.
-- Fiche aide : Corals
+- Fiche aide : Parnsnip (texte en français)
 
 ---
 

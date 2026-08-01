@@ -5970,19 +5970,30 @@ The Mandrake is a root plant found in the tunnels and underground passages of [[
 * The species neither grows nor declines — natural balance maintains the population
 * Harvested Mandrakes do not regrow
 
-**Harvest**
+<hr>
 
-* [[Foraging|Interact to harvest]] — the plant disappears permanently on harvest
-* Tool: [[Foraging Tools|Silver Sickle]] or better ⏳
-* Loot: [[item:mandrakeRoot]]
+**Foraging Mandrake**
+
+* [[Foraging|Interact to harvest]]
+* The plant disappears on harvest
+
+Foraging Tool: <<itemStar|sickleSilver>> or better
+
+**Mandrake Foraging Loot**
+
+<<itemLootTable|mandrake|foraging>>
 
 **Dangers**
 
 * Uprooting a Mandrake releases a piercing scream that attracts a [[monster:wraith]] from the surrounding darkness. ⏳
 
+<hr>
+
 **Usages** ⏳
 
 * [[item:mandrakeRoot]] — crafting ingredient ⏳
+
+<hr>
 
 **Tips**
 
