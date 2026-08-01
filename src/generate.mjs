@@ -8229,12 +8229,13 @@ class PlantGenerator {
 
   /**
    * Place les Mandrakes dans la layer underground de tous les biomes.
-   * Substrat : 2 tuiles de LIMESTONE à la même hauteur (cx et cx+1).
-   * VOID requis sur les 2x2 tuiles occupées (y-1 et y-2, cx et cx+1).
+   * Substrat : tuile LIMESTONE en cx (ancre), avec un second support LIMESTONE adjacent
+   * testé à droite (cx+1) puis à gauche (cx-1) ; 50/50 si les deux sont valides.
+   * VOID requis sur les 2x2 tuiles occupées par le sprite (y-1 et y-2, sur les 2 colonnes retenues).
    * Nombre constant défini par MANDRAKE_COUNT.
    * Arrêt après MAX_ATTEMPTS tirages infructueux consécutifs.
    * Respecte et alimente placedGuard (anti-coffre + anti-chevauchement avec toute autre entité
-   * placée, pas seulement les autres Mandrakes).
+   * placée).
    *
    * @param {Array<{x0, x1, ySkySurface, ySurface, yUnder, yCaverns, biome}>} zoneRects
    */
@@ -8242,7 +8243,7 @@ class PlantGenerator {
     const VOID = NODES.VOID.code
     const LIMESTONE = NODES.LIMESTONE.code
     const W = WORLD_WIDTH
-    const MAX_ATTEMPTS = 100
+    const MAX_ATTEMPTS = 200
 
     const rects = []
     for (const rect of zoneRects) {
@@ -8255,7 +8256,7 @@ class PlantGenerator {
 
     while (placed < MANDRAKE_COUNT && consecutiveFailures < MAX_ATTEMPTS) {
       const rect = seededRNG.randomGetArrayValue(rects)
-      const cx = seededRNG.randomGetMinMax(rect.x0 + 1, rect.x1 - 2)
+      const cx = seededRNG.randomGetMinMax(rect.x0 + 1, rect.x1 - 1)
       const cy = seededRNG.randomGetMinMax(rect.y0 + 1, rect.y1 - 1)
 
       if (worldBuffer.read(cx, cy) !== VOID) { consecutiveFailures++; continue }
@@ -8265,23 +8266,33 @@ class PlantGenerator {
       while (y < rect.y1 && worldBuffer.read(cx, y) === VOID) y++
 
       // Deux tuiles LIMESTONE à la même hauteur
-      if (worldBuffer.read(cx, y) !== LIMESTONE) { consecutiveFailures++; continue }
-      if (worldBuffer.read(cx + 1, y) !== LIMESTONE) { consecutiveFailures++; continue }
+      // 1) Ancre : deux tuiles VOID au-dessus, non réservées
+      if (worldBuffer.read(cx, y - 1) !== VOID || worldBuffer.read(cx, y - 2) !== VOID) { consecutiveFailures++; continue }
+      if (placedGuard.has(((y - 1) << 10) | cx) || placedGuard.has(((y - 2) << 10) | cx)) { consecutiveFailures++; continue }
 
-      // VOID + non réservé sur les 2x2 tuiles occupées par le sprite (y-1, y-2 × cx, cx+1)
-      let canPlace = true
-      for (let dx = 0; dx <= 1 && canPlace; dx++) {
-        for (let dy = 1; dy <= 2 && canPlace; dy++) {
-          if (worldBuffer.read(cx + dx, y - dy) !== VOID) canPlace = false
-          if (placedGuard.has(((y - dy) << 10) | (cx + dx))) canPlace = false
-        }
-      }
-      if (!canPlace) { consecutiveFailures++; continue }
+      // 2) Position à droite : cx+1 en LIMESTONE, VOID libre au-dessus
+      const canRight = worldBuffer.read(cx + 1, y) === LIMESTONE &&
+                        worldBuffer.read(cx + 1, y - 1) === VOID &&
+                        worldBuffer.read(cx + 1, y - 2) === VOID &&
+                        !placedGuard.has(((y - 1) << 10) | (cx + 1)) &&
+                        !placedGuard.has(((y - 2) << 10) | (cx + 1))
+
+      // 3) Position à gauche : cx-1 en LIMESTONE, VOID libre au-dessus
+      const canLeft = worldBuffer.read(cx - 1, y) === LIMESTONE &&
+                       worldBuffer.read(cx - 1, y - 1) === VOID &&
+                       worldBuffer.read(cx - 1, y - 2) === VOID &&
+                       !placedGuard.has(((y - 1) << 10) | (cx - 1)) &&
+                       !placedGuard.has(((y - 2) << 10) | (cx - 1))
+
+      if (!canLeft && !canRight) { consecutiveFailures++; continue }
+
+      const goLeft = canLeft && (!canRight || seededRNG.randomGetBool())
+      const soilX = goLeft ? cx - 1 : cx
 
       consecutiveFailures = 0
-      placedGuard.addRect(cx, y - 2, cx + 1, y - 1)
+      placedGuard.addRect(soilX, y - 2, soilX + 1, y - 1)
 
-      const soilIndex = (y << 10) | cx
+      const soilIndex = (y << 10) | soilX
 
       this.#plants.push({
         id: uniqueIdGenerator.getUniqueId(),
@@ -8292,7 +8303,7 @@ class PlantGenerator {
         itemId: 'mandrake',
         w: 2,
         h: 2,
-        x: cx,
+        x: soilX,
         y: y - 2,
         present: true,
         deleted: false
@@ -8480,7 +8491,7 @@ class PlantGenerator {
     const VOID = NODES.VOID.code
     const STONE = NODES.STONE.code
     const W = WORLD_WIDTH
-    const MAX_ATTEMPTS = 100
+    const MAX_ATTEMPTS = 200
 
     const rects = []
     for (const rect of zoneRects) {
