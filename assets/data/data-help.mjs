@@ -2270,7 +2270,7 @@ See [[Mining]], [[Mining Tools]] and [[Mining Buffs]] for details.
   //    Metals, Metal Fittings (Copper, Iron, Silver, Gold, Cobalt, Platinum)
   {
     title: 'Metals',
-    category: ['Crafting'],
+    category: ['Crafting Ingredients'],
     content: `
 **Description**
 
@@ -3368,7 +3368,7 @@ Higher-tier pickaxes provide a mining speed bonus (see table above). Additional 
   },
   {
     title: 'Mineable Blocks',
-    category: ['Mining', 'Natural', 'Topsoil', 'Substrat', 'Ore', 'Gem', 'Rock', 'Mini-biome'],
+    category: ['Mining', 'Natural', 'Topsoil', 'Substrat', 'Crafting Ingredients', 'Rock', 'Mini-biome'],
     content: `
 **All mineable blocks**
 
@@ -3522,13 +3522,13 @@ _Range bonus applies equally in all directions._
   },
   {
     title: 'Fishing Baits',
-    category: ['Bait', 'Fishing'],
+    category: ['Baits', 'Fishing'],
     content: `
     `
   },
   {
     title: 'Fisheable Monsters',
-    category: ['Fish', 'Fishing'],
+    category: ['Fishing'],
     content: `
     `
   },
@@ -4690,7 +4690,7 @@ Parler d'abord du Glass, puis des Bottles.
   //    Torches, Fireplaces, Campfire, Toilets, Doors, Beds, Chairs, Cloks
   {
     title: 'Gel',
-    category: ['Crafting Ingredient'],
+    category: ['Crafting Ingredients'],
     content: `
 Dropped by [[monster:slime|Slimes]]
 Used to craft [[item:torch]].
