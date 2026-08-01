@@ -302,6 +302,7 @@ const DEBUG_PACKS = {
   starter: [
     {item: 'astrarium', count: 1},
     {item: 'theodolite', count: 1},
+    {item: 'hammerCopper', count: 1},
     {item: 'sickleCopper', count: 1},
     {item: 'gel', count: 25}
   ],
@@ -337,6 +338,16 @@ const DEBUG_PACKS = {
     {item: 'barGold', count: 18},
     {item: 'barCobalt', count: 18},
     {item: 'barPlatinum', count: 18}
+  ],
+  container: [
+    {item: 'bucket', count: 1},
+    {item: 'bucketWater', count: 1},
+    {item: 'bucketHoney', count: 1},
+    {item: 'bucketSap', count: 1},
+    {item: 'bottle', count: 1},
+    {item: 'bottleWater', count: 1},
+    {item: 'bottleHoney', count: 1},
+    {item: 'bottleSap', count: 1}
   ],
   gem: [
     {item: 'rawTopaz', count: 8},
