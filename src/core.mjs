@@ -789,6 +789,7 @@ class GameCore {
     taskScheduler.debugStats()
     teleporterManager.debug()
     coralSystem.debug()
+    mandrakeSystem.debug()
     eventBus.emit('debug/buff-manager')
   }
 }

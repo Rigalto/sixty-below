@@ -621,8 +621,8 @@ class CoralSystem {
   coralSearch () {
     const record = this.#regrowQueue[this.#regrowQueue.length - 1]
     const floorIndex = this.#findCoralFloor()
-    const soilX = floorIndex !== -1 ? this.#findCoralSide(floorIndex) : -1
-    const found = soilX !== -1
+    const soilX = floorIndex !== 0 ? this.#findCoralSide(floorIndex) : 0
+    const found = soilX !== 0
 
     if (found) {
       const y = floorIndex >> 10
@@ -658,7 +658,7 @@ class CoralSystem {
 
   /**
    * Tire une mer et une colonne au hasard, descend jusqu'à la première tuile non-SEA.
-   * @returns {number} index packé (y<<10)|x du sol si SAND trouvée dans les bornes du rect, -1 sinon
+   * @returns {number} index packé (y<<10)|x du sol si SAND trouvée dans les bornes du rect, 0 sinon
    */
   #findCoralFloor () {
     const SEA = NODES.SEA.code
@@ -668,9 +668,9 @@ class CoralSystem {
     const cx = seededRNG.randomGetMinMax(rect.x1 + 1, rect.x2 - 2)
     let y = seededRNG.randomGetMinMax(rect.y1 + 1, rect.y2 - 2)
 
-    if (chunkManager.getTile(cx, y) !== SEA) return -1
+    if (chunkManager.getTile(cx, y) !== SEA) return 0
     while (y < rect.y2 && chunkManager.getTile(cx, y) === SEA) y++
-    if (chunkManager.getTile(cx, y) !== SAND) return -1
+    if (chunkManager.getTile(cx, y) !== SAND) return 0
 
     return (y << 10) | cx
   }
@@ -678,7 +678,7 @@ class CoralSystem {
   /**
    * Teste les deux côtés du sol trouvé (SAND adjacent + pocket 2×2 SEA au-dessus + tuiles libres).
    * @param {number} floorIndex — retour de #findCoralFloor
-   * @returns {number} soilX retenu, -1 si aucun côté valide
+   * @returns {number} soilX retenu, 0 si aucun côté valide
    */
   #findCoralSide (floorIndex) {
     const SEA = NODES.SEA.code
@@ -694,7 +694,7 @@ class CoralSystem {
       chunkManager.isRectCode(cx - 1, y - 2, 2, 2, SEA) &&
       blockedTiles.canPlaceRect(cx - 1, y - 2, 2, 2) && blockedTiles.canMineRect(cx - 1, y, 2, 1)
 
-    if (!canLeft && !canRight) return -1
+    if (!canLeft && !canRight) return 0
     return (canLeft && (!canRight || seededRNG.randomGetBool())) ? cx - 1 : cx
   }
 
@@ -1563,6 +1563,9 @@ export const oleanderSystem = new OleanderSystem()
 
    ==================================================================================================== */
 
+const MANDRAKE_REGROW_INITIAL_DELAY_MS = 1547
+const MANDRAKE_REGROW_RETRY_DELAY_MS = 123
+
 class MandrakeSystem {
   byTile = new Map() // Map<tileIndex, record> — public : membership O(1) + lookup record
   #list = [] // record[] — population fixe, référence affectée dans init(records)
@@ -1615,6 +1618,10 @@ class MandrakeSystem {
       return
     }
     this.#regrowQueue.push(record)
+  }
+
+  debug () {
+    console.log(`[MandrakeSystem] ${this.#list.length} mandrakes récupérés, ${this.#regrowQueue.length} en attente de repousse`)
   }
 
   /**
@@ -1677,7 +1684,7 @@ class MandrakeSystem {
     this.#regrowQueue.push(record)
     if (this.#regrowQueue.length === 1) {
       const {priority, capacity} = MICROTASK.MANDRAKE_REGROW
-      microTasker.enqueue(this.mandrakeRegrow, priority, capacity)
+      taskScheduler.enqueue('mandrake-regrow', MANDRAKE_REGROW_RETRY_DELAY_MS, this.mandrakeRegrow, priority, capacity)
     }
   }
 
@@ -1691,21 +1698,105 @@ class MandrakeSystem {
   }
 
   /**
-   * TODO — Liaison EventBus : 'time/first-loop'. Déclenchera la microtâche de repousse si
-   * #regrowQueue contient des records present=false chargés depuis la persistence
-   * (cf. OleanderSystem.onFirstLoopOleander).
+   * Liaison EventBus : 'time/first-loop'. Déclenchera la microtâche de repousse si
+   * #regrowQueue contient des records present=false chargés depuis la persistence.
+   * délai long pour ne pas surcharger le démarrage.
    */
   onFirstLoopMandrake () {
-    // TODO
+    if (this.#regrowQueue.length === 0) return
+    const {priority, capacity} = MICROTASK.MANDRAKE_REGROW
+    taskScheduler.enqueue('mandrake-regrow', MANDRAKE_REGROW_INITIAL_DELAY_MS, this.mandrakeRegrow, priority, capacity)
   }
 
   /**
-   * TODO — Microtâche de repousse (cf. OleanderSystem.oleanderRegrow) : recherche d'un
-   * nouvel emplacement (2 LIMESTONE à la même hauteur, VOID 2x2 au-dessus, tileGuarded)
-   * pour chaque record de #regrowQueue.
+   * Tire une colonne et une hauteur au hasard dans la bande under→caverns, descend
+   * jusqu'à la première tuile non-VOID.
+   * @returns {number} index packé (y<<10)|x du sol si LIMESTONE trouvée, 0 sinon
+   */
+  #findMandrakeFloor () {
+    const VOID = NODES.VOID.code
+    const LIMESTONE = NODES.LIMESTONE.code
+    const W = WORLD_WIDTH
+
+    const cx = seededRNG.randomGetMinMax(2, W - 3)
+    let y = seededRNG.randomGetMinMax(TOPSOIL_Y_SURFACE_UNDER, TOPSOIL_Y_UNDER_CAVERNS)
+
+    if (chunkManager.getTile(cx, y) !== VOID) return 0
+    while (y < TOPSOIL_Y_UNDER_CAVERNS && chunkManager.getTile(cx, y) === VOID) y++
+    if (chunkManager.getTile(cx, y) !== LIMESTONE) return 0
+
+    return (y << 10) | cx
+  }
+
+  /**
+   * Teste les deux côtés du sol trouvé (LIMESTONE adjacent + pocket 2x2 VOID au-dessus +
+   * tuiles libres de tout blocage).
+   * @param {number} floorIndex — retour de #findMandrakeFloor
+   * @returns {number} soilX retenu, 0 si aucun côté valide
+   */
+  #findMandrakeSide (floorIndex) {
+    const VOID = NODES.VOID.code
+    const LIMESTONE = NODES.LIMESTONE.code
+    const cx = floorIndex & 0x3FF
+    const y = floorIndex >> 10
+    const topY = y - 2
+
+    const canRight = chunkManager.getTile(cx + 1, y) === LIMESTONE &&
+      chunkManager.isRectCode(cx, topY, 2, 2, VOID) &&
+      blockedTiles.canPlaceRect(cx, topY, 2, 2)
+
+    const canLeft = chunkManager.getTile(cx - 1, y) === LIMESTONE &&
+      chunkManager.isRectCode(cx - 1, topY, 2, 2, VOID) &&
+      blockedTiles.canPlaceRect(cx - 1, topY, 2, 2)
+
+    if (!canLeft && !canRight) return 0
+    return (canLeft && (!canRight || seededRNG.randomGetBool())) ? cx - 1 : cx
+  }
+
+  /**
+   * Cherche un nouvel emplacement pour le dernier record de #regrowQueue.
+   * Départ VOID, descente jusqu'au  premier non-VOID, sol LIMESTONE (ancre), puis
+   * test flat à droite (cx+1) et à gauche (cx-1) — 50/50 si les deux sont valides.
+   * blockedTiles — les 2 tuiles du pocket du côté retenu doivent être canPlace().
+   * Si trouvé : finalise le record (present=true, byTile/#byChunk/#bySoil, blockPlacement,
+   * persistence) et le retire de #regrowQueue (dernier élément, length--).
+   * Replanifie tant que #regrowQueue n'est pas vide, avec MANDRAKE_REGROW_RETRY_DELAY_MS.
    */
   mandrakeRegrow () {
-    // TODO
+    if (this.#regrowQueue.length === 0) return
+
+    const floorIndex = this.#findMandrakeFloor()
+    const soilX = floorIndex !== 0 ? this.#findMandrakeSide(floorIndex) : 0
+    const found = soilX !== 0
+
+    if (found) {
+      const y = floorIndex >> 10
+      const topY = y - 2
+      const soilIndex = (y << 10) | soilX
+
+      const record = this.#regrowQueue[this.#regrowQueue.length - 1]
+
+      record.soilIndex = soilIndex
+      record.index = (topY << 10) | soilX
+      record.x = soilX
+      record.y = topY
+      record.present = true
+
+      addToByTile(this.byTile, record)
+      addToByChunk(this.#byChunk, record)
+      addToDisplayed(this.#displayed, record)
+      this.#bySoil.set(soilIndex, record)
+      this.#bySoil.set(soilIndex + 1, record)
+      blockedTiles.blockPlacementRect(soilX, topY, 2, 2)
+      saveManager.queueStaticUpdate({storeName: 'plant', record})
+
+      this.#regrowQueue.length--
+    }
+
+    if (this.#regrowQueue.length !== 0) {
+      const {priority, capacity} = MICROTASK.MANDRAKE_REGROW
+      taskScheduler.enqueue('mandrake-regrow', MANDRAKE_REGROW_RETRY_DELAY_MS, this.mandrakeRegrow, priority, capacity)
+    }
   }
 
   /**
