@@ -158,10 +158,12 @@ class WorldGenerator {
     // Ainsi, il n'y aura pas de risque d'affichage invorrect dans le BuffWidget dont
     // l'affichage pariodique (1s) est décorrellé de la boucle temps réel
 
-    // 0. Initialisation du buffer de génération et des object stores
+    // 0. Initialisations
     worldBuffer.init()
     furnitureGenerator.init()
     plantGenerator.init()
+    tileGuard.init() // mémorise les positions bloquées par des tuiles
+    placedGuard.init() // mémorise les positions bloquées par des meubles et des plantes
 
     // 1. On passe le générateur de nombre aléatoire en mode déterminé par la clé
     seededRNG.init(seed)
@@ -309,7 +311,7 @@ class WorldGenerator {
     // 7. Traitement de la surface
     // tileGuard.debug() // DEBUG
     // ATTENTION : plus d'utilisation de tileGuard mais de placedGuard à partir de maintenant
-    placedGuard.init()
+
     let surfaceLine = worldCarver.buildErodedSurfaceLine()
 
     // 7.1. Ajout des mini-biomes de surface
@@ -3694,6 +3696,7 @@ class WorldCarver {
       tileGuard.addNoisyCircle(x, y, 2, 5, 0.3, PERLIN_OFFSET_HEART)
       hearts.push({cx: x, cy: y})
       furnitureGenerator.addFurnitureAt((y << 10) | x, 'lifeCrystal')
+      placedGuard.addRect(x, y, x + 1, y + 1)
       return true
     }
 
@@ -3758,6 +3761,7 @@ class WorldCarver {
       tileGuard.addNoisyCircle(x, y, 4, 8, 0.8, PERLIN_OFFSET_HEART)
       this.addExclusion({x1: x - 1, y1: y - 1, x2: x + 2, y2: y + 2})
       triskels.push({cx: x, cy: y})
+      placedGuard.addRect(x, y, x + 1, y + 1)
       return true
     }
 
