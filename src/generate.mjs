@@ -8294,7 +8294,8 @@ class PlantGenerator {
       while (y < rect.y1 && worldBuffer.read(cx, y) === VOID) y++
 
       // Deux tuiles LIMESTONE à la même hauteur
-      // 1) Ancre : deux tuiles VOID au-dessus, non réservées
+      // 1) Ancre : tuile LIMESTONE, deux tuiles VOID au-dessus, non réservées
+      if (worldBuffer.read(cx, y) !== LIMESTONE) { consecutiveFailures++; continue }
       if (worldBuffer.read(cx, y - 1) !== VOID || worldBuffer.read(cx, y - 2) !== VOID) { consecutiveFailures++; continue }
       if (placedGuard.has(((y - 1) << 10) | cx) || placedGuard.has(((y - 2) << 10) | cx)) { consecutiveFailures++; continue }
 
