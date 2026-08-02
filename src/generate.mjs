@@ -3696,7 +3696,6 @@ class WorldCarver {
       tileGuard.addNoisyCircle(x, y, 2, 5, 0.3, PERLIN_OFFSET_HEART)
       hearts.push({cx: x, cy: y})
       furnitureGenerator.addFurnitureAt((y << 10) | x, 'lifeCrystal')
-      placedGuard.addRect(x, y, x + 1, y + 1)
       return true
     }
 
@@ -3789,7 +3788,6 @@ class WorldCarver {
     for (let i = 0; i < triskels.length; i++) {
       const {cx, cy} = triskels[i]
       furnitureGenerator.addFurnitureAt((cy << 10) | cx, items[i])
-      placedGuard.addRect(cx, cy, cx + 1, cy + 1)
     }
 
     return triskels
@@ -6687,6 +6685,11 @@ class FurnitureGenerator {
       furniture.name = `C-${id}`
     }
     this.#furnitures.push(furniture)
+
+    const x = index & 0x3FF
+    const y = index >> 10
+    placedGuard.addRect(x, y, x + w - 1, y + h - 1)
+
     return furniture
   }
 
@@ -6774,7 +6777,6 @@ class FurnitureGenerator {
       const chestX = goLeft ? cx - 1 : cx
 
       const chest = this.addFurnitureAt(((y - 2) << 10) | chestX, 'oceanChest')
-      placedGuard.addRect(chestX, y - 2, chestX + 1, y - 1)
 
       this.fillChest(chest)
       placed++
@@ -6845,7 +6847,6 @@ class FurnitureGenerator {
         chestIndexes.add(chestIndex + 1) // coffre occupe 2 tuiles de large
         chestRects.push({x: chestX, y: y - 2, w: 2, h: 2})
         const chest = this.addFurnitureAt(chestIndex, chestType)
-        placedGuard.addRect(chestX, y - 2, chestX + 1, y - 1)
 
         this.fillChest(chest)
         placed++
@@ -6918,7 +6919,6 @@ class FurnitureGenerator {
         chestIndexes.add(chestIndex + 1) // coffre occupe 2 tuiles de large
         chestRects.push({x: chestX, y: y - 2, w: 2, h: 2})
         const chest = this.addFurnitureAt(chestIndex, chestType)
-        placedGuard.addRect(chestX, y - 2, chestX + 1, y - 1)
 
         this.fillChest(chest)
         placed++
@@ -6990,7 +6990,6 @@ class FurnitureGenerator {
         chestIndexes.add(chestIndex + 1) // coffre occupe 2 tuiles de large
         chestRects.push({x: chestX, y: y - 2, w: 2, h: 2})
         const chest = this.addFurnitureAt(chestIndex, chestType)
-        placedGuard.addRect(chestX, y - 2, chestX + 1, y - 1)
 
         this.fillChest(chest)
         placed++
