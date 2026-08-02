@@ -1719,13 +1719,15 @@ class MandrakeSystem {
     const W = WORLD_WIDTH
 
     const cx = seededRNG.randomGetMinMax(2, W - 3)
-    let y = seededRNG.randomGetMinMax(TOPSOIL_Y_SURFACE_UNDER, TOPSOIL_Y_UNDER_CAVERNS)
+    const cy = seededRNG.randomGetMinMax(TOPSOIL_Y_SURFACE_UNDER, TOPSOIL_Y_UNDER_CAVERNS)
+    let idx = (cy << 10) | cx
 
-    if (chunkManager.getTile(cx, y) !== VOID) return 0
-    while (y < TOPSOIL_Y_UNDER_CAVERNS && chunkManager.getTile(cx, y) === VOID) y++
-    if (chunkManager.getTile(cx, y) !== LIMESTONE) return 0
+    if (chunkManager.getTileAt(idx) !== VOID) return 0
+    const maxIndex = (TOPSOIL_Y_UNDER_CAVERNS << 10) | cx
+    while (idx < maxIndex && chunkManager.getTileAt(idx) === VOID) idx += W
+    if (chunkManager.getTileAt(idx) !== LIMESTONE) return 0
 
-    return (y << 10) | cx
+    return idx
   }
 
   /**
@@ -1738,14 +1740,13 @@ class MandrakeSystem {
     const VOID = NODES.VOID.code
     const LIMESTONE = NODES.LIMESTONE.code
     const cx = floorIndex & 0x3FF
-    const y = floorIndex >> 10
-    const topY = y - 2
+    const topY = (floorIndex >> 10) - 2
 
-    const canRight = chunkManager.getTile(cx + 1, y) === LIMESTONE &&
+    const canRight = chunkManager.getTileAt(floorIndex + 1) === LIMESTONE &&
       chunkManager.isRectCode(cx, topY, 2, 2, VOID) &&
       blockedTiles.canPlaceRect(cx, topY, 2, 2)
 
-    const canLeft = chunkManager.getTile(cx - 1, y) === LIMESTONE &&
+    const canLeft = chunkManager.getTileAt(floorIndex - 1) === LIMESTONE &&
       chunkManager.isRectCode(cx - 1, topY, 2, 2, VOID) &&
       blockedTiles.canPlaceRect(cx - 1, topY, 2, 2)
 
