@@ -4070,13 +4070,13 @@ export const coconutSystem = new CoconutSystem()
    Orchestrateur unique de tous les systèmes de plantes. Aucune logique de rendu propre.
 
    Responsabilités :
-     - Dispatcher les records actifs vers le système compétent (addPlant)
+     - Dispatcher les records actifs vers le système compétent (initPlant)
      - Propager les changements de chunks preload à tous les systèmes (onPreloadChunksChanged)
      - Déléguer render et requêtes spatiales à chaque système
 
    Interactions :
      eventBus          — écoute : 'camera/preload-chunks-changed' → onPreloadChunksChanged
-     core.mjs          — appelant de init() et addPlant() au startSession
+     core.mjs          — appelant de init() et initPlant() au startSession
      systèmes internes — init, initPlant, onPreloadChunksChanged, render, getPlantAt
 
    Structures internes :
@@ -4103,7 +4103,7 @@ class FloraManager {
    * Les records deleted=false sont garantis par l'appelant.
    * @param {object} record — record de l'objectStore 'plant'
    */
-  addPlant (record) {
+  initPlant (record) {
     // const system = this.#systemMap.get(record.kind * 100 + record.type)
     const system = PLANT_SYSTEM_LOOKUP.get(record.kind * 100 + record.type)
     if (system === undefined) return

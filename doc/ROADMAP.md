@@ -10,7 +10,6 @@
 ### Code et tests
 
 - Implémenter les herbes, reste : Mandrake (en cours), Pricklepad, Bamboo, Satan's Cube, Sneakthorn, Cursedcrown, Abysshorn, InfernCap
-- Dans CORAL_SEARCH et coralSearch, 'search' devient 'regrow' par analogie.
 - Implémenter les plants des mini-biomes, reste : fern Cave, Mushroom Cave
 - Implémenter les Giant Mushrooms.
 - Implémenter la réduction de vitesse dans les liquides ou les cobweb.

@@ -430,7 +430,7 @@ class GameCore {
     floraManager.init()
     for (const record of plantRecords) {
       if (record.deleted) { plantsToDelete.push(record.key); continue }
-      floraManager.addPlant(record)
+      floraManager.initPlant(record)
     }
     if (plantsToDelete.length > 0) {
       await database.deleteMultipleRecords('plant', plantsToDelete)
