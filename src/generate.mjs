@@ -350,11 +350,13 @@ class WorldGenerator {
     console.log('[WorldGenerator::liquidFiller] - Sea', (performance.now() - t0).toFixed(3), 'ms')
 
     // 8.2.1. Coconut - ajoutés avant les coffres, car ils ont peu de place pour pousser
-    plantGenerator.placeSeaCoconut(leftBeach.beachRect, surfaceLine, true, guarded)
-    plantGenerator.placeSeaCoconut(rightBeach.beachRect, surfaceLine, false, guarded)
+    let coconutCount = 0
+    coconutCount += plantGenerator.placeSeaCoconut(leftBeach.beachRect, surfaceLine, true, guarded)
+    coconutCount += plantGenerator.placeSeaCoconut(rightBeach.beachRect, surfaceLine, false, guarded)
     for (const lake of surfaceLakes) {
-      plantGenerator.placeOasisCoconut(lake, surfaceLine, guarded)
+      coconutCount += plantGenerator.placeOasisCoconut(lake, surfaceLine, guarded)
     }
+    if (IS_DEV) console.log(`   🔹 Coconuts : ${coconutCount}`)
     await progress('Coconuts')
 
     // 8.2.2. Ajout des coffres et objets spéciaux
@@ -366,6 +368,7 @@ class WorldGenerator {
     const {chestIndexes: ui, chestRects: ur} = furnitureGenerator.placeUndergroundChests(zoneRects)
     const {chestIndexes: ci, chestRects: cr} = furnitureGenerator.placeCavernChests(zoneRects)
 
+    // ces deux valeurs sont sans doute à retirer, remplacées par placedGuard
     const chestIndexes = new Set([...si, ...ui, ...ci])
     const chestRects = [...sr, ...ur, ...cr]
     await progress('Chests')
@@ -393,7 +396,7 @@ class WorldGenerator {
     plantGenerator.spreadMushroom(mushroomPlants, NODES.GRASSMUSHROOM.code, NODES.HUMUS.code, NODES.VOID.code, PLANT_TYPE.NONE)
     await progress('Natural Spreading')
 
-    plantGenerator.placeAmbermirages(surfaceLine, guarded, currentWeather)
+    plantGenerator.placeAmbermirages(surfaceLine, guarded)
     plantGenerator.placeParsnipsSunflowers(surfaceLine, guarded, oakPositions)
     plantGenerator.placeBloodmoons(surfaceLine, guarded)
     const thornspineCount = plantGenerator.placeThornspines(surfaceLine, guarded, biomesDescription)
@@ -7082,16 +7085,20 @@ class PlantGenerator {
     return images
   }
 
+  // /////// //
+  // COCONUT //
+  // /////// //
+
   /**
- * Vérifie si (pos, y) est une position centrale valide pour un cocotier : les 3 tuiles de
- * surface (pos-1, pos, pos+1) sont à la même hauteur, aucune n'est guardée, toutes SAND, et
- * les deux tuiles latérales (pos-1, pos+1) ne sont pas surmontées d'eau (WATER/SEA).
- * @param {number} pos — colonne centrale testée
- * @param {number} y — Y de la tuile de surface en pos
- * @param {Int16Array} surfaceLine — Y de la première tuile solide par colonne
- * @param {Set<number>} guarded — colonnes protégées
- * @returns {boolean}
- */
+   * Vérifie si (pos, y) est une position centrale valide pour un cocotier : les 3 tuiles de
+   * surface (pos-1, pos, pos+1) sont à la même hauteur, aucune n'est guardée, toutes SAND, et
+   * les deux tuiles latérales (pos-1, pos+1) ne sont pas surmontées d'eau (WATER/SEA).
+   * @param {number} pos — colonne centrale testée
+   * @param {number} y — Y de la tuile de surface en pos
+   * @param {Int16Array} surfaceLine — Y de la première tuile solide par colonne
+   * @param {Set<number>} guarded — colonnes protégées
+   * @returns {boolean}
+   */
   #isValidCoconutSpot (pos, y, surfaceLine, guarded) {
     const SAND = NODES.SAND.code
     const WATER = NODES.WATER.code
@@ -7114,6 +7121,7 @@ class PlantGenerator {
  * @param {{x, y, w, h}} beachRect — rectangle de la plage
  * @param {Int16Array} surfaceLine — Y de la première tuile solide par colonne
  * @param {boolean} isLeft — true = plage gauche (parcours gauche→droite), false = droite→gauche
+ * @returns {integer} — nombre ce coconut réellement posés
  */
   placeSeaCoconut (beachRect, surfaceLine, isLeft, guarded) {
     const dir = isLeft ? 1 : -1
@@ -7130,8 +7138,9 @@ class PlantGenerator {
 
       const soilIndex = (y << 10) | (pos - 1)
       this.#placeOneCoconut(soilIndex)
-      return
+      return 1
     }
+    return 0
   }
 
   /**
@@ -7143,6 +7152,7 @@ class PlantGenerator {
  * @param {{cx, cy}} lake — lac de surface
  * @param {Int16Array} surfaceLine — Y de la première tuile solide par colonne
  * @param {Set<number>} guarded — colonnes protégées (modifié en place)
+ * @returns {integer} — nombre ce coconut réellement posés
  */
   placeOasisCoconut (lake, surfaceLine, guarded) {
     const SEA = NODES.SEA.code
@@ -7168,7 +7178,7 @@ class PlantGenerator {
     const right = findSide(lake.cx, 1)
     const left = findSide(lake.cx, -1)
 
-    if (!right && !left) return
+    if (!right && !left) return 0
 
     const chosen = (right && left)
       ? (seededRNG.randomGetBool() ? right : left)
@@ -7181,6 +7191,7 @@ class PlantGenerator {
 
     const soilIndex = (y << 10) | (pos - 1)
     this.#placeOneCoconut(soilIndex)
+    return 1
   }
 
   /**
@@ -7545,17 +7556,9 @@ class PlantGenerator {
     })
   }
 
-  // Lors de la récolte, le corail disparait (bloom = false, bloomTimestamp = null)
-  // Lors de cette récolte, on détermine un emplacement pour un autre corail (algorithme identique à celui dans generate.mjs).
-  // l'enregistrement du corail a été récolté est utilisé pour celui qui va pousser (nombre constant)
-  // quand l'emplacement est trouvé, ses coordonnées sont placées, sa nature est tirée aléatoirement, 'bloom = false' et un bloomTimestamp de 2 à 4 jours in-game.
-  // on lance le timer sur bloomTimestamp (après la récolte et au chargement de la session)
-  // quand le bloomTimestamp arrive à échéance, le corail passe à bloom = true et il apparaît dans le monde, bloomTimestamp = null
-
-  // on a ainsi 3 états :
-  // * bloom = true, bloomTimestamp = null => coral présent dans le monde
-  // * bloom = false, bloomTimestamp = null => recherche d'une nouvelle position (microTasker)
-  // * bloom = false, bloomTimestamp = timestamp => position déterminée, attente fin de croissance (taskScheduler)
+  // ////////////// //
+  // OAK / MAHOGANY //
+  // ////////////// //
 
   /**
  * Champignons : pour chaque arbre, un spot Bolete/Pink Mycenia est créé à gauche (x-1) ET à
@@ -7577,6 +7580,10 @@ class PlantGenerator {
     const TREE_W = 3
     const MUSH_H = 2
     const MUSH_W = 1
+    let oakCount = 0
+    let mahoganyCount = 0
+    let boleteCount = 0
+    let pinkMyceniaCount = 0
     const oakPositions = new Set()
 
     const placeTree = (soilX, y, grassCode) => {
@@ -7619,6 +7626,7 @@ class PlantGenerator {
       // guarded : 3 tuiles sous l'arbre (soilX est la tuile gauche)
       for (let dx = 0; dx <= 2; dx++) guarded.add(soilX + dx)
 
+      treeType === PLANT_TYPE.OAK ? oakCount++ : mahoganyCount++
       return {mushroomId, soilIndex}
     }
 
@@ -7641,6 +7649,7 @@ class PlantGenerator {
         deleted: false
       })
       guarded.add(soilX)
+      mushroomId === 'bolete' ? boleteCount++ : pinkMyceniaCount++
     }
 
     let x = 1
@@ -7678,8 +7687,17 @@ class PlantGenerator {
       placeMushroom(treeX - 1, y, mushroomId)
       placeMushroom(treeX + 3, y, mushroomId)
     }
+
+    if (IS_DEV) console.log(`   🔹 Oaks : ${oakCount}`)
+    if (IS_DEV) console.log(`   🔹 Mahoganies : ${mahoganyCount}`)
+    if (IS_DEV) console.log(`   🔹 Boletes : ${boleteCount}`)
+    if (IS_DEV) console.log(`   🔹 Pink Mycenias : ${pinkMyceniaCount}`)
     return oakPositions
   }
+
+  // ////////////// //
+  // GIANT MUSHROOM //
+  // ////////////// //
 
   /**
  * Place les Giant Mushrooms dans les Mushroom Caves.
@@ -7854,20 +7872,18 @@ class PlantGenerator {
 
   /**
   * Un spot est toute tuile de surface SAND ayant une tuile SKY au-dessus.
-  * Tous sont enregistrés (present ou non). Un spot n'a
-  * une chance de present que si ses tuiles de surface voisines (x-1, x+1) sont également SAND avec SKY au-dessus :
-  * AMBERMIRAGE_PCENT% de chance, 0% si le temps initial est RAINY ou STORMY.
+  * Tous sont enregistrés. Un spot n'a
+  * L'heure de départ étant 8h00, present est toujours 'false'
   * Ajoute à guarded les colonnes des spots présents.
   *
   * @param {Int16Array} surfaceLine — Y de la première tuile solide par colonne
   * @param {Set<number>} guarded — colonnes protégées (modifié en place)
-  * @param {number} initialWeather — weather du premier jour (WEATHER_TYPE_CODE)
   */
-  placeAmbermirages (surfaceLine, guarded, initialWeather) {
+  placeAmbermirages (surfaceLine, guarded) {
     const SAND = NODES.SAND.code
     const SKY = NODES.SKY.code
-
     const W = WORLD_WIDTH
+    let count = 0
 
     for (let x = 2; x < W - 2; x++) {
       if (guarded.has(x)) continue
@@ -7892,7 +7908,9 @@ class PlantGenerator {
         present: false,
         deleted: false
       })
+      count++
     }
+    if (IS_DEV) console.log(`   🔹 Ambermirages : ${count}`)
   }
 
   /**
@@ -8021,6 +8039,7 @@ class PlantGenerator {
   placeBloodmoons (surfaceLine, guarded) {
     const GRASSJUNGLE = NODES.GRASSJUNGLE.code
     const W = WORLD_WIDTH
+    let count = 0
 
     for (let x = 2; x < W - 2; x++) {
       if (guarded.has(x)) continue
@@ -8046,7 +8065,9 @@ class PlantGenerator {
         bloom: false,
         deleted: false
       })
+      count++
     }
+    if (IS_DEV) console.log(`   🔹 Bloodmoons : ${count}`)
   }
 
   /**
@@ -8111,6 +8132,7 @@ class PlantGenerator {
       count++
     }
 
+    if (IS_DEV) console.log(`   🔹 Ferns : ${count}`)
     return count
   }
 
@@ -8128,6 +8150,7 @@ class PlantGenerator {
     const GRASSMOSS = NODES.GRASSMOSS.code
     const W = WORLD_WIDTH
     const occupied = new Set()
+    let count = 0
 
     for (const plant of mossPlants) {
       if (plant.naturalCode !== GRASSMOSS) continue
@@ -8173,7 +8196,9 @@ class PlantGenerator {
         present,
         deleted: false
       })
+      count++
     }
+    if (IS_DEV) console.log(`   🔹 Moss : ${count}`)
   }
 
   /**
@@ -8193,6 +8218,7 @@ class PlantGenerator {
     const GRASSMUSHROOM = NODES.GRASSMUSHROOM.code
     const W = WORLD_WIDTH
     const sunny = initialWeather === WEATHER_TYPE_CODE.SUNNY
+    let count = 0
 
     for (const plant of mushroomPlants) {
       if (plant.naturalCode !== GRASSMUSHROOM) continue
@@ -8224,7 +8250,9 @@ class PlantGenerator {
         present,
         deleted: false
       })
+      count++
     }
+    if (IS_DEV) console.log(`   🔹 Frostcaps/Dawncap : ${count}`)
   }
 
   /**
@@ -8310,7 +8338,7 @@ class PlantGenerator {
       })
       placed++
     }
-    if (IS_DEV) console.log(`   🔹 Mandrakes : ${placed}`)
+    if (IS_DEV) console.log(`   🔹 Mandrakes : ${placed} / ${MANDRAKE_COUNT}`)
   }
 
   /**
@@ -8544,7 +8572,7 @@ class PlantGenerator {
       })
       placed++
     }
-    if (IS_DEV) console.log(`   🔹 Oleanders : ${placed}`)
+    if (IS_DEV) console.log(`   🔹 Oleanders : ${placed} / ${OLEANDER_COUNT}`)
   }
 
   /**
