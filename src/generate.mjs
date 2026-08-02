@@ -479,7 +479,7 @@ class WorldGenerator {
       {key: 'beachleft', value: leftBeach},
       {key: 'beachright', value: rightBeach},
       {key: 'cobwebcaves', value: cobwebCaves},
-      {key: 'coralsearchtimestamp', value: (480 + 1440) * 1000}, // Jour 1 - 8:00
+      {key: 'coralregrowtimestamp', value: (480 + 1440) * 1000}, // Jour 1 - 8:00
       {key: 'craftfiltermaterial', value: 'logOak'},
       {key: 'craftfiltermode', value: 'type'},
       {key: 'craftfilterstation', value: 'byHand'},

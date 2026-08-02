@@ -530,14 +530,14 @@ export const thornspineSystem = new ThornspineSystem()
    aucune création/suppression de record en session, uniquement bloom true/false.
 
    Structure record : kind HERB · type CORAL_R/P/Y/G · w 2 · h 2 · pas de bloomTimestamp
-   (la repousse est pilotée par #regrowQueue + gamestate.coralsearchtimestamp, pas par un
+   (la repousse est pilotée par #regrowQueue + gamestate.coralregrowtimestamp, pas par un
    timer individuel sur le record).
    ==================================================================================================== */
 
 // Repousse des coraux — deux vitesses de relance de coralSearch selon le résultat de la
 // tentative précédente
-export const CORAL_SEARCH_DELAY_FOUND_MS = 1440 * 1000 // ~1 jour in-game — position trouvée
-export const CORAL_SEARCH_DELAY_EMPTY_MS = 60 * 1000 // ~1 heure in-game — rien trouvé
+export const CORAL_REGROW_DELAY_FOUND_MS = 1440 * 1000 // ~1 jour in-game — position trouvée
+export const CORAL_REGROW_DELAY_EMPTY_MS = 60 * 1000 // ~1 heure in-game — rien trouvé
 
 // Approximation temporaire des mers, en attendant la gestion des liquides (non conçue à ce
 // jour) qui fournira le rectangle englobant réel — cf. WorldCarver.addSeaExclusions() en
@@ -556,11 +556,11 @@ class CoralSystem {
   #byChunk = new Map() // Map<chunkKey, Set> — lookup spatial pour onPreloadChunksChanged
   #displayed = new Set() // Set<record> — coraux dans les chunks preload (cible render)
   #regrowQueue = [] // record[] — coraux bloom=false en attente d'une position
-  #searchtimestamp = null // timestamp de prochaine croissance de corail
+  #regrowtimestamp = null // timestamp de prochaine croissance de corail
 
   constructor () {
     // Micro-tâches
-    this.coralSearch = this.coralSearch.bind(this)
+    this.coralRegrow = this.coralRegrow.bind(this)
   }
 
   /**
@@ -580,7 +580,7 @@ class CoralSystem {
    * @param {integer} timestamp
    */
   initTimestamp (timestamp) {
-    this.#searchtimestamp = timestamp
+    this.#regrowtimestamp = timestamp
   }
 
   /**
@@ -595,8 +595,8 @@ class CoralSystem {
     if (!record.bloom) {
       this.#regrowQueue.push(record)
       if (this.#regrowQueue.length === 1) {
-        const {priority, capacity} = MICROTASK.CORAL_SEARCH
-        taskScheduler.enqueueAbsolute('coral-search', this.#searchtimestamp, this.coralSearch, priority, capacity)
+        const {priority, capacity} = MICROTASK.CORAL_REGROW
+        taskScheduler.enqueueAbsolute('coral-regrow', this.#regrowtimestamp, this.coralRegrow, priority, capacity)
       }
       return
     }
@@ -618,7 +618,7 @@ class CoralSystem {
    * trouvée (pas d'urgence pour le suivant), court sinon (retenter vite). Persiste l'échéance
    * dans gamestate à chaque relance, pour rester correcte après un rechargement (cf. initTimestamp).
    */
-  coralSearch () {
+  coralRegrow () {
     const record = this.#regrowQueue[this.#regrowQueue.length - 1]
     const floorIndex = this.#findCoralFloor()
     const soilX = floorIndex !== 0 ? this.#findCoralSide(floorIndex) : 0
@@ -648,11 +648,11 @@ class CoralSystem {
     }
 
     if (this.#regrowQueue.length !== 0) {
-      const base = found ? CORAL_SEARCH_DELAY_FOUND_MS : CORAL_SEARCH_DELAY_EMPTY_MS
+      const base = found ? CORAL_REGROW_DELAY_FOUND_MS : CORAL_REGROW_DELAY_EMPTY_MS
       const delay = (base * seededRNG.randomGetRealMinMax(0.8, 1.2)) | 0
-      const {priority, capacity} = MICROTASK.CORAL_SEARCH
-      const timestamp = taskScheduler.enqueue('coral-search', delay, this.coralSearch, priority, capacity)
-      database.setGameState('coralsearchtimestamp', timestamp)
+      const {priority, capacity} = MICROTASK.CORAL_REGROW
+      const timestamp = taskScheduler.enqueue('coral-regrow', delay, this.coralRegrow, priority, capacity)
+      database.setGameState('coralregrowtimestamp', timestamp)
     }
   }
 
@@ -742,9 +742,9 @@ class CoralSystem {
     this.#regrowQueue.push(record)
     if (this.#regrowQueue.length !== 1) return
 
-    const {priority, capacity} = MICROTASK.CORAL_SEARCH
-    const timestamp = taskScheduler.enqueue('coral-search', CORAL_SEARCH_DELAY_EMPTY_MS, this.coralSearch, priority, capacity)
-    database.setGameState('coralsearchtimestamp', timestamp)
+    const {priority, capacity} = MICROTASK.CORAL_REGROW
+    const timestamp = taskScheduler.enqueue('coral-regrow', CORAL_REGROW_DELAY_EMPTY_MS, this.coralRegrow, priority, capacity)
+    database.setGameState('coralregrowtimestamp', timestamp)
   }
 
   /**
