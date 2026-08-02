@@ -3733,6 +3733,7 @@ class WorldCarver {
  * @returns {Array<{cx, cy}>} — cx, cy = coin haut-gauche du carré 2x2
  */
   digTriskels (underCaverns) {
+    const TRISKEL_ITEMS = ['triskelCopper', 'triskelSilver', 'triskelGold']
     const MAX_ATTEMPTS = 100
     const LIQUID_OR_GAZ = new Set([
       NODES.VOID.code,
@@ -3761,7 +3762,6 @@ class WorldCarver {
       tileGuard.addNoisyCircle(x, y, 4, 8, 0.8, PERLIN_OFFSET_HEART)
       this.addExclusion({x1: x - 1, y1: y - 1, x2: x + 2, y2: y + 2})
       triskels.push({cx: x, cy: y})
-      placedGuard.addRect(x, y, x + 1, y + 1)
       return true
     }
 
@@ -3783,6 +3783,13 @@ class WorldCarver {
       const x = seededRNG.randomGetMinMax(5, WORLD_WIDTH - 7)
       const y = seededRNG.randomGetMinMax(Math.round((underCaverns[x] + 510) / 2), 508)
       if (placeTriskel(x, y)) { remaining--; attempts = 0 }
+    }
+
+    const items = shuffleArray([...TRISKEL_ITEMS])
+    for (let i = 0; i < triskels.length; i++) {
+      const {cx, cy} = triskels[i]
+      furnitureGenerator.addFurnitureAt((cy << 10) | cx, items[i])
+      placedGuard.addRect(cx, cy, cx + 1, cy + 1)
     }
 
     return triskels
