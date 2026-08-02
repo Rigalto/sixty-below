@@ -663,16 +663,19 @@ class CoralSystem {
   #findCoralFloor () {
     const SEA = NODES.SEA.code
     const SAND = NODES.SAND.code
+    const W = WORLD_WIDTH
     const rect = seededRNG.randomGetArrayValue(CORAL_SEA_RECTS)
 
     const cx = seededRNG.randomGetMinMax(rect.x1 + 1, rect.x2 - 2)
-    let y = seededRNG.randomGetMinMax(rect.y1 + 1, rect.y2 - 2)
+    const cy = seededRNG.randomGetMinMax(rect.y1 + 1, rect.y2 - 2)
+    let idx = (cy << 10) | cx
 
-    if (chunkManager.getTile(cx, y) !== SEA) return 0
-    while (y < rect.y2 && chunkManager.getTile(cx, y) === SEA) y++
-    if (chunkManager.getTile(cx, y) !== SAND) return 0
+    if (chunkManager.getTileAt(idx) !== SEA) return 0
+    const maxIndex = (rect.y2 << 10) | cx
+    while (idx < maxIndex && chunkManager.getTileAt(idx) === SEA) idx += W
+    if (chunkManager.getTileAt(idx) !== SAND) return 0
 
-    return (y << 10) | cx
+    return idx
   }
 
   /**
@@ -686,11 +689,11 @@ class CoralSystem {
     const cx = floorIndex & 0x3FF
     const y = floorIndex >> 10
 
-    const canRight = chunkManager.getTile(cx + 1, y) === SAND &&
+    const canRight = chunkManager.getTileAt(floorIndex + 1) === SAND &&
       chunkManager.isRectCode(cx, y - 2, 2, 2, SEA) &&
       blockedTiles.canPlaceRect(cx, y - 2, 2, 2) && blockedTiles.canMineRect(cx, y, 2, 1)
 
-    const canLeft = chunkManager.getTile(cx - 1, y) === SAND &&
+    const canLeft = chunkManager.getTileAt(floorIndex - 1) === SAND &&
       chunkManager.isRectCode(cx - 1, y - 2, 2, 2, SEA) &&
       blockedTiles.canPlaceRect(cx - 1, y - 2, 2, 2) && blockedTiles.canMineRect(cx - 1, y, 2, 1)
 
