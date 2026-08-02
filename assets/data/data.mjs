@@ -629,7 +629,7 @@ export const ITEMS = {
   pearlPink: {name: 'Black Pink', type: 0, stype: 'pearl', star: 4, image: 'foraged_32_32-6-4', help: 'Oyster', tooltip: 'Major ingredient of Luck Potion'},
 
   mandrake: {name: 'Mandrake', type: 0, stype: 'herb', star: 2, image: null, placed: 'placed_32_32-5-0', speed: 1900, foraging: {speed: 500, items: [{item: 'mandrakeRoot', count: 1}, {item: 'slug', count: 0.12, buffs: ['lucky:100', 'rainy:300']}]}, help: 'Mandrake', tooltip: 'Harvest to collect Potions and Food ingredients'},
-  mandrakeRoot: {name: 'Mandrake Root', type: 0, stype: 'herb', star: 3, image: 'crafting_32_32-0-1', help: 'Mandrake', tooltip: 'Crafting Material for Potions and Food'},
+  mandrakeRoot: {name: 'Mandrake Root', type: 0, stype: 'herb', star: 3, image: 'foraged_32_32-7-4', help: 'Mandrake', tooltip: 'Crafting Material for Potions and Food'},
 
   pricklepad: {name: 'Pricklepad', type: 0, stype: 'herb', star: 3, image: null, placed: 'fuws_32_32-2-3', help: 'Pricklepad', tooltip: '???', foraging: {speed: 1800, items: [{item: 'pricklepadFruit', count: '1-3'}, {item: 'cactusSpine', count: 0.80}, {item: 'cactusFiber', count: 1.80}]}},
   pricklepad1: {name: 'Pricklepad', type: 0, stype: 'herb', star: 3, image: null, placed: 'fuws_32_32-2-3', help: 'Pricklepad', tooltip: '???', foraging: {speed: 1800, items: [{item: 'pricklepadFruit', count: '1-3'}, {item: 'cactusSpine', count: 0.80}, {item: 'cactusFiber', count: 1.80}]}},
