@@ -1559,7 +1559,7 @@ export const oleanderSystem = new OleanderSystem()
 
    Population constante : #list reçoit en une fois (init) le tableau complet des mandrakes,
    taille fixe jamais réallouée (pas de GC). Un record present=false signale un slot à faire
-   repousser ailleurs — mis en #regrowQueue, vidée par microtâche (contenu à définir).
+   repousser ailleurs — mis en #regrowQueue, vidée par microtâche (mandrakeRegrow).
 
    ==================================================================================================== */
 
@@ -1653,6 +1653,42 @@ class MandrakeSystem {
    * @returns {boolean}
    */
   isPresent (record) { return record.present }
+
+  /**
+   * Détruit un mandrake présent sans loot : retire byTile/#byChunk/#bySoil (2 entrées)/
+   * #displayed, débloque le rectangle 2x2 occupé, persiste, puis programme la repousse
+   * (#regrowQueue + microtâche). Guard : no-op si record.present est déjà false.
+   * @param {object} record
+   */
+  #destroyPresent (record) {
+    if (!record.present) return
+
+    record.present = false
+    removeFromByTile(this.byTile, record)
+    removeFromByChunk(this.#byChunk, record)
+    this.#bySoil.delete(record.soilIndex)
+    this.#bySoil.delete(record.soilIndex + 1)
+    this.#displayed.delete(record)
+
+    blockedTiles.unblockPlacementRect(record.x, record.y, record.w, record.h)
+
+    saveManager.queueStaticUpdate({storeName: 'plant', record})
+
+    this.#regrowQueue.push(record)
+    if (this.#regrowQueue.length === 1) {
+      const {priority, capacity} = MICROTASK.MANDRAKE_REGROW
+      microTasker.enqueue(this.mandrakeRegrow, priority, capacity)
+    }
+  }
+
+  /**
+   * Traite le foraging réussi de ce mandrake (hors loot, géré par ForagingManager).
+   * Marque le record absent et programme la repousse.
+   * @param {object} record
+   */
+  onForaged (record) {
+    this.#destroyPresent(record)
+  }
 
   /**
    * TODO — Liaison EventBus : 'time/first-loop'. Déclenchera la microtâche de repousse si
