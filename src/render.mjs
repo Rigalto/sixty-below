@@ -245,7 +245,7 @@ class Camera {
       }
     }
     eventBus.emit('camera/preload-chunks-changed', this.preloadChunks)
-    console.log('>>>>>> #updateChunkLists', this.displayChunks, this.preloadChunks, this.unpurgeableChunks)
+    // console.log('>>>>>> #updateChunkLists', this.displayChunks, this.preloadChunks, this.unpurgeableChunks)
   }
 
   /**

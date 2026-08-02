@@ -280,14 +280,18 @@ class GameCore {
  * Appelé au boot, après #hydrateItems().
  */
   #hydrateAchievements () {
+    let count = 0
     for (const category of ACHIEVEMENT_CATEGORIES) {
       for (const code of category.items) {
         if (ITEMS[code] === undefined &&
           MONSTERS[code] === undefined) {
           console.error(`[hydrateAchievements] '${category.id}' : code inconnu '${code}'`)
+        } else {
+          count++
         }
       }
     }
+    console.log(`   🔹 Achievements hydratés : ${count}`)
   }
 
   /* =========================================

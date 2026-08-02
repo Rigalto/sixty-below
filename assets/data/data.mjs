@@ -1461,7 +1461,4 @@ for (const key in RECIPES) {
 export const CRAFT_STATIONS = [..._stationSet].sort((a, b) => a.name.localeCompare(b.name))
 export const CRAFT_INGREDIENTS = [..._ingredientSet].sort((a, b) => a.name.localeCompare(b.name))
 
-// console.log('...<<<<>>>>>....', {CRAFT_RESULT_TYPES, CRAFT_STATIONS, CRAFT_INGREDIENTS})
-console.log('CRAFT_RESULT_TYPES', CRAFT_RESULT_TYPES)
-console.log('axeCopper labels', ITEMS.axeCopper.craftFilterLabels, ITEMS.axeCopper.type.toString(2), ITEMS.axeCopper.stype)
-console.log('pickaxeCopper labels', ITEMS.pickaxeCopper.craftFilterLabels, ITEMS.pickaxeCopper.type.toString(2), ITEMS.pickaxeCopper.stype)
+console.log('Data Post-processing', {CRAFT_RESULT_TYPES, CRAFT_STATIONS, CRAFT_INGREDIENTS})
