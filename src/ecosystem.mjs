@@ -1531,25 +1531,14 @@ class OleanderSystem {
    * Pas de gestion de spot — population fixe, repousse via #regrowQueue.
    * @param {{tileIndex: number, tileOldCode: number, tileNewCode: number}} payload
    */
-  onTileChangedOleander ({tileIndex, tileOldCode, tileNewCode}) {
-    const VOID = NODES.VOID.code
-    const STONE = NODES.STONE.code
-
+  onTileChangedOleander ({tileIndex, tileOldCode}) {
     // Cas 1 — tuile du corps : une des 3 VOID devient autre chose
     const byBodyRecord = this.byTile.get(tileIndex)
-    if (byBodyRecord !== undefined && tileNewCode !== VOID) {
-      const x = byBodyRecord.index & 0x3FF
-      const y = byBodyRecord.index >> 10
-      if (!chunkManager.isRectCode(x, y, 1, 3, VOID)) this.#destroyPresent(byBodyRecord)
-    }
+    if (byBodyRecord !== undefined) this.#destroyPresent(byBodyRecord)
 
-    // Cas 2 — tuile sol : STONE retiré
-    if (tileOldCode === STONE) {
-      const record = this.#bySoil.get(tileIndex)
-      if (record !== undefined && chunkManager.getTileAt(record.soilIndex) !== STONE) {
-        this.#destroyPresent(record)
-      }
-    }
+    // Cas 2 — tuile sol
+    const record = this.#bySoil.get(tileIndex)
+    if (record !== undefined) this.#destroyPresent(record)
   }
 }
 export const oleanderSystem = new OleanderSystem()
@@ -1804,13 +1793,19 @@ class MandrakeSystem {
   }
 
   /**
-   * TODO — Liaison EventBus : 'world/tile-changed'. Détruira le mandrake présent si une des
-   * 4 tuiles VOID du sprite n'est plus libre, ou si l'une des 2 tuiles sol n'est plus
-   * LIMESTONE.
+   * Liaison EventBus : 'world/tile-changed'.
+   * Détruit le mandrake présent si une des 4 tuiles VOID de son corps n'est plus libre,
+   * ou si la tuile support modifiée n'est plus LIMESTONE.
    * @param {{tileIndex: number, tileOldCode: number, tileNewCode: number}} payload
    */
-  onTileChangedMandrake ({tileIndex, tileOldCode, tileNewCode}) {
-    // TODO
+  onTileChangedMandrake ({tileIndex}) {
+    // Cas 1 — tuile du corps : une des 4 VOID devient autre chose
+    const byBodyRecord = this.byTile.get(tileIndex)
+    if (byBodyRecord !== undefined) this.#destroyPresent(byBodyRecord)
+
+    // Cas 2 — tuile sol (l'une des 2 tuiles support)
+    const record = this.#bySoil.get(tileIndex)
+    if (record !== undefined) this.#destroyPresent(record)
   }
 }
 export const mandrakeSystem = new MandrakeSystem()
