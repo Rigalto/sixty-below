@@ -29,7 +29,10 @@
 ### Images, sons et aide en ligne
 
 - corriger les icones dans weapon_32_32 : dague, épée, bow, boomrang
-- corriger les icones dans tool_32_32 : hache, pickaxe, hammer, axe
+- corriger les icones dans tool_32_32 :
+  - pickaxe : 5 restant
+  - hammer : 4 restant
+  - axe : 5 restant
 - ajouter image des quatre triskels (copper, silver, gold et complet)
 - continuer la correction et l'ajout de fiches d'aide (`HELP`) et d'items (`ITEMS`)
 - Recettes pour créer Linen Rope et l'utiliser
