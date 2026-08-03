@@ -384,6 +384,12 @@ const DEBUG_PACKS = {
     {item: 'slidingBevel', count: 1},
     {item: 'draftingCompass', count: 1},
     {item: 'theodolite', count: 1}
+  ],
+  station: [
+    {item: 'tableWood', count: 1},
+    {item: 'workbench', count: 1},
+    {item: 'anvil', count: 1},
+    {item: 'furnace', count: 1}
   ]
 }
 
