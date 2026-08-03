@@ -406,6 +406,22 @@ class FurnishingManager {
     eventBus.emit('sound/play', 'placing')
     eventBus.emit('furniture/placed', furniture.id)
   }
+
+  /**
+   * Bascule un cookingPot entre son état éteint (cookingPot) et allumé (cookingPotOn), au clic
+   * droit. Change uniquement code/stype via furnitureManager.changeCode — les deux items
+   * partagent la même empreinte (32×32), aucune validation de footprint nécessaire.
+   * @param {number} tileIndex — (y << 10) | x — tuile cliquée
+   * @param {object} furniture — meuble sous le curseur (code === 'cookingPot' ou 'cookingPotOn')
+   */
+  tryToggleCookingPot (tileIndex, furniture) {
+    if (buffManager.getBuff('playerFreeze')) return
+    if (!isInInteractionRange(tileIndex)) { eventBus.emit('sound/play', 'toofar'); return }
+
+    const newCode = furniture.code === 'cookingPot' ? 'cookingPotOn' : 'cookingPot'
+    furnitureManager.changeCode(furniture.id, newCode)
+    eventBus.emit('sound/play', 'placing')
+  }
 }
 export const furnishingManager = new FurnishingManager()
 

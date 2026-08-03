@@ -474,8 +474,8 @@ export const ITEMS = {
   leather: {name: 'Leather', type: 0, stype: 'leather', star: 1, image: 'crafting_32_32-2-0', help: 'Leatherworking', tooltip: '???'},
 
   alchemyTable: {name: 'Alchemy Table', type: ITEM_TYPE.FURNITURE | ITEM_TYPE.PLACABLE, stype: 'station', star: 2, image: 'station_32_32-0-3', placed: 'placed_32_32-4-1', unplacing: {speed: 2400}, help: 'Alchemy', tooltip: 'Crafting station for potions'},
-  cookingPot: {name: 'Cooking Pot', type: ITEM_TYPE.FURNITURE | ITEM_TYPE.PLACABLE, stype: '', star: 2, image: 'station_32_32-1-3', placed: 'placed_32_32-7-2', unplacing: {speed: 2400}, help: 'Cooking', tooltip: 'Crafting station for food'},
-  cookingPotOn: {name: 'Cooking Pot', type: ITEM_TYPE.FURNITURE | ITEM_TYPE.IMMOVABLE, stype: 'station', star: 2, image: null, placed: 'placed_32_32-7-3', help: 'Cooking', tooltip: 'Crafting station for food'},
+  cookingPot: {name: 'Cooking Pot', type: ITEM_TYPE.FURNITURE | ITEM_TYPE.PLACABLE, stype: 'station_', star: 2, image: 'station_32_32-1-3', placed: 'placed_32_32-7-2', unplacing: {speed: 2400}, help: 'Cooking', tooltip: 'Right-click to light the fire'},
+  cookingPotOn: {name: 'Cooking Pot', type: ITEM_TYPE.FURNITURE | ITEM_TYPE.IMMOVABLE, stype: 'station', star: 2, image: 'station_32_32-1-3', placed: 'placed_32_32-7-3', help: 'Cooking', tooltip: 'Crafting station for food'},
 
   brokenDecomposer: {name: 'Broken Decomposer', type: ITEM_TYPE.FURNITURE | ITEM_TYPE.IMMOVABLE, stype: 'immovable', star: 5, image: null, placed: 'placed_32_32-6-2', help: 'Decomposer', tooltip: 'Once repaired, recovers most of an item\'s crafting components'},
   decomposerPart: {name: 'Decomposer Part', type: ITEM_TYPE.TOOL, stype: 'part', star: 5, image: 'tool_32_32-4-5', placed: 'handed_48_48-0-4', help: 'Decomposer', tooltip: 'Part used to repair Broken Decomposer'},
@@ -909,7 +909,7 @@ export const RECIPES = [
 
   // Food - Tier 1-3
   {result: {item: 'sunflowerOil', count: 1}, station: 'tableWood', ingredients: [{item: 'sunflowerSeed', count: 1}]},
-  {result: {item: 'oleanderOil', count: 2}, station: 'cookingPot', ingredients: [{item: 'oleander', count: 1}, {item: 'sunflowerOil', count: 1}]},
+  {result: {item: 'oleanderOil', count: 2}, station: 'cookingPotOn', ingredients: [{item: 'oleander', count: 1}, {item: 'sunflowerOil', count: 1}]},
   {result: {item: 'daw', count: 4}, station: 'byHand', ingredients: [{item: 'flour', count: 1}, {item: 'bottleWater', count: 1}], returned: [{item: 'bottle', count: 1}]},
   {result: {item: 'bread', count: 1}, station: 'furnace', ingredients: [{item: 'daw', count: 1}]},
   {result: {item: 'croissant', count: 2}, station: 'furnace', ingredients: [{item: 'daw', count: 1}, {item: 'sunflowerOil', count: 1}]}
@@ -1432,7 +1432,7 @@ for (const recipe of RECIPES) {
     if (mask === ITEM_TYPE.MATERIAL && item.stype === 'trinket') continue // redondant avec le filtre 'Trinket'
 
     const prefix = STYPE_SUBDIVIDED.get(mask)
-    const computed = (prefix && item.stype) ? `${prefix} - ${capitalize(item.stype)}` : label
+    const computed = (prefix && item.stype) ? `${prefix} - ${capitalize(item.stype.replace(/_+$/, ''))}` : label
     labels.add(computed)
     _allFilterLabels.add(computed)
   }

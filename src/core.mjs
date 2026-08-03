@@ -666,7 +666,8 @@ class GameCore {
     if (furniture === null) return
 
     if (furniture.stype === 'teleporter') teleporterManager.tryTeleport(tileIndex, furniture)
-    // TODO : autres stype de furniture (chest, door...)
+    else if (furniture.code === 'cookingPot' || furniture.code === 'cookingPotOn') furnishingManager.tryToggleCookingPot(tileIndex, furniture)
+    // TODO : autres stype de furniture (chair, bed, campfire, door...)
   }
 
   /**
