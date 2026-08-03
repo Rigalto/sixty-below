@@ -475,7 +475,7 @@ export const ITEMS = {
 
   alchemyTable: {name: 'Alchemy Table', type: ITEM_TYPE.FURNITURE | ITEM_TYPE.PLACABLE, stype: 'station', star: 2, image: 'station_32_32-0-3', placed: 'placed_32_32-4-1', unplacing: {speed: 2400}, help: 'Alchemy', tooltip: 'Crafting station for potions'},
   cookingPot: {name: 'Cooking Pot', type: ITEM_TYPE.FURNITURE | ITEM_TYPE.PLACABLE, stype: 'station_', star: 2, image: 'station_32_32-1-3', placed: 'placed_32_32-7-2', unplacing: {speed: 2400}, help: 'Cooking', tooltip: 'Right-click to light the fire'},
-  cookingPotOn: {name: 'Cooking Pot', type: ITEM_TYPE.FURNITURE | ITEM_TYPE.IMMOVABLE, stype: 'station', star: 2, image: 'station_32_32-1-3', placed: 'placed_32_32-7-3', help: 'Cooking', tooltip: 'Crafting station for food'},
+  cookingPotOn: {name: 'Cooking Pot', type: ITEM_TYPE.FURNITURE | ITEM_TYPE.IMMOVABLE, stype: 'station', star: 2, image: 'station_32_32-3-3', placed: 'placed_32_32-7-3', help: 'Cooking', tooltip: 'Crafting station for food'},
 
   brokenDecomposer: {name: 'Broken Decomposer', type: ITEM_TYPE.FURNITURE | ITEM_TYPE.IMMOVABLE, stype: 'immovable', star: 5, image: null, placed: 'placed_32_32-6-2', help: 'Decomposer', tooltip: 'Once repaired, recovers most of an item\'s crafting components'},
   decomposerPart: {name: 'Decomposer Part', type: ITEM_TYPE.TOOL, stype: 'part', star: 5, image: 'tool_32_32-4-5', placed: 'handed_48_48-0-4', help: 'Decomposer', tooltip: 'Part used to repair Broken Decomposer'},
