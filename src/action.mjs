@@ -346,10 +346,13 @@ export const placingManager = new PlacingManager()
    POSE DE MEUBLES (FURNISHING)
    ==================================================================================================== */
 
+const COOKING_POT_LIT_DURATION = 6 * 60_000 // 6h in-game = 6 minutes réelles (HOUR_MS = 60_000ms/h in-game)
+
 class FurnishingManager {
   constructor () {
     // Micro-tâche
     this.onPlaceFurniture = this.onPlaceFurniture.bind(this)
+    this.onCookingPotExtinguish = this.onCookingPotExtinguish.bind(this)
   }
 
   /**
@@ -407,6 +410,10 @@ class FurnishingManager {
     eventBus.emit('furniture/placed', furniture.id)
   }
 
+  // /////////// //
+  // COOKING POT //
+  // /////////// //
+
   /**
    * Bascule un cookingPot entre son état éteint (cookingPot) et allumé (cookingPotOn), au clic
    * droit. Change uniquement code/stype via furnitureManager.changeCode — les deux items
@@ -417,10 +424,31 @@ class FurnishingManager {
   tryToggleCookingPot (tileIndex, furniture) {
     if (buffManager.getBuff('playerFreeze')) return
     if (!isInInteractionRange(tileIndex)) { eventBus.emit('sound/play', 'toofar'); return }
+    const taskId = `cookingpot_extinguish_${furniture.id}`
 
-    const newCode = furniture.code === 'cookingPot' ? 'cookingPotOn' : 'cookingPot'
-    furnitureManager.changeCode(furniture.id, newCode)
+    if (furniture.code === 'cookingPot') {
+      const {priority, capacity} = MICROTASK.COOKINGPOT_EXTINGUISH
+      furniture.untilLitTimestamp = taskScheduler.enqueue(taskId, COOKING_POT_LIT_DURATION, this.onCookingPotExtinguish, priority, capacity, furniture.id)
+      furnitureManager.changeCode(furniture.id, 'cookingPotOn')
+    } else {
+      taskScheduler.dequeue(taskId)
+      furnitureManager.changeCode(furniture.id, 'cookingPot')
+    }
     eventBus.emit('sound/play', 'placing')
+  }
+
+  /**
+   * Callback TaskScheduler : éteint automatiquement un cookingPot à l'échéance de
+   * untilLitTimestamp. Aucune tâche à annuler ici — on est déjà dans son exécution.
+   * Sans effet si le furniture a été retiré ou déjà éteint entre-temps.
+   * Liée dans le constructeur.
+   * @param {string} furnitureId
+   */
+  onCookingPotExtinguish (furnitureId) {
+    const furniture = furnitureManager.getFurnitureById(furnitureId)
+    if (furniture === undefined || furniture.code !== 'cookingPotOn') return
+
+    furnitureManager.changeCode(furnitureId, 'cookingPot')
   }
 }
 export const furnishingManager = new FurnishingManager()

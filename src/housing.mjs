@@ -1,8 +1,8 @@
 // housing.mjs — FurnitureManager - HousingManager
 
-import {eventBus, blockedTiles} from './utils.mjs'
+import {eventBus, blockedTiles, taskScheduler} from './utils.mjs'
 import {uniqueIdGenerator} from './database.mjs'
-import {CONTAINER_STYPES} from './constant.mjs'
+import {CONTAINER_STYPES, MICROTASK} from './constant.mjs'
 import {saveManager} from './persistence.mjs'
 import {camera} from './render.mjs'
 import {playerManager} from './player.mjs'
@@ -10,6 +10,7 @@ import {isInInteractionRange} from './buff.mjs' // ← ajouter
 import {IMAGE_CACHE} from './assets.mjs'
 import {MAX_FURNITURE_W, MAX_FURNITURE_H, ITEMS, NODES_LOOKUP, NODE_TYPE} from '../assets/data/data.mjs'
 import {chunkManager} from './world.mjs'
+import {furnishingManager} from './action.mjs'
 
 /* ====================================================================================================
    FURNITURE MANAGER
@@ -69,6 +70,7 @@ class FurnitureManager {
   #platformTiles = new Set() // Set<tileIndex> — tuile occupée par une platform (stype:'platform', toujours 1x1)
 
   constructor () {
+    // eventBus
     this.onPreloadChunksChanged = this.onPreloadChunksChanged.bind(this)
     eventBus.on('camera/preload-chunks-changed', this.onPreloadChunksChanged)
   }
@@ -205,6 +207,10 @@ class FurnitureManager {
       this.#addToChunks(record)
       this.#addToOccupancy(record)
       if (record.stype === 'teleporter') teleporterManager.initTeleporter(record)
+      if (record.code === 'cookingPotOn' && record.untilLitTimestamp !== null) {
+        const {priority, capacity} = MICROTASK.COOKINGPOT_EXTINGUISH
+        taskScheduler.enqueueAbsolute(`cookingpot_extinguish_${record.id}`, record.untilLitTimestamp, furnishingManager.onCookingPotExtinguish, priority, capacity, record.id)
+      }
     }
     console.log('FurnitureManager.init', {list: this.#list, byId: this.#byId, byChunk: this.#byChunk})
   }

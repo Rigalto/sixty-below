@@ -322,6 +322,8 @@ export const MICROTASK = {
   COBWEB_GROWTH: {priority: 20, capacity: 3, taskName: 'cobwebGrowth'}, // tentative périodique de pose d'une toile d'araignée
   AMBERMIRAGE_TILE_CHECK: {priority: 20, capacity: 10, taskName: 'onAmbermirageTileCheck'}, // entretien réactif d'un spot pour une tuile modifiée
 
+  COOKINGPOT_EXTINGUISH: {priority: 20, capacity: 2, taskName: 'onCookingPotExtinguish'}, // extinction automatique d'un cookingPot après 6h in-game
+
   UI_ENV_UPDATE: {priority: 18, capacity: 2, taskName: 'updateClockInOverlay'}, // affiche le widget time/weather/Moon/Location
   UI_TILE_HOVER: {priority: 18, capacity: 2, taskName: 'onTileHoverDetail'}, // affiche le widget tuile survolée
   PROCESS_SAVE: {priority: 15, capacity: 12, taskName: 'processSave'}, // sauvegarde en database des chunks et autres records
