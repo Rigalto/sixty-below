@@ -6049,7 +6049,7 @@ Foraging Tool: <<itemStar|sickleSilver>> or better
     content: `
 **Description**
 
-The underground Pricklepad is a hardy desert plant that has adapted to the complete absence of sunlight. Its thick, ribbed trunk and characteristic branching arms are unmistakable — even in the dark tunnels of [[Desert]] biomes.
+The underground Pricklepad is a hardy desert plant that has adapted to the complete absence of sunlight. ::mettre une description d'un figuier de Barbarie:: in the dark tunnels of [[Desert]] biomes.
 
 **Tier**
 
@@ -6070,11 +6070,12 @@ The underground Pricklepad is a hardy desert plant that has adapted to the compl
 
 **Foraging**
 
-Foraging Tool: <<itemStar|sickleCopper>> or better
+* [[Foraging|Interact to harvest]]
+* The plant disappears on harvest
 
-_The Pricklepad disappears immediately upon collection_
+Foraging Tool: <<itemStar|sickleSilver>> or better
 
-**Foraging Loot** ⏳
+**Pricklepad Foraging Loot**
 
 <<itemLootTable|pricklepad|foraging>>
 

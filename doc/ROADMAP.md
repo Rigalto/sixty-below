@@ -9,7 +9,7 @@
 
 ### Code et tests
 
-- Implémenter les herbes, reste : Pricklepad, Bamboo, Satan's Cube, Sneakthorn, Cursedcrown, Abysshorn, InfernCap
+- Implémenter les herbes, reste : Pricklepad (en cours), Bamboo, Satan's Cube, Sneakthorn, Cursedcrown, Abysshorn, InfernCap
 - Implémenter les plants des mini-biomes, reste : fern Cave, Mushroom Cave
 - Implémenter les Giant Mushrooms.
 - Implémenter la réduction de vitesse dans les liquides ou les cobweb.
@@ -30,6 +30,7 @@
 
 - corriger les icones dans weapon_32_32 : dague, épée, bow, boomrang
 - corriger les icones dans tool_32_32 : hache, pickaxe, hammer, axe
+- ajouter image des quatre triskels (copper, silver, gold et complet)
 - continuer la correction et l'ajout de fiches d'aide (`HELP`) et d'items (`ITEMS`)
 - Recettes pour créer Linen Rope et l'utiliser
 - Mettre la bonne palette et un entourage noir pour tool_32_32, reste à faire :
