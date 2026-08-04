@@ -17,7 +17,7 @@ import {furnitureManager, teleporterManager} from './housing.mjs'
 import {craftOverlay} from './craft.mjs'
 import {achievementManager} from './achievement.mjs'
 import {playerManager, lootPopupManager, handedToolManager, hotbarOverlay} from './player.mjs'
-import {floraManager, sunflowerSystem, oleanderSystem, mandrakeSystem, parsnipSystem, ambermirageSystem, oakSystem, mahoganySystem, cobwebSystem, coconutSystem, thornspineSystem, spreadForestSystem, spreadJungleSystem, coralSystem, bloodmoonSystem} from './ecosystem.mjs'
+import {floraManager, sunflowerSystem, oleanderSystem, mandrakeSystem, pricklepadSystem, parsnipSystem, ambermirageSystem, oakSystem, mahoganySystem, cobwebSystem, coconutSystem, thornspineSystem, spreadForestSystem, spreadJungleSystem, coralSystem, bloodmoonSystem} from './ecosystem.mjs'
 import {ACHIEVEMENT_CATEGORIES} from '../assets/data/data-achievement.mjs'
 import {miningManager, placingManager, foragingManager, choppingManager, sowingManager, hammingManager, furnishingManager, fillingManager, pouringManager, decomposerManager} from './action.mjs'
 import './combat.mjs'
@@ -32,6 +32,7 @@ const plantSystemLookup = [ // Map<kind*100+type, system> — peuplée au fur et
   //   [PLANT_KIND.TREE * 100 + PLANT_TYPE.GIANT_MUSHROOM, giantMushroomSystem],
   [PLANT_KIND.MUSHROOM * 100 + PLANT_TYPE.BOLETE, oakSystem],
   [PLANT_KIND.MUSHROOM * 100 + PLANT_TYPE.PINKMYCENIA, mahoganySystem],
+  [PLANT_KIND.HERB * 100 + PLANT_TYPE.PRICKLEPAD, pricklepadSystem],
   //   [PLANT_KIND.MUSHROOM * 100 + PLANT_TYPE.FROSTCAP, capystem],
   //   [PLANT_KIND.MUSHROOM * 100 + PLANT_TYPE.DAWNCAP, capystem],
   [PLANT_KIND.HERB * 100 + PLANT_TYPE.OLEANDER, oleanderSystem],
@@ -57,7 +58,7 @@ const plantSystemLookup = [ // Map<kind*100+type, system> — peuplée au fur et
   //   [PLANT_KIND.SPREAD * 100 + PLANT_TYPE.NONE, spreadSystem],
   //   [PLANT_KIND.SEED * 100 + PLANT_TYPE.NONE, seedSystem]
 ]
-const allPlantSystems = [sunflowerSystem, oleanderSystem, parsnipSystem, ambermirageSystem, oakSystem, mahoganySystem, coconutSystem, thornspineSystem, spreadForestSystem, spreadJungleSystem, coralSystem, bloodmoonSystem, mandrakeSystem]
+const allPlantSystems = [sunflowerSystem, oleanderSystem, parsnipSystem, ambermirageSystem, oakSystem, mahoganySystem, coconutSystem, thornspineSystem, spreadForestSystem, spreadJungleSystem, coralSystem, bloodmoonSystem, mandrakeSystem, pricklepadSystem]
 
 const debugHUD = () => {
   const debugDiv = document.createElement('div')
@@ -791,6 +792,7 @@ class GameCore {
     teleporterManager.debug()
     coralSystem.debug()
     mandrakeSystem.debug()
+    pricklepadSystem.debug()
     eventBus.emit('debug/buff-manager')
   }
 }

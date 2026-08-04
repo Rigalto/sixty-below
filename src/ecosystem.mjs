@@ -1,5 +1,5 @@
 // ecosystem.mjs — FloraManager - OakSystem - MahoganySystem - CoconutSystem - ThornspineSystem
-// SunflowerSystem - OleanderSystem - MandrakeSystem - ParsnipSystem - AmbermirageSystem
+// SunflowerSystem - OleanderSystem - MandrakeSystem - PricklepadSystem  - ParsnipSystem - AmbermirageSystem
 // CobwebSystem - HiveSystem
 // SpreadForestSystem - SpreadJungleSystem - CoralSystem - BloodmoonSystem
 // SampleSystem
@@ -1809,6 +1809,274 @@ class MandrakeSystem {
   }
 }
 export const mandrakeSystem = new MandrakeSystem()
+
+/* ====================================================================================================
+   PRICKLEPAD SYSTEM
+   ====================================================================================================
+
+   Singleton : pricklepadSystem.
+
+   Population constante : #list reçoit en une fois (init) le tableau complet des pricklepads,
+   taille fixe jamais réallouée (pas de GC). Un record present=false signale un slot à faire
+   repousser ailleurs — mis en #regrowQueue, vidée par microtâche (pricklepadRegrow).
+
+   ==================================================================================================== */
+
+const PRICKLEPAD_REGROW_INITIAL_DELAY_MS = 1547
+const PRICKLEPAD_REGROW_RETRY_DELAY_MS = 123
+
+class PricklepadSystem {
+  byTile = new Map() // Map<tileIndex, record> — public : membership O(1) + lookup record
+  #list = [] // record[] — population fixe, référence affectée dans init(records)
+  #byChunk = new Map() // Map<chunkKey, Set> — lookup spatial pour onPreloadChunksChanged
+  #bySoil = new Map() // Map<soilIndex, record> — pricklepads présents : détection retrait du sol (2 entrées/record, sol sur 2 tuiles)
+  #displayed = new Set() // Set<record> — cible du render (chunks preload uniquement)
+  #regrowQueue = [] // record[] — records present=false en attente d'un nouvel emplacement
+  #image = null // image à afficher (mise en cache)
+
+  constructor () {
+    // eventBus
+    this.onFirstLoopPricklepad = this.onFirstLoopPricklepad.bind(this)
+    eventBus.on('time/first-loop', this.onFirstLoopPricklepad)
+    this.onTileChangedPricklepad = this.onTileChangedPricklepad.bind(this)
+    eventBus.on('world/tile-changed', this.onTileChangedPricklepad)
+    // micro-tâches
+    this.pricklepadRegrow = this.pricklepadRegrow.bind(this)
+  }
+
+  /**
+   * Réinitialise toutes les structures.
+   * Appelé en début de session, avant toute hydratation.
+   */
+  init () {
+    this.byTile.clear()
+    this.#list.length = 0
+    this.#byChunk.clear()
+    this.#bySoil.clear()
+    this.#displayed.clear()
+    this.#regrowQueue.length = 0
+
+    this.#image = ITEMS.pricklepad.placed // après hydratation
+  }
+
+  /**
+   * Enregistre un pricklepad et peuple les structures internes.
+   * Si present=false, met le record en file de repousse.
+   * @param {object} record — record HERB/PRICKLEPAD (deleted=false garanti par l'appelant)
+   */
+  initPlant (record) {
+    this.#list.push(record)
+
+    if (record.present) {
+      addToByTile(this.byTile, record)
+      addToByChunk(this.#byChunk, record)
+      this.#bySoil.set(record.soilIndex, record)
+      this.#bySoil.set(record.soilIndex + 1, record) // sol sur 2 tuiles (cx, cx+1)
+
+      blockedTiles.blockPlacementRect(record.x, record.y, record.w, record.h)
+      return
+    }
+    this.#regrowQueue.push(record)
+  }
+
+  debug () {
+    console.log(`[PricklepadSystem] ${this.#list.length} pricklepads récupérés, ${this.#regrowQueue.length} en attente de repousse`)
+  }
+
+  /**
+   * Reconstruit #displayed depuis les chunks preload de la caméra.
+   * @param {Set<number>} preloadChunks
+   */
+  onPreloadChunksChanged (preloadChunks) {
+    buildDisplayed(this.#displayed, this.#byChunk, preloadChunks)
+  }
+
+  /**
+   * Dessine les pricklepads visibles et présents sur le contexte transformé.
+   * @param {CanvasRenderingContext2D} ctx — contexte déjà transformé (caméra appliquée)
+   */
+  render (ctx) {
+    const img = this.#image
+    for (const record of this.#displayed) {
+      const pxX = (record.index & 0x3FF) << 4
+      const pxY = ((record.index >> 10) << 4) + 2
+      ctx.drawImage(IMAGE_CACHE[img.imgIndex], img.sx, img.sy, img.sw, img.sh, pxX, pxY, img.sw, img.sh)
+    }
+  }
+
+  /**
+   * Retourne le record de pricklepad couvrant la tuile donnée, ou null.
+   * @param {number} tileIndex — (y << 10) | x
+   * @returns {object|null}
+   */
+  getPlantAt (tileIndex) {
+    return this.byTile.get(tileIndex) ?? null
+  }
+
+  /**
+   * Indique si le record est actuellement présent (forageable).
+   * @param {object} record
+   * @returns {boolean}
+   */
+  isPresent (record) { return record.present }
+
+  /**
+   * Détruit un pricklepad présent sans loot : retire byTile/#byChunk/#bySoil (2 entrées)/
+   * #displayed, débloque le rectangle 2x2 occupé, persiste, puis programme la repousse
+   * (#regrowQueue + microtâche). Guard : no-op si record.present est déjà false.
+   * @param {object} record
+   */
+  #destroyPresent (record) {
+    if (!record.present) return
+
+    record.present = false
+    removeFromByTile(this.byTile, record)
+    removeFromByChunk(this.#byChunk, record)
+    this.#bySoil.delete(record.soilIndex)
+    this.#bySoil.delete(record.soilIndex + 1)
+    this.#displayed.delete(record)
+
+    blockedTiles.unblockPlacementRect(record.x, record.y, record.w, record.h)
+
+    saveManager.queueStaticUpdate({storeName: 'plant', record})
+
+    this.#regrowQueue.push(record)
+    if (this.#regrowQueue.length === 1) {
+      const {priority, capacity} = MICROTASK.PRICKLEPAD_REGROW
+      taskScheduler.enqueue('pricklepad-regrow', PRICKLEPAD_REGROW_RETRY_DELAY_MS, this.pricklepadRegrow, priority, capacity)
+    }
+  }
+
+  /**
+   * Traite le foraging réussi de ce pricklepad (hors loot, géré par ForagingManager).
+   * Marque le record absent et programme la repousse.
+   * @param {object} record
+   */
+  onForaged (record) {
+    this.#destroyPresent(record)
+  }
+
+  /**
+   * Liaison EventBus : 'time/first-loop'. Déclenchera la microtâche de repousse si
+   * #regrowQueue contient des records present=false chargés depuis la persistence.
+   * délai long pour ne pas surcharger le démarrage.
+   */
+  onFirstLoopPricklepad () {
+    if (this.#regrowQueue.length === 0) return
+    const {priority, capacity} = MICROTASK.PRICKLEPAD_REGROW
+    taskScheduler.enqueue('pricklepad-regrow', PRICKLEPAD_REGROW_INITIAL_DELAY_MS, this.pricklepadRegrow, priority, capacity)
+  }
+
+  /**
+   * Tire une colonne et une hauteur au hasard dans la bande under→caverns, descend
+   * jusqu'à la première tuile non-VOID.
+   * @returns {number} index packé (y<<10)|x du sol si ASH trouvée, 0 sinon
+   */
+  #findPricklepadFloor () {
+    const VOID = NODES.VOID.code
+    const ASH = NODES.ASH.code
+    const W = WORLD_WIDTH
+
+    const cx = seededRNG.randomGetMinMax(2, W - 3)
+    const cy = seededRNG.randomGetMinMax(TOPSOIL_Y_SURFACE_UNDER, TOPSOIL_Y_UNDER_CAVERNS)
+    let idx = (cy << 10) | cx
+
+    if (chunkManager.getTileAt(idx) !== VOID) return 0
+    const maxIndex = (TOPSOIL_Y_UNDER_CAVERNS << 10) | cx
+    while (idx < maxIndex && chunkManager.getTileAt(idx) === VOID) idx += W
+    if (chunkManager.getTileAt(idx) !== ASH) return 0
+
+    return idx
+  }
+
+  /**
+   * Teste les deux côtés du sol trouvé (ASH adjacent + pocket 2x2 VOID au-dessus +
+   * tuiles libres de tout blocage).
+   * @param {number} floorIndex — retour de #findPricklepadFloor
+   * @returns {number} soilX retenu, 0 si aucun côté valide
+   */
+  #findPricklepadSide (floorIndex) {
+    const VOID = NODES.VOID.code
+    const ASH = NODES.ASH.code
+    const cx = floorIndex & 0x3FF
+    const topY = (floorIndex >> 10) - 2
+
+    const canRight = chunkManager.getTileAt(floorIndex + 1) === ASH &&
+      chunkManager.isRectCode(cx, topY, 2, 2, VOID) &&
+      blockedTiles.canPlaceRect(cx, topY, 2, 2)
+
+    const canLeft = chunkManager.getTileAt(floorIndex - 1) === ASH &&
+      chunkManager.isRectCode(cx - 1, topY, 2, 2, VOID) &&
+      blockedTiles.canPlaceRect(cx - 1, topY, 2, 2)
+
+    if (!canLeft && !canRight) return 0
+    return (canLeft && (!canRight || seededRNG.randomGetBool())) ? cx - 1 : cx
+  }
+
+  /**
+   * Cherche un nouvel emplacement pour le dernier record de #regrowQueue.
+   * Départ VOID, descente jusqu'au premier non-VOID, sol ASH (ancre), puis
+   * test flat à droite (cx+1) et à gauche (cx-1) — 50/50 si les deux sont valides.
+   * blockedTiles — les 2 tuiles du pocket du côté retenu doivent être canPlace().
+   * Si trouvé : finalise le record (present=true, byTile/#byChunk/#bySoil, blockPlacement,
+   * persistence) et le retire de #regrowQueue (dernier élément, length--).
+   * Replanifie tant que #regrowQueue n'est pas vide, avec PRICKLEPAD_REGROW_RETRY_DELAY_MS.
+   */
+  pricklepadRegrow () {
+    if (this.#regrowQueue.length === 0) return
+
+    const floorIndex = this.#findPricklepadFloor()
+    const soilX = floorIndex !== 0 ? this.#findPricklepadSide(floorIndex) : 0
+    const found = soilX !== 0
+
+    if (found) {
+      const y = floorIndex >> 10
+      const topY = y - 2
+      const soilIndex = (y << 10) | soilX
+
+      const record = this.#regrowQueue[this.#regrowQueue.length - 1]
+
+      record.soilIndex = soilIndex
+      record.index = (topY << 10) | soilX
+      record.x = soilX
+      record.y = topY
+      record.present = true
+
+      addToByTile(this.byTile, record)
+      addToByChunk(this.#byChunk, record)
+      addToDisplayed(this.#displayed, record)
+      this.#bySoil.set(soilIndex, record)
+      this.#bySoil.set(soilIndex + 1, record)
+      blockedTiles.blockPlacementRect(soilX, topY, 2, 2)
+      saveManager.queueStaticUpdate({storeName: 'plant', record})
+
+      this.#regrowQueue.length--
+    }
+
+    if (this.#regrowQueue.length !== 0) {
+      const {priority, capacity} = MICROTASK.PRICKLEPAD_REGROW
+      taskScheduler.enqueue('pricklepad-regrow', PRICKLEPAD_REGROW_RETRY_DELAY_MS, this.pricklepadRegrow, priority, capacity)
+    }
+  }
+
+  /**
+   * Liaison EventBus : 'world/tile-changed'.
+   * Détruit le pricklepad présent si une des 4 tuiles VOID de son corps n'est plus libre,
+   * ou si la tuile support modifiée n'est plus ASH.
+   * @param {{tileIndex: number, tileOldCode: number, tileNewCode: number}} payload
+   */
+  onTileChangedPricklepad ({tileIndex}) {
+    // Cas 1 — tuile du corps : une des 4 VOID devient autre chose
+    const byBodyRecord = this.byTile.get(tileIndex)
+    if (byBodyRecord !== undefined) this.#destroyPresent(byBodyRecord)
+
+    // Cas 2 — tuile sol (l'une des 2 tuiles support)
+    const record = this.#bySoil.get(tileIndex)
+    if (record !== undefined) this.#destroyPresent(record)
+  }
+}
+export const pricklepadSystem = new PricklepadSystem()
+
 
 /* ====================================================================================================
    PARSNIP SYSTEM

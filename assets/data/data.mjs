@@ -633,7 +633,7 @@ export const ITEMS = {
   mandrakeRoot: {name: 'Mandrake Root', type: 0, stype: 'herb', star: 3, image: 'foraged_32_32-7-4', help: 'Mandrake', tooltip: 'Crafting Material for Potions and Food'},
 
   pricklepad: {name: 'Pricklepad', type: 0, stype: 'herb', star: 3, image: null, placed: 'placed_32_32-0-3', help: 'Pricklepad', tooltip: '???', foraging: {speed: 1800, items: [{item: 'pricklepadPear', count: '1-3'}, {item: 'cactusSpine', count: 0.80}, {item: 'cactusFiber', count: 1.80}]}},
-  pricklepadPear: {name: 'Pricklepad Pear', type: 0, stype: 'herb', star: 2, image: 'fuws_32_32-2-3', help: 'Pricklepad', tooltip: '???'},
+  pricklepadPear: {name: 'Pricklepad Pear', type: 0, stype: 'herb', star: 2, image: 'foraged_32_32-7-3', help: 'Pricklepad', tooltip: '???'},
 
   bamboo: {name: 'Bamboo', type: 0, stype: 'herb', star: 2, image: null, placed: 'fuws_32_32-2-3', help: 'Bamboo', tooltip: '???'},
   bambooStalk: {name: 'Bamboo Stalk', type: 0, stype: 'herb', star: 2, image: 'fuws_32_32-2-3', help: 'Bamboo', tooltip: '???'},

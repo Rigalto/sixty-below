@@ -5054,7 +5054,7 @@ All plants found in the world of Sixty-Below. Plants can be harvested for loot, 
 | [[item:frostcap]] | {{item:frostcap:star|star}} | Mushroom | [[Mushroom Cave]] / [[node:grassmushroom]] | [[item:mushroomGill]] | [[monster:woodlouse]] (Foraging) |
 | [[item:dawncap]] | {{item:dawncap:star|star}} | Mushroom | [[Mushroom Cave]] / [[node:grassmushroom]] | [[item:mushroomGill]] | [[monster:woodlouse]] (Foraging) |
 | [[item:mandrake]] | {{item:mandrake:star|star}} | Herb | [[Forest]] [[Underground]] / [[node:dirt]] | [[item:mandrakeRoot]] | [[monster:wraith]] (Foraging) |
-| [[item:pricklepad]] | {{item:pricklepad:star|star}} | Herb | [[Desert]] [[Underground]] / [[node:sand]] | [[item:pricklepadFruit]], [[item:cactusSpine]], [[item:cactusFiber]] | [[monster:scorpion]] (Foraging) |
+| [[item:pricklepad]] | {{item:pricklepad:star|star}} | Herb | [[Desert]] [[Underground]] / [[node:sand]] | [[item:pricklepadPear]], [[item:cactusSpine]], [[item:cactusFiber]] | [[monster:scorpion]] (Foraging) |
 | [[item:bamboo]] | {{item:bamboo:star|star}} | Herb | [[Jungle]] [[Underground]] / [[node:silt]] | [[item:bambooStalk]] | [[monster:centipede]] (Foraging) |
 | [[item:oleander]] | {{item:oleander:star|star}} | Herb | [[Underground]] / [[node:stone]] | [[item:oleander]] | [[monster:caveBeetle]] (Foraging) |
 | [[item:satansCube]] | {{item:satansCube:star|star}} | Herb | [[Forest]]+[[Desert]] [[Caverns]] | [[item:satansCube]] | [[monster:firesalamander]] (Foraging) |
@@ -6088,7 +6088,7 @@ Foraging Tool: <<itemStar|sickleSilver>> or better
 
 **Usages** ⏳
 
-* [[item:pricklepadFruit]] — food and crafting ingredient ⏳
+* [[item:pricklepadPear]] — food and crafting ingredient ⏳
 * [[item:cactusFiber]] — crafting ingredient ⏳
 * [[item:cactusSpine]] — crafting ingredient ⏳
 
