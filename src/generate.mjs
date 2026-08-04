@@ -410,7 +410,7 @@ class WorldGenerator {
     await progress('Mini-biome Plants')
 
     plantGenerator.placeMandrakes(zoneRects)
-    plantGenerator.placeCactus(zoneRects, chestRects)
+    plantGenerator.placePricklepads(zoneRects)
     plantGenerator.placeBamboo(zoneRects, chestIndexes)
     plantGenerator.placeOleanders(zoneRects)
     await progress('Underground Plants')
@@ -8353,42 +8353,36 @@ class PlantGenerator {
   }
 
   /**
-   * Place les Pricklepad dans les layers surface et under du biome Desert.
-   * Substrat : SAND avec VOID en y-1, y-2, y-3.
+   * Place les Pricklepad en zone souterraine (bande under). Aucun filtre de biome : le
+   * Desert émerge par dominance du substrat ASH, sur le même principe que Mandrake/LIMESTONE.
+   * Substrat : tuile ASH en cx (ancre), avec un second support ASH adjacent testé à droite
+   * (cx+1) puis à gauche (cx-1) ; 50/50 si les deux sont valides.
+   * VOID requis sur les 2x2 tuiles occupées par le sprite (y-1 et y-2, sur les 2 colonnes retenues).
    * Nombre constant défini par PRICKLEPAD_COUNT.
    * Arrêt après MAX_ATTEMPTS tirages infructueux consécutifs.
-   * Anti-densité : rectangle d'exclusion 5x7 centré sur soilIndex.
-   * Anti-coffre : test AABB avec chestRects.
+   * Respecte et alimente placedGuard (anti-coffre + anti-chevauchement avec toute autre entité
+   * placée).
    *
    * @param {Array<{x0, x1, ySkySurface, ySurface, yUnder, yCaverns, biome}>} zoneRects
-   * @param {Array<{x, y, w, h}>} chestRects — rectangles coffres pour test AABB
    */
-  placeCactus (zoneRects, chestRects) {
+  placePricklepads (zoneRects) {
     const VOID = NODES.VOID.code
-    const SAND = NODES.SAND.code
+    const ASH = NODES.ASH.code
     const W = WORLD_WIDTH
-    const MAX_ATTEMPTS = 100
-    const cactusIds = ['pricklepad', 'pricklepad1', 'pricklepad2', 'pricklepad3']
+    const MAX_ATTEMPTS = 200
 
-    const overlaps = (ax, ay, aw, ah, b) =>
-      ax < b.x + b.w && ax + aw > b.x &&
-      ay < b.y + b.h && ay + ah > b.y
-
-    // Collecter les rectangles Desert surface + under
     const rects = []
     for (const rect of zoneRects) {
-      if (rect.biome !== BIOME_TYPE.DESERT) continue
-      rects.push({x0: rect.x0, x1: rect.x1, y0: rect.ySkySurface, y1: rect.yUnder})
+      rects.push({x0: rect.x0, x1: rect.x1, y0: rect.ySurface, y1: rect.yUnder})
     }
     if (rects.length === 0) return
 
-    const guardedCactus = new Set()
     let placed = 0
     let consecutiveFailures = 0
 
     while (placed < PRICKLEPAD_COUNT && consecutiveFailures < MAX_ATTEMPTS) {
       const rect = seededRNG.randomGetArrayValue(rects)
-      const cx = seededRNG.randomGetMinMax(rect.x0 + 2, rect.x1 - 2)
+      const cx = seededRNG.randomGetMinMax(rect.x0 + 1, rect.x1 - 1)
       const cy = seededRNG.randomGetMinMax(rect.y0 + 1, rect.y1 - 1)
 
       if (worldBuffer.read(cx, cy) !== VOID) { consecutiveFailures++; continue }
@@ -8397,58 +8391,53 @@ class PlantGenerator {
       let y = cy
       while (y < rect.y1 && worldBuffer.read(cx, y) === VOID) y++
 
-      if (worldBuffer.read(cx, y) !== SAND) { consecutiveFailures++; continue }
+      // Deux tuiles ASH à la même hauteur
+      // 1) Ancre : tuile ASH, deux tuiles VOID au-dessus, non réservées
+      if (worldBuffer.read(cx, y) !== ASH) { consecutiveFailures++; continue }
+      if (worldBuffer.read(cx, y - 1) !== VOID || worldBuffer.read(cx, y - 2) !== VOID) { consecutiveFailures++; continue }
+      if (placedGuard.has(((y - 1) << 10) | cx) || placedGuard.has(((y - 2) << 10) | cx)) { consecutiveFailures++; continue }
 
-      // Vérifier VOID en y-1, y-2, y-3
-      if (worldBuffer.read(cx, y - 1) !== VOID) { consecutiveFailures++; continue }
-      if (worldBuffer.read(cx, y - 2) !== VOID) { consecutiveFailures++; continue }
-      if (worldBuffer.read(cx, y - 3) !== VOID) { consecutiveFailures++; continue }
+      // 2) Position à droite : cx+1 en ASH, VOID libre au-dessus
+      const canRight = worldBuffer.read(cx + 1, y) === ASH &&
+                        worldBuffer.read(cx + 1, y - 1) === VOID &&
+                        worldBuffer.read(cx + 1, y - 2) === VOID &&
+                        !placedGuard.has(((y - 1) << 10) | (cx + 1)) &&
+                        !placedGuard.has(((y - 2) << 10) | (cx + 1))
 
-      // Vérifier VOID sur les tuiles latérales (colonnes cx-1 et cx+1, y-1 à y-3)
-      if (worldBuffer.read(cx - 1, y - 1) !== VOID) { consecutiveFailures++; continue }
-      if (worldBuffer.read(cx + 1, y - 1) !== VOID) { consecutiveFailures++; continue }
-      if (worldBuffer.read(cx - 1, y - 2) !== VOID) { consecutiveFailures++; continue }
-      if (worldBuffer.read(cx + 1, y - 2) !== VOID) { consecutiveFailures++; continue }
-      if (worldBuffer.read(cx - 1, y - 3) !== VOID) { consecutiveFailures++; continue }
-      if (worldBuffer.read(cx + 1, y - 3) !== VOID) { consecutiveFailures++; continue }
+      // 3) Position à gauche : cx-1 en ASH, VOID libre au-dessus
+      const canLeft = worldBuffer.read(cx - 1, y) === ASH &&
+                       worldBuffer.read(cx - 1, y - 1) === VOID &&
+                       worldBuffer.read(cx - 1, y - 2) === VOID &&
+                       !placedGuard.has(((y - 1) << 10) | (cx - 1)) &&
+                       !placedGuard.has(((y - 2) << 10) | (cx - 1))
 
-      const soilIndex = (y << 10) | cx
+      if (!canLeft && !canRight) { consecutiveFailures++; continue }
 
-      // Anti-densité
-      if (guardedCactus.has(soilIndex)) { consecutiveFailures++; continue }
-
-      // Anti-coffre AABB : cactus occupe {x: cx-1, y: y-3, w: 3, h: 4}
-      let blocked = false
-      for (const rect of chestRects) {
-        if (overlaps(cx - 1, y - 3, 3, 4, rect)) { blocked = true; break }
-      }
-      if (blocked) { consecutiveFailures++; continue }
+      const goLeft = canLeft && (!canRight || seededRNG.randomGetBool())
+      const soilX = goLeft ? cx - 1 : cx
 
       consecutiveFailures = 0
+      placedGuard.addRect(soilX, y - 2, soilX + 1, y - 1)
 
-      // Remplir le Set d'exclusion 5x7 centré sur soilIndex
-      for (let dx = -2; dx <= 2; dx++) {
-        for (let dy = -3; dy <= 3; dy++) {
-          guardedCactus.add(((y + dy) << 10) | (cx + dx))
-        }
-      }
+      const soilIndex = (y << 10) | soilX
 
       this.#plants.push({
         id: uniqueIdGenerator.getUniqueId(),
         kind: PLANT_KIND.HERB,
         type: PLANT_TYPE.PRICKLEPAD,
-        index: soilIndex - 3 * W,
+        index: soilIndex - 2 * W,
         soilIndex,
-        itemId: seededRNG.randomGetArrayValue(cactusIds),
-        w: 3,
-        h: 4,
-        x: cx - 1,
-        y: y - 3,
+        itemId: 'pricklepad',
+        w: 2,
+        h: 2,
+        x: soilX,
+        y: y - 2,
         present: true,
         deleted: false
       })
       placed++
     }
+    if (IS_DEV) console.log(`   🔹 Pricklepads : ${placed} / ${PRICKLEPAD_COUNT}`)
   }
 
   /**
