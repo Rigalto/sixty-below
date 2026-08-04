@@ -639,7 +639,7 @@ export const ITEMS = {
   bambooStalk: {name: 'Bamboo Stalk', type: 0, stype: 'herb', star: 2, image: 'fuws_32_32-2-3', help: 'Bamboo', tooltip: '???'},
   bambooShoot: {name: 'Bamboo Shoot', type: 0, stype: 'herb', star: 2, image: 'fuws_32_32-2-3', help: 'Bamboo', tooltip: '???'},
 
-  satansCube: {name: 'Satan\'s Cube', type: 0, stype: 'herb', star: 4, image: 'fuws_32_32-2-3', placed: 'fuws_32_32-2-3', foraging: {speed: 500, items: [{item: 'satansCube', count: 1, rainy: 1.8, windy: 1.8}]}, help: 'Satan\'s Cube', tooltip: 'Harvest to collect Potions and Food ingredients'},
+  satansCube: {name: 'Satan\'s Cube', type: 0, stype: 'herb', star: 4, image: 'foraged_32_32-0-5', placed: 'placed_16_48-2-0', foraging: {speed: 500, items: [{item: 'satansCube', count: 1, rainy: 1.8, windy: 1.8}]}, help: 'Satan\'s Cube', tooltip: 'Harvest to collect Potions and Food ingredients'},
   sneakthorn: {name: 'Sneakthorn', type: 0, stype: 'herb', star: 4, image: 'fuws_32_32-2-3', placed: 'fuws_32_32-2-3', foraging: {speed: 500, items: [{item: 'sneakthorn', count: 1, rainy: 1.8, windy: 1.8}]}, help: 'Sneakthorn', tooltip: 'Harvest to collect Potions and Food ingredients'},
   cursedcrown: {name: 'Cursedcrown ', type: 0, stype: 'herb', star: 4, image: 'fuws_32_32-2-3', placed: 'fuws_32_32-2-3', foraging: {speed: 500, items: [{item: 'cursedcrown', count: 1, rainy: 1.8, windy: 1.8}]}, help: 'Cursedcrown', tooltip: 'Harvest to collect Potions and Food ingredients'},
   abysshorn: {name: 'Abysshorn', type: 0, stype: 'herb', star: 5, image: 'fuws_32_32-2-3', placed: 'fuws_32_32-2-3', foraging: {speed: 500, items: [{item: 'abysshorn', count: 1, rainy: 1.8, windy: 1.8}]}, help: 'Abysshorn', tooltip: 'Harvest to collect Potions and Food ingredients'},

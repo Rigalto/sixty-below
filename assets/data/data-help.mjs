@@ -6231,26 +6231,37 @@ Satan's Cube is one of the strangest organisms found in the deep [[Caverns]]. It
 
 * Biome: [[Forest]], [[Desert]]
 * Layer: [[Caverns]]
-* Grows on any [[Mineable Blocks|Topsoil]] or [[Mineable Blocks|Substrat]] surface with 3 tiles of clearance above
+* Grows on any [[node:hardstone]] or [[node:hellstone]] surface with 3 tiles of clearance above
 
 **Population**
 
 * The species neither grows nor declines — natural balance maintains the population
 * Harvested plants do not regrow
 
-**Harvest**
+<hr>
 
-* [[Foraging|Interact to harvest]] — the plant disappears permanently on harvest
-* Tool: [[Foraging Tools|Gold Sickle]] required ⏳
-* Loot: [[item:satansCube]] ⏳
+**Foraging Satan's Cube**
+
+* [[Foraging|Interact to harvest]]
+* The plant disappears on harvest
+
+Foraging Tool: <<itemStar|sickleGold>> or better
+
+**Satan's Cube Foraging Loot**
+
+<<itemLootTable|satansCube|foraging>>
 
 **Dangers**
 
 * Foraging disturbs a [[monster:firesalamander]] lurking in the nearby rock — its burning claws inflict both [[Fire DOT]] and [[Bleeding DOT]] simultaneously. ⏳
 
+<hr>
+
 **Usages** ⏳
 
 * [[item:satansCube]] — ingredient for anti-burn preparations ⏳
+
+<hr>
 
 **Tips**
 
