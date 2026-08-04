@@ -536,8 +536,9 @@ export const thornspineSystem = new ThornspineSystem()
 
 // Repousse des coraux — deux vitesses de relance de coralSearch selon le résultat de la
 // tentative précédente
-export const CORAL_REGROW_DELAY_FOUND_MS = 1440 * 1000 // ~1 jour in-game — position trouvée
-export const CORAL_REGROW_DELAY_EMPTY_MS = 60 * 1000 // ~1 heure in-game — rien trouvé
+const CORAL_REGROW_DELAY_INITIAL_MS = 1440 * 1000 // ~1 jour in-game — initial
+const CORAL_REGROW_DELAY_RETRY_MS = 60 * 1000 // ~1 heure in-game — rien trouvé
+const CORAL_REGROW_DELAY_NEXT_MS = 360 * 1000 // ~6 heure in-game — trouvé
 
 // Approximation temporaire des mers, en attendant la gestion des liquides (non conçue à ce
 // jour) qui fournira le rectangle englobant réel — cf. WorldCarver.addSeaExclusions() en
@@ -559,6 +560,9 @@ class CoralSystem {
   #regrowtimestamp = null // timestamp de prochaine croissance de corail
 
   constructor () {
+    // eventBus
+    this.onTileChangedCoral = this.onTileChangedCoral.bind(this)
+    eventBus.on('world/tile-changed', this.onTileChangedCoral)
     // Micro-tâches
     this.coralRegrow = this.coralRegrow.bind(this)
   }
@@ -648,7 +652,7 @@ class CoralSystem {
     }
 
     if (this.#regrowQueue.length !== 0) {
-      const base = found ? CORAL_REGROW_DELAY_FOUND_MS : CORAL_REGROW_DELAY_EMPTY_MS
+      const base = found ? CORAL_REGROW_DELAY_NEXT_MS : CORAL_REGROW_DELAY_RETRY_MS
       const delay = (base * seededRNG.randomGetRealMinMax(0.8, 1.2)) | 0
       const {priority, capacity} = MICROTASK.CORAL_REGROW
       const timestamp = taskScheduler.enqueue('coral-regrow', delay, this.coralRegrow, priority, capacity)
@@ -725,12 +729,23 @@ class CoralSystem {
   }
 
   /**
-   * Traite le foraging réussi : retire le corail des structures actives, libère ses tuiles,
-   * bascule bloom=false et le met en attente de repousse, programme une nouvelle
-   * recherche taskScheduler.
+   * Traite le foraging réussi. Marque le record absent et programme la repousse.
    * @param {object} record
    */
   onForaged (record) {
+    this.#destroyPresent(record)
+  }
+
+  /**
+  * Détruit un corail présent — foraging ou ensevelissement (cf. onTileChangedCoral) : retire
+  * byTile/#byChunk/#displayed, débloque le placement et le minage, bascule bloom=false,
+  * persiste, et programme la première recherche de repousse si la file était vide (délai
+  * INITIAL). Guard : no-op si record.bloom est déjà false.
+  * @param {object} record
+  */
+  #destroyPresent (record) {
+    if (!record.bloom) return
+
     removeFromByTile(this.byTile, record)
     removeFromByChunk(this.#byChunk, record)
     this.#displayed.delete(record)
@@ -743,8 +758,20 @@ class CoralSystem {
     if (this.#regrowQueue.length !== 1) return
 
     const {priority, capacity} = MICROTASK.CORAL_REGROW
-    const timestamp = taskScheduler.enqueue('coral-regrow', CORAL_REGROW_DELAY_EMPTY_MS, this.coralRegrow, priority, capacity)
+    const timestamp = taskScheduler.enqueue('coral-regrow', CORAL_REGROW_DELAY_INITIAL_MS, this.coralRegrow, priority, capacity)
     database.setGameState('coralregrowtimestamp', timestamp)
+  }
+
+  /**
+   * Liaison EventBus : 'world/tile-changed'. Ensevelissement : détruit le corail présent si
+   * une des tuiles SEA de son corps devient autre chose (typiquement du SAND qui s'écoule
+   * depuis une poche instable au-dessus). Le sol (tuile SAND sous le corail) est protégé du
+   * minage par blockMiningRect — pas de cas 'sol' ici, contrairement à Mandrake/Oleander.
+   * @param {{tileIndex: number, tileOldCode: number, tileNewCode: number}} payload
+   */
+  onTileChangedCoral ({tileIndex}) {
+    const record = this.byTile.get(tileIndex)
+    if (record !== undefined) this.#destroyPresent(record)
   }
 
   /**
@@ -2076,7 +2103,6 @@ class PricklepadSystem {
   }
 }
 export const pricklepadSystem = new PricklepadSystem()
-
 
 /* ====================================================================================================
    PARSNIP SYSTEM

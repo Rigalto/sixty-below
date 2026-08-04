@@ -5852,6 +5852,13 @@ Foraging Tool: <<itemStar|sickleSilver>> or better
 
 <hr>
 
+**Desctruction**
+
+* The coral's root system prevents [[Mining|mining]] its supporting [[node:sand]] tile — the pickaxe cannot pass through.
+* [[node:sand]] falling from above can still bury and destroy the coral — it then re-enters the regrowth cycle exactly like a foraged coral, but yields no loot.
+
+<hr>
+
 **Regrowth**
 
 * Foraging a coral clears its spot, inducing a replacement spot.
