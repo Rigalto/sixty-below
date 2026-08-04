@@ -414,7 +414,7 @@ class WorldGenerator {
     plantGenerator.placeOleanders(zoneRects)
     await progress('Underground Plants')
 
-    plantGenerator.placeSatansCubes(zoneRects, chestIndexes)
+    plantGenerator.placeSatansCubes(zoneRects)
     plantGenerator.placeSneakthorns(zoneRects, chestIndexes)
     plantGenerator.placeCursedcrowns(zoneRects, chestIndexes)
     plantGenerator.placeAbysshorns(zoneRects, chestIndexes)
@@ -8570,27 +8570,20 @@ class PlantGenerator {
 
   /**
    * Place les Satan's Cube dans les caverns des biomes Forest et Desert.
-   * Substrat : toute tuile TOPSOIL ou SUBSTRAT (VALID_SUBSTRATES).
-   * Les trois tuiles support doivent être des substrats valides.
-   * VOID requis sur les 3x3 tuiles occupées (y-1 à y-3, x-1 à x+1).
+   * Substrat : HARDSTONE ou HELLSTONE avec VOID sur les 3 tuiles au-dessus.
    * Nombre constant défini par SATANS_CUBE_COUNT.
    * Arrêt après MAX_ATTEMPTS tirages infructueux consécutifs.
-   * Anti-coffre : test sur chestIndexes pour les trois tuiles support.
+   * Respecte et alimente placedGuard (anti-coffre + anti-chevauchement avec toute autre entité
+   * placée, pas seulement les autres Satan's Cube).
    *
-   * @param {Array<{x0, x1, ySurface, yUnder, yCaverns, biome}>} zoneRects
-   * @param {Set<number>} chestIndexes — index interdits (coffres)
+   * @param {Array<{x0, x1, yUnder, yCaverns, biome}>} zoneRects
    */
-  placeSatansCubes (zoneRects, chestIndexes) {
+  placeSatansCubes (zoneRects) {
     const VOID = NODES.VOID.code
+    const HARDSTONE = NODES.HARDSTONE.code
+    const HELLSTONE = NODES.HELLSTONE.code
     const W = WORLD_WIDTH
-    const MAX_ATTEMPTS = 100
-
-    const VALID_SUBSTRATES = new Set([
-      NODES.DIRT.code, NODES.SAND.code, NODES.SILT.code, NODES.HUMUS.code,
-      NODES.CLAY.code, NODES.SANDSTONE.code, NODES.MUD.code,
-      NODES.STONE.code, NODES.ASH.code, NODES.LIMESTONE.code,
-      NODES.HARDSTONE.code, NODES.HELLSTONE.code, NODES.SLATE.code
-    ])
+    const MAX_ATTEMPTS = 200
 
     const rects = []
     for (const rect of zoneRects) {
@@ -8609,33 +8602,25 @@ class PlantGenerator {
 
       if (worldBuffer.read(cx, cy) !== VOID) { consecutiveFailures++; continue }
 
-      // Descendre jusqu'à la première tuile non VOID dans le rectangle
       let y = cy
       while (y < rect.y1 && worldBuffer.read(cx, y) === VOID) y++
 
-      // Vérifier que les trois tuiles support sont des substrats valides
-      if (!VALID_SUBSTRATES.has(worldBuffer.read(cx - 1, y))) { consecutiveFailures++; continue }
-      if (!VALID_SUBSTRATES.has(worldBuffer.read(cx, y))) { consecutiveFailures++; continue }
-      if (!VALID_SUBSTRATES.has(worldBuffer.read(cx + 1, y))) { consecutiveFailures++; continue }
+      const support = worldBuffer.read(cx, y)
+      if (support !== HARDSTONE && support !== HELLSTONE) { consecutiveFailures++; continue }
 
-      // Vérifier VOID sur les 3x3 tuiles occupées (y-1 à y-3, x-1 à x+1)
-      let voidOk = true
-      for (let dx = -1; dx <= 1 && voidOk; dx++) {
-        for (let dy = 1; dy <= 3 && voidOk; dy++) {
-          if (worldBuffer.read(cx + dx, y - dy) !== VOID) voidOk = false
-        }
-      }
-      if (!voidOk) { consecutiveFailures++; continue }
+      const canPlace = worldBuffer.read(cx, y - 1) === VOID &&
+                        worldBuffer.read(cx, y - 2) === VOID &&
+                        worldBuffer.read(cx, y - 3) === VOID &&
+                        !placedGuard.has(((y - 1) << 10) | cx) &&
+                        !placedGuard.has(((y - 2) << 10) | cx) &&
+                        !placedGuard.has(((y - 3) << 10) | cx)
 
-      // Anti-coffre sur les trois tuiles support
-      if (chestIndexes.has((y << 10) | (cx - 2))) { consecutiveFailures++; continue }
-      if (chestIndexes.has((y << 10) | (cx - 1))) { consecutiveFailures++; continue }
-      if (chestIndexes.has((y << 10) | cx)) { consecutiveFailures++; continue }
-      if (chestIndexes.has((y << 10) | (cx + 1))) { consecutiveFailures++; continue }
+      if (!canPlace) { consecutiveFailures++; continue }
 
       consecutiveFailures = 0
+      placedGuard.addRect(cx, y - 3, cx, y - 1)
 
-      const soilIndex = (y << 10) | (cx - 1)
+      const soilIndex = (y << 10) | cx
 
       this.#plants.push({
         id: uniqueIdGenerator.getUniqueId(),
@@ -8644,15 +8629,16 @@ class PlantGenerator {
         index: soilIndex - 3 * W,
         soilIndex,
         itemId: 'satansCube',
-        w: 3,
+        w: 1,
         h: 3,
-        x: cx - 1,
+        x: cx,
         y: y - 3,
         present: true,
         deleted: false
       })
       placed++
     }
+    if (IS_DEV) console.log(`   🔹 Satan's Cubes : ${placed} / ${SATANS_CUBE_COUNT}`)
   }
 
   /**
