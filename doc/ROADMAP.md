@@ -70,7 +70,7 @@
 
 ## À faire — Amélioration
 
-- Remplacer toutes les icônes Unicode 'météo' et ''phases de la lune' par des icônes SVG ou image png
+- Remplacer toutes les icônes Unicode 'météo' et 'phases de la lune' par des icônes SVG ou image png
 
 ---
 ## À faire — Buffs
