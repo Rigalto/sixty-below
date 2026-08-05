@@ -415,8 +415,8 @@ class WorldGenerator {
     await progress('Underground Plants')
 
     plantGenerator.placeSatansCubes(zoneRects)
-    plantGenerator.placeSneakthorns(zoneRects, chestIndexes)
-    plantGenerator.placeCursedcrowns(zoneRects, chestIndexes)
+    plantGenerator.placeSneakthorns(zoneRects)
+    plantGenerator.placeCursedcrowns(zoneRects)
     plantGenerator.placeAbysshorns(zoneRects, chestIndexes)
     plantGenerator.placeInferncaps(zoneRects, chestIndexes)
     await progress('Caverns Plants')
@@ -8342,7 +8342,7 @@ class PlantGenerator {
       })
       placed++
     }
-    if (IS_DEV) console.log(`   🔹 Mandrakes : ${placed} / ${MANDRAKE_COUNT}`)
+    if (IS_DEV) console.log(`   🔹 Mandrakes : ${placed} [${MANDRAKE_COUNT}]`)
   }
 
   /**
@@ -8430,7 +8430,7 @@ class PlantGenerator {
       })
       placed++
     }
-    if (IS_DEV) console.log(`   🔹 Pricklepads : ${placed} / ${PRICKLEPAD_COUNT}`)
+    if (IS_DEV) console.log(`   🔹 Pricklepads : ${placed} [${PRICKLEPAD_COUNT}]`)
   }
 
   /**
@@ -8565,7 +8565,7 @@ class PlantGenerator {
       })
       placed++
     }
-    if (IS_DEV) console.log(`   🔹 Oleanders : ${placed} / ${OLEANDER_COUNT}`)
+    if (IS_DEV) console.log(`   🔹 Oleanders : ${placed} [${OLEANDER_COUNT}]`)
   }
 
   /**
@@ -8638,32 +8638,27 @@ class PlantGenerator {
       })
       placed++
     }
-    if (IS_DEV) console.log(`   🔹 Satan's Cubes : ${placed} / ${SATANS_CUBE_COUNT}`)
+    if (IS_DEV) console.log(`   🔹 Satan's Cubes : ${placed} [${SATANS_CUBE_COUNT}]`)
   }
 
   /**
    * Place les Sneakthorns dans les caverns des biomes Forest et Jungle.
-   * Substrat : toute tuile TOPSOIL ou SUBSTRAT (13 types, Set local).
-   * Les trois tuiles support doivent être des substrats valides.
-   * VOID requis sur les 3x3 tuiles occupées (y-1 à y-3, x-1 à x+1).
-   * Anti-coffre sur 4 tuiles support (cx-2 à cx+1).
-   * Nombre constant : SNEAKTHORN_COUNT.
-   * Arrêt après MAX_ATTEMPTS échecs consécutifs.
+   * Substrat : HARDSTONE ou SLATE avec VOID sur les 2 tuiles au-dessus, footprint 2x2.
+   * cx est l'ancre commune ; tente le footprint à droite (cx, cx+1) puis à gauche
+   * (cx-1, cx), tire au hasard si les deux sont valides.
+   * Nombre constant défini par SNEAKTHORN_COUNT.
+   * Arrêt après MAX_ATTEMPTS tirages infructueux consécutifs.
+   * Respecte et alimente placedGuard (anti-coffre + anti-chevauchement avec toute autre entité
+   * placée, pas seulement les autres Sneakthorns).
    *
-   * @param {Array<{x0, x1, ySurface, yUnder, yCaverns, biome}>} zoneRects
-   * @param {Set<number>} chestIndexes — index interdits (coffres)
+   * @param {Array<{x0, x1, yUnder, yCaverns, biome}>} zoneRects
    */
-  placeSneakthorns (zoneRects, chestIndexes) {
+  placeSneakthorns (zoneRects) {
     const VOID = NODES.VOID.code
+    const HARDSTONE = NODES.HARDSTONE.code
+    const SLATE = NODES.SLATE.code
     const W = WORLD_WIDTH
-    const MAX_ATTEMPTS = 100
-
-    const VALID_SUBSTRATES = new Set([
-      NODES.DIRT.code, NODES.SAND.code, NODES.SILT.code, NODES.HUMUS.code,
-      NODES.CLAY.code, NODES.SANDSTONE.code, NODES.MUD.code,
-      NODES.STONE.code, NODES.ASH.code, NODES.LIMESTONE.code,
-      NODES.HARDSTONE.code, NODES.HELLSTONE.code, NODES.SLATE.code
-    ])
+    const MAX_ATTEMPTS = 200
 
     const rects = []
     for (const rect of zoneRects) {
@@ -8685,68 +8680,79 @@ class PlantGenerator {
       let y = cy
       while (y < rect.y1 && worldBuffer.read(cx, y) === VOID) y++
 
-      if (!VALID_SUBSTRATES.has(worldBuffer.read(cx - 1, y))) { consecutiveFailures++; continue }
-      if (!VALID_SUBSTRATES.has(worldBuffer.read(cx, y))) { consecutiveFailures++; continue }
-      if (!VALID_SUBSTRATES.has(worldBuffer.read(cx + 1, y))) { consecutiveFailures++; continue }
+      const supportCx = worldBuffer.read(cx, y)
+      if (supportCx !== HARDSTONE && supportCx !== SLATE) { consecutiveFailures++; continue }
 
-      let voidOk = true
-      for (let dx = -1; dx <= 1 && voidOk; dx++) {
-        for (let dy = 1; dy <= 3 && voidOk; dy++) {
-          if (worldBuffer.read(cx + dx, y - dy) !== VOID) voidOk = false
-        }
-      }
-      if (!voidOk) { consecutiveFailures++; continue }
+      // Tester placement à droite (cx, cx+1)
+      const supportRight = worldBuffer.read(cx + 1, y)
+      const canPlaceRight = (supportRight === HARDSTONE || supportRight === SLATE) &&
+                             worldBuffer.read(cx, y - 1) === VOID &&
+                             worldBuffer.read(cx + 1, y - 1) === VOID &&
+                             worldBuffer.read(cx, y - 2) === VOID &&
+                             worldBuffer.read(cx + 1, y - 2) === VOID &&
+                             !placedGuard.has(((y - 1) << 10) | cx) &&
+                             !placedGuard.has(((y - 1) << 10) | (cx + 1)) &&
+                             !placedGuard.has(((y - 2) << 10) | cx) &&
+                             !placedGuard.has(((y - 2) << 10) | (cx + 1))
 
-      if (chestIndexes.has((y << 10) | (cx - 2))) { consecutiveFailures++; continue }
-      if (chestIndexes.has((y << 10) | (cx - 1))) { consecutiveFailures++; continue }
-      if (chestIndexes.has((y << 10) | cx)) { consecutiveFailures++; continue }
-      if (chestIndexes.has((y << 10) | (cx + 1))) { consecutiveFailures++; continue }
+      // Tester placement à gauche (cx-1, cx)
+      const supportLeft = worldBuffer.read(cx - 1, y)
+      const canPlaceLeft = (supportLeft === HARDSTONE || supportLeft === SLATE) &&
+                            worldBuffer.read(cx - 1, y - 1) === VOID &&
+                            worldBuffer.read(cx, y - 1) === VOID &&
+                            worldBuffer.read(cx - 1, y - 2) === VOID &&
+                            worldBuffer.read(cx, y - 2) === VOID &&
+                            !placedGuard.has(((y - 1) << 10) | (cx - 1)) &&
+                            !placedGuard.has(((y - 1) << 10) | cx) &&
+                            !placedGuard.has(((y - 2) << 10) | (cx - 1)) &&
+                            !placedGuard.has(((y - 2) << 10) | cx)
+
+      if (!canPlaceLeft && !canPlaceRight) { consecutiveFailures++; continue }
 
       consecutiveFailures = 0
 
-      const soilIndex = (y << 10) | (cx - 1)
+      const goLeft = canPlaceLeft && (!canPlaceRight || seededRNG.randomGetBool())
+      const originX = goLeft ? cx - 1 : cx
+
+      placedGuard.addRect(originX, y - 2, originX + 1, y - 1)
+
+      const soilIndex = (y << 10) | originX
 
       this.#plants.push({
         id: uniqueIdGenerator.getUniqueId(),
         kind: PLANT_KIND.HERB,
         type: PLANT_TYPE.SNEAKTHORN,
-        index: soilIndex - 3 * W,
+        index: soilIndex - 2 * W,
         soilIndex,
         itemId: 'sneakthorn',
-        w: 3,
-        h: 3,
-        x: cx - 1,
-        y: y - 3,
+        w: 2,
+        h: 2,
+        x: originX,
+        y: y - 2,
         present: true,
         deleted: false
       })
       placed++
     }
+    if (IS_DEV) console.log(`   🔹 Sneakthorns : ${placed} [${SNEAKTHORN_COUNT}]`)
   }
 
   /**
    * Place les Cursedcrowns dans les caverns des biomes Jungle et Desert.
-   * Substrat : toute tuile TOPSOIL ou SUBSTRAT (13 types, Set local).
-   * Les trois tuiles support doivent être des substrats valides.
-   * VOID requis sur les 3x3 tuiles occupées (y-1 à y-3, x-1 à x+1).
-   * Anti-coffre sur 4 tuiles support (cx-2 à cx+1).
-   * Nombre constant : CURSEDCROWN_COUNT.
-   * Arrêt après MAX_ATTEMPTS échecs consécutifs.
+   * Substrat : SLATE ou HELLSTONE avec VOID sur les 3 tuiles au-dessus.
+   * Nombre constant défini par CURSEDCROWN_COUNT.
+   * Arrêt après MAX_ATTEMPTS tirages infructueux consécutifs.
+   * Respecte et alimente placedGuard (anti-coffre + anti-chevauchement avec toute autre entité
+   * placée, pas seulement les autres Cursedcrowns).
    *
-   * @param {Array<{x0, x1, ySurface, yUnder, yCaverns, biome}>} zoneRects
-   * @param {Set<number>} chestIndexes — index interdits (coffres)
+   * @param {Array<{x0, x1, yUnder, yCaverns, biome}>} zoneRects
    */
-  placeCursedcrowns (zoneRects, chestIndexes) {
+  placeCursedcrowns (zoneRects) {
     const VOID = NODES.VOID.code
+    const SLATE = NODES.SLATE.code
+    const HELLSTONE = NODES.HELLSTONE.code
     const W = WORLD_WIDTH
-    const MAX_ATTEMPTS = 100
-
-    const VALID_SUBSTRATES = new Set([
-      NODES.DIRT.code, NODES.SAND.code, NODES.SILT.code, NODES.HUMUS.code,
-      NODES.CLAY.code, NODES.SANDSTONE.code, NODES.MUD.code,
-      NODES.STONE.code, NODES.ASH.code, NODES.LIMESTONE.code,
-      NODES.HARDSTONE.code, NODES.HELLSTONE.code, NODES.SLATE.code
-    ])
+    const MAX_ATTEMPTS = 200
 
     const rects = []
     for (const rect of zoneRects) {
@@ -8768,26 +8774,22 @@ class PlantGenerator {
       let y = cy
       while (y < rect.y1 && worldBuffer.read(cx, y) === VOID) y++
 
-      if (!VALID_SUBSTRATES.has(worldBuffer.read(cx - 1, y))) { consecutiveFailures++; continue }
-      if (!VALID_SUBSTRATES.has(worldBuffer.read(cx, y))) { consecutiveFailures++; continue }
-      if (!VALID_SUBSTRATES.has(worldBuffer.read(cx + 1, y))) { consecutiveFailures++; continue }
+      const support = worldBuffer.read(cx, y)
+      if (support !== SLATE && support !== HELLSTONE) { consecutiveFailures++; continue }
 
-      let voidOk = true
-      for (let dx = -1; dx <= 1 && voidOk; dx++) {
-        for (let dy = 1; dy <= 3 && voidOk; dy++) {
-          if (worldBuffer.read(cx + dx, y - dy) !== VOID) voidOk = false
-        }
-      }
-      if (!voidOk) { consecutiveFailures++; continue }
+      const canPlace = worldBuffer.read(cx, y - 1) === VOID &&
+                        worldBuffer.read(cx, y - 2) === VOID &&
+                        worldBuffer.read(cx, y - 3) === VOID &&
+                        !placedGuard.has(((y - 1) << 10) | cx) &&
+                        !placedGuard.has(((y - 2) << 10) | cx) &&
+                        !placedGuard.has(((y - 3) << 10) | cx)
 
-      if (chestIndexes.has((y << 10) | (cx - 2))) { consecutiveFailures++; continue }
-      if (chestIndexes.has((y << 10) | (cx - 1))) { consecutiveFailures++; continue }
-      if (chestIndexes.has((y << 10) | cx)) { consecutiveFailures++; continue }
-      if (chestIndexes.has((y << 10) | (cx + 1))) { consecutiveFailures++; continue }
+      if (!canPlace) { consecutiveFailures++; continue }
 
       consecutiveFailures = 0
+      placedGuard.addRect(cx, y - 3, cx, y - 1)
 
-      const soilIndex = (y << 10) | (cx - 1)
+      const soilIndex = (y << 10) | cx
 
       this.#plants.push({
         id: uniqueIdGenerator.getUniqueId(),
@@ -8796,15 +8798,16 @@ class PlantGenerator {
         index: soilIndex - 3 * W,
         soilIndex,
         itemId: 'cursedcrown',
-        w: 3,
+        w: 1,
         h: 3,
-        x: cx - 1,
+        x: cx,
         y: y - 3,
         present: true,
         deleted: false
       })
       placed++
     }
+    if (IS_DEV) console.log(`   🔹 Cursedcrowns : ${placed} [${CURSEDCROWN_COUNT}]`)
   }
 
   /**
