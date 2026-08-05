@@ -9,7 +9,7 @@
 
 ### Code et tests
 
-- Implémenter les herbes, reste : Pricklepad (en cours), Bamboo, Satan's Cube, Sneakthorn, Cursedcrown, Abysshorn, InfernCap
+- Implémenter les herbes, reste : Bamboo, Sneakthorn, Cursedcrown, Abysshorn, InfernCap
 - Implémenter les plants des mini-biomes, reste : fern Cave, Mushroom Cave
 - Implémenter les Giant Mushrooms.
 - Implémenter la réduction de vitesse dans les liquides ou les cobweb.
@@ -30,25 +30,21 @@
 
 - corriger les icones dans weapon_32_32 : dague, épée, bow, boomrang
 - corriger les icones dans tool_32_32 :
-  - pickaxe : 5 restant
-  - hammer : 4 restant
-  - axe : 5 restant
+  - pickaxe : 6 restant
+  - hammer : 3 restant
+  - axe : 3 restant
+  - canne à pêche : 6 restant
 - ajouter image des quatre triskels (copper, silver, gold et complet)
 - continuer la correction et l'ajout de fiches d'aide (`HELP`) et d'items (`ITEMS`)
 - Recettes pour créer Linen Rope et l'utiliser
 - Mettre la bonne palette et un entourage noir pour tool_32_32, reste à faire :
-  - 0,0 - 0,1 - 0,2 - 0,3
-  - 1,0 - 1,1 - 1,2
-  - 2,0 - 2,1 - 2,2
-  - 3,0 - 3,1 - 3,2
-  - 4,0 - 4,2
-  - 5,0 - 5,1 - 5,2
-  - 6,1 - 6,2
+  - 3,0 - 4,0 - 5,0
+  - 3,1 - 4,1 - 5,1
+  - 1,2 - 2,2 - 3,2 - 4,2 - 5,2
 - Mettre la bonne palette et un entourage noir pour placed_16_32, reste à faire :
   - 6,0 - 7,0
   - 0,1 - 1,1, - 5,1
 - Images des coffres.
-- Fiche aide : Parnsnip (texte en français)
 
 ---
 
@@ -386,6 +382,8 @@ La Sap corrode le Copper. Il doit donc être remplacer par du Gold.
 - Oleander (`OleanderSystem`)
 - Bloodmoon (`BloodmoonSystem`)
 - Mandrake (`MandrakeSystem`)
+- Pricklepad (`PricklepadSystem`)
+- Satan's Cube (`SatansCubeSystem`)
 
 ### Rendu
 - `WorldRenderer` — rendu tuiles par chunks avec cache OffscreenCanvas
