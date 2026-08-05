@@ -6230,7 +6230,7 @@ Satan's Cube is one of the strangest organisms found in the deep [[Caverns]]. It
 **Location**
 
 * Biome: [[Forest]], [[Desert]]
-* Layer: [[Caverns]]
+* Layer: [[Caverns]] top
 * Grows on any [[node:hardstone]] or [[node:hellstone]] surface with 3 tiles of clearance above
 
 **Population**
@@ -6245,7 +6245,7 @@ Satan's Cube is one of the strangest organisms found in the deep [[Caverns]]. It
 * [[Foraging|Interact to harvest]]
 * The plant disappears on harvest
 
-Foraging Tool: <<itemStar|sickleGold>> or better
+Foraging Tool: <<itemStar|sickleGold>>
 
 **Satan's Cube Foraging Loot**
 
@@ -6285,27 +6285,38 @@ Sneakthorn is a deep cavern plant that grows in the humid passages shared by [[F
 **Location**
 
 * Biome: [[Forest]], [[Jungle]]
-* Layer: [[Caverns]]
-* Grows on any [[Mineable Blocks|Topsoil]] or [[Mineable Blocks|Substrat]] surface
+* Layer: [[Caverns]] top
+* Grows on any [[node:hardstone]] or [[node:slate]] surface
 
 **Population**
 
 * The species neither grows nor declines — natural balance maintains the population
 * Harvested plants do not regrow
 
-**Harvest**
+<hr>
 
-* [[Foraging|Interact to harvest]] — the plant disappears permanently on harvest
-* Tool: [[Foraging Tools|Gold Sickle]] required ⏳
-* Loot: [[item:sneakthorn]] ⏳
+**Foraging Sneakthorn**
+
+* [[Foraging|Interact to harvest]]
+* The plant disappears on harvest
+
+Foraging Tool: <<itemStar|sickleGold>>
+
+**Sneakthorn Foraging Loot**
+
+<<itemLootTable|sneakthorn|foraging>>
 
 **Dangers**
 
 * Foraging Sneakthorn draws a [[monster:vampire]] out of the surrounding darkness — silent, fast, and venomous. Its bite inflicts both [[Bleeding DOT]] and [[Poison DOT]]. ⏳
 
+<hr>
+
 **Usages** ⏳
 
 * [[item:sneakthorn]] — ingredient for anti-poison preparations ⏳
+
+<hr>
 
 **Tips**
 
@@ -6329,27 +6340,38 @@ Cursedcrown is the most alien plant found in the deep caverns. Its rigid radial 
 **Location**
 
 * Biome: [[Jungle]], [[Desert]]
-* Layer: [[Caverns]]
-* Grows on any [[Mineable Blocks|Topsoil]] or [[Mineable Blocks|Substrat]] surface
+* Layer: [[Caverns]] top
+* Grows on any [[node:slate]] or [[node:hellstone]] surface
 
 **Population**
 
 * The species neither grows nor declines — natural balance maintains the population
 * Harvested plants do not regrow
 
-**Harvest**
+<hr>
 
-* [[Foraging|Interact to harvest]] — the plant disappears permanently on harvest
-* Tool: [[Foraging Tools|Gold Sickle]] required ⏳
-* Loot: [[item:cursedcrown]] ⏳
+**Foraging Cursedcrown**
+
+* [[Foraging|Interact to harvest]]
+* The plant disappears on harvest
+
+Foraging Tool: <<itemStar|sickleGold>>
+
+**Cursedcrown Foraging Loot**
+
+<<itemLootTable|cursedcrown|foraging>>
 
 **Dangers**
 
 * Foraging Cursedcrown agitates a nearby colony of [[monster:fireAnt|Fire Ants]] — they swarm instantly and inflict [[Fire DOT]] and [[Poison DOT]] simultaneously. ⏳
 
+<hr>
+
 **Usages** ⏳
 
 * [[item:cursedcrown]] — ingredient for anti-bleeding preparations ⏳
+
+<hr>
 
 **Tips**
 
