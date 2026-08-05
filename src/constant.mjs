@@ -320,6 +320,7 @@ export const MICROTASK = {
   OLEANDER_REGROW: {priority: 20, capacity: 2, taskName: 'oleanderRegrow'}, // recherche d'un nouvel emplacement pour les oleanders à repousser
   MANDRAKE_REGROW: {priority: 20, capacity: 2, taskName: 'mandrakeRegrow'}, // recherche d'un nouvel emplacement pour les mandrakes à repousser
   PRICKLEPAD_REGROW: {priority: 20, capacity: 2, taskName: 'pricklepadRegrow'}, // recherche d'un nouvel emplacement pour les pricklepads à repousser
+  SATANS_CUBE_REGROW: {priority: 20, capacity: 2, taskName: 'satansCubeRegrow'}, // recherche d'un nouvel emplacement pour les satan's cube à repousser
 
   COBWEB_GROWTH: {priority: 20, capacity: 3, taskName: 'cobwebGrowth'}, // tentative périodique de pose d'une toile d'araignée
   AMBERMIRAGE_TILE_CHECK: {priority: 20, capacity: 10, taskName: 'onAmbermirageTileCheck'}, // entretien réactif d'un spot pour une tuile modifiée

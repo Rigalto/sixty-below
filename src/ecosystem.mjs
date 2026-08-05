@@ -1,10 +1,10 @@
 // ecosystem.mjs — FloraManager - OakSystem - MahoganySystem - CoconutSystem - ThornspineSystem
-// SunflowerSystem - OleanderSystem - MandrakeSystem - PricklepadSystem  - ParsnipSystem - AmbermirageSystem
-// CobwebSystem - HiveSystem
+// SunflowerSystem - ParsnipSystem - OleanderSystem - MandrakeSystem - PricklepadSystem - AmbermirageSystem
+// CobwebSystem - HiveSystem - SatansCubeSystem
 // SpreadForestSystem - SpreadJungleSystem - CoralSystem - BloodmoonSystem
 // SampleSystem
 
-import {WORLD_WIDTH, WORLD_HEIGHT, MICROTASK, TOPSOIL_Y_SKY_SURFACE, TOPSOIL_Y_SURFACE_UNDER, TOPSOIL_Y_UNDER_CAVERNS, SEA_LEVEL} from './constant.mjs'
+import {WORLD_WIDTH, WORLD_HEIGHT, MICROTASK, TOPSOIL_Y_SKY_SURFACE, TOPSOIL_Y_SURFACE_UNDER, TOPSOIL_Y_UNDER_CAVERNS, TOPSOIL_Y_CAVERNS_MID, SEA_LEVEL} from './constant.mjs'
 import {database, uniqueIdGenerator} from './database.mjs'
 import {eventBus, seededRNG, blockedTiles, microTasker, taskScheduler} from './utils.mjs'
 import {NODES, ITEMS, PLANT_KIND, PLANT_TYPE, PLANT_SYSTEM_LOOKUP, ALL_PLANT_SYSTEMS, COBWEB_GROWTH_DELAY_MS, SUNFLOWER_RATE, PARSNIP_RATE, AMBERMIRAGE_PCENT, COCONUT_CYCLE_DELAY, TREE_IMAGES, THORNSPINE_JUNCTIONS, THORNSPINE_SIZES, THORNSPINE_UNBLOOM_PCENT, THORNSPINE_BLOOM_PCENT, CORAL_TYPES} from '../assets/data/data.mjs'
@@ -1849,8 +1849,8 @@ export const mandrakeSystem = new MandrakeSystem()
 
    ==================================================================================================== */
 
-const PRICKLEPAD_REGROW_INITIAL_DELAY_MS = 1547
-const PRICKLEPAD_REGROW_RETRY_DELAY_MS = 123
+const PRICKLEPAD_REGROW_INITIAL_DELAY_MS = 1551
+const PRICKLEPAD_REGROW_RETRY_DELAY_MS = 121
 
 class PricklepadSystem {
   byTile = new Map() // Map<tileIndex, record> — public : membership O(1) + lookup record
@@ -2103,6 +2103,255 @@ class PricklepadSystem {
   }
 }
 export const pricklepadSystem = new PricklepadSystem()
+
+/* ====================================================================================================
+   SATAN'S CUBE SYSTEM
+   ====================================================================================================
+
+   Singleton : satansCubeSystem.
+
+   Population constante : #list reçoit en une fois (init) le tableau complet des satan's cube,
+   taille fixe jamais réallouée (pas de GC). Un record present=false signale un slot à faire
+   repousser ailleurs — mis en #regrowQueue, vidée par microtâche (satansCubeRegrow).
+
+   ==================================================================================================== */
+
+const SATANS_CUBE_REGROW_INITIAL_DELAY_MS = 1553
+const SATANS_CUBE_REGROW_RETRY_DELAY_MS = 127
+
+class SatansCubeSystem {
+  byTile = new Map() // Map<tileIndex, record> — public : membership O(1) + lookup record
+  #list = [] // record[] — population fixe, référence affectée dans init(records)
+  #byChunk = new Map() // Map<chunkKey, Set> — lookup spatial pour onPreloadChunksChanged
+  #bySoil = new Map() // Map<soilIndex, record> — satan's cubes présents : détection retrait du sol
+  #displayed = new Set() // Set<record> — cible du render (chunks preload uniquement)
+  #regrowQueue = [] // record[] — records present=false en attente d'un nouvel emplacement
+  #image = null // image à afficher (mise en cache)
+
+  constructor () {
+    // eventBus
+    this.onFirstLoopSatansCube = this.onFirstLoopSatansCube.bind(this)
+    eventBus.on('time/first-loop', this.onFirstLoopSatansCube)
+    this.onTileChangedSatansCube = this.onTileChangedSatansCube.bind(this)
+    eventBus.on('world/tile-changed', this.onTileChangedSatansCube)
+    // micro-tâches
+    this.satansCubeRegrow = this.satansCubeRegrow.bind(this)
+  }
+
+  /**
+   * Réinitialise toutes les structures.
+   * Appelé en début de session, avant toute hydratation.
+   */
+  init () {
+    this.byTile.clear()
+    this.#list.length = 0
+    this.#byChunk.clear()
+    this.#bySoil.clear()
+    this.#displayed.clear()
+    this.#regrowQueue.length = 0
+
+    this.#image = ITEMS.satansCube.placed // après hydratation
+  }
+
+  /**
+   * Enregistre un satan's cube et peuple les structures internes.
+   * Si present=false, met le record en file de repousse.
+   * @param {object} record — record HERB/SATANS_CUBE (deleted=false garanti par l'appelant)
+   */
+  initPlant (record) {
+    this.#list.push(record)
+
+    if (record.present) {
+      addToByTile(this.byTile, record)
+      addToByChunk(this.#byChunk, record)
+      this.#bySoil.set(record.soilIndex, record)
+
+      blockedTiles.blockPlacement(record.index)
+      blockedTiles.blockPlacement(record.index + WORLD_WIDTH)
+      blockedTiles.blockPlacement(record.index + 2 * WORLD_WIDTH)
+      return
+    }
+    this.#regrowQueue.push(record)
+  }
+
+  debug () {
+    console.log(`[SatansCubeSystem] ${this.#list.length} satan's cubes récupérés, ${this.#regrowQueue.length} en attente de repousse`)
+  }
+
+  /**
+   * Liaison EventBus : 'time/first-loop'. Déclenchera la tâche de repousse si #regrowQueue
+   * contient des records present=false chargés depuis la persistence.
+   * Délai long pour ne pas surcharger le démarrage.
+   */
+  onFirstLoopSatansCube () {
+    if (this.#regrowQueue.length === 0) return
+    const {priority, capacity} = MICROTASK.SATANS_CUBE_REGROW
+    taskScheduler.enqueue('satans-cube-regrow', SATANS_CUBE_REGROW_INITIAL_DELAY_MS, this.satansCubeRegrow, priority, capacity)
+  }
+
+  /**
+   * Reconstruit #displayed depuis les chunks preload de la caméra.
+   * @param {Set<number>} preloadChunks
+   */
+  onPreloadChunksChanged (preloadChunks) {
+    buildDisplayed(this.#displayed, this.#byChunk, preloadChunks)
+  }
+
+  /**
+   * Dessine les satan's cube visibles et présents sur le contexte transformé.
+   * @param {CanvasRenderingContext2D} ctx — contexte déjà transformé (caméra appliquée)
+   */
+  render (ctx) {
+    const img = this.#image
+    for (const record of this.#displayed) {
+      const pxX = (record.index & 0x3FF) << 4
+      const pxY = (record.index >> 10) << 4
+      ctx.drawImage(IMAGE_CACHE[img.imgIndex], img.sx, img.sy, img.sw, img.sh, pxX, pxY, img.sw, img.sh)
+    }
+  }
+
+  /**
+   * Détruit un satan's cube présent sans loot : retire byTile/#byChunk/#bySoil/#displayed,
+   * débloque les 3 tuiles occupées, persiste, puis programme la repousse
+   * (#regrowQueue + tâche différée). Guard : no-op si record.present est déjà false.
+   * @param {object} record
+   */
+  #destroyPresent (record) {
+    if (!record.present) return
+
+    record.present = false
+    removeFromByTile(this.byTile, record)
+    removeFromByChunk(this.#byChunk, record)
+    this.#bySoil.delete(record.soilIndex)
+    this.#displayed.delete(record)
+
+    blockedTiles.unblockPlacement(record.index)
+    blockedTiles.unblockPlacement(record.index + WORLD_WIDTH)
+    blockedTiles.unblockPlacement(record.index + 2 * WORLD_WIDTH)
+
+    saveManager.queueStaticUpdate({storeName: 'plant', record})
+
+    this.#regrowQueue.push(record)
+    if (this.#regrowQueue.length === 1) {
+      const {priority, capacity} = MICROTASK.SATANS_CUBE_REGROW
+      taskScheduler.enqueue('satans-cube-regrow', SATANS_CUBE_REGROW_RETRY_DELAY_MS, this.satansCubeRegrow, priority, capacity)
+    }
+  }
+
+  /**
+   * Traite le foraging réussi de ce satan's cube (hors loot, géré par ForagingManager).
+   * Marque le record absent et programme la repousse.
+   * @param {object} record
+   */
+  onForaged (record) {
+    this.#destroyPresent(record)
+  }
+
+  /**
+   * Retourne le record de satan's cube couvrant la tuile donnée, ou null.
+   * @param {number} tileIndex — (y << 10) | x
+   * @returns {object|null}
+   */
+  getPlantAt (tileIndex) {
+    return this.byTile.get(tileIndex) ?? null
+  }
+
+  /**
+   * Indique si le record est actuellement présent (forageable).
+   * @param {object} record
+   * @returns {boolean}
+   */
+  isPresent (record) { return record.present }
+
+  /**
+   * Tire une colonne et une hauteur au hasard dans la bande Caverns Top
+   * (TOPSOIL_Y_UNDER_CAVERNS → TOPSOIL_Y_CAVERNS_MID), descend jusqu'à la première tuile
+   * non-VOID.
+   * @returns {number} index packé (y<<10)|x du sol si HARDSTONE ou HELLSTONE trouvé, 0 sinon
+   */
+  #findSatansCubeFloor () {
+    const VOID = NODES.VOID.code
+    const HARDSTONE = NODES.HARDSTONE.code
+    const HELLSTONE = NODES.HELLSTONE.code
+    const W = WORLD_WIDTH
+
+    const cx = seededRNG.randomGetMinMax(1, W - 2)
+    const cy = seededRNG.randomGetMinMax(TOPSOIL_Y_UNDER_CAVERNS, TOPSOIL_Y_CAVERNS_MID)
+    let idx = (cy << 10) | cx
+
+    if (chunkManager.getTileAt(idx) !== VOID) return 0
+    const maxIndex = (TOPSOIL_Y_CAVERNS_MID << 10) | cx
+    while (idx < maxIndex && chunkManager.getTileAt(idx) === VOID) idx += W
+
+    const support = chunkManager.getTileAt(idx)
+    if (support !== HARDSTONE && support !== HELLSTONE) return 0
+
+    return idx
+  }
+
+  /**
+   * Cherche un nouvel emplacement pour le dernier record de #regrowQueue.
+   * Départ VOID, descente jusqu'au premier non-VOID, sol HARDSTONE ou HELLSTONE (ancre,
+   * via #findSatansCubeFloor), puis pocket VOID 1x3 au-dessus — tuiles libres de tout
+   * blocage (blockedTiles). Pas d'ambiguïté gauche/droite (footprint w=1, contrairement à
+   * Mandrake/Pricklepad w=2).
+   * Si trouvé : finalise le record (present=true, byTile/#byChunk/#bySoil, blockPlacement,
+   * persistence) et le retire de #regrowQueue (dernier élément, length--).
+   * Replanifie tant que #regrowQueue n'est pas vide, avec SATANS_CUBE_REGROW_RETRY_DELAY_MS.
+   */
+  satansCubeRegrow () {
+    if (this.#regrowQueue.length === 0) return
+
+    const VOID = NODES.VOID.code
+    const floorIndex = this.#findSatansCubeFloor()
+
+    if (floorIndex !== 0) {
+      const cx = floorIndex & 0x3FF
+      const topY = (floorIndex >> 10) - 3
+
+      if (chunkManager.isRectCode(cx, topY, 1, 3, VOID) && blockedTiles.canPlaceRect(cx, topY, 1, 3)) {
+        const record = this.#regrowQueue[this.#regrowQueue.length - 1]
+
+        record.soilIndex = floorIndex
+        record.index = (topY << 10) | cx
+        record.x = cx
+        record.y = topY
+        record.present = true
+
+        addToByTile(this.byTile, record)
+        addToByChunk(this.#byChunk, record)
+        addToDisplayed(this.#displayed, record)
+        this.#bySoil.set(floorIndex, record)
+        blockedTiles.blockPlacementRect(cx, topY, 1, 3)
+        saveManager.queueStaticUpdate({storeName: 'plant', record})
+
+        this.#regrowQueue.length--
+      }
+    }
+
+    if (this.#regrowQueue.length !== 0) {
+      const {priority, capacity} = MICROTASK.SATANS_CUBE_REGROW
+      taskScheduler.enqueue('satans-cube-regrow', SATANS_CUBE_REGROW_RETRY_DELAY_MS, this.satansCubeRegrow, priority, capacity)
+    }
+  }
+
+  /**
+   * Liaison EventBus : 'world/tile-changed'.
+   * Détruit le satan's cube présent si une des 3 tuiles de son corps n'est plus VOID,
+   * ou si sa tuile sol n'est plus HARDSTONE ni HELLSTONE.
+   * @param {{tileIndex: number}} payload
+   */
+  onTileChangedSatansCube ({tileIndex}) {
+    // Cas 1 — tuile du corps : une des 3 VOID devient autre chose
+    const byBodyRecord = this.byTile.get(tileIndex)
+    if (byBodyRecord !== undefined) this.#destroyPresent(byBodyRecord)
+
+    // Cas 2 — tuile sol
+    const record = this.#bySoil.get(tileIndex)
+    if (record !== undefined) this.#destroyPresent(record)
+  }
+}
+export const satansCubeSystem = new SatansCubeSystem()
 
 /* ====================================================================================================
    PARSNIP SYSTEM
