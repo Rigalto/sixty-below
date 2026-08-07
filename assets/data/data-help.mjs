@@ -5032,12 +5032,14 @@ All plants found in the world of Sixty-Below. Plants can be harvested for loot, 
 | Name/Tier | Type | Location | Tile | Main Loot | Encounters |
 |---|---|---|---|---|---|
 | <<cellItemStar|coconut>> | Tree | [[Sea]] shore<br>[[Desert]] Oasis shore | [[node:sand]] | [[item:coconut]], [[item:coconutFiber]], [[item:coconutPulp]], [[item:coconutMilk]] | [[monster:coconutCrab]] (Shaking) |
-| <<cellItemStar|thornspine>> | Tree | [[Sea]] shore<br>[[Desert]] | [[node:sand]] | [[item:thornspineFlower]], [[item:cactusSpine]], [[item:cactusFiber]] | [[monster:scorpion]] |
 | <<cellItemStar|oak>> | Tree | [[Forest]]<br>[[Surface]] | [[node:grassForest]] | [[item:logOak]], [[item:acorn]] | [[monster:hornet]] (Shaking) / [[monster:boar]] (Chopping) |
 | <<cellItemStar|mahogany>> | Tree | [[Jungle]]<br>[[Surface]] | [[node:grassJungle]] | [[item:logMahogany]] | [[monster:eyelashViper]] (Shaking) / [[monster:bulletAnt]] (Chopping) |
+| <<cellItemStar|thornspine>> | Tree | [[Sea]] shore<br>[[Desert]] | [[node:sand]] | [[item:thornspineFlower]], [[item:cactusSpine]], [[item:cactusFiber]] | [[monster:scorpion]] |
 | <<cellItemStar|giantMushroom>> | Tree | [[Mushroom Cave]] | [[node:grassMushroom]] | ⏳ | [[monster:isopod]]  (Chopping) |
-| [[item:bolete]] | {{item:bolete:star|star}} | Mushroom | [[Forest]] / [[Surface]] | [[item:bolete]] | [[monster:adder]] (Foraging) |
-| [[item:pinkMycenia]] | {{item:pinkMycenia:star|star}} | Mushroom | [[Jungle]] / [[Surface]] | [[item:pinkMycenia]] | [[monster:giantRedSlug]] (Foraging) |
+| <<cellItemStar|bolete>> | Mushroom | [[Forest]] / [[Surface]] | [[node:grassForest]] | [[item:bolete]] | [[monster:adder]] (Foraging) |
+| <<cellItemStar|pinkMycenia>> | Mushroom | [[Jungle]] / [[Surface]] | [[node:grassJungle]] | [[item:pinkMycenia]] | [[monster:giantRedSlug]] (Foraging) |
+| [[item:frostcap]] | {{item:frostcap:star|star}} | Mushroom | [[Mushroom Cave]] / [[node:grassmushroom]] | [[item:mushroomGill]] | [[monster:woodlouse]] (Foraging) |
+| [[item:dawncap]] | {{item:dawncap:star|star}} | Mushroom | [[Mushroom Cave]] / [[node:grassmushroom]] | [[item:mushroomGill]] | [[monster:woodlouse]] (Foraging) |
 | [[item:coralR]] | {{item:coralR:star|star}} | Herb | Under [[Sea]] / [[node:sand]] | [[item:coral]] | [[monster:moray]] (Foraging) |
 | [[item:coralP]] | {{item:coralP:star|star}} | Herb | Under [[Sea]] / [[node:sand]] | [[item:coral]] | [[monster:moray]] (Foraging) |
 | [[item:coralY]] | {{item:coralY:star|star}} | Herb | Under [[Sea]] / [[node:sand]] | [[item:coral]] | [[monster:moray]] (Foraging) |
@@ -5051,8 +5053,6 @@ All plants found in the world of Sixty-Below. Plants can be harvested for loot, 
 | [[item:fernG]] | {{item:fernG:star|star}} | Herb | [[Fern Cave]] / [[node:grassfern]] | [[item:fernLeaf]] | [[monster:dendrobate]] /  [[monster:mamba]] (Foraging) |
 | [[item:fernM]] | {{item:fernM:star|star}} | Herb | [[Fern Cave]] / [[node:grassfern]] | [[item:fernLeaf]] | [[monster:dendrobate]] /  [[monster:mamba]] (Foraging) |
 | [[item:velvetmoss]] | {{item:velvetmoss:star|star}} | Herb | [[Moss Cave]] / [[node:grassmoss]] | [[item:velvetmoss]] | [[monster:woodlouse]] (Foraging) |
-| [[item:frostcap]] | {{item:frostcap:star|star}} | Mushroom | [[Mushroom Cave]] / [[node:grassmushroom]] | [[item:mushroomGill]] | [[monster:woodlouse]] (Foraging) |
-| [[item:dawncap]] | {{item:dawncap:star|star}} | Mushroom | [[Mushroom Cave]] / [[node:grassmushroom]] | [[item:mushroomGill]] | [[monster:woodlouse]] (Foraging) |
 | [[item:mandrake]] | {{item:mandrake:star|star}} | Herb | [[Forest]] [[Underground]] / [[node:dirt]] | [[item:mandrakeRoot]] | [[monster:wraith]] (Foraging) |
 | [[item:pricklepad]] | {{item:pricklepad:star|star}} | Herb | [[Desert]] [[Underground]] / [[node:sand]] | [[item:pricklepadPear]], [[item:cactusSpine]], [[item:cactusFiber]] | [[monster:scorpion]] (Foraging) |
 | [[item:bamboo]] | {{item:bamboo:star|star}} | Herb | [[Jungle]] [[Underground]] / [[node:silt]] | [[item:bambooStalk]] | [[monster:centipede]] (Foraging) |
