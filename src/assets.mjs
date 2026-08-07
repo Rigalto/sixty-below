@@ -13,7 +13,7 @@ import {eventBus} from './utils.mjs'
 // Pour régénérer les atlas paddés (une fois, hors runtime) :
 //   node extrude-atlas.mjs assets/sprites assets/sprites-padded
 //
-export const BASE_DIR = 'assets/sprites' // debug — artefact de bleeding visible
+const BASE_DIR = 'assets/sprites' // debug — artefact de bleeding visible
 // const BASE_DIR = 'assets/sprites-padded' // production
 
 // Dérivée de BASE_DIR : 1 si l'atlas paddé est actif, 0 sinon (atlas brut, debug bleeding).
