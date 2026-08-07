@@ -1,6 +1,6 @@
 // ecosystem.mjs — FloraManager - OakSystem - MahoganySystem - CoconutSystem - ThornspineSystem
 // SunflowerSystem - ParsnipSystem - OleanderSystem - MandrakeSystem - PricklepadSystem - AmbermirageSystem
-// CobwebSystem - HiveSystem - SatansCubeSystem - SneakthornSystem
+// CobwebSystem - HiveSystem - SatansCubeSystem - SneakthornSystem - CursedcrownSystem
 // SpreadForestSystem - SpreadJungleSystem - CoralSystem - BloodmoonSystem
 // SampleSystem
 
@@ -2626,6 +2626,255 @@ class SneakthornSystem {
   }
 }
 export const sneakthornSystem = new SneakthornSystem()
+
+/* ====================================================================================================
+   CURSEDCROWN SYSTEM
+   ====================================================================================================
+
+   Singleton : cursedcrownSystem.
+
+   Population constante : #list reçoit en une fois (init) le tableau complet des cursedcrowns,
+   taille fixe jamais réallouée (pas de GC). Un record present=false signale un slot à faire
+   repousser ailleurs — mis en #regrowQueue, vidée par microtâche (cursedcrownRegrow).
+
+   ==================================================================================================== */
+
+const CURSEDCROWN_REGROW_INITIAL_DELAY_MS = 1557
+const CURSEDCROWN_REGROW_RETRY_DELAY_MS = 137
+
+class CursedcrownSystem {
+  byTile = new Map() // Map<tileIndex, record> — public : membership O(1) + lookup record
+  #list = [] // record[] — population fixe, référence affectée dans init(records)
+  #byChunk = new Map() // Map<chunkKey, Set> — lookup spatial pour onPreloadChunksChanged
+  #bySoil = new Map() // Map<soilIndex, record> — cursedcrowns présents : détection retrait du sol
+  #displayed = new Set() // Set<record> — cible du render (chunks preload uniquement)
+  #regrowQueue = [] // record[] — records present=false en attente d'un nouvel emplacement
+  #image = null // image à afficher (mise en cache)
+
+  constructor () {
+    // eventBus
+    this.onFirstLoopCursedcrown = this.onFirstLoopCursedcrown.bind(this)
+    eventBus.on('time/first-loop', this.onFirstLoopCursedcrown)
+    this.onTileChangedCursedcrown = this.onTileChangedCursedcrown.bind(this)
+    eventBus.on('world/tile-changed', this.onTileChangedCursedcrown)
+    // micro-tâches
+    this.cursedcrownRegrow = this.cursedcrownRegrow.bind(this)
+  }
+
+  /**
+   * Réinitialise toutes les structures.
+   * Appelé en début de session, avant toute hydratation.
+   */
+  init () {
+    this.byTile.clear()
+    this.#list.length = 0
+    this.#byChunk.clear()
+    this.#bySoil.clear()
+    this.#displayed.clear()
+    this.#regrowQueue.length = 0
+
+    this.#image = ITEMS.cursedcrown.placed // après hydratation
+  }
+
+  /**
+   * Enregistre un cursedcrown et peuple les structures internes.
+   * Si present=false, met le record en file de repousse.
+   * @param {object} record — record HERB/CURSEDCROWN (deleted=false garanti par l'appelant)
+   */
+  initPlant (record) {
+    this.#list.push(record)
+
+    if (record.present) {
+      addToByTile(this.byTile, record)
+      addToByChunk(this.#byChunk, record)
+      this.#bySoil.set(record.soilIndex, record)
+
+      blockedTiles.blockPlacement(record.index)
+      blockedTiles.blockPlacement(record.index + WORLD_WIDTH)
+      blockedTiles.blockPlacement(record.index + 2 * WORLD_WIDTH)
+      return
+    }
+    this.#regrowQueue.push(record)
+  }
+
+  debug () {
+    console.log(`[CursedcrownSystem] ${this.#list.length} cursedcrowns récupérés, ${this.#regrowQueue.length} en attente de repousse`)
+  }
+
+  /**
+   * Liaison EventBus : 'time/first-loop'. Déclenchera la tâche de repousse si #regrowQueue
+   * contient des records present=false chargés depuis la persistence.
+   * Délai long pour ne pas surcharger le démarrage.
+   */
+  onFirstLoopCursedcrown () {
+    if (this.#regrowQueue.length === 0) return
+    const {priority, capacity} = MICROTASK.CURSEDCROWN_REGROW
+    taskScheduler.enqueue('cursedcrown-regrow', CURSEDCROWN_REGROW_INITIAL_DELAY_MS, this.cursedcrownRegrow, priority, capacity)
+  }
+
+  /**
+   * Reconstruit #displayed depuis les chunks preload de la caméra.
+   * @param {Set<number>} preloadChunks
+   */
+  onPreloadChunksChanged (preloadChunks) {
+    buildDisplayed(this.#displayed, this.#byChunk, preloadChunks)
+  }
+
+  /**
+   * Dessine les cursedcrowns visibles et présents sur le contexte transformé.
+   * @param {CanvasRenderingContext2D} ctx — contexte déjà transformé (caméra appliquée)
+   */
+  render (ctx) {
+    const img = this.#image
+    for (const record of this.#displayed) {
+      const pxX = (record.index & 0x3FF) << 4
+      const pxY = (record.index >> 10) << 4
+      ctx.drawImage(IMAGE_CACHE[img.imgIndex], img.sx, img.sy, img.sw, img.sh, pxX, pxY, img.sw, img.sh)
+    }
+  }
+
+  /**
+   * Retourne le record de cursedcrown couvrant la tuile donnée, ou null.
+   * @param {number} tileIndex — (y << 10) | x
+   * @returns {object|null}
+   */
+  getPlantAt (tileIndex) {
+    return this.byTile.get(tileIndex) ?? null
+  }
+
+  /**
+   * Indique si le record est actuellement présent (forageable).
+   * @param {object} record
+   * @returns {boolean}
+   */
+  isPresent (record) { return record.present }
+
+  /**
+   * Détruit un cursedcrown présent sans loot : retire byTile/#byChunk/#bySoil/#displayed,
+   * débloque les 3 tuiles occupées, persiste, puis programme la repousse
+   * (#regrowQueue + tâche différée). Guard : no-op si record.present est déjà false.
+   * @param {object} record
+   */
+  #destroyPresent (record) {
+    if (!record.present) return
+
+    record.present = false
+    removeFromByTile(this.byTile, record)
+    removeFromByChunk(this.#byChunk, record)
+    this.#bySoil.delete(record.soilIndex)
+    this.#displayed.delete(record)
+
+    blockedTiles.unblockPlacement(record.index)
+    blockedTiles.unblockPlacement(record.index + WORLD_WIDTH)
+    blockedTiles.unblockPlacement(record.index + 2 * WORLD_WIDTH)
+
+    saveManager.queueStaticUpdate({storeName: 'plant', record})
+
+    this.#regrowQueue.push(record)
+    if (this.#regrowQueue.length === 1) {
+      const {priority, capacity} = MICROTASK.CURSEDCROWN_REGROW
+      taskScheduler.enqueue('cursedcrown-regrow', CURSEDCROWN_REGROW_RETRY_DELAY_MS, this.cursedcrownRegrow, priority, capacity)
+    }
+  }
+
+  /**
+   * Traite le foraging réussi de ce cursedcrown (hors loot, géré par ForagingManager).
+   * Marque le record absent et programme la repousse.
+   * @param {object} record
+   */
+  onForaged (record) {
+    this.#destroyPresent(record)
+  }
+
+  /**
+   * Tire une colonne et une hauteur au hasard dans la bande Caverns Top
+   * (TOPSOIL_Y_UNDER_CAVERNS → TOPSOIL_Y_CAVERNS_MID), descend jusqu'à la première tuile
+   * non-VOID.
+   * @returns {number} index packé (y<<10)|x du sol si SLATE ou HELLSTONE trouvé, 0 sinon
+   */
+  #findCursedcrownFloor () {
+    const VOID = NODES.VOID.code
+    const SLATE = NODES.SLATE.code
+    const HELLSTONE = NODES.HELLSTONE.code
+    const W = WORLD_WIDTH
+
+    const cx = seededRNG.randomGetMinMax(1, W - 2)
+    const cy = seededRNG.randomGetMinMax(TOPSOIL_Y_UNDER_CAVERNS, TOPSOIL_Y_CAVERNS_MID)
+    let idx = (cy << 10) | cx
+
+    if (chunkManager.getTileAt(idx) !== VOID) return 0
+    const maxIndex = (TOPSOIL_Y_CAVERNS_MID << 10) | cx
+    while (idx < maxIndex && chunkManager.getTileAt(idx) === VOID) idx += W
+
+    const support = chunkManager.getTileAt(idx)
+    if (support !== SLATE && support !== HELLSTONE) return 0
+
+    return idx
+  }
+
+  /**
+   * Cherche un nouvel emplacement pour le dernier record de #regrowQueue.
+   * Départ VOID, descente jusqu'au premier non-VOID, sol SLATE ou HELLSTONE (ancre, via
+   * #findCursedcrownFloor), puis pocket VOID 1x3 au-dessus — tuiles libres de tout
+   * blocage (blockedTiles). Pas d'ambiguïté gauche/droite (footprint w=1, contrairement à
+   * Mandrake/Sneakthorn w=2).
+   * Si trouvé : finalise le record (present=true, byTile/#byChunk/#bySoil, blockPlacement,
+   * persistence) et le retire de #regrowQueue (dernier élément, length--).
+   * Replanifie tant que #regrowQueue n'est pas vide, avec CURSEDCROWN_REGROW_RETRY_DELAY_MS.
+   */
+  cursedcrownRegrow () {
+    if (this.#regrowQueue.length === 0) return
+
+    const VOID = NODES.VOID.code
+    const floorIndex = this.#findCursedcrownFloor()
+
+    if (floorIndex !== 0) {
+      const cx = floorIndex & 0x3FF
+      const topY = (floorIndex >> 10) - 3
+
+      if (chunkManager.isRectCode(cx, topY, 1, 3, VOID) && blockedTiles.canPlaceRect(cx, topY, 1, 3)) {
+        const record = this.#regrowQueue[this.#regrowQueue.length - 1]
+
+        record.soilIndex = floorIndex
+        record.index = (topY << 10) | cx
+        record.x = cx
+        record.y = topY
+        record.present = true
+
+        addToByTile(this.byTile, record)
+        addToByChunk(this.#byChunk, record)
+        addToDisplayed(this.#displayed, record)
+        this.#bySoil.set(floorIndex, record)
+        blockedTiles.blockPlacementRect(cx, topY, 1, 3)
+        saveManager.queueStaticUpdate({storeName: 'plant', record})
+
+        this.#regrowQueue.length--
+      }
+    }
+
+    if (this.#regrowQueue.length !== 0) {
+      const {priority, capacity} = MICROTASK.CURSEDCROWN_REGROW
+      taskScheduler.enqueue('cursedcrown-regrow', CURSEDCROWN_REGROW_RETRY_DELAY_MS, this.cursedcrownRegrow, priority, capacity)
+    }
+  }
+
+  /**
+   * Liaison EventBus : 'world/tile-changed'.
+   * Détruit le cursedcrown présent si une des 3 tuiles de son corps n'est plus VOID,
+   * ou si sa tuile sol n'est plus SLATE ni HELLSTONE.
+   * @param {{tileIndex: number, tileOldCode: number, tileNewCode: number}} payload
+   */
+  onTileChangedCursedcrown ({tileIndex}) {
+    // Cas 1 — tuile du corps : une des 3 VOID devient autre chose
+    const byBodyRecord = this.byTile.get(tileIndex)
+    if (byBodyRecord !== undefined) this.#destroyPresent(byBodyRecord)
+
+    // Cas 2 — tuile sol
+    const record = this.#bySoil.get(tileIndex)
+    if (record !== undefined) this.#destroyPresent(record)
+  }
+}
+export const cursedcrownSystem = new CursedcrownSystem()
 
 /* ====================================================================================================
    PARSNIP SYSTEM
