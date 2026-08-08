@@ -6396,26 +6396,37 @@ Abysshorn is one of the strangest organisms in the known world. Its fractal stru
 
 * Biome: [[Forest]], [[Desert]], [[Jungle]]
 * Layer: [[Caverns]] Top
-* Grows on any [[Mineable Blocks|Topsoil]] or [[Mineable Blocks|Substrat]] surface
+* Grows on any [[node:hardstone]], [[node:slate]] or [[node:hellstone]] surface
 
 **Population**
 
 * The species neither grows nor declines — natural balance maintains the population
 * Harvested plants do not regrow
 
-**Harvest**
+<hr>
 
-* [[Foraging|Interact to harvest]] — the plant disappears permanently on harvest
-* Tool: [[Foraging Tools|Gold Sickle]] required ⏳
-* Loot: [[item:abysshorn]] ⏳
+**Foraging Abysshorn**
+
+* [[Foraging|Interact to harvest]]
+* The plant disappears on harvest
+
+Foraging Tool: <<itemStar|sickleGold>>
+
+**Abysshorn Foraging Loot**
+
+<<itemLootTable|abysshorn|foraging>>
 
 **Dangers**
 
 * The hollow trumpets of the Abysshorn resonate at frequencies that attract [[monster:caveJellyfish|Cave Jellyfish]] from the surrounding cavern. Their translucent bodies are nearly invisible in the dark — and their sting causes [[Poison DOT]] and [[Fire DOT]] simultaneously. ⏳
 
+<hr>
+
 **Usages** ⏳
 
 * [[item:abysshorn]] — ingredient for pheromone preparations ⏳
+
+<hr>
 
 **Tips**
 
@@ -6440,26 +6451,37 @@ Inferncap is the deepest-growing plant in the known world. Found only in the low
 
 * Biome: [[Forest]], [[Desert]], [[Jungle]]
 * Layer: [[Caverns]] Bottom
-* Grows on any [[Mineable Blocks|Topsoil]] or [[Mineable Blocks|Substrat]] surface
+* Grows on any [[node:hardstone]], [[node:slate]] or [[node:hellstone]] surface
 
 **Population**
 
 * The species neither grows nor declines — natural balance maintains the population
 * Harvested plants do not regrow
 
-**Harvest**
+<hr>
 
-* [[Foraging|Interact to harvest]] — the plant disappears permanently on harvest
-* Tool: [[Foraging Tools|Gold Sickle]] required ⏳
-* Loot: [[item:inferncap]] ⏳
+**Foraging Inferncap**
+
+* [[Foraging|Interact to harvest]]
+* The plant disappears on harvest
+
+Foraging Tool: <<itemStar|sickleGold>>
+
+**Inferncap Foraging Loot**
+
+<<itemLootTable|inferncap|foraging>>
 
 **Dangers**
 
 * Foraging Inferncap draws both a [[monster:lavaWorm|Lava Worm]] and a [[monster:magmaCrab|Magma Crab]] from the surrounding rock. The combination is lethal — the Lava Worm attacks from below while the Magma Crab closes from the side. ⏳
 
+<hr>
+
 **Usages** ⏳
 
 * [[item:inferncap]] — rare ingredient for pheromone preparations ⏳
+
+<hr>
 
 **Tips**
 

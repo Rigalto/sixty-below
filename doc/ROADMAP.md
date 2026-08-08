@@ -9,7 +9,7 @@
 
 ### Code et tests
 
-- Implémenter les herbes, reste : Bamboo, Abysshorn, InfernCap
+- Implémenter les herbes, reste : Bamboo, InfernCap
 - Implémenter les plants des mini-biomes, reste : fern Cave, Mushroom Cave
 - Implémenter les Giant Mushrooms.
 - Implémenter la réduction de vitesse dans les liquides ou les cobweb.
@@ -386,6 +386,7 @@ La Sap corrode le Copper. Il doit donc être remplacer par du Gold.
 - Satan's Cube (`SatansCubeSystem`)
 - Sneakthorn (`SneakthornSystem`)
 - Cursedcrown (`CursedcrownSystem`)
+- Abysshorn (`AbysshornSystem`)
 
 ### Rendu
 - `WorldRenderer` — rendu tuiles par chunks avec cache OffscreenCanvas

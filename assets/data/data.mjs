@@ -997,8 +997,8 @@ export const BAMBOO_COUNT = 40
 export const SATANS_CUBE_COUNT = 80
 export const SNEAKTHORN_COUNT = 80
 export const CURSEDCROWN_COUNT = 80
-export const ABYSSHORN_COUNT = 80
-export const INFERNCAP_COUNT = 60
+export const ABYSSHORN_COUNT = 120
+export const INFERNCAP_COUNT = 180
 // CobwebSystem (ecosystem.mjs) — délai de base entre deux tentatives de pose
 // de toile (ms). Modulé à l'usage par un facteur aléatoire x[0.8, 1.2[.
 export const COBWEB_GROWTH_DELAY_MS = 20000
