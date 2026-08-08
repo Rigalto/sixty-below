@@ -645,8 +645,9 @@ export const ITEMS = {
   sneakthornTwig: {name: 'Sneakthorn Twig', type: 0, stype: 'herb', star: 4, image: 'foraged_32_32-1-5', help: 'Sneakthorn', tooltip: '???'},
 
   cursedcrown: {name: 'Cursedcrown ', type: 0, stype: 'herb', star: 4, image: 'foraged_32_32-2-5', placed: 'placed_16_48-3-0', foraging: {speed: 500, items: [{item: 'cursedcrown', count: 1, buffs: ['lucky:40']}]}, help: 'Cursedcrown', tooltip: 'Harvest to collect Potions and Food ingredients'},
-  abysshorn: {name: 'Abysshorn', type: 0, stype: 'herb', star: 5, image: 'fuws_32_32-2-3', placed: 'fuws_32_32-2-3', foraging: {speed: 500, items: [{item: 'abysshorn', count: 1, rainy: 1.8, windy: 1.8}]}, help: 'Abysshorn', tooltip: 'Harvest to collect Potions and Food ingredients'},
-  inferncap: {name: 'Inferncap', type: 0, stype: 'herb', star: 5, image: 'fuws_32_32-2-3', placed: 'fuws_32_32-2-3', foraging: {speed: 500, items: [{item: 'inferncap', count: 1, rainy: 1.8, windy: 1.8}]}, help: 'Inferncap', tooltip: 'Harvest to collect Potions and Food ingredients'},
+  abysshorn: {name: 'Abysshorn', type: 0, stype: 'herb', star: 5, image: 'foraged_32_32-3-5', placed: 'placed_32_32-2-3', foraging: {speed: 500, items: [{item: 'abysshorn', count: 1, buffs: ['lucky:45']}]}, help: 'Abysshorn', tooltip: 'Harvest to collect Potions and Food ingredients'},
+
+  inferncap: {name: 'Inferncap', type: 0, stype: 'herb', star: 5, image: 'fuws_32_32-2-3', placed: 'fuws_32_32-2-3', foraging: {speed: 500, items: [{item: 'inferncap', count: 1, buffs: ['lucky:50']}]}, help: 'Inferncap', tooltip: 'Harvest to collect Potions and Food ingredients'},
 
   // Gardening - images OK
   clayPot: {name: 'Clay Pot', type: ITEM_TYPE.FURNITURE | ITEM_TYPE.PLACABLE, stype: 'pot', surface: true, onTop: true, star: 1, capacity: 1, image: 'furniture_32_32-0-8', placed: 'placed_16_16-2-3', placedleft: 'placed_16_16-3-3', placedright: 'placed_16_16-4-3', unplacing: {speed: 800}, help: 'Clay Pots', tooltip: 'Gardening Container'},
