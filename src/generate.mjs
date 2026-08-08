@@ -417,7 +417,7 @@ class WorldGenerator {
     plantGenerator.placeSatansCubes(zoneRects)
     plantGenerator.placeSneakthorns(zoneRects)
     plantGenerator.placeCursedcrowns(zoneRects)
-    plantGenerator.placeAbysshorns(zoneRects, chestIndexes)
+    plantGenerator.placeAbysshorns(zoneRects)
     plantGenerator.placeInferncaps(zoneRects, chestIndexes)
     await progress('Caverns Plants')
 
@@ -8813,26 +8813,21 @@ class PlantGenerator {
   /**
    * Place les Abysshorns dans les caverns top de tous les biomes.
    * Substrat : toute tuile TOPSOIL ou SUBSTRAT (13 types, Set local).
-   * Les deux tuiles support doivent être des substrats valides.
-   * VOID requis sur les 2x2 tuiles occupées (y-1, y-2, x et x+1).
-   * Anti-coffre sur 3 tuiles support (cx-1 à cx+1).
-   * Nombre constant : ABYSSHORN_COUNT.
+   * cx est l'ancre commune ; tente le footprint à droite (cx, cx+1) puis à gauche
+   * (cx-1, cx), tire au hasard si les deux sont valides.
+   * Nombre constant défini par ABYSSHORN_COUNT.
    * Arrêt après MAX_ATTEMPTS échecs consécutifs.
+   * Respecte et alimente placedGuard (anti-coffre + anti-chevauchement avec toute autre entité
+   * placée, pas seulement les autres Abysshorns).
    *
-   * @param {Array<{x0, x1, yUnder, yCaverns, biome}>} zoneRects
-   * @param {Set<number>} chestIndexes — index interdits (coffres)
+   * @param {Array<{x0, x1, yUnder, yCavernsMid, biome}>} zoneRects
    */
-  placeAbysshorns (zoneRects, chestIndexes) {
+  placeAbysshorns (zoneRects) {
     const VOID = NODES.VOID.code
     const W = WORLD_WIDTH
-    const MAX_ATTEMPTS = 100
+    const MAX_ATTEMPTS = 200
 
-    const VALID_SUBSTRATES = new Set([
-      NODES.DIRT.code, NODES.SAND.code, NODES.SILT.code, NODES.HUMUS.code,
-      NODES.CLAY.code, NODES.SANDSTONE.code, NODES.MUD.code,
-      NODES.STONE.code, NODES.ASH.code, NODES.LIMESTONE.code,
-      NODES.HARDSTONE.code, NODES.HELLSTONE.code, NODES.SLATE.code
-    ])
+    const VALID_SUBSTRATES = new Set([NODES.HARDSTONE.code, NODES.HELLSTONE.code, NODES.SLATE.code])
 
     const rects = []
     for (const rect of zoneRects) {
@@ -8845,7 +8840,7 @@ class PlantGenerator {
 
     while (placed < ABYSSHORN_COUNT && consecutiveFailures < MAX_ATTEMPTS) {
       const rect = seededRNG.randomGetArrayValue(rects)
-      const cx = seededRNG.randomGetMinMax(rect.x0 + 1, rect.x1 - 2)
+      const cx = seededRNG.randomGetMinMax(rect.x0 + 2, rect.x1 - 2)
       const cy = seededRNG.randomGetMinMax(rect.y0 + 1, rect.y1 - 1)
 
       if (worldBuffer.read(cx, cy) !== VOID) { consecutiveFailures++; continue }
@@ -8853,25 +8848,40 @@ class PlantGenerator {
       let y = cy
       while (y < rect.y1 && worldBuffer.read(cx, y) === VOID) y++
 
-      if (!VALID_SUBSTRATES.has(worldBuffer.read(cx, y))) { consecutiveFailures++; continue }
-      if (!VALID_SUBSTRATES.has(worldBuffer.read(cx + 1, y))) { consecutiveFailures++; continue }
+      // Tester placement à droite (cx, cx+1)
+      const canPlaceRight = VALID_SUBSTRATES.has(worldBuffer.read(cx, y)) &&
+                             VALID_SUBSTRATES.has(worldBuffer.read(cx + 1, y)) &&
+                             worldBuffer.read(cx, y - 1) === VOID &&
+                             worldBuffer.read(cx + 1, y - 1) === VOID &&
+                             worldBuffer.read(cx, y - 2) === VOID &&
+                             worldBuffer.read(cx + 1, y - 2) === VOID &&
+                             !placedGuard.has(((y - 1) << 10) | cx) &&
+                             !placedGuard.has(((y - 1) << 10) | (cx + 1)) &&
+                             !placedGuard.has(((y - 2) << 10) | cx) &&
+                             !placedGuard.has(((y - 2) << 10) | (cx + 1))
 
-      // Vérifier VOID sur les 2x2 tuiles occupées
-      let voidOk = true
-      for (let dx = 0; dx <= 1 && voidOk; dx++) {
-        for (let dy = 1; dy <= 2 && voidOk; dy++) {
-          if (worldBuffer.read(cx + dx, y - dy) !== VOID) voidOk = false
-        }
-      }
-      if (!voidOk) { consecutiveFailures++; continue }
+      // Tester placement à gauche (cx-1, cx)
+      const canPlaceLeft = VALID_SUBSTRATES.has(worldBuffer.read(cx - 1, y)) &&
+                            VALID_SUBSTRATES.has(worldBuffer.read(cx, y)) &&
+                            worldBuffer.read(cx - 1, y - 1) === VOID &&
+                            worldBuffer.read(cx, y - 1) === VOID &&
+                            worldBuffer.read(cx - 1, y - 2) === VOID &&
+                            worldBuffer.read(cx, y - 2) === VOID &&
+                            !placedGuard.has(((y - 1) << 10) | (cx - 1)) &&
+                            !placedGuard.has(((y - 1) << 10) | cx) &&
+                            !placedGuard.has(((y - 2) << 10) | (cx - 1)) &&
+                            !placedGuard.has(((y - 2) << 10) | cx)
 
-      if (chestIndexes.has((y << 10) | (cx - 1))) { consecutiveFailures++; continue }
-      if (chestIndexes.has((y << 10) | cx)) { consecutiveFailures++; continue }
-      if (chestIndexes.has((y << 10) | (cx + 1))) { consecutiveFailures++; continue }
+      if (!canPlaceLeft && !canPlaceRight) { consecutiveFailures++; continue }
 
       consecutiveFailures = 0
 
-      const soilIndex = (y << 10) | cx
+      const goLeft = canPlaceLeft && (!canPlaceRight || seededRNG.randomGetBool())
+      const originX = goLeft ? cx - 1 : cx
+
+      placedGuard.addRect(originX, y - 2, originX + 1, y - 1)
+
+      const soilIndex = (y << 10) | originX
 
       this.#plants.push({
         id: uniqueIdGenerator.getUniqueId(),
@@ -8882,13 +8892,14 @@ class PlantGenerator {
         itemId: 'abysshorn',
         w: 2,
         h: 2,
-        x: cx,
+        x: originX,
         y: y - 2,
         present: true,
         deleted: false
       })
       placed++
     }
+    if (IS_DEV) console.log(`   🔹 Abysshorns : ${placed} [${ABYSSHORN_COUNT}]`)
   }
 
   /**
