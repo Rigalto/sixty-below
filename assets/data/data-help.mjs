@@ -6491,31 +6491,71 @@ Foraging Tool: <<itemStar|sickleGold>>
   `
   },
   {
-    title: 'Amber-Moss',
+    title: 'Amber Moss',
+    category: ['Crafting Ingredients', 'Forest'],
+    content: `
+**Description**
+
+A vivid orange moss, almost luminescent, growing on the north side of old oak trunks, where moisture stays constant.
+
+**Tier**
+
+{{item:amberMoss:star|star}}
+
+**Source**
+
+* Possible drop from [[Chopping]] an [[item:oak]] with any [[Chopping Tools|Axe]]
+* Possible drop from [[Shaking]] an [[item:oak]] with any [[Hammers|Hammer]]
+
+<hr>
+
+**Usage**⏳
+
+* Natural hemostatic (Healing): applied directly to a wound, it instantly stops bleeding. The basic early-game "bandage".
+* Filtration: placed in a container, it can serve as a rudimentary filter used in cooking.
+* Ointment that reduces itching caused by [[monster:hornet]]s by 50%.
+
+<hr>
+
+**Tips**⏳
+      `
+  },
+  {
+    title: 'Amber Moss',
     category: ['Plant', 'Forest'],
     content: `
-    <<Note pour l'IA : fiche à traduire, la décision d'intégration de cette plante n'est pas encore prise>>
-    La Mousse d'Ambre (Amber-Moss)
+**Description**
+
 C'est une mousse d'un orange vif, presque luminescente, qui pousse exclusivement sur le côté nord des vieux chênes, là où l'humidité est constante.
 
 **Tier**
 
 item:amberMoss:star
 
-**Benefits**⏳
+**Location**
+
+* Biome: [[Forest]]
+* Layer: [[Surface]]
+* Trunk of Oak trees
+
+**Usage**⏳
 
 * Hémostatique naturel (Soin) : Appliquée directement sur une plaie, elle stoppe instantanément le saignement. C'est le "pansement" de base du début de jeu.
-* Allume-feu (Survie) : Une fois séchée, cette mousse devient extrêmement inflammable. Elle est indispensable pour réussir à allumer un [[item:campfire]] ou une [[item:torch]].
 * Filtration : Placée dans un récipient, elle peut servir de filtre rudimentaire utilisé en cuisine.
-
+* onguent qui diminue de 50% les démangeaisons causées par les [[monster:hornet]]s.
 
 Localisation : Base of Oak trees.
 
-Foraging : [[Foraging|Sickle]] any tier.⏳
+<hr>
 
-**Usages**⏳
+**How to collect**
 
-* onguent qui diminue de 50% les démangeaisons causées par les [[monster:hornet]]s.
+* [[Oak]] tree [[Chopping]] with any [[Chopping Tool|Axe]]
+* [[Oak]] tree [[Shaking]] with any [[Hammers|Hammer]]
+
+<hr>
+
+**Tips**⏳
       `
   },
 
@@ -6549,6 +6589,9 @@ Note: those ingredients can also be dropped by [[Mining]] [[Cobweb]] with any [[
     title: 'Bees',
     category: ['Monster'],
     content: `
+**Description**
+
+  If Bees includes Hornet : * [[Amber Moss]] is uded in an ointment that reduces itching caused by [[monster:hornet]]s by 50%.
     `
   },
 
