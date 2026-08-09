@@ -418,7 +418,7 @@ class WorldGenerator {
     plantGenerator.placeSneakthorns(zoneRects)
     plantGenerator.placeCursedcrowns(zoneRects)
     plantGenerator.placeAbysshorns(zoneRects)
-    plantGenerator.placeInferncaps(zoneRects, chestIndexes)
+    plantGenerator.placeInferncaps(zoneRects)
     await progress('Caverns Plants')
 
     clusterGenerator.adjustBorderColumns(surfaceLine)
@@ -6783,10 +6783,10 @@ class FurnitureGenerator {
   }
 
   /**
- * Place des coffres dans la layer Caverns pour chaque tranche de biome.
- * @param {Array<{x0, x1, yUnder, yCaverns, biome}>} zoneRects — tranches de biomes
- * @returns {{chestIndexes: Set<number>, chestRects: Array<{x, y, w, h}>}} — tuiles et rectangles occupés par les coffres
- */
+   * Place des coffres dans la layer Caverns pour chaque tranche de biome.
+   * @param {Array<{x0, x1, yUnder, yCaverns, biome}>} zoneRects — tranches de biomes
+   * @returns {{chestIndexes: Set<number>, chestRects: Array<{x, y, w, h}>}} — tuiles et rectangles occupés par les coffres
+   */
   placeCavernChests (zoneRects) {
     const VOID = NODES.VOID.code
     const LIQUIDS = new Set([NODES.WATER.code, NODES.HONEY.code, NODES.SAP.code])
@@ -8904,27 +8904,22 @@ class PlantGenerator {
 
   /**
    * Place les Inferncaps dans les caverns bottom de tous les biomes.
-   * Substrat : toute tuile TOPSOIL ou SUBSTRAT (13 types, Set local).
-   * La tuile support doit être un substrat valide.
-   * VOID requis en y-1, y-2, y-3.
-   * Anti-coffre sur cx-1 et cx.
-   * Nombre constant : INFERNCAP_COUNT.
+   * Substrat : HARDSTONE, HELLSTONE ou SLATE (3 types, Set local).
+   * cx est l'ancre commune ; tente le footprint à droite (cx, cx+1) puis à gauche
+   * (cx-1, cx), tire au hasard si les deux sont valides.
+   * Nombre constant défini par INFERNCAP_COUNT.
    * Arrêt après MAX_ATTEMPTS échecs consécutifs.
+   * Respecte et alimente placedGuard (anti-coffre + anti-chevauchement avec toute autre entité
+   * placée, pas seulement les autres Inferncaps).
    *
    * @param {Array<{x0, x1, yCavernsMid, yCaverns, biome}>} zoneRects
-   * @param {Set<number>} chestIndexes — index interdits (coffres)
    */
-  placeInferncaps (zoneRects, chestIndexes) {
+  placeInferncaps (zoneRects) {
     const VOID = NODES.VOID.code
     const W = WORLD_WIDTH
-    const MAX_ATTEMPTS = 100
+    const MAX_ATTEMPTS = 200
 
-    const VALID_SUBSTRATES = new Set([
-      NODES.DIRT.code, NODES.SAND.code, NODES.SILT.code, NODES.HUMUS.code,
-      NODES.CLAY.code, NODES.SANDSTONE.code, NODES.MUD.code,
-      NODES.STONE.code, NODES.ASH.code, NODES.LIMESTONE.code,
-      NODES.HARDSTONE.code, NODES.HELLSTONE.code, NODES.SLATE.code
-    ])
+    const VALID_SUBSTRATES = new Set([NODES.HARDSTONE.code, NODES.HELLSTONE.code, NODES.SLATE.code])
 
     const rects = []
     for (const rect of zoneRects) {
@@ -8937,7 +8932,7 @@ class PlantGenerator {
 
     while (placed < INFERNCAP_COUNT && consecutiveFailures < MAX_ATTEMPTS) {
       const rect = seededRNG.randomGetArrayValue(rects)
-      const cx = seededRNG.randomGetMinMax(rect.x0 + 1, rect.x1 - 1)
+      const cx = seededRNG.randomGetMinMax(rect.x0 + 2, rect.x1 - 2)
       const cy = seededRNG.randomGetMinMax(rect.y0 + 1, rect.y1 - 1)
 
       if (worldBuffer.read(cx, cy) !== VOID) { consecutiveFailures++; continue }
@@ -8945,18 +8940,48 @@ class PlantGenerator {
       let y = cy
       while (y < rect.y1 && worldBuffer.read(cx, y) === VOID) y++
 
-      if (!VALID_SUBSTRATES.has(worldBuffer.read(cx, y))) { consecutiveFailures++; continue }
+      // Tester placement à droite (cx, cx+1)
+      const canPlaceRight = VALID_SUBSTRATES.has(worldBuffer.read(cx, y)) &&
+                             VALID_SUBSTRATES.has(worldBuffer.read(cx + 1, y)) &&
+                             worldBuffer.read(cx, y - 1) === VOID &&
+                             worldBuffer.read(cx + 1, y - 1) === VOID &&
+                             worldBuffer.read(cx, y - 2) === VOID &&
+                             worldBuffer.read(cx + 1, y - 2) === VOID &&
+                             worldBuffer.read(cx, y - 3) === VOID &&
+                             worldBuffer.read(cx + 1, y - 3) === VOID &&
+                             !placedGuard.has(((y - 1) << 10) | cx) &&
+                             !placedGuard.has(((y - 1) << 10) | (cx + 1)) &&
+                             !placedGuard.has(((y - 2) << 10) | cx) &&
+                             !placedGuard.has(((y - 2) << 10) | (cx + 1)) &&
+                             !placedGuard.has(((y - 3) << 10) | cx) &&
+                             !placedGuard.has(((y - 3) << 10) | (cx + 1))
 
-      if (worldBuffer.read(cx, y - 1) !== VOID) { consecutiveFailures++; continue }
-      if (worldBuffer.read(cx, y - 2) !== VOID) { consecutiveFailures++; continue }
-      if (worldBuffer.read(cx, y - 3) !== VOID) { consecutiveFailures++; continue }
+      // Tester placement à gauche (cx-1, cx)
+      const canPlaceLeft = VALID_SUBSTRATES.has(worldBuffer.read(cx - 1, y)) &&
+                            VALID_SUBSTRATES.has(worldBuffer.read(cx, y)) &&
+                            worldBuffer.read(cx - 1, y - 1) === VOID &&
+                            worldBuffer.read(cx, y - 1) === VOID &&
+                            worldBuffer.read(cx - 1, y - 2) === VOID &&
+                            worldBuffer.read(cx, y - 2) === VOID &&
+                            worldBuffer.read(cx - 1, y - 3) === VOID &&
+                            worldBuffer.read(cx, y - 3) === VOID &&
+                            !placedGuard.has(((y - 1) << 10) | (cx - 1)) &&
+                            !placedGuard.has(((y - 1) << 10) | cx) &&
+                            !placedGuard.has(((y - 2) << 10) | (cx - 1)) &&
+                            !placedGuard.has(((y - 2) << 10) | cx) &&
+                            !placedGuard.has(((y - 3) << 10) | (cx - 1)) &&
+                            !placedGuard.has(((y - 3) << 10) | cx)
 
-      if (chestIndexes.has((y << 10) | (cx - 1))) { consecutiveFailures++; continue }
-      if (chestIndexes.has((y << 10) | cx)) { consecutiveFailures++; continue }
+      if (!canPlaceLeft && !canPlaceRight) { consecutiveFailures++; continue }
 
       consecutiveFailures = 0
 
-      const soilIndex = (y << 10) | cx
+      const goLeft = canPlaceLeft && (!canPlaceRight || seededRNG.randomGetBool())
+      const originX = goLeft ? cx - 1 : cx
+
+      placedGuard.addRect(originX, y - 3, originX + 1, y - 1)
+
+      const soilIndex = (y << 10) | originX
 
       this.#plants.push({
         id: uniqueIdGenerator.getUniqueId(),
@@ -8965,15 +8990,16 @@ class PlantGenerator {
         index: soilIndex - 3 * W,
         soilIndex,
         itemId: 'inferncap',
-        w: 1,
+        w: 2,
         h: 3,
-        x: cx,
+        x: originX,
         y: y - 3,
         present: true,
         deleted: false
       })
       placed++
     }
+    if (IS_DEV) console.log(`   🔹 Inferncaps : ${placed} [${INFERNCAP_COUNT}]`)
   }
 }
 export const plantGenerator = new PlantGenerator()
