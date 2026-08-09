@@ -619,6 +619,8 @@ export const ITEMS = {
 
   velvetmoss: {name: 'Velvetmoss', type: 0, stype: 'herb', star: 3, image: 'crafting_32_32-0-1', placed: 'fuws_32_32-2-3', speed: 1900, foraging: {speed: 500, items: [{item: 'velvetmoss', count: 1, rainy: 1.8, windy: 1.8}]}, help: 'Velvetmoss', tooltip: '???'},
 
+  // images OK
+
   coralR: {name: 'Sunburst Brain Coral', type: 0, stype: 'herb', star: 2, image: null, placed: 'placed_32_32-0-1', speed: 1900, foraging: {speed: 500, items: [{item: 'coral', count: 1}, {item: 'oyster', count: 0.12, buffs: ['lucky:100', 'rainy:300']}]}, help: 'Corals', tooltip: 'Crafting Material for Potions and Furniture'},
   coralP: {name: 'Starfire Pillar Coral', type: 0, stype: 'herb', star: 2, image: null, placed: 'placed_32_32-1-1', speed: 1900, foraging: {speed: 500, items: [{item: 'coral', count: 1}, {item: 'oyster', count: 0.12, buffs: ['lucky:100', 'rainy:300']}]}, help: 'Corals', tooltip: 'Crafting Material for Potions and Furniture'},
   coralY: {name: 'Flickering Torch Coral', type: 0, stype: 'herb', star: 2, image: null, placed: 'placed_32_32-2-1', speed: 1900, foraging: {speed: 500, items: [{item: 'coral', count: 1}, {item: 'oyster', count: 0.12, buffs: ['lucky:100', 'rainy:300']}]}, help: 'Corals', tooltip: 'Crafting Material for Potions and Furniture'},
@@ -636,9 +638,13 @@ export const ITEMS = {
   pricklepad: {name: 'Pricklepad', type: 0, stype: 'herb', star: 3, image: null, placed: 'placed_32_32-0-3', help: 'Pricklepad', tooltip: '???', foraging: {speed: 1800, items: [{item: 'pricklepadPear', count: '1-3'}, {item: 'cactusSpine', count: 0.80}, {item: 'cactusFiber', count: 1.80}]}},
   pricklepadPear: {name: 'Pricklepad Pear', type: 0, stype: 'herb', star: 2, image: 'foraged_32_32-7-3', help: 'Pricklepad', tooltip: '???'},
 
+  // images NOK
+
   bamboo: {name: 'Bamboo', type: 0, stype: 'herb', star: 2, image: null, placed: 'fuws_32_32-2-3', help: 'Bamboo', tooltip: '???'},
   bambooStalk: {name: 'Bamboo Stalk', type: 0, stype: 'herb', star: 2, image: 'fuws_32_32-2-3', help: 'Bamboo', tooltip: '???'},
   bambooShoot: {name: 'Bamboo Shoot', type: 0, stype: 'herb', star: 2, image: 'fuws_32_32-2-3', help: 'Bamboo', tooltip: '???'},
+
+  // images OK
 
   satansCube: {name: 'Satan\'s Cube', type: 0, stype: 'herb', star: 4, image: 'foraged_32_32-0-5', placed: 'placed_16_48-2-0', foraging: {speed: 500, items: [{item: 'satansCube', count: 1, buffs: ['lucky:40']}]}, help: 'Satan\'s Cube', tooltip: 'Harvest to collect Potions and Food ingredients'},
 
@@ -648,7 +654,7 @@ export const ITEMS = {
   cursedcrown: {name: 'Cursedcrown ', type: 0, stype: 'herb', star: 4, image: 'foraged_32_32-2-5', placed: 'placed_16_48-3-0', foraging: {speed: 500, items: [{item: 'cursedcrown', count: 1, buffs: ['lucky:40']}]}, help: 'Cursedcrown', tooltip: 'Harvest to collect Potions and Food ingredients'},
   abysshorn: {name: 'Abysshorn', type: 0, stype: 'herb', star: 5, image: 'foraged_32_32-3-5', placed: 'placed_32_32-2-3', foraging: {speed: 500, items: [{item: 'abysshorn', count: 1, buffs: ['lucky:45']}]}, help: 'Abysshorn', tooltip: 'Harvest to collect Potions and Food ingredients'},
 
-  inferncap: {name: 'Inferncap', type: 0, stype: 'herb', star: 5, image: 'fuws_32_32-2-3', placed: 'fuws_32_32-2-3', foraging: {speed: 500, items: [{item: 'inferncap', count: 1, buffs: ['lucky:50']}]}, help: 'Inferncap', tooltip: 'Harvest to collect Potions and Food ingredients'},
+  inferncap: {name: 'Inferncap', type: 0, stype: 'herb', star: 5, image: 'foraged_32_32-5-5', placed: 'placed_32_48-5-0', foraging: {speed: 500, items: [{item: 'inferncap', count: 1, buffs: ['lucky:50']}]}, help: 'Inferncap', tooltip: 'Harvest to collect Potions and Food ingredients'},
 
   // Gardening - images OK
   clayPot: {name: 'Clay Pot', type: ITEM_TYPE.FURNITURE | ITEM_TYPE.PLACABLE, stype: 'pot', surface: true, onTop: true, star: 1, capacity: 1, image: 'furniture_32_32-0-8', placed: 'placed_16_16-2-3', placedleft: 'placed_16_16-3-3', placedright: 'placed_16_16-4-3', unplacing: {speed: 800}, help: 'Clay Pots', tooltip: 'Gardening Container'},
@@ -696,7 +702,7 @@ export const ITEMS = {
   // lizardcampfire: {name: 'Lizard Campfire', type: ITEM_TYPE.FURNITURE | ITEM_TYPE.LIGHT, stype: 'onoff', cozy: true, sell: 3400, star: 3, image: 'furniture_32_32-12-3', placed: 'fuws_48_32-4-1', placedleft: 'fuws_48_32-5-1', help: 'Furniture', tooltip: 'Provides Cozy Buff when lit'},
   // ultracampfire: {name: 'Ultra Bright Campfire', type: ITEM_TYPE.FURNITURE | ITEM_TYPE.LIGHT, stype: 'onoff', cozy: true, sell: 1500, star: 4, image: 'furniture_32_32-13-3', placed: 'fuws_48_32-0-2', placedleft: 'fuws_48_32-1-2', help: 'Furniture', tooltip: 'Provides Cozy Buff when lit'},
 
-  // Trinkets
+  // Trinkets - Images OK
   clockCopper: {name: 'Copper Clock', type: ITEM_TYPE.TRINKET, stype: 'trinket', star: 2, image: 'trinket_32_32-0-0', help: 'Clocks', tooltip: 'When in Inventory, increases Time accuracy', buff: [{buff: 'displayTimePrecision', value: 1, op: 'max'}]},
   clockSilver: {name: 'Silver Clock', type: ITEM_TYPE.TRINKET, stype: 'trinket', star: 3, image: 'trinket_32_32-1-0', help: 'Clocks', tooltip: 'When in Inventory, increases Time accuracy', buff: [{buff: 'displayTimePrecision', value: 2, op: 'max'}]},
   clockGold: {name: 'Gold Clock', type: ITEM_TYPE.TRINKET, stype: 'trinket', star: 4, image: 'trinket_32_32-2-0', help: 'Clocks', tooltip: 'When in Inventory, increases Time accuracy', buff: [{buff: 'displayTimePrecision', value: 3, op: 'max'}]},
@@ -712,7 +718,7 @@ export const ITEMS = {
   draftingCompass: {name: 'Drafting Compass', type: ITEM_TYPE.TRINKET, stype: 'trinket', star: 3, image: 'trinket_32_32-2-2', help: 'Surveyor\'s Tools', tooltip: 'When in Inventory, press [R] display tiles Grid', buff: [{buff: 'showGrid', value: true}]},
   theodolite: {name: 'Theodolite', type: ITEM_TYPE.TRINKET, stype: 'trinket', star: 4, image: 'trinket_32_32-3-2', help: 'Surveyor\'s Tools', tooltip: 'When in Inventory, press [R] display tiles Grid & perception and tool ranges', buff: [{buff: 'showInteractionRange', value: true}, {buff: 'showToolRange', value: true}, {buff: 'showGrid', value: true}]},
 
-  // Monster drops
+  // Monster drops - images NOK
   antlionMandible: {name: 'Antlion Mandible', type: 0, stype: 'monster', star: 2, image: 'tools_32_32-12-7', help: 'Antlion Pit', tooltip: 'Component for cutting tools'},
 
   // Food
