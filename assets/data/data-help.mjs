@@ -206,6 +206,7 @@ The Surface is the topmost layer of the world, where the player begins their adv
 | [[item:sunflower]] | {{item:sunflower:star|star}} | Herb | [[Forest]] |
 | [[item:parsnip]] | {{item:parsnip:star|star}} | Herb | [[Forest]] |
 | [[item:ambermirage]] | {{item:ambermirage:star|star}} | Herb | [[Desert]] |
+| [[item:gravelweed]] | {{item:gravelweed:star|star}} | Herb | All biomes |
 | [[item:pricklepad]] | {{item:pricklepad:star|star}} | Herb | [[Desert]] tunnels |
 
 **Mini-biomes**
@@ -263,6 +264,7 @@ The Underground layer begins just below the surface. It is darker, more dangerou
 | [[item:chunkCopper]] | {{item:chunkCopper:star|star}} | Ore | All biomes |
 | [[item:chunkIron]] | {{item:chunkIron:star|star}} | Ore | All biomes |
 | [[item:chunkSilver]] | {{item:chunkSilver:star|star}} | Ore | All biomes |
+| [[item:gravelweed]] | {{item:gravelweed:star|star}} | Herb | All biomes |
 | [[item:pricklepad]] | {{item:pricklepad:star|star}} | Herb | [[Desert]] |
 | [[item:oleander]] | {{item:oleander:star|star}} | Herb | All biomes |
 
@@ -380,7 +382,7 @@ The Forest is the starting biome, located at the center of the world. It is the 
 
 * Trees: [[item:oak]]
 * Mushrooms: [[item:bolete]]
-* Herbs: [[item:sunflower]], [[item:parsnip]], [[item:oleander]], [[item:satansCube]], [[item:sneakthorn]], [[item:abysshorn]], [[item:inferncap]]
+* Herbs: [[item:sunflower]], [[item:parsnip]], [[item:oleander]], [[item:gravelweed]], [[item:satansCube]], [[item:sneakthorn]], [[item:abysshorn]], [[item:inferncap]]
 
 **Fauna** ⏳
 
@@ -424,7 +426,7 @@ The Desert biome is characterized by its sandy terrain and arid atmosphere. It c
 **Flora** ⏳
 
 * Trees: [[item:coconut]], [[item:thornspine]]
-* Herbs: [[item:pricklepad]], [[item:satansCube]], [[item:cursedcrown]], [[item:abysshorn]], [[item:inferncap]]
+* Herbs: [[item:gravelweed]], [[item:pricklepad]], [[item:satansCube]], [[item:cursedcrown]], [[item:abysshorn]], [[item:inferncap]]
 
 **Fauna** ⏳
 
@@ -476,7 +478,7 @@ The Jungle is a lush, dangerous biome teeming with life. It features unique liqu
 
 * Trees: [[item:mahogany]]
 * Mushrooms: [[item:pinkMycenia]]
-* Herbs: [[item:bloodmoon]], [[item:bamboo]], [[item:sneakthorn]], [[item:cursedcrown]], [[item:abysshorn]], [[item:inferncap]], [[item:velvetmoss]] ([[Moss Cave]]),
+* Herbs: [[item:bloodmoon]], [[item:gravelweed]], [[item:bamboo]], [[item:sneakthorn]], [[item:cursedcrown]], [[item:abysshorn]], [[item:inferncap]], [[item:velvetmoss]] ([[Moss Cave]]),
 
 **Fauna** ⏳
 
@@ -5038,8 +5040,8 @@ All plants found in the world of Sixty-Below. Plants can be harvested for loot, 
 | <<cellItemStar|giantMushroom>> | Tree | [[Mushroom Cave]] | [[node:grassMushroom]] | ⏳ | [[monster:isopod]]  (Chopping) |
 | <<cellItemStar|bolete>> | Mushroom | [[Forest]] / [[Surface]] | [[node:grassForest]] | [[item:bolete]] | [[monster:adder]] (Foraging) |
 | <<cellItemStar|pinkMycenia>> | Mushroom | [[Jungle]] / [[Surface]] | [[node:grassJungle]] | [[item:pinkMycenia]] | [[monster:giantRedSlug]] (Foraging) |
-| [[item:frostcap]] | {{item:frostcap:star|star}} | Mushroom | [[Mushroom Cave]] / [[node:grassmushroom]] | [[item:mushroomGill]] | [[monster:woodlouse]] (Foraging) |
-| [[item:dawncap]] | {{item:dawncap:star|star}} | Mushroom | [[Mushroom Cave]] / [[node:grassmushroom]] | [[item:mushroomGill]] | [[monster:woodlouse]] (Foraging) |
+| <<cellItemStar|frostcap>> | Mushroom | [[Mushroom Cave]] | [[node:grassmushroom]] | [[item:mushroomGill]] | [[monster:woodlouse]] (Foraging) |
+| <<cellItemStar|dawncap>> | Mushroom | [[Mushroom Cave]] | [[node:grassmushroom]] | [[item:mushroomGill]] | [[monster:woodlouse]] (Foraging) |
 | [[item:coralR]] | {{item:coralR:star|star}} | Herb | Under [[Sea]] / [[node:sand]] | [[item:coral]] | [[monster:moray]] (Foraging) |
 | [[item:coralP]] | {{item:coralP:star|star}} | Herb | Under [[Sea]] / [[node:sand]] | [[item:coral]] | [[monster:moray]] (Foraging) |
 | [[item:coralY]] | {{item:coralY:star|star}} | Herb | Under [[Sea]] / [[node:sand]] | [[item:coral]] | [[monster:moray]] (Foraging) |
@@ -5048,6 +5050,7 @@ All plants found in the world of Sixty-Below. Plants can be harvested for loot, 
 | [[item:parsnip]] | {{item:parsnip:star|star}} | Herb | [[Forest]] / [[Surface]] | [[item:parsnip]] | [[monster:vole]] (Foraging) |
 | [[item:sunflower]] | {{item:sunflower:star|star}} | Herb | [[Forest]] / [[Surface]] | [[item:sunflowerSeed]] | [[monster:hedgehog]] (Foraging) |
 | [[item:bloodmoon]] | {{item:bloodmoon:star|star}} | Herb | [[Jungle]] / [[Surface]] | [[item:bloodmoon]] | [[monster:mamba]] (Foraging) |
+| <<cellItemStar|gravelweed>> | Herb | [[Forest]], [[Desert]], [[Jungle]]<br>[[Surface]], [[Underground]] | [[node:grassForest]], [[node:grassJungle]], [[node:dirt]], [[node:silt]], [[node:clay]], [[node:sandstone]], [[node:mud]], [[node:stone]], [[node:ash]], [[node:limestone]] | [[item:gravelweed]] | None |
 | [[item:fernS]] | {{item:fernS:star|star}} | Herb | [[Fern Cave]] / [[node:grassfern]] | [[item:fernLeaf]] | [[monster:dendrobate]] /  [[monster:mamba]] (Foraging) |
 | [[item:fernC]] | {{item:fernC:star|star}} | Herb | [[Fern Cave]] / [[node:grassfern]] | [[item:fernLeaf]] | [[monster:dendrobate]] /  [[monster:mamba]] (Foraging) |
 | [[item:fernG]] | {{item:fernG:star|star}} | Herb | [[Fern Cave]] / [[node:grassfern]] | [[item:fernLeaf]] | [[monster:dendrobate]] /  [[monster:mamba]] (Foraging) |
@@ -6213,7 +6216,7 @@ Foraging Tool: <<itemStar|sickleSilver>> or better
   },
 
   // ── Plants - Caverns Herbs ───────────────────────────────────
-  //    Satan's Cube, Sneakthorn, Cursedcrown, Abysshorn, Inferncap, Amber-Moss
+  //    Satan's Cube, Sneakthorn, Cursedcrown, Abysshorn, Inferncap, Gravelweed, Amber-Moss
 
   {
     title: 'Satan\'s Cube',
@@ -6491,6 +6494,57 @@ Foraging Tool: <<itemStar|sickleGold>>
   `
   },
   {
+    title: 'Gravelweed',
+    category: ['Plant', 'Forest', 'Desert', 'Jungle', 'Surface', 'Underground'],
+    content: `
+**Description**
+
+Gravelweed is a stubborn little weed that seems to shrug off whatever ground it lands on. Where most plants demand a specific soil, Gravelweed roots just as happily in loose dirt, packed clay, sandstone or bare stone — indoors or out, in daylight or deep in a tunnel. Its resilience has made it something of a running joke among settlers: if nothing else grows somewhere, Gravelweed probably will.
+
+**Tier**
+
+{{item:gravelweed:star|star}}
+
+**Location**
+
+* Biome: [[Forest]], [[Desert]], [[Jungle]] — no biome preference
+* Layer: [[Surface]] and [[Underground]]
+* Grows on [[node:grassForest]], [[node:grassJungle]], [[node:dirt]], [[node:silt]], [[node:clay]], [[node:sandstone]], [[node:mud]], [[node:stone]], [[node:ash]] or [[node:limestone]], with open air or tunnel space above
+
+**Population**
+
+* The world always holds the same number of Gravelweed — harvesting one doesn't reduce the population, it simply reappears at a new random spot on the Surface or Underground
+* A freshly-grown Gravelweed isn't harvestable right away — it takes roughly 5 in-game hours to come into bloom
+
+<hr>
+
+**Foraging Gravelweed**
+
+* [[Foraging|Interact to harvest]] — only possible once the plant is in bloom
+* The plant disappears entirely on harvest and regrows somewhere else in the world
+
+Foraging Tool: <<itemStar|sickleSilver>> or better
+
+**Gravelweed Foraging Loot**
+
+<<itemLootTable|gravelweed|foraging>>
+
+<hr>
+
+**Usages** ⏳
+
+* [[item:gravelweed]] — crafting ingredient ⏳
+
+<hr>
+
+**Tips**
+
+* _Gravelweed doesn't care what it's rooted in — clay, sand, gravel, even bare stone will do._
+* _An unbloomed patch is easy to overlook — give it a little time and it flowers on its own._
+* _Since it regrows in a random new spot after each harvest, don't count on finding it twice in the same place._
+  `
+  },
+  {
     title: 'Amber Moss',
     category: ['Crafting Ingredients', 'Forest'],
     content: `
@@ -6514,44 +6568,6 @@ A vivid orange moss, almost luminescent, growing on the north side of old oak tr
 * Natural hemostatic (Healing): applied directly to a wound, it instantly stops bleeding. The basic early-game "bandage".
 * Filtration: placed in a container, it can serve as a rudimentary filter used in cooking.
 * Ointment that reduces itching caused by [[monster:hornet]]s by 50%.
-
-<hr>
-
-**Tips**⏳
-      `
-  },
-  {
-    title: 'Amber Moss',
-    category: ['Plant', 'Forest'],
-    content: `
-**Description**
-
-C'est une mousse d'un orange vif, presque luminescente, qui pousse exclusivement sur le côté nord des vieux chênes, là où l'humidité est constante.
-
-**Tier**
-
-item:amberMoss:star
-
-**Location**
-
-* Biome: [[Forest]]
-* Layer: [[Surface]]
-* Trunk of Oak trees
-
-**Usage**⏳
-
-* Hémostatique naturel (Soin) : Appliquée directement sur une plaie, elle stoppe instantanément le saignement. C'est le "pansement" de base du début de jeu.
-* Filtration : Placée dans un récipient, elle peut servir de filtre rudimentaire utilisé en cuisine.
-* onguent qui diminue de 50% les démangeaisons causées par les [[monster:hornet]]s.
-
-Localisation : Base of Oak trees.
-
-<hr>
-
-**How to collect**
-
-* [[Oak]] tree [[Chopping]] with any [[Chopping Tool|Axe]]
-* [[Oak]] tree [[Shaking]] with any [[Hammers|Hammer]]
 
 <hr>
 
