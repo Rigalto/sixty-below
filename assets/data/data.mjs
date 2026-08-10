@@ -638,13 +638,12 @@ export const ITEMS = {
   pricklepad: {name: 'Pricklepad', type: 0, stype: 'herb', star: 3, image: null, placed: 'placed_32_32-0-3', help: 'Pricklepad', tooltip: '???', foraging: {speed: 1800, items: [{item: 'pricklepadPear', count: '1-3'}, {item: 'cactusSpine', count: 0.80}, {item: 'cactusFiber', count: 1.80}]}},
   pricklepadPear: {name: 'Pricklepad Pear', type: 0, stype: 'herb', star: 2, image: 'foraged_32_32-7-3', help: 'Pricklepad', tooltip: '???'},
 
-  // images NOK
-
-  bamboo: {name: 'Bamboo', type: 0, stype: 'herb', star: 2, image: null, placed: 'fuws_32_32-2-3', help: 'Bamboo', tooltip: '???'},
-  bambooStalk: {name: 'Bamboo Stalk', type: 0, stype: 'herb', star: 2, image: 'fuws_32_32-2-3', help: 'Bamboo', tooltip: '???'},
-  bambooShoot: {name: 'Bamboo Shoot', type: 0, stype: 'herb', star: 2, image: 'fuws_32_32-2-3', help: 'Bamboo', tooltip: '???'},
-
-  // images OK
+  bamboo: {name: 'Bamboo', type: 0, stype: 'herb', star: 2, image: null, placed: 'placed_16_64-0-0', help: 'Bamboo', tooltip: '???'},
+  bamboo1: {name: 'Bamboo', type: 0, stype: 'herb', star: 2, image: null, placed: 'placed_16_64-1-0', help: 'Bamboo', tooltip: '???'},
+  bamboo2: {name: 'Bamboo', type: 0, stype: 'herb', star: 2, image: null, placed: 'placed_16_64-2-0', help: 'Bamboo', tooltip: '???'},
+  bamboo3: {name: 'Bamboo', type: 0, stype: 'herb', star: 2, image: null, placed: 'placed_16_64-3-0', help: 'Bamboo', tooltip: '???'},
+  bambooStalk: {name: 'Bamboo Stalk', type: 0, stype: 'herb', star: 2, image: 'foraged_32_32-7-5', help: 'Bamboo', tooltip: '???'},
+  bambooShoot: {name: 'Bamboo Shoot', type: 0, stype: 'herb', star: 2, image: 'foraged_32_32-0-6', help: 'Bamboo', tooltip: '???'},
 
   satansCube: {name: 'Satan\'s Cube', type: 0, stype: 'herb', star: 4, image: 'foraged_32_32-0-5', placed: 'placed_16_48-2-0', foraging: {speed: 500, items: [{item: 'satansCube', count: 1, buffs: ['lucky:40']}]}, help: 'Satan\'s Cube', tooltip: 'Harvest to collect Potions and Food ingredients'},
 
