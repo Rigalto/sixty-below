@@ -3,7 +3,7 @@
 import {seededRNG, shuffleArray, rollLoot} from './utils.mjs'
 import {database, uniqueIdGenerator} from './database.mjs'
 import {WORLD_WIDTH, WORLD_HEIGHT, SEA_LEVEL, TOPSOIL_Y_SKY_SURFACE, TOPSOIL_Y_SURFACE_UNDER, TOPSOIL_Y_UNDER_CAVERNS, BIOME_TILE_MAP, SEA_MAX_JITTER, SEA_MAX_WIDTH, SEA_MAX_HEIGHT, CLUSTER_SCATTER_MAP, ORE_GEM_SCATTER_MAP, PERLIN_OFFSET_NATURALIZER, PERLIN_OFFSET_TUNNEL, PERLIN_OFFSET_SURFACE_TUNNEL, PERLIN_OFFSET_SMALL_TUNNEL, PERLIN_OFFSET_CAVERN, PERLIN_OFFSET_HIVE, PERLIN_OFFSET_HEART, PERLIN_OFFSET_MUSHROOM, PERLIN_OFFSET_COBWEB, PERLIN_OFFSET_FERNS, PERLIN_OFFSET_LAKES, PERLIN_OFFSET_SHELL, PERLIN_OFFSET_TEMPLE, PERLIN_OFFSET_BEACH, SMALL_CAVERNS_COUNT, MEDIUM_CAVERNS_COUNT, UNDERGROUND_TUNNEL_COUNT, CAVERNS_TUNNEL_COUNT, SMALL_TUNNELS_COUNT, HIVE_RADIUS_MIN, HIVE_RADIUS_MAX, COBWEB_CAVE_COUNT_MIN, COBWEB_CAVE_COUNT_MAX, COBWEB_RADIUS_X_MIN, COBWEB_RADIUS_X_MAX, COBWEB_RADIUS_Y_MIN, COBWEB_RADIUS_Y_MAX, COBWEB_CAVE_MAIN_MIN, COBWEB_CAVE_MAIN_MAX, COBWEB_CAVE_SIDE_MIN, COBWEB_CAVE_SIDE_MAX, COBWEB_SCATTER_COUNT, COBWEB_SCATTER_SIZE_MIN, COBWEB_SCATTER_SIZE_MAX, GEODE_CAVE_COUNT_MIN, GEODE_CAVE_COUNT_MAX, GEODE_RADIUS_MIN, GEODE_RADIUS_MAX, GEODE_TARGET_CLUSTER_COUNT, GEODE_CLUSTER_SIZE_MIN, GEODE_CLUSTER_SIZE_MAX, NATIVE_TOPSOIL_MAP, LAKE_RADIUS_X_MIN, LAKE_RADIUS_X_MAX, LAKE_RADIUS_Y_MIN, LAKE_RADIUS_Y_MAX, LAKE_PIT_RADIUS_X_MIN, LAKE_PIT_RADIUS_X_MAX, LAKE_PIT_RADIUS_Y_MIN, LAKE_PIT_RADIUS_Y_MAX, LAKE_CREATION_MAP, UNDERGROUND_LAKE_UNDER_COUNT, UNDERGROUND_LAKE_CAVERNS_COUNT, UNDERGROUND_LAKE_RADIUS_MIN, UNDERGROUND_LAKE_RADIUS_MAX, BLIND_LAKE_COUNT, BLIND_LAKE_RADIUS_MIN, BLIND_LAKE_RADIUS_MAX, SAP_LAKE_UNDER_COUNT, SAP_LAKE_CAVERNS_COUNT, SAP_LAKE_RADIUS_MIN, SAP_LAKE_RADIUS_MAX, SAP_POCKET_COUNT, SAP_POCKET_RADIUS_MIN, SAP_POCKET_RADIUS_MAX, WATER_PUDDLE_COUNT, SAP_PUDDLE_COUNT, PUDDLE_HEIGHT_MIN, PUDDLE_HEIGHT_MAX, FOSSIL_VEIN_COUNT, FERN_CAVE_RADIUS_X_MIN, FERN_CAVE_RADIUS_X_MAX, FERN_CAVE_RADIUS_Y_MIN, FERN_CAVE_RADIUS_Y_MAX, MOSS_CAVE_RADIUS_X_MIN, MOSS_CAVE_RADIUS_X_MAX, MOSS_CAVE_RADIUS_Y_MIN, MOSS_CAVE_RADIUS_Y_MAX, SAND_POCKET_RADIUS_X_MIN, SAND_POCKET_RADIUS_X_MAX, SAND_POCKET_RADIUS_Y_MIN, SAND_POCKET_RADIUS_Y_MAX, MUSHROOM_CAVE_RADIUS_X_MIN, MUSHROOM_CAVE_RADIUS_X_MAX, MUSHROOM_CAVE_RADIUS_Y_MIN, MUSHROOM_CAVE_RADIUS_Y_MAX, PYRAMID_WALL_INDEXES, PYRAMID_VOID_INDEXES, PYRAMID_WIDTH, PYRAMID_HEIGHT, PYRAMID_ROOM1_DELTA, PYRAMID_ROOM2_DELTA, TEMPLE_RUIN_WALL_INDEXES, TEMPLE_RUIN_COLUMNS_INDEXES, CHEST_CONTENT, TREES_INIT_SIZE, GIANT_MUSHROOM_INIT_SIZE} from '../assets/data/data-gen.mjs'
-import {NODES, NODES_LOOKUP, NODE_TYPE, BIOME_TYPE, PLANT_KIND, PLANT_TYPE, ITEMS, TREE_IMAGES, THORNSPINE_JUNCTIONS, THORNSPINE_SIZES, CORAL_TYPES, PARSNIP_RATE, SUNFLOWER_RATE, MANDRAKE_COUNT, PRICKLEPAD_COUNT, BAMBOO_COUNT, OLEANDER_COUNT, SATANS_CUBE_COUNT, SNEAKTHORN_COUNT, CURSEDCROWN_COUNT, ABYSSHORN_COUNT, INFERNCAP_COUNT, COCONUT_CYCLE_DELAY} from '../assets/data/data.mjs'
+import {NODES, NODES_LOOKUP, NODE_TYPE, BIOME_TYPE, PLANT_KIND, PLANT_TYPE, ITEMS, TREE_IMAGES, THORNSPINE_JUNCTIONS, THORNSPINE_SIZES, CORAL_TYPES, PARSNIP_RATE, SUNFLOWER_RATE, MANDRAKE_COUNT, PRICKLEPAD_COUNT, BAMBOO_COUNT, OLEANDER_COUNT, SATANS_CUBE_COUNT, SNEAKTHORN_COUNT, CURSEDCROWN_COUNT, ABYSSHORN_COUNT, INFERNCAP_COUNT, GRAVELWEED_COUNT, GRAVELWEED_SOIL, COCONUT_CYCLE_DELAY} from '../assets/data/data.mjs'
 import {IS_DEV, WEATHER_TYPE, WEATHER_TYPE_CODE, BAG_CAPACITY, HOTBAR_CAPACITY, ARMOR_CAPACITY, ACCESSORY_CAPACITY, CONTAINER_CAPACITY, CONTAINER_STYPES, PLAYER} from './constant.mjs'
 
 /* ====================================================================================================
@@ -412,6 +412,7 @@ class WorldGenerator {
     plantGenerator.placePricklepads(zoneRects)
     plantGenerator.placeBamboo(zoneRects, chestIndexes)
     plantGenerator.placeOleanders(zoneRects)
+    plantGenerator.placeGravelweeds(zoneRects)
     await progress('Underground Plants')
 
     plantGenerator.placeSatansCubes(zoneRects)
@@ -9000,6 +9001,105 @@ class PlantGenerator {
       placed++
     }
     if (IS_DEV) console.log(`   🔹 Inferncaps : ${placed} [${INFERNCAP_COUNT}]`)
+  }
+
+  /**
+ * Place les Gravelweed sur les bandes Surface et Underground, à l'air libre (SKY) ou en
+ * tunnel (VOID) — aucune tuile solide ne sépare jamais SKY et VOID, donc pas d'ambiguïté
+ * possible sur l'homogénéité de la poche 1×2. Sol valide : GRAVELWEED_SOIL (10 substrats,
+ * Surface + Underground, 3 biomes). Aucun filtre de biome. Corps 1×2 (w=1), pas d'ambiguïté
+ * gauche/droite. Le nombre de records créés est toujours égal à GRAVELWEED_COUNT : chaque
+ * slot tente MAX_ATTEMPTS tirages, et bascule sur un record dormant (present=false) si
+ * aucun emplacement n'est trouvé — c'est ce total qui fixe la population constante en session.
+ * Respecte et alimente placedGuard.
+ * @param {Array<{x0, x1, ySkySurface, yUnder, biome}>} zoneRects
+ */
+  placeGravelweeds (zoneRects) {
+    const SKY = NODES.SKY.code
+    const VOID = NODES.VOID.code
+    const W = WORLD_WIDTH
+    const MAX_ATTEMPTS = 200
+
+    const rects = []
+    for (const rect of zoneRects) {
+      rects.push({x0: rect.x0, x1: rect.x1, y0: rect.ySkySurface, y1: rect.yUnder})
+    }
+    if (rects.length === 0) return
+
+    let placed = 0
+
+    for (let slot = 0; slot < GRAVELWEED_COUNT; slot++) {
+      let found = false
+
+      for (let attempts = 0; attempts < MAX_ATTEMPTS && !found; attempts++) {
+        const rect = seededRNG.randomGetArrayValue(rects)
+        const cx = seededRNG.randomGetMinMax(rect.x0 + 1, rect.x1 - 2)
+        const cy = seededRNG.randomGetMinMax(rect.y0 + 1, rect.y1 - 1)
+
+        const gas = worldBuffer.read(cx, cy)
+        if (gas !== SKY && gas !== VOID) continue
+
+        let y = cy
+        while (y < rect.y1 && worldBuffer.read(cx, y) === gas) y++
+
+        if (!GRAVELWEED_SOIL.has(worldBuffer.read(cx, y))) continue
+        if (worldBuffer.read(cx, y - 1) !== gas || worldBuffer.read(cx, y - 2) !== gas) continue
+        if (placedGuard.has(((y - 1) << 10) | cx) || placedGuard.has(((y - 2) << 10) | cx)) continue
+
+        placedGuard.addRect(cx, y - 2, cx, y - 1)
+
+        const soilIndex = (y << 10) | cx
+
+        this.#plants.push({
+          id: uniqueIdGenerator.getUniqueId(),
+          kind: PLANT_KIND.HERB,
+          type: PLANT_TYPE.GRAVELWEED,
+          itemId: 'gravelweed',
+          index: soilIndex - 2 * W,
+          soilIndex,
+          w: 1,
+          h: 2,
+          x: cx,
+          y: y - 2,
+          present: true,
+          bloom: true,
+          bloomTimestamp: null, // programmé après démarrage par GravelweedSystem.initPlant
+          deleted: false
+        })
+        found = true
+        placed++
+      }
+
+      if (!found) this.#placeDormantGravelweed()
+    }
+
+    if (IS_DEV) console.log(`   🔹 Gravelweeds : ${placed} / ${GRAVELWEED_COUNT}`)
+  }
+
+  /**
+ * Crée un Gravelweed dormant (present=false) — aucun emplacement valide trouvé lors de la
+ * génération. Champs fixes (id, kind, type, itemId, w, h, deleted) correctement positionnés ;
+ * champs variables à 0/false par défaut — jamais lus tant que present reste false, ignorés
+ * par la boucle de jeu ; seule leur shape (mêmes clés, mêmes types) importe, pour rester
+ * monomorphe.
+ */
+  #placeDormantGravelweed () {
+    this.#plants.push({
+      id: uniqueIdGenerator.getUniqueId(),
+      kind: PLANT_KIND.HERB,
+      type: PLANT_TYPE.GRAVELWEED,
+      itemId: 'gravelweed',
+      index: 0,
+      soilIndex: 0,
+      w: 1,
+      h: 2,
+      x: 0,
+      y: 0,
+      present: false,
+      bloom: false,
+      bloomTimestamp: null,
+      deleted: false
+    })
   }
 }
 export const plantGenerator = new PlantGenerator()
