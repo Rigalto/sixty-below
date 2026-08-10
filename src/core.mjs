@@ -17,7 +17,7 @@ import {furnitureManager, teleporterManager} from './housing.mjs'
 import {craftOverlay} from './craft.mjs'
 import {achievementManager} from './achievement.mjs'
 import {playerManager, lootPopupManager, handedToolManager, hotbarOverlay} from './player.mjs'
-import {floraManager, sunflowerSystem, oleanderSystem, mandrakeSystem, pricklepadSystem, parsnipSystem, ambermirageSystem, oakSystem, mahoganySystem, cobwebSystem, coconutSystem, thornspineSystem, spreadForestSystem, spreadJungleSystem, coralSystem, bloodmoonSystem, satansCubeSystem, sneakthornSystem, cursedcrownSystem, abysshornSystem, inferncapSystem} from './ecosystem.mjs'
+import {floraManager, sunflowerSystem, oleanderSystem, mandrakeSystem, pricklepadSystem, parsnipSystem, ambermirageSystem, oakSystem, mahoganySystem, cobwebSystem, coconutSystem, thornspineSystem, spreadForestSystem, spreadJungleSystem, coralSystem, bloodmoonSystem, gravelweedSystem, satansCubeSystem, sneakthornSystem, cursedcrownSystem, abysshornSystem, inferncapSystem} from './ecosystem.mjs'
 import {ACHIEVEMENT_CATEGORIES} from '../assets/data/data-achievement.mjs'
 import {miningManager, placingManager, foragingManager, choppingManager, sowingManager, hammingManager, furnishingManager, fillingManager, pouringManager, decomposerManager} from './action.mjs'
 import './combat.mjs'
@@ -46,6 +46,7 @@ const plantSystemLookup = [ // Map<kind*100+type, system> — peuplée au fur et
   [PLANT_KIND.HERB * 100 + PLANT_TYPE.INFERNCAP, inferncapSystem],
   [PLANT_KIND.HERB * 100 + PLANT_TYPE.AMBERMIRAGE, ambermirageSystem],
   [PLANT_KIND.HERB * 100 + PLANT_TYPE.BLOODMOON, bloodmoonSystem],
+  [PLANT_KIND.HERB * 100 + PLANT_TYPE.GRAVELWEED, gravelweedSystem],
   //   [PLANT_KIND.HERB * 100 + PLANT_TYPE.SHADOWFERN, fernSystem],
   //   [PLANT_KIND.HERB * 100 + PLANT_TYPE.CRIMSONFROND, fernSystem],
   //   [PLANT_KIND.HERB * 100 + PLANT_TYPE.GOLDENVEIL, fernSystem],
@@ -61,7 +62,7 @@ const plantSystemLookup = [ // Map<kind*100+type, system> — peuplée au fur et
   //   [PLANT_KIND.SPREAD * 100 + PLANT_TYPE.NONE, spreadSystem],
   //   [PLANT_KIND.SEED * 100 + PLANT_TYPE.NONE, seedSystem]
 ]
-const allPlantSystems = [sunflowerSystem, oleanderSystem, parsnipSystem, ambermirageSystem, oakSystem, mahoganySystem, coconutSystem, thornspineSystem, spreadForestSystem, spreadJungleSystem, coralSystem, bloodmoonSystem, mandrakeSystem, pricklepadSystem, satansCubeSystem, sneakthornSystem, cursedcrownSystem, abysshornSystem, inferncapSystem]
+const allPlantSystems = [sunflowerSystem, oleanderSystem, parsnipSystem, ambermirageSystem, oakSystem, mahoganySystem, coconutSystem, thornspineSystem, spreadForestSystem, spreadJungleSystem, coralSystem, bloodmoonSystem, mandrakeSystem, pricklepadSystem, satansCubeSystem, sneakthornSystem, cursedcrownSystem, abysshornSystem, inferncapSystem, gravelweedSystem]
 
 const debugHUD = () => {
   const debugDiv = document.createElement('div')
@@ -588,6 +589,7 @@ class GameCore {
       spreadForestSystem.debugRenderSpots(ctx)
       spreadJungleSystem.debugRenderSpots(ctx)
       bloodmoonSystem.debugRenderSpots(ctx)
+      gravelweedSystem.debugRenderSpots(ctx)
     }
     if (this.showGrids) {
       const buffs = buffManager.getBuffs(['showGrid', 'showInteractionRange', 'showToolRange'])

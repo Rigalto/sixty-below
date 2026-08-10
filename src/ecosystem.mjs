@@ -1,13 +1,13 @@
 // ecosystem.mjs — FloraManager - OakSystem - MahoganySystem - CoconutSystem - ThornspineSystem
 // SunflowerSystem - ParsnipSystem - OleanderSystem - MandrakeSystem - PricklepadSystem - AmbermirageSystem
 // CobwebSystem - HiveSystem - SatansCubeSystem - SneakthornSystem - CursedcrownSystem
-// SpreadForestSystem - SpreadJungleSystem - CoralSystem - BloodmoonSystem
+// SpreadForestSystem - SpreadJungleSystem - CoralSystem - BloodmoonSystem - GravelweedSystem
 // SampleSystem
 
 import {WORLD_WIDTH, WORLD_HEIGHT, MICROTASK, TOPSOIL_Y_SKY_SURFACE, TOPSOIL_Y_SURFACE_UNDER, TOPSOIL_Y_UNDER_CAVERNS, TOPSOIL_Y_CAVERNS_MID, SEA_LEVEL} from './constant.mjs'
 import {database, uniqueIdGenerator} from './database.mjs'
 import {eventBus, seededRNG, blockedTiles, microTasker, taskScheduler} from './utils.mjs'
-import {NODES, ITEMS, PLANT_KIND, PLANT_TYPE, PLANT_SYSTEM_LOOKUP, ALL_PLANT_SYSTEMS, COBWEB_GROWTH_DELAY_MS, SUNFLOWER_RATE, PARSNIP_RATE, AMBERMIRAGE_PCENT, COCONUT_CYCLE_DELAY, TREE_IMAGES, THORNSPINE_JUNCTIONS, THORNSPINE_SIZES, THORNSPINE_UNBLOOM_PCENT, THORNSPINE_BLOOM_PCENT, CORAL_TYPES} from '../assets/data/data.mjs'
+import {NODES, ITEMS, PLANT_KIND, PLANT_TYPE, PLANT_SYSTEM_LOOKUP, ALL_PLANT_SYSTEMS, COBWEB_GROWTH_DELAY_MS, SUNFLOWER_RATE, PARSNIP_RATE, AMBERMIRAGE_PCENT, COCONUT_CYCLE_DELAY, TREE_IMAGES, THORNSPINE_JUNCTIONS, THORNSPINE_SIZES, THORNSPINE_UNBLOOM_PCENT, THORNSPINE_BLOOM_PCENT, CORAL_TYPES, GRAVELWEED_SOIL} from '../assets/data/data.mjs'
 import {IMAGE_CACHE} from './assets.mjs'
 import {saveManager} from './persistence.mjs'
 import {chunkManager} from './world.mjs'
@@ -6894,6 +6894,312 @@ class BloodmoonSystem {
   }
 }
 export const bloodmoonSystem = new BloodmoonSystem()
+
+/* ====================================================================================================
+   GRAVELWEED SYSTEM
+   ====================================================================================================
+
+   Singleton : gravelweedSystem.
+
+   Mauvaise herbe qui pousse indifféremment sur les bandes Surface et Underground, à l'air
+   libre (SKY) ou en tunnel (VOID) — substrat validé par GRAVELWEED_SOIL (10 codes, 3 biomes).
+   Population constante : #list reçoit en une fois (init) le tableau complet des gravelweed,
+   taille fixe jamais réallouée (pas de GC). Un record present=false signale un slot à faire
+   repousser ailleurs — mis en #regrowQueue, vidée par microtâche (gravelweedRegrow).
+
+   Cycle de floraison individuel : à la repousse, le record apparaît unbloom (bloom=false)
+   et programme un timer propre (bloomTimestamp, façon growthTimestamp des arbres) qui bascule
+   bloom=true après GRAVELWEED_BLOOM_DELAY_MS (5h in-game). Récolte possible uniquement bloom=true
+   (canForage) — la récolte détruit le record entièrement (present=false) et le renvoie en
+   #regrowQueue, contrairement à Bloodmoon/Thornspine qui restent en place et refleurissent sur place.
+
+   ==================================================================================================== */
+
+const GRAVELWEED_REGROW_INITIAL_DELAY_MS = 1563 // délai avant la première recherche après chargement
+const GRAVELWEED_REGROW_RETRY_DELAY_MS = 143 // délai entre deux tentatives de recherche
+const GRAVELWEED_BLOOM_DELAY_MS = 300000 // 5h in-game = 5min réelles (HOUR_MS = 60_000)
+
+class GravelweedSystem {
+  byTile = new Map() // Map<tileIndex, record> — public : membership O(1) + lookup record
+  #list = [] // record[] — population fixe (GRAVELWEED_COUNT), jamais réallouée (pas de GC)
+  #byChunk = new Map() // Map<chunkKey, Set> — lookup spatial pour onPreloadChunksChanged
+  #bySoil = new Map() // Map<soilIndex, record> — gravelweeds présents : détection minage + lookup bloomTimestamp
+  #displayed = new Set() // Set<record> — cible du render (chunks preload uniquement)
+  #regrowQueue = [] // record[] — records present=false en attente d'un nouvel emplacement
+  #imageBloom = null // ITEMS.gravelweed.placed, mis en cache dans init()
+  #imageUnbloom = null // ITEMS.gravelweed.placedUnbloom, mis en cache dans init()
+
+  constructor () {
+    // eventBus
+    this.onFirstLoopGravelweed = this.onFirstLoopGravelweed.bind(this)
+    eventBus.on('time/first-loop', this.onFirstLoopGravelweed)
+    this.onTileChangedGravelweed = this.onTileChangedGravelweed.bind(this)
+    eventBus.on('world/tile-changed', this.onTileChangedGravelweed)
+    // micro-tâches
+    this.gravelweedRegrow = this.gravelweedRegrow.bind(this)
+    this.gravelweedBloom = this.gravelweedBloom.bind(this)
+  }
+
+  /**
+   * Réinitialise toutes les structures. Appelé en début de session, avant toute hydratation.
+   */
+  init () {
+    this.byTile.clear()
+    this.#list.length = 0
+    this.#byChunk.clear()
+    this.#bySoil.clear()
+    this.#displayed.clear()
+    this.#regrowQueue.length = 0
+
+    this.#imageBloom = ITEMS.gravelweed.placedLeft // après hydratation
+    this.#imageUnbloom = ITEMS.gravelweed.placed // après hydratation
+  }
+
+  /**
+   * Enregistre un gravelweed et peuple les structures internes.
+   * Si present=false, met le record en file de repousse (traitée par onFirstLoopGravelweed).
+   * Si present=true et bloom=false, reprogramme le timer de floraison en attente (bloomTimestamp).
+   * @param {object} record — record HERB/GRAVELWEED (deleted=false garanti par l'appelant)
+   */
+  initPlant (record) {
+    this.#list.push(record)
+
+    if (!record.present) {
+      this.#regrowQueue.push(record)
+      return
+    }
+
+    addToByTile(this.byTile, record)
+    addToByChunk(this.#byChunk, record)
+    this.#bySoil.set(record.soilIndex, record)
+    blockedTiles.blockPlacementRect(record.x, record.y, record.w, record.h)
+
+    if (record.bloomTimestamp !== null) {
+      const {priority, capacity} = MICROTASK.GRAVELWEED_BLOOM
+      taskScheduler.enqueueAbsolute(`gravelweed_bloom_${record.id}`, record.bloomTimestamp, this.gravelweedBloom, priority, capacity, record.soilIndex)
+    }
+  }
+
+  debug () {
+    console.log(`[GravelweedSystem] ${this.#list.length} gravelweeds récupérés, ${this.#regrowQueue.length} en attente de repousse`)
+  }
+
+  /**
+   * Liaison EventBus : 'time/first-loop'. Déclenchera la microtâche de repousse si
+   * #regrowQueue contient des records present=false chargés depuis la persistence.
+   * Délai long pour ne pas surcharger le démarrage.
+   */
+  onFirstLoopGravelweed () {
+    if (this.#regrowQueue.length === 0) return
+    const {priority, capacity} = MICROTASK.GRAVELWEED_REGROW
+    taskScheduler.enqueue('gravelweed-regrow', GRAVELWEED_REGROW_INITIAL_DELAY_MS, this.gravelweedRegrow, priority, capacity)
+  }
+
+  /**
+   * Reconstruit #displayed depuis les chunks preload de la caméra.
+   * @param {Set<number>} preloadChunks
+   */
+  onPreloadChunksChanged (preloadChunks) {
+    buildDisplayed(this.#displayed, this.#byChunk, preloadChunks)
+  }
+
+  /**
+   * Dessine les gravelweed visibles et présents : sprite fleuri si bloom, sprite simple sinon.
+   * @param {CanvasRenderingContext2D} ctx — contexte déjà transformé (caméra appliquée)
+   */
+  render (ctx) {
+    for (const record of this.#displayed) {
+      const img = record.bloom ? this.#imageBloom : this.#imageUnbloom
+      const pxX = (record.index & 0x3FF) << 4
+      const pxY = (record.index >> 10) << 4
+      ctx.drawImage(IMAGE_CACHE[img.imgIndex], img.sx, img.sy, img.sw, img.sh, pxX, pxY, img.sw, img.sh)
+    }
+  }
+
+  /**
+   * Retourne le gravelweed couvrant la tuile donnée, ou null.
+   * @param {number} tileIndex — (y << 10) | x
+   * @returns {object|null}
+   */
+  getPlantAt (tileIndex) {
+    return this.byTile.get(tileIndex) ?? null
+  }
+
+  /**
+   * Indique si le record occupe actuellement le monde (pas nécessairement récoltable, cf. canForage).
+   * @param {object} record
+   * @returns {boolean}
+   */
+  isPresent (record) { return record.present }
+
+  // //////// //
+  // FORAGING //
+  // //////// //
+
+  /**
+   * Indique si le gravelweed peut être fauché à la Sickle : uniquement lorsqu'il est en fleur.
+   * @param {object} record
+   * @returns {boolean}
+   */
+  canForage (record) { return record.bloom }
+
+  /**
+   * Traite le foraging réussi de ce gravelweed (hors loot, géré par ForagingManager).
+   * Marque le record absent et programme la repousse.
+   * @param {object} record
+   */
+  onForaged (record) {
+    this.#destroyPresent(record)
+  }
+
+  // /////////// //
+  // DESTRUCTION //
+  // /////////// //
+
+  /**
+   * Détruit un gravelweed présent sans loot : retire byTile/#byChunk/#bySoil/#displayed,
+   * débloque le rectangle 1×2 occupé, annule un éventuel timer de floraison encore en attente,
+   * persiste, puis programme la repousse (#regrowQueue + microtâche).
+   * Guard : no-op si record.present est déjà false.
+   * @param {object} record
+   */
+  #destroyPresent (record) {
+    if (!record.present) return
+
+    record.present = false
+    record.bloom = false
+    removeFromByTile(this.byTile, record)
+    removeFromByChunk(this.#byChunk, record)
+    this.#bySoil.delete(record.soilIndex)
+    this.#displayed.delete(record)
+
+    blockedTiles.unblockPlacementRect(record.x, record.y, record.w, record.h)
+
+    if (record.bloomTimestamp !== null) {
+      taskScheduler.dequeue(`gravelweed_bloom_${record.id}`)
+      record.bloomTimestamp = null
+    }
+
+    saveManager.queueStaticUpdate({storeName: 'plant', record})
+
+    this.#regrowQueue.push(record)
+    if (this.#regrowQueue.length === 1) {
+      const {priority, capacity} = MICROTASK.GRAVELWEED_REGROW
+      taskScheduler.enqueue('gravelweed-regrow', GRAVELWEED_REGROW_RETRY_DELAY_MS, this.gravelweedRegrow, priority, capacity)
+    }
+  }
+
+  /**
+   * Liaison EventBus : 'world/tile-changed'.
+   * Détruit le gravelweed présent si une des 2 tuiles de son corps a changé (SKY/VOID perdu),
+   * ou si sa tuile sol sort de GRAVELWEED_SOIL (minage). Présence dans byTile/#bySoil suffit
+   * à garantir l'invariant cassé — pas de relecture de tuile nécessaire.
+   * @param {{tileIndex: number}} payload
+   */
+  onTileChangedGravelweed ({tileIndex}) {
+    const byBodyRecord = this.byTile.get(tileIndex)
+    if (byBodyRecord !== undefined) this.#destroyPresent(byBodyRecord)
+
+    const record = this.#bySoil.get(tileIndex)
+    if (record !== undefined) this.#destroyPresent(record)
+  }
+
+  // //////////////////// //
+  // POUSSE / REPOUSSE //
+  // //////////////////// //
+
+  /**
+   * Tire une colonne et une hauteur au hasard sur la bande Surface+Underground
+   * (TOPSOIL_Y_SKY_SURFACE → TOPSOIL_Y_UNDER_CAVERNS), descend jusqu'à la première tuile
+   * non-gazeuse. Accepte SKY ou VOID comme gaz de départ — une tuile solide sépare toujours
+   * les deux, aucune ambiguïté possible sur l'homogénéité de la poche.
+   * @returns {number} index packé (y<<10)|x du sol si dans GRAVELWEED_SOIL, 0 sinon
+   */
+  #findGravelweedFloor () {
+    const SKY = NODES.SKY.code
+    const VOID = NODES.VOID.code
+    const W = WORLD_WIDTH
+
+    const cx = seededRNG.randomGetMinMax(1, W - 2)
+    const cy = seededRNG.randomGetMinMax(16, TOPSOIL_Y_UNDER_CAVERNS - 1)
+    let idx = (cy << 10) | cx
+
+    const gas = chunkManager.getTileAt(idx)
+    if (gas !== SKY && gas !== VOID) return 0
+
+    const maxIndex = (TOPSOIL_Y_UNDER_CAVERNS << 10) | cx
+    while (idx < maxIndex && chunkManager.getTileAt(idx) === gas) idx += W
+
+    if (!GRAVELWEED_SOIL.has(chunkManager.getTileAt(idx))) return 0
+
+    return idx
+  }
+
+  /**
+   * Cherche un nouvel emplacement pour le dernier record de #regrowQueue. Ancre trouvée via
+   * #findGravelweedFloor, puis validation de la poche 1×2 (même gaz que l'ancre) et des
+   * tuiles libres de tout blocage. Si trouvé : finalise le record (present=true, bloom=false,
+   * byTile/#byChunk/#bySoil, blockPlacement, programme bloomTimestamp), le retire de
+   * #regrowQueue (dernier élément, length--). Replanifie tant que #regrowQueue n'est pas vide.
+   */
+  gravelweedRegrow () {
+    if (this.#regrowQueue.length === 0) return
+
+    const floorIndex = this.#findGravelweedFloor()
+
+    if (floorIndex !== 0) {
+      const cx = floorIndex & 0x3FF
+      const y = floorIndex >> 10
+      const topY = y - 2
+      const W = WORLD_WIDTH
+      const gas = chunkManager.getTileAt(floorIndex - W)
+
+      if (chunkManager.isRectCode(cx, topY, 1, 2, gas) && blockedTiles.canPlaceRect(cx, topY, 1, 2)) {
+        const record = this.#regrowQueue[this.#regrowQueue.length - 1]
+
+        record.soilIndex = floorIndex
+        record.index = (topY << 10) | cx
+        record.x = cx
+        record.y = topY
+        record.present = true
+        record.bloom = false
+
+        addToByTile(this.byTile, record)
+        addToByChunk(this.#byChunk, record)
+        addToDisplayed(this.#displayed, record)
+        this.#bySoil.set(floorIndex, record)
+        blockedTiles.blockPlacementRect(cx, topY, 1, 2)
+
+        const {priority, capacity} = MICROTASK.GRAVELWEED_BLOOM
+        record.bloomTimestamp = taskScheduler.enqueue(`gravelweed_bloom_${record.id}`, GRAVELWEED_BLOOM_DELAY_MS, this.gravelweedBloom, priority, capacity, floorIndex)
+
+        saveManager.queueStaticUpdate({storeName: 'plant', record})
+
+        this.#regrowQueue.length--
+      }
+    }
+
+    if (this.#regrowQueue.length !== 0) {
+      const {priority, capacity} = MICROTASK.GRAVELWEED_REGROW
+      taskScheduler.enqueue('gravelweed-regrow', GRAVELWEED_REGROW_RETRY_DELAY_MS, this.gravelweedRegrow, priority, capacity)
+    }
+  }
+
+  /**
+   * Callback TaskScheduler : fait fleurir un gravelweed (bloom=true), échéance atteinte.
+   * Flip unique — aucune replanification, contrairement à la croissance des arbres.
+   * @param {number} soilIndex — (y << 10) | x
+   */
+  gravelweedBloom (soilIndex) {
+    const record = this.#bySoil.get(soilIndex)
+    if (record === undefined) return // détruit entre-temps
+
+    record.bloom = true
+    record.bloomTimestamp = null
+    saveManager.queueStaticUpdate({storeName: 'plant', record})
+  }
+}
+export const gravelweedSystem = new GravelweedSystem()
 
 /* ====================================================================================================
    SAMPLE SYSTEM
