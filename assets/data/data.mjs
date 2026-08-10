@@ -656,6 +656,8 @@ export const ITEMS = {
 
   inferncap: {name: 'Inferncap', type: 0, stype: 'herb', star: 5, image: 'foraged_32_32-5-5', placed: 'placed_32_48-5-0', foraging: {speed: 500, items: [{item: 'inferncap', count: 1, buffs: ['lucky:50']}]}, help: 'Inferncap', tooltip: 'Harvest to collect Potions and Food ingredients'},
 
+  gravelweed: {name: 'Gravelweed', type: 0, stype: 'herb', star: 2, image: 'foraged_32_32-6-5', placed: 'placed_16_32-7-0', placedLeft: 'placed_16_32-6-0', foraging: {speed: 500, items: [{item: 'gravelweed', count: 1, buffs: ['lucky:20']}]}, help: 'Gravelweed', tooltip: 'Harvest to collect Potions and Food ingredients'},
+
   // Gardening - images OK
   clayPot: {name: 'Clay Pot', type: ITEM_TYPE.FURNITURE | ITEM_TYPE.PLACABLE, stype: 'pot', surface: true, onTop: true, star: 1, capacity: 1, image: 'furniture_32_32-0-8', placed: 'placed_16_16-2-3', placedleft: 'placed_16_16-3-3', placedright: 'placed_16_16-4-3', unplacing: {speed: 800}, help: 'Clay Pots', tooltip: 'Gardening Container'},
   clayPot2: {name: 'Clay Pots (x2)', type: ITEM_TYPE.FURNITURE | ITEM_TYPE.PLACABLE, stype: 'pot', surface: true, onTop: true, star: 1, capacity: 2, image: 'furniture_32_32-1-8', placed: 'placed_32_16-0-0', placedleft: 'placed_32_16-1-0', placedright: 'fuws_32_16-2-0', unplacing: {speed: 800}, help: 'Clay Pots', tooltip: 'Gardening Container'},
@@ -957,6 +959,7 @@ export const PLANT_TYPE = {
   SUNFLOWER: 22,
   AMBERMIRAGE: 24,
   BLOODMOON: 25,
+  GRAVELWEED: 26,
   // Mini-biome Herbs
   SHADOWFERN: 31,
   CRIMSONFROND: 32,
@@ -1006,6 +1009,18 @@ export const SNEAKTHORN_COUNT = 80
 export const CURSEDCROWN_COUNT = 80
 export const ABYSSHORN_COUNT = 120
 export const INFERNCAP_COUNT = 180
+export const GRAVELWEED_COUNT = 220
+
+// Substrats valides pour Gravelweed — Surface (natural/topsoil/substrat) + Underground natif,
+// 3 biomes confondus, aucun filtre de biome à l'usage (cf. GravelweedSystem, placeGravelweeds)
+// SAND est volontairement omis.
+export const GRAVELWEED_SOIL = new Set([
+  NODES.GRASSFOREST.code, NODES.GRASSJUNGLE.code,
+  NODES.DIRT.code, NODES.SILT.code,
+  NODES.CLAY.code, NODES.SANDSTONE.code, NODES.MUD.code,
+  NODES.STONE.code, NODES.ASH.code, NODES.LIMESTONE.code
+])
+
 // CobwebSystem (ecosystem.mjs) — délai de base entre deux tentatives de pose
 // de toile (ms). Modulé à l'usage par un facteur aléatoire x[0.8, 1.2[.
 export const COBWEB_GROWTH_DELAY_MS = 20000

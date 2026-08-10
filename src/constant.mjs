@@ -318,6 +318,8 @@ export const MICROTASK = {
 
   CORAL_REGROW: {priority: 20, capacity: 10, taskName: 'coralRegrow'}, // recherche d'un nouvel emplacement pour les coraux à repousser
   OLEANDER_REGROW: {priority: 20, capacity: 2, taskName: 'oleanderRegrow'}, // recherche d'un nouvel emplacement pour les oleanders à repousser
+  GRAVELWEED_REGROW: {priority: 20, capacity: 10, taskName: 'gravelweedRegrow'}, // recherche d'un nouvel emplacement pour les gravelweed à repousser
+  GRAVELWEED_BLOOM: {priority: 20, capacity: 4, taskName: 'gravelweedBloom'}, // passage individuel unbloom → bloom, 5h in-game après la pousse
   MANDRAKE_REGROW: {priority: 20, capacity: 2, taskName: 'mandrakeRegrow'}, // recherche d'un nouvel emplacement pour les mandrakes à repousser
   PRICKLEPAD_REGROW: {priority: 20, capacity: 2, taskName: 'pricklepadRegrow'}, // recherche d'un nouvel emplacement pour les pricklepads à repousser
   SATANS_CUBE_REGROW: {priority: 20, capacity: 2, taskName: 'satansCubeRegrow'}, // recherche d'un nouvel emplacement pour les satan's cube à repousser
