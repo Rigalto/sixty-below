@@ -38,7 +38,7 @@
 - continuer la correction et l'ajout de fiches d'aide (`HELP`) et d'items (`ITEMS`)
 - Recettes pour créer Linen Rope et l'utiliser
 - Mettre la bonne palette et un entourage noir pour tool_32_32, reste à faire :
-  - 3,0 - 4,0 - 5,0
+  - 4,0 - 5,0
   - 3,1 - 4,1 - 5,1
   - 1,2 - 2,2 - 3,2 - 4,2 - 5,2
 - Mettre la bonne palette et un entourage noir pour placed_16_32, reste à faire :
