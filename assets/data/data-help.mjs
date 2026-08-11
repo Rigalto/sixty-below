@@ -6119,7 +6119,7 @@ Foraging Tool: <<itemStar|sickleSilver>> or better
     content: `
 **Description**
 
-Underground Bamboo thrives in the humid tunnels and passages of [[Jungle]] biomes. Growing in dense clusters wherever it takes root, it spreads aggressively across any available [[node:silt]] surface. Its hollow stems and tender shoots make it a versatile resource for both food and crafting.
+Underground Bamboo thrives in the humid tunnels and passages of [[Jungle]] biomes. Growing in dense clusters wherever it takes root, it spreads aggressively across any available [[node:silt]], [[node:mud]] or [[node:limestone]] surface. Its hollow stems and tender shoots make it a versatile resource for both food and crafting.
 
 **Tier**
 
@@ -6129,27 +6129,38 @@ Underground Bamboo thrives in the humid tunnels and passages of [[Jungle]] biome
 
 * Biome: [[Jungle]]
 * Layer: [[Surface]] tunnels and [[Underground]]
-* Grows on [[node:silt]]
+* Grows on [[node:silt]], [[node:mud]] or [[node:limestone]]
 
 **Population**
 
 * The species neither grows nor declines — natural balance maintains the population
 * Harvested Bamboo does not regrow
 
-**Harvest**
+<hr>
 
-* [[Foraging|Interact to harvest]] — the plant disappears permanently on harvest
-* Tool: [[Foraging Tools|Silver Sickle]] or better ⏳
-* Loot: [[item:bambooShoot]], [[item:bambooStalk]]
+**Foraging Bamboo**
+
+* [[Foraging|Interact to harvest]]
+* The plant disappears on harvest
+
+Foraging Tool: <<itemStar|sickleSilver>> or better
+
+**Bamboo Foraging Loot**
+
+<<itemLootTable|bamboo|foraging>>
 
 **Dangers**
 
 * Foraging Bamboo may disturb a [[monster:centipede]] coiled around the stems — it strikes without warning and inflicts [[Poison DOT]]. ⏳
 
+<hr>
+
 **Usages** ⏳
 
 * [[item:bambooShoot]] — food ingredient ⏳
 * [[item:bambooStalk]] — construction and crafting ingredient ⏳
+
+<hr>
 
 **Tips**
 

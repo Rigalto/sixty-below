@@ -1003,6 +1003,8 @@ export const OLEANDER_COUNT = 60
 export const MANDRAKE_COUNT = 60
 export const PRICKLEPAD_COUNT = 60
 export const BAMBOO_COUNT = 40
+export const BAMBOO_ITEMS = ['bamboo', 'bamboo1', 'bamboo2', 'bamboo3'] // variantes d'image, même type/comportement
+
 export const SATANS_CUBE_COUNT = 80
 export const SNEAKTHORN_COUNT = 80
 export const CURSEDCROWN_COUNT = 80
