@@ -205,13 +205,6 @@ export const ARMOR_SLOTS = ['head', 'body', 'foot']
 export const ARMOR_SLOT_LABELS = ['Head', 'Body', 'Foot']
 
 /* =========================================
-   DEFINITION DES ITEMS
-   ========================================= */
-
-export const MAX_FURNITURE_W = 3 // largeur max d'un furniture, en tuiles
-export const MAX_FURNITURE_H = 3 // hauteur max d'un furniture, en tuiles
-
-/* =========================================
       DEFINITION DU PLAYER
       ========================================= */
 
@@ -321,6 +314,7 @@ export const MICROTASK = {
   GRAVELWEED_REGROW: {priority: 20, capacity: 10, taskName: 'gravelweedRegrow'}, // recherche d'un nouvel emplacement pour les gravelweed à repousser
   GRAVELWEED_BLOOM: {priority: 20, capacity: 4, taskName: 'gravelweedBloom'}, // passage individuel unbloom → bloom, 5h in-game après la pousse
   MANDRAKE_REGROW: {priority: 20, capacity: 2, taskName: 'mandrakeRegrow'}, // recherche d'un nouvel emplacement pour les mandrakes à repousser
+  BAMBOO_REGROW: {priority: 20, capacity: 2, taskName: 'bambooRegrow'}, // recherche d'un nouvel emplacement pour les bambous à repousser
   PRICKLEPAD_REGROW: {priority: 20, capacity: 2, taskName: 'pricklepadRegrow'}, // recherche d'un nouvel emplacement pour les pricklepads à repousser
   SATANS_CUBE_REGROW: {priority: 20, capacity: 2, taskName: 'satansCubeRegrow'}, // recherche d'un nouvel emplacement pour les satan's cube à repousser
   SNEAKTHORN_REGROW: {priority: 20, capacity: 2, taskName: 'sneakthornRegrow'}, // recherche d'un nouvel emplacement pour les sneakthorns à repousser

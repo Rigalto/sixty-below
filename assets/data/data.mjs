@@ -187,7 +187,7 @@ export const ITEM_TYPE = {
 }
 
 export const MAX_FURNITURE_W = 3 // tuiles — vérification taille réelle dans GameCore.#hydrateItems()
-export const MAX_FURNITURE_H = 3 // tuiles — idem
+export const MAX_FURNITURE_H = 4 // tuiles — idem
 
 // MATERIAL et CRAFTABLE sont ajoutés automatiquement en post-traitement
 // en fonction des recettes.
@@ -638,10 +638,10 @@ export const ITEMS = {
   pricklepad: {name: 'Pricklepad', type: 0, stype: 'herb', star: 3, image: null, placed: 'placed_32_32-0-3', help: 'Pricklepad', tooltip: '???', foraging: {speed: 1800, items: [{item: 'pricklepadPear', count: '1-3'}, {item: 'cactusSpine', count: 0.80}, {item: 'cactusFiber', count: 1.80}]}},
   pricklepadPear: {name: 'Pricklepad Pear', type: 0, stype: 'herb', star: 2, image: 'foraged_32_32-7-3', help: 'Pricklepad', tooltip: '???'},
 
-  bamboo: {name: 'Bamboo', type: 0, stype: 'herb', star: 2, image: null, placed: 'placed_16_64-0-0', help: 'Bamboo', tooltip: '???'},
-  bamboo1: {name: 'Bamboo', type: 0, stype: 'herb', star: 2, image: null, placed: 'placed_16_64-1-0', help: 'Bamboo', tooltip: '???'},
-  bamboo2: {name: 'Bamboo', type: 0, stype: 'herb', star: 2, image: null, placed: 'placed_16_64-2-0', help: 'Bamboo', tooltip: '???'},
-  bamboo3: {name: 'Bamboo', type: 0, stype: 'herb', star: 2, image: null, placed: 'placed_16_64-3-0', help: 'Bamboo', tooltip: '???'},
+  bamboo: {name: 'Bamboo', type: 0, stype: 'herb', star: 2, image: null, placed: 'placed_16_64-0-0', help: 'Bamboo', tooltip: '???', foraging: {speed: 1800, items: [{item: 'bambooStalk', count: '1-2', buffs: ['lucky:50']}, {item: 'bambooShoot', count: 0.80, buffs: ['lucky:50']}, {item: 'slug', count: 0.20, buffs: ['lucky:100', 'rainy:100']}]}},
+  bamboo1: {name: 'Bamboo', type: 0, stype: 'herb', star: 2, image: null, placed: 'placed_16_64-1-0', help: 'Bamboo', tooltip: '???', foraging: {speed: 1800, items: [{item: 'bambooStalk', count: '1-2', buffs: ['lucky:50']}, {item: 'bambooShoot', count: 0.80, buffs: ['lucky:50']}, {item: 'slug', count: 0.20, buffs: ['lucky:100', 'rainy:100']}]}},
+  bamboo2: {name: 'Bamboo', type: 0, stype: 'herb', star: 2, image: null, placed: 'placed_16_64-2-0', help: 'Bamboo', tooltip: '???', foraging: {speed: 1800, items: [{item: 'bambooStalk', count: '1-2', buffs: ['lucky:50']}, {item: 'bambooShoot', count: 0.80, buffs: ['lucky:50']}, {item: 'slug', count: 0.20, buffs: ['lucky:100', 'rainy:100']}]}},
+  bamboo3: {name: 'Bamboo', type: 0, stype: 'herb', star: 2, image: null, placed: 'placed_16_64-3-0', help: 'Bamboo', tooltip: '???', foraging: {speed: 1800, items: [{item: 'bambooStalk', count: '1-2', buffs: ['lucky:50']}, {item: 'bambooShoot', count: 0.80, buffs: ['lucky:50']}, {item: 'slug', count: 0.20, buffs: ['lucky:100', 'rainy:100']}]}},
   bambooStalk: {name: 'Bamboo Stalk', type: 0, stype: 'herb', star: 2, image: 'foraged_32_32-7-5', help: 'Bamboo', tooltip: '???'},
   bambooShoot: {name: 'Bamboo Shoot', type: 0, stype: 'herb', star: 2, image: 'foraged_32_32-0-6', help: 'Bamboo', tooltip: '???'},
 

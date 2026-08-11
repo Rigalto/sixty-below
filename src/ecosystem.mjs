@@ -1,5 +1,5 @@
 // ecosystem.mjs — FloraManager - OakSystem - MahoganySystem - CoconutSystem - ThornspineSystem
-// SunflowerSystem - ParsnipSystem - OleanderSystem - MandrakeSystem - PricklepadSystem - AmbermirageSystem
+// SunflowerSystem - ParsnipSystem - OleanderSystem - MandrakeSystem - BambooSystem - PricklepadSystem - AmbermirageSystem
 // CobwebSystem - HiveSystem - SatansCubeSystem - SneakthornSystem - CursedcrownSystem
 // SpreadForestSystem - SpreadJungleSystem - CoralSystem - BloodmoonSystem - GravelweedSystem
 // SampleSystem
@@ -1836,6 +1836,268 @@ class MandrakeSystem {
   }
 }
 export const mandrakeSystem = new MandrakeSystem()
+
+/* ====================================================================================================
+   BAMBOO SYSTEM
+   ====================================================================================================
+
+   Singleton : bambooSystem.
+
+   Population constante : #list reçoit en une fois (init) le tableau complet des bambous,
+   taille fixe jamais réallouée (pas de GC). Un record present=false signale un slot à faire
+   repousser ailleurs — mis en #regrowQueue, vidée par tâche différée (bambooRegrow).
+
+   itemId variable par record (BAMBOO_ITEMS — 4 variantes d'image, même type/comportement) :
+   pas de #image caché, résolution ITEMS[record.itemId].placed au render (cf. CoralSystem).
+
+   Substrat SILT/MUD/LIMESTONE utilisé comme proxy implicite de biome Jungle au runtime — pas
+   de filtrage biome explicite (aucune donnée de biome persistée hors génération), à l'instar
+   de MandrakeSystem/OleanderSystem.
+
+   ==================================================================================================== */
+
+const BAMBOO_REGROW_INITIAL_DELAY_MS = 1911
+const BAMBOO_REGROW_RETRY_DELAY_MS = 167
+
+class BambooSystem {
+  byTile = new Map() // Map<tileIndex, record> — public : membership O(1) + lookup record
+  #list = [] // record[] — population fixe, référence affectée dans init(records)
+  #byChunk = new Map() // Map<chunkKey, Set> — lookup spatial pour onPreloadChunksChanged
+  #bySoil = new Map() // Map<soilIndex, record> — bambous présents : détection retrait du sol
+  #displayed = new Set() // Set<record> — cible du render (chunks preload uniquement)
+  #regrowQueue = [] // record[] — records present=false en attente d'un nouvel emplacement
+
+  constructor () {
+    // eventBus
+    this.onFirstLoopBamboo = this.onFirstLoopBamboo.bind(this)
+    eventBus.on('time/first-loop', this.onFirstLoopBamboo)
+    this.onTileChangedBamboo = this.onTileChangedBamboo.bind(this)
+    eventBus.on('world/tile-changed', this.onTileChangedBamboo)
+    // micro-tâches
+    this.bambooRegrow = this.bambooRegrow.bind(this)
+  }
+
+  /**
+   * Réinitialise toutes les structures.
+   * Appelé en début de session, avant toute hydratation.
+   */
+  init () {
+    this.byTile.clear()
+    this.#list.length = 0
+    this.#byChunk.clear()
+    this.#bySoil.clear()
+    this.#displayed.clear()
+    this.#regrowQueue.length = 0
+  }
+
+  /**
+   * Enregistre un bambou et peuple les structures internes.
+   * Si present=false, met le record en file de repousse.
+   * @param {object} record — record HERB/BAMBOO (deleted=false garanti par l'appelant)
+   */
+  initPlant (record) {
+    this.#list.push(record)
+
+    if (record.present) {
+      addToByTile(this.byTile, record)
+      addToByChunk(this.#byChunk, record)
+      this.#bySoil.set(record.soilIndex, record)
+
+      blockedTiles.blockPlacementRect(record.x, record.y, record.w, record.h)
+      return
+    }
+    this.#regrowQueue.push(record)
+  }
+
+  debug () {
+    console.log(`[BambooSystem] ${this.#list.length} bambous récupérés, ${this.#regrowQueue.length} en attente de repousse`)
+  }
+
+  /**
+   * Liaison EventBus : 'time/first-loop'. Déclenche la tâche de repousse si #regrowQueue
+   * contient des records present=false chargés depuis la persistence.
+   * Délai long pour ne pas surcharger le démarrage.
+   */
+  onFirstLoopBamboo () {
+    if (this.#regrowQueue.length === 0) return
+    const {priority, capacity} = MICROTASK.BAMBOO_REGROW
+    taskScheduler.enqueue('bamboo-regrow', BAMBOO_REGROW_INITIAL_DELAY_MS, this.bambooRegrow, priority, capacity)
+  }
+
+  /**
+   * Reconstruit #displayed depuis les chunks preload de la caméra.
+   * @param {Set<number>} preloadChunks
+   */
+  onPreloadChunksChanged (preloadChunks) {
+    buildDisplayed(this.#displayed, this.#byChunk, preloadChunks)
+  }
+
+  /**
+   * Dessine les bambous visibles et présents sur le contexte transformé. itemId variable par
+   * record (BAMBOO_ITEMS) — résolution de l'image à chaque appel, pas de #image caché.
+   * @param {CanvasRenderingContext2D} ctx — contexte déjà transformé (caméra appliquée)
+   */
+  render (ctx) {
+    for (const record of this.#displayed) {
+      const img = ITEMS[record.itemId].placed
+      const pxX = record.x << 4
+      const pxY = record.y << 4
+      ctx.drawImage(IMAGE_CACHE[img.imgIndex], img.sx, img.sy, img.sw, img.sh, pxX, pxY, img.sw, img.sh)
+    }
+  }
+
+  /**
+   * Retourne le record de bambou couvrant la tuile donnée, ou null.
+   * @param {number} tileIndex — (y << 10) | x
+   * @returns {object|null}
+   */
+  getPlantAt (tileIndex) {
+    return this.byTile.get(tileIndex) ?? null
+  }
+
+  /**
+   * Indique si le record est actuellement présent (forageable).
+   * @param {object} record
+   * @returns {boolean}
+   */
+  isPresent (record) { return record.present }
+
+  /**
+   * Détruit un bambou présent sans loot : retire byTile/#byChunk/#bySoil/#displayed,
+   * débloque les 4 tuiles occupées, persiste, puis programme la repousse
+   * (#regrowQueue + tâche différée). Guard : no-op si record.present est déjà false.
+   * @param {object} record
+   */
+  #destroyPresent (record) {
+    if (!record.present) return
+
+    record.present = false
+    removeFromByTile(this.byTile, record)
+    removeFromByChunk(this.#byChunk, record)
+    this.#bySoil.delete(record.soilIndex)
+    this.#displayed.delete(record)
+
+    blockedTiles.unblockPlacementRect(record.x, record.y, record.w, record.h)
+
+    saveManager.queueStaticUpdate({storeName: 'plant', record})
+
+    this.#regrowQueue.push(record)
+    if (this.#regrowQueue.length === 1) {
+      const {priority, capacity} = MICROTASK.BAMBOO_REGROW
+      taskScheduler.enqueue('bamboo-regrow', BAMBOO_REGROW_RETRY_DELAY_MS, this.bambooRegrow, priority, capacity)
+    }
+  }
+
+  /**
+   * Traite le foraging réussi de ce bambou (hors loot, géré par ForagingManager).
+   * Marque le record absent et programme la repousse.
+   * @param {object} record
+   */
+  onForaged (record) {
+    this.#destroyPresent(record)
+  }
+
+  /**
+   * Tire une colonne et une hauteur au hasard dans la bande skySurface→caverns, descend
+   * jusqu'à la première tuile non-VOID.
+   * @returns {number} index packé (y<<10)|x du sol si SILT/MUD/LIMESTONE trouvé, 0 sinon
+   */
+  #findBambooFloor () {
+    const VOID = NODES.VOID.code
+    const SILT = NODES.SILT.code
+    const MUD = NODES.MUD.code
+    const LIMESTONE = NODES.LIMESTONE.code
+    const W = WORLD_WIDTH
+
+    const cx = seededRNG.randomGetMinMax(1, W - 2)
+    const cy = seededRNG.randomGetMinMax(TOPSOIL_Y_SKY_SURFACE, TOPSOIL_Y_UNDER_CAVERNS)
+    let idx = (cy << 10) | cx
+
+    if (chunkManager.getTileAt(idx) !== VOID) return 0
+    const maxIndex = (TOPSOIL_Y_UNDER_CAVERNS << 10) | cx
+    while (idx < maxIndex && chunkManager.getTileAt(idx) === VOID) idx += W
+
+    const support = chunkManager.getTileAt(idx)
+    if (support !== SILT && support !== MUD && support !== LIMESTONE) return 0
+
+    return idx
+  }
+
+  /**
+   * Teste le pocket 1x4 VOID au-dessus du sol trouvé, tuiles libres de tout blocage.
+   * @param {number} floorIndex — retour de #findBambooFloor
+   * @returns {boolean}
+   */
+  #canPlaceBambooAt (floorIndex) {
+    const VOID = NODES.VOID.code
+    const cx = floorIndex & 0x3FF
+    const topY = (floorIndex >> 10) - 4
+
+    return chunkManager.isRectCode(cx, topY, 1, 4, VOID) && blockedTiles.canPlaceRect(cx, topY, 1, 4)
+  }
+
+  /**
+   * Cherche un nouvel emplacement pour le dernier record de #regrowQueue, avec le même
+   * algorithme que placeBamboo (génération) : départ VOID, descente jusqu'au premier
+   * non-VOID, sol SILT/MUD/LIMESTONE, pocket VOID 1x4 au-dessus.
+   * Si trouvé : finalise le record (present=true, byTile/#byChunk/#bySoil, blockPlacement,
+   * persistence) et le retire de #regrowQueue (dernier élément, length--).
+   * Replanifie tant que #regrowQueue n'est pas vide, avec BAMBOO_REGROW_RETRY_DELAY_MS.
+   */
+  bambooRegrow () {
+    if (this.#regrowQueue.length === 0) return
+
+    const floorIndex = this.#findBambooFloor()
+    const found = floorIndex !== 0 && this.#canPlaceBambooAt(floorIndex)
+
+    if (found) {
+      const cx = floorIndex & 0x3FF
+      const y = floorIndex >> 10
+      const topY = y - 4
+      const soilIndex = floorIndex
+
+      const record = this.#regrowQueue[this.#regrowQueue.length - 1]
+
+      record.soilIndex = soilIndex
+      record.index = (topY << 10) | cx
+      record.x = cx
+      record.y = topY
+      record.present = true
+
+      addToByTile(this.byTile, record)
+      addToByChunk(this.#byChunk, record)
+      addToDisplayed(this.#displayed, record)
+      this.#bySoil.set(soilIndex, record)
+      blockedTiles.blockPlacementRect(cx, topY, 1, 4)
+      saveManager.queueStaticUpdate({storeName: 'plant', record})
+
+      this.#regrowQueue.length--
+    }
+
+    if (this.#regrowQueue.length !== 0) {
+      const {priority, capacity} = MICROTASK.BAMBOO_REGROW
+      taskScheduler.enqueue('bamboo-regrow', BAMBOO_REGROW_RETRY_DELAY_MS, this.bambooRegrow, priority, capacity)
+    }
+  }
+
+  /**
+   * Liaison EventBus : 'world/tile-changed'.
+   * Détruit le bambou présent si une des 4 tuiles VOID de son corps n'est plus libre,
+   * ou si sa tuile sol n'est plus SILT/MUD/LIMESTONE. Relit les tuiles réelles avant d'agir.
+   * Pas de gestion de spot — population fixe, repousse via #regrowQueue.
+   * @param {{tileIndex: number, tileOldCode: number, tileNewCode: number}} payload
+   */
+  onTileChangedBamboo ({tileIndex}) {
+    // Cas 1 — tuile du corps : une des 4 VOID devient autre chose
+    const byBodyRecord = this.byTile.get(tileIndex)
+    if (byBodyRecord !== undefined) this.#destroyPresent(byBodyRecord)
+
+    // Cas 2 — tuile sol
+    const record = this.#bySoil.get(tileIndex)
+    if (record !== undefined) this.#destroyPresent(record)
+  }
+}
+export const bambooSystem = new BambooSystem()
 
 /* ====================================================================================================
    PRICKLEPAD SYSTEM
