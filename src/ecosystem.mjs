@@ -7198,6 +7198,27 @@ class GravelweedSystem {
     record.bloomTimestamp = null
     saveManager.queueStaticUpdate({storeName: 'plant', record})
   }
+
+  // ///// //
+  // DEBUG //
+  // ///// //
+
+  /**
+* DEBUG — Affiche un cercle bleu clair au centre de la tuile sous chaque spot enregistré dans #list
+* @param {CanvasRenderingContext2D} ctx — contexte déjà transformé (caméra appliquée)
+*/
+  debugRenderSpots (ctx) {
+    ctx.save()
+    ctx.fillStyle = 'rgba(64, 205, 234, 0.7)'
+    for (const record of this.#list) {
+      const cx = ((record.index & 0x3FF) << 4) + 8
+      const cy = ((record.index >> 10) << 4) + 40 - 16
+      ctx.beginPath()
+      ctx.arc(cx, cy, 4, 0, 6.2832)
+      ctx.fill()
+    }
+    ctx.restore()
+  }
 }
 export const gravelweedSystem = new GravelweedSystem()
 
