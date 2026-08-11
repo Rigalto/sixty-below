@@ -387,6 +387,7 @@ La Sap corrode le Copper. Il doit donc être remplacer par du Gold.
 - Sneakthorn (`SneakthornSystem`)
 - Cursedcrown (`CursedcrownSystem`)
 - Abysshorn (`AbysshornSystem`)
+- Gravelweed (`GravelweedSystem`)
 
 ### Rendu
 - `WorldRenderer` — rendu tuiles par chunks avec cache OffscreenCanvas
