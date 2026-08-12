@@ -5908,7 +5908,7 @@ Ferns are ancient plants thriving in the humid darkness of [[Fern Cave|Fern Cave
 | Name | Color | Shape |
 |---|---|---|
 | [[item:fernS]] | Green fronds, brown stalk | Conical structure |
-| [[item:fernC]] | Crimson foliage, vibrant green stems | tiered with curls|
+| [[item:fernC]] | Purple, green stems | tiered |
 | [[item:fernG]] | Golden | Radiant blades |
 | [[item:fernM]] | Blue | Tree-shaped |
 
