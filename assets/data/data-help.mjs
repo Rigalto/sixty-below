@@ -5895,7 +5895,7 @@ Ferns are ancient plants thriving in the humid darkness of [[Fern Cave|Fern Cave
 
 **Tier**
 
-{{item:fernS:star|star}}. — Found exclusively in [[Fern Cave|Fern Caves]], a tier-3 environment.
+{{item:fernS:star|star}}
 
 **Location**
 
@@ -5907,30 +5907,36 @@ Ferns are ancient plants thriving in the humid darkness of [[Fern Cave|Fern Cave
 
 | Name | Color | Shape |
 |---|---|---|
-| [[item:fernS]] | Very dark green, almost black | Wide, drooping fronds |
-| [[item:fernC]] | Deep red | Serrated fronds |
-| [[item:fernG]] | Golden, translucent | Fine, luminous fronds |
-| [[item:fernM]] | Blue-grey | Vaporous, delicate fronds |
+| [[item:fernS]] | Green fronds, brown stalk | Conical structure |
+| [[item:fernC]] | Crimson foliage, vibrant green stems | tiered with curls|
+| [[item:fernG]] | Golden | Radiant blades |
+| [[item:fernM]] | Blue | Tree-shaped |
 
-**Harvest**
+<hr>
 
-* [[Foraging|Interact to harvest]] — the fern enters a dormant state and regrows after a few in-game hours
-* Tool: [[Foraging Tools|Silver Sickle]] ({{item:sickleSilver:star|star}}) or better⏳
-* Loot: [[item:fernLeaf]], rare chance of [[item:fernSpore]]
+**Foraging Ferns**
 
-**Planting** ⏳
+* [[Foraging|Interact to harvest]]
+* The plant disappears on harvest
 
-* Place a [[item:fernSpore]] on a [[node:grassFern]] tile to grow a new fern ⏳
-* The tile must have [[node:grassFern]] on both its left and right neighbours ⏳
+Foraging Tool: <<itemStar|sickleSilver>> or better
 
-**Usages** ⏳
+**Ferns Foraging Loot**
 
-* [[item:fernLeaf]] — crafting ingredient ⏳
-* [[item:fernSpore]] — rare ingredient, planting ⏳
+<<itemLootTable|fernS|foraging>>
 
 **Dangers**
 
 * [[monster:dendrobate]] and [[monster:mamba]] inhabit Fern Caves — expect encounters while foraging. ⏳
+
+<hr>
+
+**Usages** ⏳
+
+* [[item:fernLeaf]] — crafting ingredient ⏳
+* [[item:fernSpore]] — rare ingredient ⏳
+
+<hr>
 
 **Tips**
 

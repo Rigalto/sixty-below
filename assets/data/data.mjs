@@ -610,16 +610,16 @@ export const ITEMS = {
   bloodmoon: {name: 'Bloodmoon', type: 0, stype: 'herb', star: 2, image: 'foraged_32_32-0-4', placed: 'placed_16_32-4-0', placedLeft: 'placed_16_32-5-0', help: 'Bloodmoon', tooltip: '???', foraging: {speed: 1500, items: [{item: 'bloodmoon', count: '1-3'}, {item: 'bloodmoonSeed', count: 0.65}, {item: 'slug', count: 0.12, buffs: ['lucky:100', 'rainy:300']}]}},
   bloodmoonSeed: {name: 'Bloodmoon Seed', type: ITEM_TYPE.SEED | ITEM_TYPE.PLACABLE, stype: 'seed', star: 2, image: 'foraged_32_32-1-4', help: 'Bloodmoon', tooltip: '???'},
 
-  fernS: {name: 'Shadowfern', type: 0, stype: 'herb', star: 3, image: null, placed: 'fuws_32_32-2-3', speed: 1900, foraging: {speed: 500, items: [{item: 'fernLeaf', count: 1, rainy: 1.8, windy: 1.8}]}, help: 'Ferns', tooltip: '???'},
-  fernC: {name: 'Crimsonfrond', type: 0, stype: 'herb', star: 3, image: null, placed: 'fuws_32_32-2-3', speed: 1900, foraging: {speed: 500, items: [{item: 'fernLeaf', count: 1, rainy: 1.8, windy: 1.8}]}, help: 'Ferns', tooltip: '???'},
-  fernG: {name: 'Goldenveil', type: 0, stype: 'herb', star: 3, image: null, placed: 'fuws_32_32-2-3', speed: 1900, foraging: {speed: 500, items: [{item: 'fernLeaf', count: 1, rainy: 1.8, windy: 1.8}]}, help: 'Ferns', tooltip: '???'},
-  fernM: {name: 'Mistfern', type: 0, stype: 'herb', star: 3, image: null, placed: 'fuws_32_32-2-3', speed: 1900, foraging: {speed: 500, items: [{item: 'fernLeaf', count: 1, rainy: 1.8, windy: 1.8}]}, help: 'Ferns', tooltip: '???'},
-  fernLeaf: {name: 'Fern Leaf', type: 0, stype: 'herb', star: 4, image: 'crafting_32_32-0-1', help: 'Ferns', tooltip: 'Crafting Material for Potions and Furniture'},
-  fernSpore: {name: 'Fern Spore', type: 0, stype: 'herb', star: 4, image: 'crafting_32_32-0-1', help: 'Ferns', tooltip: 'Crafting Material for Potions and Furniture'},
-
   velvetmoss: {name: 'Velvetmoss', type: 0, stype: 'herb', star: 3, image: 'crafting_32_32-0-1', placed: 'fuws_32_32-2-3', speed: 1900, foraging: {speed: 500, items: [{item: 'velvetmoss', count: 1, rainy: 1.8, windy: 1.8}]}, help: 'Velvetmoss', tooltip: '???'},
 
   // images OK
+
+  fernS: {name: 'Shadowfern', type: 0, stype: 'herb', star: 3, image: null, placed: 'placed_32_48-0-1', speed: 1900, foraging: {speed: 500, items: [{item: 'fernLeaf', count: 1, buffs: ['lucky:50', 'rainy:60', 'windy:40']}, {item: 'fernSpore', count: 0.75, buffs: ['lucky:30', 'rainy:40', 'windy:20']}]}, help: 'Ferns', tooltip: '???'},
+  fernC: {name: 'Crimsonfrond', type: 0, stype: 'herb', star: 3, image: null, placed: 'placed_32_48-1-1', speed: 1900, foraging: {speed: 500, items: [{item: 'fernLeaf', count: 1, buffs: ['lucky:50', 'rainy:60', 'windy:40']}, {item: 'fernSpore', count: 0.75, buffs: ['lucky:30', 'rainy:40', 'windy:20']}]}, help: 'Ferns', tooltip: '???'},
+  fernG: {name: 'Goldenveil', type: 0, stype: 'herb', star: 3, image: null, placed: 'placed_32_48-2-1', speed: 1900, foraging: {speed: 500, items: [{item: 'fernLeaf', count: 1, buffs: ['lucky:50', 'rainy:60', 'windy:40']}, {item: 'fernSpore', count: 0.75, buffs: ['lucky:30', 'rainy:40', 'windy:20']}]}, help: 'Ferns', tooltip: '???'},
+  fernM: {name: 'Mistfern', type: 0, stype: 'herb', star: 3, image: null, placed: 'placed_32_48-3-1', speed: 1900, foraging: {speed: 500, items: [{item: 'fernLeaf', count: 1, buffs: ['lucky:50', 'rainy:60', 'windy:40']}, {item: 'fernSpore', count: 0.75, buffs: ['lucky:30', 'rainy:40', 'windy:20']}]}, help: 'Ferns', tooltip: '???'},
+  fernLeaf: {name: 'Fern Leaf', type: 0, stype: 'herb', star: 4, image: 'foraged_32_32-1-6', help: 'Ferns', tooltip: 'Crafting Material for Food & Potions'},
+  fernSpore: {name: 'Fern Spore', type: 0, stype: 'herb', star: 4, image: 'foraged_32_32-2-6', help: 'Ferns', tooltip: 'Crafting Material for Potions'},
 
   coralR: {name: 'Sunburst Brain Coral', type: 0, stype: 'herb', star: 2, image: null, placed: 'placed_32_32-0-1', speed: 1900, foraging: {speed: 500, items: [{item: 'coral', count: 1}, {item: 'oyster', count: 0.12, buffs: ['lucky:100', 'rainy:300']}]}, help: 'Corals', tooltip: 'Crafting Material for Potions and Furniture'},
   coralP: {name: 'Starfire Pillar Coral', type: 0, stype: 'herb', star: 2, image: null, placed: 'placed_32_32-1-1', speed: 1900, foraging: {speed: 500, items: [{item: 'coral', count: 1}, {item: 'oyster', count: 0.12, buffs: ['lucky:100', 'rainy:300']}]}, help: 'Corals', tooltip: 'Crafting Material for Potions and Furniture'},
@@ -663,7 +663,7 @@ export const ITEMS = {
   clayPot3: {name: 'Clay Pot (x3)', type: ITEM_TYPE.FURNITURE | ITEM_TYPE.PLACABLE, stype: 'pot', surface: true, onTop: true, star: 1, capacity: 3, image: 'furniture_32_32-2-8', placed: 'placed_48_16-0-0', placedleft: 'placed_48_16-1-0', placedright: 'placed_48_16-2-0', unplacing: {speed: 800}, help: 'Clay Pots', tooltip: 'Gardening Container'},
   clayPot4: {name: 'Clay Pot (x4)', type: ITEM_TYPE.FURNITURE | ITEM_TYPE.PLACABLE, stype: 'pot', surface: true, onTop: true, star: 1, capacity: 4, image: 'furniture_32_32-3-8', placed: 'placed_32_32-1-0', placedleft: 'placed_32_32-2-0', placedright: 'placed_32_32-3-0', unplacing: {speed: 800}, help: 'Clay Pots', tooltip: 'Gardening Container'},
 
-  // Accessories
+  // Accessories - images NOK
 
   // Torches
   gel: {name: 'Gel', type: ITEM_TYPE.MATERIAL, stype: 'light', star: 1, image: 'crafting_32_32-2-0', help: 'Gel', tooltip: 'Crafting material dropped by most slimes'},
@@ -844,7 +844,7 @@ export const RECIPES = [
   {result: {item: 'alchemyTable', count: 1}, station: 'workbench', ingredients: [{item: 'logMahogany', count: 6}, {item: 'logOak', count: 6}, {item: 'barCopper', count: 5}, {item: 'bottle', count: 10}, {item: 'torch', count: 2}, {item: 'sunflowerOil', count: 1}]},
   {result: {item: 'furnace', count: 1}, station: 'workbench', ingredients: [{item: 'blockStone', count: 20}, {item: 'logOak', count: 4}, {item: 'torch', count: 3}]},
   {result: {item: 'sawmill', count: 1}, station: 'workbench', ingredients: [{item: 'barIron', count: 2}, {item: 'chainIron', count: 1}, {item: 'cutRuby', count: 1}]},
-  {result: {item: 'jewelerBench', count: 1}, station: 'anvil', ingredients: [{item: 'logOak', count: 12}, {item: 'barIron', count: 2}, {item: 'silk', count: 2}, {item: 'barCopper', count: 1}]},
+  {result: {item: 'jewelerBench', count: 1}, station: 'anvil', ingredients: [{item: 'logOak', count: 12}, {item: 'barIron', count: 2}, {item: 'silk', count: 2}, {item: 'chainSilver', count: 2}, {item: 'barCopper', count: 1}]},
 
   {result: {item: 'tanningRack', count: 1}, station: 'loom', ingredients: [{item: 'silk', count: 12}, {item: 'logMahogany', count: 10}, {item: 'barCopper', count: 2}, {item: 'barSilver', count: 2}]},
   {result: {item: 'blastFurnace', count: 1}, station: 'furnace', ingredients: [{item: 'blockHardstone', count: 50}, {item: 'barCobalt', count: 21}, {item: 'blockLimestone', count: 12}, {item: 'logMahogany', count: 10}, {item: 'torch', count: 9}]},
