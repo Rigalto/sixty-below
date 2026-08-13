@@ -10,6 +10,38 @@ import {IS_DEV, WEATHER_TYPE, WEATHER_TYPE_CODE, BAG_CAPACITY, HOTBAR_CAPACITY, 
    WORLD BUFFER (CREATION DU MONDE)
    ==================================================================================================== */
 
+// Substrat attendu par PLANT_TYPE pour les kind HERB et MUSHROOM — recopié des constantes
+// déjà utilisées dans chaque placeXXX correspondant. Usage diagnostic uniquement (logStats).
+// Absence d'entrée = type non vérifié (Bolete/PinkMycenia poussent sur un arbre, pas sur une
+// tuile de sol ; Gravelweed/Coral/Thornspine à confirmer avant ajout).
+const PLANT_SUBSTRATE = new Map([
+  [PLANT_TYPE.CORAL_R, new Set([NODES.SAND.code])],
+  [PLANT_TYPE.CORAL_P, new Set([NODES.SAND.code])],
+  [PLANT_TYPE.CORAL_Y, new Set([NODES.SAND.code])],
+  [PLANT_TYPE.CORAL_G, new Set([NODES.SAND.code])],
+  [PLANT_TYPE.SHADOWFERN, new Set([NODES.GRASSFERN.code])],
+  [PLANT_TYPE.CRIMSONFROND, new Set([NODES.GRASSFERN.code])],
+  [PLANT_TYPE.GOLDENVEIL, new Set([NODES.GRASSFERN.code])],
+  [PLANT_TYPE.MISTFERN, new Set([NODES.GRASSFERN.code])],
+  [PLANT_TYPE.VELVETMOSS, new Set([NODES.GRASSMOSS.code])],
+  [PLANT_TYPE.PARSNIP, new Set([NODES.GRASSFOREST.code])],
+  [PLANT_TYPE.SUNFLOWER, new Set([NODES.GRASSFOREST.code])],
+  [PLANT_TYPE.BLOODMOON, new Set([NODES.GRASSJUNGLE.code])],
+  [PLANT_TYPE.AMBERMIRAGE, new Set([NODES.SAND.code])],
+  [PLANT_TYPE.FROSTCAP, new Set([NODES.GRASSMUSHROOM.code])],
+  [PLANT_TYPE.DAWNCAP, new Set([NODES.GRASSMUSHROOM.code])],
+  [PLANT_TYPE.MANDRAKE, new Set([NODES.LIMESTONE.code])],
+  [PLANT_TYPE.PRICKLEPAD, new Set([NODES.ASH.code])],
+  [PLANT_TYPE.BAMBOO, new Set([NODES.SILT.code, NODES.MUD.code, NODES.LIMESTONE.code])],
+  [PLANT_TYPE.OLEANDER, new Set([NODES.STONE.code])],
+  [PLANT_TYPE.SATANS_CUBE, new Set([NODES.HARDSTONE.code, NODES.HELLSTONE.code])],
+  [PLANT_TYPE.SNEAKTHORN, new Set([NODES.HARDSTONE.code, NODES.SLATE.code])],
+  [PLANT_TYPE.CURSEDCROWN, new Set([NODES.SLATE.code, NODES.HELLSTONE.code])],
+  [PLANT_TYPE.ABYSSHORN, new Set([NODES.HARDSTONE.code, NODES.HELLSTONE.code, NODES.SLATE.code])],
+  [PLANT_TYPE.INFERNCAP, new Set([NODES.HARDSTONE.code, NODES.HELLSTONE.code, NODES.SLATE.code])],
+  [PLANT_TYPE.GRAVELWEED, new Set([NODES.GRASSFOREST.code, NODES.GRASSJUNGLE.code, NODES.DIRT.code, NODES.SILT.code, NODES.CLAY.code, NODES.SANDSTONE.code, NODES.MUD.code, NODES.STONE.code, NODES.ASH.code, NODES.LIMESTONE.code])]
+])
+
 class WorldBuffer {
   #data
 
@@ -64,6 +96,16 @@ class WorldBuffer {
       result.push({key: i, chunk: buffer})
     }
     return result
+  }
+
+  getTypeArray (type) {
+    const list = []
+    const data = this.#data
+
+    for (let i = 0; i < data.length; i++) {
+      if (data[i] === type) list.push(i)
+    }
+    return list
   }
 
   /**
@@ -124,6 +166,67 @@ class WorldBuffer {
       }
     }
     console.log('[WorldBuffer::logStats]\n' + lines.join('\n'))
+  }
+
+  /**
+   * Vérifie, pour chaque plante NATURAL/SPREAD/TREE/HERB/MUSHROOM, que la tuile attendue
+   * (naturalCode, topsoilCode, grass, ou entrée de PLANT_SUBSTRATE selon le kind) correspond
+   * toujours au contenu réel du buffer à l'index concerné. Affiche une anomalie par ligne
+   * dans la console. Les types HERB/MUSHROOM absents de PLANT_SUBSTRATE sont ignorés sans
+   * anomalie signalée. Usage diagnostic uniquement — appelée par logStats().
+   * @param {object[]} plants — enregistrements de l'objectStore 'plant'
+   */
+  logPlantSubstrateIssues (plants) {
+    let issues = 0
+
+    for (const record of plants) {
+      if (record.kind === PLANT_KIND.NATURAL) continue // sera supprimé
+
+      // pour ces deux champignons, les spots sont les tuiles situées sur les
+      // côtés de l'arbre (Oak/Mahogany), indépendamment de leur type
+      if (record.type === PLANT_TYPE.BOLETE) continue
+      if (record.type === PLANT_TYPE.PINKMYCENIA) continue
+
+      if (record.kind === PLANT_KIND.SPREAD) {
+        const actual = this.readAt(record.index)
+        if (actual === record.topsoilCode) continue
+        console.warn(`[WorldBuffer::logStats] SPREAD invalide — index=${record.index} attendu=${record.topsoilCode} trouvé=${actual}`)
+        issues++
+        continue
+      }
+
+      if (record.kind === PLANT_KIND.TREE) {
+        const actual = this.readAt(record.soilIndex)
+        if (record.grass === undefined || actual === record.grass) continue
+        console.warn(`[WorldBuffer::logStats] TREE invalide — id=${record.id} soilIndex=${record.soilIndex} attendu=${record.grass} trouvé=${actual}`)
+        issues++
+        continue
+      }
+
+      const actual = this.readAt(record.soilIndex)
+
+      const expected = PLANT_SUBSTRATE.get(record.type)
+
+      if (expected === undefined) {
+        console.warn(`[WorldBuffer::logStats] type invalide — id=${record.id} kind=${record.kind} type=${record.type} soilIndex=${record.soilIndex}}`)
+        issues++
+        continue // type non répertorié, pas vérifié
+      }
+
+      if (!expected.has(actual)) {
+        // ce test permet de ne pas prendre en compte les records 'dormant' ne pointant
+        // sur aucune tuile et servant juste à faire le 'nombre' attendu de plantes dans le monde
+        if (record.soilIndex !== 0) {
+          const node = NODES_LOOKUP[actual]
+          console.warn(`[WorldBuffer::logStats] HERB/MUSHROOM invalide — id=${record.id} type=${record.type} soilIndex=${record.soilIndex} trouvé=${node ? node.name : actual}`)
+          issues++
+        }
+      }
+    }
+
+    console.log(issues === 0
+      ? '[WorldBuffer::logStats] Substrats plantes : aucune anomalie'
+      : `[WorldBuffer::logStats] Substrats plantes : ${issues} anomalie(s)`)
   }
 }
 
@@ -248,15 +351,15 @@ class WorldGenerator {
     await progress('Geode caves')
 
     // 6.1.8 Fern Caves (Underground, Forest 6 HUMUS + GRASSFERN)
-    const {fernsCaves, fernsPlants} = worldCarver.digFernCaves()
+    const {fernsCaves} = worldCarver.digFernCaves()
     await progress('Fern caves')
 
     // 6.1.9 Moss Cave (Underground - Jungle - MUD + GRASSMOSS
-    const {mossCaves, mossPlants} = worldCarver.digMossCaves()
+    const {mossCaves, grassMossIndexes} = worldCarver.digMossCaves()
     await progress('Moss caves')
 
     // 6.1.10 Mushroom caves - Forest - HUMUS + GRASSMUSHROOM
-    const {mushroomCaves, mushroomPlants} = worldCarver.digMushroomCaves()
+    const {mushroomCaves, grassMushroomIndexes} = worldCarver.digMushroomCaves()
     await progress('Mushroom caves')
 
     // 6.1.11 Pyramid / Ancient House / Lost Temple / Ruined Cabin / Abandoned Mine
@@ -382,7 +485,7 @@ class WorldGenerator {
 
     // 8.3.2. Oak / Mahogany / Giant Mushroom
     const oakPositions = plantGenerator.placeTrees(surfaceLine, guarded)
-    const giantOccupied = plantGenerator.placeGiantMushrooms(mushroomPlants)
+    const giantOccupied = plantGenerator.placeGiantMushrooms(grassMushroomIndexes)
     await progress('Trees')
 
     // 8.3.3. Coral
@@ -393,7 +496,7 @@ class WorldGenerator {
     // 8.3.4. Natural Spreading
     plantGenerator.spreadNatural(surfaceLine, NODES.GRASSFOREST.code, NODES.DIRT.code, PLANT_TYPE.FOREST)
     plantGenerator.spreadNatural(surfaceLine, NODES.GRASSJUNGLE.code, NODES.SILT.code, PLANT_TYPE.JUNGLE)
-    plantGenerator.spreadMushroom(mushroomPlants, NODES.GRASSMUSHROOM.code, NODES.HUMUS.code, NODES.VOID.code, PLANT_TYPE.NONE)
+    plantGenerator.spreadMushroom(grassMushroomIndexes, NODES.GRASSMUSHROOM.code, NODES.HUMUS.code, NODES.VOID.code, PLANT_TYPE.NONE)
     await progress('Natural Spreading')
 
     plantGenerator.placeAmbermirages(surfaceLine, guarded)
@@ -402,9 +505,9 @@ class WorldGenerator {
     const thornspineCount = plantGenerator.placeThornspines(surfaceLine, guarded, biomesDescription)
     await progress('Surface Herbs')
 
-    const fernCount = plantGenerator.placeFerns(fernsPlants)
-    plantGenerator.placeMoss(mossPlants)
-    plantGenerator.placeCaveMushrooms(mushroomPlants, currentWeather, giantOccupied)
+    plantGenerator.placeFerns()
+    plantGenerator.placeMoss(grassMossIndexes)
+    plantGenerator.placeCaveMushrooms(grassMushroomIndexes, currentWeather, giantOccupied)
     await progress('Mini-biome Plants')
 
     plantGenerator.placeMandrakes(zoneRects)
@@ -428,14 +531,15 @@ class WorldGenerator {
 
     // 9.1. Affichage de statistiques)
     worldBuffer.logStats()
+    worldBuffer.logPlantSubstrateIssues(plantGenerator.plants)
 
     // 9.2. Stochage du monde en base de données
     if (!debug) {
       const liquidBodies = [...honeyLiquidBodies, ...lakeLiquidBodies, ...underLakeLiquidBodies, ...blindLakeLiquidBodies, ...sapLakeLiquidBodies, ...sapPocketLiquidBodies, ...waterPuddleLiquidBodies, ...sapPuddleLiquidBodies]
       console.log('.................... liquidBodies', liquidBodies)
       const lakes = [...surfaceLakes, ...underLakes, ...blindLakes, ...sapLakes, ...sapPockets]
-      const plants = [...fernsPlants, ...mossPlants, ...mushroomPlants, ...surfacePlants, ...plantGenerator.plants]
-      await this.save(seed, {hives, cobwebCaves, geodeCaves, lakes, liquidBodies, fernsCaves, mossCaves, mushroomCaves, pyramid, ruinedcabin, lostTemple, ancientHouse, leftBeach, rightBeach, antlions, anthills, termites, plants, hearts, triskels, graveyard, weather, fernCount, thornspineCount})
+      const plants = [...surfacePlants, ...plantGenerator.plants]
+      await this.save(seed, {hives, cobwebCaves, geodeCaves, lakes, liquidBodies, fernsCaves, mossCaves, mushroomCaves, pyramid, ruinedcabin, lostTemple, ancientHouse, leftBeach, rightBeach, antlions, anthills, termites, plants, hearts, triskels, graveyard, weather, thornspineCount})
       worldBuffer.clear()
     }
 
@@ -446,7 +550,7 @@ class WorldGenerator {
     if (debug) { return worldBuffer } // appelant responsable du clear()
   }
 
-  async save (seed, {hives, cobwebCaves, geodeCaves, lakes, liquidBodies, fernsCaves, mossCaves, mushroomCaves, plants, pyramid, ruinedcabin, lostTemple, ancientHouse, leftBeach, rightBeach, antlions, anthills, termites, hearts, triskels, graveyard, weather, fernCount, thornspineCount}) {
+  async save (seed, {hives, cobwebCaves, geodeCaves, lakes, liquidBodies, fernsCaves, mossCaves, mushroomCaves, plants, pyramid, ruinedcabin, lostTemple, ancientHouse, leftBeach, rightBeach, antlions, anthills, termites, hearts, triskels, graveyard, weather, thornspineCount}) {
     const start = window.performance.now()
     // 1. Sauvegarde des tuiles
     await database.clearObjectStore('world_chunks')
@@ -486,7 +590,6 @@ class WorldGenerator {
       {key: 'craftfilterstation', value: 'byHand'},
       {key: 'craftfiltertype', value: 'Furniture - Station'},
       {key: 'eternals', value: this.#collectEternalTiles()},
-      {key: 'ferncount', value: fernCount},
       {key: 'ferns', value: fernsCaves},
       {key: 'geodecaves', value: geodeCaves},
       {key: 'goldhearts', value: 0},
@@ -3932,7 +4035,7 @@ class WorldCarver {
  * Bords bruités via Perlin noise.
  * Prérequis : initZoneRects(), initExclusions().
  *
- * @returns {fernsCaves: Array<{cx, cy, radiusX, radiusY}>, fernsPlants: Array<{index, system, type}>}
+ * @returns {fernsCaves: Array<{cx, cy, radiusX, radiusY}>}
 
  */
   digFernCaves () {
@@ -3941,8 +4044,6 @@ class WorldCarver {
     const HUMUS = NODES.HUMUS.code
     const caves = []
     const MAX_ATTEMPTS = 100
-
-    const plants = []
 
     for (let i = 0; i < this.#zoneRects.length; i++) {
       const rect = this.#zoneRects[i]
@@ -3972,7 +4073,7 @@ class WorldCarver {
 
       const rect2 = this.applyTiles(tiles)
       this.addExclusion(rect2)
-      this.#fillFernMushroomCaveFloor(cx, cy + 1, radiusX, GRASSFERN, HUMUS, plants)
+      this.#fillFernMushroomCaveFloor(cx, cy + 1, radiusX, GRASSFERN, HUMUS)
 
       const guardTop = cy + 6
       const guardBottom = cy + radiusY + rectHalfH + 3
@@ -3983,8 +4084,7 @@ class WorldCarver {
 
       caves.push({cx, cy, radiusX, radiusY})
     }
-
-    return {fernsCaves: caves, fernsPlants: plants}
+    return {fernsCaves: caves}
   }
 
   /**
@@ -3998,8 +4098,7 @@ class WorldCarver {
  * @param {number} radiusX
  * @param {number} surfaceCode - Code de la tuile de surface (ex: NODES.GRASSFERN.code)
  * @param {number} substrateCode - Code du substrat (ex: NODES.HUMUS.code)
- * @param {Array} plants - [OUT] Tableau accumulant les enregistrements plant à sauvegarder
- * @returns {plants: Array<{kind, index, type, deleted}>}
+ * @param {Array} plants - [OUT] Tableau accumulant les index des tuiles de 'surfaceCode'
  */
   #fillFernMushroomCaveFloor (cx, cy, radiusX, surfaceCode, substrateCode, plants) {
     const VOID = NODES.VOID.code
@@ -4014,7 +4113,7 @@ class WorldCarver {
       const sCode = seededRNG.randomGetPercent(90) ? surfaceCode : substrateCode
       worldBuffer.write(x, y, sCode)
       if (sCode === surfaceCode) {
-        plants.push({kind: PLANT_KIND.NATURAL, type: PLANT_TYPE.NONE, naturalCode: surfaceCode, index: (y << 10) | x, deleted: false})
+        if (plants !== undefined) plants.push((y << 10) | x)
       }
 
       // HUMUS sur les tuiles suivantes
@@ -4051,14 +4150,14 @@ class WorldCarver {
  * Protection TileGuard sur le bas de la cave.
  * Prérequis : initZoneRects(), initExclusions().
  *
- * @returns {mossCaves: Array<{cx, cy, radiusX, radiusY}>, mossPlants: Array<{index, system, type}>}
+ * @returns {mossCaves: Array<{cx, cy, radiusX, radiusY}>, grassMossIndexes : number[]}
  */
   digMossCaves () {
     const VOID = NODES.VOID.code
     const caves = []
     const MAX_ATTEMPTS = 100
 
-    const plants = []
+    const grassMossIndexes = []
 
     for (let i = 0; i < this.#zoneRects.length; i++) {
       const rect = this.#zoneRects[i]
@@ -4086,7 +4185,7 @@ class WorldCarver {
 
       const rect2 = this.applyTiles(tiles)
       this.addExclusion(rect2)
-      this.#fillMossCaveWalls(cx, cy, radiusX, radiusY, plants)
+      this.#fillMossCaveWalls(cx, cy, radiusX, radiusY, grassMossIndexes)
 
       const guardTop = cy + 6
       const guardBottom = cy + radiusY + rectHalfH + 3
@@ -4098,21 +4197,21 @@ class WorldCarver {
       caves.push({cx, cy, radiusX, radiusY})
     }
 
-    return {mossCaves: caves, mossPlants: plants}
+    return {mossCaves: caves, grassMossIndexes}
   }
 
   /**
- * Tapisse les parois et le sol d'une Moss Cave de GRASSMOSS (sol) et MUD (parois).
- * La mousse pousse sur le sol (VOID au-dessus) et les parois latérales (VOID à gauche ou droite).
- * Elle ne pousse pas sur le plafond (VOID en dessous).
- *
- * @param {number} cx
- * @param {number} cy
- * @param {number} radiusX
- * @param {number} radiusY
- * @param {Array} plants - [OUT] Tableau accumulant les enregistrements plant à sauvegarder
- */
-  #fillMossCaveWalls (cx, cy, radiusX, radiusY, plants) {
+   * Tapisse les parois et le sol d'une Moss Cave de GRASSMOSS (sol) et MUD (parois).
+   * La mousse pousse sur le sol (VOID au-dessus) et les parois latérales (VOID à gauche ou droite).
+   * Elle ne pousse pas sur le plafond (VOID en dessous).
+   *
+   * @param {number} cx
+   * @param {number} cy
+   * @param {number} radiusX
+   * @param {number} radiusY
+   * @param {number[]} indexes - [OUT] Tableau accumulant les index des tuiles GRASSMOSS posées
+   */
+  #fillMossCaveWalls (cx, cy, radiusX, radiusY, indexes) {
     const VOID = NODES.VOID.code
     const GRASSMOSS = NODES.GRASSMOSS.code
     const MUD = NODES.MUD.code
@@ -4145,9 +4244,7 @@ class WorldCarver {
         if (hasVoidAbove || hasVoidLeft || hasVoidRight) {
           const sCode = seededRNG.randomGetPercent(90) ? GRASSMOSS : MUD
           worldBuffer.write(x, y, sCode)
-          if (sCode === GRASSMOSS) {
-            plants.push({kind: PLANT_KIND.NATURAL, type: PLANT_TYPE.NONE, naturalCode: GRASSMOSS, index: (y << 10) | x, deleted: false})
-          }
+          if (sCode === GRASSMOSS) indexes.push((y << 10) | x)
         }
         if (hasVoidAbove && !hasVoidBelow) {
           worldBuffer.write(x, y + 1, MUD)
@@ -4165,7 +4262,7 @@ class WorldCarver {
  * Protection TileGuard sur la moitié inférieure + marge de 2 tuiles.
  * Prérequis : initZoneRects(), initExclusions().
  *
- * @returns {mushroomCaves: Array<{cx, cy, radiusX, radiusY}>, mushroomPlants: Array<{index, system, type}>}
+ * @returns {mushroomCaves: Array<{cx, cy, radiusX, radiusY}>, grassMushroomIndexes: number[]}
  */
   digMushroomCaves () {
     const VOID = NODES.VOID.code
@@ -4174,7 +4271,7 @@ class WorldCarver {
     const MAX_ATTEMPTS = 100
 
     const caves = []
-    const plants = []
+    const grassMushroomIndexes = []
 
     for (let i = 0; i < this.#zoneRects.length; i++) {
       const rect = this.#zoneRects[i]
@@ -4199,7 +4296,7 @@ class WorldCarver {
       const rect2 = this.applyTiles(tiles)
       this.addExclusion(rect2)
 
-      this.#fillFernMushroomCaveFloor(cx, cy, radiusX, GRASSMUSHROOM, HUMUS, plants)
+      this.#fillFernMushroomCaveFloor(cx, cy, radiusX, GRASSMUSHROOM, HUMUS, grassMushroomIndexes)
 
       // tileGuard.addNoisyRect(cx, cy + radiusY / 2, radiusX + 2, radiusX + 4, radiusY / 2 + 2, radiusY / 2 + 4, 0.8, PERLIN_OFFSET_MUSHROOM)
 
@@ -4214,7 +4311,7 @@ class WorldCarver {
       caves.push({cx, cy, radiusX, radiusY})
     }
 
-    return {mushroomCaves: caves, mushroomPlants: plants}
+    return {mushroomCaves: caves, grassMushroomIndexes}
   }
 
   /**
@@ -7500,6 +7597,8 @@ class PlantGenerator {
 
       placedGuard.addRect(coralX, y - 2, coralX + 1, y - 1)
 
+      if (soilIndex === 0) { console.error('??????????????') }
+
       this.#plants.push({
         id: uniqueIdGenerator.getUniqueId(),
         kind: PLANT_KIND.HERB,
@@ -7694,9 +7793,10 @@ class PlantGenerator {
  * Place les Giant Mushrooms dans les Mushroom Caves.
  * 80% des emplacements de deux tuiles GRASSMUSHROOM consécutives sont remplis.
  *
- * @param {Array<{kind, type, index, deleted}>} mushroomPlants — tuiles GRASSMUSHROOM
+ * @param {number[]} grassMushroomIndexes — index des tuiles GRASSMUSHROOM
  */
-  placeGiantMushrooms (mushroomPlants) {
+  placeGiantMushrooms (grassMushroomIndexes) {
+    const GRASSMUSHROOM = NODES.GRASSMUSHROOM.code
     const MUSH_H = 12
     const MUSH_W = 2
     const W = WORLD_WIDTH
@@ -7704,13 +7804,14 @@ class PlantGenerator {
 
     // Construire un Set des index GRASSMUSHROOM pour lookup O(1)
     const grassSet = new Set()
-    for (const plant of mushroomPlants) grassSet.add(plant.index)
+    for (const idx of grassMushroomIndexes) {
+      if (worldBuffer.readAt(idx) === GRASSMUSHROOM) grassSet.add(idx)
+    }
 
     // Set permettant de ne pas mettre deux champignons l'un sur l'autre
     const blocked = new Set()
 
-    for (const plant of mushroomPlants) {
-      const idx = plant.index
+    for (const idx of grassSet) {
       const x = idx & 0x3FF
       const y = idx >> 10
       const next = idx + 1 // tuile à droite, même y garanti si même row
@@ -7811,22 +7912,20 @@ class PlantGenerator {
    * Ensemence les tuiles de HUMUS par des spores provenant des MUSHROOMGRASS avoisinantes.
    * Crée des enregistrements SPREAD dans l'objectstore plant.
    *
-   * @param {Array<{kind, type, index, deleted}>} naturalPlants — tuiles NATURAL (filtrées par naturalCode)
+   * @param {number[]} grassIndexes — index des tuiles GRASSMUSHROOM
    * @param {number} naturalCode — code NATURAL (GRASSFOREST, GRASSJUNGLE, GRASSMUSHROOM)
    * @param {number} topsoilCode — code TOPSOIL (DIRT, SILT, HUMUS)
    * @param {number} gazCode     — code GAZ (SKY ou VOID)
    * @param {number} plantType   — PLANT_TYPE.FOREST, PLANT_TYPE.JUNGLE, ou PLANT_TYPE.NONE (mushroom)
    */
-  spreadMushroom (naturalPlants, naturalCode, topsoilCode, gazCode, plantType) {
+  spreadMushroom (grassIndexes, naturalCode, topsoilCode, gazCode, plantType) {
     const W = WORLD_WIDTH
     const HOUR_MS = 60_000 // 1h in-game = 60s temps réel
 
     const seeded = new Set() // évite les doublons
 
-    for (const plant of naturalPlants) {
-      if (plant.naturalCode !== naturalCode) continue // filtrage imparfait
-
-      const idx = plant.index
+    for (const idx of grassIndexes) {
+      if (worldBuffer.readAt(idx) !== naturalCode) continue
 
       // 6 voisins : gauche, droite, haut-gauche, bas-gauche, haut-droite, bas-droite
       const neighbors = [
@@ -8062,16 +8161,21 @@ class PlantGenerator {
   }
 
   /**
- * Place les fougères dans les Fern Caves.
- * 60% des spots valides sont peuplés.
- * Un spot est valide si les 8 tuiles F de l'image sont VOID.
- * Le nombre de fougères placées est retourné pour stockage en base (population constante).
- *
- * @param {Array<{kind, type, index, deleted}>} fernPlants — tuiles GRASSFERN
- * @returns {number} nombre de fougères placées
- */
-  placeFerns (fernsPlants) {
+   * Place les spots de fougères dans les Fern Caves.
+   * Chaque tuile GRASSFERN génère un record 'plant', y compris les spots invalides
+   * (present reste `false`, aucun tirage effectué pour ceux-ci). Un spot est valide si les
+   * 3 tuiles au-dessus du sol (colonne verticale, 1 tuile de large) sont VOID ; sur un spot
+   * valide, 80% de chance d'être present. L'espèce (parmi les 4) est tirée pour tous les
+   * spots, valides ou non, afin de garder une shape de record identique (monomorphe).
+   * La fougère occupe 1 tuile de sol (`soilIndex`) + 3 tuiles de VOID au-dessus. Le rectangle
+   * stocké (w:3, h:3) est plus large que cette occupation : centré horizontalement sur la
+   * tuile de sol (x-1 à x+1), il couvre les 3 tuiles de VOID pour permettre l'entrecroisement
+   * visuel des feuillages avec les fougères voisines (même mécanisme que Oak et Mahogany).
+   * @param {number[]} grassFernIndexes — index des tuiles GRASSFERN
+   */
+  placeFerns () {
     const VOID = NODES.VOID.code
+    const GRASSFERN = NODES.GRASSFERN.code
     const W = WORLD_WIDTH
 
     const FERN_TYPES = [
@@ -8081,50 +8185,45 @@ class PlantGenerator {
       {type: PLANT_TYPE.MISTFERN, itemId: 'fernM'}
     ]
 
+    // génération de la liste des tuiles GRASSFERN
+    const grassFernIndexes = worldBuffer.getTypeArray(GRASSFERN)
     let count = 0
 
-    for (const plant of fernsPlants) {
-      const idx = plant.index
-      const x = idx & 0x3FF
-      const y = idx >> 10
+    for (const soilIndex of grassFernIndexes) {
+      if (worldBuffer.readAt(soilIndex) !== GRASSFERN) continue
 
-      // Vérification des 8 tuiles F
-      if (worldBuffer.readAt(idx - W) !== VOID) continue // y-1, x
-      if (worldBuffer.readAt(idx - W * 2) !== VOID) continue // y-2, x
-      if (worldBuffer.readAt(idx - W * 3 - 1) !== VOID) continue // y-3, x-1
-      if (worldBuffer.readAt(idx - W * 3) !== VOID) continue // y-3, x
-      if (worldBuffer.readAt(idx - W * 3 + 1) !== VOID) continue // y-3, x+1
-      if (worldBuffer.readAt(idx - W * 4 - 1) !== VOID) continue // y-4, x-1
-      if (worldBuffer.readAt(idx - W * 4) !== VOID) continue // y-4, x
-      if (worldBuffer.readAt(idx - W * 4 + 1) !== VOID) continue // y-4, x+1
+      const x = soilIndex & 0x3FF
+      const y = soilIndex >> 10
 
-      // 60% de chance
-      if (!seededRNG.randomGetPercent(60)) continue
+      const valid = worldBuffer.readAt(soilIndex - W) === VOID &&
+        worldBuffer.readAt(soilIndex - W * 2) === VOID &&
+        worldBuffer.readAt(soilIndex - W * 3) === VOID &&
+        !placedGuard.has(soilIndex - W) &&
+        !placedGuard.has(soilIndex - W * 2) &&
+        !placedGuard.has(soilIndex - W * 3)
 
+      const present = valid && seededRNG.randomGetPercent(80)
+      if (present) placedGuard.addRect(x, y - 3, x, y - 1)
       const {type, itemId} = seededRNG.randomGetArrayValue(FERN_TYPES)
-      const soilIndex = idx
 
       this.#plants.push({
         id: uniqueIdGenerator.getUniqueId(),
         kind: PLANT_KIND.HERB,
         type,
-        index: soilIndex - W * 4,
+        index: soilIndex - W * 3,
         soilIndex,
         itemId,
         w: 3,
-        h: 4,
+        h: 3,
         x: x - 1,
-        y: y - 4,
-        bloom: true,
-        bloomTimestamp: null,
-        present: true,
+        y: y - 3,
+        present,
         deleted: false
       })
-      count++
+      if (present) count++
     }
 
-    if (IS_DEV) console.log(`   🔹 Ferns : ${count}`)
-    return count
+    if (IS_DEV) console.log(`   🔹 Ferns : ${count} / ${grassFernIndexes.length}`)
   }
 
   /**
@@ -8134,19 +8233,18 @@ class PlantGenerator {
    * La Velvetmoss occupe 1x1 tuile, s'interconnecte dans les 4 sens.
    * En temps réel, une mousse pousse tous les 2–3 jours in-game sur un spot libre.
    *
-   * @param {Array<{kind, type, index, naturalCode, deleted}>} mossPlants — tuiles GRASSMOSS
+   * @param {number[]} grassMossIndexes — index des tuiles GRASSMOSS
    */
-  placeMoss (mossPlants) {
+  placeMoss (grassMossIndexes) {
     const VOID = NODES.VOID.code
     const GRASSMOSS = NODES.GRASSMOSS.code
     const W = WORLD_WIDTH
     const occupied = new Set()
     let count = 0
 
-    for (const plant of mossPlants) {
-      if (plant.naturalCode !== GRASSMOSS) continue
+    for (const idx of grassMossIndexes) {
+      if (worldBuffer.readAt(idx) !== GRASSMOSS) continue
 
-      const idx = plant.index
       const x = idx & 0x3FF
       const y = idx >> 10
 
@@ -8189,7 +8287,7 @@ class PlantGenerator {
       })
       count++
     }
-    if (IS_DEV) console.log(`   🔹 Moss : ${count}`)
+    if (IS_DEV) console.log(`   🔹 Moss : ${count} / ${grassMossIndexes.length}`)
   }
 
   /**
@@ -8201,20 +8299,19 @@ class PlantGenerator {
    * Les deux espèces sont réparties aléatoirement à parts égales.
    * Pop : 8:30 in-game. Dépop : 21:30 in-game.
    *
-   * @param {Array<{kind, type, index, naturalCode, deleted}>} mushroomPlants — tuiles GRASSMUSHROOM
+   * @param {number[]} grassMushroomIndexes — index des tuiles GRASSMUSHROOM
    * @param {number} initialWeather — weather du premier jour (WEATHER_TYPE_CODE)
    */
-  placeCaveMushrooms (mushroomPlants, initialWeather, giantOccupied) {
+  placeCaveMushrooms (grassMushroomIndexes, initialWeather, giantOccupied) {
     const VOID = NODES.VOID.code
     const GRASSMUSHROOM = NODES.GRASSMUSHROOM.code
     const W = WORLD_WIDTH
     const sunny = initialWeather === WEATHER_TYPE_CODE.SUNNY
     let count = 0
 
-    for (const plant of mushroomPlants) {
-      if (plant.naturalCode !== GRASSMUSHROOM) continue
+    for (const idx of grassMushroomIndexes) {
+      if (worldBuffer.readAt(idx) !== GRASSMUSHROOM) continue
 
-      const idx = plant.index
       const x = idx & 0x3FF
       const y = idx >> 10
 
