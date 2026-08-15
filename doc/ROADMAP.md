@@ -29,9 +29,9 @@
 ### Images, sons et aide en ligne
 
 - corriger les icones dans weapon_32_32 : dague, épée, bow, boomrang
-- corriger les icones dans tool_32_32 :
+- corriger les icones dans handed_48_48 :
   - pickaxe : 6 restant
-  - hammer : 3 restant
+  - hammer : 2 restant
   - axe : 3 restant
   - canne à pêche : 6 restant
 - ajouter image des quatre triskels (copper, silver, gold et complet)
