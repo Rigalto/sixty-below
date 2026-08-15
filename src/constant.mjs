@@ -304,8 +304,6 @@ export const MICROTASK = {
   PARSNIP_SPOT_CHECK: {priority: 20, capacity: 10, taskName: 'onParsnipSpotCheck'}, // ajout d'un spot de parsnip
   BLOOM_PARSNIP: {priority: 20, capacity: 4, taskName: 'bloomParsnip'}, // reset + repousse nocturne des parsnips
 
-
-
   BLOOM_AMBERMIRAGE: {priority: 20, capacity: 6, taskName: 'bloomAmbermirage'}, // pousse quotidienne à 10h00 (créneau 10h-14h)
   UNBLOOM_AMBERMIRAGE: {priority: 20, capacity: 2, taskName: 'unbloomAmbermirage'}, // flétrissement inconditionnel à 14h00
 
