@@ -4450,8 +4450,6 @@ class FernSystem {
     // EventBus
     this.onTileChangedFern = this.onTileChangedFern.bind(this)
     eventBus.on('world/tile-changed', this.onTileChangedFern)
-    // Micro-tâche
-    this.onFernSpotCheck = this.onFernSpotCheck.bind(this)
   }
 
   /**
@@ -4583,7 +4581,7 @@ class FernSystem {
    * Liaison EventBus : 'world/tile-changed'.
    * — Détruit la fougère présente si une des 3 tuiles VOID au-dessus de son sol n'est plus libre.
    * — Supprime le spot (et la fougère éventuellement dessus) si sa tuile sol n'est plus GRASSFERN.
-   * — Enqueue onFernSpotCheck si une tuile devient GRASSFERN.
+   * — Appel onFernSpotCheck si une tuile devient GRASSFERN.
    * Relit les tuiles réelles avant d'agir.
    * @param {{tileIndex: number, tileOldCode: number, tileNewCode: number}} payload
    */
@@ -4614,10 +4612,7 @@ class FernSystem {
     }
 
     // Cas 3 — nouvelle tuile GRASSFERN : nouveau spot, sans fougère dessus
-    if (tileNewCode === GRASSFERN) {
-      const {priority, capacity} = MICROTASK.FERN_SPOT_CHECK
-      microTasker.enqueue(this.onFernSpotCheck, priority, capacity, tileIndex)
-    }
+    if (tileNewCode === GRASSFERN) this.onFernSpotCheck(tileIndex)
   }
 
   /**

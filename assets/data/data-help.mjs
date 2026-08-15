@@ -1634,6 +1634,18 @@ Fern Grass covers the floor of [[Fern Cave]]s. Giant ferns grow from this soft, 
 
 <hr>
 
+**Growing Fern Grass**
+
+Fern Grass never spreads on its own.
+The only way to create it is by sowing a [[item:fernSpore]] on [[node:humus]].
+
+* Place a [[item:fernSpore]] in the [[Hotbar]] ([[Inventory]] Panel [I])
+* Select its slot, then left-click a [[node:humus]] tile with an empty tile directly above it — the spore is consumed
+* The tile has to be in [[Ranges|Interaction Range]], this range can be buffed
+* The transformation is instantaneous
+
+<hr>
+
 **Mining** ⏳
 
 Mining Tool: <<itemStar|pickaxeSilver>> or better
@@ -1656,7 +1668,7 @@ See [[Foraging]], [[Foraging Tools]] and [[Foraging Buffs]] for details.
 
 **Tips**
 
-* _Fern Grass only grows in [[Fern Cave]]s — it cannot spread outside its native environment._ ⏳
+* _Fern Grass never spreads on its own — sow a [[item:fernSpore]] on [[node:humus]] to grow it anywhere, even outside a natural [[Fern Cave]]._
   `
   },
   {
@@ -1907,6 +1919,18 @@ Humus is a rich organic topsoil found across all biomes, though it is most abund
 
 <hr>
 
+**Growing Fern Grass**
+
+Humus never transforms on its own — [[node:grassFern]] does not spread naturally onto it.
+Sowing a [[item:fernSpore]] is the only way to create a [[node:grassFern]] tile.
+
+* Place a [[item:fernSpore]] in the [[Hotbar]] ([[Inventory]] Panel [I])
+* Select its slot, then left-click a [[node:humus]] tile with an empty tile directly above it — the spore is consumed
+* The tile has to be in [[Ranges|Interaction Range]], this range can be buffed
+* The transformation into [[node:grassFern]] is instantaneous
+
+<hr>
+
 **Mining**
 
 Mining Tool: <<itemStar|pickaxeCopper>> or better
@@ -1921,9 +1945,12 @@ See [[Mining]], [[Mining Tools]] and [[Mining Buffs]] for details.
 
 * {{recipe:humusBlock}}
 
+<hr>
+
 **Tips**
 
 * _Humus is the only topsoil found in both Forest and Jungle biomes at significant depth._
+* _Sow a [[item:fernSpore]] on an isolated Humus patch to grow Fern Grass without hunting down a natural [[Fern Cave]]._
   `
   },
   {
@@ -2355,7 +2382,7 @@ The table below details the [[Metal Fittings]] available for each material, incl
   },
   {
     title: 'Metal Fittings',
-    category: ['Forging'],
+    category: ['Crafting Ingredients'],
     content: `
 **Description**
 
