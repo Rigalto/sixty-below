@@ -1012,6 +1012,13 @@ export const ABYSSHORN_COUNT = 120
 export const INFERNCAP_COUNT = 180
 export const GRAVELWEED_COUNT = 220
 
+export const FERN_TYPES = [
+  {type: PLANT_TYPE.SHADOWFERN, itemId: 'fernS'},
+  {type: PLANT_TYPE.CRIMSONFROND, itemId: 'fernC'},
+  {type: PLANT_TYPE.GOLDENVEIL, itemId: 'fernG'},
+  {type: PLANT_TYPE.MISTFERN, itemId: 'fernM'}
+]
+
 // Substrats valides pour Gravelweed — Surface (natural/topsoil/substrat) + Underground natif,
 // 3 biomes confondus, aucun filtre de biome à l'usage (cf. GravelweedSystem, placeGravelweeds)
 // SAND est volontairement omis.
