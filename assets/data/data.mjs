@@ -80,7 +80,7 @@ export const NODES = {
     image: 'natural_16_16+3',
     help: 'Fern Grass',
     mining: {speed: 500, items: [{item: 'blockHumus', count: 1}, {item: 'fernSpore', count: 0.5, buffs: ['lucky:600']}, {item: 'fernLeaf', count: 0.2, buffs: ['lucky:900']}]},
-    foraging: {speed: 2400, items: [{item: 'slug', count: 0.04, buffs: ['lucky:950', 'rainy:850']}, {item: 'goldSlug', count: 0.01, buffs: ['+lucky']}]}
+    foraging: {speed: 2400, items: [{item: 'fernLeaf', count: 0.5, buffs: ['lucky:50']}, {item: 'fernSpore', count: 0.6, buffs: ['lucky:40']}, {item: 'slug', count: 0.04, buffs: ['lucky:950', 'rainy:850']}, {item: 'goldSlug', count: 0.01, buffs: ['+lucky']}]}
   },
   GRASSMOSS: {
     code: 34,
@@ -619,7 +619,7 @@ export const ITEMS = {
   fernG: {name: 'Goldenveil', type: 0, stype: 'herb', star: 3, image: null, placed: 'placed_48_48-0-1', speed: 1900, foraging: {speed: 500, items: [{item: 'fernLeaf', count: 1, buffs: ['lucky:50', 'rainy:60', 'windy:40']}, {item: 'fernSpore', count: 0.75, buffs: ['lucky:30', 'rainy:40', 'windy:20']}]}, help: 'Ferns', tooltip: '???'},
   fernM: {name: 'Mistfern', type: 0, stype: 'herb', star: 3, image: null, placed: 'placed_48_48-1-1', speed: 1900, foraging: {speed: 500, items: [{item: 'fernLeaf', count: 1, buffs: ['lucky:50', 'rainy:60', 'windy:40']}, {item: 'fernSpore', count: 0.75, buffs: ['lucky:30', 'rainy:40', 'windy:20']}]}, help: 'Ferns', tooltip: '???'},
   fernLeaf: {name: 'Fern Leaf', type: 0, stype: 'herb', star: 4, image: 'foraged_32_32-1-6', help: 'Ferns', tooltip: 'Crafting Material for Food & Potions'},
-  fernSpore: {name: 'Fern Spore', type: 0, stype: 'herb', star: 4, image: 'foraged_32_32-2-6', help: 'Ferns', tooltip: 'Crafting Material for Potions'},
+  fernSpore: {name: 'Fern Spore', type: ITEM_TYPE.SEED | ITEM_TYPE.PLACABLE, stype: 'herb', star: 4, image: 'foraged_32_32-2-6', help: 'Ferns', tooltip: 'Crafting Material for Potions'},
 
   coralR: {name: 'Sunburst Brain Coral', type: 0, stype: 'herb', star: 2, image: null, placed: 'placed_32_32-0-1', speed: 1900, foraging: {speed: 500, items: [{item: 'coral', count: 1}, {item: 'oyster', count: 0.12, buffs: ['lucky:100', 'rainy:300']}]}, help: 'Corals', tooltip: 'Crafting Material for Potions and Furniture'},
   coralP: {name: 'Starfire Pillar Coral', type: 0, stype: 'herb', star: 2, image: null, placed: 'placed_32_32-1-1', speed: 1900, foraging: {speed: 500, items: [{item: 'coral', count: 1}, {item: 'oyster', count: 0.12, buffs: ['lucky:100', 'rainy:300']}]}, help: 'Corals', tooltip: 'Crafting Material for Potions and Furniture'},

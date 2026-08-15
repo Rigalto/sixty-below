@@ -1,5 +1,6 @@
 // ecosystem.mjs — FloraManager - OakSystem - MahoganySystem - CoconutSystem - ThornspineSystem
-// SunflowerSystem - ParsnipSystem - OleanderSystem - MandrakeSystem - BambooSystem - PricklepadSystem - AmbermirageSystem
+// SunflowerSystem - ParsnipSystem - OleanderSystem - MandrakeSystem - BambooSystem
+// PricklepadSystem - AmbermirageSystem - FernSystem
 // CobwebSystem - HiveSystem - SatansCubeSystem - SneakthornSystem - CursedcrownSystem
 // SpreadForestSystem - SpreadJungleSystem - CoralSystem - BloodmoonSystem - GravelweedSystem
 // SampleSystem
@@ -7,7 +8,7 @@
 import {WORLD_WIDTH, WORLD_HEIGHT, MICROTASK, TOPSOIL_Y_SKY_SURFACE, TOPSOIL_Y_SURFACE_UNDER, TOPSOIL_Y_UNDER_CAVERNS, TOPSOIL_Y_CAVERNS_MID, SEA_LEVEL} from './constant.mjs'
 import {database, uniqueIdGenerator} from './database.mjs'
 import {eventBus, seededRNG, blockedTiles, microTasker, taskScheduler} from './utils.mjs'
-import {NODES, ITEMS, PLANT_KIND, PLANT_TYPE, PLANT_SYSTEM_LOOKUP, ALL_PLANT_SYSTEMS, COBWEB_GROWTH_DELAY_MS, SUNFLOWER_RATE, PARSNIP_RATE, AMBERMIRAGE_PCENT, COCONUT_CYCLE_DELAY, TREE_IMAGES, THORNSPINE_JUNCTIONS, THORNSPINE_SIZES, THORNSPINE_UNBLOOM_PCENT, THORNSPINE_BLOOM_PCENT, CORAL_TYPES, GRAVELWEED_SOIL} from '../assets/data/data.mjs'
+import {NODES, ITEMS, PLANT_KIND, PLANT_TYPE, PLANT_SYSTEM_LOOKUP, ALL_PLANT_SYSTEMS, COBWEB_GROWTH_DELAY_MS, SUNFLOWER_RATE, PARSNIP_RATE, AMBERMIRAGE_PCENT, COCONUT_CYCLE_DELAY, TREE_IMAGES, THORNSPINE_JUNCTIONS, THORNSPINE_SIZES, THORNSPINE_UNBLOOM_PCENT, THORNSPINE_BLOOM_PCENT, CORAL_TYPES, GRAVELWEED_SOIL, FERN_TYPES} from '../assets/data/data.mjs'
 import {IMAGE_CACHE} from './assets.mjs'
 import {saveManager} from './persistence.mjs'
 import {chunkManager} from './world.mjs'
@@ -4416,6 +4417,271 @@ class AmbermirageSystem {
   }
 }
 export const ambermirageSystem = new AmbermirageSystem()
+
+/* ====================================================================================================
+   FERN SYSTEM
+   ====================================================================================================
+
+   Singleton : fernSystem.
+
+   Gère les spots de fougères sur les tuiles GRASSFERN des Fern Caves. Patron "Spot" (comme
+   SunflowerSystem/ParsnipSystem) : un spot est créé une fois pour toutes pour chaque tuile
+   GRASSFERN (présente ou non), ancré à vie sur cette tuile — jamais de recherche d'un nouvel
+   emplacement. Le foraging détruit uniquement la plante (present=false), pas le spot ; aucun
+   mécanisme de repousse à ce jour (à venir : système dédié de mise à jour de la population).
+
+   Occupation physique (blockedTiles, détection tile-changed) : 1 colonne × 3 tuiles VOID
+   directement au-dessus du soilIndex. Le rectangle stocké sur le record (w:3, h:3, centré
+   x-1 à x+1) est plus large — il ne sert qu'au byTile/render, pour l'entrecroisement visuel
+   des feuillages avec les fougères voisines (même mécanisme que Oak et Mahogany).
+
+   ==================================================================================================== */
+
+class FernSystem {
+  byTile = new Map() // Map<tileIndex, record> — public : membership O(1) + lookup record (zone visuelle élargie w:3×h:3)
+  #list = [] // record[] — tous les spots (présents ou non)
+  #byChunk = new Map() // Map<chunkKey, Set> — lookup spatial pour onPreloadChunksChanged
+  #bySoil = new Map() // Map<soilIndex, record> — fougères présentes : détection minage de la tuile sol
+  #spotsBySoil = new Map() // Map<soilIndex, record> — tous les spots (présents ou non) : suppression O(1)
+  #displayed = new Set() // Set<record> — spots dans les chunks preload (cible render)
+  #images = null // {[type]: image} — 4 sprites (Shadowfern/Crimsonfrond/Goldenveil/Mistfern), peuplé dans init()
+
+  constructor () {
+    // EventBus
+    this.onTileChangedFern = this.onTileChangedFern.bind(this)
+    eventBus.on('world/tile-changed', this.onTileChangedFern)
+    // Micro-tâche
+    this.onFernSpotCheck = this.onFernSpotCheck.bind(this)
+  }
+
+  /**
+   * Réinitialise toutes les structures. Appelé en début de session, avant toute hydratation.
+   */
+  init () {
+    this.byTile.clear()
+    this.#list.length = 0
+    this.#byChunk.clear()
+    this.#bySoil.clear()
+    this.#spotsBySoil.clear()
+    this.#displayed.clear()
+
+    this.#images = {
+      [PLANT_TYPE.SHADOWFERN]: ITEMS.fernS.placed,
+      [PLANT_TYPE.CRIMSONFROND]: ITEMS.fernC.placed,
+      [PLANT_TYPE.GOLDENVEIL]: ITEMS.fernG.placed,
+      [PLANT_TYPE.MISTFERN]: ITEMS.fernM.placed
+    } // après hydratation
+  }
+
+  /**
+   * Enregistre un spot et peuple les structures internes.
+   * @param {object} record — record HERB/{SHADOWFERN,CRIMSONFROND,GOLDENVEIL,MISTFERN} (deleted=false garanti par l'appelant)
+   */
+  initPlant (record) {
+    this.#list.push(record)
+    this.#spotsBySoil.set(record.soilIndex, record)
+    if (!record.present) return
+
+    addToByTile(this.byTile, record)
+    addToByChunk(this.#byChunk, record)
+    this.#bySoil.set(record.soilIndex, record)
+
+    const x = record.soilIndex & 0x3FF
+    const y = (record.soilIndex >> 10) - 3
+    blockedTiles.blockPlacementRect(x, y, 1, 3)
+  }
+
+  /**
+   * Reconstruit #displayed depuis les chunks preload de la caméra.
+   * @param {Set<number>} preloadChunks
+   */
+  onPreloadChunksChanged (preloadChunks) {
+    buildDisplayed(this.#displayed, this.#byChunk, preloadChunks)
+  }
+
+  /**
+   * Dessine les fougères visibles et présentes sur le contexte transformé, sprite sélectionné
+   * selon l'espèce (record.type).
+   * @param {CanvasRenderingContext2D} ctx — contexte déjà transformé (caméra appliquée)
+   */
+  render (ctx) {
+    for (const record of this.#displayed) {
+      const img = this.#images[record.type]
+      const pxX = record.x << 4
+      const pxY = record.y << 4
+      ctx.drawImage(IMAGE_CACHE[img.imgIndex], img.sx, img.sy, img.sw, img.sh, pxX, pxY, img.sw, img.sh)
+    }
+  }
+
+  /**
+   * Traite le foraging réussi : détruit la fougère présente, le spot est conservé.
+   * Le loot est géré en commun par ForagingManager — cette méthode ne gère que l'état de la plante.
+   * @param {object} record
+   */
+  onForaged (record) {
+    this.#destroyPresent(record)
+  }
+
+  /**
+   * Retourne le record de fougère couvrant la tuile donnée, ou null.
+   * @param {number} tileIndex — (y << 10) | x
+   * @returns {object|null}
+   */
+  getPlantAt (tileIndex) {
+    return this.byTile.get(tileIndex) ?? null
+  }
+
+  /**
+   * Indique si le record est actuellement présent (forageable).
+   * @param {object} record
+   * @returns {boolean}
+   */
+  isPresent (record) { return record.present }
+
+  /**
+   * Détruit une fougère présente sans loot : retire byTile/#byChunk/#bySoil/#displayed,
+   * débloque la colonne physique (1×3) au-dessus du sol, persiste. Le spot est conservé
+   * (present=false), aucune replanification de repousse à ce jour.
+   * Guard : no-op si record.present est déjà false.
+   * @param {object} record
+   */
+  #destroyPresent (record) {
+    if (!record.present) return
+
+    record.present = false
+    removeFromByTile(this.byTile, record)
+    removeFromByChunk(this.#byChunk, record)
+    this.#bySoil.delete(record.soilIndex)
+    this.#displayed.delete(record)
+
+    const x = record.soilIndex & 0x3FF
+    const y = (record.soilIndex >> 10) - 3
+    blockedTiles.unblockPlacementRect(x, y, 1, 3)
+
+    saveManager.queueStaticUpdate({storeName: 'plant', record})
+  }
+
+  /**
+   * Retire un spot de toutes les structures mémoire et le marque deleted en DB.
+   * Détruit la fougère présente au préalable si nécessaire.
+   * @param {object} record
+   */
+  #removeSpot (record) {
+    this.#destroyPresent(record)
+    const list = this.#list
+    const idx = list.indexOf(record)
+    if (idx !== -1) {
+      list[idx] = list[list.length - 1]
+      list.length--
+    }
+    this.#spotsBySoil.delete(record.soilIndex)
+    record.deleted = true
+    saveManager.queueStaticUpdate({storeName: 'plant', record})
+  }
+
+  /**
+   * Liaison EventBus : 'world/tile-changed'.
+   * — Détruit la fougère présente si une des 3 tuiles VOID au-dessus de son sol n'est plus libre.
+   * — Supprime le spot (et la fougère éventuellement dessus) si sa tuile sol n'est plus GRASSFERN.
+   * — Enqueue onFernSpotCheck si une tuile devient GRASSFERN.
+   * Relit les tuiles réelles avant d'agir.
+   * @param {{tileIndex: number, tileOldCode: number, tileNewCode: number}} payload
+   */
+  onTileChangedFern ({tileIndex, tileOldCode, tileNewCode}) {
+    const GRASSFERN = NODES.GRASSFERN.code
+    const VOID = NODES.VOID.code
+    const W = WORLD_WIDTH
+
+    // Cas 1 — tuile du corps : une des 3 tuiles VOID au-dessus du sol devient autre chose
+    if (tileNewCode !== VOID) {
+      let record = this.#bySoil.get(tileIndex + W)
+      if (record === undefined) record = this.#bySoil.get(tileIndex + 2 * W)
+      if (record === undefined) record = this.#bySoil.get(tileIndex + 3 * W)
+
+      if (record !== undefined) {
+        const rx = record.soilIndex & 0x3FF
+        const ry = (record.soilIndex >> 10) - 3
+        if (!chunkManager.isRectCode(rx, ry, 1, 3, VOID)) this.#destroyPresent(record)
+      }
+    }
+
+    // Cas 2 — tuile sol : GRASSFERN perdu (fougère + spot)
+    if (tileOldCode === GRASSFERN) {
+      const record = this.#spotsBySoil.get(tileIndex)
+      if (record !== undefined && chunkManager.getTileAt(record.soilIndex) !== GRASSFERN) {
+        this.#removeSpot(record)
+      }
+    }
+
+    // Cas 3 — nouvelle tuile GRASSFERN : nouveau spot, sans fougère dessus
+    if (tileNewCode === GRASSFERN) {
+      const {priority, capacity} = MICROTASK.FERN_SPOT_CHECK
+      microTasker.enqueue(this.onFernSpotCheck, priority, capacity, tileIndex)
+    }
+  }
+
+  /**
+   * Microtâche : enregistre un nouveau spot fougère pour une tuile devenue GRASSFERN, sans
+   * fougère dessus (present=false). Espèce tirée immédiatement (shape monomorphe, comme à la
+   * génération) mais sans effet tant que present reste false. No-op si un spot existe déjà à
+   * ce soilIndex, ou si la tuile n'est plus GRASSFERN entre l'émission et l'exécution.
+   * @param {number} soilIndex
+   */
+  onFernSpotCheck (soilIndex) {
+    const GRASSFERN = NODES.GRASSFERN.code
+    if (chunkManager.getTileAt(soilIndex) !== GRASSFERN) return
+    if (this.#spotsBySoil.has(soilIndex)) return
+
+    const x = soilIndex & 0x3FF
+    const y = soilIndex >> 10
+    const W = WORLD_WIDTH
+    const {type, itemId} = seededRNG.randomGetArrayValue(FERN_TYPES)
+
+    const record = {
+      id: uniqueIdGenerator.getUniqueId(),
+      kind: PLANT_KIND.HERB,
+      type,
+      index: soilIndex - 3 * W,
+      soilIndex,
+      itemId,
+      w: 3,
+      h: 3,
+      x: x - 1,
+      y: y - 3,
+      present: false,
+      deleted: false
+    }
+    this.#list.push(record)
+    this.#spotsBySoil.set(soilIndex, record)
+    saveManager.queueStaticUpdate({storeName: 'plant', record})
+  }
+
+  // ///// //
+  // DEBUG //
+  // ///// //
+
+  /**
+   * DEBUG — Affiche un cercle vert au centre de la tuile sous chaque spot enregistré dans #list.
+   * Vérifie la cohérence avec #spotsBySoil (même cardinal attendu).
+   * @param {CanvasRenderingContext2D} ctx — contexte déjà transformé (caméra appliquée)
+   */
+  debugRenderSpots (ctx) {
+    ctx.save()
+    ctx.fillStyle = 'rgba(0, 200, 100, 0.7)'
+    for (const record of this.#list) {
+      const cx = ((record.soilIndex & 0x3FF) << 4) + 8
+      const cy = ((record.soilIndex >> 10) << 4) + 8
+      ctx.beginPath()
+      ctx.arc(cx, cy, 4, 0, 6.2832)
+      ctx.fill()
+    }
+    if (this.#list.length !== this.#spotsBySoil.size) {
+      console.warn(`FernSystem: #list(${this.#list.length}) !== #spotsBySoil(${this.#spotsBySoil.size})`)
+    }
+    ctx.restore()
+  }
+}
+export const fernSystem = new FernSystem()
 
 /* ====================================================================================================
    OAK SYSTEM
