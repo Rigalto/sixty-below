@@ -8195,7 +8195,7 @@ class PlantGenerator {
         !placedGuard.has(soilIndex - W * 2) &&
         !placedGuard.has(soilIndex - W * 3)
 
-      const present = valid && seededRNG.randomGetPercent(80)
+      const present = valid && seededRNG.randomGetPercent(50)
       if (present) placedGuard.addRect(x, y - 3, x, y - 1)
       const {type, itemId} = seededRNG.randomGetArrayValue(FERN_TYPES)
 
