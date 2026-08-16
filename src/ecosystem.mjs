@@ -8,7 +8,7 @@
 import {WORLD_WIDTH, WORLD_HEIGHT, MICROTASK, TOPSOIL_Y_SKY_SURFACE, TOPSOIL_Y_SURFACE_UNDER, TOPSOIL_Y_UNDER_CAVERNS, TOPSOIL_Y_CAVERNS_MID, SEA_LEVEL} from './constant.mjs'
 import {database, uniqueIdGenerator} from './database.mjs'
 import {eventBus, seededRNG, blockedTiles, microTasker, taskScheduler} from './utils.mjs'
-import {NODES, ITEMS, PLANT_KIND, PLANT_TYPE, PLANT_SYSTEM_LOOKUP, ALL_PLANT_SYSTEMS, COBWEB_GROWTH_DELAY_MS, SUNFLOWER_RATE, PARSNIP_RATE, AMBERMIRAGE_PCENT, COCONUT_CYCLE_DELAY, TREE_IMAGES, THORNSPINE_JUNCTIONS, THORNSPINE_SIZES, THORNSPINE_UNBLOOM_PCENT, THORNSPINE_BLOOM_PCENT, CORAL_TYPES, GRAVELWEED_SOIL, FERN_TYPES} from '../assets/data/data.mjs'
+import {NODES, ITEMS, PLANT_KIND, PLANT_TYPE, PLANT_SYSTEM_LOOKUP, ALL_PLANT_SYSTEMS, COBWEB_GROWTH_DELAY_MS, SUNFLOWER_RATE, PARSNIP_RATE, AMBERMIRAGE_PCENT, COCONUT_CYCLE_DELAY, TREE_IMAGES, THORNSPINE_JUNCTIONS, THORNSPINE_SIZES, THORNSPINE_UNBLOOM_PCENT, THORNSPINE_BLOOM_PCENT, CORAL_TYPES, GRAVELWEED_SOIL, FERN_TYPES, FERN_TOGGLE_PCENT, FERN_POPULATION_DELAY_MS} from '../assets/data/data.mjs'
 import {IMAGE_CACHE} from './assets.mjs'
 import {saveManager} from './persistence.mjs'
 import {chunkManager} from './world.mjs'
@@ -4431,10 +4431,7 @@ export const ambermirageSystem = new AmbermirageSystem()
    mécanisme de repousse à ce jour (à venir : système dédié de mise à jour de la population).
 
    Occupation physique (blockedTiles, détection tile-changed) : 1 colonne × 3 tuiles VOID
-   directement au-dessus du soilIndex. Le rectangle stocké sur le record (w:3, h:3, centré
-   x-1 à x+1) est plus large — il ne sert qu'au byTile/render, pour l'entrecroisement visuel
-   des feuillages avec les fougères voisines (même mécanisme que Oak et Mahogany).
-
+   directement au-dessus du soilIndex.
    ==================================================================================================== */
 
 class FernSystem {
@@ -4450,6 +4447,10 @@ class FernSystem {
     // EventBus
     this.onTileChangedFern = this.onTileChangedFern.bind(this)
     eventBus.on('world/tile-changed', this.onTileChangedFern)
+    this.onFirstLoopFern = this.onFirstLoopFern.bind(this)
+    eventBus.on('time/first-loop', this.onFirstLoopFern)
+    // TaskScheduler
+    this.fernPopulationTick = this.fernPopulationTick.bind(this)
   }
 
   /**
@@ -4484,10 +4485,11 @@ class FernSystem {
     addToByChunk(this.#byChunk, record)
     this.#bySoil.set(record.soilIndex, record)
 
-    const x = record.soilIndex & 0x3FF
-    const y = (record.soilIndex >> 10) - 3
-    blockedTiles.blockPlacementRect(x, y, 1, 3)
+    blockedTiles.blockPlacementRect(record.index & 0x3FF, record.index >> 10, record.w, record.h)
   }
+
+  /** Liaison EventBus : 'time/first-loop' — démarre la boucle de régulation de population. */
+  onFirstLoopFern () { this.#schedulePopulation() }
 
   /**
    * Reconstruit #displayed depuis les chunks preload de la caméra.
@@ -4552,9 +4554,7 @@ class FernSystem {
     this.#bySoil.delete(record.soilIndex)
     this.#displayed.delete(record)
 
-    const x = record.soilIndex & 0x3FF
-    const y = (record.soilIndex >> 10) - 3
-    blockedTiles.unblockPlacementRect(x, y, 1, 3)
+    blockedTiles.unblockPlacementRect(record.index & 0x3FF, record.index >> 10, record.w, record.h)
 
     saveManager.queueStaticUpdate({storeName: 'plant', record})
   }
@@ -4597,9 +4597,9 @@ class FernSystem {
       if (record === undefined) record = this.#bySoil.get(tileIndex + 3 * W)
 
       if (record !== undefined) {
-        const rx = record.soilIndex & 0x3FF
-        const ry = (record.soilIndex >> 10) - 3
-        if (!chunkManager.isRectCode(rx, ry, 1, 3, VOID)) this.#destroyPresent(record)
+        const rx = record.index & 0x3FF
+        const ry = record.index >> 10
+        if (!chunkManager.isRectCode(rx, ry, record.w, record.h, VOID)) this.#destroyPresent(record)
       }
     }
 
@@ -4639,7 +4639,7 @@ class FernSystem {
       index: soilIndex - 3 * W,
       soilIndex,
       itemId,
-      w: 3,
+      w: 1,
       h: 3,
       x: x - 1,
       y: y - 3,
@@ -4648,6 +4648,67 @@ class FernSystem {
     }
     this.#list.push(record)
     this.#spotsBySoil.set(soilIndex, record)
+    saveManager.queueStaticUpdate({storeName: 'plant', record})
+  }
+
+  /** Liaison EventBus : 'time/first-loop' — démarre la boucle de régulation de population. */
+  onFirstLoopFern () { this.#schedulePopulation() }
+
+  /**
+   * Planifie le prochain passage de régulation. Délai de base FERN_POPULATION_DELAY_MS,
+   * modulé par un facteur aléatoire ×[0.8, 1.2[ pour éviter un rythme mécanique.
+   */
+  #schedulePopulation () {
+    const delay = (FERN_POPULATION_DELAY_MS * seededRNG.randomGetRealMinMax(0.8, 1.2)) | 0
+    const {priority, capacity} = MICROTASK.FERN_POPULATION
+    taskScheduler.enqueue('fern-population', delay, this.fernPopulationTick, priority, capacity)
+  }
+
+  /**
+   * Callback TaskScheduler : régule organiquement la population de fougères vers un équilibre
+   * ~50% present, sans jamais parcourir #list. Tire 1 spot au hasard
+   * (accès O(1)) et bascule avec probabilité FERN_TOGGLE_PCENT — présent → disparition
+   * naturelle (pas de loot), absent → pousse. Même probabilité dans les deux sens : le point
+   * d'équilibre est 50% quel que soit le taux d'occupation courant (marche aléatoire à
+   * détalancée). Se replanifie systématiquement.
+   */
+  fernPopulationTick () {
+    if (this.#list.length > 0 && seededRNG.randomGetPercent(FERN_TOGGLE_PCENT)) {
+      const record = seededRNG.randomGetArrayValue(this.#list)
+      if (record.present) this.#destroyPresent(record)
+      else this.#growSpot(record)
+    }
+    this.#schedulePopulation()
+  }
+
+  /**
+   * Fait pousser une fougère sur un spot actuellement absent : revalide les tuiles réelles
+   * (colonne 1×3 encore VOID et non bloquée), tire une espèce — le type n'est jamais fixe pour
+   * un spot, il est retiré à chaque pousse —, enregistre dans byTile/#byChunk/#bySoil/#displayed,
+   * bloque la colonne physique, persiste. No-op si déjà present ou si la colonne n'est plus
+   * entièrement libre.
+   * @param {object} record
+   */
+  #growSpot (record) {
+    if (record.present) return
+
+    const VOID = NODES.VOID.code
+    const rx = record.index & 0x3FF
+    const ry = record.index >> 10
+    if (!chunkManager.isRectCode(rx, ry, record.w, record.h, VOID)) return
+    if (!blockedTiles.canPlaceRect(rx, ry, record.w, record.h)) return
+
+    const {type, itemId} = seededRNG.randomGetArrayValue(FERN_TYPES)
+    record.type = type
+    record.itemId = itemId
+    record.present = true
+
+    addToByTile(this.byTile, record)
+    addToByChunk(this.#byChunk, record)
+    this.#bySoil.set(record.soilIndex, record)
+    blockedTiles.blockPlacementRect(rx, ry, record.w, record.h)
+    addToDisplayed(this.#displayed, record)
+
     saveManager.queueStaticUpdate({storeName: 'plant', record})
   }
 
