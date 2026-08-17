@@ -90,8 +90,7 @@ export const NODES = {
     color: '#c1c186',
     help: 'Moss Grass',
     image: 'natural_16_16+4',
-    mining: {speed: 500, items: [{item: 'blockSilt', count: 1, lucky: 2.5}]},
-    foraging: {speed: 2400, items: [{item: 'slug', count: 0.04, buffs: ['lucky:950', 'rainy:850']}, {item: 'goldSlug', count: 0.01, buffs: ['+lucky']}]}
+    mining: {speed: 500, items: [{item: 'blockMud', count: 1, buffs: ['lucky:80']}]}
   },
   WEB: {code: 35, name: 'Cobweb', type: NODE_TYPE.WEB | NODE_TYPE.GAZ, star: 1, color: '#788696', image: 'substrat_16_16+10', mining: {speed: 500, items: [{item: 'silk', count: 1}, {item: 'eggSpider', count: '1-3-0.08'}]}, help: 'Cobweb'},
 
@@ -610,7 +609,7 @@ export const ITEMS = {
   bloodmoon: {name: 'Bloodmoon', type: 0, stype: 'herb', star: 2, image: 'foraged_32_32-0-4', placed: 'placed_16_32-4-0', placedLeft: 'placed_16_32-5-0', help: 'Bloodmoon', tooltip: '???', foraging: {speed: 1500, items: [{item: 'bloodmoon', count: '1-3'}, {item: 'bloodmoonSeed', count: 0.65}, {item: 'slug', count: 0.12, buffs: ['lucky:100', 'rainy:300']}]}},
   bloodmoonSeed: {name: 'Bloodmoon Seed', type: ITEM_TYPE.SEED | ITEM_TYPE.PLACABLE, stype: 'seed', star: 2, image: 'foraged_32_32-1-4', help: 'Bloodmoon', tooltip: '???'},
 
-  velvetmoss: {name: 'Velvetmoss', type: 0, stype: 'herb', star: 3, image: 'crafting_32_32-0-1', placed: 'fuws_32_32-2-3', speed: 1900, foraging: {speed: 500, items: [{item: 'velvetmoss', count: 1, rainy: 1.8, windy: 1.8}]}, help: 'Velvetmoss', tooltip: '???'},
+  velvetmoss: {name: 'Velvetmoss', type: 0, stype: 'herb', star: 3, image: 'foraged_32_32-3-6', placed: 'placed_16_16-5-3', foraging: {speed: 500, items: [{item: 'velvetmoss', count: 1, rainy: 1.8, windy: 1.8}]}, help: 'Velvetmoss', tooltip: '???'},
 
   // images OK
 
