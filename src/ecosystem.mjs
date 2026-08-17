@@ -4651,9 +4651,6 @@ class FernSystem {
     saveManager.queueStaticUpdate({storeName: 'plant', record})
   }
 
-  /** Liaison EventBus : 'time/first-loop' — démarre la boucle de régulation de population. */
-  onFirstLoopFern () { this.#schedulePopulation() }
-
   /**
    * Planifie le prochain passage de régulation. Délai de base FERN_POPULATION_DELAY_MS,
    * modulé par un facteur aléatoire ×[0.8, 1.2[ pour éviter un rythme mécanique.
