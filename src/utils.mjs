@@ -1114,6 +1114,36 @@ export const shuffleArray = (arr) => {
 export const capitalize = (str) => str.charAt(0).toUpperCase() + str.slice(1)
 
 /**
+ * Supprime un élément par son index en O(1) sans préserver l'ordre.
+ * @param {Array} arr
+ * @param {number} index
+ */
+export const removeIndexUnordered = (arr, index) => {
+  const lastIdx = arr.length - 1
+  if (index !== lastIdx) {
+    arr[index] = arr[lastIdx]
+  }
+  arr.length--
+}
+
+/**
+ * Recherche et supprime la première occurrence d'un élément en O(1) sans préserver l'ordre.
+ * @param {Array} arr
+ * @param {*} value
+ * @returns {boolean} true si l'élément a été trouvé et retiré
+ */
+export const removeValueUnordered = (arr, value) => {
+  const idx = arr.indexOf(value)
+  if (idx === -1) return false
+  const lastIdx = arr.length - 1
+  if (idx !== lastIdx) {
+    arr[idx] = arr[lastIdx]
+  }
+  arr.length--
+  return true
+}
+
+/**
  * Loot Table utilities — parseLootEntry / rollLoot
  *
  * Format d'une entrée : 'itemId:weight:count'

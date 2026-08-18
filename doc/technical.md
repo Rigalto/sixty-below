@@ -825,12 +825,23 @@ Ne jamais appeler `seededRNG` en mode déterministe depuis la game loop.
 | `intFract` | `(r: number): {int, fract}` | `{int: number, fract: number}` | Partie entière (`Math.floor`) et fractionnaire. `fract` toujours `>= 0`. |
 | `cosineInterpolation` | `(x: number, a: number, b: number): number` | `[a, b]` | Interpolation cosinus. `x=0` → `a`, `x=1` → `b`, monotone sur `[0, 1]`. |
 | `shuffleArray(arr): Array` | Mélange un tableau en place (algorithme Fisher-Yates). Utilise `seededRNG` pour la reproductibilité. Retourne le même tableau mélangé. |
+| removeIndexUnordered(arr, index) | Supprime un élément d'un Array par son index en $O(1)$ sans préserver l'ordre (swap-and-pop). |
+| removeValueUnordered(arr, value): boolean | Supprime un élément d'un Array par sa valeur sans préserver l'ordre. Renvoie true si l'élément a été retiré, sinon false. |
 | `capitalize` | `(str: string) → string` | Met le premier caractère en majuscule. Ex: `'hotbar'` → `'Hotbar'`. |
 | `parseLootCount` | `(countStr: string|number) → CountEntry` | Parse la partie count d'un item de loot. `CountEntry = {countMin, countMax, bonus, flags}`. `flags` 2 bits : bit0=hasRange, bit1=hasBonus. Accepte string ou number. |
 | `parseLootEntry` | `(str: string) → LootEntry` | Parse `'itemId:weight:count'` en `{itemId, weight, countMin, countMax, bonus, flags}`. `flags` 3 bits : bit0=hasRange, bit1=hasBonus, bit2=weightIs100. Délègue à `parseLootCount`. À appeler une seule fois au chargement. |
 | `parseLootBuffs` | `(arr?: string[]) → {buffs: {required: string[], forbidden: string[], modifiers: {name,value}[]}, buffList: string[]}` | Pré-parse les strings buffs en structure runtime. `buffList` = union dédupliquée des noms. Retourne structures vides si `arr` absent. |
 | `rollLoot` | `(entry: LootEntry) → number` | Tirage pour les coffres. Zéro branche — dispatche via `ROLL_FN[flags]` (8 fonctions). Retourne 0 si weight non atteint. |
 | `rollLootWithBuffs` | `(lootItem, buffValues, yieldBuff?) → number` | Tirage pour les actions (mining, harvesting...). Évalue conditions, cumule modificateurs + yieldBuff, tire un float, applique `intFract`. Zéro allocation, zéro parsing. |
+
+#### Manipulation de tableaux :
+* Ne jamais utiliser splice() ou filter() pour supprimer un élément d'un Array dont l'ordre n'a pas d'importance.
+* Utiliser systématiquement removeIndexUnordered(arr, index) ou removeValueUnordered(arr, value).
+
+#### Gestion des files et piles (Array) :
+* Ne jamais utiliser `shift()` ou `unshift()` pour consommer ou insérer des éléments dans un tableau (coût $O(n)$ interdit).
+* Les retraits d'éléments doivent toujours se faire en bout de tableau (`pop()` ou `arr.length--` en $O(1)$).
+* Pour les files de traitement, insérer avec `push()` et consommer depuis la fin (`queue.pop()` ou accès direct au dernier index).
 
 ---
 
