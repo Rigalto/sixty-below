@@ -3,7 +3,7 @@
 import {seededRNG, shuffleArray, rollLoot} from './utils.mjs'
 import {database, uniqueIdGenerator} from './database.mjs'
 import {WORLD_WIDTH, WORLD_HEIGHT, SEA_LEVEL, TOPSOIL_Y_SKY_SURFACE, TOPSOIL_Y_SURFACE_UNDER, TOPSOIL_Y_UNDER_CAVERNS, BIOME_TILE_MAP, SEA_MAX_JITTER, SEA_MAX_WIDTH, SEA_MAX_HEIGHT, CLUSTER_SCATTER_MAP, ORE_GEM_SCATTER_MAP, PERLIN_OFFSET_NATURALIZER, PERLIN_OFFSET_TUNNEL, PERLIN_OFFSET_SURFACE_TUNNEL, PERLIN_OFFSET_SMALL_TUNNEL, PERLIN_OFFSET_CAVERN, PERLIN_OFFSET_HIVE, PERLIN_OFFSET_HEART, PERLIN_OFFSET_MUSHROOM, PERLIN_OFFSET_COBWEB, PERLIN_OFFSET_FERNS, PERLIN_OFFSET_LAKES, PERLIN_OFFSET_SHELL, PERLIN_OFFSET_TEMPLE, PERLIN_OFFSET_BEACH, SMALL_CAVERNS_COUNT, MEDIUM_CAVERNS_COUNT, UNDERGROUND_TUNNEL_COUNT, CAVERNS_TUNNEL_COUNT, SMALL_TUNNELS_COUNT, HIVE_RADIUS_MIN, HIVE_RADIUS_MAX, COBWEB_CAVE_COUNT_MIN, COBWEB_CAVE_COUNT_MAX, COBWEB_RADIUS_X_MIN, COBWEB_RADIUS_X_MAX, COBWEB_RADIUS_Y_MIN, COBWEB_RADIUS_Y_MAX, COBWEB_CAVE_MAIN_MIN, COBWEB_CAVE_MAIN_MAX, COBWEB_CAVE_SIDE_MIN, COBWEB_CAVE_SIDE_MAX, COBWEB_SCATTER_COUNT, COBWEB_SCATTER_SIZE_MIN, COBWEB_SCATTER_SIZE_MAX, GEODE_CAVE_COUNT_MIN, GEODE_CAVE_COUNT_MAX, GEODE_RADIUS_MIN, GEODE_RADIUS_MAX, GEODE_TARGET_CLUSTER_COUNT, GEODE_CLUSTER_SIZE_MIN, GEODE_CLUSTER_SIZE_MAX, NATIVE_TOPSOIL_MAP, LAKE_RADIUS_X_MIN, LAKE_RADIUS_X_MAX, LAKE_RADIUS_Y_MIN, LAKE_RADIUS_Y_MAX, LAKE_PIT_RADIUS_X_MIN, LAKE_PIT_RADIUS_X_MAX, LAKE_PIT_RADIUS_Y_MIN, LAKE_PIT_RADIUS_Y_MAX, LAKE_CREATION_MAP, UNDERGROUND_LAKE_UNDER_COUNT, UNDERGROUND_LAKE_CAVERNS_COUNT, UNDERGROUND_LAKE_RADIUS_MIN, UNDERGROUND_LAKE_RADIUS_MAX, BLIND_LAKE_COUNT, BLIND_LAKE_RADIUS_MIN, BLIND_LAKE_RADIUS_MAX, SAP_LAKE_UNDER_COUNT, SAP_LAKE_CAVERNS_COUNT, SAP_LAKE_RADIUS_MIN, SAP_LAKE_RADIUS_MAX, SAP_POCKET_COUNT, SAP_POCKET_RADIUS_MIN, SAP_POCKET_RADIUS_MAX, WATER_PUDDLE_COUNT, SAP_PUDDLE_COUNT, PUDDLE_HEIGHT_MIN, PUDDLE_HEIGHT_MAX, FOSSIL_VEIN_COUNT, FERN_CAVE_RADIUS_X_MIN, FERN_CAVE_RADIUS_X_MAX, FERN_CAVE_RADIUS_Y_MIN, FERN_CAVE_RADIUS_Y_MAX, MOSS_CAVE_RADIUS_X_MIN, MOSS_CAVE_RADIUS_X_MAX, MOSS_CAVE_RADIUS_Y_MIN, MOSS_CAVE_RADIUS_Y_MAX, SAND_POCKET_RADIUS_X_MIN, SAND_POCKET_RADIUS_X_MAX, SAND_POCKET_RADIUS_Y_MIN, SAND_POCKET_RADIUS_Y_MAX, MUSHROOM_CAVE_RADIUS_X_MIN, MUSHROOM_CAVE_RADIUS_X_MAX, MUSHROOM_CAVE_RADIUS_Y_MIN, MUSHROOM_CAVE_RADIUS_Y_MAX, PYRAMID_WALL_INDEXES, PYRAMID_VOID_INDEXES, PYRAMID_WIDTH, PYRAMID_HEIGHT, PYRAMID_ROOM1_DELTA, PYRAMID_ROOM2_DELTA, TEMPLE_RUIN_WALL_INDEXES, TEMPLE_RUIN_COLUMNS_INDEXES, CHEST_CONTENT, TREES_INIT_SIZE, GIANT_MUSHROOM_INIT_SIZE} from '../assets/data/data-gen.mjs'
-import {NODES, NODES_LOOKUP, NODE_TYPE, BIOME_TYPE, PLANT_KIND, PLANT_TYPE, ITEMS, TREE_IMAGES, THORNSPINE_JUNCTIONS, THORNSPINE_SIZES, CORAL_TYPES, PARSNIP_RATE, SUNFLOWER_RATE, MANDRAKE_COUNT, PRICKLEPAD_COUNT, BAMBOO_COUNT, BAMBOO_ITEMS, OLEANDER_COUNT, SATANS_CUBE_COUNT, SNEAKTHORN_COUNT, CURSEDCROWN_COUNT, ABYSSHORN_COUNT, INFERNCAP_COUNT, GRAVELWEED_COUNT, GRAVELWEED_SOIL, COCONUT_CYCLE_DELAY, FERN_TYPES, FERN_TOGGLE_PCENT} from '../assets/data/data.mjs'
+import {NODES, NODES_LOOKUP, NODE_TYPE, BIOME_TYPE, PLANT_KIND, PLANT_TYPE, ITEMS, TREE_IMAGES, THORNSPINE_JUNCTIONS, THORNSPINE_SIZES, CORAL_TYPES, PARSNIP_RATE, SUNFLOWER_RATE, MANDRAKE_COUNT, PRICKLEPAD_COUNT, BAMBOO_COUNT, BAMBOO_ITEMS, OLEANDER_COUNT, SATANS_CUBE_COUNT, SNEAKTHORN_COUNT, CURSEDCROWN_COUNT, ABYSSHORN_COUNT, INFERNCAP_COUNT, GRAVELWEED_COUNT, GRAVELWEED_SOIL, COCONUT_CYCLE_DELAY, FERN_TYPES, FERN_TOGGLE_PCENT, MOSS_TOGGLE_PCENT} from '../assets/data/data.mjs'
 import {IS_DEV, WEATHER_TYPE, WEATHER_TYPE_CODE, BAG_CAPACITY, HOTBAR_CAPACITY, ARMOR_CAPACITY, ACCESSORY_CAPACITY, CONTAINER_CAPACITY, CONTAINER_STYPES, PLAYER} from './constant.mjs'
 
 /* ====================================================================================================
@@ -355,7 +355,7 @@ class WorldGenerator {
     await progress('Fern caves')
 
     // 6.1.9 Moss Cave (Underground - Jungle - MUD + GRASSMOSS
-    const {mossCaves, grassMossIndexes} = worldCarver.digMossCaves()
+    const {mossCaves} = worldCarver.digMossCaves()
     await progress('Moss caves')
 
     // 6.1.10 Mushroom caves - Forest - HUMUS + GRASSMUSHROOM
@@ -506,7 +506,7 @@ class WorldGenerator {
     await progress('Surface Herbs')
 
     plantGenerator.placeFerns()
-    plantGenerator.placeMoss(grassMossIndexes)
+    plantGenerator.placeMoss()
     plantGenerator.placeCaveMushrooms(grassMushroomIndexes, currentWeather, giantOccupied)
     await progress('Mini-biome Plants')
 
@@ -4150,14 +4150,12 @@ class WorldCarver {
  * Protection TileGuard sur le bas de la cave.
  * Prérequis : initZoneRects(), initExclusions().
  *
- * @returns {mossCaves: Array<{cx, cy, radiusX, radiusY}>, grassMossIndexes : number[]}
+ * @returns {mossCaves: Array<{cx, cy, radiusX, radiusY}>}
  */
   digMossCaves () {
     const VOID = NODES.VOID.code
     const caves = []
     const MAX_ATTEMPTS = 100
-
-    const grassMossIndexes = []
 
     for (let i = 0; i < this.#zoneRects.length; i++) {
       const rect = this.#zoneRects[i]
@@ -4185,7 +4183,7 @@ class WorldCarver {
 
       const rect2 = this.applyTiles(tiles)
       this.addExclusion(rect2)
-      this.#fillMossCaveWalls(cx, cy, radiusX, radiusY, grassMossIndexes)
+      this.#fillMossCaveWalls(cx, cy, radiusX, radiusY)
 
       const guardTop = cy + 6
       const guardBottom = cy + radiusY + rectHalfH + 3
@@ -4197,7 +4195,7 @@ class WorldCarver {
       caves.push({cx, cy, radiusX, radiusY})
     }
 
-    return {mossCaves: caves, grassMossIndexes}
+    return {mossCaves: caves}
   }
 
   /**
@@ -4209,9 +4207,8 @@ class WorldCarver {
    * @param {number} cy
    * @param {number} radiusX
    * @param {number} radiusY
-   * @param {number[]} indexes - [OUT] Tableau accumulant les index des tuiles GRASSMOSS posées
    */
-  #fillMossCaveWalls (cx, cy, radiusX, radiusY, indexes) {
+  #fillMossCaveWalls (cx, cy, radiusX, radiusY) {
     const VOID = NODES.VOID.code
     const GRASSMOSS = NODES.GRASSMOSS.code
     const MUD = NODES.MUD.code
@@ -4244,7 +4241,6 @@ class WorldCarver {
         if (hasVoidAbove || hasVoidLeft || hasVoidRight) {
           const sCode = seededRNG.randomGetPercent(90) ? GRASSMOSS : MUD
           worldBuffer.write(x, y, sCode)
-          if (sCode === GRASSMOSS) indexes.push((y << 10) | x)
         }
         if (hasVoidAbove && !hasVoidBelow) {
           worldBuffer.write(x, y + 1, MUD)
@@ -8220,66 +8216,44 @@ class PlantGenerator {
   }
 
   /**
-   * Place les spots de Velvetmoss dans les Moss Caves.
-   * Tous les spots valides sont enregistrés en base — 80% sont présents au démarrage.
-   * Un spot valide est une tuile GRASSMOSS avec VOID au-dessus, à gauche et à droite.
-   * La Velvetmoss occupe 1x1 tuile, s'interconnecte dans les 4 sens.
-   * En temps réel, une mousse pousse tous les 2–3 jours in-game sur un spot libre.
-   *
-   * @param {number[]} grassMossIndexes — index des tuiles GRASSMOSS
+   * Place les spots de Velvetmoss : un spot par tuile GRASSMOSS actuellement présente dans le
+   * monde (scan complet, indépendant de l'accumulation faite pendant le creusement — cf.
+   * LiquidFiller.#fillOneSea qui peut encore transformer une tuile GRASSMOSS en SEA après sa
+   * pose initiale). Velvetmoss partage la tuile de son substrat (index === soilIndex) : aucune
+   * tuile de corps séparée, aucune contrainte géométrique à revalider ici — la condition "au
+   * moins un VOID parmi dessus/gauche/droite" est garantie par construction de toute tuile
+   * GRASSMOSS (cf. #fillMossCaveWalls). #plants reste monomorphe : tous les spots reçoivent la
+   * même shape de record, present est tiré indépendamment pour chacun.
    */
-  placeMoss (grassMossIndexes) {
-    const VOID = NODES.VOID.code
+  placeMoss () {
     const GRASSMOSS = NODES.GRASSMOSS.code
-    const W = WORLD_WIDTH
-    const occupied = new Set()
+    const grassMossIndexes = worldBuffer.getTypeArray(GRASSMOSS)
     let count = 0
 
-    for (const idx of grassMossIndexes) {
-      if (worldBuffer.readAt(idx) !== GRASSMOSS) continue
+    for (const soilIndex of grassMossIndexes) {
+      if (worldBuffer.readAt(soilIndex) !== GRASSMOSS) continue
 
-      const x = idx & 0x3FF
-      const y = idx >> 10
-
-      const voidAbove = worldBuffer.readAt(idx - W) === VOID
-      const voidLeft = worldBuffer.readAt(idx - 1) === VOID
-      const voidRight = worldBuffer.readAt(idx + 1) === VOID
-      if (!voidAbove && !voidLeft && !voidRight) continue
-
-      // Position de la mousse selon priorité : dessus > droite > gauche
-      let mossX, mossY
-      if (voidAbove) {
-        mossX = x
-        mossY = y - 1
-      } else if (voidRight) {
-        mossX = x + 1
-        mossY = y
-      } else {
-        mossX = x - 1
-        mossY = y
-      }
-
-      const mossIndex = (mossY << 10) | mossX
-      const collision = occupied.has(mossIndex)
-      const present = collision ? false : seededRNG.randomGetPercent(80)
-      if (!collision) occupied.add(mossIndex)
+      const x = soilIndex & 0x3FF
+      const y = soilIndex >> 10
+      const present = seededRNG.randomGetPercent(MOSS_TOGGLE_PCENT)
 
       this.#plants.push({
         id: uniqueIdGenerator.getUniqueId(),
         kind: PLANT_KIND.HERB,
         type: PLANT_TYPE.VELVETMOSS,
-        index: mossIndex,
-        soilIndex: idx,
+        index: soilIndex,
+        soilIndex,
         itemId: 'velvetmoss',
         w: 1,
         h: 1,
-        x: mossX,
-        y: mossY,
+        x,
+        y,
         present,
         deleted: false
       })
-      count++
+      if (present) count++
     }
+
     if (IS_DEV) console.log(`   🔹 Moss : ${count} / ${grassMossIndexes.length}`)
   }
 

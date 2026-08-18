@@ -1019,6 +1019,7 @@ export const FERN_TYPES = [
 ]
 export const FERN_TOGGLE_PCENT = 50
 export const FERN_POPULATION_DELAY_MS = 8000 // délai de base (ms) entre deux passages de régulation
+export const MOSS_TOGGLE_PCENT = 60
 
 // Substrats valides pour Gravelweed — Surface (natural/topsoil/substrat) + Underground natif,
 // 3 biomes confondus, aucun filtre de biome à l'usage (cf. GravelweedSystem, placeGravelweeds)
