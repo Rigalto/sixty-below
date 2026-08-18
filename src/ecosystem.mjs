@@ -7,7 +7,7 @@
 
 import {WORLD_WIDTH, WORLD_HEIGHT, MICROTASK, TOPSOIL_Y_SKY_SURFACE, TOPSOIL_Y_SURFACE_UNDER, TOPSOIL_Y_UNDER_CAVERNS, TOPSOIL_Y_CAVERNS_MID, SEA_LEVEL} from './constant.mjs'
 import {database, uniqueIdGenerator} from './database.mjs'
-import {eventBus, seededRNG, blockedTiles, microTasker, taskScheduler} from './utils.mjs'
+import {eventBus, seededRNG, blockedTiles, microTasker, taskScheduler, removeValueUnordered} from './utils.mjs'
 import {NODES, ITEMS, PLANT_KIND, PLANT_TYPE, PLANT_SYSTEM_LOOKUP, ALL_PLANT_SYSTEMS, COBWEB_GROWTH_DELAY_MS, SUNFLOWER_RATE, PARSNIP_RATE, AMBERMIRAGE_PCENT, COCONUT_CYCLE_DELAY, TREE_IMAGES, THORNSPINE_JUNCTIONS, THORNSPINE_SIZES, THORNSPINE_UNBLOOM_PCENT, THORNSPINE_BLOOM_PCENT, CORAL_TYPES, GRAVELWEED_SOIL, FERN_TYPES, FERN_TOGGLE_PCENT, FERN_POPULATION_DELAY_MS} from '../assets/data/data.mjs'
 import {IMAGE_CACHE} from './assets.mjs'
 import {saveManager} from './persistence.mjs'
@@ -1065,19 +1065,11 @@ class SunflowerSystem {
  */
   #removeSpot (record) {
     this.#destroyPresent(record)
-    const list = this.#list
-    const idx = list.indexOf(record)
-    if (idx !== -1) {
-      list[idx] = list[list.length - 1]
-      list.length--
-    }
+    removeValueUnordered(this.#list, record)
     this.#spotsBySoil.delete(record.soilIndex)
 
     // Retrait de la graine plantée sur ce spot, si elle existe
-    const seedIdx = this.#sewedTiles.indexOf(record.soilIndex)
-    if (seedIdx !== -1) {
-      this.#sewedTiles[seedIdx] = this.#sewedTiles[this.#sewedTiles.length - 1]
-      this.#sewedTiles.length--
+    if (removeValueUnordered(this.#sewedTiles, record.soilIndex)) {
       database.setGameState('sewedsunflower', this.#sewedTiles)
     }
 
@@ -3858,12 +3850,8 @@ class ParsnipSystem {
    */
   #removeSpot (record) {
     this.#destroyPresent(record)
-    const list = this.#list
-    const idx = list.indexOf(record)
-    if (idx !== -1) {
-      list[idx] = list[list.length - 1]
-      list.length--
-    }
+    removeValueUnordered(this.#list, record)
+
     this.#spotsBySoil.delete(record.soilIndex)
     record.deleted = true
     saveManager.queueStaticUpdate({storeName: 'plant', record})
@@ -4337,9 +4325,7 @@ class AmbermirageSystem {
     record.deleted = true
     saveManager.queueStaticUpdate({storeName: 'plant', record})
 
-    const idx = this.#list.indexOf(record)
-    this.#list[idx] = this.#list[this.#list.length - 1]
-    this.#list.length--
+    removeValueUnordered(this.#list, record)
   }
 
   /**
@@ -4566,12 +4552,7 @@ class FernSystem {
    */
   #removeSpot (record) {
     this.#destroyPresent(record)
-    const list = this.#list
-    const idx = list.indexOf(record)
-    if (idx !== -1) {
-      list[idx] = list[list.length - 1]
-      list.length--
-    }
+    removeValueUnordered(this.#list, record)
     this.#spotsBySoil.delete(record.soilIndex)
     record.deleted = true
     saveManager.queueStaticUpdate({storeName: 'plant', record})
@@ -4835,9 +4816,8 @@ class MossSystem {
   }
 
   /**
-   * Fait pousser une Velvetmoss sur un spot actuellement absent, le retire de #absentList
-   * (swap dernier élément + length--). Aucune revalidation géométrique nécessaire (cf.
-   * en-tête de classe). No-op si déjà present.
+   * Fait pousser une Velvetmoss sur un spot actuellement absent, le retire de #absentList.
+   * Aucune revalidation géométrique nécessaire (cf. en-tête de classe). No-op si déjà present.
    * @param {object} record
    */
   #growSpot (record) {
@@ -4846,10 +4826,7 @@ class MossSystem {
     addToByTile(this.byTile, record)
     addToByChunk(this.#byChunk, record)
     addToDisplayed(this.#displayed, record)
-
-    const idx = this.#absentList.indexOf(record)
-    this.#absentList[idx] = this.#absentList[this.#absentList.length - 1]
-    this.#absentList.length--
+    removeValueUnordered(this.#absentList, record)
 
     saveManager.queueStaticUpdate({storeName: 'plant', record})
   }
@@ -4910,7 +4887,7 @@ class MossSystem {
   /**
    * Supprime définitivement un spot dont la tuile GRASSMOSS n'existe plus (minée). Détruit
    * d'abord la Velvetmoss si présente (sans loot) ; si le spot était déjà absent, le retire
-   * directement de #absentList (swap dernier élément + length--) puisque #destroyPresent ne
+   * directement de #absentList puisque #destroyPresent ne
    * s'en charge pas dans ce cas. Retire ensuite le spot de #list et #spotsByTile — contrairement
    * à #destroyPresent, ce spot ne repoussera jamais.
    * @param {object} record
@@ -4919,17 +4896,13 @@ class MossSystem {
     if (record.present) {
       this.#destroyPresent(record)
     } else {
-      const idx = this.#absentList.indexOf(record)
-      this.#absentList[idx] = this.#absentList[this.#absentList.length - 1]
-      this.#absentList.length--
+      removeValueUnordered(this.#absentList, record)
     }
     this.#spotsByTile.delete(record.index)
     record.deleted = true
     saveManager.queueStaticUpdate({storeName: 'plant', record})
 
-    const idx = this.#list.indexOf(record)
-    this.#list[idx] = this.#list[this.#list.length - 1]
-    this.#list.length--
+    removeValueUnordered(this.#list, record)
   }
 
   /**
@@ -5337,12 +5310,8 @@ class OakSystem {
     if (bLeft !== undefined) this.#destroyBoleteSpot(bLeft)
     if (bRight !== undefined) this.#destroyBoleteSpot(bRight)
 
-    // Retrait de la liste principale (swap-last)
-    const idx = this.#oakList.indexOf(record)
-    if (idx !== -1) {
-      this.#oakList[idx] = this.#oakList[this.#oakList.length - 1]
-      this.#oakList.length--
-    }
+    // Retrait de la liste principale
+    removeValueUnordered(this.#oakList, record)
 
     // #oakBySoil — 3 entrées
     this.#oakBySoil.delete(record.soilIndex)
@@ -5372,12 +5341,9 @@ class OakSystem {
   #destroyBoleteSpot (record) {
     if (record.present) this.#destroyBoletePresent(record)
 
-    // Retrait de #boleteList (swap-last)
-    const idx = this.#boleteList.indexOf(record)
-    if (idx !== -1) {
-      this.#boleteList[idx] = this.#boleteList[this.#boleteList.length - 1]
-      this.#boleteList.length--
-    }
+    // Retrait de #boleteList
+    removeValueUnordered(this.#boleteList, record)
+
     this.#boleteSpotsBySoil.delete(record.soilIndex)
 
     record.deleted = true
@@ -5937,12 +5903,8 @@ class MahoganySystem {
     if (pLeft !== undefined) this.#destroyPinkMyceniaSpot(pLeft)
     if (pRight !== undefined) this.#destroyPinkMyceniaSpot(pRight)
 
-    // Retrait de la liste principale (swap-last)
-    const idx = this.#mahoganyList.indexOf(record)
-    if (idx !== -1) {
-      this.#mahoganyList[idx] = this.#mahoganyList[this.#mahoganyList.length - 1]
-      this.#mahoganyList.length--
-    }
+    // Retrait de la liste principale
+    removeValueUnordered(this.#mahoganyList, record)
 
     // #mahoganyBySoil — 3 entrées
     this.#mahoganyBySoil.delete(record.soilIndex)
@@ -5972,12 +5934,9 @@ class MahoganySystem {
   #destroyPinkMyceniaSpot (record) {
     if (record.present) this.#destroyPinkMyceniaPresent(record)
 
-    // Retrait de #pinkMyceniaList (swap-last)
-    const idx = this.#pinkMyceniaList.indexOf(record)
-    if (idx !== -1) {
-      this.#pinkMyceniaList[idx] = this.#pinkMyceniaList[this.#pinkMyceniaList.length - 1]
-      this.#pinkMyceniaList.length--
-    }
+    // Retrait de #pinkMyceniaList
+    removeValueUnordered(this.#pinkMyceniaList, record)
+
     this.#pinkMyceniaSpotsBySoil.delete(record.soilIndex)
 
     record.deleted = true
@@ -6947,9 +6906,7 @@ class SpreadForestSystem {
     saveManager.queueStaticUpdate({storeName: 'plant', record})
 
     this.#byIndex.delete(tileIndex)
-    const idx = this.#list.indexOf(record)
-    this.#list[idx] = this.#list[this.#list.length - 1]
-    this.#list.length--
+    removeValueUnordered(this.#list, record)
   }
 
   /**
@@ -7262,9 +7219,7 @@ class SpreadJungleSystem {
     saveManager.queueStaticUpdate({storeName: 'plant', record})
 
     this.#byIndex.delete(tileIndex)
-    const idx = this.#list.indexOf(record)
-    this.#list[idx] = this.#list[this.#list.length - 1]
-    this.#list.length--
+    removeValueUnordered(this.#list, record)
   }
 
   /**
@@ -7547,8 +7502,7 @@ class BloodmoonSystem {
 
   /**
    * Détruit définitivement un bloodmoon (vivace, aucune repousse) : retire toutes les
-   * structures mémoire, débloque le rectangle occupé, marque deleted et persiste. Purge de
-   * #list par swap + length-- (tableau non ordonné).
+   * structures mémoire, débloque le rectangle occupé, marque deleted et persiste.
    * @param {object} record
    */
   #destroy (record) {
@@ -7560,11 +7514,7 @@ class BloodmoonSystem {
     blockedTiles.unblockPlacement(record.index)
     blockedTiles.unblockPlacement(record.index + WORLD_WIDTH)
 
-    const idx = this.#list.indexOf(record)
-    if (idx !== -1) {
-      this.#list[idx] = this.#list[this.#list.length - 1]
-      this.#list.length--
-    }
+    removeValueUnordered(this.#list, record)
 
     record.deleted = true
     saveManager.queueStaticUpdate({storeName: 'plant', record})
