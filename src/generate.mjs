@@ -601,6 +601,7 @@ class WorldGenerator {
       {key: 'lakes', value: lakes},
       {key: 'losttemple', value: lostTemple},
       {key: 'moss', value: mossCaves},
+      {key: 'mossnextgrowthtimestamp', value: null},
       {key: 'mushrooms', value: mushroomCaves},
       {key: 'naturalforaged', value: new Set()},
       {key: 'nextweather', value: weather.nextWeather},

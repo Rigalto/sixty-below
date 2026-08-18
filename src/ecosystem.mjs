@@ -4748,6 +4748,7 @@ class MossSystem {
   #absentList = [] // record[] — spots present=false : candidats à la pousse, tirage O(1) par mossPopulationTick
   #displayed = new Set() // Set<record> — spots dans les chunks preload (cible render)
   #image = null // ITEMS.velvetmoss.placed, mis en cache dans init()
+  #nextGrowthTimestamp = null // horodatage absolu (game-time) de la prochaine pousse, chargé par initTimestamp()
 
   constructor () {
     // EventBus
@@ -4774,6 +4775,15 @@ class MossSystem {
   }
 
   /**
+   * Initialise l'horodatage de la prochaine pousse programmée, chargé depuis gamestate.
+   * Appelé en début de session, avant toute hydratation (cf. core.mjs).
+   * @param {number|null} timestamp
+   */
+  initTimestamp (timestamp) {
+    this.#nextGrowthTimestamp = timestamp
+  }
+
+  /**
    * Enregistre un spot et peuple les structures internes.
    * @param {object} record — record HERB/VELVETMOSS (deleted=false garanti par l'appelant)
    */
@@ -4789,30 +4799,71 @@ class MossSystem {
   }
 
   /** Liaison EventBus : 'time/first-loop' — démarre la boucle de régulation de population. */
-  onFirstLoopMoss () { this.#schedulePopulation() }
+  onFirstLoopMoss () {
+    if (this.#absentList.length === 0) return
 
-  /**
-   * Planifie le prochain passage de régulation. Délai de base MOSS_POPULATION_DELAY_MS,
-   * modulé par un facteur aléatoire ×[0.8, 1.2[ pour éviter un rythme mécanique.
-   */
-  #schedulePopulation () {
-    const delay = (MOSS_POPULATION_DELAY_MS * seededRNG.randomGetRealMinMax(0.8, 1.2)) | 0
-    const {priority, capacity} = MICROTASK.MOSS_POPULATION
-    taskScheduler.enqueue('moss-population', delay, this.mossPopulationTick, priority, capacity)
+    if (this.#nextGrowthTimestamp !== null) {
+      const {priority, capacity} = MICROTASK.MOSS_POPULATION
+      taskScheduler.enqueueAbsolute('moss-population', this.#nextGrowthTimestamp, this.mossPopulationTick, priority, capacity)
+      return
+    }
+
+    console.warn('MossSystem.onFirstLoopMoss: #absentList non vide mais mossnextgrowthtimestamp est null — replanification de secours')
+    this.#scheduleNextGrowth()
   }
 
   /**
-   * Callback TaskScheduler : croissance monotone de la population de Velvetmoss — aucune
-   * disparition naturelle. Si #absentList contient au moins un candidat, en tire un au hasard
-   * (accès O(1)) et le fait pousser. No-op si #absentList est vide (couverture complète de
-   * toutes les tuiles GRASSMOSS). Se replanifie systématiquement, même à couverture complète.
+   * Planifie le prochain passage de régulation si #absentList contient des candidats — délai
+   * relatif depuis maintenant (MOSS_POPULATION_DELAY_MS ×[0.8, 1.2[), horodatage absolu
+   * retourné mémorisé en gamestate (synchrone) pour survivre à un rechargement. Si #absentList
+   * est vide, mémorise null à la place — rien à planifier.
+   */
+  #scheduleNextGrowth () {
+    if (this.#absentList.length > 0) {
+      const delay = (MOSS_POPULATION_DELAY_MS * seededRNG.randomGetRealMinMax(0.8, 1.2)) | 0
+      const {priority, capacity} = MICROTASK.MOSS_POPULATION
+      const timestamp = taskScheduler.enqueue('moss-population', delay, this.mossPopulationTick, priority, capacity)
+      database.setGameState('mossnextgrowthtimestamp', timestamp)
+    } else {
+      database.setGameState('mossnextgrowthtimestamp', null)
+    }
+  }
+
+  /**
+   * Ajoute un record à #absentList. Si la liste était vide juste avant, la tâche de régulation
+   * était arrêtée (cf. mossPopulationTick) — la relance.
+   * @param {object} record
+   */
+  #addToAbsentList (record) {
+    const wasEmpty = this.#absentList.length === 0
+    this.#absentList.push(record)
+    if (wasEmpty) this.#scheduleNextGrowth()
+  }
+
+  /**
+   * Retire un record de #absentList (swap dernier élément + length--). Si la liste devient
+   * vide, mémorise null en gamestate — plus aucune pousse à planifier.
+   * @param {object} record
+   */
+  #removeFromAbsentList (record) {
+    removeValueUnordered(this.#absentList, record)
+    if (this.#absentList.length === 0) this.#scheduleNextGrowth() // arrêt de la boucle
+  }
+
+  /**
+   * Callback TaskScheduler : croissance monotone — tire un candidat au hasard dans #absentList
+   * et le fait pousser. Ne replanifie que s'il reste des candidats (optimisation : la tâche
+   * s'arrête réellement quand #absentList est vide, plutôt que de tourner à vide tous les
+   * 2-3 jours). Guard : no-op si #absentList est déjà vide en entrée (dernier candidat retiré
+   * par minage entre planification et exécution).
    */
   mossPopulationTick () {
-    if (this.#absentList.length > 0) {
-      const record = seededRNG.randomGetArrayValue(this.#absentList)
-      this.#growSpot(record)
-    }
-    this.#schedulePopulation()
+    if (this.#absentList.length === 0) return
+
+    const record = seededRNG.randomGetArrayValue(this.#absentList)
+    this.#growSpot(record)
+    // ne planifie que s'il reste un candidat (cas vidé déjà géré par #removeFromAbsentList)
+    if (this.#absentList.length > 0) this.#scheduleNextGrowth()
   }
 
   /**
@@ -4826,8 +4877,7 @@ class MossSystem {
     addToByTile(this.byTile, record)
     addToByChunk(this.#byChunk, record)
     addToDisplayed(this.#displayed, record)
-    removeValueUnordered(this.#absentList, record)
-
+    this.#removeFromAbsentList(record)
     saveManager.queueStaticUpdate({storeName: 'plant', record})
   }
 
@@ -4871,8 +4921,8 @@ class MossSystem {
 
   /**
    * Détruit une Velvetmoss présente sans loot : retire byTile/#byChunk/#displayed, persiste.
-   * Le spot est conservé (present=false, reste dans #list/#spotsByTile) — il peut repousser
-   * ultérieurement via mossPopulationTick. Guard : no-op si record.present est déjà false.
+   * Le spot est conservé (present=false, reste dans #list/#spotsByTile).
+   * Guard : no-op si record.present est déjà false.
    * @param {object} record
    */
   #destroyPresent (record) {
@@ -4896,7 +4946,7 @@ class MossSystem {
     if (record.present) {
       this.#destroyPresent(record)
     } else {
-      removeValueUnordered(this.#absentList, record)
+      this.#removeFromAbsentList(record)
     }
     this.#spotsByTile.delete(record.index)
     record.deleted = true
@@ -4934,7 +4984,7 @@ class MossSystem {
    */
   onForaged (record) {
     this.#destroyPresent(record)
-    this.#absentList.push(record)
+    this.#addToAbsentList(record)
   }
 
   /**

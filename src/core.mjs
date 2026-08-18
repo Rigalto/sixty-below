@@ -430,6 +430,7 @@ class GameCore {
     // 5.4 Objectstore Plant
     thornspineSystem.init() // avant lecture des records
     coralSystem.initTimestamp(state.coralregrowtimestamp) // avant lecture des records
+    mossSystem.initTimestamp(state.mossnextgrowthtimestamp) // avant lecture des records
 
     const plantRecords = await database.readAllFromObjectStore('plant')
     const plantsToDelete = []
