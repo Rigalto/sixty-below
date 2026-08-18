@@ -1,6 +1,6 @@
 // housing.mjs — FurnitureManager - HousingManager
 
-import {eventBus, blockedTiles, taskScheduler} from './utils.mjs'
+import {eventBus, blockedTiles, taskScheduler, removeValueUnordered} from './utils.mjs'
 import {uniqueIdGenerator} from './database.mjs'
 import {CONTAINER_STYPES, MICROTASK} from './constant.mjs'
 import {saveManager} from './persistence.mjs'
@@ -442,12 +442,7 @@ class FurnitureManager {
 
     record.deleted = true
 
-    const listIndex = this.#list.indexOf(record)
-    if (listIndex !== -1) {
-      // suppression optimisée
-      this.#list[listIndex] = this.#list[this.#list.length - 1]
-      this.#list.length--
-    }
+    removeValueUnordered(this.#list, record)
 
     this.#byId.delete(furnitureId)
     this.#removeFromChunks(record)
