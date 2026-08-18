@@ -325,6 +325,7 @@ export const MICROTASK = {
   COBWEB_GROWTH: {priority: 20, capacity: 3, taskName: 'cobwebGrowth'}, // tentative périodique de pose d'une toile d'araignée
   AMBERMIRAGE_TILE_CHECK: {priority: 20, capacity: 10, taskName: 'onAmbermirageTileCheck'}, // entretien réactif d'un spot pour une tuile modifiée
   FERN_POPULATION: {priority: 20, capacity: 4, taskName: 'fernPopulationTick'}, // régulation de la population de fougères
+  MOSS_POPULATION: {priority: 20, capacity: 4, taskName: 'mossPopulationTick'}, // régulation de population Velvetmoss
 
   COOKINGPOT_EXTINGUISH: {priority: 20, capacity: 2, taskName: 'onCookingPotExtinguish'}, // extinction automatique d'un cookingPot après 6h in-game
 

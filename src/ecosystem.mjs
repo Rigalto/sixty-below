@@ -4737,6 +4737,244 @@ class FernSystem {
 export const fernSystem = new FernSystem()
 
 /* ====================================================================================================
+   MOSS SYSTEM
+   ====================================================================================================
+
+   Singleton : mossSystem.
+
+   Gère les spots de Velvetmoss sur les tuiles GRASSMOSS. Patron "Spot" comme FernSystem, mais
+   sans tuile de corps séparée : la mousse partage la tuile de son substrat (index === soilIndex).
+   Pas de blockedTiles/placedGuard (GRASSMOSS est un terrain solide, jamais une réservation
+   d'espace VOID). Pas de revalidation géométrique à la pousse : la présence d'un record dans
+   #list garantit que sa tuile est GRASSMOSS — onTileChangedMoss retire le record dès que ce
+   n'est plus le cas.
+
+   TODO — foraging : cas spécifique GrassMoss à ajouter dans ForagingManager.tryForage
+   (aujourd'hui la branche NATURAL capte GrassMoss avant d'atteindre floraManager.getPlantAt).
+   TODO — retransformation GRASSMOSS → MUD quand plus aucune tuile VOID adjacente n'existe.
+   TODO — création réactive d'un spot lors de la pose d'une nouvelle tuile GRASSMOSS par spore
+   (dépend du câblage SowingManager, pas encore fait).
+
+   ==================================================================================================== */
+
+const MOSS_POPULATION_DELAY_MS = 3600000 // 2,5 jours in-game — jitter ×[0.8, 1.2) → intervalle 2-3 jours
+
+class MossSystem {
+  byTile = new Map() // Map<tileIndex, record> — public : membership O(1) + lookup record (present uniquement)
+  #list = [] // record[] — tous les spots (présents ou non)
+  #byChunk = new Map() // Map<chunkKey, Set> — lookup spatial pour onPreloadChunksChanged
+  #spotsByTile = new Map() // Map<tileIndex, record> — tous les spots (présents ou non) : détection minage + suppression O(1)
+  #absentList = [] // record[] — spots present=false : candidats à la pousse, tirage O(1) par mossPopulationTick
+  #displayed = new Set() // Set<record> — spots dans les chunks preload (cible render)
+  #image = null // ITEMS.velvetmoss.placed, mis en cache dans init()
+
+  constructor () {
+    // EventBus
+    this.onTileChangedMoss = this.onTileChangedMoss.bind(this)
+    eventBus.on('world/tile-changed', this.onTileChangedMoss)
+    this.onFirstLoopMoss = this.onFirstLoopMoss.bind(this)
+    eventBus.on('time/first-loop', this.onFirstLoopMoss)
+    // TaskScheduler
+    this.mossPopulationTick = this.mossPopulationTick.bind(this)
+  }
+
+  /**
+   * Réinitialise toutes les structures. Appelé en début de session, avant toute hydratation.
+   */
+  init () {
+    this.byTile.clear()
+    this.#list.length = 0
+    this.#byChunk.clear()
+    this.#spotsByTile.clear()
+    this.#absentList.length = 0
+    this.#displayed.clear()
+
+    this.#image = ITEMS.velvetmoss.placed // après hydratation
+  }
+
+  /**
+   * Enregistre un spot et peuple les structures internes.
+   * @param {object} record — record HERB/VELVETMOSS (deleted=false garanti par l'appelant)
+   */
+  initPlant (record) {
+    this.#list.push(record)
+    this.#spotsByTile.set(record.index, record)
+    if (!record.present) {
+      this.#absentList.push(record)
+      return
+    }
+    addToByTile(this.byTile, record)
+    addToByChunk(this.#byChunk, record)
+  }
+
+  /** Liaison EventBus : 'time/first-loop' — démarre la boucle de régulation de population. */
+  onFirstLoopMoss () { this.#schedulePopulation() }
+
+  /**
+   * Planifie le prochain passage de régulation. Délai de base MOSS_POPULATION_DELAY_MS,
+   * modulé par un facteur aléatoire ×[0.8, 1.2[ pour éviter un rythme mécanique.
+   */
+  #schedulePopulation () {
+    const delay = (MOSS_POPULATION_DELAY_MS * seededRNG.randomGetRealMinMax(0.8, 1.2)) | 0
+    const {priority, capacity} = MICROTASK.MOSS_POPULATION
+    taskScheduler.enqueue('moss-population', delay, this.mossPopulationTick, priority, capacity)
+  }
+
+  /**
+   * Callback TaskScheduler : croissance monotone de la population de Velvetmoss — aucune
+   * disparition naturelle. Si #absentList contient au moins un candidat, en tire un au hasard
+   * (accès O(1)) et le fait pousser. No-op si #absentList est vide (couverture complète de
+   * toutes les tuiles GRASSMOSS). Se replanifie systématiquement, même à couverture complète.
+   */
+  mossPopulationTick () {
+    if (this.#absentList.length > 0) {
+      const record = seededRNG.randomGetArrayValue(this.#absentList)
+      this.#growSpot(record)
+    }
+    this.#schedulePopulation()
+  }
+
+  /**
+   * Fait pousser une Velvetmoss sur un spot actuellement absent, le retire de #absentList
+   * (swap dernier élément + length--). Aucune revalidation géométrique nécessaire (cf.
+   * en-tête de classe). No-op si déjà present.
+   * @param {object} record
+   */
+  #growSpot (record) {
+    if (record.present) return
+    record.present = true
+    addToByTile(this.byTile, record)
+    addToByChunk(this.#byChunk, record)
+    addToDisplayed(this.#displayed, record)
+
+    const idx = this.#absentList.indexOf(record)
+    this.#absentList[idx] = this.#absentList[this.#absentList.length - 1]
+    this.#absentList.length--
+
+    saveManager.queueStaticUpdate({storeName: 'plant', record})
+  }
+
+  /**
+   * Reconstruit #displayed depuis les chunks preload de la caméra.
+   * @param {Set<number>} preloadChunks
+   */
+  onPreloadChunksChanged (preloadChunks) {
+    buildDisplayed(this.#displayed, this.#byChunk, preloadChunks)
+  }
+
+  /**
+   * Dessine les Velvetmoss visibles et présentes sur le contexte transformé. Sprite unique
+   * (texture seamless), aucune sélection par record.
+   * @param {CanvasRenderingContext2D} ctx — contexte déjà transformé (caméra appliquée)
+   */
+  render (ctx) {
+    const img = this.#image
+    for (const record of this.#displayed) {
+      const pxX = record.x << 4
+      const pxY = record.y << 4
+      ctx.drawImage(IMAGE_CACHE[img.imgIndex], img.sx, img.sy, img.sw, img.sh, pxX, pxY, img.sw, img.sh)
+    }
+  }
+
+  /**
+   * Retourne le record de Velvetmoss couvrant la tuile donnée, ou null.
+   * @param {number} tileIndex — (y << 10) | x
+   * @returns {object|null}
+   */
+  getPlantAt (tileIndex) {
+    return this.byTile.get(tileIndex) ?? null
+  }
+
+  /**
+   * Indique si le record est actuellement présent (forageable).
+   * @param {object} record
+   * @returns {boolean}
+   */
+  isPresent (record) { return record.present }
+
+  /**
+   * Détruit une Velvetmoss présente sans loot : retire byTile/#byChunk/#displayed, persiste.
+   * Le spot est conservé (present=false, reste dans #list/#spotsByTile) — il peut repousser
+   * ultérieurement via mossPopulationTick. Guard : no-op si record.present est déjà false.
+   * @param {object} record
+   */
+  #destroyPresent (record) {
+    if (!record.present) return
+    record.present = false
+    removeFromByTile(this.byTile, record)
+    removeFromByChunk(this.#byChunk, record)
+    this.#displayed.delete(record)
+    saveManager.queueStaticUpdate({storeName: 'plant', record})
+  }
+
+  /**
+   * Supprime définitivement un spot dont la tuile GRASSMOSS n'existe plus (minée). Détruit
+   * d'abord la Velvetmoss si présente (sans loot) ; si le spot était déjà absent, le retire
+   * directement de #absentList (swap dernier élément + length--) puisque #destroyPresent ne
+   * s'en charge pas dans ce cas. Retire ensuite le spot de #list et #spotsByTile — contrairement
+   * à #destroyPresent, ce spot ne repoussera jamais.
+   * @param {object} record
+   */
+  #removeRecord (record) {
+    if (record.present) {
+      this.#destroyPresent(record)
+    } else {
+      const idx = this.#absentList.indexOf(record)
+      this.#absentList[idx] = this.#absentList[this.#absentList.length - 1]
+      this.#absentList.length--
+    }
+    this.#spotsByTile.delete(record.index)
+    record.deleted = true
+    saveManager.queueStaticUpdate({storeName: 'plant', record})
+
+    const idx = this.#list.indexOf(record)
+    this.#list[idx] = this.#list[this.#list.length - 1]
+    this.#list.length--
+  }
+
+  /**
+   * Liaison EventBus : 'world/tile-changed'. Supprime définitivement le spot dont la tuile
+   * GRASSMOSS vient de changer (minage) — la Velvetmoss éventuellement présente disparaît sans
+   * loot (le loot du minage de GRASSMOSS lui-même est géré ailleurs, hors MossSystem).
+   * @param {{tileIndex: number}} payload
+   */
+  onTileChangedMoss ({tileIndex}) {
+    const record = this.#spotsByTile.get(tileIndex)
+    if (record === undefined) return
+    this.#removeRecord(record)
+  }
+
+  /**
+   * DEBUG — Affiche un point plein pour chaque spot present, un point creux pour chaque spot
+   * absent. Permet de visualiser la régulation de population : les points creux doivent
+   * progressivement devenir pleins au fil du temps, jamais l'inverse (croissance monotone).
+   * Vérifie la cohérence avec #spotsByTile (même cardinal attendu).
+   * @param {CanvasRenderingContext2D} ctx — contexte déjà transformé (caméra appliquée)
+   */
+  debugRenderSpots (ctx) {
+    ctx.save()
+    for (const record of this.#list) {
+      const cx = (record.x << 4) + 8
+      const cy = (record.y << 4) + 8 + 16
+      ctx.beginPath()
+      ctx.arc(cx, cy, 4, 0, 6.2832)
+      if (record.present) {
+        ctx.fillStyle = 'rgba(0, 220, 100, 0.8)'
+        ctx.fill()
+      } else {
+        ctx.strokeStyle = 'rgba(0, 220, 100, 0.8)'
+        ctx.stroke()
+      }
+    }
+    if (this.#list.length !== this.#spotsByTile.size) {
+      console.warn(`MossSystem: #list(${this.#list.length}) !== #spotsByTile(${this.#spotsByTile.size})`)
+    }
+    ctx.restore()
+  }
+}
+export const mossSystem = new MossSystem()
+
+/* ====================================================================================================
    OAK SYSTEM
    ==================================================================================================== */
 
