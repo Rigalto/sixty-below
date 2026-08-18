@@ -4918,6 +4918,26 @@ class MossSystem {
   }
 
   /**
+   * Indique si la Velvetmoss peut être foragée.
+   * @param {object} record
+   * @returns {boolean}
+   */
+  canForage (record) { return record.present }
+
+  /**
+   * Traite le foraging réussi : détruit la Velvetmoss présente (identique à une disparition
+   * naturelle) et la réinjecte dans #absentList — contrairement au minage (#removeRecord), la
+   * tuile GRASSMOSS reste en place et redevient donc un candidat de pousse pour
+   * mossPopulationTick. Le loot est géré en commun par ForagingManager — cette méthode ne gère
+   * que l'état du spot.
+   * @param {object} record
+   */
+  onForaged (record) {
+    this.#destroyPresent(record)
+    this.#absentList.push(record)
+  }
+
+  /**
    * DEBUG — Affiche un point plein pour chaque spot present, un point creux pour chaque spot
    * absent. Permet de visualiser la régulation de population : les points creux doivent
    * progressivement devenir pleins au fil du temps, jamais l'inverse (croissance monotone).

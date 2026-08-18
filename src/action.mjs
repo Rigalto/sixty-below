@@ -671,8 +671,9 @@ class ForagingManager {
   }
 
   /**
-   * Valide la demande et déclenche la micro-tâche de foraging appropriée.
-   * Deux branches : tuile NATURAL ou tuile SKY/VOID avec plante sous la souris.
+   * Valide la demande et déclenche la micro-tâche de foraging appropriée. GRASSMOSS rejoint
+   * SKY/VOID/SEA dans la recherche de plante — nécessaire pour Velvetmoss, qui partage sa
+   * tuile avec le nœud GRASSMOSS (cf. MossSystem) — avant le repli sur le foraging NATURAL.
    * @param {number} tileIndex — (y << 10) | x
    * @param {object} tileNode  — NODES_LOOKUP[tileCode]
    * @param {object} tool      — ITEMS[slot.item]
@@ -680,6 +681,31 @@ class ForagingManager {
    */
   tryForage (tileIndex, tileNode, tool, prefix) {
     if (buffManager.getBuff('playerFreeze')) return
+
+    // 2. Tuile SKY/VOID/SEA — chercher une plante sous la souris.
+    if (tileNode.code === NODES.SKY.code || tileNode.code === NODES.VOID.code || tileNode.code === NODES.SEA.code || tileNode.code === NODES.GRASSMOSS.code) {
+      const plant = floraManager.getPlantAt(tileIndex)
+      if (plant === null) return
+      if (!floraManager.canForage(plant)) return
+
+      const plantItem = ITEMS[plant.itemId]
+      if (!plantItem.foraging) return
+
+      for (const entry of this.#queue) {
+        if (entry.type === 'plant' && entry.plant === plant) return
+      }
+
+      if (!isInToolRange(tileIndex, tool, prefix, 'foraging-range')) { eventBus.emit('sound/play', 'toofar'); return }
+      if (tool.star < plantItem.star) { eventBus.emit('sound/play', 'wrong'); return }
+      const speed = computeActionSpeed(plantItem.foraging.speed, tool.foraging.speed, 'foraging-speed', prefix)
+
+      const wasEmpty = this.#queue.length === 0
+      this.#queue.push({type: 'plant', plant, tileIndex, tool, prefix, speed})
+      eventBus.emit('sound/play', 'foraging')
+
+      if (wasEmpty) this.#scheduleNext()
+      return
+    }
 
     // 1. Tuile NATURAL (forage du sol)
     if (tileNode.type & NODE_TYPE.NATURAL) {
@@ -698,32 +724,7 @@ class ForagingManager {
       eventBus.emit('sound/play', 'foraging')
 
       if (wasEmpty) this.#scheduleNext()
-
-      return
     }
-
-    // 2. Tuile SKY/VOID/SEA — chercher une plante sous la souris.
-    if (tileNode.code !== NODES.SKY.code && tileNode.code !== NODES.VOID.code && tileNode.code !== NODES.SEA.code) return
-    const plant = floraManager.getPlantAt(tileIndex)
-    if (plant === null) return
-    if (!floraManager.canForage(plant)) return
-
-    const plantItem = ITEMS[plant.itemId]
-    if (!plantItem.foraging) return
-
-    for (const entry of this.#queue) {
-      if (entry.type === 'plant' && entry.plant === plant) return
-    }
-
-    if (!isInToolRange(tileIndex, tool, prefix, 'foraging-range')) { eventBus.emit('sound/play', 'toofar'); return }
-    if (tool.star < plantItem.star) { eventBus.emit('sound/play', 'wrong'); return }
-    const speed = computeActionSpeed(plantItem.foraging.speed, tool.foraging.speed, 'foraging-speed', prefix)
-
-    const wasEmpty = this.#queue.length === 0
-    this.#queue.push({type: 'plant', plant, tileIndex, tool, prefix, speed})
-    eventBus.emit('sound/play', 'foraging')
-
-    if (wasEmpty) this.#scheduleNext()
   }
 
   /**
