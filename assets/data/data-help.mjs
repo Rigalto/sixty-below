@@ -836,7 +836,7 @@ The Ancient House is a large desert dwelling buried deep in [[Desert]] biomes. U
     content: `
 **Description**
 
-A large underground cave found in [[Jungle]] biomes. Its walls are covered in luminous moss, creating a soft green glow. The air is humid and rich in spores.
+A large underground cave found in [[Jungle]] biomes. Its walls are covered in luminous moss, creating a soft green glow. The air is humid and rich in spores.⏳
 
 **Main Location**
 
@@ -845,11 +845,14 @@ A large underground cave found in [[Jungle]] biomes. Its walls are covered in lu
 
 **Materials**
 
-* [[node:grassMoss]] — floor and lateral walls
 * [[node:mud]] — substrate beneath the moss floor
+* [[node:grassMoss]] — floor and lateral walls
 
+**Flora**
 
-**Inhabitants** ⏳
+* Herbs: [[item:velvetmoss]]
+
+**Fauna**
 
 | Monster | Role | Trigger |
 |---|---|---|
@@ -1677,7 +1680,7 @@ See [[Foraging]], [[Foraging Tools]] and [[Foraging Buffs]] for details.
     content: `
 **Description**
 
-Luminous moss that covers the walls and floor of [[Moss Cave]]s. Its soft green glow makes it one of the few self-illuminating natural tiles.
+Luminous moss that covers the walls and floor of [[Moss Cave]]s. Its soft green glow makes it one of the few self-illuminating natural tiles.⏳
 
 **Tier**
 
@@ -1689,9 +1692,10 @@ Luminous moss that covers the walls and floor of [[Moss Cave]]s. Its soft green 
 
 <hr>
 
-**Mining** ⏳
+**Mining**
 
-Mining Tool: <<itemStar|pickaxeSilver>> or better
+* Mining a [[node:grassMoss]] tile destroys any [[item:velvetmoss]] growing on it without loot
+* Mining Tool: <<itemStar|pickaxeSilver>> or better
 
 <<lootTable|grassMoss|mining>>
 
@@ -1699,18 +1703,29 @@ See [[Mining]], [[Mining Tools]] and [[Mining Buffs]] for details.
 
 <hr>
 
-**Foraging** ⏳
+**Foraging**
 
-Foraging Tool: <<itemStar|sickleGold>>
+* [[node:grassMoss]] itself cannot be foraged
+* Foraging targets [[item:velvetmoss]] growing on it instead — see [[Velvetmoss]] for tools and loot
 
-<<lootTable|grassMoss|foraging>>
+<hr>
 
-See [[Foraging]], [[Foraging Tools]] and [[Foraging Buffs]] for details.
+**Growing Moss Grass**
+
+Moss Grass never spreads on its own.
+The only way to create it is by sowing a [[item:velvetmossSpore]] on [[node:mud]] with at least one open tile above, to its left, or to its right.
+
+* Place a [[item:velvetmossSpore]] in the [[Hotbar]] ([[Inventory]] Panel [I])
+* Select its slot, then left-click a [[node:mud]] tile with an empty tile above, to its left, or to its right — the spore is consumed
+* The tile has to be in [[Ranges|Interaction Range]], this range can be buffed
+* The transformation is instantaneous
 
 <hr>
 
 **Tips**
 
+* _A pickaxe destroys the whole [[node:grassMoss]] tile — any [[item:velvetmoss]] growing on it disappears with no moss loot, only the tile's own mining loot. Use a [[Foraging Tools|Sickle]] instead to harvest the moss and leave the tile standing, ready to be mined._
+* _Foraging a bare [[node:grassMoss]] tile does nothing — there's nothing to harvest until [[item:velvetmoss]] grows on it._
 * _Moss grows on the floor and lateral walls, but not on the ceiling._
 * _Its bioluminescence makes torches unnecessary inside a Moss Cave._ ⏳
   `
@@ -5978,7 +5993,7 @@ Foraging Tool: <<itemStar|sickleSilver>> or better
     content: `
 **Description**
 
-Velvetmoss is a slow-growing, deep-purple moss found exclusively in [[Moss Cave|Moss Caves]]. Its velvety surface clings to the floor and lateral walls of the cave, forming dense interconnected patches that slowly reclaim every exposed surface over time.
+Velvetmoss is a slow-growing, deep-purple moss found mainly in [[Moss Cave|Moss Caves]]. Its velvety surface clings to the floor and lateral walls of the cave, forming dense interconnected patches that slowly reclaim every exposed [[node:grassMoss]] tile over time.
 
 **Tier**
 
@@ -5988,20 +6003,42 @@ Velvetmoss is a slow-growing, deep-purple moss found exclusively in [[Moss Cave|
 
 * Biome: [[Jungle]]
 * Layer: [[Underground]]
-* Grows exclusively in [[Moss Cave|Moss Caves]] on [[node:grassMoss]]
+* Grows on [[node:grassMoss]], mainly in [[Moss Cave|Moss Caves]]
 
-**Harvest**
+**Placement**
 
-* [[Foraging|Interact to harvest]] — the patch disappears on harvest
-* Tool: [[Foraging Tools|Silver Sickle]] or better ⏳
-* Loot: [[item:velvetmoss]]
+* Grows on the floor (below open air) and on lateral walls (beside open air)
+* Does not grow on the ceiling
+
+<hr>
+
+**Foraging Velvetmoss**
+
+* [[Foraging|Interact to harvest]]
+* The plant disappears on harvest
+
+Foraging Tool: <<itemStar|sickleSilver>> or better
+
+**Velvetmoss Foraging Loot**
+
+<<itemLootTable|velvetmoss|foraging>>
+
+**Dangers**
+
+* Foraging Velvetmoss may disturb a colony of [[monster:millipede|Millipedes]] hidden beneath the moss — they attack in successive waves. Clear the first wave quickly or risk being overwhelmed. ⏳
+
+<hr>
 
 **Regrowth**
 
-* Foraging a patch removes it permanently from that spot — the moss does not regrow where it was picked
-* Velvetmoss spreads slowly but relentlessly across every exposed [[node:grassMoss]] surface in the cave
-* A new patch appears every 2 to 3 in-game days on a random unoccupied spot
+**Regrowth**
+
+* Foraging a patch removes it from that spot — the tile rejoins the pool of bare grassMoss, on equal footing with every other unoccupied spot
+* Velvetmoss spreads slowly but relentlessly across every exposed [[node:grassMoss]] surface
+* Every 2 to 3 in-game days, one random unoccupied grassMoss tile anywhere in the world is reclaimed — never necessarily the one you just harvested
 * Left unharvested, the moss will eventually cover every available surface
+
+<hr>
 
 **Terrain Effect** ⏳
 
@@ -6009,25 +6046,23 @@ Velvetmoss is a slow-growing, deep-purple moss found exclusively in [[Moss Cave|
 * Walking on Velvetmoss reduces Movement Speed ({{item:velvetmoss:buffs:movementSpeed}}%)
 * See [[Movement Buffs]] for details
 
-**Placement**
-
-* Grows on the floor (below open air) and on lateral walls (beside open air)
-* Does not grow on the ceiling
-* Each patch interconnects visually with its neighbours in all four directions
+<hr>
 
 **Usages** ⏳
 
 * [[item:velvetmoss]] — crafting ingredient ⏳
+* [[item:velvetmossSpore]] :
+  * Crafting ingredient⏳
+  * Sow on [[node:mud]] adjacent to open air to grow [[node:grassMoss]]
 
-**Dangers**
-
-* Foraging Velvetmoss may disturb a colony of [[monster:millipede|Millipedes]] hidden beneath the moss — they attack in successive waves. Clear the first wave quickly or risk being overwhelmed. ⏳
+<hr>
 
 **Tips**
 
-* _Velvetmoss grows slowly but persistently — even a single unoccupied spot will eventually be claimed._ ⏳
-* _Its purple hue deepens near the cave floor — patches near the ceiling tend to be paler._ ⏳
-* _Harvest systematically from one side to the other — scattered foraging wastes regrowth cycles._ ⏳
+* _Mining the [[node:grassMoss]] tile beneath a patch destroys the Velvetmoss with no loot — reach for a [[Foraging Tooles|Sickle]] instead if you want the harvest._
+* _Velvetmoss grows slowly but persistently — even a single unoccupied spot will eventually be claimed._
+* _A fully covered grassMoss floor stops producing entirely — harvest what you cross, don't let it fill up._
+* _More grassMoss won't speed up the harvest — what keeps it flowing is always leaving a spot open, not the size of the floor._
   `
   },
 
