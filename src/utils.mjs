@@ -1199,7 +1199,7 @@ export const parseLootCount = (countStr) => {
   countStr = '' + countStr
   // Séparation count et bonus
   const dotIdx = countStr.indexOf('.')
-  const bonus = dotIdx === -1 ? 0 : parseInt(countStr.slice(dotIdx + 1))
+  const bonus = dotIdx === -1 ? 0 : parseInt(countStr.slice(dotIdx + 1).slice(0, 2).padEnd(2, '0'))
   const countPart = dotIdx === -1 ? countStr : countStr.slice(0, dotIdx)
 
   // Séparation min et max
