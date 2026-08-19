@@ -4971,17 +4971,57 @@ class MossSystem {
   }
 
   /**
-   * Liaison EventBus : 'world/tile-changed'. Supprime définitivement le spot dont la tuile
-   * GRASSMOSS vient de changer (minage) — la Velvetmoss éventuellement présente disparaît sans
-   * loot (le loot du minage de GRASSMOSS lui-même est géré ailleurs, hors MossSystem).
-   * @param {{tileIndex: number}} payload
+   * Liaison EventBus : 'world/tile-changed'. Trois cas exclusifs, testés du moins au plus
+   * coûteux :
+   * — tileOldCode GRASSMOSS perdu (minage) : supprime définitivement le spot éventuel.
+   * — tileNewCode GRASSMOSS gagné (semis) : vérifie/enregistre un nouveau spot.
+   * — tileOldCode VOID perdu (placement/liquide) : jusqu'à 3 tuiles GRASSMOSS voisines
+   *   peuvent avoir perdu leur dernier VOID adjacent — les retransforme en MUD si besoin.
+   * @param {{tileIndex: number, tileOldCode: number, tileNewCode: number}} payload
    */
-  onTileChangedMoss ({tileIndex, tileNewCode}) {
-    if (tileNewCode === NODES.GRASSMOSS.code) this.#onMossSpotCheck(tileIndex)
 
-    const record = this.#spotsByTile.get(tileIndex)
-    if (record === undefined) return
-    this.#removeRecord(record)
+  onTileChangedMoss ({tileIndex, tileNewCode, tileOldCode}) {
+    if (tileOldCode === NODES.GRASSMOSS.code) {
+      const record = this.#spotsByTile.get(tileIndex)
+      if (record !== undefined) this.#removeRecord(record)
+      return
+    }
+
+    if (tileNewCode === NODES.GRASSMOSS.code) {
+      this.#onMossSpotCheck(tileIndex)
+      return
+    }
+
+    if (tileOldCode === NODES.VOID.code) {
+      const W = WORLD_WIDTH
+      this.#checkMossCandidate(tileIndex + W)
+      this.#checkMossCandidate(tileIndex - 1)
+      this.#checkMossCandidate(tileIndex + 1)
+    }
+  }
+
+  /**
+   * Teste une tuile GRASSMOSS candidate à la retransformation en MUD : si elle a perdu son
+   * dernier VOID adjacent (dessus/gauche/droite), la retransforme. La suppression du spot
+   * éventuellement présent est déléguée à la réémission de world/tile-changed, qui retombe
+   * sur le cas de destruction de onTileChangedMoss — aucune duplication ici. No-op si la
+   * tuile n'est plus GRASSMOSS.
+   * @param {number} tileIndex
+   */
+  #checkMossCandidate (tileIndex) {
+    const GRASSMOSS = NODES.GRASSMOSS.code
+    const VOID = NODES.VOID.code
+    const MUD = NODES.MUD.code
+    const W = WORLD_WIDTH
+
+    if (chunkManager.getTileAt(tileIndex) !== GRASSMOSS) return
+
+    if (chunkManager.getTileAt(tileIndex - W) === VOID ||
+        chunkManager.getTileAt(tileIndex - 1) === VOID ||
+        chunkManager.getTileAt(tileIndex + 1) === VOID) return
+
+    chunkManager.setTileAt(tileIndex, MUD)
+    eventBus.emit('world/tile-changed', {tileIndex, tileOldCode: GRASSMOSS, tileNewCode: MUD})
   }
 
   /**
