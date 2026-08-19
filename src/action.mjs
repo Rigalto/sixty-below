@@ -1007,6 +1007,7 @@ class SowingManager {
     else if (item.code === 'ambermirageSeed') this.#trySowAmbermirageSeed(tileIndex, tileNode, slotIndex)
     else if (item.code === 'bloodmoonSeed') this.#trySowBloodmoonSeed(tileIndex, tileNode, slotIndex)
     else if (item.code === 'fernSpore') this.#trySowFernSpore(tileIndex, tileNode, slotIndex)
+    else if (item.code === 'velvetmossSpore') this.#trySowVelvetmossSpore(tileIndex, tileNode, slotIndex)
     else if (item.code === 'seedForest') this.#trySowSeed(tileIndex, tileNode, slotIndex, NODES.DIRT.code, NODES.GRASSFOREST.code)
     else if (item.code === 'seedJungle') this.#trySowSeed(tileIndex, tileNode, slotIndex, NODES.SILT.code, NODES.GRASSJUNGLE.code)
   }
@@ -1048,6 +1049,50 @@ class SowingManager {
     // Succès — transformation instantanée
     chunkManager.setTileAt(tileIndex, GRASSFERN)
     eventBus.emit('world/tile-changed', {tileIndex, tileOldCode: HUMUS, tileNewCode: GRASSFERN})
+
+    inventoryManager.decrementHotbarSlotCount(slotIndex)
+    eventBus.emit('sound/play', 'placing')
+  }
+
+  /**
+   * Valide et exécute la transformation d'une tuile MUD en GRASSMOSS via une VelvetmossSpore.
+   * Transformation instantanée, comme FernSpore — aucune germination différée.
+   * Aucune tuile de corps à réserver (Velvetmoss partage sa tuile avec GRASSMOSS),
+   * seule la tuile MUD elle-même doit être libre de minage.
+   * Conditions : tuile MUD, au moins une des 3 tuiles adjacentes (dessus/gauche/droite) VOID.
+   * Silence si mauvaise tuile ou aucun VOID adjacent, 'wrong' si bloqué, 'placing' si succès.
+   * @param {number} tileIndex — tuile cliquée (le sol MUD attendu)
+   * @param {object} tileNode
+   * @param {number} slotIndex
+   */
+  #trySowVelvetmossSpore (tileIndex, tileNode, slotIndex) {
+    const MUD = NODES.MUD.code
+    const VOID = NODES.VOID.code
+    const GRASSMOSS = NODES.GRASSMOSS.code
+    const W = WORLD_WIDTH
+
+    // Silence — mauvaise tuile de sol
+    if (tileNode.code !== MUD) return
+
+    const voidAbove = chunkManager.getTileAt(tileIndex - W) === VOID
+    const voidLeft = chunkManager.getTileAt(tileIndex - 1) === VOID
+    const voidRight = chunkManager.getTileAt(tileIndex + 1) === VOID
+
+    // Silence — aucune des 3 tuiles adjacentes n'est VOID
+    if (!voidAbove && !voidLeft && !voidRight) return
+
+    // 'toofar' — tuile hors de la zone d'interaction
+    if (!isInInteractionRange(tileIndex)) { eventBus.emit('sound/play', 'toofar'); return }
+
+    // 'wrong' — tuile bloquée (furniture)
+    if (!blockedTiles.canMine(tileIndex)) {
+      eventBus.emit('sound/play', 'wrong')
+      return
+    }
+
+    // Succès — transformation instantanée
+    chunkManager.setTileAt(tileIndex, GRASSMOSS)
+    eventBus.emit('world/tile-changed', {tileIndex, tileOldCode: MUD, tileNewCode: GRASSMOSS})
 
     inventoryManager.decrementHotbarSlotCount(slotIndex)
     eventBus.emit('sound/play', 'placing')

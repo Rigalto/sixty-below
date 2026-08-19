@@ -4562,7 +4562,7 @@ class FernSystem {
    * Liaison EventBus : 'world/tile-changed'.
    * — Détruit la fougère présente si une des 3 tuiles VOID au-dessus de son sol n'est plus libre.
    * — Supprime le spot (et la fougère éventuellement dessus) si sa tuile sol n'est plus GRASSFERN.
-   * — Appel onFernSpotCheck si une tuile devient GRASSFERN.
+   * — Appel #onFernSpotCheck si une tuile devient GRASSFERN.
    * Relit les tuiles réelles avant d'agir.
    * @param {{tileIndex: number, tileOldCode: number, tileNewCode: number}} payload
    */
@@ -4593,7 +4593,7 @@ class FernSystem {
     }
 
     // Cas 3 — nouvelle tuile GRASSFERN : nouveau spot, sans fougère dessus
-    if (tileNewCode === GRASSFERN) this.onFernSpotCheck(tileIndex)
+    if (tileNewCode === GRASSFERN) this.#onFernSpotCheck(tileIndex)
   }
 
   /**
@@ -4603,7 +4603,7 @@ class FernSystem {
    * ce soilIndex, ou si la tuile n'est plus GRASSFERN entre l'émission et l'exécution.
    * @param {number} soilIndex
    */
-  onFernSpotCheck (soilIndex) {
+  #onFernSpotCheck (soilIndex) {
     const GRASSFERN = NODES.GRASSFERN.code
     if (chunkManager.getTileAt(soilIndex) !== GRASSFERN) return
     if (this.#spotsBySoil.has(soilIndex)) return
@@ -4749,6 +4749,7 @@ class MossSystem {
   #displayed = new Set() // Set<record> — spots dans les chunks preload (cible render)
   #image = null // ITEMS.velvetmoss.placed, mis en cache dans init()
   #nextGrowthTimestamp = null // horodatage absolu (game-time) de la prochaine pousse, chargé par initTimestamp()
+  #dirty = false // true si #nextGrowthTimestamp a changé depuis la dernière écriture gamestate (cf. onSaveTick)
 
   constructor () {
     // EventBus
@@ -4756,6 +4757,8 @@ class MossSystem {
     eventBus.on('world/tile-changed', this.onTileChangedMoss)
     this.onFirstLoopMoss = this.onFirstLoopMoss.bind(this)
     eventBus.on('time/first-loop', this.onFirstLoopMoss)
+    this.onSaveTick = this.onSaveTick.bind(this)
+    eventBus.on('save/tick', this.onSaveTick)
     // TaskScheduler
     this.mossPopulationTick = this.mossPopulationTick.bind(this)
   }
@@ -4770,6 +4773,7 @@ class MossSystem {
     this.#spotsByTile.clear()
     this.#absentList.length = 0
     this.#displayed.clear()
+    this.#dirty = false
 
     this.#image = ITEMS.velvetmoss.placed // après hydratation
   }
@@ -4822,11 +4826,22 @@ class MossSystem {
     if (this.#absentList.length > 0) {
       const delay = (MOSS_POPULATION_DELAY_MS * seededRNG.randomGetRealMinMax(0.8, 1.2)) | 0
       const {priority, capacity} = MICROTASK.MOSS_POPULATION
-      const timestamp = taskScheduler.enqueue('moss-population', delay, this.mossPopulationTick, priority, capacity)
-      database.setGameState('mossnextgrowthtimestamp', timestamp)
+      this.#nextGrowthTimestamp = taskScheduler.enqueue('moss-population', delay, this.mossPopulationTick, priority, capacity)
     } else {
-      database.setGameState('mossnextgrowthtimestamp', null)
+      this.#nextGrowthTimestamp = null
     }
+    this.#dirty = true
+  }
+
+  /**
+   * Liaison EventBus : 'save/tick'. Émis toutes les 2s par SaveManager.processSave, en
+   * synchronisation avec le save des chunks — persiste #nextGrowthTimestamp en gamestate
+   * uniquement s'il a changé depuis la dernière écriture.
+   */
+  onSaveTick () {
+    if (!this.#dirty) return
+    database.setGameState('mossnextgrowthtimestamp', this.#nextGrowthTimestamp)
+    this.#dirty = false
   }
 
   /**
@@ -4961,10 +4976,45 @@ class MossSystem {
    * loot (le loot du minage de GRASSMOSS lui-même est géré ailleurs, hors MossSystem).
    * @param {{tileIndex: number}} payload
    */
-  onTileChangedMoss ({tileIndex}) {
+  onTileChangedMoss ({tileIndex, tileNewCode}) {
+    if (tileNewCode === NODES.GRASSMOSS.code) this.#onMossSpotCheck(tileIndex)
+
     const record = this.#spotsByTile.get(tileIndex)
     if (record === undefined) return
     this.#removeRecord(record)
+  }
+
+  /**
+   * Enregistre un nouveau spot Velvetmoss pour une tuile devenue GRASSMOSS, sans mousse dessus
+   * (present=false) — poussera plus tard via mossPopulationTick. Passe par #addToAbsentList
+   * (pas un push direct) : la tâche de régulation a pu être arrêtée entre-temps (cf.
+   * optimisation #absentList vide) et doit être relancée si c'était le cas. No-op si un spot
+   * existe déjà à cet index, ou si la tuile n'est plus GRASSMOSS entre l'émission et l'exécution.
+   * @param {number} tileIndex
+   */
+  #onMossSpotCheck (tileIndex) {
+    const GRASSMOSS = NODES.GRASSMOSS.code
+    if (chunkManager.getTileAt(tileIndex) !== GRASSMOSS) return
+    if (this.#spotsByTile.has(tileIndex)) return
+
+    const record = {
+      id: uniqueIdGenerator.getUniqueId(),
+      kind: PLANT_KIND.HERB,
+      type: PLANT_TYPE.VELVETMOSS,
+      index: tileIndex,
+      soilIndex: tileIndex,
+      itemId: 'velvetmoss',
+      w: 1,
+      h: 1,
+      x: tileIndex & 0x3FF,
+      y: tileIndex >> 10,
+      present: false,
+      deleted: false
+    }
+    this.#list.push(record)
+    this.#spotsByTile.set(tileIndex, record)
+    this.#addToAbsentList(record)
+    saveManager.queueStaticUpdate({storeName: 'plant', record})
   }
 
   /**

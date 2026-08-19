@@ -84,7 +84,7 @@ class SaveManager {
     // 1. Re-planification immédiate (Boucle infinie)
     taskScheduler.enqueueOnce('auto_save', 2000, this.processSave, this.priority, this.capacity)
 
-    // Signal pour les écritures gamestate périodiques externes (ex: position joueur)
+    // Signal pour les écritures gamestate synchrones/périodiques externes (ex: position joueur)
     eventBus.emit('save/tick')
 
     const batchPayload = []
