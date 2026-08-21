@@ -597,6 +597,15 @@ Cette section définit les événements officiels. Tout nouvel événement doit 
 | :---: | :--- | :--- | :--- |
 | E | `time/every-hour` | `{ day, hour, minute, isDay }` | Cycle bloom/unbloom asymétrique sur 1/4 de la population (offset = hour % 4). |
 
+#### Sand Falling (`SandFallingSystem`)
+
+| Dir. | Event Name | Payload Structure | Description |
+| :---: | :--- | :--- | :--- |
+| E | `world/tile-changed` | `{ tileIndex: number, tileOldCode: number, tileNewCode: number }` | Alimente réactivement le Set de tuiles SAND candidates à la chute. |
+| E | `time/first-loop` | `{ day, hour, minute, tslot, weather, nextWeather, skyColor, moonPhase, isDay }` | Réarme la boucle périodique si des candidats ont survécu au rechargement. |
+| E | `save/tick` | — | Persiste le Set de candidats en gamestate (clé `sandfallingtiles`) si modifié. |
+| S | `world/tile-changed` | `{ tileIndex: number, tileOldCode: number, tileNewCode: number }` | Émis en bloc pour chaque tuile déplacée (source et destination) lors de l'application des chutes. |
+
 #### Debug (`WorldMapDebug`, `RealtimeDebugWidget`, `BuffManager`)
 
 | Dir. | Event Name | Payload Structure | Description |

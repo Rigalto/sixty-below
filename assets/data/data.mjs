@@ -106,7 +106,7 @@ export const NODES = {
     mining: {speed: 1000, items: [{item: 'blockDirt', count: 1}, {item: 'worm', count: 0.15, buffs: ['lucky:200', 'rainy:200']}]},
     help: 'Dirt'
   },
-  SAND: {code: 41, name: 'Sand', type: NODE_TYPE.TOPSOIL | NODE_TYPE.SOLID, stype: 'block', star: 1, color: '#fff198', image: 'substrat_16_16+12', mining: {speed: 1000, items: [{item: 'blockSand', count: 1}]}, viscosity: 500, help: 'Sand'},
+  SAND: {code: 41, name: 'Sand', type: NODE_TYPE.TOPSOIL | NODE_TYPE.SOLID, stype: 'block', star: 1, color: '#fff198', image: 'substrat_16_16+12', viscosity: 1000, mining: {speed: 1000, items: [{item: 'blockSand', count: 1}]}, help: 'Sand'},
   SILT: {code: 42, name: 'Silt', type: NODE_TYPE.TOPSOIL | NODE_TYPE.SOLID, stype: 'block', star: 2, color: '#73c882', image: 'substrat_16_16+13', mining: {speed: 1000, items: [{item: 'blockSilt', count: 1}, {item: 'slug', count: 0.15, buffs: ['lucky:200', 'rainy:200']}]}, help: 'Silt'},
   HUMUS: {code: 43, name: 'Humus', type: NODE_TYPE.TOPSOIL | NODE_TYPE.SOLID, stype: 'block', star: 2, color: '#e2b3ff', image: 'substrat_16_16+14', mining: {speed: 1000, items: [{item: 'blockHumus', count: 1}]}, help: 'Humus'},
 

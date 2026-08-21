@@ -274,6 +274,7 @@ export const MICROTASK = {
   OAK_END_SHAKE: {priority: 24, capacity: 4, taskName: 'oakEndShake'}, // fin de la période où un arbre n'est pas shakable
   MAHOGANY_GROW: {priority: 24, capacity: 4, taskName: 'growMahogany'}, // croissance d'un tronçon de mahogany
   MAHOGANY_END_SHAKE: {priority: 24, capacity: 4, taskName: 'mahoganyEndShake'}, // fin de la période où un arbre n'est pas shakable
+  SAND_FALLING_APPLY: {priority: 24, capacity: 10, taskName: 'applySandFallingMoves'}, // écriture monde en bloc + emit des tuiles tombées
 
   FORAGE_ACTION: {priority: 24, capacity: 10, taskName: 'onForage'}, // foraging
 
@@ -321,6 +322,8 @@ export const MICROTASK = {
   CURSEDCROWN_REGROW: {priority: 20, capacity: 2, taskName: 'cursedcrownRegrow'}, // recherche d'un nouvel emplacement pour les cursedcrowns à repousser
   ABYSSHORN_REGROW: {priority: 20, capacity: 2, taskName: 'abysshornRegrow'}, // recherche d'un nouvel emplacement pour les abysshorns à repousser
   INFERNCAP_REGROW: {priority: 20, capacity: 2, taskName: 'inferncapRegrow'}, // recherche d'un nouvel emplacement pour les inferncaps à repousser
+
+  SAND_FALLING_TICK: {priority: 20, capacity: 10, taskName: 'sandFallingTick'}, // détermination périodique des chutes (parcours complet de #pending)
 
   COBWEB_GROWTH: {priority: 20, capacity: 3, taskName: 'cobwebGrowth'}, // tentative périodique de pose d'une toile d'araignée
   AMBERMIRAGE_TILE_CHECK: {priority: 20, capacity: 10, taskName: 'onAmbermirageTileCheck'}, // entretien réactif d'un spot pour une tuile modifiée

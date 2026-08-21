@@ -610,6 +610,7 @@ class WorldGenerator {
       {key: 'randomkey', value: seed},
       {key: 'redhearts', value: 5},
       {key: 'ruinedcabin', value: ruinedcabin},
+      {key: 'sandfallingtiles ', value: new Set()},
       {key: 'sewedsunflower', value: []},
       {key: 'sewedmoonglow', value: []},
       {key: 'sewedambermirage', value: []},

@@ -736,8 +736,25 @@ export const timeManager = new TimeManager()
 
    ==================================================================================================== */
 
+/* ====================================================================================================
+   BLOCKED TILES
+   ====================================================================================================
+
+   Singleton : blockedTiles.
+
+   Registre centralisé des tuiles inaccessibles au placement ou au minage. Deux Sets indépendants
+   (#blockedPlacement, #blockedMining) — nécessaire depuis que SandFallingSystem peut faire
+   apparaître une tuile SOLID (SAND) sur un emplacement uniquement placement-bloqué (ex : canopée
+   d'un arbre, réservée par blockPlacementRect). Avec un Set unique partagé, canMine() renvoyait
+   incorrectement false sur cette tuile, empêchant le joueur de la miner pour libérer l'arbre.
+   API inchangée pour tous les appelants (blockPlacement/blockMining/canPlace/canMine et leurs
+   variantes Rect) — seule la représentation interne change.
+
+   ==================================================================================================== */
+
 class BlockedTiles {
-  #blocked = new Set() // Set<tileIndex> — placement et minage partagent la structure (disjoints par type de tuile)
+  #blockedPlacement = new Set() // Set<tileIndex> — tuiles inaccessibles au placement (furniture, plante)
+  #blockedMining = new Set() // Set<tileIndex> — tuiles protégées du minage
 
   /**
 * Réinitialise les tuiles bloquées et peuple la bordure du monde.
@@ -745,7 +762,8 @@ class BlockedTiles {
 * @param {number[]} eternalTiles — tuiles ETERNAL spéciales issues du gamestate
 */
   init (eternalTiles) {
-    this.#blocked.clear()
+    this.#blockedPlacement.clear()
+    this.#blockedMining.clear()
 
     for (let x = 0; x < WORLD_WIDTH; x++) {
       this.blockMining(x)
@@ -760,7 +778,6 @@ class BlockedTiles {
       this.blockPlacement((y << 10) | (WORLD_WIDTH - 1))
     }
 
-    // si pas de monde créé, alors pas de eternalTiles
     for (const tileIndex of eternalTiles) {
       this.blockMining(tileIndex)
       this.blockPlacement(tileIndex)
@@ -768,22 +785,22 @@ class BlockedTiles {
   }
 
   /** Marque la tuile comme inaccessible au placement (furniture ou plante). @param {number} tileIndex */
-  blockPlacement (tileIndex) { this.#blocked.add(tileIndex) }
+  blockPlacement (tileIndex) { this.#blockedPlacement.add(tileIndex) }
 
   /** Libère la tuile pour le placement. @param {number} tileIndex */
-  unblockPlacement (tileIndex) { this.#blocked.delete(tileIndex) }
+  unblockPlacement (tileIndex) { this.#blockedPlacement.delete(tileIndex) }
 
   /** @param {number} tileIndex @returns {boolean} true si la tuile peut accueillir un furniture ou une plante */
-  canPlace (tileIndex) { return !this.#blocked.has(tileIndex) }
+  canPlace (tileIndex) { return !this.#blockedPlacement.has(tileIndex) }
 
   /** Marque la tuile comme protégée du minage. @param {number} tileIndex */
-  blockMining (tileIndex) { this.#blocked.add(tileIndex) }
+  blockMining (tileIndex) { this.#blockedMining.add(tileIndex) }
 
   /** Libère la tuile pour le minage. @param {number} tileIndex */
-  unblockMining (tileIndex) { this.#blocked.delete(tileIndex) }
+  unblockMining (tileIndex) { this.#blockedMining.delete(tileIndex) }
 
   /** @param {number} tileIndex @returns {boolean} true si la tuile peut être minée */
-  canMine (tileIndex) { return !this.#blocked.has(tileIndex) }
+  canMine (tileIndex) { return !this.#blockedMining.has(tileIndex) }
 
   // --- FONCTIONS POUR LES RECTANGLES ---
 
@@ -791,9 +808,7 @@ class BlockedTiles {
   blockPlacementRect (x, y, w, h) {
     for (let row = y; row < y + h; row++) {
       const rowOffset = row << 10
-      for (let col = x; col < x + w; col++) {
-        this.#blocked.add(rowOffset | col)
-      }
+      for (let col = x; col < x + w; col++) this.#blockedPlacement.add(rowOffset | col)
     }
   }
 
@@ -801,9 +816,7 @@ class BlockedTiles {
   unblockPlacementRect (x, y, w, h) {
     for (let row = y; row < y + h; row++) {
       const rowOffset = row << 10
-      for (let col = x; col < x + w; col++) {
-        this.#blocked.delete(rowOffset | col)
-      }
+      for (let col = x; col < x + w; col++) this.#blockedPlacement.delete(rowOffset | col)
     }
   }
 
@@ -811,9 +824,7 @@ class BlockedTiles {
   blockMiningRect (x, y, w, h) {
     for (let row = y; row < y + h; row++) {
       const rowOffset = row << 10
-      for (let col = x; col < x + w; col++) {
-        this.#blocked.add(rowOffset | col)
-      }
+      for (let col = x; col < x + w; col++) this.#blockedMining.add(rowOffset | col)
     }
   }
 
@@ -821,9 +832,7 @@ class BlockedTiles {
   unblockMiningRect (x, y, w, h) {
     for (let row = y; row < y + h; row++) {
       const rowOffset = row << 10
-      for (let col = x; col < x + w; col++) {
-        this.#blocked.delete(rowOffset | col)
-      }
+      for (let col = x; col < x + w; col++) this.#blockedMining.delete(rowOffset | col)
     }
   }
 
@@ -836,7 +845,7 @@ class BlockedTiles {
     for (let row = y; row < y + h; row++) {
       const rowOffset = row << 10
       for (let col = x; col < x + w; col++) {
-        if (this.#blocked.has(rowOffset | col)) return false
+        if (this.#blockedPlacement.has(rowOffset | col)) return false
       }
     }
     return true
@@ -851,21 +860,27 @@ class BlockedTiles {
     for (let row = y; row < y + h; row++) {
       const rowOffset = row << 10
       for (let col = x; col < x + w; col++) {
-        if (this.#blocked.has(rowOffset | col)) return false
+        if (this.#blockedMining.has(rowOffset | col)) return false
       }
     }
     return true
   }
 
   /**
- * Visualisation debug : carré rouge semi-transparent sur chaque tuile bloquée.
- * Permet de détecter les tuiles incorrectement bloquées ou libérées.
+ * Visualisation debug : carré bleu semi-transparent sur les tuiles placement-bloquées,
+ * rouge sur les tuiles minage-bloquées (une tuile peut désormais afficher les deux).
  * @param {CanvasRenderingContext2D} ctx — contexte déjà transformé (caméra appliquée)
  */
   render (ctx) {
     ctx.save()
+    ctx.fillStyle = 'rgba(0, 100, 255, 0.4)'
+    for (const tileIndex of this.#blockedPlacement) {
+      const pxX = (tileIndex & 0x3FF) << 4
+      const pxY = (tileIndex >> 10) << 4
+      ctx.fillRect(pxX + 1, pxY + 1, 14, 14)
+    }
     ctx.fillStyle = 'rgba(255, 0, 0, 0.4)'
-    for (const tileIndex of this.#blocked) {
+    for (const tileIndex of this.#blockedMining) {
       const pxX = (tileIndex & 0x3FF) << 4
       const pxY = (tileIndex >> 10) << 4
       ctx.fillRect(pxX + 1, pxY + 1, 14, 14)
@@ -873,7 +888,6 @@ class BlockedTiles {
     ctx.restore()
   }
 }
-
 export const blockedTiles = new BlockedTiles()
 
 /* ====================================================================================================

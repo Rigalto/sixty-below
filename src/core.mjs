@@ -18,6 +18,7 @@ import {craftOverlay} from './craft.mjs'
 import {achievementManager} from './achievement.mjs'
 import {playerManager, lootPopupManager, handedToolManager, hotbarOverlay} from './player.mjs'
 import {floraManager, sunflowerSystem, oleanderSystem, mandrakeSystem, bambooSystem, pricklepadSystem, parsnipSystem, ambermirageSystem, fernSystem, mossSystem, oakSystem, mahoganySystem, cobwebSystem, coconutSystem, thornspineSystem, spreadForestSystem, spreadJungleSystem, coralSystem, bloodmoonSystem, gravelweedSystem, satansCubeSystem, sneakthornSystem, cursedcrownSystem, abysshornSystem, inferncapSystem} from './ecosystem.mjs'
+import {sandFallingSystem} from './liquid.mjs'
 import {ACHIEVEMENT_CATEGORIES} from '../assets/data/data-achievement.mjs'
 import {miningManager, placingManager, foragingManager, choppingManager, sowingManager, hammingManager, furnishingManager, fillingManager, pouringManager, decomposerManager} from './action.mjs'
 import './combat.mjs'
@@ -387,6 +388,7 @@ class GameCore {
     choppingManager.init()
     hammingManager.init()
     cobwebSystem.init()
+    sandFallingSystem.init(state.sandfallingtiles)
 
     // 5.1 Objectstore Inventory
     const inventoryRecords = await database.readAllFromObjectStore('inventory')
@@ -584,10 +586,10 @@ class GameCore {
     handedToolManager.render(ctx)
     if (this.showBlockedTiles) {
       blockedTiles.render(ctx) // DEBUG
-      // sunflowerSystem.debugRenderSpots(ctx)
-      // parsnipSystem.debugRenderSpots(ctx)
-      // ambermirageSystem.debugRenderSpots(ctx)
-      // oakSystem.debugRenderSpots(ctx)
+      sunflowerSystem.debugRenderSpots(ctx)
+      parsnipSystem.debugRenderSpots(ctx)
+      ambermirageSystem.debugRenderSpots(ctx)
+      oakSystem.debugRenderSpots(ctx)
       spreadForestSystem.debugRenderSpots(ctx)
       spreadJungleSystem.debugRenderSpots(ctx)
       bloodmoonSystem.debugRenderSpots(ctx)
