@@ -7174,6 +7174,8 @@ Activation fails in the following cases:
 * The clicked teleporter is out of [[Ranges|Interaction Range]].
 * The twin teleporter is not placed in the world.
 * There is no room around the twin for the player to stand.
+* The clicked teleporter or its twin is obstructed ([[node:sand]], liquid, or other material blocking it).
+* An obstructed teleporter displays a small warning icon, so the problem is visible before you try to activate it.
 
 To remove a teleporter from the world: use a <<itemStar|hammerSilver>> or higher.
 

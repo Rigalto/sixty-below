@@ -640,13 +640,14 @@ class TeleporterManager {
    * Active le téléporteur cliqué : retrouve son jumeau, vérifie que les 6 tuiles couvertes par
    * la hitbox joueur à l'arrivée (2 colonnes x 3 lignes, centrées sur les 2 colonnes du jumeau,
    * coin bas aligné sur son coin bas) ne contiennent aucune tuile solide, puis déclenche
-   * 'player/teleport'. Émet 'toofar' hors de portée, 'wrong' si le jumeau est absent ou l'arrivée
-   * bloquée.
+   * 'player/teleport'. Émet 'toofar' hors de portée, 'wrong' si le téléporteur cliqué ou son
+   * jumeau est obstrué, si le jumeau est absent, ou si l'arrivée est bloquée.
    * @param {number} tileIndex — (y << 10) | x — tuile cliquée
    * @param {object} furniture — meuble téléporteur sous la souris (stype === 'teleporter')
    */
   tryTeleport (tileIndex, furniture) {
     if (!isInInteractionRange(tileIndex)) { eventBus.emit('sound/play', 'toofar'); return }
+    if (furniture.blocked > 0) { eventBus.emit('sound/play', 'wrong'); return }
 
     const base = TELEPORTER_COLOR_SLOT[furniture.code]
     const twinIndex = this.#positions[base] === furniture.index ? this.#positions[base + 1] : this.#positions[base]
@@ -654,6 +655,7 @@ class TeleporterManager {
 
     const twin = furnitureManager.getFurnitureAt(twinIndex)
     if (twin === null) { eventBus.emit('sound/play', 'wrong'); return }
+    if (twin.blocked > 0) { eventBus.emit('sound/play', 'wrong'); return }
 
     const leftX = twin.index & 0x3FF
     const topY = twin.index >> 10
