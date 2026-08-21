@@ -4802,8 +4802,66 @@ Used to craft [[item:torch]].
     title: 'Platforms',
     category: ['Furniture'],
     content: `
+**Description**
+
+Platforms are thin furnitures that can be walked on like solid ground, yet allow movement through the space they occupy from below and from the sides.
+
 **Platform Types**
-* [[item:platformOak]]
+
+| Platform | Tier | Set |
+|---|---|
+| [[item:platformOak]] | {{item:platformOak:star|star}} | Wood |
+| [[item:platformGlass]] | {{item:platformGlass:star|star}} | Coral |
+| [[item:platformMahogany]] | {{item:platformMahogany:star|star}} | Mahogany |
+| [[item:platformReef]] | {{item:platformReef:star|star}} | Coral |
+
+<hr>
+
+**Behaviour**
+
+| Direction | Behaviour |
+|---|---|
+| From above | Solid — the player lands and stands on the platform |
+| From below | Passable — the player can jump through |
+| From the sides | Passable — the player walks through |
+| Press [S] while standing | The player drops through the platform |
+
+* An obstructed platform (buried under [[node:sand]] or a liquid) displays a small warning icon.
+* While obstructed, the tile behaves as solid ground instead of a platform — the player simply stands on it, and cannot drop through until the obstruction is cleared.
+
+<hr>
+
+**How to Use**
+
+* Craft a Platform
+* Place a Platform in the [[Hotbar]] ([[Inventory]] Panel [I])
+* Select its slot, then left-click an empty tile — the Platform is consumed
+* The clicked tile has to be in [[Ranges|Interaction Range]] — this range can be buffed
+* To remove a [[item:platformOak]] or a [[item:platformGlass]]: use <<itemStar|hammerOak>> or better
+* To remove a [[item:platformMahogany]] or a [[item:platformReef]]: use <<itemStar|hammerCopper>> or better
+
+<hr>
+
+**Crafting**
+
+| Platform | Tier | Station | Materials |
+|---|---|---|
+<<fullRecipeRow|platformOak>>
+<<fullRecipeRow|platformGlass>>
+<<fullRecipeRow|platformMahogany>>
+<<fullRecipeRow|platformReef>>
+
+<hr>
+
+**Tips**
+
+* _Use platforms to build quick multi-level walkways without blocking your own movement._
+* _A column of platforms makes a fast ladder-like climb — jump and walk through freely from below._
+
+**See also**
+
+* [[Player Movement]] — full movement controls
+* [[Ranges]] — full range buffs
     `
   },
   {
