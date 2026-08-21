@@ -6059,7 +6059,7 @@ Foraging Tool: <<itemStar|sickleSilver>> or better
 
 **Tips**
 
-* _Mining the [[node:grassMoss]] tile beneath a patch destroys the Velvetmoss with no loot — reach for a [[Foraging Tooles|Sickle]] instead if you want the harvest._
+* _Mining the [[node:grassMoss]] tile beneath a patch destroys the Velvetmoss with no loot — reach for a [[Foraging Tools|Sickle]] instead if you want the harvest._
 * _Velvetmoss grows slowly but persistently — even a single unoccupied spot will eventually be claimed._
 * _A fully covered grassMoss floor stops producing entirely — harvest what you cross, don't let it fill up._
 * _More grassMoss won't speed up the harvest — what keeps it flowing is always leaving a spot open, not the size of the floor._
