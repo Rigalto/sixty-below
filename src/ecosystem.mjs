@@ -8,7 +8,7 @@
 import {WORLD_WIDTH, WORLD_HEIGHT, MICROTASK, TOPSOIL_Y_SKY_SURFACE, TOPSOIL_Y_SURFACE_UNDER, TOPSOIL_Y_UNDER_CAVERNS, TOPSOIL_Y_CAVERNS_MID, SEA_LEVEL} from './constant.mjs'
 import {database, uniqueIdGenerator} from './database.mjs'
 import {eventBus, seededRNG, blockedTiles, microTasker, taskScheduler, removeValueUnordered} from './utils.mjs'
-import {NODES, ITEMS, PLANT_KIND, PLANT_TYPE, PLANT_SYSTEM_LOOKUP, ALL_PLANT_SYSTEMS, COBWEB_GROWTH_DELAY_MS, SUNFLOWER_RATE, PARSNIP_RATE, AMBERMIRAGE_PCENT, COCONUT_CYCLE_DELAY, TREE_IMAGES, THORNSPINE_JUNCTIONS, THORNSPINE_SIZES, THORNSPINE_UNBLOOM_PCENT, THORNSPINE_BLOOM_PCENT, CORAL_TYPES, GRAVELWEED_SOIL, FERN_TYPES, FERN_TOGGLE_PCENT, FERN_POPULATION_DELAY_MS} from '../assets/data/data.mjs'
+import {NODES, ITEMS, PLANT_KIND, PLANT_TYPE, PLANT_SYSTEM_LOOKUP, ALL_PLANT_SYSTEMS, COBWEB_GROWTH_DELAY_MS, SUNFLOWER_RATE, PARSNIP_RATE, AMBERMIRAGE_PCENT, COCONUT_CYCLE_DELAY, TREE_IMAGES, THORNSPINE_JUNCTIONS, THORNSPINE_SIZES, THORNSPINE_UNBLOOM_PCENT, THORNSPINE_BLOOM_PCENT, CORAL_TYPES, GRAVELWEED_SOIL, FERN_TYPES, FERN_TOGGLE_PCENT, FERN_POPULATION_DELAY_MS, BLOCKED_ICON} from '../assets/data/data.mjs'
 import {IMAGE_CACHE} from './assets.mjs'
 import {saveManager} from './persistence.mjs'
 import {chunkManager} from './world.mjs'
@@ -5261,6 +5261,13 @@ class OakSystem {
         const pxY = soilYPx - 48 * (i + 1)
         ctx.drawImage(IMAGE_CACHE[img.imgIndex], img.sx, img.sy, img.sw, img.sh, pxX, pxY, img.sw, img.sh)
       }
+
+      if (record.blocked > 0) {
+        const icon = BLOCKED_ICON.image
+        const iconX = ((record.soilIndex & 0x3FF) << 4) + 16
+        const iconY = soilYPx - 16
+        ctx.drawImage(IMAGE_CACHE[icon.imgIndex], icon.sx, icon.sy, icon.sw, icon.sh, iconX, iconY, 16, 16)
+      }
     }
   }
 
@@ -5853,6 +5860,12 @@ class MahoganySystem {
         const pxX = image.x << 4
         const pxY = soilYPx - 48 * (i + 1)
         ctx.drawImage(IMAGE_CACHE[img.imgIndex], img.sx, img.sy, img.sw, img.sh, pxX, pxY, img.sw, img.sh)
+      }
+      if (record.blocked > 0) {
+        const icon = BLOCKED_ICON.image
+        const iconX = ((record.soilIndex & 0x3FF) << 4) + 16
+        const iconY = soilYPx - 16
+        ctx.drawImage(IMAGE_CACHE[icon.imgIndex], icon.sx, icon.sy, icon.sw, icon.sh, iconX, iconY, 16, 16)
       }
     }
   }

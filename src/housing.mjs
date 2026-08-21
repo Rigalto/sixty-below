@@ -8,7 +8,7 @@ import {camera} from './render.mjs'
 import {playerManager} from './player.mjs'
 import {isInInteractionRange} from './buff.mjs' // ← ajouter
 import {IMAGE_CACHE} from './assets.mjs'
-import {MAX_FURNITURE_W, MAX_FURNITURE_H, ITEMS, NODES_LOOKUP, NODE_TYPE, FURNITURE_FOOTPRINT_MASK, FURNITURE_BLOCKED_ICON} from '../assets/data/data.mjs'
+import {MAX_FURNITURE_W, MAX_FURNITURE_H, ITEMS, NODES_LOOKUP, NODE_TYPE, FURNITURE_FOOTPRINT_MASK, BLOCKED_ICON} from '../assets/data/data.mjs'
 import {chunkManager} from './world.mjs'
 import {furnishingManager} from './action.mjs'
 
@@ -368,7 +368,7 @@ class FurnitureManager {
       ctx.drawImage(IMAGE_CACHE[img.imgIndex], img.sx, img.sy, img.sw, img.sh, pxX, pxY, img.sw, img.sh)
 
       if (furniture.blocked > 0) {
-        const icon = FURNITURE_BLOCKED_ICON.image
+        const icon = BLOCKED_ICON.image
         ctx.drawImage(IMAGE_CACHE[icon.imgIndex], icon.sx, icon.sy, icon.sw, icon.sh, pxX, pxY, 16, 16)
       }
     }

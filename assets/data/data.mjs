@@ -14,8 +14,8 @@ export const NODE_TYPE = {GAZ: 0x1, LIQUID: 0x2, SOLID: 0x4, ETERNAL: 0x8, NATUR
 
 // meubles : masque des tuiles valides sous l'empreinte
 export const FURNITURE_FOOTPRINT_MASK = NODE_TYPE.GAZ | NODE_TYPE.BWALL
-// icône affichée sur un furniture bloqué (record.blocked > 0)
-export const FURNITURE_BLOCKED_ICON = {image: 'placed_16_16-6-3'}
+// icône affichée sur un furniture/arbre bloqué (record.blocked > 0)
+export const BLOCKED_ICON = {image: 'placed_16_16-6-3'}
 
 /* ============================================================================
    2. NODES

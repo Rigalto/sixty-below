@@ -5143,6 +5143,7 @@ Chopping trees yields logs, which can then be refined into planks using a [[Wood
 * A new section grows approximately every 2 in-game days for Oak, 3 days for Mahogany
 * Growth stops at stage 5 — a fully grown tree no longer changes
 * If the space above the tree is obstructed (by water, sand, or other material), growth is suspended until the obstruction clears
+* An obstructed tree displays a small warning icon near its base
 
 **Planting**
 
