@@ -12,6 +12,11 @@ export const BIOME_TYPE = {SEA: 1, FOREST: 2, DESERT: 3, JUNGLE: 4}
 // les actions qui peuvent être conduite dessus : 'MINABLE', 'FORAGEABLE', 'BUCKETABLE'...
 export const NODE_TYPE = {GAZ: 0x1, LIQUID: 0x2, SOLID: 0x4, ETERNAL: 0x8, NATURAL: 0x10, TOPSOIL: 0x20, SUBSTRAT: 0x40, ORE: 0x80, GEM: 0x100, ROCK: 0x200, WOOD: 0x400, WALL: 0x800, BWALL: 0x1000, WEB: 0x2000}
 
+// meubles : masque des tuiles valides sous l'empreinte
+export const FURNITURE_FOOTPRINT_MASK = NODE_TYPE.GAZ | NODE_TYPE.BWALL
+// icône affichée sur un furniture bloqué (record.blocked > 0)
+export const FURNITURE_BLOCKED_ICON = {image: 'placed_16_16-6-3'}
+
 /* ============================================================================
    2. NODES
    ============================================================================ */

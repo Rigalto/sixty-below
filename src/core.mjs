@@ -1,7 +1,7 @@
 // inventory.mjs — GameCore - KeyboardManager - MouseManager
 
 import {IS_DEV, TIME_BUDGET, MICROTASK_FN_NAME_TO_KEY, STATE, OVERLAYS, MICROTASK} from './constant.mjs'
-import {NODES, NODES_LOOKUP, NODE_TYPE, SKY_BORDER_NODE, MAX_FURNITURE_W, MAX_FURNITURE_H, ITEM_TYPE, ITEMS, RECIPES, MONSTERS, PLANT_KIND, PLANT_TYPE, PLANT_SYSTEM_LOOKUP, ALL_PLANT_SYSTEMS, TREE_IMAGES} from '../assets/data/data.mjs'
+import {NODES, NODES_LOOKUP, NODE_TYPE, SKY_BORDER_NODE, MAX_FURNITURE_W, MAX_FURNITURE_H, ITEM_TYPE, ITEMS, RECIPES, MONSTERS, PLANT_KIND, PLANT_TYPE, PLANT_SYSTEM_LOOKUP, ALL_PLANT_SYSTEMS, TREE_IMAGES, FURNITURE_BLOCKED_ICON} from '../assets/data/data.mjs'
 import {HELP_TITLES, hydrateHelp, debugHelpCategories} from '../assets/data/data-help.mjs'
 import {loadAssets, resolveAssetData} from './assets.mjs'
 import {timeManager, taskScheduler, microTasker, eventBus, seededRNG, parseLootCount, parseLootBuffs, buildLootHelpRow, blockedTiles} from './utils.mjs'
@@ -245,6 +245,7 @@ class GameCore {
       }
       count++
     }
+    FURNITURE_BLOCKED_ICON.image = resolveAssetData(FURNITURE_BLOCKED_ICON.image)
 
     console.log(`   🔹 Items hydratés : ${count}, ${errors} erreur(s)`, ITEMS)
   }
