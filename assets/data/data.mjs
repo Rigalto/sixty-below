@@ -684,13 +684,13 @@ export const ITEMS = {
   campfire: {name: 'Campfire', type: ITEM_TYPE.FURNITURE | ITEM_TYPE.PLACABLE, stype: 'light', star: 1, image: 'furniture_32_32-7-3', placed: 'fuws_48_32-2-1', unplacing: {speed: 1600}, help: 'Campfires', tooltip: 'Provides Cozy Buff when lit'},
 
   // Platforms
-  platformOak: {name: 'Oak Platform', type: ITEM_TYPE.FURNITURE | ITEM_TYPE.PLACABLE, stype: 'platform', floating: true, star: 1, furnitureSet: 'wood', image: 'furniture_32_32-0-7', placed: 'placed_16_16-0-1', placedleft: 's_42_42-0-5', placedright: 's_42_42-0-4', unplacing: {speed: 600}, help: 'Platforms', tooltip: 'Can be walked on, but also allow movement through the space they occupy'},
-  platformGlass: {name: 'Glass Platform', type: ITEM_TYPE.FURNITURE | ITEM_TYPE.PLACABLE, stype: 'platform', floating: true, star: 1, furnitureSet: 'coral', image: 'furniture_32_32-3-7', placed: 'placed_16_16-3-1', placedleft: 's_42_42-0-5', placedright: 's_42_42-0-4', unplacing: {speed: 600}, help: 'Platforms', tooltip: 'Can be walked on, but also allow movement through the space they occupy'},
-  platformMahogany: {name: 'Mahogany Platform', type: ITEM_TYPE.FURNITURE | ITEM_TYPE.PLACABLE, stype: 'platform', floating: true, star: 2, furnitureSet: 'mahogany', image: 'furniture_32_32-1-7', placed: 'placed_16_16-1-1', placedleft: 's_42_42-0-5', placedright: 's_42_42-0-4', unplacing: {speed: 600}, help: 'Platforms', tooltip: 'Can be walked on, but also allow movement through the space they occupy'},
-  platformReef: {name: 'Reef Platform', type: ITEM_TYPE.FURNITURE | ITEM_TYPE.PLACABLE, stype: 'platform', floating: true, star: 2, furnitureSet: 'coral', image: 'furniture_32_32-2-7', placed: 'placed_16_16-2-1', placedleft: 's_42_42-0-5', placedright: 's_42_42-0-4', unplacing: {speed: 600}, help: 'Platforms', tooltip: 'Can be walked on, but also allow movement through the space they occupy'},
+  platformOak: {name: 'Oak Platform', type: ITEM_TYPE.FURNITURE | ITEM_TYPE.PLACABLE, stype: 'platform', floating: true, star: 1, furnitureSet: 'wood', image: 'furniture_32_32-0-7', placed: 'placed_16_16-0-1', unplacing: {speed: 600}, help: 'Platforms', tooltip: 'Can be walked on, but also allow movement through the space they occupy'},
+  platformGlass: {name: 'Glass Platform', type: ITEM_TYPE.FURNITURE | ITEM_TYPE.PLACABLE, stype: 'platform', floating: true, star: 1, furnitureSet: 'coral', image: 'furniture_32_32-3-7', placed: 'placed_16_16-3-1', unplacing: {speed: 600}, help: 'Platforms', tooltip: 'Can be walked on, but also allow movement through the space they occupy'},
+  platformMahogany: {name: 'Mahogany Platform', type: ITEM_TYPE.FURNITURE | ITEM_TYPE.PLACABLE, stype: 'platform', floating: true, star: 2, furnitureSet: 'mahogany', image: 'furniture_32_32-1-7', placed: 'placed_16_16-1-1', unplacing: {speed: 600}, help: 'Platforms', tooltip: 'Can be walked on, but also allow movement through the space they occupy'},
+  platformReef: {name: 'Reef Platform', type: ITEM_TYPE.FURNITURE | ITEM_TYPE.PLACABLE, stype: 'platform', floating: true, star: 2, furnitureSet: 'coral', image: 'furniture_32_32-2-7', placed: 'placed_16_16-2-1', unplacing: {speed: 600}, help: 'Platforms', tooltip: 'Can be walked on, but also allow movement through the space they occupy'},
   // ??? Platform : placed: 'placed_16_16-4-1' / modifier les couleurs
   // ??? Platform : placed: 'placed_16_16-5-1' / modifier les couleurs
-  // ??? Platform : placed: 'placed_16_16-6-1' / modifier les couleurs
+  platformBamboo: {name: 'Bamboo Platform', type: ITEM_TYPE.FURNITURE | ITEM_TYPE.PLACABLE, stype: 'platform', floating: true, star: 2, furnitureSet: 'bamboo', image: 'furniture_32_32-6-7', placed: 'placed_16_16-6-1', unplacing: {speed: 600}, help: 'Platforms', tooltip: 'Can be walked on, but also allow movement through the space they occupy'},
 
   // stoneptfm: {name: 'Stone Platform', type: ITEM_TYPE.FURNITURE, stype: 'platform', floating: true, sell: 25, star: 1, image: 'furniture_32_32-3-7', placed: 'fuws_16_16-4-1', placedleft: 's_42_42-4-5', placedright: 's_42_42-4-4', help: 'Platforms', tooltip: 'Can be walked on, but also allow movement through the space they occupy'},
   // sandstoneptfm: {name: 'Sandstone Platform', type: ITEM_TYPE.FURNITURE, stype: 'platform', floating: true, furnitureSet: 'sandstone', sell: 350, star: 3, image: 'furniture_32_32-4-7', placed: 'fuws_16_16-5-1', placedleft: 's_42_42-5-5', placedright: 's_42_42-5-4', help: 'Platforms', tooltip: 'Can be walked on, but also allow movement through the space they occupy'},
@@ -777,6 +777,7 @@ export const RECIPES = [
   {result: {item: 'platformGlass', count: 10}, station: 'byHand', ingredients: [{item: 'glass', count: 1}]},
   {result: {item: 'platformMahogany', count: 8}, station: 'byHand', ingredients: [{item: 'logMahogany', count: 1}]},
   {result: {item: 'platformReef', count: 6}, station: 'byHand', ingredients: [{item: 'coral', count: 1}]},
+  {result: {item: 'platformBamboo', count: 9}, station: 'byHand', ingredients: [{item: 'bambooStalk', count: 1}]},
 
   // Sickles
   {result: {item: 'sickleCopper', count: 1}, station: 'anvil', ingredients: [{item: 'plateCopper', count: 6}, {item: 'logOak', count: 4}]},

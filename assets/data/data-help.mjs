@@ -4814,6 +4814,7 @@ Platforms are thin furnitures that can be walked on like solid ground, yet allow
 | [[item:platformGlass]] | {{item:platformGlass:star|star}} | Coral |
 | [[item:platformMahogany]] | {{item:platformMahogany:star|star}} | Mahogany |
 | [[item:platformReef]] | {{item:platformReef:star|star}} | Coral |
+| [[item:platformBamboo]] | {{item:platformBamboo:star|star}} | Bamboo |
 
 <hr>
 
@@ -4837,8 +4838,8 @@ Platforms are thin furnitures that can be walked on like solid ground, yet allow
 * Place a Platform in the [[Hotbar]] ([[Inventory]] Panel [I])
 * Select its slot, then left-click an empty tile — the Platform is consumed
 * The clicked tile has to be in [[Ranges|Interaction Range]] — this range can be buffed
-* To remove a [[item:platformOak]] or a [[item:platformGlass]]: use <<itemStar|hammerOak>> or better
-* To remove a [[item:platformMahogany]] or a [[item:platformReef]]: use <<itemStar|hammerCopper>> or better
+* To remove an [[item:platformOak]] or a [[item:platformGlass]]: use <<itemStar|hammerOak>> or better
+* To remove a [[item:platformMahogany]], a [[item:platformReef]] or a [[item:platformBamboo]]: use <<itemStar|hammerCopper>> or better
 
 <hr>
 
@@ -4850,6 +4851,7 @@ Platforms are thin furnitures that can be walked on like solid ground, yet allow
 <<fullRecipeRow|platformGlass>>
 <<fullRecipeRow|platformMahogany>>
 <<fullRecipeRow|platformReef>>
+<<fullRecipeRow|platformBamboo>>
 
 <hr>
 
