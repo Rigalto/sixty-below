@@ -335,6 +335,7 @@ Cette section définit les événements officiels. Tout nouvel événement doit 
 | Dir. | Event | Payload | Description |
 | :---: | :--- | :--- | :--- |
 | E | `camera/preload-chunks-changed` | `Set<number>` | Émis à chaque changement de `preloadChunks`. |
+| E | `world/tile-changed` | `{ tileIndex: number, tileNewCode: number }` | Incrémente/décrémente `record.blocked` selon FURNITURE_FOOTPRINT_MASK. |
 
 #### Inventory (`InventoryManager`, `InventoryOverlay`)
 

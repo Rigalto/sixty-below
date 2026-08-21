@@ -3,7 +3,7 @@
 // DecomposerManager
 
 import {eventBus, taskScheduler, microTasker, blockedTiles, rollLootWithBuffs, seededRNG} from './utils.mjs'
-import {NODE_TYPE, NODES_LOOKUP, NODES, ITEM_TYPE, ITEMS, PLANT_SYSTEM_LOOKUP, PLANT_KIND} from '../assets/data/data.mjs'
+import {NODE_TYPE, NODES_LOOKUP, NODES, ITEM_TYPE, ITEMS, PLANT_SYSTEM_LOOKUP, PLANT_KIND, FURNITURE_FOOTPRINT_MASK} from '../assets/data/data.mjs'
 import {inventoryManager} from './inventory.mjs'
 import {buffManager, isInInteractionRange} from './buff.mjs'
 import {database} from './database.mjs'
@@ -385,10 +385,9 @@ class FurnishingManager {
     const px = tileIndex & 0x3FF
     const topY = (tileIndex >> 10) - h + 1
 
-    const FOOTPRINT_MASK = NODE_TYPE.GAZ | NODE_TYPE.BWALL
     const footprintCodes = chunkManager.getRectCodes(px, topY, w, h)
     for (const code of footprintCodes) {
-      if ((NODES_LOOKUP[code].type & FOOTPRINT_MASK) === 0) return
+      if ((NODES_LOOKUP[code].type & FURNITURE_FOOTPRINT_MASK) === 0) return
     }
 
     if (!item.floating) {

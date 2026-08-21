@@ -8,7 +8,7 @@ import {camera} from './render.mjs'
 import {playerManager} from './player.mjs'
 import {isInInteractionRange} from './buff.mjs' // ← ajouter
 import {IMAGE_CACHE} from './assets.mjs'
-import {MAX_FURNITURE_W, MAX_FURNITURE_H, ITEMS, NODES_LOOKUP, NODE_TYPE} from '../assets/data/data.mjs'
+import {MAX_FURNITURE_W, MAX_FURNITURE_H, ITEMS, NODES_LOOKUP, NODE_TYPE, FURNITURE_FOOTPRINT_MASK, FURNITURE_BLOCKED_ICON} from '../assets/data/data.mjs'
 import {chunkManager} from './world.mjs'
 import {furnishingManager} from './action.mjs'
 
@@ -73,6 +73,8 @@ class FurnitureManager {
     // eventBus
     this.onPreloadChunksChanged = this.onPreloadChunksChanged.bind(this)
     eventBus.on('camera/preload-chunks-changed', this.onPreloadChunksChanged)
+    this.onTileChangedFurniture = this.onTileChangedFurniture.bind(this)
+    eventBus.on('world/tile-changed', this.onTileChangedFurniture)
   }
 
   // ─── Helpers chunk ───────────────────────────────────────────────────────────
@@ -364,6 +366,11 @@ class FurnitureManager {
       const pxX = (furniture.index & 0x3FF) << 4
       const pxY = (furniture.index >> 10) << 4
       ctx.drawImage(IMAGE_CACHE[img.imgIndex], img.sx, img.sy, img.sw, img.sh, pxX, pxY, img.sw, img.sh)
+
+      if (furniture.blocked > 0) {
+        const icon = FURNITURE_BLOCKED_ICON.image
+        ctx.drawImage(IMAGE_CACHE[icon.imgIndex], icon.sx, icon.sy, icon.sw, icon.sh, pxX, pxY, 16, 16)
+      }
     }
   }
 
@@ -390,6 +397,7 @@ class FurnitureManager {
       stype: item.stype,
       w,
       h,
+      blocked: 0,
       deleted: false
     }
 
@@ -452,6 +460,29 @@ class FurnitureManager {
     saveManager.queueStaticUpdate({storeName: 'furniture', record})
 
     return record
+  }
+
+  /**
+ * Liaison EventBus : 'world/tile-changed'. Incrémente/décrémente record.blocked selon que la
+ * tuile modifiée sort ou revient de FURNITURE_FOOTPRINT_MASK — même masque que la validation
+ * de pose (onPlaceFurniture), garantissant qu'un meuble redevient actif exactement dans les
+ * conditions où il aurait pu être posé. Ex : SAND qui s'effondre dans l'empreinte (blocked++),
+ * puis miné (blocked--). Ne gate encore aucune interaction — se contente de l'état et de son
+ * affichage (cf. render()) ; le gating de chaque interaction viendra dans une passe suivante.
+ * @param {{tileIndex: number, tileNewCode: number}} payload
+ */
+  onTileChangedFurniture ({tileIndex, tileNewCode}) {
+    const furniture = this.getFurnitureAt(tileIndex)
+    if (furniture === null) return
+
+    const isValid = (NODES_LOOKUP[tileNewCode].type & FURNITURE_FOOTPRINT_MASK) !== 0
+    if (!isValid) {
+      furniture.blocked++
+    } else {
+      if (furniture.blocked === 0) return // garde de cohérence
+      furniture.blocked--
+    }
+    saveManager.queueStaticUpdate({storeName: 'furniture', record: furniture})
   }
 
   // ─── Placement ───────────────────────────────────────────────────────────────
