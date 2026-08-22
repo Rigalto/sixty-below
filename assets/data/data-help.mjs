@@ -2787,7 +2787,7 @@ Managed trough the [[item:noticeBoard]].
 * [[item:campfire]]
 * [[Fireplaces]]
 * [[item:lifeCrystal]]
-* [[item:platformOak]]
+* [[item:platformOak|Platforms]]
 * [[Sofas]]
 * [[Tables]]
 * [[Tableware]]
