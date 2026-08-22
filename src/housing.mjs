@@ -478,6 +478,7 @@ class FurnitureManager {
     const isValid = (NODES_LOOKUP[tileNewCode].type & FURNITURE_FOOTPRINT_MASK) !== 0
     if (!isValid) {
       furniture.blocked++
+      if (furniture.code === 'cookingPotOn') furnishingManager.extinguishCookingPot(furniture)
     } else {
       if (furniture.blocked === 0) return // garde de cohérence
       furniture.blocked--

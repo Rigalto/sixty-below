@@ -423,6 +423,8 @@ class FurnishingManager {
   tryToggleCookingPot (tileIndex, furniture) {
     if (buffManager.getBuff('playerFreeze')) return
     if (!isInInteractionRange(tileIndex)) { eventBus.emit('sound/play', 'toofar'); return }
+    if (furniture.blocked > 0) { eventBus.emit('sound/play', 'wrong'); return }
+
     const taskId = `cookingpot_extinguish_${furniture.id}`
 
     if (furniture.code === 'cookingPot') {
@@ -430,10 +432,22 @@ class FurnishingManager {
       furniture.untilLitTimestamp = taskScheduler.enqueue(taskId, COOKING_POT_LIT_DURATION, this.onCookingPotExtinguish, priority, capacity, furniture.id)
       furnitureManager.changeCode(furniture.id, 'cookingPotOn')
     } else {
-      taskScheduler.dequeue(taskId)
-      furnitureManager.changeCode(furniture.id, 'cookingPot')
+      this.extinguishCookingPot(furniture)
     }
     eventBus.emit('sound/play', 'placing')
+  }
+
+  /**
+   * Éteint un cookingPot allumé : annule la tâche d'extinction programmée et repasse le
+   * furniture en code 'cookingPot'. Sans effet si déjà éteint. Appelée pour une extinction
+   * manuelle (tryToggleCookingPot), automatique par timeout (onCookingPotExtinguish), ou forcée
+   * par obstruction (FurnitureManager.onTileChangedFurniture — ex : SAND qui s'effondre dessus).
+   * @param {object} furniture
+   */
+  extinguishCookingPot (furniture) {
+    if (furniture.code !== 'cookingPotOn') return
+    taskScheduler.dequeue(`cookingpot_extinguish_${furniture.id}`)
+    furnitureManager.changeCode(furniture.id, 'cookingPot')
   }
 
   /**
@@ -446,8 +460,7 @@ class FurnishingManager {
   onCookingPotExtinguish (furnitureId) {
     const furniture = furnitureManager.getFurnitureById(furnitureId)
     if (furniture === undefined || furniture.code !== 'cookingPotOn') return
-
-    furnitureManager.changeCode(furnitureId, 'cookingPot')
+    this.extinguishCookingPot(furniture)
   }
 }
 export const furnishingManager = new FurnishingManager()

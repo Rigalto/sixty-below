@@ -4480,7 +4480,13 @@ Le [[item:stoneBench]] is a [[Crafting Stations|Crafting Station]] qui permet de
     title: 'Cooking',
     category: ['Crafting', 'Crafting Stations'],
     content: `
+**Description**
 
+The [[item:cookingPot]] is a [[Crafting Stations|Crafting Station]] dedicated to preparing cooked food. Unlike most stations, it must be lit before it becomes usable — see [[Food]] for how cooking relates to food tiers.
+
+To see the full list of recipes it unlocks, open the [[Crafting]] panel **[K]** and filter by Crafting Station.
+
+<hr>
 
 **Cooking Pot Acquisition**
 
@@ -4488,6 +4494,42 @@ Le [[item:stoneBench]] is a [[Crafting Stations|Crafting Station]] qui permet de
 * Crafting Stations: {{recipe:cookingPot|allStations}}
 * Crafting Materials: {{recipe:cookingPot|allIngredients}}
 * Requires multiple crafting stages
+
+<hr>
+
+**How to Place**
+
+* Craft a [[item:cookingPot]]
+* Place it in the [[Hotbar]] ([[Inventory]] Panel [I])
+* The clicked tile has to be in [[Ranges|Interaction Range]] — this range can be buffed
+* Select its slot, then left-click the bottom-left tile of a free 2×2 tile space — the [[item:cookingPot]] is consumed
+* The clicked tile has to be in [[Ranges|Interaction Range]] — this range can be buffed
+
+**How to Remove**
+
+* Use <<itemStar|hammerCopper>> or better to remove a [[item:cookingPot]] or a lit [[item:cookingPotOn]]
+
+<hr>
+
+**How to Use — Lighting the Fire**
+
+* Right-click the [[item:cookingPot]] to light it — it turns into a [[item:cookingPotOn]] and becomes usable as a Crafting Station.
+* A lit pot stays on for 6 in-game hours, then extinguishes automatically.
+* Right-click again to extinguish it manually before the timer runs out.
+* An obstructed pot (buried under [[node:sand]] or a liquid) displays a small warning icon and cannot be lit or extinguished by hand.
+* A lit pot that becomes obstructed extinguishes immediately on its own.
+
+**How to Use — Cooking**
+
+* Stand within [[Ranges|Interaction Range]] of a lit [[item:cookingPotOn]] — this range can be buffed.
+* Press [K] to open the [[Crafting]] panel.
+* See [[Crafting]] for how to browse recipes, check ingredients and execute a craft.
+
+<hr>
+
+**Tips**
+
+⏳
     `
   },
   {
