@@ -4821,6 +4821,23 @@ class MossSystem {
   }
 
   /**
+   * Calcule le variant d'affichage (bitmask 1-7 : dessus=1, gauche=2, droite=4) à partir des 3
+   * tuiles candidates au VOID d'une tuile GRASSMOSS. Ne valide pas que tileIndex est lui-même
+   * GRASSMOSS — à l'appelant de le garantir. 0 signale qu'aucune des 3 n'est VOID (condition
+   * d'existence rompue), interprété par l'appelant plutôt que par cette méthode.
+   * @param {number} tileIndex
+   * @returns {number} bitmask 0-7
+   */
+  #computeVariant (tileIndex) {
+    const VOID = NODES.VOID.code
+    const W = WORLD_WIDTH
+    const voidAbove = chunkManager.getTileAt(tileIndex - W) === VOID
+    const voidLeft = chunkManager.getTileAt(tileIndex - 1) === VOID
+    const voidRight = chunkManager.getTileAt(tileIndex + 1) === VOID
+    return (voidAbove ? 1 : 0) | (voidLeft ? 2 : 0) | (voidRight ? 4 : 0)
+  }
+
+  /**
    * Planifie le prochain passage de régulation si #absentList contient des candidats — délai
    * relatif depuis maintenant (MOSS_POPULATION_DELAY_MS ×[0.8, 1.2[), horodatage absolu
    * retourné mémorisé en gamestate (synchrone) pour survivre à un rechargement. Si #absentList
@@ -4918,7 +4935,8 @@ class MossSystem {
     for (const record of this.#displayed) {
       const pxX = record.x << 4
       const pxY = record.y << 4
-      ctx.drawImage(IMAGE_CACHE[img.imgIndex], img.sx, img.sy, img.sw, img.sh, pxX, pxY, img.sw, img.sh)
+      const sx = img.sx + (record.variant - 1) * 16
+      ctx.drawImage(IMAGE_CACHE[img.imgIndex], sx, img.sy, img.sw, img.sh, pxX, pxY, img.sw, img.sh)
     }
   }
 
@@ -5014,18 +5032,20 @@ class MossSystem {
    */
   #checkMossCandidate (tileIndex) {
     const GRASSMOSS = NODES.GRASSMOSS.code
-    const VOID = NODES.VOID.code
     const MUD = NODES.MUD.code
-    const W = WORLD_WIDTH
-
     if (chunkManager.getTileAt(tileIndex) !== GRASSMOSS) return
 
-    if (chunkManager.getTileAt(tileIndex - W) === VOID ||
-        chunkManager.getTileAt(tileIndex - 1) === VOID ||
-        chunkManager.getTileAt(tileIndex + 1) === VOID) return
+    const variant = this.#computeVariant(tileIndex)
+    if (variant === 0) {
+      chunkManager.setTileAt(tileIndex, MUD)
+      eventBus.emit('world/tile-changed', {tileIndex, tileOldCode: GRASSMOSS, tileNewCode: MUD})
+      return
+    }
 
-    chunkManager.setTileAt(tileIndex, MUD)
-    eventBus.emit('world/tile-changed', {tileIndex, tileOldCode: GRASSMOSS, tileNewCode: MUD})
+    const record = this.#spotsByTile.get(tileIndex)
+    if (record === undefined || record.variant === variant) return
+    record.variant = variant
+    saveManager.queueStaticUpdate({storeName: 'plant', record})
   }
 
   /**
@@ -5052,6 +5072,7 @@ class MossSystem {
       h: 1,
       x: tileIndex & 0x3FF,
       y: tileIndex >> 10,
+      variant: this.#computeVariant(tileIndex),
       present: false,
       deleted: false
     }

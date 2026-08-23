@@ -616,7 +616,7 @@ export const ITEMS = {
   bloodmoon: {name: 'Bloodmoon', type: 0, stype: 'herb', star: 2, image: 'foraged_32_32-0-4', placed: 'placed_16_32-4-0', placedLeft: 'placed_16_32-5-0', help: 'Bloodmoon', tooltip: '???', foraging: {speed: 1500, items: [{item: 'bloodmoon', count: '1-3'}, {item: 'bloodmoonSeed', count: 0.65}, {item: 'slug', count: 0.12, buffs: ['lucky:100', 'rainy:300']}]}},
   bloodmoonSeed: {name: 'Bloodmoon Seed', type: ITEM_TYPE.SEED | ITEM_TYPE.PLACABLE, stype: 'seed', star: 2, image: 'foraged_32_32-1-4', help: 'Bloodmoon', tooltip: '???'},
 
-  velvetmoss: {name: 'Velvetmoss', type: 0, stype: 'herb', star: 3, image: 'foraged_32_32-3-6', placed: 'placed_16_16-5-3', foraging: {speed: 500, items: [{item: 'velvetmoss', count: 1, buffs: ['lucky:60', 'rainy:20']}, {item: 'velvetmossSpore', count: 0.6, buffs: ['lucky:80']}]}, help: 'Velvetmoss', tooltip: '???'},
+  velvetmoss: {name: 'Velvetmoss', type: 0, stype: 'herb', star: 3, image: 'foraged_32_32-3-6', placed: 'natural_16_16-0-6', foraging: {speed: 500, items: [{item: 'velvetmoss', count: 1, buffs: ['lucky:60', 'rainy:20']}, {item: 'velvetmossSpore', count: 0.6, buffs: ['lucky:80']}]}, help: 'Velvetmoss', tooltip: '???'},
   velvetmossSpore: {name: 'Velvetmoss Spore', type: ITEM_TYPE.SEED | ITEM_TYPE.PLACABLE, stype: 'herb', star: 3, image: 'foraged_32_32-4-6', help: 'Velvetmoss', tooltip: '???'},
 
   fernS: {name: 'Shadowfern', type: 0, stype: 'herb', star: 3, image: null, placed: 'placed_48_48-0-0', speed: 1900, foraging: {speed: 500, items: [{item: 'fernLeaf', count: 1, buffs: ['lucky:50', 'rainy:60', 'windy:40']}, {item: 'fernSpore', count: 0.75, buffs: ['lucky:30', 'rainy:40', 'windy:20']}]}, help: 'Ferns', tooltip: '???'},

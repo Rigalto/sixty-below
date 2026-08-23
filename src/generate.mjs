@@ -8228,6 +8228,9 @@ class PlantGenerator {
    */
   placeMoss () {
     const GRASSMOSS = NODES.GRASSMOSS.code
+    const VOID = NODES.VOID.code
+    const W = WORLD_WIDTH
+
     const grassMossIndexes = worldBuffer.getTypeArray(GRASSMOSS)
     let count = 0
 
@@ -8237,6 +8240,12 @@ class PlantGenerator {
       const x = soilIndex & 0x3FF
       const y = soilIndex >> 10
       const present = seededRNG.randomGetPercent(MOSS_TOGGLE_PCENT)
+
+      // détermination du variant d'affichage
+      const voidAbove = worldBuffer.readAt(soilIndex - W) === VOID
+      const voidLeft = worldBuffer.readAt(soilIndex - 1) === VOID
+      const voidRight = worldBuffer.readAt(soilIndex + 1) === VOID
+      const variant = (voidAbove ? 1 : 0) | (voidLeft ? 2 : 0) | (voidRight ? 4 : 0)
 
       this.#plants.push({
         id: uniqueIdGenerator.getUniqueId(),
@@ -8249,6 +8258,7 @@ class PlantGenerator {
         h: 1,
         x,
         y,
+        variant,
         present,
         deleted: false
       })
