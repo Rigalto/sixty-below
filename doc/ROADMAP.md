@@ -9,8 +9,7 @@
 
 ### Code et tests
 
-- Implémenter les herbes, reste : Bamboo, InfernCap
-- Implémenter les plants des mini-biomes, reste : fern Cave, Mushroom Cave
+- Implémenter les plants des mini-biomes, reste : Mushroom Cave
 - Implémenter les Giant Mushrooms.
 - Implémenter la réduction de vitesse dans les liquides ou les cobweb.
 - Tester : destruction d'une herbe quand la tuile du corps n'est plus SKY (spot conservé) — écoulement d'un SAND.
@@ -185,7 +184,6 @@ La Sap corrode le Copper. Il doit donc être remplacer par du Gold.
 
 - Le joueur doit flotter sur les liquides
 - La touche 'S' doit lui permettre de plonger
-- Affichage des outils en main
 
 ---
 
@@ -356,6 +354,7 @@ La Sap corrode le Copper. Il doit donc être remplacer par du Gold.
 - Remplissage d'un conteneur par un liquie (`FillingManager`)
 - Vidage d'un seau plein dans le monde (`PouringManager`)
 - Réparation du décomposeur (`DecomposerManager`)
+- Blocage des meubles par SAND ou liquides
 
 ### Joueur
  - Déplacement horizontal (touches 'Q' et 'D') (`PlayerManager`)
@@ -378,17 +377,21 @@ La Sap corrode le Copper. Il doit donc être remplacer par du Gold.
 - Pink Mycenia (`MahoganySystem`)
 - Coconut (`CoconutSystem`)
 - Thornspine (`ThornspineSystem`)
-- Coral (`CoralSystem`)
-- Oleander (`OleanderSystem`)
+- Coral (`CoralSystem`) v
+- Oleander (`OleanderSystem`) v
 - Bloodmoon (`BloodmoonSystem`)
-- Mandrake (`MandrakeSystem`)
-- Pricklepad (`PricklepadSystem`)
-- Satan's Cube (`SatansCubeSystem`)
-- Sneakthorn (`SneakthornSystem`)
-- Cursedcrown (`CursedcrownSystem`)
-- Abysshorn (`AbysshornSystem`)
-- Gravelweed (`GravelweedSystem`)
+- Mandrake (`MandrakeSystem`) v
+- Pricklepad (`PricklepadSystem`) v
+- Satan's Cube (`SatansCubeSystem`) v
+- Sneakthorn (`SneakthornSystem`) v
+- Cursedcrown (`CursedcrownSystem`) v
+- Abysshorn (`AbysshornSystem`) v
+- Gravelweed (`GravelweedSystem`) v
+- Bamboo (`BambooSystem`) v
+- Inferncap (`InferncapSystem`) v
 - Ferns (`FernSystem`)
+- Moss (`MossSystem`) v
+- Sand Falling (`SandFallingSystem`)
 
 ### Rendu
 - `WorldRenderer` — rendu tuiles par chunks avec cache OffscreenCanvas
