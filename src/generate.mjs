@@ -1338,6 +1338,13 @@ class LiquidFiller {
     const xMin = cx - radiusX
     const xMax = cx + radiusX
 
+    console.log('>>>>>>>>>>>>>>>>>>>>>>>>>>>>fillLake', {cx, cy, radiusX, shoreCode, nodeCode})
+    if (cx === 433) {
+      console.log('>>>>>>>>>>>>>>>>>>>>>>>>>>>>fillLake', {x: 426, y: 49, tle: worldBuffer.read(426, 49)})
+      console.log('>>>>>>>>>>>>>>>>>>>>>>>>>>>>fillLake', {x: 426, y: 50, tle: worldBuffer.read(426, 50)})
+      console.log('>>>>>>>>>>>>>>>>>>>>>>>>>>>>fillLake', {x: 426, y: 51, tle: worldBuffer.read(426, 51)})
+    }
+
     const src = (cy << 10) | cx
     if (worldBuffer.readAt(src) !== SKY && worldBuffer.readAt(src) !== VOID) return
 
@@ -1351,6 +1358,8 @@ class LiquidFiller {
     while (head < queue.length) {
       const idx = queue[head++]
       const nx = idx & 0x3FF
+
+      if (cx === 433) console.log('>>>>>>>>>>>>>>>>>>>>>>>>>>>>fillLake début loop', {queue, head, idx, nx, xMin, xMax})
 
       // Hors bornes latérales → substrat (berge)
       if (nx < xMin || nx > xMax) {
@@ -5687,23 +5696,44 @@ class WorldCarver {
   }
 
   /**
- * Détecte toutes les tuiles SAND instables dans le monde entier.
- * Debug : convertit en LAVA et logue les positions.
- */
-
+   * Détecte toutes les tuiles SAND instables dans le monde entier.
+   * Debug : convertit en LAVA et logue les positions.
+   */
   sandFalling () {
     const SAND = NODES.SAND.code
+    const SANDSTONE = NODES.SANDSTONE.code
     const VOID = NODES.VOID.code
-    const UNSTABLE = new Set([VOID, NODES.SKY.code, NODES.SEA.code, NODES.WATER.code, NODES.HONEY.code, NODES.SAP.code])
+    const SKY = NODES.SKY.code
+
+    const LIQUIDS = new Set([
+      NODES.SEA.code,
+      NODES.WATER.code,
+      NODES.HONEY.code,
+      NODES.SAP.code
+    ])
+
+    const EMPTY = new Set([VOID, SKY])
+    const UNSTABLE = new Set([VOID, SKY, ...LIQUIDS])
     const W = WORLD_WIDTH
 
     const isUnstableAt = (idx) => {
       if (worldBuffer.readAt(idx) !== SAND) return false
+
       const below = idx + W
-      return (
+      const wouldFall =
         UNSTABLE.has(worldBuffer.readAt(below)) ||
-      (UNSTABLE.has(worldBuffer.readAt(idx + 1)) && UNSTABLE.has(worldBuffer.readAt(below + 1))) ||
-      (UNSTABLE.has(worldBuffer.readAt(idx - 1)) && UNSTABLE.has(worldBuffer.readAt(below - 1)))
+        (UNSTABLE.has(worldBuffer.readAt(idx + 1)) && UNSTABLE.has(worldBuffer.readAt(below + 1))) ||
+        (UNSTABLE.has(worldBuffer.readAt(idx - 1)) && UNSTABLE.has(worldBuffer.readAt(below - 1)))
+
+      return wouldFall
+    }
+
+    const hasAdjacentLiquid = (idx) => {
+      return (
+        LIQUIDS.has(worldBuffer.readAt(idx - 1)) ||
+        LIQUIDS.has(worldBuffer.readAt(idx + 1)) ||
+        LIQUIDS.has(worldBuffer.readAt(idx - W)) ||
+        LIQUIDS.has(worldBuffer.readAt(idx + W))
       )
     }
 
@@ -5734,29 +5764,36 @@ class WorldCarver {
         const canLeft = curX > 1 && UNSTABLE.has(worldBuffer.readAt(cur - 1)) && UNSTABLE.has(worldBuffer.readAt(cur + W - 1))
         const canRight = curX < W - 2 && UNSTABLE.has(worldBuffer.readAt(cur + 1)) && UNSTABLE.has(worldBuffer.readAt(cur + W + 1))
 
-        if (!canLeft && !canRight) break // stable
+        if (!canLeft && !canRight) break
 
         const goLeft = canLeft && (!canRight || seededRNG.randomGetBool())
         cur = goLeft ? cur - 1 : cur + 1
-        // on reboucle pour tenter la descente verticale depuis la nouvelle position
       }
 
       if (cur === idx) return // n'a pas bougé
+
+      // Détermination du code de remplacement à la source
+      const above = idx - W
+      const aboveCode = worldBuffer.readAt(above)
+      const replacementCode = UNSTABLE.has(aboveCode) ? aboveCode : VOID
+
+      // Si le remplacement est vide et adjacent à un liquide, on pétrifie en SANDSTONE sur place
+      if (EMPTY.has(replacementCode) && hasAdjacentLiquid(idx)) {
+        worldBuffer.writeAt(idx, SANDSTONE)
+        return
+      }
 
       // Écriture destination
       worldBuffer.writeAt(cur, SAND)
 
       // Remplacement source
-      const above = idx - W
-      const aboveCode = worldBuffer.readAt(above)
-      worldBuffer.writeAt(idx, UNSTABLE.has(aboveCode) ? aboveCode : VOID)
-      worldBuffer.writeAt(idx, UNSTABLE.has(aboveCode) ? aboveCode : VOID)
+      worldBuffer.writeAt(idx, replacementCode)
 
       // Propagation SKY vers le bas
-      if (aboveCode === NODES.SKY.code) {
+      if (aboveCode === SKY) {
         let propagate = idx + W
         while (worldBuffer.readAt(propagate) === VOID) {
-          worldBuffer.writeAt(propagate, NODES.SKY.code)
+          worldBuffer.writeAt(propagate, SKY)
           propagate += W
         }
       }
@@ -5773,8 +5810,7 @@ class WorldCarver {
     for (let y = WORLD_HEIGHT - 2; y >= 1; y--) {
       for (let x = 1; x < WORLD_WIDTH - 1; x++) {
         const idx = (y << 10) | x
-        if (!isUnstableAt(idx)) continue
-        unstable.push(idx)
+        if (isUnstableAt(idx)) unstable.push(idx)
       }
     }
 
@@ -5786,40 +5822,6 @@ class WorldCarver {
     }
 
     console.log(`[sandFalling] — ${count} tuiles traitées au total`)
-  }
-
-  sandFalling_ () {
-    const SAND = NODES.SAND.code
-    // const LAVA = NODES.LAVA.code
-    const VOID = NODES.VOID.code
-    const UNSTABLE = new Set([VOID, NODES.SKY.code, NODES.SEA.code, NODES.WATER.code, NODES.HONEY.code, NODES.SAP.code])
-
-    const W = WORLD_WIDTH
-
-    // const tiles = []
-
-    const unstable = []
-    for (let y = 1; y < WORLD_HEIGHT - 1; y++) {
-      for (let x = 1; x < WORLD_WIDTH - 1; x++) {
-        const idx = (y << 10) | x
-        if (worldBuffer.readAt(idx) !== SAND) continue
-
-        const below = idx + W
-        const belowCode = worldBuffer.readAt(below)
-
-        const isUnstable =
-        UNSTABLE.has(belowCode) ||
-        (UNSTABLE.has(worldBuffer.readAt(idx + 1)) && UNSTABLE.has(worldBuffer.readAt(below + 1))) ||
-        (UNSTABLE.has(worldBuffer.readAt(idx - 1)) && UNSTABLE.has(worldBuffer.readAt(below - 1)))
-
-        if (!isUnstable) continue
-        // tiles.push({x, y, index: idx, code: LAVA})
-        unstable.push(idx)
-      }
-    }
-
-    // this.applyTiles(tiles, ETERNAL_EXCLUDED)
-    console.log(`debugUnstableSand — ${unstable.length} tuiles instables`, unstable)
   }
 
   /**
