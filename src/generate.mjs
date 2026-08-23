@@ -8172,27 +8172,38 @@ class PlantGenerator {
    */
   placeFerns () {
     const VOID = NODES.VOID.code
+    const HUMUS = NODES.HUMUS.code
     const GRASSFERN = NODES.GRASSFERN.code
     const W = WORLD_WIDTH
 
     // génération de la liste des tuiles GRASSFERN
     const grassFernIndexes = worldBuffer.getTypeArray(GRASSFERN)
+    let fixed = 0
     let count = 0
 
     for (const soilIndex of grassFernIndexes) {
       if (worldBuffer.readAt(soilIndex) !== GRASSFERN) continue
 
+      const voidValid = worldBuffer.readAt(soilIndex - W) === VOID &&
+      worldBuffer.readAt(soilIndex - W * 2) === VOID &&
+      worldBuffer.readAt(soilIndex - W * 3) === VOID
+
+      if (!voidValid) {
+      // cleanupAfterCarving (Règle 1, VOID isolé) a pu combler une des 3 tuiles requises
+      // au-dessus du sol après le tapissage du fond de la Fern Cave. Retransforme en HUMUS
+      // plutôt que de créer un spot condamné à rester present=false pour toujours, mais
+      // indiscernable d'un spot valide simplement inoccupé.
+        worldBuffer.writeAt(soilIndex, HUMUS)
+        fixed++
+        continue
+      }
+
       const x = soilIndex & 0x3FF
       const y = soilIndex >> 10
 
-      const valid = worldBuffer.readAt(soilIndex - W) === VOID &&
-        worldBuffer.readAt(soilIndex - W * 2) === VOID &&
-        worldBuffer.readAt(soilIndex - W * 3) === VOID &&
-        !placedGuard.has(soilIndex - W) &&
-        !placedGuard.has(soilIndex - W * 2) &&
-        !placedGuard.has(soilIndex - W * 3)
+      const guarded = placedGuard.has(soilIndex - W) || placedGuard.has(soilIndex - W * 2) || placedGuard.has(soilIndex - W * 3)
 
-      const present = valid && seededRNG.randomGetPercent(FERN_TOGGLE_PCENT)
+      const present = !guarded && seededRNG.randomGetPercent(FERN_TOGGLE_PCENT)
       if (present) placedGuard.addRect(x, y - 3, x, y - 1)
       const {type, itemId} = seededRNG.randomGetArrayValue(FERN_TYPES)
 
@@ -8213,7 +8224,7 @@ class PlantGenerator {
       if (present) count++
     }
 
-    if (IS_DEV) console.log(`   🔹 Ferns : ${count} / ${grassFernIndexes.length}`)
+    if (IS_DEV) console.log(`   🔹 Ferns : ${count} / ${grassFernIndexes.length} (${fixed} tuile(s) invalide(s) corrigée(s) en HUMUS)`)
   }
 
   /**
@@ -8229,22 +8240,32 @@ class PlantGenerator {
   placeMoss () {
     const GRASSMOSS = NODES.GRASSMOSS.code
     const VOID = NODES.VOID.code
+    const MUD = NODES.MUD.code
     const W = WORLD_WIDTH
-
     const grassMossIndexes = worldBuffer.getTypeArray(GRASSMOSS)
     let count = 0
+    let fixed = 0
 
     for (const soilIndex of grassMossIndexes) {
       if (worldBuffer.readAt(soilIndex) !== GRASSMOSS) continue
 
-      const x = soilIndex & 0x3FF
-      const y = soilIndex >> 10
-      const present = seededRNG.randomGetPercent(MOSS_TOGGLE_PCENT)
-
-      // détermination du variant d'affichage
       const voidAbove = worldBuffer.readAt(soilIndex - W) === VOID
       const voidLeft = worldBuffer.readAt(soilIndex - 1) === VOID
       const voidRight = worldBuffer.readAt(soilIndex + 1) === VOID
+
+      if (!voidAbove && !voidLeft && !voidRight) {
+      // Condition d'existence rompue : cleanupAfterCarving (Règle 1, suppression des VOID
+      // isolés) peut combler le seul voisin VOID d'une GRASSMOSS posée par #fillMossCaveWalls,
+      // sans connaissance de cette contrainte. Retransforme en MUD plutôt que de créer un spot
+      // invalide.
+        worldBuffer.writeAt(soilIndex, MUD)
+        fixed++
+        continue
+      }
+
+      const x = soilIndex & 0x3FF
+      const y = soilIndex >> 10
+      const present = seededRNG.randomGetPercent(MOSS_TOGGLE_PCENT)
       const variant = (voidAbove ? 1 : 0) | (voidLeft ? 2 : 0) | (voidRight ? 4 : 0)
 
       this.#plants.push({
@@ -8265,7 +8286,7 @@ class PlantGenerator {
       if (present) count++
     }
 
-    if (IS_DEV) console.log(`   🔹 Moss : ${count} / ${grassMossIndexes.length}`)
+    if (IS_DEV) console.log(`   🔹 Moss : ${count} / ${grassMossIndexes.length} (${fixed} tuile(s) invalide(s) corrigée(s) en MUD)`)
   }
 
   /**
@@ -8280,6 +8301,14 @@ class PlantGenerator {
    * @param {number[]} grassMushroomIndexes — index des tuiles GRASSMUSHROOM
    * @param {number} initialWeather — weather du premier jour (WEATHER_TYPE_CODE)
    */
+
+  // TODO — placeCaveMushrooms doit être revue (ne correspond pas encore à l'implémentation
+  // cible). Quand ce sera fait, repenser à retester la validité des tuiles GRASSMUSHROOM —
+  // même classe de bug que GRASSFERN/GRASSMOSS : cleanupAfterCarving (Règle 1, VOID isolé)
+  // peut combler le VOID requis au-dessus d'une tuile après le tapissage du fond de la
+  // Mushroom Cave, sans que rien ne la retransforme. Cf. le fix appliqué à placeFerns() et
+  // placeMoss() pour le patron à reproduire.
+
   placeCaveMushrooms (grassMushroomIndexes, initialWeather, giantOccupied) {
     const VOID = NODES.VOID.code
     const GRASSMUSHROOM = NODES.GRASSMUSHROOM.code
