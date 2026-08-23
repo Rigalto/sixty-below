@@ -258,7 +258,7 @@ class FurnitureManager {
    * Retourne les furnitures de #displayed dans le rectangle centré joueur défini par buffId.
    * Centre joueur et range récupérés depuis playerManager et buffManager (commentés — DEBUG).
    * Le range 24x20 tuiles couvrirait 9 this.#byChunk.get — moins efficace que le scan direct.
-   * @param {string}   buffId  — identifiant du buff composite définissant le range
+   * Les meubles bloqués (par du sable ou du liquide) ne sont pas renvoyés
    * @param {Set<string>} stypes — sous-types acceptés
    * @returns {Array<object>}
    */
@@ -267,6 +267,7 @@ class FurnitureManager {
     const result = []
     for (const furniture of this.#displayed) {
       if (!stypes.has(furniture.stype)) continue
+      if (furniture.blocked > 0) continue
       if (isInInteractionRange(furniture.index, centerTile)) result.push(furniture)
     }
     return result
@@ -275,6 +276,7 @@ class FurnitureManager {
   /**
    * Retourne les containers (chest, closet, cabinet...) dans le range 'interaction-range' autour du joueur.
    * Le range 24x20 tuiles couvrirait 9 this.#byChunk.get — moins efficace que le scan direct.
+   * Les meubles bloqués (par du sable ou du liquide) ne sont pas renvoyés
    * @returns {Array<object>}
    */
   getNearbyContainers () {
@@ -282,6 +284,7 @@ class FurnitureManager {
     const result = []
     for (const furniture of this.#displayed) {
       if (!CONTAINER_STYPES.has(furniture.stype)) continue
+      if (furniture.blocked > 0) continue
       if (isInInteractionRange(furniture.index, centerTile)) result.push(furniture)
     }
     return result
@@ -290,6 +293,7 @@ class FurnitureManager {
   /**
    * Retourne les crafting stations dans le range 'interaction-range' autour du joueur.
    * Le range 24x20 tuiles couvrirait 9 this.#byChunk.get — moins efficace que le scan direct.
+   * Les crafting stations bloquées (par du sable ou du liquide) ne sont pas renvoyés
    * @returns {Array<object>}
    */
   getNearbyCraftingStations () {
@@ -297,6 +301,7 @@ class FurnitureManager {
     const result = []
     for (const furniture of this.#displayed) {
       if (furniture.stype !== 'station') continue
+      if (furniture.blocked > 0) continue
       if (isInInteractionRange(furniture.index, centerTile)) result.push(furniture)
     }
     return result
