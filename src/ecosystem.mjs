@@ -4568,6 +4568,7 @@ class FernSystem {
    */
   onTileChangedFern ({tileIndex, tileOldCode, tileNewCode}) {
     const GRASSFERN = NODES.GRASSFERN.code
+    const HUMUS = NODES.HUMUS.code
     const VOID = NODES.VOID.code
     const W = WORLD_WIDTH
 
@@ -4584,7 +4585,16 @@ class FernSystem {
       }
     }
 
-    // Cas 2 — tuile sol : GRASSFERN perdu (fougère + spot)
+    // Cas 2 — tuile directement au-dessus du sol : sol désormais recouvert, occupé ou non
+    if (tileNewCode !== VOID) {
+      const spot = this.#spotsBySoil.get(tileIndex + W)
+      if (spot !== undefined && chunkManager.getTileAt(spot.soilIndex) === GRASSFERN) {
+        chunkManager.setTileAt(spot.soilIndex, HUMUS)
+        eventBus.emit('world/tile-changed', {tileIndex: spot.soilIndex, tileOldCode: GRASSFERN, tileNewCode: HUMUS})
+      }
+    }
+
+    // Cas 3 — tuile sol : GRASSFERN perdu (fougère + spot)
     if (tileOldCode === GRASSFERN) {
       const record = this.#spotsBySoil.get(tileIndex)
       if (record !== undefined && chunkManager.getTileAt(record.soilIndex) !== GRASSFERN) {
@@ -4592,7 +4602,7 @@ class FernSystem {
       }
     }
 
-    // Cas 3 — nouvelle tuile GRASSFERN : nouveau spot, sans fougère dessus
+    // Cas 4 — nouvelle tuile GRASSFERN : nouveau spot, sans fougère dessus
     if (tileNewCode === GRASSFERN) this.#onFernSpotCheck(tileIndex)
   }
 
@@ -4729,12 +4739,6 @@ export const fernSystem = new FernSystem()
    d'espace VOID). Pas de revalidation géométrique à la pousse : la présence d'un record dans
    #list garantit que sa tuile est GRASSMOSS — onTileChangedMoss retire le record dès que ce
    n'est plus le cas.
-
-   TODO — foraging : cas spécifique GrassMoss à ajouter dans ForagingManager.tryForage
-   (aujourd'hui la branche NATURAL capte GrassMoss avant d'atteindre floraManager.getPlantAt).
-   TODO — retransformation GRASSMOSS → MUD quand plus aucune tuile VOID adjacente n'existe.
-   TODO — création réactive d'un spot lors de la pose d'une nouvelle tuile GRASSMOSS par spore
-   (dépend du câblage SowingManager, pas encore fait).
 
    ==================================================================================================== */
 
