@@ -19,6 +19,12 @@ import {camera} from './render.mjs'
    HELPERS COMMUNS A TOUS LES SYSTEMS
    ==================================================================================================== */
 
+// Codes considérés 'dégagés' pour la détection d'obstruction (canopée Oak/Mahogany, rectangle
+// Thornspine, etc.) : VOID (tunnel non encore reconnecté au ciel) compte comme dégagé au même titre
+// que SKY. Comparer l'état avant/après (et non tileNewCode seul) évite toute dérive du
+// compteur 'blocked' lors du minage d'un empilement de sable en plusieurs passes.
+const CANOPY_OPEN_CODES = new Set([NODES.SKY.code, NODES.VOID.code])
+
 // ── Helpers partagés par tous les systèmes de plantes ────────────────────────
 
 /**
@@ -540,10 +546,6 @@ class ThornspineSystem {
   onTileChangedThornspine ({tileIndex, tileOldCode, tileNewCode}) {
     const record = this.byTile.get(tileIndex)
     if (record === undefined) return
-
-
-
-    const CANOPY_OPEN_CODES = new Set([NODES.SKY.code, NODES.VOID.code])
 
     const wasOpen = CANOPY_OPEN_CODES.has(tileOldCode)
     const isOpen = CANOPY_OPEN_CODES.has(tileNewCode)
@@ -5458,8 +5460,12 @@ class OakSystem {
     const byFullRecord = this.#oakByFullRect.get(tileIndex)
     if (byFullRecord === undefined) return
 
-    // Cas 3.1. Obstruction : une tuile SKY devient autre chose
-    if (tileNewCode !== SKY) {
+    const wasOpen = CANOPY_OPEN_CODES.has(tileOldCode)
+    const isOpen = CANOPY_OPEN_CODES.has(tileNewCode)
+    if (wasOpen === isOpen) return // pas de changement d'état dégagé/obstrué
+
+    // Cas 3.1. Obstruction : la tuile passe de dégagée à obstruée
+    if (!isOpen) {
       byFullRecord.blocked++
       if (byFullRecord.blocked === 1) {
         // Transition libre → bloqué : annule la croissance en cours
@@ -5470,7 +5476,7 @@ class OakSystem {
       return
     }
 
-    // Cas 3.2. Libération : une tuile redevient SKY
+    // Cas 3.2. Libération : la tuile redevient dégagée
     if (byFullRecord.blocked === 0) return // guard : compteur déjà à zéro (cohérence)
     byFullRecord.blocked--
     if (byFullRecord.blocked === 0) {
@@ -5483,6 +5489,7 @@ class OakSystem {
         )
       }
     }
+
     saveManager.queueStaticUpdate({storeName: 'plant', record: byFullRecord})
   }
 
