@@ -6064,8 +6064,12 @@ class MahoganySystem {
     const byFullRecord = this.#mahoganyByFullRect.get(tileIndex)
     if (byFullRecord === undefined) return
 
-    // Cas 3.1. Obstruction : une tuile SKY devient autre chose
-    if (tileNewCode !== SKY) {
+    const wasOpen = CANOPY_OPEN_CODES.has(tileOldCode)
+    const isOpen = CANOPY_OPEN_CODES.has(tileNewCode)
+    if (wasOpen === isOpen) return // pas de changement d'état dégagé/obstrué
+
+    // Cas 3.1. Obstruction : la tuile passe de dégagée à obstruée
+    if (!isOpen) {
       byFullRecord.blocked++
       if (byFullRecord.blocked === 1) {
         // Transition libre → bloqué : annule la croissance en cours
@@ -6076,7 +6080,7 @@ class MahoganySystem {
       return
     }
 
-    // Cas 3.2. Libération : une tuile redevient SKY
+    // Cas 3.2. Libération : la tuile redevient dégagée
     if (byFullRecord.blocked === 0) return // guard : compteur déjà à zéro (cohérence)
     byFullRecord.blocked--
     if (byFullRecord.blocked === 0) {
