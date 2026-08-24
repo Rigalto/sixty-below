@@ -198,6 +198,8 @@ class ThornspineSystem {
     // eventBus
     this.onHourThornspine = this.onHourThornspine.bind(this)
     eventBus.on('time/every-hour', this.onHourThornspine)
+    this.onTileChangedThornspine = this.onTileChangedThornspine.bind(this)
+    eventBus.on('world/tile-changed', this.onTileChangedThornspine)
     // Micro-tâche
     this.thornspineRegrow = this.thornspineRegrow.bind(this)
   }
@@ -265,6 +267,13 @@ class ThornspineSystem {
         const pxX = image.x << 4
         const pxY = soilYPx - 48 * (i + 1)
         ctx.drawImage(IMAGE_CACHE[img.imgIndex], img.sx, img.sy, img.sw, img.sh, pxX, pxY, img.sw, img.sh)
+      }
+
+      if (record.blocked > 0) {
+        const icon = BLOCKED_ICON.image
+        const iconX = ((record.soilIndex & 0x3FF) << 4) + 16
+        const iconY = soilYPx - 16
+        ctx.drawImage(IMAGE_CACHE[icon.imgIndex], icon.sx, icon.sy, icon.sw, icon.sh, iconX, iconY, 16, 16)
       }
 
       if (!record.bloom) continue
@@ -460,6 +469,7 @@ class ThornspineSystem {
         record.size = size
         record.images = this.#buildThornspineImages(soilX, size)
         record.present = true
+        record.blocked = 0
         record.bloom = false
         record.x = soilX
         record.yTop = soilY - h
@@ -517,6 +527,35 @@ class ThornspineSystem {
     }
 
     if (updates.length !== 0) saveManager.queueStaticUpdate(updates)
+  }
+
+  /**
+   * Liaison EventBus : 'world/tile-changed' — surveille le rectangle complet (byTile) de
+   * chaque thornspine present. Une tuile SKY qui devient autre chose incrémente 'blocked'
+   * (bloque chopping/shaking via le check générique plant.blocked > 0, cf. action.mjs) ; le
+   * retour à SKY décrémente. Contrairement à Oak/Mahogany, aucune tâche de croissance à
+   * suspendre/relancer — le thornspine est construit intégralement au placement.
+   * @param {{tileIndex: number, tileOldCode: number, tileNewCode: number}} payload
+   */
+  onTileChangedThornspine ({tileIndex, tileOldCode, tileNewCode}) {
+    const record = this.byTile.get(tileIndex)
+    if (record === undefined) return
+
+
+
+    const CANOPY_OPEN_CODES = new Set([NODES.SKY.code, NODES.VOID.code])
+
+    const wasOpen = CANOPY_OPEN_CODES.has(tileOldCode)
+    const isOpen = CANOPY_OPEN_CODES.has(tileNewCode)
+    if (wasOpen === isOpen) return // pas de changement d'état dégagé/obstrué
+
+    if (!isOpen) {
+      record.blocked++
+    } else {
+      if (record.blocked === 0) return // guard : compteur déjà à zéro (cohérence)
+      record.blocked--
+    }
+    saveManager.queueStaticUpdate({storeName: 'plant', record})
   }
 }
 export const thornspineSystem = new ThornspineSystem()

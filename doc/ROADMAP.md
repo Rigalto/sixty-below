@@ -369,17 +369,17 @@ La Sap corrode le Copper. Il doit donc être remplacer par du Gold.
 - Point d'entrée pour la flore (`FloraManager`)
 - Sunflower (`SunflowerSystem`)
 - Parsnip (`ParsnipSystem`)
-- Ambermirage (`AmbermirageSystem`)
+- Ambermirage (`AmbermirageSystem`) v
 - Cobweb (`CobwebSystem`)
 - Oak (`OakSystem`)
 - Bolete (`OakSystem`)
 - Mahogany (`MahoganySystem`)
-- Pink Mycenia (`MahoganySystem`)
+- Pink Mycenia (`MahoganySystem`) v
 - Coconut (`CoconutSystem`)
 - Thornspine (`ThornspineSystem`)
 - Coral (`CoralSystem`) v
 - Oleander (`OleanderSystem`) v
-- Bloodmoon (`BloodmoonSystem`)
+- Bloodmoon (`BloodmoonSystem`) v
 - Mandrake (`MandrakeSystem`) v
 - Pricklepad (`PricklepadSystem`) v
 - Satan's Cube (`SatansCubeSystem`) v
@@ -389,7 +389,7 @@ La Sap corrode le Copper. Il doit donc être remplacer par du Gold.
 - Gravelweed (`GravelweedSystem`) v
 - Bamboo (`BambooSystem`) v
 - Inferncap (`InferncapSystem`) v
-- Ferns (`FernSystem`)
+- Ferns (`FernSystem`) v
 - Moss (`MossSystem`) v
 - Sand Falling (`SandFallingSystem`)
 

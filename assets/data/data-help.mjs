@@ -5494,6 +5494,12 @@ A tall desert cactus, unmistakable with its segmented, spiny trunk rising straig
 
 * A chopped Thornspine eventually grows back on its own, somewhere on suitable Desert sand — not necessarily the same spot.
 
+**Obstruction**
+
+* If the space around the trunk is obstructed (by sand or other material), chopping is blocked until the obstruction clears.
+* An obstructed Thornspine displays a small warning icon near its base.
+* Foraging the flower is not affected by obstruction — only chopping is blocked.
+
 <hr>
 
 **Chopping**
@@ -5501,6 +5507,7 @@ A tall desert cactus, unmistakable with its segmented, spiny trunk rising straig
 * Select an [[Chopping Tools|Axe]] and click the trunk to chop it down.
 * A single chop fells the entire plant.
 * The Thornspine disappears until it regrows elsewhere in the Desert.
+* Chopping is blocked while the trunk is obstructed.
 
 Chopping Tool: <<itemStar|axeSilver>> or better
 
@@ -5515,6 +5522,7 @@ Chopping Tool: <<itemStar|axeSilver>> or better
 * Thornspines bloom and wither on their own over time — only some are ever in flower at once.
 * While in bloom, select a [[Foraging Tools|Sickle]] and click the trunk to harvest it.
 * Harvesting the flower doesn't destroy the plant — only the bloom disappears, until it flowers again later.
+* Obstruction has no effect on foraging — flowers remain harvestable even while the trunk is blocked for chopping.
 
 Foraging Tool: <<itemStar|sickleSilver>> or better
 
@@ -5532,6 +5540,7 @@ _Coming soon_
 
 * _A Thornspine without flowers isn't worth waiting around for — chop it for wood-like material instead, or come back later once it blooms._
 * _Chopped Thornspines don't respawn instantly — if you need flowers now, look for a different one already in bloom._
+* _A buried Thornspine can still be foraged if it's in bloom — only chopping waits on the sand to clear._
 
 **Sea Also**
 

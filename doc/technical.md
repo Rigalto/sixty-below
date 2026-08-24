@@ -597,6 +597,7 @@ Cette section définit les événements officiels. Tout nouvel événement doit 
 | Dir. | Event Name | Payload Structure | Description |
 | :---: | :--- | :--- | :--- |
 | E | `time/every-hour` | `{ day, hour, minute, isDay }` | Cycle bloom/unbloom asymétrique sur 1/4 de la population (offset = hour % 4). |
+| E | `world/tile-changed` | `{ tileIndex: number, tileOldCode: number, tileNewCode: number }` | Changement de tuile. |
 
 #### Sand Falling (`SandFallingSystem`)
 
