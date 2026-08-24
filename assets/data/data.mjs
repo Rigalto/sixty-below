@@ -394,12 +394,12 @@ export const ITEMS = {
   triskelGold: {name: 'Gold Triskel', type: ITEM_TYPE.FURNITURE | ITEM_TYPE.UNIQUE | ITEM_TYPE.MATERIAL, stype: 'triskel', star: 5, image: 'furniture_32_32-12-2', placed: 'furniture_32_32-6-3', unplacing: {speed: 1800}, help: 'Triskels', tooltip: ''},
   triskelAncient: {name: 'Ancient Triskel', type: ITEM_TYPE.ACCESSORY | ITEM_TYPE.UNIQUE | ITEM_TYPE.CRAFTABLE, stype: 'triskel', star: 5, image: 'furniture_32_32-12-2', placed: 'furniture_32_32-6-3', help: 'Triskels', tooltip: ''},
 
-  // Tombstone - images NOK
-  tomb: {name: 'Tombstone', type: ITEM_TYPE.FURNITURE | ITEM_TYPE.PLACABLE | ITEM_TYPE.UNDISPOSABLE, stype: 'tomb', star: 1, image: 'furniture_32_32-13-2', placed: 'fuws_32_32-3-4', unplacing: {speed: 2200}, help: 'Graveyard', tooltip: 'Summons specific enemies'},
-  tombHead: {name: 'Headstone', type: ITEM_TYPE.FURNITURE | ITEM_TYPE.PLACABLE | ITEM_TYPE.UNDISPOSABLE, stype: 'tomb', star: 1, image: 'furniture_32_32-4-8', placed: 'fuws_32_32-4-4', unplacing: {speed: 2200}, help: 'Graveyard', tooltip: 'Summons specific enemies'},
-  tombGrave: {name: 'Gravestone', type: ITEM_TYPE.FURNITURE | ITEM_TYPE.PLACABLE | ITEM_TYPE.UNDISPOSABLE, stype: 'tomb', star: 1, image: 'furniture_32_32-5-8', placed: 'fuws_32_32-5-4', unplacing: {speed: 2200}, help: 'Graveyard', tooltip: 'Summons specific enemies'},
-  tombStrange: {name: 'Strange Looking Tombstone', type: ITEM_TYPE.FURNITURE | ITEM_TYPE.PLACABLE | ITEM_TYPE.UNDISPOSABLE, star: 1, stype: 'tomb', image: 'furniture_32_32-6-8', placed: 'fuws_32_32-6-4', unplacing: {speed: 2200}, help: 'Graveyard', tooltip: 'Summons specific enemies'},
-  tombCross: {name: 'Cross Tombstone', type: ITEM_TYPE.FURNITURE | ITEM_TYPE.PLACABLE | ITEM_TYPE.UNDISPOSABLE, stype: 'tomb', star: 1, image: 'furniture_32_32-7-8', placed: 'fuws_32_32-7-4', unplacing: {speed: 2200}, help: 'Graveyard', tooltip: 'Summons specific enemies'},
+  // Tombstone - images OK
+  tomb: {name: 'Tombstone', type: ITEM_TYPE.FURNITURE | ITEM_TYPE.PLACABLE | ITEM_TYPE.UNDISPOSABLE, stype: 'tomb', star: 1, image: 'placed_32_32-0-4', placed: 'placed_32_32-0-4', unplacing: {speed: 2200}, help: 'Graveyard', tooltip: 'Summons specific enemies'},
+  tombHead: {name: 'Headstone', type: ITEM_TYPE.FURNITURE | ITEM_TYPE.PLACABLE | ITEM_TYPE.UNDISPOSABLE, stype: 'tomb', star: 1, image: 'placed_32_32-1-4', placed: 'placed_32_32-1-4', unplacing: {speed: 2200}, help: 'Graveyard', tooltip: 'Summons specific enemies'},
+  tombGrave: {name: 'Gravestone', type: ITEM_TYPE.FURNITURE | ITEM_TYPE.PLACABLE | ITEM_TYPE.UNDISPOSABLE, stype: 'tomb', star: 1, image: 'placed_32_32-2-4', placed: 'placed_32_32-2-4', unplacing: {speed: 2200}, help: 'Graveyard', tooltip: 'Summons specific enemies'},
+  tombStrange: {name: 'Strange Looking Tombstone', type: ITEM_TYPE.FURNITURE | ITEM_TYPE.PLACABLE | ITEM_TYPE.UNDISPOSABLE, star: 2, stype: 'tomb', image: 'placed_32_32-3-4', placed: 'placed_32_32-3-4', unplacing: {speed: 2200}, help: 'Graveyard', tooltip: 'Summons specific enemies'},
+  tombCross: {name: 'Cross Tombstone', type: ITEM_TYPE.FURNITURE | ITEM_TYPE.PLACABLE | ITEM_TYPE.UNDISPOSABLE, stype: 'tomb', star: 2, image: 'placed_32_32-4-4', placed: 'placed_32_32-4-4', unplacing: {speed: 2200}, help: 'Graveyard', tooltip: 'Summons specific enemies'},
 
   // accessories - combat - images NOK
   bezoar: {name: 'Bezoar', type: ITEM_TYPE.ACCESSORY, stype: 'accessory', star: 3, image: 'accessories_32_32-0-0', help: 'Accessories', tooltip: 'Immunity to Bleeding, Poisoned', immunity: ['bleeding', 'poisoned']},

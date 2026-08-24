@@ -1343,14 +1343,25 @@ Graveyards are ancient burial chambers found deep underground in all biomes. The
 * 2 or 3 rows of burial tunnels
 * Accessible from connecting caverns
 
+<hr>
+
 **Tombstones**
 
 Tombstones are found inside the burial tunnels. All tombstones behave identically — they differ only in appearance.
-* [[item:tomb]]
-* [[item:tombHead]]
-* [[item:tombGrave]]
-* [[item:tombStrange]]
-* [[item:tombCross]]
+* <<itemStar|tomb>>
+* <<itemStar|tombHead>>
+* <<itemStar|tombGrave>>
+* <<itemStar|tombStrange>>
+* <<itemStar|tombCross>>
+
+**How to Move**
+
+* Use <<itemStar|hammerCopper>> or better to remove a Tombstone
+* The Tombstone in your [[Inventory]] cannot be deleted
+* Place the Tombstone in the [[Hotbar]], then click on an empty space to place the Tombstone in the world
+* The clicked tile has to be in [[Ranges|Interaction Range]] — this range can be buffed
+
+<hr>
 
 **Inhabitants** ⏳
 
@@ -1362,6 +1373,8 @@ Tombstones are found inside the burial tunnels. All tombstones behave identicall
 **Loot** ⏳
 
 * Tombstones — interacting triggers a combat encounter, rewards high-tier items ⏳
+
+<hr>
 
 **Tips**
 

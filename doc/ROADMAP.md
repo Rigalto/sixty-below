@@ -369,29 +369,30 @@ La Sap corrode le Copper. Il doit donc être remplacer par du Gold.
 - Point d'entrée pour la flore (`FloraManager`)
 - Sunflower (`SunflowerSystem`)
 - Parsnip (`ParsnipSystem`)
-- Ambermirage (`AmbermirageSystem`) v
+- Ambermirage (`AmbermirageSystem`)
 - Cobweb (`CobwebSystem`)
 - Oak (`OakSystem`)
 - Bolete (`OakSystem`)
 - Mahogany (`MahoganySystem`)
-- Pink Mycenia (`MahoganySystem`) v
+- Pink Mycenia (`MahoganySystem`)
 - Coconut (`CoconutSystem`)
 - Thornspine (`ThornspineSystem`)
-- Coral (`CoralSystem`) v
-- Oleander (`OleanderSystem`) v
-- Bloodmoon (`BloodmoonSystem`) v
-- Mandrake (`MandrakeSystem`) v
-- Pricklepad (`PricklepadSystem`) v
-- Satan's Cube (`SatansCubeSystem`) v
-- Sneakthorn (`SneakthornSystem`) v
-- Cursedcrown (`CursedcrownSystem`) v
-- Abysshorn (`AbysshornSystem`) v
-- Gravelweed (`GravelweedSystem`) v
-- Bamboo (`BambooSystem`) v
-- Inferncap (`InferncapSystem`) v
-- Ferns (`FernSystem`) v
-- Moss (`MossSystem`) v
+- Coral (`CoralSystem`)
+- Oleander (`OleanderSystem`)
+- Bloodmoon (`BloodmoonSystem`)
+- Mandrake (`MandrakeSystem`)
+- Pricklepad (`PricklepadSystem`)
+- Satan's Cube (`SatansCubeSystem`)
+- Sneakthorn (`SneakthornSystem`)
+- Cursedcrown (`CursedcrownSystem`)
+- Abysshorn (`AbysshornSystem`)
+- Gravelweed (`GravelweedSystem`)
+- Bamboo (`BambooSystem`)
+- Inferncap (`InferncapSystem`)
+- Ferns (`FernSystem`)
+- Moss (`MossSystem`)
 - Sand Falling (`SandFallingSystem`)
+- Tombstones (`FurnishingManager`, `HammingManager`)
 
 ### Rendu
 - `WorldRenderer` — rendu tuiles par chunks avec cache OffscreenCanvas
