@@ -329,13 +329,13 @@ export const ITEMS = {
   // pickaxes
   pickaxeCopper: {name: 'Copper Pickaxe', type: ITEM_TYPE.TOOL, stype: 'pickaxe', star: 2, image: 'tool_32_32-0-0', placed: 'handed_48_48-0-0', help: 'Mining Tools', tooltip: 'Tools used to remove blocks, converting them to item form', range: 0, mining: {speed: 0, tiles: 1}},
   pickaxeIron: {name: 'Iron Pickaxe', type: ITEM_TYPE.TOOL, stype: 'pickaxe', star: 3, image: 'tool_32_32-1-0', placed: 'handed_48_48-1-0', help: 'Mining Tools', tooltip: 'Tools used to remove blocks, converting them to item form', range: 0, mining: {speed: 25, tiles: 1}},
-  pickaxeSilver: {name: 'Silver Pickaxe', type: ITEM_TYPE.TOOL, stype: 'pickaxe', star: 4, image: 'tool_32_32-2-0', placed: 'handed_48_48-2-0', placedleft: 'w_42_42-0-1', help: 'Mining Tools', tooltip: 'Tools used to remove blocks, converting them to item form', range: 0, mining: {speed: 50, tiles: 1}},
-  pickaxeGold: {name: 'Gold Pickaxe', type: ITEM_TYPE.TOOL, stype: 'pickaxe', star: 4, image: 'tool_32_32-3-0', placed: 'handed_48_48-3-0', placedleft: 'w_42_42-0-1', help: 'Mining Tools', tooltip: 'Tools used to remove blocks, converting them to item form', range: 1, mining: {speed: 75, tiles: 1}},
-  pickaxeCobalt: {name: 'Cobalt Pickaxe', type: ITEM_TYPE.TOOL, stype: 'pickaxe', star: 5, image: 'tool_32_32-4-0', placed: 'handed_48_48-4-0', placedleft: 'w_42_42-0-1', help: 'Mining Tools', tooltip: 'Tools used to remove blocks, converting them to item form', range: 2, mining: {speed: 100, tiles: 1}},
-  pickaxePlatinum: {name: 'Platinum Pickaxe', type: ITEM_TYPE.TOOL, stype: 'pickaxe', star: 5, image: 'tool_32_32-5-0', placed: 'handed_48_48-5-0', placedleft: 'w_42_42-0-1', help: 'Mining Tools', tooltip: 'Tools used to remove blocks, converting them to item form', range: 3, mining: {speed: 125, tiles: 1}},
-  pickaxeBone: {name: 'Bone Pickaxe', type: ITEM_TYPE.TOOL, stype: 'pickaxe', star: 4, image: 'tool_32_32-1-5', placed: 'w_42_42-0-0', placedleft: 'w_42_42-0-1', help: 'Mining Tools', tooltip: 'Tools used to remove blocks, converting them to item form', range: 1, mining: {speed: 175, tiles: 1}},
-  pickaxeProspector: {name: 'Prospector\'s Pickaxe', type: ITEM_TYPE.TOOL, stype: 'pickaxe', star: 5, image: 'tool_32_32-2-5', placed: 'w_42_42-0-0', placedleft: 'w_42_42-0-1', help: 'Mining Tools', tooltip: 'Tools used to remove multiple blocks, converting them to item form', range: 0, mining: {speed: 75, tiles: 5}},
-  pickaxeGeologist: {name: 'Geologist\'s Pickaxe', type: ITEM_TYPE.TOOL, stype: 'pickaxe', star: 5, image: 'tool_32_32-3-5', placed: 'w_42_42-0-0', placedleft: 'w_42_42-0-1', help: 'Mining Tools', tooltip: 'Tools used to remove multiple blocks, converting them to item form', range: 2, mining: {speed: 100, tiles: 7}},
+  pickaxeSilver: {name: 'Silver Pickaxe', type: ITEM_TYPE.TOOL, stype: 'pickaxe', star: 4, image: 'tool_32_32-2-0', placed: 'handed_48_48-2-0', help: 'Mining Tools', tooltip: 'Tools used to remove blocks, converting them to item form', range: 0, mining: {speed: 50, tiles: 1}},
+  pickaxeGold: {name: 'Gold Pickaxe', type: ITEM_TYPE.TOOL, stype: 'pickaxe', star: 4, image: 'tool_32_32-3-0', placed: 'handed_48_48-3-0', help: 'Mining Tools', tooltip: 'Tools used to remove blocks, converting them to item form', range: 1, mining: {speed: 75, tiles: 1}},
+  pickaxeCobalt: {name: 'Cobalt Pickaxe', type: ITEM_TYPE.TOOL, stype: 'pickaxe', star: 5, image: 'tool_32_32-4-0', placed: 'handed_48_48-4-0', help: 'Mining Tools', tooltip: 'Tools used to remove blocks, converting them to item form', range: 2, mining: {speed: 100, tiles: 1}},
+  pickaxePlatinum: {name: 'Platinum Pickaxe', type: ITEM_TYPE.TOOL, stype: 'pickaxe', star: 5, image: 'tool_32_32-5-0', placed: 'handed_48_48-5-0', help: 'Mining Tools', tooltip: 'Tools used to remove blocks, converting them to item form', range: 3, mining: {speed: 125, tiles: 1}},
+  pickaxeBone: {name: 'Bone Pickaxe', type: ITEM_TYPE.TOOL, stype: 'pickaxe', star: 4, image: 'tool_32_32-1-5', placed: 'w_42_42-0-0', help: 'Mining Tools', tooltip: 'Tools used to remove blocks, converting them to item form', range: 1, mining: {speed: 175, tiles: 1}},
+  pickaxeProspector: {name: 'Prospector\'s Pickaxe', type: ITEM_TYPE.TOOL, stype: 'pickaxe', star: 5, image: 'tool_32_32-2-5', placed: 'w_42_42-0-0', help: 'Mining Tools', tooltip: 'Tools used to remove multiple blocks, converting them to item form', range: 0, mining: {speed: 75, tiles: 5}},
+  pickaxeGeologist: {name: 'Geologist\'s Pickaxe', type: ITEM_TYPE.TOOL, stype: 'pickaxe', star: 5, image: 'tool_32_32-3-5', placed: 'w_42_42-0-0', help: 'Mining Tools', tooltip: 'Tools used to remove multiple blocks, converting them to item form', range: 2, mining: {speed: 100, tiles: 7}},
 
   // Sickles - OK images
   sickleCopper: {name: 'Copper Sickle', type: ITEM_TYPE.TOOL, stype: 'sickle', star: 1, image: 'tool_32_32-0-3', placed: 'handed_48_48-0-3', help: 'Foraging Tools', tooltip: 'Tools used to harvest plants', range: 0, foraging: {speed: 0}},
@@ -365,12 +365,12 @@ export const ITEMS = {
   hammerPlatinum: {name: 'Cobalt Hammer', type: ITEM_TYPE.TOOL, stype: 'hammer', star: 5, image: 'tool_32_32-5-1', placed: 'handed_48_48-5-1', range: 3, shaking: {speed: 150}, help: 'Hammers', tooltip: 'Tools used to remove wall, furniture, workstation, converting them to item form'},
 
   // Axes
-  axeCopper: {name: 'Copper Axe', type: ITEM_TYPE.TOOL | ITEM_TYPE.WEAPON, stype: 'axe', star: 1, image: 'tool_32_32-0-2', placed: 'handed_48_48-0-2', speed: 0, help: 'Chopping Tools', tooltip: 'Basic tools used to chop trees. Can be used as a slow weapon', range: 0, chopping: {speed: 0}},
-  axeIron: {name: 'Iron Axe', type: ITEM_TYPE.TOOL | ITEM_TYPE.WEAPON, stype: 'axe', star: 2, image: 'tool_32_32-1-2', placedright: 'w_42_42-0-0', placedleft: 'w_42_42-0-1', speed: 0, help: 'Chopping Tools', tooltip: 'Basic tools used to chop trees. Can be used as a slow weapon', range: 0, chopping: {speed: 25}},
-  axeSilver: {name: 'Silver Axe', type: ITEM_TYPE.TOOL | ITEM_TYPE.WEAPON, stype: 'axe', star: 3, image: 'tool_32_32-2-2', placedright: 'w_42_42-0-0', placedleft: 'w_42_42-0-1', speed: 0, help: 'Chopping Tools', tooltip: 'Basic tools used to chop trees. Can be used as a slow weapon', range: 0, chopping: {speed: 50}},
-  axeGold: {name: 'Gold Axe', type: ITEM_TYPE.TOOL | ITEM_TYPE.WEAPON, stype: 'axe', star: 3, image: 'tool_32_32-3-2', placedright: 'w_42_42-0-0', placedleft: 'w_42_42-0-1', speed: 0, help: 'Chopping Tools', tooltip: 'Basic tools used to chop trees. Can be used as a slow weapon', range: 1, chopping: {speed: 75}},
-  axeCobalt: {name: 'Cobalt Axe', type: ITEM_TYPE.TOOL | ITEM_TYPE.WEAPON, stype: 'axe', star: 4, image: 'tool_32_32-4-2', placedright: 'w_42_42-0-0', placedleft: 'w_42_42-0-1', speed: 0, help: 'Chopping Tools', tooltip: 'Basic tools used to chop trees. Can be used as a slow weapon', range: 2, chopping: {speed: 100}},
-  axePlatinum: {name: 'Platinum Axe', type: ITEM_TYPE.TOOL | ITEM_TYPE.WEAPON, stype: 'axe', star: 5, image: 'tool_32_32-5-2', placedright: 'w_42_42-0-0', placedleft: 'w_42_42-0-1', speed: 0, help: 'Chopping Tools', tooltip: 'Basic tools used to chop trees. Can be used as a slow weapon', range: 3, chopping: {speed: 125}},
+  axeCopper: {name: 'Copper Axe', type: ITEM_TYPE.TOOL | ITEM_TYPE.WEAPON, stype: 'axe', star: 1, image: 'tool_32_32-0-2', placed: 'handed_48_48-0-2', help: 'Chopping Tools', tooltip: 'Basic tools used to chop trees. Can be used as a slow weapon', range: 0, chopping: {speed: 0}},
+  axeIron: {name: 'Iron Axe', type: ITEM_TYPE.TOOL | ITEM_TYPE.WEAPON, stype: 'axe', star: 2, image: 'tool_32_32-1-2', placed: 'handed_48_48-1-2', help: 'Chopping Tools', tooltip: 'Basic tools used to chop trees. Can be used as a slow weapon', range: 0, chopping: {speed: 25}},
+  axeSilver: {name: 'Silver Axe', type: ITEM_TYPE.TOOL | ITEM_TYPE.WEAPON, stype: 'axe', star: 3, image: 'tool_32_32-2-2', placed: 'handed_48_48-2-2', help: 'Chopping Tools', tooltip: 'Basic tools used to chop trees. Can be used as a slow weapon', range: 0, chopping: {speed: 50}},
+  axeGold: {name: 'Gold Axe', type: ITEM_TYPE.TOOL | ITEM_TYPE.WEAPON, stype: 'axe', star: 3, image: 'tool_32_32-3-2', placed: 'handed_48_48-3-2', help: 'Chopping Tools', tooltip: 'Basic tools used to chop trees. Can be used as a slow weapon', range: 1, chopping: {speed: 75}},
+  axeCobalt: {name: 'Cobalt Axe', type: ITEM_TYPE.TOOL | ITEM_TYPE.WEAPON, stype: 'axe', star: 4, image: 'tool_32_32-4-2', placed: 'handed_48_48-4-2', speed: 0, help: 'Chopping Tools', tooltip: 'Basic tools used to chop trees. Can be used as a slow weapon', range: 2, chopping: {speed: 100}},
+  axePlatinum: {name: 'Platinum Axe', type: ITEM_TYPE.TOOL | ITEM_TYPE.WEAPON, stype: 'axe', star: 5, image: 'tool_32_32-5-2', placed: 'handed_48_48-5-2', help: 'Chopping Tools', tooltip: 'Basic tools used to chop trees. Can be used as a slow weapon', range: 3, chopping: {speed: 125}},
 
   // Swords
   swordCopper: {name: 'Copper Sword', type: ITEM_TYPE.WEAPON, stype: 'axe', star: 2, image: 'tools_32_32-4-0', placedright: 'w_42_42-0-0', placedleft: 'w_42_42-0-1', speed: 0, help: 'Swords', tooltip: 'Melee weapon'},
@@ -381,27 +381,27 @@ export const ITEMS = {
   // Other Weapons
   flamethrower: {name: 'Flamethrower', type: ITEM_TYPE.WEAPON | ITEM_TYPE.TOOL, stype: 'fire', star: 5, image: 'tools_32_32-4-0', placedright: 'w_42_42-0-0', placedleft: 'w_42_42-0-1', speed: 0, help: 'Flamethrower', tooltip: 'Small Range weapon - Can be used for removing Cobweb'},
 
-  // Monster - Spiders
-  spiderEgg: {name: 'Spider Egg', type: ITEM_TYPE.MATERIAL, stype: 'egg', star: 2, image: 'tools_32_32-4-0', placedright: 'w_42_42-0-0', placedleft: 'w_42_42-0-1', help: 'Spiders', tooltip: '???'},
-  spiderFang: {name: 'Spider Fang', type: ITEM_TYPE.MATERIAL, stype: 'fang', star: 3, image: 'tools_32_32-4-0', placedright: 'w_42_42-0-0', placedleft: 'w_42_42-0-1', help: 'Spiders', tooltip: '???'},
+  // Monster - Spiders - Images non OK (KO)
+  spiderEgg: {name: 'Spider Egg', type: 0, stype: 'egg', star: 2, image: 'tools_32_32-4-0', help: 'Spiders', tooltip: '???'},
+  spiderFang: {name: 'Spider Fang', type: 0, stype: 'fang', star: 3, image: 'tools_32_32-4-0', help: 'Spiders', tooltip: '???'},
 
-  // crystall
+  // crystall - image OK
   lifeCrystal: {name: 'Life Crystal', type: ITEM_TYPE.FURNITURE | ITEM_TYPE.UNIQUE | ITEM_TYPE.USABLE, stype: 'life', star: 1, image: 'foraged_32_32-7-2', placed: 'foraged_32_32-7-2', unplacing: {speed: 1800}, help: 'Life Crystal', tooltip: 'Permanently increases maximum life by 20\nCollect with a Hammer'},
 
-  // triskel
+  // triskel - images NOK
   triskelCopper: {name: 'Copper Triskel', type: ITEM_TYPE.FURNITURE | ITEM_TYPE.UNIQUE | ITEM_TYPE.MATERIAL, stype: 'triskel', star: 3, image: 'furniture_32_32-12-2', placed: 'furniture_32_32-6-3', unplacing: {speed: 1800}, help: 'Triskels', tooltip: ''},
   triskelSilver: {name: 'Silver Triskel', type: ITEM_TYPE.FURNITURE | ITEM_TYPE.UNIQUE | ITEM_TYPE.MATERIAL, stype: 'triskel', star: 4, image: 'furniture_32_32-12-2', placed: 'furniture_32_32-6-3', unplacing: {speed: 1800}, help: 'Triskels', tooltip: ''},
   triskelGold: {name: 'Gold Triskel', type: ITEM_TYPE.FURNITURE | ITEM_TYPE.UNIQUE | ITEM_TYPE.MATERIAL, stype: 'triskel', star: 5, image: 'furniture_32_32-12-2', placed: 'furniture_32_32-6-3', unplacing: {speed: 1800}, help: 'Triskels', tooltip: ''},
   triskelAncient: {name: 'Ancient Triskel', type: ITEM_TYPE.ACCESSORY | ITEM_TYPE.UNIQUE | ITEM_TYPE.CRAFTABLE, stype: 'triskel', star: 5, image: 'furniture_32_32-12-2', placed: 'furniture_32_32-6-3', help: 'Triskels', tooltip: ''},
 
-  // Tombstone
-  tomb: {name: 'Tombstone', type: ITEM_TYPE.FURNITURE | ITEM_TYPE.UNDISPOSABLE, stype: 'tomb', star: 1, image: 'furniture_32_32-13-2', placed: 'fuws_32_32-3-4', unplacing: {speed: 2200}, help: 'Graveyard', tooltip: 'Summons specific enemies'},
-  tombHead: {name: 'Headstone', type: ITEM_TYPE.FURNITURE | ITEM_TYPE.UNDISPOSABLE, stype: 'tomb', star: 1, image: 'furniture_32_32-4-8', placed: 'fuws_32_32-4-4', unplacing: {speed: 2200}, help: 'Graveyard', tooltip: 'Summons specific enemies'},
-  tombGrave: {name: 'Gravestone', type: ITEM_TYPE.FURNITURE | ITEM_TYPE.UNDISPOSABLE, stype: 'tomb', star: 1, image: 'furniture_32_32-5-8', placed: 'fuws_32_32-5-4', unplacing: {speed: 2200}, help: 'Graveyard', tooltip: 'Summons specific enemies'},
-  tombStrange: {name: 'Strange Looking Tombstone', type: ITEM_TYPE.FURNITURE | ITEM_TYPE.UNDISPOSABLE, star: 1, stype: 'tomb', image: 'furniture_32_32-6-8', placed: 'fuws_32_32-6-4', unplacing: {speed: 2200}, help: 'Graveyard', tooltip: 'Summons specific enemies'},
-  tombCross: {name: 'Cross Tombstone', type: ITEM_TYPE.FURNITURE | ITEM_TYPE.UNDISPOSABLE, stype: 'tomb', star: 1, image: 'furniture_32_32-7-8', placed: 'fuws_32_32-7-4', unplacing: {speed: 2200}, help: 'Graveyard', tooltip: 'Summons specific enemies'},
+  // Tombstone - images NOK
+  tomb: {name: 'Tombstone', type: ITEM_TYPE.FURNITURE | ITEM_TYPE.PLACABLE | ITEM_TYPE.UNDISPOSABLE, stype: 'tomb', star: 1, image: 'furniture_32_32-13-2', placed: 'fuws_32_32-3-4', unplacing: {speed: 2200}, help: 'Graveyard', tooltip: 'Summons specific enemies'},
+  tombHead: {name: 'Headstone', type: ITEM_TYPE.FURNITURE | ITEM_TYPE.PLACABLE | ITEM_TYPE.UNDISPOSABLE, stype: 'tomb', star: 1, image: 'furniture_32_32-4-8', placed: 'fuws_32_32-4-4', unplacing: {speed: 2200}, help: 'Graveyard', tooltip: 'Summons specific enemies'},
+  tombGrave: {name: 'Gravestone', type: ITEM_TYPE.FURNITURE | ITEM_TYPE.PLACABLE | ITEM_TYPE.UNDISPOSABLE, stype: 'tomb', star: 1, image: 'furniture_32_32-5-8', placed: 'fuws_32_32-5-4', unplacing: {speed: 2200}, help: 'Graveyard', tooltip: 'Summons specific enemies'},
+  tombStrange: {name: 'Strange Looking Tombstone', type: ITEM_TYPE.FURNITURE | ITEM_TYPE.PLACABLE | ITEM_TYPE.UNDISPOSABLE, star: 1, stype: 'tomb', image: 'furniture_32_32-6-8', placed: 'fuws_32_32-6-4', unplacing: {speed: 2200}, help: 'Graveyard', tooltip: 'Summons specific enemies'},
+  tombCross: {name: 'Cross Tombstone', type: ITEM_TYPE.FURNITURE | ITEM_TYPE.PLACABLE | ITEM_TYPE.UNDISPOSABLE, stype: 'tomb', star: 1, image: 'furniture_32_32-7-8', placed: 'fuws_32_32-7-4', unplacing: {speed: 2200}, help: 'Graveyard', tooltip: 'Summons specific enemies'},
 
-  // accessories - combat
+  // accessories - combat - images NOK
   bezoar: {name: 'Bezoar', type: ITEM_TYPE.ACCESSORY, stype: 'accessory', star: 3, image: 'accessories_32_32-0-0', help: 'Accessories', tooltip: 'Immunity to Bleeding, Poisoned', immunity: ['bleeding', 'poisoned']},
 
   // Wood furniture set
