@@ -5200,29 +5200,29 @@ All plants found in the world of Sixty-Below. Plants can be harvested for loot, 
 | <<cellItemStar|pinkMycenia>> | Mushroom | [[Jungle]] / [[Surface]] | [[node:grassJungle]] | [[item:pinkMycenia]] | [[monster:giantRedSlug]] (Foraging) |
 | <<cellItemStar|frostcap>> | Mushroom | [[Mushroom Cave]] | [[node:grassmushroom]] | [[item:mushroomGill]] | [[monster:woodlouse]] (Foraging) |
 | <<cellItemStar|dawncap>> | Mushroom | [[Mushroom Cave]] | [[node:grassmushroom]] | [[item:mushroomGill]] | [[monster:woodlouse]] (Foraging) |
-| [[item:coralR]] | {{item:coralR:star|star}} | Herb | Under [[Sea]] / [[node:sand]] | [[item:coral]] | [[monster:moray]] (Foraging) |
-| [[item:coralP]] | {{item:coralP:star|star}} | Herb | Under [[Sea]] / [[node:sand]] | [[item:coral]] | [[monster:moray]] (Foraging) |
-| [[item:coralY]] | {{item:coralY:star|star}} | Herb | Under [[Sea]] / [[node:sand]] | [[item:coral]] | [[monster:moray]] (Foraging) |
-| [[item:coralG]] | {{item:coralG:star|star}} | Herb | Under [[Sea]] / [[node:sand]] | [[item:coral]] | [[monster:moray]] (Foraging) |
-| [[item:ambermirage]] | {{item:ambermirage:star|star}} | Herb | [[Surface]] / [[node:sand]] | [[item:ambermirage]] | [[monster:scorpion]] (Foraging) |
-| [[item:parsnip]] | {{item:parsnip:star|star}} | Herb | [[Forest]] / [[Surface]] | [[item:parsnip]] | [[monster:vole]] (Foraging) |
-| [[item:sunflower]] | {{item:sunflower:star|star}} | Herb | [[Forest]] / [[Surface]] | [[item:sunflowerSeed]] | [[monster:hedgehog]] (Foraging) |
-| [[item:bloodmoon]] | {{item:bloodmoon:star|star}} | Herb | [[Jungle]] / [[Surface]] | [[item:bloodmoon]] | [[monster:mamba]] (Foraging) |
+| <<cellItemStar|ambermirage>> | Herb | [[Surface]] | [[node:sand]] | [[item:ambermirage]] | [[monster:scorpion]] (Foraging) |
+| <<cellItemStar|parsnip>> | Herb | [[Forest]] / [[Surface]] | [[node:grassForest]] | [[item:parsnip]] | [[monster:vole]] (Foraging) |
+| <<cellItemStar|sunflower>> | Herb | [[Forest]] / [[Surface]] | [[node:grassForest]] | [[item:sunflowerSeed]] | [[monster:hedgehog]] (Foraging) |
+| <<cellItemStar|bloodmoon>> | Herb | [[Jungle]] / [[Surface]] | [[node:grassJungle]] | [[item:bloodmoon]] | [[monster:mamba]] (Foraging) |
 | <<cellItemStar|gravelweed>> | Herb | [[Forest]], [[Desert]], [[Jungle]]<br>[[Surface]], [[Underground]] | [[node:grassForest]], [[node:grassJungle]], [[node:dirt]], [[node:silt]], [[node:clay]], [[node:sandstone]], [[node:mud]], [[node:stone]], [[node:ash]], [[node:limestone]] | [[item:gravelweed]] | None |
-| [[item:fernS]] | {{item:fernS:star|star}} | Herb | [[Fern Cave]] / [[node:grassfern]] | [[item:fernLeaf]] | [[monster:dendrobate]] /  [[monster:mamba]] (Foraging) |
-| [[item:fernC]] | {{item:fernC:star|star}} | Herb | [[Fern Cave]] / [[node:grassfern]] | [[item:fernLeaf]] | [[monster:dendrobate]] /  [[monster:mamba]] (Foraging) |
-| [[item:fernG]] | {{item:fernG:star|star}} | Herb | [[Fern Cave]] / [[node:grassfern]] | [[item:fernLeaf]] | [[monster:dendrobate]] /  [[monster:mamba]] (Foraging) |
-| [[item:fernM]] | {{item:fernM:star|star}} | Herb | [[Fern Cave]] / [[node:grassfern]] | [[item:fernLeaf]] | [[monster:dendrobate]] /  [[monster:mamba]] (Foraging) |
-| [[item:velvetmoss]] | {{item:velvetmoss:star|star}} | Herb | [[Moss Cave]] / [[node:grassmoss]] | [[item:velvetmoss]] | [[monster:woodlouse]] (Foraging) |
-| [[item:mandrake]] | {{item:mandrake:star|star}} | Herb | [[Forest]] [[Underground]] / [[node:dirt]] | [[item:mandrakeRoot]] | [[monster:wraith]] (Foraging) |
-| [[item:pricklepad]] | {{item:pricklepad:star|star}} | Herb | [[Desert]] [[Underground]] / [[node:sand]] | [[item:pricklepadPear]], [[item:cactusSpine]], [[item:cactusFiber]] | [[monster:scorpion]] (Foraging) |
-| [[item:bamboo]] | {{item:bamboo:star|star}} | Herb | [[Jungle]] [[Underground]] / [[node:silt]] | [[item:bambooStalk]] | [[monster:centipede]] (Foraging) |
-| [[item:oleander]] | {{item:oleander:star|star}} | Herb | [[Underground]] / [[node:stone]] | [[item:oleander]] | [[monster:caveBeetle]] (Foraging) |
-| [[item:satansCube]] | {{item:satansCube:star|star}} | Herb | [[Forest]]+[[Desert]] [[Caverns]] | [[item:satansCube]] | [[monster:firesalamander]] (Foraging) |
-| [[item:sneakthorn]] | {{item:sneakthorn:star|star}} | Herb | [[Forest]]+[[Jungle]] [[Caverns]] | [[item:sneakthorn]] | [[monster:vampire]] (Foraging) |
-| [[item:cursedcrown]] | {{item:cursedcrown:star|star}} | Herb | [[Jungle]]+[[Desert]] [[Caverns]] | [[item:cursedcrown]] | [[monster:fireAnt]] (Foraging) |
-| [[item:abysshorn]] | {{item:abysshorn:star|star}} | Herb | [[Caverns]] top | [[item:abysshorn]] | [[monster:caveJellyfish]] (Foraging) |
-| [[item:inferncap]] | {{item:inferncap:star|star}} | Herb | [[Caverns]] bottom | [[item:inferncap]] | [[monster:lavaWorm]] / [[monster:magmaCrab]] (Foraging) |
+| <<cellItemStar|mandrake>> | Herb | [[Forest]] [[Underground]] | [[node:dirt]] | [[item:mandrakeRoot]] | [[monster:wraith]] (Foraging) |
+| <<cellItemStar|bamboo>> | Herb | [[Jungle]] [[Underground]] | [[node:silt]] | [[item:bambooStalk]] | [[monster:centipede]] (Foraging) |
+| <<cellItemStar|coralR>> | Herb | Under [[Sea]] | [[node:sand]] | [[item:coral]] | [[monster:moray]] (Foraging) |
+| <<cellItemStar|coralP>> | Herb | Under [[Sea]] | [[node:sand]] | [[item:coral]] | [[monster:moray]] (Foraging) |
+| <<cellItemStar|coralY>> | Herb | Under [[Sea]] | [[node:sand]] | [[item:coral]] | [[monster:moray]] (Foraging) |
+| <<cellItemStar|coralG>> | Herb | Under [[Sea]] | [[node:sand]] | [[item:coral]] | [[monster:moray]] (Foraging) |
+| <<cellItemStar|fernS>> | Herb | [[Fern Cave]] | [[node:grassfern]] | [[item:fernLeaf]] | [[monster:dendrobate]] /  [[monster:mamba]] (Foraging) |
+| <<cellItemStar|fernC>> | Herb | [[Fern Cave]] | [[node:grassfern]] | [[item:fernLeaf]] | [[monster:dendrobate]] /  [[monster:mamba]] (Foraging) |
+| <<cellItemStar|fernG>> | Herb | [[Fern Cave]] | [[node:grassfern]] | [[item:fernLeaf]] | [[monster:dendrobate]] /  [[monster:mamba]] (Foraging) |
+| <<cellItemStar|fernM>> | Herb | [[Fern Cave]] | [[node:grassfern]] | [[item:fernLeaf]] | [[monster:dendrobate]] /  [[monster:mamba]] (Foraging) |
+| <<cellItemStar|velvetmoss>> | Herb | [[Moss Cave]] | [[node:grassmoss]] | [[item:velvetmoss]] | [[monster:woodlouse]] (Foraging) |
+| <<cellItemStar|pricklepad>> | Herb | [[Desert]] [[Underground]] | [[node:sand]] | [[item:pricklepadPear]], [[item:cactusSpine]], [[item:cactusFiber]] | [[monster:scorpion]] (Foraging) |
+| <<cellItemStar|oleander>> | Herb | [[Underground]] | [[node:stone]] | [[item:oleander]] | [[monster:caveBeetle]] (Foraging) |
+| <<cellItemStar|satansCube>> | Herb | [[Forest]]+[[Desert]] [[Caverns]] | [[node:hardstone]], [[node:hellstone]] | [[item:satansCube]] | [[monster:firesalamander]] (Foraging) |
+| <<cellItemStar|satansCube>> | Herb | [[Forest]]+[[Jungle]] [[Caverns]] | [[node:hardstone]], [[node:slate]] | [[item:sneakthorn]] | [[monster:vampire]] (Foraging) |
+| <<cellItemStar|cursedcrown>> | Herb | [[Jungle]]+[[Desert]] [[Caverns]] | [[node:slate]], [[node:hellstone]] | [[item:cursedcrown]] | [[monster:fireAnt]] (Foraging) |
+| <<cellItemStar|abysshorn>> | Herb | [[Caverns]] top | [[node:hardstone]], [[node:slate]], [[node:hellstone]] | [[item:abysshorn]] | [[monster:caveJellyfish]] (Foraging) |
+| <<cellItemStar|inferncap>> | Herb | [[Caverns]] bottom | [[node:hardstone]], [[node:slate]], [[node:hellstone]] | [[item:inferncap]] | [[monster:lavaWorm]] / [[monster:magmaCrab]] (Foraging) |
 
 _For detailed information on each plant, click its name._
 
