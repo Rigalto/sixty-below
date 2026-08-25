@@ -1358,6 +1358,7 @@ Tombstones are found inside the burial tunnels. All tombstones behave identicall
 **How to Move**
 
 * Use <<itemStar|hammerCopper>> or better to remove a Tombstone
+* An obstructed Tombstone (buried under [[node:sand]] or a liquid) can still be removed with a hammer
 * The Tombstone in your [[Inventory]] cannot be deleted
 * Place the Tombstone in the [[Hotbar]], then click on an empty space to place the Tombstone in the world
 * The clicked tile has to be in [[Ranges|Interaction Range]] — this range can be buffed
@@ -2807,6 +2808,12 @@ Managed trough the [[item:noticeBoard]].
 * [[Tableware]]
 * [[Toilets]]
 * [[item:torch]]
+
+**Obstruction**
+
+* An obstructed furniture (buried under [[node:sand]] or a liquid) displays a small warning icon.
+* While obstructed, a furniture cannot be used — containers can't be opened, crafting stations can't be reached, chairs can't be sat in, and so on.
+* Obstruction never prevents removal — a buried furniture can always be retrieved with a hammer, regardless of its state.
     `
   },
   {
@@ -4532,6 +4539,7 @@ To see the full list of recipes it unlocks, open the [[Crafting]] panel **[K]** 
 * Right-click again to extinguish it manually before the timer runs out.
 * An obstructed pot (buried under [[node:sand]] or a liquid) displays a small warning icon and cannot be lit or extinguished by hand.
 * A lit pot that becomes obstructed extinguishes immediately on its own.
+* Obstruction never prevents removal — an obstructed [[item:cookingPot]] can still be retrieved with a hammer.
 
 **How to Use — Cooking**
 
@@ -4885,6 +4893,7 @@ Platforms are thin furnitures that can be walked on like solid ground, yet allow
 
 * An obstructed platform (buried under [[node:sand]] or a liquid) displays a small warning icon.
 * While obstructed, the tile behaves as solid ground instead of a platform — the player simply stands on it, and cannot drop through until the obstruction is cleared.
+* Obstruction never prevents removal — an obstructed platform can still be retrieved with a hammer.
 
 <hr>
 
