@@ -1112,7 +1112,7 @@ Despite the nuisance they represent, cobwebs are one of the most valuable resour
 **Terrain Effect** ⏳
 
 * Cobweb threads are nearly invisible until you are already tangled in them — by then, each step pulls a dozen more filaments across your legs and arms.
-* Walking through [[node:web]] reduces [[Movement Buffs|Movement Speed]] ({{node:web:buffs:movementSpeed}}%)
+* Walking through [[node:web]] reduces [[Movement Buffs|Movement Speed]] ({{node:web:buffs:movementSpeed}}%)⏳
 * See [[Movement Buffs]] for details
 
 <hr>
@@ -1140,7 +1140,8 @@ Mining Tool: <<itemStar|pickaxeCopper>> or better
 
 * _Cobwebs slow movement drastically — avoid getting surrounded by spiders while slowed._ ⏳
 * _A [[item:flamethrower]] clears large cobweb areas quickly._ ⏳
-* _Cobwebs are a renewable resource — spiders will always spin new ones._ ⏳
+* _Cobwebs are a renewable resource — spiders will always spin new ones._
+* _Cobwebs are dense enough to stop falling sand — sand piles up against them instead of burying or passing through them._
   `
   },
   {
