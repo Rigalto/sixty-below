@@ -80,6 +80,7 @@ export const IMAGE_FILES = [
   `${BASE_DIR}/mahogany_80_48.png`,
   `${BASE_DIR}/coconut_80_48.png`,
   `${BASE_DIR}/cactus_80_48.png`,
+  `${BASE_DIR}/mushroom_80_48.png`,
 
   // ARMORS //
   // ////// //
