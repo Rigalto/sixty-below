@@ -530,12 +530,35 @@ Mushroom Caves are large caverns found deep in [[Forest]] biomes. Their floor is
 
 * [[Caverns]] Top — [[Forest]], one per Forest zone
 
+<hr>
+
 **Materials**
 
 * [[node:grassMushroom]] — floor
-* [[node:humus]] — substrate beneath the floor, 2-3 tiles deep
+* [[node:humus]] — substrate beneath the floor
 
-**Inhabitants** ⏳
+_Sowing a [[item:mushroomSpore]] in an [[node:humus]] tile converts it in a [[node:grassMushroom]] tile._
+
+_Mining a [[node:grassMushroom]] tile provides [[item:mycellium]]._
+
+_Foraging a [[node:grassMushroom]] tile provides [[item:mycellium]] and [[item:mushroomSpore]]._
+
+<hr>
+
+**Flora**
+
+* Trees: [[item:giantMushroom]]
+* Herbs: [[item:frostcap]], [[item:dawncap]]
+
+_Sowing [[item:mycellium]] in an [[node:grassMushroom]] tile make a [[item:giantMushroom]] appears._
+
+_Chopping or Shaking a [[item:giantMushroom]] provides [[item:mycellium]]._
+
+_Foraging a [[item:frostcap]] or a [[item:dawncap]] provides [[item:mushroomSpore]]._
+
+<hr>
+
+**Fauna** ⏳
 
 | Monster | Role | Trigger |
 |---|---|---|
@@ -544,10 +567,7 @@ Mushroom Caves are large caverns found deep in [[Forest]] biomes. Their floor is
 | [[monster:hydra]] | Uncommon | [[Chopping]] [[Giant Mushroom|Giant Mushrooms]] |
 | [[monster:isopod]] | Mini-boss, rare | [[Chopping]] [[Giant Mushroom|Giant Mushrooms]] |
 
-**Loot** ⏳
-
-* Giant mushroom spores — rare harvest from mushroom caps ⏳
-* Chest — tier 3-4 ⏳
+<hr>
 
 **Tips**
 
@@ -3883,7 +3903,7 @@ The last used filter is remembered between sessions.
 
 Each slot shows the result item of one recipe.
 
-* _Green background_ — you have all the required ingredients in your [[Inventory|bag]] or hotbar.
+* _Green background_ — you have all the required ingredients in your [[Inventory|bag]] or [[Hotbar]].
 * _Blue background_ — at least one ingredient is missing or insufficient.
 
 * _Number on the slot_ — shown when the recipe produces more than one item per run. This quantity is multiplied by the number of runs chosen at execution time.
@@ -3944,7 +3964,7 @@ See [[Crafting Buffs]] for more details.
 
 * [[Crafting Stations]] — list of all workbenches and their unlock order
 * [[Crafting Tree]] — dependency tree between stations
-* [[Inventory]] — managing your bag and hotbar
+* [[Inventory]] — managing your bag and Hotbar
 A traduire en anglais : La quantité affichée sur un slot de recette indique le nombre d'items produits par une exécution de la recette — indépendamment du nombre de fois où on choisit de l'exécuter.
     `
   },
@@ -4726,7 +4746,7 @@ Parler d'abord du Glass, puis des Bottles.
 
 **How to fill**
 
-* Hold an empty [[item:bottle]] in your active hotbar slot
+* Hold an empty [[item:bottle]] in your active [[Hotbar]] slot
 * Click on a liquid tile — [[node:water]], [[node:honey]], [[node:sap]] or the [[node:sea]] — to fill it.
 * The empty bottle is consumed and replaced by the matching filled bottle.
 
@@ -4773,14 +4793,14 @@ Parler d'abord du Glass, puis des Bottles.
 
 **How to fill**
 
-* Hold an [[item:bucket]] in your active hotbar slot
+* Hold an [[item:bucket]] in your active [[Hotbar]] slot
 * Click on a liquid tile — [[node:water]], [[node:honey]], [[node:sap]] or the [[node:sea]] — to fill it.
 * The [[item:bucket]] is consumed and replaced by the matching filled bucket.
 * One tile is removed from the liquid body.
 
 **How to empty**
 
-* Hold an [[item:bucketWater]], [[item:bucketHoney]] or [[item:bucketSap]] in your active hotbar slot
+* Hold an [[item:bucketWater]], [[item:bucketHoney]] or [[item:bucketSap]] in your active [[Hotbar]] slot
 * Click on an empty tile
 * The item si consumed and replaced by an [[item:bucket]]⏳
 * The tile is filled with the liquid ([[node:water]], [[node:honey]] or [[node:sap]])⏳
@@ -5391,21 +5411,84 @@ Giant Mushrooms grow in the depths of [[Mushroom Cave|Mushroom Caves]], their bi
 
 * Biome: [[Forest]]
 * Layer: [[Caverns]] Top
-* Grows exclusively in [[Mushroom Cave|Mushroom Caves]] on [[node:grassMushroom]]
+* Grows exclusively on [[node:grassMushroom]]
 
 **Growth**
 
-* Giant Mushrooms grow through 3 stages (1 to 3)
-* Growth takes several in-game days between each stage ⏳
+* Giant Mushrooms grow through 4 stages, visible from the moment they are planted
+* A new section grows approximately every 1-2 in-game days
+* Growth stops at stage 4 — a fully grown Giant Mushroom no longer changes
+* If the space above the Giant Mushroom is obstructed (by water, sand, or other material), growth is suspended until the obstruction clears
+* An obstructed Giant Mushroom displays a small warning icon near its base
 
-**Interactions — Chopping**
+**Planting**
 
-* Chopping removes one section — the mushroom shrinks by one stage
-* When the last section is chopped, the mushroom disappears completely
+* Chopping have a chance to yield [[item:mycellium]] (extra-chance when the Giant Mushroom is totally chopped)
+* Mining or Foraging both have a chance to yield [[item:mycellium]]
+* Place a [[item:mycellium]] (placed in your active [[Hotbar]] slot) on the central tile of 3 consecutive horizontal [[node:grassMushroom]] tiles
+* The Giant Mushroom appears immediately at first stage and grows naturally from there
+* The 15 tiles above the planting spot must be completely clear — the Giant Mushroom cannot be planted in an obstructed space
 
-| Tool | Loot | Extra Drop (last section) | Encounter |
-|---|---|---|---|
-| Any [[Chopping Tools|Axe]] | {{item:giantMushroom:chopping:items}} | ⏳ | [[monster:isopod]] |
+<hr>
+
+**Interactions - Chopping**
+
+* Select an [[Chopping Tools|Axe]] and click the Giant Mushroom to chop it
+* Each chop removes one section — the Giant Mushroom shrinks by one stage
+* When the last section is chopped, the Giant Mushroom disappears completely and yields an extra drop (mycellium)
+* A chopped Giant Mushroom regrows naturally over time if at least one section remains
+* Chopping is blocked while the Giant Mushroom is obstructed
+
+**Chopping Loot**
+
+Chopping Tool: <<itemStar|axeCobalt>> or better
+
+<<itemLootTable|giantMushroom|chopping>>
+{{item:giantMushroom:chopping:extraLoot:items[*]:helpRow|rows}}
+
+**Dangers**
+
+[[monster:isopod]]
+
+**Chopping Details**
+
+* Chopping speed and range depend on the axe used and can be extended by [[Chopping Buffs]].
+
+See [[Chopping]], [[Chopping Tools]] and [[Chopping Buffs]] for details.
+
+<hr>
+
+**Interactions - Shaking**
+
+* Select a [[Hammers|Hammer]] and click the Giant Mushroom to shake it
+* Shaking yields items without damaging the Giant Mushroom
+* Shaking is blocked while the Giant Mushroom is obstructed
+* A Giant Mushroom can only be shaken once every in-game day — shaking it again before that delay
+  expires causes the Giant Mushroom to lose one section with no loot
+
+**Shaking Loot**
+
+Shaking Tool: <<itemStar|hammerCobalt>> or better
+
+<<itemLootTable|giantMushroom|shaking>>
+
+**Dangers**
+
+Coming Soon⏳
+
+**Shaking Details**
+
+* Shaking speed and range depend on the hammer used and can be extended by [[Chopping Buffs]] (shaking and chopping share the same buffs).
+
+See [[Shaking]], [[Hammers]] and [[Chopping Buffs]] for details.
+
+<hr>
+
+**Usages**
+
+Coming Soon⏳
+
+<hr>
 
 **Tips**
 
@@ -5627,7 +5710,7 @@ _All times are in-game. See [[Day & Night Cycle]] for reference._
     content: `
 **Description**
 
-Cave Mushrooms grow on the floor of [[Mushroom Cave|Mushroom Caves]], thriving in the dim light cast by the [[item:giantMushroom]]s above them. Two species have been identified, both pale and luminous, fruiting during [[Day & Night Cycle|daylight hours]] and retreating at nightfall.
+Cave Mushrooms grow on the floor of [[Mushroom Cave|Mushroom Caves]], among the [[item:giantMushroom]]s above them. Two species have been identified, both pale and luminous, fruiting during [[Day & Night Cycle|daylight hours]] and retreating at nightfall.
 
 Like their larger relatives, the [[item:giantMushroom]]s, their main value lies in their Gills. These are used both in cooking (fried or boiled) and as a robust leather when correctly prepared.
 
@@ -5635,7 +5718,7 @@ Like their larger relatives, the [[item:giantMushroom]]s, their main value lies 
 
 * Biome: [[Forest]]
 * Layer: [[Caverns]] Top
-* Grows exclusively in [[Mushroom Cave|Mushroom Caves]] on [[node:grassMushroom]]
+* Grows exclusively on [[node:grassMushroom]]
 
 **Species**
 
@@ -5660,9 +5743,14 @@ _All times are in-game. See [[Day & Night Cycle]] for reference._
 
 **Foraging**
 
-* [[Foraging|Interact to harvest]] — the mushroom disappears on harvest
-* Tool: <<itemStar|sickleSilver>> or better ⏳
-* Loot: [[item:mushroomGill]] ⏳
+* [[Foraging|Interact to harvest]]
+* The mushroom disappears on harvest
+
+Foraging Tool: <<itemStar|sickleGold>>
+
+**[[item:frostcap]]/[[item:dawncap]] foraging Loot**
+
+<<itemLootTable|frostcap|foraging>>
 
 **Dangers**
 
@@ -6879,7 +6967,7 @@ Once you have basic tools and a shelter, you can start exploring:
   * _Health gauge_
   * _Active [[Buff Panel|buffs/debuffs]]_
 * **Panels** — pause exploration and open a full-screen panel. Press the same key again or click ✕ to close.
-  * [[Inventory]] **[I]** — bag, hotbar, armor and accessories
+  * [[Inventory]] **[I]** — bag, Hotbar, armor and accessories
   * [[Crafting]] **[K]** — browse recipes, inspect ingredients, craft items
   * [[Help Panel]] **[H]** — all reference topics, searchable
   * [[Achievements Panel]] **[U]** — to track your progress
