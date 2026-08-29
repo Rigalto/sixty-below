@@ -75,6 +75,22 @@ class WorldBuffer {
 
   writeAt (index, value) { this.#data[index] = value }
 
+  /**
+   * Teste si toutes les tuiles d'un rectangle valent le même code.
+   * @param {number} x @param {number} y @param {number} w @param {number} h
+   * @param {number} code
+   * @returns {boolean}
+   */
+  isRectCode (x, y, w, h, code) {
+    for (let row = y; row < y + h; row++) {
+      const rowOffset = row << 10
+      for (let col = x; col < x + w; col++) {
+        if (this.#data[rowOffset | col] !== code) return false
+      }
+    }
+    return true
+  }
+
   processWorldToChunks () {
     const chunksX = WORLD_WIDTH >> 4
     const chunksY = WORLD_HEIGHT >> 4
@@ -485,7 +501,7 @@ class WorldGenerator {
 
     // 8.3.2. Oak / Mahogany / Giant Mushroom
     const oakPositions = plantGenerator.placeTrees(surfaceLine, guarded)
-    const giantOccupied = plantGenerator.placeGiantMushrooms(grassMushroomIndexes)
+    plantGenerator.placeGiantMushrooms()
     await progress('Trees')
 
     // 8.3.3. Coral
@@ -507,7 +523,7 @@ class WorldGenerator {
 
     plantGenerator.placeFerns()
     plantGenerator.placeMoss()
-    plantGenerator.placeCaveMushrooms(grassMushroomIndexes, currentWeather, giantOccupied)
+    plantGenerator.placeCaveMushrooms(grassMushroomIndexes, currentWeather)
     await progress('Mini-biome Plants')
 
     plantGenerator.placeMandrakes(zoneRects)
@@ -601,7 +617,7 @@ class WorldGenerator {
       {key: 'lakes', value: lakes},
       {key: 'losttemple', value: lostTemple},
       {key: 'moss', value: mossCaves},
-      {key: 'mossnextgrowthtimestamp', value: null},
+      {key: 'mossnextgrowthtimestamp', value: 3000 * 1000},
       {key: 'mushrooms', value: mushroomCaves},
       {key: 'naturalforaged', value: new Set()},
       {key: 'nextweather', value: weather.nextWeather},
@@ -2474,6 +2490,23 @@ class PlacedGuard {
         this.#tiles.add((y << 10) | x)
       }
     }
+  }
+
+  /**
+   * Teste si au moins une tuile d'un rectangle est occupée.
+   * @param {number} x1
+   * @param {number} y1
+   * @param {number} x2
+   * @param {number} y2
+   * @returns {boolean}
+   */
+  hasRect (x1, y1, x2, y2) {
+    for (let y = y1; y <= y2; y++) {
+      for (let x = x1; x <= x2; x++) {
+        if (this.#tiles.has((y << 10) | x)) return true
+      }
+    }
+    return false
   }
 }
 
@@ -7789,77 +7822,70 @@ class PlantGenerator {
   // ////////////// //
 
   /**
- * Place les Giant Mushrooms dans les Mushroom Caves.
- * 80% des emplacements de deux tuiles GRASSMUSHROOM consécutives sont remplis.
- *
- * @param {number[]} grassMushroomIndexes — index des tuiles GRASSMUSHROOM
- */
-  placeGiantMushrooms (grassMushroomIndexes) {
+   * Place les Giant Mushrooms dans les Mushroom Caves.
+   * Un emplacement valide est 3 tuiles GRASSMUSHROOM consécutives à la même hauteur, avec un
+   * bloc de 3 x 15 tuiles VOID libre juste au-dessus (canopée — même construction que
+   * placeTrees, mais 5 hauteurs de 3 tuiles au lieu de 6). 80% des emplacements valides
+   * trouvés sont peuplés. Respecte et alimente placedGuard sur tout le rectangle occupé
+   * (sol + canopée), comme pour les herbes souterraines.
+   */
+  placeGiantMushrooms () {
     const GRASSMUSHROOM = NODES.GRASSMUSHROOM.code
-    const MUSH_H = 12
-    const MUSH_W = 2
+    const VOID = NODES.VOID.code
+    const GIANT_W = 3
+    const GIANT_H = 15
     const W = WORLD_WIDTH
-    const occupied = new Set()
+    let count = 0
 
-    // Construire un Set des index GRASSMUSHROOM pour lookup O(1)
-    const grassSet = new Set()
-    for (const idx of grassMushroomIndexes) {
-      if (worldBuffer.readAt(idx) === GRASSMUSHROOM) grassSet.add(idx)
-    }
-
-    // Set permettant de ne pas mettre deux champignons l'un sur l'autre
-    const blocked = new Set()
+    // génération de la liste des tuiles GRASSMUSHROOM
+    const grassMushroomIndexes = worldBuffer.getTypeArray(GRASSMUSHROOM)
+    const grassSet = new Set(grassMushroomIndexes)
 
     for (const idx of grassSet) {
       const x = idx & 0x3FF
       const y = idx >> 10
-      const next = idx + 1 // tuile à droite, même y garanti si même row
 
-      // Vérifier tuile droite consécutive au même y
-      if (!grassSet.has(next)) continue
+      // 3 tuiles GRASSMUSHROOM consécutives à la même hauteur
+      if (!grassSet.has(idx + 1) || !grassSet.has(idx + 2)) continue
 
-      // 80% de chance de placer un champignon
+      // Canopée 3 x 15 : VOID au-dessus
+      if (!worldBuffer.isRectCode(x, y - GIANT_H, GIANT_W, GIANT_H, VOID)) continue
+
+      // Guard : sol + canopée libres de toute autre entité placée
+      if (placedGuard.hasRect(x, y - GIANT_H, x + GIANT_W - 1, y)) continue
+
+      // 80% des emplacements valides sont peuplés
       if (seededRNG.randomReal() >= 0.8) continue
 
-      // un champignon occupe déjà l'espace
-      if (blocked.has(idx)) continue
-
-      const soilIndex = idx // tuile gauche
       const size = seededRNG.randomGetArrayValue(GIANT_MUSHROOM_INIT_SIZE)
       const images = this.#buildTreeImages('giantMushroom', x)
 
-      occupied.add(soilIndex)
-      occupied.add(soilIndex + 1) // tuile droite (w=2)
+      placedGuard.addRect(x, y - GIANT_H, x + GIANT_W - 1, y)
 
       this.#plants.push({
         id: uniqueIdGenerator.getUniqueId(),
         itemId: ITEMS.giantMushroom.code,
         kind: PLANT_KIND.TREE,
         type: PLANT_TYPE.GIANT_MUSHROOM,
-        index: soilIndex - MUSH_H * W,
-        soilIndex,
-        w: MUSH_W,
-        h: MUSH_H,
+        index: idx - GIANT_H * W,
+        soilIndex: idx,
+        w: GIANT_W,
+        h: GIANT_H,
         size,
         images,
-        grass: NODES.GRASSMUSHROOM.code,
+        grass: GRASSMUSHROOM,
         x,
-        yTop: y - MUSH_H,
+        yTop: y - GIANT_H,
         yBottom: y - 1,
         growthTimestamp: null,
         shakedTimestamp: null,
         blocked: 0,
         deleted: false
       })
-
-      // Bloquer x-1, 0, x+1, x+2 dans la tranche y-4...y+4
-      for (let dx = -1; dx <= 2; dx++) {
-        for (let dy = -4; dy <= 4; dy++) {
-          blocked.add(((y + dy) << 10) | (x + dx))
-        }
-      }
+      count++
     }
-    return occupied
+
+    if (IS_DEV) console.log(`   🔹 Giant Mushrooms : ${count}`)
   }
 
   /**
@@ -8311,7 +8337,7 @@ class PlantGenerator {
   // Mushroom Cave, sans que rien ne la retransforme. Cf. le fix appliqué à placeFerns() et
   // placeMoss() pour le patron à reproduire.
 
-  placeCaveMushrooms (grassMushroomIndexes, initialWeather, giantOccupied) {
+  placeCaveMushrooms (grassMushroomIndexes, initialWeather) {
     const VOID = NODES.VOID.code
     const GRASSMUSHROOM = NODES.GRASSMUSHROOM.code
     const W = WORLD_WIDTH
@@ -8324,7 +8350,8 @@ class PlantGenerator {
       const x = idx & 0x3FF
       const y = idx >> 10
 
-      if (giantOccupied.has(idx)) continue
+      // utiliser placeGuard pour faire le test d'occupation
+      // if (giantOccupied.has(idx)) continue
       if (worldBuffer.readAt(idx - W) !== VOID) continue // y-1 VOID
       if (worldBuffer.readAt(idx - W - W) !== VOID) continue // y-2 VOID
 
