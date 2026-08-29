@@ -73,8 +73,8 @@ export const NODES = {
     color: '#e2b3ff',
     image: 'natural_16_16+2',
     help: 'Mushroom Grass',
-    mining: {speed: 500, items: [{item: 'blockHumus', count: 1}, {item: 'slug', count: 0.05, buffs: ['lucky:200', 'rainy:100']}]},
-    foraging: {speed: 2400, items: [{item: 'mushroomGill', count: 0.24, buffs: ['lucky:100', 'sunny:50', 'rainy:-50']}, {item: 'slug', count: 0.04, buffs: ['lucky:950', 'rainy:850']}, {item: 'goldSlug', count: 0.01, buffs: ['+lucky']}]}
+    mining: {speed: 500, items: [{item: 'blockHumus', count: 1}, {item: 'mycellium', count: 0.15, buffs: ['lucky:100']}, {item: 'slug', count: 0.05, buffs: ['lucky:200', 'rainy:100']}]},
+    foraging: {speed: 2400, items: [{item: 'mycellium', count: 0.75, buffs: ['lucky:50']}, {item: 'mushroomSpore', count: 0.50, buffs: ['lucky:60']}, {item: 'mushroomGill', count: 0.24, buffs: ['lucky:100', 'sunny:50', 'rainy:-50']}, {item: 'slug', count: 0.04, buffs: ['lucky:950', 'rainy:850']}, {item: 'goldSlug', count: 0.01, buffs: ['+lucky']}]}
   },
   GRASSFERN: {
     code: 33,
@@ -586,13 +586,26 @@ export const ITEMS = {
   rootMahogany: {name: 'Mahogany Root', type: 0, stype: 'root', star: 2, image: 'potions_32_32-1-5', help: 'Oak & Mahogany', tooltip: '???'},
   samara: {name: 'Samara', type: ITEM_TYPE.SEED | ITEM_TYPE.PLACABLE, stype: 'seed', star: 2, image: 'foraged_32_32-1-1', help: 'Oak & Mahogany', tooltip: '???'},
 
-  giantMushroom: {name: 'Giant Mushroom', type: 0, stype: 'tree', star: 4, image: null, help: 'Oak & Mahogany', tooltip: '???'},
+  giantMushroom: {
+    name: 'Giant Mushroom',
+    type: 0,
+    stype: 'tree',
+    star: 4,
+    image: null,
+    help: 'Mushroom Cave',
+    tooltip: '???',
+    chopping: {speed: 2200, items: [{item: 'mushroomFiber', count: '5-9'}, {item: 'mycellium', count: 0.75}], extraLoot: {items: [{item: 'mycellium', count: '2-5', buffs: ['+felling']}]}},
+    shaking: {speed: 1800, items: [{item: 'mushroomFiber', count: 0.65}, {item: 'slug', count: 0.25}, {item: 'goldSlug', count: 0.01, buffs: ['+lucky']}]}
+  },
+  mushroomFiber: {name: 'Mushroom Fiber', type: 0, stype: 'herb', star: 4, image: 'foraged_32_32-4-6', help: 'Mushroom Cave', tooltip: '???'},
+  mushroomSpore: {name: 'Mushroom Spore', type: ITEM_TYPE.SEED | ITEM_TYPE.PLACABLE, stype: 'herb', star: 4, image: 'foraged_32_32-4-6', help: 'Mushroom Cave', tooltip: '???'},
+  mycellium: {name: 'Mycellium', type: ITEM_TYPE.SEED | ITEM_TYPE.PLACABLE, stype: 'herb', star: 4, image: 'foraged_32_32-4-6', help: 'Mushroom Cave', tooltip: '???'},
 
   // Mushrooms - images OK
   bolete: {name: 'Bolete', type: 0, stype: 'mushroom', star: 1, image: 'foraged_32_32-3-0', placed: 'placed_16_32-0-0', help: 'Surface Mushrooms', tooltip: '???', foraging: {speed: 2400, items: [{item: 'bolete', count: '1-3'}, {item: 'worm', count: 0.3, buffs: ['lucky:100', 'rainy:100']}]}},
   pinkMycenia: {name: 'Pink Mycenia', type: 0, stype: 'mushroom', star: 2, image: 'foraged_32_32-4-0', placed: 'placed_16_32-1-0', help: 'Surface Mushrooms', tooltip: '???', foraging: {speed: 2400, items: [{item: 'pinkMycenia', count: '1-3'}, {item: 'slug', count: 0.3, buffs: ['lucky:100', 'rainy:100']}]}},
-  frostcap: {name: 'Frostcap', type: 0, stype: 'mushroom', star: 3, image: null, placed: 'foraged_32_32-5-0', help: 'Cave Mushrooms', tooltip: '???', foraging: {speed: 2400, items: [{item: 'mushroomGill', count: '2-5'}, {item: 'snail', count: 0.3, buffs: ['lucky:100', 'rainy:100']}]}},
-  dawncap: {name: 'Dawncap', type: 0, stype: 'mushroom', star: 3, image: null, placed: 'foraged_32_32-6-0', help: 'Cave Mushrooms', tooltip: '???', foraging: {speed: 2400, items: [{item: 'mushroomGill', count: '2-5'}, {item: 'snail', count: 0.3, buffs: ['lucky:100', 'rainy:100']}]}},
+  frostcap: {name: 'Frostcap', type: 0, stype: 'mushroom', star: 3, image: null, placed: 'foraged_32_32-5-0', help: 'Cave Mushrooms', tooltip: '???', foraging: {speed: 2400, items: [{item: 'mushroomGill', count: '2-5'}, {item: 'mushroomSpore', count: 0.8, buffs: ['lucky:50']}, {item: 'snail', count: 0.3, buffs: ['lucky:100', 'rainy:100']}]}},
+  dawncap: {name: 'Dawncap', type: 0, stype: 'mushroom', star: 3, image: null, placed: 'foraged_32_32-6-0', help: 'Cave Mushrooms', tooltip: '???', foraging: {speed: 2400, items: [{item: 'mushroomGill', count: '2-5'}, {item: 'mushroomSpore', count: 0.8, buffs: ['lucky:50']}, {item: 'snail', count: 0.3, buffs: ['lucky:100', 'rainy:100']}]}},
   mushroomGill: {name: 'Mushroom Gill', type: 0, stype: 'mushroom', star: 3, image: 'foraged_32_32-7-0', help: 'Cave Mushrooms', tooltip: '???'},
 
   // Herbs
@@ -1107,10 +1120,9 @@ export const TREE_IMAGES = {
   giantMushroom: [
     ['mushroom_80_48-0-0', 'mushroom_80_48-1-0'], // sommet champignon pas complet
     ['mushroom_80_48-2-0', 'mushroom_80_48-3-0'], // tronc
-    ['mushroom_80_48-4-0', 'mushroom_80_48-5-0', 'mushroom_80_48-0-1', 'mushroom_80_48-1-1', 'mushroom_80_48-2-1', 'mushroom_80_48-3-1'], // pas de feuilles
+    ['mushroom_80_48-4-0', 'mushroom_80_48-5-0', 'mushroom_80_48-0-1', 'mushroom_80_48-1-1', 'mushroom_80_48-2-1', 'mushroom_80_48-3-1'], // avec volve
     ['mushroom_80_48-4-1', 'mushroom_80_48-5-1', 'mushroom_80_48-0-2', 'mushroom_80_48-1-2', 'mushroom_80_48-2-2', 'mushroom_80_48-3-2', 'mushroom_80_48-4-2', 'mushroom_80_48-5-2'], // 1 feuille
     ['mushroom_80_48-0-3', 'mushroom_80_48-1-3', 'mushroom_80_48-2-3', 'mushroom_80_48-3-3', 'mushroom_80_48-4-3', 'mushroom_80_48-5-3', 'mushroom_80_48-0-4', 'mushroom_80_48-1-4'], // 2 feuilles
-    ['mushroom_80_48-2-4', 'mushroom_80_48-3-4', 'mushroom_80_48-4-4', 'mushroom_80_48-5-4'], // 3-4 feuillles
     ['mushroom_80_48-0-5', 'mushroom_80_48-1-5', 'mushroom_80_48-2-5', 'mushroom_80_48-3-5', 'mushroom_80_48-4-5', 'mushroom_80_48-5-5'] // sommet champignon complet
   ]
 }
