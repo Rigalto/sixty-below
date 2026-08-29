@@ -17,7 +17,7 @@ import {furnitureManager, teleporterManager} from './housing.mjs'
 import {craftOverlay} from './craft.mjs'
 import {achievementManager} from './achievement.mjs'
 import {playerManager, lootPopupManager, handedToolManager, hotbarOverlay} from './player.mjs'
-import {floraManager, sunflowerSystem, oleanderSystem, mandrakeSystem, bambooSystem, pricklepadSystem, parsnipSystem, ambermirageSystem, fernSystem, mossSystem, oakSystem, mahoganySystem, cobwebSystem, coconutSystem, thornspineSystem, spreadForestSystem, spreadJungleSystem, coralSystem, bloodmoonSystem, gravelweedSystem, satansCubeSystem, sneakthornSystem, cursedcrownSystem, abysshornSystem, inferncapSystem} from './ecosystem.mjs'
+import {floraManager, sunflowerSystem, oleanderSystem, mandrakeSystem, bambooSystem, pricklepadSystem, parsnipSystem, ambermirageSystem, fernSystem, mossSystem, oakSystem, mahoganySystem, cobwebSystem, coconutSystem, thornspineSystem, spreadForestSystem, spreadJungleSystem, coralSystem, bloodmoonSystem, gravelweedSystem, satansCubeSystem, sneakthornSystem, cursedcrownSystem, abysshornSystem, inferncapSystem, giantMushroomSystem} from './ecosystem.mjs'
 import {sandFallingSystem} from './liquid.mjs'
 import {ACHIEVEMENT_CATEGORIES} from '../assets/data/data-achievement.mjs'
 import {miningManager, placingManager, foragingManager, choppingManager, sowingManager, hammingManager, furnishingManager, fillingManager, pouringManager, decomposerManager} from './action.mjs'
@@ -30,7 +30,7 @@ const plantSystemLookup = [ // Map<kind*100+type, system> — peuplée au fur et
   [PLANT_KIND.TREE * 100 + PLANT_TYPE.MAHOGANY, mahoganySystem],
   [PLANT_KIND.TREE * 100 + PLANT_TYPE.COCONUT, coconutSystem],
   [PLANT_KIND.TREE * 100 + PLANT_TYPE.THORNSPINE, thornspineSystem],
-  //   [PLANT_KIND.TREE * 100 + PLANT_TYPE.GIANT_MUSHROOM, giantMushroomSystem],
+  [PLANT_KIND.TREE * 100 + PLANT_TYPE.GIANT_MUSHROOM, giantMushroomSystem],
   [PLANT_KIND.MUSHROOM * 100 + PLANT_TYPE.BOLETE, oakSystem],
   [PLANT_KIND.MUSHROOM * 100 + PLANT_TYPE.PINKMYCENIA, mahoganySystem],
   [PLANT_KIND.HERB * 100 + PLANT_TYPE.PRICKLEPAD, pricklepadSystem],
@@ -64,7 +64,7 @@ const plantSystemLookup = [ // Map<kind*100+type, system> — peuplée au fur et
   //   [PLANT_KIND.SPREAD * 100 + PLANT_TYPE.NONE, spreadSystem],
   //   [PLANT_KIND.SEED * 100 + PLANT_TYPE.NONE, seedSystem]
 ]
-const allPlantSystems = [sunflowerSystem, oleanderSystem, parsnipSystem, ambermirageSystem, fernSystem, mossSystem, oakSystem, mahoganySystem, coconutSystem, thornspineSystem, spreadForestSystem, spreadJungleSystem, coralSystem, bloodmoonSystem, mandrakeSystem, bambooSystem, pricklepadSystem, satansCubeSystem, sneakthornSystem, cursedcrownSystem, abysshornSystem, inferncapSystem, gravelweedSystem]
+const allPlantSystems = [sunflowerSystem, oleanderSystem, parsnipSystem, ambermirageSystem, fernSystem, mossSystem, oakSystem, mahoganySystem, coconutSystem, thornspineSystem, spreadForestSystem, spreadJungleSystem, coralSystem, bloodmoonSystem, mandrakeSystem, bambooSystem, pricklepadSystem, satansCubeSystem, sneakthornSystem, cursedcrownSystem, abysshornSystem, inferncapSystem, gravelweedSystem, giantMushroomSystem]
 
 const debugHUD = () => {
   const debugDiv = document.createElement('div')
@@ -597,6 +597,7 @@ class GameCore {
       gravelweedSystem.debugRenderSpots(ctx)
       fernSystem.debugRenderSpots(ctx)
       mossSystem.debugRenderSpots(ctx)
+      giantMushroomSystem.debugRenderSpots(ctx)
     }
     if (this.showGrids) {
       const buffs = buffManager.getBuffs(['showGrid', 'showInteractionRange', 'showToolRange'])

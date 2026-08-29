@@ -1,6 +1,6 @@
 // ecosystem.mjs — FloraManager - OakSystem - MahoganySystem - CoconutSystem - ThornspineSystem
 // SunflowerSystem - ParsnipSystem - OleanderSystem - MandrakeSystem - BambooSystem
-// PricklepadSystem - AmbermirageSystem - FernSystem
+// PricklepadSystem - AmbermirageSystem - FernSystem - GiantMushroomSystem
 // CobwebSystem - HiveSystem - SatansCubeSystem - SneakthornSystem - CursedcrownSystem
 // SpreadForestSystem - SpreadJungleSystem - CoralSystem - BloodmoonSystem - GravelweedSystem
 // SampleSystem
@@ -6697,6 +6697,123 @@ class CoconutSystem {
    */
   canChop () { return false }
 }
+
+/* ====================================================================================================
+   GIANT MUSHROOM SYSTEM
+   ==================================================================================================== */
+
+// Lignes d'images empilées par size
+const GIANT_MUSHROOM_SIZE_ROWS = [
+  [1, 0],
+  [1, 2, 0],
+  [1, 2, 3, 0],
+  [1, 2, 3, 4, 5]
+]
+
+class GiantMushroomSystem {
+  byTile = new Map() // Map<tileIndex, record> — public, zone d'interaction (size-dépendante)
+  #byFullRect = new Map() // Map<tileIndex, record> — rectangle complet 3×15, surveillance obstruction
+  #list = [] // record[] — tous les giant mushrooms
+  #byChunk = new Map() // Map<chunkKey, Set> — lookup spatial pour onPreloadChunksChanged
+  #bySoil = new Map() // Map<soilIndex, record> — 3 entrées par giant mushroom (soilIndex, +1, +2) : détection minage/changement du sol
+  #displayed = new Set() // Set<record> — giant mushrooms dans les chunks preload (cible render)
+
+  /**
+   * Réinitialise toutes les structures. Appelé en début de session.
+   */
+  init () {
+    this.byTile.clear()
+    this.#byFullRect.clear()
+    this.#list.length = 0
+    this.#byChunk.clear()
+    this.#bySoil.clear()
+    this.#displayed.clear()
+  }
+
+  /**
+   * Hydrate un record depuis la DB et peuple les structures internes. Bloque le placement
+   * sur le rectangle complet (w×h) et le minage sur les 3 tuiles de sol.
+   * @param {object} record — record TREE/GIANT_MUSHROOM (deleted=false garanti par l'appelant)
+   */
+  initPlant (record) {
+    const soilIndex = record.soilIndex
+    this.#list.push(record)
+    this.#bySoil.set(soilIndex, record)
+    this.#bySoil.set(soilIndex + 1, record)
+    this.#bySoil.set(soilIndex + 2, record)
+    addToByTileTree(this.byTile, this.#byFullRect, record)
+    addToByChunk(this.#byChunk, record)
+
+    const px = record.index & 0x3FF
+    const py = record.index >> 10
+    blockedTiles.blockPlacementRect(px, py, record.w, record.h)
+
+    const soilX = soilIndex & 0x3FF
+    const soilY = soilIndex >> 10
+    blockedTiles.blockMiningRect(soilX, soilY, record.w, 1)
+  }
+
+  /**
+   * Reconstruit #displayed depuis les chunks preload de la caméra.
+   * @param {Set<number>} preloadChunks
+   */
+  onPreloadChunksChanged (preloadChunks) {
+    buildDisplayed(this.#displayed, this.#byChunk, preloadChunks)
+  }
+
+  /**
+   * Dessine les giant mushrooms visibles, sprite empilé selon le stade de croissance
+   * (record.size, record.images). Affiche l'icône d'obstruction si record.blocked > 0.
+   * @param {CanvasRenderingContext2D} ctx — contexte déjà transformé (caméra appliquée)
+   */
+  render (ctx) {
+    for (const record of this.#displayed) {
+      const rows = GIANT_MUSHROOM_SIZE_ROWS[record.size]
+      const soilYPx = ((record.soilIndex >> 10) << 4) + 2
+      for (let i = 0; i < rows.length; i++) {
+        const image = record.images[rows[i]]
+        const img = TREE_IMAGES[image.tree][image.row][image.col]
+        const pxX = image.x << 4
+        const pxY = soilYPx - 48 * (i + 1) + 2
+        ctx.drawImage(IMAGE_CACHE[img.imgIndex], img.sx, img.sy, img.sw, img.sh, pxX, pxY, img.sw, img.sh)
+      }
+
+      if (record.blocked > 0) {
+        const icon = BLOCKED_ICON.image
+        const iconX = ((record.soilIndex & 0x3FF) << 4) + 16
+        const iconY = soilYPx - 16
+        ctx.drawImage(IMAGE_CACHE[icon.imgIndex], icon.sx, icon.sy, icon.sw, icon.sh, iconX, iconY, 16, 16)
+      }
+    }
+  }
+
+  /**
+   * Retourne le giant mushroom couvrant la tuile donnée, ou null.
+   * @param {number} tileIndex — (y << 10) | x
+   * @returns {object|null}
+   */
+  getPlantAt (tileIndex) {
+    return this.byTile.get(tileIndex) ?? null
+  }
+
+  /**
+   * DEBUG — Affiche un point pour chaque giant mushroom enregistré, au coin gauche du sol.
+   * @param {CanvasRenderingContext2D} ctx — contexte déjà transformé (caméra appliquée)
+   */
+  debugRenderSpots (ctx) {
+    ctx.save()
+    ctx.fillStyle = 'rgba(0, 200, 180, 0.8)'
+    for (const record of this.#list) {
+      const cx = ((record.soilIndex & 0x3FF) << 4) + 8
+      const cy = ((record.soilIndex >> 10) << 4) + 8
+      ctx.beginPath()
+      ctx.arc(cx, cy, 4, 0, 6.2832)
+      ctx.fill()
+    }
+    ctx.restore()
+  }
+}
+export const giantMushroomSystem = new GiantMushroomSystem()
 
 export const coconutSystem = new CoconutSystem()
 
