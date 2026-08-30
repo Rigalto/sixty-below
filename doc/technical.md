@@ -187,6 +187,12 @@ eventBus.off('inventory/open', this.onOpen)
 
 // ❌ Incorrect — impossible à désabonner
 eventBus.on('inventory/open', () => { this.show() })
+
+// ❌ Incorrect — init peut être appelée plusieurs fois
+init(...) {
+  this.onOpen = this.onOpen.bind(this)
+  eventBus.off('inventory/open', this.onOpen)
+}
 ```
 
 **Catalogue des événements (exhaustif) :**
@@ -1455,7 +1461,7 @@ des tuiles adjacentes (`NODES.color`).
 
 ### Class `BuffManager` (`src/buff.mjs`) — Singleton : `buffManager`
 
-Gestion centralisée des buffs du joueur. Deux phases obligatoires : `init()` puis abonnements `eventBus`.
+Gestion centralisée des buffs du joueur. Deux phases obligatoires : abonnements `eventBus` dans le constructeur puis `init()`.
 
 #### Champs
 
@@ -1476,7 +1482,7 @@ Gestion centralisée des buffs du joueur. Deux phases obligatoires : `init()` pu
 
 | Méthode | Signature | Description |
 | :--- | :--- | :--- |
-| `init` | `() → void` | Initialise les buffs environnementaux à `false`/`0`. S'abonne aux eventBus. |
+| `init` | `() → void` | Initialise les buffs environnementaux à `false`/`0`. |
 | `getBuff` | `(name: string) → number` | `#values.get(name) ?? #fns.get(name)?.() ?? 0` |
 | `getBuffs` | `(names: string[]) → Object` | Retourne `{name: value}` pour chaque nom. |
 | `setBuff` | `(name: string[], value)` | Le buff `name` prend pour valeur `value}` |

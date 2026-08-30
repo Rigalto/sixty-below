@@ -126,6 +126,23 @@ class BuffManager {
   #currentWeather
   #currentTimeslot
 
+  constructor () {
+    // EventBus
+    this.onDaily = this.onDaily.bind(this)
+    eventBus.on('time/daily', this.onDaily)
+    eventBus.on('time/first-loop', this.onDaily) // même handler — payload compatible
+
+    this.onTimeslot = this.onTimeslot.bind(this)
+    eventBus.on('time/timeslot', this.onTimeslot)
+    eventBus.on('time/first-loop', this.onTimeslot) // payload contient tslot et isDay
+
+    this.onDebug = this.onDebug.bind(this)
+    eventBus.on('debug/buff-manager', this.onDebug)
+
+    this.onStaticBuffs = this.onStaticBuffs.bind(this)
+    eventBus.on('inventory/static-buffs', this.onStaticBuffs)
+  }
+
   /**
    * Initialise les buffers de trinkets (A et B) à 0 et définit le buffer courant.
    * Émet l'événement de changement initial pour notifier les abonnés.
@@ -156,28 +173,7 @@ class BuffManager {
     this.#values.set('isDay', false)
     this.#values.set('isNight', false)
     this.#currentTimeslot = 0
-
-    // initialisation des handlers d'eventBus
-    this.onDaily = this.onDaily.bind(this)
-    eventBus.on('time/daily', this.onDaily)
-    eventBus.on('time/first-loop', this.onDaily) // même handler — payload compatible
-
-    this.onTimeslot = this.onTimeslot.bind(this)
-    eventBus.on('time/timeslot', this.onTimeslot)
-    eventBus.on('time/first-loop', this.onTimeslot) // payload contient tslot et isDay
-
-    this.onDebug = this.onDebug.bind(this)
-    eventBus.on('debug/buff-manager', this.onDebug)
-
     this.initTrinket()
-    this.onStaticBuffs = this.onStaticBuffs.bind(this)
-    eventBus.on('inventory/static-buffs', this.onStaticBuffs)
-
-    // debug
-    // this.#values.set('buff1', 50)
-    // this.#values.set('buff2', 0)
-    this.#values.set('dyn1', 100)
-    this.timestamps.set('dyn1', timeManager.timestamp + 124000)
   }
 
   /**
