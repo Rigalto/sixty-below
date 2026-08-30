@@ -1121,9 +1121,9 @@ export const TREE_IMAGES = {
     ['mushroom_80_48-0-0', 'mushroom_80_48-1-0'], // sommet champignon pas complet
     ['mushroom_80_48-2-0', 'mushroom_80_48-3-0'], // tronc
     ['mushroom_80_48-4-0', 'mushroom_80_48-5-0', 'mushroom_80_48-0-1', 'mushroom_80_48-1-1', 'mushroom_80_48-2-1', 'mushroom_80_48-3-1'], // avec volve
-    ['mushroom_80_48-4-1', 'mushroom_80_48-5-1', 'mushroom_80_48-0-2', 'mushroom_80_48-1-2', 'mushroom_80_48-2-2', 'mushroom_80_48-3-2', 'mushroom_80_48-4-2', 'mushroom_80_48-5-2'], // 1 feuille
-    ['mushroom_80_48-0-3', 'mushroom_80_48-1-3', 'mushroom_80_48-2-3', 'mushroom_80_48-3-3', 'mushroom_80_48-4-3', 'mushroom_80_48-5-3', 'mushroom_80_48-0-4', 'mushroom_80_48-1-4'], // 2 feuilles
-    ['mushroom_80_48-0-5', 'mushroom_80_48-1-5', 'mushroom_80_48-2-5', 'mushroom_80_48-3-5', 'mushroom_80_48-4-5', 'mushroom_80_48-5-5'] // sommet champignon complet
+    ['mushroom_80_48-4-1', 'mushroom_80_48-5-1', 'mushroom_80_48-0-2', 'mushroom_80_48-1-2', 'mushroom_80_48-2-2', 'mushroom_80_48-3-2', 'mushroom_80_48-4-2', 'mushroom_80_48-5-2'], // 1 champignon de côté
+    ['mushroom_80_48-0-3', 'mushroom_80_48-1-3', 'mushroom_80_48-2-3', 'mushroom_80_48-3-3', 'mushroom_80_48-4-3', 'mushroom_80_48-5-3', 'mushroom_80_48-0-4', 'mushroom_80_48-1-4'], // 2 champignon/feuille
+    ['mushroom_80_48-2-4', 'mushroom_80_48-3-4', 'mushroom_80_48-4-4', 'mushroom_80_48-5-4', 'mushroom_80_48-0-5', 'mushroom_80_48-1-5'] // sommet champignon complet
   ]
 }
 
