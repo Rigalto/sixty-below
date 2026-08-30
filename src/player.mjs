@@ -169,6 +169,11 @@ class PlayerManager {
     eventBus.on('save/tick', this.onSaveTick)
     this.onInventoryStaticBuffs = this.onInventoryStaticBuffs.bind(this)
     eventBus.on('inventory/static-buffs', this.onInventoryStaticBuffs)
+    // écoute des eventBus dynamique
+    this.onTeleport = this.onTeleport.bind(this)
+    this.onTeleportPhase1 = this.onTeleportPhase1.bind(this)
+    this.onTeleportPhase2 = this.onTeleportPhase2.bind(this)
+    this.onTeleportPhase3 = this.onTeleportPhase3.bind(this)
   }
 
   /**
@@ -184,10 +189,6 @@ class PlayerManager {
     this.#y = parseInt(y, 10)
     this.#direction = parseInt(direction, 10)
 
-    this.onTeleport = this.onTeleport.bind(this)
-    this.onTeleportPhase1 = this.onTeleportPhase1.bind(this)
-    this.onTeleportPhase2 = this.onTeleportPhase2.bind(this)
-    this.onTeleportPhase3 = this.onTeleportPhase3.bind(this)
     eventBus.on('player/teleport', this.onTeleport)
 
     return {x: this.#x + (PLAYER.w >> 1), y: this.#y + (PLAYER.h >> 1)}
