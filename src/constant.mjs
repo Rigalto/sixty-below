@@ -274,6 +274,7 @@ export const MICROTASK = {
   OAK_END_SHAKE: {priority: 24, capacity: 4, taskName: 'oakEndShake'}, // fin de la période où un arbre n'est pas shakable
   MAHOGANY_GROW: {priority: 24, capacity: 4, taskName: 'growMahogany'}, // croissance d'un tronçon de mahogany
   MAHOGANY_END_SHAKE: {priority: 24, capacity: 4, taskName: 'mahoganyEndShake'}, // fin de la période où un arbre n'est pas shakable
+  GIANT_MUSHROOM_GROW: {priority: 24, capacity: 4, taskName: 'growGiantMushroom'}, // croissance d'un tronçon de giant mushroom
   SAND_FALLING_APPLY: {priority: 24, capacity: 10, taskName: 'applySandFallingMoves'}, // écriture monde en bloc + emit des tuiles tombées
 
   FORAGE_ACTION: {priority: 24, capacity: 10, taskName: 'onForage'}, // foraging

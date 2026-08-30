@@ -904,8 +904,8 @@ class ChoppingManager {
     system.onChopped(plant)
 
     // Extra drop si c'est le dernier coup (size est déjà décrémenté dans onChopped)
-    if (plant.size < 0 && plantItem.chopping.extraDrop) {
-      resolveLoot(plantItem.chopping.extraDrop)
+    if (plant.size < 0 && plantItem.chopping.extraLoot) {
+      resolveLoot(plantItem.chopping.extraLoot)
     }
 
     // Arbre détruit : purge les entrées restantes pour ce même arbre (clics en surplus

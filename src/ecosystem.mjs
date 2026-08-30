@@ -5693,7 +5693,11 @@ class OakSystem {
     const record = this.#oakBySoil.get(soilIndex)
 
     if (record === undefined) return
-    if (record.size >= 4) { record.growthTimestamp = null; return }
+    if (record.size >= 4) {
+      record.growthTimestamp = null
+      saveManager.queueStaticUpdate({storeName: 'plant', record})
+      return
+    }
     if (record.blocked > 0) return // arbre bloqué : croissance suspendue, tâche abandonnée
 
     removeFromByTileTree(this.oakByTile, this.#oakByFullRect, record)
@@ -6301,7 +6305,12 @@ class MahoganySystem {
     const record = this.#mahoganyBySoil.get(soilIndex)
 
     if (record === undefined) return
-    if (record.size >= 4) { record.growthTimestamp = null; return }
+    if (record.size >= 4) {
+      record.growthTimestamp = null
+      saveManager.queueStaticUpdate({storeName: 'plant', record})
+      return
+    }
+
     if (record.blocked > 0) return // arbre bloqué : croissance suspendue, tâche abandonnée
 
     removeFromByTileTree(this.mahoganyByTile, this.#mahoganyByFullRect, record)
@@ -6719,6 +6728,17 @@ class GiantMushroomSystem {
   #displayed = new Set() // Set<record> — giant mushrooms dans les chunks preload (cible render)
 
   /**
+   * Lie growGiantMushroom, passée par référence au TaskScheduler (jamais appelée en dot-call).
+   */
+  constructor () {
+    // eventBus
+    this.onTileChangedGiantMushroom = this.onTileChangedGiantMushroom.bind(this)
+    eventBus.on('world/tile-changed', this.onTileChangedGiantMushroom)
+    // micro-tâches
+    this.growGiantMushroom = this.growGiantMushroom.bind(this)
+  }
+
+  /**
    * Réinitialise toutes les structures. Appelé en début de session.
    */
   init () {
@@ -6751,6 +6771,11 @@ class GiantMushroomSystem {
     const soilX = soilIndex & 0x3FF
     const soilY = soilIndex >> 10
     blockedTiles.blockMiningRect(soilX, soilY, record.w, 1)
+
+    if (record.growthTimestamp !== null) {
+      const {priority, capacity} = MICROTASK.GIANT_MUSHROOM_GROW
+      taskScheduler.enqueueAbsolute(`giant_mushroom_grow_${record.id}`, record.growthTimestamp, this.growGiantMushroom, priority, capacity, soilIndex)
+    }
   }
 
   /**
@@ -6794,6 +6819,148 @@ class GiantMushroomSystem {
    */
   getPlantAt (tileIndex) {
     return this.byTile.get(tileIndex) ?? null
+  }
+
+  // //////// //
+  // CHOPPING //
+  // //////// //
+
+  /**
+   * Traite le chopping réussi d'un giant mushroom (hors loot, géré par ChoppingManager).
+   * Décrémente size. Si size atteint -1, détruit le giant mushroom entièrement. Sinon, met à
+   * jour byTile, planifie la repousse (même mécanisme que la croissance initiale), et persiste.
+   * @param {object} record — record TREE (giant mushroom)
+   */
+  onChopped (record) {
+    removeFromByTileTree(this.byTile, this.#byFullRect, record)
+    record.size--
+    addToByTileTree(this.byTile, this.#byFullRect, record)
+
+    if (record.size < 0) {
+      this.#destroyGiantMushroom(record) // fait le queueStaticUpdate
+      return
+    }
+
+    const growthDelay = (ITEMS.giantMushroom.growth * seededRNG.randomGetRealMinMax(0.8, 1.2)) | 0
+    const {priority, capacity} = MICROTASK.GIANT_MUSHROOM_GROW
+    const taskId = `giant_mushroom_grow_${record.id}`
+    record.growthTimestamp = taskScheduler.requeue(taskId, growthDelay, this.growGiantMushroom, priority, capacity, record.soilIndex)
+
+    saveManager.queueStaticUpdate({storeName: 'plant', record})
+  }
+
+  /**
+   * Indique si le chopping est autorisé : bloqué tant que le giant mushroom est obstrué.
+   * @param {object} record
+   * @returns {boolean}
+   */
+  canChop (record) { return record.blocked === 0 }
+
+  /**
+   * Indique si le giant mushroom existe actuellement dans le monde (non détruit).
+   * @param {object} record
+   * @returns {boolean}
+   */
+  isPresent (record) { return !record.deleted }
+
+  /**
+   * Détruit un giant mushroom complètement : retire toutes les structures, libère
+   * blockedTiles (placement + mining sol), purge la tâche de croissance planifiée, persiste.
+   * @param {object} record — record TREE (giant mushroom)
+   */
+  #destroyGiantMushroom (record) {
+    removeFromByTileTree(this.byTile, this.#byFullRect, record)
+    removeFromByChunk(this.#byChunk, record)
+    this.#displayed.delete(record)
+
+    const px = record.soilIndex & 0x3FF
+    const py = record.index >> 10
+    blockedTiles.unblockPlacementRect(px, py, record.w, record.h)
+
+    const soilX = record.soilIndex & 0x3FF
+    const soilY = record.soilIndex >> 10
+    blockedTiles.unblockMiningRect(soilX, soilY, record.w, 1)
+
+    removeValueUnordered(this.#list, record)
+
+    this.#bySoil.delete(record.soilIndex)
+    this.#bySoil.delete(record.soilIndex + 1)
+    this.#bySoil.delete(record.soilIndex + 2)
+
+    taskScheduler.dequeue(`giant_mushroom_grow_${record.id}`)
+
+    record.deleted = true
+    saveManager.queueStaticUpdate({storeName: 'plant', record})
+  }
+
+  // ////////// //
+  // CROISSANCE //
+  // ////////// //
+
+  /**
+   * Callback TaskScheduler : fait croître le giant mushroom d'un tronçon (size++), sauf si
+   * obstrué. Replanifie la prochaine pousse tant que size < 3, sinon fixe growthTimestamp à null.
+   * @param {number} soilIndex — (y << 10) | x, tuile de gauche du sol
+   */
+  growGiantMushroom (soilIndex) {
+    const record = this.#bySoil.get(soilIndex)
+
+    if (record === undefined) return
+    if (record.size >= 3) {
+      record.growthTimestamp = null
+      saveManager.queueStaticUpdate({storeName: 'plant', record})
+      return
+    }
+    if (record.blocked > 0) return // obstrué : croissance suspendue, tâche abandonnée
+
+    removeFromByTileTree(this.byTile, this.#byFullRect, record)
+    record.size++
+    addToByTileTree(this.byTile, this.#byFullRect, record)
+
+    if (record.size < 3) {
+      const growthDelay = (ITEMS.giantMushroom.growth * seededRNG.randomGetRealMinMax(0.8, 1.2)) | 0
+      const {priority, capacity} = MICROTASK.GIANT_MUSHROOM_GROW
+      record.growthTimestamp = taskScheduler.enqueue(`giant_mushroom_grow_${record.id}`, growthDelay, this.growGiantMushroom, priority, capacity, soilIndex)
+    } else {
+      record.growthTimestamp = null
+    }
+
+    saveManager.queueStaticUpdate({storeName: 'plant', record})
+  }
+
+  /**
+   * Réagit à un changement de tuile (EventBus : 'world/tile-changed') sur le rectangle complet
+   * (#byFullRect). Incrémente/décrémente 'blocked' selon la transition dégagé/obstrué. Annule
+   * la tâche de croissance en cours à l'obstruction ; la relance si l'arbre n'est pas adulte à
+   * la libération.
+   * @param {{tileIndex: number, tileOldCode: number, tileNewCode: number}} payload
+   */
+  onTileChangedGiantMushroom ({tileIndex, tileOldCode, tileNewCode}) {
+    const record = this.#byFullRect.get(tileIndex)
+    if (record === undefined) return
+
+    const wasOpen = CANOPY_OPEN_CODES.has(tileOldCode)
+    const isOpen = CANOPY_OPEN_CODES.has(tileNewCode)
+    if (wasOpen === isOpen) return // pas de changement d'état dégagé/obstrué
+
+    if (!isOpen) {
+      record.blocked++
+      if (record.blocked === 1) {
+        taskScheduler.dequeue(`giant_mushroom_grow_${record.id}`)
+        record.growthTimestamp = null
+      }
+      saveManager.queueStaticUpdate({storeName: 'plant', record})
+      return
+    }
+
+    if (record.blocked === 0) return // guard : compteur déjà à zéro (cohérence)
+    record.blocked--
+    if (record.blocked === 0 && record.size < 3) {
+      const growthDelay = (ITEMS.giantMushroom.growth * seededRNG.randomGetRealMinMax(0.8, 1.2)) | 0
+      const {priority, capacity} = MICROTASK.GIANT_MUSHROOM_GROW
+      record.growthTimestamp = taskScheduler.enqueue(`giant_mushroom_grow_${record.id}`, growthDelay, this.growGiantMushroom, priority, capacity, record.soilIndex)
+    }
+    saveManager.queueStaticUpdate({storeName: 'plant', record})
   }
 
   /**

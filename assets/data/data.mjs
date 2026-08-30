@@ -592,6 +592,7 @@ export const ITEMS = {
     stype: 'tree',
     star: 4,
     image: null,
+    growth: 1.5 * 24 * 60 * 1000,
     help: 'Mushroom Cave',
     tooltip: '???',
     chopping: {speed: 2200, items: [{item: 'mushroomFiber', count: '5-9'}, {item: 'mycellium', count: 0.75}], extraLoot: {items: [{item: 'mycellium', count: '2-5', buffs: ['+felling']}]}},

@@ -7860,6 +7860,11 @@ class PlantGenerator {
       const size = seededRNG.randomGetArrayValue(GIANT_MUSHROOM_INIT_SIZE)
       const images = this.#buildTreeImages('giantMushroom', x)
 
+      let growthTimestamp = null
+      if (size < 3) {
+        growthTimestamp = 500000 + seededRNG.randomGetMinMax(1000, (1.2 * ITEMS.giantMushroom.growth) | 0)
+      }
+
       placedGuard.addRect(x, y - GIANT_H, x + GIANT_W - 1, y)
 
       this.#plants.push({
@@ -7877,7 +7882,7 @@ class PlantGenerator {
         x,
         yTop: y - GIANT_H,
         yBottom: y - 1,
-        growthTimestamp: null,
+        growthTimestamp,
         shakedTimestamp: null,
         blocked: 0,
         deleted: false
