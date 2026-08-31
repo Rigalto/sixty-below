@@ -1388,8 +1388,8 @@ class HammingManager {
   constructor () {
     // EventBus
     this.onTeleportBegin = this.onTeleportBegin.bind(this)
-    this.onSlotActive = this.onSlotActive.bind(this)
     eventBus.on('player/teleport-begin', this.onTeleportBegin)
+    this.onSlotActive = this.onSlotActive.bind(this)
     eventBus.on('hotbar/slot-active', this.onSlotActive)
     // Micro-tasks
     this.onHamming = this.onHamming.bind(this)
