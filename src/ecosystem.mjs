@@ -6423,6 +6423,8 @@ class CoconutSystem {
     // eventBus
     this.onShaked = this.onShaked.bind(this)
     eventBus.on('shaked/coconut', this.onShaked)
+    this.onTileChangedCoconut = this.onTileChangedCoconut.bind(this)
+    eventBus.on('world/tile-changed', this.onTileChangedCoconut)
     // micro-tâches
     this.onCoconutCycle = this.onCoconutCycle.bind(this)
     this.onCoconutGroundDecay = this.onCoconutGroundDecay.bind(this)
@@ -6505,6 +6507,12 @@ class CoconutSystem {
         const nutPxX = topPxX + 32
         const nutPxY = topPxY + 16
         ctx.drawImage(IMAGE_CACHE[nutImg.imgIndex], nutImg.sx, nutImg.sy, nutImg.sw, nutImg.sh, nutPxX, nutPxY, 16, 16)
+      }
+      if (record.blocked > 0) {
+        const icon = BLOCKED_ICON.image
+        const iconX = ((record.soilIndex & 0x3FF) << 4) + 16
+        const iconY = soilYPx - 16
+        ctx.drawImage(IMAGE_CACHE[icon.imgIndex], icon.sx, icon.sy, icon.sw, icon.sh, iconX, iconY, 16, 16)
       }
     }
     this.#renderGroundNuts(ctx)
@@ -6671,16 +6679,46 @@ class CoconutSystem {
     saveManager.queueStaticUpdate({storeName: 'plant', record})
   }
 
-  // //////// //
-  // SHAKING //
-  // //////// //
+  // /////////// //
+  // OBSTRUCTION //
+  // /////////// //
 
   /**
-   * Retourne true si le cocotier peut être secoué (noix présente dans l'arbre).
+   * Liaison EventBus : 'world/tile-changed' — surveille le rectangle complet (#byFullRect)
+   * de chaque cocotier. Une tuile dégagée qui devient autre chose (ex : sable qui s'effondre)
+   * incrémente 'blocked' (bloque shaking via le check générique plant.blocked > 0 dans
+   * canShake, cf. action.mjs) ; le retour à l'état dégagé décrémente. Comme Thornspine,
+   * aucune tâche à suspendre/relancer — le cocotier ne grandit pas après la pose (size fixe
+   * à 3) ; le cycle de production de noix (onCoconutCycle) continue de tourner en arrière-plan.
+   * @param {{tileIndex: number, tileOldCode: number, tileNewCode: number}} payload
+   */
+  onTileChangedCoconut ({tileIndex, tileOldCode, tileNewCode}) {
+    const record = this.#byFullRect.get(tileIndex)
+    if (record === undefined) return
+
+    const wasOpen = CANOPY_OPEN_CODES.has(tileOldCode)
+    const isOpen = CANOPY_OPEN_CODES.has(tileNewCode)
+    if (wasOpen === isOpen) return // pas de changement d'état dégagé/obstrué
+
+    if (!isOpen) {
+      record.blocked++
+    } else {
+      if (record.blocked === 0) return // guard : compteur déjà à zéro (cohérence)
+      record.blocked--
+    }
+    saveManager.queueStaticUpdate({storeName: 'plant', record})
+  }
+
+  // /////// //
+  // SHAKING //
+  // /////// //
+
+  /**
+   * Retourne true si le cocotier peut être secoué (noix présente dans l'arbre, non obstrué).
    * @param {object} plant — pseudo-record retourné par getPlantAt
    * @returns {boolean}
    */
-  canShake (plant) { return plant.isGroundNut !== true && plant.hasNutInTree === true }
+  canShake (plant) { return plant.isGroundNut !== true && plant.hasNutInTree === true && plant.blocked === 0 }
 
   /**
    * Liaison EventBus : 'shaked/coconut' — le joueur a secoué le cocotier.
