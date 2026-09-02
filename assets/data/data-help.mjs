@@ -5516,6 +5516,13 @@ Coconut trees grow along sea shores and around desert oases. Unlike other trees,
 * A fallen nut disappears naturally after approximately 20 in-game hours if not collected
 * Shaking a tree with a nut harvests it directly — the cycle continues unaffected
 
+**Obstruction**
+
+* If the space around the tree is obstructed (by sand or other materials), no new nut will spawn until the obstruction is cleared
+* An obstructed coconut tree displays a small warning icon near its base
+* Shaking is blocked while the tree is obstructed
+* A nut already on the ground is unaffected — obstruction only concerns the tree itself
+
 <hr>
 
 **Shaking**
@@ -5523,6 +5530,7 @@ Coconut trees grow along sea shores and around desert oases. Unlike other trees,
 * Select a [[Hammers|Hammer]] and click the tree to shake it
 * Shaking a coconut tree with a nut in it drops the nut to the ground
 * If there is no nut in the tree, shaking has no effect
+* Shaking is blocked while the tree is obstructed
 
 Shaking Tool: <<itemStar|hammerCopper>> or better
 
@@ -5576,6 +5584,8 @@ Search for any of the three products in the [[Crafting|Craft Panel]] to find the
 * _A nut on the ground will eventually disappear — collect it before the next cycle drops another one._
 * _Coconut trees cannot be chopped or replanted — treat them as a renewable, fixed resource._
 * _Coconut Crabs are attracted by the vibration of shaking — be ready to fight._ ⏳
+* _Sand burying the base of a coconut tree won't kill it, but coconut production will be paused._
+
   `
   },
   {

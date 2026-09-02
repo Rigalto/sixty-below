@@ -6597,7 +6597,7 @@ class CoconutSystem {
       }
       record.treeNextAction = 'grow'
     } else {
-      record.hasNutInTree = true
+      if (record.blocked === 0) record.hasNutInTree = true
       record.treeNextAction = 'fall'
     }
 
