@@ -1019,6 +1019,7 @@ class SowingManager {
     else if (item.code === 'ambermirageSeed') this.#trySowAmbermirageSeed(tileIndex, tileNode, slotIndex)
     else if (item.code === 'bloodmoonSeed') this.#trySowBloodmoonSeed(tileIndex, tileNode, slotIndex)
     else if (item.code === 'fernSpore') this.#trySowFernSpore(tileIndex, tileNode, slotIndex)
+    else if (item.code === 'mushroomSpore') this.#trySowMushroomSpore(tileIndex, tileNode, slotIndex)
     else if (item.code === 'velvetmossSpore') this.#trySowVelvetmossSpore(tileIndex, tileNode, slotIndex)
     else if (item.code === 'seedForest') this.#trySowSeed(tileIndex, tileNode, slotIndex, NODES.DIRT.code, NODES.GRASSFOREST.code)
     else if (item.code === 'seedJungle') this.#trySowSeed(tileIndex, tileNode, slotIndex, NODES.SILT.code, NODES.GRASSJUNGLE.code)
@@ -1061,6 +1062,48 @@ class SowingManager {
     // Succès — transformation instantanée
     chunkManager.setTileAt(tileIndex, GRASSFERN)
     eventBus.emit('world/tile-changed', {tileIndex, tileOldCode: HUMUS, tileNewCode: GRASSFERN})
+
+    inventoryManager.decrementHotbarSlotCount(slotIndex)
+    eventBus.emit('sound/play', 'placing')
+  }
+
+  /**
+   * Valide et exécute la transformation d'une tuile HUMUS en GRASSMUSHROOM via une MushroomSpore.
+   * Transformation instantanée, comme FernSpore — aucune germination différée, aucun spot créé.
+   * Ne fait que préparer le substrat : planter un Giant Mushroom dessus reste un geste séparé
+   * (Mycellium sur 3 tuiles GRASSMUSHROOM consécutives).
+   * Conditions : tuile HUMUS, tuile au-dessus (tileIndex-W) VOID et non bloquée.
+   * Silence si mauvaise tuile, 'wrong' si bloqué, 'placing' si succès.
+   * @param {number} tileIndex — tuile cliquée (le sol HUMUS attendu)
+   * @param {object} tileNode
+   * @param {number} slotIndex
+   */
+  #trySowMushroomSpore (tileIndex, tileNode, slotIndex) {
+    const HUMUS = NODES.HUMUS.code
+    const VOID = NODES.VOID.code
+    const GRASSMUSHROOM = NODES.GRASSMUSHROOM.code
+    const W = WORLD_WIDTH
+
+    // Silence — mauvaise tuile de sol
+    if (tileNode.code !== HUMUS) return
+
+    const body1 = tileIndex - W // tuile juste au-dessus
+
+    // Silence — tuile du corps pas VOID
+    if (chunkManager.getTileAt(body1) !== VOID) return
+
+    // 'toofar' — tuile hors de la zone d'interaction
+    if (!isInInteractionRange(tileIndex)) { eventBus.emit('sound/play', 'toofar'); return }
+
+    // 'wrong' — tuile bloquée (furniture, plante déjà présente)
+    if (!blockedTiles.canPlace(body1) || !blockedTiles.canMine(tileIndex)) {
+      eventBus.emit('sound/play', 'wrong')
+      return
+    }
+
+    // Succès — transformation instantanée
+    chunkManager.setTileAt(tileIndex, GRASSMUSHROOM)
+    eventBus.emit('world/tile-changed', {tileIndex, tileOldCode: HUMUS, tileNewCode: GRASSMUSHROOM})
 
     inventoryManager.decrementHotbarSlotCount(slotIndex)
     eventBus.emit('sound/play', 'placing')

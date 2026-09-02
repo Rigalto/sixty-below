@@ -1803,10 +1803,19 @@ See [[Foraging]], [[Foraging Tools]] and [[Foraging Buffs]] for details.
 
 <hr>
 
+**Growing Mushroom Grass**
+
+* Place a [[item:mushroomSpore]] in the [[Hotbar]] ([[Inventory]] Panel [I])
+* Select its slot, then left-click a [[node:humus]] tile with an empty tile directly above it — the spore is consumed
+* The tile has to be in [[Ranges|Interaction Range]], this range can be buffed
+* The transformation into [[node:grassMushroom]] is instantaneous
+
+<hr>
+
 **Tips**
 
-* _Mushroom Grass is the only substrate from which giant mushrooms can grow._ ⏳
-* _[[Foraging]] mushrooms without destroying the grass allows them to regrow over time._ ⏳
+* _Mushroom Grass is the only substrate from which [[item:giantMushroom]], [[item:frostcap]] and [[item:dawncap]] can grow._ ⏳
+* _[[Foraging]] [[item:frostcap]]s or [[item:dawncap]]s doesn't destroy the grass, allowing them to regrow over time._ ⏳
   `
   },
 
@@ -1979,6 +1988,15 @@ Sowing a [[item:fernSpore]] is the only way to create a [[node:grassFern]] tile.
 * The tile has to be in [[Ranges|Interaction Range]], this range can be buffed
 * The transformation into [[node:grassFern]] is instantaneous
 
+**Growing Mushroom Grass**
+
+Sowing a [[item:mushroomSpore]] onto Humus creates a [[node:grassMushroom]] tile, the substrate a [[Giant Mushroom]] needs to grow.
+
+* Place a [[item:mushroomSpore]] in the [[Hotbar]] ([[Inventory]] Panel [I])
+* Select its slot, then left-click a [[node:humus]] tile with an empty tile directly above it — the spore is consumed
+* The tile has to be in [[Ranges|Interaction Range]], this range can be buffed
+* The transformation into [[node:grassMushroom]] is instantaneous
+
 <hr>
 
 **Mining**
@@ -2001,6 +2019,7 @@ See [[Mining]], [[Mining Tools]] and [[Mining Buffs]] for details.
 
 * _Humus is the only topsoil found in both Forest and Jungle biomes at significant depth._
 * _Sow a [[item:fernSpore]] on an isolated Humus patch to grow Fern Grass without hunting down a natural [[Fern Cave]]._
+* _Sow a [[item:mushroomSpore]] on an isolated Humus patch to prepare ground for a [[Giant Mushroom]] without hunting down a natural [[Mushroom Cave]]._
   `
   },
   {
