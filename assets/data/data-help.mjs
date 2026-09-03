@@ -148,8 +148,10 @@ Mining Loot: {{node:{3}:mining[:items[0]:item|link}}
   toolBuffRow: '| [[item:{1}]] | {{item:{1}:{2}:speed}}% | {{item:{1}:range}} |',
 
   // table listant les buffs fournis par les prefixes sur les tools (Pickaxe, Sickle)
-  toolBonus: '| Prefix | Speed Bonus | Range Bonus |\n|---|---|---|\n| [[Gear Prefixes|Quick]] | +20% | — |\n| [[Gear Prefixes|Keen]] | +5% | — |\n| [[Gear Prefixes|Sturdy]] | -5% | — |\n| [[Gear Prefixes|Extended]] | — | +2 tiles each direction |'
+  toolBonus: '| Prefix | Speed Bonus | Range Bonus |\n|---|---|---|\n| [[Gear Prefixes|Quick]] | +20% | — |\n| [[Gear Prefixes|Keen]] | +5% | — |\n| [[Gear Prefixes|Sturdy]] | -5% | — |\n| [[Gear Prefixes|Extended]] | — | +2 tiles each direction |',
 
+  // liste de la section 'Flora' des tuiles, biomes et mini-biomes
+  floraLine: '* [[item:{1}]] {{item:{1}:star|star}}'
 }
 
 /* ====================================================================================================
@@ -357,6 +359,8 @@ The Forest is the starting biome, located at the center of the world. It is the 
 * Additional Forest zones may appear elsewhere in the world.
 * Layer: all layers
 
+<hr>
+
 **Materials**
 
 * Surface: [[node:dirt]], [[node:grassForest]]
@@ -369,6 +373,8 @@ The Forest is the starting biome, located at the center of the world. It is the 
 * Gems: [[item:rawTopaz]], [[item:rawSapphire]]
 * Topsoil: [[node:dirt]], [[node:humus]]
 
+<hr>
+
 **Mini-biomes**
 
 * [[Fern Cave]] — Underground
@@ -378,11 +384,25 @@ The Forest is the starting biome, located at the center of the world. It is the 
 * [[Underground Lake]] — Caverns
 * [[Graveyard]] — Caverns Bottom
 
-**Flora** ⏳
+<hr>
 
-* Trees: [[item:oak]]
-* Mushrooms: [[item:bolete]]
-* Herbs: [[item:sunflower]], [[item:parsnip]], [[item:oleander]], [[item:gravelweed]], [[item:satansCube]], [[item:sneakthorn]], [[item:abysshorn]], [[item:inferncap]]
+**Flora**
+
+_Trees:_
+<<floraLine|oak>>
+_Mushrooms:_
+<<floraLine|bolete>>
+_Herbs:_
+<<floraLine|parsnip>>
+<<floraLine|sunflower>>
+<<floraLine|gravelweed>>
+<<floraLine|oleander>>
+<<floraLine|satansCube>>
+<<floraLine|sneakthorn>>
+<<floraLine|abysshorn>>
+<<floraLine|inferncap>>
+
+<hr>
 
 **Fauna** ⏳
 
@@ -402,6 +422,8 @@ The Desert biome is characterized by its sandy terrain and arid atmosphere. It c
 * One or more Desert zones, distributed across the world.
 * Layer: all layers
 
+<hr>
+
 **Materials**
 
 * Surface: [[node:sand]], [[node:sandstone]]
@@ -414,6 +436,8 @@ The Desert biome is characterized by its sandy terrain and arid atmosphere. It c
 * Gems: [[item:rawRuby]], [[item:rawSapphire]]
 * Topsoil: [[node:sand]], [[node:silt]]
 
+<hr>
+
 **Mini-biomes**
 
 * [[Antlion Pit]] — Surface
@@ -423,15 +447,29 @@ The Desert biome is characterized by its sandy terrain and arid atmosphere. It c
 * [[Ancient House]] — Caverns deep
 * [[Graveyard]] — Caverns Bottom
 
-**Flora** ⏳
+<hr>
 
-* Trees: [[item:coconut]], [[item:thornspine]]
-* Herbs: [[item:gravelweed]], [[item:pricklepad]], [[item:satansCube]], [[item:cursedcrown]], [[item:abysshorn]], [[item:inferncap]]
+**Flora**
+
+_Trees:_
+<<floraLine|coconut>>
+<<floraLine|thornspine>>
+_Herbs:_
+<<floraLine|gravelweed>>
+<<floraLine|pricklepad>>
+<<floraLine|cursedcrown>>
+<<floraLine|satansCube>>
+<<floraLine|abysshorn>>
+<<floraLine|inferncap>>
+
+<hr>
 
 **Fauna** ⏳
 
 * [[monster:scorpion]], [[monster:sandSnake]] — Surface
 * [[monster:bat]], [[monster:caveWorm]] — Underground
+
+<hr>
 
 **Tips**
 
@@ -451,6 +489,8 @@ The Jungle is a lush, dangerous biome teeming with life. It features unique liqu
 * One or more Jungle zones, distributed across the world.
 * Layer: all layers
 
+<hr>
+
 **Materials**
 
 * Surface: [[node:silt]], [[node:grassJungle]]
@@ -465,6 +505,8 @@ The Jungle is a lush, dangerous biome teeming with life. It features unique liqu
 * Liquid: [[node:sap]] — found in Sap Lakes and Sap Pockets
 * [[Bees]] product: [[node:honey]], [[node:hive]] — found in [[Hive]]s
 
+<hr>
+
 **Mini-biomes**
 
 * [[Termite Mound]] — Surface
@@ -474,17 +516,33 @@ The Jungle is a lush, dangerous biome teeming with life. It features unique liqu
 * [[Lost Temple]] — Caverns
 * [[Graveyard]] — Caverns Bottom
 
-**Flora** ⏳
+<hr>
 
-* Trees: [[item:mahogany]]
-* Mushrooms: [[item:pinkMycenia]]
-* Herbs: [[item:bloodmoon]], [[item:gravelweed]], [[item:bamboo]], [[item:sneakthorn]], [[item:cursedcrown]], [[item:abysshorn]], [[item:inferncap]], [[item:velvetmoss]] ([[Moss Cave]]),
+**Flora**
+
+_Trees:_
+<<floraLine|mahogany>>
+_Mushrooms:_
+<<floraLine|pinkMycenia>>
+_Herbs:_
+<<floraLine|bamboo>>
+<<floraLine|bloodmoon>>
+<<floraLine|gravelweed>>
+<<floraLine|velvetmoss>> ([[Moss Cave]])
+<<floraLine|cursedcrown>>
+<<floraLine|sneakthorn>>
+<<floraLine|abysshorn>>
+<<floraLine|inferncap>>
+
+<hr>
 
 **Fauna** ⏳
 
 * [[monster:jungleSpider]] — Surface
 * [[monster:bat]], [[monster:caveWorm]] — Underground
 * [[monster:bee]], [[monster:hornet]] — Hive
+
+<hr>
 
 **Tips**
 
@@ -547,8 +605,11 @@ _Foraging a [[node:grassMushroom]] tile provides [[item:mycellium]] and [[item:m
 
 **Flora**
 
-* Trees: [[item:giantMushroom]]
-* Herbs: [[item:frostcap]], [[item:dawncap]]
+_Trees:_
+<<floraLine|giantMushroom>>
+_Mushrooms:_
+<<floraLine|frostcap>>
+<<floraLine|dawncap>>
 
 _Sowing [[item:mycellium]] in an [[node:grassMushroom]] tile make a [[item:giantMushroom]] appears._
 
@@ -868,9 +929,13 @@ A large underground cave found in [[Jungle]] biomes. Its walls are covered in lu
 * [[node:mud]] — substrate beneath the moss floor
 * [[node:grassMoss]] — floor and lateral walls
 
+<hr>
+
 **Flora**
 
-* Herbs: [[item:velvetmoss]]
+<<floraLine|velvetmoss>>
+
+<hr>
 
 **Fauna**
 
@@ -878,10 +943,14 @@ A large underground cave found in [[Jungle]] biomes. Its walls are covered in lu
 |---|---|---|
 | [[monster:millipede]] | Common | Foraging [[Velvetmoss]] — attacks in waves of 4-5 |
 
+<hr>
+
 **Loot** ⏳
 
 * Rare vegetal drops from the moss walls
 * Crafting material from millipedes
+
+<hr>
 
 **Tips**
 
@@ -1499,11 +1568,20 @@ The Sea borders both sides of the world. Its deep, dark waters are home to uniqu
 * Liquid: [[node:sea]]
 * Sea Shore : [[node:shell]], [[node:sand]], [[node:sandstone]]
 
+<hr>
+
 **Flora**
 
-* Trees: [[item:coconut]], [[item:thornspine]] (Sea Shore)
-* Herbs: [[item:ambermirage]] (Sea Shore)
-* Corals: [[item:coralR]], [[item:coralP]], [[item:coralY]], [[item:coralG]]
+_Trees:_
+<<floraLine|coconut>>
+<<floraLine|thornspine>> (Sea Shore)
+_Herbs:_
+<<floraLine|ambermirage>> (Sea Shore)
+_Corals:_
+<<floraLine|coralR>>
+<<floraLine|coralP>>
+<<floraLine|coralY>>
+<<floraLine|coralG>>
 
 **Fauna**
 
@@ -1546,6 +1624,16 @@ Grass covers the surface of [[Forest]] biomes. It is the most common natural til
 **Main Location**
 
 * [[Surface]] — [[Forest]], top layer of solid ground
+
+<hr>
+
+**Flora**
+
+<<floraLine|bolete>>
+<<floraLine|oak>>
+<<floraLine|parsnip>>
+<<floraLine|sunflower>>
+<<floraLine|gravelweed>>
 
 <hr>
 
@@ -1611,6 +1699,15 @@ Jungle Grass covers the surface of [[Jungle]] biomes. Denser and more vibrant th
 
 <hr>
 
+**Flora**
+
+<<floraLine|bloodmoon>>
+<<floraLine|gravelweed>>
+<<floraLine|mahogany>>
+<<floraLine|pinkMycenia>>
+
+<hr>
+
 **Mining** ⏳
 
 Mining Tool: <<itemStar|pickaxeCopper>> or better
@@ -1672,6 +1769,15 @@ Fern Grass covers the floor of [[Fern Cave]]s. Giant ferns grow from this soft, 
 
 <hr>
 
+**Flora**
+
+<<floraLine|fernC>>
+<<floraLine|fernG>>
+<<floraLine|fernM>>
+<<floraLine|fernS>>
+
+<hr>
+
 **Growing Fern Grass**
 
 Fern Grass never spreads on its own.
@@ -1724,6 +1830,12 @@ Luminous moss that covers the walls and floor of [[Moss Cave]]s. Its soft green 
 **Main Location**
 
 * [[Moss Cave]] walls and floor — [[Underground]], [[Jungle]]
+
+<hr>
+
+**Flora**
+
+<<floraLine|velvetmoss>>
 
 <hr>
 
@@ -1783,6 +1895,14 @@ Mushroom Grass covers the floor of [[Mushroom Cave]]s. [[Giant Mushroom]]s grow 
 
 <hr>
 
+**Flora**
+
+<<floraLine|dawncap>>
+<<floraLine|frostcap>>
+<<floraLine|giantMushroom>>
+
+<hr>
+
 **Mining** ⏳
 
 Mining Tool: <<itemStar|pickaxeIron>> or better
@@ -1837,9 +1957,20 @@ Dirt is the primary topsoil of [[Forest]] biomes. It supports surface vegetation
 
 * [[Surface]] and [[Underground]] — [[Forest]], high density
 
-**Inhabitants**
+<hr>
+
+**Flora**
+
+<<floraLine|gravelweed>>
+<<floraLine|abysshorn>>
+
+<hr>
+
+**Fauna**
 
 Dirt is teeming with hidden life. Among its various denizens, the [[item:worm]] thrives in great numbers. These creatures prosper in this nutrient-rich layer, feeding on the decaying organic matter and turning the earth.
+
+<hr>
 
 **Soil Spreading**
 
@@ -1885,6 +2016,25 @@ Sand is the primary topsoil of [[Desert]] biomes. It is subject to gravity — u
 
 <hr>
 
+**Flora**
+
+<<floraLine|ambermirage>>
+<<floraLine|coconut>>
+<<floraLine|coralY>> (Sea)
+<<floraLine|coralP>> (Sea)
+<<floraLine|coralR>> (Sea)
+<<floraLine|coralG>> (Sea)
+<<floraLine|thornspine>>
+<<floraLine|abysshorn>>
+
+<hr>
+
+**Fauna**
+
+Comming Soon (antlion, mini-biome antlion spit, ...) ⏳
+
+<hr>
+
 **Mining**
 
 Mining Tool: <<itemStar|pickaxeCopper>> or better
@@ -1917,9 +2067,21 @@ Silt is the primary topsoil of [[Jungle]] biomes. Its fine, damp texture support
 
 * [[Surface]] and [[Underground]] — [[Jungle]], high density
 
-**Inhabitants**
+<hr>
+
+**Flora**
+
+<<floraLine|bamboo>>
+<<floraLine|gravelweed>>
+<<floraLine|abysshorn>>
+
+<hr>
+
+**Fauna**
 
 Dirt is teeming with hidden life. Among its various denizens, the [[item:slug]] thrives in great numbers. These creatures prosper in this nutrient-rich layer, feeding on the decaying organic matter and turning the earth.
+
+<hr>
 
 **Soil Spreading**
 
@@ -1975,6 +2137,12 @@ Humus is a rich organic topsoil found across all biomes, though it is most abund
 * [[Underground]] and [[Caverns]] Top — [[Forest]] and [[Jungle]], moderate density
 * [[Fern Cave]] floor — [[Forest]]
 * [[Mushroom Cave]] floor — [[Forest]]
+
+<hr>
+
+**Flora**
+
+<<floraLine|abysshorn>>
 
 <hr>
 
@@ -2072,6 +2240,13 @@ Clay is the most common substrat in [[Forest]] biomes. Its soft, workable textur
 
 <hr>
 
+**Flora**
+
+<<floraLine|gravelweed>>
+<<floraLine|abysshorn>>
+
+<hr>
+
 **Mining**
 
 Mining Tool: <<itemStar|pickaxeCopper>> or better
@@ -2106,6 +2281,14 @@ Stone is the second most common substrat in [[Forest]] biomes, found deeper than
 
 <hr>
 
+**Flora**
+
+<<floraLine|gravelweed>>
+<<floraLine|oleander>>
+<<floraLine|abysshorn>>
+
+<hr>
+
 **Mining**
 
 Mining Tool: <<itemStar|pickaxeCopper>> or better
@@ -2136,6 +2319,15 @@ Hardstone is a dense, resistant substrat found in the deepest parts of [[Forest]
 **Main Location**
 
 * [[Caverns]] — [[Forest]], dominant (native substrat)
+
+<hr>
+
+**Flora**
+
+<<floraLine|satansCube>>
+<<floraLine|sneakthorn>>
+<<floraLine|abysshorn>>
+<<floraLine|inferncap>>
 
 <hr>
 
@@ -2174,6 +2366,13 @@ Sandstone is the primary substrat of [[Desert]] biomes. It also forms the natura
 
 <hr>
 
+**Flora**
+
+<<floraLine|gravelweed>>
+<<floraLine|abysshorn>>
+
+<hr>
+
 **Mining**
 
 Mining Tool: <<itemStar|pickaxeCopper>> or better
@@ -2208,6 +2407,14 @@ Ash is the second most common substrat in [[Forest]] biomes, found deeper than [
 
 <hr>
 
+**Flora**
+
+<<floraLine|gravelweed>>
+<<floraLine|pricklepad>>
+<<floraLine|abysshorn>>
+
+<hr>
+
 **Mining**
 
 Mining Tool: <<itemStar|pickaxeIron>> or better
@@ -2238,6 +2445,15 @@ Hellstone is an extremely hard volcanic substrat found in the deepest parts of [
 **Main Location**
 
 * [[Caverns]] — [[Desert]], dominant (native substrat)
+
+<hr>
+
+**Flora**
+
+<<floraLine|cursedcrown>>
+<<floraLine|satansCube>>
+<<floraLine|abysshorn>>
+<<floraLine|inferncap>>
 
 <hr>
 
@@ -2279,6 +2495,14 @@ Mud is the primary substrat of [[Jungle]] biomes. Its soft, damp texture support
 
 <hr>
 
+**Flora**
+
+<<floraLine|bamboo>>
+<<floraLine|gravelweed>>
+<<floraLine|abysshorn>>
+
+<hr>
+
 **Mining**
 
 Mining Tool: <<itemStar|pickaxeCopper>> or better
@@ -2315,6 +2539,15 @@ Limestone is a sedimentary substrat found in [[Jungle]] biome. The pale color of
 
 <hr>
 
+**Flora**
+
+<<floraLine|bamboo>>
+<<floraLine|gravelweed>>
+<<floraLine|mandrake>>
+<<floraLine|abysshorn>>
+
+<hr>
+
 **Mining**
 
 Mining Tool: <<itemStar|pickaxeSilver>> or higher
@@ -2345,6 +2578,15 @@ Slate is a hard metamorphic substrat found in the deepest parts of [[Jungle]] bi
 **Main Location**
 
 * [[Caverns]] — [[Jungle]], dominant (native substrat)
+
+<hr>
+
+**Flora**
+
+<<floraLine|cursedcrown>>
+<<floraLine|sneakthorn>>
+<<floraLine|abysshorn>>
+<<floraLine|inferncap>>
 
 <hr>
 
@@ -5267,7 +5509,7 @@ All plants found in the world of Sixty-Below. Plants can be harvested for loot, 
 | <<cellItemStar|pricklepad>> | Herb | [[Desert]] [[Underground]] | [[node:sand]] | [[item:pricklepadPear]], [[item:cactusSpine]], [[item:cactusFiber]] | [[monster:scorpion]] (Foraging) |
 | <<cellItemStar|oleander>> | Herb | [[Underground]] | [[node:stone]] | [[item:oleander]] | [[monster:caveBeetle]] (Foraging) |
 | <<cellItemStar|satansCube>> | Herb | [[Forest]]+[[Desert]] [[Caverns]] | [[node:hardstone]], [[node:hellstone]] | [[item:satansCube]] | [[monster:firesalamander]] (Foraging) |
-| <<cellItemStar|satansCube>> | Herb | [[Forest]]+[[Jungle]] [[Caverns]] | [[node:hardstone]], [[node:slate]] | [[item:sneakthorn]] | [[monster:vampire]] (Foraging) |
+| <<cellItemStar|sneakthorn>> | Herb | [[Forest]]+[[Jungle]] [[Caverns]] | [[node:hardstone]], [[node:slate]] | [[item:sneakthorn]] | [[monster:vampire]] (Foraging) |
 | <<cellItemStar|cursedcrown>> | Herb | [[Jungle]]+[[Desert]] [[Caverns]] | [[node:slate]], [[node:hellstone]] | [[item:cursedcrown]] | [[monster:fireAnt]] (Foraging) |
 | <<cellItemStar|abysshorn>> | Herb | [[Caverns]] top | [[node:hardstone]], [[node:slate]], [[node:hellstone]] | [[item:abysshorn]] | [[monster:caveJellyfish]] (Foraging) |
 | <<cellItemStar|inferncap>> | Herb | [[Caverns]] bottom | [[node:hardstone]], [[node:slate]], [[node:hellstone]] | [[item:inferncap]] | [[monster:lavaWorm]] / [[monster:magmaCrab]] (Foraging) |
