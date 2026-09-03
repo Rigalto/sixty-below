@@ -565,15 +565,41 @@ A large underground cave found in [[Forest]] biomes, characterized by giant fern
 * Biome: [[Forest]]
 * Layer: [[Underground]]
 
-**Floor**
+<hr>
 
-* [[node:grassFern]] — surface layer
-* [[node:humus]] — 2-3 tiles deep
+**Materials**
 
-**Inhabitants** ⏳
+* [[node:grassFern]] — floor
+* [[node:humus]] — substrate beneath the floor
 
-* [[monster:dendrobate]]
-* [[monster:mamba]]
+_Sowing a [[item:fernSpore]] in a [[node:humus]] tile converts it into a [[node:grassFern]] tile._
+
+<hr>
+
+**Flora**
+
+<<floraLine|fernC>>
+<<floraLine|fernG>>
+<<floraLine|fernM>>
+<<floraLine|fernS>>
+
+_Foraging a Fern provides, occasionally, [[item:fernSpore]]._
+
+<hr>
+
+**Fauna** ⏳
+
+| Monster | Role | Trigger |
+|---|---|---|
+| [[monster:dendrobate]] | Common | [[Foraging]] Ferns |
+| [[monster:mamba]] | Uncommon | [[Foraging]] Ferns |
+
+<hr>
+
+**Tips**
+
+* _[[Foraging]] a fern without destroying the [[node:grassFern]] allows it to regrow over time._ ⏳
+* _Fern Spores are rare but valuable potion ingredients — worth the detour._ ⏳
   `
   },
   {
