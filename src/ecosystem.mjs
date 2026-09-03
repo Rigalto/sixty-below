@@ -6774,8 +6774,11 @@ class GiantMushroomSystem {
     eventBus.on('world/tile-changed', this.onTileChangedGiantMushroom)
     this.onSewedMycellium = this.onSewedMycellium.bind(this)
     eventBus.on('sewed/mycellium', this.onSewedMycellium)
+    this.onShaked = this.onShaked.bind(this)
+    eventBus.on('shaked/giantMushroom', this.onShaked)
     // micro-tâches
     this.growGiantMushroom = this.growGiantMushroom.bind(this)
+    this.giantMushroomEndShake = this.giantMushroomEndShake.bind(this)
   }
 
   /**
@@ -6815,6 +6818,10 @@ class GiantMushroomSystem {
     if (record.growthTimestamp !== null) {
       const {priority, capacity} = MICROTASK.GIANT_MUSHROOM_GROW
       taskScheduler.enqueueAbsolute(`giant_mushroom_grow_${record.id}`, record.growthTimestamp, this.growGiantMushroom, priority, capacity, soilIndex)
+    }
+    if (record.shakedTimestamp !== null) {
+      const {priority, capacity} = MICROTASK.GIANT_MUSHROOM_END_SHAKE
+      taskScheduler.enqueueAbsolute(`giant_mushroom_shake_${record.id}`, record.shakedTimestamp, this.giantMushroomEndShake, priority, capacity, soilIndex)
     }
   }
 
@@ -6928,8 +6935,46 @@ class GiantMushroomSystem {
     this.#bySoil.delete(record.soilIndex + 2)
 
     taskScheduler.dequeue(`giant_mushroom_grow_${record.id}`)
+    taskScheduler.dequeue(`giant_mushroom_shake_${record.id}`)
 
     record.deleted = true
+    saveManager.queueStaticUpdate({storeName: 'plant', record})
+  }
+
+  // /////// //
+  // SHAKING //
+  // /////// //
+
+  /**
+   * L'action de secouage est de nouveau autorisée sur ce giant mushroom.
+   * @param {number} soilIndex — (y << 10) | x, tuile de gauche du sol
+   */
+  giantMushroomEndShake (soilIndex) {
+    const record = this.#bySoil.get(soilIndex)
+    if (record === undefined) return
+
+    record.shakedTimestamp = null
+    saveManager.queueStaticUpdate({storeName: 'plant', record})
+  }
+
+  /**
+   * Liaison EventBus : 'shaked/giantMushroom' — le joueur a secoué le giant mushroom. Si déjà
+   * secoué récemment (shakedTimestamp actif), la secousse est traitée comme un chopping
+   * (pénalité). Sinon, démarre le cooldown de 24h.
+   * @param {number} soilIndex — (y << 10) | x, tuile de gauche du sol
+   */
+  onShaked (soilIndex) {
+    const record = this.#bySoil.get(soilIndex)
+    if (record === undefined) return
+
+    if (record.shakedTimestamp !== null) {
+      this.onChopped(record)
+      return
+    }
+
+    const {priority, capacity} = MICROTASK.GIANT_MUSHROOM_END_SHAKE
+    const shakedTimestamp = taskScheduler.enqueue(`giant_mushroom_shake_${record.id}`, 24 * 60 * 1000, this.giantMushroomEndShake, priority, capacity, soilIndex)
+    record.shakedTimestamp = shakedTimestamp
     saveManager.queueStaticUpdate({storeName: 'plant', record})
   }
 
