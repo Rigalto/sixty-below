@@ -6772,6 +6772,8 @@ class GiantMushroomSystem {
     // eventBus
     this.onTileChangedGiantMushroom = this.onTileChangedGiantMushroom.bind(this)
     eventBus.on('world/tile-changed', this.onTileChangedGiantMushroom)
+    this.onSewedMycellium = this.onSewedMycellium.bind(this)
+    eventBus.on('sewed/mycellium', this.onSewedMycellium)
     // micro-tâches
     this.growGiantMushroom = this.growGiantMushroom.bind(this)
   }
@@ -7000,6 +7002,86 @@ class GiantMushroomSystem {
     }
     saveManager.queueStaticUpdate({storeName: 'plant', record})
   }
+
+  // ////////// //
+  // PLANTATION //
+  // ////////// //
+
+  /**
+   * Indique si un Mycellium peut être planté sur ce soilIndex.
+   * @param {number} soilIndex — (y << 10) | x
+   * @param {string} seed
+   * @returns {boolean|null}
+   */
+  canSow (soilIndex, seed) {
+    if (seed !== 'mycellium') return null
+    return true
+  }
+
+  /**
+   * Construit le tableau d'images d'un giant mushroom en tirant aléatoirement parmi les
+   * variantes disponibles. Miroir de PlantGenerator.#buildTreeImages.
+   * @param {number} soilX — coordonnée X de la tuile support gauche
+   * @returns {Array<{tree, row, col, x}>}
+   */
+  #buildTreeImages (soilX) {
+    const imageTable = TREE_IMAGES.giantMushroom
+    const images = []
+    for (let i = 0; i < imageTable.length; i++) {
+      const col = seededRNG.randomGetArrayIndex(imageTable[i])
+      images.push({tree: 'giantMushroom', row: i, col, x: soilX - 1})
+    }
+    return images
+  }
+
+  /**
+   * Liaison EventBus : 'sewed/mycellium' — le joueur a planté un mycellium sur une tuile
+   * GRASSMUSHROOM valide (vérifications déjà faites par SowingManager). Crée le giant
+   * mushroom (size=0), l'enregistre dans toutes les structures, persiste et notifie.
+   * @param {number} tileIndex — (y << 10) | x, tuile cliquée (tuile centrale du sol, soilIndex+1)
+   */
+  onSewedMycellium (tileIndex) {
+    const GIANT_H = 15
+    const GIANT_W = 3
+    const soilIndex = tileIndex - 1
+    const soilX = soilIndex & 0x3FF
+    const soilY = soilIndex >> 10
+
+    const id = uniqueIdGenerator.getUniqueId()
+    const growthDelay = (ITEMS.giantMushroom.growth * seededRNG.randomGetRealMinMax(0.8, 1.2)) | 0
+    const {priority, capacity} = MICROTASK.GIANT_MUSHROOM_GROW
+    const growthTimestamp = taskScheduler.enqueue(`giant_mushroom_grow_${id}`, growthDelay, this.growGiantMushroom, priority, capacity, soilIndex)
+
+    const record = {
+      id,
+      itemId: 'giantMushroom',
+      kind: PLANT_KIND.TREE,
+      type: PLANT_TYPE.GIANT_MUSHROOM,
+      index: soilIndex - GIANT_H * WORLD_WIDTH,
+      soilIndex,
+      w: GIANT_W,
+      h: GIANT_H,
+      size: 0,
+      images: this.#buildTreeImages(soilX),
+      grass: NODES.GRASSMUSHROOM.code,
+      x: soilX,
+      yTop: soilY - GIANT_H,
+      yBottom: soilY - 1,
+      growthTimestamp,
+      shakedTimestamp: null,
+      blocked: 0,
+      deleted: false
+    }
+    this.initPlant(record)
+    saveManager.queueStaticUpdate({storeName: 'plant', record})
+
+    // Pour que le giant mushroom soit rendu immédiatement.
+    this.#displayed.add(record)
+  }
+
+  // ///// //
+  // DEBUG //
+  // ///// //
 
   /**
    * DEBUG — Affiche un point pour chaque giant mushroom enregistré, au coin gauche du sol.

@@ -1016,6 +1016,7 @@ class SowingManager {
     if (item.code === 'sunflowerSeed') this.#trySowSunflowerSeed(tileIndex, tileNode, slotIndex)
     else if (item.code === 'acorn') this.#trySowAcorn(tileIndex, tileNode, slotIndex)
     else if (item.code === 'samara') this.#trySowSamara(tileIndex, tileNode, slotIndex)
+    else if (item.code === 'mycellium') this.#trySowMycellium(tileIndex, tileNode, slotIndex)
     else if (item.code === 'ambermirageSeed') this.#trySowAmbermirageSeed(tileIndex, tileNode, slotIndex)
     else if (item.code === 'bloodmoonSeed') this.#trySowBloodmoonSeed(tileIndex, tileNode, slotIndex)
     else if (item.code === 'fernSpore') this.#trySowFernSpore(tileIndex, tileNode, slotIndex)
@@ -1362,6 +1363,44 @@ class SowingManager {
 
     // Succès
     eventBus.emit('sewed/samara', tileIndex)
+    inventoryManager.decrementHotbarSlotCount(slotIndex)
+    eventBus.emit('sound/play', 'placing')
+  }
+
+  /**
+   * Valide et exécute le placement d'un mycellium (Giant Mushroom seed).
+   * Conditions : tuile centrale de 3 GRASSMUSHROOM consécutives, rectangle 3×15 au-dessus du
+   * sol entièrement VOID. Silence si mauvaise tuile, 'wrong' si bloqué, 'placing' si succès.
+   * @param {number} tileIndex — tuile cliquée (le sol attendu)
+   * @param {object} tileNode
+   * @param {number} slotIndex
+   */
+  #trySowMycellium (tileIndex, tileNode, slotIndex) {
+    const GRASSMUSHROOM = NODES.GRASSMUSHROOM.code
+
+    // vérification du sol
+    if (tileNode.code !== GRASSMUSHROOM) return
+    if (chunkManager.getTileAt(tileIndex - 1) !== GRASSMUSHROOM) return
+    if (chunkManager.getTileAt(tileIndex + 1) !== GRASSMUSHROOM) return
+
+    // Vérification que le rectangle 3×15 au-dessus du sol est entièrement VOID
+    const soilIndex = tileIndex - 1
+    const VOID = NODES.VOID.code
+    if (tileRectHasOther(soilIndex - 15 * WORLD_WIDTH, 3, 15, VOID)) return
+
+    // 'toofar' — tuile hors de la zone d'interaction
+    if (!isInInteractionRange(tileIndex)) { eventBus.emit('sound/play', 'toofar'); return }
+
+    // 'wrong' — tuiles bloquées (furniture, plante déjà présente)
+    const soilX = soilIndex & 0x3FF
+    const soilY = soilIndex >> 10
+    if (!blockedTiles.canPlaceRect(soilX, soilY - 15, 3, 15)) { eventBus.emit('sound/play', 'wrong'); return }
+
+    // 'wrong' — règles métier de la graine
+    if (!floraManager.canSow(tileIndex, 'mycellium')) { eventBus.emit('sound/play', 'wrong'); return }
+
+    // Succès
+    eventBus.emit('sewed/mycellium', tileIndex)
     inventoryManager.decrementHotbarSlotCount(slotIndex)
     eventBus.emit('sound/play', 'placing')
   }
