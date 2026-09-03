@@ -968,6 +968,8 @@ A large underground cave found in [[Jungle]] biomes. Its walls are covered in lu
 * Biome: [[Jungle]]
 * Layer: [[Underground]]
 
+<hr>
+
 **Materials**
 
 * [[node:mud]] — substrate beneath the moss floor
