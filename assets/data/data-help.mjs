@@ -694,10 +694,14 @@ Ruined Cabins are the remains of ancient wooden shelters found deep in [[Forest]
 * Defeat : the chest disappears
 * The chest and its contents regenerate after a few in-game days
 
-**Inhabitants** ⏳
+<hr>
+
+**Fauna** ⏳
 
 * Ghosts — common
 * Arthur — boss
+
+<hr>
 
 **Tips**
 
@@ -728,11 +732,15 @@ Ant Hills are conical mounds of [[Compacted Earth]] found on the surface of [[Fo
 * Conical mound rising above the surface
 * Underground chamber housing the Ant Queen
 
-**Inhabitants** ⏳
+<hr>
+
+**Fauna** ⏳
 
 * [[monster:ant]] — common
 * [[monster:antSoldier]] — defender
 * [[monster:antQueen]] — boss, spawns in the underground chamber
+
+<hr>
 
 **Tips**
 
@@ -837,16 +845,22 @@ Pyramids are ancient stone structures buried deep in [[Desert]] biomes. Built fr
 * Inhabitants : [[monster:momie]], [[monster:sphinx]], [[monster:pharaon]]
 * Chamber may be empty if the Pharaon was recently defeated ⏳
 
-**Inhabitants** ⏳
+<hr>
+
+**Fauna** ⏳
 
 * [[monster:momie]] — common, both chambers
 * [[monster:sphinx]] — uncommon, both chambers
 * [[monster:pharaon]] — boss, chamber 2
 
+<hr>
+
 **Loot** ⏳
 
 * Chest — tier 4-5, chamber 1 ⏳
 * Chest — tier 5, chamber 2 ⏳
+
+<hr>
 
 **Tips**
 
@@ -881,10 +895,14 @@ Antlion Pits are conical hollow traps found on the surface of [[Desert]] biomes.
 * Inverted cone dug into the sand surface
 * Antlion waiting at the bottom center
 
-**Inhabitants** ⏳
+<hr>
+
+**Fauna** ⏳
 
 * [[monster:antlion]] — ambush predator at the pit bottom
 * [[monster:sunburstAntlion]] — boss variant, rare
+
+<hr>
 
 **Tips**
 
@@ -1005,7 +1023,9 @@ Hives are large circular caverns built by [[Bees]] deep in [[Jungle]] biomes. Th
 
 * A diagonal tunnel connects the Hive to the surrounding caverns.
 
-**Inhabitants** ⏳
+<hr>
+
+**Fauna** ⏳
 
 | Monster | Rarity |
 |---|---|
@@ -1063,15 +1083,21 @@ Sap Lakes are bodies of [[node:sap]] found in [[Jungle]] biomes. Unlike [[Sap Po
 
 * [[node:sap]] — fills the lower half of the cavity
 
-**Inhabitants** ⏳
+<hr>
+
+**Fauna** ⏳
 
 * [[monster:amberSquid]] — [[Fishing]] only
 * [[monster:glider]] — [[Fishing]] only
+
+<hr>
 
 **Loot** ⏳
 
 * [[node:sap]] — collectable with [[item:bottle]] or [[item:bucket]] ⏳
 * Rare aquatic species unique to Sap environments ⏳
+
+<hr>
 
 **Tips**
 
@@ -1097,16 +1123,22 @@ Sap Pockets are pressurized elliptical cavities filled with [[node:sap]], found 
 * [[node:sap]] — fills the entire cavity
 * [[node:sandstone]] — sealing border
 
-**Inhabitants** ⏳
+<hr>
+
+**Fauna** ⏳
 
 * [[monster:amberSquid]] — [[Fishing]] only
 * [[monster:glider]] — [[Fishing]] only
 * [[monster:mantis]] — aggressive
 
+<hr>
+
 **Loot** ⏳
 
 * Rare aquatic species unique to Sap Pockets
 * Chest — tier 4-5 ⏳
+
+<hr>
 
 **Tips**
 
@@ -1184,11 +1216,15 @@ Termite Mounds are tall cylindar structures of [[Compacted Earth]] rising above 
 * Rectangular tower rising above the surface
 * Underground chamber housing the Termite King
 
-**Inhabitants** ⏳
+<hr>
+
+**Fauna** ⏳
 
 * [[monster:termite]] — common
 * [[monster:termiteSoldier]] — defender
 * [[monster:termiteKing]] — boss, spawns in the underground chamber
+
+<hr>
 
 **Tips**
 
@@ -1276,11 +1312,15 @@ Cobweb Caves are caverns densely packed with spider webs. They are found in all 
 
 * [[node:web]] — dense coverage on ceiling
 
-**Inhabitants** ⏳
+<hr>
+
+**Fauna** ⏳
 
 * [[monster:spider]] — common
 * [[monster:mygale]] — uncommon
 * [[monster:tarentulaKing]] — boss, rare
+
+<hr>
 
 **Loot** ⏳
 
@@ -1288,6 +1328,8 @@ Cobweb Caves are caverns densely packed with spider webs. They are found in all 
 * [[item:spiderEgg]] — rare drop ⏳
 * [[item:spiderFang]] — rare drop ⏳
 * Chest — tier 3-4 depending on layer ⏳
+
+<hr>
 
 **Tips**
 
@@ -1312,14 +1354,20 @@ Geode Caves are elliptical caverns lined with crystals of [[node:granite]] or [[
 * [[node:granite]] or [[node:marble]] — crystal-lined walls
 * Hollow interior
 
-**Inhabitants** ⏳
+<hr>
+
+**Fauna** ⏳
 
 * [[monster:stonegnaw]]
 * [[monster:rockborer]] — boss
 
+<hr>
+
 **Loot** ⏳
 
 * [[Mining]] : [[item:blockGranite]] and [[item:blockMarble]] — abundant from walls
+
+<hr>
 
 **Tips**
 
@@ -1345,15 +1393,21 @@ Blind Lakes are pockets of water found in the deepest parts of all biomes. They 
 * [[node:water]] — fills the bottom of the cavity
 * [[node:hardstone]] — floor and walls
 
-**Inhabitants** ⏳
+<hr>
+
+**Fauna** ⏳
 
 * [[monster:blindFish]] — rare, [[Fishing]] only
 * [[monster:axolotl]] — very rare, [[Fishing]] only
+
+<hr>
 
 **Loot** ⏳
 
 * Rare fish species found nowhere else in the world
 * Chest — tier 4-5 ⏳
+
+<hr>
 
 **Tips**
 
@@ -1381,14 +1435,20 @@ Underground Lakes are pockets of fresh water found below the surface. They are a
 * [[node:mud]] — ceiling and upper walls, [[Jungle]]
 * [[node:sandstone]] — ceiling and upper walls, [[Desert]]
 
-**Inhabitants** ⏳
+<hr>
+
+**Fauna** ⏳
 
 * [[monster:caveFish]] — common, [[Fishing]] only
+
+<hr>
 
 **Loot** ⏳
 
 * Rare fish species ⏳
 * Chest — tier 2-3 ⏳
+
+<hr>
 
 **Tips**
 
@@ -1419,15 +1479,21 @@ Surface Lakes are bodies of water found at ground level. Each biome has its own 
 * [[node:water]] — fills the lake body and pit
 * Banks and floor vary by biome ⏳
 
-**Inhabitants** ⏳
+<hr>
+
+**Fauna** ⏳
 
 * Surface fish species — common, [[Fishing]] only
 * Aquatic critters — [[monster:frog]] near Forest lakes ⏳
+
+<hr>
 
 **Loot** ⏳
 
 * Common fish species
 * Chest — tier 1-2 ⏳
+
+<hr>
 
 **Tips**
 
@@ -1480,12 +1546,14 @@ Tombstones are found inside the burial tunnels. All tombstones behave identicall
 
 <hr>
 
-**Inhabitants** ⏳
+**Fauna** ⏳
 
 * [[monster:ghost]] — common
 * [[monster:skeleton]] — common
 * [[monster:undeadMiner]] — common
 * [[monster:lich]] — rare boss
+
+<hr>
 
 **Loot** ⏳
 
