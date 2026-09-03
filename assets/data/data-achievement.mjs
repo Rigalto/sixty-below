@@ -54,5 +54,11 @@ export const ACHIEVEMENT_CATEGORIES = [
     label: 'Mining — Gems',
     thresholds: [4, 40, 80],
     items: ['rawTopaz', 'rawRuby', 'rawEmerald', 'rawSapphire']
+  },
+  {
+    id: 'sewing-plant',
+    label: 'Sewing',
+    thresholds: [1, 10, 20],
+    items: ['rawTopaz', 'rawRuby', 'rawEmerald', 'rawSapphire']
   }
 ]
