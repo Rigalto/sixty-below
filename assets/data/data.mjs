@@ -598,9 +598,9 @@ export const ITEMS = {
     chopping: {speed: 2200, items: [{item: 'mushroomFiber', count: '5-9'}, {item: 'mycellium', count: 0.75}], extraLoot: {items: [{item: 'mycellium', count: '2-5', buffs: ['+felling']}]}},
     shaking: {speed: 1800, items: [{item: 'mushroomFiber', count: 0.65}, {item: 'slug', count: 0.25}, {item: 'goldSlug', count: 0.01, buffs: ['+lucky']}]}
   },
-  mushroomFiber: {name: 'Mushroom Fiber', type: 0, stype: 'herb', star: 4, image: 'foraged_32_32-4-6', help: 'Mushroom Cave', tooltip: '???'},
-  mushroomSpore: {name: 'Mushroom Spore', type: ITEM_TYPE.SEED | ITEM_TYPE.PLACABLE, stype: 'herb', star: 4, image: 'foraged_32_32-4-6', help: 'Mushroom Cave', tooltip: '???'},
-  mycellium: {name: 'Mycellium', type: ITEM_TYPE.SEED | ITEM_TYPE.PLACABLE, stype: 'herb', star: 4, image: 'foraged_32_32-4-6', help: 'Mushroom Cave', tooltip: '???'},
+  mushroomSpore: {name: 'Mushroom Spore', type: ITEM_TYPE.SEED | ITEM_TYPE.PLACABLE, stype: 'herb', star: 4, image: 'foraged_32_32-6-6', help: 'Mushroom Cave', tooltip: '???'},
+  mycellium: {name: 'Mycellium', type: ITEM_TYPE.SEED | ITEM_TYPE.PLACABLE, stype: 'herb', star: 4, image: 'foraged_32_32-5-6', help: 'Mushroom Cave', tooltip: '???'},
+  mushroomFiber: {name: 'Mushroom Fiber', type: 0, stype: 'herb', star: 4, image: 'foraged_32_32-7-6', help: 'Mushroom Cave', tooltip: '???'},
 
   // Mushrooms - images OK
   bolete: {name: 'Bolete', type: 0, stype: 'mushroom', star: 1, image: 'foraged_32_32-3-0', placed: 'placed_16_32-0-0', help: 'Surface Mushrooms', tooltip: '???', foraging: {speed: 2400, items: [{item: 'bolete', count: '1-3'}, {item: 'worm', count: 0.3, buffs: ['lucky:100', 'rainy:100']}]}},
