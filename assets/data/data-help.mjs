@@ -6098,8 +6098,8 @@ Like their larger relatives, the [[item:giantMushroom]]s, their main value lies 
 
 | Mushroom | Appears | Disappears |
 |---|---|---|
-| [[item:frostcap]] ⏳ | 8:30 | 21:30 |
-| [[item:dawncap]] ⏳ | 8:30 | 21:30 |
+| [[item:frostcap]] | 7:00 | 21:00 |
+| [[item:dawncap]] | 7:00 | 21:00 |
 
 _All times are in-game. See [[Day & Night Cycle]] for reference._
 
