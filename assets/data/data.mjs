@@ -1036,6 +1036,7 @@ export const FERN_TYPES = [
 export const FERN_TOGGLE_PCENT = 50
 export const FERN_POPULATION_DELAY_MS = 8000 // délai de base (ms) entre deux passages de régulation
 export const MOSS_TOGGLE_PCENT = 60
+export const CAVEMUSHROOM_TOGGLE_PCENT = 50
 
 // Substrats valides pour Gravelweed — Surface (natural/topsoil/substrat) + Underground natif,
 // 3 biomes confondus, aucun filtre de biome à l'usage (cf. GravelweedSystem, placeGravelweeds)
@@ -1065,6 +1066,11 @@ export const CORAL_TYPES = [
   {type: PLANT_TYPE.CORAL_P, itemId: 'coralP'},
   {type: PLANT_TYPE.CORAL_Y, itemId: 'coralY'},
   {type: PLANT_TYPE.CORAL_G, itemId: 'coralG'}
+]
+// Espèces de cave mushroom tirées aléatoirement à la pose (génération et repousse runtime)
+export const CAVEMUSHROOM_TYPES = [
+  {type: PLANT_TYPE.FROSTCAP, itemId: 'frostcap'},
+  {type: PLANT_TYPE.DAWNCAP, itemId: 'dawncap'}
 ]
 
 export const TREE_IMAGES = {

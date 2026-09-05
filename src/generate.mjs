@@ -3,7 +3,7 @@
 import {seededRNG, shuffleArray, rollLoot, removeIndexUnordered} from './utils.mjs'
 import {database, uniqueIdGenerator} from './database.mjs'
 import {WORLD_WIDTH, WORLD_HEIGHT, SEA_LEVEL, TOPSOIL_Y_SKY_SURFACE, TOPSOIL_Y_SURFACE_UNDER, TOPSOIL_Y_UNDER_CAVERNS, BIOME_TILE_MAP, SEA_MAX_JITTER, SEA_MAX_WIDTH, SEA_MAX_HEIGHT, CLUSTER_SCATTER_MAP, ORE_GEM_SCATTER_MAP, PERLIN_OFFSET_NATURALIZER, PERLIN_OFFSET_TUNNEL, PERLIN_OFFSET_SURFACE_TUNNEL, PERLIN_OFFSET_SMALL_TUNNEL, PERLIN_OFFSET_CAVERN, PERLIN_OFFSET_HIVE, PERLIN_OFFSET_HEART, PERLIN_OFFSET_MUSHROOM, PERLIN_OFFSET_COBWEB, PERLIN_OFFSET_FERNS, PERLIN_OFFSET_LAKES, PERLIN_OFFSET_SHELL, PERLIN_OFFSET_TEMPLE, PERLIN_OFFSET_BEACH, SMALL_CAVERNS_COUNT, MEDIUM_CAVERNS_COUNT, UNDERGROUND_TUNNEL_COUNT, CAVERNS_TUNNEL_COUNT, SMALL_TUNNELS_COUNT, HIVE_RADIUS_MIN, HIVE_RADIUS_MAX, COBWEB_CAVE_COUNT_MIN, COBWEB_CAVE_COUNT_MAX, COBWEB_RADIUS_X_MIN, COBWEB_RADIUS_X_MAX, COBWEB_RADIUS_Y_MIN, COBWEB_RADIUS_Y_MAX, COBWEB_CAVE_MAIN_MIN, COBWEB_CAVE_MAIN_MAX, COBWEB_CAVE_SIDE_MIN, COBWEB_CAVE_SIDE_MAX, COBWEB_SCATTER_COUNT, COBWEB_SCATTER_SIZE_MIN, COBWEB_SCATTER_SIZE_MAX, GEODE_CAVE_COUNT_MIN, GEODE_CAVE_COUNT_MAX, GEODE_RADIUS_MIN, GEODE_RADIUS_MAX, GEODE_TARGET_CLUSTER_COUNT, GEODE_CLUSTER_SIZE_MIN, GEODE_CLUSTER_SIZE_MAX, NATIVE_TOPSOIL_MAP, LAKE_RADIUS_X_MIN, LAKE_RADIUS_X_MAX, LAKE_RADIUS_Y_MIN, LAKE_RADIUS_Y_MAX, LAKE_PIT_RADIUS_X_MIN, LAKE_PIT_RADIUS_X_MAX, LAKE_PIT_RADIUS_Y_MIN, LAKE_PIT_RADIUS_Y_MAX, LAKE_CREATION_MAP, UNDERGROUND_LAKE_UNDER_COUNT, UNDERGROUND_LAKE_CAVERNS_COUNT, UNDERGROUND_LAKE_RADIUS_MIN, UNDERGROUND_LAKE_RADIUS_MAX, BLIND_LAKE_COUNT, BLIND_LAKE_RADIUS_MIN, BLIND_LAKE_RADIUS_MAX, SAP_LAKE_UNDER_COUNT, SAP_LAKE_CAVERNS_COUNT, SAP_LAKE_RADIUS_MIN, SAP_LAKE_RADIUS_MAX, SAP_POCKET_COUNT, SAP_POCKET_RADIUS_MIN, SAP_POCKET_RADIUS_MAX, WATER_PUDDLE_COUNT, SAP_PUDDLE_COUNT, PUDDLE_HEIGHT_MIN, PUDDLE_HEIGHT_MAX, FOSSIL_VEIN_COUNT, FERN_CAVE_RADIUS_X_MIN, FERN_CAVE_RADIUS_X_MAX, FERN_CAVE_RADIUS_Y_MIN, FERN_CAVE_RADIUS_Y_MAX, MOSS_CAVE_RADIUS_X_MIN, MOSS_CAVE_RADIUS_X_MAX, MOSS_CAVE_RADIUS_Y_MIN, MOSS_CAVE_RADIUS_Y_MAX, SAND_POCKET_RADIUS_X_MIN, SAND_POCKET_RADIUS_X_MAX, SAND_POCKET_RADIUS_Y_MIN, SAND_POCKET_RADIUS_Y_MAX, MUSHROOM_CAVE_RADIUS_X_MIN, MUSHROOM_CAVE_RADIUS_X_MAX, MUSHROOM_CAVE_RADIUS_Y_MIN, MUSHROOM_CAVE_RADIUS_Y_MAX, PYRAMID_WALL_INDEXES, PYRAMID_VOID_INDEXES, PYRAMID_WIDTH, PYRAMID_HEIGHT, PYRAMID_ROOM1_DELTA, PYRAMID_ROOM2_DELTA, TEMPLE_RUIN_WALL_INDEXES, TEMPLE_RUIN_COLUMNS_INDEXES, CHEST_CONTENT, TREES_INIT_SIZE, GIANT_MUSHROOM_INIT_SIZE} from '../assets/data/data-gen.mjs'
-import {NODES, NODES_LOOKUP, NODE_TYPE, BIOME_TYPE, PLANT_KIND, PLANT_TYPE, ITEMS, TREE_IMAGES, THORNSPINE_JUNCTIONS, THORNSPINE_SIZES, CORAL_TYPES, PARSNIP_RATE, SUNFLOWER_RATE, MANDRAKE_COUNT, PRICKLEPAD_COUNT, BAMBOO_COUNT, BAMBOO_ITEMS, OLEANDER_COUNT, SATANS_CUBE_COUNT, SNEAKTHORN_COUNT, CURSEDCROWN_COUNT, ABYSSHORN_COUNT, INFERNCAP_COUNT, GRAVELWEED_COUNT, GRAVELWEED_SOIL, COCONUT_CYCLE_DELAY, FERN_TYPES, FERN_TOGGLE_PCENT, MOSS_TOGGLE_PCENT} from '../assets/data/data.mjs'
+import {NODES, NODES_LOOKUP, NODE_TYPE, BIOME_TYPE, PLANT_KIND, PLANT_TYPE, ITEMS, TREE_IMAGES, THORNSPINE_JUNCTIONS, THORNSPINE_SIZES, CORAL_TYPES, PARSNIP_RATE, SUNFLOWER_RATE, MANDRAKE_COUNT, PRICKLEPAD_COUNT, BAMBOO_COUNT, BAMBOO_ITEMS, OLEANDER_COUNT, SATANS_CUBE_COUNT, SNEAKTHORN_COUNT, CURSEDCROWN_COUNT, ABYSSHORN_COUNT, INFERNCAP_COUNT, GRAVELWEED_COUNT, GRAVELWEED_SOIL, COCONUT_CYCLE_DELAY, FERN_TYPES, FERN_TOGGLE_PCENT, MOSS_TOGGLE_PCENT, CAVEMUSHROOM_TYPES, CAVEMUSHROOM_TOGGLE_PCENT} from '../assets/data/data.mjs'
 import {IS_DEV, WEATHER_TYPE, WEATHER_TYPE_CODE, BAG_CAPACITY, HOTBAR_CAPACITY, ARMOR_CAPACITY, ACCESSORY_CAPACITY, CONTAINER_CAPACITY, CONTAINER_STYPES, PLAYER} from './constant.mjs'
 
 /* ====================================================================================================
@@ -523,7 +523,7 @@ class WorldGenerator {
 
     plantGenerator.placeFerns()
     plantGenerator.placeMoss()
-    plantGenerator.placeCaveMushrooms(grassMushroomIndexes, currentWeather)
+    plantGenerator.placeCaveMushrooms(currentWeather)
     await progress('Mini-biome Plants')
 
     plantGenerator.placeMandrakes(zoneRects)
@@ -8323,55 +8323,44 @@ class PlantGenerator {
   }
 
   /**
-   * Place les spots de Frostcap et Dawncap dans les Mushroom Caves.
-   * Tous les spots valides sont enregistrés — 35% sont présents au démarrage,
-   * sauf si le temps initial est Sunny (present = false pour tous).
-   * Un spot valide est une tuile GRASSMUSHROOM avec les deux tuiles VOID au-dessus,
-   * sans Giant Mushroom déjà présent (tuile VOID à y-1 et y-2).
-   * Les deux espèces sont réparties aléatoirement à parts égales.
-   * Pop : 8:30 in-game. Dépop : 21:30 in-game.
-   *
-   * @param {number[]} grassMushroomIndexes — index des tuiles GRASSMUSHROOM
+   * Place un spot Frostcap/Dawncap pour chaque tuile GRASSMUSHROOM actuellement présente dans
+   * le monde (scan complet via getTypeArray, indépendant de l'accumulation faite pendant le
+   * creusement — même précaution que placeFerns/placeMoss face à cleanupAfterCarving, qui peut
+   * combler après coup le VOID requis au-dessus d'une tuile). Chaque tuile génère un record,
+   * bloquée ou non. Un spot est bloqué si le rectangle 1x2 de VOID requis au-dessus du sol
+   * n'est pas entièrement libre, ou si placedGuard y signale une autre entité déjà posée (ex.
+   * canopée d'un Giant Mushroom voisin). Sur un spot non bloqué, CAVEMUSHROOM_TOGGLE_PCENT % de
+   * chance d'être present ; aucun spot n'est present si le temps initial est Sunny (fiche
+   * d'aide : pas de champignons par temps ensoleillé). L'espèce (Frostcap/Dawncap) est tirée
+   * pour tous les spots, bloqués ou non, afin de garder une shape de record identique
+   * (monomorphe).
    * @param {number} initialWeather — weather du premier jour (WEATHER_TYPE_CODE)
    */
-
-  // TODO — placeCaveMushrooms doit être revue (ne correspond pas encore à l'implémentation
-  // cible). Quand ce sera fait, repenser à retester la validité des tuiles GRASSMUSHROOM —
-  // même classe de bug que GRASSFERN/GRASSMOSS : cleanupAfterCarving (Règle 1, VOID isolé)
-  // peut combler le VOID requis au-dessus d'une tuile après le tapissage du fond de la
-  // Mushroom Cave, sans que rien ne la retransforme. Cf. le fix appliqué à placeFerns() et
-  // placeMoss() pour le patron à reproduire.
-
-  placeCaveMushrooms (grassMushroomIndexes, initialWeather) {
+  placeCaveMushrooms (initialWeather) {
     const VOID = NODES.VOID.code
     const GRASSMUSHROOM = NODES.GRASSMUSHROOM.code
     const W = WORLD_WIDTH
     const sunny = initialWeather === WEATHER_TYPE_CODE.SUNNY
+    const grassMushroomIndexes = worldBuffer.getTypeArray(GRASSMUSHROOM)
     let count = 0
 
-    for (const idx of grassMushroomIndexes) {
-      if (worldBuffer.readAt(idx) !== GRASSMUSHROOM) continue
+    for (const soilIndex of grassMushroomIndexes) {
+      const x = soilIndex & 0x3FF
+      const y = soilIndex >> 10
 
-      const x = idx & 0x3FF
-      const y = idx >> 10
+      const blocked = !worldBuffer.isRectCode(x, y - 2, 1, 2, VOID) || placedGuard.hasRect(x, y - 2, x, y - 1)
+      const present = !sunny && !blocked && seededRNG.randomGetPercent(CAVEMUSHROOM_TOGGLE_PCENT)
+      if (present) placedGuard.addRect(x, y - 2, x, y - 1)
 
-      // utiliser placeGuard pour faire le test d'occupation
-      // if (giantOccupied.has(idx)) continue
-      if (worldBuffer.readAt(idx - W) !== VOID) continue // y-1 VOID
-      if (worldBuffer.readAt(idx - W - W) !== VOID) continue // y-2 VOID
-
-      const itemId = seededRNG.randomGetBool() ? 'frostcap' : 'dawncap'
-      const type = itemId === 'frostcap' ? PLANT_TYPE.FROSTCAP : PLANT_TYPE.DAWNCAP
-      const soilIndex = idx
-      const present = !sunny && seededRNG.randomGetPercent(35)
+      const {type, itemId} = seededRNG.randomGetArrayValue(CAVEMUSHROOM_TYPES)
 
       this.#plants.push({
         id: uniqueIdGenerator.getUniqueId(),
         kind: PLANT_KIND.MUSHROOM,
         type,
-        index: soilIndex - W - W,
-        soilIndex,
         itemId,
+        index: soilIndex - W * 2,
+        soilIndex,
         w: 1,
         h: 2,
         x,
@@ -8379,9 +8368,10 @@ class PlantGenerator {
         present,
         deleted: false
       })
-      count++
+      if (present) count++
     }
-    if (IS_DEV) console.log(`   🔹 Frostcaps/Dawncap : ${count}`)
+
+    if (IS_DEV) console.log(`   🔹 Cave Mushrooms : ${count} / ${grassMushroomIndexes.length}`)
   }
 
   /**
