@@ -1,6 +1,6 @@
 // ecosystem.mjs — FloraManager - OakSystem - MahoganySystem - CoconutSystem - ThornspineSystem
 // SunflowerSystem - ParsnipSystem - OleanderSystem - MandrakeSystem - BambooSystem
-// PricklepadSystem - AmbermirageSystem - FernSystem - GiantMushroomSystem
+// PricklepadSystem - AmbermirageSystem - FernSystem - GiantMushroomSystem - CaveMushroomSystem
 // CobwebSystem - HiveSystem - SatansCubeSystem - SneakthornSystem - CursedcrownSystem
 // SpreadForestSystem - SpreadJungleSystem - CoralSystem - BloodmoonSystem - GravelweedSystem
 // SampleSystem
@@ -8689,111 +8689,78 @@ class GravelweedSystem {
 export const gravelweedSystem = new GravelweedSystem()
 
 /* ====================================================================================================
-   SAMPLE SYSTEM
-   ====================================================================================================
-
-   Singleton : sampleSystem.
-
-   Patron de référence pour tous les systèmes de plantes de FloraManager.
-   Copier, renommer (ex: MandrakeSystem) et spécialiser render().
-
-   Responsabilités :
-     - Indexer les records dans quatre structures complémentaires (init + addRecord)
-     - Exposer byTile (public) pour les requêtes spatiales de FloraManager
-     - Limiter le render aux chunks preload via #displayed
-
-   Interactions :
-     floraManager — init, addRecord, updateDisplay, render, getPlantAt
-
+   CAVE MUSHROOM SYSTEM
    ==================================================================================================== */
 
-class SampleSystem {
-  byTile = new Map() // Map<tileIndex, record> — public : membership O(1) + lookup record
-  #list = [] // record[] — tous les records (lifecycle, itération)
-  #byChunk = new Map() // Map<chunkKey, Set> — lookup spatial pour updateDisplay
-  #displayed = new Set() // Set<record> — cible du render (chunks preload uniquement)
+class CaveMushroomSystem {
+  byTile = new Map() // Map<tileIndex, record> — public : lookup O(1) pour le foraging (present uniquement)
+  #list = [] // record[] — un spot par tuile GRASSMUSHROOM existante (bloquée ou non, present ou non)
+  #byChunk = new Map() // Map<chunkKey, Set> — lookup spatial pour onPreloadChunksChanged (present uniquement)
+  #spotsBySoil = new Map() // Map<soilIndex, record> — tous les spots : détection minage/sondage O(1)
+  #displayed = new Set() // Set<record> — spots present dans les chunks preload (cible render)
+  #imageFrostcap = null // ITEMS.frostcap.placed, mis en cache dans init()
+  #imageDawncap = null // ITEMS.dawncap.placed, mis en cache dans init()
 
   /**
-   * Réinitialise toutes les structures. Appelé en début de session.
-   * IMPLÉMENTATION OBLIGATOIRE
+   * Réinitialise toutes les structures. Appelé en début de session, avant toute hydratation.
    */
   init () {
     this.byTile.clear()
     this.#list.length = 0
     this.#byChunk.clear()
+    this.#spotsBySoil.clear()
     this.#displayed.clear()
+
+    this.#imageFrostcap = ITEMS.frostcap.placed // après hydratation
+    this.#imageDawncap = ITEMS.dawncap.placed // après hydratation
   }
 
   /**
-   * Enregistre un record actif et peuple les quatre structures internes.
-   * IMPLÉMENTATION OBLIGATOIRE
-   * @param {object} record — record de l'objectStore 'plant' (deleted=false garanti par l'appelant)
+   * Enregistre un spot Cave Mushroom et peuple les structures internes. Un spot present alimente
+   * byTile/#byChunk ; un spot absent (bloqué ou simplement pas encore poussé) ne reste que dans
+   * #list/#spotsBySoil, sans structure spatiale.
+   * @param {object} record — record MUSHROOM/FROSTCAP ou MUSHROOM/DAWNCAP (deleted=false garanti par l'appelant)
    */
   initPlant (record) {
     this.#list.push(record)
-
-    // byTile — toutes les tuiles du rectangle englobant (index, w, h)
-    const px = record.index & 0x3FF
-    const py = record.index >> 10
-    for (let dy = 0; dy < record.h; dy++) {
-      const rowBase = (py + dy) << 10
-      for (let dx = 0; dx < record.w; dx++) {
-        this.byTile.set(rowBase | (px + dx), record)
-      }
-    }
-
-    // #byChunk — chunk du coin haut-gauche uniquement
-    // Le ring preload de la caméra garantit la couverture des plantes chevauchant deux chunks.
-    const chunkKey = ((record.index >> 14) << 6) | ((record.index & 0x3FF) >> 4)
-    let set = this.#byChunk.get(chunkKey)
-    if (set === undefined) {
-      set = new Set()
-      this.#byChunk.set(chunkKey, set)
-    }
-    set.add(record)
+    this.#spotsBySoil.set(record.soilIndex, record)
+    if (!record.present) return
+    addToByTile(this.byTile, record)
+    addToByChunk(this.#byChunk, record)
   }
 
   /**
    * Reconstruit #displayed depuis les chunks preload de la caméra.
-   * Appelé directement par FloraManager (synchrone) — basculer en microtâche si dépassement 100µs.
-   * IMPLÉMENTATION OBLIGATOIRE
    * @param {Set<number>} preloadChunks
    */
   onPreloadChunksChanged (preloadChunks) {
-    this.#displayed.clear()
-    for (const chunkKey of preloadChunks) {
-      const set = this.#byChunk.get(chunkKey)
-      if (set === undefined) continue
-      for (const record of set) this.#displayed.add(record)
+    buildDisplayed(this.#displayed, this.#byChunk, preloadChunks)
+  }
+
+  /**
+   * Dessine les Cave Mushrooms visibles et present. Sprite sélectionné par espèce (type),
+   * corps 1×2 aligné sur (x, y) — pas de variation de taille contrairement aux arbres.
+   * @param {CanvasRenderingContext2D} ctx — contexte déjà transformé (caméra appliquée)
+   */
+  render (ctx) {
+    for (const record of this.#displayed) {
+      const img = record.type === PLANT_TYPE.FROSTCAP ? this.#imageFrostcap : this.#imageDawncap
+      const pxX = record.x << 4
+      const pxY = record.y << 4
+      ctx.drawImage(IMAGE_CACHE[img.imgIndex], img.sx, img.sy, img.sw, img.sh, pxX, pxY, img.sw, img.sh)
     }
   }
 
   /**
-   * Dessine les plantes visibles sur le contexte transformé par la caméra.
-   * IMPLÉMENTATION OBLIGATOIRE
-   * @param {CanvasRenderingContext2D} ctx — contexte déjà transformé (caméra appliquée)
+   * Traite le foraging réussi de ce Cave Mushroom.
+   * STUB — comportement réel ("disparaît à la récolte", cf. fiche d'aide) à coder avec le
+   * foraging complet. Laissé vide pour l'instant, à l'identique du patron SampleSystem.
+   * @param {object} record
    */
-  render (ctx) {
-    // for (const record of this.#displayed) {
-    // TODO: rendu spécifique
-    // const pxX = (record.index & 0x3FF) << 4
-    // const pxY = (record.index >> 10) << 4
-    // ctx.drawImage(IMAGE_CACHE[img.imgIndex], img.sx, img.sy, img.sw, img.sh, pxX, pxY, img.sw, img.sh)
-    // }
-  }
-
-  /**
- * Traite le foraging réussi de cette plante.
- * IMPLÉMENTATION OBLIGATOIRE — chaque système définit son propre comportement post-foraging
- * (disparition, état non-forageable temporaire, relance de croissance, etc.).
- * Le loot est géré en commun par ForagingManager — cette méthode ne gère que l'état de la plante.
- * @param {object} record
- */
   onForaged (record) { }
 
   /**
-   * Retourne le record de la plante couvrant la tuile donnée, ou null.
-   * IMPLÉMENTATION OBLIGATOIRE
+   * Retourne le Cave Mushroom couvrant la tuile donnée, ou null.
    * @param {number} tileIndex — (y << 10) | x
    * @returns {object|null}
    */
@@ -8802,12 +8769,36 @@ class SampleSystem {
   }
 
   /**
- * Indique si le record est actuellement présent (forageable).
- * IMPLÉMENTATION OBLIGATOIRE — chaque système doit définir sa propre notion de présence.
- * @param {object} record
- * @returns {boolean}
- */
-  isPresent (record) { return true }
-}
+   * Indique si le record est actuellement present (forageable).
+   * @param {object} record
+   * @returns {boolean}
+   */
+  isPresent (record) { return record.present }
 
-export const sampleSystem = new SampleSystem()
+  // ///// //
+  // DEBUG //
+  // ///// //
+
+  /**
+   * DEBUG — Affiche un cercle bleu pâle au centre de la tuile sol sous chaque spot enregistré
+   * dans #list (present ou non, bloqué ou non). Vérifie la cohérence avec #spotsBySoil (même
+   * cardinal attendu).
+   * @param {CanvasRenderingContext2D} ctx — contexte déjà transformé (caméra appliquée)
+   */
+  debugRenderSpots (ctx) {
+    ctx.save()
+    ctx.fillStyle = 'rgba(176, 224, 230, 0.8)'
+    for (const record of this.#list) {
+      const cx = ((record.soilIndex & 0x3FF) << 4) + 8
+      const cy = ((record.soilIndex >> 10) << 4) + 8
+      ctx.beginPath()
+      ctx.arc(cx, cy, 4, 0, 6.2832)
+      ctx.fill()
+    }
+    if (this.#list.length !== this.#spotsBySoil.size) {
+      console.warn(`CaveMushroomSystem: #list(${this.#list.length}) !== #spotsBySoil(${this.#spotsBySoil.size})`)
+    }
+    ctx.restore()
+  }
+}
+export const caveMushroomSystem = new CaveMushroomSystem()
