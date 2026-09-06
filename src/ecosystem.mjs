@@ -3990,11 +3990,11 @@ class ParsnipSystem {
       index,
       soilIndex,
       itemId: 'parsnip',
-      present: false,
       w: 1,
       h: 1,
       x,
       y: y - 1,
+      present: false,
       deleted: false
     }
     this.#list.push(record)
@@ -7576,8 +7576,8 @@ class SpreadForestSystem {
       kind: PLANT_KIND.SPREAD,
       type: PLANT_TYPE.FOREST,
       index: tileIndex,
-      topsoilCode: NODES.DIRT.code,
       naturalCode: NODES.GRASSFOREST.code,
+      topsoilCode: NODES.DIRT.code,
       spreadTimestamp: null,
       deleted: false
     }
@@ -7889,8 +7889,8 @@ class SpreadJungleSystem {
       kind: PLANT_KIND.SPREAD,
       type: PLANT_TYPE.JUNGLE,
       index: tileIndex,
-      topsoilCode: NODES.SILT.code,
       naturalCode: NODES.GRASSJUNGLE.code,
+      topsoilCode: NODES.SILT.code,
       spreadTimestamp: null,
       deleted: false
     }
