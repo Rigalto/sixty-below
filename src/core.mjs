@@ -25,7 +25,6 @@ import './combat.mjs'
 
 const WITH_DEBUG_HUD = true // passer à false pour désactiver sans toucher IS_DEV
 const plantSystemLookup = [ // Map<kind*100+type, system> — peuplée au fur et à mesure
-  //   [PLANT_KIND.NATURAL * 100 + PLANT_TYPE.NONE, naturalSystem],
   [PLANT_KIND.TREE * 100 + PLANT_TYPE.OAK, oakSystem],
   [PLANT_KIND.TREE * 100 + PLANT_TYPE.MAHOGANY, mahoganySystem],
   [PLANT_KIND.TREE * 100 + PLANT_TYPE.COCONUT, coconutSystem],

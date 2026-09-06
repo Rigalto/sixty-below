@@ -952,12 +952,11 @@ export const RECIPES = [
 export const PLANT_SYSTEM = {GRASS: 1, TREE: 2, HERB: 3}
 
 export const PLANT_KIND = {
-  NATURAL: 1, // tuiles NATURAL (GRASSFOREST, GRASSJUNGLE, GRASSMOSS, GRASSFERN, GRASSMUSHROOM)
-  TREE: 2, // arbres (Oak, Mahogany, Giant Mushroom, Coconut)
-  MUSHROOM: 3, // champignons (Bolete, Pink Mycenia)
-  HERB: 4, // herbes (Coral)
-  SPREAD: 5, // tuiles ensemencées (GRASSFOREST, GRASSJUNGLE)
-  SEED: 6 // Graines plantées
+  TREE: 1, // arbres (Oak, Mahogany, Giant Mushroom, Coconut)
+  MUSHROOM: 2, // champignons (Bolete, Pink Mycenia)
+  HERB: 3, // herbes (Coral)
+  SPREAD: 4, // tuiles ensemencées (GRASSFOREST, GRASSJUNGLE)
+  SEED: 5 // Graines plantées
 }
 
 export const PLANT_TYPE = {

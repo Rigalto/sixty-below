@@ -185,7 +185,7 @@ class WorldBuffer {
   }
 
   /**
-   * Vérifie, pour chaque plante NATURAL/SPREAD/TREE/HERB/MUSHROOM, que la tuile attendue
+   * Vérifie, pour chaque plante SPREAD/TREE/HERB/MUSHROOM, que la tuile attendue
    * (naturalCode, topsoilCode, grass, ou entrée de PLANT_SUBSTRATE selon le kind) correspond
    * toujours au contenu réel du buffer à l'index concerné. Affiche une anomalie par ligne
    * dans la console. Les types HERB/MUSHROOM absents de PLANT_SUBSTRATE sont ignorés sans
@@ -196,8 +196,6 @@ class WorldBuffer {
     let issues = 0
 
     for (const record of plants) {
-      if (record.kind === PLANT_KIND.NATURAL) continue // sera supprimé
-
       // pour ces deux champignons, les spots sont les tuiles situées sur les
       // côtés de l'arbre (Oak/Mahogany), indépendamment de leur type
       if (record.type === PLANT_TYPE.BOLETE) continue
@@ -444,7 +442,7 @@ class WorldGenerator {
     // guarded va protéger la surface contre l'empilement de :
     // termite mounds, anthills, antlion pits, surface chests, coconuts
     const guarded = new Set([...termiteGuarded, ...anthillGuarded, ...antlionGuarded])
-    const surfacePlants = worldCarver.paintSurfaceNatural(surfaceLine, biomesDescription, guarded)
+    worldCarver.paintSurfaceNatural(surfaceLine, biomesDescription, guarded)
     await progress('Naturalizing Surface')
 
     // 7.3. Traitement de la mer
@@ -554,8 +552,7 @@ class WorldGenerator {
       const liquidBodies = [...honeyLiquidBodies, ...lakeLiquidBodies, ...underLakeLiquidBodies, ...blindLakeLiquidBodies, ...sapLakeLiquidBodies, ...sapPocketLiquidBodies, ...waterPuddleLiquidBodies, ...sapPuddleLiquidBodies]
       console.log('.................... liquidBodies', liquidBodies)
       const lakes = [...surfaceLakes, ...underLakes, ...blindLakes, ...sapLakes, ...sapPockets]
-      const plants = [...surfacePlants, ...plantGenerator.plants]
-      await this.save(seed, {hives, cobwebCaves, geodeCaves, lakes, liquidBodies, fernsCaves, mossCaves, mushroomCaves, pyramid, ruinedcabin, lostTemple, ancientHouse, leftBeach, rightBeach, antlions, anthills, termites, plants, hearts, triskels, graveyard, weather, thornspineCount})
+      await this.save(seed, {hives, cobwebCaves, geodeCaves, lakes, liquidBodies, fernsCaves, mossCaves, mushroomCaves, pyramid, ruinedcabin, lostTemple, ancientHouse, leftBeach, rightBeach, antlions, anthills, termites, plants: plantGenerator.plants, hearts, triskels, graveyard, weather, thornspineCount})
       worldBuffer.clear()
     }
 
@@ -5461,7 +5458,6 @@ class WorldCarver {
  * @param {Int16Array}                    surfaceLine       — Y de la première tuile solide par colonne
  * @param {Array<{biome, width, offset}>} biomesDescription — zones biome ordonnées
  * @param {Set<number>} xPositions — ensemble des coordonnées X protégées contre la transformation en NATURAL
- * @returns {plants: Array<{kind, index, type, deleted}>}
  */
   paintSurfaceNatural (surfaceLine, biomesDescription, guarded) {
     const GRASSFOREST = NODES.GRASSFOREST.code
@@ -5486,7 +5482,6 @@ class WorldCarver {
     TOPSOIL_CODE[BIOME_TYPE.DESERT] = SAND
 
     const tiles = []
-    const naturalPlants = []
     let zoneIdx = 0
     let zone = biomesDescription[0]
     let zoneEnd = zone.offset + zone.width
@@ -5514,11 +5509,6 @@ class WorldCarver {
       const topCode = seededRNG.randomGetPercent(90) ? naturalCode : topsoilCode
       tiles.push({x, y, index: idx, code: topCode})
 
-      // Enregistrement NATURAL pour Forest et Jungle
-      if (topCode === GRASSFOREST || topCode === GRASSJUNGLE) {
-        naturalPlants.push({kind: PLANT_KIND.NATURAL, type: PLANT_TYPE.NONE, naturalCode: topCode, index: idx, deleted: false})
-      }
-
       // 2ème tuile : 90% de chance d'être modifiée
       if (seededRNG.randomGetPercent(90)) {
         tiles.push({x, y: y + 1, index: idx + W, code: topsoilCode})
@@ -5535,7 +5525,6 @@ class WorldCarver {
     }
 
     this.applyTiles(tiles, ETERNAL_EXCLUDED)
-    return naturalPlants
   }
 
   /**
