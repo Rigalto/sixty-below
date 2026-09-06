@@ -6846,7 +6846,7 @@ class GiantMushroomSystem {
         const image = record.images[rows[i]]
         const img = TREE_IMAGES[image.tree][image.row][image.col]
         const pxX = image.x << 4
-        const pxY = soilYPx - 48 * (i + 1) + 2
+        const pxY = soilYPx - 48 * (i + 1)
         ctx.drawImage(IMAGE_CACHE[img.imgIndex], img.sx, img.sy, img.sw, img.sh, pxX, pxY, img.sw, img.sh)
       }
 
@@ -8746,7 +8746,7 @@ class CaveMushroomSystem {
     for (const record of this.#displayed) {
       const img = record.type === PLANT_TYPE.FROSTCAP ? this.#imageFrostcap : this.#imageDawncap
       const pxX = record.x << 4
-      const pxY = record.y << 4
+      const pxY = (record.y << 4) + 2
       ctx.drawImage(IMAGE_CACHE[img.imgIndex], img.sx, img.sy, img.sw, img.sh, pxX, pxY, img.sw, img.sh)
     }
   }
