@@ -6113,7 +6113,7 @@ _All times are in-game. See [[Day & Night Cycle]] for reference._
 * [[Foraging|Interact to harvest]]
 * The mushroom disappears on harvest
 
-Foraging Tool: <<itemStar|sickleGold>>
+Foraging Tool: <<itemStar|sickleSilver>>
 
 **[[item:frostcap]]/[[item:dawncap]] foraging Loot**
 
