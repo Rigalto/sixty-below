@@ -7039,12 +7039,36 @@ class GiantMushroomSystem {
 
     if (record.blocked === 0) return // guard : compteur déjà à zéro (cohérence)
     record.blocked--
-    if (record.blocked === 0 && record.size < 3) {
-      const growthDelay = (ITEMS.giantMushroom.growth * seededRNG.randomGetRealMinMax(0.8, 1.2)) | 0
-      const {priority, capacity} = MICROTASK.GIANT_MUSHROOM_GROW
-      record.growthTimestamp = taskScheduler.enqueue(`giant_mushroom_grow_${record.id}`, growthDelay, this.growGiantMushroom, priority, capacity, record.soilIndex)
+    if (record.blocked === 0) {
+      this.#restoreSoil(record)
+      if (record.size < 3) {
+        const growthDelay = (ITEMS.giantMushroom.growth * seededRNG.randomGetRealMinMax(0.8, 1.2)) | 0
+        const {priority, capacity} = MICROTASK.GIANT_MUSHROOM_GROW
+        record.growthTimestamp = taskScheduler.enqueue(`giant_mushroom_grow_${record.id}`, growthDelay, this.growGiantMushroom, priority, capacity, record.soilIndex)
+      }
     }
     saveManager.queueStaticUpdate({storeName: 'plant', record})
+  }
+
+  /**
+   * Restaure en GRASSMUSHROOM les tuiles de sol (soilIndex, +1, +2) qu'une chute de sable
+   * aurait fait passer en HUMUS (seul CaveMushroomSystem retransforme une tuile GRASSMUSHROOM,
+   * réactivement, quand son VOID immédiat disparaît). Appelé uniquement quand blocked retombe
+   * à 0 — tant qu'une obstruction subsiste ailleurs sur la canopée, inutile de revalider le
+   * sol. No-op sur les tuiles déjà correctes. La réémission de world/tile-changed fait
+   * recréer un spot Cave Mushroom dessus (CaveMushroomSystem, Cas 4), toujours bloqué par
+   * blockedTiles tant que ce Giant Mushroom occupe la canopée.
+   * @param {object} record
+   */
+  #restoreSoil (record) {
+    const GRASSMUSHROOM = NODES.GRASSMUSHROOM.code
+    const HUMUS = NODES.HUMUS.code
+    for (let i = 0; i < 3; i++) {
+      const idx = record.soilIndex + i
+      if (chunkManager.getTileAt(idx) !== HUMUS) continue
+      chunkManager.setTileAt(idx, GRASSMUSHROOM)
+      eventBus.emit('world/tile-changed', {tileIndex: idx, tileOldCode: HUMUS, tileNewCode: GRASSMUSHROOM})
+    }
   }
 
   // ////////// //
@@ -8889,22 +8913,35 @@ class CaveMushroomSystem {
    */
   onTileChangedCaveMushroom ({tileIndex, tileOldCode, tileNewCode}) {
     const GRASSMUSHROOM = NODES.GRASSMUSHROOM.code
+    const HUMUS = NODES.HUMUS.code
+    const VOID = NODES.VOID.code
+    const W = WORLD_WIDTH
 
+    // Cas 1 — tuile du corps : une des 2 tuiles VOID au-dessus du sol devient autre chose
+    if (tileNewCode !== VOID) {
+      const present = this.byTile.get(tileIndex)
+      if (present !== undefined) this.#destroyPresent(present)
+    }
+
+    // Cas 2 — tuile directement au-dessus du sol : sol désormais recouvert, occupé ou non
+    if (tileNewCode !== VOID) {
+      const spot = this.#spotsBySoil.get(tileIndex + W)
+      if (spot !== undefined && chunkManager.getTileAt(spot.soilIndex) === GRASSMUSHROOM) {
+        chunkManager.setTileAt(spot.soilIndex, HUMUS)
+        eventBus.emit('world/tile-changed', {tileIndex: spot.soilIndex, tileOldCode: GRASSMUSHROOM, tileNewCode: HUMUS})
+      }
+    }
+
+    // Cas 3 — tuile sol : GRASSMUSHROOM perdu (champignon + spot)
     if (tileOldCode === GRASSMUSHROOM) {
       const record = this.#spotsBySoil.get(tileIndex)
-      if (record !== undefined) this.#removeSpot(record)
-      return
+      if (record !== undefined && chunkManager.getTileAt(record.soilIndex) !== GRASSMUSHROOM) {
+        this.#removeSpot(record)
+      }
     }
 
-    if (tileNewCode === GRASSMUSHROOM) {
-      this.#onCaveMushroomSpotCheck(tileIndex)
-      return
-    }
-
-    if (tileOldCode === NODES.VOID.code) {
-      const record = this.byTile.get(tileIndex)
-      if (record !== undefined) this.#destroyPresent(record)
-    }
+    // Cas 4 — nouvelle tuile GRASSMUSHROOM : nouveau spot, sans champignon dessus
+    if (tileNewCode === GRASSMUSHROOM) this.#onCaveMushroomSpotCheck(tileIndex)
   }
 
   /**
