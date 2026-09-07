@@ -8848,6 +8848,10 @@ class CaveMushroomSystem {
       if (!blockedTiles.canPlace(record.index) || !blockedTiles.canPlace(record.index + WORLD_WIDTH)) continue
       if (!seededRNG.randomGetPercent(CAVEMUSHROOM_TOGGLE_PCENT)) continue
 
+      const {type, itemId} = seededRNG.randomGetArrayValue(CAVEMUSHROOM_TYPES)
+      record.type = type
+      record.itemId = itemId
+
       record.present = true
       addToByTile(this.byTile, record)
       addToByChunk(this.#byChunk, record)
