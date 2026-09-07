@@ -8727,6 +8727,8 @@ class CaveMushroomSystem {
     if (!record.present) return
     addToByTile(this.byTile, record)
     addToByChunk(this.#byChunk, record)
+    blockedTiles.blockPlacement(record.index)
+    blockedTiles.blockPlacement(record.index + WORLD_WIDTH)
   }
 
   /**
@@ -8752,14 +8754,6 @@ class CaveMushroomSystem {
   }
 
   /**
-   * Traite le foraging réussi de ce Cave Mushroom.
-   * STUB — comportement réel ("disparaît à la récolte", cf. fiche d'aide) à coder avec le
-   * foraging complet. Laissé vide pour l'instant, à l'identique du patron SampleSystem.
-   * @param {object} record
-   */
-  onForaged (record) { }
-
-  /**
    * Retourne le Cave Mushroom couvrant la tuile donnée, ou null.
    * @param {number} tileIndex — (y << 10) | x
    * @returns {object|null}
@@ -8774,6 +8768,46 @@ class CaveMushroomSystem {
    * @returns {boolean}
    */
   isPresent (record) { return record.present }
+
+  // //////// //
+  // FORAGING //
+  // //////// //
+
+  /**
+   * Indique si le Cave Mushroom peut être forage : uniquement lorsqu'il est present.
+   * @param {object} record
+   * @returns {boolean}
+   */
+  canForage (record) { return record.present }
+
+  /**
+   * Traite le foraging réussi de ce Cave Mushroom (hors loot, géré par ForagingManager).
+   * Le champignon disparaît à la récolte — repousse au prochain cycle de floraison.
+   * @param {object} record
+   */
+  onForaged (record) {
+    this.#destroyPresent(record)
+  }
+
+  /**
+   * Détruit un Cave Mushroom present sans loot : retire byTile/#byChunk/#displayed, débloque
+   * les 2 tuiles du corps, persiste. Le spot reste dans #list/#spotsBySoil.
+   * Guard : no-op si record.present est déjà false.
+   * @param {object} record
+   */
+  #destroyPresent (record) {
+    if (!record.present) return
+
+    record.present = false
+    removeFromByTile(this.byTile, record)
+    removeFromByChunk(this.#byChunk, record)
+    this.#displayed.delete(record)
+
+    blockedTiles.unblockPlacement(record.index)
+    blockedTiles.unblockPlacement(record.index + WORLD_WIDTH)
+
+    saveManager.queueStaticUpdate({storeName: 'plant', record})
+  }
 
   // ///// //
   // DEBUG //
