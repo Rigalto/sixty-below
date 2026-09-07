@@ -7654,7 +7654,7 @@ class PlantGenerator {
     this.#plants.push({
       id: uniqueIdGenerator.getUniqueId(),
       kind: PLANT_KIND.HERB,
-      type: CORAL_TYPES[0].type,
+      type: PLANT_TYPE.NONE,
       itemId: '',
       index: 0,
       soilIndex: 0,
@@ -8227,7 +8227,8 @@ class PlantGenerator {
 
       const present = !guarded && seededRNG.randomGetPercent(FERN_TOGGLE_PCENT)
       if (present) placedGuard.addRect(x, y - 3, x, y - 1)
-      const {type, itemId} = seededRNG.randomGetArrayValue(FERN_TYPES)
+
+      const {type, itemId} = present ? seededRNG.randomGetArrayValue(FERN_TYPES) : {type: PLANT_TYPE.NONE, itemId: ''}
 
       this.#plants.push({
         id: uniqueIdGenerator.getUniqueId(),
@@ -8341,7 +8342,7 @@ class PlantGenerator {
       const present = !sunny && !blocked && seededRNG.randomGetPercent(CAVEMUSHROOM_TOGGLE_PCENT)
       if (present) placedGuard.addRect(x, y - 2, x, y - 1)
 
-      const {type, itemId} = seededRNG.randomGetArrayValue(CAVEMUSHROOM_TYPES)
+      const {type, itemId} = present ? seededRNG.randomGetArrayValue(CAVEMUSHROOM_TYPES) : {type: PLANT_TYPE.NONE, itemId: ''}
 
       this.#plants.push({
         id: uniqueIdGenerator.getUniqueId(),

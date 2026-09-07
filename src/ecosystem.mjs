@@ -4662,15 +4662,14 @@ class FernSystem {
     const x = soilIndex & 0x3FF
     const y = soilIndex >> 10
     const W = WORLD_WIDTH
-    const {type, itemId} = seededRNG.randomGetArrayValue(FERN_TYPES)
 
     const record = {
       id: uniqueIdGenerator.getUniqueId(),
       kind: PLANT_KIND.HERB,
-      type,
+      type: PLANT_TYPE.NONE,
       index: soilIndex - 3 * W,
       soilIndex,
-      itemId,
+      itemId: '',
       w: 1,
       h: 3,
       x: x - 1,
@@ -8707,6 +8706,8 @@ class CaveMushroomSystem {
     eventBus.on('time/every-hour-7', this.onHour7CaveMushroom)
     this.onHour21CaveMushroom = this.onHour21CaveMushroom.bind(this)
     eventBus.on('time/every-hour-21', this.onHour21CaveMushroom)
+    this.onTileChangedCaveMushroom = this.onTileChangedCaveMushroom.bind(this)
+    eventBus.on('world/tile-changed', this.onTileChangedCaveMushroom)
     // micro-tâches
     this.bloomCaveMushroom = this.bloomCaveMushroom.bind(this)
   }
@@ -8870,6 +8871,88 @@ class CaveMushroomSystem {
       if (!record.present) continue
       this.#destroyPresent(record)
     }
+  }
+
+  // /////////////////// //
+  // ENTRETIEN DES SPOTS //
+  // /////////////////// //
+
+  /**
+   * Liaison EventBus : 'world/tile-changed'. Deux cas exclusifs :
+   * — tileIndex est une tuile de sol GRASSMUSHROOM qui disparaît ou apparaît : entretien de
+   *   la liste complète des spots (suppression définitive avec destruction sans loot du Cave
+   *   Mushroom present éventuel, ou création d'un nouveau spot).
+   * — tileIndex est une des 2 tuiles de corps (VOID) d'un Cave Mushroom present qui perd son
+   *   VOID : destruction sans loot du champignon présent, le spot reste (repousse possible au
+   *   prochain cycle).
+   * @param {{tileIndex: number, tileOldCode: number, tileNewCode: number}} payload
+   */
+  onTileChangedCaveMushroom ({tileIndex, tileOldCode, tileNewCode}) {
+    const GRASSMUSHROOM = NODES.GRASSMUSHROOM.code
+
+    if (tileOldCode === GRASSMUSHROOM) {
+      const record = this.#spotsBySoil.get(tileIndex)
+      if (record !== undefined) this.#removeSpot(record)
+      return
+    }
+
+    if (tileNewCode === GRASSMUSHROOM) {
+      this.#onCaveMushroomSpotCheck(tileIndex)
+      return
+    }
+
+    if (tileOldCode === NODES.VOID.code) {
+      const record = this.byTile.get(tileIndex)
+      if (record !== undefined) this.#destroyPresent(record)
+    }
+  }
+
+  /**
+   * Crée un nouveau spot pour une tuile GRASSMUSHROOM apparue en cours de partie (sondage de
+   * mycellium sur HUMUS). Espèce tirée immédiatement (shape monomorphe, comme à la
+   * génération), fixée pour la durée de vie du spot. present=false — la pousse effective
+   * attend le prochain cycle horaire (7h). No-op si un spot existe déjà à ce soilIndex, ou si
+   * la tuile n'est plus GRASSMUSHROOM entre l'émission et l'exécution.
+   * @param {number} soilIndex
+   */
+  #onCaveMushroomSpotCheck (soilIndex) {
+    const GRASSMUSHROOM = NODES.GRASSMUSHROOM.code
+    if (chunkManager.getTileAt(soilIndex) !== GRASSMUSHROOM) return
+    if (this.#spotsBySoil.has(soilIndex)) return
+
+    const W = WORLD_WIDTH
+
+    const record = {
+      id: uniqueIdGenerator.getUniqueId(),
+      kind: PLANT_KIND.MUSHROOM,
+      type: PLANT_TYPE.NONE,
+      itemId: '',
+      index: soilIndex - 2 * W,
+      soilIndex,
+      w: 1,
+      h: 2,
+      x: soilIndex & 0x3FF,
+      y: (soilIndex >> 10) - 2,
+      present: false,
+      deleted: false
+    }
+    this.#list.push(record)
+    this.#spotsBySoil.set(soilIndex, record)
+    saveManager.queueStaticUpdate({storeName: 'plant', record})
+  }
+
+  /**
+   * Retire définitivement un spot dont la tuile GRASSMUSHROOM n'existe plus (minage) : détruit
+   * le Cave Mushroom present au préalable si nécessaire (sans loot), retire le spot de
+   * #list/#spotsBySoil, marque deleted en DB. Ce spot ne repoussera jamais.
+   * @param {object} record
+   */
+  #removeSpot (record) {
+    this.#destroyPresent(record)
+    removeValueUnordered(this.#list, record)
+    this.#spotsBySoil.delete(record.soilIndex)
+    record.deleted = true
+    saveManager.queueStaticUpdate({storeName: 'plant', record})
   }
 
   // ///// //
