@@ -294,6 +294,7 @@ export const MICROTASK = {
   BLOOM_BOLETE: {priority: 20, capacity: 2, taskName: 'bloomBolete'}, // ajoute les boletes dans le monde
   UNBLOOM_PINKMYCENIA: {priority: 20, capacity: 1, taskName: 'unbloomPinkMycenia'}, // supprime les pink mycenia du monde
   BLOOM_PINKMYCENIA: {priority: 20, capacity: 2, taskName: 'bloomPinkMycenia'}, // ajoute les pink mycenia dans le monde
+  BLOOM_CAVEMUSHROOM: {priority: 20, capacity: 2, taskName: 'bloomCaveMushroom'}, // ajoute les cave mushrooms dans le monde
 
   BLOOM_SUNFLOWER: {priority: 20, capacity: 2, taskName: 'bloomSunflower'}, // gère les sunflower
   UNBLOOM_SUNFLOWER: {priority: 20, capacity: 1, taskName: 'unbloomSunflower'}, // gère les sunflower

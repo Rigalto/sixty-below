@@ -8,7 +8,7 @@
 import {WORLD_WIDTH, WORLD_HEIGHT, MICROTASK, TOPSOIL_Y_SKY_SURFACE, TOPSOIL_Y_SURFACE_UNDER, TOPSOIL_Y_UNDER_CAVERNS, TOPSOIL_Y_CAVERNS_MID, SEA_LEVEL} from './constant.mjs'
 import {database, uniqueIdGenerator} from './database.mjs'
 import {eventBus, seededRNG, blockedTiles, microTasker, taskScheduler, removeValueUnordered} from './utils.mjs'
-import {NODES, ITEMS, PLANT_KIND, PLANT_TYPE, PLANT_SYSTEM_LOOKUP, ALL_PLANT_SYSTEMS, COBWEB_GROWTH_DELAY_MS, SUNFLOWER_RATE, PARSNIP_RATE, AMBERMIRAGE_PCENT, COCONUT_CYCLE_DELAY, TREE_IMAGES, THORNSPINE_JUNCTIONS, THORNSPINE_SIZES, THORNSPINE_UNBLOOM_PCENT, THORNSPINE_BLOOM_PCENT, CORAL_TYPES, GRAVELWEED_SOIL, FERN_TYPES, FERN_TOGGLE_PCENT, FERN_POPULATION_DELAY_MS, BLOCKED_ICON} from '../assets/data/data.mjs'
+import {NODES, ITEMS, PLANT_KIND, PLANT_TYPE, PLANT_SYSTEM_LOOKUP, ALL_PLANT_SYSTEMS, COBWEB_GROWTH_DELAY_MS, SUNFLOWER_RATE, PARSNIP_RATE, AMBERMIRAGE_PCENT, COCONUT_CYCLE_DELAY, TREE_IMAGES, THORNSPINE_JUNCTIONS, THORNSPINE_SIZES, THORNSPINE_UNBLOOM_PCENT, THORNSPINE_BLOOM_PCENT, CORAL_TYPES, GRAVELWEED_SOIL, FERN_TYPES, FERN_TOGGLE_PCENT, FERN_POPULATION_DELAY_MS, BLOCKED_ICON, CAVEMUSHROOM_TOGGLE_PCENT} from '../assets/data/data.mjs'
 import {IMAGE_CACHE} from './assets.mjs'
 import {saveManager} from './persistence.mjs'
 import {chunkManager} from './world.mjs'
@@ -8701,6 +8701,16 @@ class CaveMushroomSystem {
   #imageFrostcap = null // ITEMS.frostcap.placed, mis en cache dans init()
   #imageDawncap = null // ITEMS.dawncap.placed, mis en cache dans init()
 
+  constructor () {
+    // eventBus
+    this.onHour7CaveMushroom = this.onHour7CaveMushroom.bind(this)
+    eventBus.on('time/every-hour-7', this.onHour7CaveMushroom)
+    this.onHour21CaveMushroom = this.onHour21CaveMushroom.bind(this)
+    eventBus.on('time/every-hour-21', this.onHour21CaveMushroom)
+    // micro-tâches
+    this.bloomCaveMushroom = this.bloomCaveMushroom.bind(this)
+  }
+
   /**
    * Réinitialise toutes les structures. Appelé en début de session, avant toute hydratation.
    */
@@ -8807,6 +8817,55 @@ class CaveMushroomSystem {
     blockedTiles.unblockPlacement(record.index + WORLD_WIDTH)
 
     saveManager.queueStaticUpdate({storeName: 'plant', record})
+  }
+
+  // ///////////////// //
+  // POUSSE / DÉPOUSSE //
+  // ///////////////////
+
+  /** Liaison EventBus : 'time/every-hour-7' — tirage de floraison matinale simultanée. */
+  onHour7CaveMushroom () {
+    const {priority, capacity} = MICROTASK.BLOOM_CAVEMUSHROOM
+    microTasker.enqueue(this.bloomCaveMushroom, priority, capacity)
+  }
+
+  /**
+   * Microtâche : tous les spots non bloqués passent à present=true simultanément, sauf si
+   * le temps du jour est Sunny — dans ce cas aucune pousse, quel que soit l'état des spots.
+   * Un spot déjà present est ignoré ; un spot bloqué (VOID absent ou tuile occupée) reste
+   * present=false jusqu'au prochain cycle.
+   */
+  bloomCaveMushroom () {
+    if (buffManager.getBuff('sunny')) return
+
+    const VOID = NODES.VOID.code
+    for (const record of this.#list) {
+      if (record.present) continue
+
+      const x = record.soilIndex & 0x3FF
+      const y = record.soilIndex >> 10
+      if (!chunkManager.isRectCode(x, y - 2, 1, 2, VOID)) continue
+      if (!blockedTiles.canPlace(record.index) || !blockedTiles.canPlace(record.index + WORLD_WIDTH)) continue
+      if (!seededRNG.randomGetPercent(CAVEMUSHROOM_TOGGLE_PCENT)) continue
+
+      record.present = true
+      addToByTile(this.byTile, record)
+      addToByChunk(this.#byChunk, record)
+      blockedTiles.blockPlacement(record.index)
+      blockedTiles.blockPlacement(record.index + WORLD_WIDTH)
+      saveManager.queueStaticUpdate({storeName: 'plant', record})
+    }
+    buildDisplayed(this.#displayed, this.#byChunk, camera.preloadChunks)
+  }
+
+  /** Liaison EventBus : 'time/every-hour-21' — dépousse simultanée. */
+  // tous les Cave Mushrooms present repassent à present=false, simultanément,
+  //  * quel que soit le temps du jour.
+  onHour21CaveMushroom () {
+    for (const record of this.#list) {
+      if (!record.present) continue
+      this.#destroyPresent(record)
+    }
   }
 
   // ///// //
