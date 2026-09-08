@@ -9,20 +9,14 @@
 
 ### Code et tests
 
-- Implémenter les plants des mini-biomes, reste : Mushroom Cave
-- Implémenter les Giant Mushrooms.
+- gestion de la fonction 'Use' dans l'inventaire
 - Implémenter la réduction de vitesse dans les liquides ou les cobweb.
-- Tester : destruction d'une herbe quand la tuile du corps n'est plus SKY (spot conservé) — écoulement d'un SAND.
-- Tester : destruction d'une herbe quand la tuile du corps n'est plus SKY (spot conservé) — écoulement d'un liquide.
-- Tester `onTreePlantedParsnip` : apparition d'un oak.
-- Tester `onTreePlantedSunflower` : apparition d'un oak.
 - Modifier le volume sonore des sons du jeu (ActionWidget)
 - Supprimer les actions de debug accessibles au joueur, quand hébergement sous GitHub :
   - affichage après génération du monde
   - DB_CONFIG.DEBUG constant.mjs
 - Implémenter l'attribut 'tiles' du mining (permet de miner plusieurs tuiles en une seule fois)
 - Utiliser les wood planks dans des recettes
-- Dans `paintSurfaceNatural`, on prépare des enregistements : sont-ils utilisés quelque part ? Dans cette même fonction, on retourne `surfacePlants`, a priori utilisée uniquement pour l'enregistrement. Il faudra sans doute nettoyer en n'enregistrant pas les tuiles GRASSFOREST et JUNGLEFOREST.
 - Supprimer les chunks en mémoire qui sont périmés
 
 ### Images, sons et aide en ligne
@@ -391,6 +385,8 @@ La Sap corrode le Copper. Il doit donc être remplacer par du Gold.
 - Inferncap (`InferncapSystem`)
 - Ferns (`FernSystem`)
 - Moss (`MossSystem`)
+- Giant Mushroom (`GiantMushroomSystem`)
+- Cave Mushroom (`CaveMushroomSystem`)
 - Sand Falling (`SandFallingSystem`)
 - Tombstones (`FurnishingManager`, `HammingManager`)
 
