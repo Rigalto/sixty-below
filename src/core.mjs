@@ -228,6 +228,8 @@ class GameCore {
         if (item.chopping.extraLoot) this.#hydrateLootAction(item.chopping.extraLoot, 'chopping', item.name)
       }
 
+      if (item.using) this.#hydrateLootAction(item.using, 'using', item.name)
+
       if (!HELP_TITLES.has(item.help)) {
         console.error(`[core] ITEMS.${key} : help topic inconnu '${item.help}'`)
         errors++
