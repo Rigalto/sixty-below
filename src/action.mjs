@@ -2,9 +2,9 @@
 // SowingManager - HammingManager - FurnishingManager - FillingManager - PouringManager
 // DecomposerManager
 
-import {eventBus, taskScheduler, microTasker, blockedTiles, rollLootWithBuffs, seededRNG} from './utils.mjs'
+import {eventBus, taskScheduler, microTasker, blockedTiles, seededRNG} from './utils.mjs'
 import {NODE_TYPE, NODES_LOOKUP, NODES, ITEM_TYPE, ITEMS, PLANT_SYSTEM_LOOKUP, PLANT_KIND, FURNITURE_FOOTPRINT_MASK} from '../assets/data/data.mjs'
-import {inventoryManager} from './inventory.mjs'
+import {inventoryManager, resolveLoot} from './inventory.mjs'
 import {buffManager, isInInteractionRange} from './buff.mjs'
 import {database} from './database.mjs'
 import {chunkManager} from './world.mjs'
@@ -52,26 +52,6 @@ const tileRectHasOther = (index, w, h, nodeId) => {
     rowBase += WORLD_WIDTH
   }
   return false
-}
-
-/**
- * Résout un objet loot-action hydraté : tire chaque entrée avec buffs et crédite l'inventaire.
- * Émet 'player/loot-item' pour chaque item obtenu (son, achievements, UI…).
- * Le préfixe d'item (tools/armor/weapons) n'est pas encore tiré — toujours ''.
- * TODO: générer le préfixe aléatoire quand les items de type TOOL/ARMOR/WEAPON seront lootables.
- * @param {object} lootAction — objet hydraté portant {buffList, items[]}
- *                              (ex : tileNode.mining, plantItem.chopping, plantItem.shaking…)
- */
-const resolveLoot = (lootAction) => {
-  const buffValues = buffManager.getBuffs(lootAction.buffList)
-  for (const lootItem of lootAction.items) {
-    const count = rollLootWithBuffs(lootItem, buffValues)
-    if (count > 0) {
-      const itemCode = lootItem.item.code
-      inventoryManager.loot(itemCode, count, '')
-      eventBus.emit('player/loot-item', {itemCode})
-    }
-  }
 }
 
 /**

@@ -1,11 +1,12 @@
 // inventory.mjs — InventoryManager · InventorySlot · InventoryOverlay
 
 import {IS_DEV, OVERLAYS, BAG_CAPACITY, HOTBAR_CAPACITY, ARMOR_CAPACITY, ARMOR_SLOT_LABELS, ACCESSORY_CAPACITY, CONTAINER_STYPES, CONTAINER_CAPACITY, ARMOR_SLOTS, PATH_RENAME, PATH_LOCKED, PATH_UNLOCKED, PATH_CRAFT, PATH_HELP, PATH_DEBUG, PATH_SPLIT, PATH_TRASH_DOWN, PATH_TRASH_UP, PATH_USE, PATH_WARNING, PATH_ARROW_RIGHT, PATH_INVENTORY, SVG_ICON} from './constant.mjs'
-import {eventBus, capitalize} from './utils.mjs'
+import {eventBus, capitalize, rollLootWithBuffs} from './utils.mjs'
 import {createOverlayHeader} from './ui.mjs'
 import {ITEMS, ITEM_TYPE} from '../assets/data/data.mjs'
 import {saveManager} from './persistence.mjs'
 import {furnitureManager} from './housing.mjs'
+import {buffManager} from './buff.mjs'
 
 /* ====================================================================================================
    CSS - injection des styles utilisés par toutes les classes du fichier
@@ -1441,6 +1442,30 @@ class InventoryManager {
   }
 }
 export const inventoryManager = new InventoryManager()
+
+/* ====================================================================================================
+   RESOLUTION D'UNE ACTION DE LOOT
+   ==================================================================================================== */
+
+/**
+ * Résout un objet loot-action hydraté : tire chaque entrée avec buffs et crédite l'inventaire.
+ * Émet 'player/loot-item' pour chaque item obtenu (son, achievements, UI…).
+ * Le préfixe d'item (tools/armor/weapons) n'est pas encore tiré — toujours ''.
+ * TODO: générer le préfixe aléatoire quand les items de type TOOL/ARMOR/WEAPON seront lootables.
+ * @param {object} lootAction — objet hydraté portant {buffList, items[]}
+ *                              (ex : tileNode.mining, plantItem.chopping, plantItem.shaking…)
+ */
+export const resolveLoot = (lootAction) => {
+  const buffValues = buffManager.getBuffs(lootAction.buffList)
+  for (const lootItem of lootAction.items) {
+    const count = rollLootWithBuffs(lootItem, buffValues)
+    if (count > 0) {
+      const itemCode = lootItem.item.code
+      inventoryManager.loot(itemCode, count, '')
+      eventBus.emit('player/loot-item', {itemCode})
+    }
+  }
+}
 
 /* ====================================================================================================
    INVENTORY SLOT (Custom Element)
