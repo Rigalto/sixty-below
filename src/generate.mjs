@@ -588,7 +588,7 @@ class WorldGenerator {
     await database.clearObjectStore('gamestate')
     await database.clearObjectStore('achievements')
 
-    const {pxX, pxY} = this.#findSpawnPosition()
+    const {pxX, pxY, tileX, tileY} = this.#findSpawnPosition()
 
     await database.batchSetGameState([
       {key: 'ancienthouse', value: ancientHouse},
@@ -628,7 +628,7 @@ class WorldGenerator {
       {key: 'sewedmoonglow', value: []},
       {key: 'sewedambermirage', value: []},
       {key: 'sownseedgrass', value: []},
-      {key: 'spawn', value: `${pxX}|${pxY}`},
+      {key: 'spawn', value: `${tileX}|${tileY}`},
       {key: 'termites', value: termites},
       {key: 'timestamp', value: 480 * 1000}, // Day 1 - 8:00
       {key: 'triskels', value: triskels},
@@ -677,7 +677,7 @@ class WorldGenerator {
         if (y > 60) return null // trop profond (puits)
         if (INVALID_SURFACE.has(tile)) return null // surface liquide
         if (worldBuffer.read(tx + 1, y - 1) !== SKY) return null // côté droit bloqué
-        return {pxX: tx << 4, pxY: (y << 4) - PLAYER.h}
+        return {pxX: tx << 4, pxY: (y << 4) - PLAYER.h, tileX: tx, tileY: y}
       }
       return null
     }

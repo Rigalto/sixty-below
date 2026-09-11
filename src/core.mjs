@@ -16,7 +16,7 @@ import {inventoryManager} from './inventory.mjs'
 import {furnitureManager, teleporterManager} from './housing.mjs'
 import {craftOverlay} from './craft.mjs'
 import {achievementManager} from './achievement.mjs'
-import {playerManager, lootPopupManager, handedToolManager, hotbarOverlay} from './player.mjs'
+import {playerManager, spawnManager, lootPopupManager, handedToolManager, hotbarOverlay} from './player.mjs'
 import {floraManager, sunflowerSystem, oleanderSystem, mandrakeSystem, bambooSystem, pricklepadSystem, parsnipSystem, ambermirageSystem, fernSystem, mossSystem, oakSystem, mahoganySystem, cobwebSystem, coconutSystem, thornspineSystem, spreadForestSystem, spreadJungleSystem, coralSystem, bloodmoonSystem, gravelweedSystem, satansCubeSystem, sneakthornSystem, cursedcrownSystem, abysshornSystem, inferncapSystem, giantMushroomSystem, caveMushroomSystem} from './ecosystem.mjs'
 import {sandFallingSystem} from './liquid.mjs'
 import {ACHIEVEMENT_CATEGORIES} from '../assets/data/data-achievement.mjs'
@@ -388,6 +388,7 @@ class GameCore {
     hammingManager.init()
     cobwebSystem.init()
     sandFallingSystem.init(state.sandfallingtiles)
+    spawnManager.init(state.spawn, state.anthills, state.termites, state.antlions)
 
     // 5.1 Objectstore Inventory
     const inventoryRecords = await database.readAllFromObjectStore('inventory')

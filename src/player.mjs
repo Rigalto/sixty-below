@@ -1,8 +1,8 @@
-// player.mjs — PlayerManager - LootPopupManager - LifeManager - HotbarOverlay
+// player.mjs — PlayerManager - SpawnManager - LootPopupManager - LifeManager - HotbarOverlay
 
 import {WORLD_WIDTH, WORLD_HEIGHT, PLAYER, MICROTASK, TELEPORT_FADE_MS, TELEPORT_WAIT_MS, HOTBAR_CAPACITY} from './constant.mjs'
-import {NODE_TYPE, NODES_LOOKUP, ITEM_TYPE, ITEMS} from '../assets/data/data.mjs'
-import {eventBus, taskScheduler, timeManager} from './utils.mjs'
+import {NODES, NODE_TYPE, NODES_LOOKUP, ITEM_TYPE, ITEMS} from '../assets/data/data.mjs'
+import {eventBus, microTasker, taskScheduler, timeManager, seededRNG} from './utils.mjs'
 import {buffManager} from './buff.mjs'
 import {inventoryManager} from './inventory.mjs'
 import {furnitureManager} from './housing.mjs'
@@ -638,13 +638,183 @@ class PlayerManager {
 }
 export const playerManager = new PlayerManager()
 
+/* ====================================================================================================
+   SPAWN POINT (position de réapparition — mort, potion de rappel, futur lit)
+   ==================================================================================================== */
+
+class SpawnManager {
+  #tileX = 0 // tuile — position de spawn courante (entretenue localement, persistée dans gamestate.spawn)
+  #tileY = 0 // tuile — ligne du sol (convention identique à player/teleport)
+  #forbiddenX = new Set() // colonnes interdites (fourmilières/termitières/antlion pits, marge incluse)
+
+  constructor () {
+    // eventBus
+    this.onTeleportSpawn = this.onTeleportSpawn.bind(this)
+    eventBus.on('player/teleport-spawn', this.onTeleportSpawn)
+    // Micro-tâches
+    this.onFindFallback = this.onFindFallback.bind(this) // callback micro-tâche (branche de repli)
+  }
+
+  /**
+   * Initialise la position de spawn et les colonnes interdites depuis le gamestate.
+   * Appelé depuis core.mjs au startSession.
+   * @param {string} spawnRecord — 'tileX|tileY'
+   * @param {number[]} anthills — state.anthills
+   * @param {number[]} termites — state.termites
+   * @param {number[]} antlions — state.antlions
+   */
+  init (spawnRecord, anthills, termites, antlions) {
+    const [x, y] = spawnRecord.split('|')
+    this.#tileX = parseInt(x, 10)
+    this.#tileY = parseInt(y, 10)
+    this.#forbiddenX.clear()
+    this.#buildForbiddenX(anthills, termites, antlions)
+  }
+
+  /**
+   * Construit les colonnes interdites au spawn (fourmilières, termitières, antlion
+   * pits) — mini-biomes inamovibles, reconstruits indéfiniment par leurs habitants.
+   * Marges identiques à celles déjà utilisées à la génération (buildAnthills/
+   * buildTermiteMounds/buildAntlionPits) — pas de nouveau nombre magique.
+   * @param {number[]} anthills  @param {number[]} termites  @param {number[]} antlions
+   */
+  #buildForbiddenX (anthills, termites, antlions) {
+    const addRange = (idx, before, after) => {
+      const cx = idx & 0x3FF
+      for (let dx = -before; dx <= after; dx++) this.#forbiddenX.add(cx + dx)
+    }
+    for (const idx of anthills) addRange(idx, 4, 6)
+    for (const idx of termites) addRange(idx, 2, 3)
+    for (const idx of antlions) addRange(idx, 4, 4)
+  }
+
+  /**
+   * Positionne un nouveau spawn (repli calculé, ou future désignation d'un lit) et
+   * persiste en base — asynchrone, fire-and-forget, même pattern que
+   * AchievementManager.increment().
+   * @param {number} tileX
+   * @param {number} tileY
+   */
+  setPosition (tileX, tileY) {
+    this.#tileX = tileX
+    this.#tileY = tileY
+    database.setGameState('spawn', `${tileX}|${tileY}`)
+  }
+
+  /**
+   * Handler 'player/teleport-spawn' (mort, potion de rappel). Téléporte directement
+   * si le spawn courant est libre (chemin rapide, synchrone). Sinon confie la
+   * recherche de repli au MicroTasker (branche pouvant dépasser 100µs).
+   */
+  onTeleportSpawn () {
+    if (this.#isFree(this.#tileX, this.#tileY)) {
+      eventBus.emit('player/teleport', {x: this.#tileX, y: this.#tileY})
+      return
+    }
+    const {priority, capacity} = MICROTASK.FIND_SPAWN_FALLBACK
+    microTasker.enqueue(this.onFindFallback, priority, capacity)
+  }
+
+  /**
+   * Callback micro-tâche : cherche un repli à partir de la colonne du spawn courant,
+   * se rabat sur une position aléatoire en dernier recours, mémorise puis téléporte.
+   */
+  onFindFallback () {
+    let position = this.#findSpawnFallbackPosition(this.#tileX)
+    if (!position) position = this.#randomFreeSpot()
+    this.setPosition(position.x, position.y)
+    eventBus.emit('player/teleport', {x: position.x, y: position.y})
+  }
+
+  /**
+   * Rectangle 2×3 (empreinte joueur, lignes tileY-3 à tileY-1 — pas tileY lui-même,
+   * qui est le sol) exclusivement SKY/VOID. Le liquide est explicitement exclu (pas
+   * seulement le solide) pour éviter la boucle mort → spawn sous l'eau → noyade → mort...
+   * @param {number} tileX — colonne gauche du rectangle
+   * @param {number} tileY — ligne du sol (le joueur se tient au-dessus)
+   * @returns {boolean}
+   */
+  #isFree (tileX, tileY) {
+    const SKY = NODES.SKY.code
+    const VOID = NODES.VOID.code
+    for (let dy = -3; dy <= -1; dy++) {
+      for (let dx = 0; dx <= 1; dx++) {
+        const code = chunkManager.getTileAt(((tileY + dy) << 10) | (tileX + dx))
+        if (code !== SKY && code !== VOID) return false
+      }
+    }
+    return true
+  }
+
+  /**
+   * Teste une colonne : descend depuis y=5 tant que les 2 tuiles (x, x+1) sont SKY.
+   * S'arrête à la première ligne où ce n'est plus vrai. Valide si au moins une des
+   * deux tuiles d'arrêt est solide (sinon colonne rejetée — ex : mer, lac profond).
+   * Pas de plafond de profondeur : la dernière ligne du monde est ETERNAL, donc tout
+   * puits de SKY finit par rencontrer un sol.
+   * @param {number} x
+   * @returns {{x: number, y: number}|null}
+   */
+  #tryColumn (x) {
+    const SKY = NODES.SKY.code
+    for (let y = 5; y < WORLD_HEIGHT; y++) {
+      const a = chunkManager.getTileAt((y << 10) | x)
+      const b = chunkManager.getTileAt((y << 10) | (x + 1))
+      if (a === SKY && b === SKY) continue
+      const aSolid = NODES_LOOKUP[a].type & (NODE_TYPE.SOLID | NODE_TYPE.ETERNAL)
+      const bSolid = NODES_LOOKUP[b].type & (NODE_TYPE.SOLID | NODE_TYPE.ETERNAL)
+      return (aSolid || bSolid) ? {x, y} : null
+    }
+    return null
+  }
+
+  /**
+   * Cherche une position valide en éventail depuis fromTileX (colonne d'origine
+   * d'abord, puis alternance +offset/-offset). Saute les colonnes interdites
+   * (#forbiddenX) sans même descendre.
+   * @param {number} fromTileX
+   * @returns {{x: number, y: number}|null}
+   */
+  #findSpawnFallbackPosition (fromTileX) {
+    if (!this.#forbiddenX.has(fromTileX)) {
+      const r = this.#tryColumn(fromTileX)
+      if (r) return r
+    }
+    for (let offset = 1; offset < WORLD_WIDTH >> 1; offset++) {
+      for (const x of [fromTileX + offset, fromTileX - offset]) {
+        if (this.#forbiddenX.has(x)) continue
+        const r = this.#tryColumn(x)
+        if (r) return r
+      }
+    }
+    return null
+  }
+
+  /**
+   * Dernier recours — #findSpawnFallbackPosition a échoué sur toute la largeur du
+   * monde (nécessite que la totalité du ciel soit comblée par le joueur — cas extrême
+   * assumé). Tire une tuile au hasard, teste #isFree (SKY/VOID, souterrain inclus)
+   * jusqu'à trouver un espace libre. Peut être long — appelée uniquement depuis la
+   * branche micro-tâche, temps réel déjà suspendu.
+   * @returns {{x: number, y: number}}
+   */
+  #randomFreeSpot () {
+    for (;;) {
+      const x = seededRNG.randomGetMinMax(1, WORLD_WIDTH - 2)
+      const y = seededRNG.randomGetMinMax(4, WORLD_HEIGHT - 2) // y-3 ≥ 1, jamais hors monde
+      if (this.#isFree(x, y)) return {x, y}
+    }
+  }
+}
+export const spawnManager = new SpawnManager()
+
+/* ====================================================================================================
+POPUP DE LOOT (icônes au-dessus de la tête du joueur)
+==================================================================================================== */
+
 const LOOT_POPUP_FRAMES = 120 // durée d'affichage d'une icône lootée, en frames (~2s à 60 FPS)
 const LOOT_ICON_SIZE = 32
 const LOOT_ICON_GAP = 4
-
-/* ====================================================================================================
-   POPUP DE LOOT (icônes au-dessus de la tête du joueur)
-   ==================================================================================================== */
 
 class LootPopupManager {
   #queue = [] // {image, framesLeft}[] — ordre FIFO, le plus ancien en tête

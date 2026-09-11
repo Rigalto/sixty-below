@@ -270,6 +270,7 @@ export const MICROTASK = {
   SOW_SEED: {priority: 24, capacity: 4, taskName: 'doSow'}, // plante une graine
   FILL_CONTAINER: {priority: 24, capacity: 4, taskName: 'onFillContainer'}, // remplit une bottle/bucket depuis une tuile liquide
   POUR_CONTAINER: {priority: 24, capacity: 4, taskName: 'onPourContainer'}, // vide un bucket plein sur une tuile vide
+  FIND_SPAWN_FALLBACK: {priority: 24, capacity: 20, taskName: 'onFindFallback'}, // recherche de repli du spawn point (mort/potion de rappel)
   OAK_GROW: {priority: 24, capacity: 4, taskName: 'growOak'}, // croissance d'un tronçon d'oak
   OAK_END_SHAKE: {priority: 24, capacity: 4, taskName: 'oakEndShake'}, // fin de la période où un arbre n'est pas shakable
   MAHOGANY_GROW: {priority: 24, capacity: 4, taskName: 'growMahogany'}, // croissance d'un tronçon de mahogany

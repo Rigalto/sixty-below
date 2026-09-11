@@ -1,4 +1,4 @@
-// inventory.mjs — InventoryManager · InventorySlot · InventoryOverlay
+// inventory.mjs — InventoryManager - ItemUseManager - InventorySlot - InventoryOverlay
 
 import {IS_DEV, OVERLAYS, BAG_CAPACITY, HOTBAR_CAPACITY, ARMOR_CAPACITY, ARMOR_SLOT_LABELS, ACCESSORY_CAPACITY, CONTAINER_STYPES, CONTAINER_CAPACITY, ARMOR_SLOTS, PATH_RENAME, PATH_LOCKED, PATH_UNLOCKED, PATH_CRAFT, PATH_HELP, PATH_DEBUG, PATH_SPLIT, PATH_TRASH_DOWN, PATH_TRASH_UP, PATH_USE, PATH_WARNING, PATH_ARROW_RIGHT, PATH_INVENTORY, SVG_ICON} from './constant.mjs'
 import {eventBus, capitalize, rollLootWithBuffs} from './utils.mjs'
@@ -1466,6 +1466,62 @@ export const resolveLoot = (lootAction) => {
     }
   }
 }
+
+/* ====================================================================================================
+   UTILISATION DES ITEMS (bouton 'Use' du panel inventaire)
+   ==================================================================================================== */
+
+class ItemUseManager {
+  #forbiddenX = new Set() // liste des positions en X pour lesquelles des mini-biomes interdisent le spawn
+
+  constructor () {
+    // eventBus
+    this.onItemUsed = this.onItemUsed.bind(this)
+    eventBus.on('item/used', this.onItemUsed)
+  }
+
+  /**
+   * Dispatche l'item utilisé vers le traitement associé à son 'using.action'.
+   * Lié dans le constructeur.
+   * @param {string} itemId — identifiant de l'item utilisé (clé de ITEMS)
+   */
+  onItemUsed (itemId) {
+    const itemDef = ITEMS[itemId]
+    switch (itemDef.using.action) {
+      case 'teleport-spawn': this.#useTeleportSpawn(itemDef); break
+      case 'add-items': this.#useAddItems(itemDef); break
+      case 'buff-timed': this.#useBuffTimed(itemDef); break
+      case 'life-crystal': this.#useLifeCrystal(itemDef); break
+      case 'none': break
+      default: console.error(`[ItemUseManager] action inconnue : '${itemDef.using.action}'`)
+    }
+  }
+
+  /**
+   * TODO: téléporte le joueur au spawn point via 'player/teleport-spawn'.
+   * @param {object} itemDef — ITEMS[itemId]
+   */
+  #useTeleportSpawn (itemDef) { eventBus.emit('player/teleport-spawn') }
+
+  /**
+   * TODO: résout itemDef.using via resolveLoot et rafraîchit le bag.
+   * @param {object} itemDef — ITEMS[itemId]
+   */
+  #useAddItems (itemDef) { console.log('[ItemUseManager] TODO add-items', itemDef) }
+
+  /**
+   * TODO: pose un buff temporisé via BuffManager (mécanisme pas encore implémenté).
+   * @param {object} itemDef — ITEMS[itemId]
+   */
+  #useBuffTimed (itemDef) { console.log('[ItemUseManager] TODO buff-timed', itemDef) }
+
+  /**
+   * TODO: augmente la vie max du joueur / consomme le life crystal.
+   * @param {object} itemDef — ITEMS[itemId]
+   */
+  #useLifeCrystal (itemDef) { console.log('[ItemUseManager] TODO life-crystal', itemDef) }
+}
+export const itemUseManager = new ItemUseManager()
 
 /* ====================================================================================================
    INVENTORY SLOT (Custom Element)

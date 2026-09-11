@@ -1007,8 +1007,10 @@ testés unitairement en instanciant directement un `WorldBuffer` sans passer par
 **Déclencheurs**
 - Clic sur un téléporteur placé dans le monde (via `FurnitureManager`)
 - Commande debug `tp x,y` dans l'Inventory Panel
+- Mort du joueur => téléportation sur le spawn point
+- Consommation d'une potion => téléportation sur le spawn point
 
-Les deux déclencheurs émettent l'eventBus `player/teleport` avec `{x, y}` en pixels monde.
+Les déclencheurs émettent l'eventBus `player/teleport` avec `{x, y}` en tuiles.
 
 **Déroulé**
 

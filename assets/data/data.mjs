@@ -447,6 +447,8 @@ export const ITEMS = {
 
   // Furniture - Teleporter
   fallenStar: {name: 'Fallen Star', type: 0, stype: 'misc', star: 4, image: 'furniture_32_32-2-0', help: 'Teleporters', tooltip: 'A concentrated burst of energy, fallen from the sky'},
+  recallPotion: {name: 'Recall Potion', type: ITEM_TYPE.POTION | ITEM_TYPE.USABLE, stype: 'misc', star: 1, image: 'furniture_32_32-2-0', using: {action: 'teleport-spawn'}, help: 'Teleporters', tooltip: 'A concentrated burst of energy, fallen from the sky'},
+
   teleporterYellow: {name: 'Yellow teleporter', type: ITEM_TYPE.FURNITURE | ITEM_TYPE.PLACABLE, stype: 'teleporter', star: 4, image: 'furniture_32_32-8-7', placed: 'furniture_32_32-8-7', unplacing: {speed: 3200}, help: 'Teleporters', tooltip: 'Click to teleport instantly to the matching teleporter'},
   teleporterOrange: {name: 'Orange teleporter', type: ITEM_TYPE.FURNITURE | ITEM_TYPE.PLACABLE, stype: 'teleporter', star: 4, image: 'furniture_32_32-9-7', placed: 'furniture_32_32-9-7', unplacing: {speed: 3200}, help: 'Teleporters', tooltip: 'Click to teleport instantly to the matching teleporter'},
   teleporterRed: {name: 'Red teleporter', type: ITEM_TYPE.FURNITURE | ITEM_TYPE.PLACABLE, stype: 'teleporter', star: 4, image: 'furniture_32_32-10-7', placed: 'furniture_32_32-10-7', unplacing: {speed: 3200}, help: 'Teleporters', tooltip: 'Click to teleport instantly to the matching teleporter'},
