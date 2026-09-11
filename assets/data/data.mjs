@@ -386,7 +386,7 @@ export const ITEMS = {
   spiderFang: {name: 'Spider Fang', type: 0, stype: 'fang', star: 3, image: 'tools_32_32-4-0', help: 'Spiders', tooltip: '???'},
 
   // crystall - image OK
-  lifeCrystal: {name: 'Life Crystal', type: ITEM_TYPE.FURNITURE | ITEM_TYPE.UNIQUE | ITEM_TYPE.USABLE, stype: 'life', star: 1, image: 'foraged_32_32-7-2', placed: 'foraged_32_32-7-2', unplacing: {speed: 1800}, using: {action: 'life-crystal'}, help: 'Life Crystal', tooltip: 'Permanently increases maximum life by 20\nCollect with a Hammer'},
+  lifeCrystal: {name: 'Life Crystal', type: ITEM_TYPE.FURNITURE | ITEM_TYPE.UNIQUE | ITEM_TYPE.USABLE, stype: 'life', star: 1, image: 'foraged_32_32-7-2', placed: 'foraged_32_32-7-2', unplacing: {speed: 1800}, using: {action: 'emit-event', event: 'life-cristel-used'}, help: 'Life Crystal', tooltip: 'Permanently increases maximum life by 20\nCollect with a Hammer'},
 
   // triskel - images NOK
   triskelCopper: {name: 'Copper Triskel', type: ITEM_TYPE.FURNITURE | ITEM_TYPE.UNIQUE | ITEM_TYPE.MATERIAL, stype: 'triskel', star: 3, image: 'furniture_32_32-12-2', placed: 'furniture_32_32-6-3', unplacing: {speed: 1800}, help: 'Triskels', tooltip: ''},
@@ -447,7 +447,7 @@ export const ITEMS = {
 
   // Furniture - Teleporter
   fallenStar: {name: 'Fallen Star', type: 0, stype: 'misc', star: 4, image: 'furniture_32_32-2-0', help: 'Teleporters', tooltip: 'A concentrated burst of energy, fallen from the sky'},
-  recallPotion: {name: 'Recall Potion', type: ITEM_TYPE.POTION | ITEM_TYPE.USABLE, stype: 'misc', star: 1, image: 'furniture_32_32-2-0', using: {action: 'teleport-spawn'}, help: 'Teleporters', tooltip: 'A concentrated burst of energy, fallen from the sky'},
+  recallPotion: {name: 'Recall Potion', type: ITEM_TYPE.POTION | ITEM_TYPE.USABLE, stype: 'misc', star: 1, image: 'potion_32_32-0-0', using: {action: 'emit-event', event: 'player/teleport-spawn'}, help: 'Recall Potion', tooltip: 'Teleports you back to your spawn point'},
 
   teleporterYellow: {name: 'Yellow teleporter', type: ITEM_TYPE.FURNITURE | ITEM_TYPE.PLACABLE, stype: 'teleporter', star: 4, image: 'furniture_32_32-8-7', placed: 'furniture_32_32-8-7', unplacing: {speed: 3200}, help: 'Teleporters', tooltip: 'Click to teleport instantly to the matching teleporter'},
   teleporterOrange: {name: 'Orange teleporter', type: ITEM_TYPE.FURNITURE | ITEM_TYPE.PLACABLE, stype: 'teleporter', star: 4, image: 'furniture_32_32-9-7', placed: 'furniture_32_32-9-7', unplacing: {speed: 3200}, help: 'Teleporters', tooltip: 'Click to teleport instantly to the matching teleporter'},
@@ -1219,6 +1219,8 @@ for (const key in ITEMS) {
         console.error(`[data.mjs] ITEMS.${key} : type USABLE sans attribut 'using'`)
       } else if (!itemDesc.using.action) {
         console.error(`[data.mjs] ITEMS.${key} : attribut 'using' sans champ 'action'`)
+      } else if (itemDesc.using.action === 'emit-event' && !itemDesc.using.event) {
+        console.error(`[data.mjs] ITEMS.${key} : action 'emit-event' sans champ 'event'`)
       }
     }
   }

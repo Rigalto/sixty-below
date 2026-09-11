@@ -52,6 +52,8 @@ export const IMAGE_FILES = [
   `${BASE_DIR}/trinket_32_32.png`,
   // tools
   `${BASE_DIR}/tool_32_32.png`,
+  // potions
+  `${BASE_DIR}/potion_32_32.png`,
   // provisoire
   `${BASE_DIR}/loom_32_32.png`,
 
