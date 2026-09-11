@@ -718,10 +718,13 @@ class SpawnManager {
   /**
    * Callback micro-tâche : cherche un repli à partir de la colonne du spawn courant,
    * se rabat sur une position aléatoire en dernier recours, mémorise puis téléporte.
+   * Si même le dernier recours échoue (monde entièrement comblé par le joueur), ne
+   * fait rien — le joueur reste sur place plutôt que de bloquer l'application.
    */
   onFindFallback () {
     let position = this.#findSpawnFallbackPosition(this.#tileX)
     if (!position) position = this.#randomFreeSpot()
+    if (!position) return
     this.setPosition(position.x, position.y)
     eventBus.emit('player/teleport', {x: position.x, y: position.y})
   }
@@ -737,11 +740,9 @@ class SpawnManager {
   #isFree (tileX, tileY) {
     const SKY = NODES.SKY.code
     const VOID = NODES.VOID.code
-    for (let dy = -3; dy <= -1; dy++) {
-      for (let dx = 0; dx <= 1; dx++) {
-        const code = chunkManager.getTileAt(((tileY + dy) << 10) | (tileX + dx))
-        if (code !== SKY && code !== VOID) return false
-      }
+    const codes = chunkManager.getRectCodes(tileX, tileY - 3, 2, 3)
+    for (const code of codes) {
+      if (code !== SKY && code !== VOID) return false
     }
     return true
   }
@@ -757,12 +758,18 @@ class SpawnManager {
    */
   #tryColumn (x) {
     const SKY = NODES.SKY.code
+    const SOLID_OR_ETERNAL = NODE_TYPE.SOLID | NODE_TYPE.ETERNAL
+
+    let indexA = (5 << 10) | x
     for (let y = 5; y < WORLD_HEIGHT; y++) {
-      const a = chunkManager.getTileAt((y << 10) | x)
-      const b = chunkManager.getTileAt((y << 10) | (x + 1))
-      if (a === SKY && b === SKY) continue
-      const aSolid = NODES_LOOKUP[a].type & (NODE_TYPE.SOLID | NODE_TYPE.ETERNAL)
-      const bSolid = NODES_LOOKUP[b].type & (NODE_TYPE.SOLID | NODE_TYPE.ETERNAL)
+      const a = chunkManager.getTileAt(indexA)
+      const b = chunkManager.getTileAt(indexA + 1)
+      if (a === SKY && b === SKY) {
+        indexA += WORLD_WIDTH
+        continue
+      }
+      const aSolid = NODES_LOOKUP[a].type & SOLID_OR_ETERNAL
+      const bSolid = NODES_LOOKUP[b].type & SOLID_OR_ETERNAL
       return (aSolid || bSolid) ? {x, y} : null
     }
     return null
@@ -781,9 +788,14 @@ class SpawnManager {
       if (r) return r
     }
     for (let offset = 1; offset < WORLD_WIDTH >> 1; offset++) {
-      for (const x of [fromTileX + offset, fromTileX - offset]) {
-        if (this.#forbiddenX.has(x)) continue
-        const r = this.#tryColumn(x)
+      const xRight = fromTileX + offset
+      if (!this.#forbiddenX.has(xRight)) {
+        const r = this.#tryColumn(xRight)
+        if (r) return r
+      }
+      const xLeft = fromTileX - offset
+      if (!this.#forbiddenX.has(xLeft)) {
+        const r = this.#tryColumn(xLeft)
         if (r) return r
       }
     }
@@ -794,16 +806,20 @@ class SpawnManager {
    * Dernier recours — #findSpawnFallbackPosition a échoué sur toute la largeur du
    * monde (nécessite que la totalité du ciel soit comblée par le joueur — cas extrême
    * assumé). Tire une tuile au hasard, teste #isFree (SKY/VOID, souterrain inclus)
-   * jusqu'à trouver un espace libre. Peut être long — appelée uniquement depuis la
-   * branche micro-tâche, temps réel déjà suspendu.
-   * @returns {{x: number, y: number}}
+   * jusqu'à trouver un espace libre. Abandonne après MAX_ATTEMPTS tentatives — le
+   * joueur a délibérément provoqué ce scénario, il reste alors sur place plutôt que
+   * de figer l'application.
+   * @returns {{x: number, y: number}|null}
    */
   #randomFreeSpot () {
-    for (;;) {
+    const MAX_ATTEMPTS = 100000
+    for (let i = 0; i < MAX_ATTEMPTS; i++) {
       const x = seededRNG.randomGetMinMax(1, WORLD_WIDTH - 2)
       const y = seededRNG.randomGetMinMax(4, WORLD_HEIGHT - 2) // y-3 ≥ 1, jamais hors monde
       if (this.#isFree(x, y)) return {x, y}
     }
+    console.error('[SpawnManager] #randomFreeSpot : aucune position libre trouvée après', MAX_ATTEMPTS, 'tentatives')
+    return null
   }
 }
 export const spawnManager = new SpawnManager()
