@@ -1488,20 +1488,20 @@ class ItemUseManager {
   onItemUsed (itemId) {
     const itemDef = ITEMS[itemId]
     switch (itemDef.using.action) {
-      case 'teleport-spawn': this.#useTeleportSpawn(itemDef); break
+      case 'emit-event': this.#useEmitEvent(itemDef); break
       case 'add-items': this.#useAddItems(itemDef); break
       case 'buff-timed': this.#useBuffTimed(itemDef); break
-      case 'life-crystal': this.#useLifeCrystal(itemDef); break
       case 'none': break
       default: console.error(`[ItemUseManager] action inconnue : '${itemDef.using.action}'`)
     }
   }
 
   /**
-   * TODO: téléporte le joueur au spawn point via 'player/teleport-spawn'.
+   * Émet l'event défini par itemDef.using.event, avec le payload optionnel
+   * itemDef.using.payload (absent → undefined, équivalent à un emit sans second argument).
    * @param {object} itemDef — ITEMS[itemId]
    */
-  #useTeleportSpawn (itemDef) { eventBus.emit('player/teleport-spawn') }
+  #useEmitEvent (itemDef) { eventBus.emit(itemDef.using.event, itemDef.using.payload) }
 
   /**
    * TODO: résout itemDef.using via resolveLoot et rafraîchit le bag.
@@ -1514,12 +1514,6 @@ class ItemUseManager {
    * @param {object} itemDef — ITEMS[itemId]
    */
   #useBuffTimed (itemDef) { console.log('[ItemUseManager] TODO buff-timed', itemDef) }
-
-  /**
-   * TODO: augmente la vie max du joueur / consomme le life crystal.
-   * @param {object} itemDef — ITEMS[itemId]
-   */
-  #useLifeCrystal (itemDef) { console.log('[ItemUseManager] TODO life-crystal', itemDef) }
 }
 export const itemUseManager = new ItemUseManager()
 
