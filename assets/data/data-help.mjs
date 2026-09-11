@@ -10,7 +10,7 @@
  *   Ne pas mettre 'Drops' dans les titres, mais 'Loot'.
  *   Utiliser 'Foraging' pour les actions avec une 'Sickle' et 'Harvesting' pour les opérations liées au 'gardening'.
  *   Ne pas utiliser 'logging', mais 'chopping'.
- *   Ne pas mettre dans la section "See Also" une fiche cible déjà linkée dans le texte.
+ *   Ne pas mettre dans la section "See also" une fiche cible déjà linkée dans le texte.
  *   Ne mettre une balise <hr> que si les sections qu'elles délimitent peuvent se lire seules, indépendamment de celles qui précèdent ou suivent.
  *   Outil ou meilleur => [[item:tool] or better / Outil ou équivalent => [[item:tool]  or equivalent / Outil équivalent ou meilleur => [[item:tool] ] or higher
  *
@@ -3852,7 +3852,7 @@ Higher-tier pickaxes provide a mining speed bonus (see table above). Additional 
 <<mineableRow|Gem|emerald>>
 <<mineableRow|Gem|sapphire>>
 
-**See Also**
+**See also**
 
 * [[Block Directory]]: list of all world tiles
     `
@@ -4516,7 +4516,7 @@ See [[Foraging Tools]] and [[Foraging Buffs]] for details.
 
 <hr>
 
-**See Also**
+**See also**
 
 * [[Mining]] — removing blocks permanently
 * [[Flora]] — plant behaviors against foraging
@@ -5123,7 +5123,7 @@ Parler d'abord du Glass, puis des Bottles.
 
 * Parler des [[item:bucket]]s.
 
-**See Also**
+**See also**
 
 * [[Tableware]] for the full list of containers.
     `
@@ -7541,7 +7541,7 @@ _If no container is in [[Ranges|Interaction Range]], the chest panel is inactive
   },
 
   // ── Gameplay ─────────────────────────────────────────────────
-  //    Buffs, Buff Panel, Player Movement, Movement Buffs, Teleporters,  World Creation
+  //    Buffs, Buff Panel, Player Movement, Movement Buffs, Teleporters,  Recall Potion, World Creation
 
   {
     title: 'Buffs',
@@ -7653,6 +7653,8 @@ The player moves using the keyboard. Movement is governed by physics — gravity
 **Teleportation**
 
 Placed [[Teleporters]] provide an instant way to travel between two fixed points in the world.
+Consuming a [[Recall Potion]] provides an instant way to travel to your spawn point.
+You can designate any [[Beds|Bed]] as your spawn point.
 
 **Controls**
 
@@ -7797,7 +7799,44 @@ _It is not possible to place in the world more than two teleporters of the same 
 
 **See also**
 
+* For single-use, unpaired travel back to your spawn point, see [[Recall Potion]]
 * [[Player Movement]] — standard movement by walking and jumping
+    `
+  },
+  {
+    title: 'Recall Potion',
+    category: ['Potion', 'Gameplay'],
+    content: `
+**Description**
+
+A single-use potion that instantly teleports the player back to their spawn point.
+Unlike a pair of [[Teleporters]], it needs no second location placed in advance — and it always
+finds a way back, even if the spawn point itself is currently obstructed.
+
+**Tier**
+
+{{item:recallPotion:star|star}}
+
+**[[item:recallPotion]] Crafting**
+
+<<fullRecipe|recallPotion>>
+
+**How to Use**
+
+* Open your [[Inventory]] Panel [I]
+* Select the slot containing a [[item:recallPotion]]
+* Click on 'Use Item' Icon - Shortcut [Space]
+* One Recall Potion is consumed but nothing happens yet
+* Close the [[Inventory]] Panel and you are instantly teleported to your spawn point
+
+**Tips**
+
+* _Keep one in your [[Inventory]] as an emergency escape from dangerous situations._
+* _You can set a new spawn point by selecting a [[Beds|Bed]]._ ⏳
+
+**See also**
+
+* [[Teleporters]] — paired, reusable travel between two fixed points
     `
   },
   {
