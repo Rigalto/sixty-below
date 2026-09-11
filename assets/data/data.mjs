@@ -447,7 +447,7 @@ export const ITEMS = {
 
   // Furniture - Teleporter
   fallenStar: {name: 'Fallen Star', type: 0, stype: 'misc', star: 4, image: 'furniture_32_32-2-0', help: 'Teleporters', tooltip: 'A concentrated burst of energy, fallen from the sky'},
-  recallPotion: {name: 'Recall Potion', type: ITEM_TYPE.POTION | ITEM_TYPE.USABLE, stype: 'misc', star: 1, image: 'potion_32_32-0-0', using: {action: 'emit-event', event: 'player/teleport-spawn'}, help: 'Recall Potion', tooltip: 'Teleports you back to your spawn point'},
+  recallPotion: {name: 'Recall Potion', type: ITEM_TYPE.POTION | ITEM_TYPE.USABLE, stype: 'misc', star: 3, image: 'potion_32_32-0-0', using: {action: 'emit-event', event: 'player/teleport-spawn'}, help: 'Recall Potion', tooltip: 'Teleports you back to your spawn point'},
 
   teleporterYellow: {name: 'Yellow teleporter', type: ITEM_TYPE.FURNITURE | ITEM_TYPE.PLACABLE, stype: 'teleporter', star: 4, image: 'furniture_32_32-8-7', placed: 'furniture_32_32-8-7', unplacing: {speed: 3200}, help: 'Teleporters', tooltip: 'Click to teleport instantly to the matching teleporter'},
   teleporterOrange: {name: 'Orange teleporter', type: ITEM_TYPE.FURNITURE | ITEM_TYPE.PLACABLE, stype: 'teleporter', star: 4, image: 'furniture_32_32-9-7', placed: 'furniture_32_32-9-7', unplacing: {speed: 3200}, help: 'Teleporters', tooltip: 'Click to teleport instantly to the matching teleporter'},
@@ -735,8 +735,13 @@ export const ITEMS = {
   draftingCompass: {name: 'Drafting Compass', type: ITEM_TYPE.TRINKET, stype: 'trinket', star: 3, image: 'trinket_32_32-2-2', help: 'Surveyor\'s Tools', tooltip: 'When in Inventory, press [R] display tiles Grid', buff: [{buff: 'showGrid', value: true}]},
   theodolite: {name: 'Theodolite', type: ITEM_TYPE.TRINKET, stype: 'trinket', star: 4, image: 'trinket_32_32-3-2', help: 'Surveyor\'s Tools', tooltip: 'When in Inventory, press [R] display tiles Grid & perception and tool ranges', buff: [{buff: 'showInteractionRange', value: true}, {buff: 'showToolRange', value: true}, {buff: 'showGrid', value: true}]},
 
-  // Monster drops - images NOK
+  // Monster drops - Insects - images NOK
   antlionMandible: {name: 'Antlion Mandible', type: 0, stype: 'monster', star: 2, image: 'tools_32_32-12-7', help: 'Antlion Pit', tooltip: 'Component for cutting tools'},
+
+  // Monster drops - Reptile - images NOK
+  viperVenom: {name: 'Viper Venom', type: 0, stype: 'monster', star: 2, image: 'tools_32_32-12-7', help: 'Antlion Pit', tooltip: 'Component for potions'},
+  viperFang: {name: 'Viper Fang', type: 0, stype: 'monster', star: 2, image: 'tools_32_32-12-7', help: 'Antlion Pit', tooltip: 'Component for tools'},
+  viperScale: {name: 'Viper Scale', type: 0, stype: 'monster', star: 2, image: 'tools_32_32-12-7', help: 'Antlion Pit', tooltip: 'Component for accessories'},
 
   // Food
   flour: {name: 'Flour', type: 0, stype: 'food', star: 1, image: 'tools_32_32-12-7', help: 'Food', tooltip: 'Component for daw'},
@@ -935,6 +940,9 @@ export const RECIPES = [
   {result: {item: 'coconutFiber', count: 1}, station: 'workbench', ingredients: [{item: 'coconut', count: 1}], returned: [{item: 'coconutPulp', count: 1}, {item: 'coconutMilk', count: 1}]},
   {result: {item: 'coconutPulp', count: 1}, station: 'workbench', ingredients: [{item: 'coconut', count: 1}], returned: [{item: 'coconutFiber', count: 1}, {item: 'coconutMilk', count: 1}]},
   {result: {item: 'coconutMilk', count: 1}, station: 'workbench', ingredients: [{item: 'coconut', count: 1}], returned: [{item: 'coconutFiber', count: 1}, {item: 'coconutPulp', count: 1}]},
+
+  // Potions
+  {result: {item: 'recallPotion', count: 1}, station: 'alchemyTable', ingredients: [{item: 'mandrakeRoot', count: 1}, {item: 'viperVenom', count: 1}, {item: 'silk', count: 1}]},
 
   // Food - Tier 1-3
   {result: {item: 'sunflowerOil', count: 1}, station: 'tableWood', ingredients: [{item: 'sunflowerSeed', count: 1}]},

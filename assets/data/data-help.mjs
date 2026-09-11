@@ -132,6 +132,8 @@ Mining Loot: {{node:{3}:mining[:items[0]:item|link}}
   cellNodeStar: '[[node:{1}]]<br>{{node:{1}:star|star}}',
   // pour renseigner une cellule de table avec un item et son tier en dessous
   cellItemStar: '[[item:{1}]]<br>{{item:{1}:star|star}}',
+  // pour renseigner une cellule de table avec un monstre et son tier en dessous
+  cellMonsterStar: '{1}',
 
   // Trois puces affichant le tier, la crafting station et les ingrédients pour crafter un item
   fullRecipe: '* Tier: {{item:{1}:star|star}}\n* Crafting Station: {{recipe:{1}|station}}\n* Crafting Materials: {{recipe:{1}|ingredients}}',
@@ -5897,9 +5899,9 @@ Shaking Tool: <<itemStar|hammerCopper>> or better
 
 **Shaking Encounters**
 
-| Tree | Encounter |
+| Encounter | Tier |
 |---|---|
-| Coconut | [[monster:coconutCrab]] |
+| [[monster:coconutCrab]] | ⏳ |
 
 <hr>
 
@@ -5913,6 +5915,12 @@ Foraging Tool: <<itemStar|sickleCopper>> or better
 **Foraging Loot** ⏳
 
 <<itemLootTable|coconut|foraging>>
+
+**Foraging Encounters**
+
+| Encounter | Tier |
+|---|---|
+| [[monster:hornedViper]] | ⏳ |
 
 <hr>
 
@@ -6621,8 +6629,6 @@ Foraging Tool: <<itemStar|sickleSilver>> or better
 
 **Regrowth**
 
-**Regrowth**
-
 * Foraging a patch removes it from that spot — the tile rejoins the pool of bare grassMoss, on equal footing with every other unoccupied spot
 * Velvetmoss spreads slowly but relentlessly across every exposed [[node:grassMoss]] surface
 * Every 2 to 3 in-game days, one random unoccupied grassMoss tile anywhere in the world is reclaimed — never necessarily the one you just harvested
@@ -7249,7 +7255,31 @@ A vivid orange moss, almost luminescent, growing on the north side of old oak tr
   // ── Fishs - Sap ──────────────────────────────────────────────
   // ── Monsters ─────────────────────────────────────────────────
   //    Fauna
+  {
+    title: 'Fauna',
+    category: ['Monster', 'Gameplay'],
+    content: `
+**Description**
 
+Comming Soon ⏳
+
+**Monsters** ⏳
+
+| Name/Tier | Type | Main location | Main Loot | Aggro |
+|---|---|---|---|---|---|
+| <<cellMonsterStar|hornedViper>> | Reptile | Foraging fallen [[item:coconut]] | [[item:viperVenom]], [[item:viperFang]], [[item:viperScale]] | Yes |
+| <<cellMonsterStar|coconutCrab>> | Crustacean | Shaking [[item:coconut]] | ⏳ | Yes |
+
+
+_For detailed information on each monster, click its name._
+
+<hr>
+
+**Critters & Baits** ⏳
+
+
+  `
+  },
   // ── Monsters ─────────────────────────────────────────────────
   //    Spiders, Bees
 
