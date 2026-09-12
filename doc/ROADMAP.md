@@ -9,6 +9,21 @@
 
 ### Code et tests
 
+- gestion des points de vie :
+
+  - Modèle de données HealthManager — champs (capacity, current), clé(s) gamestate, valeurs par défaut nouveau monde
+  - Correction du contrat life/add — un seul nom, un seul payload, mise à jour de TECHNICAL.md et du commentaire conception dans player.mjs
+  - Consommation Life Crystal — écouter l'event (renommé), incrémenter capacity, plafond 400 (20 red hearts)
+  - Life Fruit — création de l'item dans data.mjs, incrément capacity +5 (gold heart), plafond 500
+  - Health Regeneration — buff composé dans BuffManager, formule de base scalée sur maxHealth, tick d'application
+  - Mort du joueur — test current <= 0 → émission de l'event déclenchant spawnManager.onTeleportSpawn()
+  - HealthWidget (Right Panel) — classe séparée, pattern BuffManager/BuffWidget, rendu cœurs rouges/or + tooltip hover
+  - Persistance — écriture/lecture gamestate
+  - Consommation potions/food — brancher un vrai handler heal dans ItemUseManager
+  - Potion Sickness — debuff anti-spam à designer
+  - Lifeforce Potion — dépend du système "buff timed" (pas encore implémenté, TODO déjà noté dans BuffManager)
+  - Dégâts environnementaux (noyade, traversée de zone dangereuse, DOT) — gros morceau, probablement hors scope immédiat
+
 - gestion de la fonction 'Use' dans l'inventaire
 - Implémenter la réduction de vitesse dans les liquides ou les cobweb.
 - Modifier le volume sonore des sons du jeu (ActionWidget)
