@@ -605,9 +605,8 @@ class WorldGenerator {
       {key: 'eternals', value: this.#collectEternalTiles()},
       {key: 'ferns', value: fernsCaves},
       {key: 'geodecaves', value: geodeCaves},
-      {key: 'goldhearts', value: 0},
       {key: 'graveyard', value: graveyard},
-      {key: 'health', value: 100},
+      {key: 'health', value: '100|5|0'}, // current|totalHearts|goldHearts
       {key: 'hearts', value: hearts},
       {key: 'helptopic', value: 'Getting Started'},
       {key: 'hives', value: hives},
@@ -621,7 +620,6 @@ class WorldGenerator {
       {key: 'player', value: `${pxX}|${pxY}|1`},
       {key: 'pyramid', value: pyramid},
       {key: 'randomkey', value: seed},
-      {key: 'redhearts', value: 5},
       {key: 'ruinedcabin', value: ruinedcabin},
       {key: 'sandfallingtiles ', value: new Set()},
       {key: 'sewedsunflower', value: []},
@@ -3860,6 +3858,10 @@ class WorldCarver {
         const y = seededRNG.randomGetMinMax(underCaverns[x], Math.round((underCaverns[x] + 510) / 2) - 2)
         if (placeHeart(x, y)) { remaining--; attempts = 0 }
       }
+    }
+
+    if (remaining > 0) {
+      console.warn('[WorldCarver] digHearts : quota non atteint —', HEART_COUNT - remaining, '/', HEART_COUNT, 'Life Crystal placés')
     }
 
     return hearts
