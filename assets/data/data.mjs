@@ -386,7 +386,7 @@ export const ITEMS = {
   spiderFang: {name: 'Spider Fang', type: 0, stype: 'fang', star: 3, image: 'tools_32_32-4-0', help: 'Spiders', tooltip: '???'},
 
   // crystall - image OK
-  lifeCrystal: {name: 'Life Crystal', type: ITEM_TYPE.FURNITURE | ITEM_TYPE.UNIQUE | ITEM_TYPE.USABLE, stype: 'life', star: 1, image: 'foraged_32_32-7-2', placed: 'foraged_32_32-7-2', unplacing: {speed: 1800}, using: {action: 'emit-event', event: 'life-cristel-used'}, help: 'Life Crystal', tooltip: 'Permanently increases maximum life by 20\nCollect with a Hammer'},
+  lifeCrystal: {name: 'Life Crystal', type: ITEM_TYPE.FURNITURE | ITEM_TYPE.UNIQUE | ITEM_TYPE.USABLE, stype: 'life', star: 1, image: 'foraged_32_32-7-2', placed: 'foraged_32_32-7-2', unplacing: {speed: 1800}, using: {action: 'emit-event', event: 'life/crystal-used'}, help: 'Life Crystal', tooltip: 'Permanently increases maximum life by 20\nCollect with a Hammer'},
 
   // triskel - images NOK
   triskelCopper: {name: 'Copper Triskel', type: ITEM_TYPE.FURNITURE | ITEM_TYPE.UNIQUE | ITEM_TYPE.MATERIAL, stype: 'triskel', star: 3, image: 'furniture_32_32-12-2', placed: 'furniture_32_32-6-3', unplacing: {speed: 1800}, help: 'Triskels', tooltip: ''},
@@ -647,8 +647,9 @@ export const ITEMS = {
   coralY: {name: 'Flickering Torch Coral', type: 0, stype: 'herb', star: 2, image: null, placed: 'placed_32_32-2-1', speed: 1900, foraging: {speed: 500, items: [{item: 'coral', count: 1}, {item: 'oyster', count: 0.12, buffs: ['lucky:100', 'rainy:300']}]}, help: 'Corals', tooltip: 'Crafting Material for Potions and Furniture'},
   coralG: {name: 'Whispering Fan Coral', type: 0, stype: 'herb', star: 2, image: null, placed: 'placed_32_32-3-1', speed: 1900, foraging: {speed: 500, items: [{item: 'coral', count: 1}, {item: 'oyster', count: 0.12, buffs: ['lucky:100', 'rainy:300']}]}, help: 'Corals', tooltip: 'Crafting Material for Potions and Furniture'},
   coral: {name: 'Coral', type: 0, stype: 'herb', star: 2, image: 'foraged_32_32-3-3', help: 'Corals', tooltip: 'Crafting Material for Potions and Furniture'},
-  oyster: {name: 'Oyster', type: 0, stype: 'food', star: 2, image: 'foraged_32_32-2-4', help: 'Oyster', tooltip: 'Open it to eat and collect pearls'},
-  shuckedOyster: {name: 'Shucked Oyster', type: 0, stype: 'food', star: 2, image: 'foraged_32_32-3-4', help: 'Oyster', tooltip: 'Minor improvements to all stats (10 minutes)'},
+
+  oyster: {name: 'Oyster', type: ITEM_TYPE.USABLE, stype: 'food', star: 2, image: 'foraged_32_32-2-4', help: 'Oyster', tooltip: 'Open it to eat and collect pearls', using: {action: 'add-items', items: [{item: 'shuckedOyster', count: 1}, {item: 'pearlWhite', count: 0.25, buffs: ['lucky:60']}, {item: 'pearlBlack', count: 0.15, buffs: ['lucky:50']}, {item: 'pearlPink', count: 0.05, buffs: ['lucky:40']}]}},
+  shuckedOyster: {name: 'Shucked Oyster', type: ITEM_TYPE.FOOD, stype: 'food', star: 2, image: 'foraged_32_32-3-4', help: 'Oyster', tooltip: 'Minor improvements to all stats (10 minutes)'},
   pearlWhite: {name: 'White Pearl', type: 0, stype: 'pearl', star: 2, image: 'foraged_32_32-4-4', help: 'Oyster', tooltip: 'Major ingredient of Luck Potion'},
   pearlBlack: {name: 'Black Pearl', type: 0, stype: 'pearl', star: 3, image: 'foraged_32_32-5-4', help: 'Oyster', tooltip: 'Major ingredient of Luck Potion'},
   pearlPink: {name: 'Black Pink', type: 0, stype: 'pearl', star: 4, image: 'foraged_32_32-6-4', help: 'Oyster', tooltip: 'Major ingredient of Luck Potion'},
@@ -677,6 +678,8 @@ export const ITEMS = {
   inferncap: {name: 'Inferncap', type: 0, stype: 'herb', star: 5, image: 'foraged_32_32-5-5', placed: 'placed_32_48-5-0', foraging: {speed: 500, items: [{item: 'inferncap', count: 1, buffs: ['lucky:50']}]}, help: 'Inferncap', tooltip: 'Harvest to collect Potions and Food ingredients'},
 
   gravelweed: {name: 'Gravelweed', type: 0, stype: 'herb', star: 2, image: 'foraged_32_32-6-5', placed: 'placed_16_32-7-0', placedLeft: 'placed_16_32-6-0', foraging: {speed: 500, items: [{item: 'gravelweed', count: 1, buffs: ['lucky:20']}]}, help: 'Gravelweed', tooltip: 'Harvest to collect Potions and Food ingredients'},
+
+  seedBag: {name: 'Seed Bag', type: ITEM_TYPE.USABLE, stype: 'bag', star: 2, image: 'container_32_32-0-3', help: 'Oyster', tooltip: 'Open to get wild plant seeds', using: {action: 'add-items', items: [{item: 'sunflowerSeed', count: 0.30}, {item: 'ambermirageSeed', count: 0.30}, {item: 'bloodmoonSeed', count: 0.25}, {item: 'seedForest', count: 0.30}, {item: 'seedJungle', count: 0.30}, {item: 'acorn', count: 0.20}, {item: 'samara', count: 0.20}]}},
 
   // Gardening - images OK
   clayPot: {name: 'Clay Pot', type: ITEM_TYPE.FURNITURE | ITEM_TYPE.PLACABLE, stype: 'pot', surface: true, onTop: true, star: 1, capacity: 1, image: 'furniture_32_32-0-8', placed: 'placed_16_16-2-3', placedleft: 'placed_16_16-3-3', placedright: 'placed_16_16-4-3', unplacing: {speed: 800}, help: 'Clay Pots', tooltip: 'Gardening Container'},
