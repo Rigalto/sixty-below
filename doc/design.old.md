@@ -473,7 +473,7 @@ L'architecture sépare la logique (UI Logic) du rendu pur (Render) et distingue 
 │   ├── world.mjs            # DATA & PHYSICS : ChunkManager (Uint8Array Grid storage, Dirty Flags), PhysicsSystem (AABB Collisions, Gravity, Velocity), LiquidSimulator.
 │   ├── persistence.mjs      # ORCHESTRATOR : SaveManager. Coordonne la sauvegarde (Player/World/Flore/Faune -> Database).
 ├── action.mjs           # GAMEPLAY : ActionManager (Mining, Cutting, Fishing, Foraging...)
-│   ├── player.mjs           # PLAYER : PlayerManager (Déplacement, animation des actions, équipement, caractéristiques), LifeManager
+│   ├── player.mjs           # PLAYER : PlayerManager (Déplacement, animation des actions, équipement, caractéristiques), Manager
 │   ├── buff.mjs             # BUFFS/DEBUFFS : BuffManager, EffectDefinitions, StatModifiers (Middleware de calcul des bonus/malus), BuffDisplay (dans un Canvas en overlay)
 │   ├── housing.mjs          # HOUSING : FurnitureManager (Placememnt/suppression Furniture/Crafting Station), HousingManager, Buffs
 │   ├── combat.mjs           # TACTICAL : ArenaCreator (procédural - forme, murs et trous), TurnManager, Pathfinding (A* pour le combat), SpellSystem (Portée, DamageCalculator), CombatAI (CombatBehaviors combinables)

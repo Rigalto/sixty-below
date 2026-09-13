@@ -321,7 +321,7 @@ Cette section définit les événements officiels. Tout nouvel événement doit 
 | S | `player/teleport-begin` | — | Début de téléportation, avant fading. Le joueur est bloqué, ses actions annulées. |
 | S | `player/teleport-end` | — | Fin de téléportation, avant fading. Le joueur est débloqué. |
 
-#### Player Life (`LifeManager`)
+#### Player Life (`HealthManager`)
 *En prévision*
 | Dir. | Event Name | Payload Structure | Description |
 | :---: | :--- | :--- | :--- |

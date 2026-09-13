@@ -1,4 +1,4 @@
-// player.mjs — PlayerManager - SpawnManager - LootPopupManager - LifeManager - HotbarOverlay
+// player.mjs — PlayerManager - SpawnManager - LootPopupManager - HealthManager - HealthWidget - HotbarOverlay
 
 import {WORLD_WIDTH, WORLD_HEIGHT, PLAYER, MICROTASK, TELEPORT_FADE_MS, TELEPORT_WAIT_MS, HOTBAR_CAPACITY} from './constant.mjs'
 import {NODES, NODE_TYPE, NODES_LOOKUP, ITEM_TYPE, ITEMS} from '../assets/data/data.mjs'
@@ -1034,12 +1034,136 @@ class HandedToolManager {
 export const handedToolManager = new HandedToolManager()
 
 /* ====================================================================================================
-   HOTBAR OVERLAY
+   HEALTH (Health Capacity, Health Regeneration, Health courant — cf. conception validée)
    ==================================================================================================== */
 
-class LifeManager {
+const HEART_HP = 20 // points de vie apportés par un cœur rouge
+const GOLD_HEART_BONUS = 5 // points de vie supplémentaires apportés par la dorure d'un cœur
+
+class HealthManager {
+  #current = 100 // points de vie actuels — persisté, borné [0, capacité]
+  #totalHearts = 5 // nombre total de cœurs (rouges + dorés) — persisté, +1 par Life Crystal consommé
+  #goldHearts = 0 // nombre de cœurs dorés parmi #totalHearts — persisté, +1 par Life Fruit consommé
+  #dirty = false // true si current/totalHearts/goldHearts a changé depuis la dernière écriture gamestate (cf. onSaveTick)
+  #capacity = 0 // cache de la santé maximale — recalculé uniquement si #totalHearts/#goldHearts changent (cf. #computeCapacity)
+
+  constructor () {
+    // eventBus
+    this.onSaveTick = this.onSaveTick.bind(this)
+    eventBus.on('save/tick', this.onSaveTick)
+    this.onCrystalUsed = this.onCrystalUsed.bind(this)
+    eventBus.on('life/crystal-used', this.onCrystalUsed)
+    this.onFruitUsed = this.onFruitUsed.bind(this)
+    eventBus.on('life/fruit-used', this.onFruitUsed)
+  }
+
+  /**
+   * Initialise l'état de santé depuis le gamestate.
+   * @param {string} healthRecord - state.health, format 'current|totalHearts|goldHearts'
+   */
+  init (healthRecord) {
+    const [current, totalHearts, goldHearts] = healthRecord.split('|')
+    this.#current = parseInt(current, 10)
+    this.#totalHearts = parseInt(totalHearts, 10)
+    this.#goldHearts = parseInt(goldHearts, 10)
+    this.#dirty = false
+    this.#computeCapacity()
+  }
+
+  /**
+  * Recalcule et met en cache #capacity à partir des cœurs actuels. Appelé uniquement aux
+  * points où #totalHearts/#goldHearts changent (init, onCrystalUsed, onFruitUsed).
+  */
+  #computeCapacity () {
+    this.#capacity = this.#totalHearts * HEART_HP + this.#goldHearts * GOLD_HEART_BONUS
+  }
+
+  // /////// //
+  // GETTERS //
+  // /////// //
+
+  /**
+   * Points de vie actuels du joueur.
+   * @returns {number}
+   */
+  getCurrent () {
+    return this.#current
+  }
+
+  /**
+   * Nombre total de cœurs (rouges + dorés) — pour le rendu du widget.
+   * @returns {number}
+   */
+  getTotalHearts () {
+    return this.#totalHearts
+  }
+
+  /**
+   * Nombre de cœurs dorés parmi les cœurs totaux — pour le rendu du widget.
+   * @returns {number}
+   */
+  getGoldHearts () {
+    return this.#goldHearts
+  }
+
+  /**
+  * Santé maximale (capacité).
+  * @returns {number}
+  */
+  getCapacity () {
+    return this.#capacity
+  }
+
+  // /////////// //
+  // PERSISTENCE //
+  // /////////// //
+
+  /**
+   * Liaison EventBus : 'save/tick' — écrit l'état de santé courant dans gamestate
+   * (clé 'health'). Émis toutes les 2s par SaveManager.processSave, synchronisé
+   * avec le save des chunks.
+   */
+  onSaveTick () {
+    if (!this.#dirty) return
+    const record = `${this.#current}|${this.#totalHearts}|${this.#goldHearts}`
+    database.setGameState('health', record)
+    this.#dirty = false
+  }
+
+  // ////////////// //
+  // MAXIMUM HEALTH //
+  // ////////////// //
+
+  /**
+  * Liaison EventBus : 'life/crystal-used' — incrémente le nombre total de cœurs. Pas de
+  * plafond vérifié ici : la génération garantit au maximum 15 Life Crystal dans le monde.
+  */
+  onCrystalUsed () {
+    this.#totalHearts++
+    this.#computeCapacity()
+    this.#dirty = true
+  }
+
+  /**
+  * Liaison EventBus : 'life/fruit-used' — dore un cœur rouge existant. No-op si tous les
+  * cœurs sont déjà dorés (aucun cœur rouge disponible à transformer).
+  */
+  onFruitUsed () {
+    if (this.#goldHearts >= this.#totalHearts) return
+    this.#goldHearts++
+    this.#computeCapacity()
+    this.#dirty = true
+  }
 }
-export const lifeManager = new LifeManager()
+export const healthManager = new HealthManager()
+
+/* ====================================================================================================
+   HEALTH WIDGET
+   ==================================================================================================== */
+
+class HealthWidget {
+}
+export const healthWidget = new HealthWidget()
 
 /* ====================================================================================================
    HOTBAR OVERLAY
