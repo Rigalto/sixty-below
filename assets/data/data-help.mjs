@@ -6262,9 +6262,9 @@ Foraging Tool: <<itemStar|sickleCopper>> or better
 
 **Usages**
 
-* <<itemStar|sunflowerSeed>>— replanting Sunflowers ⏳
-* <<itemStar|sunflowerOil>>— extracted from seeds, essential ingredient for food and ointments ⏳
-* <<itemStar|oleanderOil>>— contains 50% [[item:sunflowerOil]] ⏳
+* <<itemStar|sunflowerSeed>>— replanting Sunflowers
+* <<itemStar|sunflowerOil>>— extracted from seeds, essential ingredient for food and ointments
+* <<itemStar|oleanderOil>>— contains 50% [[item:sunflowerOil]]
 
 **[[item:sunflowerOil]] Crafting**
 
@@ -6286,7 +6286,8 @@ Foraging Tool: <<itemStar|sickleCopper>> or better
 **Tips**
 
 * _Sunflowers only grow in clearings — planting too many [[Oak & Mahogany|Oak]] trees will eliminate their growing spots._
-* _Managing your forest density is key : fewer trees means more Sunflowers, and vice versa._ ⏳
+* _Managing your forest density is key : fewer trees means more Sunflowers, and vice versa._
+* _Sunflowers track the sun across the sky, offering a rough estimate of the [[Day & Night Cycle|time of day]]._
   `
   },
   {
@@ -7926,6 +7927,8 @@ Carrying one of the following [[Trinkets]] in your [[Inventory]] improves accura
 * _Night lasts 6 in-game hours — make sure you are sheltered before 21:00._ ⏳
 * _Dawn and Midnight are the most dangerous periods — monsters are most active._ ⏳
 * _Use [[item:clockCopper|Clocks]], [[item:bottledFrog]] and [[item:sextant]] for precise environment tracking._
+* _[[Sunflower]]s track the sun across the sky, offering a rough estimate of the time of day._
+
   `
   },
   {

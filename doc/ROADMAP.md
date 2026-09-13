@@ -64,6 +64,7 @@
 ---
 
 ## À faire — Bugs connus
+- ajouter dans les fiches d'aide l'explication du range pour le foraging des plantes (cf Sunflower)
 - Lorsqu'une tuile est modifiée sans déplacement de la souris, les informations la concernant dans le Control Panel ne sont pas mises à jour
 - Il faut qu'il y ait des clusters de STONE dans tous les biomes et toutes les layers.
 - Il n'y a pas assez de Pricklepad dans le monde => sans doute pas assez de SAND sur le sol souterrain.
