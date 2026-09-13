@@ -503,6 +503,7 @@ class FillingManager {
     // consommation / crédit
     inventoryManager.decrementHotbarSlotCount(slotIndex)
     inventoryManager.loot(resultId, 1, '')
+    eventBus.emit('player/loot-item', {itemCode: resultId})
 
     // transformation de la tuile
     if (item.code === 'bucket') {
