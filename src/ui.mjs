@@ -286,7 +286,11 @@ uiStyle.textContent = /* css */`
 #env-overlay-root .weather-row { display: flex; justify-content: space-between; align-items: center; font-size: 24px; }
 #env-overlay-root .weather-group { display: flex; gap: 5px; }
 #env-overlay-root .weather-now,
-#env-overlay-root .moon { cursor: help; }
+#env-overlay-root .weather-next,
+#env-overlay-root .moon,
+#env-overlay-root .time,
+#env-overlay-root .speed { cursor: help; }
+
 #env-overlay-root .weather-next { display: none; }
 #env-overlay-root .bottom-row {
   display: flex;

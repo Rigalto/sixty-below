@@ -381,7 +381,7 @@ buffStyle.textContent = /* css */`
     flex-direction: column;
     align-items: center;
     width: 32px;
-    cursor: default;
+    cursor: help;
   }
 
   .buff-icon {
