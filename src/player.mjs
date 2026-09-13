@@ -1107,11 +1107,30 @@ class HealthManager {
   }
 
   /**
-  * Santé maximale (capacité).
-  * @returns {number}
-  */
+   * Santé maximale (capacité).
+   * @returns {number}
+   */
   getCapacity () {
     return this.#capacity
+  }
+
+  /**
+   * Calcule directement (sans boucle) l'indice du cœur actuellement en remplissage
+   * partiel et sa fraction. Tous les cœurs d'indice < boundary sont pleins, ceux
+   * d'indice > boundary sont vides. boundary === #totalHearts si aucun cœur n'est
+   * partiel (santé pleine).
+   * @returns {{boundary: number, fraction: number}}
+   */
+  getFillBoundary () {
+    const goldHeartValue = HEART_HP + GOLD_HEART_BONUS
+    const goldCapacity = this.#goldHearts * goldHeartValue
+    if (this.#current < goldCapacity) {
+      return {boundary: Math.floor(this.#current / goldHeartValue), fraction: (this.#current % goldHeartValue) / goldHeartValue}
+    }
+    const remaining = this.#current - goldCapacity
+    const boundary = this.#goldHearts + Math.floor(remaining / HEART_HP)
+    const fraction = boundary < this.#totalHearts ? (remaining % HEART_HP) / HEART_HP : 0
+    return {boundary, fraction}
   }
 
   // /////////// //
@@ -1141,6 +1160,7 @@ class HealthManager {
   onCrystalUsed () {
     this.#totalHearts++
     this.#computeCapacity()
+    this.#current += HEART_HP
     this.#dirty = true
   }
 
@@ -1152,18 +1172,11 @@ class HealthManager {
     if (this.#goldHearts >= this.#totalHearts) return
     this.#goldHearts++
     this.#computeCapacity()
+    this.#current += GOLD_HEART_BONUS
     this.#dirty = true
   }
 }
 export const healthManager = new HealthManager()
-
-/* ====================================================================================================
-   HEALTH WIDGET
-   ==================================================================================================== */
-
-class HealthWidget {
-}
-export const healthWidget = new HealthWidget()
 
 /* ====================================================================================================
    HOTBAR OVERLAY

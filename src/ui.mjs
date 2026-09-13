@@ -1,10 +1,11 @@
-// ui.mjs — MenuBarWIdget - CreationDialogOverlay - EnvironementWidget - TileHoverWidget - ModalBlocker - SeedWidget
+// ui.mjs — MenuBarWIdget - CreationDialogOverlay - EnvironementWidget - TileHoverWidget
+// ModalBlocker - SeedWidget - HealthWidget
 
 import {eventBus, seededRNG} from './utils.mjs'
 import {gameCore} from './core.mjs'
 import {buffManager} from './buff.mjs'
-import {playerManager} from './player.mjs'
-import {IS_DEV, WEATHER_TYPE, MOON_PHASE, MOON_PHASE_BLURRED, STATE, OVERLAYS, UI_LAYOUT, PATH_INVENTORY, PATH_CRAFT, PATH_TROPHY, PATH_HELP, PATH_ZOOM_IN, PATH_ZOOM_OUT, PATH_NEW_WORLD, PATH_SAVE, PATH_RESTORE, PATH_DEBUG, PATH_CANCEL, SVG_ICON, PLAYER} from './constant.mjs'
+import {playerManager, healthManager} from './player.mjs'
+import {IS_DEV, WEATHER_TYPE, MOON_PHASE, MOON_PHASE_BLURRED, STATE, OVERLAYS, UI_LAYOUT, PATH_INVENTORY, PATH_HEART, PATH_CRAFT, PATH_TROPHY, PATH_HELP, PATH_ZOOM_IN, PATH_ZOOM_OUT, PATH_NEW_WORLD, PATH_SAVE, PATH_RESTORE, PATH_DEBUG, PATH_CANCEL, SVG_ICON, PLAYER} from './constant.mjs'
 import {furnitureManager} from './housing.mjs'
 import {floraManager} from './ecosystem.mjs'
 import {ITEMS} from '../assets/data/data.mjs'
@@ -347,6 +348,46 @@ uiStyle.textContent = /* css */`
   cursor: text;
   text-shadow: 0 0 4px #ffffff;
 }
+
+
+/* HealthWidget */
+
+#health-widget {
+  order: ${UI_LAYOUT.LIFE};
+  margin-bottom: 10px;
+  background-color: rgba(20, 20, 25, 0.9);
+  border: 1px solid #444;
+  border-radius: 6px;
+  padding: 8px;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.5);
+}
+
+#health-widget .health-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2px;
+  cursor: help;
+}
+
+#health-widget .heart-wrap {
+  position: relative;
+  width: 20px;
+  height: 20px;
+  flex-shrink: 0;
+}
+
+#health-widget .heart-bg,
+#health-widget .heart-fill {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 20px;
+  height: 20px;
+}
+
+#health-widget .heart-bg { color: #4a4a4a; }
+#health-widget .heart-fill { color: #e74c3c; }
+#health-widget .heart-fill.gold { color: #f1c40f; }
 `
 document.head.appendChild(uiStyle)
 
@@ -1336,3 +1377,158 @@ class SeedWidget {
   }
 }
 export const seedWidget = new SeedWidget()
+
+/* ====================================================================================================
+   HEALTH WIDGET
+   ==================================================================================================== */
+
+class HealthWidget {
+  #container = null // conteneur racine, injecté dans #right-sidebar
+  #row = null // conteneur des cœurs
+  #hearts = [] // refs DOM précalculées vers les .heart-fill, un par cœur affiché
+  #lastTotalHearts = 0 // nombre de cœurs déjà présents dans le DOM
+  #lastGoldHearts = 0 // nombre de cœurs déjà dorés dans le DOM
+  #lastBoundary = 0 // indice du cœur partiel au dernier rendu appliqué
+  #lastFraction = -1 // fraction du dernier rendu — -1 force l'application au premier tick
+  #lastTitle = '' // dernier texte écrit dans #row.title
+
+  constructor () {
+    this.#buildDOM()
+    this.onFirstLoop = this.onFirstLoop.bind(this)
+    eventBus.on('time/first-loop', this.onFirstLoop)
+    this.#startInterval()
+  }
+
+  /**
+   * Construit le conteneur et la rangée de cœurs, et l'injecte dans #right-sidebar.
+   */
+  #buildDOM () {
+    this.#container = document.createElement('div')
+    this.#container.id = 'health-widget'
+
+    this.#row = document.createElement('div')
+    this.#row.className = 'health-row'
+    this.#container.appendChild(this.#row)
+
+    const rightSidebar = document.getElementById('right-sidebar')
+    if (rightSidebar) {
+      rightSidebar.appendChild(this.#container)
+    } else {
+      console.error('HealthWidget: #right-sidebar introuvable')
+    }
+  }
+
+  /**
+  * Liaison EventBus : 'time/first-loop' — (re)peint l'état de santé complet. Émis
+  * une fois par session (donc aussi après génération d'un nouveau monde) : la
+  * rangée est intégralement réinitialisée pour ne pas garder les cœurs de la
+  * session précédente (leur nombre peut diminuer d'un monde à l'autre).
+  */
+  onFirstLoop () {
+    this.#row.textContent = ''
+    this.#row.title = ''
+    this.#hearts.length = 0
+    this.#lastTotalHearts = 0
+    this.#lastGoldHearts = 0
+    this.#lastTitle = ''
+
+    const totalHearts = healthManager.getTotalHearts()
+    const goldHearts = healthManager.getGoldHearts()
+    this.#addHearts(totalHearts)
+    this.#gildHearts(goldHearts)
+
+    const {boundary, fraction} = healthManager.getFillBoundary()
+    for (let i = 0; i < totalHearts; i++) {
+      if (i < boundary) this.#setHeartFill(i, 1)
+      else if (i === boundary) this.#setHeartFill(i, fraction)
+      else this.#setHeartFill(i, 0)
+    }
+    this.#lastBoundary = boundary
+    this.#lastFraction = fraction
+  }
+
+  /**
+   * Démarre l'intervalle d'actualisation du widget.
+   * Découplé du temps de jeu.
+   */
+  #startInterval () {
+    setInterval(() => this.#update(), 200)
+  }
+
+  /**
+   * Lit l'état de santé et reconstruit la rangée de cœurs si leur nombre/couleur a changé,
+   * puis met à jour le remplissage visuel et le tooltip.
+   */
+  #update () {
+    const totalHearts = healthManager.getTotalHearts()
+    const goldHearts = healthManager.getGoldHearts()
+    if (totalHearts > this.#lastTotalHearts) this.#addHearts(totalHearts)
+    if (goldHearts > this.#lastGoldHearts) this.#gildHearts(goldHearts)
+
+    const {boundary, fraction} = healthManager.getFillBoundary()
+    if (boundary !== this.#lastBoundary || fraction !== this.#lastFraction) {
+      this.#applyBoundary(boundary, fraction)
+    }
+    const title = `${healthManager.getCurrent()} / ${healthManager.getCapacity()} HP`
+    if (title !== this.#lastTitle) {
+      this.#row.title = title
+      this.#lastTitle = title
+    }
+  }
+
+  /**
+   * Ajoute les cœurs manquants en fin de rangée (rouges, pleins). Les cœurs ne
+   * diminuant jamais, aucune suppression n'est à gérer.
+   * @param {number} totalHearts
+   */
+  #addHearts (totalHearts) {
+    for (let i = this.#lastTotalHearts; i < totalHearts; i++) {
+      const wrap = document.createElement('div')
+      wrap.className = 'heart-wrap'
+      wrap.innerHTML = SVG_ICON(PATH_HEART, 'class="heart-bg"') + SVG_ICON(PATH_HEART, 'class="heart-fill"')
+      this.#row.appendChild(wrap)
+      this.#hearts.push(wrap.querySelector('.heart-fill'))
+    }
+    this.#lastTotalHearts = totalHearts
+  }
+
+  /**
+   * Dore les cœurs nouvellement transformés — toujours en tête de rangée, indices
+   * [#lastGoldHearts, goldHearts[.
+   * @param {number} goldHearts
+   */
+  #gildHearts (goldHearts) {
+    for (let i = this.#lastGoldHearts; i < goldHearts; i++) {
+      this.#hearts[i].classList.add('gold')
+    }
+    this.#lastGoldHearts = goldHearts
+  }
+
+  /**
+   * Fixe le remplissage d'un cœur (1 = plein, 0 = vide, entre les deux = partiel).
+   * @param {number} index
+   * @param {number} fraction
+   */
+  #setHeartFill (index, fraction) {
+    this.#hearts[index].style.clipPath = fraction >= 1 ? 'none' : `inset(0 ${(1 - fraction) * 100}% 0 0)`
+  }
+
+  /**
+   * Met à jour uniquement les cœurs dont l'état plein/vide a changé depuis le dernier
+   * rendu (plage entre l'ancien et le nouveau boundary), plus le cœur actuellement
+   * partiel. Les cœurs inchangés ne sont jamais touchés.
+   * @param {number} boundary
+   * @param {number} fraction
+   */
+  #applyBoundary (boundary, fraction) {
+    if (boundary > this.#lastBoundary) {
+      for (let i = this.#lastBoundary; i < boundary; i++) this.#setHeartFill(i, 1)
+    } else if (boundary < this.#lastBoundary) {
+      for (let i = boundary + 1; i <= this.#lastBoundary; i++) this.#setHeartFill(i, 0)
+    }
+    if (boundary < this.#hearts.length) this.#setHeartFill(boundary, fraction)
+    this.#lastBoundary = boundary
+    this.#lastFraction = fraction
+  }
+}
+export const healthWidget = new HealthWidget()
