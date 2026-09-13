@@ -385,8 +385,9 @@ export const ITEMS = {
   spiderEgg: {name: 'Spider Egg', type: 0, stype: 'egg', star: 2, image: 'tools_32_32-4-0', help: 'Spiders', tooltip: '???'},
   spiderFang: {name: 'Spider Fang', type: 0, stype: 'fang', star: 3, image: 'tools_32_32-4-0', help: 'Spiders', tooltip: '???'},
 
-  // crystall - image OK
+  // health related - image OK
   lifeCrystal: {name: 'Life Crystal', type: ITEM_TYPE.FURNITURE | ITEM_TYPE.UNIQUE | ITEM_TYPE.USABLE, stype: 'life', star: 1, image: 'foraged_32_32-7-2', placed: 'foraged_32_32-7-2', unplacing: {speed: 1800}, using: {action: 'emit-event', event: 'life/crystal-used'}, help: 'Life Crystal', tooltip: 'Permanently increases maximum life by 20\nCollect with a Hammer'},
+  lifeFruit: {name: 'Life Fruit', type: ITEM_TYPE.FURNITURE | ITEM_TYPE.UNIQUE | ITEM_TYPE.USABLE, stype: 'life', star: 1, image: 'foraged_32_32-0-7', using: {action: 'emit-event', event: 'life/fruit-used'}, help: 'Life Crystal', tooltip: 'Permanently increases one heart by 5'},
 
   // triskel - images NOK
   triskelCopper: {name: 'Copper Triskel', type: ITEM_TYPE.FURNITURE | ITEM_TYPE.UNIQUE | ITEM_TYPE.MATERIAL, stype: 'triskel', star: 3, image: 'furniture_32_32-12-2', placed: 'furniture_32_32-6-3', unplacing: {speed: 1800}, help: 'Triskels', tooltip: ''},
