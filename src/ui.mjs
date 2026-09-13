@@ -1469,7 +1469,7 @@ class HealthWidget {
     if (boundary !== this.#lastBoundary || fraction !== this.#lastFraction) {
       this.#applyBoundary(boundary, fraction)
     }
-    const title = `${healthManager.getCurrent()} / ${healthManager.getCapacity()} HP`
+    const title = `${healthManager.getCurrent()} / ${healthManager.getCapacity()} HP\n${healthManager.getRegenRate().toFixed(1)} HP/s`
     if (title !== this.#lastTitle) {
       this.#row.title = title
       this.#lastTitle = title

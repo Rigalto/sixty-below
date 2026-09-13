@@ -1046,6 +1046,7 @@ class HealthManager {
   #goldHearts = 0 // nombre de cœurs dorés parmi #totalHearts — persisté, +1 par Life Fruit consommé
   #dirty = false // true si current/totalHearts/goldHearts a changé depuis la dernière écriture gamestate (cf. onSaveTick)
   #capacity = 0 // cache de la santé maximale — recalculé uniquement si #totalHearts/#goldHearts changent (cf. #computeCapacity)
+  #regenRate = 0.5986 // taux de régénération (HP/s), mis en cache — valeur de debug constante en attendant le buff composé 'health-regen'
 
   constructor () {
     // eventBus
@@ -1086,33 +1087,32 @@ class HealthManager {
    * Points de vie actuels du joueur.
    * @returns {number}
    */
-  getCurrent () {
-    return this.#current
-  }
+  getCurrent () { return this.#current }
 
   /**
    * Nombre total de cœurs (rouges + dorés) — pour le rendu du widget.
    * @returns {number}
    */
-  getTotalHearts () {
-    return this.#totalHearts
-  }
+  getTotalHearts () { return this.#totalHearts }
 
   /**
    * Nombre de cœurs dorés parmi les cœurs totaux — pour le rendu du widget.
    * @returns {number}
    */
-  getGoldHearts () {
-    return this.#goldHearts
-  }
+  getGoldHearts () { return this.#goldHearts }
 
   /**
    * Santé maximale (capacité).
    * @returns {number}
    */
-  getCapacity () {
-    return this.#capacity
-  }
+  getCapacity () { return this.#capacity }
+
+  /**
+   * Taux de régénération courant (HP/s), mis en cache. Valeur de debug constante pour
+   * l'instant, en attendant le buff composé 'health-regen' (cf. conception validée).
+   * @returns {number}
+   */
+  getRegenRate () { return this.#regenRate }
 
   /**
    * Calcule directement (sans boucle) l'indice du cœur actuellement en remplissage
