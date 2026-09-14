@@ -512,7 +512,7 @@ class GameCore {
     // 2.B. TaskScheduler (Vérifie si des tâches longues sont dues)
     taskScheduler.update(gameTimestamp)
 
-    // 2.C Mouvements et caméra — déléguée à PlayerManager
+    // 2.C.1 Mouvements et caméra — déléguée à PlayerManager
     // Version DEBUG
     if (keyboardManager.directionsArrow !== 0) {
       camera.update(playerManager.updateDebug(dt, keyboardManager.directionsArrow))
@@ -523,6 +523,9 @@ class GameCore {
     // Version Normale
     // camera.update(playerManager.update(dt, keyboardManager.directionsArrow | keyboardManager.directionsGame))
     // fin version Normale
+
+    // 2.C.2 Gestion des points de vie
+    healthManager.update(dt)
 
     // 2.D Tuile sous la souris — disponible pour tous les systèmes de la frame
     const tileIndex = camera.canvasToTile(mouseManager.mouse.x, mouseManager.mouse.y)

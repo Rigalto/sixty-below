@@ -1046,7 +1046,8 @@ class HealthManager {
   #goldHearts = 0 // nombre de cœurs dorés parmi #totalHearts — persisté, +1 par Life Fruit consommé
   #dirty = false // true si current/totalHearts/goldHearts a changé depuis la dernière écriture gamestate (cf. onSaveTick)
   #capacity = 0 // cache de la santé maximale — recalculé uniquement si #totalHearts/#goldHearts changent (cf. #computeCapacity)
-  #regenRate = 0.5986 // taux de régénération (HP/s), mis en cache — valeur de debug constante en attendant le buff composé 'health-regen'
+  #regenRate = 0 // taux de régénération (HP/s), mis en cache
+  #regenCarry = 0 // reliquat fractionnaire de régénération (HP), reporté frame à frame
 
   constructor () {
     // eventBus
@@ -1108,11 +1109,20 @@ class HealthManager {
   getCapacity () { return this.#capacity }
 
   /**
-   * Taux de régénération courant (HP/s), mis en cache. Valeur de debug constante pour
-   * l'instant, en attendant le buff composé 'health-regen' (cf. conception validée).
+   * Taux de régénération courant (HP/s), mis en cache.
    * @returns {number}
    */
   getRegenRate () { return this.#regenRate }
+
+  /**
+   * Calcule le taux de régénération courant (HP/s) — scale avec #capacity (100s pour
+   * un plein regen à taux plein), modulé par le buff composé 'health-regen' (100 =
+   * taux plein, 0 = régénération suspendue).
+   * @returns {number}
+   */
+  #computeRegenRate () {
+    this.#regenRate = this.#capacity / 100 * buffManager.getBuff('health-regen') / 100
+  }
 
   /**
    * Calcule directement (sans boucle) l'indice du cœur actuellement en remplissage
@@ -1131,6 +1141,34 @@ class HealthManager {
     const boundary = this.#goldHearts + Math.floor(remaining / HEART_HP)
     const fraction = boundary < this.#totalHearts ? (remaining % HEART_HP) / HEART_HP : 0
     return {boundary, fraction}
+  }
+
+  // /////////// //
+  // MISE A JOUR //
+  // /////////// //
+
+  // ///////// //
+  // ENTRETIEN //
+  // ///////// //
+
+  /**
+   * Entretien par frame : recalcule le taux de régénération, puis — si #current n'a
+   * pas atteint #capacity — accumule le gain fractionnaire dans #regenCarry et
+   * incrémente #current d'un nombre entier de HP dès que le reliquat atteint 1.
+   * @param {number} dt - delta temps en ms
+   */
+  update (dt) {
+    this.#computeRegenRate()
+    if (this.#current >= this.#capacity) return
+
+    const gain = this.#regenRate * dt / 1000 + this.#regenCarry
+    const intGain = gain | 0
+    this.#regenCarry = gain - intGain
+    if (intGain === 0) return
+
+    this.#current += intGain
+    if (this.#current > this.#capacity) this.#current = this.#capacity
+    this.#dirty = true
   }
 
   // /////////// //

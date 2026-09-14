@@ -77,6 +77,10 @@ class BuffManager {
     ['fall-damage', () => {
       return 100
     }],
+    ['health-regen', () => {
+      if (this.#values.get('playerFreeze')) return 0
+      return 100
+    }],
     ['interaction-range', () => {
       const x = -10
       const y = -8
