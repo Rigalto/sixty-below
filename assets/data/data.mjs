@@ -565,7 +565,7 @@ export const ITEMS = {
   eggMaleo: {name: 'Maleo Egg', type: 0, stype: 'egg', star: 2, image: 'foraged_32_32-3-1', help: 'Oak & Mahogany', tooltip: '???'}, // jungle
   featherBird: {name: 'Bird Feather', type: 0, stype: 'feather', star: 1, image: 'foraged_32_32-4-2', help: 'Oak & Mahogany', tooltip: '???'},
   featherKakapo: {name: 'Kakapo Feather', type: 0, stype: 'feather', star: 2, image: 'foraged_32_32-5-2', help: 'Oak & Mahogany', tooltip: '???'},
-  apple: {name: 'Apple', type: 0, stype: 'fruit', star: 1, image: 'foraged_32_32-2-2', help: 'Oak & Mahogany', tooltip: 'An apple a day keeps Doctor Bones away!'},
+  apple: {name: 'Apple', type: ITEM_TYPE.FOOD | ITEM_TYPE.USABLE, stype: 'fruit', star: 1, image: 'foraged_32_32-2-2', help: 'Oak & Mahogany', tooltip: 'An apple a day keeps Doctor Bones away!', using: {action: 'emit-event', event: 'life/add', payload: {flat: 20}}},
   peach: {name: 'Peach', type: 0, stype: 'fruit', star: 1, image: 'foraged_32_32-3-2', help: 'Oak & Mahogany', tooltip: '???'},
 
   acorn: {name: 'Acorn', type: ITEM_TYPE.SEED | ITEM_TYPE.PLACABLE, stype: 'seed', star: 1, image: 'foraged_32_32-0-1', help: 'Oak & Mahogany', tooltip: '???'},
