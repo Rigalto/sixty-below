@@ -315,17 +315,24 @@ Cette section définit les événements officiels. Tout nouvel événement doit 
 | Dir. | Event Name | Payload Structure | Description |
 | :---: | :--- | :--- | :--- |
 | S | `player/move` | `{x: number, y: number}` | Émis quand la tuile sous les pieds du joueur change. Coordonnées en tuiles. |
-| S | `life/add` | `{dmg: number}` | Dégâts de chute. dmg < 0. |
+| S | `life/add` | `{flat?: number, ofCurrent?: number, ofCapacity?: number}` | Dégâts de chute |
 | E | `player/teleport` | `{x: number, y: number}` | Téléporte le joueur aux coordonnées tuiles données. |
 | E | `save/tick` | — | Écrit la position courante dans gamestate via database.setGameState('player', ...). |
 | S | `player/teleport-begin` | — | Début de téléportation, avant fading. Le joueur est bloqué, ses actions annulées. |
 | S | `player/teleport-end` | — | Fin de téléportation, avant fading. Le joueur est débloqué. |
 
 #### Player Life (`HealthManager`)
-*En prévision*
+
 | Dir. | Event Name | Payload Structure | Description |
 | :---: | :--- | :--- | :--- |
-| E | `life/add` | `{deltaLife: number}` | Ajout de points de vie. |
+| E | `save/tick` | — | Persiste les points de vie et le nombre de coeurs, si modifié. |
+| E | `life/crystal-used` | — | Augmente le nombre de coeurs. |
+| E | `life/fruit-used` | — | Passe un coeur rouge (s'il y en a) en un coeur doré. |
+| E | `life/add` | `{flat?: number, ofCurrent?: number, ofCapacity?: number}` | Ajout de points de vie. |
+
+
+
+
 
 #### Rendering (`Camera`, `SkyRenderer`)
 
