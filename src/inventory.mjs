@@ -1481,39 +1481,43 @@ class ItemUseManager {
   }
 
   /**
-   * Dispatche l'item utilisé vers le traitement associé à son 'using.action'.
+   * Dispatche chaque entrée de itemDef.using vers le traitement associé à son 'action'.
+   * Une utilisation peut désormais combiner plusieurs actions non exclusives
+   * (ex: heal + buff-timed pour un aliment).
    * Lié dans le constructeur.
    * @param {string} itemId — identifiant de l'item utilisé (clé de ITEMS)
    */
   onItemUsed (itemId) {
     const itemDef = ITEMS[itemId]
-    switch (itemDef.using.action) {
-      case 'emit-event': this.#useEmitEvent(itemDef); break
-      case 'add-items': this.#useAddItems(itemDef); break
-      case 'buff-timed': this.#useBuffTimed(itemDef); break
-      case 'none': break
-      default: console.error(`[ItemUseManager] action inconnue : '${itemDef.using.action}'`)
+    for (const using of itemDef.using) {
+      switch (using.action) {
+        case 'emit-event': this.#useEmitEvent(using); break
+        case 'add-items': this.#useAddItems(using); break
+        case 'buff-timed': this.#useBuffTimed(using); break
+        case 'none': break
+        default: console.error(`[ItemUseManager] action inconnue : '${using.action}'`)
+      }
     }
   }
 
   /**
-   * Émet l'event défini par itemDef.using.event, avec le payload optionnel
-   * itemDef.using.payload (absent → undefined, équivalent à un emit sans second argument).
-   * @param {object} itemDef — ITEMS[itemId]
+   * Émet l'event défini par using.event, avec le payload optionnel using.payload
+   * (absent → undefined, équivalent à un emit sans second argument).
+   * @param {object} using — une entrée de itemDef.using ({action: 'emit-event', event, payload})
    */
-  #useEmitEvent (itemDef) { eventBus.emit(itemDef.using.event, itemDef.using.payload) }
+  #useEmitEvent (using) { eventBus.emit(using.event, using.payload) }
 
   /**
-   * TODO: résout itemDef.using via resolveLoot et rafraîchit le bag.
-   * @param {object} itemDef — ITEMS[itemId]
+   * TODO: résout `using` via resolveLoot et rafraîchit le bag.
+   * @param {object} using — une entrée de itemDef.using ({action: 'add-items', items[]...})
    */
-  #useAddItems (itemDef) { console.log('[ItemUseManager] TODO add-items', itemDef) }
+  #useAddItems (using) { console.log('[ItemUseManager] TODO add-items', using) }
 
   /**
    * TODO: pose un buff temporisé via BuffManager (mécanisme pas encore implémenté).
-   * @param {object} itemDef — ITEMS[itemId]
+   * @param {object} using — une entrée de itemDef.using ({action: 'buff-timed', ...})
    */
-  #useBuffTimed (itemDef) { console.log('[ItemUseManager] TODO buff-timed', itemDef) }
+  #useBuffTimed (using) { console.log('[ItemUseManager] TODO buff-timed', using) }
 }
 export const itemUseManager = new ItemUseManager()
 

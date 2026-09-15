@@ -386,8 +386,8 @@ export const ITEMS = {
   spiderFang: {name: 'Spider Fang', type: 0, stype: 'fang', star: 3, image: 'tools_32_32-4-0', help: 'Spiders', tooltip: '???'},
 
   // health related - image OK
-  lifeCrystal: {name: 'Life Crystal', type: ITEM_TYPE.FURNITURE | ITEM_TYPE.UNIQUE | ITEM_TYPE.USABLE, stype: 'life', star: 1, image: 'foraged_32_32-7-2', placed: 'foraged_32_32-7-2', unplacing: {speed: 1800}, using: {action: 'emit-event', event: 'life/crystal-used'}, help: 'Life Crystal', tooltip: 'Permanently increases maximum life by 20\nCollect with a Hammer'},
-  lifeFruit: {name: 'Life Fruit', type: ITEM_TYPE.FURNITURE | ITEM_TYPE.UNIQUE | ITEM_TYPE.USABLE, stype: 'life', star: 1, image: 'foraged_32_32-0-7', using: {action: 'emit-event', event: 'life/fruit-used'}, help: 'Life Crystal', tooltip: 'Permanently increases one heart by 5'},
+  lifeCrystal: {name: 'Life Crystal', type: ITEM_TYPE.FURNITURE | ITEM_TYPE.UNIQUE | ITEM_TYPE.USABLE, stype: 'life', star: 1, image: 'foraged_32_32-7-2', placed: 'foraged_32_32-7-2', unplacing: {speed: 1800}, using: [{action: 'emit-event', event: 'life/crystal-used'}], help: 'Life Crystal', tooltip: 'Permanently increases maximum life by 20\nCollect with a Hammer'},
+  lifeFruit: {name: 'Life Fruit', type: ITEM_TYPE.FURNITURE | ITEM_TYPE.UNIQUE | ITEM_TYPE.USABLE, stype: 'life', star: 1, image: 'foraged_32_32-0-7', using: [{action: 'emit-event', event: 'life/fruit-used'}], help: 'Life Crystal', tooltip: 'Permanently increases one heart by 5'},
 
   // triskel - images NOK
   triskelCopper: {name: 'Copper Triskel', type: ITEM_TYPE.FURNITURE | ITEM_TYPE.UNIQUE | ITEM_TYPE.MATERIAL, stype: 'triskel', star: 3, image: 'furniture_32_32-12-2', placed: 'furniture_32_32-6-3', unplacing: {speed: 1800}, help: 'Triskels', tooltip: ''},
@@ -448,7 +448,7 @@ export const ITEMS = {
 
   // Furniture - Teleporter
   fallenStar: {name: 'Fallen Star', type: 0, stype: 'misc', star: 4, image: 'furniture_32_32-2-0', help: 'Teleporters', tooltip: 'A concentrated burst of energy, fallen from the sky'},
-  recallPotion: {name: 'Recall Potion', type: ITEM_TYPE.POTION | ITEM_TYPE.USABLE, stype: 'misc', star: 3, image: 'potion_32_32-0-0', using: {action: 'emit-event', event: 'player/teleport-spawn'}, help: 'Recall Potion', tooltip: 'Teleports you back to your spawn point'},
+  recallPotion: {name: 'Recall Potion', type: ITEM_TYPE.POTION | ITEM_TYPE.USABLE, stype: 'misc', star: 3, image: 'potion_32_32-0-0', using: [{action: 'emit-event', event: 'player/teleport-spawn'}], help: 'Recall Potion', tooltip: 'Teleports you back to your spawn point'},
 
   teleporterYellow: {name: 'Yellow teleporter', type: ITEM_TYPE.FURNITURE | ITEM_TYPE.PLACABLE, stype: 'teleporter', star: 4, image: 'furniture_32_32-8-7', placed: 'furniture_32_32-8-7', unplacing: {speed: 3200}, help: 'Teleporters', tooltip: 'Click to teleport instantly to the matching teleporter'},
   teleporterOrange: {name: 'Orange teleporter', type: ITEM_TYPE.FURNITURE | ITEM_TYPE.PLACABLE, stype: 'teleporter', star: 4, image: 'furniture_32_32-9-7', placed: 'furniture_32_32-9-7', unplacing: {speed: 3200}, help: 'Teleporters', tooltip: 'Click to teleport instantly to the matching teleporter'},
@@ -524,9 +524,9 @@ export const ITEMS = {
   // Liquid containers (small capacity) - images OK
   glass: {name: 'Glass', type: 0, stype: 'glass', star: 1, image: 'refined_32_32-4-2', help: 'Bottles', tooltip: 'Used to make Bottles or decorative furniture'},
   bottle: {name: 'Bottle', type: ITEM_TYPE.FURNITURE | ITEM_TYPE.PLACABLE | ITEM_TYPE.FILLABLE, stype: 'container', star: 1, furnitureSet: 'glass', image: 'container_32_32-0-0', placed: 'container_32_32-0-0', unplacing: {speed: 600}, help: 'Bottles', tooltip: 'Crafting container for potions and food'},
-  bottleWater: {name: 'Bottled Water', type: ITEM_TYPE.FURNITURE | ITEM_TYPE.PLACABLE | ITEM_TYPE.POTION | ITEM_TYPE.USABLE, stype: 'container', star: 1, image: 'container_32_32-1-0', placed: 'container_32_32-1-0', heal: 20, sickness: 40, unplacing: {speed: 600}, using: {action: 'none'}, help: 'Bottles', tooltip: 'Healing item and Crafting Material for potions'},
-  bottleSap: {name: 'Bottled Sap', type: ITEM_TYPE.FURNITURE | ITEM_TYPE.PLACABLE | ITEM_TYPE.POTION | ITEM_TYPE.USABLE, stype: 'container', star: 1, image: 'container_32_32-2-0', placed: 'container_32_32-2-0', heal: 80, sickness: 60, timedbuff: 'honey', time: 15, unplacing: {speed: 600}, using: {action: 'none'}, help: 'Bottles', tooltip: 'Healing item'},
-  bottleHoney: {name: 'Bottled Honey', type: ITEM_TYPE.FURNITURE | ITEM_TYPE.PLACABLE | ITEM_TYPE.POTION | ITEM_TYPE.USABLE, stype: 'container', star: 1, image: 'container_32_32-3-0', placed: 'container_32_32-3-0', heal: 80, sickness: 60, timedbuff: 'honey', time: 15, unplacing: {speed: 600}, using: {action: 'none'}, help: 'Bottles', tooltip: 'Healing item'},
+  bottleWater: {name: 'Bottled Water', type: ITEM_TYPE.FURNITURE | ITEM_TYPE.PLACABLE | ITEM_TYPE.POTION | ITEM_TYPE.USABLE, stype: 'container', star: 1, image: 'container_32_32-1-0', placed: 'container_32_32-1-0', heal: 20, sickness: 40, unplacing: {speed: 600}, using: [{action: 'none'}], help: 'Bottles', tooltip: 'Healing item and Crafting Material for potions'},
+  bottleSap: {name: 'Bottled Sap', type: ITEM_TYPE.FURNITURE | ITEM_TYPE.PLACABLE | ITEM_TYPE.POTION | ITEM_TYPE.USABLE, stype: 'container', star: 1, image: 'container_32_32-2-0', placed: 'container_32_32-2-0', heal: 80, sickness: 60, timedbuff: 'honey', time: 15, unplacing: {speed: 600}, using: [{action: 'none'}], help: 'Bottles', tooltip: 'Healing item'},
+  bottleHoney: {name: 'Bottled Honey', type: ITEM_TYPE.FURNITURE | ITEM_TYPE.PLACABLE | ITEM_TYPE.POTION | ITEM_TYPE.USABLE, stype: 'container', star: 1, image: 'container_32_32-3-0', placed: 'container_32_32-3-0', heal: 80, sickness: 60, timedbuff: 'honey', time: 15, unplacing: {speed: 600}, using: [{action: 'none'}], help: 'Bottles', tooltip: 'Healing item'},
 
   // Liquid containers (large capacity)
   bucket: {name: 'Empty Bucket', type: ITEM_TYPE.FURNITURE | ITEM_TYPE.PLACABLE | ITEM_TYPE.FILLABLE | ITEM_TYPE.ARMOR, stype: 'container', armor: 'head', star: 1, image: 'container_32_32-0-1', placed: 'placed_32_32-6-0', armorImage: 'head_26_22-0-2', unplacing: {speed: 600}, help: 'Buckets', tooltip: 'Used to scoop up a small amount of water, honey or sap', defense: 1},
@@ -565,7 +565,7 @@ export const ITEMS = {
   eggMaleo: {name: 'Maleo Egg', type: 0, stype: 'egg', star: 2, image: 'foraged_32_32-3-1', help: 'Oak & Mahogany', tooltip: '???'}, // jungle
   featherBird: {name: 'Bird Feather', type: 0, stype: 'feather', star: 1, image: 'foraged_32_32-4-2', help: 'Oak & Mahogany', tooltip: '???'},
   featherKakapo: {name: 'Kakapo Feather', type: 0, stype: 'feather', star: 2, image: 'foraged_32_32-5-2', help: 'Oak & Mahogany', tooltip: '???'},
-  apple: {name: 'Apple', type: ITEM_TYPE.FOOD | ITEM_TYPE.USABLE, stype: 'fruit', star: 1, image: 'foraged_32_32-2-2', help: 'Oak & Mahogany', tooltip: 'An apple a day keeps Doctor Bones away!', using: {action: 'emit-event', event: 'life/add', payload: {flat: 20}}},
+  apple: {name: 'Apple', type: ITEM_TYPE.FOOD | ITEM_TYPE.USABLE, stype: 'fruit', star: 1, image: 'foraged_32_32-2-2', help: 'Oak & Mahogany', tooltip: 'An apple a day keeps Doctor Bones away!', using: [{action: 'emit-event', event: 'life/add', payload: {flat: 20}}]},
   peach: {name: 'Peach', type: 0, stype: 'fruit', star: 1, image: 'foraged_32_32-3-2', help: 'Oak & Mahogany', tooltip: '???'},
 
   acorn: {name: 'Acorn', type: ITEM_TYPE.SEED | ITEM_TYPE.PLACABLE, stype: 'seed', star: 1, image: 'foraged_32_32-0-1', help: 'Oak & Mahogany', tooltip: '???'},
@@ -614,8 +614,8 @@ export const ITEMS = {
 
   // Herbs
   parsnip: {name: 'Parsnip', type: 0, stype: 'herb', star: 1, image: 'foraged_32_32-6-1', placed: 'placed_16_16-0-0', help: 'Parsnip', tooltip: '???', foraging: {speed: 1800, items: [{item: 'parsnip', count: '1-3'}]}},
-  parsnipMash: {name: 'Parsnip Mash', type: ITEM_TYPE.FOOD | ITEM_TYPE.USABLE, stype: 'food', star: 1, image: 'potions_32_32-1-5', using: {action: 'none'}, help: 'Parsnip', tooltip: '???'},
-  vegetableSoup: {name: 'Vegetable Soup', type: ITEM_TYPE.FOOD | ITEM_TYPE.USABLE, stype: 'food', star: 2, image: 'potions_32_32-1-5', using: {action: 'none'}, help: 'Soups', tooltip: '???'},
+  parsnipMash: {name: 'Parsnip Mash', type: ITEM_TYPE.FOOD | ITEM_TYPE.USABLE, stype: 'food', star: 1, image: 'potions_32_32-1-5', using: [{action: 'none'}], help: 'Parsnip', tooltip: '???'},
+  vegetableSoup: {name: 'Vegetable Soup', type: ITEM_TYPE.FOOD | ITEM_TYPE.USABLE, stype: 'food', star: 2, image: 'potions_32_32-1-5', using: [{action: 'none'}], help: 'Soups', tooltip: '???'},
 
   sunflower: {name: 'Sunflower', type: 0, stype: 'herb', star: 1, image: null, placed: 'placed_16_32-2-1', placedLeft: 'placed_16_32-3-1', placedRight: 'placed_16_32-4-1', help: 'Sunflower', tooltip: 'Blooms at dawn and always faces the sun', foraging: {speed: 2400, items: [{item: 'sunflowerSeed', count: '3-4'}, {item: 'worm', count: 0.10, buffs: ['lucky:100', 'rainy:200']}]}},
   sunflowerSeed: {name: 'Sunflower Seed', type: ITEM_TYPE.SEED | ITEM_TYPE.PLACABLE, stype: 'seed', star: 1, image: 'foraged_32_32-0-0', placed: 'placed_16_16-1-0', help: 'Sunflower', tooltip: '???'},
@@ -649,7 +649,7 @@ export const ITEMS = {
   coralG: {name: 'Whispering Fan Coral', type: 0, stype: 'herb', star: 2, image: null, placed: 'placed_32_32-3-1', speed: 1900, foraging: {speed: 500, items: [{item: 'coral', count: 1}, {item: 'oyster', count: 0.12, buffs: ['lucky:100', 'rainy:300']}]}, help: 'Corals', tooltip: 'Crafting Material for Potions and Furniture'},
   coral: {name: 'Coral', type: 0, stype: 'herb', star: 2, image: 'foraged_32_32-3-3', help: 'Corals', tooltip: 'Crafting Material for Potions and Furniture'},
 
-  oyster: {name: 'Oyster', type: ITEM_TYPE.USABLE, stype: 'food', star: 2, image: 'foraged_32_32-2-4', help: 'Oyster', tooltip: 'Open it to eat and collect pearls', using: {action: 'add-items', items: [{item: 'shuckedOyster', count: 1}, {item: 'pearlWhite', count: 0.25, buffs: ['lucky:60']}, {item: 'pearlBlack', count: 0.15, buffs: ['lucky:50']}, {item: 'pearlPink', count: 0.05, buffs: ['lucky:40']}]}},
+  oyster: {name: 'Oyster', type: ITEM_TYPE.USABLE, stype: 'food', star: 2, image: 'foraged_32_32-2-4', help: 'Oyster', tooltip: 'Open it to eat and collect pearls', using: [{action: 'add-items', items: [{item: 'shuckedOyster', count: 1}, {item: 'pearlWhite', count: 0.25, buffs: ['lucky:60']}, {item: 'pearlBlack', count: 0.15, buffs: ['lucky:50']}, {item: 'pearlPink', count: 0.05, buffs: ['lucky:40']}]}]},
   shuckedOyster: {name: 'Shucked Oyster', type: ITEM_TYPE.FOOD, stype: 'food', star: 2, image: 'foraged_32_32-3-4', help: 'Oyster', tooltip: 'Minor improvements to all stats (10 minutes)'},
   pearlWhite: {name: 'White Pearl', type: 0, stype: 'pearl', star: 2, image: 'foraged_32_32-4-4', help: 'Oyster', tooltip: 'Major ingredient of Luck Potion'},
   pearlBlack: {name: 'Black Pearl', type: 0, stype: 'pearl', star: 3, image: 'foraged_32_32-5-4', help: 'Oyster', tooltip: 'Major ingredient of Luck Potion'},
@@ -680,7 +680,7 @@ export const ITEMS = {
 
   gravelweed: {name: 'Gravelweed', type: 0, stype: 'herb', star: 2, image: 'foraged_32_32-6-5', placed: 'placed_16_32-7-0', placedLeft: 'placed_16_32-6-0', foraging: {speed: 500, items: [{item: 'gravelweed', count: 1, buffs: ['lucky:20']}]}, help: 'Gravelweed', tooltip: 'Harvest to collect Potions and Food ingredients'},
 
-  seedBag: {name: 'Seed Bag', type: ITEM_TYPE.USABLE, stype: 'bag', star: 2, image: 'container_32_32-0-3', help: 'Oyster', tooltip: 'Open to get wild plant seeds', using: {action: 'add-items', items: [{item: 'sunflowerSeed', count: 0.30}, {item: 'ambermirageSeed', count: 0.30}, {item: 'bloodmoonSeed', count: 0.25}, {item: 'seedForest', count: 0.30}, {item: 'seedJungle', count: 0.30}, {item: 'acorn', count: 0.20}, {item: 'samara', count: 0.20}]}},
+  seedBag: {name: 'Seed Bag', type: ITEM_TYPE.USABLE, stype: 'bag', star: 2, image: 'container_32_32-0-3', help: 'Oyster', tooltip: 'Open to get wild plant seeds', using: [{action: 'add-items', items: [{item: 'sunflowerSeed', count: 0.30}, {item: 'ambermirageSeed', count: 0.30}, {item: 'bloodmoonSeed', count: 0.25}, {item: 'seedForest', count: 0.30}, {item: 'seedJungle', count: 0.30}, {item: 'acorn', count: 0.20}, {item: 'samara', count: 0.20}]}]},
 
   // Gardening - images OK
   clayPot: {name: 'Clay Pot', type: ITEM_TYPE.FURNITURE | ITEM_TYPE.PLACABLE, stype: 'pot', surface: true, onTop: true, star: 1, capacity: 1, image: 'furniture_32_32-0-8', placed: 'placed_16_16-2-3', placedleft: 'placed_16_16-3-3', placedright: 'placed_16_16-4-3', unplacing: {speed: 800}, help: 'Clay Pots', tooltip: 'Gardening Container'},
@@ -751,7 +751,7 @@ export const ITEMS = {
   flour: {name: 'Flour', type: 0, stype: 'food', star: 1, image: 'tools_32_32-12-7', help: 'Food', tooltip: 'Component for daw'},
   daw: {name: 'Daw', type: 0, stype: 'food', star: 1, image: 'tools_32_32-12-7', help: 'Food', tooltip: 'To cook for bread and pies'},
   bread: {name: 'Bread', type: ITEM_TYPE.FOOD, stype: 'food', star: 1, image: 'tools_32_32-12-7', help: 'Food', tooltip: 'Restaure health when eated'},
-  croissant: {name: 'Croissant', type: ITEM_TYPE.FOOD | ITEM_TYPE.USABLE, stype: 'food', star: 1, image: 'food_32_32-7-1', using: {action: 'none'}, help: 'Food', tooltip: 'Restaure health when eated'},
+  croissant: {name: 'Croissant', type: ITEM_TYPE.FOOD | ITEM_TYPE.USABLE, stype: 'food', star: 1, image: 'food_32_32-7-1', using: [{action: 'none'}], help: 'Food', tooltip: 'Restaure health when eated'},
 
   // armors
   playerHead: {name: 'Player Head', type: 0, stype: '', star: 1, image: null, armorImage: 'head_26_22-0-0', help: 'Armors', tooltip: ''},
@@ -1227,12 +1227,16 @@ for (const key in ITEMS) {
     }
     // vérification USABLE → attributs 'using' et 'using.action' obligatoires
     if (itemDesc.type & ITEM_TYPE.USABLE) {
-      if (!itemDesc.using) {
+      if (!itemDesc.using || itemDesc.using.length === 0) {
         console.error(`[data.mjs] ITEMS.${key} : type USABLE sans attribut 'using'`)
-      } else if (!itemDesc.using.action) {
-        console.error(`[data.mjs] ITEMS.${key} : attribut 'using' sans champ 'action'`)
-      } else if (itemDesc.using.action === 'emit-event' && !itemDesc.using.event) {
-        console.error(`[data.mjs] ITEMS.${key} : action 'emit-event' sans champ 'event'`)
+      } else {
+        for (const using of itemDesc.using) {
+          if (!using.action) {
+            console.error(`[data.mjs] ITEMS.${key} : une entrée de 'using' sans champ 'action'`)
+          } else if (using.action === 'emit-event' && !using.event) {
+            console.error(`[data.mjs] ITEMS.${key} : action 'emit-event' sans champ 'event'`)
+          }
+        }
       }
     }
   }
