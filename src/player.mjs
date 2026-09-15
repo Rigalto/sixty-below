@@ -372,7 +372,7 @@ class PlayerManager {
         if (deltaY > PLAYER.FALL_DAMAGE_THRESHOLD) {
           const damage = ((deltaY - PLAYER.FALL_DAMAGE_THRESHOLD) * PLAYER.FALL_DAMAGE_MULTIPLIER) | 0
           if (damage > 0) {
-            eventBus.emit('life/add', -damage)
+            eventBus.emit('life/add', {flat: -damage})
             console.log('DAMAGE DE CHUTE', damage)
           }
         }
@@ -1057,6 +1057,8 @@ class HealthManager {
     eventBus.on('life/crystal-used', this.onCrystalUsed)
     this.onFruitUsed = this.onFruitUsed.bind(this)
     eventBus.on('life/fruit-used', this.onFruitUsed)
+    this.onLifeAdd = this.onLifeAdd.bind(this)
+    eventBus.on('life/add', this.onLifeAdd)
   }
 
   /**
@@ -1146,6 +1148,28 @@ class HealthManager {
   // /////////// //
   // MISE A JOUR //
   // /////////// //
+
+  /**
+   * Liaison EventBus : 'life/add' — modifie #current d'un delta combinant jusqu'à trois
+   * composantes indépendantes et cumulables (montant fixe, % de la vie courante, % de
+   * la capacité). Résultat arrondi, borné [0, #capacity]. Détecte la mort (current
+   * tombe à 0) — traitement TODO.
+   * @param {{flat?: number, ofCurrent?: number, ofCapacity?: number}} payload
+   */
+  onLifeAdd ({flat = 0, ofCurrent = 0, ofCapacity = 0}) {
+    const delta = flat + this.#current * ofCurrent / 100 + this.#capacity * ofCapacity / 100
+    let newCurrent = Math.round(this.#current + delta)
+    if (newCurrent < 0) newCurrent = 0
+    else if (newCurrent > this.#capacity) newCurrent = this.#capacity
+    if (newCurrent === this.#current) return
+
+    this.#current = newCurrent
+    this.#dirty = true
+
+    if (this.#current === 0) {
+      // TODO: mort du joueur — déclencher la téléportation au spawn (cf. SpawnManager.onTeleportSpawn)
+    }
+  }
 
   // ///////// //
   // ENTRETIEN //

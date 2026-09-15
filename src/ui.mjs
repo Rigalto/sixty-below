@@ -1528,7 +1528,9 @@ class HealthWidget {
     if (boundary > this.#lastBoundary) {
       for (let i = this.#lastBoundary; i < boundary; i++) this.#setHeartFill(i, 1)
     } else if (boundary < this.#lastBoundary) {
-      for (let i = boundary + 1; i <= this.#lastBoundary; i++) this.#setHeartFill(i, 0)
+      let upper = this.#lastBoundary
+      if (upper >= this.#hearts.length) upper = this.#hearts.length - 1
+      for (let i = boundary + 1; i <= upper; i++) this.#setHeartFill(i, 0)
     }
     if (boundary < this.#hearts.length) this.#setHeartFill(boundary, fraction)
     this.#lastBoundary = boundary
