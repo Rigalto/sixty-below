@@ -10,19 +10,59 @@
 ### Code et tests
 
 - gestion des points de vie :
-
-  - Modèle de données HealthManager — champs (capacity, current), clé(s) gamestate, valeurs par défaut nouveau monde
-  - Correction du contrat life/add — un seul nom, un seul payload, mise à jour de TECHNICAL.md et du commentaire conception dans player.mjs
-  - Consommation Life Crystal — écouter l'event (renommé), incrémenter capacity, plafond 400 (20 red hearts)
-  - Life Fruit — création de l'item dans data.mjs, incrément capacity +5 (gold heart), plafond 500
-  - Health Regeneration — buff composé dans BuffManager, formule de base scalée sur maxHealth, tick d'application
   - Mort du joueur — test current <= 0 → émission de l'event déclenchant spawnManager.onTeleportSpawn()
-  - HealthWidget (Right Panel) — classe séparée, pattern BuffManager/BuffWidget, rendu cœurs rouges/or + tooltip hover
-  - Persistance — écriture/lecture gamestate
   - Consommation potions/food — brancher un vrai handler heal dans ItemUseManager
   - Potion Sickness — debuff anti-spam à designer
   - Lifeforce Potion — dépend du système "buff timed" (pas encore implémenté, TODO déjà noté dans BuffManager)
   - Dégâts environnementaux (noyade, traversée de zone dangereuse, DOT) — gros morceau, probablement hors scope immédiat
+
+- Timed Buffs
+
+  - Étape 1 — Done — Migration du schéma item (data.mjs)
+  - Étape 2 — Constante MICROTASK
+
+Ajouter une entrée BUFF_TIMED_EXPIRE dans constant.mjs (priorité/capacité à définir par comparaison avec les entrées voisines).
+Vérif : import propre, cohérence visuelle avec le reste de la table.
+
+  - Étape 3 — Cœur logique de BuffManager (isolé, sans eventBus ni DB)
+
+createTimedBuff(buff, duration, value = true) → #values.set, taskScheduler.extendTask(...) vers un handler d'expiration, mise à jour de timestamps.
+onExpireTimedBuff(buff) → remet #values à 0/false, supprime l'entrée timestamps.
+Vérif : nouveau tests/test-buffmanager.mjs (enregistré dans REGISTRY de run.mjs), suivant le pattern déjà utilisé pour TaskScheduler :
+création → getBuff retourne la valeur, timestamps contient l'entrée
+création sur un buff déjà actif → la nouvelle échéance = ancienne échéance + nouvelle durée (pas juste now + duration)
+appel direct du handler d'expiration → getBuff revient à 0, timestamps ne contient plus l'entrée
+C'est l'étape la plus importante : elle isole toute la logique métier de l'UI/DB, donc 100 % testable en CLI (node tests/run.mjs BuffManager).
+
+  - Étape 4 — Découplage eventBus
+
+eventBus.on('buff/create-timed', ...) dans le constructeur, payload {buff, duration, value?}, forward vers createTimedBuff.
+Vérif : ajout de 2-3 assert dans le même fichier de test — eventBus.emit(...) produit le même état que l'appel direct.
+
+  - Étape 5 — Branchement consommables (ItemUseManager)
+
+Implémentation de #useBuffTimed(using) dans inventory.mjs.
+Vérif manuelle en jeu : utiliser bottleSap/bottleHoney depuis l'inventaire, puis commande debug debug/buff-manager → honey apparaît dans #values avec la bonne échéance.
+
+  - Étape 6 — Persistance (écriture)
+
+createTimedBuff pousse un record via saveManager.queueStaticUpdate({storeName: 'buff', record}), avec une Map interne buffId → dbKey pour réécrire le même enregistrement plutôt que d'en créer un nouveau à chaque cumul.
+À l'expiration : deleted: true + nouveau queueStaticUpdate.
+Vérif manuelle : créer un buff, attendre le tick de save (2 s), inspecter SixtyBelowDB → buff dans DevTools → l'enregistrement apparaît. Laisser expirer, attendre le save suivant → deleted: true.
+
+  - Étape 7 — Restauration au démarrage (core.mjs)
+
+Section "5.5 Objectstore Buff" dans startSession : lecture du store, purge des deleted, pour chaque actif → #values.set + timestamps.set + taskScheduler.enqueueAbsolute(...) (pas extendTask, pas de tâche existante à froid).
+Vérif manuelle : créer un buff longue durée (ex. 120 s), reload en cours de route → le countdown reprend là où il en était (pas remis à 120 s), et expire correctement même après plusieurs reloads.
+
+  - Étape 8 — Câblage BuffWidget / Buff Panel
+
+Remplacer les placeholders de DISPLAY_BUFFS par les vrais buffId (honey, etc.).
+Vérif manuelle : icône + countdown apparaissent à l'usage de l'item, disparaissent à expiration — bout en bout.
+
+  - Étape 9 — Documentation TECHNICAL.md
+
+Lignes exactes pour createTimedBuff, onExpireTimedBuff, l'event buff/create-timed, la section persistance buff, la section startSession 5.5, l'entrée MICROTASK.
 
 - gestion de la fonction 'Use' dans l'inventaire
 - Implémenter la réduction de vitesse dans les liquides ou les cobweb.

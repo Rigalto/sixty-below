@@ -525,8 +525,8 @@ export const ITEMS = {
   glass: {name: 'Glass', type: 0, stype: 'glass', star: 1, image: 'refined_32_32-4-2', help: 'Bottles', tooltip: 'Used to make Bottles or decorative furniture'},
   bottle: {name: 'Bottle', type: ITEM_TYPE.FURNITURE | ITEM_TYPE.PLACABLE | ITEM_TYPE.FILLABLE, stype: 'container', star: 1, furnitureSet: 'glass', image: 'container_32_32-0-0', placed: 'container_32_32-0-0', unplacing: {speed: 600}, help: 'Bottles', tooltip: 'Crafting container for potions and food'},
   bottleWater: {name: 'Bottled Water', type: ITEM_TYPE.FURNITURE | ITEM_TYPE.PLACABLE | ITEM_TYPE.POTION | ITEM_TYPE.USABLE, stype: 'container', star: 1, image: 'container_32_32-1-0', placed: 'container_32_32-1-0', heal: 20, sickness: 40, unplacing: {speed: 600}, using: [{action: 'none'}], help: 'Bottles', tooltip: 'Healing item and Crafting Material for potions'},
-  bottleSap: {name: 'Bottled Sap', type: ITEM_TYPE.FURNITURE | ITEM_TYPE.PLACABLE | ITEM_TYPE.POTION | ITEM_TYPE.USABLE, stype: 'container', star: 1, image: 'container_32_32-2-0', placed: 'container_32_32-2-0', heal: 80, sickness: 60, timedbuff: 'honey', time: 15, unplacing: {speed: 600}, using: [{action: 'none'}], help: 'Bottles', tooltip: 'Healing item'},
-  bottleHoney: {name: 'Bottled Honey', type: ITEM_TYPE.FURNITURE | ITEM_TYPE.PLACABLE | ITEM_TYPE.POTION | ITEM_TYPE.USABLE, stype: 'container', star: 1, image: 'container_32_32-3-0', placed: 'container_32_32-3-0', heal: 80, sickness: 60, timedbuff: 'honey', time: 15, unplacing: {speed: 600}, using: [{action: 'none'}], help: 'Bottles', tooltip: 'Healing item'},
+  bottleSap: {name: 'Bottled Sap', type: ITEM_TYPE.FURNITURE | ITEM_TYPE.PLACABLE | ITEM_TYPE.POTION | ITEM_TYPE.USABLE, stype: 'container', star: 1, image: 'container_32_32-2-0', placed: 'container_32_32-2-0', using: [{action: 'buff-timed', buff: 'honey', duration: 15}, {action: 'emit-event', event: 'potion/heal', payload: {heal: 80, sickness: 60}}], unplacing: {speed: 600}, help: 'Bottles', tooltip: 'Healing item'},
+  bottleHoney: {name: 'Bottled Honey', type: ITEM_TYPE.FURNITURE | ITEM_TYPE.PLACABLE | ITEM_TYPE.POTION | ITEM_TYPE.USABLE, stype: 'container', star: 1, image: 'container_32_32-3-0', placed: 'container_32_32-3-0', using: [{action: 'buff-timed', buff: 'honey', duration: 15}, {action: 'emit-event', event: 'potion/heal', payload: {heal: 80, sickness: 60}}], unplacing: {speed: 600}, help: 'Bottles', tooltip: 'Healing item'},
 
   // Liquid containers (large capacity)
   bucket: {name: 'Empty Bucket', type: ITEM_TYPE.FURNITURE | ITEM_TYPE.PLACABLE | ITEM_TYPE.FILLABLE | ITEM_TYPE.ARMOR, stype: 'container', armor: 'head', star: 1, image: 'container_32_32-0-1', placed: 'placed_32_32-6-0', armorImage: 'head_26_22-0-2', unplacing: {speed: 600}, help: 'Buckets', tooltip: 'Used to scoop up a small amount of water, honey or sap', defense: 1},
@@ -1225,17 +1225,19 @@ for (const key in ITEMS) {
         TRINKET_BUFF_TABLE[buff] = resolvedOp
       }
     }
-    // vérification USABLE → attributs 'using' et 'using.action' obligatoires
-    if (itemDesc.type & ITEM_TYPE.USABLE) {
-      if (!itemDesc.using || itemDesc.using.length === 0) {
-        console.error(`[data.mjs] ITEMS.${key} : type USABLE sans attribut 'using'`)
-      } else {
-        for (const using of itemDesc.using) {
-          if (!using.action) {
-            console.error(`[data.mjs] ITEMS.${key} : une entrée de 'using' sans champ 'action'`)
-          } else if (using.action === 'emit-event' && !using.event) {
-            console.error(`[data.mjs] ITEMS.${key} : action 'emit-event' sans champ 'event'`)
-          }
+  }
+  // vérification USABLE → attributs 'using' et 'using.action' obligatoires
+  if (itemDesc.type & ITEM_TYPE.USABLE) {
+    if (!itemDesc.using || itemDesc.using.length === 0) {
+      console.error(`[data.mjs] ITEMS.${key} : type USABLE sans attribut 'using'`)
+    } else {
+      for (const using of itemDesc.using) {
+        if (!using.action) {
+          console.error(`[data.mjs] ITEMS.${key} : une entrée de 'using' sans champ 'action'`)
+        } else if (using.action === 'emit-event' && !using.event) {
+          console.error(`[data.mjs] ITEMS.${key} : action 'emit-event' sans champ 'event'`)
+        } else if (using.action === 'buff-timed' && (!using.buff || using.duration === undefined)) {
+          console.error(`[data.mjs] ITEMS.${key} : action 'buff-timed' sans champ 'buff' et/ou 'duration'`)
         }
       }
     }
