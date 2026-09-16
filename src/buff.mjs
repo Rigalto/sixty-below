@@ -283,7 +283,7 @@ class BuffManager {
   createTimedBuff (buff, duration) {
     this.#values.set(buff, true)
     const {priority, capacity} = MICROTASK.BUFF_TIMED_EXPIRE
-    const expiration = taskScheduler.extendTask(buff, duration * 1000, this.onExpireTimedBuff, priority, capacity, buff)
+    const expiration = taskScheduler.extendTask(`buff-timed-${buff}`, duration * 1000, this.onExpireTimedBuff, priority, capacity, buff)
     this.timestamps.set(buff, expiration) // pour le Widget
   }
 
@@ -454,6 +454,7 @@ document.head.appendChild(buffStyle)
 // x, y : coordonnées dans buff_32_32.png (multiples de 32)
 const DISPLAY_BUFFS = [
   {id: 'armors', title: 'Armors', x: -128, y: 0},
+  {id: 'honey', title: 'Honey', x: -128, y: 0},
   {id: 'buff1', title: 'Buff 1', x: 0, y: 0},
   {id: 'buff2', title: 'Buff 2', x: -32, y: 0},
   {id: 'dyn1', title: 'Dynamic Buff 1', x: -64, y: 0},

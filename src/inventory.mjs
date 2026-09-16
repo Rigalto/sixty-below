@@ -1514,10 +1514,11 @@ class ItemUseManager {
   #useAddItems (using) { console.log('[ItemUseManager] TODO add-items', using) }
 
   /**
-   * TODO: pose un buff temporisé via BuffManager (mécanisme pas encore implémenté).
-   * @param {object} using — une entrée de itemDef.using ({action: 'buff-timed', ...})
+   * Active un buff temporisé via BuffManager, à partir des champs buff/duration de using.
+   * @param {object} using — une entrée de itemDef.using ({action: 'buff-timed', buff, duration})
    */
-  #useBuffTimed (using) { console.log('[ItemUseManager] TODO buff-timed', using) }
+  // #useBuffTimed (using) { buffManager.createTimedBuff(using.buff, using.duration) }
+  #useBuffTimed (using) { console.log('[useBuffTimed] TODO add-items', using); buffManager.createTimedBuff(using.buff, using.duration) }
 }
 export const itemUseManager = new ItemUseManager()
 

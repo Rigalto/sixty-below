@@ -22,11 +22,7 @@
   - Étape 2 — Done — Constante MICROTASK
   - Étape 3 — Done — Cœur logique de BuffManager (isolé, sans eventBus ni DB)
   - Étape 4 — Done — Découplage eventBus
-
-  - Étape 5 — Branchement consommables (ItemUseManager)
-
-Implémentation de #useBuffTimed(using) dans inventory.mjs.
-Vérif manuelle en jeu : utiliser bottleSap/bottleHoney depuis l'inventaire, puis commande debug debug/buff-manager → honey apparaît dans #values avec la bonne échéance.
+  - Étape 5 — Done — Branchement consommables (ItemUseManager)
 
   - Étape 6 — Persistance (écriture)
 
@@ -43,6 +39,7 @@ Vérif manuelle : créer un buff longue durée (ex. 120 s), reload en cours de r
 
 Remplacer les placeholders de DISPLAY_BUFFS par les vrais buffId (honey, etc.).
 Vérif manuelle : icône + countdown apparaissent à l'usage de l'item, disparaissent à expiration — bout en bout.
+Optimiser la gestion de l'affichage, maintenant que BuffManager les supprime après expiration (devient la seule source de vérité).
 
   - Étape 9 — Documentation TECHNICAL.md
 
