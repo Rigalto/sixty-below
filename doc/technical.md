@@ -330,10 +330,6 @@ Cette section définit les événements officiels. Tout nouvel événement doit 
 | E | `life/fruit-used` | — | Passe un coeur rouge (s'il y en a) en un coeur doré. |
 | E | `life/add` | `{flat?: number, ofCurrent?: number, ofCapacity?: number}` | Ajout de points de vie. |
 
-
-
-
-
 #### Rendering (`Camera`, `SkyRenderer`)
 
 | Dir. | Event Name | Payload Structure | Description |
@@ -429,6 +425,8 @@ Cette section définit les événements officiels. Tout nouvel événement doit 
 | E | `time/first-loop` | `{ day, hour, minute, tslot, weather, nextWeather, skyColor, moonPhase, isDay }` | Émis une seule fois au démarrage du rendu. |
 | E | `time/timeslot` | `{ tslot, isDay }` | Émis toutes les 3h (changement de slot). |
 | E | `time/daily` | `{ day, weather, nextWeather, moonPhase }` | Émis à minuit (changement de jour). |
+| E | `inventory/static-buffs` | `{ {armor, accessories, trinkets}}` | Liste des items contribuants aux buffs. |
+| E | `buff/create-timed` | `{ buff: string, duration: number }` | Crée ou prolonge un buff temporisé — délégué à `createTimedBuff`. |
 | E | `debug/buff-manager` | _(none)_ | Affiche sur la console le contenu de `#values` et `#fns`. |
 | S | `buff/trinket-changed` | `Set<string>` | Émis par `buffManager` quand un buff trinket change. Payload = buffIds modifiés. |
 

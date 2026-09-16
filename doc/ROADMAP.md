@@ -21,12 +21,7 @@
   - Étape 1 — Done — Migration du schéma item (data.mjs)
   - Étape 2 — Done — Constante MICROTASK
   - Étape 3 — Done — Cœur logique de BuffManager (isolé, sans eventBus ni DB)
-
-
-  - Étape 4 — Découplage eventBus
-
-eventBus.on('buff/create-timed', ...) dans le constructeur, payload {buff, duration, value?}, forward vers createTimedBuff.
-Vérif : ajout de 2-3 assert dans le même fichier de test — eventBus.emit(...) produit le même état que l'appel direct.
+  - Étape 4 — Done — Découplage eventBus
 
   - Étape 5 — Branchement consommables (ItemUseManager)
 

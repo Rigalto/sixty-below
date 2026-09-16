@@ -145,6 +145,9 @@ class BuffManager {
     this.onStaticBuffs = this.onStaticBuffs.bind(this)
     eventBus.on('inventory/static-buffs', this.onStaticBuffs)
 
+    this.onCreateTimedBuff = this.onCreateTimedBuff.bind(this)
+    eventBus.on('buff/create-timed', this.onCreateTimedBuff)
+
     // Micro-tâches
     this.onExpireTimedBuff = this.onExpireTimedBuff.bind(this)
   }
@@ -282,6 +285,17 @@ class BuffManager {
     const {priority, capacity} = MICROTASK.BUFF_TIMED_EXPIRE
     const expiration = taskScheduler.extendTask(buff, duration * 1000, this.onExpireTimedBuff, priority, capacity, buff)
     this.timestamps.set(buff, expiration) // pour le Widget
+  }
+
+  /**
+   * Handler eventBus 'buff/create-timed' — permet de créer un buff temporisé sans dépendance
+   * directe à BuffManager (ex: ItemUseManager, futurs effets de furniture/événements).
+   * @param {Object} payload
+   * @param {string} payload.buff - identifiant du buff élémentaire
+   * @param {number} payload.duration - durée en secondes
+   */
+  onCreateTimedBuff ({buff, duration}) {
+    this.createTimedBuff(buff, duration)
   }
 
   /**
