@@ -336,6 +336,7 @@ export const MICROTASK = {
   MOSS_POPULATION: {priority: 20, capacity: 4, taskName: 'mossPopulationTick'}, // régulation de population Velvetmoss
 
   COOKINGPOT_EXTINGUISH: {priority: 20, capacity: 2, taskName: 'onCookingPotExtinguish'}, // extinction automatique d'un cookingPot après 6h in-game
+  BUFF_TIMED_EXPIRE: {priority: 20, capacity: 2, taskName: 'onExpireTimedBuff'}, // remise à zéro d'un buff temporisé à son expiration
 
   UI_ENV_UPDATE: {priority: 18, capacity: 2, taskName: 'updateClockInOverlay'}, // affiche le widget time/weather/Moon/Location
   UI_TILE_HOVER: {priority: 18, capacity: 2, taskName: 'onTileHoverDetail'}, // affiche le widget tuile survolée

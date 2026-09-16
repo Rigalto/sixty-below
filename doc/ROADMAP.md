@@ -19,10 +19,7 @@
 - Timed Buffs
 
   - Étape 1 — Done — Migration du schéma item (data.mjs)
-  - Étape 2 — Constante MICROTASK
-
-Ajouter une entrée BUFF_TIMED_EXPIRE dans constant.mjs (priorité/capacité à définir par comparaison avec les entrées voisines).
-Vérif : import propre, cohérence visuelle avec le reste de la table.
+  - Étape 2 — Done — Constante MICROTASK
 
   - Étape 3 — Cœur logique de BuffManager (isolé, sans eventBus ni DB)
 
