@@ -20,16 +20,8 @@
 
   - Étape 1 — Done — Migration du schéma item (data.mjs)
   - Étape 2 — Done — Constante MICROTASK
+  - Étape 3 — Done — Cœur logique de BuffManager (isolé, sans eventBus ni DB)
 
-  - Étape 3 — Cœur logique de BuffManager (isolé, sans eventBus ni DB)
-
-createTimedBuff(buff, duration, value = true) → #values.set, taskScheduler.extendTask(...) vers un handler d'expiration, mise à jour de timestamps.
-onExpireTimedBuff(buff) → remet #values à 0/false, supprime l'entrée timestamps.
-Vérif : nouveau tests/test-buffmanager.mjs (enregistré dans REGISTRY de run.mjs), suivant le pattern déjà utilisé pour TaskScheduler :
-création → getBuff retourne la valeur, timestamps contient l'entrée
-création sur un buff déjà actif → la nouvelle échéance = ancienne échéance + nouvelle durée (pas juste now + duration)
-appel direct du handler d'expiration → getBuff revient à 0, timestamps ne contient plus l'entrée
-C'est l'étape la plus importante : elle isole toute la logique métier de l'UI/DB, donc 100 % testable en CLI (node tests/run.mjs BuffManager).
 
   - Étape 4 — Découplage eventBus
 

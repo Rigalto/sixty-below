@@ -1,10 +1,9 @@
 // buff.mjs — BuffManager - BuffWidget
 
 import {ITEMS, TRINKET_BUFF_TABLE} from '../assets/data/data.mjs'
-import {eventBus, timeManager} from './utils.mjs'
-import {UI_LAYOUT} from './constant.mjs'
+import {UI_LAYOUT, MICROTASK} from './constant.mjs'
 import {playerManager} from './player.mjs'
-// import {timeManager, taskScheduler, microTasker} from './utils.mjs'
+import {eventBus, timeManager, taskScheduler} from './utils.mjs'
 
 /**
  * ── Principes ───────────────────────────────────────────────────────────────
@@ -145,6 +144,9 @@ class BuffManager {
 
     this.onStaticBuffs = this.onStaticBuffs.bind(this)
     eventBus.on('inventory/static-buffs', this.onStaticBuffs)
+
+    // Micro-tâches
+    this.onExpireTimedBuff = this.onExpireTimedBuff.bind(this)
   }
 
   /**
@@ -266,6 +268,30 @@ class BuffManager {
    */
   setBuff (name, value) {
     this.#values.set(name, value)
+  }
+
+  /**
+   * Crée un buff temporisé ou prolonge son échéance s'il est déjà actif.
+   * Positionne le buff élémentaire à true et planifie sa remise à zéro via taskScheduler.
+   * Cumule la durée fournie à l'échéance courante si le buff est déjà actif.
+   * @param {string} buff - identifiant du buff élémentaire (camelCase)
+   * @param {number} duration - durée en secondes
+   */
+  createTimedBuff (buff, duration) {
+    this.#values.set(buff, true)
+    const {priority, capacity} = MICROTASK.BUFF_TIMED_EXPIRE
+    const expiration = taskScheduler.extendTask(buff, duration * 1000, this.onExpireTimedBuff, priority, capacity, buff)
+    this.timestamps.set(buff, expiration) // pour le Widget
+  }
+
+  /**
+   * Planifiée par taskScheduler à l'expiration d'un buff temporisé.
+   * Retire buff de #values (retour à la valeur neutre) et son échéance de timestamps.
+   * @param {string} buff - identifiant du buff élémentaire
+   */
+  onExpireTimedBuff (buff) {
+    this.#values.delete(buff)
+    this.timestamps.delete(buff) // pour le Widget
   }
 
   /**
