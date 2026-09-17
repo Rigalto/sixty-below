@@ -4,6 +4,8 @@ import {ITEMS, TRINKET_BUFF_TABLE} from '../assets/data/data.mjs'
 import {UI_LAYOUT, MICROTASK} from './constant.mjs'
 import {playerManager} from './player.mjs'
 import {eventBus, timeManager, taskScheduler} from './utils.mjs'
+import {saveManager} from './persistence.mjs'
+import {uniqueIdGenerator} from './database.mjs'
 
 /**
  * ── Principes ───────────────────────────────────────────────────────────────
@@ -125,6 +127,7 @@ class BuffManager {
   #trinketB = {} // buffer B — alterné avec A à chaque mise à jour
   #currentTrinket = null // pointe vers le buffer courant (valeurs en vigueur)
   #nextTrinket = null // pointe vers le buffer en cours de calcul
+  #timedBuffRecords = new Map() // buffId → record DB 'buff' (nature: 'timed')
 
   #currentWeather
   #currentTimeslot
@@ -275,8 +278,8 @@ class BuffManager {
 
   /**
    * Crée un buff temporisé ou prolonge son échéance s'il est déjà actif.
-   * Positionne le buff élémentaire à true et planifie sa remise à zéro via taskScheduler.
-   * Cumule la durée fournie à l'échéance courante si le buff est déjà actif.
+   * Positionne le buff élémentaire à true, planifie sa remise à zéro via taskScheduler,
+   * et empile la persistance via saveManager.
    * @param {string} buff - identifiant du buff élémentaire (camelCase)
    * @param {number} duration - durée en secondes
    */
@@ -285,6 +288,18 @@ class BuffManager {
     const {priority, capacity} = MICROTASK.BUFF_TIMED_EXPIRE
     const expiration = taskScheduler.extendTask(`buff-timed-${buff}`, duration * 1000, this.onExpireTimedBuff, priority, capacity, buff)
     this.timestamps.set(buff, expiration) // pour le Widget
+
+    // persistence
+    let record = this.#timedBuffRecords.get(buff)
+    if (record === undefined) {
+      record = {id: uniqueIdGenerator.getUniqueId(), nature: 'timed', buff, value: true, expiration, deleted: false}
+      this.#timedBuffRecords.set(buff, record)
+    } else {
+      record.value = true
+      record.expiration = expiration
+      record.deleted = false
+    }
+    saveManager.queueStaticUpdate({storeName: 'buff', record})
   }
 
   /**
@@ -306,6 +321,13 @@ class BuffManager {
   onExpireTimedBuff (buff) {
     this.#values.delete(buff)
     this.timestamps.delete(buff) // pour le Widget
+
+    // persistence
+    const record = this.#timedBuffRecords.get(buff)
+    if (record === undefined) return
+    record.value = false
+    record.deleted = true
+    saveManager.queueStaticUpdate({storeName: 'buff', record})
   }
 
   /**

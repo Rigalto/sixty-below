@@ -23,12 +23,7 @@
   - Étape 3 — Done — Cœur logique de BuffManager (isolé, sans eventBus ni DB)
   - Étape 4 — Done — Découplage eventBus
   - Étape 5 — Done — Branchement consommables (ItemUseManager)
-
-  - Étape 6 — Persistance (écriture)
-
-createTimedBuff pousse un record via saveManager.queueStaticUpdate({storeName: 'buff', record}), avec une Map interne buffId → dbKey pour réécrire le même enregistrement plutôt que d'en créer un nouveau à chaque cumul.
-À l'expiration : deleted: true + nouveau queueStaticUpdate.
-Vérif manuelle : créer un buff, attendre le tick de save (2 s), inspecter SixtyBelowDB → buff dans DevTools → l'enregistrement apparaît. Laisser expirer, attendre le save suivant → deleted: true.
+  - Étape 6 — Done — Persistance (écriture)
 
   - Étape 7 — Restauration au démarrage (core.mjs)
 
