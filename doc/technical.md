@@ -425,9 +425,9 @@ Cette section définit les événements officiels. Tout nouvel événement doit 
 | E | `time/first-loop` | `{ day, hour, minute, tslot, weather, nextWeather, skyColor, moonPhase, isDay }` | Émis une seule fois au démarrage du rendu. |
 | E | `time/timeslot` | `{ tslot, isDay }` | Émis toutes les 3h (changement de slot). |
 | E | `time/daily` | `{ day, weather, nextWeather, moonPhase }` | Émis à minuit (changement de jour). |
-| E | `inventory/static-buffs` | `{ {armor, accessories, trinkets}}` | Liste des items contribuants aux buffs. |
+| E | `inventory/static-buffs` | `{armor, accessories, trinkets}` | Liste des items contribuants aux buffs. |
 | E | `buff/create-timed` | `{ buff: string, duration: number }` | Crée ou prolonge un buff temporisé — délégué à `createTimedBuff`. |
-| E | `debug/buff-manager` | _(none)_ | Affiche sur la console le contenu de `#values` et `#fns`. |
+| E | `debug/buff-manager` | _(none)_ | Affiche sur la console le contenu de `#values`, `#currentTrinket` et `#fns`. |
 | S | `buff/trinket-changed` | `Set<string>` | Émis par `buffManager` quand un buff trinket change. Payload = buffIds modifiés. |
 
 #### Action de minage (`MiningManager`)
@@ -1472,8 +1472,6 @@ Gestion centralisée des buffs du joueur. Deux phases obligatoires : abonnements
 
 | Champ | Type | Description |
 | :--- | :--- | :--- |
-| `#values` | `Map<string, number\|boolean>` | Valeurs brutes des buffs élémentaires. Mise à jour via `eventBus`. |
-| `#fns` | `Map<string, () => number>` | Fonctions de calcul des buffs composés. |
 | `timestamps` | `Map<string, number>` | Timestamps d'expiration des buffs timed (ms jeu). Lu par `BuffWidget`. |
 
 #### Notation
@@ -1496,6 +1494,10 @@ Gestion centralisée des buffs du joueur. Deux phases obligatoires : abonnements
 | `onDebug` | `() → void` | Handler `debug/buff-manager`. Affiche `#values` et `#fns` sur la console. |
 | `onStaticBuffs ` | `({armor, accessories, trinkets}) → void` | Handler `inventory/static-buffs`. Prise en compte des buffs  provenant des trinkets, accessoires et armures. |
 | `onTrinketsBuffs` | `(trinkets) → void` | Buffs  provenant des trinkets. Double-buffer, émet `buff/trinket-changed`. |
+| `createTimedBuff` | `(buff: string, duration: number) → void` | Active `buff` (`true`) pendant `duration` secondes. Cumule la durée si `buff` est déjà actif. |
+| `initBuff` | `(record: object) → void` | Intègre un enregistrement du store `buff` (`{id, nature, buff, value, expiration, deleted}`) dans l'état mémoire. Appelée par `core.mjs` au démarrage, une fois par enregistrement non supprimé. |
+| `onExpireTimedBuff` | `(buff: string) → void` | Planifiée automatiquement à l'échéance par `createTimedBuff`/`initBuff`. Remet `buff` à `false`. |
+| `onCreateTimedBuff` | `({buff, duration}) → void` | Handler `buff/create-timed`. Délègue à `createTimedBuff`. |
 
 #### Buffs environnementaux initialisés
 
@@ -1505,11 +1507,19 @@ Gestion centralisée des buffs du joueur. Deux phases obligatoires : abonnements
 | Météo | `sunny` `cloudy` `rainy` `windy` `stormy` | `time/daily` |
 | Cycle | `midnight` `dawn` `morning` `noon` `afternoon` `dusk` `evening` `night` `isDay` `isNight` | `time/timeslot` |
 
-#### Buffs timed (à implémenter lors du premier buff timed)
+#### Buffs timed
 
-Structure objectStore `buff` : `{key, id, buff, value, expiration, deleted}`.
-Au démarrage, `core.mjs` supprime en base les enregistrements 'deleted===true), et passe les enregistrements non supprimés à `init()` → `taskScheduler.enqueueAbsolute`.
-À l'expiration : valeur remise à `0`, enregistrement marqué `deleted=true` en DB, suppression retardée au prochain lancement.
+Buff temporisé : `createTimedBuff(buff, duration)` (ou l'event `buff/create-timed`) active `buff`
+— lisible ensuite via `getBuff(buff)` → `true`/`false` — pour `duration` secondes. Une nouvelle
+création sur un buff déjà actif ajoute `duration` à l'échéance en cours plutôt que de la
+remplacer. À l'échéance, le buff repasse automatiquement à `false`.
+
+`timestamps.get(buff)` retourne l'échéance absolue (même horloge que `timeManager.timestamp`)
+d'un buff actuellement actif, ou `undefined` sinon — utilisé par `BuffWidget` pour afficher un
+compte à rebours.
+
+Au démarrage, `core.mjs` appelle `initBuff(record)` pour chaque enregistrement non supprimé du
+store `buff` (voir signature ci-dessus pour la forme de `record`).
 
 ### Class `BuffWidget` (`src/buff.mjs`) — Singleton : `buffWidget`
 
