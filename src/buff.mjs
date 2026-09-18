@@ -189,6 +189,25 @@ class BuffManager {
   }
 
   /**
+   * Restaure un buff temporisé actif depuis un record DB (nature 'timed') au démarrage
+   * de session. Réactive le buff dans #values, replanifie son expiration à l'échéance
+   * absolue déjà persistée, et conserve la référence du record dans #timedBuffRecords.
+   * @param {object} record - record 'buff' non supprimé, nature 'timed', issu de la DB
+   */
+  initBuff (record) {
+    if (record.nature === 'timed') {
+      this.#timedBuffRecords.set(record.buff, record)
+      this.#values.set(record.buff, record.value)
+      if (!record.value) return
+
+      // Buff en activité
+      this.timestamps.set(record.buff, record.expiration)
+      const {priority, capacity} = MICROTASK.BUFF_TIMED_EXPIRE
+      taskScheduler.enqueueAbsolute(`buff-timed-${record.buff}`, record.expiration, this.onExpireTimedBuff, priority, capacity, record.buff)
+    }
+  }
+
+  /**
    * Handler eventBus déclenché chaque jour. Met à jour la phase de la lune et la météo actuelle.
    * @param {Object} payload
    * @param {number} payload.weather - Index de la nouvelle météo.
@@ -297,7 +316,6 @@ class BuffManager {
     } else {
       record.value = true
       record.expiration = expiration
-      record.deleted = false
     }
     saveManager.queueStaticUpdate({storeName: 'buff', record})
   }
@@ -319,14 +337,13 @@ class BuffManager {
    * @param {string} buff - identifiant du buff élémentaire
    */
   onExpireTimedBuff (buff) {
-    this.#values.delete(buff)
+    this.#values.set(buff, false)
     this.timestamps.delete(buff) // pour le Widget
 
     // persistence
     const record = this.#timedBuffRecords.get(buff)
     if (record === undefined) return
     record.value = false
-    record.deleted = true
     saveManager.queueStaticUpdate({storeName: 'buff', record})
   }
 
@@ -558,14 +575,8 @@ class BuffWidget {
 
       if (expiration) {
         // buff timed
-        const remaining = Math.ceil((expiration - now) / 1000)
-        if (remaining > 0) {
-          el.style.display = 'flex'
-          timeEl.textContent = remaining
-        } else {
-          el.style.display = 'none'
-          timeEl.textContent = ''
-        }
+        el.style.display = 'flex'
+        timeEl.textContent = Math.ceil((expiration - now) / 1000)
       } else {
         // buff statique : value = truthy/falsy
         el.style.display = value ? 'flex' : 'none'

@@ -452,7 +452,18 @@ class GameCore {
 
     floraManager.onPreloadChunksChanged(camera.preloadChunks)
 
-    // 5.5 TODO Monsters
+    // 5.5 Objectstore Buff
+    const buffRecords = await database.readAllFromObjectStore('buff')
+    const buffsToDelete = []
+    for (const record of buffRecords) {
+      if (record.deleted) { buffsToDelete.push(record.key); continue }
+      buffManager.initBuff(record)
+    }
+    if (buffsToDelete.length > 0) {
+      await database.deleteMultipleRecords('buff', buffsToDelete)
+    }
+
+    // 5.6 TODO Monsters
 
     // 6. Lancement de la boucle
     this.isRunning = true

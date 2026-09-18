@@ -24,17 +24,8 @@
   - Étape 4 — Done — Découplage eventBus
   - Étape 5 — Done — Branchement consommables (ItemUseManager)
   - Étape 6 — Done — Persistance (écriture)
-
-  - Étape 7 — Restauration au démarrage (core.mjs)
-
-Section "5.5 Objectstore Buff" dans startSession : lecture du store, purge des deleted, pour chaque actif → #values.set + timestamps.set + taskScheduler.enqueueAbsolute(...) (pas extendTask, pas de tâche existante à froid).
-Vérif manuelle : créer un buff longue durée (ex. 120 s), reload en cours de route → le countdown reprend là où il en était (pas remis à 120 s), et expire correctement même après plusieurs reloads.
-
-  - Étape 8 — Câblage BuffWidget / Buff Panel
-
-Remplacer les placeholders de DISPLAY_BUFFS par les vrais buffId (honey, etc.).
-Vérif manuelle : icône + countdown apparaissent à l'usage de l'item, disparaissent à expiration — bout en bout.
-Optimiser la gestion de l'affichage, maintenant que BuffManager les supprime après expiration (devient la seule source de vérité).
+  - Étape 7 — Done — Restauration au démarrage (core.mjs)
+  - Étape 8 — Done — Câblage BuffWidget / Buff Panel
 
   - Étape 9 — Documentation TECHNICAL.md
 
