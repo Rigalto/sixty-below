@@ -265,6 +265,7 @@ class PlayerManager {
         speed = PLAYER.speed * ratio
       }
     }
+    speed *= buffManager.getBuff('movement-speed') / 100
     const dist = speed * dt * direction
     this.#direction = direction < 0 ? 0 : 1
 
@@ -317,7 +318,8 @@ class PlayerManager {
 
     if (this.#moveState !== 1) return // Jumping
 
-    const newY = this.#y - PLAYER.JUMP_SPEED * dt // vitesse constante
+    const speed = PLAYER.JUMP_SPEED * buffManager.getBuff('movement-speed') / 100
+    const newY = this.#y - speed * dt // vitesse constante
 
     // Fin du saut : limite atteinte
     if (newY <= this.#jumpStartY) {
@@ -394,7 +396,7 @@ class PlayerManager {
 
     if (this.#moveState === 2) { // FALLING
       const gravity = PLAYER.GRAVITY / 5
-      const speedBuff = 1
+      const speedBuff = (buffManager.getBuff('movement-speed') + buffManager.getBuff('fall-speed')) / 100
 
       const vy = Math.min(this.#vy + gravity * dt, PLAYER.FALLING_SPEED_MAX)
       let newY = this.#y + vy * dt * speedBuff + this.#carryY

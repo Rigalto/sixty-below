@@ -70,10 +70,14 @@ class BuffManager {
 
   #fns = new Map([ // fonctions pur buffs composés : mining-speed, movement-speed...
     // 'movement-speed' : vitesse horizontale du joueur, 0 = joueur immobile, 100% = PLAYER.SPEED
-    // ne tient pas compte tuiles environnantes (sous le joueur et sous ses pieds)
+    // ne tient pas compte tuiles environnantes sous ses pieds
+    // Mettre à jour de façon synchrone 'MOVEMENT_SPEED_KEYS' dans 'ui.mjs'
     ['movement-speed', () => {
       if (this.#values.get('playerFreeze')) return 0
-      if (this.#values.get('web')) return 50 // % de vitesse conservée en toile
+      if (this.#values.get('web')) return 10 // % de vitesse conservée en toile
+      return 100
+    }],
+    ['fall-speed', () => {
       return 100
     }],
     ['fall-damage', () => {
