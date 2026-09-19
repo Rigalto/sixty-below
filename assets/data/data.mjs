@@ -97,7 +97,7 @@ export const NODES = {
     image: 'natural_16_16+4',
     mining: {speed: 500, items: [{item: 'blockMud', count: 1, buffs: ['lucky:80']}, {item: 'velvetmossSpore', count: 0.8, buffs: ['lucky:40']}]}
   },
-  WEB: {code: 35, name: 'Cobweb', type: NODE_TYPE.WEB | NODE_TYPE.GAZ, star: 1, color: '#788696', image: 'substrat_16_16+10', mining: {speed: 500, items: [{item: 'silk', count: 1}, {item: 'eggSpider', count: '1-3-0.08'}]}, help: 'Cobweb'},
+  WEB: {code: 35, name: 'Cobweb', type: NODE_TYPE.WEB | NODE_TYPE.GAZ, star: 1, color: '#788696', image: 'substrat_16_16+10', mining: {speed: 500, items: [{item: 'silk', count: 1}, {item: 'eggSpider', count: '1-3-0.08'}]}, help: 'Cobweb', terrain: 'web'},
 
   // ── Topsoil (terrain nourricier, propice aux plantes) ────────────────────────
   DIRT: {

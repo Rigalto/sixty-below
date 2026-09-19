@@ -163,6 +163,9 @@ class PlayerManager {
   #updateResult = {x: 0, y: 0} // résultat de update()
   #armor = [null, null, null] // itemId des 3 slots d'armure (tête, torse, jambes) — synchronisé via 'inventory/static-buffs'
 
+  #surroundingRect = {x: 0, y: 0, w: 2 << 4, h: 3 << 4} // empreinte joueur 2×3 tuiles (pixels) — w/h fixes, x/y mutés en place
+  #surroundingCodes = new Set() // Set<number> — codes distincts de l'empreinte joueur, vidé/repeuplé en place à chaque recalcul
+
   constructor () {
     // eventBus
     this.onSaveTick = this.onSaveTick.bind(this)
@@ -491,6 +494,34 @@ class PlayerManager {
     return false
   }
 
+  // ///////////////////// //
+  // TUILES SOUS LE JOUEUR //
+  // ///////////////////// //
+
+  /**
+   * Recalcule #surroundingCodes (empreinte joueur, 2×3 tuiles, lignes sol-3 à sol-1 — pas la
+   * tuile du sol elle-même) via chunkManager.getTilesInRect. Zéro allocation : #surroundingRect
+   * et #surroundingCodes sont mutés en place plutôt que recréés à chaque appel.
+   * @param {{x: number, y: number}} feet - tuile sous les pieds (sol)
+   */
+  #refreshSurroundingCodes (feet) {
+    this.#surroundingRect.x = feet.x << 4
+    this.#surroundingRect.y = (feet.y - 3) << 4
+    const tiles = chunkManager.getTilesInRect(this.#surroundingRect)
+    this.#surroundingCodes.clear()
+    for (const code of tiles) this.#surroundingCodes.add(code)
+  }
+
+  /**
+   * Retourne l'ensemble des codes de tuiles distincts de l'empreinte joueur (2×3, lignes
+   * sol-3 à sol-1). Recalculé uniquement quand la tuile sous les pieds change (même
+   * détection que l'émission de 'player/move'). Vue sur un Set interne réutilisé — à lire
+   * immédiatement, ne pas conserver la référence pour comparaison future (contenu muté en
+   * place au prochain recalcul).
+   * @returns {Set<number>}
+   */
+  getSurroundingCodes () { return this.#surroundingCodes }
+
   /**
    * Retourne le centre de la hitbox en pixels monde.
    * @returns {[number, number]}
@@ -632,6 +663,7 @@ class PlayerManager {
     if (feet.x !== this.#lastTileX || feet.y !== this.#lastTileY) {
       this.#lastTileX = feet.x
       this.#lastTileY = feet.y
+      this.#refreshSurroundingCodes(feet)
       eventBus.emit('player/move', feet)
     }
   }

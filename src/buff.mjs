@@ -1,6 +1,6 @@
 // buff.mjs — BuffManager - BuffWidget
 
-import {ITEMS, TRINKET_BUFF_TABLE} from '../assets/data/data.mjs'
+import {ITEMS, TRINKET_BUFF_TABLE, NODES_LOOKUP} from '../assets/data/data.mjs'
 import {UI_LAYOUT, MICROTASK} from './constant.mjs'
 import {playerManager} from './player.mjs'
 import {eventBus, timeManager, taskScheduler} from './utils.mjs'
@@ -73,6 +73,7 @@ class BuffManager {
     // ne tient pas compte tuiles environnantes (sous le joueur et sous ses pieds)
     ['movement-speed', () => {
       if (this.#values.get('playerFreeze')) return 0
+      if (this.#values.get('web')) return 50 // % de vitesse conservée en toile
       return 100
     }],
     ['fall-damage', () => {
@@ -129,6 +130,11 @@ class BuffManager {
   #nextTrinket = null // pointe vers le buffer en cours de calcul
   #timedBuffRecords = new Map() // buffId → record DB 'buff' (nature: 'timed')
 
+  #terrainA = new Set() // buffer A — clés des buffs terrain actives ou en cours de calcul
+  #terrainB = new Set() // buffer B — alterné avec A à chaque recalcul (player/move)
+  #activeTerrain = null // pointe vers le buffer courant (clés actives en vigueur) — câblé dans init()
+  #nextTerrain = null // pointe vers le buffer en cours de calcul — câblé dans init()
+
   #currentWeather
   #currentTimeslot
 
@@ -151,6 +157,9 @@ class BuffManager {
     this.onCreateTimedBuff = this.onCreateTimedBuff.bind(this)
     eventBus.on('buff/create-timed', this.onCreateTimedBuff)
 
+    this.onPlayerMove = this.onPlayerMove.bind(this)
+    eventBus.on('player/move', this.onPlayerMove)
+
     // Micro-tâches
     this.onExpireTimedBuff = this.onExpireTimedBuff.bind(this)
   }
@@ -169,23 +178,33 @@ class BuffManager {
   }
 
   /**
+   * Initialise les buffers de terrain (A et B) à 0 et définit le buffer courant.
+   */
+  initTerrain () {
+    this.#terrainA.clear()
+    this.#terrainB.clear()
+    this.#activeTerrain = this.#terrainA
+    this.#nextTerrain = this.#terrainB
+  }
+
+  /**
    * Initialise le gestionnaire de buffs. Démare les états par défaut (météo, lune, temps),
-   * lie les écouteurs d'événements globaux et configure les buffers.
+   * configure les buffers.
    */
   init () {
     // Initialisation des buffs de lune à false
-    for (const key of MOON_BUFF_KEYS) this.#values.set(key, false)
-
+    for (const key of MOON_BUFF_KEYS) this.setBuff(key, false)
     // Initialisation des buffs de météo à false
-    for (const key of WEATHER_BUFF_KEYS) this.#values.set(key, false)
-    this.#currentWeather = 0 // index du weather courant pour le passer à false
-
+    for (const key of WEATHER_BUFF_KEYS) this.setBuff(key, false)
+    this.#currentWeather = 0
     // Initialisation des buffs de Timeslot à false
-    for (const key of TIMESLOT_BUFF_KEYS) this.#values.set(key, false)
-    this.#values.set('isDay', false)
-    this.#values.set('isNight', false)
+    for (const key of TIMESLOT_BUFF_KEYS) this.setBuff(key, false)
+    this.setBuff('isDay', false)
+    this.setBuff('isNight', false)
     this.#currentTimeslot = 0
+    // Autres initialisations
     this.initTrinket()
+    this.initTerrain()
   }
 
   /**
@@ -197,7 +216,7 @@ class BuffManager {
   initBuff (record) {
     if (record.nature === 'timed') {
       this.#timedBuffRecords.set(record.buff, record)
-      this.#values.set(record.buff, record.value)
+      this.setBuff(record.buff, record.value)
       if (!record.value) return
 
       // Buff en activité
@@ -215,12 +234,11 @@ class BuffManager {
    */
   onDaily ({weather, moonPhase}) {
     // Met à 'false' la phase précédente et à 'true' la phase courante
-    this.#values.set(MOON_BUFF_KEYS[(moonPhase - 1) & 7], false)
-    this.#values.set(MOON_BUFF_KEYS[moonPhase], true)
-
+    this.setBuff(MOON_BUFF_KEYS[(moonPhase - 1) & 7], false)
+    this.setBuff(MOON_BUFF_KEYS[moonPhase], true)
     // weather mis à jour dans #values
-    this.#values.set(WEATHER_BUFF_KEYS[this.#currentWeather], false)
-    this.#values.set(WEATHER_BUFF_KEYS[weather], true)
+    this.setBuff(WEATHER_BUFF_KEYS[this.#currentWeather], false)
+    this.setBuff(WEATHER_BUFF_KEYS[weather], true)
     this.#currentWeather = weather
   }
 
@@ -231,14 +249,42 @@ class BuffManager {
    * @param {boolean} payload.isDay - Indique s'il fait jour.
    */
   onTimeslot ({tslot, isDay}) {
-  // Période
-    this.#values.set(TIMESLOT_BUFF_KEYS[this.#currentTimeslot], false)
-    this.#values.set(TIMESLOT_BUFF_KEYS[tslot], true)
+    // Période
+    this.setBuff(TIMESLOT_BUFF_KEYS[this.#currentTimeslot], false)
+    this.setBuff(TIMESLOT_BUFF_KEYS[tslot], true)
     this.#currentTimeslot = tslot
-
     // Jour / Nuit
-    this.#values.set('isDay', isDay)
-    this.#values.set('isNight', !isDay)
+    this.setBuff('isDay', isDay)
+    this.setBuff('isNight', !isDay)
+  }
+
+  /**
+   * Handler 'player/move' — recalcule les buffs de terrain (nature des tuiles de
+   * l'empreinte joueur) à chaque changement de tuile sous les pieds. Les clés actives sont
+   * exactement celles des codes présents dans playerManager.getSurroundingCodes() qui
+   * portent un attribut 'terrain' dans NODES — ni plus, ni moins. Double-buffer (#terrainA/
+   * #terrainB) : #nextTerrain est vidé et repeuplé en place puis les deux pointeurs sont
+   * échangés — aucune allocation. Ne réagit pas à une tuile qui change sous un joueur
+   * immobile (limite acceptée — se résorbe au prochain déplacement).
+   */
+  onPlayerMove () {
+    const codes = playerManager.getSurroundingCodes()
+    this.#nextTerrain.clear()
+    for (const code of codes) {
+      const terrain = NODES_LOOKUP[code]?.terrain
+      if (terrain !== undefined) this.#nextTerrain.add(terrain)
+    }
+
+    for (const key of this.#activeTerrain) {
+      if (!this.#nextTerrain.has(key)) this.setBuff(key, false)
+    }
+    for (const key of this.#nextTerrain) {
+      if (!this.#activeTerrain.has(key)) this.setBuff(key, true)
+    }
+
+    const swap = this.#activeTerrain
+    this.#activeTerrain = this.#nextTerrain
+    this.#nextTerrain = swap
   }
 
   /**
@@ -286,13 +332,15 @@ class BuffManager {
   }
 
   /**
-   * Positionne directement un buff élémentaire dans #values.
-   * Réservé aux buffs dont la source est externe à BuffManager (ex: playerFreeze).
+   * Point d'écriture unique de #values. No-op si value est déjà la valeur courante.
+   * Émet 'buff/changed' (payload : name) sinon,.
    * @param {string} name
    * @param {number|boolean} value
    */
   setBuff (name, value) {
+    if (this.#values.get(name) === value) return
     this.#values.set(name, value)
+    eventBus.emit('buff/changed', name)
   }
 
   /**
@@ -303,7 +351,7 @@ class BuffManager {
    * @param {number} duration - durée en secondes
    */
   createTimedBuff (buff, duration) {
-    this.#values.set(buff, true)
+    this.setBuff(buff, true)
     const {priority, capacity} = MICROTASK.BUFF_TIMED_EXPIRE
     const expiration = taskScheduler.extendTask(`buff-timed-${buff}`, duration * 1000, this.onExpireTimedBuff, priority, capacity, buff)
     this.timestamps.set(buff, expiration) // pour le Widget
@@ -337,7 +385,7 @@ class BuffManager {
    * @param {string} buff - identifiant du buff élémentaire
    */
   onExpireTimedBuff (buff) {
-    this.#values.set(buff, false)
+    this.setBuff(buff, false)
     this.timestamps.delete(buff) // pour le Widget
 
     // persistence

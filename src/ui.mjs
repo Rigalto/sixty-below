@@ -861,6 +861,7 @@ export const creationDialogOverlay = new CreationDialogOverlay()
    ==================================================================================================== */
 
 const TIMESLOT_NAMES = ['Midnight', 'Dawn', 'Morning', 'Noon', 'Afternoon', 'Dusk', 'Evening', 'Night']
+const MOVEMENT_SPEED_KEYS = new Set(['playerFreeze', 'web']) // clés dont un changement affecte movement-speed — à tenir à jour avec BuffManager#fns.get('movement-speed')
 
 class EnvironmentWidget {
   #container = null
@@ -871,6 +872,7 @@ class EnvironmentWidget {
   #moon = null
   #coords = null
   #speed = null
+  #speedActive = false
 
   #lastMinuteStr = ''
   #lastWeatherCode = -1
@@ -970,6 +972,9 @@ class EnvironmentWidget {
 
     // player/move (attachement/détachement dynamique) -> Coords
     this.updateCoords = this.updateCoords.bind(this)
+
+    // buff/changed (attachement/détachement dynamique, filtré sur MOVEMENT_SPEED_KEYS) -> Speed
+    this.onBuffChanged = this.onBuffChanged.bind(this)
   }
 
   /* =========================================
@@ -1148,8 +1153,17 @@ class EnvironmentWidget {
    * @param {number|boolean} isActive
    */
   #applySpeed (isActive) {
+    if (this.#speedActive === isActive) return // Pas de changement
+
+    this.#speedActive = isActive
     this.#speed.style.display = isActive ? 'inline' : 'none'
-    if (isActive) this.#updateSpeed()
+
+    if (isActive) {
+      eventBus.on('buff/changed', this.onBuffChanged)
+      this.#updateSpeed()
+    } else {
+      eventBus.off('buff/changed', this.onBuffChanged)
+    }
   }
 
   /**
@@ -1160,6 +1174,16 @@ class EnvironmentWidget {
     const buff = buffManager.getBuff('movement-speed')
     this.#speed.textContent = `Speed: ${buff}%`
     this.#speed.title = `Speed: ${PLAYER.speed * 5 / 8 * buff} tiles/s`
+  }
+
+  /**
+   * Handler 'buff/changed' — ne recalcule l'affichage de la vitesse que si la clé modifiée
+   * fait partie de MOVEMENT_SPEED_KEYS (évite un recalcul pour un buff sans rapport).
+   * Bindée dans constructor — abonnée dynamiquement par #applySpeed.
+   * @param {string} key - clé du buff élémentaire modifié
+   */
+  onBuffChanged (key) {
+    if (MOVEMENT_SPEED_KEYS.has(key)) this.#updateSpeed()
   }
 }
 export const environmentWidget = new EnvironmentWidget()
