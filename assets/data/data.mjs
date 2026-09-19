@@ -800,7 +800,7 @@ export const BUFFS = {
   web: 50, // malus de movement-speed / toile d'araignée
   water: 20, // malus de movement-speed / Sea - Water
   honey: 60, // malus de movement-speed / Honey
-  sap: 90 // malus de movement-speed / sap
+  sap: 40 // malus de movement-speed / sap
 }
 
 /* ============================================================================
