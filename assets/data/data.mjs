@@ -37,10 +37,10 @@ export const NODES = {
   INVISIBLE: {code: 12, name: 'Invisible', type: NODE_TYPE.SOLID, star: 0, color: '#300606', image: null, help: null},
 
   // ── Liquides ─────────────────────────────────────────────────────────────────
-  SEA: {code: 20, name: 'Sea', type: NODE_TYPE.LIQUID, star: 0, color: '#2D5EBF', image: 'liquid_16_16-0-0', waveImage: 'liquid_16_16-1-0', viscosity: 200, help: 'Sea'},
-  WATER: {code: 21, name: 'Water', type: NODE_TYPE.LIQUID, star: 0, color: '#477BFF', image: null, viscosity: 200, help: 'Water'},
-  HONEY: {code: 22, name: 'Honey', type: NODE_TYPE.LIQUID, star: 0, color: '#FFC700', image: null, viscosity: 600, help: 'Honey'},
-  SAP: {code: 23, name: 'Sap', type: NODE_TYPE.LIQUID, star: 0, color: '#008000', image: null, viscosity: 400, help: 'Sap'},
+  SEA: {code: 20, name: 'Sea', type: NODE_TYPE.LIQUID, star: 0, color: '#2D5EBF', image: 'liquid_16_16-0-0', waveImage: 'liquid_16_16-1-0', viscosity: 200, help: 'Sea', terrain: 'water'},
+  WATER: {code: 21, name: 'Water', type: NODE_TYPE.LIQUID, star: 0, color: '#477BFF', image: null, viscosity: 200, help: 'Water', terrain: 'water'},
+  HONEY: {code: 22, name: 'Honey', type: NODE_TYPE.LIQUID, star: 0, color: '#FFC700', image: null, viscosity: 600, help: 'Honey', terrain: 'honey'},
+  SAP: {code: 23, name: 'Sap', type: NODE_TYPE.LIQUID, star: 0, color: '#008000', image: null, viscosity: 400, help: 'Sap', terrain: 'sap'},
 
   // ── Natural (topsoil en surface recouvert de végétation) ─────────────────────
   GRASSFOREST: {
@@ -793,7 +793,18 @@ export const ITEMS = {
 }
 
 /* ============================================================================
-   4. RECIPES
+   4. BUFFS
+   ============================================================================ */
+
+export const BUFFS = {
+  web: 50, // malus de movement-speed / toile d'araignée
+  water: 20, // malus de movement-speed / Sea - Water
+  honey: 60, // malus de movement-speed / Honey
+  sap: 90 // malus de movement-speed / sap
+}
+
+/* ============================================================================
+   5. RECIPES
    ============================================================================ */
 
 export const RECIPES = [
@@ -960,7 +971,7 @@ export const RECIPES = [
 ]
 
 /* ============================================================================
-   5. PLANTS
+   6. PLANTS
    ============================================================================ */
 
 export const PLANT_SYSTEM = {GRASS: 1, TREE: 2, HERB: 3}
@@ -1148,7 +1159,7 @@ export const TREE_IMAGES = {
 }
 
 /* ============================================================================
-   6. MONSTERS
+   7. MONSTERS
    ============================================================================ */
 
 export const MONSTERS = {
@@ -1156,11 +1167,11 @@ export const MONSTERS = {
 }
 
 /* ============================================================================
-   7. MISCELLANEOUS
+   8. MISCELLANEOUS
    ============================================================================ */
 
 /* ============================================================================
-   8. POST-TRAITEMENTS (top-level — exécutés une fois au premier import)
+   9. POST-TRAITEMENTS (top-level — exécutés une fois au premier import)
    ============================================================================ */
 
 // export pour le debug (WorldMapDebug.drawMap)
@@ -1173,7 +1184,7 @@ export const hexToRgb = (hex) => {
   return {r, g, b, rgb: `rgb(${r}, ${g}, ${b})`}
 }
 
-// — 8.1. Construction de NODES_LOOKUP + tests intégritée + couleur + résolution mining[].item string → objet —
+// — 9.1. Construction de NODES_LOOKUP + tests intégritée + couleur + résolution mining[].item string → objet —
 const REQUIRED_NODE_FIELDS = ['code', 'name', 'type', 'star', 'image', 'color', 'help']
 for (const key in NODES) {
   const nodeDesc = NODES[key]
@@ -1196,7 +1207,7 @@ for (const key in NODES) {
 //   }
 }
 
-// — 8.2. Validation des ITEMS
+// — 9.2. Validation des ITEMS
 const REQUIRED_ITEM_FIELDS = ['name', 'type', 'stype', 'star', 'image', 'help', 'tooltip']
 export const TRINKET_BUFF_TABLE = {}
 for (const key in ITEMS) {
@@ -1259,14 +1270,14 @@ for (const key in ITEMS) {
   // le post traitement des images est effectué par GameCore.#hydrateItems()
 }
 
-// — 8.3. Résolution placesNode string → objet node —
+// — 9.3. Résolution placesNode string → objet node —
 // for (const key in ITEMS) {
 //   const item = ITEMS[key]
 //   if (!item.placesNode) continue
 //   item.placesNode = NODES[item.placesNode] ?? item.placesNode
 // }
 
-// — 8.4. Résolution PLANTS (growsOn[], drops[].item) —
+// — 9.4. Résolution PLANTS (growsOn[], drops[].item) —
 // for (const key in PLANTS) {
 //   const plant = PLANTS[key]
 
@@ -1284,7 +1295,7 @@ for (const key in ITEMS) {
 //   }
 // }
 
-// — 8.5. Validation des RECIPES
+// — 9.5. Validation des RECIPES
 for (const recipe of RECIPES) {
   if (!ITEMS[recipe.result.item]) {
     console.error(`[data.mjs] RECIPES '${recipe.result.item}' : result item inconnu`)
@@ -1299,7 +1310,7 @@ for (const recipe of RECIPES) {
   }
 }
 
-// — 8.5. Résolution RECIPES (ingredients[].item, result.item)
+// — 9.6. Résolution RECIPES (ingredients[].item, result.item)
 for (const key in RECIPES) {
   const recipe = RECIPES[key]
   // result
@@ -1332,9 +1343,9 @@ for (const key in RECIPES) {
   }
 }
 
-// — 8.6. Résolution MONSTERS
+// — 9.7. Résolution MONSTERS
 
-// — 8.7. Validations transverses  ────────────────────
+// — 9.8. Validations transverses  ────────────────────
 
 // obligatoirement après l'ajout des types MATERIAL et CRAFTABLE
 for (const key in ITEMS) {
@@ -1363,7 +1374,7 @@ for (const key in ITEMS) {
   }
 }
 
-// — 9.x. Détection des cycles dans la chaîne de craft ────────────────────
+// — 9.9. Détection des cycles dans la chaîne de craft ────────────────────
 
 const _recipeByResult = new Map()
 for (const recipe of RECIPES) {
@@ -1402,13 +1413,13 @@ for (const recipe of RECIPES) {
 }
 
 /* ============================================================================
-   9. VALIDATION D'INTÉGRITÉ (top-level — throw bloquant si KO)
+   10. VALIDATION D'INTÉGRITÉ (top-level — throw bloquant si KO)
    ============================================================================ */
 
 {
   const errors = []
 
-  // 9.1. Codes NODES uniques
+  // 10.1. Codes NODES uniques
   const seenCodes = new Set()
   for (const key in NODES) {
     const {code} = NODES[key]
@@ -1450,7 +1461,7 @@ for (const recipe of RECIPES) {
   //   }
   // }
 
-  // 9.2. Toutes les références croisées sont résolues (pas de string résiduelle)
+  // 10.2. Toutes les références croisées sont résolues (pas de string résiduelle)
   //   for (const key in NODES) {
   //     const node = NODES[key]
   //     if (!node.mining) continue
@@ -1486,14 +1497,16 @@ for (const recipe of RECIPES) {
   //     }
   //   }
 
-  // 9.3. Vérification des recettes
+  // 10.3. Vérification des recettes
 
   if (errors.length) {
     throw new Error(`[data.mjs] Intégrité des données KO :\n${errors.join('\n')}`)
   }
 }
 
-// ─── §10. LISTES DÉRIVÉES POUR LES OVERLAYS ──────────────────────────────
+/* ============================================================================
+   11. LISTES DÉRIVÉES POUR LES OVERLAYS
+   ============================================================================ */
 
 const _allDisplayTypes = []
 for (const mask of Object.values(ITEM_TYPE)) {

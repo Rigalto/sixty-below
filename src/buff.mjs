@@ -1,6 +1,6 @@
 // buff.mjs — BuffManager - BuffWidget
 
-import {ITEMS, TRINKET_BUFF_TABLE, NODES_LOOKUP} from '../assets/data/data.mjs'
+import {NODES_LOOKUP, ITEMS, TRINKET_BUFF_TABLE, BUFFS} from '../assets/data/data.mjs'
 import {UI_LAYOUT, MICROTASK} from './constant.mjs'
 import {playerManager} from './player.mjs'
 import {eventBus, timeManager, taskScheduler} from './utils.mjs'
@@ -74,8 +74,12 @@ class BuffManager {
     // Mettre à jour de façon synchrone 'MOVEMENT_SPEED_KEYS' dans 'ui.mjs'
     ['movement-speed', () => {
       if (this.#values.get('playerFreeze')) return 0
-      if (this.#values.get('web')) return 10 // % de vitesse conservée en toile
-      return 100
+      let speed = 100
+      if (this.#values.get('web')) speed -= BUFFS.web // toiles d'araignées
+      if (this.#values.get('water')) speed -= BUFFS.water // sea - water
+      if (this.#values.get('sap')) speed -= BUFFS.sap // sap
+      if (this.#values.get('honey')) speed -= BUFFS.honey // honey
+      return speed < 0 ? 0 : speed
     }],
     ['fall-speed', () => {
       return 100

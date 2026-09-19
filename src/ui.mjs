@@ -861,7 +861,7 @@ export const creationDialogOverlay = new CreationDialogOverlay()
    ==================================================================================================== */
 
 const TIMESLOT_NAMES = ['Midnight', 'Dawn', 'Morning', 'Noon', 'Afternoon', 'Dusk', 'Evening', 'Night']
-const MOVEMENT_SPEED_KEYS = new Set(['playerFreeze', 'web']) // clés dont un changement affecte movement-speed — à tenir à jour avec BuffManager#fns.get('movement-speed')
+const MOVEMENT_SPEED_KEYS = new Set(['playerFreeze', 'web', 'water', 'sap', 'honey']) // clés dont un changement affecte movement-speed — à tenir à jour avec BuffManager#fns.get('movement-speed')
 
 class EnvironmentWidget {
   #container = null

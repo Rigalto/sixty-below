@@ -1267,7 +1267,7 @@ Despite the nuisance they represent, cobwebs are one of the most valuable resour
 **Terrain Effect** ⏳
 
 * Cobweb threads are nearly invisible until you are already tangled in them — by then, each step pulls a dozen more filaments across your legs and arms.
-* Walking through [[node:web]] reduces [[Movement Buffs|Movement Speed]] ({{node:web:buffs:movementSpeed}}%)⏳
+* Walking/Jumping/Falling through [[node:web]] reduces [[Movement Buffs|Movement Speed]] ({{buff:web}}%)
 * See [[Movement Buffs]] for details
 
 <hr>
@@ -6637,14 +6637,6 @@ Foraging Tool: <<itemStar|sickleSilver>> or better
 
 <hr>
 
-**Terrain Effect** ⏳
-
-* Velvetmoss secretes a thin, permanent moisture that makes every step a negotiation with gravity — the harder you push, the more it slips away from under you.
-* Walking on Velvetmoss reduces Movement Speed ({{item:velvetmoss:buffs:movementSpeed}}%)
-* See [[Movement Buffs]] for details
-
-<hr>
-
 **Usages** ⏳
 
 * [[item:velvetmoss]] — crafting ingredient ⏳
@@ -7718,12 +7710,11 @@ All the bonus are additive.
 
 | Terrain | Effect | Location |
 |---|---|---|
-| [[node:web]] | -50% Movement Speed Bonus | [[Cobweb Cave]] and [[node:web]] hanging from ceilings of dark corners |
-| [[item:velvetmoss]] | -10% Movement Speed Bonus ⏳ | [[Moss Cave]] floor and walls |
-| [[node:sea]] | -20% Movement Speed Bonus ⏳ | Right / Left of the World |
-| [[node:water]] | -20% Movement Speed Bonus ⏳ | Anywhere |
-| [[node:sap]] | -40% Movement Speed Bonus ⏳ | Mainly in [[Sap Pocket]]s |
-| [[node:honey]] | -60% Movement Speed Bonus ⏳ | [[Hive]]s |
+| [[node:web]] | -{{buff:web}}% Movement Speed Bonus | [[Cobweb Cave]] and [[node:web]] hanging from ceilings of dark corners |
+| [[node:sea]] | -{{buff:water}}% Movement Speed Bonus | Right / Left of the World |
+| [[node:water]] | -{{buff:water}}% Movement Speed Bonus | Anywhere |
+| [[node:sap]] | -{{buff:sap}}% Movement Speed Bonus | Mainly in [[Sap Pocket]]s |
+| [[node:honey]] | -{{buff:honey}}% Movement Speed Bonus | [[Hive]]s |
 
 **Trinket Effects**
 
@@ -7757,6 +7748,7 @@ The player is freeze during all the Teleportation process.
 
 **Tips**
 
+* _If you touch both [[node:honey]] and a [[node:web]], the speed penalty exceeds 100% and you will be completely stuck. Mine the [[node:web]] to break free, or drink a [[item:recallPotion]] to escape._
 * _Velvetmoss patches are visually distinct — you can plan your path to avoid them if speed matters._ ⏳
 * _Boots with traction bonuses can partially offset terrain penalties._ ⏳
   `
@@ -8437,11 +8429,13 @@ const renderParagraphs = (html) => html.split('\n\n').map(block => {
   return `<p>${trimmed}</p>`
 }).join('\n')
 
-const resolvePath = (type, code, segments, NODES, ITEMS, MONSTERS) => {
+const resolvePath = (type, code, segments, NODES, ITEMS, BUFFS, MONSTERS) => {
   // 1. Objet racine
   let obj
   if (type === 'node') {
     obj = NODES[code.toUpperCase()]
+  } else if (type === 'buff') {
+    obj = BUFFS[code]
   } else if (type === 'item') {
     obj = ITEMS[code]
   } else if (type === 'monster') {
@@ -8609,13 +8603,13 @@ const formatValue = (resolved, format, entryTitle, path) => {
   }
 }
 
-const resolveDynamic = (entry, NODES, ITEMS, MONSTERS) => {
+const resolveDynamic = (entry, NODES, ITEMS, BUFFS, MONSTERS) => {
   let errors = 0
   entry.content = entry.content.replace(
-    /\{\{(node|item|monster):([^:}]+)((?::[^|}]+)*?)(?:\|([^}]*))?\}\}/g,
+    /\{\{(node|item|buff|monster):([^:}]+)((?::[^|}]+)*?)(?:\|([^}]*))?\}\}/g,
     (match, type, code, pathStr, format) => {
       const segments = pathStr ? pathStr.slice(1).split(':') : []
-      const resolved = resolvePath(type, code, segments, NODES, ITEMS, MONSTERS)
+      const resolved = resolvePath(type, code, segments, NODES, ITEMS, BUFFS, MONSTERS)
       const result = formatValue(resolved, format ?? '', entry.title, match)
       if (result.startsWith('⚠️')) errors++
       return result
@@ -8757,7 +8751,7 @@ const renderMarkdown = (entry) => {
   return errors
 }
 
-export const hydrateHelp = (NODES, ITEMS, RECIPES, MONSTERS = {}) => {
+export const hydrateHelp = (NODES, ITEMS, BUFFS, RECIPES, MONSTERS = {}) => {
   let count = 0
   let errors = 0
 
@@ -8772,7 +8766,7 @@ export const hydrateHelp = (NODES, ITEMS, RECIPES, MONSTERS = {}) => {
     errors += resolveItemLinks(entry, ITEMS)
     errors += resolveMonsterLinks(entry, MONSTERS)
     // Résolution des données dynamiques {{...}}
-    errors += resolveDynamic(entry, NODES, ITEMS, MONSTERS)
+    errors += resolveDynamic(entry, NODES, ITEMS, BUFFS, MONSTERS)
     errors += resolveRecipes(entry, RECIPES, ITEMS, recipeByResult)
     // Conversion Markdown → HTML (entry.html = html généré)
     errors += renderMarkdown(entry)
