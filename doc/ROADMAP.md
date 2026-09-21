@@ -16,20 +16,34 @@
   - Lifeforce Potion — dépend du système "buff timed" (pas encore implémenté, TODO déjà noté dans BuffManager)
   - Dégâts environnementaux (noyade, traversée de zone dangereuse, DOT) — gros morceau, probablement hors scope immédiat
 
-- Timed Buffs
+- Buffs Armure/Accessoire
 
-  - Étape 1 — Done — Migration du schéma item (data.mjs)
-  - Étape 2 — Done — Constante MICROTASK
-  - Étape 3 — Done — Cœur logique de BuffManager (isolé, sans eventBus ni DB)
-  - Étape 4 — Done — Découplage eventBus
-  - Étape 5 — Done — Branchement consommables (ItemUseManager)
-  - Étape 6 — Done — Persistance (écriture)
-  - Étape 7 — Done — Restauration au démarrage (core.mjs)
-  - Étape 8 — Done — Câblage BuffWidget / Buff Panel
+  - Étape 1 — `EQUIPMENT_BUFF_TABLE` (`data.mjs`)**
+Nouvelle table de configuration `{clé: 'sum'|'max'|'or'}`, même forme que `TRINKET_BUFF_TABLE`. Vérif : import propre, pas d'erreur au chargement.
 
-  - Étape 9 — Documentation TECHNICAL.md
+  - Étape 2 — Attribut `buff` sur au moins un item d'armure et un item d'accessoire (`data.mjs`)**
+Ajouter `buff: [{buff: '...', value: ...}]` sur un item réel de chaque catégorie, pour avoir des données à tester. *Point ouvert : quel item et quelle clé choisir pour ce premier test (`'defense'` ou autre) — à trancher à ce moment-là, pas maintenant.*
 
-Lignes exactes pour createTimedBuff, onExpireTimedBuff, l'event buff/create-timed, la section persistance buff, la section startSession 5.5, l'entrée MICROTASK.
+  - Étape 3 — Buffers dans `BuffManager`**
+Déclaration des champs `#armorA`/`#armorB`/`#currentArmor`/`#nextArmor` et `#accessoryA`/`#accessoryB`/`#currentAccessory`/`#nextAccessory`, initialisés dans `init()` (même principe que `#trinketA`/`#trinketB` dans `initTrinket`). Pas encore de calcul à cette étape.
+
+  - Étape 4 — `#onArmorBuffs` / `#onAccessoriesBuffs`**
+Implémentation des deux méthodes (remplacent les stubs commentés), réutilisant `#resetBuffer`/`#applyItems`/`#computeChanged` tels quels (déjà génériques). Émission de `buff/armor-changed` / `buff/accessory-changed` (payload : `Set<string>` des clés modifiées) si le diff n'est pas vide.
+
+  - Étape 5 — Branchement `onStaticBuffs`**
+Décommenter les deux appels vers `#onArmorBuffs`/`#onAccessoriesBuffs`, retirer les `// TODO`.
+
+  - Étape 6 — Extension du debug (`onDebug`)**
+Ajouter l'affichage de `#currentArmor`/`#currentAccessory` (même section que `#currentTrinket` déjà affiché) — permet de vérifier visuellement l'équipement/déséquipement sans attendre un buff composé.
+
+  - Étape 7 — Un buff composé de test**
+Une entrée `#fns` lisant les deux buffers (ex: `defense: () => #currentArmor.defense + #currentAccessory.defense`), pour valider `getBuff(...)` bout en bout une fois l'inventaire fermé.
+
+  - Étape 8 — Consommateur réel (si applicable)**
+Câblage d'un widget existant sur `buff/armor-changed`/`buff/accessory-changed`, même principe que `EnvironmentWidget`/Speed pour le Terrain. *Dépend de l'existence d'un widget candidat pour la clé choisie à l'Étape 2 — à voir à ce moment-là.*
+
+  - Étape 9 — Documentation `TECHNICAL.md`**
+Champs, méthodes, table des eventBus (les deux nouveaux events + mise à jour de la description de `onStaticBuffs`).
 
 - gestion de la fonction 'Use' dans l'inventaire
 - Implémenter la réduction de vitesse dans les liquides ou les cobweb.
