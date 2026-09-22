@@ -18,14 +18,12 @@
 
 - Buffs Armure/Accessoire
 
-  - Étape 1 — `EQUIPMENT_BUFF_TABLE` (`data.mjs`)**
-Nouvelle table de configuration `{clé: 'sum'|'max'|'or'}`, même forme que `TRINKET_BUFF_TABLE`. Vérif : import propre, pas d'erreur au chargement.
-
-  - Étape 2 — Attribut `buff` sur au moins un item d'armure et un item d'accessoire (`data.mjs`)**
-Ajouter `buff: [{buff: '...', value: ...}]` sur un item réel de chaque catégorie, pour avoir des données à tester. *Point ouvert : quel item et quelle clé choisir pour ce premier test (`'defense'` ou autre) — à trancher à ce moment-là, pas maintenant.*
-
+  - Étape 1 — Done — `EQUIPMENT_BUFF_TABLE` (`data.mjs`)**
+  - Étape 2 — Done — Attribut `buff` sur au moins un item d'armure et un item d'accessoire (`data.mjs`)**
   - Étape 3 — Buffers dans `BuffManager`**
-Déclaration des champs `#armorA`/`#armorB`/`#currentArmor`/`#nextArmor` et `#accessoryA`/`#accessoryB`/`#currentAccessory`/`#nextAccessory`, initialisés dans `init()` (même principe que `#trinketA`/`#trinketB` dans `initTrinket`). Pas encore de calcul à cette étape.
+  - Étape 4 — Done — Extension du debug (`onDebug`)**
+
+
 
   - Étape 4 — `#onArmorBuffs` / `#onAccessoriesBuffs`**
 Implémentation des deux méthodes (remplacent les stubs commentés), réutilisant `#resetBuffer`/`#applyItems`/`#computeChanged` tels quels (déjà génériques). Émission de `buff/armor-changed` / `buff/accessory-changed` (payload : `Set<string>` des clés modifiées) si le diff n'est pas vide.
@@ -33,8 +31,7 @@ Implémentation des deux méthodes (remplacent les stubs commentés), réutilisa
   - Étape 5 — Branchement `onStaticBuffs`**
 Décommenter les deux appels vers `#onArmorBuffs`/`#onAccessoriesBuffs`, retirer les `// TODO`.
 
-  - Étape 6 — Extension du debug (`onDebug`)**
-Ajouter l'affichage de `#currentArmor`/`#currentAccessory` (même section que `#currentTrinket` déjà affiché) — permet de vérifier visuellement l'équipement/déséquipement sans attendre un buff composé.
+
 
   - Étape 7 — Un buff composé de test**
 Une entrée `#fns` lisant les deux buffers (ex: `defense: () => #currentArmor.defense + #currentAccessory.defense`), pour valider `getBuff(...)` bout en bout une fois l'inventaire fermé.

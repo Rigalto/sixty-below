@@ -1,6 +1,6 @@
 // buff.mjs — BuffManager - BuffWidget
 
-import {NODES_LOOKUP, ITEMS, TRINKET_BUFF_TABLE, BUFFS} from '../assets/data/data.mjs'
+import {NODES_LOOKUP, ITEMS, TRINKET_BUFF_TABLE, EQUIPMENT_BUFF_TABLE, BUFFS} from '../assets/data/data.mjs'
 import {UI_LAYOUT, MICROTASK} from './constant.mjs'
 import {playerManager} from './player.mjs'
 import {eventBus, timeManager, taskScheduler} from './utils.mjs'
@@ -136,6 +136,17 @@ class BuffManager {
   #trinketB = {} // buffer B — alterné avec A à chaque mise à jour
   #currentTrinket = null // pointe vers le buffer courant (valeurs en vigueur)
   #nextTrinket = null // pointe vers le buffer en cours de calcul
+
+  #armorA = {} // buffer A — buffs armure courants ou prochains
+  #armorB = {} // buffer B — alterné avec A à chaque mise à jour
+  #currentArmor = null // pointe vers le buffer courant (valeurs en vigueur)
+  #nextArmor = null // pointe vers le buffer en cours de calcul
+
+  #accessoryA = {} // buffer A — buffs accessoires courants ou prochains
+  #accessoryB = {} // buffer B — alterné avec A à chaque mise à jour
+  #currentAccessory = null // pointe vers le buffer courant (valeurs en vigueur)
+  #nextAccessory = null // pointe vers le buffer en cours de calcul
+
   #timedBuffRecords = new Map() // buffId → record DB 'buff' (nature: 'timed')
 
   #terrainA = new Set() // buffer A — clés des buffs terrain actives ou en cours de calcul
@@ -186,6 +197,24 @@ class BuffManager {
   }
 
   /**
+   * Initialise les buffers d'équipement (armure et accessoires) à 0 et définit les buffers
+   * courants. Émet les événements de changement initiaux pour notifier les abonnés.
+   */
+  initEquipment () {
+    this.#resetBuffer(this.#armorA, EQUIPMENT_BUFF_TABLE)
+    this.#resetBuffer(this.#armorB, EQUIPMENT_BUFF_TABLE)
+    this.#currentArmor = this.#armorA
+    this.#nextArmor = this.#armorB
+    eventBus.emit('buff/armor-changed', new Set(Object.keys(EQUIPMENT_BUFF_TABLE)))
+
+    this.#resetBuffer(this.#accessoryA, EQUIPMENT_BUFF_TABLE)
+    this.#resetBuffer(this.#accessoryB, EQUIPMENT_BUFF_TABLE)
+    this.#currentAccessory = this.#accessoryA
+    this.#nextAccessory = this.#accessoryB
+    eventBus.emit('buff/accessory-changed', new Set(Object.keys(EQUIPMENT_BUFF_TABLE)))
+  }
+
+  /**
    * Initialise les buffers de terrain (A et B) à 0 et définit le buffer courant.
    */
   initTerrain () {
@@ -212,6 +241,7 @@ class BuffManager {
     this.#currentTimeslot = 0
     // Autres initialisations
     this.initTrinket()
+    this.initEquipment()
     this.initTerrain()
   }
 
@@ -301,6 +331,14 @@ class BuffManager {
   onDebug () {
     let output = '--- BuffManager - Values ---\n'
     for (const [key, value] of this.#values) {
+      output += `  ${key}: ${value}\n`
+    }
+    output += '--- BuffManager - Armor ---\n'
+    for (const [key, value] of Object.entries(this.#currentArmor)) {
+      output += `  ${key}: ${value}\n`
+    }
+    output += '--- BuffManager - Accessories ---\n'
+    for (const [key, value] of Object.entries(this.#currentAccessory)) {
       output += `  ${key}: ${value}\n`
     }
     output += '--- BuffManager - Trinkets ---\n'

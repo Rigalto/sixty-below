@@ -393,7 +393,7 @@ export const ITEMS = {
   triskelCopper: {name: 'Copper Triskel', type: ITEM_TYPE.FURNITURE | ITEM_TYPE.UNIQUE | ITEM_TYPE.MATERIAL, stype: 'triskel', star: 3, image: 'furniture_32_32-12-2', placed: 'furniture_32_32-6-3', unplacing: {speed: 1800}, help: 'Triskels', tooltip: ''},
   triskelSilver: {name: 'Silver Triskel', type: ITEM_TYPE.FURNITURE | ITEM_TYPE.UNIQUE | ITEM_TYPE.MATERIAL, stype: 'triskel', star: 4, image: 'furniture_32_32-12-2', placed: 'furniture_32_32-6-3', unplacing: {speed: 1800}, help: 'Triskels', tooltip: ''},
   triskelGold: {name: 'Gold Triskel', type: ITEM_TYPE.FURNITURE | ITEM_TYPE.UNIQUE | ITEM_TYPE.MATERIAL, stype: 'triskel', star: 5, image: 'furniture_32_32-12-2', placed: 'furniture_32_32-6-3', unplacing: {speed: 1800}, help: 'Triskels', tooltip: ''},
-  triskelAncient: {name: 'Ancient Triskel', type: ITEM_TYPE.ACCESSORY | ITEM_TYPE.UNIQUE | ITEM_TYPE.CRAFTABLE, stype: 'triskel', star: 5, image: 'furniture_32_32-12-2', placed: 'furniture_32_32-6-3', help: 'Triskels', tooltip: ''},
+  triskelAncient: {name: 'Ancient Triskel', type: ITEM_TYPE.ACCESSORY | ITEM_TYPE.UNIQUE | ITEM_TYPE.CRAFTABLE, stype: 'triskel', star: 5, image: 'furniture_32_32-12-2', placed: 'furniture_32_32-6-3', help: 'Triskels', tooltip: '', buff: [{buff: 'movementSpeed', value: 20, op: 'sum'}]},
 
   // Tombstone - images OK
   tomb: {name: 'Tombstone', type: ITEM_TYPE.FURNITURE | ITEM_TYPE.PLACABLE | ITEM_TYPE.UNDISPOSABLE, stype: 'tomb', star: 1, image: 'placed_32_32-0-4', placed: 'placed_32_32-0-4', unplacing: {speed: 2200}, help: 'Graveyard', tooltip: 'Summons specific enemies'},
@@ -403,7 +403,7 @@ export const ITEMS = {
   tombCross: {name: 'Cross Tombstone', type: ITEM_TYPE.FURNITURE | ITEM_TYPE.PLACABLE | ITEM_TYPE.UNDISPOSABLE, stype: 'tomb', star: 2, image: 'placed_32_32-4-4', placed: 'placed_32_32-4-4', unplacing: {speed: 2200}, help: 'Graveyard', tooltip: 'Summons specific enemies'},
 
   // accessories - combat - images NOK
-  bezoar: {name: 'Bezoar', type: ITEM_TYPE.ACCESSORY, stype: 'accessory', star: 3, image: 'accessories_32_32-0-0', help: 'Accessories', tooltip: 'Immunity to Bleeding, Poisoned', immunity: ['bleeding', 'poisoned']},
+  bezoar: {name: 'Bezoar', type: ITEM_TYPE.ACCESSORY, stype: 'accessory', star: 3, image: 'accessories_32_32-0-0', help: 'Accessories', tooltip: 'Immunity to Bleeding, Poisoned', immunity: ['bleeding', 'poisoned'], buff: [{buff: 'defense', value: 1, op: 'sum'}]},
 
   // Wood furniture set
   chairWood: {name: 'Wooden Chair', type: ITEM_TYPE.FURNITURE | ITEM_TYPE.PLACABLE, stype: 'chair', star: 1, image: 'furniture_32_32-0-5', placedLeft: 'fuws_16_48-1-0', placedRight: 'fuws_16_48-2-0', unplacing: {speed: 1500}, help: 'Chairs', tooltip: '???', furnitureSet: 'wood', comfort: true},
@@ -786,9 +786,9 @@ export const ITEMS = {
   bodyPlatinum: {name: 'Platinum Breastplate', type: ITEM_TYPE.ARMOR, stype: '', star: 5, image: 'armor_32_32-1-3', armorImage: 'body_26_18-0-1', defense: 16, help: 'Armors', tooltip: 'Provides sturdy protection', armor: 'body', set: 'platinum'},
   footPlatinum: {name: 'Platinum Leggings', type: ITEM_TYPE.ARMOR, stype: '', star: 5, image: 'armor_32_32-2-3', armorImage: 'foot_26_12-0-1', defense: 12, help: 'Armors', tooltip: 'Provides sturdy protection', armor: 'foot', set: 'platinum'},
 
-  headMiner: {name: 'Mining Helmet', type: ITEM_TYPE.ARMOR, stype: '', star: 2, image: 'armor_32_32-3-3', armorImage: 'head_26_22-6-0', defense: 2, buff: [{buff: 'miningspeed', value: 10}], help: 'Armors', tooltip: 'Provides sturdy protection', armor: 'head', set: 'miner'},
-  bodyMiner: {name: 'Mining Shirt', type: ITEM_TYPE.ARMOR, stype: '', star: 2, image: 'armor_32_32-4-3', armorImage: 'body_26_18-6-0', defense: 1, buff: [{buff: 'miningspeed', value: 10}], help: 'Armors', tooltip: 'Provides sturdy protection', armor: 'body', set: 'miner'},
-  footMiner: {name: 'Mining Pants', type: ITEM_TYPE.ARMOR, stype: '', star: 2, image: 'armor_32_32-5-3', armorImage: 'foot_26_12-6-0', defense: 1, buff: [{buff: 'miningspeed', value: 10}], help: 'Armors', tooltip: 'Provides sturdy protection', armor: 'foot', set: 'miner'}
+  headMiner: {name: 'Mining Helmet', type: ITEM_TYPE.ARMOR, stype: '', star: 2, image: 'armor_32_32-3-3', armorImage: 'head_26_22-6-0', buff: [{buff: 'defense', value: 2, op: 'sum'}, {buff: 'miningSpeed', value: 10, op: 'sum'}], help: 'Armors', tooltip: 'Provides sturdy protection', armor: 'head', set: 'miner'},
+  bodyMiner: {name: 'Mining Shirt', type: ITEM_TYPE.ARMOR, stype: '', star: 2, image: 'armor_32_32-4-3', armorImage: 'body_26_18-6-0', buff: [{buff: 'defense', value: 1, op: 'sum'}, {buff: 'miningSpeed', value: 10, op: 'sum'}], help: 'Armors', tooltip: 'Provides sturdy protection', armor: 'body', set: 'miner'},
+  footMiner: {name: 'Mining Pants', type: ITEM_TYPE.ARMOR, stype: '', star: 2, image: 'armor_32_32-5-3', armorImage: 'foot_26_12-6-0', buff: [{buff: 'defense', value: 1, op: 'sum'}, {buff: 'movementSpeed', value: 10, op: 'sum'}, {buff: 'miningSpeed', value: 10, op: 'sum'}], help: 'Armors', tooltip: 'Provides sturdy protection', armor: 'foot', set: 'miner'}
 
 }
 
@@ -1210,6 +1210,7 @@ for (const key in NODES) {
 // — 9.2. Validation des ITEMS
 const REQUIRED_ITEM_FIELDS = ['name', 'type', 'stype', 'star', 'image', 'help', 'tooltip']
 export const TRINKET_BUFF_TABLE = {}
+export const EQUIPMENT_BUFF_TABLE = {}
 for (const key in ITEMS) {
   const itemDesc = ITEMS[key]
 
@@ -1224,7 +1225,7 @@ for (const key in ITEMS) {
   if ((itemDesc.type & PLACABLE_FURNITURE) === PLACABLE_FURNITURE && !itemDesc.placed && !itemDesc.placedLeft) {
     console.error(`[data.mjs] ITEMS.${key} : FURNITURE sans attribut 'placed' ni 'placedLeft'`)
   }
-  // post traitement des buffs
+  // post traitement des buffs (trinkets)
   if ((itemDesc.type & ITEM_TYPE.TRINKET) && itemDesc.buff) {
     for (const {buff, op} of itemDesc.buff) {
       const resolvedOp = op ?? ''
@@ -1234,6 +1235,19 @@ for (const key in ITEMS) {
         }
       } else {
         TRINKET_BUFF_TABLE[buff] = resolvedOp
+      }
+    }
+  }
+  // post traitement des buffs (armure/accessoire — même table pour les deux domaines)
+  if ((itemDesc.type & (ITEM_TYPE.ARMOR | ITEM_TYPE.ACCESSORY)) && itemDesc.buff) {
+    for (const {buff, op} of itemDesc.buff) {
+      const resolvedOp = op ?? ''
+      if (buff in EQUIPMENT_BUFF_TABLE) {
+        if (EQUIPMENT_BUFF_TABLE[buff] !== resolvedOp) {
+          console.error(`[data.mjs] ITEMS.${key} : op mismatch pour le buff '${buff}' (attendu '${EQUIPMENT_BUFF_TABLE[buff]}', trouvé '${resolvedOp}')`)
+        }
+      } else {
+        EQUIPMENT_BUFF_TABLE[buff] = resolvedOp
       }
     }
   }
@@ -1269,6 +1283,7 @@ for (const key in ITEMS) {
   }
   // le post traitement des images est effectué par GameCore.#hydrateItems()
 }
+console.log('>>>>>>>>>>>>>>>>>>>> EQUIPMENT_BUFF_TABLE', EQUIPMENT_BUFF_TABLE)
 
 // — 9.3. Résolution placesNode string → objet node —
 // for (const key in ITEMS) {
