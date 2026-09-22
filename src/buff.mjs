@@ -449,8 +449,8 @@ class BuffManager {
    * @param {string[]} payload.trinkets - Liste des IDs de bibelots (trinkets) équipés.
    */
   onStaticBuffs ({armor, accessories, trinkets}) {
-    // this.#onArmorBuffs(armor)               // TODO
-    // this.#onAccessoriesBuffs(accessories)   // TODO
+    this.#onArmorBuffs(armor)
+    this.#onAccessoriesBuffs(accessories)
     this.onTrinketsBuffs(trinkets)
   }
 
@@ -464,6 +464,30 @@ class BuffManager {
     const changed = this.#computeChanged(TRINKET_BUFF_TABLE, this.#currentTrinket, this.#nextTrinket)
     ;[this.#currentTrinket, this.#nextTrinket] = [this.#nextTrinket, this.#currentTrinket]
     if (changed.size > 0) eventBus.emit('buff/trinket-changed', changed)
+  }
+
+  /**
+   * Recalcule les buffs armure, détecte les changements et émet 'buff/armor-changed'.
+   * @param {string[]} armor - Liste des IDs d'armures actuellement équipées.
+   */
+  #onArmorBuffs (armor) {
+    this.#resetBuffer(this.#nextArmor, EQUIPMENT_BUFF_TABLE)
+    this.#applyItems(armor, EQUIPMENT_BUFF_TABLE, this.#nextArmor)
+    const changed = this.#computeChanged(EQUIPMENT_BUFF_TABLE, this.#currentArmor, this.#nextArmor)
+    ;[this.#currentArmor, this.#nextArmor] = [this.#nextArmor, this.#currentArmor]
+    if (changed.size > 0) eventBus.emit('buff/armor-changed', changed)
+  }
+
+  /**
+   * Recalcule les buffs accessoires, détecte les changements et émet 'buff/accessory-changed'.
+   * @param {string[]} accessories - Liste des IDs d'accessoires actuellement équipés.
+   */
+  #onAccessoriesBuffs (accessories) {
+    this.#resetBuffer(this.#nextAccessory, EQUIPMENT_BUFF_TABLE)
+    this.#applyItems(accessories, EQUIPMENT_BUFF_TABLE, this.#nextAccessory)
+    const changed = this.#computeChanged(EQUIPMENT_BUFF_TABLE, this.#currentAccessory, this.#nextAccessory)
+    ;[this.#currentAccessory, this.#nextAccessory] = [this.#nextAccessory, this.#currentAccessory]
+    if (changed.size > 0) eventBus.emit('buff/accessory-changed', changed)
   }
 
   /**

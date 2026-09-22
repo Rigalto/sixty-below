@@ -20,18 +20,10 @@
 
   - Étape 1 — Done — `EQUIPMENT_BUFF_TABLE` (`data.mjs`)**
   - Étape 2 — Done — Attribut `buff` sur au moins un item d'armure et un item d'accessoire (`data.mjs`)**
-  - Étape 3 — Buffers dans `BuffManager`**
+  - Étape 3 — Done — Buffers dans `BuffManager`**
   - Étape 4 — Done — Extension du debug (`onDebug`)**
-
-
-
-  - Étape 4 — `#onArmorBuffs` / `#onAccessoriesBuffs`**
-Implémentation des deux méthodes (remplacent les stubs commentés), réutilisant `#resetBuffer`/`#applyItems`/`#computeChanged` tels quels (déjà génériques). Émission de `buff/armor-changed` / `buff/accessory-changed` (payload : `Set<string>` des clés modifiées) si le diff n'est pas vide.
-
-  - Étape 5 — Branchement `onStaticBuffs`**
-Décommenter les deux appels vers `#onArmorBuffs`/`#onAccessoriesBuffs`, retirer les `// TODO`.
-
-
+  - Étape 5 — Done — `#onArmorBuffs` / `#onAccessoriesBuffs`**
+  - Étape 6 — Done — Branchement `onStaticBuffs`**
 
   - Étape 7 — Un buff composé de test**
 Une entrée `#fns` lisant les deux buffers (ex: `defense: () => #currentArmor.defense + #currentAccessory.defense`), pour valider `getBuff(...)` bout en bout une fois l'inventaire fermé.
