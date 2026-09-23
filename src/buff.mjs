@@ -341,19 +341,19 @@ class BuffManager {
     }
     output += '--- BuffManager - Armor ---\n'
     for (const [key, value] of Object.entries(this.#currentArmor)) {
-      output += `  ${key}: ${value}\n`
+      output += `  ${key}: ${this.#formatDebugValue(value)}\n`
     }
     output += '--- BuffManager - Accessories ---\n'
     for (const [key, value] of Object.entries(this.#currentAccessory)) {
-      output += `  ${key}: ${value}\n`
+      output += `  ${key}: ${this.#formatDebugValue(value)}\n`
     }
     output += '--- BuffManager - Trinkets ---\n'
     for (const [key, value] of Object.entries(this.#currentTrinket)) {
-      output += `  ${key}: ${value}\n`
+      output += `  ${key}: ${this.#formatDebugValue(value)}\n`
     }
     output += '--- BuffManager - Functions ---\n'
     for (const [key] of this.#fns) {
-      output += `  ${key}: ${this.#fns.get(key)()}\n`
+      output += `  ${key}: ${this.#formatDebugValue(this.#fns.get(key)())}\n`
     }
     console.log(output)
   }
@@ -535,6 +535,19 @@ class BuffManager {
       if (current[key] !== next[key]) changed.add(key)
     }
     return changed
+  }
+
+  /**
+   * Formate une valeur pour l'affichage debug. Les objets à plat (Range: {x, y, w, h}) sont
+   * rendus en une ligne — un seul niveau, pas de récursion pour d'éventuels sous-objets.
+   * @param {*} value
+   * @returns {string|number|boolean}
+   */
+  #formatDebugValue (value) {
+    if (typeof value !== 'object' || value === null) return value
+    const parts = []
+    for (const key in value) parts.push(`${key}: ${value[key]}`)
+    return `{${parts.join(', ')}}`
   }
 }
 
