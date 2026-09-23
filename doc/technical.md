@@ -429,6 +429,8 @@ Cette section définit les événements officiels. Tout nouvel événement doit 
 | E | `buff/create-timed` | `{ buff: string, duration: number }` | Crée ou prolonge un buff temporisé — délégué à `createTimedBuff`. |
 | E | `debug/buff-manager` | _(none)_ | Affiche sur la console le contenu de `#values`, `#currentTrinket` et `#fns`. |
 | S | `buff/trinket-changed` | `Set<string>` | Émis par `buffManager` quand un buff trinket change. Payload = buffIds modifiés. |
+| S | `buff/armor-changed` | `Set<string>` | Émis quand au moins un buff d'armure change (recalculé à la fermeture de l'inventaire). Payload = buffIds modifiés. |
+| S | `buff/accessory-changed` | `Set<string>` | Émis quand au moins un buff d'accessoire change (recalculé à la fermeture de l'inventaire). Payload = buffIds modifiés. |
 
 #### Action de minage (`MiningManager`)
 

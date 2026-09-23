@@ -8,7 +8,10 @@
 ## En cours
 
 ### Code et tests
-
+- afficher dans le debug '²' les attributs des buffs range.
+- supprimer l'icône statique 'Armor' du widget des Buffs.
+- ajouter un overlay affichant les caractéristiques du personnages (buffs...).
+- ajouter un bouton dans l'inventaire pour afficher l'overlay du personnage (impact sur son z-index).
 - gestion des points de vie :
   - Mort du joueur — test current <= 0 → émission de l'event déclenchant spawnManager.onTeleportSpawn()
   - Consommation potions/food — brancher un vrai handler heal dans ItemUseManager
@@ -16,26 +19,8 @@
   - Lifeforce Potion — dépend du système "buff timed" (pas encore implémenté, TODO déjà noté dans BuffManager)
   - Dégâts environnementaux (noyade, traversée de zone dangereuse, DOT) — gros morceau, probablement hors scope immédiat
 
-- Buffs Armure/Accessoire
-
-  - Étape 1 — Done — `EQUIPMENT_BUFF_TABLE` (`data.mjs`)**
-  - Étape 2 — Done — Attribut `buff` sur au moins un item d'armure et un item d'accessoire (`data.mjs`)**
-  - Étape 3 — Done — Buffers dans `BuffManager`**
-  - Étape 4 — Done — Extension du debug (`onDebug`)**
-  - Étape 5 — Done — `#onArmorBuffs` / `#onAccessoriesBuffs`**
-  - Étape 6 — Done — Branchement `onStaticBuffs`**
-
-  - Étape 7 — Un buff composé de test**
-Une entrée `#fns` lisant les deux buffers (ex: `defense: () => #currentArmor.defense + #currentAccessory.defense`), pour valider `getBuff(...)` bout en bout une fois l'inventaire fermé.
-
-  - Étape 8 — Consommateur réel (si applicable)**
-Câblage d'un widget existant sur `buff/armor-changed`/`buff/accessory-changed`, même principe que `EnvironmentWidget`/Speed pour le Terrain. *Dépend de l'existence d'un widget candidat pour la clé choisie à l'Étape 2 — à voir à ce moment-là.*
-
-  - Étape 9 — Documentation `TECHNICAL.md`**
-Champs, méthodes, table des eventBus (les deux nouveaux events + mise à jour de la description de `onStaticBuffs`).
-
-- gestion de la fonction 'Use' dans l'inventaire
-- Implémenter la réduction de vitesse dans les liquides ou les cobweb.
+- traiter le cas particulier des trois buffs relatifs à la nourriture.
+- gestion de la fonction 'Use' dans l'inventaire - reste la consommation à coder
 - Modifier le volume sonore des sons du jeu (ActionWidget)
 - Supprimer les actions de debug accessibles au joueur, quand hébergement sous GitHub :
   - affichage après génération du monde

@@ -75,10 +75,13 @@ class BuffManager {
     ['movement-speed', () => {
       if (this.#values.get('playerFreeze')) return 0
       let speed = 100
-      if (this.#values.get('web')) speed -= BUFFS.web // toiles d'araignées
-      if (this.#values.get('water')) speed -= BUFFS.water // sea - water
-      if (this.#values.get('sap')) speed -= BUFFS.sap // sap
-      if (this.#values.get('honey')) speed -= BUFFS.honey // honey
+      if (this.#values.get('web')) speed -= BUFFS.web
+      if (this.#values.get('water')) speed -= BUFFS.water
+      if (this.#values.get('sap')) speed -= BUFFS.sap
+      if (this.#values.get('honey')) speed -= BUFFS.honey
+      speed += this.#currentArmor.movementSpeed ?? 0
+      speed += this.#currentAccessory.movementSpeed ?? 0
+
       return speed < 0 ? 0 : speed
     }],
     ['fall-speed', () => {
@@ -106,7 +109,7 @@ class BuffManager {
       return {x, y, w, h}
     }],
     ['mining-speed', () => {
-      return 0
+      return (this.#currentArmor.miningSpeed ?? 0) + (this.#currentAccessory.miningSpeed ?? 0)
     }],
     ['foraging-range', () => {
       const x = -2
@@ -127,6 +130,9 @@ class BuffManager {
       const w = 7
       const h = 9
       return {x, y, w, h}
+    }],
+    ['combat-defense', () => {
+      return (this.#currentArmor.defense ?? 0) + (this.#currentAccessory.defense ?? 0)
     }]
   ])
 
