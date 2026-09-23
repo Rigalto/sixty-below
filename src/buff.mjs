@@ -64,6 +64,7 @@ import {uniqueIdGenerator} from './database.mjs'
 const MOON_BUFF_KEYS = ['fullMoon', 'waningGibbous', 'thirdQuarter', 'waningCrescent', 'newMoon', 'waxingCrescent', 'firstQuarter', 'waxingGibbous']
 const WEATHER_BUFF_KEYS = ['sunny', 'cloudy', 'rainy', 'windy', 'stormy']
 const TIMESLOT_BUFF_KEYS = ['midnight', 'dawn', 'morning', 'noon', 'afternoon', 'dusk', 'evening', 'night']
+const FOOD_TIER_KEYS = ['wellFed', 'plentySatisfied', 'exquisitelyStuffed'] // mutuellement exclusifs — activer l'un désactive les deux autres
 
 class BuffManager {
   #values = new Map() // valeurs brutes : rainy, lucky, armorHelmetMiningSpeed...
@@ -403,6 +404,13 @@ class BuffManager {
    * @param {number} duration - durée en secondes
    */
   createTimedBuff (buff, duration) {
+    // 1. Cas particulier de la nourriture (buffs exclusifs)
+    if (FOOD_TIER_KEYS.includes(buff)) {
+      for (const tier of FOOD_TIER_KEYS) {
+        if (tier !== buff && this.#values.get(tier)) this.#cancelTimedBuff(tier)
+      }
+    }
+    // 2. Traitement générique
     this.setBuff(buff, true)
     const {priority, capacity} = MICROTASK.BUFF_TIMED_EXPIRE
     const expiration = taskScheduler.extendTask(`buff-timed-${buff}`, duration * 1000, this.onExpireTimedBuff, priority, capacity, buff)
@@ -445,6 +453,17 @@ class BuffManager {
     if (record === undefined) return
     record.value = false
     saveManager.queueStaticUpdate({storeName: 'buff', record})
+  }
+
+  /**
+   * Désactive un buff temporisé avant son échéance naturelle. Annule la tâche taskScheduler
+   * en cours puis réutilise onExpireTimedBuff pour le nettoyage d'état (identique à une
+   * expiration naturelle).
+   * @param {string} buff - identifiant du buff élémentaire
+   */
+  #cancelTimedBuff (buff) {
+    taskScheduler.dequeue(`buff-timed-${buff}`)
+    this.onExpireTimedBuff(buff)
   }
 
   /**
