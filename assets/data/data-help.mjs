@@ -7632,6 +7632,64 @@ Consuming the same type too quickly extends the cooldown before you can benefit 
   `
   },
   {
+    title: 'Food Buff',
+    category: ['Buff', 'Food'],
+    content: `
+**Description**
+
+Food buffs are powerful status effects obtained by consuming food items. These buffs provide comprehensive stat improvements that enhance combat, mining, and movement capabilities.
+
+**Food Buff Types**
+
+| Buff Name | Food Tier | Duration | Quality |
+| --- | --- | --- | --- |
+| Well Fed | ⭐☆☆☆☆ | ~10 minutes / 4 fights | Raw Foods |
+| Well Fed | ⭐⭐☆☆☆ | ~12 minutes / 5 fights | Basic Foods |
+| Plenty Satisfied | ⭐⭐⭐☆☆ | ~8 minutes / 2 fights | Cooked Meals |
+| Plenty Satisfied | ⭐⭐⭐⭐☆ | ~10 minutes / 3 fights | Elaborate Dishes |
+| Exquisitely Stuffed | ⭐⭐⭐⭐⭐ | ~5 minutes / 1 fight | Gourmet Dishes |
+
+_Note: Duration may vary slightly depending on the specific food item._
+
+<hr>
+
+**Food Buff Effects**
+
+| Stat Bonus | Well Fed | Plenty Satisfied | Exquisitely Stuffed |
+| --- | --- | --- | --- |
+| Health Regeneration rate | +{{buff:wellFedHealthRegen}}% | +{{buff:plentySatisfiedHealthRegen}}% | +{{buff:exquisitelyStuffedHealthRegen}}% |
+| Movement Speed | +{{buff:wellFedMovementSpeed}}% | +{{buff:plentySatisfiedMovementSpeed}}% | +{{buff:exquisitelyStuffedMovementSpeed}}% |
+| Mining Speed | +{{buff:wellFedMiningSpeed}}% | +{{buff:plentySatisfiedMiningSpeed}}% | +{{buff:exquisitelyStuffedMiningSpeed}}% |
+| Defense | +{{buff:wellFedDefense}} | +{{buff:plentySatisfiedDefense}} | +{{buff:exquisitelyStuffedDefense}} |
+| Damage⏳ | +{{buff:wellFedDamage}} | +{{buff:plentySatisfiedDamage}} | +{{buff:exquisitelyStuffedDamage}} |
+| Critical Chance⏳ | +{{buff:wellFedCriticalChance}}% | +{{buff:plentySatisfiedCriticalChance}}% | +{{buff:exquisitelyStuffedCriticalChance}}% |
+| PA⏳ | +{{buff:wellFedPa}} | +{{buff:plentySatisfiedPa}} | +{{buff:exquisitelyStuffedPa}} |
+| PM⏳ | +{{buff:wellFedPm}} | +{{buff:plentySatisfiedPm}} | +{{buff:exquisitelyStuffedPm}} |
+
+**Food Buff Mechanics⏳**
+
+* Only one food buff can be active at a time
+* Consuming food that grants the same buff extends its duration
+* Consuming food that grants a different buff immediately replaces the previous one
+
+<hr>
+
+**Exploration Tips**
+
+* [[Movement Buffs]] aids in exploration
+* [[Mining Buffs]] increases resource gathering efficiency
+* Carry multiple stacks for long expeditions
+* Use lower-tier foods for routine activities
+
+**Efficiency Tips**
+
+* Create a farm for common ingredients
+* Cook in batches to save time
+* Store prepared meals near spawn point
+* Set up [[Cooking|Cooking Pot]] near main base
+  `
+  },
+  {
     title: 'Player Movement',
     category: ['Gameplay'],
     content: `

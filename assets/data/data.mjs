@@ -800,7 +800,34 @@ export const BUFFS = {
   web: 50, // malus de movement-speed / toile d'araignée
   water: 20, // malus de movement-speed / Sea - Water
   honey: 60, // malus de movement-speed / Honey
-  sap: 40 // malus de movement-speed / sap
+  sap: 40, // malus de movement-speed / sap
+
+  wellFedHealthRegen: 10,
+  wellFedMovementSpeed: 10,
+  wellFedMiningSpeed: 5,
+  wellFedDefense: 2,
+  wellFedDamage: 2,
+  wellFedCriticalChance: 2,
+  wellFedPa: 1,
+  wellFedPm: 1,
+
+  plentySatisfiedHealthRegen: 20,
+  plentySatisfiedMovementSpeed: 20,
+  plentySatisfiedMiningSpeed: 10,
+  plentySatisfiedDefense: 3,
+  plentySatisfiedDamage: 3,
+  plentySatisfiedCriticalChance: 3,
+  plentySatisfiedPa: 2,
+  plentySatisfiedPm: 2,
+
+  exquisitelyStuffedHealthRegen: 30,
+  exquisitelyStuffedMovementSpeed: 30,
+  exquisitelyStuffedMiningSpeed: 15,
+  exquisitelyStuffedDefense: 4,
+  exquisitelyStuffedDamage: 4,
+  exquisitelyStuffedCriticalChance: 4,
+  exquisitelyStuffedPa: 3,
+  exquisitelyStuffedPm: 3
 }
 
 /* ============================================================================
