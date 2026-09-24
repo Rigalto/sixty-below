@@ -82,6 +82,9 @@ class BuffManager {
       if (this.#values.get('honey')) speed -= BUFFS.honey
       speed += this.#currentArmor.movementSpeed ?? 0
       speed += this.#currentAccessory.movementSpeed ?? 0
+      if (this.#values.get('wellFed')) speed += BUFFS.wellFedMovementSpeed
+      if (this.#values.get('plentySatisfied')) speed += BUFFS.plentySatisfiedMovementSpeed
+      if (this.#values.get('exquisitelyStuffed')) speed += BUFFS.exquisitelyStuffedMovementSpeed
 
       return speed < 0 ? 0 : speed
     }],
@@ -93,7 +96,12 @@ class BuffManager {
     }],
     ['health-regen', () => {
       if (this.#values.get('playerFreeze')) return 0
-      return 100
+      let regen = 100
+      if (this.#values.get('wellFed')) regen += BUFFS.wellFedHealthRegen
+      if (this.#values.get('plentySatisfied')) regen += BUFFS.plentySatisfiedHealthRegen
+      if (this.#values.get('exquisitelyStuffed')) regen += BUFFS.exquisitelyStuffedHealthRegen
+
+      return regen < 0 ? 0 : regen
     }],
     ['interaction-range', () => {
       const x = -10
@@ -110,7 +118,13 @@ class BuffManager {
       return {x, y, w, h}
     }],
     ['mining-speed', () => {
-      return (this.#currentArmor.miningSpeed ?? 0) + (this.#currentAccessory.miningSpeed ?? 0)
+      if (this.#values.get('playerFreeze')) return 0
+      let speed = (this.#currentArmor.miningSpeed ?? 0) + (this.#currentAccessory.miningSpeed ?? 0)
+      if (this.#values.get('wellFed')) speed += BUFFS.wellFedMiningSpeed
+      if (this.#values.get('plentySatisfied')) speed += BUFFS.plentySatisfiedMiningSpeed
+      if (this.#values.get('exquisitelyStuffed')) speed += BUFFS.exquisitelyStuffedMiningSpeed
+
+      return speed < 0 ? 0 : speed
     }],
     ['foraging-range', () => {
       const x = -2
@@ -133,7 +147,12 @@ class BuffManager {
       return {x, y, w, h}
     }],
     ['combat-defense', () => {
-      return (this.#currentArmor.defense ?? 0) + (this.#currentAccessory.defense ?? 0)
+      let defense = (this.#currentArmor.defense ?? 0) + (this.#currentAccessory.defense ?? 0)
+      if (this.#values.get('wellFed')) defense += BUFFS.wellFedDefense
+      if (this.#values.get('plentySatisfied')) defense += BUFFS.plentySatisfiedDefense
+      if (this.#values.get('exquisitelyStuffed')) defense += BUFFS.exquisitelyStuffedDefense
+
+      return defense < 0 ? 0 : defense
     }]
   ])
 

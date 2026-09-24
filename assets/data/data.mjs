@@ -154,22 +154,25 @@ export const NODES = {
 
   // ── HOUSING (murs des maisons) ────────────────────────
 
-  WOODWALL: {code: 100, name: 'Wood Wall', type: NODE_TYPE.WALL | NODE_TYPE.SOLID, star: 1, color: '#855959', image: 'wall_16_16+0', hammering: {speed: 1200, items: [{item: 'woodwall', count: 1}]}, help: 'Wood Wall'},
-  BRICKWALL: {code: 101, name: 'Brick Wall', type: NODE_TYPE.BWALL | NODE_TYPE.GAZ, star: 1, color: '#788696', image: 'wall_16_16+1', hammering: {speed: 1200, items: [{item: 'brickwall', count: 1}]}, help: 'Background Wall'},
-  STONEWALL: {code: 102, name: 'Stone Wall', type: NODE_TYPE.BWALL | NODE_TYPE.GAZ, star: 1, color: '#788696', image: 'wall_16_16+2', hammering: {speed: 1200, items: [{item: 'stonewall', count: 1}]}, help: 'Background Wall'},
-  SANDSTONEWALL: {code: 103, name: 'Sandstone Wall', type: NODE_TYPE.BWALL | NODE_TYPE.GAZ, star: 1, color: '#788696', image: 'wall_16_16+3', hammering: {speed: 1200, items: [{item: 'sandstonewall', count: 1}]}, help: 'Background Wall'},
-  COPPERWALL: {code: 104, name: 'Copper Wall', type: NODE_TYPE.BWALL | NODE_TYPE.GAZ, star: 2, color: '#788696', image: 'wall_16_16+4', hammering: {speed: 1400, items: [{item: 'copperwall', count: 1}]}, help: 'Background Wall'},
-  IRONWALL: {code: 105, name: 'Iron Wall', type: NODE_TYPE.BWALL | NODE_TYPE.GAZ, star: 2, color: '#788696', image: 'wall_16_16+5', hammering: {speed: 1400, items: [{item: 'ironwall', count: 1}]}, help: 'Background Wall'},
-  SILVERWALL: {code: 106, name: 'Silver Wall', type: NODE_TYPE.BWALL | NODE_TYPE.GAZ, star: 2, color: '#788696', image: 'wall_16_16+6', hammering: {speed: 1400, items: [{item: 'silverwall', count: 1}]}, help: 'Background Wall'},
-  GOLDWALL: {code: 107, name: 'Gold Wall', type: NODE_TYPE.BWALL | NODE_TYPE.GAZ, star: 2, color: '#788696', image: 'wall_16_16+7', hammering: {speed: 1400, items: [{item: 'goldwall', count: 1}]}, help: 'Background Wall'},
-  TOPAZWALL: {code: 108, name: 'Topaz Wall', type: NODE_TYPE.BWALL | NODE_TYPE.GAZ, star: 3, color: '#788696', image: 'wall_16_16+8', hammering: {speed: 1600, items: [{item: 'topazwall', count: 1}]}, help: 'Background Wall'},
-  RUBYWALL: {code: 109, name: 'Ruby Wall', type: NODE_TYPE.BWALL | NODE_TYPE.GAZ, star: 3, color: '#788696', image: 'wall_16_16+9', hammering: {speed: 1600, items: [{item: 'rubywall', count: 1}]}, help: 'Background Wall'},
-  EMERALDWALL: {code: 110, name: 'Emerald Wall', type: NODE_TYPE.BWALL | NODE_TYPE.GAZ, star: 3, color: '#788696', image: 'wall_16_16+10', hammering: {speed: 1600, items: [{item: 'emeraldwall', count: 1}]}, help: 'Background Wall'},
-  SAPPHIREWALL: {code: 111, name: 'Sapphire Wall', type: NODE_TYPE.BWALL | NODE_TYPE.GAZ, star: 3, color: '#788696', image: 'wall_16_16+11', hammering: {speed: 1600, items: [{item: 'sapphirewall', count: 1}]}, help: 'Background Wall'},
-  COBALTWALL: {code: 112, name: 'Cobalt Wall', type: NODE_TYPE.BWALL | NODE_TYPE.GAZ, star: 4, color: '#788696', image: 'wall_16_16+12', hammering: {speed: 1800, items: [{item: 'cobaltwall', count: 1}]}, help: 'Background Wall'},
-  PLATINUMWALL: {code: 113, name: 'Platinum Wall', type: NODE_TYPE.BWALL | NODE_TYPE.GAZ, star: 4, color: '#788696', image: 'wall_16_16+13', hammering: {speed: 1800, items: [{item: 'platinumwall', count: 1}]}, help: 'Background Wall'},
-  GRANITEWALL: {code: 114, name: 'Granite Wall', type: NODE_TYPE.BWALL | NODE_TYPE.GAZ, star: 4, color: '#788696', image: 'wall_16_16+14', hammering: {speed: 1800, items: [{item: 'granitewall', count: 1}]}, help: 'Background Wall'},
-  MARBLEWALL: {code: 115, name: 'Marble Wall', type: NODE_TYPE.BWALL | NODE_TYPE.GAZ, star: 4, color: '#788696', image: 'wall_16_16+15', hammering: {speed: 1800, items: [{item: 'marblewall', count: 1}]}, help: 'Background Wall'},
+  WOODWALL: {code: 100, name: 'Wood Wall', type: NODE_TYPE.WALL | NODE_TYPE.SOLID, star: 1, color: '#855959', image: 'wall_16_16+0', hamming: {speed: 1200, items: [{item: 'woodwall', count: 1}]}, help: 'Wood Wall'},
+  BRICKWALL: {code: 101, name: 'Brick Wall', type: NODE_TYPE.BWALL | NODE_TYPE.GAZ, star: 1, color: '#788696', image: 'wall_16_16+1', hamming: {speed: 1200, items: [{item: 'brickwall', count: 1}]}, help: 'Background Wall'},
+  STONEWALL: {code: 102, name: 'Stone Wall', type: NODE_TYPE.BWALL | NODE_TYPE.GAZ, star: 1, color: '#788696', image: 'wall_16_16+2', hamming: {speed: 1200, items: [{item: 'stonewall', count: 1}]}, help: 'Background Wall'},
+  STONEWALL: {code: 102, name: 'Stone Wall', type: NODE_TYPE.BWALL | NODE_TYPE.GAZ, star: 1, color: '#788696', image: 'wall_16_16+2', hamming: {speed: 1200, items: [{item: 'stonewall', count: 1}]}, help: 'Background Wall'},
+  SANDSTONEWALL: {code: 103, name: 'Sandstone Wall', type: NODE_TYPE.BWALL | NODE_TYPE.GAZ, star: 1, color: '#788696', image: 'wall_16_16+3', hamming: {speed: 1200, items: [{item: 'sandstonewall', count: 1}]}, help: 'Background Wall'},
+  SANDSTONEWALL: {code: 103, name: 'Sandstone Wall', type: NODE_TYPE.BWALL | NODE_TYPE.GAZ, star: 1, color: '#788696', image: 'wall_16_16+3', hamming: {speed: 1200, items: [{item: 'sandstonewall', count: 1}]}, help: 'Background Wall'},
+  SANDSTONEWALL: {code: 103, name: 'Sandstone Wall', type: NODE_TYPE.BWALL | NODE_TYPE.GAZ, star: 1, color: '#788696', image: 'wall_16_16+3', hamming: {speed: 1200, items: [{item: 'sandstonewall', count: 1}]}, help: 'Background Wall'},
+  COPPERWALL: {code: 104, name: 'Copper Wall', type: NODE_TYPE.BWALL | NODE_TYPE.GAZ, star: 2, color: '#788696', image: 'wall_16_16+4', hamming: {speed: 1400, items: [{item: 'copperwall', count: 1}]}, help: 'Background Wall'},
+  IRONWALL: {code: 105, name: 'Iron Wall', type: NODE_TYPE.BWALL | NODE_TYPE.GAZ, star: 2, color: '#788696', image: 'wall_16_16+5', hamming: {speed: 1400, items: [{item: 'ironwall', count: 1}]}, help: 'Background Wall'},
+  SILVERWALL: {code: 106, name: 'Silver Wall', type: NODE_TYPE.BWALL | NODE_TYPE.GAZ, star: 2, color: '#788696', image: 'wall_16_16+6', hamming: {speed: 1400, items: [{item: 'silverwall', count: 1}]}, help: 'Background Wall'},
+  GOLDWALL: {code: 107, name: 'Gold Wall', type: NODE_TYPE.BWALL | NODE_TYPE.GAZ, star: 2, color: '#788696', image: 'wall_16_16+7', hamming: {speed: 1400, items: [{item: 'goldwall', count: 1}]}, help: 'Background Wall'},
+  TOPAZWALL: {code: 108, name: 'Topaz Wall', type: NODE_TYPE.BWALL | NODE_TYPE.GAZ, star: 3, color: '#788696', image: 'wall_16_16+8', hamming: {speed: 1600, items: [{item: 'topazwall', count: 1}]}, help: 'Background Wall'},
+  RUBYWALL: {code: 109, name: 'Ruby Wall', type: NODE_TYPE.BWALL | NODE_TYPE.GAZ, star: 3, color: '#788696', image: 'wall_16_16+9', hamming: {speed: 1600, items: [{item: 'rubywall', count: 1}]}, help: 'Background Wall'},
+  EMERALDWALL: {code: 110, name: 'Emerald Wall', type: NODE_TYPE.BWALL | NODE_TYPE.GAZ, star: 3, color: '#788696', image: 'wall_16_16+10', hamming: {speed: 1600, items: [{item: 'emeraldwall', count: 1}]}, help: 'Background Wall'},
+  SAPPHIREWALL: {code: 111, name: 'Sapphire Wall', type: NODE_TYPE.BWALL | NODE_TYPE.GAZ, star: 3, color: '#788696', image: 'wall_16_16+11', hamming: {speed: 1600, items: [{item: 'sapphirewall', count: 1}]}, help: 'Background Wall'},
+  COBALTWALL: {code: 112, name: 'Cobalt Wall', type: NODE_TYPE.BWALL | NODE_TYPE.GAZ, star: 4, color: '#788696', image: 'wall_16_16+12', hamming: {speed: 1800, items: [{item: 'cobaltwall', count: 1}]}, help: 'Background Wall'},
+  PLATINUMWALL: {code: 113, name: 'Platinum Wall', type: NODE_TYPE.BWALL | NODE_TYPE.GAZ, star: 4, color: '#788696', image: 'wall_16_16+13', hamming: {speed: 1800, items: [{item: 'platinumwall', count: 1}]}, help: 'Background Wall'},
+  GRANITEWALL: {code: 114, name: 'Granite Wall', type: NODE_TYPE.BWALL | NODE_TYPE.GAZ, star: 4, color: '#788696', image: 'wall_16_16+14', hamming: {speed: 1800, items: [{item: 'granitewall', count: 1}]}, help: 'Background Wall'},
+  MARBLEWALL: {code: 115, name: 'Marble Wall', type: NODE_TYPE.BWALL | NODE_TYPE.GAZ, star: 4, color: '#788696', image: 'wall_16_16+15', hamming: {speed: 1800, items: [{item: 'marblewall', count: 1}]}, help: 'Background Wall'},
   OLYMPITEWALL: {code: 116, name: 'Olympite Column', type: NODE_TYPE.ETERNAL | NODE_TYPE.GAZ | NODE_TYPE.WALL, stype: 'background', star: 6, color: '#C8D8E8', image: 'wall_16_16+15', help: 'Lost Temple'}
 }
 // Overlay bordure SKY — 7 colonnes (skyVariant 1–7), ligne 4 de natural_16_16.
@@ -582,7 +585,7 @@ export const ITEMS = {
     help: 'Oak & Mahogany',
     tooltip: 'Common tree in jungle, can be chopping or shaking',
     chopping: {speed: 1800, items: [{item: 'logMahogany', count: '1-2'}, {item: 'samara', count: 0.25}, {item: 'featherKakapo', count: 0.08}], extraLoot: {items: [{item: 'rootMahogany', count: '2-5', buffs: ['+felling']}]}},
-    shaking: {speed: 1800, items: [{item: 'egg', count: 0.75}, {item: 'featherKakapo', count: 0.75}, {item: 'samara', count: 0.25}, {item: 'logMahogany', count: 0.12}]}
+    shaking: {speed: 2000, items: [{item: 'egg', count: 0.75}, {item: 'featherKakapo', count: 0.75}, {item: 'samara', count: 0.25}, {item: 'logMahogany', count: 0.12}]}
   },
   logMahogany: {name: 'Mahogany Log', type: 0, stype: 'log', star: 2, image: 'foraged_32_32-2-0', help: 'Oak & Mahogany', tooltip: '???'},
   plankMahogany: {name: 'Mahogany Plank', type: 0, stype: 'plank', star: 2, image: 'refined_32_32-6-2', help: 'Oak & Mahogany', tooltip: '???'},
@@ -599,7 +602,7 @@ export const ITEMS = {
     help: 'Giant Mushroom',
     tooltip: '???',
     chopping: {speed: 2200, items: [{item: 'mushroomFiber', count: '5-9'}, {item: 'mycellium', count: 0.75}], extraLoot: {items: [{item: 'mycellium', count: '2-5', buffs: ['+felling']}]}},
-    shaking: {speed: 1800, items: [{item: 'mushroomFiber', count: 0.65}, {item: 'slug', count: 0.25}, {item: 'goldSlug', count: 0.01, buffs: ['+lucky']}]}
+    shaking: {speed: 2200, items: [{item: 'mushroomFiber', count: 0.65}, {item: 'slug', count: 0.25}, {item: 'goldSlug', count: 0.01, buffs: ['+lucky']}]}
   },
   mushroomSpore: {name: 'Mushroom Spore', type: ITEM_TYPE.SEED | ITEM_TYPE.PLACABLE, stype: 'herb', star: 4, image: 'foraged_32_32-6-6', help: 'Mushroom Cave', tooltip: '???'},
   mycellium: {name: 'Mycellium', type: ITEM_TYPE.SEED | ITEM_TYPE.PLACABLE, stype: 'herb', star: 4, image: 'foraged_32_32-5-6', help: 'Mushroom Cave', tooltip: '???'},
@@ -788,7 +791,24 @@ export const ITEMS = {
 
   headMiner: {name: 'Mining Helmet', type: ITEM_TYPE.ARMOR, stype: '', star: 2, image: 'armor_32_32-3-3', armorImage: 'head_26_22-6-0', buff: [{buff: 'defense', value: 2, op: 'sum'}, {buff: 'miningSpeed', value: 10, op: 'sum'}], help: 'Armors', tooltip: 'Provides sturdy protection', armor: 'head', set: 'miner'},
   bodyMiner: {name: 'Mining Shirt', type: ITEM_TYPE.ARMOR, stype: '', star: 2, image: 'armor_32_32-4-3', armorImage: 'body_26_18-6-0', buff: [{buff: 'defense', value: 1, op: 'sum'}, {buff: 'miningSpeed', value: 10, op: 'sum'}], help: 'Armors', tooltip: 'Provides sturdy protection', armor: 'body', set: 'miner'},
-  footMiner: {name: 'Mining Pants', type: ITEM_TYPE.ARMOR, stype: '', star: 2, image: 'armor_32_32-5-3', armorImage: 'foot_26_12-6-0', buff: [{buff: 'defense', value: 1, op: 'sum'}, {buff: 'movementSpeed', value: 10, op: 'sum'}, {buff: 'miningSpeed', value: 10, op: 'sum'}], help: 'Armors', tooltip: 'Provides sturdy protection', armor: 'foot', set: 'miner'}
+  footMiner: {name: 'Mining Pants', type: ITEM_TYPE.ARMOR, stype: '', star: 2, image: 'armor_32_32-5-3', armorImage: 'foot_26_12-6-0', buff: [{buff: 'defense', value: 1, op: 'sum'}, {buff: 'movementSpeed', value: 10, op: 'sum'}, {buff: 'miningSpeed', value: 10, op: 'sum'}], help: 'Armors', tooltip: 'Provides sturdy protection', armor: 'foot', set: 'miner'},
+
+  woodwall: {name: 'Wood Wall', type: ITEM_TYPE.WALL, stype: 'wall', star: 1, image: 'armor_32_32-5-3', help: 'Wood Wall', tooltip: 'Shelter outer walls'},
+  brickwall: {name: 'Brick Wall', type: ITEM_TYPE.WALL, stype: 'wall', star: 1, image: 'armor_32_32-5-3', help: 'Background Wall', tooltip: 'Shelter inner walls'},
+  stonewall: {name: 'Stone Wall', type: ITEM_TYPE.WALL, stype: 'wall', star: 1, image: 'armor_32_32-5-3', help: 'Background Wall', tooltip: 'Shelter inner walls'},
+  sandstonewall: {name: 'Sandstone Wall', type: ITEM_TYPE.WALL, stype: 'wall', star: 1, image: 'armor_32_32-5-3', help: 'Background Wall', tooltip: 'Shelter inner walls'},
+  copperwall: {name: 'Copper Wall', type: ITEM_TYPE.WALL, stype: 'wall', star: 2, image: 'armor_32_32-5-3', help: 'Background Wall', tooltip: 'Shelter inner walls'},
+  ironwall: {name: 'Iron Wall', type: ITEM_TYPE.WALL, stype: 'wall', star: 2, image: 'armor_32_32-5-3', help: 'Background Wall', tooltip: 'Shelter inner walls'},
+  silverwall: {name: 'Silver Wall', type: ITEM_TYPE.WALL, stype: 'wall', star: 2, image: 'armor_32_32-5-3', help: 'Background Wall', tooltip: 'Shelter inner walls'},
+  goldwall: {name: 'Gold Wall', type: ITEM_TYPE.WALL, stype: 'wall', star: 2, image: 'armor_32_32-5-3', help: 'Background Wall', tooltip: 'Shelter inner walls'},
+  topazwall: {name: 'Topaz Wall', type: ITEM_TYPE.WALL, stype: 'wall', star: 3, image: 'armor_32_32-5-3', help: 'Background Wall', tooltip: 'Shelter inner walls'},
+  rubywall: {name: 'Ruby Wall', type: ITEM_TYPE.WALL, stype: 'wall', star: 3, image: 'armor_32_32-5-3', help: 'Background Wall', tooltip: 'Shelter inner walls'},
+  emeraldwall: {name: 'Emerald Wall', type: ITEM_TYPE.WALL, stype: 'wall', star: 3, image: 'armor_32_32-5-3', help: 'Background Wall', tooltip: 'Shelter inner walls'},
+  sapphirewall: {name: 'Sapphire Wall', type: ITEM_TYPE.WALL, stype: 'wall', star: 3, image: 'armor_32_32-5-3', help: 'Background Wall', tooltip: 'Shelter inner walls'},
+  cobaltwall: {name: 'Cobalt Wall', type: ITEM_TYPE.WALL, stype: 'wall', star: 4, image: 'armor_32_32-5-3', help: 'Background Wall', tooltip: 'Shelter inner walls'},
+  platinumwall: {name: 'Platinum Wall', type: ITEM_TYPE.WALL, stype: 'wall', star: 4, image: 'armor_32_32-5-3', help: 'Background Wall', tooltip: 'Shelter inner walls'},
+  granitewall: {name: 'Granite Wall', type: ITEM_TYPE.WALL, stype: 'wall', star: 4, image: 'armor_32_32-5-3', help: 'Background Wall', tooltip: 'Shelter inner walls'},
+  marblewall: {name: 'Marble Wall', type: ITEM_TYPE.WALL, stype: 'wall', star: 4, image: 'armor_32_32-5-3', help: 'Background Wall', tooltip: 'Shelter inner walls'}
 
 }
 
@@ -801,6 +821,10 @@ export const BUFFS = {
   water: 20, // malus de movement-speed / Sea - Water
   honey: 60, // malus de movement-speed / Honey
   sap: 40, // malus de movement-speed / sap
+
+  quickTool: 20,
+  keenTool: 5,
+  sturdyTool: -5,
 
   wellFedHealthRegen: 10,
   wellFedMovementSpeed: 10,

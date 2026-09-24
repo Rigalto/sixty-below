@@ -3,7 +3,7 @@
 // DecomposerManager
 
 import {eventBus, taskScheduler, microTasker, blockedTiles, seededRNG} from './utils.mjs'
-import {NODE_TYPE, NODES_LOOKUP, NODES, ITEM_TYPE, ITEMS, PLANT_SYSTEM_LOOKUP, PLANT_KIND, FURNITURE_FOOTPRINT_MASK} from '../assets/data/data.mjs'
+import {NODE_TYPE, NODES_LOOKUP, NODES, ITEM_TYPE, ITEMS, BUFFS, PLANT_SYSTEM_LOOKUP, PLANT_KIND, FURNITURE_FOOTPRINT_MASK} from '../assets/data/data.mjs'
 import {inventoryManager, resolveLoot} from './inventory.mjs'
 import {buffManager, isInInteractionRange} from './buff.mjs'
 import {database} from './database.mjs'
@@ -64,9 +64,9 @@ const tileRectHasOther = (index, w, h, nodeId) => {
  */
 const computeActionSpeed = (baseSpeed, toolSpeed, buffSpeed, prefix) => {
   let coefficient = 100 + toolSpeed + buffManager.getBuff(buffSpeed)
-  coefficient += prefix === 'Quick' ? 20 : 0
-  coefficient += prefix === 'Keen' ? 5 : 0
-  coefficient -= prefix === 'Sturdy' ? 5 : 0
+  coefficient += prefix === 'Quick' ? BUFFS.quickTool : 0
+  coefficient += prefix === 'Keen' ? BUFFS.keenTool : 0
+  coefficient += prefix === 'Sturdy' ? BUFFS.sturdyTool : 0
   return (baseSpeed * coefficient / 100) | 0
 }
 

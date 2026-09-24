@@ -115,6 +115,8 @@ Mining Loot: {{node:{3}:mining[:items[0]:item|link}}
 
   // une ligne de la table des blocs minables
   mineableRow: '| {1} | [[node:{2}]]| {{node:{2}:star|star}} | {{node:{2}:mining:items[0]:item|link}} | {{node:{2}:mining:speed}} |',
+  // une ligne de la table des tuiles WALL
+  wallRow: '| [[node:{1}]]| {{node:{1}:star|star}} | {{node:{1}:hamming:items[0]:item|link}} | {{node:{1}:hamming:speed}} |',
 
   metalChunksRow: '| [[node:{1}]] | [[item:{2}]] | {{item:{2}:star|star}} | [[item:{3}]] | {{item:{3}:star|star}} |',
   metalBarsRow: '| [[item:{1}]] | {{item:{1}:star|star}} | {{recipe:{2}|station}} | [[item:{2}]] | {{item:{2}:star|star}} |',
@@ -150,7 +152,7 @@ Mining Loot: {{node:{3}:mining[:items[0]:item|link}}
   toolBuffRow: '| [[item:{1}]] | {{item:{1}:{2}:speed}}% | {{item:{1}:range}} |',
 
   // table listant les buffs fournis par les prefixes sur les tools (Pickaxe, Sickle)
-  toolBonus: '| Prefix | Speed Bonus | Range Bonus |\n|---|---|---|\n| [[Gear Prefixes|Quick]] | +20% | — |\n| [[Gear Prefixes|Keen]] | +5% | — |\n| [[Gear Prefixes|Sturdy]] | -5% | — |\n| [[Gear Prefixes|Extended]] | — | +2 tiles each direction |',
+  toolBonus: '| Prefix | Speed Bonus | Range Bonus |\n|---|---|---|\n| [[Gear Prefixes|Quick]] | +{{buff:quickTool}}% | — |\n| [[Gear Prefixes|Keen]] | +{{buff:keenTool}}% | — |\n| [[Gear Prefixes|Sturdy]] | {{buff:sturdyTool}}% | — |\n| [[Gear Prefixes|Extended]] | — | +2 tiles each direction |',
 
   // liste de la section 'Flora' des tuiles, biomes et mini-biomes
   floraLine: '* [[item:{1}]] {{item:{1}:star|star}}'
@@ -3995,20 +3997,63 @@ To be written
 
 **Hamming Types**
 
-To be written
+| Hammer | Tier | Speed Bonus | Range Bonus |
+|---|---|---|---|---|
+<<toolTypeRow|hammerOak|shaking>>
+<<toolTypeRow|hammerCopper|shaking>>
+<<toolTypeRow|hammerIron|shaking>>
+<<toolTypeRow|hammerSilver|shaking>>
+<<toolTypeRow|hammerGold|shaking>>
+<<toolTypeRow|hammerCobalt|shaking>>
+<<toolTypeRow|hammerPlatinum|shaking>>
+
+<hr>
+
+**Hammer Prefix**
+
+<<toolBonus>>
 
 **Striking Range**
 
 * Hammers and [[Chopping Tools|Axes]] share the same [[Ranges|Striking Range]]
-* Base range covers 3 tiles in front of the player, 2 tiles back, 4 tiles above and 2 tiles below.
-* Bas range xcaan be extented
+* Base range covers 3 tiles in front of the player, 2 tiles back, 4 tiles above and 2 tiles below
+* Base range can be extented
 * See [[Ranges]] topic for details
+
+<hr>
 
 **Usages**
 
-* Shaking trees
-* Removing furnitures
-* Removing Walls
+* Removing [[Furnitures]]
+* Shaking trees:
+
+| Type | Tier | Drop | Hamming Speed |
+| ---- | ---- | ---- | ---- |
+| [[item:oak]] | {{item:oak:star|star}} | {{item:oak:shaking:items[*]:item|links}} | {{item:oak:shaking:speed}} |
+| [[item:coconut]] | {{item:coconut:star|star}} | {{item:coconut:shaking:items[*]:item|links}} | {{item:coconut:shaking:speed}} |
+| [[item:mahogany]] | {{item:mahogany:star|star}} | {{item:mahogany:shaking:items[*]:item|links}} | {{item:mahogany:shaking:speed}} |
+| [[item:giantMushroom]] | {{item:giantMushroom:star|star}} | {{item:giantMushroom:shaking:items[*]:item|links}} | {{item:giantMushroom:shaking:speed}} |
+
+* Removing Walls:
+
+| Type | Tier | Drop | Hamming Speed |
+| ---- | ---- | ---- | ---- |
+<<wallRow|woodWall>>
+<<wallRow|brickWall>>
+<<wallRow|stoneWall>>
+<<wallRow|sandstoneWall>>
+<<wallRow|copperwall>>
+<<wallRow|ironwall>>
+<<wallRow|silverwall>>
+<<wallRow|goldwall>>
+<<wallRow|topazwall>>
+<<wallRow|rubywall>>
+<<wallRow|emeraldwall>>
+<<wallRow|sapphirewall>>
+<<wallRow|cobaltwall>>
+<<wallRow|platinumwall>>
+<<wallRow|granitewall>>
+<<wallRow|marblewall>>
     `
   },
 
@@ -4102,10 +4147,12 @@ _Some specific gear pieces may deviate from these rules._ ⏳
 
 **Tool Specific**
 
-* **Quick** : increases tool speed by 20%.
-* **Keen** : increases tool speed by 5%.
-* **Sturdy** : decreases tool speed by 5%.
+* **Quick** : increases tool speed by {{buff:quickTool}}%.
+* **Keen** : increases tool speed by {{buff:keenTool}}%.
+* **Sturdy** : increases tool speed by {{buff:sturdyTool}}%.
 * **Extended** : only available on tools. Extends [[Ranges|Tool Range]] by 2 tiles in all directions.
+
+_Affected tools: [[item:pickaxeCopper|Pickaxe]], [[item:sickleCopper|Sickle]], [[item:axeCopper|Axe]], [[item:hammerCopper|Hammer]], [[item:rodOak|Fishing Rod]]⏳, [[item:bugNetWood|Bug Net]]⏳._
 
 _When a tool is used as a weapon, standard weapon prefix effects apply._
 
@@ -4458,7 +4505,7 @@ A small set of essential items can be crafted anywhere, without a workstation ne
 
 Foraging lets you collect items from natural tiles without permanently removing them and ...⏳
 
-Use a [[item:sickleCopper|Sicle]] to forage. A sickle tier must be greater than or equal to the tile tier.
+Use a [[item:sickleCopper|Sickle]] to forage. A sickle tier must be greater than or equal to the tile tier.
 
 
 **Forageable Natural Tiles**
@@ -4495,7 +4542,7 @@ To be designed. ⏳
 The base speed depends on the tile or plant being foraged. It is then modified by:
 
 * The [[Foraging Tools|Sickle type]] — higher-tier sickles provide a speed bonus
-* The pickaxe [[Gear Prefixes|prefix]] — _Quick_ (+20%), _Keen_ (+5%), _Sturdy_ (−5%)
+* The pickaxe [[Gear Prefixes|prefix]] — _Quick_ (+{{buff:quickTool}}%), _Keen_ (+{{buff:keenTool}}%), _Sturdy_ ({{buff:sturdyTool}}%)
 * [[Accessories]] ⏳
 * [[Armors|Armor]] ⏳
 * [[Potions]] ⏳
