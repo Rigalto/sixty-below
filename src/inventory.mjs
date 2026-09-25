@@ -1514,11 +1514,11 @@ class ItemUseManager {
   #useAddItems (using) { console.log('[ItemUseManager] TODO add-items', using) }
 
   /**
-   * Active un buff temporisé via BuffManager, à partir des champs buff/duration de using.
+   * Émet 'buff/create-timed' avec using comme payload ({buff, duration} lus par l'abonné,
+   * action ignoré). Aucune allocation : l'objet de données statique est transmis tel quel.
    * @param {object} using — une entrée de itemDef.using ({action: 'buff-timed', buff, duration})
    */
-  // #useBuffTimed (using) { buffManager.createTimedBuff(using.buff, using.duration) }
-  #useBuffTimed (using) { console.log('[useBuffTimed] TODO add-items', using); buffManager.createTimedBuff(using.buff, using.duration) }
+  #useBuffTimed (using) { eventBus.emit('buff/create-timed', using) }
 }
 export const itemUseManager = new ItemUseManager()
 

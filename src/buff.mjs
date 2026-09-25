@@ -134,10 +134,22 @@ class BuffManager {
       return {x, y, w, h}
     }],
     ['foraging-speed', () => {
-      return 0
+      if (this.#values.get('playerFreeze')) return 0
+      let speed = (this.#currentArmor.foragingSpeed ?? 0) + (this.#currentAccessory.foragingSpeed ?? 0)
+      if (this.#values.get('wellFed')) speed += BUFFS.wellFedForagingSpeed
+      if (this.#values.get('plentySatisfied')) speed += BUFFS.plentySatisfiedForagingSpeed
+      if (this.#values.get('exquisitelyStuffed')) speed += BUFFS.exquisitelyStuffedForagingSpeed
+
+      return speed < 0 ? 0 : speed
     }],
     ['chopping-speed', () => {
-      return 0
+      if (this.#values.get('playerFreeze')) return 0
+      let speed = (this.#currentArmor.choppingSpeed ?? 0) + (this.#currentAccessory.choppingSpeed ?? 0)
+      if (this.#values.get('wellFed')) speed += BUFFS.wellFedChoppingSpeed
+      if (this.#values.get('plentySatisfied')) speed += BUFFS.plentySatisfiedChoppingSpeed
+      if (this.#values.get('exquisitelyStuffed')) speed += BUFFS.exquisitelyStuffedChoppingSpeed
+
+      return speed < 0 ? 0 : speed
     }],
     ['chopping-range', () => {
       const x = -2
@@ -667,7 +679,11 @@ document.head.appendChild(buffStyle)
 // { id, title, x, y, timed }
 // x, y : coordonnées dans buff_32_32.png (multiples de 32)
 const DISPLAY_BUFFS = [
-  {id: 'armors', title: 'Armors', x: -128, y: 0},
+  {id: 'wellFed', title: 'Well Fed', x: -0, y: 0},
+  {id: 'plentySatisfied', title: 'Plenty Satisfied', x: -32, y: 0},
+  {id: 'exquisitelyStuffed', title: 'Exquisitely Stuffed', x: -64, y: 0},
+  // debug
+  {id: 'armors', title: 'Armors', x: -128, y: 0}, // supprimer intelligemment
   {id: 'honey', title: 'Honey', x: -128, y: 0},
   {id: 'buff1', title: 'Buff 1', x: 0, y: 0},
   {id: 'buff2', title: 'Buff 2', x: -32, y: 0},

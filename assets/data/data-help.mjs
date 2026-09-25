@@ -3688,9 +3688,9 @@ It is then modified by:⏳
 * [[Accessories]]
 * [[Armors|Armor]]
 * [[Potions]]
-* [[Food]] ⏳ (not sure)
+* [[Food]]
 
-See [[Mineable Blocks]], [[Mining Tools]] and [[Mining Buffs]] for details.
+See [[Mineable Blocks]], [[Mining Tools]], [[Mining Buffs]] and [[Food Buff]] for details.
 
 **Mining Range**
 
@@ -3751,6 +3751,8 @@ _A block can only be mined if the pickaxe tier is greater than or equal to the b
 
 _Tiles / click: only contiguous tiles of the same type are mined in a single click._
 
+<hr>
+
 **Mining Range**
 
 * Base [[Ranges|Mining Range]] covers 3 tiles in front of the player, 2 tiles above and 2 tiles below.
@@ -3766,10 +3768,16 @@ _Tiles / click: only contiguous tiles of the same type are mined in a single cli
 
 Higher-tier pickaxes provide a mining speed bonus (see table above). Additional bonuses:
 
-* item:miningPotion: +25%
-* item:chisel or item:toolbox (accessory): +25%
-* Food Buff: +5% (Well Fed), +10% (Plenty Satisfied), +15% (Exquisitely Stuffed)⏳
-* Full item:miningArmor set: +80%
+* item:miningPotion: +25%⏳
+* item:chisel or item:toolbox (accessory): +25%⏳
+* Food Buff: +{{buff:wellFedMiningSpeed}}% (Well Fed), +{{buff:plentySatisfiedMiningSpeed}}% (Plenty Satisfied), +{{buff:exquisitelyStuffedMiningSpeed}}% (Exquisitely Stuffed)
+* Full item:miningArmor set: +80%⏳
+
+<<additiveNote>>
+
+See [[Ranges]] and [[Mining Buffs]] for details.
+
+<hr>
 
 **Pickaxes Crafting**
 
@@ -3800,6 +3808,8 @@ Higher-tier pickaxes provide a mining speed bonus (see table above). Additional 
 * Place a pickaxe in the [[Hotbar]]
 * Select it from the Hotbar
 * Click on the block to mine it
+
+<hr>
 
 **Tips**
 
@@ -3932,9 +3942,9 @@ _Range bonus applies equally in all directions._
 
 | Food | Speed Bonus | Range Bonus |
 |---|---|---|
-| Well Fed ⏳ | +5% | — |
-| Plenty Satisfied ⏳ | +10% | — |
-| Exquisitely Stuffed ⏳ | +15% | — |
+| Well Fed | +{{buff:wellFedMiningSpeed}}% | — |
+| Plenty Satisfied | +{{buff:plentySatisfiedMiningSpeed}}% | — |
+| Exquisitely Stuffed | +{{buff:exquisitelyStuffedMiningSpeed}}% | — |
     `
   },
 
@@ -4657,10 +4667,9 @@ _Range bonus applies equally in all directions._
 
 | Food | Speed Bonus | Range Bonus |
 |---|---|---|
-| Well Fed ⏳ | +5% | — |
-| Plenty Satisfied ⏳ | +10% | — |
-| Exquisitely Stuffed ⏳ | +15% | — |
-
+| Well Fed | +{{buff:wellFedForagingSpeed}}% | — |
+| Plenty Satisfied | +{{buff:plentySatisfiedForagingSpeed}}% | — |
+| Exquisitely Stuffed | +{{buff:exquisitelyStuffedForagingSpeed}}% | — |
     `
   },
 
@@ -4746,8 +4755,9 @@ Higher-tier axes provide a chopping speed bonus (see table above). Additional bo
 
 * item:loggerPotion (6h): +25%⏳
 * item:chisel or item:toolbox (accessory): +25%⏳
-* Food Buff: +5% (Well Fed), +10% (Plenty Satisfied), +15% (Exquisitely Stuffed)⏳
-* Full item:miningArmor set: +80%⏳
+* Food Buff: +wellFedChoppingSpeed% (Well Fed), +{{buff:plentySatisfiedChoppingSpeed}}% (Plenty Satisfied), +{{buff:exquisitelyStuffedChoppingSpeed}}% (Exquisitely Stuffed)
+
+<hr>
 
 **Axes Crafting**
 
@@ -5542,23 +5552,53 @@ _The Potion Sickness debuff is applied after consuming these items, preventing t
   //    Food, Soups, Eggs
   {
     title: 'Food',
-    category: ['Gameplay'],
+    category: ['Food', 'Gameplay'],
     content: `
 **Description**
 
-Food restores health and provides temporary buffs. More elaborate preparations require better ingredients and equipment, but confer stronger and longer-lasting effects.
+Food provides temporary buffs. More elaborate preparations require better ingredients and equipment, but confer stronger and longer-lasting effects.
 
 **Food Tiers**
 
-| Tier | Description | Example |
-|---|---|---|
-| ★☆☆☆☆ | Raw food — no cooking required | Fruits, seeds, mushrooms |
-| ★★☆☆☆ | Cooked food — requires [[item:sunflowerOil|Sunflower Oil]] — does not withstand high temperatures | Basic cooked meals |
-| ★★★☆☆ | Refined cooking — requires [[item:oleanderOil|Oleander Oil]] — stable at high temperatures | High-temperature dishes |
-| ★★★★☆ | Elaborate preparations — noble ingredients conferring resistance to [[Bleeding DOT]], [[Poison DOT]], and [[Fire DOT]] ⏳ | ⏳ |
-| ★★★★★ | Pheromone mastery — allows control of specific monster species ⏳ | ⏳ |
+| Food Tier | Description |
+| --- | --- |
+| ⭐☆☆☆☆ | Raw Foods — no cooking required |
+| ⭐⭐☆☆☆ | Basic Foods |
+| ⭐⭐⭐☆☆ | Cooked Meals |
+| ⭐⭐⭐⭐☆ | Elaborate Dishes |
+| ⭐⭐⭐⭐⭐ | Gourmet Dishes |
+
+<hr>
+
+**Food Benefits**
+
+Consuming any Food grants a [[Food Buff]] :
+
+| Food Tier | Food Buff |
+| --- | --- |
+| ⭐☆☆☆☆ and ⭐⭐☆☆☆ | Well Fed |
+| ⭐⭐⭐☆☆ and  ⭐⭐⭐⭐☆ | Plenty Satisfied |
+| ⭐⭐⭐⭐⭐ | Exquisitely Stuffed |
+
+See [[Food Buff]] for details.
+
+Some Food grants additionnal benefits:
+
+| Food Name | Food Tier | Benefits |
+| --- | --- | --- |
+| [[item:apple]] | {{item:apple:star|star}} | +{{item:apple:using[0]:payload:flat}} Health |
+| [[item:peach]] | {{item:peach:star|star}} | +{{item:peach:using[0]:payload:flat}} Health |
+
+
+_Note pour implémentation - à supprimer ⏳
+Cooked food — requires [[item:sunflowerOil|Sunflower Oil]] — does not withstand high temperatures
+Refined cooking — requires [[item:oleanderOil|Oleander Oil]] — stable at high temperatures
+Elaborate preparations — noble ingredients conferring resistance to [[Bleeding DOT]], [[Poison DOT]], and [[Fire DOT]]
+Pheromone mastery — allows control of specific monster species
 
 **Cooking Stations** ⏳
+
+[[Cooking|Cooking Pot]]
 
 **Tips**
 
@@ -5594,15 +5634,57 @@ Coming soon.
 
 | Egg | Tier | Found | Main usage |
 |---|---|---|---|
-| [[item:egg]] | {{item:egg:star|star}} | Chopping/Shaking [[item:oak]] | ⏳ |
+| [[item:egg]] | {{item:egg:star|star}} | Chopping/Shaking [[item:oak]] | Food<br>Food Ingredient⏳ |
 | [[item:eggMaleo]] | {{item:eggMaleo:star|star}} | Chopping/Shaking [[item:mahogany]] | ⏳ |
 | [[item:eggSpider]] | {{item:eggSpider:star|star}} | Mining [[node:web]] | Potions |
 | [[item:eggSnake]] | {{item:eggSnake:star|star}} | ⏳ | ⏳ |
 
+_Swallowing an [[item:egg]] grants the 'Well Fed' buff for {{item:egg:using[0]:duration|time}}._
+
 **Recipes**
 `
   },
+  {
+    title: 'Fruits',
+    category: ['Food'],
+    content: `
+**Description**
 
+
+
+Chopping or Shaking trees ⏳
+
+**Fruit Types**
+
+| Fruit | Tier | Found |
+|---|---|---|
+| [[item:apple]] | {{item:apple:star|star}} | Chopping/Shaking [[item:oak]] |
+| [[item:peach]] | {{item:peach:star|star}} | Chopping/Shaking [[item:oak]] |
+| [[item:coconutPulp]] | {{item:coconutPulp:star|star}} | Raw [[item:coconut]] processed at a [[Woodworking|Workbench]] |
+| [[item:coconutMilk]] | {{item:coconutMilk:star|star}} | Raw [[item:coconut]] processed at a [[Woodworking|Workbench]] |
+
+<hr>
+
+**Fruit Consumption**
+
+Some fruits can be eated without any preparation:
+
+| Fruit | Food Buff | Extra Benefit |
+|---|---|---|
+| [[item:apple]] | 'Well Fed' for {{item:apple:using[1]:duration|time}} | +{{item:apple:using[0]:payload:flat}} Health |
+| [[item:peach]] | 'Well Fed' for {{item:peach:using[1]:duration|time}} | +{{item:peach:using[0]:payload:flat}} Health |
+| [[item:coconutPulp]] | 'Well Fed' for {{item:coconutPulp:using[0]:duration|time}} ⏳ | |
+| [[item:coconutMilk]] | 'Well Fed' for {{item:coconutMilk:using[0]:duration|time}} ⏳ | |
+
+<hr>
+
+**Recipes**
+
+Fruits are food ingredient in many recipes.
+
+⏳
+`
+  },
   // ── Potions ──────────────────────────────────────────────────
   //    Potions
   {
@@ -7707,6 +7789,8 @@ _Note: Duration may vary slightly depending on the specific food item._
 | Health Regeneration rate | +{{buff:wellFedHealthRegen}}% | +{{buff:plentySatisfiedHealthRegen}}% | +{{buff:exquisitelyStuffedHealthRegen}}% |
 | Movement Speed | +{{buff:wellFedMovementSpeed}}% | +{{buff:plentySatisfiedMovementSpeed}}% | +{{buff:exquisitelyStuffedMovementSpeed}}% |
 | Mining Speed | +{{buff:wellFedMiningSpeed}}% | +{{buff:plentySatisfiedMiningSpeed}}% | +{{buff:exquisitelyStuffedMiningSpeed}}% |
+| Chopping Speed | +{{buff:wellFedChoppingSpeed}}% | +{{buff:plentySatisfiedChoppingSpeed}}% | +{{buff:exquisitelyStuffedChoppingSpeed}}% |
+| Foraging Speed | +{{buff:wellFedForagingSpeed}}% | +{{buff:plentySatisfiedForagingSpeed}}% | +{{buff:exquisitelyStuffedForagingSpeed}}% |
 | Defense | +{{buff:wellFedDefense}} | +{{buff:plentySatisfiedDefense}} | +{{buff:exquisitelyStuffedDefense}} |
 | Damage⏳ | +{{buff:wellFedDamage}} | +{{buff:plentySatisfiedDamage}} | +{{buff:exquisitelyStuffedDamage}} |
 | Critical Chance⏳ | +{{buff:wellFedCriticalChance}}% | +{{buff:plentySatisfiedCriticalChance}}% | +{{buff:exquisitelyStuffedCriticalChance}}% |

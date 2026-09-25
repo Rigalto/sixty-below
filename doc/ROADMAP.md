@@ -8,7 +8,7 @@
 ## En cours
 
 ### Code et tests
-- afficher dans le debug '²' les attributs des buffs range.
+- Intégrer les buffs de Set d'armure
 - supprimer l'icône statique 'Armor' du widget des Buffs.
 - ajouter un overlay affichant les caractéristiques du personnages (buffs...).
 - ajouter un bouton dans l'inventaire pour afficher l'overlay du personnage (impact sur son z-index).

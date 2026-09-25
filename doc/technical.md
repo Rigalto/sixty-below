@@ -365,6 +365,13 @@ Cette section définit les événements officiels. Tout nouvel événement doit 
 | E | `furniture/placed` | `string` (furnitureId) | Crée les slots vides si le meuble posé est un container. |
 | E | `furniture/unplaced` | `string` (furnitureId) | Supprime les slots du meuble s'il est un container. |
 
+#### Utilisation d'items (`ItemUseManager`)
+
+| Dir. | Event Name | Payload Structure | Description |
+| :---: | :--- | :--- | :--- |
+| E | `item/used` | `string` (itemId) | Dispatche chaque entrée de `ITEMS[itemId].using` selon son `action`. |
+| S | `buff/create-timed` | `{ action, buff: string, duration: number }` (entrée `using` de `ITEMS`, non copiée) | Émis pour chaque entrée `action: 'buff-timed'`. Payload en lecture seule. |
+
 #### Hotbar (`HotbarOverlay`)
 
 | Dir. | Event Name | Payload Structure | Description |
