@@ -537,8 +537,8 @@ export const ITEMS = {
   // Trees
   coconut: {name: 'Coconut', type: 0, stype: 'tree', star: 1, image: 'foraged_32_32-1-2', placed: 'placed_16_16-2-0', help: 'Coconut', tooltip: '???', shaking: {speed: 2400, items: [{item: 'coconut', count: 1}]}, foraging: {speed: 2400, items: [{item: 'coconut', count: 1}]}},
   coconutFiber: {name: 'Coconut Fiber', type: 0, stype: 'textile', star: 1, image: 'refined_32_32-0-3', help: 'Coconut', tooltip: '???'},
-  coconutPulp: {name: 'Coconut Pulp', type: 0, stype: 'fruit', star: 1, image: 'refined_32_32-1-3', help: 'Coconut', tooltip: '???'},
-  coconutMilk: {name: 'Coconut Milk', type: 0, stype: 'beverage', star: 1, image: 'refined_32_32-2-3', help: 'Coconut', tooltip: '???'},
+  coconutPulp: {name: 'Coconut Pulp', type: 0, stype: 'fruit', star: 1, image: 'refined_32_32-1-3', help: 'Coconut', tooltip: '???', using: [{action: 'buff-timed', buff: 'plentySatisfied', duration: 660}]},
+  coconutMilk: {name: 'Coconut Milk', type: 0, stype: 'beverage', star: 1, image: 'refined_32_32-2-3', help: 'Coconut', tooltip: '???', using: [{action: 'buff-timed', buff: 'plentySatisfied', duration: 480}]},
 
   thornspine: {name: 'Thornspine', type: 0, stype: 'tree', star: 3, image: null, help: 'Thornspine', tooltip: '???', chopping: {speed: 2200, items: [{item: 'cactusFiber', count: '2-3'}, {item: 'cactusSpine', count: '4-10'}]}, foraging: {speed: 2000, items: [{item: 'thornspineFlower', count: 1}, {item: 'cactusSpine', count: 0.60}]}},
   thornspineFlower: {name: 'Thornspine Flower', type: 0, stype: 'flower', star: 3, image: 'foraged_32_32-2-3', placed: 'placed_16_16-0-3', help: 'Thornspine', tooltip: '???'},

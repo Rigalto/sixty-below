@@ -59,6 +59,8 @@
  *   |optional|   → chaîne vide si absent, pas de ⚠️
  *   |list|       → tableau : liste à puces  (* item\n* item\n...)
  *   |lines|      → tableau : valeurs séparées par <br>
+ *   |time|       → durée en secondes réelles affichée en temps in-game : 'in-game 10 hours 5 minutes'
+ *                  (1 s réelle = 1 min in-game ; pluriel dynamique ; partie nulle omise)
  *   |loot|       → table de loot ⏳
  *
  *  * ── Données dynamiques des recettes ──────────────────────────
@@ -5676,6 +5678,8 @@ Some fruits can be eated without any preparation:
 | [[item:coconutPulp]] | 'Well Fed' for {{item:coconutPulp:using[0]:duration|time}} ⏳ | |
 | [[item:coconutMilk]] | 'Well Fed' for {{item:coconutMilk:using[0]:duration|time}} ⏳ | |
 
+_See [[Food Buff]] for details about 'Well Fed'._
+
 <hr>
 
 **Recipes**
@@ -8668,6 +8672,21 @@ const resolvePath = (type, code, segments, NODES, ITEMS, BUFFS, MONSTERS) => {
   return {value: obj, tail: [], error: null, isStar: false}
 }
 
+/**
+ * Formate une durée exprimée en minutes in-game en 'x hour(s) y minute(s)', avec pluriel
+ * dynamique. Une partie nulle est omise ; une durée nulle retourne '0 minutes'.
+ * @param {number} totalMinutes — durée en minutes in-game (entier positif ou nul)
+ * @returns {string}
+ */
+const formatGameDuration = (totalMinutes) => {
+  const hours = Math.floor(totalMinutes / 60)
+  const minutes = totalMinutes % 60
+  const h = hours > 0 ? `${hours} hour${hours > 1 ? 's' : ''}` : ''
+  const m = minutes > 0 ? `${minutes} minute${minutes > 1 ? 's' : ''}` : ''
+  if (h && m) return `${h} ${m}`
+  return h || m || '0 minutes'
+}
+
 const formatValue = (resolved, format, entryTitle, path) => {
   const {value, tail, error, isStar, isMissing} = resolved
 
@@ -8703,6 +8722,15 @@ const formatValue = (resolved, format, entryTitle, path) => {
       }
       n = Math.max(1, Math.min(5, n))
       return '⭐'.repeat(n) + '☆'.repeat(5 - n)
+    }
+
+    case 'time': {
+      const minutes = Number(value) // 1 s réelle = 1 min in-game
+      if (!Number.isFinite(minutes) || minutes < 0) {
+        console.error(`[help] '${entryTitle}' : valeur time invalide '${value}'`)
+        return `⚠️ ${path}`
+      }
+      return `in-game ${formatGameDuration(minutes)}`
     }
 
     case 'link': {
