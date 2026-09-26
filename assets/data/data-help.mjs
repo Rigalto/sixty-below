@@ -5687,6 +5687,13 @@ _See [[Food Buff]] for details about 'Well Fed'._
 Fruits are food ingredient in many recipes.
 
 ⏳
+
+<hr>
+
+**Tips**
+
+* _Shaking trees provide a ??? amount of fruits, witch can help you in early game._
+
 `
   },
   // ── Potions ──────────────────────────────────────────────────
