@@ -157,7 +157,9 @@ Mining Loot: {{node:{3}:mining[:items[0]:item|link}}
   toolBonus: '| Prefix | Speed Bonus | Range Bonus |\n|---|---|---|\n| [[Gear Prefixes|Quick]] | +{{buff:quickTool}}% | — |\n| [[Gear Prefixes|Keen]] | +{{buff:keenTool}}% | — |\n| [[Gear Prefixes|Sturdy]] | {{buff:sturdyTool}}% | — |\n| [[Gear Prefixes|Extended]] | — | +2 tiles each direction |',
 
   // liste de la section 'Flora' des tuiles, biomes et mini-biomes
-  floraLine: '* [[item:{1}]] {{item:{1}:star|star}}'
+  floraLine: '* [[item:{1}]] {{item:{1}:star|star}}',
+
+  healthPotions: '| Item | Health Restored | Sickness Duration (in-game minutes) |\n| [[item:bottleWater]] | {{item:bottleWater:using[0]:payload:heal}} | {{item:bottleWater:using[0]:payload:sickness}} |\n| [[item:bottleHoney]] | {{item:bottleHoney:using[1]:payload:heal}} | {{item:bottleHoney:using[1]:payload:sickness}} |\n| [[item:bottleSap]] | {{item:bottleSap:using[1]:payload:heal}} | {{item:bottleSap:using[1]:payload:sickness}} |\n| [[item:apple]] | {{item:apple:using[1]:payload:heal}} | {{item:apple:using[1]:payload:sickness}} \n| [[item:peach]] | {{item:peach:using[1]:payload:heal}} | {{item:peach:using[1]:payload:sickness}} |'
 }
 
 /* ====================================================================================================
@@ -1615,14 +1617,39 @@ Honey is a viscous golden liquid produced by [[Bees]] in [[Hive]]s. It is harder
 
 * [[Hive]]s — [[Jungle]], [[Caverns]] Top
 
-**Collection** ⏳
+<hr>
+
+**Effect on Movement**
+
+* [[Movement Buffs|Movement speed]] is reduced by {{buff:honey}}% while the player is in Honey.
+
+**Drinking Honey**
+
+Using a [[item:bottleHoney]] from the [[Inventory]] ('Use Item' icon — shortcut [Space]):
+
+* Restores {{item:bottleHoney:using[1]:payload:heal}} [[Health]] points.
+* Applies the Honey buff for {{item:bottleHoney:using[0]:duration|time}}: [[Movement Buffs|Movement Speed]] is reduced by {{buff:honey}}%.
+* Applies the Potion Sickness debuff for {{item:bottleHoney:using[1]:payload:sickness|time}}, preventing the use of other healing items. ⏳
+
+<hr>
+
+**Collection**
 
 * <<itemStar|bottle>> — small quantity
 * <<itemStar|bucket>> — large quantity
 
+**How to fill**
+
+* Hold an empty [[item:bottle]] or [[item:bucket]] in your active [[Hotbar]] slot.
+* Click on a [[node:honey]] tile within your [[Ranges|Interaction Range]].
+* The empty container is consumed and replaced by the matching filled container.
+* With a [[item:bucket]], the honey tile is removed from the world; a [[item:bottle]] leaves it in place.
+
+<hr>
+
 **Tips**
 
-* _Honey slows movement — avoid falling into it without a plan to escape._ ⏳
+* _Honey slows movement — avoid falling into it without a plan to escape._
 * _The [[Bees]] will defend their honey aggressively — consider building a diversion canal to collect it safely._ ⏳
   `
   },
@@ -1640,15 +1667,40 @@ Sap is a rare green liquid found exclusively in [[Jungle]] biomes. It fills Sap 
 * [[Sap Pocket]]s — [[Jungle]], [[Caverns]] Bottom
 * Sap puddles — [[Jungle]], [[Underground]] and [[Caverns]]
 
-**Collection** ⏳
+<hr>
+
+**Effect on Movement**
+
+* [[Movement Buffs|Movement speed]] is reduced by {{buff:sap}}% while the player is in Sap.
+
+**Drinking Sap**
+
+Using a [[item:bottleSap]] from the [[Inventory]] ('Use Item' icon — shortcut [Space]):
+
+* Restores {{item:bottleSap:using[1]:payload:heal}} [[Health]] points.
+* Applies the Sap buff for {{item:bottleSap:using[0]:duration|time}}: [[Movement Buffs|Movement Speed]] is reduced by {{buff:sap}}%.
+* Applies the Potion Sickness debuff for {{item:bottleSap:using[1]:payload:sickness|time}}, preventing the use of other healing items. ⏳
+
+<hr>
+
+**Collection**
 
 * <<itemStar|bottle>> — small quantity
 * <<itemStar|bucket>> — large quantity
 
+**How to fill**
+
+* Hold an empty [[item:bottle]] or [[item:bucket]] in your active [[Hotbar]] slot.
+* Click on a [[node:sap]] tile within your [[Ranges|Interaction Range]].
+* The empty container is consumed and replaced by the matching filled container.
+* With a [[item:bucket]], the sap tile is removed from the world; a [[item:bottle]] leaves it in place.
+
+<hr>
+
 **Tips**
 
 * _Sap Pockets are sealed by [[node:sandstone]] borders — removing them releases the sap._ ⏳
-* _Sap is even more viscous than [[node:honey]] — movement is severely impaired._ ⏳
+* _Sap slows movement — avoid falling into it without a plan to escape._
   `
   },
   {
@@ -5509,8 +5561,7 @@ _The natural health regeneration rate scales with maximum health. This means tha
 
 In addition to natural regeneration, Health can be restored instantly by consuming certain items. However, most of these items inflict the Potion Sickness debuff.⏳
 
-| Item | Health Restored | Sickness Duration |
-|---|---|---|
+<<healthPotions>>
 
 _The Potion Sickness debuff is applied after consuming these items, preventing the use of any other healing items (except [[Life Crystal]]s or [[Life Fruit]]s) for the duration specified in the table._
 
@@ -5590,7 +5641,6 @@ Some Food grants additionnal benefits:
 | --- | --- | --- |
 | [[item:apple]] | {{item:apple:star|star}} | +{{item:apple:using[0]:payload:flat}} Health |
 | [[item:peach]] | {{item:peach:star|star}} | +{{item:peach:using[0]:payload:flat}} Health |
-
 
 _Note pour implémentation - à supprimer ⏳
 Cooked food — requires [[item:sunflowerOil|Sunflower Oil]] — does not withstand high temperatures
@@ -5702,6 +5752,24 @@ Fruits are food ingredient in many recipes.
     title: 'Potions',
     category: ['Gameplay'],
     content: `
+**Description**
+
+⏳
+**Health Potion**
+
+Dire que cela donne de la Health en plus, mais que cela met également le debuff 'Sickness' pour un certain temps. Tant que ce buff est actif, on ne peut pas consommer une autre potion de soin.
+Analyser préalablement la conception sur la consommation d'une potion pendant qu'une autre est active (bouton grisé ou consommation ineffective avec item perdu).
+
+<<healthPotions>>
+
+Some Health Potion grants additionnal benefits:
+
+| Potion Name | Potion Tier | Benefits |
+| --- | --- | --- |
+| [[item:bottleHoney]] | {{item:bottleHoney:star|star}} | -{{buff:honey}}% Movement Speed |
+| [[item:bottleSap]] | {{item:bottleSap:star|star}} | -{{buff:sap}}% Movement Speed |
+
+_Note: some early game [[Fruits]] also grant Health._
   `
   },
 
@@ -7937,19 +8005,22 @@ Carrying a [[item:stopwatch]], a [[item:chronometer]] or an [[item:astrarium]] i
 | Gear / Set | Movement Speed Bonus | Maximum Jump Height | Gravity | Fall Damage |
 |---|---|---|---|---|
 
-**Food/Potion Modifiers ⏳**
+**Food/Potion Modifiers**
 
-| Gear / Set | Duration | Movement Speed Bonus | Maximum Jump Height | Gravity | Fall Damage |
+Drinking certain potions or eating certain foods can alter your Movement Speed:
+
+| Food / Potion | Tier | Movement Speed Bonus | Duration |
 |---|---|---|---|---|---|
+| [[item:bottleSap]] | {{item:bottleSap:star|star}} | -{{buff:sap}}% | {{item:bottleSap:using[0]:duration|time}} |
+| [[item:bottleHoney]] | {{item:bottleHoney:star|star}} | -{{buff:honey}}% | {{item:bottleHoney:using[0]:duration|time}} |
 
 **Teleportation**
 
-The player is freeze during all the Teleportation process.
+The player is freeze during all the [[Teleporters|Teleportation]] process.
 
 **Tips**
 
 * _If you touch both [[node:honey]] and a [[node:web]], the speed penalty exceeds 100% and you will be completely stuck. Mine the [[node:web]] to break free, or drink a [[item:recallPotion]] to escape._
-* _Velvetmoss patches are visually distinct — you can plan your path to avoid them if speed matters._ ⏳
 * _Boots with traction bonuses can partially offset terrain penalties._ ⏳
   `
   },

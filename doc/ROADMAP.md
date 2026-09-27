@@ -8,6 +8,8 @@
 ## En cours
 
 ### Code et tests
+- Apple et Peach ne doivent pas donner de Heal, Bolet et Pink Mycenia doivent en donner
+- Ajouter un buff 'wet/Honey/Sap' de 15 secondes quand on sort de l'eau/honey/sap
 - Intégrer les buffs de Set d'armure
 - supprimer l'icône statique 'Armor' du widget des Buffs.
 - ajouter un overlay affichant les caractéristiques du personnages (buffs...).
