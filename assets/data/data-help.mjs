@@ -5641,7 +5641,7 @@ Coming soon.
 | [[item:eggSpider]] | {{item:eggSpider:star|star}} | Mining [[node:web]] | Potions |
 | [[item:eggSnake]] | {{item:eggSnake:star|star}} | ⏳ | ⏳ |
 
-_Swallowing an [[item:egg]] grants the 'Well Fed' buff for {{item:egg:using[0]:duration|time}}._
+_Swallowing an [[item:egg]] grants the [[Food Buff|'Well Fed' buff]] for {{item:egg:using[0]:duration|time}}._
 
 **Recipes**
 `

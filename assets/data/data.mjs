@@ -561,12 +561,12 @@ export const ITEMS = {
   amberMoss: {name: 'Amber Moss', type: 0, stype: 'moss', star: 2, image: 'foraged_32_32-4-5', help: 'Amber Moss', tooltip: '???'},
   plankOak: {name: 'Oak Plank', type: 0, stype: 'plank', star: 1, image: 'refined_32_32-5-2', help: 'Oak & Mahogany', tooltip: '???'},
   rootOak: {name: 'Wood Root', type: 0, stype: 'root', star: 1, image: 'potions_32_32-1-5', help: 'Oak & Mahogany', tooltip: '???'},
-  egg: {name: 'Bird Egg', type: ITEM_TYPE.FOOD | ITEM_TYPE.USABLE, stype: 'egg', star: 1, image: 'foraged_32_32-2-1', help: 'Oak & Mahogany', tooltip: '???', using: [{action: 'buff-timed', buff: 'wellFed', duration: 600}]},
-  eggMaleo: {name: 'Maleo Egg', type: 0, stype: 'egg', star: 2, image: 'foraged_32_32-3-1', help: 'Oak & Mahogany', tooltip: '???'}, // jungle
+  egg: {name: 'Bird Egg', type: ITEM_TYPE.FOOD | ITEM_TYPE.USABLE, stype: 'egg', star: 1, image: 'foraged_32_32-2-1', help: 'Eggs', tooltip: '???', using: [{action: 'buff-timed', buff: 'wellFed', duration: 600}]},
+  eggMaleo: {name: 'Maleo Egg', type: 0, stype: 'egg', star: 2, image: 'foraged_32_32-3-1', help: 'Eggs', tooltip: '???'}, // jungle
   featherBird: {name: 'Bird Feather', type: 0, stype: 'feather', star: 1, image: 'foraged_32_32-4-2', help: 'Oak & Mahogany', tooltip: '???'},
   featherKakapo: {name: 'Kakapo Feather', type: 0, stype: 'feather', star: 2, image: 'foraged_32_32-5-2', help: 'Oak & Mahogany', tooltip: '???'},
-  apple: {name: 'Apple', type: ITEM_TYPE.FOOD | ITEM_TYPE.USABLE, stype: 'fruit', star: 1, image: 'foraged_32_32-2-2', help: 'Oak & Mahogany', tooltip: 'An apple a day keeps Doctor Bones away!', using: [{action: 'emit-event', event: 'life/add', payload: {flat: 20}}, {action: 'buff-timed', buff: 'plentySatisfied', duration: 540}]},
-  peach: {name: 'Peach', type: ITEM_TYPE.FOOD | ITEM_TYPE.USABLE, stype: 'fruit', star: 1, image: 'foraged_32_32-3-2', help: 'Oak & Mahogany', tooltip: '???', using: [{action: 'emit-event', event: 'life/add', payload: {flat: 20}}, {action: 'buff-timed', buff: 'exquisitelyStuffed', duration: 540}]},
+  apple: {name: 'Apple', type: ITEM_TYPE.FOOD | ITEM_TYPE.USABLE, stype: 'fruit', star: 1, image: 'foraged_32_32-2-2', help: 'Fruits', tooltip: 'An apple a day keeps Doctor Bones away!', using: [{action: 'emit-event', event: 'life/add', payload: {flat: 20}}, {action: 'buff-timed', buff: 'plentySatisfied', duration: 540}]},
+  peach: {name: 'Peach', type: ITEM_TYPE.FOOD | ITEM_TYPE.USABLE, stype: 'fruit', star: 1, image: 'foraged_32_32-3-2', help: 'Fruits', tooltip: '???', using: [{action: 'emit-event', event: 'life/add', payload: {flat: 20}}, {action: 'buff-timed', buff: 'exquisitelyStuffed', duration: 540}]},
 
   acorn: {name: 'Acorn', type: ITEM_TYPE.SEED | ITEM_TYPE.PLACABLE, stype: 'seed', star: 1, image: 'foraged_32_32-0-1', help: 'Oak & Mahogany', tooltip: '???'},
   seedForest: {name: 'Forest Grass Seed', type: ITEM_TYPE.SEED | ITEM_TYPE.PLACABLE, stype: 'seed', star: 1, image: 'foraged_32_32-4-3', placed: 'placed_16_16-5-0', help: 'Forest Grass', tooltip: 'Plant to change Dirt into Forest Grass'},

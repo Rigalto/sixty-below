@@ -678,10 +678,11 @@ document.head.appendChild(buffStyle)
 // Définition des buffs affichables
 // { id, title, x, y, timed }
 // x, y : coordonnées dans buff_32_32.png (multiples de 32)
+
 const DISPLAY_BUFFS = [
-  {id: 'wellFed', title: 'Well Fed', x: -0, y: 0},
-  {id: 'plentySatisfied', title: 'Plenty Satisfied', x: -32, y: 0},
-  {id: 'exquisitelyStuffed', title: 'Exquisitely Stuffed', x: -64, y: 0},
+  {id: 'wellFed', title: `Well Fed\n+${BUFFS.wellFedHealthRegen}% Health Regeneration\n+${BUFFS.wellFedMovementSpeed}% Movement Speed\n+${BUFFS.wellFedMiningSpeed}% Mining Speed\n+${BUFFS.wellFedChoppingSpeed}% Chopping Speed\n+${BUFFS.wellFedForagingSpeed}% Foraging Speed\n+${BUFFS.wellFedDefense} Defense\n+${BUFFS.wellFedDamage} Damage\n+${BUFFS.wellFedCriticalChance} Critical Chance\n+${BUFFS.wellFedPa} PA\n+${BUFFS.wellFedPm} PM`, x: -0, y: 0},
+  {id: 'plentySatisfied', title: `Plenty Satisfied\n+${BUFFS.plentySatisfiedHealthRegen}% Health Regeneration\n+${BUFFS.plentySatisfiedMovementSpeed}% Movement Speed\n+${BUFFS.plentySatisfiedMiningSpeed}% Mining Speed\n+${BUFFS.plentySatisfiedChoppingSpeed}% Chopping Speed\n+${BUFFS.plentySatisfiedForagingSpeed}% Foraging Speed\n+${BUFFS.plentySatisfiedDefense} Defense\n+${BUFFS.plentySatisfiedDamage} Damage\n+${BUFFS.plentySatisfiedCriticalChance} Critical Chance\n+${BUFFS.plentySatisfiedPa} PA\n+${BUFFS.plentySatisfiedPm} PM`, x: -32, y: 0},
+  {id: 'exquisitelyStuffed', title: `Exquisitely Stuffed\n+${BUFFS.exquisitelyStuffedHealthRegen}% Health Regeneration\n+${BUFFS.exquisitelyStuffedMovementSpeed}% Movement Speed\n+${BUFFS.exquisitelyStuffedMiningSpeed}% Mining Speed\n+${BUFFS.exquisitelyStuffedChoppingSpeed}% Chopping Speed\n+${BUFFS.exquisitelyStuffedForagingSpeed}% Foraging Speed\n+${BUFFS.exquisitelyStuffedDefense} Defense\n+${BUFFS.exquisitelyStuffedDamage} Damage\n+${BUFFS.exquisitelyStuffedCriticalChance} Critical Chance\n+${BUFFS.exquisitelyStuffedPa} PA\n+${BUFFS.exquisitelyStuffedPm} PM`, x: -64, y: 0},
   // debug
   {id: 'armors', title: 'Armors', x: -128, y: 0}, // supprimer intelligemment
   {id: 'honey', title: 'Honey', x: -128, y: 0},
