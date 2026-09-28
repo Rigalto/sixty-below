@@ -9,8 +9,6 @@
 
 ### Code et tests
 - gestion des points de vie :
-  - Consommation potions/food — brancher un vrai handler heal dans ItemUseManager
-  - Potion Sickness — debuff anti-spam à designer
   - Mort du joueur — test current <= 0 → émission de l'event déclenchant spawnManager.onTeleportSpawn()
   - Lifeforce Potion — dépend du système "buff timed" (TODO déjà noté dans BuffManager)
 - Séparer visuellement Buffs et Debuffs Dans le Buff Widget.

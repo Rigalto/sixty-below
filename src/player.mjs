@@ -1093,6 +1093,8 @@ class HealthManager {
     eventBus.on('life/fruit-used', this.onFruitUsed)
     this.onLifeAdd = this.onLifeAdd.bind(this)
     eventBus.on('life/add', this.onLifeAdd)
+    this.onPotionHeal = this.onPotionHeal.bind(this)
+    eventBus.on('potion/heal', this.onPotionHeal)
   }
 
   /**
@@ -1203,6 +1205,29 @@ class HealthManager {
     if (this.#current === 0) {
       // TODO: mort du joueur — déclencher la téléportation au spawn (cf. SpawnManager.onTeleportSpawn)
     }
+  }
+
+  /**
+   * Liaison EventBus : 'potion/heal' — sans effet (son 'wrong' + alerte) si le debuff
+   * 'sickness' est actif. Sinon, ajoute heal à #current (borné à #capacity) puis crée
+   * le buff temporisé 'sickness', y compris si la vie était déjà pleine.
+   * @param {{heal: number, sickness: number}} payload - payload statique de ITEMS, lecture seule
+   */
+  onPotionHeal ({heal, sickness}) {
+    if (buffManager.getBuff('sickness')) {
+      eventBus.emit('sound/play', 'wrong')
+      window.alert('Sickness debuff is active.\nThe item was consumed without effect.')
+      return
+    }
+
+    let newCurrent = this.#current + heal
+    if (newCurrent > this.#capacity) newCurrent = this.#capacity
+    if (newCurrent !== this.#current) {
+      this.#current = newCurrent
+      this.#dirty = true
+    }
+
+    buffManager.createTimedBuff('sickness', sickness)
   }
 
   // ///////// //
