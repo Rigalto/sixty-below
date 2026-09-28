@@ -805,8 +805,10 @@ export const ITEMS = {
   cobaltwall: {name: 'Cobalt Wall', type: ITEM_TYPE.WALL, stype: 'wall', star: 4, image: 'armor_32_32-5-3', help: 'Background Wall', tooltip: 'Shelter inner walls'},
   platinumwall: {name: 'Platinum Wall', type: ITEM_TYPE.WALL, stype: 'wall', star: 4, image: 'armor_32_32-5-3', help: 'Background Wall', tooltip: 'Shelter inner walls'},
   granitewall: {name: 'Granite Wall', type: ITEM_TYPE.WALL, stype: 'wall', star: 4, image: 'armor_32_32-5-3', help: 'Background Wall', tooltip: 'Shelter inner walls'},
-  marblewall: {name: 'Marble Wall', type: ITEM_TYPE.WALL, stype: 'wall', star: 4, image: 'armor_32_32-5-3', help: 'Background Wall', tooltip: 'Shelter inner walls'}
+  marblewall: {name: 'Marble Wall', type: ITEM_TYPE.WALL, stype: 'wall', star: 4, image: 'armor_32_32-5-3', help: 'Background Wall', tooltip: 'Shelter inner walls'},
 
+  // Drinks - images NOK
+  ale: {name: 'Ale', type: ITEM_TYPE.FOOD | ITEM_TYPE.USABLE, stype: 'drink', star: 2, image: 'armor_32_32-5-3', help: 'Drinks', tooltip: 'Increase your Melee caracteristics', using: [{action: 'buff-timed', buff: 'tipsy', duration: 600}]}
 }
 
 /* ============================================================================
@@ -822,6 +824,13 @@ export const BUFFS = {
   quickTool: 20,
   keenTool: 5,
   sturdyTool: -5,
+
+  tipsyDamage: 3,
+  tipsyPa: 1,
+  tipsyPm: -1,
+  tipsyCriticalChance: 10,
+  tipsyDefense: -4,
+  tipsyMovementSpeed: -10,
 
   wellFedHealthRegen: 10,
   wellFedMovementSpeed: 10,

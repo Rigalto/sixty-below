@@ -85,6 +85,7 @@ class BuffManager {
       if (this.#values.get('wellFed')) speed += BUFFS.wellFedMovementSpeed
       if (this.#values.get('plentySatisfied')) speed += BUFFS.plentySatisfiedMovementSpeed
       if (this.#values.get('exquisitelyStuffed')) speed += BUFFS.exquisitelyStuffedMovementSpeed
+      if (this.#values.get('tipsy')) speed += BUFFS.tipsyMovementSpeed
 
       return speed < 0 ? 0 : speed
     }],
@@ -163,6 +164,7 @@ class BuffManager {
       if (this.#values.get('wellFed')) defense += BUFFS.wellFedDefense
       if (this.#values.get('plentySatisfied')) defense += BUFFS.plentySatisfiedDefense
       if (this.#values.get('exquisitelyStuffed')) defense += BUFFS.exquisitelyStuffedDefense
+      if (this.#values.get('tipsy')) defense += BUFFS.tipsyDefense
 
       return defense < 0 ? 0 : defense
     }]
@@ -687,7 +689,8 @@ const DISPLAY_BUFFS = [
   {id: 'sap', title: `Sap\n-${BUFFS.sap}% Movement Speed`, x: -128, y: 0},
   {id: 'water', title: `Wet\n-${BUFFS.water}% Movement Speed`, x: -160, y: 0},
   {id: 'sickness', title: 'Sickness\nHealing Items have no effect', x: 0, y: -32},
-  {id: 'tipsy', title: 'Tipsy\nTBD', x: -32, y: -32}
+  {id: 'tipsy', title: `Tipsy\n${BUFFS.tipsyMovementSpeed}% Movement Speed\n${BUFFS.tipsyDefense} Defense\n${BUFFS.tipsyPm} PM\n+${BUFFS.tipsyPa} PA\n+${BUFFS.tipsyDamage} Damage\n+${BUFFS.tipsyCriticalChance} Critical Chance`, x: -32, y: -32}
+
   // debug
   // {id: 'armors', title: 'Armors', x: -128, y: 0}, // supprimer intelligemment
   // {id: 'buff1', title: 'Buff 1', x: 0, y: 0},

@@ -5637,10 +5637,11 @@ See [[Food Buff]] for details.
 
 Some Food grants additionnal benefits:
 
-| Food Name | Food Tier | Benefits |
+| Food Name | Food Tier | Food Buff | Benefits |
 | --- | --- | --- |
-| [[item:apple]] | {{item:apple:star|star}} | +{{item:apple:using[0]:payload:flat}} Health |
-| [[item:peach]] | {{item:peach:star|star}} | +{{item:peach:using[0]:payload:flat}} Health |
+| [[item:apple]] | {{item:apple:star|star}} | Well Fed  | +{{item:apple:using[0]:payload:flat}} Health |
+| [[item:peach]] | {{item:peach:star|star}} | Well Fed  | +{{item:peach:using[0]:payload:flat}} Health |
+| [[item:ale]] | {{item:ale:star|star}} | None | [[Drinks|Tipsy Buff]] |
 
 _Note pour implémentation - à supprimer ⏳
 Cooked food — requires [[item:sunflowerOil|Sunflower Oil]] — does not withstand high temperatures
@@ -5656,6 +5657,41 @@ Pheromone mastery — allows control of specific monster species
 
  ⏳
   `
+  },
+  {
+    title: 'Drinks',
+    category: ['Food'],
+    content: `
+**Description**
+
+Coming soon.
+
+<hr>
+
+**Drink Types**
+
+| Drink Name | Drink Tier | Food Buff | Benefits |
+| [[item:ale]] | {{item:ale:star|star}} | None | Tipsy Buff |
+
+_See [[Food Buff]] for details about 'Well Fed'._
+
+**Tipsy Buff**
+
+Drinking alcoolic beverages grants you the Tipsy Buff:
+
+* {{buff:tipsyMovementSpeed}}% Movement Speed
+* {{buff:tipsyDefense}} Defense
+* {{buff:tipsyPm}} PM
+* +{{buff:tipsyPa}} PA
+* +{{buff:tipsyDamage}} Damage
+* +{{buff:tipsyCriticalChance}} Critical Chance
+
+<hr>
+
+**Recipes**
+
+[[item:vegetableSoup]]
+      `
   },
   {
     title: 'Soups',
@@ -8026,6 +8062,7 @@ Drinking certain potions or eating certain foods can alter your Movement Speed:
 |---|---|---|---|---|---|
 | [[item:bottleSap]] | {{item:bottleSap:star|star}} | -{{buff:sap}}% | {{item:bottleSap:using[0]:duration|time}} |
 | [[item:bottleHoney]] | {{item:bottleHoney:star|star}} | -{{buff:honey}}% | {{item:bottleHoney:using[0]:duration|time}} |
+| [[item:ale]] | {{item:ale:star|star}} | {{buff:tipsyMovementSpeed}}% | {{item:ale:using[0]:duration|time}} |
 
 **Teleportation**
 
