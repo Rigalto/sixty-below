@@ -329,6 +329,7 @@ Cette section définit les événements officiels. Tout nouvel événement doit 
 | E | `life/crystal-used` | — | Augmente le nombre de coeurs. |
 | E | `life/fruit-used` | — | Passe un coeur rouge (s'il y en a) en un coeur doré. |
 | E | `life/add` | `{flat?: number, ofCurrent?: number, ofCapacity?: number}` | Ajout de points de vie. |
+| E | `potion/heal` | `{heal: number, sickness: number}` | Si le buff 'sickness' est inactif : ajoute `heal` PV et crée le buff temporisé 'sickness' (`sickness` secondes). Sinon : son 'wrong' + alerte, sans effet. |
 
 #### Rendering (`Camera`, `SkyRenderer`)
 

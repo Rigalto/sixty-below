@@ -686,7 +686,8 @@ const DISPLAY_BUFFS = [
   {id: 'honey', title: `Honey\n-${BUFFS.honey}% Movement Speed`, x: -96, y: 0},
   {id: 'sap', title: `Sap\n-${BUFFS.sap}% Movement Speed`, x: -128, y: 0},
   {id: 'water', title: `Wet\n-${BUFFS.water}% Movement Speed`, x: -160, y: 0},
-  {id: 'sickness', title: 'Sickness\nPrevents consumption of Healing Items', x: 0, y: -32}
+  {id: 'sickness', title: 'Sickness\nHealing Items have no effect', x: 0, y: -32},
+  {id: 'tipsy', title: 'Tipsy\nTBD', x: -32, y: -32}
   // debug
   // {id: 'armors', title: 'Armors', x: -128, y: 0}, // supprimer intelligemment
   // {id: 'buff1', title: 'Buff 1', x: 0, y: 0},

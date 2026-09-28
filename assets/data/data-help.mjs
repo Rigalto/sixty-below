@@ -1629,7 +1629,7 @@ Using a [[item:bottleHoney]] from the [[Inventory]] ('Use Item' icon — shortcu
 
 * Restores {{item:bottleHoney:using[1]:payload:heal}} [[Health]] points.
 * Applies the Honey buff for {{item:bottleHoney:using[0]:duration|time}}: [[Movement Buffs|Movement Speed]] is reduced by {{buff:honey}}%.
-* Applies the Potion Sickness debuff for {{item:bottleHoney:using[1]:payload:sickness|time}}, preventing the use of other healing items. ⏳
+* Applies the Sickness debuff for {{item:bottleHoney:using[1]:payload:sickness|time}}, preventing the use of other healing items. ⏳
 
 <hr>
 
@@ -1679,7 +1679,7 @@ Using a [[item:bottleSap]] from the [[Inventory]] ('Use Item' icon — shortcut 
 
 * Restores {{item:bottleSap:using[1]:payload:heal}} [[Health]] points.
 * Applies the Sap buff for {{item:bottleSap:using[0]:duration|time}}: [[Movement Buffs|Movement Speed]] is reduced by {{buff:sap}}%.
-* Applies the Potion Sickness debuff for {{item:bottleSap:using[1]:payload:sickness|time}}, preventing the use of other healing items. ⏳
+* Applies the Sickness debuff for {{item:bottleSap:using[1]:payload:sickness|time}}, preventing the use of other healing items. ⏳
 
 <hr>
 
@@ -5559,11 +5559,11 @@ _The natural health regeneration rate scales with maximum health. This means tha
 
 **Health Restoration**
 
-In addition to natural regeneration, Health can be restored instantly by consuming certain items. However, most of these items inflict the Potion Sickness debuff.⏳
+In addition to natural regeneration, Health can be restored instantly by consuming certain items. However, most of these items inflict the Sickness debuff.⏳
 
 <<healthPotions>>
 
-_The Potion Sickness debuff is applied after consuming these items, preventing the use of any other healing items (except [[Life Crystal]]s or [[Life Fruit]]s) for the duration specified in the table._
+_The Sickness debuff is applied after consuming these items, preventing the use of any other healing items (except [[Life Crystal]]s or [[Life Fruit]]s) for the duration specified in the table._
 
 <hr>
 
@@ -5572,7 +5572,7 @@ _The Potion Sickness debuff is applied after consuming these items, preventing t
 * _Prioritize increasing your maximum health with [[Life Crystal]]ls and [[Life Fruit]]s as you find them._
 * _Strategically place Campfires⏳ and Heart Lanterns⏳ in your base and arenas to benefit from their regeneration buffs._
 * _lways carry healing items, especially during exploration or boss fights._
-* _Be mindful of the Potion Sickness cooldown to avoid wasting healing items._
+* _Be mindful of the Sickness cooldown to avoid wasting healing items._
     `
   },
 
@@ -5757,8 +5757,7 @@ Fruits are food ingredient in many recipes.
 ⏳
 **Health Potion**
 
-Dire que cela donne de la Health en plus, mais que cela met également le debuff 'Sickness' pour un certain temps. Tant que ce buff est actif, on ne peut pas consommer une autre potion de soin.
-Analyser préalablement la conception sur la consommation d'une potion pendant qu'une autre est active (bouton grisé ou consommation ineffective avec item perdu).
+Health Potions instantly restore [[Health]], but also apply the Sickness debuff for a certain duration. While Sickness is active, any other healing item is consumed without effect.
 
 <<healthPotions>>
 
@@ -5769,7 +5768,7 @@ Some Health Potion grants additionnal benefits:
 | [[item:bottleHoney]] | {{item:bottleHoney:star|star}} | -{{buff:honey}}% Movement Speed |
 | [[item:bottleSap]] | {{item:bottleSap:star|star}} | -{{buff:sap}}% Movement Speed |
 
-_Note: some early game [[Fruits]] also grant Health._
+_Note: early game Surface Mushrooms ([[item:bolete]], [[item:pinkMycenia]]) also restore Health and apply Sickness._
   `
   },
 
