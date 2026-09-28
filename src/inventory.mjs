@@ -2629,9 +2629,10 @@ class InventoryOverlay {
   #onUseClick () {
     const [container, index] = this.#selectedSlot.getAttribute('location').split('|')
     if (container !== 'bag') return // précaution - ne devrait jamais arriver
+    const itemId = this.#selectedSlot.getAttribute('item') // lu avant décrément : le slot peut se vider
     const slot = inventoryManager.decrementBagSlotCount(parseInt(index, 10))
     this.#updateSlotDOM(this.#selectedSlot, slot)
-    eventBus.emit('item/used', slot.item !== '' ? this.#selectedSlot.getAttribute('item') : slot.item)
+    eventBus.emit('item/used', itemId)
     if (slot.item === '') {
       this.#selectedSlot.classList.remove('selected')
       this.#selectedSlot = null
