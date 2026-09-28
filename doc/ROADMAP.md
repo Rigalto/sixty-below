@@ -8,19 +8,16 @@
 ## En cours
 
 ### Code et tests
-- Apple et Peach ne doivent pas donner de Heal, Bolet et Pink Mycenia doivent en donner
-- Ajouter un buff 'wet/Honey/Sap' de 15 secondes quand on sort de l'eau/honey/sap
-- Intégrer les buffs de Set d'armure
-- supprimer l'icône statique 'Armor' du widget des Buffs.
-- ajouter un overlay affichant les caractéristiques du personnages (buffs...).
-- ajouter un bouton dans l'inventaire pour afficher l'overlay du personnage (impact sur son z-index).
 - gestion des points de vie :
-  - Mort du joueur — test current <= 0 → émission de l'event déclenchant spawnManager.onTeleportSpawn()
   - Consommation potions/food — brancher un vrai handler heal dans ItemUseManager
   - Potion Sickness — debuff anti-spam à designer
-  - Lifeforce Potion — dépend du système "buff timed" (pas encore implémenté, TODO déjà noté dans BuffManager)
-  - Dégâts environnementaux (noyade, traversée de zone dangereuse, DOT) — gros morceau, probablement hors scope immédiat
-
+  - Mort du joueur — test current <= 0 → émission de l'event déclenchant spawnManager.onTeleportSpawn()
+  - Lifeforce Potion — dépend du système "buff timed" (TODO déjà noté dans BuffManager)
+- Séparer visuellement Buffs et Debuffs Dans le Buff Widget.
+- Ajouter un buff 'wet/Honey/Sap' de 15 secondes quand on sort de l'eau/honey/sap
+- Intégrer les buffs de Set d'armure
+- ajouter un overlay affichant les caractéristiques du personnages (buffs...).
+- ajouter un bouton dans l'inventaire pour afficher l'overlay du personnage (impact sur son z-index).
 - traiter le cas particulier des trois buffs relatifs à la nourriture.
 - gestion de la fonction 'Use' dans l'inventaire - reste la consommation à coder
 - Modifier le volume sonore des sons du jeu (ActionWidget)
