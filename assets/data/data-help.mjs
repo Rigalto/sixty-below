@@ -159,7 +159,7 @@ Mining Loot: {{node:{3}:mining[:items[0]:item|link}}
   // liste de la section 'Flora' des tuiles, biomes et mini-biomes
   floraLine: '* [[item:{1}]] {{item:{1}:star|star}}',
 
-  healthPotions: '| Item | Health Restored | Sickness Duration (in-game minutes) |\n| [[item:bottleWater]] | {{item:bottleWater:using[0]:payload:heal}} | {{item:bottleWater:using[0]:payload:sickness}} |\n| [[item:bottleHoney]] | {{item:bottleHoney:using[1]:payload:heal}} | {{item:bottleHoney:using[1]:payload:sickness}} |\n| [[item:bottleSap]] | {{item:bottleSap:using[1]:payload:heal}} | {{item:bottleSap:using[1]:payload:sickness}} |\n| [[item:apple]] | {{item:apple:using[1]:payload:heal}} | {{item:apple:using[1]:payload:sickness}} \n| [[item:peach]] | {{item:peach:using[1]:payload:heal}} | {{item:peach:using[1]:payload:sickness}} |'
+  healthPotions: '| Item | Health Restored | Sickness Duration (in-game minutes) |\n| [[item:bottleWater]] | {{item:bottleWater:using[0]:payload:heal}} | {{item:bottleWater:using[0]:payload:sickness}} |\n| [[item:bottleHoney]] | {{item:bottleHoney:using[1]:payload:heal}} | {{item:bottleHoney:using[1]:payload:sickness}} |\n| [[item:bottleSap]] | {{item:bottleSap:using[1]:payload:heal}} | {{item:bottleSap:using[1]:payload:sickness}} |\n| [[item:bolete]] | {{item:bolete:using[0]:payload:heal}} | {{item:bolete:using[0]:payload:sickness}} |\n| [[item:pinkMycenia]] | {{item:pinkMycenia:using[0]:payload:heal}} | {{item:pinkMycenia:using[0]:payload:sickness}} |'
 }
 
 /* ====================================================================================================
@@ -5686,12 +5686,12 @@ Coming soon.
 
 | Egg | Tier | Found | Main usage |
 |---|---|---|---|
-| [[item:egg]] | {{item:egg:star|star}} | Chopping/Shaking [[item:oak]] | Food<br>Food Ingredient⏳ |
+| [[item:egg]] | {{item:egg:star|star}} | Chopping/Shaking [[item:oak]] | Food (*)<br>Food Ingredient⏳ |
 | [[item:eggMaleo]] | {{item:eggMaleo:star|star}} | Chopping/Shaking [[item:mahogany]] | ⏳ |
 | [[item:eggSpider]] | {{item:eggSpider:star|star}} | Mining [[node:web]] | Potions |
 | [[item:eggSnake]] | {{item:eggSnake:star|star}} | ⏳ | ⏳ |
 
-_Swallowing an [[item:egg]] grants the [[Food Buff|'Well Fed' buff]] for {{item:egg:using[0]:duration|time}}._
+_(*) Swallowing an [[item:egg]] grants the [[Food Buff|'Well Fed' buff]] for {{item:egg:using[0]:duration|time}}._
 
 **Recipes**
 `
@@ -5719,14 +5719,14 @@ Chopping or Shaking trees ⏳
 
 **Fruit Consumption**
 
-Some fruits can be eated without any preparation:
+Some fruits can be eated without any preparation or after a simple process at a [[Woodworking|Workbench]]:
 
 | Fruit | Food Buff | Extra Benefit |
 |---|---|---|
-| [[item:apple]] | 'Well Fed' for {{item:apple:using[1]:duration|time}} | +{{item:apple:using[0]:payload:flat}} Health |
-| [[item:peach]] | 'Well Fed' for {{item:peach:using[1]:duration|time}} | +{{item:peach:using[0]:payload:flat}} Health |
-| [[item:coconutPulp]] | 'Well Fed' for {{item:coconutPulp:using[0]:duration|time}} ⏳ | |
-| [[item:coconutMilk]] | 'Well Fed' for {{item:coconutMilk:using[0]:duration|time}} ⏳ | |
+| [[item:apple]] | 'Well Fed' for {{item:apple:using[0]:duration|time}} | |
+| [[item:peach]] | 'Well Fed' for {{item:peach:using[0]:duration|time}} | |
+| [[item:coconutPulp]] | 'Well Fed' for {{item:coconutPulp:using[0]:duration|time}} | |
+| [[item:coconutMilk]] | 'Well Fed' for {{item:coconutMilk:using[0]:duration|time}} | |
 
 _See [[Food Buff]] for details about 'Well Fed'._
 
@@ -6260,8 +6260,10 @@ Surface Mushrooms grow at the base of [[Oak & Mahogany|Trees]] on the [[Forest]]
 | [[item:pinkMycenia]] | 22:00 | 7:00 |
 _All times are in-game. See [[Day & Night Cycle]] for reference._
 
-* All mushrooms of the same species appear and disappear simultaneously ⏳
-* Mushrooms are more abundant during [[Weather|Rainy Weather]] ⏳
+* All mushrooms of the same species appear and disappear simultaneously
+* Mushrooms are more abundant during [[Weather|Rainy Weather]]
+
+<hr>
 
 **Harvest**
 
@@ -6271,20 +6273,32 @@ _All times are in-game. See [[Day & Night Cycle]] for reference._
 |  [[item:bolete]] | <<itemStar|sickleCopper>>  or better | {{item:bolete:foraging:items[*]:item|links}} |
 |  [[item:pinkMycenia]] |<<itemStar|sickleSilver>> or better | {{item:pinkMycenia:foraging:items[*]:item|links}} |
 
-**Usages**
-
-* Food, potion and crafting ingredient. ⏳
-
 **Dangers**
 
 * [[monster:adder]] may attack when foraging [[item:bolete]]. ⏳
 * [[monster:giantRedSlug]] may attack when foraging [[item:pinkMycenia]]. ⏳
 
+<hr>
+
+**Usages**
+
+* Consuming Surface Mushrooms:
+
+[[Health]] can be restored instantly by consuming Surface Mushrooms. However, they inflict the Sickness Debuff, preventing the use of any other healing items for a certain duration.
+
+| Mushroom | Health Restored | Sickness Duration (in-game minutes) |
+| [[item:bolete]] | {{item:bolete:using[0]:payload:heal}} | {{item:bolete:using[0]:payload:sickness}} |
+| [[item:pinkMycenia]] | {{item:pinkMycenia:using[0]:payload:heal}} | {{item:pinkMycenia:using[0]:payload:sickness}} |'
+
+* Crafting ingredient for food and Potions. ⏳
+
+<hr>
+
 **Tips**
 
-* _Surface Mushrooms only appear at night — plan your foraging accordingly._ ⏳
-* _Knowing tomorrow's weather helps plan your foraging — the [[item:bottledFrog]] trinket reveals the next day's forecast._ ⏳
-* _All mushrooms of the same species appear simultaneously — a single rainy night can yield a large harvest._ ⏳
+* _Surface Mushrooms only appear at night — plan your foraging accordingly._
+* _Knowing tomorrow's weather helps plan your foraging — the [[item:bottledFrog]] trinket reveals the next day's forecast._
+* _All mushrooms of the same species appear simultaneously — a single rainy night can yield a large harvest._
   `
   },
   {

@@ -97,7 +97,7 @@ export const NODES = {
     image: 'natural_16_16+4',
     mining: {speed: 500, items: [{item: 'blockMud', count: 1, buffs: ['lucky:80']}, {item: 'velvetmossSpore', count: 0.8, buffs: ['lucky:40']}]}
   },
-  WEB: {code: 35, name: 'Cobweb', type: NODE_TYPE.WEB | NODE_TYPE.GAZ, star: 1, color: '#788696', image: 'substrat_16_16+10', mining: {speed: 500, items: [{item: 'silk', count: 1}, {item: 'eggSpider', count: '1-3-0.08'}]}, help: 'Cobweb', terrain: 'web'},
+  WEB: {code: 35, name: 'Cobweb', type: NODE_TYPE.WEB | NODE_TYPE.GAZ, star: 1, color: '#788696', image: 'substrat_16_16+10', mining: {speed: 600, items: [{item: 'silk', count: 1}, {item: 'eggSpider', count: '1-3-0.08'}]}, help: 'Cobweb', terrain: 'web'},
 
   // ── Topsoil (terrain nourricier, propice aux plantes) ────────────────────────
   DIRT: {
@@ -537,8 +537,8 @@ export const ITEMS = {
   // Trees
   coconut: {name: 'Coconut', type: 0, stype: 'tree', star: 1, image: 'foraged_32_32-1-2', placed: 'placed_16_16-2-0', help: 'Coconut', tooltip: '???', shaking: {speed: 2400, items: [{item: 'coconut', count: 1}]}, foraging: {speed: 2400, items: [{item: 'coconut', count: 1}]}},
   coconutFiber: {name: 'Coconut Fiber', type: 0, stype: 'textile', star: 1, image: 'refined_32_32-0-3', help: 'Coconut', tooltip: '???'},
-  coconutPulp: {name: 'Coconut Pulp', type: 0, stype: 'fruit', star: 1, image: 'refined_32_32-1-3', help: 'Coconut', tooltip: '???', using: [{action: 'buff-timed', buff: 'plentySatisfied', duration: 660}]},
-  coconutMilk: {name: 'Coconut Milk', type: 0, stype: 'beverage', star: 1, image: 'refined_32_32-2-3', help: 'Coconut', tooltip: '???', using: [{action: 'buff-timed', buff: 'plentySatisfied', duration: 480}]},
+  coconutPulp: {name: 'Coconut Pulp', type: 0, stype: 'fruit', star: 1, image: 'refined_32_32-1-3', help: 'Coconut', tooltip: '???', using: [{action: 'buff-timed', buff: 'wellFed', duration: 660}]},
+  coconutMilk: {name: 'Coconut Milk', type: 0, stype: 'beverage', star: 1, image: 'refined_32_32-2-3', help: 'Coconut', tooltip: '???', using: [{action: 'buff-timed', buff: 'wellFed', duration: 480}]},
 
   thornspine: {name: 'Thornspine', type: 0, stype: 'tree', star: 3, image: null, help: 'Thornspine', tooltip: '???', chopping: {speed: 2200, items: [{item: 'cactusFiber', count: '2-3'}, {item: 'cactusSpine', count: '4-10'}]}, foraging: {speed: 2000, items: [{item: 'thornspineFlower', count: 1}, {item: 'cactusSpine', count: 0.60}]}},
   thornspineFlower: {name: 'Thornspine Flower', type: 0, stype: 'flower', star: 3, image: 'foraged_32_32-2-3', placed: 'placed_16_16-0-3', help: 'Thornspine', tooltip: '???'},
@@ -565,8 +565,8 @@ export const ITEMS = {
   eggMaleo: {name: 'Maleo Egg', type: 0, stype: 'egg', star: 2, image: 'foraged_32_32-3-1', help: 'Eggs', tooltip: '???'}, // jungle
   featherBird: {name: 'Bird Feather', type: 0, stype: 'feather', star: 1, image: 'foraged_32_32-4-2', help: 'Oak & Mahogany', tooltip: '???'},
   featherKakapo: {name: 'Kakapo Feather', type: 0, stype: 'feather', star: 2, image: 'foraged_32_32-5-2', help: 'Oak & Mahogany', tooltip: '???'},
-  apple: {name: 'Apple', type: ITEM_TYPE.FOOD | ITEM_TYPE.USABLE, stype: 'fruit', star: 1, image: 'foraged_32_32-2-2', help: 'Fruits', tooltip: 'An apple a day keeps Doctor Bones away!', using: [{action: 'emit-event', event: 'life/add', payload: {flat: 20}}, {action: 'buff-timed', buff: 'plentySatisfied', duration: 540}]},
-  peach: {name: 'Peach', type: ITEM_TYPE.FOOD | ITEM_TYPE.USABLE, stype: 'fruit', star: 1, image: 'foraged_32_32-3-2', help: 'Fruits', tooltip: '???', using: [{action: 'emit-event', event: 'life/add', payload: {flat: 20}}, {action: 'buff-timed', buff: 'exquisitelyStuffed', duration: 540}]},
+  apple: {name: 'Apple', type: ITEM_TYPE.FOOD | ITEM_TYPE.USABLE, stype: 'fruit', star: 1, image: 'foraged_32_32-2-2', help: 'Fruits', tooltip: 'An apple a day keeps Doctor Bones away!', using: [{action: 'buff-timed', buff: 'plentySatisfied', duration: 540}]},
+  peach: {name: 'Peach', type: ITEM_TYPE.FOOD | ITEM_TYPE.USABLE, stype: 'fruit', star: 1, image: 'foraged_32_32-3-2', help: 'Fruits', tooltip: '???', using: [{action: 'buff-timed', buff: 'exquisitelyStuffed', duration: 540}]},
 
   acorn: {name: 'Acorn', type: ITEM_TYPE.SEED | ITEM_TYPE.PLACABLE, stype: 'seed', star: 1, image: 'foraged_32_32-0-1', help: 'Oak & Mahogany', tooltip: '???'},
   seedForest: {name: 'Forest Grass Seed', type: ITEM_TYPE.SEED | ITEM_TYPE.PLACABLE, stype: 'seed', star: 1, image: 'foraged_32_32-4-3', placed: 'placed_16_16-5-0', help: 'Forest Grass', tooltip: 'Plant to change Dirt into Forest Grass'},
@@ -606,8 +606,8 @@ export const ITEMS = {
   mushroomFiber: {name: 'Mushroom Fiber', type: 0, stype: 'herb', star: 4, image: 'foraged_32_32-7-6', help: 'Mushroom Cave', tooltip: '???'},
 
   // Mushrooms - images OK
-  bolete: {name: 'Bolete', type: 0, stype: 'mushroom', star: 1, image: 'foraged_32_32-3-0', placed: 'placed_16_32-0-0', help: 'Surface Mushrooms', tooltip: '???', foraging: {speed: 2400, items: [{item: 'bolete', count: '1-3'}, {item: 'worm', count: 0.3, buffs: ['lucky:100', 'rainy:100']}]}},
-  pinkMycenia: {name: 'Pink Mycenia', type: 0, stype: 'mushroom', star: 2, image: 'foraged_32_32-4-0', placed: 'placed_16_32-1-0', help: 'Surface Mushrooms', tooltip: '???', foraging: {speed: 2400, items: [{item: 'pinkMycenia', count: '1-3'}, {item: 'slug', count: 0.3, buffs: ['lucky:100', 'rainy:100']}]}},
+  bolete: {name: 'Bolete', type: ITEM_TYPE.POTION | ITEM_TYPE.USABLE, stype: 'mushroom', star: 1, image: 'foraged_32_32-3-0', placed: 'placed_16_32-0-0', help: 'Surface Mushrooms', tooltip: '???', foraging: {speed: 2400, items: [{item: 'bolete', count: '1-3'}, {item: 'worm', count: 0.3, buffs: ['lucky:100', 'rainy:100']}]}, using: [{action: 'emit-event', event: 'potion/heal', payload: {heal: 20, sickness: 40}}]},
+  pinkMycenia: {name: 'Pink Mycenia', type: ITEM_TYPE.POTION | ITEM_TYPE.USABLE, stype: 'mushroom', star: 2, image: 'foraged_32_32-4-0', placed: 'placed_16_32-1-0', help: 'Surface Mushrooms', tooltip: '???', foraging: {speed: 2400, items: [{item: 'pinkMycenia', count: '1-3'}, {item: 'slug', count: 0.3, buffs: ['lucky:100', 'rainy:100']}]}, using: [{action: 'emit-event', event: 'potion/heal', payload: {heal: 30, sickness: 50}}]},
   frostcap: {name: 'Frostcap', type: 0, stype: 'mushroom', star: 3, image: null, placed: 'placed_16_32-0-1', help: 'Cave Mushrooms', tooltip: '???', foraging: {speed: 2400, items: [{item: 'mushroomGill', count: '2-5'}, {item: 'mushroomSpore', count: 0.8, buffs: ['lucky:50']}, {item: 'snail', count: 0.3, buffs: ['lucky:100', 'rainy:100']}]}},
   dawncap: {name: 'Dawncap', type: 0, stype: 'mushroom', star: 3, image: null, placed: 'placed_16_32-1-1', help: 'Cave Mushrooms', tooltip: '???', foraging: {speed: 2400, items: [{item: 'mushroomGill', count: '2-5'}, {item: 'mushroomSpore', count: 0.8, buffs: ['lucky:50']}, {item: 'snail', count: 0.3, buffs: ['lucky:100', 'rainy:100']}]}},
   mushroomGill: {name: 'Mushroom Gill', type: 0, stype: 'mushroom', star: 3, image: 'foraged_32_32-7-0', help: 'Cave Mushrooms', tooltip: '???'},

@@ -685,7 +685,8 @@ const DISPLAY_BUFFS = [
   {id: 'exquisitelyStuffed', title: `Exquisitely Stuffed\n+${BUFFS.exquisitelyStuffedHealthRegen}% Health Regeneration\n+${BUFFS.exquisitelyStuffedMovementSpeed}% Movement Speed\n+${BUFFS.exquisitelyStuffedMiningSpeed}% Mining Speed\n+${BUFFS.exquisitelyStuffedChoppingSpeed}% Chopping Speed\n+${BUFFS.exquisitelyStuffedForagingSpeed}% Foraging Speed\n+${BUFFS.exquisitelyStuffedDefense} Defense\n+${BUFFS.exquisitelyStuffedDamage} Damage\n+${BUFFS.exquisitelyStuffedCriticalChance} Critical Chance\n+${BUFFS.exquisitelyStuffedPa} PA\n+${BUFFS.exquisitelyStuffedPm} PM`, x: -64, y: 0},
   {id: 'honey', title: `Honey\n-${BUFFS.honey}% Movement Speed`, x: -96, y: 0},
   {id: 'sap', title: `Sap\n-${BUFFS.sap}% Movement Speed`, x: -128, y: 0},
-  {id: 'water', title: `Wet\n-${BUFFS.water}% Movement Speed`, x: -160, y: 0}
+  {id: 'water', title: `Wet\n-${BUFFS.water}% Movement Speed`, x: -160, y: 0},
+  {id: 'sickness', title: 'Sickness\nPrevents consumption of Healing Items', x: 0, y: -32}
   // debug
   // {id: 'armors', title: 'Armors', x: -128, y: 0}, // supprimer intelligemment
   // {id: 'buff1', title: 'Buff 1', x: 0, y: 0},
