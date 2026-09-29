@@ -634,74 +634,86 @@ export const isInInteractionRange = (tileIndex, centerTile) => {
 
 const buffStyle = document.createElement('style')
 buffStyle.textContent = /* css */`
-  #buff-widget {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 4px;
-    padding: 6px;
-    background-color: rgba(60, 65, 75, 0.9);
-    border: 1px solid #444;
-    border-radius: 6px;
-    width: 100%;
-    box-sizing: border-box;
-    margin-bottom: 10px;
-    box-shadow: 0 2px 10px rgba(0,0,0,0.5);
-    order: ${UI_LAYOUT.BUFF};
- }
+#buff-widget {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 6px;
+  background-color: rgba(60, 65, 75, 0.9);
+  border: 1px solid #444;
+  border-radius: 6px;
+  width: 100%;
+  box-sizing: border-box;
+  margin-bottom: 10px;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.5);
+  order: ${UI_LAYOUT.BUFF};
+}
 
-  .buff-item {
-    flex-direction: column;
-    align-items: center;
-    width: 32px;
-    cursor: help;
-  }
+.buff-group {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
 
-  .buff-icon {
-    width: 32px;
-    height: 32px;
-    background-image: url('assets/sprites/buff_32_32.png');
-    background-repeat: no-repeat;
-    image-rendering: pixelated;
-    flex-shrink: 0;
-  }
+.buff-item {
+  flex-direction: column;
+  align-items: center;
+  width: 32px;
+  cursor: help;
+}
 
-  .buff-time {
-    font-size: 10px;
-    text-align: center;
-    line-height: 1;
-    min-height: 12px;
-    user-select: none;
-    color: #ffffff;
-    text-shadow: 1px 1px 2px #000000;
-  }
+.buff-icon {
+  width: 32px;
+  height: 32px;
+  box-sizing: border-box;
+  border: 2px solid #000;
+  border-radius: 4px;
+  background-origin: border-box;
+  background-image: url('assets/sprites/buff_32_32.png');
+  background-repeat: no-repeat;
+  image-rendering: pixelated;
+  flex-shrink: 0;
+}
+
+.buff-group-buff .buff-icon { background-color: #adff34; }
+.buff-group-mixed .buff-icon { background-color: #d693ff; }
+.buff-group-debuff .buff-icon { background-color: #f27a93; }
+
+.buff-time {
+  font-size: 10px;
+  text-align: center;
+  line-height: 1;
+  min-height: 12px;
+  user-select: none;
+  color: #ffffff;
+  text-shadow: 1px 1px 2px #000000;
+}
 `
 document.head.appendChild(buffStyle)
 
+// Catégories d'affichage, dans l'ordre des groupes du widget (index = rang du groupe)
+const BUFF_KINDS = ['buff', 'mixed', 'debuff']
+
 // Définition des buffs affichables
 // { id, title, x, y, timed }
+// kind : 'buff' | 'mixed' | 'debuff' (cf. BUFF_KINDS)
 // x, y : coordonnées dans buff_32_32.png (multiples de 32)
 
 const DISPLAY_BUFFS = [
-  {id: 'wellFed', title: `Well Fed\n+${BUFFS.wellFedHealthRegen}% Health Regeneration\n+${BUFFS.wellFedMovementSpeed}% Movement Speed\n+${BUFFS.wellFedMiningSpeed}% Mining Speed\n+${BUFFS.wellFedChoppingSpeed}% Chopping Speed\n+${BUFFS.wellFedForagingSpeed}% Foraging Speed\n+${BUFFS.wellFedDefense} Defense\n+${BUFFS.wellFedDamage} Damage\n+${BUFFS.wellFedCriticalChance} Critical Chance\n+${BUFFS.wellFedPa} PA\n+${BUFFS.wellFedPm} PM`, x: -0, y: 0},
-  {id: 'plentySatisfied', title: `Plenty Satisfied\n+${BUFFS.plentySatisfiedHealthRegen}% Health Regeneration\n+${BUFFS.plentySatisfiedMovementSpeed}% Movement Speed\n+${BUFFS.plentySatisfiedMiningSpeed}% Mining Speed\n+${BUFFS.plentySatisfiedChoppingSpeed}% Chopping Speed\n+${BUFFS.plentySatisfiedForagingSpeed}% Foraging Speed\n+${BUFFS.plentySatisfiedDefense} Defense\n+${BUFFS.plentySatisfiedDamage} Damage\n+${BUFFS.plentySatisfiedCriticalChance} Critical Chance\n+${BUFFS.plentySatisfiedPa} PA\n+${BUFFS.plentySatisfiedPm} PM`, x: -32, y: 0},
-  {id: 'exquisitelyStuffed', title: `Exquisitely Stuffed\n+${BUFFS.exquisitelyStuffedHealthRegen}% Health Regeneration\n+${BUFFS.exquisitelyStuffedMovementSpeed}% Movement Speed\n+${BUFFS.exquisitelyStuffedMiningSpeed}% Mining Speed\n+${BUFFS.exquisitelyStuffedChoppingSpeed}% Chopping Speed\n+${BUFFS.exquisitelyStuffedForagingSpeed}% Foraging Speed\n+${BUFFS.exquisitelyStuffedDefense} Defense\n+${BUFFS.exquisitelyStuffedDamage} Damage\n+${BUFFS.exquisitelyStuffedCriticalChance} Critical Chance\n+${BUFFS.exquisitelyStuffedPa} PA\n+${BUFFS.exquisitelyStuffedPm} PM`, x: -64, y: 0},
-  {id: 'honey', title: `Honey\n-${BUFFS.honey}% Movement Speed`, x: -96, y: 0},
-  {id: 'sap', title: `Sap\n-${BUFFS.sap}% Movement Speed`, x: -128, y: 0},
-  {id: 'water', title: `Wet\n-${BUFFS.water}% Movement Speed`, x: -160, y: 0},
-  {id: 'sickness', title: 'Sickness\nHealing Items have no effect', x: 0, y: -32},
-  {id: 'tipsy', title: `Tipsy\n${BUFFS.tipsyMovementSpeed}% Movement Speed\n${BUFFS.tipsyDefense} Defense\n${BUFFS.tipsyPm} PM\n+${BUFFS.tipsyPa} PA\n+${BUFFS.tipsyDamage} Damage\n+${BUFFS.tipsyCriticalChance} Critical Chance`, x: -32, y: -32}
-
-  // debug
-  // {id: 'armors', title: 'Armors', x: -128, y: 0}, // supprimer intelligemment
-  // {id: 'buff1', title: 'Buff 1', x: 0, y: 0},
-  // {id: 'buff2', title: 'Buff 2', x: -32, y: 0},
-  // {id: 'dyn1', title: 'Dynamic Buff 1', x: -64, y: 0},
-  // {id: 'dyn2', title: 'Dynamic Buff 2', x: -96, y: 0}
-
+  {id: 'wellFed', kind: 'buff', title: `Well Fed\n+${BUFFS.wellFedHealthRegen}% Health Regeneration\n+${BUFFS.wellFedMovementSpeed}% Movement Speed\n+${BUFFS.wellFedMiningSpeed}% Mining Speed\n+${BUFFS.wellFedChoppingSpeed}% Chopping Speed\n+${BUFFS.wellFedForagingSpeed}% Foraging Speed\n+${BUFFS.wellFedDefense} Defense\n+${BUFFS.wellFedDamage} Damage\n+${BUFFS.wellFedCriticalChance} Critical Chance\n+${BUFFS.wellFedPa} PA\n+${BUFFS.wellFedPm} PM`, x: -0, y: 0},
+  {id: 'plentySatisfied', kind: 'buff', title: `Plenty Satisfied\n+${BUFFS.plentySatisfiedHealthRegen}% Health Regeneration\n+${BUFFS.plentySatisfiedMovementSpeed}% Movement Speed\n+${BUFFS.plentySatisfiedMiningSpeed}% Mining Speed\n+${BUFFS.plentySatisfiedChoppingSpeed}% Chopping Speed\n+${BUFFS.plentySatisfiedForagingSpeed}% Foraging Speed\n+${BUFFS.plentySatisfiedDefense} Defense\n+${BUFFS.plentySatisfiedDamage} Damage\n+${BUFFS.plentySatisfiedCriticalChance} Critical Chance\n+${BUFFS.plentySatisfiedPa} PA\n+${BUFFS.plentySatisfiedPm} PM`, x: -32, y: 0},
+  {id: 'exquisitelyStuffed', kind: 'buff', title: `Exquisitely Stuffed\n+${BUFFS.exquisitelyStuffedHealthRegen}% Health Regeneration\n+${BUFFS.exquisitelyStuffedMovementSpeed}% Movement Speed\n+${BUFFS.exquisitelyStuffedMiningSpeed}% Mining Speed\n+${BUFFS.exquisitelyStuffedChoppingSpeed}% Chopping Speed\n+${BUFFS.exquisitelyStuffedForagingSpeed}% Foraging Speed\n+${BUFFS.exquisitelyStuffedDefense} Defense\n+${BUFFS.exquisitelyStuffedDamage} Damage\n+${BUFFS.exquisitelyStuffedCriticalChance} Critical Chance\n+${BUFFS.exquisitelyStuffedPa} PA\n+${BUFFS.exquisitelyStuffedPm} PM`, x: -64, y: 0},
+  {id: 'tipsy', kind: 'mixed', title: `Tipsy\n${BUFFS.tipsyMovementSpeed}% Movement Speed\n${BUFFS.tipsyDefense} Defense\n${BUFFS.tipsyPm} PM\n+${BUFFS.tipsyPa} PA\n+${BUFFS.tipsyDamage} Damage\n+${BUFFS.tipsyCriticalChance} Critical Chance`, x: -32, y: -32},
+  {id: 'sickness', kind: 'debuff', title: 'Sickness\nHealing Items have no effect', x: 0, y: -32},
+  {id: 'honey', kind: 'debuff', title: `Honey\n-${BUFFS.honey}% Movement Speed`, x: -96, y: 0},
+  {id: 'sap', kind: 'debuff', title: `Sap\n-${BUFFS.sap}% Movement Speed`, x: -128, y: 0},
+  {id: 'water', kind: 'debuff', title: `Wet\n-${BUFFS.water}% Movement Speed`, x: -160, y: 0}
 ]
 
 class BuffWidget {
   #container = null // référence de la balise eenglobant le widget
+  #groups = [] // conteneurs DOM des groupes, indexés comme BUFF_KINDS
+  #visibleCounts = new Uint8Array(BUFF_KINDS.length) // nombre de buffs visibles par groupe, recalculé par #update
   #buffIds // liste de tous les buffs
   #refs = new Map() // Refs DOM précalculées : Map<id, {el, timeEl}>
 
@@ -720,7 +732,16 @@ class BuffWidget {
     this.#container = document.createElement('div')
     this.#container.id = 'buff-widget'
 
+    for (const kind of BUFF_KINDS) {
+      const group = document.createElement('div')
+      group.className = `buff-group buff-group-${kind}`
+      group.style.display = 'none'
+      this.#container.appendChild(group)
+      this.#groups.push(group)
+    }
+
     for (const def of DISPLAY_BUFFS) {
+      const kind = BUFF_KINDS.indexOf(def.kind)
       const el = document.createElement('div')
       el.title = def.title
       el.className = 'buff-item'
@@ -738,8 +759,8 @@ class BuffWidget {
       timeEl.className = 'buff-time'
       el.appendChild(timeEl)
 
-      this.#container.appendChild(el)
-      this.#refs.set(def.id, {el, timeEl, timed: def.timed})
+      this.#groups[kind].appendChild(el)
+      this.#refs.set(def.id, {el, timeEl, timed: def.timed, kind})
     }
 
     // Injection dans le Control Panel
@@ -766,10 +787,10 @@ class BuffWidget {
   #update () {
     const now = timeManager.timestamp
     const values = buffManager.getBuffs(this.#buffIds)
+    this.#visibleCounts.fill(0)
 
     for (const def of DISPLAY_BUFFS) {
-      if (def.id === 'armors') continue
-      const {el, timeEl} = this.#refs.get(def.id)
+      const {el, timeEl, kind} = this.#refs.get(def.id)
       const value = values[def.id]
       const expiration = buffManager.timestamps.get(def.id)
 
@@ -777,10 +798,16 @@ class BuffWidget {
         // buff timed
         el.style.display = 'flex'
         timeEl.textContent = Math.ceil((expiration - now) / 1000)
+        this.#visibleCounts[kind]++
       } else {
         // buff statique : value = truthy/falsy
         el.style.display = value ? 'flex' : 'none'
+        if (value) this.#visibleCounts[kind]++
       }
+    }
+
+    for (let i = 0; i < BUFF_KINDS.length; i++) {
+      this.#groups[i].style.display = this.#visibleCounts[i] ? 'flex' : 'none'
     }
   }
 }

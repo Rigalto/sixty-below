@@ -37,6 +37,10 @@ export const IMAGE_FILES = [
   // Tuiles de natural / grass
   `${BASE_DIR}/natural_16_16.png`,
 
+  // BUFFS //
+  // ///// //
+  `${BASE_DIR}/buff_32_32.png`,
+
   // ITEMS //
   // ///// //
 
@@ -152,7 +156,6 @@ export const IMAGE_FILES = [
   `${BASE_DIR}/w_62_62.png`,
   // IHM //
   // //////
-  `${BASE_DIR}/buff_32_32.png`, // buffs et town signs
   `${BASE_DIR}/moon_50_50.png`,
   `${BASE_DIR}/env_32_32.png`,
   `${BASE_DIR}/ihm_32_32.png`

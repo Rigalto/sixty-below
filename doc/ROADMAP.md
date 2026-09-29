@@ -11,7 +11,6 @@
 - gestion des points de vie :
   - Mort du joueur — test current <= 0 → émission de l'event déclenchant spawnManager.onTeleportSpawn()
   - Lifeforce Potion — dépend du système "buff timed" (TODO déjà noté dans BuffManager)
-- Séparer visuellement Buffs et Debuffs Dans le Buff Widget.
 - Ajouter un buff 'wet/Honey/Sap' de 15 secondes quand on sort de l'eau/honey/sap
 - Intégrer les buffs de Set d'armure
 - ajouter un overlay affichant les caractéristiques du personnages (buffs...).
