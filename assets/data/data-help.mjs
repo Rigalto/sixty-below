@@ -7853,16 +7853,32 @@ _From your equipment:_
 _From consumables:_
 
 * [[Food]] provides a timed bonus after consumption
-* [[Potions]] provide powerful timed bonuses — overuse extends the cooldown
+* [[Healing Potions]] grant Health points, also inflict the Sickness debuff
+* Other [[Potions]] provide powerful timed bonuses — overuse extends the cooldown
 
 _From the world events:_
 
 * [[Events]] such as invasions or meteor strikes activate specific buffs for their duration
 
+<hr>
+
 **Timed Buffs**
 
 Potions and food activate buffs with a countdown visible in the [[Buff Panel]].
 Consuming the same type too quickly extends the cooldown before you can benefit again.⏳
+
+**Timed Buffs**
+
+Potions, food and drinks activate buffs with a countdown visible in the [[Buff Panel]].
+
+Consuming an item that grants an already active buff adds its duration to the remaining time (e.g. drinking another [[item:ale]] while Tipsy).
+
+Two exceptions:
+
+* **Healing items** — they restore [[Health]] instantly and inflict the Sickness debuff. While Sickness is active, any other healing item is consumed without effect, and the remaining time of Sickness is not changed.
+* **[[Food Buff]]s** — Well Fed, Plenty Satisfied and Exquisitely Stuffed are exclusive. Eating food of the same tier adds its duration; eating food of a different tier replaces the current Food Buff with a fresh duration.
+
+<hr>
 
 **Buff Categories**
 
@@ -7875,17 +7891,50 @@ Consuming the same type too quickly extends the cooldown before you can benefit 
 * [[Gardening Buffs]] — better yield,
 * [[Luck Buff]] — rare loot, special encounters
 * Environmental Buffs — [[Weather|weather]], [[Moon Phases|moon]], [[Day & Night Cycle|time of day]]
+
+**Buff Nature**
+
+Every buff is either a Buff (+), a Mixed (±) or a Debuff (-), displayed with a green/purple/red background in [[Buff Panel]].
   `
   },
   {
     title: 'Buff Panel',
     category: ['Gameplay'],
     content: `
-  **Description**
+**Description**
 
-  The Buff Panel is a section in the [[Control Panel]] with display [[Buffs]] status.
+The Buff Panel is a section of the [[Control Panel]], below the [[Health|Health Panel]].
+It displays an icon for each active [[Buffs|buff or debuff]]. When a buff ends, its icon disappears.
 
-  To be continued ⏳
+<hr>
+
+**Icon colors**
+
+Each icon background shows the nature of the effect:
+
+| Color | Nature | Meaning |
+|---|---|---|
+| Green | Buff (+) | Grants only benefits |
+| Purple | Mixed (±) | A trade-off: grants benefits at the cost of drawbacks |
+| Red | Debuff (-) | Inflicts only drawbacks |
+
+Icons are grouped by nature: buffs on the first row(s), then mixed effects, then debuffs. A group with no active effect is hidden.
+
+The sign (+, ±, -) is repeated in the name shown when hovering an icon.
+
+**Reading the icons**
+
+* **Timed buffs** — granted by [[Food]] or [[Potions]]. The remaining time, in in-game minutes, is shown below the icon.
+* **Permanent buffs** — active as long as their source is present (terrain under your feet, equipment...). No countdown is shown.
+* Hover an icon to display the buff name and the bonuses it grants.
+
+<hr>
+
+**Tips**
+
+* Only one [[Food Buff]] can be active at a time — eating a different tier replaces the current one.
+* _Keep an eye on the countdown before a long expedition — eat again just before your [[Food Buff]] expires._
+* _See [[Buffs]] for the full list of buff sources and categories._
   `
   },
   {
