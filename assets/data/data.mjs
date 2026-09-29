@@ -807,6 +807,17 @@ export const ITEMS = {
   granitewall: {name: 'Granite Wall', type: ITEM_TYPE.WALL, stype: 'wall', star: 4, image: 'armor_32_32-5-3', help: 'Background Wall', tooltip: 'Shelter inner walls'},
   marblewall: {name: 'Marble Wall', type: ITEM_TYPE.WALL, stype: 'wall', star: 4, image: 'armor_32_32-5-3', help: 'Background Wall', tooltip: 'Shelter inner walls'},
 
+  // Healing Potions - images NOK, help NOK
+  lesserHealingPotion: {name: 'Lesser Healing Potion', type: ITEM_TYPE.POTION | ITEM_TYPE.USABLE, stype: 'healing', star: 1, image: 'potion_32_32-1-0', help: 'Drinks', tooltip: 'Restores 50 health when used', using: [{action: 'emit-event', event: 'potion/heal', payload: {heal: 50, sickness: 45}}, {action: 'add-items', items: [{item: 'bottle', count: 1}]}]},
+  standardHealingPotion: {name: 'Standard Healing Potion', type: ITEM_TYPE.POTION | ITEM_TYPE.USABLE, stype: 'healing', star: 13, image: 'potion_32_32-2-0', help: 'Drinks', tooltip: 'Restores 100 health when used', using: [{action: 'emit-event', event: 'potion/heal', payload: {heal: 100, sickness: 60}}, {action: 'add-items', items: [{item: 'bottle', count: 1}]}]},
+  greaterHealingPotion: {name: 'Greater Healing Potion', type: ITEM_TYPE.POTION | ITEM_TYPE.USABLE, stype: 'healing', star: 4, image: 'potion_32_32-3-0', help: 'Drinks', tooltip: 'Restores 150 health when used', using: [{action: 'emit-event', event: 'potion/heal', payload: {heal: 150, sickness: 60}}, {action: 'add-items', items: [{item: 'bottle', count: 1}]}]},
+  superHealingPotion: {name: 'Super Healing Potion', type: ITEM_TYPE.POTION | ITEM_TYPE.USABLE, stype: 'healing', star: 5, image: 'potion_32_32-4-0', help: 'Drinks', tooltip: 'Restores 250 health when used', using: [{action: 'emit-event', event: 'potion/heal', payload: {heal: 250, sickness: 60}}, {action: 'add-items', items: [{item: 'bottle', count: 1}]}]},
+
+  // healless: {name: 'Lesser Healing Potion', type: ITEM_TYPE.POTION | ITEM_TYPE.USABLE | ITEM_TYPE.CRAFTING, star: 1, sell: 300, image: 'potions_32_32-4-0', heal: 50, sickness: 45, bag: [{item: 'bottle', count: 1}], tooltip: 'Restores 50 health when used', help: 'Healing Potions'},
+  // healstd: {name: 'Standard Healing Potion', type: ITEM_TYPE.POTION | ITEM_TYPE.USABLE, star: 3, sell: 900, image: 'potions_32_32-4-1', heal: 100, sickness: 60, bag: [{item: 'bottle', count: 1}], tooltip: 'Restores 100 health when used', help: 'Healing Potions'},
+  // healgreat: {name: 'Greater Healing Potion', type: ITEM_TYPE.POTION | ITEM_TYPE.USABLE, star: 4, sell: 2400, image: 'potions_32_32-4-2', heal: 150, bag: [{item: 'bottle', count: 1}], sickness: 60, tooltip: 'Restores 150 health when used', help: 'Healing Potions'},
+  // healsuper: {name: 'Super Healing Potion', type: ITEM_TYPE.POTION | ITEM_TYPE.USABLE, star: 5, sell: 19000, image: 'potions_32_32-4-3', heal: 250, sickness: 60, bag: [{item: 'bottle', count: 1}], tooltip: 'Restores 250 health when used', help: 'Healing Potions'},
+
   // Drinks - images NOK
   ale: {name: 'Ale', type: ITEM_TYPE.FOOD | ITEM_TYPE.USABLE, stype: 'drink', star: 2, image: 'armor_32_32-5-3', help: 'Drinks', tooltip: 'Increase your Melee caracteristics', using: [{action: 'buff-timed', buff: 'tipsy', duration: 600}]}
 }
