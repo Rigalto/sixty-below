@@ -8,7 +8,6 @@
 ## En cours
 
 ### Code et tests
-- Healing Potions : fiche d'aide
 - gestion des points de vie :
   - Mort du joueur — test current <= 0 → émission de l'event déclenchant spawnManager.onTeleportSpawn()
   - Lifeforce Potion — dépend du système "buff timed" (TODO déjà noté dans BuffManager)
