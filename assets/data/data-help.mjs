@@ -78,7 +78,8 @@
  * ── Templates ───────────────────────────────────────────────────
  *   <<templateName|param1|param2>>   → inclusion d'un template
  *   Dans le template : {1}, {2}...   → placeholders des paramètres
- *   (un seul niveau d'inclusion — pas de template dans un template)
+ *   Un template peut inclure un autre template (1 niveau max) ; {n} peut être relayé : <<inner|{1}>>
+ *   Un template ne peut pas être passé en paramètre (<<a|<<b>>>> non supporté)
  *
  * ═══════════════════════════════════════════════════════════════
  * CARACTÈRES SPÉCIAUX  (copier/coller depuis ici)
@@ -159,7 +160,9 @@ Mining Loot: {{node:{3}:mining[:items[0]:item|link}}
   // liste de la section 'Flora' des tuiles, biomes et mini-biomes
   floraLine: '* [[item:{1}]] {{item:{1}:star|star}}',
 
-  healthPotions: '| Item | Health Restored | Sickness Duration (in-game minutes) |\n| [[item:bottleWater]] | {{item:bottleWater:using[0]:payload:heal}} | {{item:bottleWater:using[0]:payload:sickness}} |\n| [[item:bottleHoney]] | {{item:bottleHoney:using[1]:payload:heal}} | {{item:bottleHoney:using[1]:payload:sickness}} |\n| [[item:bottleSap]] | {{item:bottleSap:using[1]:payload:heal}} | {{item:bottleSap:using[1]:payload:sickness}} |\n| [[item:bolete]] | {{item:bolete:using[0]:payload:heal}} | {{item:bolete:using[0]:payload:sickness}} |\n| [[item:pinkMycenia]] | {{item:pinkMycenia:using[0]:payload:heal}} | {{item:pinkMycenia:using[0]:payload:sickness}} |'
+  // table des potions de soin
+  healthPotionsLine: '| [[item:{1}]] | {{item:{1}:star|star}} | {{item:{1}:using[{2}]:payload:heal}} | {{item:{1}:using[{2}]:payload:sickness}} |',
+  healthPotions: '| Item | Tier | Health Restored | Sickness Duration (in-game minutes) |\n<<healthPotionsLine|bottleWater|0>>\n<<healthPotionsLine|bolete|0>>\n<<healthPotionsLine|pinkMycenia|0>>\n<<healthPotionsLine|lesserHealingPotion|0>>\n<<healthPotionsLine|bottleHoney|1>>\n<<healthPotionsLine|bottleSap|1>>\n<<healthPotionsLine|standardHealingPotion|0>>\n<<healthPotionsLine|greaterHealingPotion|0>>\n<<healthPotionsLine|superHealingPotion|0>>'
 }
 
 /* ====================================================================================================
@@ -5226,6 +5229,11 @@ Parler d'abord du Glass, puis des Bottles.
 
 **Bottle Usages**
 
+* Used in many Food or Potion recipes aa container
+* Consuming those Food or Potion place back the empty bottle in your [[Inventory]]
+* Bottles can be filled with Water, Honey or Sap. You get [[item:bottleWater]], [[item:bottleHoney]] or [[item:bottleSap]] in your [[Inventory]]
+* Empty or filled Bottles can be placed on any flat-surfaced furniture ([[Wooden Table]], [[Woodworking|Workbench]], etc.) as decorative items
+
 ⏳
 
 **Glass Usages**
@@ -5291,7 +5299,17 @@ Parler d'abord du Glass, puis des Bottles.
     category: ['Crafting Ingredients'],
     content: `
 Dropped by [[monster:slime|Slimes]]
-Used to craft [[item:torch]].
+
+**Usage**
+
+* Crafting ingredient:
+
+| Item | Tier | Crafting Station | Ingredients |
+| --- | --- | --- | --- |
+<<fullRecipeRow|torch>>
+<<fullRecipeRow|lesserHealingPotion>>
+
+
     `
   },
   {
@@ -5724,8 +5742,8 @@ Coming soon.
 |---|---|---|---|
 | [[item:egg]] | {{item:egg:star|star}} | Chopping/Shaking [[item:oak]] | Food (*)<br>Food Ingredient⏳ |
 | [[item:eggMaleo]] | {{item:eggMaleo:star|star}} | Chopping/Shaking [[item:mahogany]] | ⏳ |
-| [[item:eggSpider]] | {{item:eggSpider:star|star}} | Mining [[node:web]] | Potions |
-| [[item:eggSnake]] | {{item:eggSnake:star|star}} | ⏳ | ⏳ |
+| [[item:eggSpider]] | {{item:eggSpider:star|star}} | Mining [[node:web]] | [[item:greaterHealingPotion]]<br>Potions⏳ |
+| [[item:eggSnake]] | {{item:eggSnake:star|star}} | ⏳ | [[item:superHealingPotion]]<br>Potions⏳ |
 
 _(*) Swallowing an [[item:egg]] grants the [[Food Buff|'Well Fed' buff]] for {{item:egg:using[0]:duration|time}}._
 
@@ -5783,7 +5801,7 @@ Fruits are food ingredient in many recipes.
 `
   },
   // ── Potions ──────────────────────────────────────────────────
-  //    Potions
+  //    Potions, Healing Potions
   {
     title: 'Potions',
     category: ['Gameplay'],
@@ -5791,20 +5809,60 @@ Fruits are food ingredient in many recipes.
 **Description**
 
 ⏳
-**Health Potion**
 
-Health Potions instantly restore [[Health]], but also apply the Sickness debuff for a certain duration. While Sickness is active, any other healing item is consumed without effect.
+<hr>
+
+**Healing Potions**
+
+Healing Potions instantly restore [[Health]], but also apply the Sickness debuff for a certain duration. While Sickness is active, any other healing item is consumed without effect.
+
+Details about [[Healing Potion]]s.
+
+<hr>
+
+Other Potion descriptions coming soon.⏳
+
+  `
+  },
+  {
+    title: 'Healing Potions',
+    category: ['Potion'],
+    content: `
+**Description**
+
+Healing Potions are consumables which restore Health. But you cannot drink such potions too often.
+
+Mushrooms are a key ingredient for major Healing Potions. The strongest Healing Potions have to be stabilized with egg albumen.
+
+<hr>
+
+**Sickness debuff**
+
+Healing Potions instantly restore [[Health]], but also apply the Sickness debuff for a certain duration. While Sickness is active, any other healing item is consumed without effect.
+
+<hr>
+
+**Healing Potion List**
 
 <<healthPotions>>
 
-Some Health Potion grants additionnal benefits:
+Some Healing Potions grant additional effects:
 
 | Potion Name | Potion Tier | Benefits |
 | --- | --- | --- |
 | [[item:bottleHoney]] | {{item:bottleHoney:star|star}} | -{{buff:honey}}% Movement Speed |
 | [[item:bottleSap]] | {{item:bottleSap:star|star}} | -{{buff:sap}}% Movement Speed |
 
-_Note: early game Surface Mushrooms ([[item:bolete]], [[item:pinkMycenia]]) also restore Health and apply Sickness._
+<hr>
+
+**Healing Potion Recipes**
+
+| Potion | Tier | Crafting Station | Ingredients |
+| --- | --- | --- | --- |
+<<fullRecipeRow|lesserHealingPotion>>
+<<fullRecipeRow|standardHealingPotion>>
+<<fullRecipeRow|greaterHealingPotion>>
+<<fullRecipeRow|superHealingPotion>>
   `
   },
 
@@ -6325,6 +6383,13 @@ _All times are in-game. See [[Day & Night Cycle]] for reference._
 | [[item:bolete]] | {{item:bolete:using[0]:payload:heal}} | {{item:bolete:using[0]:payload:sickness}} |
 | [[item:pinkMycenia]] | {{item:pinkMycenia:using[0]:payload:heal}} | {{item:pinkMycenia:using[0]:payload:sickness}} |'
 
+* Crafting ingredient for [[Healing Potions]]:
+
+| Potion | Tier | Crafting Station | Ingredients |
+| --- | --- | --- | --- |
+<<fullRecipeRow|lesserHealingPotion>>
+<<fullRecipeRow|standardHealingPotion>>
+
 * Crafting ingredient for food and Potions. ⏳
 
 <hr>
@@ -6391,13 +6456,22 @@ Foraging Tool: <<itemStar|sickleSilver>>
 
 <hr>
 
-**[[item:mushroomGill]]** ⏳
+**[[item:mushroomGill]]**
 
-* Foraged from: [[item:frostcap]], [[item:dawncap]] and [[node:grassMushroom]]⏳
-* Obtained by shaking: [[item:giantMushroom]]⏳
+* Foraged from: [[item:frostcap]], [[item:dawncap]] and [[node:grassMushroom]]
 * Usage:
   * Food: Can be fried or boiled in a [[item:cookingPot]] ⏳
+  * Key ingredient of [[item:greaterHealingPotion]]
   * Leather: A robust crafting material once tanned at a [[item:tanningRack]] ⏳
+
+<hr>
+
+**[[item:mushroomSpore]]**
+
+* Foraged from: [[item:frostcap]], [[item:dawncap]] and [[node:grassMushroom]]
+* Usage:
+  * Key ingredient of [[item:superHealingPotion]]
+  * Coming Soon ⏳
 
 <hr>
 
@@ -7545,6 +7619,14 @@ _For detailed information on each monster, click its name._
 
 Note: those ingredients can also be dropped by [[Mining]] [[Cobweb]] with any [[Mining Tools|Pickaxe]].
 
+<hr>
+
+**Usage**
+
+* [[item:spiderEgg]] is an ingredient of [[item:greaterHealingPotion]].
+
+<hr>
+
 **Tips**
 
 * if you are looking for [[item:silk]], prefers [[Mining]] [[Cobweb]] as the drop rate is far better
@@ -8583,19 +8665,27 @@ Les tools sont des items placés dans la hotbar pour être utilisé pour perform
    POST-TRAITEMENTS
    ==================================================================================================== */
 
-// 1. Remplacement textuel des <<...>> par le template correspondant.
+// 1. Remplacement textuel des <<...>> par le template correspondant, pris dans `templates`.
 // ⚠️ est injecté si le template ou un paramètre est manquant.
-const expandTemplates = (content) =>
+const expandTemplates = (content, templates) =>
   content.replace(/<<(\w+)\|?([^>]*)>>/g, (_, name, params) => {
-    const template = HELP_TEMPLATES[name]
+    const template = templates[name]
     if (!template) return `⚠️ template inconnu: ${name}`
     const args = params ? params.split('|') : []
     return template.replace(/\{(\d+)\}/g, (_, i) => args[parseInt(i) - 1] ?? `⚠️ param {${i}} manquant`)
   })
 
-// Expansion au chargement
+// 1.1 Pré-expansion d'un niveau d'imbrication, depuis les corps originaux.
+// ⚠️ remplace le corps d'un template qui contient encore un template après expansion (2ᵉ niveau interdit).
+const EXPANDED_TEMPLATES = {}
+for (const name in HELP_TEMPLATES) {
+  const body = expandTemplates(HELP_TEMPLATES[name], HELP_TEMPLATES)
+  EXPANDED_TEMPLATES[name] = body.includes('<<') ? `⚠️ template trop imbriqué: ${name}` : body
+}
+
+// 1.3 Expansion au chargement
 for (const entry of HELP) {
-  entry.content = expandTemplates(entry.content)
+  entry.content = expandTemplates(entry.content, EXPANDED_TEMPLATES)
 }
 
 // 2. Liste complète de tous les topics de l'aide

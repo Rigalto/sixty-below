@@ -601,7 +601,6 @@ export const ITEMS = {
     chopping: {speed: 2200, items: [{item: 'mushroomFiber', count: '5-9'}, {item: 'mycellium', count: 0.75}], extraLoot: {items: [{item: 'mycellium', count: '2-5', buffs: ['+felling']}]}},
     shaking: {speed: 2200, items: [{item: 'mushroomFiber', count: 0.65}, {item: 'slug', count: 0.25}, {item: 'goldSlug', count: 0.01, buffs: ['+lucky']}]}
   },
-  mushroomSpore: {name: 'Mushroom Spore', type: ITEM_TYPE.SEED | ITEM_TYPE.PLACABLE, stype: 'herb', star: 4, image: 'foraged_32_32-6-6', help: 'Mushroom Cave', tooltip: '???'},
   mycellium: {name: 'Mycellium', type: ITEM_TYPE.SEED | ITEM_TYPE.PLACABLE, stype: 'herb', star: 4, image: 'foraged_32_32-5-6', help: 'Mushroom Cave', tooltip: '???'},
   mushroomFiber: {name: 'Mushroom Fiber', type: 0, stype: 'herb', star: 4, image: 'foraged_32_32-7-6', help: 'Mushroom Cave', tooltip: '???'},
 
@@ -611,6 +610,7 @@ export const ITEMS = {
   frostcap: {name: 'Frostcap', type: 0, stype: 'mushroom', star: 3, image: null, placed: 'placed_16_32-0-1', help: 'Cave Mushrooms', tooltip: '???', foraging: {speed: 2400, items: [{item: 'mushroomGill', count: '2-5'}, {item: 'mushroomSpore', count: 0.8, buffs: ['lucky:50']}, {item: 'snail', count: 0.3, buffs: ['lucky:100', 'rainy:100']}]}},
   dawncap: {name: 'Dawncap', type: 0, stype: 'mushroom', star: 3, image: null, placed: 'placed_16_32-1-1', help: 'Cave Mushrooms', tooltip: '???', foraging: {speed: 2400, items: [{item: 'mushroomGill', count: '2-5'}, {item: 'mushroomSpore', count: 0.8, buffs: ['lucky:50']}, {item: 'snail', count: 0.3, buffs: ['lucky:100', 'rainy:100']}]}},
   mushroomGill: {name: 'Mushroom Gill', type: 0, stype: 'mushroom', star: 3, image: 'foraged_32_32-7-0', help: 'Cave Mushrooms', tooltip: '???'},
+  mushroomSpore: {name: 'Mushroom Spore', type: ITEM_TYPE.SEED | ITEM_TYPE.PLACABLE, stype: 'herb', star: 4, image: 'foraged_32_32-6-6', help: 'Cave Mushroom', tooltip: '???'},
 
   // Herbs
   parsnip: {name: 'Parsnip', type: 0, stype: 'herb', star: 1, image: 'foraged_32_32-6-1', placed: 'placed_16_16-0-0', help: 'Parsnip', tooltip: '???', foraging: {speed: 1800, items: [{item: 'parsnip', count: '1-3'}]}},
@@ -808,10 +808,10 @@ export const ITEMS = {
   marblewall: {name: 'Marble Wall', type: ITEM_TYPE.WALL, stype: 'wall', star: 4, image: 'armor_32_32-5-3', help: 'Background Wall', tooltip: 'Shelter inner walls'},
 
   // Healing Potions - images NOK, help NOK
-  lesserHealingPotion: {name: 'Lesser Healing Potion', type: ITEM_TYPE.POTION | ITEM_TYPE.USABLE, stype: 'healing', star: 1, image: 'potion_32_32-1-0', help: 'Drinks', tooltip: 'Restores 50 health when used', using: [{action: 'emit-event', event: 'potion/heal', payload: {heal: 50, sickness: 45}}, {action: 'add-items', items: [{item: 'bottle', count: 1}]}]},
-  standardHealingPotion: {name: 'Standard Healing Potion', type: ITEM_TYPE.POTION | ITEM_TYPE.USABLE, stype: 'healing', star: 2, image: 'potion_32_32-2-0', help: 'Drinks', tooltip: 'Restores 100 health when used', using: [{action: 'emit-event', event: 'potion/heal', payload: {heal: 100, sickness: 60}}, {action: 'add-items', items: [{item: 'bottle', count: 1}]}]},
-  greaterHealingPotion: {name: 'Greater Healing Potion', type: ITEM_TYPE.POTION | ITEM_TYPE.USABLE, stype: 'healing', star: 3, image: 'potion_32_32-3-0', help: 'Drinks', tooltip: 'Restores 150 health when used', using: [{action: 'emit-event', event: 'potion/heal', payload: {heal: 150, sickness: 60}}, {action: 'add-items', items: [{item: 'bottle', count: 1}]}]},
-  superHealingPotion: {name: 'Super Healing Potion', type: ITEM_TYPE.POTION | ITEM_TYPE.USABLE, stype: 'healing', star: 4, image: 'potion_32_32-4-0', help: 'Drinks', tooltip: 'Restores 250 health when used', using: [{action: 'emit-event', event: 'potion/heal', payload: {heal: 250, sickness: 60}}, {action: 'add-items', items: [{item: 'bottle', count: 1}]}]},
+  lesserHealingPotion: {name: 'Lesser Healing Potion', type: ITEM_TYPE.POTION | ITEM_TYPE.USABLE, stype: 'healing', star: 1, image: 'potion_32_32-1-0', help: 'Healing Potions', tooltip: 'Restores 50 health when used', using: [{action: 'emit-event', event: 'potion/heal', payload: {heal: 50, sickness: 45}}, {action: 'add-items', items: [{item: 'bottle', count: 1}]}]},
+  standardHealingPotion: {name: 'Standard Healing Potion', type: ITEM_TYPE.POTION | ITEM_TYPE.USABLE, stype: 'healing', star: 2, image: 'potion_32_32-2-0', help: 'Healing Potions', tooltip: 'Restores 100 health when used', using: [{action: 'emit-event', event: 'potion/heal', payload: {heal: 100, sickness: 60}}, {action: 'add-items', items: [{item: 'bottle', count: 1}]}]},
+  greaterHealingPotion: {name: 'Greater Healing Potion', type: ITEM_TYPE.POTION | ITEM_TYPE.USABLE, stype: 'healing', star: 3, image: 'potion_32_32-3-0', help: 'Healing Potions', tooltip: 'Restores 150 health when used', using: [{action: 'emit-event', event: 'potion/heal', payload: {heal: 150, sickness: 60}}, {action: 'add-items', items: [{item: 'bottle', count: 1}]}]},
+  superHealingPotion: {name: 'Super Healing Potion', type: ITEM_TYPE.POTION | ITEM_TYPE.USABLE, stype: 'healing', star: 4, image: 'potion_32_32-4-0', help: 'Healing Potions', tooltip: 'Restores 250 health when used', using: [{action: 'emit-event', event: 'potion/heal', payload: {heal: 250, sickness: 60}}, {action: 'add-items', items: [{item: 'bottle', count: 1}]}]},
 
   // healless: {name: 'Lesser Healing Potion', type: ITEM_TYPE.POTION | ITEM_TYPE.USABLE | ITEM_TYPE.CRAFTING, star: 1, sell: 300, image: 'potions_32_32-4-0', heal: 50, sickness: 45, bag: [{item: 'bottle', count: 1}], tooltip: 'Restores 50 health when used', help: 'Healing Potions'},
   // healstd: {name: 'Standard Healing Potion', type: ITEM_TYPE.POTION | ITEM_TYPE.USABLE, star: 3, sell: 900, image: 'potions_32_32-4-1', heal: 100, sickness: 60, bag: [{item: 'bottle', count: 1}], tooltip: 'Restores 100 health when used', help: 'Healing Potions'},
