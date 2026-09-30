@@ -809,9 +809,9 @@ export const ITEMS = {
 
   // Healing Potions - images NOK, help NOK
   lesserHealingPotion: {name: 'Lesser Healing Potion', type: ITEM_TYPE.POTION | ITEM_TYPE.USABLE, stype: 'healing', star: 1, image: 'potion_32_32-1-0', help: 'Drinks', tooltip: 'Restores 50 health when used', using: [{action: 'emit-event', event: 'potion/heal', payload: {heal: 50, sickness: 45}}, {action: 'add-items', items: [{item: 'bottle', count: 1}]}]},
-  standardHealingPotion: {name: 'Standard Healing Potion', type: ITEM_TYPE.POTION | ITEM_TYPE.USABLE, stype: 'healing', star: 13, image: 'potion_32_32-2-0', help: 'Drinks', tooltip: 'Restores 100 health when used', using: [{action: 'emit-event', event: 'potion/heal', payload: {heal: 100, sickness: 60}}, {action: 'add-items', items: [{item: 'bottle', count: 1}]}]},
-  greaterHealingPotion: {name: 'Greater Healing Potion', type: ITEM_TYPE.POTION | ITEM_TYPE.USABLE, stype: 'healing', star: 4, image: 'potion_32_32-3-0', help: 'Drinks', tooltip: 'Restores 150 health when used', using: [{action: 'emit-event', event: 'potion/heal', payload: {heal: 150, sickness: 60}}, {action: 'add-items', items: [{item: 'bottle', count: 1}]}]},
-  superHealingPotion: {name: 'Super Healing Potion', type: ITEM_TYPE.POTION | ITEM_TYPE.USABLE, stype: 'healing', star: 5, image: 'potion_32_32-4-0', help: 'Drinks', tooltip: 'Restores 250 health when used', using: [{action: 'emit-event', event: 'potion/heal', payload: {heal: 250, sickness: 60}}, {action: 'add-items', items: [{item: 'bottle', count: 1}]}]},
+  standardHealingPotion: {name: 'Standard Healing Potion', type: ITEM_TYPE.POTION | ITEM_TYPE.USABLE, stype: 'healing', star: 2, image: 'potion_32_32-2-0', help: 'Drinks', tooltip: 'Restores 100 health when used', using: [{action: 'emit-event', event: 'potion/heal', payload: {heal: 100, sickness: 60}}, {action: 'add-items', items: [{item: 'bottle', count: 1}]}]},
+  greaterHealingPotion: {name: 'Greater Healing Potion', type: ITEM_TYPE.POTION | ITEM_TYPE.USABLE, stype: 'healing', star: 3, image: 'potion_32_32-3-0', help: 'Drinks', tooltip: 'Restores 150 health when used', using: [{action: 'emit-event', event: 'potion/heal', payload: {heal: 150, sickness: 60}}, {action: 'add-items', items: [{item: 'bottle', count: 1}]}]},
+  superHealingPotion: {name: 'Super Healing Potion', type: ITEM_TYPE.POTION | ITEM_TYPE.USABLE, stype: 'healing', star: 4, image: 'potion_32_32-4-0', help: 'Drinks', tooltip: 'Restores 250 health when used', using: [{action: 'emit-event', event: 'potion/heal', payload: {heal: 250, sickness: 60}}, {action: 'add-items', items: [{item: 'bottle', count: 1}]}]},
 
   // healless: {name: 'Lesser Healing Potion', type: ITEM_TYPE.POTION | ITEM_TYPE.USABLE | ITEM_TYPE.CRAFTING, star: 1, sell: 300, image: 'potions_32_32-4-0', heal: 50, sickness: 45, bag: [{item: 'bottle', count: 1}], tooltip: 'Restores 50 health when used', help: 'Healing Potions'},
   // healstd: {name: 'Standard Healing Potion', type: ITEM_TYPE.POTION | ITEM_TYPE.USABLE, star: 3, sell: 900, image: 'potions_32_32-4-1', heal: 100, sickness: 60, bag: [{item: 'bottle', count: 1}], tooltip: 'Restores 100 health when used', help: 'Healing Potions'},
@@ -942,7 +942,7 @@ export const RECIPES = [
   {result: {item: 'plankOak', count: 4}, station: 'workbench', ingredients: [{item: 'logOak', count: 1}]},
   {result: {item: 'plankMahogany', count: 4}, station: 'workbench', ingredients: [{item: 'logMahogany', count: 1}]},
 
-  // Gems
+  // Fabric
   {result: {item: 'fabric', count: 3}, station: 'loom', ingredients: [{item: 'silk', count: 7}]},
 
   // Crafting Stations
@@ -1032,6 +1032,17 @@ export const RECIPES = [
 
   // Potions
   {result: {item: 'recallPotion', count: 1}, station: 'alchemyTable', ingredients: [{item: 'mandrakeRoot', count: 1}, {item: 'viperVenom', count: 1}, {item: 'silk', count: 1}]},
+  {result: {item: 'lesserHealingPotion', count: 2}, station: 'alchemyTable', ingredients: [{item: 'bolete', count: 1}, {item: 'gel', count: 2}, {item: 'bottleWater', count: 2}]},
+  {result: {item: 'standardHealingPotion', count: 2}, station: 'alchemyTable', ingredients: [{item: 'lesserHealingPotion', count: 2}, {item: 'pinkMycenia', count: 1}]},
+  {result: {item: 'greaterHealingPotion', count: 3}, station: 'alchemyTable', ingredients: [{item: 'mushroomGill', count: 1}, {item: 'eggSpider', count: 1}, {item: 'bottleWater', count: 3}]},
+  {result: {item: 'superHealingPotion', count: 4}, station: 'alchemyTable', ingredients: [{item: 'mushroomSpore', count: 1}, {item: 'eggSnake', count: 1}, {item: 'bottleWater', count: 4}]},
+
+  // {output: 'healstd', station: 'potiontable', recipe: [{item: 'mushj', count: 1}, {item: 'healless', count: 2}, {item: 'water', count: 1}]},
+  // {output: 'healgreat', station: 'potiontable', recipe: [{item: 'mushm', count: 1}, {item: 'healless', count: 3}, {item: 'water', count: 1}]},
+  // {output: 'healsuper', station: 'potiontable', recipe: [{item: 'spideregg', count: 2}, {item: 'fireblossom', count: 3}, {item: 'healless', count: 4}, {item: 'water', count: 1}]},
+  // {output: 'lessluck', station: 'potiontable', recipe: [{item: 'pearlw', count: 1}, {item: 'waterleaf', count: 1}, {item: 'ladybug', count: 1}, {item: 'water', count: 2}], built: 2},
+  // {output: 'stdluck', station: 'potiontable', recipe: [{item: 'pearlb', count: 1}, {item: 'waterleaf', count: 1}, {item: 'ladybug', count: 1}, {item: 'water', count: 2}], built: 2},
+  // {output: 'greatluck', station: 'potiontable', recipe: [{item: 'pearlp', count: 1}, {item: 'waterleaf', count: 1}, {item: 'ladybug', count: 1}, {item: 'water', count: 2}], built: 2},
 
   // Food - Tier 1-3
   {result: {item: 'sunflowerOil', count: 1}, station: 'tableWood', ingredients: [{item: 'sunflowerSeed', count: 1}]},
