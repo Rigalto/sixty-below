@@ -5597,13 +5597,6 @@ _The Sickness debuff is applied after consuming these items, preventing the use 
   // ── Items & Crafting ─────────────────────────────────────────
   // ── Fauna & Critters ─────────────────────────────────────────
   // ── Buffs & Debuffs ──────────────────────────────────────────
-  //    Luck Buff
-  {
-    title: 'Luck Buff',
-    category: ['Buff'],
-    content: `
-    `
-  },
 
   // ── Leather ────────────────────────────────────────────────
   {
@@ -5801,10 +5794,10 @@ Fruits are food ingredient in many recipes.
 `
   },
   // ── Potions ──────────────────────────────────────────────────
-  //    Potions, Healing Potions
+  //    Potions, Healing Potions, Lucky Potions
   {
     title: 'Potions',
-    category: ['Gameplay'],
+    category: ['Gameplay', 'Potion'],
     content: `
 **Description**
 
@@ -5816,7 +5809,15 @@ Fruits are food ingredient in many recipes.
 
 Healing Potions instantly restore [[Health]], but also apply the Sickness debuff for a certain duration. While Sickness is active, any other healing item is consumed without effect.
 
-Details about [[Healing Potions]]s.
+Details about [[Healing Potions]].
+
+<hr>
+
+**Lucky Potions**
+
+Lucky Potions grant the Lucky Buff. While this buff is active, the drop rate of most collectable items is increased.
+
+Details about [[Lucky Potions]].
 
 <hr>
 
@@ -5863,6 +5864,43 @@ Some Healing Potions grant additional effects:
 <<fullRecipeRow|standardHealingPotion>>
 <<fullRecipeRow|greaterHealingPotion>>
 <<fullRecipeRow|superHealingPotion>>
+  `
+  },
+  {
+    title: 'Lucky Potions',
+    category: ['Potion'],
+    content: `
+**Description**
+
+Lucky Potions are consumables which grant the Lucky Buff. While this buff is active, the drop rate of most collectable items is increased.
+
+Some very rare items can only be looted while the Lucky Buff is active.
+
+<hr>
+
+**Lucky Buff Duration**
+
+Drinking a Lucky Potion while the Lucky Buff is already active adds its duration to the remaining time.
+
+| Potion Name | Potion Tier | Lucky Buff Duration |
+| --- | --- | --- |
+| [[item:lesserLuckyPotion]] | {{item:lesserLuckyPotion:star|star}} | {{item:lesserLuckyPotion:using[0]:duration|time}} |
+| [[item:standardLuckyPotion]] | {{item:standardLuckyPotion:star|star}} | {{item:standardLuckyPotion:using[0]:duration|time}} |
+| [[item:greaterLuckyPotion]] | {{item:greaterLuckyPotion:star|star}} | {{item:greaterLuckyPotion:using[0]:duration|time}} |
+
+<hr>
+
+**Lucky Potion Recipes**
+
+| Potion | Tier | Crafting Station | Ingredients |
+| --- | --- | --- | --- |
+<<fullRecipeRow|lesserLuckyPotion>>
+<<fullRecipeRow|standardLuckyPotion>>
+<<fullRecipeRow|greaterLuckyPotion>>
+
+* _Pearls are obtained by opening [[item:oyster]]s._
+* _A [[item:bottleWater]] is filled in a lake or in the sea._
+* _Plants are harvested by [[Foraging]] with a [[Foraging Tools|Sickle]]._
   `
   },
 
@@ -6527,17 +6565,21 @@ Foraging Tool: <<itemStar|sickleCopper>> or better
 
 <hr>
 
-**Usages** ⏳
+**Usages**
 
-* [[item:parsnip]] — food (when used, give +20 Health during 1 in-game hour)
-* [[item:parsnip]] — crafting ingredient ⏳
-* [[item:parsnipMash]] — when used, give +20 Health and +10 Max Health during 2 in-game hours)
-* [[item:vegetableSoup]] — when used, give +20 Health and ???
+Crafting Ingredient:
+
+* [[item:lesserLuckyPotion]] — when used, grants Lucky Buff for {{item:lesserLuckyPotion:using[0]:duration|time}}
+* [[item:parsnipMash]] — when used, give Well Fed Buff for ⏳
+* [[item:vegetableSoup]] — when used, give Well Fed Buff for ⏳
 
 **Recipes** ⏳
 
-* [[item:parsnipMash]]
-* [[item:vegetableSoup]]
+| Potion | Tier | Crafting Station | Ingredients |
+| --- | --- | --- | --- |
+<<fullRecipeRow|lesserLuckyPotion>>
+<<fullRecipeRow|parsnipMash>>
+<<fullRecipeRow|vegetableSoup>>
 
 <hr>
 
@@ -7086,9 +7128,21 @@ Foraging Tool: <<itemStar|sickleSilver>> or better
 
 **Usages** ⏳
 
-* [[item:pricklepadPear]] — food and crafting ingredient ⏳
-* [[item:cactusFiber]] — crafting ingredient ⏳
-* [[item:cactusSpine]] — crafting ingredient ⏳
+* [[item:pricklepadPear]] :
+
+| Potion | Tier | Crafting Station | Ingredients |
+| --- | --- | --- | --- |
+<<fullRecipeRow|greaterLuckyPotion>>
+
+* [[item:cactusFiber]] :
+
+| Potion | Tier | Crafting Station | Ingredients |
+| --- | --- | --- | --- |
+
+* [[item:cactusSpine]] :
+
+| Potion | Tier | Crafting Station | Ingredients |
+| --- | --- | --- | --- |
 
 <hr>
 
@@ -7532,7 +7586,11 @@ Foraging Tool: <<itemStar|sickleSilver>> or better
 
 **Usages** ⏳
 
-* [[item:gravelweed]] — crafting ingredient ⏳
+Crafting Ingredients:
+
+| Potion / Food | Tier | Crafting Station | Ingredients |
+| --- | --- | --- | --- |
+<<fullRecipeRow|standardLuckyPotion>>
 
 <hr>
 

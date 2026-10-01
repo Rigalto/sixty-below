@@ -653,7 +653,7 @@ export const ITEMS = {
   shuckedOyster: {name: 'Shucked Oyster', type: ITEM_TYPE.FOOD, stype: 'food', star: 2, image: 'foraged_32_32-3-4', help: 'Oyster', tooltip: 'Minor improvements to all stats (10 minutes)'},
   pearlWhite: {name: 'White Pearl', type: 0, stype: 'pearl', star: 1, image: 'foraged_32_32-4-4', help: 'Oyster', tooltip: 'Major ingredient of Luck Potion'},
   pearlBlack: {name: 'Black Pearl', type: 0, stype: 'pearl', star: 2, image: 'foraged_32_32-5-4', help: 'Oyster', tooltip: 'Major ingredient of Luck Potion'},
-  pearlPink: {name: 'Black Pink', type: 0, stype: 'pearl', star: 3, image: 'foraged_32_32-6-4', help: 'Oyster', tooltip: 'Major ingredient of Luck Potion'},
+  pearlPink: {name: 'Pink Pearl', type: 0, stype: 'pearl', star: 3, image: 'foraged_32_32-6-4', help: 'Oyster', tooltip: 'Major ingredient of Luck Potion'},
 
   mandrake: {name: 'Mandrake', type: 0, stype: 'herb', star: 2, image: null, placed: 'placed_32_32-5-0', speed: 1900, foraging: {speed: 500, items: [{item: 'mandrakeRoot', count: 1}, {item: 'slug', count: 0.12, buffs: ['lucky:100', 'rainy:300']}]}, help: 'Mandrake', tooltip: 'Harvest to collect Potions and Food ingredients'},
   mandrakeRoot: {name: 'Mandrake Root', type: 0, stype: 'herb', star: 3, image: 'foraged_32_32-7-4', help: 'Mandrake', tooltip: 'Crafting Material for Potions and Food'},
@@ -814,9 +814,9 @@ export const ITEMS = {
   superHealingPotion: {name: 'Super Healing Potion', type: ITEM_TYPE.POTION | ITEM_TYPE.USABLE, stype: 'healing', star: 4, image: 'potion_32_32-4-0', help: 'Healing Potions', tooltip: 'Restores 250 health when used', using: [{action: 'emit-event', event: 'potion/heal', payload: {heal: 250, sickness: 60}}, {action: 'add-items', items: [{item: 'bottle', count: 1}]}]},
 
   // Lucky Potions - help NOK
-  lesserLuckyPotion: {name: 'Lesser Lucky Potion', type: ITEM_TYPE.POTION | ITEM_TYPE.USABLE, stype: 'luck', star: 1, image: 'potion_32_32-5-0', help: 'Healing Potions', tooltip: 'Grants Lucky Buff for 1 in-game hour', using: [{action: 'buff-timed', buff: 'lucky', duration: 60}, {action: 'add-items', items: [{item: 'bottle', count: 1}]}]},
-  standardLuckyPotion: {name: 'Standard Lucky Potion', type: ITEM_TYPE.POTION | ITEM_TYPE.USABLE, stype: 'luck', star: 2, image: 'potion_32_32-6-0', help: 'Healing Potions', tooltip: 'Grants Lucky Buff for 8 in-game hour', using: [{action: 'buff-timed', buff: 'lucky', duration: 480}, {action: 'add-items', items: [{item: 'bottle', count: 1}]}]},
-  greaterLuckyPotion: {name: 'Greater Lucky Potion', type: ITEM_TYPE.POTION | ITEM_TYPE.USABLE, stype: 'luck', star: 3, image: 'potion_32_32-7-0', help: 'Healing Potions', tooltip: 'Grants Lucky Buff for 24 in-game hour', using: [{action: 'buff-timed', buff: 'lucky', duration: 1440}, {action: 'add-items', items: [{item: 'bottle', count: 1}]}]},
+  lesserLuckyPotion: {name: 'Lesser Lucky Potion', type: ITEM_TYPE.POTION | ITEM_TYPE.USABLE, stype: 'luck', star: 1, image: 'potion_32_32-5-0', help: 'Lucky Potions', tooltip: 'Grants Lucky Buff for 1 in-game hour', using: [{action: 'buff-timed', buff: 'lucky', duration: 60}, {action: 'add-items', items: [{item: 'bottle', count: 1}]}]},
+  standardLuckyPotion: {name: 'Standard Lucky Potion', type: ITEM_TYPE.POTION | ITEM_TYPE.USABLE, stype: 'luck', star: 2, image: 'potion_32_32-6-0', help: 'Lucky Potions', tooltip: 'Grants Lucky Buff for 8 in-game hour', using: [{action: 'buff-timed', buff: 'lucky', duration: 480}, {action: 'add-items', items: [{item: 'bottle', count: 1}]}]},
+  greaterLuckyPotion: {name: 'Greater Lucky Potion', type: ITEM_TYPE.POTION | ITEM_TYPE.USABLE, stype: 'luck', star: 3, image: 'potion_32_32-7-0', help: 'Lucky Potions', tooltip: 'Grants Lucky Buff for 24 in-game hour', using: [{action: 'buff-timed', buff: 'lucky', duration: 1440}, {action: 'add-items', items: [{item: 'bottle', count: 1}]}]},
 
   // Drinks - images NOK
   ale: {name: 'Ale', type: ITEM_TYPE.FOOD | ITEM_TYPE.USABLE, stype: 'drink', star: 2, image: 'armor_32_32-5-3', help: 'Drinks', tooltip: 'Increase your Melee caracteristics', using: [{action: 'buff-timed', buff: 'tipsy', duration: 600}]}
