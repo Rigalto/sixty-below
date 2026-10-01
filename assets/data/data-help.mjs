@@ -3287,7 +3287,12 @@ Unlike [[Trinkets]], Accessories must be placed in a dedicated Accessory slot in
     content: `
 **Description**
 
-⏳
+Trinkets are small instruments that improve your user interface by displaying useful information in the [[Control Panel]]: time, [[Weather]] forecast, [[Moon Phases]], your position or your movement speed.
+
+Unlike [[Accessories]], Trinkets have no effect on the world itself or on your character's abilities. They only reveal or refine information shown in the [[Environment Panel]].
+
+Higher-tier Trinkets combine the effects of several basic ones, which frees up space in your bag.
+
 
 **How to Use**
 

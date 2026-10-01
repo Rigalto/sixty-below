@@ -819,7 +819,7 @@ export const ITEMS = {
   greaterLuckyPotion: {name: 'Greater Lucky Potion', type: ITEM_TYPE.POTION | ITEM_TYPE.USABLE, stype: 'luck', star: 3, image: 'potion_32_32-7-0', help: 'Lucky Potions', tooltip: 'Grants Lucky Buff for 24 in-game hour', using: [{action: 'buff-timed', buff: 'lucky', duration: 1440}, {action: 'add-items', items: [{item: 'bottle', count: 1}]}]},
 
   // Drinks - images NOK
-  ale: {name: 'Ale', type: ITEM_TYPE.FOOD | ITEM_TYPE.USABLE, stype: 'drink', star: 2, image: 'armor_32_32-5-3', help: 'Drinks', tooltip: 'Increase your Melee caracteristics', using: [{action: 'buff-timed', buff: 'tipsy', duration: 600}]}
+  ale: {name: 'Ale', type: ITEM_TYPE.FOOD | ITEM_TYPE.USABLE, stype: 'drink', star: 2, image: 'food_32_32-2-1', help: 'Drinks', tooltip: 'Increase your Melee caracteristics', using: [{action: 'buff-timed', buff: 'tipsy', duration: 600}]}
 }
 
 /* ============================================================================
