@@ -5816,7 +5816,7 @@ Fruits are food ingredient in many recipes.
 
 Healing Potions instantly restore [[Health]], but also apply the Sickness debuff for a certain duration. While Sickness is active, any other healing item is consumed without effect.
 
-Details about [[Healing Potion]]s.
+Details about [[Healing Potions]]s.
 
 <hr>
 

@@ -610,7 +610,7 @@ export const ITEMS = {
   frostcap: {name: 'Frostcap', type: 0, stype: 'mushroom', star: 3, image: null, placed: 'placed_16_32-0-1', help: 'Cave Mushrooms', tooltip: '???', foraging: {speed: 2400, items: [{item: 'mushroomGill', count: '2-5'}, {item: 'mushroomSpore', count: 0.8, buffs: ['lucky:50']}, {item: 'snail', count: 0.3, buffs: ['lucky:100', 'rainy:100']}]}},
   dawncap: {name: 'Dawncap', type: 0, stype: 'mushroom', star: 3, image: null, placed: 'placed_16_32-1-1', help: 'Cave Mushrooms', tooltip: '???', foraging: {speed: 2400, items: [{item: 'mushroomGill', count: '2-5'}, {item: 'mushroomSpore', count: 0.8, buffs: ['lucky:50']}, {item: 'snail', count: 0.3, buffs: ['lucky:100', 'rainy:100']}]}},
   mushroomGill: {name: 'Mushroom Gill', type: 0, stype: 'mushroom', star: 3, image: 'foraged_32_32-7-0', help: 'Cave Mushrooms', tooltip: '???'},
-  mushroomSpore: {name: 'Mushroom Spore', type: ITEM_TYPE.SEED | ITEM_TYPE.PLACABLE, stype: 'herb', star: 4, image: 'foraged_32_32-6-6', help: 'Cave Mushroom', tooltip: '???'},
+  mushroomSpore: {name: 'Mushroom Spore', type: ITEM_TYPE.SEED | ITEM_TYPE.PLACABLE, stype: 'herb', star: 4, image: 'foraged_32_32-6-6', help: 'Cave Mushrooms', tooltip: '???'},
 
   // Herbs
   parsnip: {name: 'Parsnip', type: 0, stype: 'herb', star: 1, image: 'foraged_32_32-6-1', placed: 'placed_16_16-0-0', help: 'Parsnip', tooltip: '???', foraging: {speed: 1800, items: [{item: 'parsnip', count: '1-3'}]}},
@@ -651,15 +651,15 @@ export const ITEMS = {
 
   oyster: {name: 'Oyster', type: ITEM_TYPE.USABLE, stype: 'food', star: 2, image: 'foraged_32_32-2-4', help: 'Oyster', tooltip: 'Open it to eat and collect pearls', using: [{action: 'add-items', items: [{item: 'shuckedOyster', count: 1}, {item: 'pearlWhite', count: 0.25, buffs: ['lucky:60']}, {item: 'pearlBlack', count: 0.15, buffs: ['lucky:50']}, {item: 'pearlPink', count: 0.05, buffs: ['lucky:40']}]}]},
   shuckedOyster: {name: 'Shucked Oyster', type: ITEM_TYPE.FOOD, stype: 'food', star: 2, image: 'foraged_32_32-3-4', help: 'Oyster', tooltip: 'Minor improvements to all stats (10 minutes)'},
-  pearlWhite: {name: 'White Pearl', type: 0, stype: 'pearl', star: 2, image: 'foraged_32_32-4-4', help: 'Oyster', tooltip: 'Major ingredient of Luck Potion'},
-  pearlBlack: {name: 'Black Pearl', type: 0, stype: 'pearl', star: 3, image: 'foraged_32_32-5-4', help: 'Oyster', tooltip: 'Major ingredient of Luck Potion'},
-  pearlPink: {name: 'Black Pink', type: 0, stype: 'pearl', star: 4, image: 'foraged_32_32-6-4', help: 'Oyster', tooltip: 'Major ingredient of Luck Potion'},
+  pearlWhite: {name: 'White Pearl', type: 0, stype: 'pearl', star: 1, image: 'foraged_32_32-4-4', help: 'Oyster', tooltip: 'Major ingredient of Luck Potion'},
+  pearlBlack: {name: 'Black Pearl', type: 0, stype: 'pearl', star: 2, image: 'foraged_32_32-5-4', help: 'Oyster', tooltip: 'Major ingredient of Luck Potion'},
+  pearlPink: {name: 'Black Pink', type: 0, stype: 'pearl', star: 3, image: 'foraged_32_32-6-4', help: 'Oyster', tooltip: 'Major ingredient of Luck Potion'},
 
   mandrake: {name: 'Mandrake', type: 0, stype: 'herb', star: 2, image: null, placed: 'placed_32_32-5-0', speed: 1900, foraging: {speed: 500, items: [{item: 'mandrakeRoot', count: 1}, {item: 'slug', count: 0.12, buffs: ['lucky:100', 'rainy:300']}]}, help: 'Mandrake', tooltip: 'Harvest to collect Potions and Food ingredients'},
   mandrakeRoot: {name: 'Mandrake Root', type: 0, stype: 'herb', star: 3, image: 'foraged_32_32-7-4', help: 'Mandrake', tooltip: 'Crafting Material for Potions and Food'},
 
   pricklepad: {name: 'Pricklepad', type: 0, stype: 'herb', star: 3, image: null, placed: 'placed_32_32-0-3', help: 'Pricklepad', tooltip: '???', foraging: {speed: 1800, items: [{item: 'pricklepadPear', count: '1-3'}, {item: 'cactusSpine', count: 0.80}, {item: 'cactusFiber', count: 1.80}]}},
-  pricklepadPear: {name: 'Pricklepad Pear', type: 0, stype: 'herb', star: 2, image: 'foraged_32_32-7-3', help: 'Pricklepad', tooltip: '???'},
+  pricklepadPear: {name: 'Pricklepad Pear', type: 0, stype: 'herb', star: 3, image: 'foraged_32_32-7-3', help: 'Pricklepad', tooltip: '???'},
 
   bamboo: {name: 'Bamboo', type: 0, stype: 'herb', star: 2, image: null, placed: 'placed_16_64-0-0', help: 'Bamboo', tooltip: '???', foraging: {speed: 1800, items: [{item: 'bambooStalk', count: '1-2', buffs: ['lucky:50']}, {item: 'bambooShoot', count: 0.80, buffs: ['lucky:50']}, {item: 'slug', count: 0.20, buffs: ['lucky:100', 'rainy:100']}]}},
   bamboo1: {name: 'Bamboo', type: 0, stype: 'herb', star: 2, image: null, placed: 'placed_16_64-1-0', help: 'Bamboo', tooltip: '???', foraging: {speed: 1800, items: [{item: 'bambooStalk', count: '1-2', buffs: ['lucky:50']}, {item: 'bambooShoot', count: 0.80, buffs: ['lucky:50']}, {item: 'slug', count: 0.20, buffs: ['lucky:100', 'rainy:100']}]}},
@@ -807,16 +807,16 @@ export const ITEMS = {
   granitewall: {name: 'Granite Wall', type: ITEM_TYPE.WALL, stype: 'wall', star: 4, image: 'armor_32_32-5-3', help: 'Background Wall', tooltip: 'Shelter inner walls'},
   marblewall: {name: 'Marble Wall', type: ITEM_TYPE.WALL, stype: 'wall', star: 4, image: 'armor_32_32-5-3', help: 'Background Wall', tooltip: 'Shelter inner walls'},
 
-  // Healing Potions - images NOK, help NOK
+  // Healing Potions - images OK
   lesserHealingPotion: {name: 'Lesser Healing Potion', type: ITEM_TYPE.POTION | ITEM_TYPE.USABLE, stype: 'healing', star: 1, image: 'potion_32_32-1-0', help: 'Healing Potions', tooltip: 'Restores 50 health when used', using: [{action: 'emit-event', event: 'potion/heal', payload: {heal: 50, sickness: 45}}, {action: 'add-items', items: [{item: 'bottle', count: 1}]}]},
   standardHealingPotion: {name: 'Standard Healing Potion', type: ITEM_TYPE.POTION | ITEM_TYPE.USABLE, stype: 'healing', star: 2, image: 'potion_32_32-2-0', help: 'Healing Potions', tooltip: 'Restores 100 health when used', using: [{action: 'emit-event', event: 'potion/heal', payload: {heal: 100, sickness: 60}}, {action: 'add-items', items: [{item: 'bottle', count: 1}]}]},
   greaterHealingPotion: {name: 'Greater Healing Potion', type: ITEM_TYPE.POTION | ITEM_TYPE.USABLE, stype: 'healing', star: 3, image: 'potion_32_32-3-0', help: 'Healing Potions', tooltip: 'Restores 150 health when used', using: [{action: 'emit-event', event: 'potion/heal', payload: {heal: 150, sickness: 60}}, {action: 'add-items', items: [{item: 'bottle', count: 1}]}]},
   superHealingPotion: {name: 'Super Healing Potion', type: ITEM_TYPE.POTION | ITEM_TYPE.USABLE, stype: 'healing', star: 4, image: 'potion_32_32-4-0', help: 'Healing Potions', tooltip: 'Restores 250 health when used', using: [{action: 'emit-event', event: 'potion/heal', payload: {heal: 250, sickness: 60}}, {action: 'add-items', items: [{item: 'bottle', count: 1}]}]},
 
-  // healless: {name: 'Lesser Healing Potion', type: ITEM_TYPE.POTION | ITEM_TYPE.USABLE | ITEM_TYPE.CRAFTING, star: 1, sell: 300, image: 'potions_32_32-4-0', heal: 50, sickness: 45, bag: [{item: 'bottle', count: 1}], tooltip: 'Restores 50 health when used', help: 'Healing Potions'},
-  // healstd: {name: 'Standard Healing Potion', type: ITEM_TYPE.POTION | ITEM_TYPE.USABLE, star: 3, sell: 900, image: 'potions_32_32-4-1', heal: 100, sickness: 60, bag: [{item: 'bottle', count: 1}], tooltip: 'Restores 100 health when used', help: 'Healing Potions'},
-  // healgreat: {name: 'Greater Healing Potion', type: ITEM_TYPE.POTION | ITEM_TYPE.USABLE, star: 4, sell: 2400, image: 'potions_32_32-4-2', heal: 150, bag: [{item: 'bottle', count: 1}], sickness: 60, tooltip: 'Restores 150 health when used', help: 'Healing Potions'},
-  // healsuper: {name: 'Super Healing Potion', type: ITEM_TYPE.POTION | ITEM_TYPE.USABLE, star: 5, sell: 19000, image: 'potions_32_32-4-3', heal: 250, sickness: 60, bag: [{item: 'bottle', count: 1}], tooltip: 'Restores 250 health when used', help: 'Healing Potions'},
+  // Lucky Potions - help NOK
+  lesserLuckyPotion: {name: 'Lesser Lucky Potion', type: ITEM_TYPE.POTION | ITEM_TYPE.USABLE, stype: 'luck', star: 1, image: 'potion_32_32-5-0', help: 'Healing Potions', tooltip: 'Grants Lucky Buff for 1 in-game hour', using: [{action: 'buff-timed', buff: 'lucky', duration: 60}, {action: 'add-items', items: [{item: 'bottle', count: 1}]}]},
+  standardLuckyPotion: {name: 'Standard Lucky Potion', type: ITEM_TYPE.POTION | ITEM_TYPE.USABLE, stype: 'luck', star: 2, image: 'potion_32_32-6-0', help: 'Healing Potions', tooltip: 'Grants Lucky Buff for 8 in-game hour', using: [{action: 'buff-timed', buff: 'lucky', duration: 480}, {action: 'add-items', items: [{item: 'bottle', count: 1}]}]},
+  greaterLuckyPotion: {name: 'Greater Lucky Potion', type: ITEM_TYPE.POTION | ITEM_TYPE.USABLE, stype: 'luck', star: 3, image: 'potion_32_32-7-0', help: 'Healing Potions', tooltip: 'Grants Lucky Buff for 24 in-game hour', using: [{action: 'buff-timed', buff: 'lucky', duration: 1440}, {action: 'add-items', items: [{item: 'bottle', count: 1}]}]},
 
   // Drinks - images NOK
   ale: {name: 'Ale', type: ITEM_TYPE.FOOD | ITEM_TYPE.USABLE, stype: 'drink', star: 2, image: 'armor_32_32-5-3', help: 'Drinks', tooltip: 'Increase your Melee caracteristics', using: [{action: 'buff-timed', buff: 'tipsy', duration: 600}]}
@@ -1036,6 +1036,10 @@ export const RECIPES = [
   {result: {item: 'standardHealingPotion', count: 2}, station: 'alchemyTable', ingredients: [{item: 'lesserHealingPotion', count: 2}, {item: 'pinkMycenia', count: 1}]},
   {result: {item: 'greaterHealingPotion', count: 3}, station: 'alchemyTable', ingredients: [{item: 'mushroomGill', count: 1}, {item: 'eggSpider', count: 1}, {item: 'bottleWater', count: 3}]},
   {result: {item: 'superHealingPotion', count: 4}, station: 'alchemyTable', ingredients: [{item: 'mushroomSpore', count: 1}, {item: 'eggSnake', count: 1}, {item: 'bottleWater', count: 4}]},
+
+  {result: {item: 'lesserLuckyPotion', count: 1}, station: 'alchemyTable', ingredients: [{item: 'pearlWhite', count: 1}, {item: 'parsnip', count: 1}, {item: 'bottleWater', count: 1}]},
+  {result: {item: 'standardLuckyPotion', count: 1}, station: 'alchemyTable', ingredients: [{item: 'pearlBlack', count: 1}, {item: 'gravelweed', count: 1}, {item: 'bottleWater', count: 1}]},
+  {result: {item: 'greaterLuckyPotion', count: 1}, station: 'alchemyTable', ingredients: [{item: 'pearlPink', count: 1}, {item: 'pricklepadPear', count: 1}, {item: 'bottleWater', count: 1}]},
 
   // {output: 'healstd', station: 'potiontable', recipe: [{item: 'mushj', count: 1}, {item: 'healless', count: 2}, {item: 'water', count: 1}]},
   // {output: 'healgreat', station: 'potiontable', recipe: [{item: 'mushm', count: 1}, {item: 'healless', count: 3}, {item: 'water', count: 1}]},
