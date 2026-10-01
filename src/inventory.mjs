@@ -1508,10 +1508,14 @@ class ItemUseManager {
   #useEmitEvent (using) { eventBus.emit(using.event, using.payload) }
 
   /**
-   * TODO: résout `using` via resolveLoot et rafraîchit le bag.
-   * @param {object} using — une entrée de itemDef.using ({action: 'add-items', items[]...})
+    * Ajoute à l'inventaire les items tirés de using.items (quantités et probabilités modulées
+    * par les buffs de using.buffList), puis rafraîchit l'affichage du bag et de la hotbar.
+    * @param {object} using — une entrée hydratée de itemDef.using ({action: 'add-items', items[], buffList})
    */
-  #useAddItems (using) { console.log('[ItemUseManager] TODO add-items', using) }
+  #useAddItems (using) {
+    resolveLoot(using)
+    inventoryOverlay.refreshBag()
+  }
 
   /**
    * Émet 'buff/create-timed' avec using comme payload ({buff, duration} lus par l'abonné,
