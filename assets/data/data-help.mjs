@@ -3276,7 +3276,7 @@ Managed trough the [[item:noticeBoard]].
     content: `
 **Description**
 
-**How to use**
+**How to Use**
 
 Unlike [[Trinkets]], Accessories must be placed in a dedicated Accessory slot in your [[Inventory]] to activate their effect. Simply carrying one in your bag is not enough.
     `
@@ -3289,7 +3289,7 @@ Unlike [[Trinkets]], Accessories must be placed in a dedicated Accessory slot in
 
 ⏳
 
-**How to use**
+**How to Use**
 
 Unlike [[Accessories]], Trinkets do not need to be placed in a dedicated slot — carrying one anywhere in your [[Inventory]] is enough to activate its effect.
 
@@ -3859,7 +3859,7 @@ See [[Ranges]] and [[Mining Buffs]] for details.
 * One [[item:pickaxeCopper]] is given to the player at [[World Creation]].
 * This starting pickaxe does not grant any [[Achievements|Achievement]] points.
 
-**How to use**
+**How to Use**
 
 * Open the [[Inventory]] Panel [I]
 * Place a pickaxe in the [[Hotbar]]
@@ -4832,7 +4832,7 @@ Higher-tier axes provide a chopping speed bonus (see table above). Additional bo
 * One [[item:axeCopper]] is given to the player at [[World Creation]].
 * This starting axe does not grant any [[Achievements|Achievement]] points.
 
-**How to use**
+**How to Use**
 
 * Open the [[Inventory]] Panel [I]
 * Place an axe in the [[Hotbar]]
@@ -5856,6 +5856,17 @@ Some Healing Potions grant additional effects:
 
 <hr>
 
+**How to Use**
+
+* Open your [[Inventory]] Panel [I]
+* Select the potion in your bag.
+* Click the Use button or press [Space] to drink one potion.
+* Only potions in the bag can be used, not those in the [[Hotbar]] or in a chest.
+* Locked slots cannot be used.
+* The [[item:bottle]] used to brew the potion is returned to your [[Inventory]].
+
+<hr>
+
 **Healing Potion Recipes**
 
 | Potion | Tier | Crafting Station | Ingredients |
@@ -5887,6 +5898,17 @@ Drinking a Lucky Potion while the Lucky Buff is already active adds its duration
 | [[item:lesserLuckyPotion]] | {{item:lesserLuckyPotion:star|star}} | {{item:lesserLuckyPotion:using[0]:duration|time}} |
 | [[item:standardLuckyPotion]] | {{item:standardLuckyPotion:star|star}} | {{item:standardLuckyPotion:using[0]:duration|time}} |
 | [[item:greaterLuckyPotion]] | {{item:greaterLuckyPotion:star|star}} | {{item:greaterLuckyPotion:using[0]:duration|time}} |
+
+<hr>
+
+**How to Use**
+
+* Open your [[Inventory]] Panel [I]
+* Select the potion in your bag.
+* Click the Use button or press [Space] to drink one potion.
+* Only potions in the bag can be used, not those in the [[Hotbar]] or in a chest.
+* Locked slots cannot be used.
+* The [[item:bottle]] used to brew the potion is returned to your [[Inventory]].
 
 <hr>
 
