@@ -18,6 +18,7 @@
 - traiter le cas particulier des trois buffs relatifs à la nourriture.
 - gestion de la fonction 'Use' dans l'inventaire - reste la consommation à coder
 - Modifier le volume sonore des sons du jeu (ActionWidget)
+- Traiter la situation dans laquelle l'inventaire est plein mais que l'on doit y ajouter quelque chose (récolte, loot, item use...)
 - Supprimer les actions de debug accessibles au joueur, quand hébergement sous GitHub :
   - affichage après génération du monde
   - DB_CONFIG.DEBUG constant.mjs
