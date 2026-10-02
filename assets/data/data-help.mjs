@@ -139,6 +139,8 @@ Mining Loot: {{node:{3}:mining[:items[0]:item|link}}
   cellItemStar: '[[item:{1}]]<br>{{item:{1}:star|star}}',
   // pour renseigner une cellule de table avec un monstre et son tier en dessous
   cellMonsterStar: '{1}',
+  // pour afficher deux colonnes, la première le nom de l'item, la deuxième son tier
+  itemStar2Columns: '[[item:{1}]] | {{item:{1}:star|star}}',
 
   // Trois puces affichant le tier, la crafting station et les ingrédients pour crafter un item
   fullRecipe: '* Tier: {{item:{1}:star|star}}\n* Crafting Station: {{recipe:{1}|station}}\n* Crafting Materials: {{recipe:{1}|ingredients}}',
@@ -4429,7 +4431,7 @@ Certain buffs modify crafting behaviour. ⏳
 
 * ⏳ _Artisan's Luck_ — chance to produce one extra item per run
 * ⏳ _Frugal Hands_ — chance to not consume one or more ingredients
-* ⏳ _[[Luck Buff]]_ — small chance to not consume one or more ingredients and small chance to produce one extra item per run
+* ⏳ _[[Lucky Potions|Lucky Buff]]_ — small chance to not consume one or more ingredients and small chance to produce one extra item per run
 * ⏳ _Extended Reach_ — increases the [[Ranges|Interaction Range]] within which
 .
 chests, cabinets, closets and crafting stations are accessible
@@ -5669,6 +5671,24 @@ Pheromone mastery — allows control of specific monster species
 
 [[Cooking|Cooking Pot]]
 
+<hr>
+
+**Food List**
+
+| Food Name | Food Tier |
+| --- | --- |
+| <<itemStar2Columns|ale>> |
+| <<itemStar2Columns|apple>> |
+| <<itemStar2Columns|egg>> |
+| <<itemStar2Columns|bread>> |
+| <<itemStar2Columns|croissant>> |
+| <<itemStar2Columns|parsnipMash>> |
+| <<itemStar2Columns|peach>> |
+| <<itemStar2Columns|shuckedOyster>> |
+| <<itemStar2Columns|vegetableSoup>> |
+
+<hr>
+
 **Tips**
 
  ⏳
@@ -5715,15 +5735,23 @@ Drinking alcoolic beverages grants you the Tipsy Buff:
     content: `
 **Description**
 
-Coming soon.
+Coming soon. ⏳
 
-**Tier**
+<hr>
 
-{{item:vegetableSoup:star|star}}
+**Soup Types**
 
-**Recipes**
+| Fruit | Tier | Food Buff | Extra Benefit |
+|---|---|---|
+| <<itemStar2Columns|vegetableSoup>> | 'Well Fed' for {{item:vegetableSoup:using[0]:duration|time}} | |
 
-[[item:vegetableSoup]]
+<hr>
+
+**Soup Recipes**
+
+| Potion | Tier | Crafting Station | Ingredients |
+| --- | --- | --- | --- |
+<<fullRecipeRow|vegetableSoup>>
       `
   },
   {
@@ -8056,7 +8084,7 @@ Two exceptions:
 * [[Housing Buffs]] — placement speed, range
 * [[Fishing Buffs]] — better yield, special encounters, rangee
 * [[Gardening Buffs]] — better yield,
-* [[Luck Buff]] — rare loot, special encounters
+* [[Lucky Potions|Lucky Buff]] — rare loot, special encounters
 * Environmental Buffs — [[Weather|weather]], [[Moon Phases|moon]], [[Day & Night Cycle|time of day]]
 
 **Buff Nature**

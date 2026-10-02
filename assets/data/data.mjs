@@ -614,8 +614,8 @@ export const ITEMS = {
 
   // Herbs
   parsnip: {name: 'Parsnip', type: 0, stype: 'herb', star: 1, image: 'foraged_32_32-6-1', placed: 'placed_16_16-0-0', help: 'Parsnip', tooltip: '???', foraging: {speed: 1800, items: [{item: 'parsnip', count: '1-3'}]}},
-  parsnipMash: {name: 'Parsnip Mash', type: ITEM_TYPE.FOOD | ITEM_TYPE.USABLE, stype: 'food', star: 1, image: 'potions_32_32-1-5', using: [{action: 'none'}], help: 'Parsnip', tooltip: '???'},
-  vegetableSoup: {name: 'Vegetable Soup', type: ITEM_TYPE.FOOD | ITEM_TYPE.USABLE, stype: 'food', star: 2, image: 'potions_32_32-1-5', using: [{action: 'none'}], help: 'Soups', tooltip: '???'},
+  parsnipMash: {name: 'Parsnip Mash', type: ITEM_TYPE.FOOD | ITEM_TYPE.USABLE, stype: 'food', star: 1, image: 'potions_32_32-1-5', using: [{action: 'buff-timed', buff: 'wellFed', duration: 600}], help: 'Parsnip', tooltip: '???'},
+  vegetableSoup: {name: 'Vegetable Soup', type: ITEM_TYPE.FOOD | ITEM_TYPE.USABLE, stype: 'food', star: 2, image: 'potions_32_32-1-5', using: [{action: 'buff-timed', buff: 'wellFed', duration: 720}], help: 'Soups', tooltip: '???'},
 
   sunflower: {name: 'Sunflower', type: 0, stype: 'herb', star: 1, image: null, placed: 'placed_16_32-2-1', placedLeft: 'placed_16_32-3-1', placedRight: 'placed_16_32-4-1', help: 'Sunflower', tooltip: 'Blooms at dawn and always faces the sun', foraging: {speed: 2400, items: [{item: 'sunflowerSeed', count: '3-4'}, {item: 'worm', count: 0.10, buffs: ['lucky:100', 'rainy:200']}]}},
   sunflowerSeed: {name: 'Sunflower Seed', type: ITEM_TYPE.SEED | ITEM_TYPE.PLACABLE, stype: 'seed', star: 1, image: 'foraged_32_32-0-0', placed: 'placed_16_16-1-0', help: 'Sunflower', tooltip: '???'},
@@ -650,7 +650,7 @@ export const ITEMS = {
   coral: {name: 'Coral', type: 0, stype: 'herb', star: 2, image: 'foraged_32_32-3-3', help: 'Corals', tooltip: 'Crafting Material for Potions and Furniture'},
 
   oyster: {name: 'Oyster', type: ITEM_TYPE.USABLE, stype: 'food', star: 2, image: 'foraged_32_32-2-4', help: 'Oyster', tooltip: 'Open it to eat and collect pearls', using: [{action: 'add-items', items: [{item: 'shuckedOyster', count: 1}, {item: 'pearlWhite', count: 0.25, buffs: ['lucky:60']}, {item: 'pearlBlack', count: 0.15, buffs: ['lucky:50']}, {item: 'pearlPink', count: 0.05, buffs: ['lucky:40']}]}]},
-  shuckedOyster: {name: 'Shucked Oyster', type: ITEM_TYPE.FOOD, stype: 'food', star: 2, image: 'foraged_32_32-3-4', help: 'Oyster', tooltip: 'Minor improvements to all stats (10 minutes)'},
+  shuckedOyster: {name: 'Shucked Oyster', type: ITEM_TYPE.FOOD, stype: 'food', star: 2, image: 'foraged_32_32-3-4', help: 'Oyster', tooltip: 'Minor improvements to all stats (8 minutes)', using: [{action: 'buff-timed', buff: 'wellFed', duration: 480}]},
   pearlWhite: {name: 'White Pearl', type: 0, stype: 'pearl', star: 1, image: 'foraged_32_32-4-4', help: 'Oyster', tooltip: 'Major ingredient of Luck Potion'},
   pearlBlack: {name: 'Black Pearl', type: 0, stype: 'pearl', star: 2, image: 'foraged_32_32-5-4', help: 'Oyster', tooltip: 'Major ingredient of Luck Potion'},
   pearlPink: {name: 'Pink Pearl', type: 0, stype: 'pearl', star: 3, image: 'foraged_32_32-6-4', help: 'Oyster', tooltip: 'Major ingredient of Luck Potion'},
@@ -750,8 +750,8 @@ export const ITEMS = {
   // Food
   flour: {name: 'Flour', type: 0, stype: 'food', star: 1, image: 'tools_32_32-12-7', help: 'Food', tooltip: 'Component for daw'},
   daw: {name: 'Daw', type: 0, stype: 'food', star: 1, image: 'tools_32_32-12-7', help: 'Food', tooltip: 'To cook for bread and pies'},
-  bread: {name: 'Bread', type: ITEM_TYPE.FOOD, stype: 'food', star: 1, image: 'tools_32_32-12-7', help: 'Food', tooltip: 'Restaure health when eated'},
-  croissant: {name: 'Croissant', type: ITEM_TYPE.FOOD | ITEM_TYPE.USABLE, stype: 'food', star: 1, image: 'food_32_32-7-1', using: [{action: 'none'}], help: 'Food', tooltip: 'Restaure health when eated'},
+  bread: {name: 'Bread', type: ITEM_TYPE.FOOD, stype: 'food', star: 1, image: 'tools_32_32-12-7', help: 'Food', tooltip: 'Minor improvements to all stats 10 minutes)', using: [{action: 'buff-timed', buff: 'wellFed', duration: 600}]},
+  croissant: {name: 'Croissant', type: ITEM_TYPE.FOOD | ITEM_TYPE.USABLE, stype: 'food', star: 1, image: 'food_32_32-7-1', help: 'Food', tooltip: 'Minor improvements to all stats (11 minutes)', using: [{action: 'buff-timed', buff: 'wellFed', duration: 660}]},
 
   // armors
   playerHead: {name: 'Player Head', type: 0, stype: '', star: 1, image: null, armorImage: 'head_26_22-0-0', help: 'Armors', tooltip: ''},
@@ -819,7 +819,7 @@ export const ITEMS = {
   greaterLuckyPotion: {name: 'Greater Lucky Potion', type: ITEM_TYPE.POTION | ITEM_TYPE.USABLE, stype: 'luck', star: 3, image: 'potion_32_32-7-0', help: 'Lucky Potions', tooltip: 'Grants Lucky Buff for 24 in-game hour', using: [{action: 'buff-timed', buff: 'lucky', duration: 1440}, {action: 'add-items', items: [{item: 'bottle', count: 1}]}]},
 
   // Drinks - images NOK
-  ale: {name: 'Ale', type: ITEM_TYPE.FOOD | ITEM_TYPE.USABLE, stype: 'drink', star: 2, image: 'food_32_32-2-1', help: 'Drinks', tooltip: 'Increase your Melee caracteristics', using: [{action: 'buff-timed', buff: 'tipsy', duration: 600}]}
+  ale: {name: 'Ale', type: ITEM_TYPE.FOOD | ITEM_TYPE.USABLE, stype: 'drink', star: 2, image: 'food_32_32-2-1', help: 'Drinks', tooltip: 'Increase your Melee caracteristics', using: [{action: 'buff-timed', buff: 'tipsy', duration: 600}, {action: 'buff-timed', buff: 'wellFed', duration: 300}]}
 }
 
 /* ============================================================================
