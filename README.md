@@ -22,11 +22,12 @@
 * Création d'un nouveau monde : 100%
 * Panneaux d'information (Inventaire, craft, succès, aide, contrôle) : 90%
 * Affichage (tuiles 100%, meubles 100%, plantes 100%, monstres 0%, lumière 0%)
-* Déplacement joueur : 80%
+* Déplacement joueur : 80% (manque nage/plongée)
 * Actions joueur : 50% (manque fishing, gardening, bug catching)
-* Evolution de l'environnement : 25%
+* Buffs : 100%
+* Evolution de l'environnement : (plantes : 100%, animaux: 0%, mini-biomess: 0%)
 * Housing : 0%
-* Combat : 0%
+* Combat : overlay personnage: 0%, création arène: 0%, gameplay combat: 0%, loot combat : 0%, monstres: 0%)
 * Suivi détaillé dans fichier ROADMAP.md
 
 ## Application
