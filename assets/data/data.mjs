@@ -680,12 +680,12 @@ export const ITEMS = {
 
   gravelweed: {name: 'Gravelweed', type: 0, stype: 'herb', star: 2, image: 'foraged_32_32-6-5', placed: 'placed_16_32-7-0', placedLeft: 'placed_16_32-6-0', foraging: {speed: 500, items: [{item: 'gravelweed', count: 1, buffs: ['lucky:20']}]}, help: 'Gravelweed', tooltip: 'Harvest to collect Potions and Food ingredients'},
 
-  // Condiments - images NOK
-  salt: {name: 'Salt', type: 0, stype: 'condiment', star: 1, image: 'foraged_32_32-6-5', help: 'Condiments', tooltip: 'A natural flavor enhancer'},
-  pepper: {name: 'Pepper', type: 0, stype: 'condiment', star: 2, image: 'foraged_32_32-6-5', help: 'Condiments', tooltip: 'A natural flavor enhancer'},
-  mustard: {name: 'Mustard', type: 0, stype: 'condiment', star: 3, image: 'foraged_32_32-6-5', help: 'Condiments', tooltip: 'A natural flavor enhancer'},
-  curry: {name: 'Curry', type: 0, stype: 'condiment', star: 4, image: 'foraged_32_32-6-5', help: 'Condiments', tooltip: 'A natural flavor enhancer'},
-  saffron: {name: 'Saffron', type: 0, stype: 'condiment', star: 5, image: 'foraged_32_32-6-5', help: 'Condiments', tooltip: 'A natural flavor enhancer'},
+  // Condiments - images OK
+  salt: {name: 'Salt', type: 0, stype: 'condiment', star: 1, image: 'refined_32_32-0-4', help: 'Condiments', tooltip: 'A natural flavor enhancer'},
+  pepper: {name: 'Pepper', type: 0, stype: 'condiment', star: 2, image: 'refined_32_32-1-4', help: 'Condiments', tooltip: 'A natural flavor enhancer'},
+  mustard: {name: 'Mustard', type: 0, stype: 'condiment', star: 3, image: 'refined_32_32-2-4', help: 'Condiments', tooltip: 'A natural flavor enhancer'},
+  curry: {name: 'Curry', type: 0, stype: 'condiment', star: 4, image: 'refined_32_32-3-4', help: 'Condiments', tooltip: 'A natural flavor enhancer'},
+  saffron: {name: 'Saffron', type: 0, stype: 'condiment', star: 5, image: 'refined_32_32-4-4', help: 'Condiments', tooltip: 'A natural flavor enhancer'},
 
   seedBag: {name: 'Seed Bag', type: ITEM_TYPE.USABLE, stype: 'bag', star: 2, image: 'container_32_32-0-3', help: 'Bags', tooltip: 'Open to get wild plant seeds', using: [{action: 'add-items', items: [{item: 'sunflowerSeed', count: 0.30}, {item: 'ambermirageSeed', count: 0.30}, {item: 'bloodmoonSeed', count: 0.25}, {item: 'seedForest', count: 0.30}, {item: 'seedJungle', count: 0.30}, {item: 'acorn', count: 0.20}, {item: 'samara', count: 0.20}]}]},
 
