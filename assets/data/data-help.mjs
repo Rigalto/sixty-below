@@ -5705,6 +5705,7 @@ Pheromone mastery — allows control of specific monster species
 | <<itemStar2Columns|egg>> |
 | <<itemStar2Columns|bread>> |
 | <<itemStar2Columns|croissant>> |
+| <<itemStar2Columns|friedEgg>> |
 | <<itemStar2Columns|parsnipMash>> |
 | <<itemStar2Columns|peach>> |
 | <<itemStar2Columns|shuckedOyster>> |
@@ -5843,14 +5844,22 @@ Coming soon. ⏳
 
 | Egg | Tier | Found | Main usage |
 |---|---|---|---|
-| [[item:egg]] | {{item:egg:star|star}} | Chopping/Shaking [[item:oak]] | Food (*)<br>Food Ingredient⏳ |
+| [[item:egg]] | {{item:egg:star|star}} | Chopping/Shaking [[item:oak]] | Food (*)<br>Food Ingredient |
 | [[item:eggMaleo]] | {{item:eggMaleo:star|star}} | Chopping/Shaking [[item:mahogany]] | ⏳ |
 | [[item:eggSpider]] | {{item:eggSpider:star|star}} | Mining [[node:web]] | [[item:greaterHealingPotion]]<br>Potions⏳ |
 | [[item:eggSnake]] | {{item:eggSnake:star|star}} | ⏳ | [[item:superHealingPotion]]<br>Potions⏳ |
 
 _(*) Swallowing an [[item:egg]] grants the [[Food Buff|'Well Fed' buff]] for {{item:egg:using[0]:duration|time}}._
 
+<hr>
+
 **Recipes**
+
+| Potion | Tier | Crafting Station | Ingredients |
+| --- | --- | --- | --- |
+<<fullRecipeRow|friedEgg>>
+<<fullRecipeRow|greaterHealingPotion>>
+<<fullRecipeRow|superHealingPotion>>
 `
   },
   {

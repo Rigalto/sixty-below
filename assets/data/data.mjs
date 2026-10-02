@@ -754,11 +754,13 @@ export const ITEMS = {
   viperFang: {name: 'Viper Fang', type: 0, stype: 'monster', star: 2, image: 'tools_32_32-12-7', help: 'Antlion Pit', tooltip: 'Component for tools'},
   viperScale: {name: 'Viper Scale', type: 0, stype: 'monster', star: 2, image: 'tools_32_32-12-7', help: 'Antlion Pit', tooltip: 'Component for accessories'},
 
-  // Food
+  // Food - Pastry
   flour: {name: 'Flour', type: 0, stype: 'food', star: 1, image: 'tools_32_32-12-7', help: 'Food', tooltip: 'Component for daw'},
   daw: {name: 'Daw', type: 0, stype: 'food', star: 1, image: 'tools_32_32-12-7', help: 'Food', tooltip: 'To cook for bread and pies'},
   bread: {name: 'Bread', type: ITEM_TYPE.FOOD, stype: 'food', star: 1, image: 'tools_32_32-12-7', help: 'Food', tooltip: 'Minor improvements to all stats 10 minutes)', using: [{action: 'buff-timed', buff: 'wellFed', duration: 600}]},
   croissant: {name: 'Croissant', type: ITEM_TYPE.FOOD | ITEM_TYPE.USABLE, stype: 'food', star: 1, image: 'food_32_32-7-1', help: 'Food', tooltip: 'Minor improvements to all stats (11 minutes)', using: [{action: 'buff-timed', buff: 'wellFed', duration: 660}]},
+
+  friedEgg: {name: 'Fried Egg', type: ITEM_TYPE.FOOD | ITEM_TYPE.USABLE, stype: 'food', star: 1, image: 'food_32_32-4-1', help: 'Food', tooltip: 'Minor improvements to all stats (9 minutes)', using: [{action: 'buff-timed', buff: 'wellFed', duration: 540}]},
 
   // armors
   playerHead: {name: 'Player Head', type: 0, stype: '', star: 1, image: null, armorImage: 'head_26_22-0-0', help: 'Armors', tooltip: ''},
@@ -1059,6 +1061,8 @@ export const RECIPES = [
   // {output: 'greatluck', station: 'potiontable', recipe: [{item: 'pearlp', count: 1}, {item: 'waterleaf', count: 1}, {item: 'ladybug', count: 1}, {item: 'water', count: 2}], built: 2},
 
   // Food - Tier 1-3
+
+  {result: {item: 'friedEgg', count: 1}, station: 'cookingPot', ingredients: [{item: 'egg', count: 1}, {item: 'salt', count: 1}]},
   {result: {item: 'sunflowerOil', count: 1}, station: 'tableWood', ingredients: [{item: 'sunflowerSeed', count: 1}]},
   {result: {item: 'oleanderOil', count: 2}, station: 'cookingPotOn', ingredients: [{item: 'oleander', count: 1}, {item: 'sunflowerOil', count: 1}]},
   {result: {item: 'daw', count: 4}, station: 'byHand', ingredients: [{item: 'flour', count: 1}, {item: 'bottleWater', count: 1}], returned: [{item: 'bottle', count: 1}]},
