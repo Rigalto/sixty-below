@@ -5714,6 +5714,7 @@ Pheromone mastery — allows control of specific monster species
 
 **Tips**
 
+* _A [[Condiments|condiment]] enhance a dish._
  ⏳
   `
   },
@@ -6839,7 +6840,15 @@ Foraging Tool: <<itemStar|sickleCopper>> or better
 **Usages**
 
 * [[item:ambermirage]] — crafting ingredient ⏳
-* [[item:ambermirageSeed]] — replanting Ambermirage ⏳
+* [[item:ambermirageSeed]]:
+  * Replanting Ambermirage
+  * Grinding on a [[item:stoneBench]] produces [[item:mustard]]
+
+**Recipes**
+
+| Potion | Tier | Crafting Station | Ingredients |
+| --- | --- | --- | --- |
+<<fullRecipeRow|mustard>>
 
 <hr>
 
