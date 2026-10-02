@@ -5618,9 +5618,32 @@ _The Sickness debuff is applied after consuming these items, preventing the use 
     `
   },
   // ── Mechanics ────────────────────────────────────────────────
+  //    Bags
+  {
+    title: 'Bags',
+    category: ['Gameplay'],
+    content: `
+**Description**
+
+<hr>
+
+**How to open**
+
+⏳
+
+<hr>
+
+**Seed Bag**
+
+* Tier: {{item:seedBag:star|star}}
+* Found in Chests dispersed in World during its creation
+* Contents: {{item:seedBag:using[0]:items[*]:item|links}}
+
+    `
+  },
 
   // ── Food ─────────────────────────────────────────────────────
-  //    Food, Soups, Eggs
+  //    Food, Condiments, Drinks, Soups, Eggs
   {
     title: 'Food',
     category: ['Food', 'Gameplay'],
@@ -5692,6 +5715,59 @@ Pheromone mastery — allows control of specific monster species
 **Tips**
 
  ⏳
+  `
+  },
+  {
+    title: 'Condiments',
+    category: ['Food'],
+    content: `
+**Description**
+
+Condiments are rare seasonings that elevate ordinary ingredients into finer dishes. Five condiments exist, one per tier — the higher its tier, the harder it is to obtain.
+
+<hr>
+
+**Condiment List**
+
+| Condiment | Tier | Source |
+|---|---|---|
+| [[item:salt]] | {{item:salt:star|star}} | [[Foraging]] [[node:sand]] near the [[Sea]] ⏳ |
+| [[item:pepper]] | {{item:pepper:star|star}} | Foraging [[item:gravelweed]] ⏳ |
+| [[item:mustard]] | {{item:mustard:star|star}} | Grinding [[item:ambermirageSeed]] on a [[item:stoneBench]] |
+| [[item:curry]] | {{item:curry:star|star}} | Grinding hard animal parts on a [[item:stoneBench]] ⏳ |
+| [[item:saffron]] | {{item:saffron:star|star}} | Extracted from [[item:inferncap]] pistils ⏳ |
+
+<hr>
+
+**Salt**
+
+* Salt crystallizes on the [[node:sand]] of the beaches, where the sea spray dries
+* [[Foraging]] a surface sand tile close to the [[Sea]] may yield [[item:salt]] ⏳
+* Desert sand, far from the sea, never contains salt
+
+**Pepper**
+
+* A common seasoning, found when [[Foraging]] [[item:gravelweed]] ⏳
+
+**Mustard**
+
+* Obtained by grinding [[item:ambermirageSeed]]s on a [[item:stoneBench]]
+* Seeds used for mustard can no longer be planted — choose between replanting and cooking
+
+**Curry**
+
+* Obtained by grinding the hard parts (shells, carapaces, elytra...) of tier 4 animals on a [[item:stoneBench]] ⏳
+
+**Saffron**
+
+* The most precious seasoning, extracted from the fiery pistils of the [[item:inferncap]] ⏳
+
+<hr>
+
+**Tips**
+
+* _Condiments are the cheapest way to improve a dish: a pinch of seasoning saves you from hunting rare ingredients._
+* _Keep a stock of each condiment before a cooking session — better food buffs make the difference in tougher fights._
   `
   },
   {
@@ -6872,11 +6948,95 @@ How to plant:
   },
   {
     title: 'Oyster',
-    category: ['Sea'],
+    category: ['Sea', 'Food'],
     content: `
 **Description**
 
-Coming Soon.
+Oysters live hidden among the corals in the sandy floor of the [[Sea]]. Their rough shell protects a tasty flesh and, sometimes, a precious pearl. They are the only source of pearls, the major ingredient of [[Lucky Potions]].
+
+**Tier**
+
+{{item:oyster:star|star}}
+
+<hr>
+
+**How to Collect Oysters**
+
+There is no oyster to see in the world: they are always found hidden, in three ways.
+
+_From Corals_
+
+* Each [[Foraging|coral harvest]] may yield an [[item:oyster]] in addition to its [[item:coral]]
+* The chance is low, but is greatly increased by [[Lucky Potions|Lucky Buff]] and by [[Weather|rainy weather]]
+
+_From the Sea Floor_ ⏳
+
+* [[Foraging]] a [[node:sand]] tile lying under the [[Sea]] may uncover an [[item:oyster]]
+
+_From Fishing_ ⏳
+
+* [[Fishing]] in the [[Sea]] may bring up an [[item:oyster]]
+
+<hr>
+
+**Coral Foraging**
+
+Foraging Tool: <<itemStar|sickleSilver>> or better
+
+<<itemLootTable|coralR|foraging>>
+
+<<additiveNote>>
+
+**Sand Foraging**
+
+Foraging Tool: <<itemStar|coperSilver>> or better
+
+<hr>
+
+**Opening an Oyster**
+
+* Open your [[Inventory]] Panel [I]
+* Select the slot containing the oysters
+* Click on 'Use Item' Icon - Shortcut [Space]
+* One oyster is consumed: you always get a [[item:shuckedOyster]], and you may find a pearl
+
+**Opening Loot**
+
+| Item | Tier | Amount | Conditions | Modifiers |
+|---|---|---|---|---|
+{{item:oyster:using[0]:items[*]:helpRow|rows}}
+
+<hr>
+
+**Shucked Oyster**
+
+* <<itemStar|shuckedOyster>> is a raw [[Food]] — no cooking required
+* Eating it grants the [[Food Buff|Well Fed]] Buff for {{item:shuckedOyster:using[0]:duration|time}}
+
+**Pearls**
+
+| Pearl | Tier | Usage |
+|---|---|---|
+| [[item:pearlWhite]] | {{item:pearlWhite:star|star}} | [[item:lesserLuckyPotion]] |
+| [[item:pearlBlack]] | {{item:pearlBlack:star|star}} | [[item:standardLuckyPotion]] |
+| [[item:pearlPink]] | {{item:pearlPink:star|star}} | [[item:greaterLuckyPotion]] |
+
+**Lucky Potion Recipes**
+
+| Potion | Tier | Crafting Station | Ingredients |
+| --- | --- | --- | --- |
+<<fullRecipeRow|lesserLuckyPotion>>
+<<fullRecipeRow|standardLuckyPotion>>
+<<fullRecipeRow|greaterLuckyPotion>>
+
+<hr>
+
+**Tips**
+
+* _Forage corals on rainy days: the chance to find an oyster is multiplied._
+* _A Lucky Potion boosts both the chance to find oysters and the chance to find pearls inside — brew one before a coral-harvesting session._
+* _Keep your oysters closed until you have drunk a Lucky Potion: Lucky Buff applies when opening them._
+
   `
   },
   {

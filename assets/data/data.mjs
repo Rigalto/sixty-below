@@ -626,7 +626,7 @@ export const ITEMS = {
   oleanderBulb: {name: 'Oleander Bulb', type: 0, stype: 'vegie', star: 3, image: 'foraged_32_32-0-2', help: 'Oleander', tooltip: 'Its pulp has a velvety, creamy texture'},
 
   ambermirage: {name: 'Ambermirage', type: 0, stype: 'herb', star: 1, image: 'foraged_32_32-6-2', placed: 'placed_16_16-3-0', help: 'Ambermirage', tooltip: '???', foraging: {speed: 2400, items: [{item: 'ambermirage', count: '1-2'}, {item: 'ambermirageSeed', count: 0.5, buffs: ['lucky:50']}]}},
-  ambermirageSeed: {name: 'Ambermirage Seed', type: ITEM_TYPE.SEED | ITEM_TYPE.PLACABLE, stype: 'seed', star: 2, image: 'foraged_32_32-6-3', placed: 'placed_16_16-4-0', help: 'Ambermirage', tooltip: '???'},
+  ambermirageSeed: {name: 'Ambermirage Seed', type: ITEM_TYPE.SEED | ITEM_TYPE.PLACABLE, stype: 'seed', star: 3, image: 'foraged_32_32-6-3', placed: 'placed_16_16-4-0', help: 'Ambermirage', tooltip: '???'},
 
   // images OK
 
@@ -650,7 +650,7 @@ export const ITEMS = {
   coral: {name: 'Coral', type: 0, stype: 'herb', star: 2, image: 'foraged_32_32-3-3', help: 'Corals', tooltip: 'Crafting Material for Potions and Furniture'},
 
   oyster: {name: 'Oyster', type: ITEM_TYPE.USABLE, stype: 'food', star: 2, image: 'foraged_32_32-2-4', help: 'Oyster', tooltip: 'Open it to eat and collect pearls', using: [{action: 'add-items', items: [{item: 'shuckedOyster', count: 1}, {item: 'pearlWhite', count: 0.25, buffs: ['lucky:60']}, {item: 'pearlBlack', count: 0.15, buffs: ['lucky:50']}, {item: 'pearlPink', count: 0.05, buffs: ['lucky:40']}]}]},
-  shuckedOyster: {name: 'Shucked Oyster', type: ITEM_TYPE.FOOD, stype: 'food', star: 2, image: 'foraged_32_32-3-4', help: 'Oyster', tooltip: 'Minor improvements to all stats (8 minutes)', using: [{action: 'buff-timed', buff: 'wellFed', duration: 480}]},
+  shuckedOyster: {name: 'Shucked Oyster', type: ITEM_TYPE.FOOD | ITEM_TYPE.USABLE, stype: 'food', star: 2, image: 'foraged_32_32-3-4', help: 'Oyster', tooltip: 'Minor improvements to all stats (8 minutes)', using: [{action: 'buff-timed', buff: 'wellFed', duration: 480}]},
   pearlWhite: {name: 'White Pearl', type: 0, stype: 'pearl', star: 1, image: 'foraged_32_32-4-4', help: 'Oyster', tooltip: 'Major ingredient of Luck Potion'},
   pearlBlack: {name: 'Black Pearl', type: 0, stype: 'pearl', star: 2, image: 'foraged_32_32-5-4', help: 'Oyster', tooltip: 'Major ingredient of Luck Potion'},
   pearlPink: {name: 'Pink Pearl', type: 0, stype: 'pearl', star: 3, image: 'foraged_32_32-6-4', help: 'Oyster', tooltip: 'Major ingredient of Luck Potion'},
@@ -680,7 +680,14 @@ export const ITEMS = {
 
   gravelweed: {name: 'Gravelweed', type: 0, stype: 'herb', star: 2, image: 'foraged_32_32-6-5', placed: 'placed_16_32-7-0', placedLeft: 'placed_16_32-6-0', foraging: {speed: 500, items: [{item: 'gravelweed', count: 1, buffs: ['lucky:20']}]}, help: 'Gravelweed', tooltip: 'Harvest to collect Potions and Food ingredients'},
 
-  seedBag: {name: 'Seed Bag', type: ITEM_TYPE.USABLE, stype: 'bag', star: 2, image: 'container_32_32-0-3', help: 'Oyster', tooltip: 'Open to get wild plant seeds', using: [{action: 'add-items', items: [{item: 'sunflowerSeed', count: 0.30}, {item: 'ambermirageSeed', count: 0.30}, {item: 'bloodmoonSeed', count: 0.25}, {item: 'seedForest', count: 0.30}, {item: 'seedJungle', count: 0.30}, {item: 'acorn', count: 0.20}, {item: 'samara', count: 0.20}]}]},
+  // Condiments - images NOK
+  salt: {name: 'Salt', type: 0, stype: 'condiment', star: 1, image: 'foraged_32_32-6-5', help: 'Condiments', tooltip: 'A natural flavor enhancer'},
+  pepper: {name: 'Pepper', type: 0, stype: 'condiment', star: 2, image: 'foraged_32_32-6-5', help: 'Condiments', tooltip: 'A natural flavor enhancer'},
+  mustard: {name: 'Mustard', type: 0, stype: 'condiment', star: 3, image: 'foraged_32_32-6-5', help: 'Condiments', tooltip: 'A natural flavor enhancer'},
+  curry: {name: 'Curry', type: 0, stype: 'condiment', star: 4, image: 'foraged_32_32-6-5', help: 'Condiments', tooltip: 'A natural flavor enhancer'},
+  saffron: {name: 'Saffron', type: 0, stype: 'condiment', star: 5, image: 'foraged_32_32-6-5', help: 'Condiments', tooltip: 'A natural flavor enhancer'},
+
+  seedBag: {name: 'Seed Bag', type: ITEM_TYPE.USABLE, stype: 'bag', star: 2, image: 'container_32_32-0-3', help: 'Bags', tooltip: 'Open to get wild plant seeds', using: [{action: 'add-items', items: [{item: 'sunflowerSeed', count: 0.30}, {item: 'ambermirageSeed', count: 0.30}, {item: 'bloodmoonSeed', count: 0.25}, {item: 'seedForest', count: 0.30}, {item: 'seedJungle', count: 0.30}, {item: 'acorn', count: 0.20}, {item: 'samara', count: 0.20}]}]},
 
   // Gardening - images OK
   clayPot: {name: 'Clay Pot', type: ITEM_TYPE.FURNITURE | ITEM_TYPE.PLACABLE, stype: 'pot', surface: true, onTop: true, star: 1, capacity: 1, image: 'furniture_32_32-0-8', placed: 'placed_16_16-2-3', placedleft: 'placed_16_16-3-3', placedright: 'placed_16_16-4-3', unplacing: {speed: 800}, help: 'Clay Pots', tooltip: 'Gardening Container'},
@@ -1029,6 +1036,9 @@ export const RECIPES = [
   {result: {item: 'coconutFiber', count: 1}, station: 'workbench', ingredients: [{item: 'coconut', count: 1}], returned: [{item: 'coconutPulp', count: 1}, {item: 'coconutMilk', count: 1}]},
   {result: {item: 'coconutPulp', count: 1}, station: 'workbench', ingredients: [{item: 'coconut', count: 1}], returned: [{item: 'coconutFiber', count: 1}, {item: 'coconutMilk', count: 1}]},
   {result: {item: 'coconutMilk', count: 1}, station: 'workbench', ingredients: [{item: 'coconut', count: 1}], returned: [{item: 'coconutFiber', count: 1}, {item: 'coconutPulp', count: 1}]},
+
+  // Condiments
+  {result: {item: 'mustard', count: 10}, station: 'stoneBench', ingredients: [{item: 'ambermirageSeed', count: 1}]},
 
   // Potions
   {result: {item: 'recallPotion', count: 1}, station: 'alchemyTable', ingredients: [{item: 'mandrakeRoot', count: 1}, {item: 'viperVenom', count: 1}, {item: 'silk', count: 1}]},
