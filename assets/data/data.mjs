@@ -111,7 +111,7 @@ export const NODES = {
     mining: {speed: 1000, items: [{item: 'blockDirt', count: 1}, {item: 'worm', count: 0.15, buffs: ['lucky:200', 'rainy:200']}]},
     help: 'Dirt'
   },
-  SAND: {code: 41, name: 'Sand', type: NODE_TYPE.TOPSOIL | NODE_TYPE.SOLID, stype: 'block', star: 1, color: '#fff198', image: 'substrat_16_16+12', viscosity: 1000, mining: {speed: 1000, items: [{item: 'blockSand', count: 1}]}, help: 'Sand'},
+  SAND: {code: 41, name: 'Sand', type: NODE_TYPE.TOPSOIL | NODE_TYPE.SOLID, stype: 'block', star: 1, color: '#fff198', image: 'substrat_16_16+12', viscosity: 1000, mining: {speed: 1000, items: [{item: 'blockSand', count: 1}]}, foraging: {speed: 2400, items: [{item: 'salt', count: 0.6, buffs: ['+shore', 'lucky:50']}, {item: 'oyster', count: 0.60, buffs: ['+submerged', 'lucky:50']}]}, help: 'Sand'},
   SILT: {code: 42, name: 'Silt', type: NODE_TYPE.TOPSOIL | NODE_TYPE.SOLID, stype: 'block', star: 2, color: '#73c882', image: 'substrat_16_16+13', mining: {speed: 1000, items: [{item: 'blockSilt', count: 1}, {item: 'slug', count: 0.15, buffs: ['lucky:200', 'rainy:200']}]}, help: 'Silt'},
   HUMUS: {code: 43, name: 'Humus', type: NODE_TYPE.TOPSOIL | NODE_TYPE.SOLID, stype: 'block', star: 2, color: '#e2b3ff', image: 'substrat_16_16+14', mining: {speed: 1000, items: [{item: 'blockHumus', count: 1}]}, help: 'Humus'},
 
@@ -760,7 +760,7 @@ export const ITEMS = {
   bread: {name: 'Bread', type: ITEM_TYPE.FOOD, stype: 'food', star: 1, image: 'tools_32_32-12-7', help: 'Food', tooltip: 'Minor improvements to all stats 10 minutes)', using: [{action: 'buff-timed', buff: 'wellFed', duration: 600}]},
   croissant: {name: 'Croissant', type: ITEM_TYPE.FOOD | ITEM_TYPE.USABLE, stype: 'food', star: 1, image: 'food_32_32-7-1', help: 'Food', tooltip: 'Minor improvements to all stats (11 minutes)', using: [{action: 'buff-timed', buff: 'wellFed', duration: 660}]},
 
-  friedEgg: {name: 'Fried Egg', type: ITEM_TYPE.FOOD | ITEM_TYPE.USABLE, stype: 'food', star: 1, image: 'food_32_32-4-1', help: 'Food', tooltip: 'Minor improvements to all stats (9 minutes)', using: [{action: 'buff-timed', buff: 'wellFed', duration: 540}]},
+  friedEgg: {name: 'Fried Egg', type: ITEM_TYPE.FOOD | ITEM_TYPE.USABLE, stype: 'food', star: 1, image: 'food_32_32-4-1', help: 'Eggs', tooltip: 'Minor improvements to all stats (9 minutes)', using: [{action: 'buff-timed', buff: 'wellFed', duration: 540}]},
 
   // armors
   playerHead: {name: 'Player Head', type: 0, stype: '', star: 1, image: null, armorImage: 'head_26_22-0-0', help: 'Armors', tooltip: ''},

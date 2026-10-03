@@ -1733,9 +1733,9 @@ The Sea borders both sides of the world. Its deep, dark waters are home to uniqu
 
 _Trees:_
 <<floraLine|coconut>>
-<<floraLine|thornspine>> (Sea Shore)
+<<floraLine|thornspine>> ([[Sea|Sea Shore]])
 _Herbs:_
-<<floraLine|ambermirage>> (Sea Shore)
+<<floraLine|ambermirage>> ([[Sea|Sea Shore]])
 _Corals:_
 <<floraLine|coralR>>
 <<floraLine|coralP>>
@@ -1744,7 +1744,7 @@ _Corals:_
 
 **Fauna**
 
-* xxx: [[item:oyster]]
+* [[item:oyster]] (hide in the sea floor [[node:sand]] and among the [[Corals]])
 
 Coming Soon.⏳
 
@@ -2179,16 +2179,19 @@ Sand is the primary topsoil of [[Desert]] biomes. It is subject to gravity — u
 
 <<floraLine|ambermirage>>
 <<floraLine|coconut>>
-<<floraLine|coralY>> (Sea)
-<<floraLine|coralP>> (Sea)
-<<floraLine|coralR>> (Sea)
-<<floraLine|coralG>> (Sea)
+<<floraLine|coralY>> ([[Sea]])
+<<floraLine|coralP>> ([[Sea]])
+<<floraLine|coralR>> ([[Sea]])
+<<floraLine|coralG>> ([[Sea]])
 <<floraLine|thornspine>>
 <<floraLine|abysshorn>>
 
 <hr>
 
 **Fauna**
+
+* [[item:oyster]] (hide in the sea floor [[node:sand]] and among the [[Corals]])
+
 
 Comming Soon (antlion, mini-biome antlion spit, ...) ⏳
 
@@ -2204,10 +2207,27 @@ See [[Mining]], [[Mining Tools]] and [[Mining Buffs]] for details.
 
 <hr>
 
+**Foraging**
+
+Sand near the [[Sea]] can be foraged with a [[item|sickleCopper]] or better:
+
+* _Shore_ — a sand tile with open sky above or beside it, close to the sea, may yield [[item:salt]]
+* _Submerged_ — a sand tile with sea water above or beside it may yield an [[item:oyster]]
+* Desert sand, far from the sea, cannot be foraged
+
+**Foraging Loot**
+
+<<lootTable|sand|foraging>>
+
+Sand foraging shares the daily [[Foraging]] quota with natural tiles.
+
+<hr>
+
 **Tips**
 
 * _Sand falls when the tile below is empty — be careful when mining near Sand Pockets._
 * _Sand Pockets are sealed by [[node:sandstone]] borders — removing them releases the sand._ ⏳
+* _Falling sand ruins a foraging in progress — the action still counts against your daily quota._
   `
   },
   {
@@ -4594,12 +4614,27 @@ Natural tiles — forest, jungle, moss, fern, and mushroom grass — yield herbs
 | [[node:grassFern]] | {{node:grassFern:star|star}} | <<cellItemStar|sickleGold>>| {{node:grassFern:foraging:items[*]:item|links}} |
 | [[node:grassMoss]] | {{node:grassMoss:star|star}} | <<cellItemStar|sickleGold>>| {{node:grassMoss:foraging:items[*]:item|links}} |
 
+**Other Forageable Tiles**
+
+Some tiles can only be foraged in specific surroundings.
+
+| Tile | Tier | Sickle | Condition | Loot |
+|---|---|---|---|---|
+| [[node:sand]] | {{node:sand:star|star}} | <<cellItemStar|sickleCopper>> | Open sky above or beside, close to the [[Sea]] | [[item:salt]] |
+| [[node:sand]] | {{node:sand:star|star}} | <<cellItemStar|sickleCopper>> | [[Sea]] water above or beside | [[item:oyster]] |
+
+Elsewhere (desert sand, dug tunnels), these tiles cannot be foraged.
+
 **Daily Limits**
 
 To preserve balance, foraging natural tiles is limited each in-game day:
 
-* Each natural tile can only be foraged once per day.
-* No more than 12 natural tiles can be foraged per day.
+* Each tile can only be foraged once per day.
+* No more than 15 tiles can be foraged per day — natural tiles and [[node:sand]] share this quota.
+* A tile counts against the quota as soon as you click it.
+* When the quota is reached, the _Over-Foraged_ debuff appears in the [[Buff Panel]] and further clicks are ignored.
+* Switching to another tool or teleporting cancels the pending foraging: tiles not yet harvested are given back to the quota.
+* If a tile changes while you are foraging it (falling sand, meteorite...), the action is lost and still counts against the quota.
 
 The limits reset at midnight.
 
@@ -5733,7 +5768,7 @@ Condiments are rare seasonings that elevate ordinary ingredients into finer dish
 
 | Condiment | Tier | Source |
 |---|---|---|
-| [[item:salt]] | {{item:salt:star|star}} | [[Foraging]] [[node:sand]] near the [[Sea]] ⏳ |
+| [[item:salt]] | {{item:salt:star|star}} | [[Foraging]] [[node:sand]] near the [[Sea]] |
 | [[item:pepper]] | {{item:pepper:star|star}} | Foraging [[item:gravelweed]] ⏳ |
 | [[item:mustard]] | {{item:mustard:star|star}} | Grinding [[item:ambermirageSeed]] on a [[item:stoneBench]] |
 | [[item:curry]] | {{item:curry:star|star}} | Grinding hard animal parts on a [[item:stoneBench]] ⏳ |
@@ -6989,7 +7024,12 @@ _From Corals_
 
 _From the Sea Floor_ ⏳
 
-* [[Foraging]] a [[node:sand]] tile lying under the [[Sea]] may uncover an [[item:oyster]]
+* [[Foraging]] a [[node:sand]] tile with sea water above or beside it may uncover an [[item:oyster]]
+* Rainy weather and [[Lucky Potions|Luck]] greatly increase the chance
+
+Foraging Tool: <<itemStar|sickleCopper>> or better
+
+See [[Sand]] for the full loot table.
 
 _From Fishing_ ⏳
 
@@ -8223,6 +8263,11 @@ _From your equipment:_
 * [[Accessories]] must be placed in dedicated slots to be active (4 slots)
 * The tool currently in your hand provides bonuses related to its use
 
+_From your actions:_
+
+* Over-Foraged (debuff) — appears when the daily tile [[Foraging]] quota is reached: no more tiles can be foraged until midnight
+
+
 _From consumables:_
 
 * [[Food]] provides a timed bonus after consumption
@@ -8234,11 +8279,6 @@ _From the world events:_
 * [[Events]] such as invasions or meteor strikes activate specific buffs for their duration
 
 <hr>
-
-**Timed Buffs**
-
-Potions and food activate buffs with a countdown visible in the [[Buff Panel]].
-Consuming the same type too quickly extends the cooldown before you can benefit again.⏳
 
 **Timed Buffs**
 

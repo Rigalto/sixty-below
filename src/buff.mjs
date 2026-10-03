@@ -708,7 +708,9 @@ const DISPLAY_BUFFS = [
   {id: 'sickness', kind: 'debuff', title: 'Sickness\nHealing Items have no effect', x: 0, y: -32},
   {id: 'honey', kind: 'debuff', title: `Honey\n-${BUFFS.honey}% Movement Speed`, x: -96, y: 0},
   {id: 'sap', kind: 'debuff', title: `Sap\n-${BUFFS.sap}% Movement Speed`, x: -128, y: 0},
-  {id: 'water', kind: 'debuff', title: `Wet\n-${BUFFS.water}% Movement Speed`, x: -160, y: 0}
+  {id: 'water', kind: 'debuff', title: `Wet\n-${BUFFS.water}% Movement Speed`, x: -160, y: 0},
+  {id: 'overForaged', kind: 'debuff', title: 'Over-Foraged\nNo more ground foraging until midnight', x: -64, y: -32} // TODO icône dédiée (fond rouge)
+
 ]
 
 class BuffWidget {

@@ -9,7 +9,7 @@ import {buffManager, isInInteractionRange} from './buff.mjs'
 import {database} from './database.mjs'
 import {chunkManager} from './world.mjs'
 import {playerManager} from './player.mjs'
-import {WORLD_WIDTH, MICROTASK} from './constant.mjs'
+import {WORLD_WIDTH, SEA_LEVEL, MICROTASK} from './constant.mjs'
 import {floraManager} from './ecosystem.mjs'
 import {furnitureManager, teleporterManager} from './housing.mjs'
 import {IMAGE_CACHE} from './assets.mjs'
@@ -625,7 +625,8 @@ export const pouringManager = new PouringManager()
    FORAGING DE PLANTES
    ==================================================================================================== */
 
-const NATURAL_FORAGE_DAILY_LIMIT = 12
+const NATURAL_FORAGE_DAILY_LIMIT = 15
+const SALT_SEA_DISTANCE = 24
 
 class ForagingManager {
   #queue = [] // {type:'natural', tileIndex, tileNode, tool, prefix} | {type:'plant', plant, tileIndex, tool, prefix}
@@ -652,6 +653,7 @@ class ForagingManager {
   init (savedSet) {
     this.#foragedToday = savedSet ?? new Set()
     this.#queue.length = 0
+    buffManager.setBuff('overForaged', this.#foragedToday.size >= NATURAL_FORAGE_DAILY_LIMIT)
   }
 
   /**
@@ -661,6 +663,7 @@ class ForagingManager {
   onDayStart () {
     this.#foragedToday.clear()
     database.setGameState('naturalforaged', this.#foragedToday)
+    buffManager.setBuff('overForaged', false)
   }
 
   /**
@@ -675,7 +678,7 @@ class ForagingManager {
   tryForage (tileIndex, tileNode, tool, prefix) {
     if (buffManager.getBuff('playerFreeze')) return
 
-    // 2. Tuile SKY/VOID/SEA — chercher une plante sous la souris.
+    // 1. Tuile SKY/VOID/SEA — chercher une plante sous la souris.
     if (tileNode.code === NODES.SKY.code || tileNode.code === NODES.VOID.code || tileNode.code === NODES.SEA.code || tileNode.code === NODES.GRASSMOSS.code) {
       const plant = floraManager.getPlantAt(tileIndex)
       if (plant === null) return
@@ -700,8 +703,9 @@ class ForagingManager {
       return
     }
 
-    // 1. Tuile NATURAL (forage du sol)
-    if (tileNode.type & NODE_TYPE.NATURAL) {
+    // 2. Tuile solide possédant une table de foraging
+    if (tileNode.foraging) {
+      if (tileNode.code === NODES.SAND.code && !this.#getSandContext(tileIndex)) return
       if (!isInToolRange(tileIndex, tool, prefix, 'foraging-range')) { eventBus.emit('sound/play', 'toofar'); return }
       if (tool.star < tileNode.star) { eventBus.emit('sound/play', 'wrong'); return }
       if (this.#foragedToday.size >= NATURAL_FORAGE_DAILY_LIMIT) { eventBus.emit('sound/play', 'wrong'); return }
@@ -709,6 +713,7 @@ class ForagingManager {
 
       this.#foragedToday.add(tileIndex)
       database.setGameState('naturalforaged', this.#foragedToday)
+      if (this.#foragedToday.size >= NATURAL_FORAGE_DAILY_LIMIT) buffManager.setBuff('overForaged', true)
 
       const speed = computeActionSpeed(tileNode.foraging.speed, tool.foraging.speed, 'foraging-speed', prefix)
 
@@ -718,6 +723,48 @@ class ForagingManager {
 
       if (wasEmpty) this.#scheduleNext()
     }
+  }
+
+  /**
+    * Positionne les buffs de contexte 'submerged' et 'shore' d'une tuile SAND (true/false,
+    * sans tenir compte de leur valeur précédente) et retourne le tier de faucille requis.
+    * SEA au-dessus, à gauche ou à droite → submerged ; sinon SKY au-dessus, à gauche ou à
+    * droite et mer proche → shore ; sinon aucun des deux.
+    * @param {number} tileIndex — (y << 10) | x
+    * @returns {number} tier minimal de faucille, 0 si la tuile n'est pas forageable
+    */
+  #getSandContext (tileIndex) {
+    const SEA = NODES.SEA.code
+    const SKY = NODES.SKY.code
+    const up = chunkManager.getTileAt(tileIndex - WORLD_WIDTH)
+    const left = chunkManager.getTileAt(tileIndex - 1)
+    const right = chunkManager.getTileAt(tileIndex + 1)
+
+    const submerged = up === SEA || left === SEA || right === SEA
+    const shore = !submerged && (up === SKY || left === SKY || right === SKY) && this.#isNearSea(tileIndex & 0x3FF)
+    buffManager.setBuff('submerged', submerged)
+    buffManager.setBuff('shore', shore)
+
+    return submerged || shore
+  }
+
+  /**
+    * Indique si une tuile SEA existe sur la ligne SEA_LEVEL à moins de SALT_SEA_DISTANCE tuiles
+    * de la colonne x, en direction du bord du monde le plus proche.
+    * @param {number} x — colonne testée
+    * @returns {boolean}
+    */
+  #isNearSea (x) {
+    const SEA = NODES.SEA.code
+    const dir = x < (WORLD_WIDTH >> 1) ? -1 : 1
+    const rowBase = SEA_LEVEL << 10
+    let sx = x + dir
+    for (let d = 0; d < SALT_SEA_DISTANCE; d++) {
+      if (sx <= 0 || sx >= WORLD_WIDTH - 1) return false
+      if (chunkManager.getTileAt(rowBase | sx) === SEA) return true
+      sx += dir
+    }
+    return false
   }
 
   /**
@@ -737,14 +784,20 @@ class ForagingManager {
   }
 
   /**
-   * Callback TaskScheduler : traite l'entrée en tête de file (natural ou plant).
-   */
+    * Callback TaskScheduler : traite l'entrée en tête de file (natural ou plant). Une entrée de
+    * sol est ignorée si la tuile a changé ; pour SAND, les buffs de contexte sont repositionnés
+    * avant le tirage et l'entrée est ignorée si la tuile n'est plus forageable.
+    */
   onForage () {
     const entry = this.#queue.shift()
     if (entry === undefined) return
 
     if (entry.type === 'natural') {
       if (chunkManager.getTileAt(entry.tileIndex) !== entry.tileNode.code) {
+        this.#scheduleNext()
+        return
+      }
+      if (entry.tileNode.code === NODES.SAND.code && !this.#getSandContext(entry.tileIndex)) {
         this.#scheduleNext()
         return
       }
@@ -769,9 +822,24 @@ class ForagingManager {
     this.#scheduleNext()
   }
 
-  /** Annule toute tâche de foraging en attente. */
+  /**
+    * Annule toute tâche de foraging en attente. Les tuiles de sol encore en file (non foragées)
+    * sont restituées au quota journalier, et le debuff 'overForaged' est mis à jour.
+    */
   #interrupt () {
     if (this.#queue.length === 0) return
+
+    let refunded = false
+    for (const entry of this.#queue) {
+      if (entry.type !== 'natural') continue
+      this.#foragedToday.delete(entry.tileIndex)
+      refunded = true
+    }
+    if (refunded) {
+      database.setGameState('naturalforaged', this.#foragedToday)
+      buffManager.setBuff('overForaged', this.#foragedToday.size >= NATURAL_FORAGE_DAILY_LIMIT)
+    }
+
     this.#queue.length = 0
     taskScheduler.dequeue('forage-current')
     // annuler animation outil (sickle)
