@@ -2209,7 +2209,7 @@ See [[Mining]], [[Mining Tools]] and [[Mining Buffs]] for details.
 
 **Foraging**
 
-Sand near the [[Sea]] can be foraged with a [[item|sickleCopper]] or better:
+Sand near the [[Sea]] can be foraged with a [[item:sickleCopper]] or better:
 
 * _Shore_ — a sand tile with open sky above or beside it, close to the sea, may yield [[item:salt]]
 * _Submerged_ — a sand tile with sea water above or beside it may yield an [[item:oyster]]
@@ -7065,7 +7065,7 @@ Foraging Tool: <<itemStar|sickleSilver>> or better
 
 **Sand Foraging**
 
-Foraging Tool: <<itemStar|coperSilver>> or better
+Foraging Tool: <<itemStar|sickleCopper>> or better
 
 <hr>
 
