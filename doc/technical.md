@@ -1540,7 +1540,6 @@ Toutes les refs DOM précalculées à l'init. Zéro parcours DOM en runtime.
 #### `DISPLAY_BUFFS`
 
 Tableau de définitions `{id, title, x, y}` — coordonnées dans `assets/sprites/buff_32_32.png` (tuiles 32x32px).
-`id === 'armors'` : toujours visible, title dynamique mis à jour à la fermeture de l'inventaire.
 
 #### Comportement `#update` (chaque seconde)
 
