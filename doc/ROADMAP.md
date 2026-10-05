@@ -8,11 +8,11 @@
 ## En cours
 
 ### Code et tests
+- Intégrer les buffs de Set d'armure
 - gestion des points de vie :
   - Mort du joueur — test current <= 0 → émission de l'event déclenchant spawnManager.onTeleportSpawn()
   - Lifeforce Potion — dépend du système "buff timed" (TODO déjà noté dans BuffManager)
 - Ajouter un buff 'wet/Honey/Sap' de 15 secondes quand on sort de l'eau/honey/sap
-- Intégrer les buffs de Set d'armure
 - ajouter un overlay affichant les caractéristiques du personnages (buffs...).
 - ajouter un bouton dans l'inventaire pour afficher l'overlay du personnage (impact sur son z-index).
 - traiter le cas particulier des trois buffs relatifs à la nourriture.
