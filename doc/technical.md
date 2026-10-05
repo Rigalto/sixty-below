@@ -1545,7 +1545,6 @@ Tableau de définitions `{id, title, x, y}` — coordonnées dans `assets/sprite
 
 1.buffManager.getBuffs(#buffIds)  — un seul appel pour tous les buffs statiques
 2. Pour chaque buff :
-  * id === 'armors'                → toujours display:flex, skip
   * buffManager.timestamps.get(id) → buff timed : affiche remaining (ceil((exp-now)/1000)), caché si ≤ 0
   * sinon                          → buff statique : display selon valeur truthy/falsy
 
@@ -1555,7 +1554,7 @@ Tableau de définitions `{id, title, x, y}` — coordonnées dans `assets/sprite
 | :--- | :--- |
 | `#container` | Élément racine injecté dans `#right-sidebar` |
 | `#refs` | `Map<id, {el, timeEl}>` — refs DOM précalculées |
-| `#buffIds` | `string[]` — ids filtrés (sans `armors`), précalculés dans le constructeur |
+| `#buffIds` | `string[]` — ids de `DISPLAY_BUFFS`, précalculés dans le constructeur |
 
 
 ## 15. Inventaire
