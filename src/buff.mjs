@@ -1,6 +1,6 @@
 // buff.mjs — BuffManager - BuffWidget
 
-import {NODES_LOOKUP, ITEMS, TRINKET_BUFF_TABLE, EQUIPMENT_BUFF_TABLE, BUFFS} from '../assets/data/data.mjs'
+import {NODES_LOOKUP, ITEMS, TRINKET_BUFF_TABLE, EQUIPMENT_BUFF_TABLE, ARMOR_SET_BUFFS, BUFFS} from '../assets/data/data.mjs'
 import {UI_LAYOUT, MICROTASK} from './constant.mjs'
 import {playerManager} from './player.mjs'
 import {eventBus, timeManager, taskScheduler} from './utils.mjs'
@@ -526,12 +526,16 @@ class BuffManager {
   }
 
   /**
-   * Recalcule les buffs armure, détecte les changements et émet 'buff/armor-changed'.
+   * Recalcule les buffs armure (pièces équipées + bonus de set complet), détecte les changements
+   * et émet 'buff/armor-changed'.
    * @param {string[]} armor - Liste des IDs d'armures actuellement équipées.
    */
   #onArmorBuffs (armor) {
     this.#resetBuffer(this.#nextArmor, EQUIPMENT_BUFF_TABLE)
     this.#applyItems(armor, EQUIPMENT_BUFF_TABLE, this.#nextArmor)
+    const setBonus = this.#getArmorSetBonus(armor)
+    if (setBonus !== null) this.#applyBuffs(setBonus.buff, EQUIPMENT_BUFF_TABLE, this.#nextArmor)
+
     const changed = this.#computeChanged(EQUIPMENT_BUFF_TABLE, this.#currentArmor, this.#nextArmor)
     ;[this.#currentArmor, this.#nextArmor] = [this.#nextArmor, this.#currentArmor]
     if (changed.size > 0) eventBus.emit('buff/armor-changed', changed)
@@ -568,11 +572,39 @@ class BuffManager {
     for (const itemId of itemIds) {
       const item = ITEMS[itemId]
       if (!item?.buff) continue
-      for (const {buff, value} of item.buff) {
-        const op = table[buff]
-        if (op === 'sum') { buffer[buff] += value } else if (op === 'max') { if (value > buffer[buff]) buffer[buff] = value } else if (op === 'or') { if (value) buffer[buff] = value } else { buffer[buff] = value }
-      }
+      this.#applyBuffs(item.buff, table, buffer)
+      // for (const {buff, value} of item.buff) {
+      //   const op = table[buff]
+      //   if (op === 'sum') { buffer[buff] += value } else if (op === 'max') { if (value > buffer[buff]) buffer[buff] = value } else if (op === 'or') { if (value) buffer[buff] = value } else { buffer[buff] = value }
+      // }
     }
+  }
+
+  /**
+   * Applique une liste de buffs dans le buffer selon leur opération ('sum', 'max', 'or', sinon affectation).
+   * @param {Array<{buff: string, value: number}>} buffs - Buffs à appliquer.
+   * @param {Object.<string, string>} table - Table liant le buff à son type d'opération mathématique.
+   * @param {Object.<string, number>} buffer - Le buffer de destination modifié par effet de bord.
+   */
+  #applyBuffs (buffs, table, buffer) {
+    for (const {buff, value} of buffs) {
+      const op = table[buff]
+      if (op === 'sum') { buffer[buff] += value } else if (op === 'max') { if (value > buffer[buff]) buffer[buff] = value } else if (op === 'or') { if (value) buffer[buff] = value } else { buffer[buff] = value }
+    }
+  }
+
+  /**
+   * Retourne l'entrée ARMOR_SET_BUFFS du set complet formé par les 3 pièces d'armure,
+   * ou null si un slot est vide, si les pièces n'appartiennent pas au même set, ou si le set n'a pas de bonus.
+   * @param {string[]} armor - IDs des 3 slots d'armure (HEAD=0, BODY=1, FOOT=2), '' si vide.
+   * @returns {{name: string, buff: Array<{buff: string, value: number, op: string}>}|null}
+   */
+  #getArmorSetBonus (armor) {
+    const [head, body, foot] = armor
+    if (head === '' || body === '' || foot === '') return null
+    const set = ITEMS[head].set
+    if (set === undefined || ITEMS[body].set !== set || ITEMS[foot].set !== set) return null
+    return ARMOR_SET_BUFFS[set] ?? null
   }
 
   /**

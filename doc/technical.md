@@ -438,7 +438,7 @@ Cette section définit les événements officiels. Tout nouvel événement doit 
 | E | `debug/buff-manager` | _(none)_ | Affiche sur la console le contenu de `#values`, `#currentTrinket` et `#fns`. |
 | S | `buff/trinket-changed` | `Set<string>` | Émis par `buffManager` quand un buff trinket change. Payload = buffIds modifiés. |
 | S | `buff/armor-changed` | `Set<string>` | Émis quand au moins un buff d'armure change (recalculé à la fermeture de l'inventaire). Payload = buffIds modifiés. |
-| S | `buff/accessory-changed` | `Set<string>` | Émis quand au moins un buff d'accessoire change (recalculé à la fermeture de l'inventaire). Payload = buffIds modifiés. |
+| S | `buff/accessory-changed` | `Set<string>` | Émis quand au moins un buff d'armure change, bonus de set inclus (recalculé à la fermeture de l'inventaire). Payload = buffIds modifiés. |
 
 #### Action de minage (`MiningManager`)
 
@@ -1536,6 +1536,12 @@ store `buff` (voir signature ci-dessus pour la forme de `record`).
 Affiche les buffs actifs dans le Control Panel (`UI_LAYOUT.BUFF = 40`).
 Indépendant de la boucle principale — `setInterval` 1 seconde.
 Toutes les refs DOM précalculées à l'init. Zéro parcours DOM en runtime.
+
+#### `ARMOR_SET_BUFFS` (`data.mjs`)
+
+Table des bonus de set d'armure : `{[set]: {name: string, buff: Array<{buff, value, op}>}}`. La clé est l'attribut `set` des pièces d'armure.
+Hydratation au chargement (9.2b) : vérifie que chaque set compte 3 pièces dans `ITEMS` et enregistre les `op` dans `EQUIPMENT_BUFF_TABLE`, avec contrôle de cohérence.
+Bonus appliqué dans le buffer armure quand les 3 slots (head, body, foot) contiennent des pièces du même set. Un set absent de la table n'octroie rien.
 
 #### `DISPLAY_BUFFS`
 
