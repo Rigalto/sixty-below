@@ -724,7 +724,7 @@ class BuffWidget {
     this.#buildDOM()
     this.#startInterval()
     // Précalculé une fois de la liste des buffs
-    this.#buffIds = DISPLAY_BUFFS.filter(def => def.id !== 'armors').map(def => def.id)
+    this.#buffIds = DISPLAY_BUFFS.map(def => def.id)
   }
 
   /**
@@ -749,7 +749,7 @@ class BuffWidget {
       el.title = def.title
       el.className = 'buff-item'
       el.title = def.title
-      el.style.display = def.id === 'armors' ? 'flex' : 'none'
+      el.style.display = 'none'
 
       // Icône via ::before simulé avec un div dédié
       const icon = document.createElement('div')
