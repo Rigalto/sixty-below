@@ -9,6 +9,7 @@
 
 ### Code et tests
 - Intégrer les buffs de Set d'armure
+- Optimiser en utilisant un objet statique pour toutes les buffs composés 'xxxx-range'.
 - gestion des points de vie :
   - Mort du joueur — test current <= 0 → émission de l'event déclenchant spawnManager.onTeleportSpawn()
   - Lifeforce Potion — dépend du système "buff timed" (TODO déjà noté dans BuffManager)
