@@ -748,7 +748,6 @@ class BuffWidget {
       const el = document.createElement('div')
       el.title = def.title
       el.className = 'buff-item'
-      el.title = def.title
       el.style.display = 'none'
 
       // Icône via ::before simulé avec un div dédié
