@@ -837,20 +837,6 @@ export const ITEMS = {
    4. BUFFS
    ============================================================================ */
 
-// Bonus de set d'armure — clé = attribut 'set' des pièces d'armure
-// Appliqué par BuffManager quand les 3 pièces équipées (head, body, foot) partagent le même set
-// Un set absent de la table n'octroie aucun bonus
-export const ARMOR_SET_BUFFS = {
-  wood: {name: 'Wood Armor', buff: [{buff: 'defense', value: 1, op: 'sum'}]},
-  copper: {name: 'Copper Armor', buff: [{buff: 'defense', value: 2, op: 'sum'}]},
-  iron: {name: 'Iron Armor', buff: [{buff: 'defense', value: 2, op: 'sum'}]},
-  silver: {name: 'Silver Armor', buff: [{buff: 'defense', value: 3, op: 'sum'}]},
-  gold: {name: 'Gold Armor', buff: [{buff: 'defense', value: 3, op: 'sum'}]},
-  cobalt: {name: 'Platinum Armor', buff: [{buff: 'defense', value: 4, op: 'sum'}]},
-  platinum: {name: 'Platinum Armor', buff: [{buff: 'defense', value: 5, op: 'sum'}]},
-  miner: {name: 'Mining Armor', buff: [{buff: 'defense', value: 1, op: 'sum'}, {buff: 'miningSpeed', value: 30, op: 'sum'}, {buff: 'miningRange', value: 1, op: 'sum'}]}
-}
-
 export const BUFFS = {
   web: 50, // malus de movement-speed / toile d'araignée
   water: 20, // malus de movement-speed / Sea - Water
@@ -899,7 +885,33 @@ export const BUFFS = {
   exquisitelyStuffedDamage: 4,
   exquisitelyStuffedCriticalChance: 4,
   exquisitelyStuffedPa: 3,
-  exquisitelyStuffedPm: 3
+  exquisitelyStuffedPm: 3,
+
+  woodSetDefense: 1,
+  copperSetDefense: 2,
+  ironSetDefense: 2,
+  silverSetDefense: 3,
+  goldSetDefense: 3,
+  cobaltSetDefense: 4,
+  platinumSetDefense: 5,
+  minerSetDefense: 1,
+
+  minerSetMiningSpeed: 30,
+  minerSetMiningRange: 1
+}
+
+// Bonus de set d'armure — clé = attribut 'set' des pièces d'armure
+// Appliqué par BuffManager quand les 3 pièces équipées (head, body, foot) partagent le même set
+// Un set absent de la table n'octroie aucun bonus
+export const ARMOR_SET_BUFFS = {
+  wood: {name: 'Wood Armor', buff: [{buff: 'defense', value: BUFFS.woodSetDefense, op: 'sum'}]},
+  copper: {name: 'Copper Armor', buff: [{buff: 'defense', value: BUFFS.copperSetDefense, op: 'sum'}]},
+  iron: {name: 'Iron Armor', buff: [{buff: 'defense', value: BUFFS.ironSetDefense, op: 'sum'}]},
+  silver: {name: 'Silver Armor', buff: [{buff: 'defense', value: BUFFS.silverSetDefense, op: 'sum'}]},
+  gold: {name: 'Gold Armor', buff: [{buff: 'defense', value: BUFFS.goldSetDefense, op: 'sum'}]},
+  cobalt: {name: 'Cobalt Armor', buff: [{buff: 'defense', value: BUFFS.cobaltSetDefense, op: 'sum'}]},
+  platinum: {name: 'Platinum Armor', buff: [{buff: 'defense', value: BUFFS.platinumSetDefense, op: 'sum'}]},
+  miner: {name: 'Mining Armor', buff: [{buff: 'defense', value: BUFFS.minerSetDefense, op: 'sum'}, {buff: 'miningSpeed', value: BUFFS.minerSetMiningSpeed, op: 'sum'}, {buff: 'miningRange', value: BUFFS.minerSetMiningRange, op: 'sum'}]}
 }
 
 /* ============================================================================

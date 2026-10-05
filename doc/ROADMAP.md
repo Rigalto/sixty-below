@@ -8,7 +8,7 @@
 ## En cours
 
 ### Code et tests
-- Intégrer les buffs de Set d'armure
+- Aligner les buffs et prefixes pour les armures (head = PA, body = PO (ne pas parler de torse), feet = PM + Movement Speed). Ajouter deux préfixes aux armures (Taux critique et domages critiques) pour avoir 4 choix au lieu de deux.
 - Optimiser en utilisant un objet statique pour toutes les buffs composés 'xxxx-range'.
 - gestion des points de vie :
   - Mort du joueur — test current <= 0 → émission de l'event déclenchant spawnManager.onTeleportSpawn()

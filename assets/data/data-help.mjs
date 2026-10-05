@@ -4322,12 +4322,15 @@ Biome: [[Jungle]]
   //    Armors, Armor Sets
   {
     title: 'Armors',
-    category: ['Armor'],
+    category: ['Armor', 'Fighting'],
     content: `
-    Three slots: Head, Body, Foot
+**Description**
 
+Three slots: Head, Body, Foot
 
-    **Axe Types**
+<hr>
+
+**Armors Types**
 
 | Set | Armor | Slot | Tier | Defense Bonus | Other Bonus |
 |---|---|---|---|
@@ -4354,15 +4357,92 @@ Biome: [[Jungle]]
 | Platinum | [[item:bodyPlatinum]] | Body | {{item:bodyPlatinum:star|star}} | {{item:bodyPlatinum:defense}} | - |
 | Platinum | [[item:footPlatinum]] | Foot | {{item:footPlatinum:star|star}} | {{item:footPlatinum:defense}} | - |
 
-    Armor prefixes :
+<hr>
 
-    [[Armor Sets]] :
+**Armor prefixes**
+
+A [[Gear Prefixes|Gear Prefixe]] enhance any armor piece, adding special properties beyond their base stats. An armor piece can carry at most one prefix.
+
+See [[Gear Prefixes]] for a detailed list of Prefixes, their granted bonus and how to obtain.
+
+<hr>
+
+**Armor Sets**
+
+An [[Armor Sets|Armor Set]] is a group of three armor pieces — Head, Body and Foot — made from the same material.
+
+Wearing all three pieces of the same set grants an additional **Set Bonus**, on top of the bonuses of each individual piece.
+
+See [[Armor Sets]] for a detailed list of Sets and their granted bonus.
     `
   },
   {
     title: 'Armor Sets',
-    category: ['Armor'],
+    category: ['Armor', 'Fighting'],
     content: `
+**Description**
+
+An **Armor Set** is a group of three [[Armors|armor pieces]] — Head, Body and Foot — made from the same material.
+
+Wearing all three pieces of the same set grants an additional **Set Bonus**, on top of the bonuses of each individual piece.
+
+* The bonus is active only while the three pieces are equipped in their [[Inventory]] armor slots.
+* When the set is complete, the three armor slots turn bright green.
+* Pieces that do not belong to any set (such as the [[item:bucket]]) never complete a set.
+* Set Bonuses stack with all other [[Buffs]].
+
+Set Bonuses cover both fighting and activities:
+
+* _Combat_ — Defense (DEF), Action Points (PA), Movement Points (PM), Range (PO), Critical Chance and Critical Damage⏳
+* _Activities_ — speed and range of [[Mining Buffs|Mining]], and other activities⏳
+
+_All Foot pieces will also grant a [[Movement Buffs|Movement Speed]] bonus._⏳
+
+<hr>
+
+**Sets Composition**
+
+| Set | Tier | Head | Body | Foot |
+|---|---|---|---|---|
+| Wood | {{item:headOak:star|star}} | [[item:headOak]] | [[item:bodyOak]] | [[item:footOak]] |
+| Copper | {{item:headCopper:star|star}} | [[item:headCopper]] | [[item:bodyCopper]] | [[item:footCopper]] |
+| Iron | {{item:headIron:star|star}} | [[item:headIron]] | [[item:bodyIron]] | [[item:footIron]] |
+| Mining | {{item:headMiner:star|star}} | [[item:headMiner]] | [[item:bodyMiner]] | [[item:footMiner]] |
+| Silver | {{item:headSilver:star|star}} | [[item:headSilver]] | [[item:bodySilver]] | [[item:footSilver]] |
+| Gold | {{item:headGold:star|star}} | [[item:headGold]] | [[item:bodyGold]] | [[item:footGold]] |
+| Cobalt | {{item:headCobalt:star|star}} | [[item:headCobalt]] | [[item:bodyCobalt]] | [[item:footCobalt]] |
+| Platinum | {{item:headPlatinum:star|star}} | [[item:headPlatinum]] | [[item:bodyPlatinum]] | [[item:footPlatinum]] |
+
+<hr>
+
+**Set Bonuses — Combat**
+
+| Set | Defense |
+|---|---|
+| Wood | +{{buff:woodSetDefense}} |
+| Copper | +{{buff:copperSetDefense}} |
+| Iron | +{{buff:ironSetDefense}} |
+| Mining | +{{buff:minerSetDefense}} |
+| Silver | +{{buff:silverSetDefense}} |
+| Gold | +{{buff:goldSetDefense}} |
+| Cobalt | +{{buff:cobaltSetDefense}} |
+| Platinum | +{{buff:platinumSetDefense}} |
+
+<<additiveNote>>
+
+See [[Combat Buffs]] for details.
+
+**Set Bonuses — Activities**
+
+| Set | Mining Speed | Mining Range |
+|---|---|---|
+| Mining | +{{buff:minerSetMiningSpeed}}% | +{{buff:minerSetMiningRange}} tile |
+
+_Range bonus applies equally in all directions._
+
+<<additiveNote>>
+
+See [[Mining Buffs]] and [[Ranges]] for details.
     `
   },
 
