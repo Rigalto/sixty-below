@@ -5282,6 +5282,23 @@ Parler d'abord du Glass, puis des Bottles.
 
 ⏳
 
+<hr>
+
+**Recipes**
+
+| Potion | Tier | Crafting Station | Ingredients |
+| --- | --- | --- | --- |
+<<fullRecipeRow|daw>>
+<<fullRecipeRow|lesserHealingPotion>>
+<<fullRecipeRow|lesserLuckyPotion>>
+<<fullRecipeRow|standardHealingPotion>>
+<<fullRecipeRow|standardLuckyPotion>>
+<<fullRecipeRow|greaterHealingPotion>>
+<<fullRecipeRow|greaterLuckyPotion>>
+<<fullRecipeRow|jelly>>
+
+<hr>
+
 **Tips**
 
 * Parler des [[item:bucket]]s.
@@ -5350,7 +5367,7 @@ Dropped by [[monster:slime|Slimes]]
 | --- | --- | --- | --- |
 <<fullRecipeRow|torch>>
 <<fullRecipeRow|lesserHealingPotion>>
-
+<<fullRecipeRow|jelly>>
 
     `
   },
@@ -5741,6 +5758,7 @@ Pheromone mastery — allows control of specific monster species
 | <<itemStar2Columns|bread>> |
 | <<itemStar2Columns|croissant>> |
 | <<itemStar2Columns|friedEgg>> |
+| <<itemStar2Columns|jelly>> |
 | <<itemStar2Columns|parsnipMash>> |
 | <<itemStar2Columns|peach>> |
 | <<itemStar2Columns|shuckedOyster>> |

@@ -754,13 +754,18 @@ export const ITEMS = {
   viperFang: {name: 'Viper Fang', type: 0, stype: 'monster', star: 2, image: 'tools_32_32-12-7', help: 'Antlion Pit', tooltip: 'Component for tools'},
   viperScale: {name: 'Viper Scale', type: 0, stype: 'monster', star: 2, image: 'tools_32_32-12-7', help: 'Antlion Pit', tooltip: 'Component for accessories'},
 
-  // Food - Pastry
-  flour: {name: 'Flour', type: 0, stype: 'food', star: 1, image: 'tools_32_32-12-7', help: 'Food', tooltip: 'Component for daw'},
-  daw: {name: 'Daw', type: 0, stype: 'food', star: 1, image: 'tools_32_32-12-7', help: 'Food', tooltip: 'To cook for bread and pies'},
-  bread: {name: 'Bread', type: ITEM_TYPE.FOOD, stype: 'food', star: 1, image: 'tools_32_32-12-7', help: 'Food', tooltip: 'Minor improvements to all stats 10 minutes)', using: [{action: 'buff-timed', buff: 'wellFed', duration: 600}]},
-  croissant: {name: 'Croissant', type: ITEM_TYPE.FOOD | ITEM_TYPE.USABLE, stype: 'food', star: 1, image: 'food_32_32-7-1', help: 'Food', tooltip: 'Minor improvements to all stats (11 minutes)', using: [{action: 'buff-timed', buff: 'wellFed', duration: 660}]},
+  // Foof from surface loot
+  jelly: {name: 'Jelly', type: ITEM_TYPE.FOOD | ITEM_TYPE.USABLE, stype: 'food', star: 1, image: 'food_32_32-0-0', help: 'Gel', tooltip: 'Minor improvements to all stats (10 minutes)', using: [{action: 'buff-timed', buff: 'wellFed', duration: 600}]},
+  friedEgg: {name: 'Fried Egg', type: ITEM_TYPE.FOOD | ITEM_TYPE.USABLE, stype: 'food', star: 1, image: 'food_32_32-1-0', help: 'Eggs', tooltip: 'Minor improvements to all stats (9 minutes)', using: [{action: 'buff-timed', buff: 'wellFed', duration: 540}]},
 
-  friedEgg: {name: 'Fried Egg', type: ITEM_TYPE.FOOD | ITEM_TYPE.USABLE, stype: 'food', star: 1, image: 'food_32_32-4-1', help: 'Eggs', tooltip: 'Minor improvements to all stats (9 minutes)', using: [{action: 'buff-timed', buff: 'wellFed', duration: 540}]},
+  // Drinks - images NOK
+  ale: {name: 'Ale', type: ITEM_TYPE.FOOD | ITEM_TYPE.USABLE, stype: 'drink', star: 2, image: 'food_32_32-2-0', help: 'Drinks', tooltip: 'Increase your Melee caracteristics', using: [{action: 'buff-timed', buff: 'tipsy', duration: 600}, {action: 'buff-timed', buff: 'wellFed', duration: 300}]},
+
+  // Food - Pastry
+  flour: {name: 'Flour', type: 0, stype: 'food', star: 1, image: 'food_32_32-3-0', help: 'Food', tooltip: 'Component for daw'},
+  daw: {name: 'Daw', type: 0, stype: 'food', star: 1, image: 'food_32_32-4-0', help: 'Food', tooltip: 'To cook for bread and pies'},
+  bread: {name: 'Bread', type: ITEM_TYPE.FOOD, stype: 'food', star: 1, image: 'food_32_32-5-0', help: 'Food', tooltip: 'Minor improvements to all stats 10 minutes)', using: [{action: 'buff-timed', buff: 'wellFed', duration: 600}]},
+  croissant: {name: 'Croissant', type: ITEM_TYPE.FOOD | ITEM_TYPE.USABLE, stype: 'food', star: 1, image: 'food_32_32-6-0', help: 'Food', tooltip: 'Minor improvements to all stats (11 minutes)', using: [{action: 'buff-timed', buff: 'wellFed', duration: 660}]},
 
   // armors
   playerHead: {name: 'Player Head', type: 0, stype: '', star: 1, image: null, armorImage: 'head_26_22-0-0', help: 'Armors', tooltip: ''},
@@ -825,10 +830,7 @@ export const ITEMS = {
   // Lucky Potions - help NOK
   lesserLuckyPotion: {name: 'Lesser Lucky Potion', type: ITEM_TYPE.POTION | ITEM_TYPE.USABLE, stype: 'luck', star: 1, image: 'potion_32_32-5-0', help: 'Lucky Potions', tooltip: 'Grants Lucky Buff for 1 in-game hour', using: [{action: 'buff-timed', buff: 'lucky', duration: 60}, {action: 'add-items', items: [{item: 'bottle', count: 1}]}]},
   standardLuckyPotion: {name: 'Standard Lucky Potion', type: ITEM_TYPE.POTION | ITEM_TYPE.USABLE, stype: 'luck', star: 2, image: 'potion_32_32-6-0', help: 'Lucky Potions', tooltip: 'Grants Lucky Buff for 8 in-game hour', using: [{action: 'buff-timed', buff: 'lucky', duration: 480}, {action: 'add-items', items: [{item: 'bottle', count: 1}]}]},
-  greaterLuckyPotion: {name: 'Greater Lucky Potion', type: ITEM_TYPE.POTION | ITEM_TYPE.USABLE, stype: 'luck', star: 3, image: 'potion_32_32-7-0', help: 'Lucky Potions', tooltip: 'Grants Lucky Buff for 24 in-game hour', using: [{action: 'buff-timed', buff: 'lucky', duration: 1440}, {action: 'add-items', items: [{item: 'bottle', count: 1}]}]},
-
-  // Drinks - images NOK
-  ale: {name: 'Ale', type: ITEM_TYPE.FOOD | ITEM_TYPE.USABLE, stype: 'drink', star: 2, image: 'food_32_32-2-1', help: 'Drinks', tooltip: 'Increase your Melee caracteristics', using: [{action: 'buff-timed', buff: 'tipsy', duration: 600}, {action: 'buff-timed', buff: 'wellFed', duration: 300}]}
+  greaterLuckyPotion: {name: 'Greater Lucky Potion', type: ITEM_TYPE.POTION | ITEM_TYPE.USABLE, stype: 'luck', star: 3, image: 'potion_32_32-7-0', help: 'Lucky Potions', tooltip: 'Grants Lucky Buff for 24 in-game hour', using: [{action: 'buff-timed', buff: 'lucky', duration: 1440}, {action: 'add-items', items: [{item: 'bottle', count: 1}]}]}
 }
 
 /* ============================================================================
@@ -1063,13 +1065,13 @@ export const RECIPES = [
   // Food - Tier 1-3
 
   {result: {item: 'friedEgg', count: 1}, station: 'cookingPot', ingredients: [{item: 'egg', count: 1}, {item: 'salt', count: 1}]},
+  {result: {item: 'jelly', count: 1}, station: 'cookingPot', ingredients: [{item: 'gel', count: 1}, {item: 'bottleHoney', count: 1}], returned: [{item: 'bottle', count: 1}]},
   {result: {item: 'sunflowerOil', count: 1}, station: 'tableWood', ingredients: [{item: 'sunflowerSeed', count: 1}]},
   {result: {item: 'oleanderOil', count: 2}, station: 'cookingPotOn', ingredients: [{item: 'oleander', count: 1}, {item: 'sunflowerOil', count: 1}]},
   {result: {item: 'daw', count: 4}, station: 'byHand', ingredients: [{item: 'flour', count: 1}, {item: 'bottleWater', count: 1}], returned: [{item: 'bottle', count: 1}]},
   {result: {item: 'bread', count: 1}, station: 'furnace', ingredients: [{item: 'daw', count: 1}]},
   {result: {item: 'croissant', count: 2}, station: 'furnace', ingredients: [{item: 'daw', count: 1}, {item: 'sunflowerOil', count: 1}]}
   // {output: 'clafoutis', station: 'furnace', recipe: [{item: 'flour', count: 1}, {item: 'milk', count: 1}, {item: 'cherry', count: 1}], bonus: [{item: 'cherryseed', count: 1}], built: 2},
-  // {output: 'jelly', station: 'cook', recipe: [{item: 'trawberry', count: 1}, {item: 'gel', count: 2}]},
   // {output: 'trawberrypie', station: 'cook', recipe: [{item: 'flour', count: 1}, {item: 'milk', count: 1}, {item: 'trawberry', count: 1}, {item: 'gel', count: 1}, {item: 'lemon', count: 1}]}
 ]
 
