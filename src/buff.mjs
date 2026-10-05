@@ -112,10 +112,11 @@ class BuffManager {
       return {x, y, w, h}
     }],
     ['mining-range', () => {
-      const x = -2
-      const y = -4
-      const w = 6
-      const h = 8
+      const range = this.#currentArmor.miningRange ?? 0
+      const x = -2 - range
+      const y = -4 - range
+      const w = 6 + (range << 1)
+      const h = 8 + (range << 1)
       return {x, y, w, h}
     }],
     ['mining-speed', () => {
