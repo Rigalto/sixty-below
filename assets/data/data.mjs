@@ -837,6 +837,20 @@ export const ITEMS = {
    4. BUFFS
    ============================================================================ */
 
+// Bonus de set d'armure — clé = attribut 'set' des pièces d'armure
+// Appliqué par BuffManager quand les 3 pièces équipées (head, body, foot) partagent le même set
+// Un set absent de la table n'octroie aucun bonus
+export const ARMOR_SET_BUFFS = {
+  wood: {name: 'Wood Armor', buff: [{buff: 'defense', value: 1, op: 'sum'}]},
+  copper: {name: 'Copper Armor', buff: [{buff: 'defense', value: 2, op: 'sum'}]},
+  iron: {name: 'Iron Armor', buff: [{buff: 'defense', value: 2, op: 'sum'}]},
+  silver: {name: 'Silver Armor', buff: [{buff: 'defense', value: 3, op: 'sum'}]},
+  gold: {name: 'Gold Armor', buff: [{buff: 'defense', value: 3, op: 'sum'}]},
+  cobalt: {name: 'Platinum Armor', buff: [{buff: 'defense', value: 4, op: 'sum'}]},
+  platinum: {name: 'Platinum Armor', buff: [{buff: 'defense', value: 5, op: 'sum'}]},
+  miner: {name: 'Mining Armor', buff: [{buff: 'defense', value: 1, op: 'sum'}, {buff: 'miningSpeed', value: 30, op: 'sum'}, {buff: 'miningRange', value: 1, op: 'sum'}]}
+}
+
 export const BUFFS = {
   web: 50, // malus de movement-speed / toile d'araignée
   water: 20, // malus de movement-speed / Sea - Water
@@ -1356,6 +1370,26 @@ for (const key in ITEMS) {
       }
     }
   }
+
+  // Hydratation de ARMOR_SET_BUFFS : contrôle des 3 pièces du set + enregistrement des op dans EQUIPMENT_BUFF_TABLE —
+  for (const set in ARMOR_SET_BUFFS) {
+    let pieces = 0
+    for (const key in ITEMS) {
+      if (ITEMS[key].set === set) pieces++
+    }
+    if (pieces !== 3) console.error(`[data.mjs] ARMOR_SET_BUFFS.${set} : ${pieces} pièce(s) d'armure trouvée(s) (attendu 3)`)
+    for (const {buff, op} of ARMOR_SET_BUFFS[set].buff) {
+      const resolvedOp = op ?? ''
+      if (buff in EQUIPMENT_BUFF_TABLE) {
+        if (EQUIPMENT_BUFF_TABLE[buff] !== resolvedOp) {
+          console.error(`[data.mjs] ARMOR_SET_BUFFS.${set} : op mismatch pour le buff '${buff}' (attendu '${EQUIPMENT_BUFF_TABLE[buff]}', trouvé '${resolvedOp}')`)
+        }
+      } else {
+        EQUIPMENT_BUFF_TABLE[buff] = resolvedOp
+      }
+    }
+  }
+
   // vérification USABLE → attributs 'using' et 'using.action' obligatoires
   if (itemDesc.type & ITEM_TYPE.USABLE) {
     if (!itemDesc.using || itemDesc.using.length === 0) {
