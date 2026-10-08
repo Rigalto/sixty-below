@@ -154,7 +154,7 @@ export const TIME_SLOT = ['Midnight', 'Dawn', 'Morning', 'Noon', 'Afternoon', 'D
 
 export const DB_CONFIG = {
   NAME: 'SixtyBelowDB',
-  VERSION: 3,
+  VERSION: 4,
   DEBUG: true,
   STORES: [
     'world_chunks', // Stockage des chunks (Uint8Array)
@@ -164,7 +164,6 @@ export const DB_CONFIG = {
     'plant', // Trees, Herbs, Mushrooms, Flowers, Corals
     'monster', // Enemies, Criters, Bosses
     'furniture', // Furniture (Housing), Crafting Station
-    'liquid', // 'index' et 'code' d'une des tuiles de chaque liquid body
     'achievements' // Compteurs de succès : {code, count}
   ]
 }

@@ -323,15 +323,8 @@ class WorldGenerator {
     // ⚠️ digSurfaceLakes DOIT rester en premier — il n'utilise pas #exclusions pour se placer,
     // mais alimente la table pour tous les mini-biomes suivants.
     const surfaceLakes = worldCarver.digSurfaceLakes(skySurface)
-    const lakeLiquidBodies = surfaceLakes.map(h => h.liquidBody)
-    surfaceLakes.forEach(l => delete l.liquidBody)
-
     const underLakes = worldCarver.digUndergroundLakes(surfaceUnder, underCaverns)
-    const underLakeLiquidBodies = underLakes.map(h => h.liquidBody)
-    underLakes.forEach(l => delete l.liquidBody)
     const blindLakes = worldCarver.digBlindLakes(underCaverns)
-    const blindLakeLiquidBodies = blindLakes.map(h => h.liquidBody)
-    blindLakes.forEach(l => delete l.liquidBody)
     await progress('Lakes & oasis')
 
     // 6.1.2 Fossil Veins (caverns_top - desert - SHELL)
@@ -342,16 +335,11 @@ class WorldGenerator {
 
     // 6.1.4 Sap Pockets
     const sapLakes = worldCarver.digSapLakes(surfaceUnder, underCaverns)
-    const sapLakeLiquidBodies = sapLakes.map(h => h.liquidBody)
-    sapLakes.forEach(l => delete l.liquidBody)
     const sapPockets = worldCarver.digSapPockets(underCaverns)
-    const sapPocketLiquidBodies = sapPockets.map(h => h.liquidBody)
-    sapPockets.forEach(l => delete l.liquidBody)
     await progress('Sap Pockets')
 
     // 6.1.5 HIVE caves
     const hives = worldCarver.digHives(biomeCounts)
-    const honeyLiquidBodies = hives.map(h => h.liquidBody)
     await progress('Hives')
 
     // 6.1.6 Cobweb caves
@@ -421,8 +409,8 @@ class WorldGenerator {
     await progress('Carving Cleanup')
 
     // 6.5. Ajout des flaques sousterraines
-    const waterPuddleLiquidBodies = worldCarver.digWaterPuddles(surfaceUnder)
-    const sapPuddleLiquidBodies = worldCarver.digSapPuddles(surfaceUnder)
+    worldCarver.digWaterPuddles(surfaceUnder)
+    worldCarver.digSapPuddles(surfaceUnder)
     await progress('Puddles')
 
     // 7. Traitement de la surface
@@ -549,10 +537,8 @@ class WorldGenerator {
 
     // 9.2. Stochage du monde en base de données
     if (!debug) {
-      const liquidBodies = [...honeyLiquidBodies, ...lakeLiquidBodies, ...underLakeLiquidBodies, ...blindLakeLiquidBodies, ...sapLakeLiquidBodies, ...sapPocketLiquidBodies, ...waterPuddleLiquidBodies, ...sapPuddleLiquidBodies]
-      console.log('.................... liquidBodies', liquidBodies)
       const lakes = [...surfaceLakes, ...underLakes, ...blindLakes, ...sapLakes, ...sapPockets]
-      await this.save(seed, {hives, cobwebCaves, geodeCaves, lakes, liquidBodies, fernsCaves, mossCaves, mushroomCaves, pyramid, ruinedcabin, lostTemple, ancientHouse, leftBeach, rightBeach, antlions, anthills, termites, plants: plantGenerator.plants, hearts, triskels, graveyard, weather, thornspineCount})
+      await this.save(seed, {hives, cobwebCaves, geodeCaves, lakes, fernsCaves, mossCaves, mushroomCaves, pyramid, ruinedcabin, lostTemple, ancientHouse, leftBeach, rightBeach, antlions, anthills, termites, plants: plantGenerator.plants, hearts, triskels, graveyard, weather, thornspineCount})
       worldBuffer.clear()
     }
 
@@ -563,7 +549,7 @@ class WorldGenerator {
     if (debug) { return worldBuffer } // appelant responsable du clear()
   }
 
-  async save (seed, {hives, cobwebCaves, geodeCaves, lakes, liquidBodies, fernsCaves, mossCaves, mushroomCaves, plants, pyramid, ruinedcabin, lostTemple, ancientHouse, leftBeach, rightBeach, antlions, anthills, termites, hearts, triskels, graveyard, weather, thornspineCount}) {
+  async save (seed, {hives, cobwebCaves, geodeCaves, lakes, fernsCaves, mossCaves, mushroomCaves, plants, pyramid, ruinedcabin, lostTemple, ancientHouse, leftBeach, rightBeach, antlions, anthills, termites, hearts, triskels, graveyard, weather, thornspineCount}) {
     const start = window.performance.now()
     // 1. Sauvegarde des tuiles
     await database.clearObjectStore('world_chunks')
@@ -633,9 +619,6 @@ class WorldGenerator {
       {key: 'uniqueidseed', value: 'a'},
       {key: 'weather', value: weather.currentWeather}
     ])
-    // sauvegarde des liquid bodies
-    await database.clearObjectStore('liquid')
-    await database.addMultipleRecords('liquid', liquidBodies)
 
     // sauvegarde des plantes
     await database.clearObjectStore('plant')
@@ -1341,20 +1324,13 @@ class LiquidFiller {
  * @param {number} cy          - Borne supérieure stricte du fill (y >= cy)
  * @param {number} radiusX     - Demi-largeur de l'ellipse — borne latérale
  * @param {number} shoreCode   - Code substrat natif pour consolider les berges
- * @returns {{index: number, nodeCode: number}} — index monde du premier WATER posé
+ * @param {number} nodeCode    - Code du liquide posé (WATER par défaut)
  */
   fillLake (cx, cy, radiusX, shoreCode, nodeCode = NODES.WATER.code) {
     const SKY = NODES.SKY.code
     const VOID = NODES.VOID.code
     const xMin = cx - radiusX
     const xMax = cx + radiusX
-
-    console.log('>>>>>>>>>>>>>>>>>>>>>>>>>>>>fillLake', {cx, cy, radiusX, shoreCode, nodeCode})
-    if (cx === 433) {
-      console.log('>>>>>>>>>>>>>>>>>>>>>>>>>>>>fillLake', {x: 426, y: 49, tle: worldBuffer.read(426, 49)})
-      console.log('>>>>>>>>>>>>>>>>>>>>>>>>>>>>fillLake', {x: 426, y: 50, tle: worldBuffer.read(426, 50)})
-      console.log('>>>>>>>>>>>>>>>>>>>>>>>>>>>>fillLake', {x: 426, y: 51, tle: worldBuffer.read(426, 51)})
-    }
 
     const src = (cy << 10) | cx
     if (worldBuffer.readAt(src) !== SKY && worldBuffer.readAt(src) !== VOID) return
@@ -1369,8 +1345,6 @@ class LiquidFiller {
     while (head < queue.length) {
       const idx = queue[head++]
       const nx = idx & 0x3FF
-
-      if (cx === 433) console.log('>>>>>>>>>>>>>>>>>>>>>>>>>>>>fillLake début loop', {queue, head, idx, nx, xMin, xMax})
 
       // Hors bornes latérales → substrat (berge)
       if (nx < xMin || nx > xMax) {
@@ -1397,7 +1371,6 @@ class LiquidFiller {
         queue.push(nIdx)
       }
     }
-    return {index: src, nodeCode}
   }
 
   /**
@@ -1407,7 +1380,6 @@ class LiquidFiller {
  *
  * @param {number} cx - Centre horizontal de la ruche
  * @param {number} cy - Centre vertical de la ruche (borne supérieure stricte du fill)
- * @returns {{index: number, nodeCode: number}} — index monde du premier HONEY posé
  */
   fillHive (cx, cy) {
     const VOID = NODES.VOID.code
@@ -1443,7 +1415,6 @@ class LiquidFiller {
         queue.push(nIdx)
       }
     }
-    return {index: src, nodeCode: HONEY}
   }
 }
 
@@ -3068,7 +3039,7 @@ class WorldCarver {
  * Gère les tentatives et les exclusions en interne.
  *
  * @param {{biome, x0, x1, ySurface, yUnder, yCavernsMid}} rect
- * @returns {{cx, cy, radius}|null, liquidBody: {index, nodeCode}} — null si MAX_ATTEMPTS épuisé
+ * @returns {{cx, cy, radius}|null} — null si MAX_ATTEMPTS épuisé
  */
   #digOneHive (rect) {
     const VOID = NODES.VOID.code
@@ -3106,12 +3077,11 @@ class WorldCarver {
     const path = this.pathTunnel(cx, cy, 4, length, angle, 10)
     this.carveAlongPath(path, PERLIN_OFFSET_HIVE, ETERNAL_EXCLUDED)
 
-    const liquidBody = liquidFiller.fillHive(cx, cy + 2)
+    liquidFiller.fillHive(cx, cy + 2)
 
     this.addExclusion(rect2)
     tileGuard.addNoisyCircle(cx, cy, radius + 2, radius + 6, 0.3, PERLIN_OFFSET_HIVE)
-
-    return {cx, cy, radius, liquidBody}
+    return {cx, cy, radius}
   }
 
   /**
@@ -3121,7 +3091,7 @@ class WorldCarver {
  * Le remplissage HONEY est différé.
  *
  * @param {{forest, desert, jungle}} biomeCounts
- * @returns {Array<{cx, cy, radius, liquidBody: {index, nodeCode}}>}
+ * @returns {Array<{cx, cy, radius}>}
  */
   digHives (biomeCounts) {
     const hiveCount = Math.max(3, 2 * biomeCounts.jungle)
@@ -3165,7 +3135,7 @@ class WorldCarver {
  * Le remplissage WATER est différé.
  *
  * Prérequis : initZoneRects()
- * @returns {Array<{cx, cy, biome, layer, liquidBody: {index, nodeCode}}>}
+ * @returns {Array<{cx, cy, biome, layer}>}
  */
 
   digSurfaceLakes (skySurface) {
@@ -3214,7 +3184,7 @@ class WorldCarver {
 
       // Passe 3 : remplir le base de l'ellipse par du WATER
       const lakeCreation = LAKE_CREATION_MAP[rect.biome]
-      const liquidBody = liquidFiller.fillLake(cx, cy, radiusX, lakeCreation.side)
+      liquidFiller.fillLake(cx, cy, radiusX, lakeCreation.side)
 
       // Passe 4 : Nettoyage des tuiles volantes au-dessus du lac
       const cleanX0 = Math.round(cx - radiusX * 0.6)
@@ -3273,7 +3243,7 @@ class WorldCarver {
       this.addExclusion(this.boundingRect(rect2, rect3))
       tileGuard.addNoisyEllipse(cx, cy, radiusX + 3, radiusX + 5, radiusY + 3, radiusY + 5, 0.8, PERLIN_OFFSET_LAKES)
       tileGuard.addNoisyEllipse(pitCx, pitCy, pitRadiusX + 3, pitRadiusX + 5, pitRadiusY + 3, pitRadiusY + 5, 0.8, PERLIN_OFFSET_LAKES)
-      lakes.push({cx, cy, biome: rect.biome, layer: 'surface', liquidBody})
+      lakes.push({cx, cy, biome: rect.biome, layer: 'surface'})
       // window.DEBUG_POINTS.push({x: cx, y: cy, color: 'orange'}) // DEBUG
     }
 
@@ -3312,10 +3282,10 @@ class WorldCarver {
       tileGuard.addNoisyEllipseBottom(cx, cy, radiusX + 2, radiusX + 4, radiusY + 2, radiusY + 4, 0.8, PERLIN_OFFSET_LAKES)
 
       // ajout de la WATER
-      const liquidBody = liquidFiller.fillLake(cx, cy + 1, radiusX + 4, WATER)
+      liquidFiller.fillLake(cx, cy + 1, radiusX + 4, WATER)
 
       const biome = clusterGenerator.getRectAt(cx).biome
-      lakes.push({cx, cy, biome, layer, liquidBody})
+      lakes.push({cx, cy, biome, layer})
     }
 
     for (let i = 0; i < UNDERGROUND_LAKE_UNDER_COUNT; i++) {
@@ -3336,7 +3306,7 @@ class WorldCarver {
  * Remplissage WATER différé.
  *
  * @param {Int16Array} underCaverns - Altitudes haute caverne par colonne X
- * @returns {Array<{cx, cy, biome, layer, liquidBody: {index, nodeCode}}>}
+ * @returns {Array<{cx, cy, biome, layer}>}
  */
   digBlindLakes (underCaverns) {
     const VOID = NODES.VOID.code
@@ -3359,10 +3329,10 @@ class WorldCarver {
 
       tileGuard.addNoisyEllipse(cx, cy, radiusX + 1, radiusX + 3, radiusY + 1, radiusY + 3, 0.8, PERLIN_OFFSET_LAKES)
 
-      const liquidBody = liquidFiller.fillLake(cx, cy + 1, radiusX + 4, WATER)
+      liquidFiller.fillLake(cx, cy + 1, radiusX + 4, WATER)
       const biome = clusterGenerator.getRectAt(cx).biome
 
-      lakes.push({cx, cy, biome, layer: 'caverns_bottom', liquidBody})
+      lakes.push({cx, cy, biome, layer: 'caverns_bottom'})
     }
 
     return lakes
@@ -3375,7 +3345,7 @@ class WorldCarver {
  *
  * @param {Int16Array} surfaceUnder
  * @param {Int16Array} underCaverns
- * @returns {Array<{cx, cy, biome, layer, liquidBody: {index, nodeCode}}>}
+ * @returns {Array<{cx, cy, biome, layer}>}
  */
   digSapLakes (surfaceUnder, underCaverns) {
     const VOID = NODES.VOID.code
@@ -3402,8 +3372,8 @@ class WorldCarver {
 
       tileGuard.addNoisyEllipseBottom(cx, cy, radiusX + 1, radiusX + 3, radiusY + 1, radiusY + 3, 0.8, PERLIN_OFFSET_CAVERN)
 
-      const liquidBody = liquidFiller.fillLake(cx, cy + 1, radiusX + 4, SAP, SAP)
-      lakes.push({cx, cy, biome: BIOME_TYPE.JUNGLE, layer, liquidBody})
+      liquidFiller.fillLake(cx, cy + 1, radiusX + 4, SAP, SAP)
+      lakes.push({cx, cy, biome: BIOME_TYPE.JUNGLE, layer})
     }
 
     for (let i = 0; i < SAP_LAKE_UNDER_COUNT; i++) {
@@ -3418,13 +3388,13 @@ class WorldCarver {
   }
 
   /**
- * Creuse SAP_POCKET_COUNT poches de sève ellipsoïdales bruitées en caverns_bottom,
- * uniquement dans le biome JUNGLE.
- * Protection TileGuard complète. Remplissage SAP différé.
- *
- * @param {Int16Array} underCaverns - Altitudes haute caverne par colonne X
- * @returns {Array<{cx, cy, biome, layer, liquidBody: {index, nodeCode}}>}
- */
+   * Creuse SAP_POCKET_COUNT poches de sève ellipsoïdales bruitées en caverns_bottom,
+   * uniquement dans le biome JUNGLE.
+   * Protection TileGuard complète. Remplissage SAP différé.
+   *
+   * @param {Int16Array} underCaverns - Altitudes haute caverne par colonne X
+   * @returns {Array<{cx, cy, biome, layer}>}
+   */
   digSapPockets (underCaverns) {
     const VOID = NODES.VOID.code
     const SAP = NODES.SAP.code
@@ -3453,21 +3423,21 @@ class WorldCarver {
 
       tileGuard.addNoisyEllipse(cx, cy, radiusX + 1, radiusX + 3, radiusY + 1, radiusY + 3, 0.8, PERLIN_OFFSET_LAKES)
 
-      const liquidBody = liquidFiller.fillLake(cx, cy + 1, radiusX + 4, SAP, SAP)
-      pockets.push({cx, cy, biome: BIOME_TYPE.JUNGLE, layer: 'caverns_bottom', liquidBody})
+      liquidFiller.fillLake(cx, cy + 1, radiusX + 4, SAP, SAP)
+      pockets.push({cx, cy, biome: BIOME_TYPE.JUNGLE, layer: 'caverns_bottom'})
     }
 
     return pockets
   }
 
   /**
- * Vérifie qu'au moins une tuile de la surface supérieure de la flaque
- * a du VOID au-dessus d'elle — détecte les poches fermées.
- *
- * @param {Set<number>} visited - Index des tuiles de la flaque (résultat du BFS)
- * @param {number} yMin - Y minimal de la flaque
- * @returns {boolean} — true si la flaque est ouverte vers le haut
- */
+   * Vérifie qu'au moins une tuile de la surface supérieure de la flaque
+   * a du VOID au-dessus d'elle — détecte les poches fermées.
+   *
+   * @param {Set<number>} visited - Index des tuiles de la flaque (résultat du BFS)
+   * @param {number} yMin - Y minimal de la flaque
+   * @returns {boolean} — true si la flaque est ouverte vers le haut
+   */
   #isPuddleOpen (visited, yMin) {
     const VOID = NODES.VOID.code
 
@@ -3519,7 +3489,7 @@ class WorldCarver {
  * @param {number} cx
  * @param {number} cy - Point de départ — doit être VOID
  * @param {number} nodeCode - Code du liquide à poser (WATER ou SAP)
- * @returns {{index: number, nodeCode: number}|null} — null si hauteur invalide
+ * @returns {boolean} — true si la flaque a été posée, false si l'emplacement est invalide
  */
   #tryFillPuddle (cx, cy, nodeCode) {
     const VOID = NODES.VOID.code
@@ -3531,7 +3501,7 @@ class WorldCarver {
     let head = 0
     let yMin = yStart
 
-    if (LIQUID.has(worldBuffer.read(cx, cy + 1)) || tileGuard.has(((cy + 1) << 10) | cx)) return null
+    if (LIQUID.has(worldBuffer.read(cx, cy + 1)) || tileGuard.has(((cy + 1) << 10) | cx)) return false
 
     const src = (yStart << 10) | cx
     visited.add(src)
@@ -3541,7 +3511,7 @@ class WorldCarver {
       const idx = queue[head++]
       const ny = idx >> 10
 
-      if (ny > yStart) return null
+      if (ny > yStart) return false
       if (ny < yMin) yMin = ny
 
       const neighbors = [idx - 1, idx + 1, idx - 1024, idx + 1024]
@@ -3553,7 +3523,7 @@ class WorldCarver {
         if (nnx <= 1 || nnx >= 1022 || nny <= 1 || nny >= 510) continue
         if (nny <= yStart - PUDDLE_HEIGHT_MAX) continue
         if (worldBuffer.readAt(nIdx) !== VOID) {
-          if (LIQUID.has(worldBuffer.readAt(nIdx)) || tileGuard.has(nIdx)) return null
+          if (LIQUID.has(worldBuffer.readAt(nIdx)) || tileGuard.has(nIdx)) return false
           continue
         }
         visited.add(nIdx)
@@ -3561,8 +3531,8 @@ class WorldCarver {
       }
     }
 
-    if (yStart - yMin < PUDDLE_HEIGHT_MIN - 1) return null
-    if (!this.#isPuddleOpen(visited, yMin)) return null
+    if (yStart - yMin < PUDDLE_HEIGHT_MIN - 1) return false
+    if (!this.#isPuddleOpen(visited, yMin)) return false
 
     // Vrai fill
     const tiles = []
@@ -3571,8 +3541,7 @@ class WorldCarver {
     }
     this.applyTiles(tiles, ETERNAL_EXCLUDED)
 
-    // return {index: src, nodeCode, cx, yStart}
-    return {index: src, nodeCode}
+    return true
   }
 
   /**
@@ -3580,12 +3549,10 @@ class WorldCarver {
  * Hauteur comprise entre PUDDLE_HEIGHT_MIN et PUDDLE_HEIGHT_MAX tuiles.
  *
  * @param {Int16Array} surfaceUnder
- * @returns {Array<{index, nodeCode}>}
  */
   digWaterPuddles (surfaceUnder) {
     const VOID = NODES.VOID.code
     const WATER = NODES.WATER.code
-    const liquidBodies = []
     let attempts = 0
     let count = 0
 
@@ -3599,19 +3566,15 @@ class WorldCarver {
       const dx = seededRNG.randomGetBool() ? 1 : -1
       const bottom1 = this.#flowToBottom(x, y, dx)
       if (bottom1) {
-        const lb = this.#tryFillPuddle(bottom1.x, bottom1.y, WATER)
-        if (lb) { liquidBodies.push(lb); count++ }
+        if (this.#tryFillPuddle(bottom1.x, bottom1.y, WATER)) count++
       }
       if (count < WATER_PUDDLE_COUNT) {
         const bottom2 = this.#flowToBottom(x, y, -dx)
         if (bottom2) {
-          const lb = this.#tryFillPuddle(bottom2.x, bottom2.y, WATER)
-          if (lb) { liquidBodies.push(lb); count++ }
+          if (this.#tryFillPuddle(bottom2.x, bottom2.y, WATER)) count++
         }
       }
     }
-
-    return liquidBodies
   }
 
   /**
@@ -3619,17 +3582,15 @@ class WorldCarver {
  * uniquement en biome JUNGLE.
  *
  * @param {Int16Array} surfaceUnder
- * @returns {Array<{index, nodeCode}>}
  */
   digSapPuddles (surfaceUnder) {
     const VOID = NODES.VOID.code
     const SAP = NODES.SAP.code
-    const liquidBodies = []
     const jungleRects = []
     for (let i = 0; i < this.#zoneRects.length; i++) {
       if (this.#zoneRects[i].biome === BIOME_TYPE.JUNGLE) jungleRects.push(this.#zoneRects[i])
     }
-    if (jungleRects.length === 0) return liquidBodies
+    if (jungleRects.length === 0) return
 
     let attempts = 0
     let count = 0
@@ -3644,19 +3605,15 @@ class WorldCarver {
       const dx = seededRNG.randomGetBool() ? 1 : -1
       const bottom1 = this.#flowToBottom(x, y, dx)
       if (bottom1) {
-        const lb = this.#tryFillPuddle(bottom1.x, bottom1.y, SAP)
-        if (lb) { liquidBodies.push(lb); count++ }
+        if (this.#tryFillPuddle(bottom1.x, bottom1.y, SAP)) count++
       }
       if (count < SAP_PUDDLE_COUNT) {
         const bottom2 = this.#flowToBottom(x, y, -dx)
         if (bottom2) {
-          const lb = this.#tryFillPuddle(bottom2.x, bottom2.y, SAP)
-          if (lb) { liquidBodies.push(lb); count++ }
+          if (this.#tryFillPuddle(bottom2.x, bottom2.y, SAP)) count++
         }
       }
     }
-
-    return liquidBodies
   }
 
   /**

@@ -932,7 +932,6 @@ Configuration dans `constant.mjs` → `DB_CONFIG` : `NAME`, `VERSION`, `DEBUG`, 
 | `plant` | `key` | oui | Trees, Herbs, Mushrooms, Flowers, Corals |
 | `monster` | `key` | oui | Enemies, Critters, Bosses |
 | `furniture` | `key` | oui | Furniture (Housing), Crafting Station |
-| `liquid` | `key` | oui | Liquid bodies générés : `{index, nodeCode}` — `index` = index monde d'une tuile du body, `nodeCode` = code du liquide (HONEY, WATER, SAP...) |
 | `achievements` | `code` | non | Compteurs de succès : `{code, count}` |
 
 **Règles :**
