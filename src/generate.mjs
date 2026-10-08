@@ -538,7 +538,9 @@ class WorldGenerator {
     // 9.2. Stochage du monde en base de données
     if (!debug) {
       const lakes = [...surfaceLakes, ...underLakes, ...blindLakes, ...sapLakes, ...sapPockets]
-      await this.save(seed, {hives, cobwebCaves, geodeCaves, lakes, fernsCaves, mossCaves, mushroomCaves, pyramid, ruinedcabin, lostTemple, ancientHouse, leftBeach, rightBeach, antlions, anthills, termites, plants: plantGenerator.plants, hearts, triskels, graveyard, weather, thornspineCount})
+      const liquidBodies = liquidFiller.buildLiquidBodies()
+
+      await this.save(seed, {hives, cobwebCaves, geodeCaves, lakes, fernsCaves, mossCaves, mushroomCaves, pyramid, ruinedcabin, lostTemple, ancientHouse, leftBeach, rightBeach, antlions, anthills, termites, plants: plantGenerator.plants, hearts, triskels, graveyard, weather, thornspineCount, liquidBodies})
       worldBuffer.clear()
     }
 
@@ -549,33 +551,18 @@ class WorldGenerator {
     if (debug) { return worldBuffer } // appelant responsable du clear()
   }
 
-  async save (seed, {hives, cobwebCaves, geodeCaves, lakes, fernsCaves, mossCaves, mushroomCaves, plants, pyramid, ruinedcabin, lostTemple, ancientHouse, leftBeach, rightBeach, antlions, anthills, termites, hearts, triskels, graveyard, weather, thornspineCount}) {
+  async save (seed, {hives, cobwebCaves, geodeCaves, lakes, fernsCaves, mossCaves, mushroomCaves, plants, pyramid, ruinedcabin, lostTemple, ancientHouse, leftBeach, rightBeach, antlions, anthills, termites, hearts, triskels, graveyard, weather, thornspineCount, liquidBodies}) {
     const start = window.performance.now()
     // 1. Sauvegarde des tuiles
     await database.clearObjectStore('world_chunks')
     const chunks = worldBuffer.processWorldToChunks() // NEW
     await database.addMultipleRecords('world_chunks', chunks)
-    // for (let yc = 0; yc < GEOMETRY.WORLD_CHUNK_Y; yc++) {
-    //   const records = []
-    //   for (let xc = 0; xc < GEOMETRY.WORLD_CHUNK_X; xc++) {
-    //     const key = yc * GEOMETRY.WORLD_CHUNK_X + xc
-    //     const chunk = this.chunks[key]
-    //     records.push({key, chunk: chunk.chunk})
-    //   await database.addMultipleRecords('world_chunks', records)
-    //   }
-    // }
-    // sauvegardes des spots de graines
-    // await database.clearObjectStore('seeds')
-    // await database.addMultipleRecords('seeds', this.seedSpots)
-    // sauvegardes des arbres
-    // await database.clearObjectStore('trees')
-    // await database.addMultipleRecords('trees', this.treeSpots)
 
-    await database.clearObjectStore('gamestate')
     await database.clearObjectStore('achievements')
 
     const {pxX, pxY, tileX, tileY} = this.#findSpawnPosition()
 
+    await database.clearObjectStore('gamestate')
     await database.batchSetGameState([
       {key: 'ancienthouse', value: ancientHouse},
       {key: 'anthills', value: anthills},
@@ -597,6 +584,7 @@ class WorldGenerator {
       {key: 'helptopic', value: 'Getting Started'},
       {key: 'hives', value: hives},
       {key: 'lakes', value: lakes},
+      {key: 'liquidbodies', value: liquidBodies},
       {key: 'losttemple', value: lostTemple},
       {key: 'moss', value: mossCaves},
       {key: 'mossnextgrowthtimestamp', value: 3000 * 1000},
@@ -607,7 +595,7 @@ class WorldGenerator {
       {key: 'pyramid', value: pyramid},
       {key: 'randomkey', value: seed},
       {key: 'ruinedcabin', value: ruinedcabin},
-      {key: 'sandfallingtiles ', value: new Set()},
+      {key: 'sandfallingtiles', value: new Set()},
       {key: 'sewedsunflower', value: []},
       {key: 'sewedmoonglow', value: []},
       {key: 'sewedambermirage', value: []},
@@ -1415,6 +1403,68 @@ class LiquidFiller {
         queue.push(nIdx)
       }
     }
+  }
+
+  /**
+    * Calcule la table des LiquidBodies (WATER, HONEY, SAP) à partir de l'état final du
+    * WorldBuffer. Un body est une composante 4-connexe de tuiles de même nature, toutes
+    * pleines. La SEA n'est pas concernée. Parcours en ordre d'index croissant ; chaque
+    * composante est explorée en BFS sur une file Int32Array partagée, les tuiles visitées
+    * étant marquées dans un Uint8Array.
+    * @returns {number[]} — tableau plat [ref0, volume0, ref1, volume1, …] : ref = index de la
+    *   tuile la plus basse (y maximal, puis x minimal), volume = 16 × nombre de tuiles
+    */
+  buildLiquidBodies () {
+    const WATER = NODES.WATER.code
+    const HONEY = NODES.HONEY.code
+    const SAP = NODES.SAP.code
+    const data = worldBuffer.world
+    const size = WORLD_WIDTH * WORLD_HEIGHT
+    const NEIGHBOR_OFFSETS = [-1, 1, -WORLD_WIDTH, WORLD_WIDTH]
+
+    const visited = new Uint8Array(size) // 1 = tuile déjà rattachée à un body
+    const queue = new Int32Array(size) // file BFS réutilisée pour chaque composante
+    const liquidBodies = []
+
+    for (let start = 0; start < size; start++) {
+      const code = data[start]
+      if (visited[start] === 1 || (code !== WATER && code !== HONEY && code !== SAP)) continue
+
+      visited[start] = 1
+      queue[0] = start
+      let head = 0
+      let tail = 1
+      let ref = start
+      let refY = start >> 10
+      let refX = start & 0x3FF
+
+      while (head < tail) {
+        const idx = queue[head]
+        head++
+
+        const y = idx >> 10
+        const x = idx & 0x3FF
+        if (y > refY || (y === refY && x < refX)) {
+          ref = idx
+          refY = y
+          refX = x
+        }
+
+        // ghost cells : un liquide n'est jamais posé sur le pourtour, pas de bounds checking
+        for (const offset of NEIGHBOR_OFFSETS) {
+          const nIdx = idx + offset
+          if (visited[nIdx] === 1 || data[nIdx] !== code) continue
+          visited[nIdx] = 1
+          queue[tail] = nIdx
+          tail++
+        }
+      }
+
+      liquidBodies.push(ref, tail << 4)
+    }
+
+    if (IS_DEV) console.log(`[LiquidFiller.buildLiquidBodies] ${liquidBodies.length >> 1} liquid bodies`)
+    return liquidBodies
   }
 }
 
