@@ -321,7 +321,7 @@ sont indicatives — les densités exactes sont définies dans `ORE_GEM_SCATTER_
 * **Déplacement :** Flèches directionnelles + ZQSD. Caméra centrée joueur. Zoom possible.
 * **Hitbox joueur** : 20x36 px → 2x3 tuiles. Espace minimum praticable : 2 tuiles de large, 3 tuiles de haut.
 * **Collision :** AABB (Axis-Aligned Bounding Box) custom.
-* **Liquides :** Algorithme custom paramétrable (viscosité) pour Water, Honey, Sap. Automates cellulaires pour le sable.
+* **Liquides :** Simulation par `LiquidBody` à volume constant, cadencée par la viscosité (voir §11). Automates cellulaires pour le sable.
 * **AI Faune :** Comportements simples (Suit, Fuit, Erre) sans pathfinding complexe en temps réel.
 * **Contrainte :** Pas de moteur physique externe (Matter.js…). Pas de projectiles ni d'effets spéciaux hormis les animations de sprites.
 
@@ -952,7 +952,7 @@ Toute action joueur déclenchée par clic (minage, placement, récolte…) suit 
 │   ├── buff.mjs             # Layer 4 : BuffManager, StatModifiers
 │   ├── housing.mjs          # Layer 4 : FurnitureManager, TeleporterManager, HousingManager
 │   ├── ecosystem.mjs        # Layer 4 : HiveSystem, FloraManager, CobwebSystem…
-│   ├── liquid.mjs           # Layer 4 : SandFallingSystem, SeaFlowingSystem, LiquidFlowingSystem…
+│   ├── liquid.mjs           # Layer 4 : SandFallingSystem, LiquidSystem
 │   ├── combat.mjs           # Layer 4 : ArenaCreator, TurnManager, SpellSystem, CombatAI
 │   ├── inventory.mjs        # Layer 4 : InventoryManager, InventorySlot, InventoryOverlay
 │   ├── craft.mjs            # Layer 4 : CraftSystem
@@ -1041,3 +1041,128 @@ Créé dans `render.mjs` lors de l'initialisation du canvas. Positionné au-dess
 
 **Comportement avec les overlays**
 Quand l'Inventory est ouvert (`STATE !== EXPLORATION`), la loop fait un `return` avant `taskScheduler.update()` → les phases sont gelées jusqu'à la fermeture. La commande `tp` déclenche donc la téléportation à la fermeture de l'inventaire, sans code supplémentaire.
+
+
+---
+
+## 11. Liquides — Conception
+
+### 11.1 Principes
+
+* **Natures :** `SEA`, `WATER`, `HONEY`, `SAP` (identifiées par `NODES.XXX.code`). Une tuile liquide, pleine ou partielle, porte le code de sa nature dans le `Uint8Array` du monde.
+* **LiquidBody :** composante connexe (4-connexité) de tuiles liquides de même nature.
+* **Niveau unique (vases communicants) :** toutes les tuiles d'un body sont pleines, sauf celles de sa rangée la plus haute (`topRow`), qui se partagent équitablement le volume restant.
+* **Volume :** entier exprimé en 1/16 de tuile. Avec `N` = nombre de tuiles du body et `w` = nombre de tuiles sur `topRow` :
+  * `rowVol = volume − 16 × (N − w)`, toujours dans `[1 .. 16w]` ;
+  * niveau affiché de chaque tuile de `topRow` = `floor(rowVol / w)` ∈ `[1 .. 16]` ; le reste n'est pas visible mais est conservé dans `volume`.
+* **Ajout / retrait de volume :** toujours appliqué instantanément à `topRow` (pas de bulle). Si `rowVol` tombe à 0, la rangée disparaît (ses tuiles redeviennent SKY/VOID) et la rangée inférieure devient `topRow`. Si `volume > 16N`, une nouvelle rangée est créée au-dessus.
+* **Stabilité :** un body est stable quand aucune règle d'écoulement (§11.4) ne s'applique. Les bodies stables sont ignorés par la simulation. Seule la liste des bodies instables est traitée.
+* **Gouttes :** une tuile liquide isolée en mouvement n'est pas un LiquidBody mais une goutte (§11.5).
+
+### 11.2 Données runtime (`LiquidSystem`, `liquid.mjs`)
+
+| Donnée | Type | Rôle |
+|---|---|---|
+| `liquidBodyId` | `Uint16Array(1024 × 512)` | Body de chaque tuile : `0` = aucun, `0xFFFF` = goutte. Lecture O(1) pour fusion, contact et réaction à `world/tile-changed`. |
+| `liquidLevel` | `Uint8Array(1024 × 512)` dans `ChunkManager` | Niveau des tuiles partielles (`0` = pleine, `1..15` = niveau en 1/16). Lu par le renderer ; toute modification marque le chunk render-dirty. |
+| Pool de gouttes | `Int32Array index`, `Uint8Array volume`, `Uint8Array nature` | Suppression par swap avec le dernier élément puis `length--`. |
+| Liste des bodies instables | tableau | Parcourue par la tâche de chaque nature. |
+
+Champs d'un `LiquidBody` (ordre fixe, monomorphisme V8) : `id`, `nature`, `refIndex`, `volume`, `tileCount`, `topRow`, `topCount`, `xMin`, `yMin`, `xMax`, `yMax`, `rim`, `unstableSlot`.
+
+* **`rim` :** ensemble des cellules ouvertes (SKY/VOID) adjacentes au body. Toute l'activité d'écoulement part de ces cellules. Les tuiles de fond et de côté au contact d'un solide ne sont pas listées : le minage d'un solide voisin émet `world/tile-changed`, la cellule entre dans le `rim` et le body devient instable.
+* **Rectangle englobant :** unique. Les tuiles de `topRow` s'obtiennent en balayant cette rangée sur `[xMin .. xMax]` avec `liquidBodyId === id` (aucune liste maintenue).
+* **Identifiants :** recyclés via une liste libre (65 534 bodies au maximum).
+
+### 11.3 Persistance
+
+* **Clé gamestate `liquidbodies` :** tableau plat `[ref0, volume0, ref1, volume1, …]`. Rien d'autre n'est enregistré :
+  * la nature est le code de la tuile `ref` ;
+  * la SEA n'y figure pas (§11.8) ;
+  * une goutte est enregistrée comme un body d'une tuile (`volume ≤ 16`) ;
+  * la stabilité n'est pas persistée : elle est recalculée au chargement.
+* **Tuile de référence :** la tuile la plus basse du body (`y` maximal, puis `x` minimal), dernière à se vider. Elle est réélue uniquement quand elle quitte le body.
+* **Écriture :** sur `save/tick`, uniquement si le flag dirty est levé, dans la même transaction que les chunks. Le tableau est réécrit en bloc : pas de soft-delete, la `ref` peut changer librement.
+* **Création du monde :** `generate.mjs` calcule et enregistre `liquidbodies` en fin de génération (passe de composantes connexes sur le `WorldBuffer` final, `volume = 16N`). Le store `liquid` est supprimé.
+* **Fiabilité :** la valeur enregistrée est réputée exacte. Aucun traitement ne suppose qu'elle puisse être incorrecte (pas de balayage d'orphelins, pas de bornage correctif).
+* **Chargement (`startSession`) :** flood-fill depuis chaque `ref` pour reconstruire `liquidBodyId`, `tileCount`, `topRow`, le rectangle et le `rim` ; la stabilité est évaluée pendant ce même parcours ; `liquidLevel` est reconstruit à partir des volumes.
+
+### 11.4 Règle d'écoulement
+
+Pour chaque cellule `R` du `rim` (soutenue = la cellule sous `R` est solide ou liquide) :
+
+| Position de R | R soutenue | Action |
+|---|---|---|
+| sous `topRow` (à côté, dessous, ou au-dessus d'un bras plus bas) | oui | **Remplissage** : R rejoint le body, `volume` inchangé, `topRow` baisse de 16 |
+| sous `topRow` | non | **Fuite** : goutte de 16 créée en R, `volume −= 16` |
+| sur `topRow`, à côté | oui | **Étalement**, seulement si chaque tuile de `topRow` garde un niveau ≥ 1/16 (`rowVol ≥ w + 1`) |
+| sur `topRow`, à côté | non | **Débordement** : goutte de `min(16, rowVol)` |
+| au-dessus de `topRow` | — | aucune action (sauf création d'une rangée si `volume > 16N`) |
+
+* **Débit :** une action par body et par tick. Le tick est cadencé par la viscosité de la nature (`NODES.XXX.viscosity`, en ms).
+* **Ordre :** la cellule `R` la plus basse est traitée en premier ; à hauteur égale, fuite > remplissage > débordement > étalement.
+* **Film :** un film de 16 tuiles à 1/16 est autorisé. Si un body de volume ≤ 16 perd le soutien d'une de ses tuiles de bord, toutes ses tuiles fusionnent en une seule goutte de volume `volume`, créée à la position non soutenue, qui tombe.
+* **Convergence :** chaque action déplace du volume de `topRow` vers une rangée strictement plus basse, ou l'étale à hauteur constante avec un seuil. Aucune règle ne remonte du liquide ni ne contracte une surface : l'énergie potentielle décroît strictement, il n'y a pas d'oscillation.
+* **Ordonnancement :** une tâche `taskScheduler` par nature (et non par body), en deux temps comme `SandFallingSystem` : détermination sans écriture, puis application groupée en micro-tâche (tous les `setTileAt` avant tout `emit`).
+
+### 11.5 Gouttes
+
+* **Chute :** une tuile par tick, cadencée par la viscosité de sa nature : d'abord verticale, puis diagonale si la verticale est bloquée.
+* **Arrêt :**
+  * entrée en contact avec un body de même nature : fusion (`volume += volume de la goutte`) ;
+  * entrée en contact avec une autre nature : §11.7 ;
+  * aucune descente possible : la goutte se pose et devient un body d'une tuile.
+* **Rendu :** une goutte de volume < 16 est affichée comme une tuile partielle.
+
+### 11.6 Événements de jeu
+
+* **Création d'un body :** versement d'un seau (`PouringManager`) = création d'une goutte de 16 sur la cellule visée ; le body naît quand la goutte se pose.
+* **Remplissage d'un seau (`FillingManager`) :** `volume −= 16` appliqué à `topRow`, quelle que soit la tuile cliquée (elle reste liquide). Le remplissage d'une bouteille ne modifie pas le volume (comportement actuel inchangé).
+* **Fusion :** une action (remplissage, étalement, goutte) met en contact deux bodies de même nature. Le plus petit est réétiqueté dans le plus grand (coût O(petit)), les volumes et les `rim` s'additionnent, le niveau s'égalise instantanément.
+* **Minage d'un bord :** la cellule libérée entre dans le `rim` du body voisin, qui devient instable.
+* **Séparation :** une tuile quitte le body (fuite, seau, sable, cristallisation). Un BFS entrelacé est lancé depuis ses voisins du body et s'arrête dès qu'une composante est fermée (coût O(plus petite composante), indispensable pour la SEA). Chaque partie reçoit `16 × N_i` moins le déficit de ses tuiles de `topRow`.
+* **Modifications extérieures (sable…) :** une tuile liquide apparue hors du `LiquidSystem` compte pour +16 (adoption par le body voisin, ou goutte) ; une tuile de body disparue compte pour −16. Les `world/tile-changed` émis par le `LiquidSystem` lui-même sont ignorés par son propre listener (flag `#applying`).
+* **Vidage d'une tuile :** la tuile devient SKY si la tuile du dessus est SKY (avec propagation SKY vers le bas sur les VOID), sinon VOID — même logique que `FillingManager`.
+
+### 11.7 Rencontre de natures différentes
+
+Le contact (une action ou une goutte place une tuile liquide adjacente à une tuile d'une autre nature) provoque une cristallisation en gemme. C'est toujours la tuile HONEY ou SAP impliquée qui cristallise, à sa position ; l'autre est inchangée, sauf HONEY/SAP où les deux cristallisent.
+
+| Contact | Résultat |
+|---|---|
+| WATER / HONEY | WATER inchangée, HONEY → `TOPAZ` |
+| SEA / HONEY | SEA inchangée, HONEY → `TOPAZ` |
+| WATER / SAP | WATER inchangée, SAP → `EMERALD` |
+| SEA / SAP | SEA inchangée, SAP → `EMERALD` |
+| HONEY / SAP | HONEY → `RUBY`, SAP → `SAPPHIRE` |
+| SEA / WATER | Fusion en SEA (§11.8) |
+
+Le volume de la tuile cristallisée (16, ou volume de la goutte) est retiré de son body.
+
+### 11.8 SEA
+
+La SEA est un LiquidBody spécialisé :
+
+* volume infini, `topRow` figée à `SEA_LEVEL`, niveau toujours 16/16 ;
+* aucune tuile de référence ni volume persistés (positions déjà connues par les constantes) ;
+* seules les cellules du `rim` sous `SEA_LEVEL` agissent : la mer est inerte au repos ;
+* l'inondation de tout réseau ouvert connecté sous `SEA_LEVEL` est voulue, sans limite ;
+* **Fusion SEA + WATER → SEA :** les tuiles WATER sont converties en SEA ;
+* **Séparation d'une SEA → SEA + WATER :** la partie contenant la référence de la mer reste SEA, l'autre devient un body WATER de volume `16N`.
+* **Conversion SEA ↔ WATER :** **exception documentée, aucun `world/tile-changed` n'est émis.** Les systèmes concernés testent la nature à la demande : le corail sous WATER est affiché et traité comme corail mort (toujours minable), aucun corail ni huître ne pousse dans WATER, la pêche teste la nature avant chaque action. La conversion est découpée en micro-tâches.
+
+### 11.9 Rendu
+
+* WATER, HONEY et SAP sont des aplats de couleur : une tuile partielle est dessinée par `fillRect(x, y + 16 − niveau, 16, niveau)` dans `#drawChunkToCanvas`, à partir de `liquidLevel`.
+* Les niveaux ne changent qu'au tick (cadence de viscosité) et ne touchent que `topRow` et les gouttes : seuls les chunks concernés sont redessinés. Aucun coût supplémentaire dans la boucle de rendu.
+
+### 11.10 EventBus
+
+* Toute modification de tuile par le `LiquidSystem` émet `world/tile-changed` (émission différée, après toutes les mutations), **sauf la conversion SEA ↔ WATER** (§11.8).
+* Persistance sur `save/tick`.
+
+### 11.11 Points de vigilance performance
+
+* Une goutte émet 2 `world/tile-changed` par tick : une cascade de 50 gouttes à 5 Hz représente environ 500 émissions par seconde.
+* Un body SEA qui inonde les cavernes grossit sans limite : le BFS de séparation doit rester O(plus petite composante).
+* Chargement : un flood-fill de toutes les tuiles liquides (quelques ms, TypedArrays, aucune allocation par tuile).

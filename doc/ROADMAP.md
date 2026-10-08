@@ -27,6 +27,23 @@
 - Utiliser les wood planks dans des recettes
 - Supprimer les chunks en mémoire qui sont périmés
 
+### Liquides — écoulement (conception : DESIGN §11)
+
+Chaque étape est validée (tests + contrôle visuel) avant la suivante.
+
+1. **`generate.mjs`** : passe finale de composantes connexes (WATER, HONEY, SAP) sur le `WorldBuffer` → clé gamestate `liquidbodies` `[ref, volume, …]` (ref = tuile la plus basse, `volume = 16N`). Suppression des retours `liquidBody` des fillers et du store `liquid` (`DB_CONFIG.STORES`, `VERSION++`). Tests.
+2. **Rendu des tuiles partielles** : `liquidLevel` (`Uint8Array`) et son setter dans `ChunkManager` (chunk render-dirty) ; `fillRect` dans `#drawChunkToCanvas`. Contrôle visuel via une commande de debug.
+3. **`LiquidSystem` — chargement** : `init` (flood-fill depuis les refs, `liquidBodyId`, rectangle, `topRow`, `rim`, stabilité), `onSaveTick`, affichage de debug des bodies. Tests.
+4. **Volume ↔ surface** : ajout/retrait de volume sur `topRow` (rangée créée/supprimée, SKY/VOID) ; `FillingManager` (seau) délégué au `LiquidSystem`.
+5. **Gouttes** : pool TypedArray, chute verticale/diagonale cadencée par la viscosité, atterrissage (création d'un body d'une tuile) ; `PouringManager` délégué.
+6. **Règle d'écoulement** : liste des instables, tâche par nature, remplissage/fuite/étalement/débordement, règle du film, réaction à `world/tile-changed` (minage d'un bord).
+7. **Fusion** de bodies de même nature (réétiquetage du plus petit, égalisation du niveau).
+8. **Séparation** (BFS entrelacé), répartition du volume entre les parties.
+9. **Modifications extérieures** : réconciliation (+16 / −16) avec `SandFallingSystem`, flag `#applying`.
+10. **Rencontre de natures** : cristallisation (TOPAZ, EMERALD, RUBY, SAPPHIRE).
+11. **SEA** : body spécialisé (volume infini, `topRow` figée), fusion/séparation SEA ↔ WATER sans `world/tile-changed`, corail mort sous WATER.
+12. **Documentation** : `TECHNICAL.md` (API + EventBus, exception SEA ↔ WATER), fiches d'aide (Water, Honey, Sap, Sea, Buckets, Gems).
+
 ### Images, sons et aide en ligne
 
 - corriger les icones dans weapon_32_32 : dague, épée, bow, boomrang
