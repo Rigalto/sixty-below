@@ -188,8 +188,10 @@ class WorldBuffer {
    * Vérifie, pour chaque plante SPREAD/TREE/HERB/MUSHROOM, que la tuile attendue
    * (naturalCode, topsoilCode, grass, ou entrée de PLANT_SUBSTRATE selon le kind) correspond
    * toujours au contenu réel du buffer à l'index concerné. Affiche une anomalie par ligne
-   * dans la console. Les types HERB/MUSHROOM absents de PLANT_SUBSTRATE sont ignorés sans
-   * anomalie signalée. Usage diagnostic uniquement — appelée par logStats().
+   * dans la console. Les records HERB/MUSHROOM dormants (soilIndex = 0) sont ignorés ; un
+   * spot inoccupé à espèces multiples (type NONE) est vérifié sur le substrat de son kind
+   * (HERB → fougère, MUSHROOM → champignon des cavernes) ; un type HERB/MUSHROOM absent de
+   * PLANT_SUBSTRATE est signalé comme anomalie. Usage diagnostic uniquement.
    * @param {object[]} plants — enregistrements de l'objectStore 'plant'
    */
   logPlantSubstrateIssues (plants) {
@@ -217,30 +219,42 @@ class WorldBuffer {
         continue
       }
 
-      const actual = this.readAt(record.soilIndex)
+      // records 'dormant' : ne pointent sur aucune tuile, servent juste à atteindre le
+      // 'nombre' attendu de plantes dans le monde (type éventuellement NONE)
+      if (record.soilIndex === 0) continue
 
-      const expected = PLANT_SUBSTRATE.get(record.type)
+      const actual = this.readAt(record.soilIndex)
+      const expected = PLANT_SUBSTRATE.get(record.type === PLANT_TYPE.NONE ? this.#spotReferenceType(record.kind) : record.type)
 
       if (expected === undefined) {
-        console.warn(`[WorldBuffer::logStats] type invalide — id=${record.id} kind=${record.kind} type=${record.type} soilIndex=${record.soilIndex}}`)
+        console.warn(`[WorldBuffer::logStats] type invalide — id=${record.id} kind=${record.kind} type=${record.type} soilIndex=${record.soilIndex}`)
         issues++
         continue // type non répertorié, pas vérifié
       }
 
-      if (!expected.has(actual)) {
-        // ce test permet de ne pas prendre en compte les records 'dormant' ne pointant
-        // sur aucune tuile et servant juste à faire le 'nombre' attendu de plantes dans le monde
-        if (record.soilIndex !== 0) {
-          const node = NODES_LOOKUP[actual]
-          console.warn(`[WorldBuffer::logStats] HERB/MUSHROOM invalide — id=${record.id} type=${record.type} soilIndex=${record.soilIndex} trouvé=${node ? node.name : actual}`)
-          issues++
-        }
-      }
+      if (expected.has(actual)) continue
+      const node = NODES_LOOKUP[actual]
+      console.warn(`[WorldBuffer::logStats] HERB/MUSHROOM invalide — id=${record.id} type=${record.type} soilIndex=${record.soilIndex} trouvé=${node ? node.name : actual}`)
+      issues++
     }
 
     console.log(issues === 0
       ? '[WorldBuffer::logStats] Substrats plantes : aucune anomalie'
       : `[WorldBuffer::logStats] Substrats plantes : ${issues} anomalie(s)`)
+  }
+
+  /**
+    * Retourne un type représentatif des spots à espèces multiples d'un kind donné, dont le
+    * substrat est commun à toutes les espèces du spot.
+    * @param {number} kind — PLANT_KIND
+    * @returns {number} — PLANT_TYPE représentatif, PLANT_TYPE.NONE si le kind n'a pas de tel spot
+    */
+  #spotReferenceType (kind) {
+    switch (kind) {
+      case PLANT_KIND.HERB: return PLANT_TYPE.SHADOWFERN // spots Fern : GRASSFERN
+      case PLANT_KIND.MUSHROOM: return PLANT_TYPE.FROSTCAP // spots Cave Mushroom : GRASSMUSHROOM
+      default: return PLANT_TYPE.NONE
+    }
   }
 }
 
