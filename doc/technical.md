@@ -629,6 +629,12 @@ Cette section définit les événements officiels. Tout nouvel événement doit 
 | E | `save/tick` | — | Persiste le Set de candidats en gamestate (clé `sandfallingtiles`) si modifié. |
 | S | `world/tile-changed` | `{ tileIndex: number, tileOldCode: number, tileNewCode: number }` | Émis en bloc pour chaque tuile déplacée (source et destination) lors de l'application des chutes. |
 
+#### Liquides (`LiquidSystem`)
+
+| Dir. | Event Name | Payload Structure | Description |
+| :---: | :--- | :--- | :--- |
+| E | `save/tick` | — | Persiste la table des LiquidBodies en gamestate (clé `liquidbodies`, `[ref, volume, …]`) si modifiée. |
+
 #### Debug (`WorldMapDebug`, `RealtimeDebugWidget`, `BuffManager`)
 
 | Dir. | Event Name | Payload Structure | Description |
@@ -1140,11 +1146,13 @@ Maître unique de la donnée monde. Le renderer et la persistence **ne font que 
 | `init`                    | `(savedChunks: Array): void`     | Hydrate le buffer depuis la DB. Lève une erreur si count ≠ 2048.   |
 | `getTile`                 | `(x, y): number`                 | Hot path. Pas de bounds checking (Ghost Cells).                    |
 | `getTileAt`               | `(index): number`                | Hot path. Pas de bounds checking (Ghost Cells).                    |
+| `getLiquidLevelAt`        | `(index): number`                | Hot path. Niveau liquide : `0` = pleine (ou non liquide), `1..15` = niveau en 1/16. |
 | `isRectCode`              | `(x, y, w, h, code): boolean`    | Teste si toutes les tuiles d'un rectangle valent le même code.     |
 | `getRectCodes`            | `(x, y, w, h): Set<number>`      | Retourne l'ensemble des codes de tuiles distincts présents dans un rectangle. |
 | `getTilesInRect` | `({x, y, w, h}): Uint8Array` | Codes des tuiles chevauchant le rectangle pixel (même partiellement). Vue sur buffer interne — invalide à l'appel suivant. Requiert `w > 0`, `h > 0`. Maximum 64 tuiles. |
 | `setTile`                 | `(x, y, code): void`             | Écriture avec dirty flags (render + save).                         |
 | `setTileAt`               | `(index, code): void`            | Écriture avec dirty flags (render + save).                         |
+| `setLiquidLevelAt`        | `(index, level): void`           | Écriture du niveau liquide, render dirty uniquement (non persisté, reconstruit au chargement). Ne modifie pas le code de la tuile. |
 | `getChunkData`            | `(chunkIndex): Uint8Array`       | Retourne une copie des 256 octets du chunk.                        |
 | `getChunkSaveData`        | `(chunkIndex): {key, index, chunk}` | DTO pour la persistence.                                        |
 | `consumeRenderDirtyChunks`| `(): Set<number> \| null`        | Clone + vide la liste render dirty. Appelé par le Renderer.        |

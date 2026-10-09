@@ -18,7 +18,7 @@ import {craftOverlay} from './craft.mjs'
 import {achievementManager} from './achievement.mjs'
 import {playerManager, spawnManager, lootPopupManager, handedToolManager, hotbarOverlay, healthManager} from './player.mjs'
 import {floraManager, sunflowerSystem, oleanderSystem, mandrakeSystem, bambooSystem, pricklepadSystem, parsnipSystem, ambermirageSystem, fernSystem, mossSystem, oakSystem, mahoganySystem, cobwebSystem, coconutSystem, thornspineSystem, spreadForestSystem, spreadJungleSystem, coralSystem, bloodmoonSystem, gravelweedSystem, satansCubeSystem, sneakthornSystem, cursedcrownSystem, abysshornSystem, inferncapSystem, giantMushroomSystem, caveMushroomSystem} from './ecosystem.mjs'
-import {sandFallingSystem} from './liquid.mjs'
+import {sandFallingSystem, liquidSystem} from './liquid.mjs'
 import {ACHIEVEMENT_CATEGORIES} from '../assets/data/data-achievement.mjs'
 import {miningManager, placingManager, foragingManager, choppingManager, sowingManager, hammingManager, furnishingManager, fillingManager, pouringManager, decomposerManager} from './action.mjs'
 import './combat.mjs'
@@ -356,6 +356,9 @@ class GameCore {
     const mockSavedChunks = await database.readAllFromObjectStore('world_chunks')
     chunkManager.init(mockSavedChunks)
 
+    // gestion des liquides
+    liquidSystem.init(state.liquidbodies)
+
     // position et direction du joueur
     const position = playerManager.init(state.player)
     camera.init(position)
@@ -614,6 +617,7 @@ class GameCore {
       mossSystem.debugRenderSpots(ctx)
       giantMushroomSystem.debugRenderSpots(ctx)
       caveMushroomSystem.debugRenderSpots(ctx)
+      liquidSystem.debugRender(ctx)
     }
     if (this.showGrids) {
       const buffs = buffManager.getBuffs(['showGrid', 'showInteractionRange', 'showToolRange'])

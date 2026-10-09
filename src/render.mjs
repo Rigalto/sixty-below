@@ -401,6 +401,11 @@ class WorldRenderer {
    * ou image statique sans blending. Sur la ligne SEA_LEVEL, une tuile disposant d'un waveImage
    * (SEA, DEEPSEA) l'utilise à la place de image (effet de vague en surface).
    * Les tuiles ETERNAL (image=null) sont rendues en aplat couleur uniquement — pas de blending.
+   * Une tuile en aplat dont le niveau liquide est partiel (1..15) est remplie de sa couleur sur
+   * sa hauteur basse ; sa partie haute reste transparente sous une tuile SKY (couleur du ciel),
+   * et est peinte en VOID sinon. Les bandeaux gauche/droite peints d'après une voisine partielle
+   * suivent la même règle (partie basse couleur liquide, partie haute VOID si la tuile au-dessus
+   * de cette voisine n'est pas SKY) ; le bandeau bas peint d'après une voisine partielle est VOID.
    * Les variantes à colonne dynamique (NATURAL, autotile générique, SKY_BORDER_NODE) compensent
    * PADDING localement : sx = variant * (img.sw + 2*PADDING) + PADDING — resolveAssetData ne
    * peut pas précalculer ce sx puisque la colonne n'est connue qu'au moment du rendu.
@@ -410,6 +415,7 @@ class WorldRenderer {
   #drawChunkToCanvas (chunkIndex, canvas) {
     const SKY = NODES.SKY.code
     const VOID = NODES.VOID.code
+    const VOID_COLOR = NODES.VOID.color
     const TOPSOIL_SUBSTRAT = NODE_TYPE.TOPSOIL | NODE_TYPE.SUBSTRAT
 
     const ctx = canvas.getContext('2d')
@@ -446,8 +452,19 @@ class WorldRenderer {
             }
             ctx.drawImage(IMAGE_CACHE[img.imgIndex], img.sx, img.sy, img.sw, img.sh, px, py, 16, 16)
           } else {
-            ctx.fillStyle = node.color
-            ctx.fillRect(px, py, 16, 16)
+            const level = chunkManager.getLiquidLevelAt(idx)
+            if (level === 0) {
+              ctx.fillStyle = node.color
+              ctx.fillRect(px, py, 16, 16)
+            } else {
+              const empty = 16 - level
+              if (chunkManager.getTileAt(idx - 1024) !== SKY) {
+                ctx.fillStyle = VOID_COLOR
+                ctx.fillRect(px, py, 16, empty)
+              }
+              ctx.fillStyle = node.color
+              ctx.fillRect(px, py + empty, 16, level)
+            }
           }
           px += 16
           continue
@@ -491,22 +508,44 @@ class WorldRenderer {
         if (variant & 2) {
           const rightNode = NODES_LOOKUP[right]
           if (rightNode && rightNode.color !== 'none') {
-            ctx.fillStyle = rightNode.color
-            ctx.fillRect(px + 14, py, 2, 16)
+            const level = chunkManager.getLiquidLevelAt(idx + 1)
+            if (level === 0) {
+              ctx.fillStyle = rightNode.color
+              ctx.fillRect(px + 14, py, 2, 16)
+            } else {
+              const empty = 16 - level
+              if (chunkManager.getTileAt(idx + 1 - 1024) !== SKY) {
+                ctx.fillStyle = VOID_COLOR
+                ctx.fillRect(px + 14, py, 2, empty)
+              }
+              ctx.fillStyle = rightNode.color
+              ctx.fillRect(px + 14, py + empty, 2, level)
+            }
           }
         }
         if (variant & 4) {
           const bottomNode = NODES_LOOKUP[bottom]
           if (bottomNode && bottomNode.color !== 'none') {
-            ctx.fillStyle = bottomNode.color
+            ctx.fillStyle = chunkManager.getLiquidLevelAt(idx + 1024) === 0 ? bottomNode.color : VOID_COLOR
             ctx.fillRect(px, py + 14, 16, 2)
           }
         }
         if (variant & 8) {
           const leftNode = NODES_LOOKUP[left]
           if (leftNode && leftNode.color !== 'none') {
-            ctx.fillStyle = leftNode.color
-            ctx.fillRect(px, py, 2, 16)
+            const level = chunkManager.getLiquidLevelAt(idx - 1)
+            if (level === 0) {
+              ctx.fillStyle = leftNode.color
+              ctx.fillRect(px, py, 2, 16)
+            } else {
+              const empty = 16 - level
+              if (chunkManager.getTileAt(idx - 1 - 1024) !== SKY) {
+                ctx.fillStyle = VOID_COLOR
+                ctx.fillRect(px, py, 2, empty)
+              }
+              ctx.fillStyle = leftNode.color
+              ctx.fillRect(px, py + empty, 2, level)
+            }
           }
         }
 

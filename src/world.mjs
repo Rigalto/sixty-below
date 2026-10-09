@@ -15,6 +15,8 @@ const TOTAL_CHUNKS = 2048
  */
 class ChunkManager {
   #data // @type {Uint8Array} Stockage plat (1 octet par tuile)
+  #liquidLevel = new Uint8Array(WORLD_WIDTH * WORLD_HEIGHT) // niveau des tuiles liquides partielles : 0 = pleine, 1..15 = niveau en 1/16 — non persisté
+
   #dirtyRenderChunks // @type {Set<number>} IDs des chunks modifiés visuellement (pour Renderer)
   #dirtySaveChunks // @type {Set<number>} IDs des chunks modifiés (pour Persistence)
   #dbKeys // @type {Array<number>} Index Logique des chunks (0-2047) -> Clé DB (Primary Key)
@@ -41,6 +43,7 @@ class ChunkManager {
     this.#dirtyRenderChunks.clear()
     this.#dirtySaveChunks.clear()
     this.#dbKeys.fill(null)
+    this.#liquidLevel.fill(0)
 
     // 2. Hydratation + Mapping des Clés
     this.#hydrateFromSave(savedChunks)
@@ -96,6 +99,13 @@ class ChunkManager {
   getTileAt (index) { return this.#data[index] }
 
   getTile (x, y) { return this.#data[(y << 10) | x] }
+
+  /**
+    * Renvoie le niveau d'une tuile liquide (HOT PATH, sans bounds checking).
+    * @param {number} index — (y << 10) | x
+    * @returns {number} 0 = pleine (ou non liquide), 1..15 = niveau en 1/16
+    */
+  getLiquidLevelAt (index) { return this.#liquidLevel[index] }
 
   /**
    * Teste si toutes les tuiles d'un rectangle valent le même code.
@@ -197,6 +207,31 @@ class ChunkManager {
     this.#dirtySaveChunks.add(chunkKey)
     // Invalider les chunks voisins si la tuile est sur un bord de chunk —
     // leur auto-tiling dépend de cette tuile comme voisine
+    const localX = tileX & 0xF
+    const localY = tileY & 0xF
+    if (localX === 0 && cx > 0) this.#dirtyRenderChunks.add(chunkKey - 1)
+    if (localX === 15 && cx < 63) this.#dirtyRenderChunks.add(chunkKey + 1)
+    if (localY === 0 && cy > 0) this.#dirtyRenderChunks.add(chunkKey - 64)
+    if (localY === 15 && cy < 31) this.#dirtyRenderChunks.add(chunkKey + 64)
+  }
+
+  /**
+    * Modifie le niveau d'une tuile liquide. Marque le chunk render dirty, ainsi que le chunk
+    * voisin si la tuile est sur un bord de chunk (les bandeaux de blending des tuiles voisines
+    * dépendent du niveau). Ne marque pas le chunk save dirty : le niveau n'est pas persisté.
+    * Ne modifie pas le code de la tuile.
+    * @param {number} index — (y << 10) | x
+    * @param {number} level — 0 = pleine, 1..15 = niveau en 1/16
+    */
+  setLiquidLevelAt (index, level) {
+    if (this.#liquidLevel[index] === level) return
+    this.#liquidLevel[index] = level
+    const tileX = index & 0x3FF
+    const tileY = index >> 10
+    const cx = tileX >> 4
+    const cy = tileY >> 4
+    const chunkKey = (cy << 6) | cx
+    this.#dirtyRenderChunks.add(chunkKey)
     const localX = tileX & 0xF
     const localY = tileY & 0xF
     if (localX === 0 && cx > 0) this.#dirtyRenderChunks.add(chunkKey - 1)

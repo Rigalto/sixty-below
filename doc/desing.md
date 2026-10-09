@@ -952,7 +952,7 @@ Toute action joueur déclenchée par clic (minage, placement, récolte…) suit 
 │   ├── buff.mjs             # Layer 4 : BuffManager, StatModifiers
 │   ├── housing.mjs          # Layer 4 : FurnitureManager, TeleporterManager, HousingManager
 │   ├── ecosystem.mjs        # Layer 4 : HiveSystem, FloraManager, CobwebSystem…
-│   ├── liquid.mjs           # Layer 4 : SandFallingSystem, LiquidSystem
+│   ├── liquid.mjs           # Layer 4 : SandFallingSystem, LiquidBody, LiquidSystem
 │   ├── combat.mjs           # Layer 4 : ArenaCreator, TurnManager, SpellSystem, CombatAI
 │   ├── inventory.mjs        # Layer 4 : InventoryManager, InventorySlot, InventoryOverlay
 │   ├── craft.mjs            # Layer 4 : CraftSystem

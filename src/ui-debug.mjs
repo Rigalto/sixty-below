@@ -416,7 +416,8 @@ class InventoryDebug {
         'add <itemId> [count]   — add items to inventory\n' +
         'pack <packId>          — add a pre-configured pack\n' +
         'emit <event> [payload] — trigger an eventBus event\n' +
-        'tp <x> <y>             — teleport player to tile coordinates'
+        'tp <x> <y>             — teleport player to tile coordinates' +
+        'level <x> <y> <n>      — set liquid level of a tile (0 = full, 1..15 = n/16)'
       )
       return
     }
@@ -465,6 +466,15 @@ class InventoryDebug {
       const x = parseInt(parts[1], 10)
       const y = parseInt(parts[2], 10)
       eventBus.emit('player/teleport', {x, y})
+      return
+    }
+
+    if (command === 'level') {
+      const x = parseInt(parts[1], 10)
+      const y = parseInt(parts[2], 10)
+      const level = parseInt(parts[3], 10)
+      if (!(level >= 0 && level <= 15)) { window.alert(`Invalid level: ${parts[3]} (0..15)`); return }
+      chunkManager.setLiquidLevelAt((y << 10) | x, level)
       return
     }
 
