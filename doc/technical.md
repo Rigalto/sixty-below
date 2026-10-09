@@ -634,6 +634,7 @@ Cette section définit les événements officiels. Tout nouvel événement doit 
 | Dir. | Event Name | Payload Structure | Description |
 | :---: | :--- | :--- | :--- |
 | E | `save/tick` | — | Persiste la table des LiquidBodies en gamestate (clé `liquidbodies`, `[ref, volume, …]`) si modifiée. |
+| S | `world/tile-changed` | `{ tileIndex, tileOldCode, tileNewCode }` | Émis pour chaque tuile créée ou retirée à la surface d'un body (après toutes les mutations). |
 
 #### Debug (`WorldMapDebug`, `RealtimeDebugWidget`, `BuffManager`)
 

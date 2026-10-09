@@ -4,6 +4,7 @@ import {MICROTASK, WORLD_WIDTH, WORLD_HEIGHT, OVERLAYS, UI_LAYOUT, SKY_COLORS} f
 import {hexToRgb, ITEMS, NODES_LOOKUP} from '../assets/data/data.mjs'
 import {eventBus, microTasker, taskScheduler} from './utils.mjs'
 import {chunkManager} from './world.mjs'
+import {liquidSystem} from './liquid.mjs'
 import {inventoryManager, inventoryOverlay} from './inventory.mjs'
 
 /* ====================================================================================================
@@ -416,8 +417,8 @@ class InventoryDebug {
         'add <itemId> [count]   — add items to inventory\n' +
         'pack <packId>          — add a pre-configured pack\n' +
         'emit <event> [payload] — trigger an eventBus event\n' +
-        'tp <x> <y>             — teleport player to tile coordinates' +
-        'level <x> <y> <n>      — set liquid level of a tile (0 = full, 1..15 = n/16)'
+        'tp <x> <y>             — teleport player to tile coordinates\n' +
+        'liquid <x> <y> <n>     — add (n > 0) or remove (n < 0) n/16 of volume to the liquid body of a tile'
       )
       return
     }
@@ -469,12 +470,18 @@ class InventoryDebug {
       return
     }
 
-    if (command === 'level') {
+    if (command === 'liquid') {
       const x = parseInt(parts[1], 10)
       const y = parseInt(parts[2], 10)
-      const level = parseInt(parts[3], 10)
-      if (!(level >= 0 && level <= 15)) { window.alert(`Invalid level: ${parts[3]} (0..15)`); return }
-      chunkManager.setLiquidLevelAt((y << 10) | x, level)
+      const delta = parseInt(parts[3], 10)
+      const tileIndex = (y << 10) | x
+      if (!Number.isInteger(delta) || delta === 0) { window.alert(`Invalid volume: ${parts[3]} (non-zero, in 1/16)`); return }
+      if (delta > 0) {
+        const accepted = liquidSystem.addVolume(tileIndex, delta)
+        if (accepted !== delta) window.alert(`Accepted volume: ${accepted} / ${delta}`)
+      } else if (!liquidSystem.removeVolume(tileIndex, -delta)) {
+        window.alert('No liquid body here, or not enough volume')
+      }
       return
     }
 

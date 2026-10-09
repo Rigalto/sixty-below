@@ -13,6 +13,7 @@ import {WORLD_WIDTH, SEA_LEVEL, MICROTASK} from './constant.mjs'
 import {floraManager} from './ecosystem.mjs'
 import {furnitureManager, teleporterManager} from './housing.mjs'
 import {IMAGE_CACHE} from './assets.mjs'
+import {liquidSystem} from './liquid.mjs'
 
 /* ====================================================================================================
    HELPERS COMMUNS A TOUS LES MANAGERS
@@ -480,12 +481,13 @@ class FillingManager {
   }
 
   /**
- * Callback MicroTasker : exécute le remplissage.
+   * Callback MicroTasker : exécute le remplissage.
    * Re-vérifie la tuile cible — elle a pu changer entre tryFill et l'exécution.
-   * Consomme l'item en main, crédite le contenant rempli. Pour un bucket, transforme la tuile
-   * en SKY (si la tuile au-dessus est SKY, avec propagation sur les VOID consécutifs en dessous)
-   * ou VOID. Toutes les tuiles concernées sont modifiées avant l'émission des eventBus
-   * 'world/tile-changed', pour que les listeners synchrones lisent un monde déjà cohérent.
+   * Pour un bucket hors SEA, retire 16/16 de volume au LiquidBody de la tuile (appliqué à sa
+   * surface par liquidSystem) ; si le body contient moins de 16/16, le remplissage est refusé
+   * (son 'wrong', rien n'est consommé). La SEA, de volume infini, et le remplissage d'une
+   * bottle ne modifient pas le monde. Consomme ensuite l'item en main et crédite le contenant
+   * rempli.
    * @param {number} tileIndex
    * @param {object} tileNode
    * @param {object} item
@@ -498,6 +500,12 @@ class FillingManager {
     const suffix = LIQUID_RESULT_SUFFIX[tileOldCode]
     if (suffix === undefined) return // liquide non convertible (ex. Deep Sea)
 
+    // retrait du volume (bucket uniquement, SEA inépuisable)
+    if (item.code === 'bucket' && tileOldCode !== NODES.SEA.code && !liquidSystem.removeVolume(tileIndex, 16)) {
+      eventBus.emit('sound/play', 'wrong')
+      return
+    }
+
     const resultId = `${item.code}${suffix}`
 
     // consommation / crédit
@@ -506,33 +514,33 @@ class FillingManager {
     eventBus.emit('player/loot-item', {itemCode: resultId})
 
     // transformation de la tuile
-    if (item.code === 'bucket') {
-      const SKY = NODES.SKY.code
-      const VOID = NODES.VOID.code
-      const aboveCode = chunkManager.getTileAt(tileIndex - WORLD_WIDTH)
-      const tileNewCode = aboveCode === SKY ? SKY : VOID
+    // if (item.code === 'bucket') {
+    //   const SKY = NODES.SKY.code
+    //   const VOID = NODES.VOID.code
+    //   const aboveCode = chunkManager.getTileAt(tileIndex - WORLD_WIDTH)
+    //   const tileNewCode = aboveCode === SKY ? SKY : VOID
 
-      // mutation de toutes les tuiles concernées
-      chunkManager.setTileAt(tileIndex, tileNewCode)
+    //   // mutation de toutes les tuiles concernées
+    //   chunkManager.setTileAt(tileIndex, tileNewCode)
 
-      let propagationEnd = tileIndex
-      if (tileNewCode === SKY) {
-        let idx = tileIndex + WORLD_WIDTH
-        while (chunkManager.getTileAt(idx) === VOID) {
-          chunkManager.setTileAt(idx, SKY)
-          idx += WORLD_WIDTH
-        }
-        propagationEnd = idx - WORLD_WIDTH
-      }
+    //   let propagationEnd = tileIndex
+    //   if (tileNewCode === SKY) {
+    //     let idx = tileIndex + WORLD_WIDTH
+    //     while (chunkManager.getTileAt(idx) === VOID) {
+    //       chunkManager.setTileAt(idx, SKY)
+    //       idx += WORLD_WIDTH
+    //     }
+    //     propagationEnd = idx - WORLD_WIDTH
+    //   }
 
-      // émission — le monde est désormais entièrement cohérent
-      eventBus.emit('world/tile-changed', {tileIndex, tileOldCode, tileNewCode})
-      let idx = tileIndex + WORLD_WIDTH
-      while (idx <= propagationEnd) {
-        eventBus.emit('world/tile-changed', {tileIndex: idx, tileOldCode: VOID, tileNewCode: SKY})
-        idx += WORLD_WIDTH
-      }
-    }
+    //   // émission — le monde est désormais entièrement cohérent
+    //   eventBus.emit('world/tile-changed', {tileIndex, tileOldCode, tileNewCode})
+    //   let idx = tileIndex + WORLD_WIDTH
+    //   while (idx <= propagationEnd) {
+    //     eventBus.emit('world/tile-changed', {tileIndex: idx, tileOldCode: VOID, tileNewCode: SKY})
+    //     idx += WORLD_WIDTH
+    //   }
+    // }
 
     eventBus.emit('sound/play', 'placing')
   }

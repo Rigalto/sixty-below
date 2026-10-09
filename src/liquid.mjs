@@ -253,6 +253,7 @@ class LiquidSystem {
   #freeIds = [] // ids libérés, réutilisés en priorité
   #queue = new Int32Array(WORLD_WIDTH * WORLD_HEIGHT) // file BFS partagée (flood-fill)
   #dirty = false // true si la table des bodies a changé depuis la dernière écriture gamestate
+  #changes = [] // Array<{tileIndex, tileOldCode, tileNewCode}> — mutations en attente d'émission 'world/tile-changed'
 
   constructor () {
     // eventBus
@@ -298,6 +299,68 @@ class LiquidSystem {
     }
     database.setGameState('liquidbodies', table)
     this.#dirty = false
+  }
+
+  /**
+   * Ajoute du volume au body contenant la tuile, appliqué instantanément à la surface : tant
+   * que la rangée haute déborde (rowVol > 16 × topCount), une nouvelle rangée est créée
+   * au-dessus, sur les cellules SKY/VOID situées directement au-dessus des tuiles de topRow.
+   * Si aucune cellule n'est disponible, le body est plein et l'excédent est refusé. Toutes les
+   * mutations précèdent l'émission des 'world/tile-changed'.
+   * @param {number} tileIndex — une tuile quelconque du body
+   * @param {number} amount — volume à ajouter, en 1/16 de tuile (> 0)
+   * @returns {number} volume réellement ajouté (0 si la tuile n'appartient à aucun body)
+   */
+  addVolume (tileIndex, amount) {
+    const id = this.#liquidBodyId[tileIndex]
+    if (id === 0) return 0
+    const body = this.#bodies[id]
+    this.#changes.length = 0
+
+    body.volume += amount
+    let accepted = amount
+    while (body.volume - ((body.tileCount - body.topCount) << 4) > (body.topCount << 4)) {
+      if (this.#addTopRow(body)) continue
+      const overflow = body.volume - (body.tileCount << 4)
+      body.volume -= overflow
+      accepted -= overflow
+      break
+    }
+
+    this.#applyTopRowLevel(body)
+    if (accepted > 0) this.#dirty = true
+    this.#emitChanges()
+    return accepted
+  }
+
+  /**
+ * Retire du volume au body contenant la tuile, appliqué instantanément à la surface : tant
+ * que la rangée haute est vide (rowVol ≤ 0), ses tuiles redeviennent SKY (tuile au-dessus SKY)
+ * ou VOID et la rangée inférieure devient topRow. Un body dont toutes les tuiles ont disparu
+ * est supprimé. Toutes les mutations précèdent l'émission des 'world/tile-changed'.
+ * @param {number} tileIndex — une tuile quelconque du body
+ * @param {number} amount — volume à retirer, en 1/16 de tuile (> 0)
+ * @returns {boolean} false (rien n'est modifié) si la tuile n'appartient à aucun body ou si
+ *   le volume du body est inférieur à amount
+ */
+  removeVolume (tileIndex, amount) {
+    const id = this.#liquidBodyId[tileIndex]
+    if (id === 0) return false
+    const body = this.#bodies[id]
+    if (body.volume < amount) return false
+    this.#changes.length = 0
+
+    body.volume -= amount
+    while (body.volume - ((body.tileCount - body.topCount) << 4) <= 0) {
+      this.#removeTopRow(body)
+      if (body.tileCount === 0) break
+    }
+
+    if (body.tileCount === 0) this.#deleteBody(body)
+    else this.#applyTopRowLevel(body)
+    this.#dirty = true
+    this.#emitChanges()
+    return true
   }
 
   /**
@@ -377,14 +440,16 @@ class LiquidSystem {
   /**
    * Répartit le volume de la rangée haute entre ses tuiles et pose leur niveau dans
    * chunkManager : rowVol = volume − 16 × (tileCount − topCount), niveau = floor(rowVol /
-   * topCount), 16 étant noté 0 (pleine). Le reste de la division n'est pas affiché.
+   * topCount) borné à [1..16], 16 étant noté 0 (pleine). Le reste de la division n'est pas
+   * affiché ; une rangée dont rowVol < topCount est affichée à 1/16.
    * @param {LiquidBody} body
    */
   #applyTopRowLevel (body) {
     const {id, volume, tileCount, topRow, topCount, xMin, xMax} = body
     const rowVol = volume - ((tileCount - topCount) << 4)
     let level = (rowVol / topCount) | 0
-    if (level >= 16) level = 0
+    if (level === 0) level = 1
+    else if (level >= 16) level = 0
 
     let idx = (topRow << 10) | xMin
     const end = (topRow << 10) | xMax
@@ -392,6 +457,147 @@ class LiquidSystem {
       if (this.#liquidBodyId[idx] === id) chunkManager.setLiquidLevelAt(idx, level)
       idx++
     }
+  }
+
+  /**
+ * Crée une rangée au-dessus de topRow : chaque cellule SKY/VOID située directement au-dessus
+ * d'une tuile de topRow devient une tuile du body. Les tuiles de l'ancienne topRow repassent
+ * au niveau plein. Met à jour tileCount, topRow, topCount, yMin et le rim ; empile les
+ * mutations dans #changes.
+ * @param {LiquidBody} body
+ * @returns {boolean} false (rien n'est modifié) si aucune cellule n'est disponible
+ */
+  #addTopRow (body) {
+    const ids = this.#liquidBodyId
+    const {id, nature, topRow, xMin, xMax, rim} = body
+    const first = this.#changes.length
+
+    let idx = (topRow << 10) | xMin
+    const end = (topRow << 10) | xMax
+    while (idx <= end) {
+      if (ids[idx] === id) {
+        const above = idx - WORLD_WIDTH
+        const aboveCode = chunkManager.getTileAt(above)
+        if (LIQUID_OPEN_CODES.has(aboveCode)) {
+          chunkManager.setTileAt(above, nature)
+          ids[above] = id
+          this.#changes.push({tileIndex: above, tileOldCode: aboveCode, tileNewCode: nature})
+        }
+      }
+      idx++
+    }
+
+    const added = this.#changes.length - first
+    if (added === 0) return false
+
+    // ancienne rangée haute : désormais pleine
+    idx = (topRow << 10) | xMin
+    while (idx <= end) {
+      if (ids[idx] === id) chunkManager.setLiquidLevelAt(idx, 0)
+      idx++
+    }
+
+    // rim : les nouvelles tuiles en sortent, leurs voisins ouverts y entrent
+    for (let i = first; i < this.#changes.length; i++) {
+      const tile = this.#changes[i].tileIndex
+      rim.delete(tile)
+      for (const offset of LIQUID_NEIGHBOR_OFFSETS) {
+        const n = tile + offset
+        if (LIQUID_OPEN_CODES.has(chunkManager.getTileAt(n))) rim.add(n)
+      }
+    }
+
+    body.tileCount += added
+    body.topRow = topRow - 1
+    body.topCount = added
+    body.yMin = topRow - 1
+    return true
+  }
+
+  /**
+ * Supprime la rangée topRow : ses tuiles redeviennent SKY (si la tuile au-dessus est SKY) ou
+ * VOID, leur niveau est remis à 0. Met à jour tileCount, puis topRow, topCount et yMin sur la
+ * rangée inférieure (si le body n'est pas vide), et le rim ; empile les mutations dans
+ * #changes. Le rectangle n'est pas réduit en x (il reste englobant).
+ * @param {LiquidBody} body
+ */
+  #removeTopRow (body) {
+    const SKY = NODES.SKY.code
+    const VOID = NODES.VOID.code
+    const ids = this.#liquidBodyId
+    const {id, nature, topRow, topCount, xMin, xMax, rim} = body
+    const first = this.#changes.length
+
+    let idx = (topRow << 10) | xMin
+    let end = (topRow << 10) | xMax
+    while (idx <= end) {
+      if (ids[idx] === id) {
+        const tileNewCode = chunkManager.getTileAt(idx - WORLD_WIDTH) === SKY ? SKY : VOID
+        ids[idx] = 0
+        chunkManager.setLiquidLevelAt(idx, 0)
+        chunkManager.setTileAt(idx, tileNewCode)
+        this.#changes.push({tileIndex: idx, tileOldCode: nature, tileNewCode})
+      }
+      idx++
+    }
+    body.tileCount -= topCount
+
+    // rim : les tuiles libérées y entrent si elles touchent encore le body ; leurs voisins
+    // du rim qui ne le touchent plus en sortent
+    for (let i = first; i < this.#changes.length; i++) {
+      const tile = this.#changes[i].tileIndex
+      if (this.#touchesBody(tile, id)) rim.add(tile)
+      for (const offset of LIQUID_NEIGHBOR_OFFSETS) {
+        const n = tile + offset
+        if (rim.has(n) && !this.#touchesBody(n, id)) rim.delete(n)
+      }
+    }
+
+    if (body.tileCount === 0) return
+
+    const y = topRow + 1
+    let count = 0
+    idx = (y << 10) | xMin
+    end = (y << 10) | xMax
+    while (idx <= end) {
+      if (ids[idx] === id) count++
+      idx++
+    }
+    body.topRow = y
+    body.topCount = count
+    body.yMin = y
+  }
+
+  /**
+ * Supprime un body vide : libère son identifiant et vide son rim.
+ * @param {LiquidBody} body
+ */
+  #deleteBody (body) {
+    body.rim.clear()
+    this.#bodies[body.id] = null
+    this.#freeIds.push(body.id)
+  }
+
+  /**
+ * Indique si une cellule a au moins un voisin 4-connexe appartenant au body.
+ * @param {number} tileIndex
+ * @param {number} id — identifiant du body
+ * @returns {boolean}
+ */
+  #touchesBody (tileIndex, id) {
+    const ids = this.#liquidBodyId
+    for (const offset of LIQUID_NEIGHBOR_OFFSETS) {
+      if (ids[tileIndex + offset] === id) return true
+    }
+    return false
+  }
+
+  /**
+  * Émet 'world/tile-changed' pour chaque mutation empilée dans #changes, puis vide la pile.
+  */
+  #emitChanges () {
+    for (const change of this.#changes) eventBus.emit('world/tile-changed', change)
+    this.#changes.length = 0
   }
 
   // ///// //
