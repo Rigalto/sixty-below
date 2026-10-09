@@ -26,6 +26,7 @@
 - Implémenter l'attribut 'tiles' du mining (permet de miner plusieurs tuiles en une seule fois)
 - Utiliser les wood planks dans des recettes
 - Supprimer les chunks en mémoire qui sont périmés
+- Remplissage d'un bucket sur un liquidBody de volume < à 16/16 (un film ou une petite flaque partielle) : actuellement pas de remplissage et son 'wrong', sans rien consommer. Cele empêche de supprimer une petite flaque. Si ce cas arrive, il faudra envisager soit de remplir quand même le bucket et vider entièrement le volume (le bucket créerait du volume), soit de vider le volume sans remplir le bucket (le bucket supprimerait du volume).
 
 ### Liquides — écoulement (conception : DESIGN §11)
 

@@ -402,10 +402,10 @@ class WorldRenderer {
    * (SEA, DEEPSEA) l'utilise à la place de image (effet de vague en surface).
    * Les tuiles ETERNAL (image=null) sont rendues en aplat couleur uniquement — pas de blending.
    * Une tuile en aplat dont le niveau liquide est partiel (1..15) est remplie de sa couleur sur
-   * sa hauteur basse ; sa partie haute reste transparente sous une tuile SKY (couleur du ciel),
-   * et est peinte en VOID sinon. Les bandeaux gauche/droite peints d'après une voisine partielle
-   * suivent la même règle (partie basse couleur liquide, partie haute VOID si la tuile au-dessus
-   * de cette voisine n'est pas SKY) ; le bandeau bas peint d'après une voisine partielle est VOID.
+   * sa hauteur basse ; sa partie haute reste transparente si la première tuile non liquide
+   * au-dessus est SKY (couleur du ciel, gouttes en chute traversées), et est peinte en VOID
+   * sinon. Les bandeaux gauche/droite peints d'après une voisine partielle suivent la même règle
+   * appliquée à cette voisine ; le bandeau bas peint d'après une voisine partielle est VOID.
    * Les variantes à colonne dynamique (NATURAL, autotile générique, SKY_BORDER_NODE) compensent
    * PADDING localement : sx = variant * (img.sw + 2*PADDING) + PADDING — resolveAssetData ne
    * peut pas précalculer ce sx puisque la colonne n'est connue qu'au moment du rendu.
@@ -458,7 +458,7 @@ class WorldRenderer {
               ctx.fillRect(px, py, 16, 16)
             } else {
               const empty = 16 - level
-              if (chunkManager.getTileAt(idx - 1024) !== SKY) {
+              if (!this.#isSkyAbove(idx)) {
                 ctx.fillStyle = VOID_COLOR
                 ctx.fillRect(px, py, 16, empty)
               }
@@ -514,7 +514,7 @@ class WorldRenderer {
               ctx.fillRect(px + 14, py, 2, 16)
             } else {
               const empty = 16 - level
-              if (chunkManager.getTileAt(idx + 1 - 1024) !== SKY) {
+              if (!this.#isSkyAbove(idx + 1)) {
                 ctx.fillStyle = VOID_COLOR
                 ctx.fillRect(px + 14, py, 2, empty)
               }
@@ -539,7 +539,7 @@ class WorldRenderer {
               ctx.fillRect(px, py, 2, 16)
             } else {
               const empty = 16 - level
-              if (chunkManager.getTileAt(idx - 1 - 1024) !== SKY) {
+              if (!this.#isSkyAbove(idx - 1)) {
                 ctx.fillStyle = VOID_COLOR
                 ctx.fillRect(px, py, 2, empty)
               }
@@ -568,6 +568,23 @@ class WorldRenderer {
       rowIdx += 1024
       py += 16
     }
+  }
+
+  /**
+   * Indique si la partie vide d'une tuile liquide partielle est ouverte sur le ciel : remonte
+   * la colonne en traversant les tuiles liquides (gouttes en chute) et teste si la première
+   * tuile non liquide est SKY. La rangée 0 (FOG) borne la remontée.
+   * @param {number} index — (y << 10) | x de la tuile partielle
+   * @returns {boolean}
+   */
+  #isSkyAbove (index) {
+    let idx = index - 1024
+    let code = chunkManager.getTileAt(idx)
+    while (NODES_LOOKUP[code].type & NODE_TYPE.LIQUID) {
+      idx -= 1024
+      code = chunkManager.getTileAt(idx)
+    }
+    return code === NODES.SKY.code
   }
 
   /**

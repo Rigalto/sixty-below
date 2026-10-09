@@ -357,7 +357,7 @@ class GameCore {
     chunkManager.init(mockSavedChunks)
 
     // gestion des liquides
-    liquidSystem.init(state.liquidbodies)
+    liquidSystem.init(state.liquidbodies, state.liquiddrops)
 
     // position et direction du joueur
     const position = playerManager.init(state.player)

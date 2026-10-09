@@ -1077,15 +1077,15 @@ Champs d'un `LiquidBody` (ordre fixe, monomorphisme V8) : `id`, `nature`, `refIn
 ### 11.3 Persistance
 
 * **Clé gamestate `liquidbodies` :** tableau plat `[ref0, volume0, ref1, volume1, …]`. Rien d'autre n'est enregistré :
-  * la nature est le code de la tuile `ref` ;
-  * la SEA n'y figure pas (§11.8) ;
-  * une goutte est enregistrée comme un body d'une tuile (`volume ≤ 16`) ;
-  * la stabilité n'est pas persistée : elle est recalculée au chargement.
+  * la nature est le code de la tuile `ref`
+  * la SEA n'y figure pas (§11.8)
+  * la stabilité n'est pas persistée : elle est recalculée au chargement
+* **Clé gamestate `liquiddrops` :** tableau plat `[index0, volume0, …]` des gouttes en vol ; la nature est le code de la tuile. Les gouttes sont restaurées avant les bodies et exclues de leur flood-fill (une goutte posée contre un body ne doit pas y être absorbée).
 * **Tuile de référence :** la tuile la plus basse du body (`y` maximal, puis `x` minimal), dernière à se vider. Elle est réélue uniquement quand elle quitte le body.
 * **Écriture :** sur `save/tick`, uniquement si le flag dirty est levé, dans la même transaction que les chunks. Le tableau est réécrit en bloc : pas de soft-delete, la `ref` peut changer librement.
 * **Création du monde :** `generate.mjs` calcule et enregistre `liquidbodies` en fin de génération (passe de composantes connexes sur le `WorldBuffer` final, `volume = 16N`). Le store `liquid` est supprimé.
 * **Fiabilité :** la valeur enregistrée est réputée exacte. Aucun traitement ne suppose qu'elle puisse être incorrecte (pas de balayage d'orphelins, pas de bornage correctif).
-* **Chargement (`startSession`) :** flood-fill depuis chaque `ref` pour reconstruire `liquidBodyId`, `tileCount`, `topRow`, le rectangle et le `rim` ; la stabilité est évaluée pendant ce même parcours ; `liquidLevel` est reconstruit à partir des volumes.
+* **Chargement (`startSession`) :** restauration des gouttes, puis flood-fill depuis chaque `ref` pour reconstruire `liquidBodyId`, `tileCount`, `topRow`, le rectangle et le `rim` ; la stabilité est évaluée pendant ce même parcours ; `liquidLevel` est reconstruit à partir des volumes.
 
 ### 11.4 Règle d'écoulement
 

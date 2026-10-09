@@ -512,36 +512,6 @@ class FillingManager {
     inventoryManager.decrementHotbarSlotCount(slotIndex)
     inventoryManager.loot(resultId, 1, '')
     eventBus.emit('player/loot-item', {itemCode: resultId})
-
-    // transformation de la tuile
-    // if (item.code === 'bucket') {
-    //   const SKY = NODES.SKY.code
-    //   const VOID = NODES.VOID.code
-    //   const aboveCode = chunkManager.getTileAt(tileIndex - WORLD_WIDTH)
-    //   const tileNewCode = aboveCode === SKY ? SKY : VOID
-
-    //   // mutation de toutes les tuiles concernées
-    //   chunkManager.setTileAt(tileIndex, tileNewCode)
-
-    //   let propagationEnd = tileIndex
-    //   if (tileNewCode === SKY) {
-    //     let idx = tileIndex + WORLD_WIDTH
-    //     while (chunkManager.getTileAt(idx) === VOID) {
-    //       chunkManager.setTileAt(idx, SKY)
-    //       idx += WORLD_WIDTH
-    //     }
-    //     propagationEnd = idx - WORLD_WIDTH
-    //   }
-
-    //   // émission — le monde est désormais entièrement cohérent
-    //   eventBus.emit('world/tile-changed', {tileIndex, tileOldCode, tileNewCode})
-    //   let idx = tileIndex + WORLD_WIDTH
-    //   while (idx <= propagationEnd) {
-    //     eventBus.emit('world/tile-changed', {tileIndex: idx, tileOldCode: VOID, tileNewCode: SKY})
-    //     idx += WORLD_WIDTH
-    //   }
-    // }
-
     eventBus.emit('sound/play', 'placing')
   }
 }
@@ -581,9 +551,9 @@ class PouringManager {
   /**
    * Callback MicroTasker : exécute le versement.
    * Re-vérifie la tuile cible et le blocage — ils ont pu changer entre tryPour et l'exécution.
-   * Consomme le seau plein, crédite un seau vide, pose la tuile de liquide correspondante,
-   * émet 'world/tile-changed'. Si la tuile remplacée était SKY, propage VOID sur les tuiles
-   * SKY situées en dessous (même logique que PlacingManager.onPlaceTile).
+   * Crée une goutte de 16/16 du liquide du seau sur la tuile (liquidSystem) ; si le pool de
+   * gouttes est plein, le versement est refusé (son 'wrong', rien n'est consommé). Consomme
+   * ensuite le seau plein et crédite un seau vide.
    * @param {number} tileIndex
    * @param {object} tileNode
    * @param {object} item
@@ -594,37 +564,44 @@ class PouringManager {
     if (tileOldCode !== tileNode.code) return // tuile changée entre-temps
     if (!blockedTiles.canPlace(tileIndex)) return // bloquée entre-temps
 
-    const tileNewCode = item.pouring.liquid
-    if (tileNewCode === undefined) return // item non versable (sécurité)
+    const nature = item.pouring.liquid
+    if (nature === undefined) return // item non versable (sécurité)
+
+    if (!liquidSystem.createDrop(tileIndex, nature, 16)) {
+      eventBus.emit('sound/play', 'wrong')
+      return
+    }
 
     // consommation / crédit
     inventoryManager.decrementHotbarSlotCount(slotIndex)
     inventoryManager.loot(item.pouring.container, 1, '')
 
-    // transformation de la tuile
-    chunkManager.setTileAt(tileIndex, tileNewCode)
-    eventBus.emit('world/tile-changed', {tileIndex, tileOldCode, tileNewCode})
     eventBus.emit('sound/play', 'placing')
 
-    // propagation SKY→VOID vers le bas : les SKY sous le liquide posé perdent leur connexion au ciel
-    let propagationEnd = tileIndex // évite la création dynamique d'un Array
-    if (tileOldCode === NODES.SKY.code) {
-      let idx = tileIndex + WORLD_WIDTH
-      while (chunkManager.getTileAt(idx) === NODES.SKY.code) {
-        chunkManager.setTileAt(idx, NODES.VOID.code)
-        idx += WORLD_WIDTH
-      }
-      propagationEnd = idx - WORLD_WIDTH
-    }
+    // // transformation de la tuile
+    // chunkManager.setTileAt(tileIndex, tileNewCode)
+    // eventBus.emit('world/tile-changed', {tileIndex, tileOldCode, tileNewCode})
+    // eventBus.emit('sound/play', 'placing')
 
-    // on effectue les traitements induits mainteannt que le monde est désormais entièrement cohérent
-    eventBus.emit('world/tile-changed', {tileIndex, tileOldCode, tileNewCode})
-    let idx = tileIndex + WORLD_WIDTH
-    while (idx <= propagationEnd) {
-      eventBus.emit('world/tile-changed', {tileIndex: idx, tileOldCode: NODES.SKY.code, tileNewCode: NODES.VOID.code})
-      idx += WORLD_WIDTH
-    }
-    eventBus.emit('sound/play', 'placing')
+    // // propagation SKY→VOID vers le bas : les SKY sous le liquide posé perdent leur connexion au ciel
+    // let propagationEnd = tileIndex // évite la création dynamique d'un Array
+    // if (tileOldCode === NODES.SKY.code) {
+    //   let idx = tileIndex + WORLD_WIDTH
+    //   while (chunkManager.getTileAt(idx) === NODES.SKY.code) {
+    //     chunkManager.setTileAt(idx, NODES.VOID.code)
+    //     idx += WORLD_WIDTH
+    //   }
+    //   propagationEnd = idx - WORLD_WIDTH
+    // }
+
+    // // on effectue les traitements induits mainteannt que le monde est désormais entièrement cohérent
+    // eventBus.emit('world/tile-changed', {tileIndex, tileOldCode, tileNewCode})
+    // let idx = tileIndex + WORLD_WIDTH
+    // while (idx <= propagationEnd) {
+    //   eventBus.emit('world/tile-changed', {tileIndex: idx, tileOldCode: NODES.SKY.code, tileNewCode: NODES.VOID.code})
+    //   idx += WORLD_WIDTH
+    // }
+    // eventBus.emit('sound/play', 'placing')
   }
 }
 export const pouringManager = new PouringManager()

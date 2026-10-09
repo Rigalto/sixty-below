@@ -599,6 +599,7 @@ class WorldGenerator {
       {key: 'hives', value: hives},
       {key: 'lakes', value: lakes},
       {key: 'liquidbodies', value: liquidBodies},
+      {key: 'liquiddrops', value: []},
       {key: 'losttemple', value: lostTemple},
       {key: 'moss', value: mossCaves},
       {key: 'mossnextgrowthtimestamp', value: 3000 * 1000},

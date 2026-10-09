@@ -328,6 +328,7 @@ export const MICROTASK = {
   INFERNCAP_REGROW: {priority: 20, capacity: 2, taskName: 'inferncapRegrow'}, // recherche d'un nouvel emplacement pour les inferncaps à repousser
 
   SAND_FALLING_TICK: {priority: 20, capacity: 10, taskName: 'sandFallingTick'}, // détermination périodique des chutes (parcours complet de #pending)
+  LIQUID_TICK: {priority: 20, capacity: 10, taskName: 'liquidTick'}, // simulation des gouttes de liquide, par nature
 
   COBWEB_GROWTH: {priority: 20, capacity: 3, taskName: 'cobwebGrowth'}, // tentative périodique de pose d'une toile d'araignée
   AMBERMIRAGE_TILE_CHECK: {priority: 20, capacity: 10, taskName: 'onAmbermirageTileCheck'}, // entretien réactif d'un spot pour une tuile modifiée
