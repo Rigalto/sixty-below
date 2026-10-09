@@ -5582,14 +5582,28 @@ Platforms are thin furnitures that can be walked on like solid ground, yet allow
     title: 'Cabinets',
     category: ['Furniture'],
     content: `
-    48 slots
+**Description**
+48 slots
+
+<hr>
+
+**See also**
+
+* [[Closets]] and [[Chests]] — other item containers
     `
   },
   {
     title: 'Closets',
     category: ['Furniture'],
     content: `
+**Description**
     64 slots
+
+<hr>
+
+**See also**
+
+* [[Chests]] and [[Cabinets]] — other item containers
     `
   },
   {
@@ -5619,7 +5633,31 @@ Platforms are thin furnitures that can be walked on like solid ground, yet allow
     title: 'Chests',
     category: ['Furniture'],
     content: `
-    56 slots
+**Description**
+
+56 slots
+
+**Chest Types**
+
+| Food Name | Food Tier | Location |
+| --- | --- | --- |
+| <<itemStar2Columns|woodChest>> | [[Surface]] [[Forest]] |
+| <<itemStar2Columns|sandstoneChest>> | [[Surface]] [[Desert]] |
+| <<itemStar2Columns|mahoganyChest>> | [[Surface]] [[Jungle]] |
+| <<itemStar2Columns|oceanChest>> | [[Sea]] |
+| <<itemStar2Columns|copperChest>> | [[Underground]] [[Forest]] |
+| <<itemStar2Columns|silverChest>> | [[Underground]] [[Desert]] |
+| <<itemStar2Columns|goldChest>> | [[Underground]] [[Jungle]] |
+| <<itemStar2Columns|chestAncient>> | [[Ruined Cabin]] |
+| <<itemStar2Columns|forestChest>> | [[Caverns]] [[Forest]] |
+| <<itemStar2Columns|desertChest>> | [[Caverns]] [[Desert]] |
+| <<itemStar2Columns|jungleChest>> | [[Caverns]] [[Jungle]] |
+
+<hr>
+
+**See also**
+
+* [[Closets]] and [[Cabinets]] — other item containers
     `
   },
 
