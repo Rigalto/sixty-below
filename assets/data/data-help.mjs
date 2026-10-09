@@ -4148,6 +4148,25 @@ To be written
 <<wallRow|platinumwall>>
 <<wallRow|granitewall>>
 <<wallRow|marblewall>>
+
+<hr>
+
+**Hammers Crafting**
+
+| Hammer | Tier | Station | Materials |
+|---|---|---|---|
+<<fullRecipeRow|hammerOak>>
+<<fullRecipeRow|hammerCopper>>
+<<fullRecipeRow|hammerIron>>
+<<fullRecipeRow|hammerSilver>>
+<<fullRecipeRow|hammerGold>>
+<<fullRecipeRow|hammerCobalt>>
+<<fullRecipeRow|hammerPlatinum>>
+
+**World Creation**
+
+* One [[item:hammerOak]] is given to the player at [[World Creation]].
+* This starting axe does not grant any [[Achievements|Achievement]] points.
     `
   },
 
@@ -4778,6 +4797,20 @@ See [[Foraging Tools]] and [[Foraging Buffs]] for details.
 <<toolTypeRow|sickleSilver|foraging>>
 <<toolTypeRow|sickleGold|foraging>>
 
+<hr>
+
+**Sickles Crafting**
+
+| Sickle | Tier | Station | Materials |
+|---|---|---|---|
+<<fullRecipeRow|sickleCopper>>
+<<fullRecipeRow|sickleSilver>>
+<<fullRecipeRow|sickleGold>>
+
+**World Creation**
+
+* One [[item:sickleCopper]] is given to the player at [[World Creation]].
+* This starting axe does not grant any [[Achievements|Achievement]] points.
     `
   },
   {
@@ -4954,12 +4987,16 @@ Higher-tier axes provide a chopping speed bonus (see table above). Additional bo
 * One [[item:axeCopper]] is given to the player at [[World Creation]].
 * This starting axe does not grant any [[Achievements|Achievement]] points.
 
+<hr>
+
 **How to Use**
 
 * Open the [[Inventory]] Panel [I]
 * Place an axe in the [[Hotbar]]
 * Select it from the Hotbar
 * Click on the tree to chop it
+
+<hr>
 
 **Tips**
 
