@@ -321,7 +321,7 @@ export const ITEMS = {
   turretSnail: {name: 'Turret Snail ', type: ITEM_TYPE.BAIT, star: 1, stype: 'bait', image: 'bait_32_32-2-1', help: 'Fishing Baits', tooltip: '???'},
   buterfly: {name: 'Buterfly', type: ITEM_TYPE.BAIT, star: 1, stype: 'bait', image: 'bait_32_32-0-2', help: 'Fishing Baits', tooltip: '???'},
   ladybug: {name: 'Ladybug', type: ITEM_TYPE.BAIT, star: 1, stype: 'bait', image: 'bait_32_32-1-2', help: 'Fishing Baits', tooltip: '???'},
-  bunny: {name: 'Bunny', type: ITEM_TYPE.BAIT, star: 1, stype: 'critter', image: 'bait_32_32-2-2', help: 'Fishing Baits', tooltip: '???'},
+  bunny: {name: 'Bunny', type: ITEM_TYPE.BAIT, star: 1, stype: 'critter', image: 'bait_32_32-2-2', help: 'Bunny', tooltip: '???'},
   frog: {name: 'Frog', type: ITEM_TYPE.BAIT, star: 1, stype: 'critter', image: 'bait_32_32-0-3', help: 'Fishing Baits', tooltip: '???'},
   squirel: {name: 'Squirel', type: ITEM_TYPE.BAIT, star: 1, stype: 'critter', image: 'bait_32_32-1-3', help: 'Fishing Baits', tooltip: '???'},
   redSlug: {name: 'Red Slug', type: ITEM_TYPE.BAIT, star: 1, stype: 'bait', image: 'bait_32_32-2-3', help: 'Fishing Baits', tooltip: '???'},
@@ -345,7 +345,7 @@ export const ITEMS = {
   // Bug Nets
   bugNetWood: {name: 'Wooden Bug Net', type: ITEM_TYPE.TOOL, stype: 'bugNet', star: 1, image: 'tool_32_32-3-3', placedright: 'w_42_42-0-0', placedleft: 'w_42_42-0-1', help: 'Catching Tools', tooltip: 'Tools used to catch bugs', range: 0, catching: {speed: 0}},
   bugNetGold: {name: 'Gold Bug Net', type: ITEM_TYPE.TOOL, stype: 'bugNet', star: 3, image: 'tool_32_32-4-3', placedright: 'w_42_42-0-0', placedleft: 'w_42_42-0-1', speed: 0, help: 'Catching Tools', tooltip: 'Tools used to catch bugs', range: 1, catching: {speed: 80}},
-  bugNetCobalt: {name: 'Cobalt Bug Net', type: ITEM_TYPE.TOOL, stype: 'bugNet', star: 5, image: 'tool_32_32-5-3', placedright: 'w_42_42-0-0', placedleft: 'w_42_42-0-1', speed: 0, help: 'Catching Tools', tooltip: 'Tools used to catch bugs', range: 2, catching: {speed: 150}},
+  bugNetCobalt: {name: 'Cobalt Bug Net', type: ITEM_TYPE.TOOL, stype: 'bugNet', star: 4, image: 'tool_32_32-5-3', placedright: 'w_42_42-0-0', placedleft: 'w_42_42-0-1', speed: 0, help: 'Catching Tools', tooltip: 'Tools used to catch bugs', range: 2, catching: {speed: 150}},
 
   // Fishing Rods
   rodOak: {name: 'Oak Fishing Rod', type: ITEM_TYPE.TOOL, stype: 'rod', star: 1, image: 'tool_32_32-0-4', placedright: 'w_42_42-0-0', placedleft: 'w_42_42-0-1', help: 'Fishing Rods', tooltip: 'Tools used to catch fishes', range: 0, fishing: {speed: 0, power: 15}},
@@ -754,9 +754,10 @@ export const ITEMS = {
   viperFang: {name: 'Viper Fang', type: 0, stype: 'monster', star: 2, image: 'tools_32_32-12-7', help: 'Antlion Pit', tooltip: 'Component for tools'},
   viperScale: {name: 'Viper Scale', type: 0, stype: 'monster', star: 2, image: 'tools_32_32-12-7', help: 'Antlion Pit', tooltip: 'Component for accessories'},
 
-  // Foof from surface loot
+  // Food from surface loot
   jelly: {name: 'Jelly', type: ITEM_TYPE.FOOD | ITEM_TYPE.USABLE, stype: 'food', star: 1, image: 'food_32_32-0-0', help: 'Gel', tooltip: 'Minor improvements to all stats (10 minutes)', using: [{action: 'buff-timed', buff: 'wellFed', duration: 600}]},
   friedEgg: {name: 'Fried Egg', type: ITEM_TYPE.FOOD | ITEM_TYPE.USABLE, stype: 'food', star: 1, image: 'food_32_32-1-0', help: 'Eggs', tooltip: 'Minor improvements to all stats (9 minutes)', using: [{action: 'buff-timed', buff: 'wellFed', duration: 540}]},
+  bunnyStew: {name: 'Bunny Stew', type: ITEM_TYPE.FOOD | ITEM_TYPE.USABLE, stype: 'food', star: 1, image: 'food_32_32-7-0', help: 'Bunny', tooltip: 'Minor improvements to all stats (10 minutes)', using: [{action: 'buff-timed', buff: 'wellFed', duration: 600}, {action: 'add-items', items: [{item: 'bowl', count: 1}]}]},
 
   // Drinks - images NOK
   ale: {name: 'Ale', type: ITEM_TYPE.FOOD | ITEM_TYPE.USABLE, stype: 'drink', star: 2, image: 'food_32_32-2-0', help: 'Drinks', tooltip: 'Increase your Melee caracteristics', using: [{action: 'buff-timed', buff: 'tipsy', duration: 600}, {action: 'buff-timed', buff: 'wellFed', duration: 300}]},
@@ -931,6 +932,11 @@ export const RECIPES = [
   {result: {item: 'sickleSilver', count: 1}, station: 'anvil', ingredients: [{item: 'barSilver', count: 2}, {item: 'logMahogany', count: 4}, {item: 'shellPowder', count: 1}]},
   {result: {item: 'sickleGold', count: 1}, station: 'forge', ingredients: [{item: 'barGold', count: 2}, {item: 'bambooStalk', count: 4}, {item: 'corundumPowder', count: 1}]},
 
+  // Bug nets
+  {result: {item: 'bugNetWood', count: 1}, station: 'workbench', ingredients: [{item: 'logOak', count: 2}, {item: 'silk', count: 1}, {item: 'wireCopper', count: 1}]},
+  {result: {item: 'bugNetGold', count: 1}, station: 'workbench', ingredients: [{item: 'logMahogany', count: 2}, {item: 'silk', count: 1}, {item: 'wireGold', count: 1}]},
+  {result: {item: 'bugNetCobalt', count: 1}, station: 'workbench', ingredients: [{item: 'logMahogany', count: 2}, {item: 'silk', count: 1}, {item: 'wireCobalt', count: 1}]},
+
   // Pickaxes
   {result: {item: 'pickaxeCopper', count: 1}, station: 'anvil', ingredients: [{item: 'barCopper', count: 8}, {item: 'logOak', count: 4}, {item: 'cutTopaz', count: 1}]},
   {result: {item: 'pickaxeIron', count: 1}, station: 'anvil', ingredients: [{item: 'barIron', count: 10}, {item: 'logOak', count: 3}, {item: 'cutRuby', count: 1}]},
@@ -1091,6 +1097,7 @@ export const RECIPES = [
   // Food - Tier 1-3
 
   {result: {item: 'friedEgg', count: 1}, station: 'cookingPot', ingredients: [{item: 'egg', count: 1}, {item: 'salt', count: 1}]},
+  {result: {item: 'bunnyStew', count: 1}, station: 'cookingPot', ingredients: [{item: 'bunny', count: 1}, {item: 'bowl', count: 1}]},
   {result: {item: 'jelly', count: 1}, station: 'cookingPot', ingredients: [{item: 'gel', count: 1}, {item: 'bottleHoney', count: 1}], returned: [{item: 'bottle', count: 1}]},
   {result: {item: 'sunflowerOil', count: 1}, station: 'tableWood', ingredients: [{item: 'sunflowerSeed', count: 1}]},
   {result: {item: 'oleanderOil', count: 2}, station: 'cookingPotOn', ingredients: [{item: 'oleander', count: 1}, {item: 'sunflowerOil', count: 1}]},

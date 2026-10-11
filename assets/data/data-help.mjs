@@ -1297,6 +1297,7 @@ Mining Tool: <<itemStar|pickaxeCopper>> or better
 
 **Crafting chain**
 
+* [[item:silk]] → [[Catching Tools|Bug Nets]] — craft at [[item:workbench]]
 * [[item:silk]] → [[item:fabric]] — craft at [[item:loom]] ⏳
 * [[item:fabric]] is an essential ingredient for armors, furniture and accessories.
 
@@ -4079,6 +4080,51 @@ _Range bonus applies equally in all directions._
     `
   },
 
+  // ── Activities Catching Critters  ─────────────────────────────────────
+  //    Bunny
+  {
+    title: 'Bunny',
+    category: ['Critter'],
+    content: `
+**Description**
+
+Coming soon. ⏳
+
+**Tier**
+
+{{item:bunny:star|star}}
+
+**Location**
+
+Coming soon. ⏳
+
+<hr>
+
+**Bunny Catching ⏳**
+
+Tool : [[item:bugNetWood]] or better
+
+* Open the [[Inventory]] Panel [I]
+* Place a [[Catching Tools|Bug Net]] in the [[Hotbar]]
+* Select it from the Hotbar
+* Click on a jumping Bunny in the world
+
+<hr>
+
+**Usage**
+
+* Crafting Ingredient for Food: ([[item:bunnyStew]])
+* Crafting Ingredient for "peau de lapin"⏳
+* "Peau de lapin" is a crafting Ingredient for ⏳
+
+**Recipes**
+
+| Potion | Tier | Crafting Station | Ingredients |
+| --- | --- | --- | --- |
+<<fullRecipeRow|bunnyStew>>
+    `
+  },
+
   // ── Activities Hamming  ─────────────────────────────────────
   //    Axes
   {
@@ -4208,7 +4254,7 @@ Damage accumulates based on your position in the world. The two independent axes
 
 _Example : in [[Caverns]] Bottom in the [[Jungle]] monsters inflict Crushing and Poison simultaneously._
 
-_Some monsters may deal unexpected damage types for their environment — stay alert._  ⏳
+_Some monsters may deal unexpected damage types for their environment — stay alert._ ⏳
 _Bosses can combine multiple physical damage types and DOT effects simultaneously._ ⏳
 
 **Tips**
@@ -4910,6 +4956,15 @@ _Range bonus applies equally in all directions._
 <<toolTypeRow|bugNetGold|catching>>
 <<toolTypeRow|bugNetCobalt|catching>>
 
+<hr>
+
+**Bug Nets Crafting**
+
+| Potion | Tier | Crafting Station | Ingredients |
+| --- | --- | --- | --- |
+<<fullRecipeRow|bugNetWood>>
+<<fullRecipeRow|bugNetGold>>
+<<fullRecipeRow|bugNetCobalt>>
 
     `
   },
@@ -5314,7 +5369,7 @@ Tableware is a category of [[Furnitures]] that serve as containers for food and 
 **Food Containers**
 
 Empty containers used as crafting ingredients in cooking and potion recipes. They are returned to the player's inventory upon consuming the food or potion.
-* <<itemStar|bowl>> — soups and stews
+* <<itemStar|bowl>> — soups and stews ([[item:bunnyStew]])
 * <<itemStar|mug>> — ales and drinks
 * <<itemStar|plate>> — solid food dishes
 * <<itemStar|trencher>> — rustic wooden plate for simple meals
