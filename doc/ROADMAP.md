@@ -37,8 +37,8 @@ Chaque étape est validée (tests + contrôle visuel) avant la suivante.
 3. **`LiquidSystem` — chargement** - Done : `init` (flood-fill depuis les refs, `liquidBodyId`, rectangle, `topRow`, `rim`, stabilité), `onSaveTick`, affichage de debug des bodies. Tests.
 4. **Volume ↔ surface** - Done : ajout/retrait de volume sur `topRow` (rangée créée/supprimée, SKY/VOID) ; `FillingManager` (seau) délégué au `LiquidSystem`.
 5. **Gouttes** - Done : pool TypedArray, chute verticale/diagonale cadencée par la viscosité, atterrissage (création d'un body d'une tuile) ; `PouringManager` délégué.
-6. **Règle d'écoulement** : liste des instables, tâche par nature, remplissage/fuite/étalement/débordement, règle du film, réaction à `world/tile-changed` (minage d'un bord).
-7. **Fusion** de bodies de même nature (réétiquetage du plus petit, égalisation du niveau).
+6. **Règle d'écoulement** - Done : liste des instables, tâche par nature, remplissage/fuite/étalement/débordement, règle du film, réaction à `world/tile-changed` (minage d'un bord).
+7. **Fusion** (Done) de bodies de même nature (réétiquetage du plus petit, égalisation du niveau).
 8. **Séparation** (BFS entrelacé), répartition du volume entre les parties.
 9. **Modifications extérieures** : réconciliation (+16 / −16) avec `SandFallingSystem`, flag `#applying`.
 10. **Rencontre de natures** : cristallisation (TOPAZ, EMERALD, RUBY, SAPPHIRE).

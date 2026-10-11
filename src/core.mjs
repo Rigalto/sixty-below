@@ -353,10 +353,10 @@ class GameCore {
     blockedTiles.init(state.eternals)
 
     // Injection des tuiles
-    const mockSavedChunks = await database.readAllFromObjectStore('world_chunks')
-    chunkManager.init(mockSavedChunks)
+    const savedChunks = await database.readAllFromObjectStore('world_chunks')
+    chunkManager.init(savedChunks)
 
-    // gestion des liquides
+    // gestion des liquides (requiert un chunkManager déjà initialisé)
     liquidSystem.init(state.liquidbodies, state.liquiddrops)
 
     // position et direction du joueur

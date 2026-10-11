@@ -109,7 +109,7 @@ class MiningManager {
     this.onSlotActive = this.onSlotActive.bind(this)
     eventBus.on('player/teleport-begin', this.onTeleportBegin)
     eventBus.on('hotbar/slot-active', this.onSlotActive)
-    // Micro-tasks
+    // Micro-task
     this.onMineTile = this.onMineTile.bind(this)
   }
 
@@ -626,7 +626,7 @@ class ForagingManager {
     eventBus.on('hotbar/slot-active', this.onSlotActive)
     eventBus.on('time/daily', this.onDayStart)
 
-    // Micro-Tasks
+    // Micro-Task
     this.onForage = this.onForage.bind(this)
     this.#queue.length = 0
   }
@@ -1507,7 +1507,7 @@ class HammingManager {
     eventBus.on('player/teleport-begin', this.onTeleportBegin)
     this.onSlotActive = this.onSlotActive.bind(this)
     eventBus.on('hotbar/slot-active', this.onSlotActive)
-    // Micro-tasks
+    // Micro-task
     this.onHamming = this.onHamming.bind(this)
   }
 

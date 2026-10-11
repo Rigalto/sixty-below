@@ -635,6 +635,7 @@ Cette section définit les événements officiels. Tout nouvel événement doit 
 | :---: | :--- | :--- | :--- |
 | E | `save/tick` | — | Persiste les LiquidBodies (clé `liquidbodies`) et les gouttes (clé `liquiddrops`) en gamestate si modifiés. |
 | E | `time/first-loop` | `{…}` | Réarme la tâche des natures ayant des gouttes restaurées au chargement. |
+| E | `world/tile-changed` | `{ tileIndex, tileOldCode, tileNewCode }` | Hors mutations propres (flag `#applying`) : une cellule devenue SKY/VOID entre dans le rim des bodies voisins (instables) ; une cellule fermée en sort ; les bodies bordant la cellule du dessus deviennent instables (support gagné/perdu). |
 | S | `world/tile-changed` | … | Émis pour chaque tuile créée ou retirée à la surface d'un body, et pour chaque déplacement de goutte (après toutes les mutations du tick). |
 
 #### Debug (`WorldMapDebug`, `RealtimeDebugWidget`, `BuffManager`)

@@ -1070,7 +1070,7 @@ Quand l'Inventory est ouvert (`STATE !== EXPLORATION`), la loop fait un `return`
 
 Champs d'un `LiquidBody` (ordre fixe, monomorphisme V8) : `id`, `nature`, `refIndex`, `volume`, `tileCount`, `topRow`, `topCount`, `xMin`, `yMin`, `xMax`, `yMax`, `rim`, `unstableSlot`.
 
-* **`rim` :** ensemble des cellules ouvertes (SKY/VOID) adjacentes au body. Toute l'activité d'écoulement part de ces cellules. Les tuiles de fond et de côté au contact d'un solide ne sont pas listées : le minage d'un solide voisin émet `world/tile-changed`, la cellule entre dans le `rim` et le body devient instable.
+* **`rim` :** ensemble des cellules ouvertes (SKY/VOID), ou momentanément occupées par une goutte, adjacentes au body. Une cellule occupée par une goutte est ignorée pour le choix de l'action mais maintient le body instable. Toute l'activité d'écoulement part de ces cellules. Les tuiles de fond et de côté au contact d'un solide ne sont pas listées : le minage d'un solide voisin émet `world/tile-changed`, la cellule entre dans le `rim` et le body devient instable.
 * **Rectangle englobant :** unique. Les tuiles de `topRow` s'obtiennent en balayant cette rangée sur `[xMin .. xMax]` avec `liquidBodyId === id` (aucune liste maintenue).
 * **Identifiants :** recyclés via une liste libre (65 534 bodies au maximum).
 
@@ -1107,7 +1107,7 @@ Pour chaque cellule `R` du `rim` (soutenue = la cellule sous `R` est solide ou l
 
 ### 11.5 Gouttes
 
-* **Chute :** une tuile par tick, cadencée par la viscosité de sa nature : d'abord verticale, puis diagonale si la verticale est bloquée.
+* **Chute :** une tuile par tick, cadencée par la viscosité de sa nature : d'abord verticale ; si la verticale est bloquée, fusion avec un body de même nature adjacent, sinon diagonale. La chute passe avant la fusion, pour qu'une goutte issue d'une fuite ou d'un débordement quitte son body.
 * **Arrêt :**
   * entrée en contact avec un body de même nature : fusion (`volume += volume de la goutte`) ;
   * entrée en contact avec une autre nature : §11.7 ;
@@ -1121,7 +1121,10 @@ Pour chaque cellule `R` du `rim` (soutenue = la cellule sous `R` est solide ou l
 * **Fusion :** une action (remplissage, étalement, goutte) met en contact deux bodies de même nature. Le plus petit est réétiqueté dans le plus grand (coût O(petit)), les volumes et les `rim` s'additionnent, le niveau s'égalise instantanément.
 * **Minage d'un bord :** la cellule libérée entre dans le `rim` du body voisin, qui devient instable.
 * **Séparation :** une tuile quitte le body (fuite, seau, sable, cristallisation). Un BFS entrelacé est lancé depuis ses voisins du body et s'arrête dès qu'une composante est fermée (coût O(plus petite composante), indispensable pour la SEA). Chaque partie reçoit `16 × N_i` moins le déficit de ses tuiles de `topRow`.
-* **Modifications extérieures (sable…) :** une tuile liquide apparue hors du `LiquidSystem` compte pour +16 (adoption par le body voisin, ou goutte) ; une tuile de body disparue compte pour −16. Les `world/tile-changed` émis par le `LiquidSystem` lui-même sont ignorés par son propre listener (flag `#applying`).
+* **Bloc posé dans un body :** le volume du body est inchangé ; la tuile remplacée sort du body (tileCount − 1), la surface monte d'autant. Si le body ne peut pas monter (aucune cellule libre au-dessus de topRow), le bloc est posé quand même et l'excédent de volume est détruit.
+* **Bloc retiré :** la cellule libérée entre dans le rim et est remplie (remplissage, volume inchangé), la surface baisse.
+* **Sable tombant dans un liquide :** traité comme un bloc posé (la tuile envahie sort du body à volume constant) ; la cellule quittée par le sable devient SKY/VOID, et non plus la tuile liquide échangée (`SandFallingSystem.applySandFallingMoves`).
+* Les `world/tile-changed` émis par le `LiquidSystem` lui-même sont ignorés par son propre listener (flag `#applying`).
 * **Vidage d'une tuile :** la tuile devient SKY si la tuile du dessus est SKY (avec propagation SKY vers le bas sur les VOID), sinon VOID — même logique que `FillingManager`.
 
 ### 11.7 Rencontre de natures différentes

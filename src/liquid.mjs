@@ -1,6 +1,6 @@
 // liquid.mjs — SandFallingSystem - LiquidBody - LiquidSystem
 
-import {IS_DEV, WORLD_WIDTH, WORLD_HEIGHT, MICROTASK} from './constant.mjs'
+import {IS_DEV, WORLD_WIDTH, WORLD_HEIGHT, MICROTASK, SEA_LEVEL} from './constant.mjs'
 import {eventBus, seededRNG, microTasker, taskScheduler} from './utils.mjs'
 import {NODES, NODES_LOOKUP} from '../assets/data/data.mjs'
 import {chunkManager} from './world.mjs'
@@ -37,12 +37,14 @@ class SandFallingSystem {
   #dirty = false // true si #pending a changé depuis la dernière écriture gamestate
 
   constructor () {
+    // eventBus
     this.onTileChangedSand = this.onTileChangedSand.bind(this)
     eventBus.on('world/tile-changed', this.onTileChangedSand)
     this.onFirstLoopSand = this.onFirstLoopSand.bind(this)
     eventBus.on('time/first-loop', this.onFirstLoopSand)
     this.onSaveTick = this.onSaveTick.bind(this)
     eventBus.on('save/tick', this.onSaveTick)
+    // Micro-task
     this.sandFallingTick = this.sandFallingTick.bind(this)
     this.applySandFallingMoves = this.applySandFallingMoves.bind(this)
   }
@@ -174,11 +176,14 @@ class SandFallingSystem {
 
   /**
    * Exécuté en micro-tâche séparée (MICROTASK.SAND_FALLING_APPLY). Applique tous les
-   * déplacements en bloc : swap complet entre la source (hérite du code qui occupait la
-   * destination) et la destination (devient SAND), tous les setTileAt() avant tout emit pour
-   * garantir un monde cohérent aux listeners synchrones (dont onTileChangedSand lui-même, qui
-   * repeuple #pending pour les tuiles concernées). Aucune vérification blockedTiles : un
-   * meuble/plante sur la destination est détruit, son propre listener s'en charge.
+   * déplacements en bloc : la destination devient SAND ; la source devient SKY si la
+   * destination était SKY, SEA si la destination était SEA et la source sous SEA_LEVEL, sinon
+   * SKY (tuile au-dessus SKY ou FOG) ou VOID. Le liquide déplacé par le sable n'est donc pas
+   * recopié à la place de la source : sa conservation relève du LiquidSystem. Tous les
+   * setTileAt() précèdent tout emit pour garantir un monde cohérent aux listeners synchrones
+   * (dont onTileChangedSand lui-même, qui repeuple #pending pour les tuiles concernées). Aucune
+   * vérification blockedTiles : un meuble/plante sur la destination est détruit, son propre
+   * listener s'en charge.
    * @param {Array<{from: number, to: number}>} moves
    */
   applySandFallingMoves (moves) {
@@ -186,14 +191,17 @@ class SandFallingSystem {
     const VOID = NODES.VOID.code
     const SKY = NODES.SKY.code
     const FOG = NODES.FOG.code
+    const SEA = NODES.SEA.code
     const W = WORLD_WIDTH
 
     const changes = []
 
     for (const move of moves) {
       const destinationOldCode = chunkManager.getTileAt(move.to)
-      let sourceNewCode = destinationOldCode
-      if (sourceNewCode === VOID) {
+      let sourceNewCode = SKY
+      if (destinationOldCode === SEA && (move.from >> 10) >= SEA_LEVEL) {
+        sourceNewCode = SEA // sous le niveau de la mer, la cellule libérée reste dans la mer
+      } else if (destinationOldCode !== SKY) {
         const aboveCode = chunkManager.getTileAt(move.from - W)
         sourceNewCode = (aboveCode === SKY || aboveCode === FOG) ? SKY : VOID
       }
@@ -219,7 +227,10 @@ const LIQUID_NEIGHBOR_OFFSETS = [-1, 1, -WORLD_WIDTH, WORLD_WIDTH] // voisins 4-
 const LIQUID_DROP_ID = 0xFFFF // valeur de liquidBodyId sur une tuile occupée par une goutte
 const LIQUID_DROP_CAPACITY = 1024 // nombre maximum de gouttes simultanées
 const LIQUID_TICK_IDS = {[NODES.WATER.code]: 'liquid-tick-water', [NODES.HONEY.code]: 'liquid-tick-honey', [NODES.SAP.code]: 'liquid-tick-sap'} // id TaskScheduler de la tâche de chaque nature
-
+const LIQUID_ACTION_SPREAD = 1 // étalement — rangs d'action à hauteur égale (le plus grand l'emporte)
+const LIQUID_ACTION_OVERFLOW = 2 // débordement
+const LIQUID_ACTION_FILL = 3 // remplissage
+const LIQUID_ACTION_LEAK = 4 // fuite
 const LIQUID_DEBUG_COLORS = ['#ff00ff', '#00ffff', '#ffff00', '#ff8000', '#00ff00', '#8000ff', '#ff0080', '#0080ff'] // couleur des carrés de debug, indexée par (id & 7)
 
 /**
@@ -246,7 +257,7 @@ class LiquidBody {
     this.yMin = 0
     this.xMax = 0
     this.yMax = 0
-    this.rim = new Set() // Set<tileIndex> — cellules SKY/VOID adjacentes au body
+    this.rim = new Set() // Set<tileIndex> — cellules SKY/VOID (ou occupées par une goutte) adjacentes au body
     this.unstableSlot = -1 // position dans la liste des instables, -1 si stable
   }
 }
@@ -265,12 +276,17 @@ class LiquidSystem {
   #dropCount = 0 // nombre de gouttes actives (slots 0..#dropCount-1)
   #dropsDirty = false // true si les gouttes ont changé depuis la dernière écriture gamestate
 
+  #unstable = [] // Array<LiquidBody> — bodies instables, body.unstableSlot = position dans ce tableau
+  #applying = false // true pendant l'émission des 'world/tile-changed' du LiquidSystem (ignorés par son propre listener)
+
   constructor () {
     // eventBus
     this.onSaveTick = this.onSaveTick.bind(this)
     eventBus.on('save/tick', this.onSaveTick)
     this.onFirstLoopLiquid = this.onFirstLoopLiquid.bind(this)
     eventBus.on('time/first-loop', this.onFirstLoopLiquid)
+    this.onTileChangedLiquid = this.onTileChangedLiquid.bind(this)
+    eventBus.on('world/tile-changed', this.onTileChangedLiquid)
     // Micro-task
     this.liquidTick = this.liquidTick.bind(this)
   }
@@ -279,7 +295,8 @@ class LiquidSystem {
    * Restaure les gouttes (liquidBodyId = LIQUID_DROP_ID, niveau), puis reconstruit tous les
    * LiquidBodies depuis la table persistée : flood-fill depuis chaque tuile de référence
    * (liquidBodyId, nombre de tuiles, rectangle, topRow, rim, tuiles des gouttes exclues), puis
-   * pose du niveau des tuiles de topRow dans chunkManager. Requiert un chunkManager déjà initialisé.
+   * pose du niveau des tuiles de topRow dans chunkManager. Tous les bodies sont placés dans la
+   * liste des instables (la première passe écarte les stables). Requiert un chunkManager déjà initialisé.
    * @param {number[]} liquidBodies — persisté (gamestate.liquidbodies) : [ref0, volume0, ref1, volume1, …]
    * @param {number[]} liquidDrops — persisté (gamestate.liquiddrops) : [index0, volume0, index1, volume1, …]
    */
@@ -291,6 +308,7 @@ class LiquidSystem {
     this.#dirty = false
     this.#dropCount = 0
     this.#dropsDirty = false
+    this.#unstable.length = 0
 
     for (let i = 0; i < liquidDrops.length; i += 2) {
       const tileIndex = liquidDrops[i]
@@ -309,6 +327,8 @@ class LiquidSystem {
       const body = this.#createBody(liquidBodies[i], liquidBodies[i + 1])
       this.#floodFill(body)
       this.#applyTopRowLevel(body)
+      body.unstableSlot = this.#unstable.length
+      this.#unstable.push(body)
       tiles += body.tileCount
     }
 
@@ -340,10 +360,44 @@ class LiquidSystem {
 
   /**
  * Liaison EventBus : 'time/first-loop' — réarme la tâche de chaque nature ayant des gouttes
- * restaurées au chargement.
+ * ou des bodies instables au chargement.
  */
   onFirstLoopLiquid () {
     for (let i = 0; i < this.#dropCount; i++) this.#scheduleTick(this.#dropNature[i])
+    for (const body of this.#unstable) this.#scheduleTick(body.nature)
+  }
+
+  /**
+   * Liaison EventBus : 'world/tile-changed' (hors mutations du LiquidSystem lui-même). Si la
+   * tuile devient SKY/VOID, elle entre dans le rim des bodies voisins, qui deviennent instables ;
+   * sinon elle sort de leur rim. Si la cellule au-dessus est ouverte, les bodies qui la bordent
+   * deviennent instables (elle a gagné ou perdu un support).
+   * @param {{tileIndex: number, tileNewCode: number}} payload
+   */
+  onTileChangedLiquid ({tileIndex, tileNewCode}) {
+    if (this.#applying) return
+    const ids = this.#liquidBodyId
+    const open = LIQUID_OPEN_CODES.has(tileNewCode)
+
+    for (const offset of LIQUID_NEIGHBOR_OFFSETS) {
+      const id = ids[tileIndex + offset]
+      if (id === 0 || id === LIQUID_DROP_ID) continue
+      const body = this.#bodies[id]
+      if (open) {
+        body.rim.add(tileIndex)
+        this.#markUnstable(body)
+      } else {
+        body.rim.delete(tileIndex)
+      }
+    }
+
+    const above = tileIndex - WORLD_WIDTH
+    if (!LIQUID_OPEN_CODES.has(chunkManager.getTileAt(above))) return
+    for (const offset of LIQUID_NEIGHBOR_OFFSETS) {
+      const id = ids[above + offset]
+      if (id === 0 || id === LIQUID_DROP_ID) continue
+      this.#markUnstable(this.#bodies[id])
+    }
   }
 
   /**
@@ -356,39 +410,34 @@ class LiquidSystem {
  * @returns {boolean} false (rien n'est modifié) si le pool de gouttes est plein
  */
   createDrop (tileIndex, nature, volume) {
-    if (this.#dropCount === LIQUID_DROP_CAPACITY) {
-      console.warn(`[LiquidSystem.createDrop] pool plein (${LIQUID_DROP_CAPACITY} gouttes)`)
-      return false
-    }
     this.#changes.length = 0
-    const slot = this.#dropCount
-    this.#dropIndex[slot] = tileIndex
-    this.#dropVolume[slot] = volume
-    this.#dropNature[slot] = nature
-    this.#dropCount++
-    this.#dropsDirty = true
-    this.#setDropTile(tileIndex, nature, volume)
+    if (!this.#spawnDrop(tileIndex, nature, volume)) return false
     this.#scheduleTick(nature)
     this.#emitChanges()
     return true
   }
 
   /**
- * Callback TaskScheduler (exécuté via MicroTasker), cadencé par la viscosité de la nature :
- * fait avancer d'un pas chaque goutte de cette nature (parcours décroissant des slots, pour
- * que les suppressions par swap ne sautent aucune goutte). Toutes les mutations précèdent
- * l'émission des 'world/tile-changed'. Réarme la tâche s'il reste des gouttes de la nature.
- * @param {number} nature — NODES.XXX.code
- */
+   * Callback TaskScheduler (exécuté via MicroTasker), cadencé par la viscosité de la nature :
+   * fait avancer d'un pas chaque goutte de cette nature, puis applique au plus une action
+   * d'écoulement à chaque body instable de cette nature ; un body sans action possible sort de
+   * la liste des instables. Parcours décroissants, pour que les suppressions par swap ne sautent
+   * aucun élément. Toutes les mutations précèdent l'émission des 'world/tile-changed'. Réarme la
+   * tâche s'il reste des gouttes ou des bodies instables de la nature.
+   * @param {number} nature — NODES.XXX.code
+   */
   liquidTick (nature) {
     this.#changes.length = 0
-    let remaining = 0
     for (let i = this.#dropCount - 1; i >= 0; i--) {
-      if (this.#dropNature[i] !== nature) continue
-      if (this.#stepDrop(i)) remaining++
+      if (this.#dropNature[i] === nature) this.#stepDrop(i)
+    }
+    for (let i = this.#unstable.length - 1; i >= 0; i--) {
+      if (i >= this.#unstable.length) continue
+      const body = this.#unstable[i]
+      if (body.nature === nature && !this.#stepBody(body)) this.#markStable(body)
     }
     this.#emitChanges()
-    if (remaining > 0) this.#scheduleTick(nature)
+    if (this.#hasWork(nature)) this.#scheduleTick(nature)
   }
 
   /**
@@ -428,13 +477,7 @@ class LiquidSystem {
     this.#changes.length = 0
 
     body.volume -= amount
-    while (body.volume - ((body.tileCount - body.topCount) << 4) <= 0) {
-      this.#removeTopRow(body)
-      if (body.tileCount === 0) break
-    }
-
-    if (body.tileCount === 0) this.#deleteBody(body)
-    else this.#applyTopRowLevel(body)
+    if (this.#settleTop(body)) this.#markUnstable(body)
     this.#dirty = true
     this.#emitChanges()
     return true
@@ -457,8 +500,8 @@ class LiquidSystem {
   /**
    * Flood-fill 4-connexe depuis la tuile de référence sur les tuiles de même nature : marque
    * liquidBodyId, calcule tileCount, le rectangle englobant, topRow/topCount, et collecte le
-   * rim (voisins SKY/VOID). Les tuiles de gouttes (LIQUID_DROP_ID) sont exclues. Pas de bounds
-   * checking (ghost cells).
+   * rim (voisins SKY/VOID ou occupés par une goutte). Les tuiles de gouttes (LIQUID_DROP_ID) ne
+   * font pas partie du body. Pas de bounds checking (ghost cells).
    * @param {LiquidBody} body
    */
   #floodFill (body) {
@@ -494,7 +537,11 @@ class LiquidSystem {
 
       for (const offset of LIQUID_NEIGHBOR_OFFSETS) {
         const nIdx = idx + offset
-        if (ids[nIdx] !== 0) continue // déjà dans le body, ou goutte
+        if (ids[nIdx] === LIQUID_DROP_ID) { // goutte : cellule momentanément occupée, membre du rim
+          rim.add(nIdx)
+          continue
+        }
+        if (ids[nIdx] !== 0) continue // déjà dans le body
         const code = chunkManager.getTileAt(nIdx)
         if (code === nature) {
           ids[nIdx] = id
@@ -540,12 +587,14 @@ class LiquidSystem {
   /**
    * Ajoute du volume à un body (sans émission) : tant que la rangée haute déborde, crée une
    * rangée au-dessus ; si aucune cellule n'est disponible, l'excédent est refusé. Pose le niveau
-   * de topRow ; empile les mutations dans #changes.
+   * de topRow et rend le body instable ; fusionne avec les bodies de même nature touchés par
+   * les nouvelles rangées. Empile les mutations dans #changes.
    * @param {LiquidBody} body
    * @param {number} amount — volume à ajouter, en 1/16 de tuile (> 0)
    * @returns {number} volume réellement ajouté
    */
   #addVolumeToBody (body, amount) {
+    const first = this.#changes.length
     body.volume += amount
     let accepted = amount
     while (body.volume - ((body.tileCount - body.topCount) << 4) > (body.topCount << 4)) {
@@ -558,16 +607,20 @@ class LiquidSystem {
 
     this.#applyTopRowLevel(body)
     if (accepted > 0) this.#dirty = true
+    this.#markUnstable(body)
+    this.#mergeTouching(body, first)
     return accepted
   }
 
   /**
-   * Fait avancer une goutte d'un pas, dans l'ordre : fusion avec un body de même nature
-   * 4-adjacent (la cellule est libérée puis le volume ajouté au body) ; chute verticale sur une
-   * cellule ouverte ; attente si la cellule du dessous, un côté ou une diagonale basse est
-   * occupé par une autre goutte ; chute diagonale (côté et diagonale basse ouverts, tirage
-   * aléatoire si les deux côtés sont possibles) ; sinon atterrissage : la goutte devient un body
-   * d'une tuile. Les autres liquides et la SEA sont des obstacles.
+   * Fait avancer une goutte d'un pas, dans l'ordre : chute verticale sur une cellule ouverte ;
+   * fusion avec un body de même nature 4-adjacent (la cellule est libérée puis le volume ajouté
+   * au body) ; attente si la cellule du dessous, un côté ou une diagonale basse est occupé par
+   * une autre goutte ; chute diagonale (côté et diagonale basse ouverts, tirage aléatoire si
+   * les deux côtés sont possibles) ; sinon atterrissage : la goutte devient un body d'une tuile,
+   * instable. La chute passe avant la fusion : une goutte issue d'une fuite ou d'un débordement
+   * (toujours au-dessus du vide) quitte le body au lieu d'y retourner. Les autres liquides et la
+   * SEA sont des obstacles.
    * @param {number} slot — slot de la goutte dans le pool
    * @returns {boolean} true si la goutte existe encore après ce pas
    */
@@ -578,7 +631,14 @@ class LiquidSystem {
     const volume = this.#dropVolume[slot]
     const nature = this.#dropNature[slot]
 
-    // 1. contact avec un body de même nature : fusion
+    // 1. chute verticale
+    const below = idx + W
+    if (LIQUID_OPEN_CODES.has(chunkManager.getTileAt(below))) {
+      this.#moveDrop(slot, below)
+      return true
+    }
+
+    // 2. contact avec un body de même nature : fusion
     for (const offset of LIQUID_NEIGHBOR_OFFSETS) {
       const id = ids[idx + offset]
       if (id === 0 || id === LIQUID_DROP_ID || this.#bodies[id].nature !== nature) continue
@@ -586,13 +646,6 @@ class LiquidSystem {
       this.#removeDropSlot(slot)
       this.#addVolumeToBody(this.#bodies[id], volume)
       return false
-    }
-
-    // 2. chute verticale
-    const below = idx + W
-    if (LIQUID_OPEN_CODES.has(chunkManager.getTileAt(below))) {
-      this.#moveDrop(slot, below)
-      return true
     }
 
     // 3. attente derrière une autre goutte
@@ -613,8 +666,205 @@ class LiquidSystem {
     const body = this.#createBody(idx, volume)
     this.#floodFill(body)
     this.#applyTopRowLevel(body)
+    this.#markUnstable(body)
     this.#dirty = true
     return false
+  }
+
+  /**
+   * Applique au body l'action d'écoulement prioritaire, choisie parmi les cellules ouvertes de
+   * son rim situées au niveau de topRow ou plus bas (soutenue = cellule du dessous non ouverte) :
+   * - plus bas que topRow, soutenue : remplissage (la cellule rejoint le body, volume inchangé) ;
+   * - plus bas que topRow, non soutenue : fuite (goutte de min(16, volume)) ;
+   * - sur topRow, non soutenue : débordement (goutte de min(16, rowVol)) ;
+   * - sur topRow, soutenue : étalement, si rowVol ≥ topCount + 1 (chaque tuile garde ≥ 1/16).
+   * La cellule la plus basse l'emporte ; à hauteur égale : fuite > remplissage > débordement >
+   * étalement. Un body de volume ≤ 16 qui fuit part entièrement en une goutte (règle du film).
+   * Une tuile ajoutée par remplissage ou étalement qui touche un body de même nature provoque
+   * leur fusion.
+   * La surface est ensuite recalculée (rangées vidées supprimées, body vide supprimé). Une
+   * cellule du rim occupée par une goutte est ignorée, mais maintient le body instable.
+   * @param {LiquidBody} body
+   * @returns {boolean} false si aucune action n'est possible et aucune goutte n'occupe le rim (body stable)
+   */
+  #stepBody (body) {
+    const W = WORLD_WIDTH
+    const {topRow, topCount, rim} = body
+    const rowVol = body.volume - ((body.tileCount - topCount) << 4)
+    const canSpread = rowVol >= topCount + 1
+
+    let best = -1
+    let bestScore = -1
+    let waiting = false // une cellule du rim est momentanément occupée par une goutte
+    for (const cell of rim) {
+      if (!LIQUID_OPEN_CODES.has(chunkManager.getTileAt(cell))) {
+        if (this.#liquidBodyId[cell] === LIQUID_DROP_ID) waiting = true
+        continue
+      }
+      const y = cell >> 10
+      if (y < topRow) continue
+      const supported = !LIQUID_OPEN_CODES.has(chunkManager.getTileAt(cell + W))
+      let rank
+      if (y > topRow) rank = supported ? LIQUID_ACTION_FILL : LIQUID_ACTION_LEAK
+      else if (!supported) rank = LIQUID_ACTION_OVERFLOW
+      else if (canSpread) rank = LIQUID_ACTION_SPREAD
+      else continue
+      const score = (y << 3) | rank
+      if (score > bestScore) {
+        bestScore = score
+        best = cell
+      }
+    }
+    if (best === -1) return waiting // body maintenu instable tant qu'une goutte occupe son rim
+
+    switch (bestScore & 7) {
+      case LIQUID_ACTION_LEAK: {
+        const amount = body.volume < 16 ? body.volume : 16
+        if (!this.#spawnDrop(best, body.nature, amount)) return true // pool plein : nouvel essai au prochain pas
+        this.#scheduleTick(body.nature)
+        body.volume -= amount
+        this.#settleTop(body)
+        break
+      }
+      case LIQUID_ACTION_FILL: {
+        const first = this.#changes.length
+        this.#addTileToBody(body, best)
+        this.#settleTop(this.#mergeTouching(body, first))
+        break
+      }
+      case LIQUID_ACTION_OVERFLOW: {
+        const amount = rowVol < 16 ? rowVol : 16
+        if (!this.#spawnDrop(best, body.nature, amount)) return true
+        this.#scheduleTick(body.nature)
+        body.volume -= amount
+        this.#settleTop(body)
+        break
+      }
+      default: { // LIQUID_ACTION_SPREAD
+        const first = this.#changes.length
+        this.#addTileToBody(body, best)
+        this.#applyTopRowLevel(body)
+        this.#mergeTouching(body, first)
+      }
+    }
+    this.#dirty = true
+    return true
+  }
+
+  /**
+   * Ajoute une cellule ouverte au body : code de la nature, liquidBodyId, rim (la cellule en
+   * sort, ses voisins ouverts ou occupés par une goutte y entrent), tileCount, rectangle,
+   * topCount si elle est sur topRow, tuile de référence si elle est plus basse (ou aussi basse
+   * et plus à gauche). Volume inchangé ; empile la mutation dans #changes.
+   * @param {LiquidBody} body
+   * @param {number} tileIndex — cellule SKY/VOID adjacente au body
+   */
+  #addTileToBody (body, tileIndex) {
+    const tileOldCode = chunkManager.getTileAt(tileIndex)
+    chunkManager.setTileAt(tileIndex, body.nature)
+    this.#liquidBodyId[tileIndex] = body.id
+    this.#changes.push({tileIndex, tileOldCode, tileNewCode: body.nature})
+
+    body.rim.delete(tileIndex)
+    for (const offset of LIQUID_NEIGHBOR_OFFSETS) {
+      const n = tileIndex + offset
+      if (LIQUID_OPEN_CODES.has(chunkManager.getTileAt(n)) || this.#liquidBodyId[n] === LIQUID_DROP_ID) body.rim.add(n)
+    }
+
+    body.tileCount++
+    const x = tileIndex & 0x3FF
+    const y = tileIndex >> 10
+    if (x < body.xMin) body.xMin = x
+    if (x > body.xMax) body.xMax = x
+    if (y > body.yMax) body.yMax = y
+    if (y === body.topRow) body.topCount++
+    const refY = body.refIndex >> 10
+    if (y > refY || (y === refY && x < (body.refIndex & 0x3FF))) body.refIndex = tileIndex
+  }
+
+  /**
+   * Recalcule la surface après une baisse de volume ou un ajout de tuile : supprime les rangées
+   * hautes vides (rowVol ≤ 0), supprime le body s'il n'a plus de tuile, sinon pose le niveau de
+   * topRow.
+   * @param {LiquidBody} body
+   * @returns {boolean} false si le body a été supprimé
+   */
+  #settleTop (body) {
+    while (body.volume - ((body.tileCount - body.topCount) << 4) <= 0) {
+      this.#removeTopRow(body)
+      if (body.tileCount === 0) {
+        this.#deleteBody(body)
+        return false
+      }
+    }
+    this.#applyTopRowLevel(body)
+    return true
+  }
+
+  /**
+   * Ajoute un body à la liste des instables (sans effet s'il y est déjà) et arme la tâche de
+   * sa nature.
+   * @param {LiquidBody} body
+   */
+  #markUnstable (body) {
+    if (body.unstableSlot !== -1) return
+    body.unstableSlot = this.#unstable.length
+    this.#unstable.push(body)
+    this.#scheduleTick(body.nature)
+  }
+
+  /**
+   * Retire un body de la liste des instables (swap avec le dernier élément), sans effet s'il
+   * n'y est pas.
+   * @param {LiquidBody} body
+   */
+  #markStable (body) {
+    const slot = body.unstableSlot
+    if (slot === -1) return
+    const last = this.#unstable.pop()
+    if (last !== body) {
+      this.#unstable[slot] = last
+      last.unstableSlot = slot
+    }
+    body.unstableSlot = -1
+  }
+
+  /**
+   * Indique s'il reste des gouttes ou des bodies instables d'une nature.
+   * @param {number} nature
+   * @returns {boolean}
+   */
+  #hasWork (nature) {
+    for (let i = 0; i < this.#dropCount; i++) {
+      if (this.#dropNature[i] === nature) return true
+    }
+    for (const body of this.#unstable) {
+      if (body.nature === nature) return true
+    }
+    return false
+  }
+
+  /**
+   * Ajoute une goutte au pool et occupe sa cellule (sans armer la tâche ni émettre) ; empile la
+   * mutation dans #changes. La cellule doit être ouverte.
+   * @param {number} tileIndex
+   * @param {number} nature
+   * @param {number} volume — 1..16
+   * @returns {boolean} false (rien n'est modifié) si le pool de gouttes est plein
+   */
+  #spawnDrop (tileIndex, nature, volume) {
+    if (this.#dropCount === LIQUID_DROP_CAPACITY) {
+      console.warn(`[LiquidSystem] pool de gouttes plein (${LIQUID_DROP_CAPACITY})`)
+      return false
+    }
+    const slot = this.#dropCount
+    this.#dropIndex[slot] = tileIndex
+    this.#dropVolume[slot] = volume
+    this.#dropNature[slot] = nature
+    this.#dropCount++
+    this.#dropsDirty = true
+    this.#setDropTile(tileIndex, nature, volume)
+    return true
   }
 
   /**
@@ -719,13 +969,13 @@ class LiquidSystem {
       idx++
     }
 
-    // rim : les nouvelles tuiles en sortent, leurs voisins ouverts y entrent
+    // rim : les nouvelles tuiles en sortent, leurs voisins ouverts ou occupés par une goutte y entrent
     for (let i = first; i < this.#changes.length; i++) {
       const tile = this.#changes[i].tileIndex
       rim.delete(tile)
       for (const offset of LIQUID_NEIGHBOR_OFFSETS) {
         const n = tile + offset
-        if (LIQUID_OPEN_CODES.has(chunkManager.getTileAt(n))) rim.add(n)
+        if (LIQUID_OPEN_CODES.has(chunkManager.getTileAt(n)) || ids[n] === LIQUID_DROP_ID) rim.add(n)
       }
     }
 
@@ -791,13 +1041,125 @@ class LiquidSystem {
   }
 
   /**
- * Supprime un body vide : libère son identifiant et vide son rim.
- * @param {LiquidBody} body
- */
+   * Supprime un body vide : le retire de la liste des instables, libère son identifiant et vide
+   * son rim. * @param {LiquidBody} body
+   */
   #deleteBody (body) {
+    this.#markStable(body)
     body.rim.clear()
     this.#bodies[body.id] = null
     this.#freeIds.push(body.id)
+  }
+
+  /**
+   * Parcourt les tuiles ajoutées au body depuis la mutation d'indice first de #changes et
+   * fusionne le body avec chaque body de même nature qui touche l'une d'elles. Une tuile
+   * entre-temps retirée (surface recalculée par une fusion) est ignorée.
+   * @param {LiquidBody} body
+   * @param {number} first — indice, dans #changes, de la première mutation à examiner
+   * @returns {LiquidBody} le body survivant (body, ou le body plus grand qui l'a absorbé)
+   */
+  #mergeTouching (body, first) {
+    const ids = this.#liquidBodyId
+    const end = this.#changes.length
+    for (let i = first; i < end; i++) {
+      const tile = this.#changes[i].tileIndex
+      if (ids[tile] !== body.id) continue // tuile retirée, ou mutation d'une autre nature
+      for (const offset of LIQUID_NEIGHBOR_OFFSETS) {
+        const id = ids[tile + offset]
+        if (id === 0 || id === LIQUID_DROP_ID || id === body.id) continue
+        const other = this.#bodies[id]
+        if (other.nature === body.nature) body = this.#mergeBodies(body, other)
+      }
+    }
+    return body
+  }
+
+  /**
+   * Fusionne deux bodies de même nature : le plus petit (en tuiles) est réétiqueté dans le plus
+   * grand (BFS sur ses tuiles, coût proportionnel à sa taille), puis supprimé. Volumes et
+   * nombres de tuiles s'additionnent, rectangles et rims s'unissent, la tuile de référence est
+   * la plus basse des deux ; topRow devient la plus haute des deux rangées hautes. Les tuiles des
+   * anciennes rangées hautes repassent au niveau plein, puis la surface est recalculée sur le
+   * volume total (niveau égalisé instantanément). Le body survivant devient instable.
+   * @param {LiquidBody} a
+   * @param {LiquidBody} b
+   * @returns {LiquidBody} le body survivant
+   */
+  #mergeBodies (a, b) {
+    const big = a.tileCount >= b.tileCount ? a : b
+    const small = big === a ? b : a
+    const ids = this.#liquidBodyId
+    const queue = this.#queue
+
+    this.#clearTopRowLevel(big)
+    this.#clearTopRowLevel(small)
+
+    // réétiquetage des tuiles du petit body
+    ids[small.refIndex] = big.id
+    queue[0] = small.refIndex
+    let head = 0
+    let tail = 1
+    while (head < tail) {
+      const idx = queue[head]
+      head++
+      for (const offset of LIQUID_NEIGHBOR_OFFSETS) {
+        const n = idx + offset
+        if (ids[n] !== small.id) continue
+        ids[n] = big.id
+        queue[tail] = n
+        tail++
+      }
+    }
+
+    big.volume += small.volume
+    big.tileCount += small.tileCount
+    if (small.xMin < big.xMin) big.xMin = small.xMin
+    if (small.xMax > big.xMax) big.xMax = small.xMax
+    if (small.yMax > big.yMax) big.yMax = small.yMax
+    if (small.topRow < big.topRow) {
+      big.topRow = small.topRow
+      big.yMin = small.topRow
+    }
+    const bigRefY = big.refIndex >> 10
+    const smallRefY = small.refIndex >> 10
+    if (smallRefY > bigRefY || (smallRefY === bigRefY && (small.refIndex & 0x3FF) < (big.refIndex & 0x3FF))) big.refIndex = small.refIndex
+    for (const cell of small.rim) {
+      if (ids[cell] !== big.id) big.rim.add(cell)
+    }
+    for (const cell of big.rim) {
+      if (ids[cell] === big.id) big.rim.delete(cell) // tuile de jonction
+    }
+
+    // topCount sur la nouvelle rangée haute
+    let count = 0
+    let idx = (big.topRow << 10) | big.xMin
+    const end = (big.topRow << 10) | big.xMax
+    while (idx <= end) {
+      if (ids[idx] === big.id) count++
+      idx++
+    }
+    big.topCount = count
+
+    this.#deleteBody(small)
+    this.#settleTop(big)
+    this.#markUnstable(big)
+    this.#dirty = true
+    return big
+  }
+
+  /**
+   * Remet au niveau plein les tuiles de la rangée haute d'un body.
+   * @param {LiquidBody} body
+   */
+  #clearTopRowLevel (body) {
+    const ids = this.#liquidBodyId
+    let idx = (body.topRow << 10) | body.xMin
+    const end = (body.topRow << 10) | body.xMax
+    while (idx <= end) {
+      if (ids[idx] === body.id) chunkManager.setLiquidLevelAt(idx, 0)
+      idx++
+    }
   }
 
   /**
@@ -815,10 +1177,13 @@ class LiquidSystem {
   }
 
   /**
-  * Émet 'world/tile-changed' pour chaque mutation empilée dans #changes, puis vide la pile.
-  */
+   * Émet 'world/tile-changed' pour chaque mutation empilée dans #changes (flag #applying levé
+   * pendant l'émission, pour que onTileChangedLiquid les ignore), puis vide la pile.
+   */
   #emitChanges () {
+    this.#applying = true
     for (const change of this.#changes) eventBus.emit('world/tile-changed', change)
+    this.#applying = false
     this.#changes.length = 0
   }
 
@@ -828,9 +1193,9 @@ class LiquidSystem {
 
   /**
    * DEBUG — Sur la zone visible : un carré au centre de chaque tuile appartenant à un body,
-   * coloré selon son id (contour noir sur les tuiles de topRow, carré blanc plus grand sur la
-   * tuile de référence), un carré blanc à contour noir sur chaque goutte, et un petit carré
-   * rouge sur chaque cellule du rim.
+   * coloré selon son id (contour sur les tuiles de topRow : noir si le body est stable, rouge
+   * s'il est instable ; carré blanc plus grand sur la tuile de référence), un carré blanc à
+   * contour noir sur chaque goutte, et un petit carré rouge sur chaque cellule du rim.
    * @param {CanvasRenderingContext2D} ctx — contexte déjà transformé (caméra appliquée)
    */
   debugRender (ctx) {
@@ -863,7 +1228,11 @@ class LiquidSystem {
           }
           ctx.fillStyle = LIQUID_DEBUG_COLORS[id & 7]
           ctx.fillRect(px + 5, py + 5, 6, 6)
-          if (y === body.topRow) ctx.strokeRect(px + 4.5, py + 4.5, 7, 7)
+          if (y === body.topRow) {
+            ctx.strokeStyle = body.unstableSlot === -1 ? '#000000' : '#ff0000'
+            ctx.strokeRect(px + 4.5, py + 4.5, 7, 7)
+            ctx.strokeStyle = '#000000'
+          }
         }
         idx++
       }
