@@ -224,6 +224,7 @@ export const sandFallingSystem = new SandFallingSystem()
 
 const LIQUID_OPEN_CODES = new Set([NODES.SKY.code, NODES.VOID.code]) // cellules ouvertes pouvant former le rim
 const LIQUID_NEIGHBOR_OFFSETS = [-1, 1, -WORLD_WIDTH, WORLD_WIDTH] // voisins 4-connexes (gauche, droite, haut, bas)
+const LIQUID_ABOVE_OFFSETS = [-WORLD_WIDTH, -WORLD_WIDTH - 1, -WORLD_WIDTH + 1] // cellules d'où un sable a pu tomber (dessus, diagonales hautes)
 const LIQUID_DROP_ID = 0xFFFF // valeur de liquidBodyId sur une tuile occupée par une goutte
 const LIQUID_DROP_CAPACITY = 1024 // nombre maximum de gouttes simultanées
 const LIQUID_TICK_IDS = {[NODES.WATER.code]: 'liquid-tick-water', [NODES.HONEY.code]: 'liquid-tick-honey', [NODES.SAP.code]: 'liquid-tick-sap'} // id TaskScheduler de la tâche de chaque nature
@@ -369,7 +370,9 @@ class LiquidSystem {
   }
 
   /**
-   * Liaison EventBus : 'world/tile-changed' (hors mutations du LiquidSystem lui-même). Si la
+   * Liaison EventBus : 'world/tile-changed' (hors mutations du LiquidSystem lui-même). Une tuile
+   * de goutte ou de body remplacée par autre chose que son liquide est d'abord retirée du système
+   * (voir #onDropReplaced et #onBodyTileReplaced). Ensuite, si la
    * tuile devient SKY/VOID, elle entre dans le rim des bodies voisins, qui deviennent instables ;
    * sinon elle sort de leur rim. Si la cellule au-dessus est ouverte, les bodies qui la bordent
    * deviennent instables (elle a gagné ou perdu un support).
@@ -379,6 +382,14 @@ class LiquidSystem {
     if (this.#applying) return
     const ids = this.#liquidBodyId
     const open = LIQUID_OPEN_CODES.has(tileNewCode)
+
+    // une tuile de goutte ou de body remplacée de l'extérieur (bloc posé, sable)
+    const ownId = ids[tileIndex]
+    if (ownId === LIQUID_DROP_ID) {
+      this.#onDropReplaced(tileIndex)
+    } else if (ownId !== 0 && tileNewCode !== this.#bodies[ownId].nature) {
+      this.#onBodyTileReplaced(this.#bodies[ownId], tileIndex)
+    }
 
     for (const offset of LIQUID_NEIGHBOR_OFFSETS) {
       const id = ids[tileIndex + offset]
@@ -784,6 +795,108 @@ class LiquidSystem {
   }
 
   /**
+   * Retire du body une tuile remplacée de l'extérieur (bloc posé, sable), à volume constant :
+   * la tuile sort du body (niveau remis à 0, rim, référence, topRow) ; si une cellule ouverte
+   * juste au-dessus (ou en diagonale haute) est sous la surface et touche le body, elle est
+   * aussitôt intégrée au body (cellule quittée par un sable qui traverse le liquide : ni trou
+   * ni variation de niveau) ; sinon la surface monte (nouvelles rangées, excédent détruit si le
+   * body ne peut pas monter). Un body réduit à zéro tuile devient une goutte sur une cellule
+   * ouverte au-dessus, ou disparaît. Puis séparation éventuelle et émission des mutations.
+   * @param {LiquidBody} body
+   * @param {number} tileIndex — tuile du body dont le code vient de changer
+   */
+  #onBodyTileReplaced (body, tileIndex) {
+    const ids = this.#liquidBodyId
+    this.#changes.length = 0
+
+    ids[tileIndex] = 0
+    chunkManager.setLiquidLevelAt(tileIndex, 0)
+    body.tileCount--
+    if ((tileIndex >> 10) === body.topRow) body.topCount--
+    for (const offset of LIQUID_NEIGHBOR_OFFSETS) {
+      const n = tileIndex + offset
+      if (body.rim.has(n) && !this.#touchesBody(n, body.id)) body.rim.delete(n)
+    }
+
+    // body vidé : son volume repart en goutte au-dessus (ou disparaît)
+    if (body.tileCount === 0) {
+      const volume = body.volume < 16 ? body.volume : 16
+      this.#deleteBody(body)
+      for (const offset of LIQUID_ABOVE_OFFSETS) {
+        const c = tileIndex + offset
+        if (!LIQUID_OPEN_CODES.has(chunkManager.getTileAt(c))) continue
+        if (this.#spawnDrop(c, body.nature, volume)) this.#scheduleTick(body.nature)
+        break
+      }
+      this.#dirty = true
+      this.#emitChanges()
+      return
+    }
+
+    // cellule quittée par le sable, sous la surface : intégrée aussitôt
+    const first = this.#changes.length
+    for (const offset of LIQUID_ABOVE_OFFSETS) {
+      const c = tileIndex + offset
+      if ((c >> 10) <= body.topRow || !LIQUID_OPEN_CODES.has(chunkManager.getTileAt(c)) || !this.#touchesBody(c, body.id)) continue
+      this.#addTileToBody(body, c)
+      break
+    }
+
+    if (ids[body.refIndex] !== body.id) this.#findReference(body)
+    if (body.topCount === 0) this.#lowerTopRow(body)
+    body = this.#raiseSurface(body, first)
+    this.#splitDetached(body, [tileIndex])
+    this.#applyTopRowLevel(body)
+    this.#markUnstable(body)
+    this.#dirty = true
+    this.#emitChanges()
+  }
+
+  /**
+   * Monte la surface d'un body dont la rangée haute déborde (rowVol > 16 × topCount) en créant
+   * des rangées au-dessus ; si aucune cellule n'est disponible, l'excédent de volume est détruit.
+   * Fusionne avec les bodies de même nature touchés par les tuiles ajoutées depuis la mutation
+   * d'indice first de #changes. Empile les mutations dans #changes.
+   * @param {LiquidBody} body
+   * @param {number} first — indice, dans #changes, de la première mutation à examiner pour la fusion
+   * @returns {LiquidBody} le body survivant
+   */
+  #raiseSurface (body, first) {
+    while (body.volume - ((body.tileCount - body.topCount) << 4) > (body.topCount << 4)) {
+      if (this.#addTopRow(body)) continue
+      body.volume = body.tileCount << 4
+      break
+    }
+    return this.#mergeTouching(body, first)
+  }
+
+  /**
+   * Gère une goutte dont la tuile a été remplacée de l'extérieur (sable) : la goutte est
+   * déplacée sur une cellule ouverte au-dessus (ou en diagonale haute), sinon détruite.
+   * Émet les mutations.
+   * @param {number} tileIndex — tuile occupée par la goutte
+   */
+  #onDropReplaced (tileIndex) {
+    this.#liquidBodyId[tileIndex] = 0
+    chunkManager.setLiquidLevelAt(tileIndex, 0)
+    let slot = 0
+    while (slot < this.#dropCount && this.#dropIndex[slot] !== tileIndex) slot++
+    if (slot === this.#dropCount) return
+
+    this.#changes.length = 0
+    for (const offset of LIQUID_ABOVE_OFFSETS) {
+      const c = tileIndex + offset
+      if (!LIQUID_OPEN_CODES.has(chunkManager.getTileAt(c))) continue
+      this.#setDropTile(c, this.#dropNature[slot], this.#dropVolume[slot])
+      this.#dropIndex[slot] = c
+      this.#dropsDirty = true
+      this.#emitChanges()
+      return
+    }
+    this.#removeDropSlot(slot)
+  }
+
+  /**
    * Recalcule la surface après une baisse de volume ou un ajout de tuile : supprime les rangées
    * hautes vides (rowVol ≤ 0), supprime le body s'il n'a plus de tuile, sinon pose le niveau de
    * topRow.
@@ -799,14 +912,18 @@ class LiquidSystem {
         return false
       }
     }
-    if (this.#changes.length > first) this.#splitDetached(body, first)
+    if (this.#changes.length > first) {
+      const removed = []
+      for (let i = first; i < this.#changes.length; i++) removed.push(this.#changes[i].tileIndex)
+      this.#splitDetached(body, removed)
+    }
     this.#applyTopRowLevel(body)
     return true
   }
 
   /**
-   * Détecte et réalise la séparation d'un body après le retrait de tuiles (mutations de
-   * #changes depuis l'indice first dont la tuile n'appartient plus au body). Les voisins de ces
+   * Détecte et réalise la séparation d'un body après le retrait de tuiles (celles de la liste
+   * qui n'appartiennent plus au body). Les voisins de ces
    * tuiles restés dans le body servent de graines à un BFS entrelacé (une file par graine, un
    * nœud par file et par tour ; deux files qui se rencontrent fusionnent leur groupe). Dès qu'un
    * groupe a épuisé toutes ses files alors que d'autres groupes subsistent, sa composante est
@@ -816,21 +933,19 @@ class LiquidSystem {
    * prorata de leurs tuiles sur topRow (arrondi supérieur pour les parties détachées, le body
    * d'origine conserve le reste) ; chaque partie reçoit 16 × N moins son déficit.
    * @param {LiquidBody} body — body d'origine, encore vivant
-   * @param {number} first — indice, dans #changes, de la première mutation à examiner
+   * @param {number[]} removed — index des tuiles retirées (les autres sont ignorées)
    */
-  #splitDetached (body, first) {
+  #splitDetached (body, removed) {
     const ids = this.#liquidBodyId
     const mark = this.#splitMark
     const {id} = body
-    const end = this.#changes.length
 
     // graines : voisins, restés dans le body, des tuiles retirées
     const queues = []
-    for (let i = first; i < end; i++) {
-      const change = this.#changes[i]
-      if (change.tileOldCode !== body.nature || ids[change.tileIndex] === id) continue
+    for (const tile of removed) {
+      if (ids[tile] === id) continue
       for (const offset of LIQUID_NEIGHBOR_OFFSETS) {
-        const n = change.tileIndex + offset
+        const n = tile + offset
         if (ids[n] !== id || mark[n] !== 0) continue
         mark[n] = queues.length + 1
         queues.push([n])
