@@ -267,6 +267,7 @@ class LiquidSystem {
   #bodies = [null] // Array<LiquidBody|null> indexé par id — l'index 0 n'est jamais utilisé
   #freeIds = [] // ids libérés, réutilisés en priorité
   #queue = new Int32Array(WORLD_WIDTH * WORLD_HEIGHT) // file BFS partagée (flood-fill)
+  #splitMark = new Int32Array(WORLD_WIDTH * WORLD_HEIGHT) // séparation : étiquette + 1 de la graine ayant atteint la tuile, 0 = non visitée
   #dirty = false // true si la table des bodies a changé depuis la dernière écriture gamestate
   #changes = [] // Array<{tileIndex, tileOldCode, tileNewCode}> — mutations en attente d'émission 'world/tile-changed'
 
@@ -790,6 +791,7 @@ class LiquidSystem {
    * @returns {boolean} false si le body a été supprimé
    */
   #settleTop (body) {
+    const first = this.#changes.length
     while (body.volume - ((body.tileCount - body.topCount) << 4) <= 0) {
       this.#removeTopRow(body)
       if (body.tileCount === 0) {
@@ -797,8 +799,259 @@ class LiquidSystem {
         return false
       }
     }
+    if (this.#changes.length > first) this.#splitDetached(body, first)
     this.#applyTopRowLevel(body)
     return true
+  }
+
+  /**
+   * Détecte et réalise la séparation d'un body après le retrait de tuiles (mutations de
+   * #changes depuis l'indice first dont la tuile n'appartient plus au body). Les voisins de ces
+   * tuiles restés dans le body servent de graines à un BFS entrelacé (une file par graine, un
+   * nœud par file et par tour ; deux files qui se rencontrent fusionnent leur groupe). Dès qu'un
+   * groupe a épuisé toutes ses files alors que d'autres groupes subsistent, sa composante est
+   * fermée : elle devient un nouveau body. Le parcours s'arrête quand il ne reste qu'un groupe ;
+   * son coût est celui des composantes détachées, plus le chemin jusqu'aux rencontres.
+   * Le déficit de la rangée haute (16 × topCount − rowVol) est réparti entre les parties au
+   * prorata de leurs tuiles sur topRow (arrondi supérieur pour les parties détachées, le body
+   * d'origine conserve le reste) ; chaque partie reçoit 16 × N moins son déficit.
+   * @param {LiquidBody} body — body d'origine, encore vivant
+   * @param {number} first — indice, dans #changes, de la première mutation à examiner
+   */
+  #splitDetached (body, first) {
+    const ids = this.#liquidBodyId
+    const mark = this.#splitMark
+    const {id} = body
+    const end = this.#changes.length
+
+    // graines : voisins, restés dans le body, des tuiles retirées
+    const queues = []
+    for (let i = first; i < end; i++) {
+      const change = this.#changes[i]
+      if (change.tileOldCode !== body.nature || ids[change.tileIndex] === id) continue
+      for (const offset of LIQUID_NEIGHBOR_OFFSETS) {
+        const n = change.tileIndex + offset
+        if (ids[n] !== id || mark[n] !== 0) continue
+        mark[n] = queues.length + 1
+        queues.push([n])
+      }
+    }
+    const count = queues.length
+    if (count < 2) {
+      if (count === 1) mark[queues[0][0]] = 0
+      return
+    }
+
+    // BFS entrelacé avec union-find sur les étiquettes
+    const parent = new Int32Array(count)
+    const active = new Int32Array(count) // par racine : nombre de files non épuisées du groupe
+    const heads = new Int32Array(count)
+    for (let a = 0; a < count; a++) {
+      parent[a] = a
+      active[a] = 1
+    }
+    const closed = new Uint8Array(count) // par racine : composante déjà détachée
+    const parts = [] // bodies détachés, surface recalculée après nettoyage des marques
+    let groups = count
+    let running = count
+
+    while (groups > 1 && running > 0) {
+      for (let a = 0; a < count && groups > 1; a++) {
+        const queue = queues[a]
+        if (heads[a] >= queue.length) continue
+        const idx = queue[heads[a]]
+        heads[a]++
+        for (const offset of LIQUID_NEIGHBOR_OFFSETS) {
+          const n = idx + offset
+          if (ids[n] !== id) continue
+          const m = mark[n]
+          if (m === 0) {
+            mark[n] = a + 1
+            queue.push(n)
+            continue
+          }
+          const ra = this.#findRoot(parent, a)
+          const rb = this.#findRoot(parent, m - 1)
+          if (ra === rb) continue
+          parent[rb] = ra
+          active[ra] += active[rb]
+          groups--
+        }
+        if (heads[a] < queue.length) continue
+
+        // file épuisée : le groupe est-il fermé ?
+        running--
+        const root = this.#findRoot(parent, a)
+        active[root]--
+        if (active[root] > 0 || closed[root] === 1 || groups === 1) continue
+        closed[root] = 1
+        groups--
+        parts.push(this.#detachComponent(body, queues, parent, root))
+      }
+    }
+
+    // nettoyage des marques, puis surface des parties (une partie peut à son tour se séparer)
+    for (const queue of queues) {
+      for (const n of queue) mark[n] = 0
+    }
+    if (body.topCount === 0) this.#lowerTopRow(body)
+    for (const part of parts) this.#settleTop(part)
+  }
+
+  /**
+   * Racine union-find d'une étiquette (avec compression de chemin par saut).
+   * @param {Int32Array} parent
+   * @param {number} a
+   * @returns {number}
+   */
+  #findRoot (parent, a) {
+    while (parent[a] !== a) {
+      parent[a] = parent[parent[a]]
+      a = parent[a]
+    }
+    return a
+  }
+
+  /**
+   * Transforme en nouveau body la composante fermée formée des files du groupe root (tuiles
+   * encore étiquetées au body d'origine) : réétiquetage, nombre de tuiles, rectangle, topRow,
+   * tuile de référence, rim, volume (16 × N moins sa part du déficit de la rangée haute du body
+   * d'origine). Met à jour le body d'origine (volume, tileCount, topCount, rim, tuile de
+   * référence). La nouvelle partie devient instable ; sa surface reste à recalculer.
+   * @param {LiquidBody} body — body d'origine
+   * @param {Array<number[]>} queues — files du BFS entrelacé (tuiles visitées par graine)
+   * @param {Int32Array} parent — union-find des étiquettes
+   * @param {number} root — racine union-find du groupe fermé
+   * @returns {LiquidBody} la nouvelle partie
+   */
+  #detachComponent (body, queues, parent, root) {
+    const ids = this.#liquidBodyId
+    const {topRow} = body
+    const deficit = (body.topCount << 4) - (body.volume - ((body.tileCount - body.topCount) << 4))
+
+    let tileCount = 0
+    let onTopRow = 0
+    let xMin = WORLD_WIDTH
+    let xMax = 0
+    let yMin = WORLD_HEIGHT
+    let yMax = 0
+    let ref = -1
+    for (let a = 0; a < queues.length; a++) {
+      if (this.#findRoot(parent, a) !== root) continue
+      for (const n of queues[a]) {
+        if (ids[n] !== body.id) continue
+        tileCount++
+        const x = n & 0x3FF
+        const y = n >> 10
+        if (x < xMin) xMin = x
+        if (x > xMax) xMax = x
+        if (y < yMin) yMin = y
+        if (y === topRow) onTopRow++
+        if (y > yMax || (y === yMax && x < (ref & 0x3FF))) {
+          yMax = y
+          ref = n
+        }
+      }
+    }
+
+    // part du déficit (arrondi supérieur, bornée par le déficit restant du body d'origine)
+    let share = onTopRow === 0 ? 0 : Math.ceil(deficit * onTopRow / body.topCount)
+    if (share > deficit) share = deficit
+    const volume = (tileCount << 4) - share
+
+    const part = this.#createBody(ref, volume)
+    for (let a = 0; a < queues.length; a++) {
+      if (this.#findRoot(parent, a) !== root) continue
+      for (const n of queues[a]) {
+        if (ids[n] !== body.id) continue
+        ids[n] = part.id
+      }
+    }
+    part.tileCount = tileCount
+    part.xMin = xMin
+    part.xMax = xMax
+    part.yMin = yMin
+    part.yMax = yMax
+    part.topRow = yMin
+    let topCount = 0
+    let idx = (yMin << 10) | xMin
+    const end = (yMin << 10) | xMax
+    while (idx <= end) {
+      if (ids[idx] === part.id) {
+        chunkManager.setLiquidLevelAt(idx, 0)
+        topCount++
+      }
+      idx++
+    }
+    part.topCount = topCount
+
+    // rim de la partie ; le body d'origine perd les cellules qu'il ne touche plus
+    for (let a = 0; a < queues.length; a++) {
+      if (this.#findRoot(parent, a) !== root) continue
+      for (const n of queues[a]) {
+        if (ids[n] !== part.id) continue
+        for (const offset of LIQUID_NEIGHBOR_OFFSETS) {
+          const c = n + offset
+          if (!LIQUID_OPEN_CODES.has(chunkManager.getTileAt(c)) && ids[c] !== LIQUID_DROP_ID) continue
+          part.rim.add(c)
+          if (body.rim.has(c) && !this.#touchesBody(c, body.id)) body.rim.delete(c)
+        }
+      }
+    }
+
+    body.volume -= volume
+    body.tileCount -= tileCount
+    body.topCount -= onTopRow
+    if (ids[body.refIndex] !== body.id) this.#findReference(body)
+
+    this.#markUnstable(part)
+    this.#dirty = true
+    if (IS_DEV) console.log(`[LiquidSystem] séparation : body ${body.id} → ${part.id} (${tileCount} tuiles, volume ${volume})`)
+    return part
+  }
+
+  /**
+   * Recherche la tuile de référence d'un body (la plus basse, puis la plus à gauche) en
+   * remontant les rangées de son rectangle depuis yMax ; met à jour refIndex et yMax.
+   * @param {LiquidBody} body
+   */
+  #findReference (body) {
+    const ids = this.#liquidBodyId
+    for (let y = body.yMax; y >= body.yMin; y--) {
+      let idx = (y << 10) | body.xMin
+      const end = (y << 10) | body.xMax
+      while (idx <= end) {
+        if (ids[idx] === body.id) {
+          body.refIndex = idx
+          body.yMax = y
+          return
+        }
+        idx++
+      }
+    }
+  }
+
+  /**
+   * Abaisse topRow jusqu'à la première rangée contenant des tuiles du body (après le départ de
+   * toutes les tuiles de sa rangée haute dans une partie détachée) ; met à jour topCount et yMin.
+   * @param {LiquidBody} body
+   */
+  #lowerTopRow (body) {
+    const ids = this.#liquidBodyId
+    for (let y = body.topRow + 1; y <= body.yMax; y++) {
+      let count = 0
+      let idx = (y << 10) | body.xMin
+      const end = (y << 10) | body.xMax
+      while (idx <= end) {
+        if (ids[idx] === body.id) count++
+        idx++
+      }
+      if (count === 0) continue
+      body.topRow = y
+      body.yMin = y
+      body.topCount = count
+      return
+    }
   }
 
   /**

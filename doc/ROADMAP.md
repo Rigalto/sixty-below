@@ -39,7 +39,7 @@ Chaque étape est validée (tests + contrôle visuel) avant la suivante.
 5. **Gouttes** - Done : pool TypedArray, chute verticale/diagonale cadencée par la viscosité, atterrissage (création d'un body d'une tuile) ; `PouringManager` délégué.
 6. **Règle d'écoulement** - Done : liste des instables, tâche par nature, remplissage/fuite/étalement/débordement, règle du film, réaction à `world/tile-changed` (minage d'un bord).
 7. **Fusion** (Done) de bodies de même nature (réétiquetage du plus petit, égalisation du niveau).
-8. **Séparation** (BFS entrelacé), répartition du volume entre les parties.
+8. **Séparation** (Done) (BFS entrelacé), répartition du volume entre les parties.
 9. **Modifications extérieures** : réconciliation (+16 / −16) avec `SandFallingSystem`, flag `#applying`.
 10. **Rencontre de natures** : cristallisation (TOPAZ, EMERALD, RUBY, SAPPHIRE).
 11. **SEA** : body spécialisé (volume infini, `topRow` figée), fusion/séparation SEA ↔ WATER sans `world/tile-changed`, corail mort sous WATER.
