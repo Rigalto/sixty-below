@@ -25,7 +25,7 @@
 * Déplacement joueur : 80% (manque nage/plongée)
 * Actions joueur : 50% (manque fishing, gardening, bug catching)
 * Buffs : 100%
-* Evolution de l'environnement : (plantes : 100%, animaux: 0%, mini-biomess: 0%)
+* Evolution de l'environnement : (plantes : 100%, écoulement sable : 100%, écoulement liquides : 80%, animaux: 0%, mini-biomess: 0%)
 * Housing : 0%
 * Combat : overlay personnage: 0%, création arène: 0%, gameplay combat: 0%, loot combat : 0%, monstres: 0%)
 * Suivi détaillé dans fichier ROADMAP.md
