@@ -41,7 +41,7 @@ Chaque étape est validée (tests + contrôle visuel) avant la suivante.
 7. **Fusion** (Done) de bodies de même nature (réétiquetage du plus petit, égalisation du niveau).
 8. **Séparation** (Done) (BFS entrelacé), répartition du volume entre les parties.
 9. **Modifications extérieures** - Done : réconciliation (+16 / −16) avec `SandFallingSystem`, flag `#applying`.
-10. **Rencontre de natures** : cristallisation (TOPAZ, EMERALD, RUBY, SAPPHIRE).
+10. **Rencontre de natures** - Done : cristallisation (TOPAZ, EMERALD, RUBY, SAPPHIRE).
 11. **SEA** : body spécialisé (volume infini, `topRow` figée), fusion/séparation SEA ↔ WATER sans `world/tile-changed`, corail mort sous WATER.
 12. **Documentation** : `TECHNICAL.md` (API + EventBus, exception SEA ↔ WATER), fiches d'aide (Water, Honey, Sap, Sea, Buckets, Gems).
 

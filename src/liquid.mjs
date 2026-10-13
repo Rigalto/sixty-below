@@ -2,7 +2,7 @@
 
 import {IS_DEV, WORLD_WIDTH, WORLD_HEIGHT, MICROTASK, SEA_LEVEL} from './constant.mjs'
 import {eventBus, seededRNG, microTasker, taskScheduler} from './utils.mjs'
-import {NODES, NODES_LOOKUP} from '../assets/data/data.mjs'
+import {NODES, NODES_LOOKUP, NODE_TYPE} from '../assets/data/data.mjs'
 import {chunkManager} from './world.mjs'
 import {database} from './database.mjs'
 import {camera} from './render.mjs'
@@ -1545,10 +1545,131 @@ class LiquidSystem {
   }
 
   /**
-   * Émet 'world/tile-changed' pour chaque mutation empilée dans #changes (flag #applying levé
+   * Parcourt les mutations empilées dans #changes et, pour chaque tuile WATER, HONEY ou SAP
+   * nouvellement posée (et toujours présente), cristallise les contacts avec une autre nature
+   * de liquide 4-adjacente : c'est toujours la tuile HONEY ou SAP impliquée qui devient une
+   * gemme, à sa position (HONEY/SAP : les deux cristallisent). Les cristallisations empilent
+   * leurs propres mutations, qui ne posent aucun liquide.
+   */
+  #resolveContacts () {
+    const WATER = NODES.WATER.code
+    const HONEY = NODES.HONEY.code
+    const SAP = NODES.SAP.code
+    for (let i = 0; i < this.#changes.length; i++) {
+      const {tileIndex, tileNewCode} = this.#changes[i]
+      if (tileNewCode !== WATER && tileNewCode !== HONEY && tileNewCode !== SAP) continue
+      if (chunkManager.getTileAt(tileIndex) !== tileNewCode) continue // tuile entre-temps retirée ou cristallisée
+      for (const offset of LIQUID_NEIGHBOR_OFFSETS) {
+        const c = tileIndex + offset
+        const other = chunkManager.getTileAt(c)
+        if (other === tileNewCode || !(NODES_LOOKUP[other].type & NODE_TYPE.LIQUID)) continue
+        const gemOther = this.#crystalFor(other, tileNewCode)
+        if (gemOther !== 0) this.#crystallize(c, gemOther)
+        const gemSelf = this.#crystalFor(tileNewCode, other)
+        if (gemSelf === 0) continue
+        this.#crystallize(tileIndex, gemSelf)
+        break
+      }
+    }
+  }
+
+  /**
+   * Gemme produite par une tuile de liquide au contact d'une autre nature.
+   * @param {number} self — code du liquide qui cristallise éventuellement
+   * @param {number} other — code du liquide au contact
+   * @returns {number} code de la gemme, 0 si self ne cristallise pas (WATER, SEA, DEEPSEA)
+   */
+  #crystalFor (self, other) {
+    switch (self) {
+      case NODES.HONEY.code:
+        return other === NODES.SAP.code ? NODES.RUBY.code : NODES.TOPAZ.code
+      case NODES.SAP.code:
+        return other === NODES.HONEY.code ? NODES.SAPPHIRE.code : NODES.EMERALD.code
+      default:
+        return 0
+    }
+  }
+
+  /**
+   * Cristallise une tuile de goutte ou de body en gemme (une tuile hors système, ex. SEA, est
+   * ignorée).
+   * @param {number} tileIndex
+   * @param {number} gem — NODES.XXX.code de la gemme
+   */
+  #crystallize (tileIndex, gem) {
+    const id = this.#liquidBodyId[tileIndex]
+    if (id === LIQUID_DROP_ID) this.#crystallizeDrop(tileIndex, gem)
+    else if (id !== 0) this.#crystallizeBodyTile(this.#bodies[id], tileIndex, gem)
+  }
+
+  /**
+   * Remplace une goutte par une gemme : la goutte quitte le pool, son volume est perdu ; empile
+   * la mutation dans #changes.
+   * @param {number} tileIndex
+   * @param {number} gem
+   */
+  #crystallizeDrop (tileIndex, gem) {
+    let slot = 0
+    while (slot < this.#dropCount && this.#dropIndex[slot] !== tileIndex) slot++
+    if (slot === this.#dropCount) return
+    const tileOldCode = this.#dropNature[slot]
+    this.#removeDropSlot(slot)
+    this.#liquidBodyId[tileIndex] = 0
+    chunkManager.setLiquidLevelAt(tileIndex, 0)
+    chunkManager.setTileAt(tileIndex, gem)
+    this.#changes.push({tileIndex, tileOldCode, tileNewCode: gem})
+  }
+
+  /**
+   * Remplace une tuile de body par une gemme : la tuile sort du body avec son contenu (16, ou
+   * le niveau de la rangée haute si elle y est, au moins 1), retiré du volume ; rim, référence
+   * et topRow mis à jour ; surface recalculée, séparation éventuelle ; un body vidé est
+   * supprimé. Empile les mutations dans #changes.
+   * @param {LiquidBody} body
+   * @param {number} tileIndex
+   * @param {number} gem
+   */
+  #crystallizeBodyTile (body, tileIndex, gem) {
+    const ids = this.#liquidBodyId
+    const onTopRow = (tileIndex >> 10) === body.topRow
+    let amount = 16
+    if (onTopRow) {
+      amount = ((body.volume - ((body.tileCount - body.topCount) << 4)) / body.topCount) | 0
+      if (amount === 0) amount = 1
+    }
+
+    ids[tileIndex] = 0
+    chunkManager.setLiquidLevelAt(tileIndex, 0)
+    chunkManager.setTileAt(tileIndex, gem)
+    this.#changes.push({tileIndex, tileOldCode: body.nature, tileNewCode: gem})
+    body.tileCount--
+    if (onTopRow) body.topCount--
+    body.volume -= amount
+    for (const offset of LIQUID_NEIGHBOR_OFFSETS) {
+      const n = tileIndex + offset
+      if (body.rim.has(n) && !this.#touchesBody(n, body.id)) body.rim.delete(n)
+    }
+    this.#dirty = true
+
+    if (body.tileCount === 0) {
+      this.#deleteBody(body)
+      return
+    }
+    if (ids[body.refIndex] !== body.id) this.#findReference(body)
+    if (body.topCount === 0) this.#lowerTopRow(body)
+    if (!this.#settleTop(body)) return
+    this.#splitDetached(body, [tileIndex])
+    this.#applyTopRowLevel(body)
+    this.#markUnstable(body)
+  }
+
+  /**
+   * Résout les contacts entre natures différentes (cristallisation), puis émet
+   * 'world/tile-changed' pour chaque mutation empilée dans #changes (flag #applying levé
    * pendant l'émission, pour que onTileChangedLiquid les ignore), puis vide la pile.
    */
   #emitChanges () {
+    this.#resolveContacts()
     this.#applying = true
     for (const change of this.#changes) eventBus.emit('world/tile-changed', change)
     this.#applying = false
