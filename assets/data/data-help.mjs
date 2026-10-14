@@ -1600,15 +1600,74 @@ Water is the most common liquid in the world. It fills surface lakes, undergroun
 * [[Blind Lake]]s — all biomes, [[Caverns]] Bottom
 * Water puddles — [[Underground]] and [[Caverns]]
 
-**Collection** ⏳
+<hr>
+
+**Effect on Movement**
+
+* [[Movement Buffs|Movement speed]] is reduced by {{buff:water}}% while the player is in Water.
+
+**Drinking Water**
+
+Using a [[item:bottleWater]] from the [[Inventory]] ('Use Item' icon — shortcut [Space]):
+
+* Restores {{item:bottleWater:using[0]:payload:heal}} [[Health]] points.
+* Applies the Sickness debuff for {{item:bottleWater:using[0]:payload:sickness|time}}, preventing the use of other healing items.
+
+<hr>
+
+**How Water Flows**
+
+* Water moves one tile every {{node:water:viscosity}} ms.
+* A body of water always has a single, flat surface: connected basins level out instantly, like communicating vessels.
+* Only the top row can be partially filled, from 1/16 to 16/16 of a tile.
+* Water never disappears by itself: when it flows, it only moves.
+* Water spreads over flat ground until it is a film 1/16 of a tile thick. A full bucket can cover up to 16 tiles.
+* When the ground under a film is removed, the whole film falls as a single drop.
+* Removing a solid tile next to water makes it flow: it fills hollows below its surface and falls into empty space.
+
+**Blocks and Sand**
+
+* Placing a block in water pushes the surface up: the water is displaced, not destroyed.
+* If the water is trapped under a ceiling and cannot rise, the displaced water is lost.
+* Removing that block lets the water fill the hole again, and the surface goes down.
+* [[node:sand]] sinks through water. The surface rises once, by one tile of water.
+
+<hr>
+
+**Collection**
 
 * <<itemStar|bottle>> — small quantity
 * <<itemStar|bucket>> — large quantity
 
+**How to fill**
+
+* Hold an empty [[item:bottle]] or [[item:bucket]] in your active [[Hotbar]] slot.
+* Click on a [[node:water]] tile within your [[Ranges|Interaction Range]].
+* The empty container is consumed and replaced by the matching filled container.
+* A [[item:bucket]] takes one full tile of water from the surface of the lake, whatever tile you click on. A [[item:bottle]] takes nothing.
+* A body holding less than one full tile of water cannot fill a bucket.
+
+**How to pour**
+
+* Click on an empty tile with a [[item:bucketWater]]: the water falls as a drop.
+
+<hr>
+
+**Meeting Other Liquids**
+
+* With the [[Sea]]: the water joins the sea. Any water above sea level drains into it.
+* With [[node:honey]]: the honey it touches turns into [[node:topaz]]. The water itself is unchanged.
+* With [[node:sap]]: the sap it touches turns into [[node:emerald]]. The water itself is unchanged.
+* Water spreading over honey or sap keeps crystallizing the tiles under it: a single bucket can turn up to 16 tiles of the surface into a crust of [[Gems]].
+
+<hr>
+
 **Tips**
 
 * _Water puddles form naturally in tunnels and caverns._
-* _Removing the solid tile bordering a lake or a puddle will cause the water to flow._ ⏳
+* _Removing the solid tile bordering a lake or a puddle will cause the water to flow._
+* _Pour water over honey or sap to harvest [[Gems]] — but beware, the crust spreads as far as the water does._
+* _Water supports aquatic life: some fish can only be caught in fresh water._ ⏳
   `
   },
   {
