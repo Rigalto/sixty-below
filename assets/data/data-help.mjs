@@ -2995,7 +2995,7 @@ The table below details the [[Metal Fittings]] available for each material, incl
 
 | Metal | Plate | Rod | Strip |
 |---|---|---|---|
-| **Copper** | <<cellItemStar|plateCopper>> | - | yes |
+| **Copper** | <<cellItemStar|plateCopper>> | - | <<cellItemStar|stripCopper>> |
 | **Iron** | <<cellItemStar|plateIron>> | yes | yes |
 | **Silver** | - | yes | <<cellItemStar|stripSilver>> |
 | **Gold** | <<cellItemStar|plateGold>> | yes | - |

@@ -504,11 +504,11 @@ export const ITEMS = {
   wireCobalt: {name: 'Cobalt Wire', type: 0, stype: 'fitting', star: 4, image: 'refined_32_32-3-5', help: 'Metal Fittings', tooltip: 'Fastener used to built a lot of items'},
 
   // Metal Fittings Parts [succès]
-  plateCopper: {name: 'Copper Plate', type: 0, stype: 'fitting', star: 1, image: 'crafting_32_32-2-0', help: 'Metal Fittings', tooltip: 'Part used to built a lot of items'},
-  plateIron: {name: 'Iron Plate', type: 0, stype: 'fitting', star: 2, image: 'crafting_32_32-2-0', help: 'Metal Fittings', tooltip: 'Part used to built a lot of items'},
-  plateGold: {name: 'Gold Plate', type: 0, stype: 'fitting', star: 3, image: 'crafting_32_32-2-0', help: 'Metal Fittings', tooltip: 'Part used to built a lot of items'},
-  plateCobalt: {name: 'Cobalt Plate', type: 0, stype: 'fitting', star: 4, image: 'crafting_32_32-2-0', help: 'Metal Fittings', tooltip: 'Part used to built a lot of items'},
-  platePlatinum: {name: 'Platinum Plate', type: 0, stype: 'fitting', star: 5, image: 'crafting_32_32-2-0', help: 'Metal Fittings', tooltip: 'Part used to built a lot of items'},
+  plateCopper: {name: 'Copper Plate', type: 0, stype: 'fitting', star: 1, image: 'refined_32_32-5-4', help: 'Metal Fittings', tooltip: 'Part used to built a lot of items'},
+  plateIron: {name: 'Iron Plate', type: 0, stype: 'fitting', star: 2, image: 'refined_32_32-6-4', help: 'Metal Fittings', tooltip: 'Part used to built a lot of items'},
+  plateGold: {name: 'Gold Plate', type: 0, stype: 'fitting', star: 3, image: 'refined_32_32-4-5', help: 'Metal Fittings', tooltip: 'Part used to built a lot of items'},
+  plateCobalt: {name: 'Cobalt Plate', type: 0, stype: 'fitting', star: 4, image: 'refined_32_32-5-5', help: 'Metal Fittings', tooltip: 'Part used to built a lot of items'},
+  platePlatinum: {name: 'Platinum Plate', type: 0, stype: 'fitting', star: 5, image: 'refined_32_32-6-5', help: 'Metal Fittings', tooltip: 'Part used to built a lot of items'},
 
   stripCopper: {name: 'Copper Strip', type: 0, stype: 'fitting', star: 1, image: 'crafting_32_32-2-0', help: 'Metal Fittings', tooltip: 'Part used to built a lot of items'},
   stripSilver: {name: 'Silver Strip', type: 0, stype: 'fitting', star: 3, image: 'crafting_32_32-2-0', help: 'Metal Fittings', tooltip: 'Part used to built a lot of items'},
