@@ -498,10 +498,10 @@ export const ITEMS = {
   chainIron: {name: 'Iron Chain', type: 0, stype: 'fitting', star: 2, image: 'refined_32_32-1-2', help: 'Metal Fittings', tooltip: 'Fastener used to built a lot of sensitive items'},
   chainSilver: {name: 'Silver Chain', type: 0, stype: 'fitting', star: 3, image: 'refined_32_32-2-2', help: 'Metal Fittings', tooltip: 'Fastener used to built a lot of sensitive items'},
   chainPlatinum: {name: 'Platinum Chain', type: 0, stype: 'fitting', star: 5, image: 'refined_32_32-3-2', help: 'Metal Fittings', tooltip: 'Fastener used to built a lot of sensitive items'},
-  wireCopper: {name: 'Copper Wire', type: 0, stype: 'fitting', star: 1, image: 'crafting_32_32-2-0', help: 'Metal Fittings', tooltip: 'Fastener used to built a lot of sensitive items'},
-  wireIron: {name: 'Iron Wire', type: 0, stype: 'fitting', star: 2, image: 'crafting_32_32-2-0', help: 'Metal Fittings', tooltip: 'Fastener used to built a lot of items'},
-  wireGold: {name: 'Gold Wire', type: 0, stype: 'fitting', star: 3, image: 'crafting_32_32-2-0', help: 'Metal Fittings', tooltip: 'Fastener used to built a lot of items'},
-  wireCobalt: {name: 'Cobalt Wire', type: 0, stype: 'fitting', star: 4, image: 'crafting_32_32-2-0', help: 'Metal Fittings', tooltip: 'Fastener used to built a lot of items'},
+  wireCopper: {name: 'Copper Wire', type: 0, stype: 'fitting', star: 1, image: 'refined_32_32-0-5', help: 'Metal Fittings', tooltip: 'Fastener used to built a lot of sensitive items'},
+  wireIron: {name: 'Iron Wire', type: 0, stype: 'fitting', star: 2, image: 'refined_32_32-1-5', help: 'Metal Fittings', tooltip: 'Fastener used to built a lot of items'},
+  wireGold: {name: 'Gold Wire', type: 0, stype: 'fitting', star: 3, image: 'refined_32_32-2-5', help: 'Metal Fittings', tooltip: 'Fastener used to built a lot of items'},
+  wireCobalt: {name: 'Cobalt Wire', type: 0, stype: 'fitting', star: 4, image: 'refined_32_32-3-5', help: 'Metal Fittings', tooltip: 'Fastener used to built a lot of items'},
 
   // Metal Fittings Parts [succès]
   plateCopper: {name: 'Copper Plate', type: 0, stype: 'fitting', star: 1, image: 'crafting_32_32-2-0', help: 'Metal Fittings', tooltip: 'Part used to built a lot of items'},
@@ -510,6 +510,7 @@ export const ITEMS = {
   plateCobalt: {name: 'Cobalt Plate', type: 0, stype: 'fitting', star: 4, image: 'crafting_32_32-2-0', help: 'Metal Fittings', tooltip: 'Part used to built a lot of items'},
   platePlatinum: {name: 'Platinum Plate', type: 0, stype: 'fitting', star: 5, image: 'crafting_32_32-2-0', help: 'Metal Fittings', tooltip: 'Part used to built a lot of items'},
 
+  stripCopper: {name: 'Copper Strip', type: 0, stype: 'fitting', star: 1, image: 'crafting_32_32-2-0', help: 'Metal Fittings', tooltip: 'Part used to built a lot of items'},
   stripSilver: {name: 'Silver Strip', type: 0, stype: 'fitting', star: 3, image: 'crafting_32_32-2-0', help: 'Metal Fittings', tooltip: 'Part used to built a lot of items'},
 
   // housing furniture
@@ -1008,7 +1009,7 @@ export const RECIPES = [
   // containers
   {result: {item: 'glass', count: 1}, station: 'furnace', ingredients: [{item: 'blockSand', count: 2}]},
   {result: {item: 'bottle', count: 2}, station: 'furnace', ingredients: [{item: 'glass', count: 1}]},
-  {result: {item: 'bucket', count: 2}, station: 'furnace', ingredients: [{item: 'logOak', count: 1}, {item: 'barCopper', count: 1}]},
+  {result: {item: 'bucket', count: 3}, station: 'furnace', ingredients: [{item: 'logOak', count: 1}, {item: 'stripCopper', count: 6}]},
 
   // torches
   {result: {item: 'torch', count: 3}, station: 'byHand', ingredients: [{item: 'gel', count: 1}, {item: 'logOak', count: 1}]},
@@ -1050,6 +1051,7 @@ export const RECIPES = [
   {result: {item: 'plateGold', count: 6}, station: 'anvil', ingredients: [{item: 'barGold', count: 1}]},
   {result: {item: 'plateCobalt', count: 5}, station: 'anvil', ingredients: [{item: 'barCobalt', count: 1}]},
   {result: {item: 'platePlatinum', count: 4}, station: 'anvil', ingredients: [{item: 'barPlatinum', count: 1}]},
+  {result: {item: 'stripCopper', count: 18}, station: 'anvil', ingredients: [{item: 'barCopper', count: 1}]},
   {result: {item: 'stripSilver', count: 20}, station: 'anvil', ingredients: [{item: 'barSilver', count: 1}]},
 
   // Trinkets
