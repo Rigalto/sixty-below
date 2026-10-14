@@ -1147,11 +1147,13 @@ Le contenu de la tuile cristallisée est retiré : volume de la goutte ; pour un
 La SEA est un LiquidBody spécialisé :
 
 * volume infini, `topRow` figée à `SEA_LEVEL`, niveau toujours 16/16 ;
-* aucune tuile de référence ni volume persistés (positions déjà connues par les constantes) ;
-* seules les cellules du `rim` sous `SEA_LEVEL` agissent : la mer est inerte au repos ;
+* rien n'est persisté : au chargement, toute composante de SEA touchant la colonne x = 1 ou x = WORLD_WIDTH − 2 (au contact du DEEPSEA) est une mer ;
+* volume représenté par une valeur sentinelle (2³⁰) : rangée haute toujours pleine, jamais vidée (seau sans effet) ;
+* seules les cellules du `rim` au niveau de `SEA_LEVEL` ou plus bas agissent : la plus basse rejoint la mer à chaque pas, soutenue ou non (ni goutte ni étalement) ; la mer est inerte au repos ;
 * l'inondation de tout réseau ouvert connecté sous `SEA_LEVEL` est voulue, sans limite ;
-* **Fusion SEA + WATER → SEA :** les tuiles WATER sont converties en SEA ;
-* **Séparation d'une SEA → SEA + WATER :** la partie contenant la référence de la mer reste SEA, l'autre devient un body WATER de volume `16N`.
+* **Fusion SEA + WATER → SEA :** une goutte WATER au contact de la mer y disparaît ; un body WATER est absorbé : ses tuiles au niveau de `SEA_LEVEL` ou plus bas sont converties en SEA, celles au-dessus s'écoulent (SKY/VOID, avec `world/tile-changed`) ;
+* **Séparation d'une SEA → SEA + WATER :** une partie qui touche le bord (DEEPSEA) reste SEA, les autres deviennent des bodies WATER de volume `16N`, persistés ;
+* **Sable :** sous `SEA_LEVEL`, la cellule quittée par le sable reçoit SEA et rejoint la mer.
 * **Conversion SEA ↔ WATER :** **exception documentée, aucun `world/tile-changed` n'est émis.** Les systèmes concernés testent la nature à la demande : le corail sous WATER est affiché et traité comme corail mort (toujours minable), aucun corail ni huître ne pousse dans WATER, la pêche teste la nature avant chaque action. La conversion est découpée en micro-tâches.
 
 ### 11.9 Rendu

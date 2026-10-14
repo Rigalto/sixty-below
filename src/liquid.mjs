@@ -227,7 +227,10 @@ const LIQUID_NEIGHBOR_OFFSETS = [-1, 1, -WORLD_WIDTH, WORLD_WIDTH] // voisins 4-
 const LIQUID_ABOVE_OFFSETS = [-WORLD_WIDTH, -WORLD_WIDTH - 1, -WORLD_WIDTH + 1] // cellules d'où un sable a pu tomber (dessus, diagonales hautes)
 const LIQUID_DROP_ID = 0xFFFF // valeur de liquidBodyId sur une tuile occupée par une goutte
 const LIQUID_DROP_CAPACITY = 1024 // nombre maximum de gouttes simultanées
-const LIQUID_TICK_IDS = {[NODES.WATER.code]: 'liquid-tick-water', [NODES.HONEY.code]: 'liquid-tick-honey', [NODES.SAP.code]: 'liquid-tick-sap'} // id TaskScheduler de la tâche de chaque nature
+const LIQUID_TICK_IDS = {[NODES.WATER.code]: 'liquid-tick-water', [NODES.HONEY.code]: 'liquid-tick-honey', [NODES.SAP.code]: 'liquid-tick-sap', [NODES.SEA.code]: 'liquid-tick-sea'} // id TaskScheduler de la tâche de chaque nature
+const LIQUID_SEA_VOLUME = 0x40000000 // volume sentinelle d'un body SEA (infini : rangée haute toujours pleine, jamais vidée)
+const LIQUID_SEA_BORDER_X0 = 1 // colonne de SEA au contact du DEEPSEA gauche (x = 0)
+const LIQUID_SEA_BORDER_X1 = WORLD_WIDTH - 2 // colonne de SEA au contact du DEEPSEA droit (x = WORLD_WIDTH - 1)
 const LIQUID_ACTION_SPREAD = 1 // étalement — rangs d'action à hauteur égale (le plus grand l'emporte)
 const LIQUID_ACTION_OVERFLOW = 2 // débordement
 const LIQUID_ACTION_FILL = 3 // remplissage
@@ -260,6 +263,7 @@ class LiquidBody {
     this.yMax = 0
     this.rim = new Set() // Set<tileIndex> — cellules SKY/VOID (ou occupées par une goutte) adjacentes au body
     this.unstableSlot = -1 // position dans la liste des instables, -1 si stable
+    this.isSea = false // true pour un body SEA (volume infini, non persisté)
   }
 }
 
@@ -297,8 +301,10 @@ class LiquidSystem {
    * Restaure les gouttes (liquidBodyId = LIQUID_DROP_ID, niveau), puis reconstruit tous les
    * LiquidBodies depuis la table persistée : flood-fill depuis chaque tuile de référence
    * (liquidBodyId, nombre de tuiles, rectangle, topRow, rim, tuiles des gouttes exclues), puis
-   * pose du niveau des tuiles de topRow dans chunkManager. Tous les bodies sont placés dans la
-   * liste des instables (la première passe écarte les stables). Requiert un chunkManager déjà initialisé.
+   * pose du niveau des tuiles de topRow dans chunkManager. Reconstruit enfin les bodies SEA
+   * (composantes de SEA touchant les colonnes x = 1 et x = WORLD_WIDTH − 2, au contact du
+   * DEEPSEA), de volume infini. Tous les bodies sont placés dans la liste des
+   * instables (la première passe écarte les stables). Requiert un chunkManager déjà initialisé.
    * @param {number[]} liquidBodies — persisté (gamestate.liquidbodies) : [ref0, volume0, ref1, volume1, …]
    * @param {number[]} liquidDrops — persisté (gamestate.liquiddrops) : [index0, volume0, index1, volume1, …]
    */
@@ -334,11 +340,26 @@ class LiquidSystem {
       tiles += body.tileCount
     }
 
+    // mers : composantes de SEA au contact des colonnes de DEEPSEA (non persistées)
+    const SEA = NODES.SEA.code
+    const borders = [LIQUID_SEA_BORDER_X0, LIQUID_SEA_BORDER_X1]
+    for (let y = 0; y < WORLD_HEIGHT; y++) {
+      for (const x of borders) {
+        const idx = (y << 10) | x
+        if (this.#liquidBodyId[idx] !== 0 || chunkManager.getTileAt(idx) !== SEA) continue
+        const sea = this.#createBody(idx, LIQUID_SEA_VOLUME)
+        sea.isSea = true
+        this.#floodFill(sea)
+        sea.unstableSlot = this.#unstable.length
+        this.#unstable.push(sea)
+      }
+    }
+
     if (IS_DEV) console.log(`[LiquidSystem] ${this.#bodies.length - 1} liquid bodies, ${tiles} tuiles, ${this.#dropCount} gouttes, ${(performance.now() - t0).toFixed(1)} ms`)
   }
 
   /**
-   * Liaison EventBus : 'save/tick' — persiste la table des bodies en gamestate (clé
+   * Liaison EventBus : 'save/tick' — persiste la table des bodies hors SEA en gamestate (clé
    * 'liquidbodies', tableau plat [ref, volume, …]) uniquement si elle a changé depuis la
    * dernière écriture.
    */
@@ -346,7 +367,7 @@ class LiquidSystem {
     if (this.#dirty) {
       const table = []
       for (const body of this.#bodies) {
-        if (body === null) continue
+        if (body === null || body.isSea) continue
         table.push(body.refIndex, body.volume)
       }
       database.setGameState('liquidbodies', table)
@@ -372,7 +393,8 @@ class LiquidSystem {
   /**
    * Liaison EventBus : 'world/tile-changed' (hors mutations du LiquidSystem lui-même). Une tuile
    * de goutte ou de body remplacée par autre chose que son liquide est d'abord retirée du système
-   * (voir #onDropReplaced et #onBodyTileReplaced). Ensuite, si la
+   * (voir #onDropReplaced et #onBodyTileReplaced) ; une tuile SEA apparue de l'extérieur (sable
+   * tombant dans la mer) rejoint le body SEA voisin. Ensuite, si la
    * tuile devient SKY/VOID, elle entre dans le rim des bodies voisins, qui deviennent instables ;
    * sinon elle sort de leur rim. Si la cellule au-dessus est ouverte, les bodies qui la bordent
    * deviennent instables (elle a gagné ou perdu un support).
@@ -389,6 +411,8 @@ class LiquidSystem {
       this.#onDropReplaced(tileIndex)
     } else if (ownId !== 0 && tileNewCode !== this.#bodies[ownId].nature) {
       this.#onBodyTileReplaced(this.#bodies[ownId], tileIndex)
+    } else if (ownId === 0 && tileNewCode === NODES.SEA.code) {
+      this.#adoptSeaTile(tileIndex)
     }
 
     for (const offset of LIQUID_NEIGHBOR_OFFSETS) {
@@ -460,11 +484,13 @@ class LiquidSystem {
    * mutations précèdent l'émission des 'world/tile-changed'.
    * @param {number} tileIndex — une tuile quelconque du body
    * @param {number} amount — volume à ajouter, en 1/16 de tuile (> 0)
-   * @returns {number} volume réellement ajouté (0 si la tuile n'appartient à aucun body ou est une goutte)
+   * @returns {number} volume réellement ajouté (0 si la tuile n'appartient à aucun body ou est
+   *   une goutte ; amount, sans effet, pour un body SEA)
    */
   addVolume (tileIndex, amount) {
     const id = this.#liquidBodyId[tileIndex]
     if (id === 0 || id === LIQUID_DROP_ID) return 0
+    if (this.#bodies[id].isSea) return amount // volume infini : absorbé sans effet
     this.#changes.length = 0
     const accepted = this.#addVolumeToBody(this.#bodies[id], amount)
     this.#emitChanges()
@@ -472,19 +498,20 @@ class LiquidSystem {
   }
 
   /**
- * Retire du volume au body contenant la tuile, appliqué instantanément à la surface : tant
- * que la rangée haute est vide (rowVol ≤ 0), ses tuiles redeviennent SKY (tuile au-dessus SKY)
- * ou VOID et la rangée inférieure devient topRow. Un body dont toutes les tuiles ont disparu
- * est supprimé. Toutes les mutations précèdent l'émission des 'world/tile-changed'.
- * @param {number} tileIndex — une tuile quelconque du body
- * @param {number} amount — volume à retirer, en 1/16 de tuile (> 0)
- * @returns {boolean} false (rien n'est modifié) si la tuile n'appartient à aucun body (ou est
- *   une goutte) ou si le volume du body est inférieur à amount
- */
+   * Retire du volume au body contenant la tuile, appliqué instantanément à la surface : tant
+   * que la rangée haute est vide (rowVol ≤ 0), ses tuiles redeviennent SKY (tuile au-dessus SKY)
+   * ou VOID et la rangée inférieure devient topRow. Un body dont toutes les tuiles ont disparu
+   * est supprimé. Toutes les mutations précèdent l'émission des 'world/tile-changed'.
+   * @param {number} tileIndex — une tuile quelconque du body
+   * @param {number} amount — volume à retirer, en 1/16 de tuile (> 0)
+   * @returns {boolean} false (rien n'est modifié) si la tuile n'appartient à aucun body (ou est
+   *   une goutte) ou si le volume du body est inférieur à amount ; true sans effet pour un body SEA
+   */
   removeVolume (tileIndex, amount) {
     const id = this.#liquidBodyId[tileIndex]
     if (id === 0 || id === LIQUID_DROP_ID) return false
     const body = this.#bodies[id]
+    if (body.isSea) return true // volume infini : inépuisable
     if (body.volume < amount) return false
     this.#changes.length = 0
 
@@ -609,7 +636,7 @@ class LiquidSystem {
     const first = this.#changes.length
     body.volume += amount
     let accepted = amount
-    while (body.volume - ((body.tileCount - body.topCount) << 4) > (body.topCount << 4)) {
+    while (!body.isSea && body.volume - ((body.tileCount - body.topCount) << 4) > (body.topCount << 4)) {
       if (this.#addTopRow(body)) continue
       const overflow = body.volume - (body.tileCount << 4)
       body.volume -= overflow
@@ -627,8 +654,9 @@ class LiquidSystem {
   /**
    * Fait avancer une goutte d'un pas, dans l'ordre : chute verticale sur une cellule ouverte ;
    * fusion avec un body de même nature 4-adjacent (la cellule est libérée puis le volume ajouté
-   * au body) ; attente si la cellule du dessous, un côté ou une diagonale basse est occupé par
-   * une autre goutte ; chute diagonale (côté et diagonale basse ouverts, tirage aléatoire si
+   * au body ; une goutte WATER au contact de la SEA y disparaît) ; attente si la cellule du
+   * dessous, un côté ou une diagonale basse est occupé par une autre goutte ;
+   * chute diagonale (côté et diagonale basse ouverts, tirage aléatoire si
    * les deux côtés sont possibles) ; sinon atterrissage : la goutte devient un body d'une tuile,
    * instable. La chute passe avant la fusion : une goutte issue d'une fuite ou d'un débordement
    * (toujours au-dessus du vide) quitte le body au lieu d'y retourner. Les autres liquides et la
@@ -650,13 +678,20 @@ class LiquidSystem {
       return true
     }
 
-    // 2. contact avec un body de même nature : fusion
+    // 2. contact avec un body de même nature : fusion (une goutte WATER est absorbée par la SEA)
     for (const offset of LIQUID_NEIGHBOR_OFFSETS) {
       const id = ids[idx + offset]
-      if (id === 0 || id === LIQUID_DROP_ID || this.#bodies[id].nature !== nature) continue
+      if (id === 0 || id === LIQUID_DROP_ID) continue
+      const other = this.#bodies[id]
+      if (other.isSea && nature === NODES.WATER.code) {
+        this.#clearCell(idx)
+        this.#removeDropSlot(slot)
+        return false
+      }
+      if (other.nature !== nature) continue
       this.#clearCell(idx)
       this.#removeDropSlot(slot)
-      this.#addVolumeToBody(this.#bodies[id], volume)
+      this.#addVolumeToBody(other, volume)
       return false
     }
 
@@ -684,6 +719,154 @@ class LiquidSystem {
   }
 
   /**
+   * Action d'écoulement d'un body SEA (volume infini) : la cellule ouverte la plus basse de son
+   * rim, au niveau de SEA_LEVEL ou plus bas, rejoint la mer (soutenue ou non : la mer inonde
+   * sans limite, une cellule par pas) ; fusion éventuelle avec les bodies touchés. Les cellules
+   * au-dessus de SEA_LEVEL sont ignorées.
+   * @param {LiquidBody} body — body SEA
+   * @returns {boolean} false si aucune cellule à inonder et aucune goutte n'occupe le rim (stable)
+   */
+  #stepSea (body) {
+    let best = -1
+    let bestY = -1
+    let waiting = false
+    for (const cell of body.rim) {
+      if (!LIQUID_OPEN_CODES.has(chunkManager.getTileAt(cell))) {
+        if (this.#liquidBodyId[cell] === LIQUID_DROP_ID) waiting = true
+        continue
+      }
+      const y = cell >> 10
+      if (y < SEA_LEVEL || y <= bestY) continue
+      bestY = y
+      best = cell
+    }
+    if (best === -1) return waiting
+    const first = this.#changes.length
+    this.#addTileToBody(body, best)
+    this.#mergeTouching(body, first)
+    return true
+  }
+
+  /**
+   * Absorbe un body WATER dans un body SEA : ses tuiles situées au niveau de SEA_LEVEL ou plus
+   * bas deviennent SEA (conversion sans 'world/tile-changed', exception documentée), celles
+   * situées au-dessus s'écoulent dans la mer (SKY si la tuile au-dessus est SKY, VOID sinon,
+   * avec 'world/tile-changed'). Le volume du body WATER est perdu dans le volume infini de la
+   * mer ; son rim rejoint celui de la mer, qui devient instable.
+   * @param {LiquidBody} sea
+   * @param {LiquidBody} water
+   * @returns {LiquidBody} le body SEA
+   */
+  #mergeWithSea (sea, water) {
+    const SEA = NODES.SEA.code
+    const SKY = NODES.SKY.code
+    const VOID = NODES.VOID.code
+    const ids = this.#liquidBodyId
+    const queue = this.#queue
+
+    this.#clearTopRowLevel(water)
+
+    // parcours des tuiles du body WATER (réétiquetées SEA au passage)
+    ids[water.refIndex] = sea.id
+    queue[0] = water.refIndex
+    let head = 0
+    let tail = 1
+    while (head < tail) {
+      const idx = queue[head]
+      head++
+      for (const offset of LIQUID_NEIGHBOR_OFFSETS) {
+        const n = idx + offset
+        if (ids[n] !== water.id) continue
+        ids[n] = sea.id
+        queue[tail] = n
+        tail++
+      }
+    }
+
+    // conversion sous le niveau de la mer, écoulement au-dessus (de haut en bas pour SKY/VOID)
+    const drained = []
+    for (let i = 0; i < tail; i++) {
+      const idx = queue[i]
+      const y = idx >> 10
+      if (y < SEA_LEVEL) {
+        drained.push(idx)
+        continue
+      }
+      chunkManager.setTileAt(idx, SEA)
+      sea.tileCount++
+      if (y === sea.topRow) sea.topCount++
+      const x = idx & 0x3FF
+      if (x < sea.xMin) sea.xMin = x
+      if (x > sea.xMax) sea.xMax = x
+      if (y > sea.yMax) sea.yMax = y
+    }
+    const sorted = Int32Array.from(drained).sort()
+    for (const idx of sorted) {
+      ids[idx] = 0
+      const tileNewCode = chunkManager.getTileAt(idx - WORLD_WIDTH) === SKY ? SKY : VOID
+      chunkManager.setTileAt(idx, tileNewCode)
+      this.#changes.push({tileIndex: idx, tileOldCode: water.nature, tileNewCode})
+    }
+
+    // rim : celui du body WATER rejoint la mer ; nettoyage des jonctions et des cellules libérées
+    for (const cell of water.rim) {
+      if (ids[cell] !== sea.id) sea.rim.add(cell)
+    }
+    for (const idx of sorted) {
+      if (this.#touchesBody(idx, sea.id)) sea.rim.add(idx)
+      for (const offset of LIQUID_NEIGHBOR_OFFSETS) {
+        const n = idx + offset
+        if (sea.rim.has(n) && !this.#touchesBody(n, sea.id)) sea.rim.delete(n)
+      }
+    }
+    for (const cell of sea.rim) {
+      if (ids[cell] === sea.id) sea.rim.delete(cell)
+    }
+
+    this.#deleteBody(water)
+    this.#markUnstable(sea)
+    this.#dirty = true
+    return sea
+  }
+
+  /**
+   * Intègre au body SEA voisin une tuile devenue SEA de l'extérieur (sans nouvelle mutation :
+   * la tuile porte déjà le code SEA) : liquidBodyId, tileCount, topCount, rim ; puis absorbe les
+   * bodies WATER et fusionne les autres bodies SEA qu'elle touche. Émet les mutations éventuelles.
+   * @param {number} tileIndex
+   */
+  #adoptSeaTile (tileIndex) {
+    const ids = this.#liquidBodyId
+    for (const offset of LIQUID_NEIGHBOR_OFFSETS) {
+      const id = ids[tileIndex + offset]
+      if (id === 0 || id === LIQUID_DROP_ID || !this.#bodies[id].isSea) continue
+      let sea = this.#bodies[id]
+      ids[tileIndex] = sea.id
+      sea.tileCount++
+      if ((tileIndex >> 10) === sea.topRow) sea.topCount++
+      sea.rim.delete(tileIndex)
+      for (const o of LIQUID_NEIGHBOR_OFFSETS) {
+        const n = tileIndex + o
+        if (LIQUID_OPEN_CODES.has(chunkManager.getTileAt(n)) || ids[n] === LIQUID_DROP_ID) sea.rim.add(n)
+      }
+
+      // jonction avec un body WATER (absorbé) ou une autre mer (fusionnée)
+      this.#changes.length = 0
+      for (const o of LIQUID_NEIGHBOR_OFFSETS) {
+        const other = ids[tileIndex + o]
+        if (other === 0 || other === LIQUID_DROP_ID || other === sea.id) continue
+        const body = this.#bodies[other]
+        if (body.isSea) sea = this.#mergeBodies(sea, body)
+        else if (body.nature === NODES.WATER.code) sea = this.#mergeWithSea(sea, body)
+      }
+
+      this.#markUnstable(sea)
+      this.#emitChanges()
+      return
+    }
+  }
+
+  /**
    * Applique au body l'action d'écoulement prioritaire, choisie parmi les cellules ouvertes de
    * son rim situées au niveau de topRow ou plus bas (soutenue = cellule du dessous non ouverte) :
    * - plus bas que topRow, soutenue : remplissage (la cellule rejoint le body, volume inchangé) ;
@@ -700,6 +883,7 @@ class LiquidSystem {
    * @returns {boolean} false si aucune action n'est possible et aucune goutte n'occupe le rim (body stable)
    */
   #stepBody (body) {
+    if (body.isSea) return this.#stepSea(body)
     const W = WORLD_WIDTH
     const {topRow, topCount, rim} = body
     const rowVol = body.volume - ((body.tileCount - topCount) << 4)
@@ -801,7 +985,8 @@ class LiquidSystem {
    * aussitôt intégrée au body (cellule quittée par un sable qui traverse le liquide : ni trou
    * ni variation de niveau) ; sinon la surface monte (nouvelles rangées, excédent détruit si le
    * body ne peut pas monter). Un body réduit à zéro tuile devient une goutte sur une cellule
-   * ouverte au-dessus, ou disparaît. Puis séparation éventuelle et émission des mutations.
+   * ouverte au-dessus, ou disparaît. Puis séparation éventuelle et émission des mutations. Pour
+   * un body SEA, seule la séparation éventuelle est traitée (volume infini).
    * @param {LiquidBody} body
    * @param {number} tileIndex — tuile du body dont le code vient de changer
    */
@@ -816,6 +1001,15 @@ class LiquidSystem {
     for (const offset of LIQUID_NEIGHBOR_OFFSETS) {
       const n = tileIndex + offset
       if (body.rim.has(n) && !this.#touchesBody(n, body.id)) body.rim.delete(n)
+    }
+
+    // SEA : volume infini, la surface ne bouge pas ; séparation éventuelle seulement
+    if (body.isSea) {
+      if (ids[body.refIndex] !== body.id) this.#findReference(body)
+      this.#splitDetached(body, [tileIndex])
+      this.#markUnstable(body)
+      this.#emitChanges()
+      return
     }
 
     // body vidé : son volume repart en goutte au-dessus (ou disparaît)
@@ -856,13 +1050,13 @@ class LiquidSystem {
    * Monte la surface d'un body dont la rangée haute déborde (rowVol > 16 × topCount) en créant
    * des rangées au-dessus ; si aucune cellule n'est disponible, l'excédent de volume est détruit.
    * Fusionne avec les bodies de même nature touchés par les tuiles ajoutées depuis la mutation
-   * d'indice first de #changes. Empile les mutations dans #changes.
+   * d'indice first de #changes. Sans effet sur la surface d'un body SEA. Empile les mutations dans #changes.
    * @param {LiquidBody} body
    * @param {number} first — indice, dans #changes, de la première mutation à examiner pour la fusion
    * @returns {LiquidBody} le body survivant
    */
   #raiseSurface (body, first) {
-    while (body.volume - ((body.tileCount - body.topCount) << 4) > (body.topCount << 4)) {
+    while (!body.isSea && body.volume - ((body.tileCount - body.topCount) << 4) > (body.topCount << 4)) {
       if (this.#addTopRow(body)) continue
       body.volume = body.tileCount << 4
       break
@@ -1032,7 +1226,9 @@ class LiquidSystem {
    * encore étiquetées au body d'origine) : réétiquetage, nombre de tuiles, rectangle, topRow,
    * tuile de référence, rim, volume (16 × N moins sa part du déficit de la rangée haute du body
    * d'origine). Met à jour le body d'origine (volume, tileCount, topCount, rim, tuile de
-   * référence). La nouvelle partie devient instable ; sa surface reste à recalculer.
+   * référence). Une partie détachée d'un body SEA reste SEA si elle touche une colonne au contact
+   * du DEEPSEA ; sinon ses tuiles sont converties en WATER (sans 'world/tile-changed') et elle
+   * reçoit 16 × N. La nouvelle partie devient instable ; sa surface reste à recalculer.
    * @param {LiquidBody} body — body d'origine
    * @param {Array<number[]>} queues — files du BFS entrelacé (tuiles visitées par graine)
    * @param {Int32Array} parent — union-find des étiquettes
@@ -1042,7 +1238,7 @@ class LiquidSystem {
   #detachComponent (body, queues, parent, root) {
     const ids = this.#liquidBodyId
     const {topRow} = body
-    const deficit = (body.topCount << 4) - (body.volume - ((body.tileCount - body.topCount) << 4))
+    const deficit = body.isSea ? 0 : (body.topCount << 4) - (body.volume - ((body.tileCount - body.topCount) << 4))
 
     let tileCount = 0
     let onTopRow = 0
@@ -1051,6 +1247,8 @@ class LiquidSystem {
     let yMin = WORLD_HEIGHT
     let yMax = 0
     let ref = -1
+    let border = false // la composante touche une colonne au contact du DEEPSEA
+
     for (let a = 0; a < queues.length; a++) {
       if (this.#findRoot(parent, a) !== root) continue
       for (const n of queues[a]) {
@@ -1058,6 +1256,7 @@ class LiquidSystem {
         tileCount++
         const x = n & 0x3FF
         const y = n >> 10
+        if (x === LIQUID_SEA_BORDER_X0 || x === LIQUID_SEA_BORDER_X1) border = true
         if (x < xMin) xMin = x
         if (x > xMax) xMax = x
         if (y < yMin) yMin = y
@@ -1072,9 +1271,21 @@ class LiquidSystem {
     // part du déficit (arrondi supérieur, bornée par le déficit restant du body d'origine)
     let share = onTopRow === 0 ? 0 : Math.ceil(deficit * onTopRow / body.topCount)
     if (share > deficit) share = deficit
-    const volume = (tileCount << 4) - share
+
+    // SEA : une partie au contact du DEEPSEA reste SEA ; sinon elle devient WATER (sans événement)
+    const isSea = body.isSea && border
+    if (body.isSea && !isSea) {
+      for (let a = 0; a < queues.length; a++) {
+        if (this.#findRoot(parent, a) !== root) continue
+        for (const n of queues[a]) {
+          if (ids[n] === body.id) chunkManager.setTileAt(n, NODES.WATER.code)
+        }
+      }
+    }
+    const volume = isSea ? LIQUID_SEA_VOLUME : (tileCount << 4) - share
 
     const part = this.#createBody(ref, volume)
+    part.isSea = isSea
     for (let a = 0; a < queues.length; a++) {
       if (this.#findRoot(parent, a) !== root) continue
       for (const n of queues[a]) {
@@ -1114,7 +1325,7 @@ class LiquidSystem {
       }
     }
 
-    body.volume -= volume
+    if (!body.isSea) body.volume -= volume
     body.tileCount -= tileCount
     body.topCount -= onTopRow
     if (ids[body.refIndex] !== body.id) this.#findReference(body)
@@ -1421,7 +1632,8 @@ class LiquidSystem {
 
   /**
    * Parcourt les tuiles ajoutées au body depuis la mutation d'indice first de #changes et
-   * fusionne le body avec chaque body de même nature qui touche l'une d'elles. Une tuile
+   * fusionne le body avec chaque body de même nature qui touche l'une d'elles (un body WATER au
+   * contact d'un body SEA est absorbé par la mer, voir #mergeWithSea). Une tuile
    * entre-temps retirée (surface recalculée par une fusion) est ignorée.
    * @param {LiquidBody} body
    * @param {number} first — indice, dans #changes, de la première mutation à examiner
@@ -1438,6 +1650,8 @@ class LiquidSystem {
         if (id === 0 || id === LIQUID_DROP_ID || id === body.id) continue
         const other = this.#bodies[id]
         if (other.nature === body.nature) body = this.#mergeBodies(body, other)
+        else if (other.isSea && body.nature === NODES.WATER.code) body = this.#mergeWithSea(other, body)
+        else if (body.isSea && other.nature === NODES.WATER.code) body = this.#mergeWithSea(body, other)
       }
     }
     return body
@@ -1545,7 +1759,7 @@ class LiquidSystem {
   }
 
   /**
-   * Parcourt les mutations empilées dans #changes et, pour chaque tuile WATER, HONEY ou SAP
+   * Parcourt les mutations empilées dans #changes et, pour chaque tuile WATER, HONEY, SAP ou SEA
    * nouvellement posée (et toujours présente), cristallise les contacts avec une autre nature
    * de liquide 4-adjacente : c'est toujours la tuile HONEY ou SAP impliquée qui devient une
    * gemme, à sa position (HONEY/SAP : les deux cristallisent). Les cristallisations empilent
@@ -1555,9 +1769,11 @@ class LiquidSystem {
     const WATER = NODES.WATER.code
     const HONEY = NODES.HONEY.code
     const SAP = NODES.SAP.code
+    const SEA = NODES.SEA.code
+
     for (let i = 0; i < this.#changes.length; i++) {
       const {tileIndex, tileNewCode} = this.#changes[i]
-      if (tileNewCode !== WATER && tileNewCode !== HONEY && tileNewCode !== SAP) continue
+      if (tileNewCode !== WATER && tileNewCode !== HONEY && tileNewCode !== SAP && tileNewCode !== SEA) continue
       if (chunkManager.getTileAt(tileIndex) !== tileNewCode) continue // tuile entre-temps retirée ou cristallisée
       for (const offset of LIQUID_NEIGHBOR_OFFSETS) {
         const c = tileIndex + offset
