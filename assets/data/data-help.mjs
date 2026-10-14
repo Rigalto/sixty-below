@@ -1694,7 +1694,26 @@ Using a [[item:bottleHoney]] from the [[Inventory]] ('Use Item' icon — shortcu
 
 * Restores {{item:bottleHoney:using[1]:payload:heal}} [[Health]] points.
 * Applies the Honey buff for {{item:bottleHoney:using[0]:duration|time}}: [[Movement Buffs|Movement Speed]] is reduced by {{buff:honey}}%.
-* Applies the Sickness debuff for {{item:bottleHoney:using[1]:payload:sickness|time}}, preventing the use of other healing items. ⏳
+* Applies the Sickness debuff for {{item:bottleHoney:using[1]:payload:sickness|time}}, preventing the use of other healing items.
+
+<hr>
+
+**How Honey Flows**
+
+* Honey is very viscous: it moves one tile every {{node:honey:viscosity}} ms.
+* A body of honey always has a single, flat surface: connected basins level out, like communicating vessels.
+* Only the top row can be partially filled, from 1/16 to 16/16 of a tile.
+* Honey never disappears by itself: when it flows, it only moves.
+* Honey spreads over flat ground until it is a film 1/16 of a tile thick. A full bucket can cover up to 16 tiles.
+* When the ground under a film is removed, the whole film falls as a single drop.
+* Removing a solid tile next to honey makes it flow: it fills hollows below its surface and falls into empty space.
+
+**Blocks and Sand**
+
+* Placing a block in honey pushes the surface up: the honey is displaced, not destroyed.
+* If the honey is trapped under a ceiling and cannot rise, the displaced honey is lost.
+* Removing that block lets the honey fill the hole again, and the surface goes down.
+* [[node:sand]] sinks through honey. The surface rises once, by one tile of honey.
 
 <hr>
 
@@ -1708,13 +1727,29 @@ Using a [[item:bottleHoney]] from the [[Inventory]] ('Use Item' icon — shortcu
 * Hold an empty [[item:bottle]] or [[item:bucket]] in your active [[Hotbar]] slot.
 * Click on a [[node:honey]] tile within your [[Ranges|Interaction Range]].
 * The empty container is consumed and replaced by the matching filled container.
-* With a [[item:bucket]], the honey tile is removed from the world; a [[item:bottle]] leaves it in place.
+* A [[item:bucket]] takes one full tile of honey from the surface of the pool, whatever tile you click on. A [[item:bottle]] takes nothing.
+* A body holding less than one full tile of honey cannot fill a bucket.
+
+**How to pour**
+
+* Click on an empty tile with a [[item:bucketHoney]]: the honey falls as a drop.
+
+<hr>
+
+**Meeting Other Liquids**
+
+* With [[Water]] or the [[Sea]]: each honey tile in contact turns into [[node:topaz]]. The water is unchanged.
+* With [[node:sap]]: each honey tile in contact turns into [[node:ruby]], and each sap tile in contact turns into [[node:sapphire]].
+* The honey turned into a gem is lost: the pool loses that tile's volume.
+* Water spreading over a pool of honey crystallizes its surface: a single bucket can turn up to 16 tiles into a crust of [[Gems]].
 
 <hr>
 
 **Tips**
 
 * _Honey slows movement — avoid falling into it without a plan to escape._
+* _Honey flowing toward water seals itself: its front turns into [[node:topaz]] and forms a wall._
+* _Pour honey next to sap to obtain both [[node:ruby]] and [[node:sapphire]]._
 * _The [[Bees]] will defend their honey aggressively — consider building a diversion canal to collect it safely._ ⏳
   `
   },
