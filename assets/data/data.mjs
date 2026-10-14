@@ -362,7 +362,7 @@ export const ITEMS = {
   hammerSilver: {name: 'Silver Hammer', type: ITEM_TYPE.TOOL, stype: 'hammer', star: 4, image: 'tool_32_32-2-1', placed: 'handed_48_48-2-1', range: 0, shaking: {speed: 50}, help: 'Hammers', tooltip: 'Tools used to remove wall, furniture, workstation, converting them to item form'},
   hammerGold: {name: 'Gold Hammer', type: ITEM_TYPE.TOOL, stype: 'hammer', star: 4, image: 'tool_32_32-3-1', placed: 'handed_48_48-3-1', range: 1, shaking: {speed: 75}, help: 'Hammers', tooltip: 'Tools used to remove wall, furniture, workstation, converting them to item form'},
   hammerCobalt: {name: 'Cobalt Hammer', type: ITEM_TYPE.TOOL, stype: 'hammer', star: 5, image: 'tool_32_32-4-1', placed: 'handed_48_48-4-1', range: 2, shaking: {speed: 100}, help: 'Hammers', tooltip: 'Tools used to remove wall, furniture, workstation, converting them to item form'},
-  hammerPlatinum: {name: 'Cobalt Hammer', type: ITEM_TYPE.TOOL, stype: 'hammer', star: 5, image: 'tool_32_32-5-1', placed: 'handed_48_48-5-1', range: 3, shaking: {speed: 150}, help: 'Hammers', tooltip: 'Tools used to remove wall, furniture, workstation, converting them to item form'},
+  hammerPlatinum: {name: 'Platinum Hammer', type: ITEM_TYPE.TOOL, stype: 'hammer', star: 5, image: 'tool_32_32-5-1', placed: 'handed_48_48-5-1', range: 3, shaking: {speed: 150}, help: 'Hammers', tooltip: 'Tools used to remove wall, furniture, workstation, converting them to item form'},
 
   // Axes
   axeCopper: {name: 'Copper Axe', type: ITEM_TYPE.TOOL | ITEM_TYPE.WEAPON, stype: 'axe', star: 1, image: 'tool_32_32-0-2', placed: 'handed_48_48-0-2', help: 'Chopping Tools', tooltip: 'Basic tools used to chop trees. Can be used as a slow weapon', range: 0, chopping: {speed: 0}},
@@ -945,8 +945,8 @@ export const RECIPES = [
   {result: {item: 'pickaxeGold', count: 1}, station: 'anvil', ingredients: [{item: 'barGold', count: 12}, {item: 'logMahogany', count: 4}, {item: 'cutEmerald', count: 2}]},
   {result: {item: 'pickaxeCobalt', count: 1}, station: 'forge', ingredients: [{item: 'barCobalt', count: 14}, {item: 'logOak', count: 4}, {item: 'cutSapphire', count: 3}]},
   {result: {item: 'pickaxePlatinum', count: 1}, station: 'forge', ingredients: [{item: 'barPlatinum', count: 16}, {item: 'logMahogany', count: 6}, {item: 'cutSapphire', count: 4}]},
-  {result: {item: 'pickaxeProspector', count: 1}, station: 'forge', ingredients: [{item: 'barPlatinum', count: 1}, {item: 'barPlatinum', count: 16}, {item: 'shellPowder', count: 1}, {item: 'nailIron', count: 5}]},
-  {result: {item: 'pickaxeGeologist', count: 1}, station: 'forge', ingredients: [{item: 'barPlatinum', count: 1}, {item: 'barPlatinum', count: 16}, {item: 'shellPowder', count: 1}, {item: 'nailIron', count: 5}]},
+  {result: {item: 'pickaxeProspector', count: 1}, station: 'forge', ingredients: [{item: 'barPlatinum', count: 1}, {item: 'logMahogany', count: 2}, {item: 'shellPowder', count: 1}, {item: 'rivetPlatinum', count: 5}]},
+  {result: {item: 'pickaxeGeologist', count: 1}, station: 'forge', ingredients: [{item: 'barPlatinum', count: 1}, {item: 'logMahogany', count: 2}, {item: 'shellPowder', count: 1}, {item: 'rivetCobalt', count: 5}]},
 
   // Axes
   {result: {item: 'axeCopper', count: 1}, station: 'anvil', ingredients: [{item: 'barCopper', count: 10}, {item: 'logOak', count: 5}]},
@@ -962,8 +962,8 @@ export const RECIPES = [
   {result: {item: 'hammerIron', count: 1}, station: 'anvil', ingredients: [{item: 'barIron', count: 6}, {item: 'nailIron', count: 1}, {item: 'logOak', count: 3}, {item: 'oleanderOil', count: 1}]},
   {result: {item: 'hammerSilver', count: 1}, station: 'anvil', ingredients: [{item: 'barSilver', count: 6}, {item: 'nailIron', count: 1}, {item: 'cutEmerald', count: 1}, {item: 'logMahogany', count: 3}]},
   {result: {item: 'hammerGold', count: 1}, station: 'anvil', ingredients: [{item: 'barGold', count: 6}, {item: 'nailIron', count: 1}, {item: 'cutEmerald', count: 2}, {item: 'logMahogany', count: 3}]},
-  {result: {item: 'hammerCobalt', count: 1}, station: 'forge', ingredients: [{item: 'barCobalt', count: 7}, {item: 'nailIron', count: 1}, {item: 'cutSapphire', count: 1}, {item: 'logMahogany', count: 3}]},
-  {result: {item: 'hammerPlatinum', count: 1}, station: 'forge', ingredients: [{item: 'barPlatinum', count: 7}, {item: 'nailIron', count: 2}, {item: 'cutSapphire', count: 2}, {item: 'logMahogany', count: 3}]},
+  {result: {item: 'hammerCobalt', count: 1}, station: 'forge', ingredients: [{item: 'barCobalt', count: 7}, {item: 'nailCobalt', count: 1}, {item: 'cutSapphire', count: 1}, {item: 'logMahogany', count: 3}]},
+  {result: {item: 'hammerPlatinum', count: 1}, station: 'forge', ingredients: [{item: 'barPlatinum', count: 7}, {item: 'nailCobalt', count: 2}, {item: 'cutSapphire', count: 2}, {item: 'logMahogany', count: 3}]},
 
   // Teleporters
   {result: {item: 'teleporterYellow', count: 2}, station: 'forge', ingredients: [{item: 'fallenStar', count: 10}]},
