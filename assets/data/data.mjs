@@ -290,10 +290,10 @@ export const ITEMS = {
   blockMarble: {name: 'Marble Block', type: ITEM_TYPE.BLOCK | ITEM_TYPE.PLACABLE, star: 4, stype: 'block', placedNode: 'MARBLE', image: 'mined_32_32-2-2', help: 'Geode Stones', tooltip: 'Prized crafting materials found in crystalline structures'},
   // Rock - Others
   blockObsidian: {name: 'Obsidian Block', type: ITEM_TYPE.BLOCK | ITEM_TYPE.PLACABLE, star: 5, stype: 'block', placedNode: 'OBSIDIAN', image: 'mined_32_32-3-2', help: 'Obsidian', tooltip: 'Hardest material'},
-  blockMeteorite: {name: 'Meteorite Block', type: ITEM_TYPE.BLOCK, star: 5, stype: 'block', image: 'mined_32_32-3-2', help: 'Meteorite', tooltip: 'Falling from space, hard to use'},
+  blockMeteorite: {name: 'Meteorite Block', type: ITEM_TYPE.BLOCK, star: 5, stype: 'block', image: 'mined_32_32-4-2', help: 'Meteorite', tooltip: 'Falling from space, hard to use'},
 
   // Hive
-  blockHive: {name: 'Hive Block', type: ITEM_TYPE.BLOCK, star: 3, stype: 'block', image: 'mined_32_32-4-2', help: 'Hive', tooltip: 'Hexagonal alveoles build by Bees'},
+  blockHive: {name: 'Hive Block', type: ITEM_TYPE.BLOCK, star: 3, stype: 'block', image: 'mined_32_32-5-2', help: 'Hive', tooltip: 'Hexagonal alveoles build by Bees'},
   beeswax: {name: 'Beeswax', type: 0, star: 3, stype: 'wax', image: 'refined_32_32-5-1', help: 'Hive', tooltip: 'Melted down from honeycombs, used as a binding agent'},
 
   // Shell - Image OK
@@ -345,7 +345,7 @@ export const ITEMS = {
   // Bug Nets
   bugNetWood: {name: 'Wooden Bug Net', type: ITEM_TYPE.TOOL, stype: 'bugNet', star: 1, image: 'tool_32_32-3-3', placedright: 'w_42_42-0-0', placedleft: 'w_42_42-0-1', help: 'Catching Tools', tooltip: 'Tools used to catch bugs', range: 0, catching: {speed: 0}},
   bugNetGold: {name: 'Gold Bug Net', type: ITEM_TYPE.TOOL, stype: 'bugNet', star: 3, image: 'tool_32_32-4-3', placedright: 'w_42_42-0-0', placedleft: 'w_42_42-0-1', speed: 0, help: 'Catching Tools', tooltip: 'Tools used to catch bugs', range: 1, catching: {speed: 80}},
-  bugNetCobalt: {name: 'Cobalt Bug Net', type: ITEM_TYPE.TOOL, stype: 'bugNet', star: 4, image: 'tool_32_32-5-3', placedright: 'w_42_42-0-0', placedleft: 'w_42_42-0-1', speed: 0, help: 'Catching Tools', tooltip: 'Tools used to catch bugs', range: 2, catching: {speed: 150}},
+  bugNetCobalt: {name: 'Cobalt Bug Net', type: ITEM_TYPE.TOOL, stype: 'bugNet', star: 5, image: 'tool_32_32-5-3', placedright: 'w_42_42-0-0', placedleft: 'w_42_42-0-1', speed: 0, help: 'Catching Tools', tooltip: 'Tools used to catch bugs', range: 2, catching: {speed: 150}},
 
   // Fishing Rods
   rodOak: {name: 'Oak Fishing Rod', type: ITEM_TYPE.TOOL, stype: 'rod', star: 1, image: 'tool_32_32-0-4', placedright: 'w_42_42-0-0', placedleft: 'w_42_42-0-1', help: 'Fishing Rods', tooltip: 'Tools used to catch fishes', range: 0, fishing: {speed: 0, power: 15}},
@@ -936,7 +936,7 @@ export const RECIPES = [
   // Bug nets
   {result: {item: 'bugNetWood', count: 1}, station: 'workbench', ingredients: [{item: 'logOak', count: 2}, {item: 'silk', count: 1}, {item: 'wireCopper', count: 1}]},
   {result: {item: 'bugNetGold', count: 1}, station: 'workbench', ingredients: [{item: 'logMahogany', count: 2}, {item: 'silk', count: 1}, {item: 'wireGold', count: 1}]},
-  {result: {item: 'bugNetCobalt', count: 1}, station: 'workbench', ingredients: [{item: 'logMahogany', count: 2}, {item: 'silk', count: 1}, {item: 'wireCobalt', count: 1}]},
+  {result: {item: 'bugNetCobalt', count: 1}, station: 'workbench', ingredients: [{item: 'logMahogany', count: 2}, {item: 'silk', count: 1}, {item: 'wireCobalt', count: 1}, {item: 'blockHellstone', count: 1}]},
 
   // Pickaxes
   {result: {item: 'pickaxeCopper', count: 1}, station: 'anvil', ingredients: [{item: 'barCopper', count: 8}, {item: 'logOak', count: 4}, {item: 'cutTopaz', count: 1}]},
