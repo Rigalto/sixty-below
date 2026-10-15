@@ -124,7 +124,7 @@ Mining Loot: {{node:{3}:mining[:items[0]:item|link}}
   metalChunksRow: '| [[node:{1}]] | [[item:{2}]] | {{item:{2}:star|star}} | [[item:{3}]] | {{item:{3}:star|star}} |',
   metalBarsRow: '| [[item:{1}]] | {{item:{1}:star|star}} | {{recipe:{2}|station}} | [[item:{2}]] | {{item:{2}:star|star}} |',
   gemRawRow: '| [[node:{1}]] | [[item:{2}]] | {{item:{2}:star|star}} | [[item:{3}]] | {{item:{3}:star|star}} |',
-  gemCutRow: '| [[item:{1}]] | {{item:{1}:star|star}} | [[item:stoneBench]] | [[item:{2}]] | {{item:{2}:star|star}} |',
+  gemCutRow: '| [[item:{1}]] | {{item:{1}:star|star}} | [[item:{2}]] | {{item:{2}:star|star}} | [[item:{3}]] | {{item:{3}:star|star}} |',
   lootTableHeader: '| Item | Tier | Amount | Conditions | Modifiers |\n|---|---|---|---|---|',
   additiveNote: '_All modifiers are additive and stack with each other._',
 
@@ -3078,15 +3078,18 @@ The table below details the [[Metal Fittings]] available for each material, incl
     content: `
 **Description**
 
-Gems are rare crafting materials found deep underground. Each gem exists in three forms : gem deposits (placed in the World), raw gem (dropped when mined) and cut gem (shaped at a [[item:stoneBench]]).
+Gems are rare crafting materials found deep underground. Each gem exists in four forms : gem deposits (placed in the World), raw gem (dropped when mined), cut gem (shaped at a [[item:stoneBench]]) and gem dust (left over when cutting).
+
 
 **Forms & Transformation**
 
 | Form | How to obtain | Notes |
 |---|---|---|
-| Gem Deposit | Gem veins placed in the World | Not directly usable |
+| Gem Deposit | Gem veins placed in the World, or formed when two liquids meet | Not directly usable |
 | Raw Gem | Dropped when [[Mining]] deposits | Crafting ingredient |
 | Cut Gem | Cut raw gems at a [[item:stoneBench]] | Crafting ingredient |
+| Gem Dust | Left over when cutting raw gems at a [[item:stoneBench]] | Crafting ingredient for abrasives |
+
 
 **Gem Deposits**
 
@@ -3096,6 +3099,30 @@ Gems are rare crafting materials found deep underground. Each gem exists in thre
 | [[node:ruby]] | {{node:ruby:star|star}} | [[Desert]] | [[Caverns]] |
 | [[node:emerald]] | {{node:emerald:star|star}} | [[Jungle]] | [[Caverns]] |
 | [[node:sapphire]] | {{node:sapphire:star|star}} | All biomes | [[Caverns]] Bottom |
+
+
+**Crystallization**
+
+When two liquids of different kinds touch, the [[node:honey]] or [[node:sap]] tiles in contact instantly turn into a gem deposit:
+
+| Liquid | Meets | Becomes |
+|---|---|---|
+| [[node:honey]] | [[node:water]] or [[node:sea]] | [[node:topaz]] |
+| [[node:sap]] | [[node:water]] or [[node:sea]] | [[node:emerald]] |
+| [[node:honey]] | [[node:sap]] | [[node:ruby]] |
+| [[node:sap]] | [[node:honey]] | [[node:sapphire]] |
+
+* [[node:water]] and the [[node:sea]] never crystallize: only honey and sap do.
+* When honey meets sap, both sides crystallize: the honey into [[node:ruby]], the sap into [[node:sapphire]].
+* The liquid turned into a gem is lost: the pool loses that tile's volume.
+* Water spreading over a pool of honey or sap crystallizes its surface: a single bucket of water can turn up to 16 tiles into a crust of gems.
+* Gems formed this way are ordinary deposits: they are mined like any other.
+
+**How to grow Gems**
+
+* Fill a [[item:bucket]] with one liquid (see [[Buckets]]).
+* Pour it so that it meets a liquid of another kind.
+* Mine the deposits that form at the contact.
 
 **Raw Gems**
 
@@ -3110,12 +3137,14 @@ Raw gems are placed in your [[Inventory]] when mined with a [[Mining Tools|Picka
 
 **Cut Gems**
 
-| Raw Gem | Raw Gem Tier | Crafting Station | Cut Gem | Cut Gem Tier |
-|---|---|---|---|---|
-<<gemCutRow|rawTopaz|cutTopaz>>
-<<gemCutRow|rawRuby|cutRuby>>
-<<gemCutRow|rawEmerald|cutEmerald>>
-<<gemCutRow|rawSapphire|cutSapphire>>
+Raw gems are cut at a [[item:stoneBench]]. Cutting a raw gem yields cut gems and, in the same craft, gem dust.
+
+| Raw Gem | Raw Gem Tier | Cut Gem | Cut Gem Tier | Gem Dust | Gem Dust Tier |
+|---|---|---|---|---|---|
+<<gemCutRow|rawTopaz|cutTopaz|dustTopaz>>
+<<gemCutRow|rawRuby|cutRuby|dustRuby>>
+<<gemCutRow|rawEmerald|cutEmerald|dustEmerald>>
+<<gemCutRow|rawSapphire|cutSapphire|dustSapphire>>
 
 **Usages**
 
@@ -3126,10 +3155,19 @@ Raw gems are placed in your [[Inventory]] when mined with a [[Mining Tools|Picka
 | [[item:cutEmerald]] | {{item:cutEmerald:star|star}} — accessories, weapons | ⏳ |
 | [[item:cutSapphire]] | {{item:cutSapphire:star|star}} — accessories, weapons | ⏳ |
 
+Gem dusts are combined two by two at a [[item:stoneBench]] to craft abrasives:
+
+* <<itemStar|emeri>> — {{recipe:emeri|ingredients}}
+* <<itemStar|corundumPowder>> — {{recipe:corundumPowder|ingredients}}
+
+<hr>
+
 **Tips**
 
-* _Gems are biome-specific — explore the right biome to find the gem you need._ ⏳
-* _Always bring a [[Mining Tools|Pickaxe]] strong enough to mine the gems of the layer you are exploring._ ⏳
+* _Gem veins are biome-specific — explore the right biome to find the gem you need._
+* _Buckets free you from biomes: with [[node:honey]] from a [[Hive]] and [[node:sap]] from the [[Jungle]], you can grow [[node:ruby]] and [[node:sapphire]] anywhere._
+* _Pouring water over a large pool of honey or sap only crystallizes its surface; the liquid below stays trapped under the crust._
+* _Always bring a [[Mining Tools|Pickaxe]] strong enough to mine the gems of the layer you are exploring._
   `
   },
 
