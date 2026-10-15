@@ -1880,18 +1880,50 @@ Coming Soon.⏳
 
 <hr>
 
-**How to collect Water**
+**Effect on Movement**
 
-Coming soon⏳
+* [[Movement Buffs|Movement speed]] is reduced by {{buff:water}}% while the player is in the Sea.
 
-* [[item:bottle]] — small quantity
-* [[item:bucket]] — large quantity
+<hr>
+
+**How the Sea Flows**
+
+* The Sea is inexhaustible: it never runs dry, whatever you take from it or let escape from it.
+* Its surface always stays at sea level.
+* When an opening connects it to an empty space at or below sea level, the Sea floods it gradually, one tile every {{node:sea:viscosity}} ms, until every connected space below sea level is filled.
+* Empty spaces above sea level are never flooded.
+* Water cut off from the Sea (by a block, for example) is no longer part of it: it becomes ordinary [[node:water]] and can be emptied.
+* [[node:sand]] sinks through the Sea; the space it leaves below sea level is filled by the Sea again.
+
+<hr>
+
+**Collection**
+
+* <<itemStar|bottle>> — small quantity
+* <<itemStar|bucket>> — large quantity
+
+**How to fill**
+
+* Hold an empty [[item:bottle]] or [[item:bucket]] in your active [[Hotbar]] slot.
+* Click on a [[node:sea]] tile within your [[Ranges|Interaction Range]].
+* The empty container is consumed and replaced by a [[item:bottleWater]] or a [[item:bucketWater]].
+* The Sea is inexhaustible: filling a container takes nothing from it.
+* The Deep Sea cannot be collected.
+
+<hr>
+
+**Meeting Other Liquids**
+
+* With [[node:water]]: the water joins the Sea. Any water above sea level drains away.
+* With [[node:honey]]: each honey tile in contact turns into [[node:topaz]]. The Sea is unchanged.
+* With [[node:sap]]: each sap tile in contact turns into [[node:emerald]]. The Sea is unchanged.
 
 <hr>
 
 **Tips**
 
-* _The Sea is bordered by [[Sandstone]] walls that prevent it from flooding the world. Destroying these walls may cause seawater to flood tunnels and caverns — potentially destroying entire ecosystems and making large areas of the world inaccessible._ ⏳
+* _The Sea is bordered by [[Sandstone]] walls that prevent it from flooding the world. Destroying these walls may cause seawater to flood tunnels and caverns — potentially destroying entire ecosystems and making large areas of the world inaccessible._
+* _A flood cannot be pumped out: block the breach first, then empty the cut-off water with a [[item:bucket]]._
 * _Deep Sea areas are extremely dangerous — bring strong equipment._ ⏳
   `
   },
