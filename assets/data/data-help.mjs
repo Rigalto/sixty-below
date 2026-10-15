@@ -1720,6 +1720,12 @@ Using a [[item:bottleWater]] from the [[Inventory]] ('Use Item' icon — shortcu
 * With [[node:sap]]: the sap it touches turns into [[node:emerald]]. The water itself is unchanged.
 * Water spreading over honey or sap keeps crystallizing the tiles under it: a single bucket can turn up to 16 tiles of the surface into a crust of [[Gems]].
 
+**Meeting Lava**
+
+* Each tile of water touching [[node:lava]] turns into [[node:obsidian]]. The lava itself is unchanged.
+* This happens whether the water is poured from a bucket or flows from a lake whose bank or floor has been mined.
+* The water turned into Obsidian is lost: the lake loses that tile's volume.
+
 <hr>
 
 **Tips**
@@ -1727,6 +1733,7 @@ Using a [[item:bottleWater]] from the [[Inventory]] ('Use Item' icon — shortcu
 * _Water puddles form naturally in tunnels and caverns._
 * _Removing the solid tile bordering a lake or a puddle will cause the water to flow._
 * _Pour water over honey or sap to harvest [[Gems]] — but beware, the crust spreads as far as the water does._
+* _Pour water on [[node:lava]] to harvest [[node:obsidian]], one of the hardest materials in the world._
 * _Water supports aquatic life: some fish can only be caught in fresh water._ ⏳
   `
   },
@@ -1803,13 +1810,20 @@ Using a [[item:bottleHoney]] from the [[Inventory]] ('Use Item' icon — shortcu
 * The honey turned into a gem is lost: the pool loses that tile's volume.
 * Water spreading over a pool of honey crystallizes its surface: a single bucket can turn up to 16 tiles into a crust of [[Gems]].
 
+**Meeting Lava**
+
+* Each tile of honey touching [[node:lava]] turns into [[node:hellstone]]. The lava itself is unchanged.
+* This happens whether the honey is poured from a bucket or flows from a pool whose bank or floor has been mined.
+* The honey turned into Hellstone is lost: the pool loses that tile's volume.
+
 <hr>
 
 **Tips**
 
 * _Honey slows movement — avoid falling into it without a plan to escape._
 * _Honey flowing toward water seals itself: its front turns into [[node:topaz]] and forms a wall._
-* _Pour honey next to sap to obtain both [[node:ruby]] and [[node:sapphire]]._
+* _Pour honey next to [[node:sap]] to obtain both [[node:ruby]] and [[node:sapphire]]._
+* _Pour honey on [[node:lava]] to harvest [[node:hellstone]]._
 * _The [[Bees]] will defend their honey aggressively — consider building a diversion canal to collect it safely._ ⏳
   `
   },
@@ -1888,6 +1902,12 @@ Using a [[item:bottleSap]] from the [[Inventory]] ('Use Item' icon — shortcut 
 * The sap turned into a gem is lost: the pool loses that tile's volume.
 * Water spreading over a pool of sap crystallizes its surface: a single bucket can turn up to 16 tiles into a crust of [[Gems]].
 
+**Meeting Lava**
+
+* Each tile of sap touching [[node:lava]] turns into [[node:slate]]. The lava itself is unchanged.
+* This happens whether the sap is poured from a bucket or flows from a pool whose bank or floor has been mined.
+* The sap turned into Slate is lost: the pool loses that tile's volume.
+
 <hr>
 
 **Tips**
@@ -1895,7 +1915,8 @@ Using a [[item:bottleSap]] from the [[Inventory]] ('Use Item' icon — shortcut 
 * _Sap Pockets are sealed by [[node:sandstone]] borders — removing them releases the sap._
 * _Sap slows movement — avoid falling into it without a plan to escape._
 * _Sap flowing toward water seals itself: its front turns into [[node:emerald]] and forms a wall._
-* _Pour sap next to honey to obtain both [[node:sapphire]] and [[node:ruby]]._
+* _Pour sap next to [[node:honey]] to obtain both [[node:sapphire]] and [[node:ruby]]._
+* _Pour sap on [[node:lava]] to harvest [[node:slate]]._
   `
   },
   {
@@ -1978,12 +1999,19 @@ Coming Soon.⏳
 * With [[node:honey]]: each honey tile in contact turns into [[node:topaz]]. The Sea is unchanged.
 * With [[node:sap]]: each sap tile in contact turns into [[node:emerald]]. The Sea is unchanged.
 
+**Meeting Lava**
+
+* Each tile of seawater touching [[node:lava]] turns into [[node:obsidian]]. The lava itself is unchanged.
+* The Sea loses nothing: it stays inexhaustible.
+* The Obsidian forms a solid crust over the lava: a flood reaching the lava seals it off.
+
 <hr>
 
 **Tips**
 
 * _The Sea is bordered by [[Sandstone]] walls that prevent it from flooding the world. Destroying these walls may cause seawater to flood tunnels and caverns — potentially destroying entire ecosystems and making large areas of the world inaccessible._
 * _A flood cannot be pumped out: block the breach first, then empty the cut-off water with a [[item:bucket]]._
+* _A flood reaching the [[node:lava]] leaves behind a layer of [[node:obsidian]] — one of the hardest materials in the world._
 * _Deep Sea areas are extremely dangerous — bring strong equipment._ ⏳
   `
   },
@@ -2846,6 +2874,17 @@ Hellstone is an extremely hard volcanic substrat found in the deepest parts of [
 **Main Location**
 
 * [[Caverns]] — [[Desert]], dominant (native substrat)
+* Created by the player by pouring [[node:honey]] onto [[node:lava]]
+
+<hr>
+
+**Creating Hellstone**
+
+* Hold a [[item:bucketHoney]] in your active [[Hotbar]] slot.
+* Click on an empty tile above a [[node:lava]] tile: the honey falls as a drop.
+* Each tile of [[node:honey]] touching the lava turns into Hellstone. The lava itself is unchanged.
+* A flow of honey does the same: mining a tile under a pool of honey lets the honey fall, and each tile reaching the lava turns into Hellstone.
+* _Warning : lava is extremely dangerous — keep your distance and act quickly._
 
 <hr>
 
@@ -2868,13 +2907,18 @@ See [[Mining]], [[Mining Tools]] and [[Mining Buffs]] for details.
 
 <hr>
 
-**Recipes** ⏳
+**Recipes**
 
-* {{recipe:hellstoneBar}}
+| Potion | Tier | Crafting Station | Ingredients |
+| --- | --- | --- | --- |
+<<fullRecipeRow|bugNetCobalt>>
+
+<hr>
 
 **Tips**
 
-* _Hellstone is one of the hardest materials to mine — bring your best pickaxe._ ⏳
+* _Hellstone is one of the hardest materials to mine — bring your best pickaxe._
+* _No need to travel to the [[Desert]] Caverns: a bucket of [[node:honey]] poured on [[node:lava]] creates Hellstone wherever the lava is._
   `
   },
   {
@@ -2940,6 +2984,16 @@ Limestone is a sedimentary substrat found in [[Jungle]] biome. The pale color of
 
 <hr>
 
+**Creating Slate**
+
+* Hold a [[item:bucketSap]] in your active [[Hotbar]] slot.
+* Click on an empty tile above a [[node:lava]] tile: the sap falls as a drop.
+* Each tile of [[node:sap]] touching the lava turns into Slate. The lava itself is unchanged.
+* A flow of sap does the same: mining a tile under a pool of sap lets the sap fall, and each tile reaching the lava turns into Slate.
+* _Warning : lava is extremely dangerous — keep your distance and act quickly._
+
+<hr>
+
 **Flora**
 
 <<floraLine|bamboo>>
@@ -2961,7 +3015,13 @@ See [[Mining]], [[Mining Tools]] and [[Mining Buffs]] for details.
 
 **Recipes** ⏳
 
-* {{recipe:limestoneBlock}}
+Coming Soon ⏳
+
+<hr>
+
+**Tips**
+
+* _No need to travel to the [[Jungle]] Caverns: a bucket of [[node:sap]] poured on [[node:lava]] creates Slate wherever the lava is._
   `
   },
   {
@@ -2979,6 +3039,7 @@ Slate is a hard metamorphic substrat found in the deepest parts of [[Jungle]] bi
 **Main Location**
 
 * [[Caverns]] — [[Jungle]], dominant (native substrat)
+* Created by the player by pouring [[node:sap]] onto [[node:lava]]
 
 <hr>
 
@@ -3376,7 +3437,7 @@ Obsidian is a volcanic glass formed where lava meets water. It is one of the har
 **Main Location**
 
 * [[Caverns]] — all biomes, rare clusters
-* Created by the player by pouring water onto [[node:lava]] ⏳
+* Created by the player by pouring water onto [[node:lava]]
 
 <hr>
 
@@ -3392,16 +3453,19 @@ See [[Mining]], [[Mining Tools]] and [[Mining Buffs]] for details.
 
 <hr>
 
-**Creating Obsidian** ⏳
+**Creating Obsidian**
 
-* Equip a [[item:bottleWater]]
-* Click on an empty tile above a [[node:lava]] tile
-* An Obsidian block appears at the clicked location
+* Hold a [[item:bucketWater]] in your active [[Hotbar]] slot.
+* Click on an empty tile above a [[node:lava]] tile: the water falls as a drop.
+* Each tile of [[node:water]] touching the lava turns into Obsidian. The lava itself is unchanged.
+* A flow of water does the same: mining a tile under a body of water lets the water fall, and each tile reaching the lava turns into Obsidian.
+* The [[Sea]] does the same: seawater reaching the lava turns into Obsidian, which seals the breach.
 * _Warning : lava is extremely dangerous — keep your distance and act quickly._
 
-**Recipes** ⏳
+**Other Liquids on Lava**
 
-* {{recipe:obsidianBlock}}
+* [[node:honey]] touching the lava turns into [[node:hellstone]].
+* [[node:sap]] touching the lava turns into [[node:slate]].
   `
   },
   {
@@ -7645,10 +7709,20 @@ Foraging Tool: <<itemStar|sickleSilver>> or better
 
 <hr>
 
-**Desctruction**
+**Destruction**
 
 * The coral's root system prevents [[Mining|mining]] its supporting [[node:sand]] tile — the pickaxe cannot pass through.
 * [[node:sand]] falling from above can still bury and destroy the coral — it then re-enters the regrowth cycle exactly like a foraged coral, but yields no loot.
+
+<hr>
+
+**Cut Off from the Sea**
+
+* When the water around a coral is cut off from the [[Sea]] (by a block, for example), it becomes ordinary [[node:water]]: the coral dies, but its skeleton stays in place.
+* A dead coral can still be harvested like a living one, with the same tool and the same loot.
+* The skeleton remains as long as the four tiles of the coral hold water, even partially.
+* As soon as one of these tiles runs out of water (emptied with a [[item:bucket]], or drained by a flow), the skeleton crumbles and disappears, without loot. It then re-enters the regrowth cycle.
+* New corals only grow in the [[Sea]], never in water cut off from it.
 
 <hr>
 
@@ -7669,6 +7743,7 @@ Foraging Tool: <<itemStar|sickleSilver>> or better
 **Tips**
 
 * _The ocean always maintains the same number of corals — patience is rewarded._
+* _Cutting off part of the sea does not destroy its corals: harvest their skeletons before draining the water._
 * _Bring a breathing potion before diving to harvest corals._ ⏳
   `
   },

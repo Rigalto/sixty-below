@@ -1140,6 +1140,15 @@ Le contact (une action ou une goutte place une tuile liquide adjacente à une tu
 | HONEY / SAP | HONEY → `RUBY`, SAP → `SAPPHIRE` |
 | SEA / WATER | Fusion en SEA (§11.8) |
 
+Au contact de la `LAVA` (`ETERNAL`, inchangée), la tuile liquide se solidifie en tuile de tier 5, avec la même règle de retrait de contenu :
+
+| Contact | Résultat |
+|---|---|
+| WATER / LAVA | WATER → `OBSIDIAN` |
+| SEA / LAVA | SEA → `OBSIDIAN` (volume de la mer inchangé) |
+| HONEY / LAVA | HONEY → `HELLSTONE` |
+| SAP / LAVA | SAP → `SLATE` |
+
 Le contenu de la tuile cristallisée est retiré : volume de la goutte ; pour une tuile de body, 16, ou le niveau de la rangée haute si elle y est (au moins 1). La surface est recalculée et une séparation éventuelle est vérifiée. Seules les tuiles nouvellement posées déclenchent le contrôle (détection centralisée à l'émission des mutations du `LiquidSystem`).
 
 ### 11.8 SEA

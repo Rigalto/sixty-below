@@ -1760,16 +1760,18 @@ class LiquidSystem {
 
   /**
    * Parcourt les mutations empilées dans #changes et, pour chaque tuile WATER, HONEY, SAP ou SEA
-   * nouvellement posée (et toujours présente), cristallise les contacts avec une autre nature
-   * de liquide 4-adjacente : c'est toujours la tuile HONEY ou SAP impliquée qui devient une
-   * gemme, à sa position (HONEY/SAP : les deux cristallisent). Les cristallisations empilent
-   * leurs propres mutations, qui ne posent aucun liquide.
+   * nouvellement posée (et toujours présente), traite ses contacts 4-adjacents : au contact de
+   * la LAVA, la tuile se solidifie (WATER/SEA → OBSIDIAN, HONEY → HELLSTONE, SAP → SLATE) ; au
+   * contact d'une autre nature de liquide, c'est toujours la tuile HONEY ou SAP impliquée qui
+   * devient une gemme, à sa position (HONEY/SAP : les deux cristallisent). Les cristallisations
+   * empilent leurs propres mutations, qui ne posent aucun liquide.
    */
   #resolveContacts () {
     const WATER = NODES.WATER.code
     const HONEY = NODES.HONEY.code
     const SAP = NODES.SAP.code
     const SEA = NODES.SEA.code
+    const LAVA = NODES.LAVA.code
 
     for (let i = 0; i < this.#changes.length; i++) {
       const {tileIndex, tileNewCode} = this.#changes[i]
@@ -1778,7 +1780,14 @@ class LiquidSystem {
       for (const offset of LIQUID_NEIGHBOR_OFFSETS) {
         const c = tileIndex + offset
         const other = chunkManager.getTileAt(c)
-        if (other === tileNewCode || !(NODES_LOOKUP[other].type & NODE_TYPE.LIQUID)) continue
+
+        if (other === tileNewCode) continue
+        if (other === LAVA) {
+          this.#crystallize(tileIndex, this.#crystalFor(tileNewCode, LAVA))
+          break
+        }
+        if (!(NODES_LOOKUP[other].type & NODE_TYPE.LIQUID)) continue
+
         const gemOther = this.#crystalFor(other, tileNewCode)
         if (gemOther !== 0) this.#crystallize(c, gemOther)
         const gemSelf = this.#crystalFor(tileNewCode, other)
@@ -1790,16 +1799,24 @@ class LiquidSystem {
   }
 
   /**
-   * Gemme produite par une tuile de liquide au contact d'une autre nature.
+   * Tuile solide produite par une tuile de liquide au contact d'une autre nature de liquide ou
+   * de la LAVA.
    * @param {number} self — code du liquide qui cristallise éventuellement
-   * @param {number} other — code du liquide au contact
-   * @returns {number} code de la gemme, 0 si self ne cristallise pas (WATER, SEA, DEEPSEA)
+   * @param {number} other — code du liquide au contact, ou NODES.LAVA.code
+   * @returns {number} code de la tuile produite, 0 si self ne cristallise pas (WATER, SEA ou
+   *   DEEPSEA hors contact LAVA)
    */
   #crystalFor (self, other) {
+    const LAVA = NODES.LAVA.code
     switch (self) {
+      case NODES.WATER.code:
+      case NODES.SEA.code:
+        return other === LAVA ? NODES.OBSIDIAN.code : 0
       case NODES.HONEY.code:
+        if (other === LAVA) return NODES.HELLSTONE.code
         return other === NODES.SAP.code ? NODES.RUBY.code : NODES.TOPAZ.code
       case NODES.SAP.code:
+        if (other === LAVA) return NODES.SLATE.code
         return other === NODES.HONEY.code ? NODES.SAPPHIRE.code : NODES.EMERALD.code
       default:
         return 0
@@ -1807,8 +1824,8 @@ class LiquidSystem {
   }
 
   /**
-   * Cristallise une tuile de goutte ou de body en gemme (une tuile hors système, ex. SEA, est
-   * ignorée).
+   * Cristallise une tuile de goutte ou de body en tuile solide (une tuile hors système, ex.
+   * DEEPSEA, est ignorée).
    * @param {number} tileIndex
    * @param {number} gem — NODES.XXX.code de la gemme
    */
@@ -1837,10 +1854,11 @@ class LiquidSystem {
   }
 
   /**
-   * Remplace une tuile de body par une gemme : la tuile sort du body avec son contenu (16, ou
-   * le niveau de la rangée haute si elle y est, au moins 1), retiré du volume ; rim, référence
-   * et topRow mis à jour ; surface recalculée, séparation éventuelle ; un body vidé est
-   * supprimé. Empile les mutations dans #changes.
+   * Remplace une tuile de body par une tuile solide : la tuile sort du body avec son contenu
+   * (16, ou le niveau de la rangée haute si elle y est, au moins 1), retiré du volume ; rim,
+   * référence et topRow mis à jour ; surface recalculée, séparation éventuelle ; un body vidé
+   * est supprimé. Pour un body SEA (volume infini), seuls le rim, la référence et la séparation
+   * éventuelle sont traités. Empile les mutations dans #changes.
    * @param {LiquidBody} body
    * @param {number} tileIndex
    * @param {number} gem
@@ -1849,7 +1867,7 @@ class LiquidSystem {
     const ids = this.#liquidBodyId
     const onTopRow = (tileIndex >> 10) === body.topRow
     let amount = 16
-    if (onTopRow) {
+    if (onTopRow && !body.isSea) {
       amount = ((body.volume - ((body.tileCount - body.topCount) << 4)) / body.topCount) | 0
       if (amount === 0) amount = 1
     }
@@ -1860,12 +1878,20 @@ class LiquidSystem {
     this.#changes.push({tileIndex, tileOldCode: body.nature, tileNewCode: gem})
     body.tileCount--
     if (onTopRow) body.topCount--
-    body.volume -= amount
+    if (!body.isSea) body.volume -= amount
     for (const offset of LIQUID_NEIGHBOR_OFFSETS) {
       const n = tileIndex + offset
       if (body.rim.has(n) && !this.#touchesBody(n, body.id)) body.rim.delete(n)
     }
     this.#dirty = true
+
+    // SEA : volume infini, la surface ne bouge pas ; séparation éventuelle seulement
+    if (body.isSea) {
+      if (ids[body.refIndex] !== body.id) this.#findReference(body)
+      this.#splitDetached(body, [tileIndex])
+      this.#markUnstable(body)
+      return
+    }
 
     if (body.tileCount === 0) {
       this.#deleteBody(body)
