@@ -7,8 +7,6 @@
 
 ## En cours
 
-* Bug : l'écoulement du sable ne doit pas faire glisser une tuile bloquée au minage ! (exemple sous un cocotier).
-
 ### Code et tests
 - Aligner les buffs et prefixes pour les armures (head = PA, body = PO (ne pas parler de torse), feet = PM + Movement Speed). Ajouter deux préfixes aux armures (Taux critique et domages critiques) pour avoir 4 choix au lieu de deux.
 - Optimiser en utilisant un objet statique pour toutes les buffs composés 'xxxx-range'.
