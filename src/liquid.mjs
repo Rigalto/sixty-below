@@ -1,7 +1,7 @@
 // liquid.mjs — SandFallingSystem - LiquidBody - LiquidSystem
 
 import {IS_DEV, WORLD_WIDTH, WORLD_HEIGHT, MICROTASK, SEA_LEVEL} from './constant.mjs'
-import {eventBus, seededRNG, microTasker, taskScheduler} from './utils.mjs'
+import {eventBus, seededRNG, microTasker, taskScheduler, blockedTiles} from './utils.mjs'
 import {NODES, NODES_LOOKUP, NODE_TYPE} from '../assets/data/data.mjs'
 import {chunkManager} from './world.mjs'
 import {database} from './database.mjs'
@@ -20,9 +20,11 @@ import {camera} from './render.mjs'
    (aucune écriture monde) puis application en bloc (tous les setTileAt avant tout emit), pour
    respecter la cohérence attendue par les listeners synchrones.
 
-   Aucune vérification blockedTiles : le sable écrase tout meuble/plante sur son passage — la
-   suppression du record concerné est déléguée au listener 'world/tile-changed' propre à chaque
-   système existant, pas à SandFallingSystem.
+   Une tuile SAND protégée du minage (blockedTiles.canMine false, ex. les tuiles sous un
+   cocotier ou sous un corail) ne tombe jamais. Aucune vérification blockedTiles sur la
+   destination : le sable écrase tout meuble/plante sur son passage — la suppression du record
+   concerné est déléguée au listener 'world/tile-changed' propre à chaque système existant, pas
+   à SandFallingSystem.
 
    ==================================================================================================== */
 
@@ -109,7 +111,8 @@ class SandFallingSystem {
    * Callback TaskScheduler (exécuté via MicroTasker) : détermination pure, sans écriture
    * monde. Reconstruit entièrement #pending — chaque tuile SAND encore valide est testée
    * (verticale puis diagonale aléatoire si les deux sont possibles) ; les tuiles stables ou
-   * qui ne sont plus SAND sont abandonnées. Un Set 'claimed' évite que deux sources visent
+   * qui ne sont plus SAND sont abandonnées, de même que les tuiles protégées du minage
+   * (blockedTiles), qui ne tombent jamais. Un Set 'claimed' évite que deux sources visent
    * la même destination dans ce passage ; le perdant est conservé dans le nouveau Set pour
    * retenter au prochain tick. Délègue l'écriture monde à applySandFallingMoves en
    * micro-tâche séparée. Réarme la boucle si le nouveau Set n'est pas vide.
@@ -126,6 +129,7 @@ class SandFallingSystem {
 
     for (const tileIndex of this.#pending) {
       if (chunkManager.getTileAt(tileIndex) !== SAND) continue
+      if (!blockedTiles.canMine(tileIndex)) continue // tuile protégée : ne tombe pas
 
       const destination = this.#resolveFallTarget(tileIndex, claimed)
       if (destination === -1) continue // stable
