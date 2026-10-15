@@ -1779,7 +1779,26 @@ Using a [[item:bottleSap]] from the [[Inventory]] ('Use Item' icon — shortcut 
 
 * Restores {{item:bottleSap:using[1]:payload:heal}} [[Health]] points.
 * Applies the Sap buff for {{item:bottleSap:using[0]:duration|time}}: [[Movement Buffs|Movement Speed]] is reduced by {{buff:sap}}%.
-* Applies the Sickness debuff for {{item:bottleSap:using[1]:payload:sickness|time}}, preventing the use of other healing items. ⏳
+* Applies the Sickness debuff for {{item:bottleSap:using[1]:payload:sickness|time}}, preventing the use of other healing items.
+
+<hr>
+
+**How Sap Flows**
+
+* Sap is viscous: it moves one tile every {{node:sap:viscosity}} ms.
+* A body of sap always has a single, flat surface: connected basins level out, like communicating vessels.
+* Only the top row can be partially filled, from 1/16 to 16/16 of a tile.
+* Sap never disappears by itself: when it flows, it only moves.
+* Sap spreads over flat ground until it is a film 1/16 of a tile thick. A full bucket can cover up to 16 tiles.
+* When the ground under a film is removed, the whole film falls as a single drop.
+* Removing a solid tile next to sap makes it flow: it fills hollows below its surface and falls into empty space.
+
+**Blocks and Sand**
+
+* Placing a block in sap pushes the surface up: the sap is displaced, not destroyed.
+* If the sap is trapped under a ceiling and cannot rise, the displaced sap is lost.
+* Removing that block lets the sap fill the hole again, and the surface goes down.
+* [[node:sand]] sinks through sap. The surface rises once, by one tile of sap.
 
 <hr>
 
@@ -1793,14 +1812,30 @@ Using a [[item:bottleSap]] from the [[Inventory]] ('Use Item' icon — shortcut 
 * Hold an empty [[item:bottle]] or [[item:bucket]] in your active [[Hotbar]] slot.
 * Click on a [[node:sap]] tile within your [[Ranges|Interaction Range]].
 * The empty container is consumed and replaced by the matching filled container.
-* With a [[item:bucket]], the sap tile is removed from the world; a [[item:bottle]] leaves it in place.
+* A [[item:bucket]] takes one full tile of sap from the surface of the pool, whatever tile you click on. A [[item:bottle]] takes nothing.
+* A body holding less than one full tile of sap cannot fill a bucket.
+
+**How to pour**
+
+* Click on an empty tile with a [[item:bucketSap]]: the sap falls as a drop.
+
+<hr>
+
+**Meeting Other Liquids**
+
+* With [[Water]] or the [[Sea]]: each sap tile in contact turns into [[node:emerald]]. The water is unchanged.
+* With [[node:honey]]: each sap tile in contact turns into [[node:sapphire]], and each honey tile in contact turns into [[node:ruby]].
+* The sap turned into a gem is lost: the pool loses that tile's volume.
+* Water spreading over a pool of sap crystallizes its surface: a single bucket can turn up to 16 tiles into a crust of [[Gems]].
 
 <hr>
 
 **Tips**
 
-* _Sap Pockets are sealed by [[node:sandstone]] borders — removing them releases the sap._ ⏳
+* _Sap Pockets are sealed by [[node:sandstone]] borders — removing them releases the sap._
 * _Sap slows movement — avoid falling into it without a plan to escape._
+* _Sap flowing toward water seals itself: its front turns into [[node:emerald]] and forms a wall._
+* _Pour sap next to honey to obtain both [[node:sapphire]] and [[node:ruby]]._
   `
   },
   {
