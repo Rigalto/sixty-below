@@ -1050,10 +1050,15 @@ Hives are large circular caverns built by [[Bees]] deep in [[Jungle]] biomes. Th
 
 <hr>
 
-**Collecting Honey**
+**Honey**
 
-* [[node:honey]] forms pools on the floor, abundant but dangerous to collect while [[Bees]] are present
-* Collected with a [[item:bottle]] selected in [[Hotbar]] → <<itemStar|bottleHoney>>
+* [[node:honey]] forms pools on the floor, abundant but dangerous to collect while [[Bees]] are present.
+* The honey of the Hive can flow: digging through a wall below its surface lets it escape, very slowly, into the caverns around.
+* It can be collected with a [[item:bottle]] or a [[item:bucket]].
+* It can be poured anywhere with a [[item:bucketHoney]].
+* Water or sap falling on the honey: the honey in contact turns into [[node:topaz]] (water) or [[node:ruby]] (sap — the sap itself turns into [[node:sapphire]]).
+* Honey falling on water or sap: the falling honey turns into [[node:topaz]] (water) or [[node:ruby]] (sap — the sap it touches turns into [[node:sapphire]]).
+* See [[Honey]] for details.
 
 **Mining Hive**
 
@@ -1072,6 +1077,8 @@ See [[Mining]], [[Mining Tools]] and [[Mining Buffs]] for details.
 
 * [[item:bottleHoney]] is used for food or potion ([[item:bottle]] is returned)
 * [[item:blockHive]] can be [[Crafting|smelted]] in a [[item:cookingPot]] → <<itemStar|beeswax>>
+
+<hr>
 
 **Tips**
 
