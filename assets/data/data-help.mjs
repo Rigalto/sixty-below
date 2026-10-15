@@ -1100,6 +1100,17 @@ Sap Lakes are bodies of [[node:sap]] found in [[Jungle]] biomes. Unlike [[Sap Po
 
 <hr>
 
+**Sap**
+
+* The sap of the lake can flow: digging under its surface lets it escape, slowly, into the tunnels and caverns below.
+* It can be collected with a [[item:bottle]] or a [[item:bucket]].
+* It can be poured anywhere with a [[item:bucketSap]].
+* Water or honey falling on the lake: the sap in contact turns into [[node:emerald]] (water) or [[node:sapphire]] (honey — the honey itself turns into [[node:ruby]]).
+* Sap falling on water or honey: the falling sap turns into [[node:emerald]] (water) or [[node:sapphire]] (honey — the honey it touches turns into [[node:ruby]]).
+* See [[Sap]] for details.
+
+<hr>
+
 **Fauna** ⏳
 
 * [[monster:amberSquid]] — [[Fishing]] only
@@ -1109,15 +1120,14 @@ Sap Lakes are bodies of [[node:sap]] found in [[Jungle]] biomes. Unlike [[Sap Po
 
 **Loot** ⏳
 
-* [[node:sap]] — collectable with [[item:bottle]] or [[item:bucket]] ⏳
 * Rare aquatic species unique to Sap environments ⏳
 
 <hr>
 
 **Tips**
 
-* _Sap Lakes are one of the few accessible sources of [[node:sap]] — bring containers._ ⏳
-* _Sap severely impairs movement — avoid falling in without a plan to escape._ ⏳
+* _Sap Lakes are one of the few accessible sources of [[node:sap]] — bring containers._
+* _Sap severely impairs movement — avoid falling in without a plan to escape._
 * _[[Fishing]] in Sap yields unique species not found in water lakes._ ⏳
   `
   },
@@ -1127,7 +1137,7 @@ Sap Lakes are bodies of [[node:sap]] found in [[Jungle]] biomes. Unlike [[Sap Po
     content: `
 **Description**
 
-Sap Pockets are pressurized elliptical cavities filled with [[node:sap]], found deep in [[Jungle]] biomes. They are sealed by a [[node:sandstone]] border — removing it releases the sap, which can flood nearby tunnels and caverns.
+Sap Pockets are elliptical cavities filled with [[node:sap]], found deep in [[Jungle]] biomes. They are sealed by a [[node:sandstone]] border — removing it releases the sap, which can flood nearby tunnels and caverns.
 
 **Main Location**
 
@@ -1137,6 +1147,17 @@ Sap Pockets are pressurized elliptical cavities filled with [[node:sap]], found 
 
 * [[node:sap]] — fills the entire cavity
 * [[node:sandstone]] — sealing border
+
+<hr>
+
+**Sap**
+
+* The sap of the pocket can flow: opening its border lets it escape, slowly, into the tunnels and caverns around.
+* It can be collected with a [[item:bottle]] or a [[item:bucket]].
+* It can be poured anywhere with a [[item:bucketSap]].
+* Water or honey falling on the pocket: the sap in contact turns into [[node:emerald]] (water) or [[node:sapphire]] (honey — the honey itself turns into [[node:ruby]]).
+* Sap falling on water or honey: the falling sap turns into [[node:emerald]] (water) or [[node:sapphire]] (honey — the honey it touches turns into [[node:ruby]]).
+* See [[Sap]] for details.
 
 <hr>
 
@@ -1158,8 +1179,9 @@ Sap Pockets are pressurized elliptical cavities filled with [[node:sap]], found 
 **Tips**
 
 * _Sap Pockets are sealed — look for [[node:sandstone]] borders in the cave walls to locate one._
-* _Removing the sandstone border releases the sap — make sure you have containers ready._ ⏳
-* _Sap severely impairs movement — avoid falling in without a plan to escape._ ⏳
+* _Removing the sandstone border on the side or below releases the sap — make sure you have containers ready._
+* _Opening the pocket from the top releases nothing: the sap stays in place and can be collected with a bucket, tile by tile._
+* _Sap severely impairs movement — avoid falling in without a plan to escape._
 * _The Mantis is extremely dangerous in the confined space of a Sap Pocket._ ⏳
   `
   },
