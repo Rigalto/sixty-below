@@ -5645,10 +5645,9 @@ Parler d'abord du Glass, puis des Bottles.
     title: 'Buckets',
     category: ['Liquid'],
     content: `
+**Description**
 
-    **Description**
-
-⏳
+A bucket carries one full tile of liquid. It is the only way to move [[node:water]], [[node:honey]] or [[node:sap]] from one place to another.
 
 **Bucket Types**
 
@@ -5657,30 +5656,47 @@ Parler d'abord du Glass, puis des Bottles.
 * <<itemStar|bucketHoney>> — when full of [[node:honey]]
 * <<itemStar|bucketSap>> — when full of [[node:sap]]
 
+<hr>
+
 **[[item:bucket]] Crafting**
 
 <<fullRecipe|bucket>>
 
+<hr>
+
 **How to fill**
 
-* Hold an [[item:bucket]] in your active [[Hotbar]] slot
-* Click on a liquid tile — [[node:water]], [[node:honey]], [[node:sap]] or the [[node:sea]] — to fill it.
+* Hold an [[item:bucket]] in your active [[Hotbar]] slot.
+* Click on a liquid tile — [[node:water]], [[node:honey]], [[node:sap]] or the [[node:sea]] — within your [[Ranges|Interaction Range]].
 * The [[item:bucket]] is consumed and replaced by the matching filled bucket.
-* One tile is removed from the liquid body.
+* The bucket takes one full tile of liquid from the surface of the pool, whatever tile you click on: the surface goes down.
+* A pool holding less than one full tile of liquid cannot fill a bucket.
+* The [[node:sea]] is inexhaustible: it fills an [[item:bucketWater]] and loses nothing.
+* The Deep Sea cannot be collected.
 
 **How to empty**
 
-* Hold an [[item:bucketWater]], [[item:bucketHoney]] or [[item:bucketSap]] in your active [[Hotbar]] slot
-* Click on an empty tile
-* The item si consumed and replaced by an [[item:bucket]]⏳
-* The tile is filled with the liquid ([[node:water]], [[node:honey]] or [[node:sap]])⏳
+* Hold an [[item:bucketWater]], [[item:bucketHoney]] or [[item:bucketSap]] in your active [[Hotbar]] slot.
+* Click on an empty tile within your [[Ranges|Interaction Range]].
+* The filled bucket is consumed and replaced by an [[item:bucket]].
+* The liquid falls as a drop, then joins the liquid it lands on or settles on the ground.
+* On flat ground, one bucket spreads into a film up to 16 tiles wide.
+* A different liquid meeting it may crystallize into [[Gems]]: see the [[Water]], [[Honey]] and [[Sap]] pages.
 
 **Usages**
 
-⏳
+* Buckets move liquids: take [[node:water]], [[node:honey]] or [[node:sap]] in one place and pour it anywhere else.
+* Buckets create [[Gems]]: pour a liquid so that it meets a liquid of a different kind, and the tiles in contact crystallize.
+* An empty [[item:bucket]] can be placed as furniture.
+* An empty [[item:bucket]] can be worn on the head as armor.
+
+<hr>
 
 **Tips**
+
+* _Use buckets to drain a small pool, dig a channel, or bring water to honey or sap to harvest [[Gems]]._
 * _See [[Tableware]] for the full list of containers._
+* _Pour a bucket into a small hollow next to your crafting stations: a [[item:bottle]] takes nothing from a pool, so this little puddle fills bottles endlessly._
     `
   },
 
