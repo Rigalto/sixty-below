@@ -1411,6 +1411,15 @@ Blind Lakes are pockets of water found in the deepest parts of all biomes. They 
 
 <hr>
 
+**Water**
+
+* The water of the lake can flow: opening the cavity below its surface lets it pour out.
+* It can be collected with a [[item:bottle]] or a [[item:bucket]].
+* It can be poured anywhere with a [[item:bucketWater]].
+* See [[Water]] for details.
+
+<hr>
+
 **Fauna** ⏳
 
 * [[monster:blindFish]] — rare, [[Fishing]] only
@@ -1428,6 +1437,7 @@ Blind Lakes are pockets of water found in the deepest parts of all biomes. They 
 **Tips**
 
 * _Blind Lakes have no natural entrance — bring a [[Mining Tools|pickaxe]]._
+* _Dig your way in from above the water: a tunnel reaching the lake below its surface will be flooded as the lake empties into it._
 * _The fish found here are unique to this environment and cannot be found anywhere else._ ⏳
   `
   },
@@ -1453,6 +1463,15 @@ Underground Lakes are pockets of fresh water found below the surface. They are a
 
 <hr>
 
+**Water**
+
+* The water of the lake can flow: digging under its surface lets it escape into the tunnels and caverns below.
+* It can be collected with a [[item:bottle]] or a [[item:bucket]].
+* It can be poured anywhere with a [[item:bucketWater]].
+* See [[Water]] for details.
+
+<hr>
+
 **Fauna** ⏳
 
 * [[monster:caveFish]] — common, [[Fishing]] only
@@ -1469,6 +1488,8 @@ Underground Lakes are pockets of fresh water found below the surface. They are a
 **Tips**
 
 * _Underground Lakes are one of the few sources of fresh water below the surface._
+* _The lake fills only the lower half of its cavity: the upper half is air, so a ceiling can be dug safely._
+* _Mining the floor or a wall below the surface drains the lake into whatever lies beneath — check before digging down._
 * _[[Fishing]] here yields species not found in surface lakes._ ⏳
   `
   },
@@ -1497,6 +1518,15 @@ Surface Lakes are bodies of water found at ground level. Each biome has its own 
 
 <hr>
 
+**Water**
+
+* The water of the lake can flow: digging into a bank lets it escape and fill the hollows below.
+* It can be collected with a [[item:bottle]] or a [[item:bucket]].
+* It can be poured anywhere with a [[item:bucketWater]].
+* See [[Water]] for details.
+
+<hr>
+
 **Fauna** ⏳
 
 * Surface fish species — common, [[Fishing]] only
@@ -1514,6 +1544,7 @@ Surface Lakes are bodies of water found at ground level. Each biome has its own 
 **Tips**
 
 * _Surface Lakes are the most accessible source of water early in the game._
+* _Surface Lakes are the most accessible source of water early in the game. Each bucket taken lowers the lake: it does not refill by itself._
 * _The Desert Oasis is a landmark — it often signals the presence of underground resources nearby._ ⏳
 * _Each lake has a deeper pit section — [[Fishing]] there yields rarer catches._ ⏳
   `
