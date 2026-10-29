@@ -7743,8 +7743,8 @@ class SpreadForestSystem {
     const W = WORLD_WIDTH
 
     if (chunkManager.getTileAt(tileIndex) !== DIRT ||
-        chunkManager.getTileAt(tileIndex - W) !== SKY ||
-        !this.#hasForestGrassNeighbor(tileIndex)) {
+      chunkManager.getTileAt(tileIndex - W) !== SKY ||
+      !this.#hasForestGrassNeighbor(tileIndex)) {
       record.spreadTimestamp = null
       saveManager.queueStaticUpdate({storeName: 'plant', record})
       return
@@ -8056,8 +8056,8 @@ class SpreadJungleSystem {
     const W = WORLD_WIDTH
 
     if (chunkManager.getTileAt(tileIndex) !== SILT ||
-        chunkManager.getTileAt(tileIndex - W) !== SKY ||
-        !this.#hasJungleGrassNeighbor(tileIndex)) {
+      chunkManager.getTileAt(tileIndex - W) !== SKY ||
+      !this.#hasJungleGrassNeighbor(tileIndex)) {
       record.spreadTimestamp = null
       saveManager.queueStaticUpdate({storeName: 'plant', record})
       return
