@@ -7319,8 +7319,7 @@ class CobwebSystem {
     // Micro-task
     this.cobwebGrowth = this.cobwebGrowth.bind(this)
   }
-perlin.png
-histo.png
+
   /**
    * Réinitialise le système. Aucun état interne à ce jour.
    */
